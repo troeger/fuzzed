@@ -6,6 +6,9 @@ from django.http import HttpResponseRedirect
 def teaser(request):
     return render_to_response('teaser.html', {}, context_instance=RequestContext(request))
 
+def editor(request):
+    return render_to_response('editor.html', {}, context_instance=RequestContext(request))
+
 def login(request):
 	if request.POST:
 		if "loginname" in request.POST and "loginpw" in request.POST:
@@ -13,7 +16,7 @@ def login(request):
 			if user is not None:
 				if user.is_active:
 					auth.login(request, user)
-	return HttpResponseRedirect("/")
+	return HttpResponseRedirect("/editor/")
 
 def logout(request):
 	auth.logout(request)
