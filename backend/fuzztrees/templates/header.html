@@ -1,0 +1,14 @@
+<div style="font-size: 70%;text-align: right; width: 100%">
+{% if user.is_authenticated %}
+	<form action="/login">
+	<label for="loginname">Name:</label><input id="loginname" type="text"/>
+	<label for="loginpw">Password:</label><input id="loginpw" type="password"/>
+	<input type="submit" value="Login"/>
+	</form>
+{% else %}
+	{{ user.get_full_name }}
+	<form action="/logout">
+	<input type="submit" value="Logout"/>
+	</form>
+{% endif %}
+</div>
