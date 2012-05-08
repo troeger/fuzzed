@@ -1,14 +1,14 @@
 <div style="font-size: 70%;text-align: right; width: 100%">
-{% if user.is_authenticated and not user.is_anonymous %}
-	Hello {{ user }}
-	<form action="/logout/" method="post">{% csrf_token %}
-	<input type="submit" value="Logout"/>
+{% if user.is_authenticated %}
+	<form action="/login">
+	<label for="loginname">Name:</label><input id="loginname" type="text"/>
+	<label for="loginpw">Password:</label><input id="loginpw" type="password"/>
+	<input type="submit" value="Login"/>
 	</form>
 {% else %}
-	<form action="/login/" method="post">{% csrf_token %}
-	<label for="loginname">Name:</label><input id="loginname" name="loginname" type="text"/>
-	<label for="loginpw">Password:</label><input id="loginpw" name="loginpw" type="password"/>
-	<input type="submit" value="Login"/>
+	{{ user.get_full_name }}
+	<form action="/logout">
+	<input type="submit" value="Logout"/>
 	</form>
 {% endif %}
 </div>
