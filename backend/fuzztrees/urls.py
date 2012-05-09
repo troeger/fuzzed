@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     url(r'^login/', 'fuzztrees.views.login', name='login'),
     url(r'^logout/', 'fuzztrees.views.logout', name='logout'),
     url(r'^editor/', 'fuzztrees.views.editor', name='editor'),
+	url(r'^api/json/','fuzztrees.api.json', name='json'),
 )
 
 urlpatterns += staticfiles_urlpatterns()

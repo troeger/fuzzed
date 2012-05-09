@@ -11,14 +11,14 @@ def editor(request):
 
 def login(request):
 	if request.POST:
-		if "loginname" in request.POST and "loginpw" in request.POST:
-			user=auth.authenticate(username=request.POST["loginname"], password=request.POST["loginpw"])
+		if 'loginname' in request.POST and 'loginpw' in request.POST:
+			user=auth.authenticate(username=request.POST['loginname'], password=request.POST['loginpw'])
 			if user is not None:
 				if user.is_active:
 					auth.login(request, user)
-	return HttpResponseRedirect("/editor/")
+	return HttpResponseRedirect('/editor/')
 
 def logout(request):
 	auth.logout(request)
-	return HttpResponseRedirect("/")
+	return HttpResponseRedirect('/')
 	
