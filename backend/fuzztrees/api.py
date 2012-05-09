@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-import simplejson
+import json as simplejson
 
 def json(request):
 	if request.is_ajax():
