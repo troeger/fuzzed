@@ -1,4 +1,4 @@
-<div style="font-size: 70%;text-align: right; width: 100%">
+<div id="headline" style="font-size: 70%;text-align: right; width: 100%">
 {% if user.is_authenticated and not user.is_anonymous %}
 	Hello {{ user }}
 	<form action="/logout/" method="post">{% csrf_token %}

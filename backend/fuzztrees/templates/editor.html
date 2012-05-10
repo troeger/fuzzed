@@ -5,11 +5,11 @@
 	<script data-main="{{ STATIC_URL }}FuzzEd" src="{{ STATIC_URL }}lib/requirejs/require-1.0.8.min.js" type="text/javascript" language="javascript"></script>
 	<style type="text/css">
 		#editor {
-			position:relative;
-			width:600px;
-			height:600px;
-			margin:auto;
-			overflow:hidden;
+			background-color: #eee;
+		}
+
+		body {
+			margin : 0px;
 		}
 	</style>
 </head>
@@ -17,6 +17,6 @@
 <body>
 	{% include "headline.html" %}
 	<div id="editor">
-	</div>    
+	</div>
 </body>
 </html>
