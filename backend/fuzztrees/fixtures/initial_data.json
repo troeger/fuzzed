@@ -12,7 +12,8 @@
     "pk": 1,
     "fields": {
     	"name" : "TOP",
-    	"graph" : 1
+    	"graph" : 1,
+    	"root" : "True"
     }
   },
   {

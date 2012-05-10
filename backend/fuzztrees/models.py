@@ -10,16 +10,25 @@ class Graph(models.Model):
 class Node(models.Model):
 	name = models.CharField(max_length=255)
 	graph = models.ForeignKey(Graph, null=False, related_name='nodes')
+	root = models.BooleanField(default=False)
 	def __unicode__(self):
-		return self.name
-	def getSubTree(self):
+		if self.root:
+			return self.name+" (root)"
+		else:
+			return self.name
+	def getChildren(self):
 		edges=self.outgoing.all()
 		if len(edges)>0:
-			return [e.dest.getSubTree() for e in edges]
+			return [e.dest.getTreeDict() for e in edges]
 		else:
-			return self
+			return ''
+	def getTreeDict(self):
+		d={'id':self.pk,'name':self.name}
+		kids=self.getChildren()
+		if kids:
+			d['children']=kids
+		return d
 
-	
 class Edge(models.Model):
 	src  = models.ForeignKey(Node, null=False, related_name='outgoing')
 	dest = models.ForeignKey(Node, null=False, related_name='incoming')
@@ -36,3 +45,5 @@ class Property(models.Model):
 			return "Node "+str(node)+":%s = %s"%(self.key, self.val)
 		else:
 			return "Edge "+str(node)+":%s = %s"%(self.key, self.val)
+
+		
