@@ -1,11 +1,14 @@
 <html>
+
 <head>
 <title>FuzzTrees Modeling - Demo Page</title>
-<script language="javascript" type="text/javascript" src="{{ STATIC_URL }}jit.js"></script>
-<script language="javascript" type="text/javascript" src="{{ STATIC_URL }}jquery-1.7.2.min.js"></script>
+
+<script language="javascript" type="text/javascript" src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-1.7.2.min.js"></script>
+<script language="javascript" type="text/javascript" src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-ui-1.8.20.custom.min.js"></script>
+<script language="javascript" type="text/javascript" src="{{ STATIC_URL }}lib/jit/jit-2.0.1.js"></script>
 <script  language="javascript">
 function init(){
-	var jqxhr = $.getJSON("/api/json/", function(data) {
+	var jqxhr = jQuery.getJSON("/api/json/", function(data) {
 		var st = new $jit.ST({
 			injectInto: 'graph',
 			duration: 800,
@@ -64,7 +67,7 @@ function init(){
 </head>
 
 <body onload="init();">
-{% include "headline.html" %}
-<div id="graph"></div>    
+	{% include "headline.html" %}
+	<div id="graph"></div>    
 </body>
 </html>
