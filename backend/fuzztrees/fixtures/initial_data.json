@@ -1,0 +1,84 @@
+[
+  {
+    "model": "fuzztrees.Graph",
+    "pk": 1,
+    "fields": {
+    	"name" : "Example Fault Tree",
+    	"owner" : 1
+    }
+  },
+  {
+    "model": "fuzztrees.Node",
+    "pk": 1,
+    "fields": {
+    	"name" : "TOP",
+    	"graph" : 1
+    }
+  },
+  {
+    "model": "fuzztrees.Node",
+    "pk": 2,
+    "fields": {
+    	"name" : "CPU",
+    	"graph" : 1
+    }
+  },
+  {
+    "model": "fuzztrees.Node",
+    "pk": 3,
+    "fields": {
+    	"name" : "Disc",
+    	"graph" : 1
+    }
+  },
+  {
+    "model": "fuzztrees.Node",
+    "pk": 4,
+    "fields": {
+    	"name" : "Fan",
+    	"graph" : 1
+    }
+  },
+  {
+    "model": "fuzztrees.Node",
+    "pk": 5,
+    "fields": {
+    	"name" : "Chip",
+    	"graph" : 1
+    }
+  },
+  {
+    "model": "fuzztrees.Edge",
+    "pk": 1,
+    "fields": {
+    	"src"  : 1,
+    	"dest" : 2
+    }
+  },
+  {
+    "model": "fuzztrees.Edge",
+    "pk": 2,
+    "fields": {
+    	"src"  : 1,
+    	"dest" : 3
+    }
+  },
+  {
+    "model": "fuzztrees.Edge",
+    "pk": 3,
+    "fields": {
+    	"src"  : 2,
+    	"dest" : 4
+    }
+  },
+  {
+    "model": "fuzztrees.Edge",
+    "pk": 4,
+    "fields": {
+    	"src"  : 2,
+    	"dest" : 5
+    }
+  }
+]
+
+

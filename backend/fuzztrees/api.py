@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from fuzztrees.models import Graph
 import simplejson
 
 def json(request):
@@ -7,6 +8,8 @@ def json(request):
 			print 'Got POST request with JSON data'
 			print request.POST
 		elif request.method == 'GET':
+			g=request.user.graphs.all()[0].getSubTree()
+			print g
 			fan={'id': 'fan', 'name': 'Fan'}
 			chip={'id': 'chip', 'name': 'Chip'}
 			cpu={'id': 'cpu', 'name': 'CPU', 'children': [fan, chip]}
