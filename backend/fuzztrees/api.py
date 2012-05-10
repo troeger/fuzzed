@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from fuzztrees.models import Graph
-import simplejson
+import json as simplejson
 
 def json(request):
 	if request.is_ajax():
