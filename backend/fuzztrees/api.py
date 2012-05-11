@@ -18,7 +18,8 @@ def graph(request, graph_id):
 			#cpu={'id': 'cpu', 'name': 'CPU', 'children': [fan, chip]}
 			#disc={'id': 'disc', 'name': 'Disc'}
 			#tree={'id': 'tree', 'name': 'TOP', 'children': [cpu, disc]}	
-			return HttpResponse(json.dumps(top.getTreeDict()), 'application/javascript')
+			data=json.dumps(top.getTreeDict())
+			return HttpResponse(data, 'application/javascript')
 		return HttpResponseNotAllowed(['GET']) 
 	
 def nodes(request):
