@@ -1,6 +1,7 @@
-define(["FUZZED_HOME/diagram/diagram"], function(Diagram) {
+define(["FUZZED_HOME/diagram/diagram", "FUZZED_HOME/nodes/nodes"], function(Diagram, Nodes) {
     var FuzzEd = {
-        Diagram: Diagram
+        Diagram : Diagram,
+        Nodes   : Nodes
     };
 
     return FuzzEd;
