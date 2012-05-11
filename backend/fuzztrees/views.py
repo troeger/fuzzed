@@ -6,8 +6,9 @@ from django.http import HttpResponseRedirect
 def teaser(request):
     return render_to_response('teaser.html', {}, context_instance=RequestContext(request))
 
-def editor(request):
-    return render_to_response('editor.html', {}, context_instance=RequestContext(request))
+def editor(request, graph_id):
+	graphs=request.user.graphs.all()
+	return render_to_response('editor.html', {'graphs' : graphs, 'graph_id' : graph_id}, context_instance=RequestContext(request))
 
 def login(request):
 	if request.POST:

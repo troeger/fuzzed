@@ -10,8 +10,12 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^login/', 'fuzztrees.views.login', name='login'),
     url(r'^logout/', 'fuzztrees.views.logout', name='logout'),
-    url(r'^editor/', 'fuzztrees.views.editor', name='editor'),
-	url(r'^api/json/','fuzztrees.api.json', name='json'),
+    url(r'^editor/(?P<graph_id>\d+)$', 'fuzztrees.views.editor', name='editor'),
+	url(r'^api/graphs/(?P<graph_id>\d+)$','fuzztrees.api.graph', name='graph'),
+	url(r'^api/graphs/(?P<graph_id>\d+)/nodes$','fuzztrees.api.nodes', name='nodes'),
+	url(r'^api/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$','fuzztrees.api.node', name='node'),
+	url(r'^api/redos$','fuzztrees.api.redos', name='redos'),
+	url(r'^api/undos$','fuzztrees.api.undos', name='undos'),
 )
 
 urlpatterns += staticfiles_urlpatterns()

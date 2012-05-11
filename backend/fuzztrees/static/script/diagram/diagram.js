@@ -2,7 +2,7 @@ define(["JQUERY_HOME/require-jquery", "JIT_HOME/require-jit"], function(jQuery, 
     var headline = jQuery("#fuzzed-toolbar");
 
     // Static diagram properties
-    Diagram.BACKEND_URL    = "/api/json";
+    Diagram.BACKEND_URL    = "/api/graphs/"+graph_id;  // constant comes from web page
     Diagram.CONTAINER      = "fuzzed-editor";
     Diagram.HEIGHT         = jQuery(window).height() - headline.height();
     Diagram.WIDTH          = jQuery(window).width();
