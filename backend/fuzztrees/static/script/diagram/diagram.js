@@ -1,30 +1,21 @@
-define(["JQUERY_HOME/require-jquery", "JIT_HOME/require-jit"], function(jQuery, $jit) {
-    var headline = jQuery("#fuzzed-toolbar");
-
+define(["JQUERY_HOME/require-jquery", "JIT_HOME/require-jit", "FUZZED_HOME/nodes/nodes"], function(jQuery, $jit, Nodes) {
     // Static diagram properties
     Diagram.BACKEND_URL    = "/api/graphs/"+graph_id;  // constant comes from web page
     Diagram.CONTAINER      = "fuzzed-editor";
-    Diagram.HEIGHT         = jQuery(window).height() - headline.height();
+    Diagram.HEIGHT         = jQuery(window).height() - jQuery("#fuzzed-toolbar").height();
     Diagram.WIDTH          = jQuery(window).width();
+
+    Diagram.ORIENTATION    = "top";
     Diagram.SUBTREE_OFFSET = 10;
     Diagram.SIBLING_OFFSET = 10;
     Diagram.ANIMATION_MSEC = 500;
-
-    // Static node properties of the diagram
-    Diagram.NODE           = {};
-    Diagram.NODE.TYPE      = "rectangle";
-    Diagram.NODE.HEIGHT    = 55;
-    Diagram.NODE.WIDTH     = 120;
-    Diagram.NODE.SHADOW    = "#333";
-    Diagram.NODE.BLUR      = 7;
+    Diagram.TRANSITION     = $jit.Trans.Expo.easeOut;
 
     // Static edge properties of the diagram
     Diagram.EDGE           = {};
-    Diagram.EDGE.TYPE      = "bezier";
+    Diagram.EDGE.TYPE      = "line";
     Diagram.EDGE.COLOR     = "#000";
     Diagram.EDGE.WIDTH     = 1;
-    Diagram.EDGE.SHADOW    = "#333";
-    Diagram.EDGE.BLUR      = 35;
 
     function Diagram() {
         this._spaceTree = null;
@@ -53,24 +44,21 @@ define(["JQUERY_HOME/require-jquery", "JIT_HOME/require-jit"], function(jQuery, 
             height              : Diagram.HEIGHT,
 
             // tree
-            orientation         : "top",
+            orientation         : Diagram.ORIENTATION,
             subtreeOffset       : Diagram.SUBTREE_OFFSET,
             siblingOffset       : Diagram.SIBLING_OFFSET,
 
             // animation
             duration            : Diagram.ANIMATION_MSEC,
-            transition          : $jit.Trans.Expo.easeOut,
+            transition          : Diagram.TRANSITION,
 
             // node
             Node                : {
-                type            : Diagram.NODE.TYPE,
-                width           : Diagram.NODE.WIDTH,
-                height          : Diagram.NODE.HEIGHT,
-                overridable     : true,
-                CanvasStyles    : {
-                    shadowColor : Diagram.NODE.SHADOW,
-                    shadowBlur  : Diagram.NODE.BLUR
-                }
+                type            : Nodes.TYPE,
+                width           : Nodes.WIDTH,
+                height          : Nodes.HEIGHT,
+                color           : Nodes.COLOR,
+                overridable     : true
             },
 
             // edge
@@ -78,11 +66,7 @@ define(["JQUERY_HOME/require-jquery", "JIT_HOME/require-jit"], function(jQuery, 
                 type            : Diagram.EDGE.TYPE,
                 color           : Diagram.EDGE.COLOR,
                 lineWidth       : Diagram.EDGE.WIDTH,
-                overridable     : true,
-                CanvasStyles    : {
-                    shadowColor : Diagram.EDGE.SHADOW,
-                    shadowBlur  : Diagram.EDGE.BLUR
-                }
+                overridable     : true
             },
 
             // navigation
@@ -92,27 +76,34 @@ define(["JQUERY_HOME/require-jquery", "JIT_HOME/require-jit"], function(jQuery, 
                 zooming         : true
             },
 
-            onCreateLabel: function(label, node){
-                label.id = node.id;            
-                label.innerHTML = node.name;
-                label.onclick = function(){
-                    if(normal.checked) {
-                      st.onClick(node.id);
-                    } else {
-                    st.setRoot(node.id, 'animate');
-                    }
-                };
-                //set label styles
-                var style = label.style;
-                style.width = 60 + 'px';
-                style.height = 20 + 'px';            
-                style.cursor = 'pointer';
-                style.color = 'black';
-                style.fontSize = '0.8em';
-                style.textAlign= 'center';
-                style.paddingTop = '3px';
+            onCreateLabel: function(domElement, node) {
+                var element = jQuery(domElement);
+
+                element.width(Nodes.WIDTH);
+                element.height(Nodes.HEIGHT);
+                element.html(node.name);
             }
         });
+        tree = {
+            id   : 1,
+            name : "TOP",
+            data : {
+                type : "event"
+            },
+            children : [{
+                id   : 2,
+                name : "CPU",
+                data : {
+                    type : "other"
+                }
+            }, {
+                id   : 3,
+                name : "FAN",
+                data : {
+                    type : "rofl"
+                }
+            }]
+        };
 
         with (this._spaceTree) {
             loadJSON(tree);
