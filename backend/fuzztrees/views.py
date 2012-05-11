@@ -17,7 +17,8 @@ def login(request):
 			if user is not None:
 				if user.is_active:
 					auth.login(request, user)
-	return HttpResponseRedirect('/editor/')
+	firstgraph=request.user.graphs.all()[0]
+	return HttpResponseRedirect('/editor/%u'%firstgraph.pk)
 
 def logout(request):
 	auth.logout(request)
