@@ -1,11 +1,11 @@
 define(["JQUERY_HOME/require-jquery", "JIT_HOME/require-jit"], function(jQuery, $jit) {
-    var headline = jQuery("#headline");
+    var headline = jQuery("#fuzzed-toolbar");
 
     // Static diagram properties
     Diagram.BACKEND_URL    = "/api/json";
-    Diagram.CONTAINER      = "editor";
-    Diagram.HEIGHT         = jQuery(window).height() - headline.offset().top - headline.height();
-    Diagram.WIDTH          = jQuery(document).width();
+    Diagram.CONTAINER      = "fuzzed-editor";
+    Diagram.HEIGHT         = jQuery(window).height() - headline.height();
+    Diagram.WIDTH          = jQuery(window).width();
     Diagram.SUBTREE_OFFSET = 10;
     Diagram.SIBLING_OFFSET = 10;
     Diagram.ANIMATION_MSEC = 500;
@@ -13,14 +13,18 @@ define(["JQUERY_HOME/require-jquery", "JIT_HOME/require-jit"], function(jQuery, 
     // Static node properties of the diagram
     Diagram.NODE           = {};
     Diagram.NODE.TYPE      = "rectangle";
-    Diagram.NODE.HEIGHT    = 50;
-    Diagram.NODE.WIDTH     = 100;
-    Diagram.NODE.COLOR     = "#d00";
+    Diagram.NODE.HEIGHT    = 55;
+    Diagram.NODE.WIDTH     = 120;
+    Diagram.NODE.SHADOW    = "#333";
+    Diagram.NODE.BLUR      = 7;
 
     // Static edge properties of the diagram
     Diagram.EDGE           = {};
-    Diagram.EDGE.TYPE      = "line";
+    Diagram.EDGE.TYPE      = "bezier";
     Diagram.EDGE.COLOR     = "#000";
+    Diagram.EDGE.WIDTH     = 1;
+    Diagram.EDGE.SHADOW    = "#333";
+    Diagram.EDGE.BLUR      = 35;
 
     function Diagram() {
         this._spaceTree = null;
@@ -44,40 +48,48 @@ define(["JQUERY_HOME/require-jquery", "JIT_HOME/require-jit"], function(jQuery, 
     Diagram.prototype._drawDiagram = function(tree) {
         this._spaceTree = new $jit.ST({
             // canvas
-            injectInto      : Diagram.CONTAINER,
-            width           : Diagram.WIDTH,
-            height          : Diagram.HEIGHT,
+            injectInto          : Diagram.CONTAINER,
+            width               : Diagram.WIDTH,
+            height              : Diagram.HEIGHT,
 
             // tree
-            orientation     : "top",
-            subtreeOffset   : Diagram.SUBTREE_OFFSET,
-            siblingOffset   : Diagram.SIBLING_OFFSET,
+            orientation         : "top",
+            subtreeOffset       : Diagram.SUBTREE_OFFSET,
+            siblingOffset       : Diagram.SIBLING_OFFSET,
 
             // animation
-            duration        : Diagram.ANIMATION_MSEC,
-            transition      : $jit.Trans.Expo.easeOut,
+            duration            : Diagram.ANIMATION_MSEC,
+            transition          : $jit.Trans.Expo.easeOut,
 
             // node
-            Node            : {
-                type        : Diagram.NODE.TYPE,
-                width       : Diagram.NODE.WIDTH,
-                height      : Diagram.NODE.HEIGHT,
-                color       : Diagram.NODE.COLOR,
-                overridable : true
+            Node                : {
+                type            : Diagram.NODE.TYPE,
+                width           : Diagram.NODE.WIDTH,
+                height          : Diagram.NODE.HEIGHT,
+                overridable     : true,
+                CanvasStyles    : {
+                    shadowColor : Diagram.NODE.SHADOW,
+                    shadowBlur  : Diagram.NODE.BLUR
+                }
             },
 
             // edge
-            Edge            : {
-                type        : Diagram.EDGE.TYPE,
-                color       : Diagram.EDGE.COLOR,
-                overridable : true
+            Edge                : {
+                type            : Diagram.EDGE.TYPE,
+                color           : Diagram.EDGE.COLOR,
+                lineWidth       : Diagram.EDGE.WIDTH,
+                overridable     : true,
+                CanvasStyles    : {
+                    shadowColor : Diagram.EDGE.SHADOW,
+                    shadowBlur  : Diagram.EDGE.BLUR
+                }
             },
 
             // navigation
-            Navigation      : {
-                enable      : true,
-                panning     : true,
-                zooming     : true
+            Navigation          : {
+                enable          : true,
+                panning         : true,
+                zooming         : true
             },
 
             onCreateLabel: function(label, node){

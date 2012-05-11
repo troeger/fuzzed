@@ -2,21 +2,18 @@
 
 <head>
 	<title>FuzzTrees Modeling - Demo Page</title>
-	<script data-main="{{ STATIC_URL }}FuzzEd" src="{{ STATIC_URL }}lib/requirejs/require-1.0.8.min.js" type="text/javascript" language="javascript"></script>
-	<style type="text/css">
-		#editor {
-			background-color: #eee;
-		}
 
-		body {
-			margin : 0px;
-		}
+	<style type="text/css">
+		@import url("{{ STATIC_URL }}lib/jquery-ui/css/custom-theme/jquery-ui-1.8.20.custom.css");
+		@import url("{{ STATIC_URL }}css/editor.css");
 	</style>
+
+	<script data-main="{{ STATIC_URL }}FuzzEd" src="{{ STATIC_URL }}lib/requirejs/require-1.0.8.min.js" type="text/javascript" language="javascript"></script>
 </head>
 
 <body>
 	{% include "headline.html" %}
-	<div id="editor">
+	<div id="fuzzed-editor">
 	</div>
 </body>
 </html>
