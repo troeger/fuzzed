@@ -14,8 +14,8 @@ urlpatterns = patterns('',
 	url(r'^api/graphs/(?P<graph_id>\d+)$','fuzztrees.api.graph', name='graph'),
 	url(r'^api/graphs/(?P<graph_id>\d+)/nodes$','fuzztrees.api.nodes', name='nodes'),
 	url(r'^api/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$','fuzztrees.api.node', name='node'),
-	url(r'^api/redos$','fuzztrees.api.redos', name='redos'),
-	url(r'^api/undos$','fuzztrees.api.undos', name='undos'),
+	url(r'^api/graphs/(?P<graph_id>\d+)/redos$','fuzztrees.api.redos', name='redos'),
+	url(r'^api/graphs/(?P<graph_id>\d+)/undos$','fuzztrees.api.undos', name='undos'),
 )
 
 urlpatterns += staticfiles_urlpatterns()
