@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadRequest, HttpResponseNotFound
 from fuzztrees.models import Graph
 import json
 
@@ -26,7 +26,10 @@ def graph(request, graph_id):
 	if request.is_ajax():
 		if request.method == 'GET':
 			# fetch graph 
-			g=Graph.objects.get(pk=graph_id, owner=request.user)
+			try:
+				g=Graph.objects.get(pk=graph_id, owner=request.user)
+			except:
+				return HttpResponseNotFound()
 			top=g.nodes.get(root=True)
 			#fan={'id': 'fan', 'name': 'Fan'}
 			#chip={'id': 'chip', 'name': 'Chip'}
@@ -36,6 +39,7 @@ def graph(request, graph_id):
 			data=json.dumps(top.getTreeDict())
 			return HttpResponse(data, 'application/javascript')
 		return HttpResponseNotAllowed(['GET']) 
+	
 	
 def nodes(request, graph_id):
 	if request.is_ajax():
@@ -51,15 +55,17 @@ def node(request, graph_id, node_id):
 			# delete node
 			return HttpResponse(status=200)
 		elif request.method == 'PUT':
-			if 'parent' in request.PUT:
+			if 'parent' in request.POST:
 				# relocate node
 				return HttpResponse(status=200)
-			elif 'key' in request.PUT and 'val' in request.PUT:
+			elif 'key' in request.POST and 'val' in request.POST:
 				# change node property
 				return HttpResponse(status=200)
-			elif 'type' in request.PUT:
+			elif 'type' in request.POST:
 				# change node type			
 				return HttpResponse(status=200)
+			else:
+				return HttpResponseBadRequest()
 		return HttpResponseNotAllowed(['DELETE','PUT']) 
 	
 	
