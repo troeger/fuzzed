@@ -51,7 +51,7 @@ class ApiTestCase(unittest.TestCase):
 	def testRelocateNode(self):
 		node1id=Node.objects.all()[0].pk
 		node2id=Node.objects.all()[1].pk
-		response=self.c.put('/api/graphs/%u/nodes/%u'%(self.graphid, node1id),
+		response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, node1id),
 							{'parent':node2id},
 		                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 200)
@@ -59,7 +59,7 @@ class ApiTestCase(unittest.TestCase):
 
 	def testPropertyChange(self):
 		nodeid=Node.objects.all()[0].pk
-		response=self.c.put('/api/graphs/%u/nodes/%u'%(self.graphid, nodeid),
+		response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, nodeid),
 							{'key':'foo', 'val':'bar'},
 							**{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 200)
@@ -67,8 +67,8 @@ class ApiTestCase(unittest.TestCase):
 
 	def testMorphNode(self):
 		morphid=Node.objects.all()[0].pk
-		response=self.c.put('/api/graphs/%u/nodes/%u'%(self.graphid, morphid),
-							data={'type':'t'},
+		response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, morphid),
+							data={"type":"t"},
 							**{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 200)
 		#TODO: Check if really done

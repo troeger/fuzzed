@@ -58,7 +58,7 @@ def node(request, graph_id, node_id):
 		if request.method == 'DELETE':
 			# delete node
 			return HttpResponse(status=200)
-		elif request.method == 'PUT':
+		elif request.method == 'POST':
 			if 'parent' in request.POST:
 				# relocate node
 				return HttpResponse(status=200)
@@ -70,6 +70,6 @@ def node(request, graph_id, node_id):
 				return HttpResponse(status=200)
 			else:
 				return HttpResponseBadRequest()
-		return HttpResponseNotAllowed(['DELETE','PUT']) 
+		return HttpResponseNotAllowed(['DELETE','POST']) 
 	
 	
