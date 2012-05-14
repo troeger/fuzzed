@@ -38,7 +38,7 @@ class ApiTestCase(unittest.TestCase):
 		response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
 							 {'parent':-1, 'type':'foo'},
 							 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-		self.assertEqual(response.status_code, 404)
+		self.assertEqual(response.status_code, 400)
 		#TODO: Check invalid type
 
 	def testDeleteNode(self):

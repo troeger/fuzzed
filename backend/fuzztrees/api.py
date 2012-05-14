@@ -45,6 +45,10 @@ def nodes(request, graph_id):
 	if request.is_ajax():
 		if request.method == 'POST':
 			if 'parent' in request.POST and 'type' in request.POST:
+				try:
+					parent=Graph.objects.get(pk=request.POST['parent'])
+				except:
+					return HttpResponseBadRequest()			
 				# create node
 				return HttpResponse(status=200)
 		return HttpResponseNotAllowed(['POST']) 
