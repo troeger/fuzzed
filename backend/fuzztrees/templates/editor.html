@@ -5,18 +5,32 @@
 
 	<style type="text/css">
 		@import url("{{ STATIC_URL }}lib/jquery-ui/css/custom-theme/jquery-ui-1.8.20.custom.css");
+		@import url("{{ STATIC_URL }}lib/jquery-ui/css/custom-theme/jquery-ui-layout-1.2.0.css");
 		@import url("{{ STATIC_URL }}css/editor.css");
 	</style>
 
-	<script type="text/javascript">
-		graphId = {{ graph_id }};
-	</script>
+	<!-- libs go statically here -->
+	<script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-1.7.2.min.js" type="text/javascript" language="javascript"></script>
+	<script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-ui-1.8.20.custom.min.js" type="text/javascript" language="javascript"></script>
+	<script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-ui-layout-1.2.0.min.js" type="text/javascript" language="javascript"></script>
+	<script src="{{ STATIC_URL }}lib/jsplumb/jsplumb-1.3.8.min.js" type="text/javascript" language="javascript"></script>
 
-	<script data-main="{{ STATIC_URL }}FuzzEd" src="{{ STATIC_URL }}lib/requirejs/require-1.0.8.min.js" type="text/javascript" language="javascript"></script>
+	<!-- requirejs/own code -->
+	<script src="{{ STATIC_URL }}lib/requirejs/require-1.0.8.min.js" type="text/javascript" language="javascript"></script>
+	<script type="text/javascript" language="javascript">
+		//graphId = {{ graph_id }};
+		require.config({
+			waitSeconds: 5,
+			baseUrl: "script"
+		});
+
+		require(['require'], function() {
+			console.log(jQuery, jsPlumb, "foo", {{ graph_id }});
+		});
+	</script>
 </head>
 
 <body>
-	{% include "headline.html" %}
 	<div id="graphs"><ul>
 		{% for g in graphs %}<li><a href="{% url editor g.pk %}">{{ g.name }}</a></li>{% endfor %}
 	</ul></div>
