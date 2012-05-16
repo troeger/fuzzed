@@ -1,7 +1,7 @@
 [
   {
     "model": "auth.user",
-    "pk": 1,
+    "pk": 2,
     "fields": {
     	"username" : "testadmin",
     	"password" : "pbkdf2_sha256$10000$JNt1EZn2g72p$vX3UFh7g4mPa313pWW4lf4YxkUhL534V8/kxFaQ1XvM="
@@ -12,7 +12,8 @@
     "pk": 1,
     "fields": {
     	"name" : "Example Fault Tree",
-    	"owner" : 1
+    	"owner" : 2,
+    	"type" : 1
     }
   },
   {
@@ -21,39 +22,60 @@
     "fields": {
     	"name" : "TOP",
     	"graph" : 1,
-    	"root" : "True"
+    	"root" : "True",
+    	"type" : 1
     }
   },
   {
     "model": "fuzztrees.Node",
     "pk": 2,
     "fields": {
-    	"name" : "CPU",
-    	"graph" : 1
+    	"graph" : 1,
+    	"type" : 5
     }
   },
   {
     "model": "fuzztrees.Node",
     "pk": 3,
     "fields": {
-    	"name" : "Disc",
-    	"graph" : 1
+    	"name" : "CPU",
+    	"graph" : 1,
+    	"type" : 1
     }
   },
   {
     "model": "fuzztrees.Node",
     "pk": 4,
     "fields": {
-    	"name" : "Fan",
-    	"graph" : 1
+    	"name" : "Disc",
+    	"graph" : 1,
+    	"type" : 1
     }
   },
   {
     "model": "fuzztrees.Node",
     "pk": 5,
     "fields": {
+    	"graph" : 1,
+    	"type" : 5
+    }
+  },
+  {
+    "model": "fuzztrees.Node",
+    "pk": 6,
+    "fields": {
+    	"name" : "Fan",
+    	"graph" : 1,
+    	"type" : 1
+    }
+  },
+  {
+    "model": "fuzztrees.Node",
+    "pk": 7,
+    "fields": {
     	"name" : "Chip",
-    	"graph" : 1
+    	"graph" : 1,
+    	"type" : 1
     }
   },
   {
@@ -68,7 +90,7 @@
     "model": "fuzztrees.Edge",
     "pk": 2,
     "fields": {
-    	"src"  : 1,
+    	"src"  : 2,
     	"dest" : 3
     }
   },
@@ -84,8 +106,24 @@
     "model": "fuzztrees.Edge",
     "pk": 4,
     "fields": {
-    	"src"  : 2,
+    	"src"  : 3,
     	"dest" : 5
+    }
+  },
+  {
+    "model": "fuzztrees.Edge",
+    "pk": 5,
+    "fields": {
+    	"src"  : 5,
+    	"dest" : 6
+    }
+  },
+  {
+    "model": "fuzztrees.Edge",
+    "pk": 6,
+    "fields": {
+    	"src"  : 5,
+    	"dest" : 7
     }
   }
 ]
