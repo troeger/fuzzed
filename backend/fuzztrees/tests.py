@@ -33,7 +33,7 @@ class ApiTestCase(unittest.TestCase):
 		response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
 							 {'parent':parentid, 'type':'foo'},
 							 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.status_code, 201)
 		# test invalid parent ID
 		response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
 							 {'parent':-1, 'type':'foo'},
@@ -45,7 +45,7 @@ class ApiTestCase(unittest.TestCase):
 		delid=Node.objects.all()[0].pk
 		response=self.c.delete('/api/graphs/%u/nodes/%u'%(self.graphid, delid),
 		                       **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.status_code, 204)
 		#TODO: Check if really gone
 
 	def testRelocateNode(self):
@@ -54,7 +54,7 @@ class ApiTestCase(unittest.TestCase):
 		response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, node1id),
 							{'parent':node2id},
 		                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.status_code, 204)
 		#TODO: Check if really done
 
 	def testPropertyChange(self):
@@ -62,7 +62,7 @@ class ApiTestCase(unittest.TestCase):
 		response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, nodeid),
 							{'key':'foo', 'val':'bar'},
 							**{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.status_code, 204)
 		#TODO: Check if really done
 
 	def testMorphNode(self):
@@ -70,19 +70,19 @@ class ApiTestCase(unittest.TestCase):
 		response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, morphid),
 							data={"type":"t"},
 							**{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.status_code, 204)
 		#TODO: Check if really done
 
 	def testRedo(self):
 		response=self.c.post('/api/graphs/%u/redos'%(self.graphid),
 							**{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.status_code, 204)
 		#TODO: Check if really done
 					
 	def testUndo(self):
 		response=self.c.post('/api/graphs/%u/undos'%(self.graphid),
 							**{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-		self.assertEqual(response.status_code, 200)
+		self.assertEqual(response.status_code, 204)
 		#TODO: Check if really done
 				
 				

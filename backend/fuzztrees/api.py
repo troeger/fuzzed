@@ -10,7 +10,7 @@ def undos(request, graph_id):
 
 	Tell the backend that an undo has been issued in the model
 	API Request:  POST /api/graphs/[graphID]/undos, no body
-	API Response: no body
+	API Response: no body, status code 204
 	"""
 	if request.is_ajax():
 		if request.method == 'GET':
@@ -18,7 +18,7 @@ def undos(request, graph_id):
 			return HttpResponse(status=200)
 		elif request.method == 'POST':
 			# Perform top command on undo stack
-			return HttpResponse(status=200)
+			return HttpResponse(status=204)
 		return HttpResponseNotAllowed(['GET', 'POST']) 
 	
 def redos(request, graph_id):
@@ -29,7 +29,7 @@ def redos(request, graph_id):
 
 	Tell the backend that an redo has been issued in the model
 	API Request:  POST /api/graphs/[graphID]/redos, no body
-	API Response: no body
+	API Response: no body, status code 204
 	"""
 	if request.is_ajax():
 		if request.method == 'GET':
@@ -37,16 +37,27 @@ def redos(request, graph_id):
 			return HttpResponse(status=200)
 		elif request.method == 'POST':
 			# Perform top command on redo stack
-			return HttpResponse(status=200)
+			return HttpResponse(status=204)
 		return HttpResponseNotAllowed(['GET', 'POST']) 
-				
-def graph(request, graph_id):
+
+def graphs(request):
 	"""
 	Add new graph in the backend
 	API Request:            POST /api/graphs
-	API Request Parameters: type=[GRAPH_TYPE]
-	API Response:           no body
-
+	API Request Parameters: type=[GRAPH_TYPE], name=[graph name]
+	API Response:           no body, status code 201, location URI for new graph
+	"""	
+	if request.is_ajax():
+		if request.method == 'POST':
+			if 'type' in request.POST and 'name' in request.POST:
+				# add new graph			
+				return HttpResponse(status=201)
+			else:
+				return HttpResponseBadRequest()
+		return HttpResponseNotAllowed(['POST']) 
+				
+def graph(request, graph_id):
+	"""
 	Fetch serialized current graph from backend
 	API Request:  GET /api/graphs/[graphID] , no body
 	API Response: JSON body with serialized graph
@@ -74,7 +85,7 @@ def nodes(request, graph_id):
 	Add new node to graph stored in the backend
 	API Request:            POST /api/graphs/[graphID]/nodes
 	API Request Parameters: parent=[parentID], type=[NODE_TYPE]
-	API Response:           no body
+	API Response:           no body, status code 201, location URI for new node
 	"""
 	if request.is_ajax():
 		if request.method == 'POST':
@@ -84,44 +95,44 @@ def nodes(request, graph_id):
 				except:
 					return HttpResponseBadRequest()			
 				# create node
-				return HttpResponse(status=200)
+				return HttpResponse(status=201)
 		return HttpResponseNotAllowed(['POST']) 
 	
 def node(request, graph_id, node_id):
 	"""
 	Delete node from graph stored in the backend
 	API Request:  DELETE /api/graphs/[graphID]/nodes/[nodeID], no body
-	API Response: no body
+	API Response: no body, status code 204
 
 	Move node to another position in the graph	
 	API Request:            POST /api/graphs/[graphID]/nodes/[nodeID] 
 	API Request Parameters: parent=[nodeID]
-	API Response:           no body
+	API Response:           no body, status code 204
 
 	Change property of a node
 	API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]
 	API Request Parameters: key=... , val=...
-	API Response:           no body
+	API Response:           no body, status code 204
 
 	Morph node to another type
 	API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]
 	API Request Parameters: type=[NODE_TYPE]
-	API Response:           no body
+	API Response:           no body, status code 204
 	"""
 	if request.is_ajax():
 		if request.method == 'DELETE':
 			# delete node
-			return HttpResponse(status=200)
+			return HttpResponse(status=204)
 		elif request.method == 'POST':
 			if 'parent' in request.POST:
 				# relocate node
-				return HttpResponse(status=200)
+				return HttpResponse(status=204)
 			elif 'key' in request.POST and 'val' in request.POST:
 				# change node property
-				return HttpResponse(status=200)
+				return HttpResponse(status=204)
 			elif 'type' in request.POST:
 				# change node type			
-				return HttpResponse(status=200)
+				return HttpResponse(status=204)
 			else:
 				return HttpResponseBadRequest()
 		return HttpResponseNotAllowed(['DELETE','POST']) 
