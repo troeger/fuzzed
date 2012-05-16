@@ -1,0 +1,48 @@
+body {
+    margin:           0;
+    padding:          0px 4px 4px 4px;
+    background-color: #ddd;
+    overflow:         hidden;
+}
+
+.layout {
+    height: 100%;
+}
+
+.north, .west, .center, .east {
+    display: inline-block;
+    border:  1px solid #aaa;
+}
+
+.north {
+    height:     24px;
+    margin:     -2px -6px 0px -6px;
+    overflow:   hidden;
+}
+
+.west, .east {
+    width:            15%;
+    background-color: white;
+}
+
+.center {
+    background-color: white;
+}
+
+.fuzzed-header {
+    height:      24px;
+    font-size:   12px;
+    line-height: 24px;
+    margin:      -1px -1px 0 -1px;
+    padding:     0 10px;
+}
+
+#FuzzEdToolbar {
+    text-align:  right;
+    font-weight: bold;
+    font-size:   10px;
+}
+
+#FuzzEdUserLogin {
+    display: inline;
+}
