@@ -15,16 +15,17 @@ define(function() {
             });
         }
         relayout();
+        jQuery(window).resize(relayout);
 
         
         west.resizable({
             handles: "e",
             resize:  relayout
-        })
+        });
 
         east.resizable({
             handles: "w",
             resize:  relayout
-        })
+        });
     });
 });
