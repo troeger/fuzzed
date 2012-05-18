@@ -2,13 +2,14 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib import auth
 from django.http import HttpResponseRedirect
+from nodes_config import NODE_TYPES
 
 def teaser(request):
     return render_to_response('teaser.html', {}, context_instance=RequestContext(request))
 
 def editor(request, graph_id):
 	graphs=request.user.graphs.all()
-	return render_to_response('editor.html', {'graphs' : graphs, 'graph_id' : graph_id}, context_instance=RequestContext(request))
+	return render_to_response('editor.html', {'graphs' : graphs, 'graph_id' : graph_id, 'node_types' : NODE_TYPES}, context_instance=RequestContext(request))
 
 def login(request):
 	if request.POST:
