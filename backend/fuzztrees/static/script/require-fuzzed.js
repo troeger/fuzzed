@@ -1,5 +1,6 @@
-define(['require-editor'], function(Editor) {
+define(['require-editor', 'require-nodes'], function(Editor, Nodes) {
     return {
-        Editor: Editor
+        Editor: Editor,
+        Nodes:  Nodes
     };
 });

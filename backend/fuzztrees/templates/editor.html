@@ -40,11 +40,7 @@
 <body>
     <div class="ui-layout-north">{% include "toolbar.html" %}</div>
     <div class="ui-layout-west">{% include "shapes.html" %}</div>
-    <div class="ui-layout-center">
-        <ul>
-            {% for g in graphs %}<li><a href="{% url editor g.pk %}">{{ g.name }}</a></li>{% endfor %}
-        </ul>
-    </div>
+    <div class="ui-layout-center"></div>
     <div class="ui-layout-east">{% include "properties.html" %}</div>
 </body>
 </html>
