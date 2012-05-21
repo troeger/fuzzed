@@ -1,5 +1,5 @@
 define(function() {
-
+    
     function Node() {
         this._visualRepresentation = jQuery('<div class="node"></div>')
             .css({
@@ -15,7 +15,6 @@ define(function() {
     Node.prototype.appendTo = function(domElement) {
         jQuery(domElement).append(this._visualRepresentation);
     }
-
 
     return Node;
 })
