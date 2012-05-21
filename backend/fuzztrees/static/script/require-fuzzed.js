@@ -30,4 +30,6 @@ define(['./require-node'], function(Node) {
         var node = new Node();
         node.appendTo(jQuery('.ui-layout-center'));
     });
+    
+    return FuzzEd;
 });

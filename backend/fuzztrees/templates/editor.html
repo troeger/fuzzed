@@ -24,15 +24,15 @@
 	<!-- requirejs and own code -->
 	<script src="{{ STATIC_URL }}lib/requirejs/require-1.0.8.min.js" type="text/javascript" language="javascript"></script>
 	<script type="text/javascript" language="javascript">
-		graphId = {{ graph_id }};
-
 		require.config({
 			baseUrl: "../static/script/",
 			waitSeconds: 5
 		});
 
-		require(["require-fuzzed"], function() {
-			// Instantiate Diagram here later
+		require(["require-fuzzed"], function(FuzzEd) {
+			jQuery(document).ready(function() {
+				new FuzzEd.Editor({{ graph_id }});
+			});
 		});
 	</script>
 </head>

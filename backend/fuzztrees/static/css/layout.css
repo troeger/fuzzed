@@ -11,8 +11,14 @@ body {
     overflow: hidden;
 }
 
-.ui-layout-west > .shapes > p {
-    margin: 0.2em 0;
+#FuzzEdToolbar {
+    text-align:  right;
+    font-weight: bold;
+    font-size:   10px;
+}
+
+#FuzzEdUserLogin {
+    display: inline;
 }
 
 .fuzzed-header {
@@ -23,13 +29,8 @@ body {
     padding:     0 10px;
 }
 
-#FuzzEdToolbar {
-    text-align:  right;
-    font-weight: bold;
-    font-size:   10px;
-    overflow: hidden;
-}
-
-#FuzzEdUserLogin {
-    display: inline;
+.fuzzed-header-close {
+    position: absolute;
+    top:      4px;
+    right:    4px;
 }
