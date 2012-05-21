@@ -5,17 +5,18 @@
 
 	<style type="text/css">
 		@import url("{{ STATIC_URL }}lib/jquery-ui/css/custom-theme/jquery-ui-1.8.20.custom.css");
+        @import url("{{ STATIC_URL }}lib/jquery-layout/layout-default-latest.css");
 		@import url("{{ STATIC_URL }}css/layout.css");
 	</style>
 
-	<!-- jQuery/UI -->
-	<script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-1.7.2.min.js" type="text/javascript" language="javascript"></script>
+    <!-- jQuery -->
+    <script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-1.7.2.min.js" type="text/javascript" language="javascript"></script>
+
+	<!-- jQueryUI -->
 	<script src="{{ STATIC_URL }}lib/jquery-ui/js/jquery-ui-1.8.20.custom.min.js" type="text/javascript" language="javascript"></script>
 
-	<!-- jLayout -->
-	<script src="{{ STATIC_URL }}lib/jlayout/jquery.sizes-0.3.3.js" type="text/javascript" language="javascript"></script>
-	<script src="{{ STATIC_URL }}lib/jlayout/jlayout.border-0.4.js" type="text/javascript" language="javascript"></script>
-	<script src="{{ STATIC_URL }}lib/jlayout/jquery.jlayout-0.1.7.js" type="text/javascript" language="javascript"></script>
+    <!-- jQuery Layout -->
+    <script src="{{ STATIC_URL }}lib/jquery-layout/jquery.layout-latest.js" type="text/javascript" language="javascript"></script>
 
 	<!-- jsPlumb -->
 	<script src="{{ STATIC_URL }}lib/jsplumb/jsplumb-1.3.8.min.js" type="text/javascript" language="javascript"></script>
@@ -37,15 +38,13 @@
 </head>
 
 <body>
-	<div class="layout">
-		<div class="north">{% include "toolbar.html" %}</div>
-		<div class="west">{% include "shapes.html" %}</div>
-		<div class="center">
-			<ul>
-				{% for g in graphs %}<li><a href="{% url editor g.pk %}">{{ g.name }}</a></li>{% endfor %}
-			</ul>
-		</div>
-		<div class="east">{% include "properties.html" %}</div>
-	</div>
+    <div class="ui-layout-north">{% include "toolbar.html" %}</div>
+    <div class="ui-layout-west">{% include "shapes.html" %}</div>
+    <div class="ui-layout-center">
+        <ul>
+            {% for g in graphs %}<li><a href="{% url editor g.pk %}">{{ g.name }}</a></li>{% endfor %}
+        </ul>
+    </div>
+    <div class="ui-layout-east">{% include "properties.html" %}</div>
 </body>
 </html>
