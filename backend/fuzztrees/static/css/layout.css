@@ -20,9 +20,33 @@ body {
     overflow:   hidden;
 }
 
+#FuzzEdToolbar {
+    text-align:  right;
+    font-weight: bold;
+    font-size:   10px;
+}
+
+#FuzzEdUserLogin {
+    display: inline;
+}
+
 .west, .east {
     width:            15%;
     background-color: white;
+}
+
+.fuzzed-header {
+    height:      24px;
+    font-size:   12px;
+    line-height: 24px;
+    margin:      -1px -1px 5px -1px;
+    padding:     0 10px;
+}
+
+.fuzzed-header-close {
+    position: absolute;
+    top:      4px;
+    right:    4px;
 }
 
 .west {
@@ -44,26 +68,6 @@ body {
     background-color: white;
 }
 
-.fuzzed-header {
-    height:      24px;
-    font-size:   12px;
-    line-height: 24px;
-    margin:      -1px -1px 5px -1px;
-    padding:     0 10px;
-}
-
-.fuzzed-header-close {
-    position: absolute;
-    top:      4px;
-    right:    4px;
-}
-
-#FuzzEdToolbar {
-    text-align:  right;
-    font-weight: bold;
-    font-size:   10px;
-}
-
-#FuzzEdUserLogin {
-    display: inline;
+.east {
+    text-align: center;
 }
