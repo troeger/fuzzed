@@ -1,6 +1,7 @@
 from django.utils import unittest
 from django.test.client import Client
 from django.contrib.auth.models import User
+from nodes_config import NODE_TYPES
 from fuzztrees.models import Graph, Node, Edge
 
 class ApiTestCase(unittest.TestCase):
@@ -29,17 +30,24 @@ class ApiTestCase(unittest.TestCase):
 		self.assertEqual(response.status_code, 200)
 
 	def testCreateNode(self):
-		parentid=Node.objects.all()[0].pk
+		oldncount=Graph.objects.get(pk=self.graphid).nodes.count()
+		parent=Node.objects.get(pk=6) # from fixture, FAN basic event
 		response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
-							 {'parent':parentid, 'type':'foo'},
+							 {'parent':parent.pk, 'type':4},    # AND gate
 							 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 201)
+		self.assertIn('Location', response)
+		self.assertEqual(oldncount+1, Graph.objects.get(pk=self.graphid).nodes.count() )
 		# test invalid parent ID
 		response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
-							 {'parent':-1, 'type':'foo'},
+							 {'parent':-1, 'type':1},
 							 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 400)
-		#TODO: Check invalid type
+		# Check invalid type
+		response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
+							 {'parent':parent.pk, 'type':9999},
+							 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+		self.assertEqual(response.status_code, 400)
 
 	def testDeleteNode(self):
 		delid=Node.objects.all()[0].pk
@@ -85,6 +93,15 @@ class ApiTestCase(unittest.TestCase):
 		self.assertEqual(response.status_code, 204)
 		#TODO: Check if really done
 				
-				
-		
+	def testCreateGraph(self):
+		response=self.c.post(	'/api/graphs',
+								data={"type":1, "name":"Second graph"},
+								**{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+		self.assertEqual(response.status_code, 201)
+		self.assertIn('Location', response)
+		# test invalid type
+		response=self.c.post(	'/api/graphs',
+								data={"type":99999, "name":"Third graph"},
+								**{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+		self.assertEqual(response.status_code, 400)
 		

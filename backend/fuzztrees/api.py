@@ -1,7 +1,11 @@
 from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadRequest, HttpResponseNotFound
-from fuzztrees.models import Graph
+from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
+from fuzztrees.models import Graph, Node, Edge, GRAPH_JS_TYPE
+from nodes_config import NODE_TYPES
 import json
 
+@login_required
 def undos(request, graph_id):
 	"""
 	Fetch undo command stack from backend
@@ -20,7 +24,8 @@ def undos(request, graph_id):
 			# Perform top command on undo stack
 			return HttpResponse(status=204)
 		return HttpResponseNotAllowed(['GET', 'POST']) 
-	
+
+@login_required	
 def redos(request, graph_id):
 	"""
 	Fetch redo command stack from backend
@@ -40,6 +45,7 @@ def redos(request, graph_id):
 			return HttpResponse(status=204)
 		return HttpResponseNotAllowed(['GET', 'POST']) 
 
+@login_required
 def graphs(request):
 	"""
 	Add new graph in the backend
@@ -50,12 +56,23 @@ def graphs(request):
 	if request.is_ajax():
 		if request.method == 'POST':
 			if 'type' in request.POST and 'name' in request.POST:
-				# add new graph			
-				return HttpResponse(status=201)
+				# add new graph		
+				try:
+					t=int(request.POST['type'])
+					assert(t in GRAPH_JS_TYPE)
+					g=Graph(name=request.POST['name'], owner=request.user, type=t)
+					g.save()
+				except:
+					return HttpResponseBadRequest()	
+				else:		
+					response=HttpResponse(status=201)
+					response['Location']=reverse('graph', args=[g.pk])
+					return response
 			else:
 				return HttpResponseBadRequest()
 		return HttpResponseNotAllowed(['POST']) 
-				
+
+@login_required				
 def graph(request, graph_id):
 	"""
 	Fetch serialized current graph from backend
@@ -79,7 +96,7 @@ def graph(request, graph_id):
 			return HttpResponse(data, 'application/javascript')
 		return HttpResponseNotAllowed(['GET']) 
 	
-	
+@login_required	
 def nodes(request, graph_id):
 	"""
 	Add new node to graph stored in the backend
@@ -91,13 +108,23 @@ def nodes(request, graph_id):
 		if request.method == 'POST':
 			if 'parent' in request.POST and 'type' in request.POST:
 				try:
-					parent=Graph.objects.get(pk=request.POST['parent'])
-				except:
+					t=int(request.POST['type'])
+					assert(t in NODE_TYPES)
+					g=Graph.objects.get(pk=graph_id)
+					p=Node.objects.get(pk=request.POST['parent'])
+					n=Node(type=t, graph=g) 
+					n.save()
+					e=Edge(src=p, dest=n)
+					e.save()					
+				except Exception, e:
 					return HttpResponseBadRequest()			
-				# create node
-				return HttpResponse(status=201)
+				else:					
+					response=HttpResponse(status=201)
+					response['Location']=reverse('node', args=[g.pk, n.pk])
+					return response
 		return HttpResponseNotAllowed(['POST']) 
-	
+
+@login_required	
 def node(request, graph_id, node_id):
 	"""
 	Delete node from graph stored in the backend
