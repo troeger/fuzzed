@@ -8,7 +8,13 @@ define(['require-oop'], function() {
 
         // epoch timestampe in milliseconds will serve as timestamp
         this._id  = new Date().getTime();
-        this._visualRepresentation = jQuery('.shapes .fuzzed-' + this.type()).clone().css("position", "absolute");
+        var shape = jQuery('.shapes .fuzzed-' + this.type());
+        this._visualRepresentation = shape.clone()
+            .css({
+                'position': 'absolute',
+                'width': shape.css('width'),
+                'height': shape.css('height')
+            });
     };
 
     Node.prototype.id = function() {
