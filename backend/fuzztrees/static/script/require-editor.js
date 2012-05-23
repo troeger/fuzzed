@@ -10,8 +10,6 @@ define(['require-nodes'], function(Nodes) {
         node.appendTo(this._container);
         var node2 = new Nodes.UndevelopedEvent();
         node2.appendTo(this._container);
-        var node3 = new Nodes.UndevelopedEvent();
-        node3.appendTo(this._container);
     }
 
     Editor.prototype._initialize = function() {

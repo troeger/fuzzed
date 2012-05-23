@@ -8,9 +8,7 @@ define(['require-oop'], function() {
 
         // epoch timestampe in milliseconds will serve as timestamp
         this._id  = new Date().getTime();
-        this._visualRepresentation = jQuery('.shapes .fuzzed-' + this.type())
-                                        .clone()
-                                        .draggable();
+        this._visualRepresentation = jQuery('.shapes .fuzzed-' + this.type()).clone().css("position", "absolute");
     };
 
     Node.prototype.id = function() {
@@ -23,7 +21,7 @@ define(['require-oop'], function() {
 
     Node.prototype.appendTo = function(domElement) {
         jQuery(domElement).append(this._visualRepresentation);
-        
+
         jsPlumb.addEndpoint(this._visualRepresentation, {
             anchor: 'BottomCenter',
             isSource: true,
@@ -34,6 +32,7 @@ define(['require-oop'], function() {
             isSource: false,
             isTarget: true
         });
+
         jsPlumb.draggable(this._visualRepresentation);
     };
 
