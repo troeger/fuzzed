@@ -8,7 +8,11 @@ define(['require-oop'], function() {
 
         // epoch timestampe in milliseconds will serve as timestamp
         this._id  = new Date().getTime();
-        this._visualRepresentation = jQuery('.shapes .fuzzed-' + this.type()).clone().css("position", "absolute");
+        this._visualRepresentation = jQuery('.shapes .fuzzed-' + this.type())
+                                        .clone()
+                                        .css('position', 'absolute')
+                                        .css('top', 0)
+                                        .css('left', 0);
     };
 
     Node.prototype.id = function() {
@@ -16,7 +20,7 @@ define(['require-oop'], function() {
     };
 
     Node.prototype.type = function() {
-        throw "Abstract Method - override type in subclass";
+        throw 'Abstract Method - override type in subclass';
     };
 
     Node.prototype.appendTo = function(domElement) {
@@ -45,20 +49,20 @@ define(['require-oop'], function() {
     BasicEvent.Extends(Node);
 
     BasicEvent.prototype.type = function() {
-        return "basic";
+        return 'basic';
     }
 
     /*
      *  Undeveloped Event
      */
-     function UndevelopedEvent() {
+    function UndevelopedEvent() {
         this.Super.constructor.apply(this, arguments);
-     }
-     UndevelopedEvent.Extends(Node);
+    }
+    UndevelopedEvent.Extends(Node);
 
-     UndevelopedEvent.prototype.type = function() {
-        return "undeveloped";
-     }
+    UndevelopedEvent.prototype.type = function() {
+       return 'undeveloped';
+    }
 
     /*
      *  Return the collection of all nodes for require
