@@ -56,7 +56,9 @@ define(['require-oop'], function() {
             isTarget: true
         });
 
-        jsPlumb.draggable(this._visualRepresentation);
+        jsPlumb.draggable(this._visualRepresentation, {
+            grid: [50, 50]
+        });
     };
 
     /*

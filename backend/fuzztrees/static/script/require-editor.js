@@ -28,7 +28,7 @@ define(['require-nodes'], function(Nodes) {
         var width  = this._body.width();
 
         // horizontal lines
-        for (var y = Editor.GRID_OFFSET; y < height; y += Editor.GRID_OFFSET) {
+        for (var y = Editor.GRID_OFFSET / 2; y < height; y += Editor.GRID_OFFSET) {
             this._paper.path('M0 ' + y + ' L' + width + ' ' + y)
                 .attr('stroke', Editor.GRID_STROKE)
                 .attr('stroke-width', Editor.GRID_STROKE_WIDTH)
@@ -36,7 +36,7 @@ define(['require-nodes'], function(Nodes) {
         }
 
         // vertical lines
-        for (var x = Editor.GRID_OFFSET; x < width; x += Editor.GRID_OFFSET) {
+        for (var x = Editor.GRID_OFFSET / 2; x < width; x += Editor.GRID_OFFSET) {
             this._paper.path('M' + x + ' 0 L' + x + ' ' + height)
                 .attr('stroke', Editor.GRID_STROKE)
                 .attr('stroke-width', Editor.GRID_STROKE_WIDTH)
