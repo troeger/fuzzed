@@ -13,7 +13,9 @@ define(['require-oop'], function() {
             .css({
                 'position': 'absolute',
                 'width': shape.css('width'),
-                'height': shape.css('height')
+                'height': shape.css('height'),
+                'top': 0,
+                'left': 0
             });
     };
 
@@ -22,7 +24,7 @@ define(['require-oop'], function() {
     };
 
     Node.prototype.type = function() {
-        throw "Abstract Method - override type in subclass";
+        throw 'Abstract Method - override type in subclass';
     };
 
     Node.prototype.appendTo = function(domElement) {
@@ -51,20 +53,20 @@ define(['require-oop'], function() {
     BasicEvent.Extends(Node);
 
     BasicEvent.prototype.type = function() {
-        return "basic";
+        return 'basic';
     }
 
     /*
      *  Undeveloped Event
      */
-     function UndevelopedEvent() {
+    function UndevelopedEvent() {
         this.Super.constructor.apply(this, arguments);
-     }
-     UndevelopedEvent.Extends(Node);
+    }
+    UndevelopedEvent.Extends(Node);
 
-     UndevelopedEvent.prototype.type = function() {
-        return "undeveloped";
-     }
+    UndevelopedEvent.prototype.type = function() {
+       return 'undeveloped';
+    }
 
     /*
      *  Return the collection of all nodes for require
