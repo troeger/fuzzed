@@ -9,11 +9,11 @@ define(['require-oop'], function() {
         this._visualRepresentation = jQuery('<div class="node"></div>')
             .css({
                 'display': 'block',
+                'position': 'absolute',
                 'width': 50,
                 'height': 50,
-                'border': '1px solid black'
-                })
-            .draggable();
+                'border': '3px solid black'
+                });
 
     };
 
@@ -23,6 +23,17 @@ define(['require-oop'], function() {
 
     Node.prototype.appendTo = function(domElement) {
         jQuery(domElement).append(this._visualRepresentation);
+        jsPlumb.addEndpoint(this._visualRepresentation, {
+            anchor: 'BottomCenter',
+            isSource: true,
+            isTarget: false
+        });
+        jsPlumb.addEndpoint(this._visualRepresentation, {
+            anchor: 'TopCenter',
+            isSource: false,
+            isTarget: true
+        });
+        jsPlumb.draggable(this._visualRepresentation);
     };
 
     /*
