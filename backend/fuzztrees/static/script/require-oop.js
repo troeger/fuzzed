@@ -1,13 +1,15 @@
 define(function() {
-    Function.prototype.extend = function(parent) {
-        if (parent.constructor != Function) {
-            throw "Cannot inherit from " + parent;
+    Function.prototype.Extends = function(Super) {
+        if (Super.constructor != Function) {
+            throw "Cannot inherit from " + Super;
         }
 
-        this.prototype = new parent();
+        this.prototype = new Super;
         this.prototype.constructor = this;
-        this.prototype.parent = parent.prototype;
-    } 
+        this.prototype.Super = Super.prototype;
 
-    return this;
+        return this;
+    }
+
+    return null;
 });
