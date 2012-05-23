@@ -1,7 +1,8 @@
 from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadRequest, HttpResponseNotFound
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from fuzztrees.models import Graph, Node, Edge, GRAPH_JS_TYPE
+from django.db import transaction
+from fuzztrees.models import Graph, Node, Edge, History, GRAPH_JS_TYPE
 from nodes_config import NODE_TYPES
 import json
 
@@ -18,14 +19,14 @@ def undos(request, graph_id):
 	"""
 	if request.is_ajax():
 		if request.method == 'GET':
-			# Fetch undo stack for the graph
+			#TODO: Fetch undo stack for the graph
 			return HttpResponse(status=200)
 		elif request.method == 'POST':
-			# Perform top command on undo stack
+			#TODO: Perform top command on undo stack
 			return HttpResponse(status=204)
 		return HttpResponseNotAllowed(['GET', 'POST']) 
 
-@login_required	
+@login_required
 def redos(request, graph_id):
 	"""
 	Fetch redo command stack from backend
@@ -38,14 +39,15 @@ def redos(request, graph_id):
 	"""
 	if request.is_ajax():
 		if request.method == 'GET':
-			# Fetch redo stack for the graph
+			#TODO Fetch redo stack for the graph
 			return HttpResponse(status=200)
 		elif request.method == 'POST':
-			# Perform top command on redo stack
+			#TODO Perform top command on redo stack
 			return HttpResponse(status=204)
 		return HttpResponseNotAllowed(['GET', 'POST']) 
 
 @login_required
+@transaction.commit_manually
 def graphs(request):
 	"""
 	Add new graph in the backend
@@ -62,7 +64,11 @@ def graphs(request):
 					assert(t in GRAPH_JS_TYPE)
 					g=Graph(name=request.POST['name'], owner=request.user, type=t)
 					g.save()
+					c=History(command=1, numeric=t)
+					c.save()
+					transaction.commit()
 				except:
+					transaction.rollback()
 					return HttpResponseBadRequest()	
 				else:		
 					response=HttpResponse(status=201)
@@ -72,7 +78,7 @@ def graphs(request):
 				return HttpResponseBadRequest()
 		return HttpResponseNotAllowed(['POST']) 
 
-@login_required				
+@login_required
 def graph(request, graph_id):
 	"""
 	Fetch serialized current graph from backend
@@ -96,7 +102,8 @@ def graph(request, graph_id):
 			return HttpResponse(data, 'application/javascript')
 		return HttpResponseNotAllowed(['GET']) 
 	
-@login_required	
+@login_required
+@transaction.commit_manually
 def nodes(request, graph_id):
 	"""
 	Add new node to graph stored in the backend
@@ -112,11 +119,15 @@ def nodes(request, graph_id):
 					assert(t in NODE_TYPES)
 					g=Graph.objects.get(pk=graph_id)
 					p=Node.objects.get(pk=request.POST['parent'])
-					n=Node(type=t, graph=g) 
+					n=Node(type=t, graph=g)
 					n.save()
 					e=Edge(src=p, dest=n)
-					e.save()					
+					e.save()
+					c=History(command=2, graph=g, node=p, numeric=t)
+					c.save()
+					transaction.commit()
 				except Exception, e:
+					transaction.rollback()
 					return HttpResponseBadRequest()			
 				else:					
 					response=HttpResponse(status=201)
@@ -148,17 +159,17 @@ def node(request, graph_id, node_id):
 	"""
 	if request.is_ajax():
 		if request.method == 'DELETE':
-			# delete node
+			#TODO delete node
 			return HttpResponse(status=204)
 		elif request.method == 'POST':
 			if 'parent' in request.POST:
-				# relocate node
+				#TODO relocate node
 				return HttpResponse(status=204)
 			elif 'key' in request.POST and 'val' in request.POST:
-				# change node property
+				#TODO change node property
 				return HttpResponse(status=204)
 			elif 'type' in request.POST:
-				# change node type			
+				#TODO change node type			
 				return HttpResponse(status=204)
 			else:
 				return HttpResponseBadRequest()

@@ -15,6 +15,11 @@ GRAPH_JS_TYPE = {
 	3: 'rbd'
 }
 
+COMMAND_TYPE = (
+	(1, 'Add graph'),		# graph type ID in numeric field
+	(2, 'Add node') 		# parent node in node field, graph in graph field, node type in numeric field
+)
+
 class Graph(models.Model):
 	name = models.CharField(max_length=255)
 	owner = models.ForeignKey(User, related_name='graphs')
@@ -66,4 +71,10 @@ class Property(models.Model):
 		else:
 			return "Edge "+str(node)+":%s = %s"%(self.key, self.val)
 
-		
+class History(models.Model):
+	command = models.PositiveSmallIntegerField(choices=COMMAND_TYPE, null=False)
+	numeric = models.IntegerField() 		
+	graph = models.ForeignKey(Graph, null=True, related_name='commands')
+	node = models.ForeignKey(Node, null=True)
+	insert_date = models.DateTimeField(null=False, blank=False, auto_now_add=True, editable=False)
+	modification_date = models.DateTimeField(null=False, blank=False, auto_now=True, editable=False)
