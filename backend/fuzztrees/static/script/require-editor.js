@@ -40,7 +40,13 @@ define(['require-nodes'], function(Nodes) {
             Endpoints: [
                 ['Dot', {radius: 5}], 
                 ['Dot', {radius: 5}]
-            ]
+            ],
+            PaintStyle: {
+                lineWidth: 2,
+                strokeStyle: 'rgb(0,0,0)'
+            },
+            Connector: 'Flowchart',
+            Anchors: [ 'BottomMiddle', 'TopMiddle' ]
         });
     }
 
