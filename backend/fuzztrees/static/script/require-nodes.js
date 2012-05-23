@@ -9,6 +9,8 @@ define(['require-oop'], function() {
         // epoch timestampe in milliseconds will serve as timestamp
         this._id  = new Date().getTime();
         var shape = jQuery('.shapes .fuzzed-' + this.type());
+        var _this = this;
+
         this._visualRepresentation = shape.clone()
             .css({
                 'position': 'absolute',
@@ -16,7 +18,20 @@ define(['require-oop'], function() {
                 'height': shape.css('height'),
                 'top': 0,
                 'left': 0
-            });
+            })
+            .hover(
+                function(e) {
+                    jQuery(_this._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', '');
+                    jQuery(_this._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
+                },
+                function(e) {
+                    function hideEndpoints() {
+                        jQuery(_this._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
+                        jQuery(_this._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
+                    }
+                    setTimeout(hideEndpoints, 2000);
+                }
+            );
     };
 
     Node.prototype.id = function() {
@@ -30,12 +45,12 @@ define(['require-oop'], function() {
     Node.prototype.appendTo = function(domElement) {
         jQuery(domElement).append(this._visualRepresentation);
 
-        jsPlumb.addEndpoint(this._visualRepresentation, {
+        this._sourceEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
             anchor: 'BottomCenter',
             isSource: true,
             isTarget: false
         });
-        jsPlumb.addEndpoint(this._visualRepresentation, {
+        this._targetEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
             anchor: 'TopCenter',
             isSource: false,
             isTarget: true
