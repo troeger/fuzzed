@@ -35,14 +35,10 @@ define(['require-nodes'], function(Nodes) {
 
     Editor.prototype._initializeJsPlumb = function() {
         jsPlumb.importDefaults({
-            EndpointStyles: [
-                { fillStyle: '#225588' }, 
-                { fillStyle: '#225566' }
-            ],
-            Endpoints: [
-                ['Dot', {radius: 5}], 
-                ['Dot', {radius: 5}]
-            ],
+            EndpointStyle: {
+                fillStyle: '#00D1E0'
+            },
+            Endpoint: ['Dot', {radius: 7}],
             PaintStyle: {
                 lineWidth: 2,
                 strokeStyle: 'rgb(0,0,0)'
