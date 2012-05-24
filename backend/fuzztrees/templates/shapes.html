@@ -4,7 +4,7 @@
 </div>
 <div class="shapes ui-layout-content">
     {% for key,node in node_types.items %}
-        <img class="fuzzed-{{ node.type }}" src="{{ STATIC_URL }}img/nodes/{{ node.image }}" alt="{{ node.name }}"/>
+        <img id="{{ node.type }}" class="fuzzed-node fuzzed-{{ node.type }}" src="{{ STATIC_URL }}img/nodes/{{ node.image }}" alt="{{ node.name }}"/>
         <p>{{ node.name }}</p>
         <hr>
     {% endfor %}
