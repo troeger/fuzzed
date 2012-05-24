@@ -18,8 +18,8 @@ def teaser(request):
     return render_to_response('teaser.html', {}, context_instance=RequestContext(request))
 
 def editor(request, graph_id):
-	graphs=request.user.graphs.all()
-	return render_to_response('editor.html', {'graphs' : graphs, 'graph_id' : graph_id, 'node_types' : NODE_TYPES}, context_instance=RequestContext(request))
+	g=get_object_or_404(Graph, pk=graph_id, owner=request.user)
+	return render_to_response('editor.html', {'graph' : g, 'node_types' : NODE_TYPES}, context_instance=RequestContext(request))
 
 def login(request):
 	#if request.POST:
