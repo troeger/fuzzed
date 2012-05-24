@@ -1,23 +1,22 @@
-define(['require-oop'], function() {
+define(['require-config', 'require-oop'], function(Config) {
     /*
      *  Abstract node base class
      */
     function Node() {
         // pass here on inheritance calls
         if (this.constructor === Node) return;
-
-        // epoch timestampe in milliseconds will serve as timestamp
+        // epoch timestamp in milliseconds will do as an id
         this._id  = new Date().getTime();
-        var shape = jQuery('.shapes .fuzzed-' + this.type());
-        var _this = this;
 
+        var shape = jQuery(Config.SHAPES_MENU + ' ' + Config.FUZZED_CLASS + this.type());
+        var _this = this;
         this._visualRepresentation = shape.clone()
+            // remove draggable class... thank you jsPlumb for all the weird sanity checks
+            .removeClass('ui-draggable')
             .css({
                 'position': 'absolute',
-                'width': shape.css('width'),
-                'height': shape.css('height'),
-                'top': 0,
-                'left': 0
+                'width':    shape.css('width'),
+                'height':   shape.css('height')
             })
             .hover(
                 function(e) {
@@ -42,22 +41,27 @@ define(['require-oop'], function() {
         throw 'Abstract Method - override type in subclass';
     };
 
-    Node.prototype.appendTo = function(domElement) {
-        jQuery(domElement).append(this._visualRepresentation);
+    Node.prototype.appendTo = function(domElement, x, y) {
+        this._visualRepresentation
+            .appendTo(domElement)
+            .css({
+                top:  y || 0,
+                left: x || 0
+        });
 
         this._sourceEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
-            anchor: 'BottomCenter',
+            anchor:   'BottomCenter',
             isSource: true,
             isTarget: false
         });
         this._targetEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
-            anchor: 'TopCenter',
+            anchor:   'TopCenter',
             isSource: false,
             isTarget: true
         });
 
         jsPlumb.draggable(this._visualRepresentation, {
-            grid: [50, 50]
+            grid: [Config.GRID_SIZE, Config.GRID_SIZE]
         });
     };
 

@@ -1,43 +1,39 @@
-define(['require-nodes'], function(Nodes) {
-    Editor.GRID_STROKE       = '#eee';
-    Editor.GRID_STROKE_WIDTH = 1;
-    Editor.GRID_STROKE_STYLE = '--';
-    Editor.GRID_OFFSET       = 50;
+define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
     function Editor(graphId) {
-        this._initializeMember();
+        this._initializeMember(graphId);
         this._initializeJsPlumb();
+
         this._layout();
         this._drawGrid();
 
-        this._enableShapeDragAndDrop();
-
-        // XXX: test node
-        // var node = new Nodes.BasicEvent();
-        // node.appendTo(this._container);
-        // var node2 = new Nodes.UndevelopedEvent();
-        // node2.appendTo(this._container);
+        this._enableShapeMenu();
     }
 
-    Editor.prototype._initializeMember = function() {
+    Editor.prototype.graphId = function() {
+        return this._graphId;
+    }
+
+    Editor.prototype._initializeMember = function(graphId) {
+        this._graphId   = graphId;
         this._body      = jQuery('body');
-        this._shapes    = this._body.find('#FuzzedShapes');
-        this._container = this._body.find('#FuzzedCanvas');
+        this._shapes    = this._body.find(Config.SHAPES_MENU);
+        this._container = this._body.find(Config.CANVAS);
         this._paper     = Raphael(this._container[0], this._body.width(), this._body.height());
     }
 
     Editor.prototype._initializeJsPlumb = function() {
         jsPlumb.importDefaults({
             EndpointStyle: {
-                fillStyle: '#00D1E0'
+                fillStyle:   Config.JSPLUMB_ENDPOINT_FILL
             },
-            Endpoint: ['Dot', {radius: 7}],
+            Endpoint:        [Config.JSPLUMB_ENDPOINT_STYLE, {radius: Config.JSPLUMB_ENDPOINT_RADIUS}],
             PaintStyle: {
-                lineWidth: 2,
-                strokeStyle: 'black'
+                strokeStyle: Config.JSPLUMB_LINE_STROKE,
+                lineWidth:   Config.JSPLUMB_LINE_STROKE_WIDTH
             },
-            Connector: 'Flowchart',
-            Anchors: [ 'BottomMiddle', 'TopMiddle' ]
+            Connector:       Config.JSPLUMB_LINE_STYLE,
+            Anchors:         ['BottomMiddle', 'TopMiddle']
         });
     }
 
@@ -45,12 +41,12 @@ define(['require-nodes'], function(Nodes) {
         var layoutOptions = {
             defaults: {
                 applyDefaultStyles: false,
-                resizable: false,
-                closable: false,
-                spacing_open: 0
+                resizable:          false,
+                closable:           false,
+                spacing_open:       Config.LAYOUT_SPACING
             },
             north: {
-                size: 24
+                size:               Config.LAYOUT_NORTH_SIZE
             }
         };
 
@@ -62,35 +58,35 @@ define(['require-nodes'], function(Nodes) {
         var width  = this._container.width();
 
         // horizontal lines
-        for (var y = Editor.GRID_OFFSET / 2; y < height; y += Editor.GRID_OFFSET) {
+        for (var y = Config.GRID_SIZE / 2; y < height; y += Config.GRID_SIZE) {
             this._paper.path('M0 ' + y + ' L' + width + ' ' + y)
-                .attr('stroke', Editor.GRID_STROKE)
-                .attr('stroke-width', Editor.GRID_STROKE_WIDTH)
-                .attr('stroke-dasharray', Editor.GRID_STROKE_STYLE);
+                .attr('stroke',           Config.GRID_STROKE)
+                .attr('stroke-width',     Config.GRID_STROKE_WIDTH)
+                .attr('stroke-dasharray', Config.GRID_STROKE_STYLE);
         }
 
         // vertical lines
-        for (var x = Editor.GRID_OFFSET / 2; x < width; x += Editor.GRID_OFFSET) {
+        for (var x = Config.GRID_SIZE / 2; x < width; x += Config.GRID_SIZE) {
             this._paper.path('M' + x + ' 0 L' + x + ' ' + height)
-                .attr('stroke', Editor.GRID_STROKE)
-                .attr('stroke-width', Editor.GRID_STROKE_WIDTH)
-                .attr('stroke-dasharray', Editor.GRID_STROKE_STYLE);
+                .attr('stroke',           Config.GRID_STROKE)
+                .attr('stroke-width',     Config.GRID_STROKE_WIDTH)
+                .attr('stroke-dasharray', Config.GRID_STROKE_STYLE);
         }
     }
 
-    Editor.prototype._enableShapeDragAndDrop = function() {
+    Editor.prototype._enableShapeMenu = function() {
         var _this = this;
 
         this._container.droppable({
-            accept: '.fuzzed-node',
+            accept:    Config.NODES_CLASS,
             tolerance: 'fit',
-            drop: function(a,b,c) {
-                console.log(a,b,c)
+            drop:      function(event, object) {
+                new Nodes.BasicEvent().appendTo(_this._container, event.pageX, event.pageY);
             }
 
         });
 
-        this._shapes.find('.fuzzed-node').draggable({
+        this._shapes.find(Config.NODES_CLASS).draggable({
             helper:   'clone',
             appendTo: 'body',
             revert:   'invalid'
