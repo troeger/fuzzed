@@ -1,11 +1,16 @@
 <html>
 <head>
 <title>FuzzTrees Modeling</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+
 	<style type="text/css">
 		@import url("{{ STATIC_URL }}css/layout.css");
+		@import url("{{ STATIC_URL }}lib/jquery-mobile/jquery.mobile-1.1.0.min.css");
 		@import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
 	</style>
+
     <script src="{{ STATIC_URL }}lib/jquery-ui/development-bundle/jquery-1.7.2.js" type="text/javascript" language="javascript"></script>
+    <script src="{{ STATIC_URL }}lib/jquery-mobile/jquery.mobile-1.1.0.min.js" type="text/javascript" language="javascript"></script>
     <script src="{{ STATIC_URL }}lib/openid-selector/js/openid-jquery.js" type="text/javascript" language="javascript"></script>
     <script src="{{ STATIC_URL }}lib/openid-selector/js/openid-en.js" type="text/javascript" language="javascript"></script>
 	<script type="text/javascript">
@@ -15,27 +20,33 @@
 		});
 	</script>
 </head>
-<body class="gradient">
-	<h1 style="text-align: center">FuzzTrees</h1>
-	<div style="margin-top: 100px; margin-left: auto; margin-right: auto; width: 580px">
-	<form style="text-align:center" action="/login/" method="get" id="openid_form">
-		<input type="hidden" name="action" value="verify" />
-		<fieldset>
-			<legend>Sign-in or Create New Account</legend>
-			<div id="openid_choice">
-				<p>Please click your account provider:</p>
-				<div id="openid_btns"></div>
-			</div>
-			<div id="openid_input_area">
-				<input id="openid_identifier" name="openid_identifier" type="text" value="http://" />
-				<input id="openid_submit" type="submit" value="Sign-In"/>
-			</div>
-			<noscript>
-				<p>OpenID is service that allows you to log-on to many different websites using a single indentity.
-				Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
-			</noscript>
-		</fieldset>
-	</form>
+<body>
+	<div data-role="page">
+		<div data-theme="c"  data-role="header">
+			<h1>FuzzTrees</h1>
+		</div>	
+		<div data-role="content">	
+			<div data-theme="c" style="margin-top: 100px; margin-left: auto; margin-right: auto; width: 580px">
+				<form data-ajax="false" style="text-align:center" action="/login/" method="get" id="openid_form">
+					<input type="hidden" name="action" value="verify" />
+					<fieldset>
+						<legend>Sign-in or Create New Account</legend>
+						<div id="openid_choice">
+							<p>Please click your account provider:</p>
+							<div id="openid_btns"></div>
+						</div>
+						<div id="openid_input_area">
+							<input id="openid_identifier" name="openid_identifier" type="text" value="http://" />
+							<input id="openid_submit" type="submit" value="Sign-In"/>
+						</div>
+						<noscript>
+							<p>OpenID is service that allows you to log-on to many different websites using a single indentity.
+							Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
+						</noscript>
+					</fieldset>
+				</form>
+			</div>	
+		</div>	
 	</div>	
 </body>
 </html>
