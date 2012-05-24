@@ -19,6 +19,20 @@ define(function() {
         JSPLUMB_ENDPOINT_FILL:     '#00d1e0',
         JSPLUMB_ENDPOINT_STYLE:    'Dot',
 
+        // Type Strings
+        BASIC_EVENT:               'basic',
+        UNDEVELOPED_EVENT:         'undeveloped',
+        HOUSE_EVENT:               'house',
+        AND_GATE:                  'and', 
+        OR_GATE:                   'or', 
+        XOR_GATE:                  'xor',
+        PRIORITY_AND_GATE:         'p-and',
+        VOTING_OR_GATE:            'v-or',
+        INHIBIT_GATE:              'inhibit',
+        CHOICE_EVENT:              'choice',
+        REDUNDANCY_EVENT:          'redundancy',
+        BLOCK:                     'block',
+
         // Selectors
         TOOLBAR:                   '#FuzzedToolbar',
         SHAPES_MENU:               '#FuzzedShapes',
