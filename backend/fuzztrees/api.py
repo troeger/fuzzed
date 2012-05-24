@@ -162,8 +162,9 @@ def node(request, graph_id, node_id):
 			try:
 				n=Node.objects.get(pk=node_id)
 				n.delete()
+				c=History(command=3, graph=g, node=n)
+				c.save()
 				transaction.commit()
-				#TODO delete node
 			except:
 				transaction.rollback()
 				return HttpResponseBadRequest()						

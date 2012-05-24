@@ -17,7 +17,8 @@ GRAPH_JS_TYPE = {
 
 COMMAND_TYPE = (
 	(1, 'Add graph'),		# graph type ID in numeric field
-	(2, 'Add node') 		# parent node in node field, graph in graph field, node type in numeric field
+	(2, 'Add node'), 		# parent node in node field, graph in graph field, node type in numeric field
+	(3, 'Delete node')		# graph in graph field, node in node field
 )
 
 class Graph(models.Model):
