@@ -80,17 +80,26 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         this._container.droppable({
             accept:    Config.NODES_CLASS,
             tolerance: 'fit',
-            drop:      function(event, object) {
-                new Nodes.BasicEvent().appendTo(_this._container, event.pageX, event.pageY);
+            drop:      function(uiEvent, uiObject) {
+                _this._handleShapeDrop(uiEvent, uiObject);
             }
-
         });
 
         this._shapes.find(Config.NODES_CLASS).draggable({
             helper:   'clone',
-            appendTo: 'body',
+            appendTo: this._body,
             revert:   'invalid'
         });
+    }
+
+    Editor.prototype._handleShapeDrop = function(uiEvent, uiObject) {
+        var offset   = this._container.position();
+        offset.left += uiEvent.offsetX;
+        offset.top  += uiEvent.offsetY;
+
+        Nodes
+            .fromId(uiObject.draggable.attr('id'))
+            .appendTo(this._container, event.pageX - offset.left, event.pageY - offset.top);
     }
 
     return Editor;
