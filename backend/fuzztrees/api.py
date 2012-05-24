@@ -159,8 +159,16 @@ def node(request, graph_id, node_id):
 	"""
 	if request.is_ajax():
 		if request.method == 'DELETE':
-			#TODO delete node
-			return HttpResponse(status=204)
+			try:
+				n=Node.objects.get(pk=node_id)
+				n.delete()
+				transaction.commit()
+				#TODO delete node
+			except:
+				transaction.rollback()
+				return HttpResponseBadRequest()						
+			else:
+				return HttpResponse(status=204)
 		elif request.method == 'POST':
 			if 'parent' in request.POST:
 				#TODO relocate node

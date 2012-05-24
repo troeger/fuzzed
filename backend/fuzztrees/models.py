@@ -74,6 +74,8 @@ class Property(models.Model):
 class History(models.Model):
 	command = models.PositiveSmallIntegerField(choices=COMMAND_TYPE, null=False)
 	numeric = models.IntegerField() 		
+	text1 = models.CharField(max_length=255)
+	text2 = models.CharField(max_length=255)
 	graph = models.ForeignKey(Graph, null=True, related_name='commands')
 	node = models.ForeignKey(Node, null=True)
 	insert_date = models.DateTimeField(null=False, blank=False, auto_now_add=True, editable=False)
