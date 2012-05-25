@@ -23,20 +23,29 @@ define(['require-config', 'require-oop'], function(Config) {
                 'height':   shape.css('height')
             })
             .hover(
+                // hover in
                 function(e) {
                     clearTimeout(this._hideEndpointsTimeout);
-                    jQuery(jQuery(this).data(Config.DATA_NODE)._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', '');
-                    jQuery(jQuery(this).data(Config.DATA_NODE)._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
+                    var node = jQuery(this).data(Config.DATA_NODE);
+                    jQuery(node._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', '');
+                    jQuery(node._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
                 },
+                // hover out
                 function(e) {
-                    _this = this;
+                    var _this = this;
                     function hideEndpoints() {
-                        jQuery(jQuery(_this).data(Config.DATA_NODE)._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
-                        jQuery(jQuery(_this).data(Config.DATA_NODE)._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
+                        var node = jQuery(_this).data(Config.DATA_NODE);
+                        jQuery(node._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
+                        jQuery(node._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
                     }
                     this._hideEndpointsTimeout = setTimeout(hideEndpoints, 2000);
                 }
-            );
+            )
+            .click(function() {
+                var node = jQuery(this).data(Config.DATA_NODE);
+                jQuery(Config.NODE_CLASS).removeClass('fuzzed-node-selected'); //TODO: config
+                jQuery(this).addClass('fuzzed-node-selected');
+            });
 
         // link back to Node object
         this._visualRepresentation.data(Config.DATA_NODE, this);

@@ -49,6 +49,10 @@
     padding: 0px 5px;
 }
 
+.fuzzed-node-selected {
+    border: 2px solid blue;
+}
+
 .fuzzed-node-thumbnail {
     display: inline;
     margin:  3px 0 5px 0;
