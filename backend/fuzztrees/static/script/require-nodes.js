@@ -20,6 +20,7 @@ define(['require-config', 'require-oop'], function(Config) {
             })
             .hover(
                 function(e) {
+                    clearTimeout(this._hideEndpointsTimeout);
                     jQuery(jQuery(this).data(Config.DATA_NODE)._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', '');
                     jQuery(jQuery(this).data(Config.DATA_NODE)._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
                 },
@@ -29,7 +30,7 @@ define(['require-config', 'require-oop'], function(Config) {
                         jQuery(jQuery(_this).data(Config.DATA_NODE)._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
                         jQuery(jQuery(_this).data(Config.DATA_NODE)._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
                     }
-                    setTimeout(hideEndpoints, 2000);
+                    this._hideEndpointsTimeout = setTimeout(hideEndpoints, 2000);
                 }
             );
 
