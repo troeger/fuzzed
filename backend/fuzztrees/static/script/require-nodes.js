@@ -9,7 +9,6 @@ define(['require-config', 'require-oop'], function(Config) {
         this._id  = new Date().getTime();
 
         var shape = jQuery(Config.SHAPES_MENU + ' #' + this.type());
-        var _this = this;
         this._visualRepresentation = shape.clone()
             // remove draggable class... thank you jsPlumb for all the weird sanity checks
             .removeClass('ui-draggable')
@@ -21,20 +20,20 @@ define(['require-config', 'require-oop'], function(Config) {
             })
             .hover(
                 function(e) {
-                    jQuery(_this._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', '');
-                    jQuery(_this._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
+                    jQuery(jQuery(this).data(Config.DATA_NODE)._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', '');
+                    jQuery(jQuery(this).data(Config.DATA_NODE)._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
                 },
                 function(e) {
                     function hideEndpoints() {
-                        jQuery(_this._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
-                        jQuery(_this._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
+                        jQuery(jQuery(this).data(Config.DATA_NODE)._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
+                        jQuery(jQuery(this).data(Config.DATA_NODE)._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
                     }
                     setTimeout(hideEndpoints, 2000);
                 }
             );
 
         // link back to Node object
-        this._visualRepresentation.data(Config.DATA_NODE);
+        this._visualRepresentation.data(Config.DATA_NODE, this);
     };
 
     Node.prototype.id = function() {
