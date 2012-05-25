@@ -31,9 +31,9 @@ class ApiTestCase(unittest.TestCase):
 
 	def testCreateNode(self):
 		oldncount=Graph.objects.get(pk=self.graphid).nodes.count()
-		parent=Node.objects.get(pk=6) # from fixture, FAN basic event
+		parent=Node.objects.get(pk=5) # from fixture, gate for CPU components
 		response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
-							 {'parent':parent.pk, 'type':4},    # AND gate
+							 {'parent':parent.pk, 'type':1},    # Basic event
 							 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 201)
 		self.assertIn('Location', response)
@@ -50,20 +50,17 @@ class ApiTestCase(unittest.TestCase):
 		self.assertEqual(response.status_code, 400)
 
 	def testDeleteNode(self):
-		delid=Node.objects.all()[0].pk
-		response=self.c.delete('/api/graphs/%u/nodes/%u'%(self.graphid, delid),
+		response=self.c.delete('/api/graphs/%u/nodes/%u'%(self.graphid, 7),
 		                       **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 204)
-		#TODO: Check if really gone
+		#TODO: Check if really gone, including edge from 5
 
 	def testRelocateNode(self):
-		node1id=Node.objects.filter(deleted=False)[0].pk
-		node2id=Node.objects.filter(deleted=False)[1].pk
-		response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, node1id),
-							{'parent':node2id},
+		response=self.c.post('/api/graphs/%u/nodes/6'%self.graphid,
+							{'parent':2},	# OR gate for TOP event, from fixture
 		                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 204)
-		#TODO: Check if really done
+		#TODO: Check if really done, including edge rearrangement
 
 	def testPropertyChange(self):
 		nodeid=Node.objects.filter(deleted=False)[0].pk
