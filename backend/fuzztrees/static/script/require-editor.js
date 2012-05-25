@@ -4,9 +4,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         this._initializeMember(graphId);
         this._initializeJsPlumb();
 
-        this._layout();
         this._drawGrid();
-
         this._enableShapeMenu();
     }
 
@@ -35,28 +33,6 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
             Connector:       Config.JSPLUMB_LINE_STYLE,
             Anchors:         ['BottomMiddle', 'TopMiddle']
         });
-    }
-
-    Editor.prototype._layout = function() {
-        var layoutOptions = {
-            defaults: {
-                applyDefaultStyles: false,
-                resizable:          false,
-                closable:           false,
-                spacing_open:       Config.LAYOUT_SPACING
-            },
-            west:  {
-                size:               Config.LAYOUT_WEST_SIZE
-            },
-            north: {
-                size:               Config.LAYOUT_NORTH_SIZE
-            },
-            east:  {
-                size:               Config.LAYOUT_EAST_SIZE
-            }
-        };
-
-        this._body.layout(layoutOptions);
     }
 
     Editor.prototype._drawGrid = function() {

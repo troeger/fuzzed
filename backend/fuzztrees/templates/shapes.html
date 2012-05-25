@@ -1,8 +1,4 @@
-<div class="fuzzed-header ui-state-default">
-    Shapes
-    <span class="fuzzed-header-close ui-icon ui-icon-close"></span>
-</div>
-<div class="shapes ui-layout-content">
+<div id="FuzzedShapes">
     {% for key,node in node_types.items %}
         <img id="{{ node.type }}" class="fuzzed-node fuzzed-{{ node.type }}" src="{{ STATIC_URL }}img/nodes/{{ node.image }}" alt="{{ node.name }}"/>
         <p>{{ node.name }}</p>

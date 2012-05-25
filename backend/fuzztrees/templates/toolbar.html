@@ -1,4 +1,4 @@
-<div id="FuzzEdToolbar" class="fuzzed-header ui-state-default">
+<div data-role="header" id="FuzzEdToolbar">
 {% if user.is_authenticated and not user.is_anonymous %}
     Hello {{ user }}
     <form id="FuzzEdUserLogin" action="/logout/" method="post">{% csrf_token %}

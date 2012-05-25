@@ -44,7 +44,6 @@ define(function() {
         SHAPES_MENU:               '#FuzzedShapes',
         CANVAS:                    '#FuzzedCanvas',
         PROPERTIES_MENU:           '#FuzzedProperties',
-
         FUZZED_CLASS:              '.fuzzed-',
         NODES_CLASS:               '.fuzzed-node'
     };
