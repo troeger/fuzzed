@@ -9,10 +9,14 @@ define(['require-config', 'require-oop'], function(Config) {
         this._id  = new Date().getTime();
 
         var shape = jQuery(Config.SHAPES_MENU + ' #' + this.type());
-        this._visualRepresentation = shape.clone()
+        var _this = this;
+        this._visualRepresentation = shape
+            .clone()
             // remove draggable class... thank you jsPlumb for all the weird sanity checks
-            .removeClass('ui-draggable')
             .attr('id', shape.attr('id') + this._id)
+            .removeClass('ui-draggable')
+            .removeClass(Config.NODE_THUMBNAIL_CLASS.substr(1))
+            .addClass(Config.NODE_CLASS.substr(1))
             .css({
                 'position': 'absolute',
                 'width':    shape.css('width'),

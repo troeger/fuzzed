@@ -49,6 +49,7 @@ define(function() {
         CANVAS:                    '#FuzzedCanvas',
         PROPERTIES_MENU:           '#FuzzedProperties',
         FUZZED_CLASS:              '.fuzzed-',
-        NODES_CLASS:               '.fuzzed-node'
+        NODE_CLASS:                '.fuzzed-node',
+        NODE_THUMBNAIL_CLASS:      '.fuzzed-node-thumbnail'
     };
 });

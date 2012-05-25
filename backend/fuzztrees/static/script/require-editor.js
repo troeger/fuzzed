@@ -1,7 +1,7 @@
 define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
-    function Editor(graphId) {
-        this._initializeMember(graphId);
+    function Editor(graph) {
+        this._initializeMember(graph);
         this._initializeJsPlumb();
 
         this._drawGrid();
@@ -12,8 +12,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         return this._graphId;
     }
 
-    Editor.prototype._initializeMember = function(graphId) {
-        this._graphId    = graphId;
+    Editor.prototype._initializeMember = function(graph) {
+        this._graphId    = graph;
         this._body       = jQuery('body');
         this._shapes     = this._body.find(Config.SHAPES_MENU);
         this._canvas     = this._body.find(Config.CANVAS);
@@ -62,14 +62,14 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         var _this = this;
 
         this._canvas.droppable({
-            accept:    Config.NODES_CLASS,
+            accept:    Config.NODE_THUMBNAIL_CLASS,
             tolerance: 'fit',
             drop:      function(uiEvent, uiObject) {
                 _this._handleShapeDrop(uiEvent, uiObject);
             }
         });
 
-        this._shapes.find(Config.NODES_CLASS).draggable({
+        this._shapes.find(Config.NODE_THUMBNAIL_CLASS).draggable({
             helper:   'clone',
             opacity:  Config.DRAGGING_OPACITY,
             cursor:   Config.DRAGGING_CURSOR,
@@ -79,14 +79,15 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     Editor.prototype._handleShapeDrop = function(uiEvent, uiObject) {
+        var node = uiObject.draggable.data(Config.DATA_CONSTRUCTOR);
         var position   = this._canvas.position();
         // calculate the position where to drop the element
         // we have to take into account here the offset of the container (position.left/.top)
         // as well as the grid snapping (rounding and Config.GRID_SIZE magic)
-        var x = Math.round((event.pageX - position.left - uiEvent.offsetX) / Config.GRID_SIZE) * Config.GRID_SIZE;
-        var y = Math.round((event.pageY - position.top  - uiEvent.offsetY) / Config.GRID_SIZE) * Config.GRID_SIZE;
+        var x = Math.round((uiEvent.pageX - position.left - uiEvent.offsetX) / Config.GRID_SIZE) * Config.GRID_SIZE;
+        var y = Math.round((uiEvent.pageY - position.top  - uiEvent.offsetY) / Config.GRID_SIZE) * Config.GRID_SIZE;
 
-        (new uiObject.draggable.data(Config.CONSTRUCTOR)).appendTo(this._canvas, x, y);
+        new node().appendTo(this._canvas, x, y);
     }
 
     return Editor;

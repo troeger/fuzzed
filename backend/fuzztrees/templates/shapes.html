@@ -3,8 +3,10 @@
     <div class="ui-grid-a">
         {% for key, node in node_types.items %}
             <div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell">
+                &nbsp
                 <img id="{{ node.type }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}" src="{{ STATIC_URL }}img/nodes/{{ node.image }}" alt="{{ node.name }}"/>
-                <span>{{ node.name }}</span>
+                &nbsp
+                <span class="fuzzed-node-thumbnail-label">{{ node.name }}</span>
             </div> 
         {% endfor %}
     </div>

@@ -50,9 +50,14 @@
 }
 
 .fuzzed-node-thumbnail {
-    display: block;
-    margin:  3px auto 5px auto;
+    display: inline;
+    margin:  3px 0 5px 0;
     height:  30px;
+}
+
+.fuzzed-node-thumbnail-label {
+    /* here be dragons - nasty workaround for the draggable centering problem */
+    display: block;
 }
 
 .fuzzed-node-thumbnail-cell {
