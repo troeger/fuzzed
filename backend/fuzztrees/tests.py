@@ -57,8 +57,8 @@ class ApiTestCase(unittest.TestCase):
 		#TODO: Check if really gone
 
 	def testRelocateNode(self):
-		node1id=Node.objects.all()[0].pk
-		node2id=Node.objects.all()[1].pk
+		node1id=Node.objects.filter(deleted=False)[0].pk
+		node2id=Node.objects.filter(deleted=False)[1].pk
 		response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, node1id),
 							{'parent':node2id},
 		                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
@@ -66,7 +66,7 @@ class ApiTestCase(unittest.TestCase):
 		#TODO: Check if really done
 
 	def testPropertyChange(self):
-		nodeid=Node.objects.all()[0].pk
+		nodeid=Node.objects.filter(deleted=False)[0].pk
 		response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, nodeid),
 							{'key':'foo', 'val':'bar'},
 							**{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
@@ -74,7 +74,7 @@ class ApiTestCase(unittest.TestCase):
 		#TODO: Check if really done
 
 	def testMorphNode(self):
-		morphid=Node.objects.all()[0].pk
+		morphid=Node.objects.filter(deleted=False)[0].pk
 		response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, morphid),
 							data={"type":"t"},
 							**{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
