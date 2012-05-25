@@ -62,7 +62,11 @@ define(['require-config', 'require-oop'], function(Config) {
         });
 
         jsPlumb.draggable(this._visualRepresentation, {
-            grid: [Config.GRID_SIZE, Config.GRID_SIZE]
+            containment: 'parent',
+            opacity:     Config.DRAGGING_OPACITY,
+            cursor:      Config.DRAGGING_CURSOR,
+            grid:        [Config.GRID_SIZE, Config.GRID_SIZE],
+            stack:       Config.NODES_CLASS
         });
     };
 

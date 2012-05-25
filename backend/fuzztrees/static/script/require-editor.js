@@ -15,11 +15,11 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     Editor.prototype._initializeMember = function(graphId) {
-        this._graphId   = graphId;
-        this._body      = jQuery('body');
-        this._shapes    = this._body.find(Config.SHAPES_MENU);
-        this._container = this._body.find(Config.CANVAS);
-        this._paper     = Raphael(this._container[0], this._body.width(), this._body.height());
+        this._graphId    = graphId;
+        this._body       = jQuery('body');
+        this._shapes     = this._body.find(Config.SHAPES_MENU);
+        this._canvas     = this._body.find(Config.CANVAS);
+        this._background = this._canvas.svg().svg('get');
     }
 
     Editor.prototype._initializeJsPlumb = function() {
@@ -54,30 +54,32 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     Editor.prototype._drawGrid = function() {
-        var height = this._container.height();
-        var width  = this._container.width();
+        var height = this._canvas.height();
+        var width  = this._canvas.width();
 
         // horizontal lines
         for (var y = Config.GRID_SIZE / 2; y < height; y += Config.GRID_SIZE) {
-            this._paper.path('M0 ' + y + ' L' + width + ' ' + y)
-                .attr('stroke',           Config.GRID_STROKE)
-                .attr('stroke-width',     Config.GRID_STROKE_WIDTH)
-                .attr('stroke-dasharray', Config.GRID_STROKE_STYLE);
+            this._background.line(0, y, width, y, {
+                stroke:          Config.GRID_STROKE,
+                strokeWidth:     Config.GRID_STROKE_WIDTH,
+                strokeDashArray: Config.GRID_STROKE_STYLE
+            });
         }
 
         // vertical lines
         for (var x = Config.GRID_SIZE / 2; x < width; x += Config.GRID_SIZE) {
-            this._paper.path('M' + x + ' 0 L' + x + ' ' + height)
-                .attr('stroke',           Config.GRID_STROKE)
-                .attr('stroke-width',     Config.GRID_STROKE_WIDTH)
-                .attr('stroke-dasharray', Config.GRID_STROKE_STYLE);
+            this._background.line(x, 0, x, height, {
+                stroke:          Config.GRID_STROKE,
+                strokeWidth:     Config.GRID_STROKE_WIDTH,
+                strokeDashArray: Config.GRID_STROKE_STYLE
+            });
         }
     }
 
     Editor.prototype._enableShapeMenu = function() {
         var _this = this;
 
-        this._container.droppable({
+        this._canvas.droppable({
             accept:    Config.NODES_CLASS,
             tolerance: 'fit',
             drop:      function(uiEvent, uiObject) {
@@ -87,19 +89,24 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
         this._shapes.find(Config.NODES_CLASS).draggable({
             helper:   'clone',
+            opacity:  Config.DRAGGING_OPACITY,
+            cursor:   Config.DRAGGING_CURSOR,
             appendTo: this._body,
             revert:   'invalid'
         });
     }
 
     Editor.prototype._handleShapeDrop = function(uiEvent, uiObject) {
-        var offset   = this._container.position();
-        offset.left += uiEvent.offsetX;
-        offset.top  += uiEvent.offsetY;
+        var position   = this._canvas.position();
+        // calculate the position where to drop the element
+        // we have to take into account here the offset of the container (position.left/.top)
+        // as well as the grid snapping (rounding and Config.GRID_SIZE magic)
+        var x = Math.round((event.pageX - position.left - uiEvent.offsetX) / Config.GRID_SIZE) * Config.GRID_SIZE;
+        var y = Math.round((event.pageY - position.top  - uiEvent.offsetY) / Config.GRID_SIZE) * Config.GRID_SIZE;
 
         Nodes
             .fromId(uiObject.draggable.attr('id'))
-            .appendTo(this._container, event.pageX - offset.left, event.pageY - offset.top);
+            .appendTo(this._canvas, x, y);
     }
 
     return Editor;

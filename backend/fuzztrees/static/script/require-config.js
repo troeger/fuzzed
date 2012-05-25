@@ -8,7 +8,7 @@ define(function() {
         GRID_SIZE:                 50,
         GRID_STROKE:               '#dddddd',
         GRID_STROKE_WIDTH:         1,
-        GRID_STROKE_STYLE:         '--',
+        GRID_STROKE_STYLE:         '7, 3',
 
         // JsPlumb
         JSPLUMB_LINE_STROKE:       '#000000',
@@ -18,6 +18,10 @@ define(function() {
         JSPLUMB_ENDPOINT_RADIUS:   7,
         JSPLUMB_ENDPOINT_FILL:     '#00d1e0',
         JSPLUMB_ENDPOINT_STYLE:    'Dot',
+
+        // Dragging
+        DRAGGING_OPACITY:          0.5,
+        DRAGGING_CURSOR:           'move',
 
         // Type Strings
         BASIC_EVENT:               'basic',
