@@ -31,7 +31,16 @@ class Graph(models.Model):
 	type = models.PositiveSmallIntegerField(choices=GRAPH_TYPE)
 	def __unicode__(self):
 		return self.name
-
+	def dump(self, tree=None, indent=0):
+		if not tree:
+			root=self.nodes.filter(root=True)[0]
+			tree=root.getTreeDict()
+			print "Tree dump:"
+		print "|"*indent + "-%s (%s)"%(tree['name'], tree['id'])
+		if "children" in tree:
+			for subtree in tree['children']:
+				self.dump(subtree, indent+1)		
+		
 class Node(models.Model):
 	name = models.CharField(max_length=255)
 	graph = models.ForeignKey(Graph, null=False, related_name='nodes')
@@ -48,13 +57,16 @@ class Node(models.Model):
 		else:
 			return NODE_TYPES[self.type]['type'] + "_" + str(self.pk)
 	def getChildren(self):
-		edges=self.outgoing.all()
+		edges=self.outgoing.all().filter(deleted=False)
 		if len(edges)>0:
 			return [e.dest.getTreeDict() for e in edges]
 		else:
 			return ''
 	def getTreeDict(self):
-		d={'id':self.pk,'name':self.name}
+		if self.name=='':
+			d={'id':self.pk,'name':NODE_TYPES[self.type]['name']}
+		else:
+			d={'id':self.pk,'name':self.name}
 		kids=self.getChildren()
 		if kids:
 			d['children']=kids
