@@ -8,7 +8,7 @@ define(['require-config', 'require-oop'], function(Config) {
         // epoch timestamp in milliseconds will do as an id
         this._id  = new Date().getTime();
 
-        var shape = jQuery(Config.SHAPES_MENU + ' ' + Config.FUZZED_CLASS + this.type());
+        var shape = jQuery(Config.SHAPES_MENU + ' #' + this.type());
         var _this = this;
         this._visualRepresentation = shape.clone()
             // remove draggable class... thank you jsPlumb for all the weird sanity checks
@@ -215,32 +215,20 @@ define(['require-config', 'require-oop'], function(Config) {
     }
 
     /*
-     *  Static map from type string to class
+     *  Associate the constructors with the thumbnails in the shape menu
      */
-    var NodeTypes = {};
-
-    NodeTypes[Config.BASIC_EVENT]       = BasicEvent;
-    NodeTypes[Config.UNDEVELOPED_EVENT] = UndevelopedEvent;
-    NodeTypes[Config.HOUSE_EVENT]       = HouseEvent;
-    NodeTypes[Config.AND_GATE]          = AndGate;
-    NodeTypes[Config.OR_GATE]           = OrGate;
-    NodeTypes[Config.XOR_GATE]          = XorGate;
-    NodeTypes[Config.PRIORITY_AND_GATE] = PriorityAndGate;
-    NodeTypes[Config.VOTING_OR_GATE]    = VotingOrGate;
-    NodeTypes[Config.INHIBIT_GATE]      = InhibitGate;
-    NodeTypes[Config.CHOICE_EVENT]      = ChoiceEvent;
-    NodeTypes[Config.REDUNDANCY_EVENT]  = RedundancyEvent;
-    NodeTypes[Config.BLOCK]             = Block;
-
-    /*
-     *  fromId - creates a node instance from a shape menu node id
-     */
-    function fromId(nodeId) {
-        if (typeof(nodeId) !== 'string') throw 'Type Error - id has to be a string';
-
-        var node = NodeTypes[nodeId];
-        return typeof(node) !== 'undefined' ? new node : null;
-    }
+    jQuery('#' + Config.BASIC_EVENT)      .data(Config.DATA_CONSTRUCTOR, BasicEvent);
+    jQuery('#' + Config.UNDEVELOPED_EVENT).data(Config.DATA_CONSTRUCTOR, UndevelopedEvent);
+    jQuery('#' + Config.HOUSE_EVENT)      .data(Config.DATA_CONSTRUCTOR, HouseEvent);
+    jQuery('#' + Config.AND_GATE)         .data(Config.DATA_CONSTRUCTOR, AndGate);
+    jQuery('#' + Config.OR_GATE)          .data(Config.DATA_CONSTRUCTOR, OrGate);
+    jQuery('#' + Config.XOR_GATE)         .data(Config.DATA_CONSTRUCTOR, XorGate);
+    jQuery('#' + Config.PRIORITY_AND_GATE).data(Config.DATA_CONSTRUCTOR, PriorityAndGate);
+    jQuery('#' + Config.VOTING_OR_GATE)   .data(Config.DATA_CONSTRUCTOR, VotingOrGate);
+    jQuery('#' + Config.INHIBIT_GATE)     .data(Config.DATA_CONSTRUCTOR, InhibitGate);
+    jQuery('#' + Config.CHOICE_EVENT)     .data(Config.DATA_CONSTRUCTOR, ChoiceEvent);
+    jQuery('#' + Config.REDUNDANCY_EVENT) .data(Config.DATA_CONSTRUCTOR, RedundancyEvent);
+    jQuery('#' + Config.BLOCK)            .data(Config.DATA_CONSTRUCTOR, Block);
 
     /*
      *  Return the collection of all nodes for require
@@ -258,9 +246,6 @@ define(['require-config', 'require-oop'], function(Config) {
         InhibitGate:      InhibitGate,
         ChoiceEvent:      ChoiceEvent,
         RedundancyEvent:  RedundancyEvent,
-        Block:            Block,
-
-        // module functions
-        fromId:           fromId
+        Block:            Block
     };
 })

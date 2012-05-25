@@ -86,9 +86,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         var x = Math.round((event.pageX - position.left - uiEvent.offsetX) / Config.GRID_SIZE) * Config.GRID_SIZE;
         var y = Math.round((event.pageY - position.top  - uiEvent.offsetY) / Config.GRID_SIZE) * Config.GRID_SIZE;
 
-        Nodes
-            .fromId(uiObject.draggable.attr('id'))
-            .appendTo(this._canvas, x, y);
+        (new uiObject.draggable.data(Config.CONSTRUCTOR)).appendTo(this._canvas, x, y);
     }
 
     return Editor;

@@ -23,14 +23,14 @@
     min-width:    200px;
     height:       100%;
     float:        left;
-    overflow:     hidden;
+    overflow:     scroll;
     border-right: 1px solid #bbb;
 }
 
 #FuzzedCanvas {
-	position: relative;
-	height:   100%;
-	overflow: auto;
+	position:         relative;
+	height:           100%;
+	overflow:         auto;
     background-color: white;
 }
 

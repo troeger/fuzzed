@@ -25,6 +25,10 @@ define(function() {
         DRAGGING_OPACITY:          0.5,
         DRAGGING_CURSOR:           'move',
 
+        // Data keys
+        DATA_CONSTRUCTOR:          'constructor',
+        DATA_NODE:                 'node',
+
         // Type Strings
         BASIC_EVENT:               'basic',
         UNDEVELOPED_EVENT:         'undeveloped',
