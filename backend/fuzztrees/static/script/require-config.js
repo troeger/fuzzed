@@ -2,7 +2,9 @@ define(function() {
     return {
         // Layouting
         LAYOUT_SPACING:            0,
+        LAYOUT_WEST_SIZE:          250,
         LAYOUT_NORTH_SIZE:         24,
+        LAYOUT_EAST_SIZE:          250,
 
         // Background Grid
         GRID_SIZE:                 50,

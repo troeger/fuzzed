@@ -45,8 +45,14 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
                 closable:           false,
                 spacing_open:       Config.LAYOUT_SPACING
             },
+            west:  {
+                size:               Config.LAYOUT_WEST_SIZE
+            },
             north: {
                 size:               Config.LAYOUT_NORTH_SIZE
+            },
+            east:  {
+                size:               Config.LAYOUT_EAST_SIZE
             }
         };
 
