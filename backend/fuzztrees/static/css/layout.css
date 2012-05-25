@@ -1,9 +1,29 @@
+#FuzzedToolbar {
+    height:      44px;
+    font-size:   11px;
+    overflow:    hidden;
+}
+
+#FuzzedLogin {
+    text-align:  right;
+    height:      44px;
+    padding:     0px 5px;
+}
+
+#FuzzedContent {
+    position: absolute;
+    top:      46px;
+    bottom:   0;
+    width:    100%;
+}
+
 #FuzzedShapes {
-	position: absolute;
-	left: 0;
-	width: 200px;
-	height: 100%;
-	border-right: 1px solid black;
+	position:     relative;
+    width:        200px;
+    min-width:    200px;
+    height:       100%;
+    overflow:     hidden;
+    border-right: 1px solid #bbb;
 }
 
 #FuzzedCanvas {
@@ -20,13 +40,29 @@
 	height: 100%;
 }
 
-#FuzzedToolbar {
-    text-align:  right;
-    font-weight: bold;
-    font-size:   10px;
+.fuzzed-header-label {
+    line-height: 30px;
+    padding:     0px 5px;
+    text-align:  center;
 }
 
-#FuzzEdUserLogin {
+#FuzzedToolbar .fuzzed-header-label {
+    line-height: 44px;
+}
+
+.fuzzed-header-button {
     display: inline;
+    padding: 0px 5px;
 }
 
+.fuzzed-node-thumbnail {
+    display: block;
+    margin: 3px auto 5px auto;
+    height: 30px;
+}
+
+.fuzzed-node-thumbnail-cell {
+    text-align: center;
+    font-size: 0.7em;
+    margin: 10px 0px;
+}

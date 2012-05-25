@@ -1,7 +1,11 @@
 <div id="FuzzedShapes">
-    {% for key,node in node_types.items %}
-        <img id="{{ node.type }}" class="fuzzed-node fuzzed-{{ node.type }}" src="{{ STATIC_URL }}img/nodes/{{ node.image }}" alt="{{ node.name }}"/>
-        <p>{{ node.name }}</p>
-        <hr>
-    {% endfor %}
+    <div class="fuzzed-header-label" data-role="header" data-theme="e">Shapes</div>
+    <div class="ui-grid-a">
+        {% for key, node in node_types.items %}
+            <div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell">
+                <img id="{{ node.type }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}" src="{{ STATIC_URL }}img/nodes/{{ node.image }}" alt="{{ node.name }}"/>
+                <span>{{ node.name }}</span>
+            </div> 
+        {% endfor %}
+    </div>
 </div>
