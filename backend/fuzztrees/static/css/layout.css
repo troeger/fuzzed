@@ -22,22 +22,16 @@
     width:        200px;
     min-width:    200px;
     height:       100%;
+    float:        left;
     overflow:     hidden;
     border-right: 1px solid #bbb;
 }
 
 #FuzzedCanvas {
-	position: absolute;
-	left: 200px;
-	width: 80%;
-	height: 100%;
+	position: relative;
+	height:   100%;
 	overflow: auto;
-}
-
-#FuzzedProperties {
-	position: absolute;
-	right: 0;
-	height: 100%;
+    background-color: white;
 }
 
 .fuzzed-header-label {
@@ -57,12 +51,12 @@
 
 .fuzzed-node-thumbnail {
     display: block;
-    margin: 3px auto 5px auto;
-    height: 30px;
+    margin:  3px auto 5px auto;
+    height:  30px;
 }
 
 .fuzzed-node-thumbnail-cell {
     text-align: center;
-    font-size: 0.7em;
-    margin: 10px 0px;
+    font-size:  0.7em;
+    margin:     10px 0px;
 }
