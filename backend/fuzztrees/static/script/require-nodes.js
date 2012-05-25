@@ -24,9 +24,10 @@ define(['require-config', 'require-oop'], function(Config) {
                     jQuery(jQuery(this).data(Config.DATA_NODE)._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
                 },
                 function(e) {
+                    _this = this;
                     function hideEndpoints() {
-                        jQuery(jQuery(this).data(Config.DATA_NODE)._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
-                        jQuery(jQuery(this).data(Config.DATA_NODE)._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
+                        jQuery(jQuery(_this).data(Config.DATA_NODE)._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
+                        jQuery(jQuery(_this).data(Config.DATA_NODE)._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
                     }
                     setTimeout(hideEndpoints, 2000);
                 }
