@@ -64,7 +64,7 @@ def graphs(request):
 					assert(t in GRAPH_JS_TYPE)
 					g=Graph(name=request.POST['name'], owner=request.user, type=t)
 					g.save()
-					c=History(command=1, numeric=t)
+					c=History(command=1, graph=g)
 					c.save()
 					transaction.commit()
 				except:
@@ -89,7 +89,7 @@ def graph(request, graph_id):
 		if request.method == 'GET':
 			# fetch graph 
 			try:
-				g=Graph.objects.get(pk=graph_id, owner=request.user)
+				g=Graph.objects.get(pk=graph_id, owner=request.user, deleted=False)
 			except:
 				return HttpResponseNotFound()
 			top=g.nodes.get(root=True)
@@ -117,14 +117,16 @@ def nodes(request, graph_id):
 				try:
 					t=int(request.POST['type'])
 					assert(t in NODE_TYPES)
-					g=Graph.objects.get(pk=graph_id)
-					p=Node.objects.get(pk=request.POST['parent'])
+					g=Graph.objects.get(pk=graph_id, deleted=False)
+					p=Node.objects.get(pk=request.POST['parent'], deleted=False)
 					n=Node(type=t, graph=g)
 					n.save()
+					c=History(command=2, graph=g, node=n)
+					c.save()
 					e=Edge(src=p, dest=n)
 					e.save()
-					c=History(command=2, graph=g, node=p, numeric=t)
-					c.save()
+					c2=History(command=3, graph=g, edge=e)
+					c2.save()
 					transaction.commit()
 				except Exception, e:
 					transaction.rollback()
@@ -158,11 +160,28 @@ def node(request, graph_id, node_id):
 	API Response:           no body, status code 204
 	"""
 	if request.is_ajax():
+		try:
+			g=Graph.objects.get(pk=graph_id, deleted=False)
+			n=Node.objects.get(pk=node_id, deleted=False)
+		except:
+			return HttpResponseBadRequest()						
 		if request.method == 'DELETE':
+			# delete node
 			try:
-				n=Node.objects.get(pk=node_id)
-				n.delete()
-				c=History(command=3, graph=g, node=n)
+				# remove edges explicitly to keep history
+				for e in n.outgoing.all():
+					e.deleted=True
+					e.save()
+					c=History(command=6, graph=g, edge=e)
+					c.save()
+				for e in n.incoming.all():
+					e.deleted=True
+					e.save()
+					c=History(command=6, graph=g, edge=e)
+					c.save()
+				n.deleted=True
+				n.save()
+				c=History(command=5, graph=g, node=n)
 				c.save()
 				transaction.commit()
 			except:
@@ -172,8 +191,30 @@ def node(request, graph_id, node_id):
 				return HttpResponse(status=204)
 		elif request.method == 'POST':
 			if 'parent' in request.POST:
-				#TODO relocate node
-				return HttpResponse(status=204)
+				# relocate node
+				try:
+					# - get new parent node
+					p=Node.objects.get(pk=request.POST['parent'], deleted=False)				
+					# - remove edge from old parent to this node
+					# -> this will throw an exception if the node has more than one incoming edge
+					# -> this is good, since it would mean that we have more than one parent,
+					# -> which is not modelled in the current API
+					e=Edge.objects.get(dest=n, deleted=False)
+					e.deleted=True
+					e.save()
+					c=History(command=6, graph=g, edge=e)
+					c.save()
+					# - link new parent with this node
+					new_e=Edge(src=p, dest=n)
+					new_e.save()
+					c=History(command=3, graph=g, edge=new_e)
+					c.save()
+					transaction.commit()
+				except:
+					transaction.rollback()
+					return HttpResponseBadRequest()						
+				else:
+					return HttpResponse(status=204)
 			elif 'key' in request.POST and 'val' in request.POST:
 				#TODO change node property
 				return HttpResponse(status=204)

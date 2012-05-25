@@ -16,22 +16,36 @@ GRAPH_JS_TYPE = {
 }
 
 COMMAND_TYPE = (
-	(1, 'Add graph'),		# graph type ID in numeric field
-	(2, 'Add node'), 		# parent node in node field, graph in graph field, node type in numeric field
-	(3, 'Delete node')		# graph in graph field, node in node field
+	(1, 'Add graph'),		
+	(2, 'Add node'), 		
+	(3, 'Add edge'),		
+	(4, 'Delete graph'),		
+	(5, 'Delete node'), 		
+	(6, 'Delete edge')		
 )
 
 class Graph(models.Model):
 	name = models.CharField(max_length=255)
 	owner = models.ForeignKey(User, related_name='graphs')
+	deleted = models.BooleanField(default=False)
 	type = models.PositiveSmallIntegerField(choices=GRAPH_TYPE)
 	def __unicode__(self):
 		return self.name
-
+	def dump(self, tree=None, indent=0):
+		if not tree:
+			root=self.nodes.filter(root=True)[0]
+			tree=root.getTreeDict()
+			print "Tree dump:"
+		print "|"*indent + "-%s (%s)"%(tree['name'], tree['id'])
+		if "children" in tree:
+			for subtree in tree['children']:
+				self.dump(subtree, indent+1)		
+		
 class Node(models.Model):
 	name = models.CharField(max_length=255)
 	graph = models.ForeignKey(Graph, null=False, related_name='nodes')
 	root = models.BooleanField(default=False)
+	deleted = models.BooleanField(default=False)
 	type = models.PositiveSmallIntegerField(choices=nodeTypeChoices())
 	optional = models.BooleanField(default=False)
 	def __unicode__(self):
@@ -43,13 +57,16 @@ class Node(models.Model):
 		else:
 			return NODE_TYPES[self.type]['type'] + "_" + str(self.pk)
 	def getChildren(self):
-		edges=self.outgoing.all()
+		edges=self.outgoing.all().filter(deleted=False)
 		if len(edges)>0:
 			return [e.dest.getTreeDict() for e in edges]
 		else:
 			return ''
 	def getTreeDict(self):
-		d={'id':self.pk,'name':self.name}
+		if self.name=='':
+			d={'id':self.pk,'name':NODE_TYPES[self.type]['name']}
+		else:
+			d={'id':self.pk,'name':self.name}
 		kids=self.getChildren()
 		if kids:
 			d['children']=kids
@@ -58,6 +75,7 @@ class Node(models.Model):
 class Edge(models.Model):
 	src  = models.ForeignKey(Node, null=False, related_name='outgoing')
 	dest = models.ForeignKey(Node, null=False, related_name='incoming')
+	deleted = models.BooleanField(default=False)
 	def __unicode__(self):
 		return str(self.src) + "->" + str(self.dest)
 
@@ -66,6 +84,7 @@ class Property(models.Model):
 	edge = models.ForeignKey(Edge, null=True, related_name='properties')
 	key = models.CharField(max_length=255)
 	val = models.CharField(max_length=255)
+	deleted = models.BooleanField(default=False)
 	def __unicode__(self):
 		if self.node:
 			return "Node "+str(node)+":%s = %s"%(self.key, self.val)
@@ -74,10 +93,7 @@ class Property(models.Model):
 
 class History(models.Model):
 	command = models.PositiveSmallIntegerField(choices=COMMAND_TYPE, null=False)
-	numeric = models.IntegerField() 		
-	text1 = models.CharField(max_length=255)
-	text2 = models.CharField(max_length=255)
-	graph = models.ForeignKey(Graph, null=True, related_name='commands')
+	graph = models.ForeignKey(Graph, null=False, related_name='commands')
 	node = models.ForeignKey(Node, null=True)
+	edge = models.ForeignKey(Edge, null=True)
 	insert_date = models.DateTimeField(null=False, blank=False, auto_now_add=True, editable=False)
-	modification_date = models.DateTimeField(null=False, blank=False, auto_now=True, editable=False)
