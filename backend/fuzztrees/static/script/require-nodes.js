@@ -32,6 +32,9 @@ define(['require-config', 'require-oop'], function(Config) {
                     setTimeout(hideEndpoints, 2000);
                 }
             );
+
+        // link back to Node object
+        this._visualRepresentation.data(Config.DATA_NODE);
     };
 
     Node.prototype.id = function() {
