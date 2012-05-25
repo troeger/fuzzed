@@ -23,7 +23,7 @@
     min-width:    200px;
     height:       100%;
     float:        left;
-    overflow:     scroll;
+    overflow:     auto;
     border-right: 1px solid #bbb;
 }
 
