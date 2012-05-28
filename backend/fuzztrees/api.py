@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadReq
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from fuzztrees.models import Graph, Node, Edge, History, GRAPH_JS_TYPE
+from fuzztrees.models import Graph, Node, Edge, History, GRAPH_JS_TYPE, Commands
 from nodes_config import NODE_TYPES
 import json
 
@@ -64,7 +64,7 @@ def graphs(request):
 					assert(t in GRAPH_JS_TYPE)
 					g=Graph(name=request.POST['name'], owner=request.user, type=t)
 					g.save()
-					c=History(command=1, graph=g)
+					c=History(command=Commands.ADD_GRAPH, graph=g)
 					c.save()
 					transaction.commit()
 				except:
@@ -108,24 +108,24 @@ def nodes(request, graph_id):
 	"""
 	Add new node to graph stored in the backend
 	API Request:            POST /api/graphs/[graphID]/nodes
-	API Request Parameters: parent=[parentID], type=[NODE_TYPE]
+	API Request Parameters: parent=[parentID], type=[NODE_TYPE], xcoord, ycoord
 	API Response:           no body, status code 201, location URI for new node
 	"""
 	if request.is_ajax():
 		if request.method == 'POST':
-			if 'parent' in request.POST and 'type' in request.POST:
+			if 'parent' in request.POST and 'type' in request.POST and 'xcoord' in request.POST and 'ycoord' in request.POST:
 				try:
 					t=int(request.POST['type'])
 					assert(t in NODE_TYPES)
 					g=Graph.objects.get(pk=graph_id, deleted=False)
 					p=Node.objects.get(pk=request.POST['parent'], deleted=False)
-					n=Node(type=t, graph=g)
+					n=Node(type=t, graph=g, xcoord=request.POST['xcoord'], ycoord=request.POST['ycoord'] )
 					n.save()
-					c=History(command=2, graph=g, node=n)
+					c=History(command=Commands.ADD_NODE, graph=g, node=n)
 					c.save()
 					e=Edge(src=p, dest=n)
 					e.save()
-					c2=History(command=3, graph=g, edge=e)
+					c2=History(command=Commands.ADD_EDGE, graph=g, edge=e)
 					c2.save()
 					transaction.commit()
 				except Exception, e:
@@ -144,14 +144,19 @@ def node(request, graph_id, node_id):
 	API Request:  DELETE /api/graphs/[graphID]/nodes/[nodeID], no body
 	API Response: no body, status code 204
 
-	Move node to another position in the graph	
+	Link node to another parent in the graph	
 	API Request:            POST /api/graphs/[graphID]/nodes/[nodeID] 
-	API Request Parameters: parent=[nodeID]
+	API Request Parameters: parent=[nodeID],  xcoord=..., ycoord=...
 	API Response:           no body, status code 204
 
 	Change property of a node
 	API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]
 	API Request Parameters: key=... , val=...
+	API Response:           no body, status code 204
+
+	Change position of a node
+	API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]
+	API Request Parameters: xcoord=... , ycoord=...
 	API Response:           no body, status code 204
 
 	Morph node to another type
@@ -172,16 +177,16 @@ def node(request, graph_id, node_id):
 				for e in n.outgoing.all():
 					e.deleted=True
 					e.save()
-					c=History(command=6, graph=g, edge=e)
+					c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
 					c.save()
 				for e in n.incoming.all():
 					e.deleted=True
 					e.save()
-					c=History(command=6, graph=g, edge=e)
+					c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
 					c.save()
 				n.deleted=True
 				n.save()
-				c=History(command=5, graph=g, node=n)
+				c=History(command=Commands.DEL_NODE, graph=g, node=n)
 				c.save()
 				transaction.commit()
 			except:
@@ -190,24 +195,29 @@ def node(request, graph_id, node_id):
 			else:
 				return HttpResponse(status=204)
 		elif request.method == 'POST':
-			if 'parent' in request.POST:
-				# relocate node
+			if 'parent' in request.POST and 'xcoord' in request.POST and 'ycoord' in request.POST:
+				# relink node
 				try:
-					# - get new parent node
+					# - Change node position
+					c=History(command=Commands.CHANGE_COORD, graph=g, oldxcoord=n.xcoord, oldycoord=n.ycoord)
+					c.save()
+					n.xcoord=request.POST['xcoord']
+					n.ycoord=request.POST['ycoord']					
+					n.save()
+					# - get new parent node and remove edge from old parent to this node
 					p=Node.objects.get(pk=request.POST['parent'], deleted=False)				
-					# - remove edge from old parent to this node
 					# -> this will throw an exception if the node has more than one incoming edge
 					# -> this is good, since it would mean that we have more than one parent,
 					# -> which is not modelled in the current API
 					e=Edge.objects.get(dest=n, deleted=False)
 					e.deleted=True
 					e.save()
-					c=History(command=6, graph=g, edge=e)
+					c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
 					c.save()
 					# - link new parent with this node
 					new_e=Edge(src=p, dest=n)
 					new_e.save()
-					c=History(command=3, graph=g, edge=new_e)
+					c=History(command=Commands.ADD_EDGE, graph=g, edge=new_e)
 					c.save()
 					transaction.commit()
 				except:
@@ -215,6 +225,9 @@ def node(request, graph_id, node_id):
 					return HttpResponseBadRequest()						
 				else:
 					return HttpResponse(status=204)
+			elif 'xcoord' in request.POST and 'ycoord' in request.POST:
+				#TODO reposition node
+				return HttpResponse(status=204)
 			elif 'key' in request.POST and 'val' in request.POST:
 				#TODO change node property
 				return HttpResponse(status=204)

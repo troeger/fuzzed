@@ -14,6 +14,10 @@ from nodes_config import NODE_TYPES
 def index(request):
     return render_to_response('index.html', {}, context_instance=RequestContext(request))
 
+def dashboard(request):
+	graphs=request.user.graphs.all()
+	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
+
 def teaser(request):
     return render_to_response('teaser.html', {}, context_instance=RequestContext(request))
 
@@ -50,13 +54,14 @@ def login(request):
 			linkOpenID(newuser, user.openid_claim)
 			return HttpResponseRedirect('/login/?openid_identifier=%s'%urllib.quote_plus(request.session['openid_identifier']))	
 	backend_login(request, user)
-	allgraphs=user.graphs.all()
-	if len(allgraphs)==0:
-		g=Graph(owner=user, type=1)
-		g.save()
-		return HttpResponseRedirect('/editor/%u'%g.pk)
-	else:
-		return HttpResponseRedirect('/editor/%u'%allgraphs[0].pk)
+	#allgraphs=user.graphs.all()
+	#if len(allgraphs)==0:
+	#	g=Graph(owner=user, type=1)
+	#	g.save()
+	#	return HttpResponseRedirect('/editor/%u'%g.pk)
+	#else:
+	#	return HttpResponseRedirect('/editor/%u'%allgraphs[0].pk)
+	return HttpResponseRedirect('/dashboard/')
 
 def logout(request):
 	auth.logout(request)

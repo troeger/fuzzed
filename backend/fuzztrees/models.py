@@ -15,13 +15,25 @@ GRAPH_JS_TYPE = {
 	3: 'rbd'
 }
 
+class Commands():
+	ADD_GRAPH=1
+	ADD_NODE=2
+	ADD_EDGE=3
+	DEL_GRAPH=4
+	DEL_NODE=5
+	DEL_EDGE=6
+	CHANGE_COORD=7
+	CMD_GROUP=8
+
 COMMAND_TYPE = (
-	(1, 'Add graph'),		
-	(2, 'Add node'), 		
-	(3, 'Add edge'),		
-	(4, 'Delete graph'),		
-	(5, 'Delete node'), 		
-	(6, 'Delete edge')		
+	(Commands.ADD_GRAPH, 'Add graph'),		
+	(Commands.ADD_NODE, 'Add node'), 		
+	(Commands.ADD_EDGE, 'Add edge'),		
+	(Commands.DEL_GRAPH, 'Delete graph'),		
+	(Commands.DEL_NODE, 'Delete node'), 		
+	(Commands.DEL_EDGE, 'Delete edge'),
+	(Commands.CHANGE_COORD, 'Change node coordinates'),
+	(Commands.CMD_GROUP, 'Start of command group')		
 )
 
 class Graph(models.Model):
@@ -29,8 +41,16 @@ class Graph(models.Model):
 	owner = models.ForeignKey(User, related_name='graphs')
 	deleted = models.BooleanField(default=False)
 	type = models.PositiveSmallIntegerField(choices=GRAPH_TYPE)
+
+	def created(self):
+		print self.commands.get(command=Commands.ADD_GRAPH)
+		return str("foo")
+
 	def __unicode__(self):
-		return self.name
+		if self.name:
+			return self.name
+		else:
+			return "Graph"+str(self.pk)
 	def dump(self, tree=None, indent=0):
 		if not tree:
 			root=self.nodes.filter(root=True)[0]
@@ -47,6 +67,8 @@ class Node(models.Model):
 	root = models.BooleanField(default=False)
 	deleted = models.BooleanField(default=False)
 	type = models.PositiveSmallIntegerField(choices=nodeTypeChoices())
+	xcoord = models.IntegerField()
+	ycoord = models.IntegerField()
 	optional = models.BooleanField(default=False)
 	def __unicode__(self):
 		if self.type == 1:
@@ -96,4 +118,7 @@ class History(models.Model):
 	graph = models.ForeignKey(Graph, null=False, related_name='commands')
 	node = models.ForeignKey(Node, null=True)
 	edge = models.ForeignKey(Edge, null=True)
+	oldxcoord = models.IntegerField(null=True)
+	oldycoord = models.IntegerField(null=True)
+	group = models.ForeignKey('History', null=True)
 	insert_date = models.DateTimeField(null=False, blank=False, auto_now_add=True, editable=False)

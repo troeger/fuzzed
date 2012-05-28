@@ -3,7 +3,7 @@
         Hello {{ user }}
     </span>
 
-    <form class="fuzzed-header-button" action="/logout/" method="post">{% csrf_token %}
+    <form data-ajax="false" class="fuzzed-header-button" action="/logout/" method="post">{% csrf_token %}
        <input type="submit" value="Logout" data-role="button" data-mini="true"/>
     </form>
 </div>

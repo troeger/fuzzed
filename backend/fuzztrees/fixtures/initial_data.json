@@ -34,7 +34,9 @@
     	"name" : "TOP",
     	"graph" : 1,
     	"root" : "True",
-    	"type" : 1
+    	"type" : 1,
+    	"xcoord" : 5,
+    	"ycoord" : 10
     }
   },
   {
@@ -42,7 +44,9 @@
     "pk": 2,
     "fields": {
     	"graph" : 1,
-    	"type" : 5
+    	"type" : 5,
+    	"xcoord" : 5,
+    	"ycoord" : 9    	
     }
   },
   {
@@ -51,7 +55,9 @@
     "fields": {
     	"name" : "CPU",
     	"graph" : 1,
-    	"type" : 1
+    	"type" : 1,
+    	"xcoord" : 3,
+    	"ycoord" : 8    	
     }
   },
   {
@@ -60,7 +66,9 @@
     "fields": {
     	"name" : "Disc",
     	"graph" : 1,
-    	"type" : 1
+    	"type" : 1,
+    	"xcoord" : 7,
+    	"ycoord" : 8    	
     }
   },
   {
@@ -68,7 +76,9 @@
     "pk": 5,
     "fields": {
     	"graph" : 1,
-    	"type" : 5
+    	"type" : 5,
+    	"xcoord" : 5,
+    	"ycoord" : 7    	
     }
   },
   {
@@ -77,7 +87,9 @@
     "fields": {
     	"name" : "Fan",
     	"graph" : 1,
-    	"type" : 1
+    	"type" : 1,
+    	"xcoord" : 3,
+    	"ycoord" : 6    	
     }
   },
   {
@@ -86,7 +98,9 @@
     "fields": {
     	"name" : "Chip",
     	"graph" : 1,
-    	"type" : 1
+    	"type" : 1,
+    	"xcoord" : 7,
+    	"ycoord" : 6    	
     }
   },
   {

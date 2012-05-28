@@ -33,19 +33,19 @@ class ApiTestCase(unittest.TestCase):
 		oldncount=Graph.objects.get(pk=self.graphid).nodes.count()
 		parent=Node.objects.get(pk=5) # from fixture, gate for CPU components
 		response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
-							 {'parent':parent.pk, 'type':1},    # Basic event
+							 {'parent':parent.pk, 'type':1, 'xcoord':10, 'ycoord':7},    # Basic event
 							 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 201)
 		self.assertIn('Location', response)
 		self.assertEqual(oldncount+1, Graph.objects.get(pk=self.graphid).nodes.count() )
 		# test invalid parent ID
 		response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
-							 {'parent':-1, 'type':1},
+							 {'parent':-1, 'type':1, 'xcoord':10, 'ycoord':7},
 							 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 400)
 		# Check invalid type
 		response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
-							 {'parent':parent.pk, 'type':9999},
+							 {'parent':parent.pk, 'type':9999, 'xcoord':10, 'ycoord':7},
 							 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 400)
 
@@ -57,7 +57,7 @@ class ApiTestCase(unittest.TestCase):
 
 	def testRelocateNode(self):
 		response=self.c.post('/api/graphs/%u/nodes/6'%self.graphid,
-							{'parent':2},	# OR gate for TOP event, from fixture
+							{'parent':2, 'ycoord': 8, 'xcoord':10},	# OR gate for TOP event, from fixture
 		                    **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 		self.assertEqual(response.status_code, 204)
 		#TODO: Check if really done, including edge rearrangement
