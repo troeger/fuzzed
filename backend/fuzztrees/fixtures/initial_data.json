@@ -28,6 +28,15 @@
     }
   },
   {
+    "model": "fuzztrees.History",
+    "pk": 1,
+    "fields": {
+    	"graph" : 1,
+    	"command" : 1,
+    	"insert_date" : "2012-05-29"
+    }
+  },
+  {
     "model": "fuzztrees.Node",
     "pk": 1,
     "fields": {
