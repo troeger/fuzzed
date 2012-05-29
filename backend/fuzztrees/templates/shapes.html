@@ -1,13 +1,17 @@
 <div id="FuzzedShapes">
-    <div class="fuzzed-header-label" data-theme="e" >Shapes</div>
-    <div class="ui-grid-a">
-        {% for key, node in node_types.items %}
-            <div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell">
-                &nbsp
-                <img id="{{ node.type }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}" src="{{ STATIC_URL }}img/nodes/{{ node.image }}" alt="{{ node.name }}"/>
-                &nbsp
-                <span class="fuzzed-node-thumbnail-label">{{ node.name }}</span>
-            </div> 
-        {% endfor %}
-    </div>
+	<ul data-role="listview" data-theme="c" data-divider-theme="c" data-inset="true" >
+		<li data-role="list-divider">Shapes</li>
+		<li>
+			<div class="ui-grid-a">
+				{% for key, node in node_types.items %}
+					<div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell">
+						&nbsp
+						<img id="{{ node.type }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}" src="{{ STATIC_URL }}img/nodes/{{ node.image }}" alt="{{ node.name }}"/>
+						&nbsp
+						<span class="fuzzed-node-thumbnail-label">{{ node.name }}</span>
+					</div> 
+				{% endfor %}
+			</div>
+		<li>
+	</ul>
 </div>
