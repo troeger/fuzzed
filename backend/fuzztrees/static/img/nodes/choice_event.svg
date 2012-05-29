@@ -9,7 +9,7 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="50.625"
+   width="50.125"
    height="50"
    id="svg4011"
    version="1.1"
@@ -24,17 +24,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="3.68"
-     inkscape:cx="2.9067897"
-     inkscape:cy="25.118393"
+     inkscape:zoom="6.6618556"
+     inkscape:cx="25.001142"
+     inkscape:cy="25.501165"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      showguides="false"
      inkscape:window-width="1440"
      inkscape:window-height="852"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-x="1600"
+     inkscape:window-y="22"
      inkscape:window-maximized="1"
      fit-margin-top="0"
      fit-margin-left="0"
@@ -64,22 +64,12 @@
      inkscape:label="Ebene 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0.625,-1002.375)">
-    <g
-       id="g5299"
-       transform="translate(-0.3125,0)">
-      <path
-         sodipodi:nodetypes="ccccc"
-         inkscape:connector-curvature="0"
-         id="path4688"
-         d="M 0.95160937,1003.3266 1,1021.375 l 48.048391,0.048 0,-18.0968 z"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.90321875;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <path
-         sodipodi:nodetypes="cczccc"
-         inkscape:connector-curvature="0"
-         id="path4690"
-         d="m 15,1021.375 -14.00001917,20.9701 c 0,0 9.60000817,9.0299 24.00001917,9.0299 14.400011,0 24.000019,-9.0299 24.000019,-9.0299 L 35,1021.375 z"
-         style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.99996161;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-    </g>
+     transform="translate(0.6875,-1002.375)">
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.99996161;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 0.3125,1037.375 c 0,0 4.2277069,14 24.0625,14 19.834793,0 23.9375,-14 23.9375,-14 l -19,-34 -10,0 z"
+       id="path4690"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="czcccc" />
   </g>
 </svg>

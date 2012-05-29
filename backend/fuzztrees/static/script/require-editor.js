@@ -105,8 +105,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     Editor.prototype._toGridCoordinates = function(first, second) {
-        var x        = Number.NaN;
-        var y        = Number.NaN;
+        var x = Number.NaN;
+        var y = Number.NaN;
 
         if (jQuery.isNumeric(first) && jQuery.isNumeric(second)) {
             x = first;

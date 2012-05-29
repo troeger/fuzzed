@@ -107,6 +107,18 @@ define(['require-config', 'require-oop'], function(Config) {
     }
 
     /*
+     *  Multi Event
+     */
+    function MultiEvent() {
+        this.Super.constructor.apply(this, arguments);
+    }
+    MultiEvent.Extends(Node);
+
+    MultiEvent.prototype.type = function() {
+        return Config.Types.MULTI_EVENT;
+    }
+
+    /*
      *  Undeveloped Event
      */
     function UndevelopedEvent() {
@@ -230,6 +242,7 @@ define(['require-config', 'require-oop'], function(Config) {
      *  Associate the constructors with the thumbnails in the shape menu
      */
     jQuery('#' + Config.Types.BASIC_EVENT)      .data(Config.Keys.CONSTRUCTOR, BasicEvent);
+    jQuery('#' + Config.Types.MULTI_EVENT)      .data(Config.Keys.CONSTRUCTOR, MultiEvent);
     jQuery('#' + Config.Types.UNDEVELOPED_EVENT).data(Config.Keys.CONSTRUCTOR, UndevelopedEvent);
     jQuery('#' + Config.Types.HOUSE_EVENT)      .data(Config.Keys.CONSTRUCTOR, HouseEvent);
     jQuery('#' + Config.Types.AND_GATE)         .data(Config.Keys.CONSTRUCTOR, AndGate);
@@ -247,6 +260,7 @@ define(['require-config', 'require-oop'], function(Config) {
     return {
         // classes
         BasicEvent:       BasicEvent,
+        MultiEvent:       MultiEvent,
         UndevelopedEvent: UndevelopedEvent,
         HouseEvent:       HouseEvent,
         AndGate:          AndGate,

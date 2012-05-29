@@ -1,5 +1,5 @@
 define(function() {
-    var gridSize = 50;
+    var gridSize = 60;
 
     return {
         Grid: {
@@ -32,6 +32,7 @@ define(function() {
 
         Types: {
             BASIC_EVENT:       'basic',
+            MULTI_EVENT:       'multi',
             UNDEVELOPED_EVENT: 'undeveloped',
             HOUSE_EVENT:       'house',
             AND_GATE:          'and', 
