@@ -227,18 +227,6 @@ define(['require-config', 'require-oop'], function(Config) {
     }
 
     /*
-     *  Block
-     */
-    function Block() {
-        this.Super.constructor.apply(this, arguments);
-    } 
-    Block.Extends(Node);
-
-    Block.prototype.type = function() {
-        return Config.Types.BLOCK;
-    }
-
-    /*
      *  Associate the constructors with the thumbnails in the shape menu
      */
     jQuery('#' + Config.Types.BASIC_EVENT)      .data(Config.Keys.CONSTRUCTOR, BasicEvent);
@@ -252,7 +240,6 @@ define(['require-config', 'require-oop'], function(Config) {
     jQuery('#' + Config.Types.INHIBIT_GATE)     .data(Config.Keys.CONSTRUCTOR, InhibitGate);
     jQuery('#' + Config.Types.CHOICE_EVENT)     .data(Config.Keys.CONSTRUCTOR, ChoiceEvent);
     jQuery('#' + Config.Types.REDUNDANCY_EVENT) .data(Config.Keys.CONSTRUCTOR, RedundancyEvent);
-    jQuery('#' + Config.Types.BLOCK)            .data(Config.Keys.CONSTRUCTOR, Block);
 
     /*
      *  Return the collection of all nodes for require
@@ -269,7 +256,6 @@ define(['require-config', 'require-oop'], function(Config) {
         VotingOrGate:     VotingOrGate,
         InhibitGate:      InhibitGate,
         ChoiceEvent:      ChoiceEvent,
-        RedundancyEvent:  RedundancyEvent,
-        Block:            Block
+        RedundancyEvent:  RedundancyEvent
     };
 })

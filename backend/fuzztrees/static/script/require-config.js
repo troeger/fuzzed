@@ -41,8 +41,7 @@ define(function() {
             VOTING_OR_GATE:    'v-or',
             INHIBIT_GATE:      'inhibit',
             CHOICE_EVENT:      'choice',
-            REDUNDANCY_EVENT:  'redundancy',
-            BLOCK:             'block'
+            REDUNDANCY_EVENT:  'redundancy'
         },
 
         Selectors: {

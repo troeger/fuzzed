@@ -53,12 +53,7 @@ NODE_TYPES = {
         'name': u'Redundancy event',
         'type': 'redundancy',
         'image': 'redundancy_event.svg'
-    },
-    12: {
-        'name': u'Block',
-        'type': 'block',
-        'image': 'block.svg'
-    },
+    }
 }
 
 def nodeTypeChoices():
