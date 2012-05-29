@@ -3,10 +3,15 @@ from django.contrib.auth.models import User
 
 from nodes_config import NODE_TYPES, nodeTypeChoices
 
+class GraphTypes():
+	FAULT_TREE=1,
+	FUZZ_TREE=2,
+	RBD=3
+
 GRAPH_TYPE = (
-    ( 1, u'Fault Tree'),
-    ( 2, u'Fuzz Tree'),	
-    ( 3, u'Reliability Block Diagram')
+    ( GraphTypes.FAULT_TREE, u'Fault Tree'),
+    ( GraphTypes.FUZZ_TREE, u'Fuzz Tree'),	
+    ( GraphTypes.RBD, u'Reliability Block Diagram')
 )
 
 GRAPH_JS_TYPE = {
@@ -43,8 +48,11 @@ class Graph(models.Model):
 	type = models.PositiveSmallIntegerField(choices=GRAPH_TYPE)
 
 	def created(self):
-		print self.commands.get(command=Commands.ADD_GRAPH)
-		return str("foo")
+		try:
+			c=self.commands.get(command=Commands.ADD_GRAPH)
+			return c.insert_date
+		except:
+			return "(Unknown)"
 
 	def __unicode__(self):
 		if self.name:
