@@ -3,8 +3,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     function Editor(graph) {
         this._initializeMember(graph);
         this._initializeJsPlumb();
-
-        this._drawGrid();
+        this._drawBackground();
         this._enableShapeMenu();
     }
 
@@ -35,9 +34,25 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         });
     }
 
+    Editor.prototype._drawBackground = function() {
+        var _this = this;
+
+        _this._drawGrid();
+        jQuery(window).resize(function() {
+            _this._drawGrid();
+        });
+    }
+
     Editor.prototype._drawGrid = function() {
         var height = this._canvas.height();
         var width  = this._canvas.width();
+
+        // clear old background and resize svg container to current canvas size - needed for resize callback
+        this._background.clear();
+        this._background.configure({
+            height: height,
+            width:  width
+        });
 
         // horizontal lines
         for (var y = Config.Grid.HALF_SIZE; y < height; y += Config.Grid.SIZE) {
