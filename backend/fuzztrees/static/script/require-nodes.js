@@ -89,8 +89,8 @@ define(['require-config', 'require-oop'], function(Config) {
 
     Node.prototype.moveTo = function(x, y) {
         this._visualRepresentation.css({
-            left: x - Config.Grid.HALF_SIZE || Config.Grid.HALF_SIZE,
-            top:  y - Config.Grid.HALF_SIZE || Config.Grid.HALF_SIZE
+            left: x || 0,
+            top:  y || 0
         });
     }
 

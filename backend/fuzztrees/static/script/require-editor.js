@@ -85,7 +85,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
         with (node) {
             appendTo(this._canvas);
-            moveTo(coordinates.x * Config.Grid.SIZE + Config.Grid.HALF_SIZE, coordinates.y * Config.Grid.SIZE + Config.Grid.HALF_SIZE);
+            moveTo(coordinates.x * Config.Grid.SIZE, coordinates.y * Config.Grid.SIZE);
         }
     }
 
