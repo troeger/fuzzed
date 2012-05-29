@@ -1,7 +1,6 @@
 define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
     function Editor(graph) {
-		console.log("Hello");
         this._initializeMember(graph);
         this._initializeJsPlumb();
 
@@ -16,22 +15,22 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     Editor.prototype._initializeMember = function(graph) {
         this._graphId    = graph;
         this._body       = jQuery('body');
-        this._shapes     = this._body.find(Config.SHAPES_MENU);
-        this._canvas     = this._body.find(Config.CANVAS);
+        this._shapes     = this._body.find(Config.Selectors.IDs.SHAPES_MENU);
+        this._canvas     = this._body.find(Config.Selectors.IDs.CANVAS);
         this._background = this._canvas.svg().svg('get');
     }
 
     Editor.prototype._initializeJsPlumb = function() {
         jsPlumb.importDefaults({
             EndpointStyle: {
-                fillStyle:   Config.JSPLUMB_ENDPOINT_FILL
+                fillStyle:   Config.JSPlumb.ENDPOINT_FILL
             },
-            Endpoint:        [Config.JSPLUMB_ENDPOINT_STYLE, {radius: Config.JSPLUMB_ENDPOINT_RADIUS}],
+            Endpoint:        [Config.JSPlumb.ENDPOINT_STYLE, {radius: Config.JSPlumb.ENDPOINT_RADIUS}],
             PaintStyle: {
-                strokeStyle: Config.JSPLUMB_LINE_STROKE,
-                lineWidth:   Config.JSPLUMB_LINE_STROKE_WIDTH
+                strokeStyle: Config.JSPlumb.STROKE,
+                lineWidth:   Config.JSPlumb.STROKE_WIDTH
             },
-            Connector:       Config.JSPLUMB_LINE_STYLE,
+            Connector:       Config.JSPlumb.STROKE_STYLE,
             Anchors:         ['BottomMiddle', 'TopMiddle']
         });
     }
@@ -41,20 +40,20 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         var width  = this._canvas.width();
 
         // horizontal lines
-        for (var y = Config.GRID_SIZE >> 1; y < height; y += Config.GRID_SIZE) {
+        for (var y = Config.Grid.HALF_SIZE; y < height; y += Config.Grid.SIZE) {
             this._background.line(0, y, width, y, {
-                stroke:          Config.GRID_STROKE,
-                strokeWidth:     Config.GRID_STROKE_WIDTH,
-                strokeDashArray: Config.GRID_STROKE_STYLE
+                stroke:          Config.Grid.STROKE,
+                strokeWidth:     Config.Grid.STROKE_WIDTH,
+                strokeDashArray: Config.Grid.STROKE_STYLE
             });
         }
 
         // vertical lines
-        for (var x = Config.GRID_SIZE >> 1; x < width; x += Config.GRID_SIZE) {
+        for (var x = Config.Grid.HALF_SIZE; x < width; x += Config.Grid.SIZE) {
             this._background.line(x, 0, x, height, {
-                stroke:          Config.GRID_STROKE,
-                strokeWidth:     Config.GRID_STROKE_WIDTH,
-                strokeDashArray: Config.GRID_STROKE_STYLE
+                stroke:          Config.Grid.STROKE,
+                strokeWidth:     Config.Grid.STROKE_WIDTH,
+                strokeDashArray: Config.Grid.STROKE_STYLE
             });
         }
     }
@@ -63,37 +62,34 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         var _this = this;
 
         this._canvas.droppable({
-            accept:    Config.NODE_THUMBNAIL_CLASS,
+            accept:    Config.Selectors.Classes.NODE_THUMBNAIL,
             tolerance: 'fit',
             drop:      function(uiEvent, uiObject) {
                 _this._handleShapeDrop(uiEvent, uiObject);
             }
         });
 
-        this._shapes.find(Config.NODE_THUMBNAIL_CLASS).draggable({
+        this._shapes.find(Config.Selectors.Classes.NODE_THUMBNAIL).draggable({
             helper:   'clone',
-            opacity:  Config.DRAGGING_OPACITY,
-            cursor:   Config.DRAGGING_CURSOR,
+            opacity:  Config.Dragging.OPACITY,
+            cursor:   Config.Dragging.CURSOR,
             appendTo: this._body,
             revert:   'invalid'
         });
     }
 
     Editor.prototype._handleShapeDrop = function(uiEvent, uiObject) {
-        var nodeType    = uiObject.draggable.data(Config.DATA_CONSTRUCTOR);
+        var node        = new (uiObject.draggable.data(Config.Keys.CONSTRUCTOR))();
         var offset      = this._canvas.offset();
         var coordinates = this._toGridCoordinates(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
-        var halfGrid    = Config.GRID_SIZE >> 1;
-        var node        = new nodeType();
 
         with (node) {
             appendTo(this._canvas);
-            moveTo(coordinates.x * Config.GRID_SIZE + halfGrid, coordinates.y * Config.GRID_SIZE + halfGrid);
+            moveTo(coordinates.x * Config.Grid.SIZE + Config.Grid.HALF_SIZE, coordinates.y * Config.Grid.SIZE + Config.Grid.HALF_SIZE);
         }
     }
 
     Editor.prototype._toGridCoordinates = function(first, second) {
-        var halfGrid = Config.GRID_SIZE >> 1;
         var x        = Number.NaN;
         var y        = Number.NaN;
 
@@ -107,8 +103,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         }
 
         return {
-            x: Math.round((first  - halfGrid) / Config.GRID_SIZE),
-            y: Math.round((second - halfGrid) / Config.GRID_SIZE)
+            x: Math.round((first  - Config.Grid.HALF_SIZE) / Config.Grid.SIZE),
+            y: Math.round((second - Config.Grid.HALF_SIZE) / Config.Grid.SIZE)
         }
     }
 

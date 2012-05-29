@@ -8,15 +8,15 @@ define(['require-config', 'require-oop'], function(Config) {
         // epoch timestamp in milliseconds will do as an id
         this._id  = new Date().getTime();
 
-        var shape = jQuery(Config.SHAPES_MENU + ' #' + this.type());
+        var shape = jQuery(Config.Selectors.IDs.SHAPES_MENU + ' #' + this.type());
         var _this = this;
         this._visualRepresentation = shape
             .clone()
             // remove draggable class... thank you jsPlumb for all the weird sanity checks
             .attr('id', shape.attr('id') + this._id)
             .removeClass('ui-draggable')
-            .removeClass(Config.NODE_THUMBNAIL_CLASS.substr(1))
-            .addClass(Config.NODE_CLASS.substr(1))
+            .removeClass(Config.Selectors.Classes.NODE_THUMBNAIL.substr(1))
+            .addClass(Config.Selectors.Classes.NODE.substr(1))
             .css({
                 'position': 'absolute',
                 'width':    shape.css('width'),
@@ -26,7 +26,7 @@ define(['require-config', 'require-oop'], function(Config) {
                 // hover in
                 function(e) {
                     clearTimeout(this._hideEndpointsTimeout);
-                    var node = jQuery(this).data(Config.DATA_NODE);
+                    var node = jQuery(this).data(Config.Keys.NODE);
                     jQuery(node._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', '');
                     jQuery(node._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
                 },
@@ -34,7 +34,7 @@ define(['require-config', 'require-oop'], function(Config) {
                 function(e) {
                     var _this = this;
                     function hideEndpoints() {
-                        var node = jQuery(_this).data(Config.DATA_NODE);
+                        var node = jQuery(_this).data(Config.Keys.NODE);
                         jQuery(node._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
                         jQuery(node._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
                     }
@@ -42,13 +42,13 @@ define(['require-config', 'require-oop'], function(Config) {
                 }
             )
             .click(function() {
-                var node = jQuery(this).data(Config.DATA_NODE);
-                jQuery(Config.NODE_CLASS).removeClass('fuzzed-node-selected'); //TODO: config
-                jQuery(this).addClass('fuzzed-node-selected');
+                var node = jQuery(this).data(Config.Keys.NODE);
+                jQuery(Config.Selectors.Classes.NODE).removeClass(Config.Selectors.Classes.SELECTED);
+                jQuery(this).addClass(Config.Selectors.Classes.SELECTED);
             });
 
         // link back to Node object
-        this._visualRepresentation.data(Config.DATA_NODE, this);
+        this._visualRepresentation.data(Config.Keys.NODE, this);
     };
 
     Node.prototype.id = function() {
@@ -63,8 +63,8 @@ define(['require-config', 'require-oop'], function(Config) {
         this._visualRepresentation
             .appendTo(domElement)
             .css({
-                width:  Config.GRID_SIZE,
-                height: Config.GRID_SIZE
+                width:  Config.Grid.SIZE,
+                height: Config.Grid.SIZE
             });
 
         this._sourceEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
@@ -80,19 +80,17 @@ define(['require-config', 'require-oop'], function(Config) {
 
         jsPlumb.draggable(this._visualRepresentation, {
             containment: 'parent',
-            opacity:     Config.DRAGGING_OPACITY,
-            cursor:      Config.DRAGGING_CURSOR,
-            grid:        [Config.GRID_SIZE, Config.GRID_SIZE],
-            stack:       Config.NODES_CLASS
+            opacity:     Config.Dragging.OPACITY,
+            cursor:      Config.Dragging.CURSOR,
+            grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
+            stack:       Config.Selectors.Classes.NODE
         });
     };
 
     Node.prototype.moveTo = function(x, y) {
-        var halfGrid = Config.GRID_SIZE >> 1;
-
         this._visualRepresentation.css({
-            left: x - halfGrid || halfGrid,
-            top:  y - halfGrid || halfGrid
+            left: x - Config.Grid.HALF_SIZE || Config.Grid.HALF_SIZE,
+            top:  y - Config.Grid.HALF_SIZE || Config.Grid.HALF_SIZE
         });
     }
 
@@ -105,7 +103,7 @@ define(['require-config', 'require-oop'], function(Config) {
     BasicEvent.Extends(Node);
 
     BasicEvent.prototype.type = function() {
-        return Config.BASIC_EVENT;
+        return Config.Types.BASIC_EVENT;
     }
 
     /*
@@ -117,7 +115,7 @@ define(['require-config', 'require-oop'], function(Config) {
     UndevelopedEvent.Extends(Node);
 
     UndevelopedEvent.prototype.type = function() {
-       return Config.UNDEVELOPED_EVENT;
+       return Config.Types.UNDEVELOPED_EVENT;
     }
 
     /*
@@ -129,7 +127,7 @@ define(['require-config', 'require-oop'], function(Config) {
     HouseEvent.Extends(Node);
 
     HouseEvent.prototype.type = function() {
-       return Config.HOUSE_EVENT;
+       return Config.Types.HOUSE_EVENT;
     }
 
     /*
@@ -141,7 +139,7 @@ define(['require-config', 'require-oop'], function(Config) {
     AndGate.Extends(Node);
 
     AndGate.prototype.type = function() {
-       return Config.AND_GATE;
+       return Config.Types.AND_GATE;
     }
 
     /*
@@ -153,7 +151,7 @@ define(['require-config', 'require-oop'], function(Config) {
     OrGate.Extends(Node);
 
     OrGate.prototype.type = function() {
-        return Config.OR_GATE;
+        return Config.Types.OR_GATE;
     }
 
     /*
@@ -165,7 +163,7 @@ define(['require-config', 'require-oop'], function(Config) {
     XorGate.Extends(Node);
 
     XorGate.prototype.type = function() {
-        return Config.XOR_GATE;
+        return Config.Types.XOR_GATE;
     }
 
     /*
@@ -177,7 +175,7 @@ define(['require-config', 'require-oop'], function(Config) {
     PriorityAndGate.Extends(Node);
 
     PriorityAndGate.prototype.type = function() {
-        return Config.PRIORITY_AND_GATE;
+        return Config.Types.PRIORITY_AND_GATE;
     }
 
     /*
@@ -189,7 +187,7 @@ define(['require-config', 'require-oop'], function(Config) {
     VotingOrGate.Extends(Node);
 
     VotingOrGate.prototype.type = function() {
-        return Config.VOTING_OR_GATE;
+        return Config.Types.VOTING_OR_GATE;
     }
 
     /*
@@ -201,7 +199,7 @@ define(['require-config', 'require-oop'], function(Config) {
     InhibitGate.Extends(Node);
 
     InhibitGate.prototype.type = function() {
-        return Config.INHIBIT_GATE;
+        return Config.Types.INHIBIT_GATE;
     }
 
     /*
@@ -213,7 +211,7 @@ define(['require-config', 'require-oop'], function(Config) {
     ChoiceEvent.Extends(Node);
 
     ChoiceEvent.prototype.type = function() {
-        return Config.CHOICE_EVENT;
+        return Config.Types.CHOICE_EVENT;
     }
 
     /*
@@ -225,7 +223,7 @@ define(['require-config', 'require-oop'], function(Config) {
     RedundancyEvent.Extends(Node);
 
     RedundancyEvent.prototype.type = function() {
-        return Config.REDUNDANCY_EVENT;
+        return Config.Types.REDUNDANCY_EVENT;
     }
 
     /*
@@ -237,24 +235,24 @@ define(['require-config', 'require-oop'], function(Config) {
     Block.Extends(Node);
 
     Block.prototype.type = function() {
-        return Config.BLOCK;
+        return Config.Types.BLOCK;
     }
 
     /*
      *  Associate the constructors with the thumbnails in the shape menu
      */
-    jQuery('#' + Config.BASIC_EVENT)      .data(Config.DATA_CONSTRUCTOR, BasicEvent);
-    jQuery('#' + Config.UNDEVELOPED_EVENT).data(Config.DATA_CONSTRUCTOR, UndevelopedEvent);
-    jQuery('#' + Config.HOUSE_EVENT)      .data(Config.DATA_CONSTRUCTOR, HouseEvent);
-    jQuery('#' + Config.AND_GATE)         .data(Config.DATA_CONSTRUCTOR, AndGate);
-    jQuery('#' + Config.OR_GATE)          .data(Config.DATA_CONSTRUCTOR, OrGate);
-    jQuery('#' + Config.XOR_GATE)         .data(Config.DATA_CONSTRUCTOR, XorGate);
-    jQuery('#' + Config.PRIORITY_AND_GATE).data(Config.DATA_CONSTRUCTOR, PriorityAndGate);
-    jQuery('#' + Config.VOTING_OR_GATE)   .data(Config.DATA_CONSTRUCTOR, VotingOrGate);
-    jQuery('#' + Config.INHIBIT_GATE)     .data(Config.DATA_CONSTRUCTOR, InhibitGate);
-    jQuery('#' + Config.CHOICE_EVENT)     .data(Config.DATA_CONSTRUCTOR, ChoiceEvent);
-    jQuery('#' + Config.REDUNDANCY_EVENT) .data(Config.DATA_CONSTRUCTOR, RedundancyEvent);
-    jQuery('#' + Config.BLOCK)            .data(Config.DATA_CONSTRUCTOR, Block);
+    jQuery('#' + Config.Types.BASIC_EVENT)      .data(Config.Keys.CONSTRUCTOR, BasicEvent);
+    jQuery('#' + Config.Types.UNDEVELOPED_EVENT).data(Config.Keys.CONSTRUCTOR, UndevelopedEvent);
+    jQuery('#' + Config.Types.HOUSE_EVENT)      .data(Config.Keys.CONSTRUCTOR, HouseEvent);
+    jQuery('#' + Config.Types.AND_GATE)         .data(Config.Keys.CONSTRUCTOR, AndGate);
+    jQuery('#' + Config.Types.OR_GATE)          .data(Config.Keys.CONSTRUCTOR, OrGate);
+    jQuery('#' + Config.Types.XOR_GATE)         .data(Config.Keys.CONSTRUCTOR, XorGate);
+    jQuery('#' + Config.Types.PRIORITY_AND_GATE).data(Config.Keys.CONSTRUCTOR, PriorityAndGate);
+    jQuery('#' + Config.Types.VOTING_OR_GATE)   .data(Config.Keys.CONSTRUCTOR, VotingOrGate);
+    jQuery('#' + Config.Types.INHIBIT_GATE)     .data(Config.Keys.CONSTRUCTOR, InhibitGate);
+    jQuery('#' + Config.Types.CHOICE_EVENT)     .data(Config.Keys.CONSTRUCTOR, ChoiceEvent);
+    jQuery('#' + Config.Types.REDUNDANCY_EVENT) .data(Config.Keys.CONSTRUCTOR, RedundancyEvent);
+    jQuery('#' + Config.Types.BLOCK)            .data(Config.Keys.CONSTRUCTOR, Block);
 
     /*
      *  Return the collection of all nodes for require

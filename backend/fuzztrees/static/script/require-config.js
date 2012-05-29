@@ -1,55 +1,65 @@
 define(function() {
+    var gridSize = 50;
+
     return {
-        // Layouting
-        LAYOUT_SPACING:            0,
-        LAYOUT_WEST_SIZE:          250,
-        LAYOUT_NORTH_SIZE:         24,
-        LAYOUT_EAST_SIZE:          250,
+        Grid: {
+            SIZE:         gridSize,
+            HALF_SIZE:    gridSize >> 1,
+            STROKE:       '#ddd',
+            STROKE_WIDTH: 1,
+            STROKE_STYLE: '7 3' // svg dash-array value
+        },
 
-        // Background Grid
-        GRID_SIZE:                 50,
-        GRID_STROKE:               '#dddddd',
-        GRID_STROKE_WIDTH:         1,
-        GRID_STROKE_STYLE:         '7, 3',
+        JSPlumb: {
+            STROKE:         '#000',
+            STROKE_WIDTH:   2,
+            STROKE_STYLE:   'Flowchart',
 
-        // JsPlumb
-        JSPLUMB_LINE_STROKE:       '#000000',
-        JSPLUMB_LINE_STROKE_WIDTH: 2,
-        JSPLUMB_LINE_STYLE:        'Flowchart', 
+            ENDPOINT_RADIUS: 7,
+            ENDPOINT_FILL:   '#00d1e0',
+            ENDPOINT_STYLE:  'Dot'
+        },
 
-        JSPLUMB_ENDPOINT_RADIUS:   7,
-        JSPLUMB_ENDPOINT_FILL:     '#00d1e0',
-        JSPLUMB_ENDPOINT_STYLE:    'Dot',
+        Dragging: {
+            OPACITY: 0.5,
+            CURSOR:  'move'
+        },
 
-        // Dragging
-        DRAGGING_OPACITY:          0.5,
-        DRAGGING_CURSOR:           'move',
+        Keys: {
+            CONSTRUCTOR: 'constructor',
+            NODE:        'node'
+        },
 
-        // Data keys
-        DATA_CONSTRUCTOR:          'constructor',
-        DATA_NODE:                 'node',
+        Types: {
+            BASIC_EVENT:       'basic',
+            UNDEVELOPED_EVENT: 'undeveloped',
+            HOUSE_EVENT:       'house',
+            AND_GATE:          'and', 
+            OR_GATE:           'or', 
+            XOR_GATE:          'xor',
+            PRIORITY_AND_GATE: 'p-and',
+            VOTING_OR_GATE:    'v-or',
+            INHIBIT_GATE:      'inhibit',
+            CHOICE_EVENT:      'choice',
+            REDUNDANCY_EVENT:  'redundancy',
+            BLOCK:             'block'
+        },
 
-        // Type Strings
-        BASIC_EVENT:               'basic',
-        UNDEVELOPED_EVENT:         'undeveloped',
-        HOUSE_EVENT:               'house',
-        AND_GATE:                  'and', 
-        OR_GATE:                   'or', 
-        XOR_GATE:                  'xor',
-        PRIORITY_AND_GATE:         'p-and',
-        VOTING_OR_GATE:            'v-or',
-        INHIBIT_GATE:              'inhibit',
-        CHOICE_EVENT:              'choice',
-        REDUNDANCY_EVENT:          'redundancy',
-        BLOCK:                     'block',
+        Selectors: {
+            IDs: {
+                TOOLBAR:         '#FuzzedToolbar',
+                SHAPES_MENU:     '#FuzzedShapes',
+                CANVAS:          '#FuzzedCanvas',
+                PROPERTIES_MENU: '#FuzzedProperties'
 
-        // Selectors
-        TOOLBAR:                   '#FuzzedToolbar',
-        SHAPES_MENU:               '#FuzzedShapes',
-        CANVAS:                    '#FuzzedCanvas',
-        PROPERTIES_MENU:           '#FuzzedProperties',
-        FUZZED_CLASS:              '.fuzzed-',
-        NODE_CLASS:                '.fuzzed-node',
-        NODE_THUMBNAIL_CLASS:      '.fuzzed-node-thumbnail'
+            },
+
+            Classes: {
+                PREFIX:         '.fuzzed-',
+                NODE:           '.fuzzed-node',
+                NODE_THUMBNAIL: '.fuzzed-node-thumbnail',
+                SELECTED:       '.fuzzed-node-selected'
+            }
+        }
     };
 });
