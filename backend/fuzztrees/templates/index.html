@@ -22,9 +22,7 @@
 </head>
 <body>
 	<div data-role="page">
-		<div data-theme="c"  data-role="header">
-			<h1>FuzzTrees</h1>
-		</div>	
+		{% include "toolbar.html" %}
 		<div data-role="content">	
 			<div data-theme="c" style="margin-top: 100px; margin-left: auto; margin-right: auto; width: 580px">
 				<form data-ajax="false" style="text-align:center" action="/login/" method="get" id="openid_form">

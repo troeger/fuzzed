@@ -1,9 +1,11 @@
-<div id="FuzzedLogin">
-    <span class="fuzzed-header-label">
-        Hello {{ user }}
-    </span>
+<div data-theme="c" data-role="header" id="toolbar">
+{% if user.is_authenticated %}
+	<div id="toolbar-content">
+		<span>{{ user }}</span>
+		<a href="/?logout" data-ajax="false" data-role="button">Logout</a>
+	</div>
+{% else %}
+	<h1>FuzzTrees</h1>
+{% endif %}
 
-    <form data-ajax="false" class="fuzzed-header-button" action="/logout/" method="post">{% csrf_token %}
-       <input type="submit" value="Logout" data-role="button" data-mini="true"/>
-    </form>
 </div>

@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 from nodes_config import NODE_TYPES, nodeTypeChoices
 
 class GraphTypes():
-	FAULT_TREE=1,
-	FUZZ_TREE=2,
+	FAULT_TREE=1
+	FUZZ_TREE=2
 	RBD=3
 
 GRAPH_TYPE = (

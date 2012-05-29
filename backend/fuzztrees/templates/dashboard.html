@@ -15,19 +15,24 @@
 
 <body>
 	<div data-role="page">
-		<div data-role="header">
-			{% include "toolbar.html" %}
-		</div>
+		{% include "toolbar.html" %}
 
 		<div data-role="content">
-		<ul data-role="listview">
-		{% for g in graphs %}
-		<li>
-			<a class="ui-li-heading" href="/editor/{{ g.pk }}">{{ g }}</a>
-			<p class="ui-li-desc">Created on: {{ g.created }}</p>
-		</li>
-		{% endfor %}
-		</ul>
+			<ul data-role="listview" data-insert="true" class="ui-listview-inset ui-corner-all ui-shadow">
+			{% for g in graphs %}
+			<li>
+				<a class="ui-link-inherit" href="/editor/{{ g.pk }}">
+					<h3 class="ui-li-heading">{{ g }}</h3>
+					<p class="ui-li-desc">Created on: {{ g.created }}</p>
+				</a>
+			</li>
+			{% endfor %}
+			</ul>
+			<form action="/dashboard/" style="text-align: center" method="post">{% csrf_token %}
+			   <button type="submit" name="new" value="faulttree" data-mini="true" data-inline="true" data-icon="plus" disabled="True" >New Fault Tree</button>
+			   <button type="submit" name="new" value="fuzztree"  data-mini="true" data-inline="true" data-icon="plus" >New FuzzTree</button>
+			   <button type="submit" name="new" value="rbd"       data-mini="true" data-inline="true" data-icon="plus" disabled="True" >New Reliability Block Diagram</button>
+			</form>
 		</div>
 	</div>
 </body>

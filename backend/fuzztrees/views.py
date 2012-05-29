@@ -3,18 +3,44 @@ from django.contrib.auth import login as backend_login
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib import auth
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
 import os, urllib, random, string
-from fuzztrees.models import Graph
+from fuzztrees.models import Graph, GraphTypes, History, Commands
 
 from fuzztrees.models import User
 from nodes_config import NODE_TYPES
 
 def index(request):
-    return render_to_response('index.html', {}, context_instance=RequestContext(request))
+	if "logout" in request.GET:
+		auth.logout(request)
+	return render_to_response('index.html', {}, context_instance=RequestContext(request))
 
 def dashboard(request):
+	if "new" in request.POST:
+		if request.POST['new']=='faulttree':
+			g=Graph(owner=request.user)
+			g.type=GraphTypes.FAULT_TREE
+			g.name="New Fault Tree"
+			g.save()
+			c=History(command=Commands.ADD_GRAPH, graph=g)
+			c.save()
+		elif request.POST['new']=='fuzztree':
+			g=Graph(owner=request.user)
+			g.type=GraphTypes.FUZZ_TREE
+			g.name="New FuzzTree"
+			g.save()
+			c=History(command=Commands.ADD_GRAPH, graph=g)
+			c.save()
+		elif request.POST['new']=='rbd':
+			g=Graph(owner=request.user)
+			g.type=GraphTypes.RBD
+			g.name="New Reliability Block Diagram"
+			g.save()
+			c=History(command=Commands.ADD_GRAPH, graph=g)
+			c.save()
+		else:
+			return HttpResponseBadRequest()
 	graphs=request.user.graphs.all()
 	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
 
@@ -62,8 +88,4 @@ def login(request):
 	#else:
 	#	return HttpResponseRedirect('/editor/%u'%allgraphs[0].pk)
 	return HttpResponseRedirect('/dashboard/')
-
-def logout(request):
-	auth.logout(request)
-	return HttpResponseRedirect('/')
 	
