@@ -1,19 +1,10 @@
 #toolbar {
     height:      37px;
-    font-size:   11px;
-    overflow:    hidden;
-    text-align:  right;
-    padding-top: 7px;
-    padding-right: 5px;
-}
-
-#toolbar-content form {
-	display: inline;
 }
 
 #FuzzedContent {
     position: absolute;
-    top:      46px;
+    top:      39px;
     bottom:   0;
     width:    100%;
 }

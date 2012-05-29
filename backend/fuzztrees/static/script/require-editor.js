@@ -1,6 +1,7 @@
 define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
     function Editor(graph) {
+		console.log("Hello");
         this._initializeMember(graph);
         this._initializeJsPlumb();
 

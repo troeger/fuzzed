@@ -1,7 +1,7 @@
 <html xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 
 <head>
-	<title>FuzzTrees Modeling - Demo Page</title>
+	<title>FuzzTrees - {{ graph.name }}</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<style type="text/css">
@@ -41,8 +41,12 @@
 </head>
 
 <body>
-	<div data-role="page" data-add-back-btn="true">
-		{% include "toolbar.html" %}
+	<div data-role="page">
+		<div data-theme="c" data-role="header" id="toolbar">
+			<a href="/dashboard/" data-icon="home">Dashboard</a>
+			<h1>{{ graph.name }}</h1>
+			<a href="/?logout" data-icon="delete" data-ajax="false">Logout</a>
+		</div>
 
 		<div id="FuzzedContent">
 			{% include "content.html" %}
