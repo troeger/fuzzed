@@ -41,7 +41,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         var width  = this._canvas.width();
 
         // horizontal lines
-        for (var y = Config.GRID_SIZE / 2; y < height; y += Config.GRID_SIZE) {
+        for (var y = Config.GRID_SIZE >> 1; y < height; y += Config.GRID_SIZE) {
             this._background.line(0, y, width, y, {
                 stroke:          Config.GRID_STROKE,
                 strokeWidth:     Config.GRID_STROKE_WIDTH,
@@ -50,7 +50,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         }
 
         // vertical lines
-        for (var x = Config.GRID_SIZE / 2; x < width; x += Config.GRID_SIZE) {
+        for (var x = Config.GRID_SIZE >> 1; x < width; x += Config.GRID_SIZE) {
             this._background.line(x, 0, x, height, {
                 stroke:          Config.GRID_STROKE,
                 strokeWidth:     Config.GRID_STROKE_WIDTH,
@@ -80,15 +80,36 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     Editor.prototype._handleShapeDrop = function(uiEvent, uiObject) {
-        var node = uiObject.draggable.data(Config.DATA_CONSTRUCTOR);
-        var position   = this._canvas.position();
-        // calculate the position where to drop the element
-        // we have to take into account here the offset of the container (position.left/.top)
-        // as well as the grid snapping (rounding and Config.GRID_SIZE magic)
-        var x = Math.round((uiEvent.pageX - position.left - uiEvent.offsetX) / Config.GRID_SIZE) * Config.GRID_SIZE;
-        var y = Math.round((uiEvent.pageY - position.top  - uiEvent.offsetY) / Config.GRID_SIZE) * Config.GRID_SIZE;
+        var nodeType    = uiObject.draggable.data(Config.DATA_CONSTRUCTOR);
+        var offset      = this._canvas.offset();
+        var coordinates = this._toGridCoordinates(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
+        var halfGrid    = Config.GRID_SIZE >> 1;
+        var node        = new nodeType();
 
-        new node().appendTo(this._canvas, x, y);
+        with (node) {
+            appendTo(this._canvas);
+            moveTo(coordinates.x * Config.GRID_SIZE + halfGrid, coordinates.y * Config.GRID_SIZE + halfGrid);
+        }
+    }
+
+    Editor.prototype._toGridCoordinates = function(first, second) {
+        var halfGrid = Config.GRID_SIZE >> 1;
+        var x        = Number.NaN;
+        var y        = Number.NaN;
+
+        if (jQuery.isNumeric(first) && jQuery.isNumeric(second)) {
+            x = first;
+            y = second;
+
+        } else if (typeof first === 'object') {
+            x = first.x;
+            y = first.y;
+        }
+
+        return {
+            x: Math.round((first  - halfGrid) / Config.GRID_SIZE),
+            y: Math.round((second - halfGrid) / Config.GRID_SIZE)
+        }
     }
 
     return Editor;

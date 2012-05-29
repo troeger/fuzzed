@@ -59,13 +59,13 @@ define(['require-config', 'require-oop'], function(Config) {
         throw 'Abstract Method - override type in subclass';
     };
 
-    Node.prototype.appendTo = function(domElement, x, y) {
+    Node.prototype.appendTo = function(domElement) {
         this._visualRepresentation
             .appendTo(domElement)
             .css({
-                top:  y || 0,
-                left: x || 0
-        });
+                width:  Config.GRID_SIZE,
+                height: Config.GRID_SIZE
+            });
 
         this._sourceEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
             anchor:   'BottomCenter',
@@ -86,6 +86,15 @@ define(['require-config', 'require-oop'], function(Config) {
             stack:       Config.NODES_CLASS
         });
     };
+
+    Node.prototype.moveTo = function(x, y) {
+        var halfGrid = Config.GRID_SIZE >> 1;
+
+        this._visualRepresentation.css({
+            left: x - halfGrid || halfGrid,
+            top:  y - halfGrid || halfGrid
+        });
+    }
 
     /*
      *  Basic Event
