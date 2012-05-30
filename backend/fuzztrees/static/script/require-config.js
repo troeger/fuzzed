@@ -24,6 +24,10 @@ define(function() {
             ENDPOINT_STYLE:  'Dot'
         },
 
+        Node: {
+            LABEL_HEIGHT: 15 
+        },
+
         Dragging: {
             OPACITY:        0.5,
             CURSOR:         'move',
@@ -63,7 +67,7 @@ define(function() {
             NODE:           'fuzzed-node',
             NODE_THUMBNAIL: 'fuzzed-node-thumbnail',
             NODE_IMAGE:     'fuzzed-node-image',
-            SELECTED:       'fuzzed-node-selected'
+            NODE_LABEL:     'fuzzed-node-label'
         }
     };
 });

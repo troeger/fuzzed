@@ -37,6 +37,12 @@
     z-index:   100;
 }
 
+.fuzzed-node-thumbnail-cell {
+    text-align: center;
+    font-size:  0.7em;
+    margin:     10px 0px;
+}
+
 .fuzzed-node-thumbnail {
     display: inline-block;
 }
@@ -50,17 +56,23 @@
     display: block;
 }
 
-.fuzzed-node-thumbnail-cell {
-    text-align: center;
-    font-size:  0.7em;
-    margin:     10px 0px;
-}
-
 .fuzzed-node {
-    border:     1px dashed rgba(255, 255, 255, 0);
-    text-align: center;
+    text-align: center;;
+    outline:    1px dashed rgba(255, 255, 255, 0);
 }
 
-.fuzzed-node-selected {
-    border: 1px dashed #bbb;
+.fuzzed-node:hover {
+    outline:    1px dashed rgba(190, 190, 190, 255);
+}
+
+.fuzzed-node-image {
+    display: inline-block;
+    margin:  3px;
+}
+
+.fuzzed-node-label {
+    height:      15px;
+    line-height: 15px;
+    font-weight: bold;
+    font-size:   0.8em;
 }

@@ -23,7 +23,10 @@ define(['require-config', 'require-oop'], function(Config) {
     Node.prototype.appendTo = function(domElement) {
         this._visualRepresentation.appendTo(domElement);
 
-        // interactivity and endpoint initialization need to go here - element needs to be in DOM
+        console.log(this._visualRepresentation.children('div').outerHeight(true));
+        // some visual stuff, interaction and endpoints need to go here since they require the elements to be
+        // already in the DOM. This is why we cannot do this already in the visual representation initialization
+        this._resizeOnDrop();
         this._initializeEndpoints();
         this._makeInteractive();
 
@@ -48,6 +51,7 @@ define(['require-config', 'require-oop'], function(Config) {
     Node.prototype._initializeVisualRepresentation = function() {
         // get the thumbnail and clone it
         var container = jQuery('<div>');
+        var label     = jQuery('<span>Foo</span>');
         var thumbnail = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
 
         container
@@ -68,10 +72,30 @@ define(['require-config', 'require-oop'], function(Config) {
             .addClass(Config.Classes.NODE_IMAGE)
             .appendTo(container);
 
+        label
+            .addClass(Config.Classes.NODE_LABEL)
+            .appendTo(container);
+
         this._visualRepresentation = container;
     }
 
-    Node.prototype._initializeEndpoints = function() {        
+    Node.prototype._resizeOnDrop = function() {
+        // find the nodes
+        var image = this._visualRepresentation.children('.' + Config.Classes.NODE_IMAGE);
+        var svg   = image.children('svg');
+        var g     = svg.children('g');
+
+        // calculate the scale factor
+        var marginOffset = image.outerWidth(true) - image.width();
+        var scaleFactor  = (Config.Grid.SIZE - Config.Node.LABEL_HEIGHT - marginOffset) / svg.height();
+
+        // resize the svg and its elements
+        svg.width(svg.width() * scaleFactor);
+        svg.height(svg.height() * scaleFactor);
+        g.attr('transform', 'scale(' + scaleFactor + ') ' + g.attr('transform'));
+    }
+
+    Node.prototype._initializeEndpoints = function() {     
         this._sourceEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
             anchor:   'BottomCenter',
             isSource: true,
@@ -88,6 +112,7 @@ define(['require-config', 'require-oop'], function(Config) {
     Node.prototype._makeInteractive = function() {
         var _this = this;
 
+        // make the node draggable
         jsPlumb.draggable(this._visualRepresentation, {
             containment: 'parent',
             opacity:     Config.Dragging.OPACITY,
@@ -98,11 +123,11 @@ define(['require-config', 'require-oop'], function(Config) {
 
         this._visualRepresentation.hover(
             function() {
-                _this._visualRepresentation.addClass(Config.Classes.SELECTED);
+                //_this._visualRepresentation.addClass(Config.Classes.SELECTED);
             },
             function() {
-               _this._visualRepresentation.removeClass(Config.Classes.SELECTED);
-            });    
+               //_this._visualRepresentation.removeClass(Config.Classes.SELECTED);
+            });  
 
         // this._visualRepresentation
         //     .hover(
