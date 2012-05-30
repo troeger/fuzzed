@@ -125,8 +125,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         var coordinates = this._toGridCoordinates(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
 
         node
-            .appendTo(this._canvas)
-            .moveTo(coordinates.x * Config.Grid.SIZE, coordinates.y * Config.Grid.SIZE);
+            .moveTo(coordinates.x * Config.Grid.SIZE, coordinates.y * Config.Grid.SIZE)
+            .appendTo(this._canvas);
     }
 
     Editor.prototype._toGridCoordinates = function(first, second) {

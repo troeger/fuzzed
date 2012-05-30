@@ -37,10 +37,6 @@
     z-index:   100;
 }
 
-.fuzzed-node-selected {
-    border: 2px solid blue;
-}
-
 .fuzzed-node-thumbnail {
     display: inline;
     margin:  3px 0 5px 0;
@@ -56,4 +52,19 @@
     text-align: center;
     font-size:  0.7em;
     margin:     10px 0px;
+}
+
+.fuzzed-node {
+    margin-left: -4px; /* compensate for border and padding */
+    border:       1px dashed rgba(255, 255, 255, 0);
+    padding:      3px;
+}
+
+.fuzzed-node-image {
+    display: block;
+    margin:  0 auto;
+}
+
+.fuzzed-node-selected {
+    border: 1px dashed #bbb;
 }

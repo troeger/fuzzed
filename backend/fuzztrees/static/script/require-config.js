@@ -58,6 +58,7 @@ define(function() {
             PREFIX:         'fuzzed-',
             NODE:           'fuzzed-node',
             NODE_THUMBNAIL: 'fuzzed-node-thumbnail',
+            NODE_IMAGE:     'fuzzed-node-image',
             SELECTED:       'fuzzed-node-selected'
         }
     };

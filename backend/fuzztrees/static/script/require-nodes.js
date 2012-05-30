@@ -5,48 +5,9 @@ define(['require-config', 'require-oop'], function(Config) {
     function Node() {
         // pass here on inheritance calls
         if (this.constructor === Node) return;
-        // epoch timestamp in milliseconds will do as an id
-        this._id  = new Date().getTime();
 
-        var shape = jQuery('#'+Config.IDs.SHAPES_MENU + ' #' + this.type());
-        var _this = this;
-        this._visualRepresentation = shape
-            .clone()
-            // remove draggable class... thank you jsPlumb for all the weird sanity checks
-            .attr('id', shape.attr('id') + this._id)
-            .removeClass('ui-draggable')
-            .removeClass(Config.Classes.NODE_THUMBNAIL)
-            .addClass(Config.Classes.NODE)
-            .css({
-                'position': 'absolute',
-                'width':    shape.css('width'),
-                'height':   shape.css('height')
-            })
-            .hover(
-                // hover in
-                function(e) {
-                    clearTimeout(this._hideEndpointsTimeout);
-                    var node = jQuery(this).data(Config.Keys.NODE);
-                    jQuery(node._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', '');
-                    jQuery(node._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
-                },
-                // hover out
-                function(e) {
-                    var _this = this;
-                    function hideEndpoints() {
-                        var node = jQuery(_this).data(Config.Keys.NODE);
-                        jQuery(node._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
-                        jQuery(node._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
-                    }
-                    this._hideEndpointsTimeout = setTimeout(hideEndpoints, 2000);
-                }
-            )
-            .click(function() {
-                var node = jQuery(this).data(Config.Keys.NODE);
-                jQuery('.'+Config.Classes.NODE).removeClass(Config.Classes.SELECTED);
-                jQuery(this).addClass(Config.Classes.SELECTED);
-            });
-
+        this._generateId();
+        this._initializeVisualRepresentation();
         // link back to Node object
         this._visualRepresentation.data(Config.Keys.NODE, this);
     };
@@ -60,31 +21,11 @@ define(['require-config', 'require-oop'], function(Config) {
     };
 
     Node.prototype.appendTo = function(domElement) {
-        this._visualRepresentation
-            .appendTo(domElement)
-            .css({
-                width:  Config.Grid.SIZE,
-                height: Config.Grid.SIZE
-            });
+        this._visualRepresentation.appendTo(domElement);
 
-        this._sourceEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
-            anchor:   'BottomCenter',
-            isSource: true,
-            isTarget: false
-        });
-        this._targetEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
-            anchor:   'TopCenter',
-            isSource: false,
-            isTarget: true
-        });
-
-        jsPlumb.draggable(this._visualRepresentation, {
-            containment: 'parent',
-            opacity:     Config.Dragging.OPACITY,
-            cursor:      Config.Dragging.CURSOR,
-            grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
-            stack:       '.'+Config.Classes.NODE
-        });
+        // interactivity and endpoint initialization need to go here - element needs to be in DOM
+        this._initializeEndpoints();
+        this._makeInteractive();
 
         return this;
     };
@@ -94,8 +35,100 @@ define(['require-config', 'require-oop'], function(Config) {
             left: x || 0,
             top:  y || 0
         });
+        this._visualRepresentation.trigger('dragstart');
 
         return this;
+    }
+
+    Node.prototype._generateId = function() {
+        // epoch timestamp will do
+        this._id = new Date().getTime();
+    }
+
+    Node.prototype._initializeVisualRepresentation = function() {
+        // get the thumbnail and clone it
+        var container = jQuery('<div>');
+        var shape     = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
+
+        container
+            .attr('id', shape.attr('id') + this._id)
+            .addClass(Config.Classes.NODE)
+            .css({
+                position: 'absolute',
+                width:    Config.Grid.SIZE,
+                height:   Config.Grid.SIZE 
+            });
+
+        shape
+            // cleanup the thumbnail's specific properties
+            .removeClass('ui-draggable')
+            .removeClass(Config.Classes.NODE_THUMBNAIL)
+            .removeAttr('id')
+            // add new stuff
+            .addClass(Config.Classes.NODE_IMAGE)
+            .appendTo(container);
+
+        this._visualRepresentation = container;
+    }
+
+    Node.prototype._initializeEndpoints = function() {        
+        this._sourceEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
+            anchor:   'BottomCenter',
+            isSource: true,
+            isTarget: false
+        });
+
+        this._targetEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
+            anchor:   'TopCenter',
+            isSource: false,
+            isTarget: true
+        });
+    }
+
+    Node.prototype._makeInteractive = function() {
+        var _this = this;
+
+        jsPlumb.draggable(this._visualRepresentation, {
+            containment: 'parent',
+            opacity:     Config.Dragging.OPACITY,
+            cursor:      Config.Dragging.CURSOR,
+            grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
+            stack:       '.' + Config.Classes.NODE
+        });
+
+        this._visualRepresentation.hover(
+            function() {
+                _this._visualRepresentation.addClass(Config.Classes.SELECTED);
+            },
+            function() {
+               _this._visualRepresentation.removeClass(Config.Classes.SELECTED);
+            });    
+
+        // this._visualRepresentation
+        //     .hover(
+        //         // hover in
+        //         function(e) {
+        //             clearTimeout(this._hideEndpointsTimeout);
+        //             var node = jQuery(this).data(Config.Keys.NODE);
+        //             jQuery(node._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', '');
+        //             jQuery(node._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
+        //         },
+        //         // hover out
+        //         function(e) {
+        //             var _this = this;
+        //             function hideEndpoints() {
+        //                 var node = jQuery(_this).data(Config.Keys.NODE);
+        //                 jQuery(node._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
+        //                 jQuery(node._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
+        //             }
+        //             this._hideEndpointsTimeout = setTimeout(hideEndpoints, 2000);
+        //         }
+        //     )
+        //     .click(function() {
+        //         var node = jQuery(this).data(Config.Keys.NODE);
+        //         jQuery(Config.Selectors.Classes.NODE).removeClass(Config.Selectors.Classes.SELECTED);
+        //         jQuery(this).addClass(Config.Selectors.Classes.SELECTED);
+        //     });
     }
 
     /*
