@@ -123,11 +123,21 @@ define(['require-config', 'require-oop'], function(Config) {
 
         this._visualRepresentation.hover(
             function() {
-                //_this._visualRepresentation.addClass(Config.Classes.SELECTED);
+                if (!_this.selected)
+                    _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_HOVER);
             },
             function() {
-               //_this._visualRepresentation.removeClass(Config.Classes.SELECTED);
-            });  
+                if (!_this.selected)
+                    _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+            }
+        );
+
+        this._visualRepresentation.click(
+            function() {
+                _this.selected = true; //XXX: replace with select() method
+                _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+            }
+        );
 
         // this._visualRepresentation
         //     .hover(

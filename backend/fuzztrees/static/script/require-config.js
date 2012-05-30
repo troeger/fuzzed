@@ -25,7 +25,10 @@ define(function() {
         },
 
         Node: {
-            LABEL_HEIGHT: 15 
+            LABEL_HEIGHT: 15,
+            STROKE_NORMAL:   '#000000',
+            STROKE_HOVER:    '#409FFF',
+            STROKE_SELECTED: '#FF9640'
         },
 
         Dragging: {
