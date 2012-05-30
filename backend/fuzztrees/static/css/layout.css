@@ -10,13 +10,13 @@
 }
 
 #FuzzedShapes {
-	position:     relative;
-    width:        200px;
-    min-width:    200px;
-    height:       100%;
-    float:        left;
-    overflow:     auto;
-    border-right: 1px solid #bbb;
+	position:  absolute;
+    top:       0;
+    left:      0;
+    width:     200px;
+    min-width: 200px;
+    overflow:  auto;
+    z-index:   100;
 }
 
 #FuzzedCanvas {
@@ -24,6 +24,17 @@
 	height:           100%;
 	overflow:         auto;
     background-color: white;
+    z-index:          0;
+}
+
+#FuzzedProperties {
+    position:  absolute;
+    top:       0;
+    right:     0;
+    width:     300px;
+    min-width: 300px;
+    overflow:  auto;
+    z-index:   100;
 }
 
 .fuzzed-node-selected {

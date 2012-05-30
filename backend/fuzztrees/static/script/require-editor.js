@@ -3,8 +3,9 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     function Editor(graph) {
         this._initializeMember(graph);
         this._initializeJsPlumb();
-        this._drawBackground();
-        this._enableShapeMenu();
+        this._initializeBackground();
+        this._initializeShapeMenu();
+        this._initializePropertiesMenu();
     }
 
     Editor.prototype.graphId = function() {
@@ -34,7 +35,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         });
     }
 
-    Editor.prototype._drawBackground = function() {
+    Editor.prototype._initializeBackground = function() {
         var _this = this;
 
         _this._drawGrid();
@@ -73,9 +74,30 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         }
     }
 
-    Editor.prototype._enableShapeMenu = function() {
+    Editor.prototype._initializeShapeMenu = function() {
         var _this = this;
 
+        // make shape menu itself draggable
+        jQuery(Config.Selectors.IDs.SHAPES_MENU).draggable({
+            containment:   Config.Selectors.IDs.CONTENT,
+            stack:         Config.Selectors.Classes.NODE,
+            cursor:        Config.Dragging.CURSOR,
+            scroll:        false,
+            snap:          Config.Selectors.IDs.CONTENT,
+            snapMode:      'inner',
+            snapTolerance: Config.Dragging.SNAP_TOLERANCE
+        });
+
+        // make shapes in the menu draggable
+        this._shapes.find(Config.Selectors.Classes.NODE_THUMBNAIL).draggable({
+            helper:   'clone',
+            opacity:  Config.Dragging.OPACITY,
+            cursor:   Config.Dragging.CURSOR,
+            appendTo: this._body,
+            revert:   'invalid'
+        });
+
+        // make canvas droppable for shapes in the menu
         this._canvas.droppable({
             accept:    Config.Selectors.Classes.NODE_THUMBNAIL,
             tolerance: 'fit',
@@ -83,13 +105,17 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
                 _this._handleShapeDrop(uiEvent, uiObject);
             }
         });
+    }
 
-        this._shapes.find(Config.Selectors.Classes.NODE_THUMBNAIL).draggable({
-            helper:   'clone',
-            opacity:  Config.Dragging.OPACITY,
-            cursor:   Config.Dragging.CURSOR,
-            appendTo: this._body,
-            revert:   'invalid'
+    Editor.prototype._initializePropertiesMenu = function() {
+        jQuery(Config.Selectors.IDs.PROPERTIES_MENU).draggable({
+            containment:   Config.Selectors.IDs.CONTENT,
+            stack:         Config.Selectors.Classes.NODE,
+            cursor:        Config.Dragging.CURSOR,
+            scroll:        false,
+            snap:          Config.Selectors.IDs.CONTENT,
+            snapMode:      'inner',
+            snapTolerance: Config.Dragging.SNAP_TOLERANCE
         });
     }
 
@@ -98,10 +124,9 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         var offset      = this._canvas.offset();
         var coordinates = this._toGridCoordinates(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
 
-        with (node) {
-            appendTo(this._canvas);
-            moveTo(coordinates.x * Config.Grid.SIZE, coordinates.y * Config.Grid.SIZE);
-        }
+        node
+            .appendTo(this._canvas)
+            .moveTo(coordinates.x * Config.Grid.SIZE, coordinates.y * Config.Grid.SIZE);
     }
 
     Editor.prototype._toGridCoordinates = function(first, second) {

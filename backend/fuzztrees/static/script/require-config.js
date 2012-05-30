@@ -1,10 +1,10 @@
 define(function() {
-    var gridSize = 60;
+    var GRID_SIZE = 80;
 
     return {
         Grid: {
-            SIZE:         gridSize,
-            HALF_SIZE:    gridSize >> 1,
+            SIZE:         GRID_SIZE,
+            HALF_SIZE:    GRID_SIZE >> 1,
             STROKE:       '#ddd',
             STROKE_WIDTH: 1,
             STROKE_STYLE: '7 3' // svg dash-array value
@@ -21,8 +21,9 @@ define(function() {
         },
 
         Dragging: {
-            OPACITY: 0.5,
-            CURSOR:  'move'
+            OPACITY:        0.5,
+            CURSOR:         'move',
+            SNAP_TOLERANCE: 10
         },
 
         Keys: {
@@ -47,11 +48,11 @@ define(function() {
 
         Selectors: {
             IDs: {
+                CONTENT:         '#FuzzedContent',
                 TOOLBAR:         '#FuzzedToolbar',
                 SHAPES_MENU:     '#FuzzedShapes',
                 CANVAS:          '#FuzzedCanvas',
                 PROPERTIES_MENU: '#FuzzedProperties'
-
             },
 
             Classes: {

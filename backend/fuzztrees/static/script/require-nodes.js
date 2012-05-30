@@ -85,6 +85,8 @@ define(['require-config', 'require-oop'], function(Config) {
             grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
             stack:       Config.Selectors.Classes.NODE
         });
+
+        return this;
     };
 
     Node.prototype.moveTo = function(x, y) {
@@ -92,6 +94,8 @@ define(['require-config', 'require-oop'], function(Config) {
             left: x || 0,
             top:  y || 0
         });
+
+        return this;
     }
 
     /*
