@@ -15,8 +15,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     Editor.prototype._initializeMember = function(graph) {
         this._graphId    = graph;
         this._body       = jQuery('body');
-        this._shapes     = this._body.find(Config.Selectors.IDs.SHAPES_MENU);
-        this._canvas     = this._body.find(Config.Selectors.IDs.CANVAS);
+        this._shapes     = this._body.find('#'+Config.IDs.SHAPES_MENU);
+        this._canvas     = this._body.find('#'+Config.IDs.CANVAS);
         this._background = this._canvas.svg().svg('get');
     }
 
@@ -78,18 +78,18 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         var _this = this;
 
         // make shape menu itself draggable
-        jQuery(Config.Selectors.IDs.SHAPES_MENU).draggable({
-            containment:   Config.Selectors.IDs.CONTENT,
-            stack:         Config.Selectors.Classes.NODE,
+        jQuery('#'+Config.IDs.SHAPES_MENU).draggable({
+            containment:   '#'+Config.IDs.CONTENT,
+            stack:         '.'+Config.Classes.NODE,
             cursor:        Config.Dragging.CURSOR,
             scroll:        false,
-            snap:          Config.Selectors.IDs.CONTENT,
+            snap:          '#'+Config.IDs.CONTENT,
             snapMode:      'inner',
             snapTolerance: Config.Dragging.SNAP_TOLERANCE
         });
 
         // make shapes in the menu draggable
-        this._shapes.find(Config.Selectors.Classes.NODE_THUMBNAIL).draggable({
+        this._shapes.find('.'+Config.Classes.NODE_THUMBNAIL).draggable({
             helper:   'clone',
             opacity:  Config.Dragging.OPACITY,
             cursor:   Config.Dragging.CURSOR,
@@ -99,7 +99,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
         // make canvas droppable for shapes in the menu
         this._canvas.droppable({
-            accept:    Config.Selectors.Classes.NODE_THUMBNAIL,
+            accept:    '.'+Config.Classes.NODE_THUMBNAIL,
             tolerance: 'fit',
             drop:      function(uiEvent, uiObject) {
                 _this._handleShapeDrop(uiEvent, uiObject);
@@ -108,12 +108,12 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     Editor.prototype._initializePropertiesMenu = function() {
-        jQuery(Config.Selectors.IDs.PROPERTIES_MENU).draggable({
-            containment:   Config.Selectors.IDs.CONTENT,
-            stack:         Config.Selectors.Classes.NODE,
+        jQuery('#'+Config.IDs.PROPERTIES_MENU).draggable({
+            containment:   '#'+Config.IDs.CONTENT,
+            stack:         '.'+Config.Classes.NODE,
             cursor:        Config.Dragging.CURSOR,
             scroll:        false,
-            snap:          Config.Selectors.IDs.CONTENT,
+            snap:          '#'+Config.IDs.CONTENT,
             snapMode:      'inner',
             snapTolerance: Config.Dragging.SNAP_TOLERANCE
         });

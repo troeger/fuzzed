@@ -46,21 +46,19 @@ define(function() {
             REDUNDANCY_EVENT:  'redundancy'
         },
 
-        Selectors: {
-            IDs: {
-                CONTENT:         '#FuzzedContent',
-                TOOLBAR:         '#FuzzedToolbar',
-                SHAPES_MENU:     '#FuzzedShapes',
-                CANVAS:          '#FuzzedCanvas',
-                PROPERTIES_MENU: '#FuzzedProperties'
-            },
+        IDs: {
+            CONTENT:         'FuzzedContent',
+            TOOLBAR:         'FuzzedToolbar',
+            SHAPES_MENU:     'FuzzedShapes',
+            CANVAS:          'FuzzedCanvas',
+            PROPERTIES_MENU: 'FuzzedProperties'
+        },
 
-            Classes: {
-                PREFIX:         '.fuzzed-',
-                NODE:           '.fuzzed-node',
-                NODE_THUMBNAIL: '.fuzzed-node-thumbnail',
-                SELECTED:       '.fuzzed-node-selected'
-            }
+        Classes: {
+            PREFIX:         'fuzzed-',
+            NODE:           'fuzzed-node',
+            NODE_THUMBNAIL: 'fuzzed-node-thumbnail',
+            SELECTED:       'fuzzed-node-selected'
         }
     };
 });

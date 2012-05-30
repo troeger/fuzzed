@@ -8,15 +8,15 @@ define(['require-config', 'require-oop'], function(Config) {
         // epoch timestamp in milliseconds will do as an id
         this._id  = new Date().getTime();
 
-        var shape = jQuery(Config.Selectors.IDs.SHAPES_MENU + ' #' + this.type());
+        var shape = jQuery('#'+Config.IDs.SHAPES_MENU + ' #' + this.type());
         var _this = this;
         this._visualRepresentation = shape
             .clone()
             // remove draggable class... thank you jsPlumb for all the weird sanity checks
             .attr('id', shape.attr('id') + this._id)
             .removeClass('ui-draggable')
-            .removeClass(Config.Selectors.Classes.NODE_THUMBNAIL.substr(1))
-            .addClass(Config.Selectors.Classes.NODE.substr(1))
+            .removeClass(Config.Classes.NODE_THUMBNAIL)
+            .addClass(Config.Classes.NODE)
             .css({
                 'position': 'absolute',
                 'width':    shape.css('width'),
@@ -43,8 +43,8 @@ define(['require-config', 'require-oop'], function(Config) {
             )
             .click(function() {
                 var node = jQuery(this).data(Config.Keys.NODE);
-                jQuery(Config.Selectors.Classes.NODE).removeClass(Config.Selectors.Classes.SELECTED);
-                jQuery(this).addClass(Config.Selectors.Classes.SELECTED);
+                jQuery('.'+Config.Classes.NODE).removeClass(Config.Classes.SELECTED);
+                jQuery(this).addClass(Config.Classes.SELECTED);
             });
 
         // link back to Node object
@@ -83,7 +83,7 @@ define(['require-config', 'require-oop'], function(Config) {
             opacity:     Config.Dragging.OPACITY,
             cursor:      Config.Dragging.CURSOR,
             grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
-            stack:       Config.Selectors.Classes.NODE
+            stack:       '.'+Config.Classes.NODE
         });
 
         return this;
