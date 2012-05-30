@@ -15,8 +15,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     Editor.prototype._initializeMember = function(graph) {
         this._graphId    = graph;
         this._body       = jQuery('body');
-        this._shapes     = this._body.find('#'+Config.IDs.SHAPES_MENU);
-        this._canvas     = this._body.find('#'+Config.IDs.CANVAS);
+        this._shapes     = this._body.find('#' + Config.IDs.SHAPES_MENU);
+        this._canvas     = this._body.find('#' + Config.IDs.CANVAS);
         this._background = this._canvas.svg().svg('get');
     }
 
@@ -78,29 +78,40 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         var _this = this;
 
         // make shape menu itself draggable
-        jQuery('#'+Config.IDs.SHAPES_MENU).draggable({
-            containment:   '#'+Config.IDs.CONTENT,
-            stack:         '.'+Config.Classes.NODE,
+        jQuery('#' + Config.IDs.SHAPES_MENU).draggable({
+            containment:   '#' + Config.IDs.CONTENT,
+            stack:         '.' + Config.Classes.NODE,
             cursor:        Config.Dragging.CURSOR,
             scroll:        false,
-            snap:          '#'+Config.IDs.CONTENT,
+            snap:          '#' + Config.IDs.CONTENT,
             snapMode:      'inner',
             snapTolerance: Config.Dragging.SNAP_TOLERANCE
         });
 
+        var thumbnails = this._shapes.find('.' + Config.Classes.NODE_THUMBNAIL);
+        var svgs       = thumbnails.children('svg');
+
+        // scale the icons down
+        svgs.width(svgs.width() * Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR);
+        svgs.height(svgs.height() * Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR);
+        svgs.each(function() {
+            var g = jQuery(this).children('g');
+            g.attr('transform', 'scale(' + Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR + ') ' + g.attr('transform'));
+        });
+
         // make shapes in the menu draggable
-        this._shapes.find('.'+Config.Classes.NODE_THUMBNAIL).draggable({
+        thumbnails.draggable({
             helper:   'clone',
             opacity:  Config.Dragging.OPACITY,
             cursor:   Config.Dragging.CURSOR,
             appendTo: this._body,
             revert:   'invalid',
-            zIndex:  200
+            zIndex:   200
         });
 
         // make canvas droppable for shapes in the menu
         this._canvas.droppable({
-            accept:    '.'+Config.Classes.NODE_THUMBNAIL,
+            accept:    '.' + Config.Classes.NODE_THUMBNAIL,
             tolerance: 'fit',
             drop:      function(uiEvent, uiObject) {
                 _this._handleShapeDrop(uiEvent, uiObject);
@@ -110,11 +121,11 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
     Editor.prototype._initializePropertiesMenu = function() {
         jQuery('#'+Config.IDs.PROPERTIES_MENU).draggable({
-            containment:   '#'+Config.IDs.CONTENT,
-            stack:         '.'+Config.Classes.NODE,
+            containment:   '#' + Config.IDs.CONTENT,
+            stack:         '.' + Config.Classes.NODE,
             cursor:        Config.Dragging.CURSOR,
             scroll:        false,
-            snap:          '#'+Config.IDs.CONTENT,
+            snap:          '#' + Config.IDs.CONTENT,
             snapMode:      'inner',
             snapTolerance: Config.Dragging.SNAP_TOLERANCE
         });

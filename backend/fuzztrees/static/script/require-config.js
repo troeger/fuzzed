@@ -2,6 +2,10 @@ define(function() {
     var GRID_SIZE = 80;
 
     return {
+        ShapeMenu: {
+            THUMBNAIL_SCALE_FACTOR: 0.7
+        },
+
         Grid: {
             SIZE:         GRID_SIZE,
             HALF_SIZE:    GRID_SIZE >> 1,
