@@ -1,5 +1,5 @@
 #toolbar {
-    height:      37px;
+    height: 37px;
 }
 
 #FuzzedContent {
@@ -38,9 +38,11 @@
 }
 
 .fuzzed-node-thumbnail {
-    display: inline;
+    display: inline-block;
+}
+
+.fuzzed-node-thumbnail svg {
     margin:  3px 0 5px 0;
-    height:  30px;
 }
 
 .fuzzed-node-thumbnail-label {
@@ -55,14 +57,8 @@
 }
 
 .fuzzed-node {
-    margin-left: -4px; /* compensate for border and padding */
-    border:       1px dashed rgba(255, 255, 255, 0);
-    padding:      3px;
-}
-
-.fuzzed-node-image {
-    display: block;
-    margin:  0 auto;
+    border:     1px dashed rgba(255, 255, 255, 0);
+    text-align: center;
 }
 
 .fuzzed-node-selected {

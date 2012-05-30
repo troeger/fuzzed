@@ -94,7 +94,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
             opacity:  Config.Dragging.OPACITY,
             cursor:   Config.Dragging.CURSOR,
             appendTo: this._body,
-            revert:   'invalid'
+            revert:   'invalid',
+            zIndex:  200
         });
 
         // make canvas droppable for shapes in the menu

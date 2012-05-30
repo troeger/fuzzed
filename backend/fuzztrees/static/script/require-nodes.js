@@ -48,18 +48,18 @@ define(['require-config', 'require-oop'], function(Config) {
     Node.prototype._initializeVisualRepresentation = function() {
         // get the thumbnail and clone it
         var container = jQuery('<div>');
-        var shape     = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
+        var thumbnail = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
 
         container
-            .attr('id', shape.attr('id') + this._id)
+            .attr('id', thumbnail.attr('id') + this._id)
             .addClass(Config.Classes.NODE)
             .css({
                 position: 'absolute',
                 width:    Config.Grid.SIZE,
-                height:   Config.Grid.SIZE 
+                height:   Config.Grid.SIZE
             });
 
-        shape
+        thumbnail
             // cleanup the thumbnail's specific properties
             .removeClass('ui-draggable')
             .removeClass(Config.Classes.NODE_THUMBNAIL)
