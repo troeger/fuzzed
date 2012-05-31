@@ -12,12 +12,44 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         return this._graphId;
     }
 
+    Editor.prototype.selection = function(newSelection) {
+        // getter
+        if (typeof (newSelection) === 'undefined') return this._selection;
+
+        // setter
+        this.clearSelection();
+
+        if (jQuery.isArray(newSelection)) {
+            this._selection = newSelection;
+        } else {
+            this._selection.push(newSelection);
+        }
+
+        for (var i = 0, iLen = this._selection.length; i < iLen; ++i) {
+            this._selection[i].select();
+        }
+    }
+
+    Editor.prototype.clearSelection = function() {
+        for (var i = 0, iLen = this._selection.length; i < iLen; ++i) {
+            this._selection[i].deselect();
+        }
+        this._selection = [];
+    }
+
+    Editor.prototype.isSelected = function(node) {
+        return this._selection.indexOf(node) > -1;
+    }
+
     Editor.prototype._initializeMember = function(graph) {
         this._graphId    = graph;
         this._body       = jQuery('body');
         this._shapes     = this._body.find('#' + Config.IDs.SHAPES_MENU);
         this._canvas     = this._body.find('#' + Config.IDs.CANVAS);
         this._background = this._canvas.svg().svg('get');
+        this._selection  = [];
+
+        this._canvas.data(Config.Keys.EDITOR, this);
     }
 
     Editor.prototype._initializeJsPlumb = function() {
@@ -37,6 +69,10 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
     Editor.prototype._initializeBackground = function() {
         var _this = this;
+
+        this._canvas.click(function() {
+            _this.clearSelection();
+        });
 
         _this._drawGrid();
         jQuery(window).resize(function() {

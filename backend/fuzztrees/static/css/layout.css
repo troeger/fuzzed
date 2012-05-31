@@ -58,11 +58,6 @@
 
 .fuzzed-node {
     text-align: center;;
-    outline:    1px dashed rgba(255, 255, 255, 0);
-}
-
-.fuzzed-node:hover {
-    outline:    1px dashed rgba(190, 190, 190, 255);
 }
 
 .fuzzed-node-image {

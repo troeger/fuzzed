@@ -7,45 +7,56 @@ define(['require-config', 'require-oop'], function(Config) {
         if (this.constructor === Node) return;
 
         this._generateId();
+        this._locateEditor();
         this._initializeVisualRepresentation();
-        // link back to Node object
-        this._visualRepresentation.data(Config.Keys.NODE, this);
-    };
-
-    Node.prototype.id = function() {
-        return this._id;
-    };
-
-    Node.prototype.type = function() {
-        throw 'Abstract Method - override type in subclass';
-    };
+    }
 
     Node.prototype.appendTo = function(domElement) {
+        // some visual stuff, interaction and endpoints need to go here since they require the elements to be
+        // already in the DOM. This is why we cannot initialize all of it already in the constructor
         this._visualRepresentation.appendTo(domElement);
 
-        console.log(this._visualRepresentation.children('div').outerHeight(true));
-        // some visual stuff, interaction and endpoints need to go here since they require the elements to be
-        // already in the DOM. This is why we cannot do this already in the visual representation initialization
         this._resizeOnDrop();
         this._initializeEndpoints();
         this._makeInteractive();
 
         return this;
-    };
+    }
+
+    Node.prototype.id = function() {
+        return this._id;
+    }
 
     Node.prototype.moveTo = function(x, y) {
         this._visualRepresentation.css({
             left: x || 0,
             top:  y || 0
         });
-        this._visualRepresentation.trigger('dragstart');
 
         return this;
+    }
+
+    Node.prototype.select = function() {
+        this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+    }
+
+    Node.prototype.deselect = function() {
+        this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+    }
+
+    Node.prototype.type = function() {
+        throw 'Abstract Method - override type in subclass';
     }
 
     Node.prototype._generateId = function() {
         // epoch timestamp will do
         this._id = new Date().getTime();
+
+        return this._id;
+    }
+
+    Node.prototype._locateEditor = function() {
+        this._editor = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
     }
 
     Node.prototype._initializeVisualRepresentation = function() {
@@ -77,6 +88,9 @@ define(['require-config', 'require-oop'], function(Config) {
             .appendTo(container);
 
         this._visualRepresentation = container;
+
+        // give visual representation a back-link to this object
+        this._visualRepresentation.data(Config.Keys.NODE, this); 
     }
 
     Node.prototype._resizeOnDrop = function() {
@@ -121,49 +135,27 @@ define(['require-config', 'require-oop'], function(Config) {
             stack:       '.' + Config.Classes.NODE
         });
 
+        // hovering over a node
         this._visualRepresentation.hover(
             function() {
-                if (!_this.selected)
+                if (!_this._editor.isSelected(_this)) {
                     _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_HOVER);
+                }
             },
             function() {
-                if (!_this.selected)
+                if (!_this._editor.isSelected(_this)) {
                     _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+                }
             }
         );
 
+        // clicking on a node
         this._visualRepresentation.click(
-            function() {
-                _this.selected = true; //XXX: replace with select() method
-                _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+            function(eventObject) {
+                eventObject.stopPropagation();
+                _this._editor.selection(_this);
             }
         );
-
-        // this._visualRepresentation
-        //     .hover(
-        //         // hover in
-        //         function(e) {
-        //             clearTimeout(this._hideEndpointsTimeout);
-        //             var node = jQuery(this).data(Config.Keys.NODE);
-        //             jQuery(node._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', '');
-        //             jQuery(node._targetEndpoint.endpoint.getDisplayElements()).css('visibility', '');
-        //         },
-        //         // hover out
-        //         function(e) {
-        //             var _this = this;
-        //             function hideEndpoints() {
-        //                 var node = jQuery(_this).data(Config.Keys.NODE);
-        //                 jQuery(node._sourceEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
-        //                 jQuery(node._targetEndpoint.endpoint.getDisplayElements()).css('visibility', 'hidden');
-        //             }
-        //             this._hideEndpointsTimeout = setTimeout(hideEndpoints, 2000);
-        //         }
-        //     )
-        //     .click(function() {
-        //         var node = jQuery(this).data(Config.Keys.NODE);
-        //         jQuery(Config.Selectors.Classes.NODE).removeClass(Config.Selectors.Classes.SELECTED);
-        //         jQuery(this).addClass(Config.Selectors.Classes.SELECTED);
-        //     });
     }
 
     /*

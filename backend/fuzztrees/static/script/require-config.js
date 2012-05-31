@@ -38,6 +38,7 @@ define(function() {
         },
 
         Keys: {
+            EDITOR:      'editor',
             CONSTRUCTOR: 'constructor',
             NODE:        'node'
         },
