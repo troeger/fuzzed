@@ -1,6 +1,7 @@
-define(['require-config', 'require-oop'], function(Config) {
+define(['require-config', 'require-properties', 'require-oop'], function(Config, Properties) {
+
     /*
-     *  Abstract node base class
+     *  Abstract Node Base Class
      */
     function Node() {
         // pass here on inheritance calls
@@ -9,6 +10,7 @@ define(['require-config', 'require-oop'], function(Config) {
         this._generateId();
         this._locateEditor();
         this._initializeVisualRepresentation();
+        this._initializeProperties();
     }
 
     Node.prototype.appendTo = function(domElement) {
@@ -25,6 +27,7 @@ define(['require-config', 'require-oop'], function(Config) {
 
     Node.prototype.deselect = function() {
         this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+        return this;
     }
 
     Node.prototype.id = function() {
@@ -48,6 +51,10 @@ define(['require-config', 'require-oop'], function(Config) {
 
     Node.prototype.select = function() {
         this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+        _.each(this._properties, function(property) {
+            property.show();
+        });
+        return this;
     }
 
     Node.prototype.type = function() {
@@ -57,7 +64,6 @@ define(['require-config', 'require-oop'], function(Config) {
     Node.prototype._generateId = function() {
         // epoch timestamp will do
         this._id = new Date().getTime();
-
         return this._id;
     }
 
@@ -68,17 +74,12 @@ define(['require-config', 'require-oop'], function(Config) {
     Node.prototype._initializeVisualRepresentation = function() {
         // get the thumbnail and clone it
         var container = jQuery('<div>');
-        var label     = jQuery('<span>Foo</span>');
         var thumbnail = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
 
         container
             .attr('id', thumbnail.attr('id') + this._id)
             .addClass(Config.Classes.NODE)
-            .css({
-                position: 'absolute',
-                width:    Config.Grid.SIZE,
-                height:   Config.Grid.SIZE
-            });
+            .css('position', 'absolute');
 
         thumbnail
             // cleanup the thumbnail's specific properties
@@ -89,12 +90,7 @@ define(['require-config', 'require-oop'], function(Config) {
             .addClass(Config.Classes.NODE_IMAGE)
             .appendTo(container);
 
-        label
-            .addClass(Config.Classes.NODE_LABEL)
-            .appendTo(container);
-
         this._visualRepresentation = container;
-
         // give visual representation a back-link to this object
         this._visualRepresentation.data(Config.Keys.NODE, this); 
     }
@@ -107,7 +103,7 @@ define(['require-config', 'require-oop'], function(Config) {
 
         // calculate the scale factor
         var marginOffset = image.outerWidth(true) - image.width();
-        var scaleFactor  = (Config.Grid.SIZE - Config.Node.LABEL_HEIGHT - marginOffset) / svg.height();
+        var scaleFactor  = (Config.Grid.SIZE - marginOffset) / svg.height();
 
         // resize the svg and its elements
         svg.width(svg.width() * scaleFactor);
@@ -167,13 +163,60 @@ define(['require-config', 'require-oop'], function(Config) {
         );
     }
 
+    Node.prototype._initializeProperties = function() {
+        this._properties = [];
+    }
+
+    /*
+     *  Abstract Event Base Class
+     */
+    function Event() {
+        if (this.constructor === Event) return;
+        Event.Super.constructor.apply(this, arguments);
+    }
+    Event.Extends(Node);
+
+    Event.prototype._initializeVisualRepresentation = function() {
+        Event.Super._initializeVisualRepresentation.call(this);
+
+        // add label for events
+        jQuery('<span>Event</span>')
+            .addClass(Config.Classes.NODE_LABEL)
+            .appendTo(this._visualRepresentation);
+    }
+
+    Event.prototype._initializeProperties = function() {
+        Event.Super._initializeProperties.call(this);
+
+        this._properties = _.union(this._properties, [
+            new Properties.Text(this, {
+                name:  'Name',
+                value: 'Event',
+                label: true
+            }),
+            new Properties.Text(this, {
+                name:  'Probability',
+                value: '0' 
+            }),
+        ]);
+    }
+
+    /*
+     *  Abstract Gate Base Class
+     */
+    function Gate() {
+        if (this.constructor === Gate) return;
+        Gate.Super.constructor.apply(this, arguments);
+    }
+    Gate.Extends(Node);
+
     /*
      *  Basic Event
      */
     function BasicEvent() {
-        this.Super.constructor.apply(this, arguments);
+        BasicEvent.Super.constructor.apply(this, arguments);
     }
-    BasicEvent.Extends(Node);
+    BasicEvent.Extends(Event);
 
     BasicEvent.prototype.type = function() {
         return Config.Types.BASIC_EVENT;
@@ -183,9 +226,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  Multi Event
      */
     function MultiEvent() {
-        this.Super.constructor.apply(this, arguments);
+        MultiEvent.Super.constructor.apply(this, arguments);
     }
-    MultiEvent.Extends(Node);
+    MultiEvent.Extends(Event);
 
     MultiEvent.prototype.type = function() {
         return Config.Types.MULTI_EVENT;
@@ -195,9 +238,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  Undeveloped Event
      */
     function UndevelopedEvent() {
-        this.Super.constructor.apply(this, arguments);
+        UndevelopedEvent.Super.constructor.apply(this, arguments);
     }
-    UndevelopedEvent.Extends(Node);
+    UndevelopedEvent.Extends(Event);
 
     UndevelopedEvent.prototype.type = function() {
        return Config.Types.UNDEVELOPED_EVENT;
@@ -207,9 +250,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  Fault Event
      */
     function FaultEvent() {
-        this.Super.constructor.apply(this, arguments);
+        FaultEvent.Super.constructor.apply(this, arguments);
     }
-    FaultEvent.Extends(Node);
+    FaultEvent.Extends(Event);
 
     FaultEvent.prototype.type = function() {
        return Config.Types.FAULT_EVENT;
@@ -219,9 +262,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  AndGate
      */
     function AndGate() {
-        this.Super.constructor.apply(this, arguments);
+        AndGate.Super.constructor.apply(this, arguments);
     } 
-    AndGate.Extends(Node);
+    AndGate.Extends(Gate);
 
     AndGate.prototype.type = function() {
        return Config.Types.AND_GATE;
@@ -231,9 +274,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  OrGate
      */
     function OrGate() {
-        this.Super.constructor.apply(this, arguments);
+        OrGate.Super.constructor.apply(this, arguments);
     } 
-    OrGate.Extends(Node);
+    OrGate.Extends(Gate);
 
     OrGate.prototype.type = function() {
         return Config.Types.OR_GATE;
@@ -243,9 +286,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  XorGate
      */
     function XorGate() {
-        this.Super.constructor.apply(this, arguments);
+        XorGate.Super.constructor.apply(this, arguments);
     } 
-    XorGate.Extends(Node);
+    XorGate.Extends(Gate);
 
     XorGate.prototype.type = function() {
         return Config.Types.XOR_GATE;
@@ -255,9 +298,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  PriorityAndGate
      */
     function PriorityAndGate() {
-        this.Super.constructor.apply(this, arguments);
+        PriorityAndGate.Super.constructor.apply(this, arguments);
     } 
-    PriorityAndGate.Extends(Node);
+    PriorityAndGate.Extends(Gate);
 
     PriorityAndGate.prototype.type = function() {
         return Config.Types.PRIORITY_AND_GATE;
@@ -267,9 +310,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  VotingOrGate
      */
     function VotingOrGate() {
-        this.Super.constructor.apply(this, arguments);
+        VotingOrGate.Super.constructor.apply(this, arguments);
     } 
-    VotingOrGate.Extends(Node);
+    VotingOrGate.Extends(Gate);
 
     VotingOrGate.prototype.type = function() {
         return Config.Types.VOTING_OR_GATE;
@@ -279,9 +322,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  InhibitGate
      */
     function InhibitGate() {
-        this.Super.constructor.apply(this, arguments);
+        InhibitGate.Super.constructor.apply(this, arguments);
     } 
-    InhibitGate.Extends(Node);
+    InhibitGate.Extends(Gate);
 
     InhibitGate.prototype.type = function() {
         return Config.Types.INHIBIT_GATE;
@@ -291,9 +334,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  ChoiceEvent
      */
     function ChoiceEvent() {
-        this.Super.constructor.apply(this, arguments);
+        ChoiceEvent.Super.constructor.apply(this, arguments);
     } 
-    ChoiceEvent.Extends(Node);
+    ChoiceEvent.Extends(Event);
 
     ChoiceEvent.prototype.type = function() {
         return Config.Types.CHOICE_EVENT;
@@ -303,9 +346,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  RedundancyEvent
      */
     function RedundancyEvent() {
-        this.Super.constructor.apply(this, arguments);
+        RedundancyEvent.Super.constructor.apply(this, arguments);
     } 
-    RedundancyEvent.Extends(Node);
+    RedundancyEvent.Extends(Event);
 
     RedundancyEvent.prototype.type = function() {
         return Config.Types.REDUNDANCY_EVENT;
@@ -315,9 +358,9 @@ define(['require-config', 'require-oop'], function(Config) {
      *  House Event
      */
     function HouseEvent() {
-        this.Super.constructor.apply(this, arguments);
+        HouseEvent.Super.constructor.apply(this, arguments);
     }
-    HouseEvent.Extends(Node);
+    HouseEvent.Extends(Event);
 
     HouseEvent.prototype.type = function() {
        return Config.Types.HOUSE_EVENT;

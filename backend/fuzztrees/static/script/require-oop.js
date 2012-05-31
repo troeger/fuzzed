@@ -6,7 +6,7 @@ define(function() {
 
         this.prototype = new Super;
         this.prototype.constructor = this;
-        this.prototype.Super = Super.prototype;
+        this.Super = Super.prototype;
 
         return this;
     }

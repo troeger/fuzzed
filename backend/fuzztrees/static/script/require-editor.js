@@ -1,7 +1,7 @@
 define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
     function Editor(graph) {
-        this._initializeMember(graph);
+        this._findElements(graph);
         this._initializeJsPlumb();
         this._initializeBackground();
         this._initializeShapeMenu();
@@ -14,23 +14,25 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     Editor.prototype.clearSelection = function() {
-        for (var i = 0, iLen = this._selection.length; i < iLen; ++i) {
-            this._selection[i].deselect();
-        }
+        _.each(this._selection, function(node) {
+            node.deselect()
+        });
         this._selection = [];
+        this._properties.hide();
     }
 
     Editor.prototype.isSelected = function(node) {
-        return this._selection.indexOf(node) > -1;
+        return _.indexOf(this._selection, node) > -1;
     }
 
     Editor.prototype.removeSelection = function() {
         if (this._selection.length === 0) return;
 
-        for (var i = 0, iLen = this._selection.length; i < iLen; ++i) {
-            this._selection[i].remove();
-        }
+        _.each(this._selection, function(node) {
+            node.remove();
+        })
         this._selection = [];
+        this._properties.hide();
     }
 
     Editor.prototype.selection = function(newSelection) {
@@ -46,18 +48,23 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
             this._selection.push(newSelection);
         }
 
-        for (var i = 0, iLen = this._selection.length; i < iLen; ++i) {
-            this._selection[i].select();
-        }
+        this._properties_items.empty();
+        _.each(this._selection, function(node) {
+            node.select();
+        });
+        this._properties.show();
     }
 
-    Editor.prototype._initializeMember = function(graph) {
-        this._graphId    = graph;
-        this._body       = jQuery('body');
-        this._shapes     = this._body.find('#' + Config.IDs.SHAPES_MENU);
-        this._canvas     = this._body.find('#' + Config.IDs.CANVAS);
-        this._background = this._canvas.svg().svg('get');
-        this._selection  = [];
+    Editor.prototype._findElements = function(graph) {
+        this._graphId          = graph;
+
+        this._body             = jQuery('body');
+        this._shapes           = this._body.find('#' + Config.IDs.SHAPES_MENU);
+        this._canvas           = this._body.find('#' + Config.IDs.CANVAS);
+        this._properties       = this._body.find('#' + Config.IDs.PROPERTIES_MENU);
+        this._properties_items = this._properties.find('form');
+        this._background       = this._canvas.svg().svg('get');
+        this._selection        = [];
 
         this._canvas.data(Config.Keys.EDITOR, this);
     }
@@ -166,7 +173,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     Editor.prototype._initializePropertiesMenu = function() {
-        jQuery('#'+Config.IDs.PROPERTIES_MENU).draggable({
+        this._properties.draggable({
             containment:   '#' + Config.IDs.CONTENT,
             stack:         '.' + Config.Classes.NODE,
             cursor:        Config.Dragging.CURSOR,

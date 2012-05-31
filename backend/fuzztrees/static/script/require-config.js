@@ -1,5 +1,5 @@
 define(function() {
-    var GRID_SIZE = 80;
+    var GRID_SIZE = 60;
 
     return {
         ShapeMenu: {
@@ -25,7 +25,7 @@ define(function() {
         },
 
         Node: {
-            LABEL_HEIGHT: 15,
+            LABEL_HEIGHT:    15,
             STROKE_NORMAL:   '#000000',
             STROKE_HOVER:    '#409FFF',
             STROKE_SELECTED: '#FF9640'
@@ -68,11 +68,13 @@ define(function() {
         },
 
         Classes: {
-            PREFIX:         'fuzzed-',
-            NODE:           'fuzzed-node',
-            NODE_THUMBNAIL: 'fuzzed-node-thumbnail',
-            NODE_IMAGE:     'fuzzed-node-image',
-            NODE_LABEL:     'fuzzed-node-label'
+            NODE:             'fuzzed-node',
+            NODE_THUMBNAIL:   'fuzzed-node-thumbnail',
+            NODE_IMAGE:       'fuzzed-node-image',
+            NODE_LABEL:       'fuzzed-node-label',
+
+            PROPERTY_LABEL: 'fuzzed-property-label',
+            PROPERTY_TEXT:  'fuzzed-property-text' 
         }
     };
 });

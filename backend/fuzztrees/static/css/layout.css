@@ -66,8 +66,19 @@
 }
 
 .fuzzed-node-label {
+    display:     block;
     height:      15px;
     line-height: 15px;
     font-weight: bold;
     font-size:   0.8em;
+}
+
+#FuzzedProperties .fuzzed-property-label {
+    vertical-align: middle;
+    font-weight:    bold;
+    width:          30%;
+}
+
+#FuzzedProperties .fuzzed-property-text {
+    width: 64%;
 }
