@@ -23,6 +23,10 @@ define(['require-config', 'require-oop'], function(Config) {
         return this;
     }
 
+    Node.prototype.deselect = function() {
+        this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+    }
+
     Node.prototype.id = function() {
         return this._id;
     }
@@ -36,12 +40,14 @@ define(['require-config', 'require-oop'], function(Config) {
         return this;
     }
 
-    Node.prototype.select = function() {
-        this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+    Node.prototype.remove = function() {
+        jsPlumb.deleteEndpoint(this._sourceEndpoint);
+        jsPlumb.deleteEndpoint(this._targetEndpoint);
+        this._visualRepresentation.remove();
     }
 
-    Node.prototype.deselect = function() {
-        this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+    Node.prototype.select = function() {
+        this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_SELECTED);
     }
 
     Node.prototype.type = function() {

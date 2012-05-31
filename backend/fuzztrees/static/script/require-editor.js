@@ -6,10 +6,31 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         this._initializeBackground();
         this._initializeShapeMenu();
         this._initializePropertiesMenu();
+        this._initializeKeyboard();
     }
 
     Editor.prototype.graphId = function() {
         return this._graphId;
+    }
+
+    Editor.prototype.clearSelection = function() {
+        for (var i = 0, iLen = this._selection.length; i < iLen; ++i) {
+            this._selection[i].deselect();
+        }
+        this._selection = [];
+    }
+
+    Editor.prototype.isSelected = function(node) {
+        return this._selection.indexOf(node) > -1;
+    }
+
+    Editor.prototype.removeSelection = function() {
+        if (this._selection.length === 0) return;
+
+        for (var i = 0, iLen = this._selection.length; i < iLen; ++i) {
+            this._selection[i].remove();
+        }
+        this._selection = [];
     }
 
     Editor.prototype.selection = function(newSelection) {
@@ -28,17 +49,6 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         for (var i = 0, iLen = this._selection.length; i < iLen; ++i) {
             this._selection[i].select();
         }
-    }
-
-    Editor.prototype.clearSelection = function() {
-        for (var i = 0, iLen = this._selection.length; i < iLen; ++i) {
-            this._selection[i].deselect();
-        }
-        this._selection = [];
-    }
-
-    Editor.prototype.isSelected = function(node) {
-        return this._selection.indexOf(node) > -1;
     }
 
     Editor.prototype._initializeMember = function(graph) {
@@ -167,6 +177,18 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         });
     }
 
+    Editor.prototype._initializeKeyboard = function() {
+        var _this = this;
+
+        jQuery(document).keydown(function(eventObject) {
+            // delete or backspace
+            if (eventObject.which === jQuery.ui.keyCode.BACKSPACE || eventObject.which === jQuery.ui.keyCode.DELETE) {
+                eventObject.preventDefault();
+                _this.removeSelection();
+            }
+        });
+    }
+
     Editor.prototype._handleShapeDrop = function(uiEvent, uiObject) {
         var node        = new (uiObject.draggable.data(Config.Keys.CONSTRUCTOR))();
         var offset      = this._canvas.offset();
@@ -175,6 +197,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         node
             .moveTo(coordinates.x * Config.Grid.SIZE, coordinates.y * Config.Grid.SIZE)
             .appendTo(this._canvas);
+
+        this.selection(node);
     }
 
     Editor.prototype._toGridCoordinates = function(first, second) {
