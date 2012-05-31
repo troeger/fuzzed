@@ -16,7 +16,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     Node.prototype.appendTo = function(domElement) {
         // some visual stuff, interaction and endpoints need to go here since they require the elements to be
         // already in the DOM. This is why we cannot initialize all of it already in the constructor
-        this._visualRepresentation.appendTo(domElement);
+        this._container.appendTo(domElement);
 
         this._resizeOnDrop();
         this._initializeEndpoints();
@@ -26,7 +26,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype.deselect = function() {
-        this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+        this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
         return this;
     }
 
@@ -35,7 +35,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype.moveTo = function(x, y) {
-        this._visualRepresentation.css({
+        this._container.css({
             left: x || 0,
             top:  y || 0
         });
@@ -46,11 +46,11 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     Node.prototype.remove = function() {
         jsPlumb.deleteEndpoint(this._sourceEndpoint);
         jsPlumb.deleteEndpoint(this._targetEndpoint);
-        this._visualRepresentation.remove();
+        this._container.remove();
     }
 
     Node.prototype.select = function() {
-        this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+        this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
         _.each(this._properties, function(property) {
             property.show();
         });
@@ -73,31 +73,30 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     Node.prototype._initializeVisualRepresentation = function() {
         // get the thumbnail and clone it
-        var container = jQuery('<div>');
-        var thumbnail = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
+        this._container = jQuery('<div>');
+        this._nodeImage = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
 
-        container
-            .attr('id', thumbnail.attr('id') + this._id)
+        this._container
+            .attr('id', this._nodeImage.attr('id') + this._id)
             .addClass(Config.Classes.NODE)
             .css('position', 'absolute');
 
-        thumbnail
+        this._nodeImage
             // cleanup the thumbnail's specific properties
             .removeClass('ui-draggable')
             .removeClass(Config.Classes.NODE_THUMBNAIL)
             .removeAttr('id')
             // add new stuff
             .addClass(Config.Classes.NODE_IMAGE)
-            .appendTo(container);
+            .appendTo(this._container);
 
-        this._visualRepresentation = container;
         // give visual representation a back-link to this object
-        this._visualRepresentation.data(Config.Keys.NODE, this); 
+        this._container.data(Config.Keys.NODE, this);
     }
 
     Node.prototype._resizeOnDrop = function() {
         // find the nodes
-        var image = this._visualRepresentation.children('.' + Config.Classes.NODE_IMAGE);
+        var image = this._nodeImage;
         var svg   = image.children('svg');
         var g     = svg.children('g');
 
@@ -112,13 +111,13 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype._initializeEndpoints = function() {     
-        this._sourceEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
+        this._sourceEndpoint = jsPlumb.addEndpoint(this._container, {
             anchor:   'BottomCenter',
             isSource: true,
             isTarget: false
         });
 
-        this._targetEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
+        this._targetEndpoint = jsPlumb.addEndpoint(this._container, {
             anchor:   'TopCenter',
             isSource: false,
             isTarget: true
@@ -129,7 +128,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         var _this = this;
 
         // make the node draggable
-        jsPlumb.draggable(this._visualRepresentation, {
+        jsPlumb.draggable(this._container, {
             containment: 'parent',
             opacity:     Config.Dragging.OPACITY,
             cursor:      Config.Dragging.CURSOR,
@@ -141,21 +140,21 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         });
 
         // hovering over a node
-        this._visualRepresentation.hover(
+        this._container.hover(
             function() {
                 if (!_this._editor.isSelected(_this)) {
-                    _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_HOVER);
+                    _this._container.find('path').css('stroke', Config.Node.STROKE_HOVER);
                 }
             },
             function() {
                 if (!_this._editor.isSelected(_this)) {
-                    _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+                    _this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
                 }
             }
         );
 
         // clicking on a node
-        this._visualRepresentation.click(
+        this._container.click(
             function(eventObject) {
                 eventObject.stopPropagation();
                 _this._editor.selection(_this);
@@ -182,7 +181,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         // add label for events
         jQuery('<span>Event</span>')
             .addClass(Config.Classes.NODE_LABEL)
-            .appendTo(this._visualRepresentation);
+            .appendTo(this._container);
     }
 
     Event.prototype._initializeProperties = function() {
