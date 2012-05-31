@@ -15,9 +15,9 @@ NODE_TYPES = {
         'image': 'undeveloped_event.svg'
     },
     4: {
-        'name': u'House event',
-        'type': 'house',
-        'image': 'house_event.svg'
+        'name': u'Fault event',
+        'type': 'fault',
+        'image': 'fault_event.svg'
     },
     5: {
         'name': u'AND gate',
@@ -58,6 +58,11 @@ NODE_TYPES = {
         'name': u'Redundancy event',
         'type': 'redundancy',
         'image': 'redundancy_event.svg'
+    },
+    13: {
+        'name': u'House Event',
+        'type': 'house',
+        'image': 'house_event.svg'
     }
 }
 

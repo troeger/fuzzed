@@ -132,7 +132,10 @@ define(['require-config', 'require-oop'], function(Config) {
             opacity:     Config.Dragging.OPACITY,
             cursor:      Config.Dragging.CURSOR,
             grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
-            stack:       '.' + Config.Classes.NODE
+            stack:       '.' + Config.Classes.NODE,
+            start:       function() {
+                _this._editor.selection(_this);
+            }
         });
 
         // hovering over a node
@@ -195,15 +198,15 @@ define(['require-config', 'require-oop'], function(Config) {
     }
 
     /*
-     *  House Event
+     *  Fault Event
      */
-    function HouseEvent() {
+    function FaultEvent() {
         this.Super.constructor.apply(this, arguments);
     }
-    HouseEvent.Extends(Node);
+    FaultEvent.Extends(Node);
 
-    HouseEvent.prototype.type = function() {
-       return Config.Types.HOUSE_EVENT;
+    FaultEvent.prototype.type = function() {
+       return Config.Types.FAULT_EVENT;
     }
 
     /*
@@ -303,12 +306,24 @@ define(['require-config', 'require-oop'], function(Config) {
     }
 
     /*
+     *  House Event
+     */
+    function HouseEvent() {
+        this.Super.constructor.apply(this, arguments);
+    }
+    HouseEvent.Extends(Node);
+
+    HouseEvent.prototype.type = function() {
+       return Config.Types.HOUSE_EVENT;
+    }
+
+    /*
      *  Associate the constructors with the thumbnails in the shape menu
      */
     jQuery('#' + Config.Types.BASIC_EVENT)      .data(Config.Keys.CONSTRUCTOR, BasicEvent);
     jQuery('#' + Config.Types.MULTI_EVENT)      .data(Config.Keys.CONSTRUCTOR, MultiEvent);
     jQuery('#' + Config.Types.UNDEVELOPED_EVENT).data(Config.Keys.CONSTRUCTOR, UndevelopedEvent);
-    jQuery('#' + Config.Types.HOUSE_EVENT)      .data(Config.Keys.CONSTRUCTOR, HouseEvent);
+    jQuery('#' + Config.Types.FAULT_EVENT)      .data(Config.Keys.CONSTRUCTOR, FaultEvent);
     jQuery('#' + Config.Types.AND_GATE)         .data(Config.Keys.CONSTRUCTOR, AndGate);
     jQuery('#' + Config.Types.OR_GATE)          .data(Config.Keys.CONSTRUCTOR, OrGate);
     jQuery('#' + Config.Types.XOR_GATE)         .data(Config.Keys.CONSTRUCTOR, XorGate);
@@ -317,6 +332,7 @@ define(['require-config', 'require-oop'], function(Config) {
     jQuery('#' + Config.Types.INHIBIT_GATE)     .data(Config.Keys.CONSTRUCTOR, InhibitGate);
     jQuery('#' + Config.Types.CHOICE_EVENT)     .data(Config.Keys.CONSTRUCTOR, ChoiceEvent);
     jQuery('#' + Config.Types.REDUNDANCY_EVENT) .data(Config.Keys.CONSTRUCTOR, RedundancyEvent);
+    jQuery('#' + Config.Types.HOUSE_EVENT)      .data(Config.Keys.CONSTRUCTOR, HouseEvent);
 
     /*
      *  Return the collection of all nodes for require
@@ -326,7 +342,7 @@ define(['require-config', 'require-oop'], function(Config) {
         BasicEvent:       BasicEvent,
         MultiEvent:       MultiEvent,
         UndevelopedEvent: UndevelopedEvent,
-        HouseEvent:       HouseEvent,
+        FaultEvent:       FaultEvent,
         AndGate:          AndGate,
         OrGate:           OrGate,
         XorGate:          XorGate,
@@ -334,6 +350,7 @@ define(['require-config', 'require-oop'], function(Config) {
         VotingOrGate:     VotingOrGate,
         InhibitGate:      InhibitGate,
         ChoiceEvent:      ChoiceEvent,
-        RedundancyEvent:  RedundancyEvent
+        RedundancyEvent:  RedundancyEvent,
+        HouseEvent:       HouseEvent
     };
 })

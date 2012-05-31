@@ -47,15 +47,16 @@ define(function() {
             BASIC_EVENT:       'basic',
             MULTI_EVENT:       'multi',
             UNDEVELOPED_EVENT: 'undeveloped',
-            HOUSE_EVENT:       'house',
-            AND_GATE:          'and', 
-            OR_GATE:           'or', 
-            XOR_GATE:          'xor',
+            FAULT_EVENT:       'fault',
+            AND_GATE:          'and',
             PRIORITY_AND_GATE: 'p-and',
+            OR_GATE:           'or',
+            XOR_GATE:          'xor',
             VOTING_OR_GATE:    'v-or',
             INHIBIT_GATE:      'inhibit',
             CHOICE_EVENT:      'choice',
-            REDUNDANCY_EVENT:  'redundancy'
+            REDUNDANCY_EVENT:  'redundancy',
+            HOUSE_EVENT:       'house'
         },
 
         IDs: {
