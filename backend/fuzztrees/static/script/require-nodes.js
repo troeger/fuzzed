@@ -110,15 +110,18 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         g.attr('transform', 'scale(' + scaleFactor + ') ' + g.attr('transform'));
     }
 
-    Node.prototype._initializeEndpoints = function() {     
+    Node.prototype._initializeEndpoints = function() {
+        var imageTopOffset = this._nodeImage.offset().top - this._container.offset().top;
+        var imageBottomOffset = imageTopOffset + this._nodeImage.height();
+
         this._sourceEndpoint = jsPlumb.addEndpoint(this._container, {
-            anchor:   'BottomCenter',
+            anchor:   [ 0.5, 0, 0, 1, 0, imageBottomOffset],
             isSource: true,
             isTarget: false
         });
 
         this._targetEndpoint = jsPlumb.addEndpoint(this._container, {
-            anchor:   'TopCenter',
+            anchor:   [ 0.5, 0, 0, -1, 0, imageTopOffset],
             isSource: false,
             isTarget: true
         });
@@ -143,12 +146,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._container.hover(
             function() {
                 if (!_this._editor.isSelected(_this)) {
-                    _this._container.find('path').css('stroke', Config.Node.STROKE_HOVER);
+                    _this._nodeImage.find('path').css('stroke', Config.Node.STROKE_HOVER);
                 }
             },
             function() {
                 if (!_this._editor.isSelected(_this)) {
-                    _this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+                    _this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
                 }
             }
         );

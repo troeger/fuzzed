@@ -73,6 +73,8 @@ define(function() {
             NODE_IMAGE:       'fuzzed-node-image',
             NODE_LABEL:       'fuzzed-node-label',
 
+            JSPLUMB_ENDPOINT: 'jsplumb-endpoint',
+
             PROPERTY_LABEL: 'fuzzed-property-label',
             PROPERTY_TEXT:  'fuzzed-property-text' 
         }
