@@ -83,9 +83,14 @@
     height:           10px;
     background-color: #409FFF;
     position:         absolute;
+    visibility:       hidden;
     top:              0;
     right:            0;
     z-index:          150; /* above image, TODO: let halo care about that */
+}
+
+.fuzzed-node:hover .fuzzed-node-halo-connect {
+    visibility: visible;
 }
 
 .jsplumb-endpoint {
