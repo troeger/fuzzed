@@ -75,7 +75,11 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
                 fillStyle:   Config.JSPlumb.ENDPOINT_FILL
             },
             Endpoint:        [Config.JSPlumb.ENDPOINT_STYLE,
-                {radius: Config.JSPlumb.ENDPOINT_RADIUS, cssClass: Config.Classes.JSPLUMB_ENDPOINT}],
+                {
+                    radius:     Config.JSPlumb.ENDPOINT_RADIUS,
+                    cssClass:   Config.Classes.JSPLUMB_ENDPOINT,
+                    hoverClass: Config.Classes.JSPLUMB_ENDPOINT_HOVER
+                }],
             PaintStyle: {
                 strokeStyle: Config.JSPlumb.STROKE,
                 lineWidth:   Config.JSPlumb.STROKE_WIDTH

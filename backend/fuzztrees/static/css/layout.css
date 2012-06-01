@@ -78,6 +78,15 @@
 
 .jsplumb-endpoint {
     z-index: 200; /* above labels and connections */
+    opacity: 0;
+}
+
+.jsplumb-endpoint.jsplumb-endpoint-drop-active {
+    opacity: 1;
+}
+
+.jsplumb-endpoint.jsplumb-endpoint-hover {
+    opacity: 1;
 }
 
 #FuzzedProperties .fuzzed-property-label {

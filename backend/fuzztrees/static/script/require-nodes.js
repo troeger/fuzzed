@@ -123,7 +123,8 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                 anchor:   [ 0.5, 0, 0, 1, 0, imageBottomOffset],
                 isSource: true,
                 isTarget: false,
-                maxConnections: this._maxInConnections
+                maxConnections: this._maxInConnections,
+                cssClass: 'foo'
             });
         }
 
@@ -132,7 +133,8 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                 anchor:   [ 0.5, 0, 0, -1, 0, imageTopOffset],
                 isSource: false,
                 isTarget: true,
-                maxConnections: this._maxOutConnections
+                maxConnections: this._maxOutConnections,
+                dropOptions: { hoverClass: Config.Classes.JSPLUMB_ENDPOINT_DROP_HOVER, activeClass: Config.Classes.JSPLUMB_ENDPOINT_DROP_ACTIVE }
             });
         }
     }
@@ -158,11 +160,15 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                 if (!_this._editor.isSelected(_this)) {
                     _this._nodeImage.find('path').css('stroke', Config.Node.STROKE_HOVER);
                 }
+                if (_this._sourceEndpoint) _this._sourceEndpoint.setHover(true);
+//                if (_this._targetEndpoint) _this._targetEndpoint.setHover(true);
             },
             function() {
                 if (!_this._editor.isSelected(_this)) {
                     _this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
                 }
+                if (_this._sourceEndpoint) _this._sourceEndpoint.setHover(false);
+//                if (_this._targetEndpoint) _this._targetEndpoint.setHover(false);
             }
         );
 

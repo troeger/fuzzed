@@ -73,7 +73,10 @@ define(function() {
             NODE_IMAGE:       'fuzzed-node-image',
             NODE_LABEL:       'fuzzed-node-label',
 
-            JSPLUMB_ENDPOINT: 'jsplumb-endpoint',
+            JSPLUMB_ENDPOINT:             'jsplumb-endpoint',
+            JSPLUMB_ENDPOINT_DROP_ACTIVE: 'jsplumb-endpoint-drop-active',
+            JSPLUMB_ENDPOINT_DROP_HOVER:  'jsplumb-endpoint-drop-hover',
+            JSPLUMB_ENDPOINT_HOVER:       'jsplumb-endpoint-hover',
 
             PROPERTY_LABEL: 'fuzzed-property-label',
             PROPERTY_TEXT:  'fuzzed-property-text' 
