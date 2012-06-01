@@ -79,6 +79,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         // get the thumbnail and clone it
         this._container = jQuery('<div>');
         this._nodeImage = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
+        this._connectionHandle = jQuery('<span></span>');
 
         this._container
             .attr('id', this._nodeImage.attr('id') + this._id)
@@ -92,6 +93,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             .removeAttr('id')
             // add new stuff
             .addClass(Config.Classes.NODE_IMAGE)
+            .appendTo(this._container);
+
+        this._connectionHandle
+            .addClass(Config.Classes.NODE_HALO_CONNECT)
             .appendTo(this._container);
 
         // give visual representation a back-link to this object
@@ -119,22 +124,18 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         var imageBottomOffset = imageTopOffset + this._nodeImage.height();
 
         if (this._maxInConnections != 0) {
-            this._sourceEndpoint = jsPlumb.addEndpoint(this._container, {
+            //TODO: we can use an halo icon instead later
+            jsPlumb.makeSource(this._connectionHandle, {
+                parent: this._container,
                 anchor:   [ 0.5, 0, 0, 1, 0, imageBottomOffset],
-                isSource: true,
-                isTarget: false,
-                maxConnections: this._maxInConnections,
-                cssClass: 'foo'
+                maxConnections: this._maxInConnections
             });
         }
 
         if (this._maxOutConnections != 0) {
-            this._targetEndpoint = jsPlumb.addEndpoint(this._container, {
+            jsPlumb.makeTarget(this._container, {
                 anchor:   [ 0.5, 0, 0, -1, 0, imageTopOffset],
-                isSource: false,
-                isTarget: true,
-                maxConnections: this._maxOutConnections,
-                dropOptions: { hoverClass: Config.Classes.JSPLUMB_ENDPOINT_DROP_HOVER, activeClass: Config.Classes.JSPLUMB_ENDPOINT_DROP_ACTIVE }
+                maxConnections: this._maxOutConnections
             });
         }
     }
@@ -160,15 +161,11 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                 if (!_this._editor.isSelected(_this)) {
                     _this._nodeImage.find('path').css('stroke', Config.Node.STROKE_HOVER);
                 }
-                if (_this._sourceEndpoint) _this._sourceEndpoint.setHover(true);
-//                if (_this._targetEndpoint) _this._targetEndpoint.setHover(true);
             },
             function() {
                 if (!_this._editor.isSelected(_this)) {
                     _this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
                 }
-                if (_this._sourceEndpoint) _this._sourceEndpoint.setHover(false);
-//                if (_this._targetEndpoint) _this._targetEndpoint.setHover(false);
             }
         );
 

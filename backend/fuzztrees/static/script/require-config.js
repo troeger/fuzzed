@@ -16,6 +16,7 @@ define(function() {
 
         JSPlumb: {
             STROKE:         '#000',
+            STROKE_HOVER:   '#409FFF',
             STROKE_WIDTH:   2,
             STROKE_STYLE:   'Flowchart',
 
@@ -72,11 +73,10 @@ define(function() {
             NODE_THUMBNAIL:   'fuzzed-node-thumbnail',
             NODE_IMAGE:       'fuzzed-node-image',
             NODE_LABEL:       'fuzzed-node-label',
+            NODE_HALO_CONNECT:'fuzzed-node-halo-connect',
 
-            JSPLUMB_ENDPOINT:             'jsplumb-endpoint',
-            JSPLUMB_ENDPOINT_DROP_ACTIVE: 'jsplumb-endpoint-drop-active',
-            JSPLUMB_ENDPOINT_DROP_HOVER:  'jsplumb-endpoint-drop-hover',
-            JSPLUMB_ENDPOINT_HOVER:       'jsplumb-endpoint-hover',
+            JSPLUMB_ENDPOINT:       'jsplumb-endpoint',
+            JSPLUMB_ENDPOINT_HOVER: 'jsplumb-endpoint-hover',
 
             PROPERTY_LABEL: 'fuzzed-property-label',
             PROPERTY_TEXT:  'fuzzed-property-text' 
