@@ -20,7 +20,7 @@ define(function() {
             STROKE_STYLE:   'Flowchart',
 
             ENDPOINT_RADIUS: 7,
-            ENDPOINT_FILL:   '#00d1e0',
+            ENDPOINT_FILL:   '#409FFF',
             ENDPOINT_STYLE:  'Dot'
         },
 
