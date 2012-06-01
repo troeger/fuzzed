@@ -7,6 +7,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         // pass here on inheritance calls
         if (this.constructor === Node) return;
 
+        // default node configuration
+        this._maxInConnections = -1; // infinite
+        this._maxOutConnections = 1;
+
         this._generateId();
         this._locateEditor();
         this._initializeVisualRepresentation();
@@ -114,17 +118,23 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         var imageTopOffset = this._nodeImage.offset().top - this._container.offset().top;
         var imageBottomOffset = imageTopOffset + this._nodeImage.height();
 
-        this._sourceEndpoint = jsPlumb.addEndpoint(this._container, {
-            anchor:   [ 0.5, 0, 0, 1, 0, imageBottomOffset],
-            isSource: true,
-            isTarget: false
-        });
+        if (this._maxInConnections != 0) {
+            this._sourceEndpoint = jsPlumb.addEndpoint(this._container, {
+                anchor:   [ 0.5, 0, 0, 1, 0, imageBottomOffset],
+                isSource: true,
+                isTarget: false,
+                maxConnections: this._maxInConnections
+            });
+        }
 
-        this._targetEndpoint = jsPlumb.addEndpoint(this._container, {
-            anchor:   [ 0.5, 0, 0, -1, 0, imageTopOffset],
-            isSource: false,
-            isTarget: true
-        });
+        if (this._maxOutConnections != 0) {
+            this._targetEndpoint = jsPlumb.addEndpoint(this._container, {
+                anchor:   [ 0.5, 0, 0, -1, 0, imageTopOffset],
+                isSource: false,
+                isTarget: true,
+                maxConnections: this._maxOutConnections
+            });
+        }
     }
 
     Node.prototype._makeInteractive = function() {
@@ -175,6 +185,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     function Event() {
         if (this.constructor === Event) return;
         Event.Super.constructor.apply(this, arguments);
+
+        this._maxOutConnections = -1;
+        this._maxInConnections  =  1;
     }
     Event.Extends(Node);
 
@@ -209,6 +222,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     function Gate() {
         if (this.constructor === Gate) return;
         Gate.Super.constructor.apply(this, arguments);
+
+        this._maxOutConnections = 1;
+        this._maxInConnections = -1;
     }
     Gate.Extends(Node);
 
@@ -217,6 +233,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      */
     function BasicEvent() {
         BasicEvent.Super.constructor.apply(this, arguments);
+
+        // no incoming connections allowed
+        this._maxInConnections = 0;
     }
     BasicEvent.Extends(Event);
 
