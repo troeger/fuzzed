@@ -1,107 +1,194 @@
 define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
-    function Editor(graph) {
-        this._findElements(graph);
-        this._initializeJsPlumb();
-        this._initializeBackground();
-        this._initializeShapeMenu();
-        this._initializePropertiesMenu();
-        this._initializeKeyboard();
+    /*
+     *  ShapeMenu
+     */
+    function ShapeMenu() {
+        this._shapes = jQuery('#' + Config.IDs.SHAPES_MENU);
+
+        this._setupDragging();
+        this._setupThumbnails();
+    }
+
+    ShapeMenu.prototype._setupDragging = function() {
+        jQuery('#' + Config.IDs.SHAPES_MENU).draggable({
+            containment:   '#' + Config.IDs.CONTENT,
+            stack:         '.' + Config.Classes.NODE,
+            cursor:        Config.Dragging.CURSOR,
+            scroll:        false,
+            snap:          '#' + Config.IDs.CONTENT,
+            snapMode:      'inner',
+            snapTolerance: Config.Dragging.SNAP_TOLERANCE
+        });
+    }
+
+    ShapeMenu.prototype._setupThumbnails = function() {  
+        var thumbnails = this._shapes.find('.' + Config.Classes.NODE_THUMBNAIL);
+        var svgs       = thumbnails.children('svg');
+
+        // scale the icons down
+        svgs.width (svgs.width()  * Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR);
+        svgs.height(svgs.height() * Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR);
+        svgs.each(function() {
+            var g = jQuery(this).children('g');
+            g.attr('transform', 'scale(' + Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR + ') ' + g.attr('transform'));
+        });
+
+        // make shapes in the menu draggable
+        thumbnails.draggable({
+            helper:   'clone',
+            opacity:  Config.Dragging.OPACITY,
+            cursor:   Config.Dragging.CURSOR,
+            appendTo: 'body',
+            revert:   'invalid',
+            zIndex:   200
+        });
+    }
+
+    /*
+     *  PropertiesMenu
+     */
+    function PropertiesMenu() {
+        // menu is the container and properties the actual element where properties will bea added
+        this._menu       = jQuery('#' + Config.IDs.PROPERTIES_MENU);
+        this._properties = this._menu.find('.' + Config.Classes.PROPERTIES);
+
+        this._setupDragging();
+    }
+
+    PropertiesMenu.prototype.hide = function() {
+        this._menu.hide();
+    }
+
+    PropertiesMenu.prototype.show = function(nodes, force) {
+        this._menu.show();
+    }
+
+    PropertiesMenu.prototype._setupDragging = function() {
+        this._properties.draggable({
+            containment:   '#' + Config.IDs.CONTENT,
+            stack:         '.' + Config.Classes.NODE,
+            cursor:        Config.Dragging.CURSOR,
+            scroll:        false,
+            snap:          '#' + Config.IDs.CONTENT,
+            snapMode:      'inner',
+            snapTolerance: Config.Dragging.SNAP_TOLERANCE
+        });
+    }
+
+    /*
+     *  Selection
+     */
+    function Selection() {
+        this._nodes  = []; // node objects; not DOM elements
+        this._editor = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
+    }
+
+    // clear the selection, leaving the nodes on the canvas
+    Selection.prototype.clear = function() {
+        _.each(this._nodes, function(node) {
+            node.deselect()
+        });
+        this._empty();
+        this._editor.properties.hide();
+
+        return this;
+    }
+
+    Selection.prototype.contains = function(node) {
+        return _.indexOf(this._nodes, node) >= 0;
+    }
+
+    // make a new selection of the given node(s)
+    Selection.prototype.of = function(nodes) {
+        this.clear();
+
+        if (_.isArray(nodes)) {
+            this._nodes = nodes;
+        } else {
+            this._nodes.push(nodes);
+        }
+
+        _.each(this._selection, function(node) {
+            node.select();
+        });
+        this._editor.properties.show(nodes);
+
+        return this;
+    }
+
+    // remove the current contained nodes from the canvas and clear the selection
+    Selection.prototype.remove = function() {
+        _.each(this._nodes, function(node) {
+            node.remove();
+        })
+        this._empty();
+        this._editor.properties.hide();
+
+        return this;
+    }
+
+    // helper function to empty the selected nodes
+    Selection.prototype._empty = function() {
+        this._nodes = [];
+        return this;
+    }
+
+    /*
+     *  Editor
+     */
+    function Editor(_id_) {
+        this._graphId = _id_;
+
+        // locate own DOM elements and bind Editor instance to canvas
+        this._canvas     = jQuery('#' + Config.IDs.CANVAS);
+        this._background = this._canvas.svg().svg('get');
+        this._canvas.data(Config.Keys.EDITOR, this);
+
+        // create manager objects for the bars and the selection
+        this.shapes     = new ShapeMenu();
+        this.properties = new PropertiesMenu();
+        this.selection  = new Selection();
+
+        // run a few sub initializer
+        this._setupBackground();
+        this._setupCanvas();
+        this._setupJsPlumb();
+        this._setupKeyBindings();
     }
 
     Editor.prototype.graphId = function() {
         return this._graphId;
     }
 
-    Editor.prototype.clearSelection = function() {
-        _.each(this._selection, function(node) {
-            node.deselect()
-        });
-        this._selection = [];
-        this._properties.hide();
-    }
+    Editor.prototype.toGrid = function(first, second) {
+        var x = Number.NaN;
+        var y = Number.NaN;
 
-    Editor.prototype.isSelected = function(node) {
-        return _.indexOf(this._selection, node) > -1;
-    }
+        // if both parameter are numbers we can take them as they are
+        if (_.isNumber(first) && _.isNumber(second)) {
+            x = first;
+            y = second;
 
-    Editor.prototype.removeSelection = function() {
-        if (this._selection.length === 0) return;
-
-        _.each(this._selection, function(node) {
-            node.remove();
-        })
-        this._selection = [];
-        this._properties.hide();
-    }
-
-    Editor.prototype.selection = function(newSelection) {
-        // getter
-        if (typeof (newSelection) === 'undefined') return this._selection;
-
-        // setter
-        this.clearSelection();
-
-        if (jQuery.isArray(newSelection)) {
-            this._selection = newSelection;
-        } else {
-            this._selection.push(newSelection);
+        // however the first parameter could also be an object
+        // of the form {x: NUMBER, y: NUMBER} (convenience reasons)
+        } else if (typeof first === 'object') {
+            x = first.x;
+            y = first.y;
         }
 
-        this._properties_items.empty();
-        _.each(this._selection, function(node) {
-            node.select();
-        });
-        this._properties.show();
-    }
-
-    Editor.prototype._findElements = function(graph) {
-        this._graphId          = graph;
-
-        this._body             = jQuery('body');
-        this._shapes           = this._body.find('#' + Config.IDs.SHAPES_MENU);
-        this._canvas           = this._body.find('#' + Config.IDs.CANVAS);
-        this._properties       = this._body.find('#' + Config.IDs.PROPERTIES_MENU);
-        this._properties_items = this._properties.find('form');
-        this._background       = this._canvas.svg().svg('get');
-        this._selection        = [];
-
-        this._canvas.data(Config.Keys.EDITOR, this);
-    }
-
-    Editor.prototype._initializeJsPlumb = function() {
-        jsPlumb.importDefaults({
-            EndpointStyle: {
-                fillStyle:   Config.JSPlumb.ENDPOINT_FILL
-            },
-            Endpoint:        [Config.JSPlumb.ENDPOINT_STYLE, {radius: Config.JSPlumb.ENDPOINT_RADIUS}],
-            PaintStyle: {
-                strokeStyle: Config.JSPlumb.STROKE,
-                lineWidth:   Config.JSPlumb.STROKE_WIDTH
-            },
-            Connector:       Config.JSPlumb.STROKE_STYLE,
-            Anchors:         ['BottomMiddle', 'TopMiddle']
-        });
-    }
-
-    Editor.prototype._initializeBackground = function() {
-        var _this = this;
-
-        this._canvas.click(function() {
-            _this.clearSelection();
-        });
-
-        _this._drawGrid();
-        jQuery(window).resize(function() {
-            _this._drawGrid();
-        });
+        return {
+            x: Math.round((first  - Config.Grid.HALF_SIZE) / Config.Grid.SIZE),
+            y: Math.round((second - Config.Grid.HALF_SIZE) / Config.Grid.SIZE)
+        }
     }
 
     Editor.prototype._drawGrid = function() {
         var height = this._canvas.height();
         var width  = this._canvas.width();
 
-        // clear old background and resize svg container to current canvas size - needed for resize callback
+        // clear old background and resize svg container to current canvas size
+        // important when window was resized in the mean time
         this._background.clear();
         this._background.configure({
             height: height,
@@ -127,104 +214,60 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         }
     }
 
-    Editor.prototype._initializeShapeMenu = function() {
-        var _this = this;
+    Editor.prototype._setupBackground = function() {
+        this._drawGrid();
 
-        // make shape menu itself draggable
-        jQuery('#' + Config.IDs.SHAPES_MENU).draggable({
-            containment:   '#' + Config.IDs.CONTENT,
-            stack:         '.' + Config.Classes.NODE,
-            cursor:        Config.Dragging.CURSOR,
-            scroll:        false,
-            snap:          '#' + Config.IDs.CONTENT,
-            snapMode:      'inner',
-            snapTolerance: Config.Dragging.SNAP_TOLERANCE
-        });
+        // clicks on the canvas clear the selection
+        this._canvas.click(this.selection.clear.bind(this.selection));
+        // redraw the background grid when the window resizes
+        jQuery(window).resize(this._drawGrid.bind(this));
+    }
 
-        var thumbnails = this._shapes.find('.' + Config.Classes.NODE_THUMBNAIL);
-        var svgs       = thumbnails.children('svg');
-
-        // scale the icons down
-        svgs.width(svgs.width() * Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR);
-        svgs.height(svgs.height() * Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR);
-        svgs.each(function() {
-            var g = jQuery(this).children('g');
-            g.attr('transform', 'scale(' + Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR + ') ' + g.attr('transform'));
-        });
-
-        // make shapes in the menu draggable
-        thumbnails.draggable({
-            helper:   'clone',
-            opacity:  Config.Dragging.OPACITY,
-            cursor:   Config.Dragging.CURSOR,
-            appendTo: this._body,
-            revert:   'invalid',
-            zIndex:   200
-        });
-
-        // make canvas droppable for shapes in the menu
+    Editor.prototype._setupCanvas = function() {
+        // make canvas droppable for shapes from the shape menu
         this._canvas.droppable({
             accept:    '.' + Config.Classes.NODE_THUMBNAIL,
             tolerance: 'fit',
-            drop:      function(uiEvent, uiObject) {
-                _this._handleShapeDrop(uiEvent, uiObject);
-            }
+            drop:      this._shapeDropped.bind(this)
         });
     }
 
-    Editor.prototype._initializePropertiesMenu = function() {
-        this._properties.draggable({
-            containment:   '#' + Config.IDs.CONTENT,
-            stack:         '.' + Config.Classes.NODE,
-            cursor:        Config.Dragging.CURSOR,
-            scroll:        false,
-            snap:          '#' + Config.IDs.CONTENT,
-            snapMode:      'inner',
-            snapTolerance: Config.Dragging.SNAP_TOLERANCE
+    Editor.prototype._setupJsPlumb = function() {
+        jsPlumb.importDefaults({
+            EndpointStyle: {
+                fillStyle:   Config.JSPlumb.ENDPOINT_FILL
+            },
+            Endpoint:        [Config.JSPlumb.ENDPOINT_STYLE, {radius: Config.JSPlumb.ENDPOINT_RADIUS}],
+            PaintStyle: {
+                strokeStyle: Config.JSPlumb.STROKE,
+                lineWidth:   Config.JSPlumb.STROKE_WIDTH
+            },
+            Connector:       Config.JSPlumb.STROKE_STYLE,
+            Anchors:         ['BottomMiddle', 'TopMiddle']
         });
     }
 
-    Editor.prototype._initializeKeyboard = function() {
+    Editor.prototype._setupKeyBindings = function() {
         var _this = this;
 
         jQuery(document).keydown(function(eventObject) {
-            // delete or backspace
+            // on hitting delete or backspace we delete the current selected nodes
             if (eventObject.which === jQuery.ui.keyCode.BACKSPACE || eventObject.which === jQuery.ui.keyCode.DELETE) {
                 eventObject.preventDefault();
-                _this.removeSelection();
+                _this._selection.remove();
             }
         });
     }
 
-    Editor.prototype._handleShapeDrop = function(uiEvent, uiObject) {
+    Editor.prototype._shapeDropped = function(uiEvent, uiObject) {
         var node        = new (uiObject.draggable.data(Config.Keys.CONSTRUCTOR))();
         var offset      = this._canvas.offset();
-        var coordinates = this._toGridCoordinates(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
+        var coordinates = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
 
         node
             .moveTo(coordinates.x * Config.Grid.SIZE, coordinates.y * Config.Grid.SIZE)
             .appendTo(this._canvas);
-
-        this.selection(node);
-    }
-
-    Editor.prototype._toGridCoordinates = function(first, second) {
-        var x = Number.NaN;
-        var y = Number.NaN;
-
-        if (jQuery.isNumeric(first) && jQuery.isNumeric(second)) {
-            x = first;
-            y = second;
-
-        } else if (typeof first === 'object') {
-            x = first.x;
-            y = first.y;
-        }
-
-        return {
-            x: Math.round((first  - Config.Grid.HALF_SIZE) / Config.Grid.SIZE),
-            y: Math.round((second - Config.Grid.HALF_SIZE) / Config.Grid.SIZE)
-        }
+        this.selection.of(node);
     }
 
     return Editor;
