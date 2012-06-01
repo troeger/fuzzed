@@ -73,6 +73,7 @@ define(function() {
             NODE_THUMBNAIL:   'fuzzed-node-thumbnail',
             NODE_IMAGE:       'fuzzed-node-image',
             NODE_LABEL:       'fuzzed-node-label',
+            NODE_DROP_ACTIVE: 'fuzzed-node-drop-active',
             NODE_HALO_CONNECT:'fuzzed-node-halo-connect',
 
             JSPLUMB_ENDPOINT:       'jsplumb-endpoint',
