@@ -7,17 +7,25 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         // pass here on inheritance calls
         if (this.constructor === Node) return;
 
-        // fetch editor instance
-        this._editor               = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
-        this._id                   = this._generateId();
-        this._properties           = this._defineProperties();
-        this._visualRepresentation = this._setupVisualRepresentation();
+        // logical values
+        this._editor     = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
+        this._id         = this._generateId();
+        this._properties = this._defineProperties();
+
+        // visuals
+        var visuals      = this._setupVisualRepresentation();
+        this._container  = visuals.container;
+        this._nodeImage  = visuals.nodeImage;
+
+        // endpoints (default configuration)
+        this._maxInConnections  = this._maxInConnections  == undefined ? -1 : this._maxInConnections; // infinite
+        this._maxOutConnections = this._maxOutConnections == undefined ?  1 : this._maxOutConnections;
     }
 
     Node.prototype.appendTo = function(domElement) {
         // some visual stuff, interaction and endpoints need to go here since they require the elements to be
         // already in the DOM. This is why we cannot initialize all of it already in the constructor
-        this._visualRepresentation.appendTo(domElement);
+        this._container.appendTo(domElement);
 
         this._resize();
         this._setupEndpoints();
@@ -28,7 +36,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype.deselect = function() {
-        this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+        this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
         return this;
     }
 
@@ -37,7 +45,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype.moveTo = function(x, y) {
-        this._visualRepresentation.css({
+        this._container.css({
             left: x || 0,
             top:  y || 0
         });
@@ -52,11 +60,14 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     Node.prototype.remove = function() {
         jsPlumb.deleteEndpoint(this._sourceEndpoint);
         jsPlumb.deleteEndpoint(this._targetEndpoint);
-        this._visualRepresentation.remove();
+        this._container.remove();
     }
 
     Node.prototype.select = function() {
-        this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+        this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+        _.each(this._properties, function(property) {
+            property.show();
+        });
         return this;
     }
 
@@ -77,7 +88,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     Node.prototype._resize = function() {
         // find the node's svg element and path groups
-        var image = this._visualRepresentation.children('.' + Config.Classes.NODE_IMAGE);
+        var image = this._container.children('.' + Config.Classes.NODE_IMAGE);
         var svg   = image.children('svg');
         var g     = svg.children('g');
 
@@ -94,7 +105,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     Node.prototype._setupDragging = function() {
         var _this = this;
 
-        jsPlumb.draggable(this._visualRepresentation, {
+        jsPlumb.draggable(this._container, {
             containment: 'parent',
             opacity:     Config.Dragging.OPACITY,
             cursor:      Config.Dragging.CURSOR,
@@ -106,41 +117,85 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         });
     }
 
-    Node.prototype._setupEndpoints = function() {     
-        this._sourceEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
-            anchor:   'BottomCenter',
-            isSource: true,
-            isTarget: false
-        });
+    Node.prototype._setupEndpoints = function() {
+        var imageTopOffset = this._nodeImage.offset().top - this._container.offset().top;
+        var imageBottomOffset = imageTopOffset + this._nodeImage.height();
 
-        this._targetEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
-            anchor:   'TopCenter',
-            isSource: false,
-            isTarget: true
-        });
+        if (this._maxInConnections != 0) {
+            //TODO: we can use an halo icon instead later
+            jsPlumb.makeSource(this._connectionHandle, {
+                parent: this._container,
+                anchor:   [ 0.5, 0, 0, 1, 0, imageBottomOffset],
+                maxConnections: this._maxInConnections
+            });
+        }
+
+        var targetNode = this;
+        if (this._maxOutConnections != 0) {
+            jsPlumb.makeTarget(this._container, {
+                anchor:   [ 0.5, 0, 0, -1, 0, imageTopOffset],
+                maxConnections: this._maxOutConnections,
+                dropOptions: {
+                    accept: function(draggable) {
+                        var elid = draggable.attr('elid');
+                        if (elid == undefined) return false;
+
+                        // this is not a connection-dragging-scenario
+                        var sourceNode = jQuery('.' + Config.Classes.NODE + ':has(#' + elid + ')').data('node');
+                        if (sourceNode == undefined) return false;
+
+                        // no connections to same node
+                        if (targetNode == sourceNode) return false;
+
+                        // there is already a connection between these nodes
+                        var connections = jsPlumb.getConnections({
+                            //XXX: the selector should suffice, but due to a bug in jsPlumb we need the IDs here
+                            source: sourceNode._container.attr('id'),
+                            target: targetNode._container.attr('id')
+                        });
+                        if (connections.length != 0) return false;
+
+                        // no connection if endpoint is full
+                        var endpoints = jsPlumb.getEndpoints(targetNode._container);
+                        if (endpoints) {
+                            //XXX: find a better way to determine endpoint
+                            var targetEndpoint = _.find(endpoints, function(endpoint){
+                                return endpoint.isTarget || endpoint._makeTargetCreator
+                            });
+                            if (targetEndpoint && targetEndpoint.isFull()) return false;
+                        }
+
+                        //TODO: type-dependent checks
+
+                        return true;
+                    },
+                    activeClass: Config.Classes.NODE_DROP_ACTIVE
+                }
+            });
+        }
     }
 
     Node.prototype._setupMouse = function() {
         var _this = this;
 
         // click on the node
-        this._visualRepresentation.click(
+        this._container.click(
             function(eventObject) {
                 eventObject.stopPropagation();
                 _this._editor.selection.of(_this);
             }
         );
 
-        // hovering
-        this._visualRepresentation.hover(
+        // hovering over a node
+        this._container.hover(
             function() {
                 if (!_this._editor.selection.contains(_this)) {
-                    _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_HOVER);
+                    _this._container.find('path').css('stroke', Config.Node.STROKE_HOVER);
                 }
             },
             function() {
                 if (!_this._editor.selection.contains(_this)) {
-                    _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+                    _this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
                 }
             }
         );
@@ -149,15 +204,15 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     Node.prototype._setupVisualRepresentation = function() {
         // get the thumbnail, clone it and wrap it with a container (for labels)
         var container = jQuery('<div>');
-        var thumbnail = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
+        var nodeImage = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
 
         container
-            .attr('id', thumbnail.attr('id') + this._id)
+            .attr('id', nodeImage.attr('id') + this._id)
             .addClass(Config.Classes.NODE)
             .css('position', 'absolute')
             .data(Config.Keys.NODE, this);
 
-        thumbnail
+        nodeImage
             // cleanup the thumbnail's specific properties
             .removeClass('ui-draggable')
             .removeClass(Config.Classes.NODE_THUMBNAIL)
@@ -166,7 +221,16 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             .addClass(Config.Classes.NODE_IMAGE)
             .appendTo(container);
 
-        return container;
+        if (this._maxInConnections != 0) {
+            this._connectionHandle = jQuery('<span></span>')
+                .addClass(Config.Classes.NODE_HALO_CONNECT)
+                .appendTo(this._container);
+        }
+
+        return {
+            container: container,
+            nodeImage: nodeImage
+        };
     }
 
     /*
@@ -174,6 +238,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      */
     function Event() {
         if (this.constructor === Event) return;
+        this._maxInConnections  = this._maxInConnections  == undefined ?  1 : this._maxInConnections;
+        this._maxOutConnections = this._maxOutConnections == undefined ? -1 : this._maxOutConnections;
+
         Event.Super.constructor.apply(this, arguments);
     }
     Event.Extends(Node);
@@ -208,6 +275,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      */
     function Gate() {
         if (this.constructor === Gate) return;
+
+        this._maxInConnections  = this._maxInConnections  == undefined ? -1 : this._maxInConnections;
+        this._maxOutConnections = this._maxOutConnections == undefined ?  1 : this._maxOutConnections;
+
         Gate.Super.constructor.apply(this, arguments);
     }
     Gate.Extends(Node);
@@ -216,6 +287,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      *  Basic Event
      */
     function BasicEvent() {
+        // no incoming connections allowed
+        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
+
         BasicEvent.Super.constructor.apply(this, arguments);
     }
     BasicEvent.Extends(Event);
@@ -240,6 +314,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      *  Undeveloped Event
      */
     function UndevelopedEvent() {
+        // no incoming connections allowed
+        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
+
         UndevelopedEvent.Super.constructor.apply(this, arguments);
     }
     UndevelopedEvent.Extends(Event);
@@ -360,6 +437,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      *  House Event
      */
     function HouseEvent() {
+        // no incoming connections allowed
+        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
+
         HouseEvent.Super.constructor.apply(this, arguments);
     }
     HouseEvent.Extends(Event);
