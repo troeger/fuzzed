@@ -1,28 +1,32 @@
 define(['require-config', 'require-oop'], function(Config) {
 
+    /*
+     *  Abstract Property
+     */
     function Property(node, options) {
         // skip inheritance call
         if (this.constructor === Property) return;
 
-        this._node  = node;
-        this._name  = options.name    || '';
-        this._value = options.value   || '';
-        this._label = options.label   || false;
+        this._node   = node;
+        this._name   = options.name   || '';
+        this._value  = options.value  || '';
+        this._label  = options.label  || false;
         this._modify = options.modify || true;
-
-        this._properties = jQuery('#' + Config.IDs.PROPERTIES_MENU).find('form');
     }
 
     Property.prototype.show = function() {
         throw 'Abstract Method - overwrite in subclass';
     }
 
+    /*
+     *  Text Property
+     */
     function Text(node, options) {
         Text.Super.constructor.call(this, node, options);
     }
     Text.Extends(Property);
 
-    Text.prototype.show = function() {
+    Text.prototype.show = function(container) {
         var id             = _.uniqueId('label');
         var fieldcontainer = jQuery('<div data-role="fieldcontain">');
         var label          = jQuery('<label for="' + id + '">' + this._name + '</label>');
@@ -30,7 +34,7 @@ define(['require-config', 'require-oop'], function(Config) {
 
         fieldcontainer
             .append(label, input)
-            .appendTo(this._properties)
+            .appendTo(container)
             .fieldcontain();
 
         label
@@ -39,8 +43,6 @@ define(['require-config', 'require-oop'], function(Config) {
         input
             .addClass(Config.Classes.PROPERTY_TEXT)
             .textinput();
-
-        console.log(Config.Classes.PROPERTY_LABEL, Config.Classes.PROPERTY_TEXT)
     }
 
     return {

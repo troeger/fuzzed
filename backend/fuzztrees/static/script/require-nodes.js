@@ -7,10 +7,11 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         // pass here on inheritance calls
         if (this.constructor === Node) return;
 
-        this._generateId();
-        this._locateEditor();
-        this._initializeVisualRepresentation();
-        this._initializeProperties();
+        // fetch editor instance
+        this._editor               = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
+        this._id                   = this._generateId();
+        this._properties           = this._defineProperties();
+        this._visualRepresentation = this._setupVisualRepresentation();
     }
 
     Node.prototype.appendTo = function(domElement) {
@@ -18,9 +19,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         // already in the DOM. This is why we cannot initialize all of it already in the constructor
         this._visualRepresentation.appendTo(domElement);
 
-        this._resizeOnDrop();
-        this._initializeEndpoints();
-        this._makeInteractive();
+        this._resize();
+        this._setupEndpoints();
+        this._setupDragging();
+        this._setupMouse();
 
         return this;
     }
@@ -43,6 +45,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         return this;
     }
 
+    Node.prototype.properties = function() {
+        return this._properties;
+    }
+
     Node.prototype.remove = function() {
         jsPlumb.deleteEndpoint(this._sourceEndpoint);
         jsPlumb.deleteEndpoint(this._targetEndpoint);
@@ -51,9 +57,6 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     Node.prototype.select = function() {
         this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_SELECTED);
-        _.each(this._properties, function(property) {
-            property.show();
-        });
         return this;
     }
 
@@ -61,42 +64,19 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         throw 'Abstract Method - override type in subclass';
     }
 
+    Node.prototype._defineProperties = function() {
+        // the basic node does not have any properties therefore the empty array
+        // overwrite in subclasses in order to set any
+        return [];
+    }
+
     Node.prototype._generateId = function() {
         // epoch timestamp will do
-        this._id = new Date().getTime();
-        return this._id;
+        return new Date().getTime();
     }
 
-    Node.prototype._locateEditor = function() {
-        this._editor = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
-    }
-
-    Node.prototype._initializeVisualRepresentation = function() {
-        // get the thumbnail and clone it
-        var container = jQuery('<div>');
-        var thumbnail = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
-
-        container
-            .attr('id', thumbnail.attr('id') + this._id)
-            .addClass(Config.Classes.NODE)
-            .css('position', 'absolute');
-
-        thumbnail
-            // cleanup the thumbnail's specific properties
-            .removeClass('ui-draggable')
-            .removeClass(Config.Classes.NODE_THUMBNAIL)
-            .removeAttr('id')
-            // add new stuff
-            .addClass(Config.Classes.NODE_IMAGE)
-            .appendTo(container);
-
-        this._visualRepresentation = container;
-        // give visual representation a back-link to this object
-        this._visualRepresentation.data(Config.Keys.NODE, this); 
-    }
-
-    Node.prototype._resizeOnDrop = function() {
-        // find the nodes
+    Node.prototype._resize = function() {
+        // find the node's svg element and path groups
         var image = this._visualRepresentation.children('.' + Config.Classes.NODE_IMAGE);
         var svg   = image.children('svg');
         var g     = svg.children('g');
@@ -105,13 +85,28 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         var marginOffset = image.outerWidth(true) - image.width();
         var scaleFactor  = (Config.Grid.SIZE - marginOffset) / svg.height();
 
-        // resize the svg and its elements
-        svg.width(svg.width() * scaleFactor);
+        // resize the svg and the groups
+        svg.width (svg.width()  * scaleFactor);
         svg.height(svg.height() * scaleFactor);
         g.attr('transform', 'scale(' + scaleFactor + ') ' + g.attr('transform'));
     }
 
-    Node.prototype._initializeEndpoints = function() {     
+    Node.prototype._setupDragging = function() {
+        var _this = this;
+
+        jsPlumb.draggable(this._visualRepresentation, {
+            containment: 'parent',
+            opacity:     Config.Dragging.OPACITY,
+            cursor:      Config.Dragging.CURSOR,
+            grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
+            stack:       '.' + Config.Classes.NODE,
+            start:       function() {
+                _this._editor.selection.of(_this);
+            }
+        });
+    }
+
+    Node.prototype._setupEndpoints = function() {     
         this._sourceEndpoint = jsPlumb.addEndpoint(this._visualRepresentation, {
             anchor:   'BottomCenter',
             isSource: true,
@@ -125,46 +120,53 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         });
     }
 
-    Node.prototype._makeInteractive = function() {
+    Node.prototype._setupMouse = function() {
         var _this = this;
 
-        // make the node draggable
-        jsPlumb.draggable(this._visualRepresentation, {
-            containment: 'parent',
-            opacity:     Config.Dragging.OPACITY,
-            cursor:      Config.Dragging.CURSOR,
-            grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
-            stack:       '.' + Config.Classes.NODE,
-            start:       function() {
-                _this._editor.selection(_this);
+        // click on the node
+        this._visualRepresentation.click(
+            function(eventObject) {
+                eventObject.stopPropagation();
+                _this._editor.selection.of(_this);
             }
-        });
+        );
 
-        // hovering over a node
+        // hovering
         this._visualRepresentation.hover(
             function() {
-                if (!_this._editor.isSelected(_this)) {
+                if (!_this._editor.selection.contains(_this)) {
                     _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_HOVER);
                 }
             },
             function() {
-                if (!_this._editor.isSelected(_this)) {
+                if (!_this._editor.selection.contains(_this)) {
                     _this._visualRepresentation.find('path').css('stroke', Config.Node.STROKE_NORMAL);
                 }
             }
         );
-
-        // clicking on a node
-        this._visualRepresentation.click(
-            function(eventObject) {
-                eventObject.stopPropagation();
-                _this._editor.selection(_this);
-            }
-        );
     }
 
-    Node.prototype._initializeProperties = function() {
-        this._properties = [];
+    Node.prototype._setupVisualRepresentation = function() {
+        // get the thumbnail, clone it and wrap it with a container (for labels)
+        var container = jQuery('<div>');
+        var thumbnail = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
+
+        container
+            .attr('id', thumbnail.attr('id') + this._id)
+            .addClass(Config.Classes.NODE)
+            .css('position', 'absolute')
+            .data(Config.Keys.NODE, this);
+
+        thumbnail
+            // cleanup the thumbnail's specific properties
+            .removeClass('ui-draggable')
+            .removeClass(Config.Classes.NODE_THUMBNAIL)
+            .removeAttr('id')
+            // add new classes for the actual node
+            .addClass(Config.Classes.NODE_IMAGE)
+            .appendTo(container);
+
+        return container;
     }
 
     /*
@@ -176,19 +178,8 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
     Event.Extends(Node);
 
-    Event.prototype._initializeVisualRepresentation = function() {
-        Event.Super._initializeVisualRepresentation.call(this);
-
-        // add label for events
-        jQuery('<span>Event</span>')
-            .addClass(Config.Classes.NODE_LABEL)
-            .appendTo(this._visualRepresentation);
-    }
-
-    Event.prototype._initializeProperties = function() {
-        Event.Super._initializeProperties.call(this);
-
-        this._properties = _.union(this._properties, [
+    Event.prototype._defineProperties = function() {
+        return [
             new Properties.Text(this, {
                 name:  'Name',
                 value: 'Event',
@@ -198,7 +189,18 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                 name:  'Probability',
                 value: '0' 
             }),
-        ]);
+        ];
+    }
+
+    Event.prototype._setupVisualRepresentation = function() {
+        var container = Event.Super._setupVisualRepresentation.call(this);
+
+        // add label for events
+        jQuery('<span>Event</span>')
+            .addClass(Config.Classes.NODE_LABEL)
+            .appendTo(container);
+
+        return container;
     }
 
     /*

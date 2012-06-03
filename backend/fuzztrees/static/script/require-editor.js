@@ -61,7 +61,18 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     PropertiesMenu.prototype.show = function(nodes, force) {
-        this._menu.show();
+        if (!_.isArray(nodes)) nodes = [nodes];
+
+        if (force || typeof(nodes) === 'undefined' || _.any(nodes, function(node) { return node.properties().length > 0})) {
+            this._properties.empty();
+            this._menu.show();
+
+            _.each(nodes, function(node) {
+                _.each(node.properties(), function(property) {
+                    property.show(this._properties);
+                }.bind(this));
+            }.bind(this));
+        }
     }
 
     PropertiesMenu.prototype._setupDragging = function() {
@@ -109,7 +120,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
             this._nodes.push(nodes);
         }
 
-        _.each(this._selection, function(node) {
+        _.each(this._nodes, function(node) {
             node.select();
         });
         this._editor.properties.show(nodes);
