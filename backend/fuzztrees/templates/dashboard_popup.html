@@ -2,11 +2,17 @@
 <head>
 </head>
 <body>
-<div data-role="page">
-<div data-theme="c" data-role="header">Edit properties</div>
-<div data-role="content">
-Hello World
-</div>
+<div data-role="dialog">
+<div data-theme="c" data-role="header"><h1>Edit properties</h1></div>
+	<div data-role="content">
+		<form method="POST" action="/dashboard/{{ graph.pk }}">{% csrf_token %}
+			<label for="title">Graph title:</label>
+			<input type="text" name="newtitle" id="title" value="{{ graph.name }}" data-mini="true" />
+			<button type="submit" name="change">Change title</button>
+			<button data-theme="a" type="submit" name="delete">Delete</button>
+		</form>
+		<a data-role="button" data-rel="back" href="#">Cancel</a>
+	</div>
 </div>
 </body>
 </html>
