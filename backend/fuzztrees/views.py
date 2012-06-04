@@ -44,6 +44,10 @@ def dashboard(request):
 	graphs=request.user.graphs.all()
 	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
 
+def dashboard_popup(request, graph_id):
+	g=get_object_or_404(Graph, pk=graph_id, owner=request.user)
+	return render_to_response('dashboard_popup.html', {'graph': g}, context_instance=RequestContext(request))	
+
 def teaser(request):
     return render_to_response('teaser.html', {}, context_instance=RequestContext(request))
 

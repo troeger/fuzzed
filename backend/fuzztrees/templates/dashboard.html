@@ -28,7 +28,7 @@
 					<h3 class="ui-li-heading">{{ g }}</h3>
 					<p class="ui-li-desc">Created on: {{ g.created }}</p>
 				</a>
-				<a href="/editor/{{ g.pk }}">Foo</a>
+				<a href="/dashboard/{{ g.pk }}" data-rel="dialog">Edit</a>
 			</li>
 			{% endfor %}
 			</ul>
