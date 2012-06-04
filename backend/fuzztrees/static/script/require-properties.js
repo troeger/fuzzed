@@ -17,9 +17,9 @@ define(['require-config', 'require-oop'], function(Config) {
         this._edit     = typeof options.edit  === 'undefined' ? true : options.edit;
 
         if (this._type === 'number') {
-            this._min  = typeof options.min  === 'undefined' ? '' : options.min;
-            this._max  = typeof options.max  === 'undefined' ? '' : options.max;
-            this._step = typeof options.step === 'undefined' ? '' : options.step;
+            this._min  = typeof options.min  === 'undefined' ? 0 : options.min;
+            this._max  = typeof options.max  === 'undefined' ? Number.MAX_VALUE : options.max;
+            this._step = typeof options.step === 'undefined' ? 1 : options.step;
         }
 
         if (this._hasLabel) {
@@ -81,7 +81,7 @@ define(['require-config', 'require-oop'], function(Config) {
                 // TODO: send properties changed command here
                 if (this._type === 'number') {
                     var n = parseFloat(input.val());
-                    
+
                     this._value = Math.max(this._min, Math.min(n, this._max));
                     input.val(this._value)
 
