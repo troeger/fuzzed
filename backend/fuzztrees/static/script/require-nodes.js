@@ -7,19 +7,20 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         // pass here on inheritance calls
         if (this.constructor === Node) return;
 
+        // endpoints (default configuration)
+        this._maxInConnections  = this._maxInConnections  == undefined ? -1 : this._maxInConnections; // infinite
+        this._maxOutConnections = this._maxOutConnections == undefined ?  1 : this._maxOutConnections;
+
         // logical values
         this._editor     = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
         this._id         = this._generateId();
         this._properties = this._defineProperties();
 
         // visuals
-        var visuals      = this._setupVisualRepresentation();
-        this._container  = visuals.container;
-        this._nodeImage  = visuals.nodeImage;
-
-        // endpoints (default configuration)
-        this._maxInConnections  = this._maxInConnections  == undefined ? -1 : this._maxInConnections; // infinite
-        this._maxOutConnections = this._maxOutConnections == undefined ?  1 : this._maxOutConnections;
+        var visuals            = this._setupVisualRepresentation();
+        this._container        = visuals.container;
+        this._nodeImage        = visuals.nodeImage;
+        this._connectionHandle = visuals.connectionHandle;
     }
 
     Node.prototype.appendTo = function(domElement) {
@@ -58,8 +59,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype.remove = function() {
-        jsPlumb.deleteEndpoint(this._sourceEndpoint);
-        jsPlumb.deleteEndpoint(this._targetEndpoint);
+        _.each(jsPlumb.getEndpoints(this._container), function(endpoint) {
+            jsPlumb.deleteEndpoint(endpoint);
+        })
         this._container.remove();
     }
 
@@ -118,9 +120,11 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype._setupEndpoints = function() {
-        var imageTopOffset = this._nodeImage.offset().top - this._container.offset().top;
+        // get upper and lower image offsets
+        var imageTopOffset    = this._nodeImage.offset().top - this._container.offset().top;
         var imageBottomOffset = imageTopOffset + this._nodeImage.height();
 
+        // make node source
         if (this._maxInConnections != 0) {
             //TODO: we can use an halo icon instead later
             jsPlumb.makeSource(this._connectionHandle, {
@@ -130,6 +134,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             });
         }
 
+        // make node target
         var targetNode = this;
         if (this._maxOutConnections != 0) {
             jsPlumb.makeTarget(this._container, {
@@ -138,11 +143,11 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                 dropOptions: {
                     accept: function(draggable) {
                         var elid = draggable.attr('elid');
-                        if (elid == undefined) return false;
+                        if (typeof elid === 'undefined') return false;
 
                         // this is not a connection-dragging-scenario
                         var sourceNode = jQuery('.' + Config.Classes.NODE + ':has(#' + elid + ')').data('node');
-                        if (sourceNode == undefined) return false;
+                        if (typeof sourceNode === 'undefined') return false;
 
                         // no connections to same node
                         if (targetNode == sourceNode) return false;
@@ -222,14 +227,15 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             .appendTo(container);
 
         if (this._maxInConnections != 0) {
-            this._connectionHandle = jQuery('<span></span>')
+            var connectionHandle = jQuery('<span></span>')
                 .addClass(Config.Classes.NODE_HALO_CONNECT)
-                .appendTo(this._container);
+                .appendTo(container);
         }
 
         return {
-            container: container,
-            nodeImage: nodeImage
+            container:        container,
+            nodeImage:        nodeImage,
+            connectionHandle: connectionHandle
         };
     }
 
@@ -260,14 +266,14 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Event.prototype._setupVisualRepresentation = function() {
-        var container = Event.Super._setupVisualRepresentation.call(this);
+        var visuals = Event.Super._setupVisualRepresentation.call(this);
 
         // add label for events
         jQuery('<span>Event</span>')
             .addClass(Config.Classes.NODE_LABEL)
-            .appendTo(container);
+            .appendTo(visuals.container);
 
-        return container;
+        return visuals;
     }
 
     /*

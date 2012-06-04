@@ -248,10 +248,18 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
             EndpointStyle: {
                 fillStyle:   Config.JSPlumb.ENDPOINT_FILL
             },
-            Endpoint:        [Config.JSPlumb.ENDPOINT_STYLE, {radius: Config.JSPlumb.ENDPOINT_RADIUS}],
+            Endpoint:        [Config.JSPlumb.ENDPOINT_STYLE, 
+                {
+                    radius:     Config.JSPlumb.ENDPOINT_RADIUS,
+                    cssClass:   Config.Classes.JSPLUMB_ENDPOINT,
+                    hoverClass: Config.Classes.JSPLUMB_ENDPOINT_HOVER
+                }],
             PaintStyle: {
                 strokeStyle: Config.JSPlumb.STROKE,
                 lineWidth:   Config.JSPlumb.STROKE_WIDTH
+            },
+            HoverPaintStyle: {
+                strokeStyle: Config.JSPlumb.STROKE_HOVER
             },
             Connector:       Config.JSPlumb.STROKE_STYLE,
             Anchors:         ['BottomMiddle', 'TopMiddle']
@@ -259,15 +267,12 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     Editor.prototype._setupKeyBindings = function() {
-        var _this = this;
-
         jQuery(document).keydown(function(eventObject) {
-            // on hitting delete or backspace we delete the current selected nodes
-            if (eventObject.which === jQuery.ui.keyCode.BACKSPACE || eventObject.which === jQuery.ui.keyCode.DELETE) {
-                eventObject.preventDefault();
-                _this._selection.remove();
+            // hitting delete removes the current selection from the canvas
+            if (eventObject.which === jQuery.ui.keyCode.DELETE) {
+                this.selection.remove();
             }
-        });
+        }.bind(this));
     }
 
     Editor.prototype._shapeDropped = function(uiEvent, uiObject) {
