@@ -62,7 +62,9 @@
 
 .fuzzed-node-image {
     display: inline-block;
+    position: relative;
     margin:  3px;
+    z-index: 100;
 }
 
 .fuzzed-node-label {
@@ -76,17 +78,37 @@
     z-index:          100; /* above connections */
 }
 
-.jsplumb-endpoint {
-    z-index: 200; /* above labels and connections */
-    opacity: 0;
+.fuzzed-node-drop-active {
+    outline: #409FFF solid 3px;
 }
 
-.jsplumb-endpoint.jsplumb-endpoint-drop-active {
-    opacity: 1;
+.fuzzed-node-halo-connect {
+    width:            10px;
+    height:           10px;
+    background-color: #409FFF;
+    position:         absolute;
+    visibility:       hidden;
+    top:              0;
+    right:            0;
+    z-index:          150; /* above image, TODO: let halo care about that */
+}
+
+.fuzzed-node:hover .fuzzed-node-halo-connect {
+    visibility: visible;
+}
+
+.jsplumb-endpoint {
+    opacity: 0;
+    z-index: 50; /* above connection, below image */
 }
 
 .jsplumb-endpoint.jsplumb-endpoint-hover {
     opacity: 1;
+}
+
+/* FIX: For some reasons endpoints sometimes get this class when dragging connections */
+.jsplumb-endpoint.fuzzed-node-drop-active {
+    outline: none;
 }
 
 #FuzzedProperties .fuzzed-property-label {

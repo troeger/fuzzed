@@ -84,6 +84,9 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
                 strokeStyle: Config.JSPlumb.STROKE,
                 lineWidth:   Config.JSPlumb.STROKE_WIDTH
             },
+            HoverPaintStyle: {
+                strokeStyle: Config.JSPlumb.STROKE_HOVER
+            },
             Connector:       Config.JSPlumb.STROKE_STYLE
         });
     }
