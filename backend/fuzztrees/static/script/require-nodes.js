@@ -152,6 +152,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                         // no connections to same node
                         if (targetNode == sourceNode) return false;
 
+                        if (targetNode instanceof Gate && sourceNode instanceof Gate) return false;
+                        if (targetNode instanceof Event && sourceNode instanceof Event) return false;
+
                         // there is already a connection between these nodes
                         var connections = jsPlumb.getConnections({
                             //XXX: the selector should suffice, but due to a bug in jsPlumb we need the IDs here
@@ -308,6 +311,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      *  Multi Event
      */
     function MultiEvent() {
+        // no incoming connections allowed
+        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
+        
         MultiEvent.Super.constructor.apply(this, arguments);
     }
     MultiEvent.Extends(Event);
