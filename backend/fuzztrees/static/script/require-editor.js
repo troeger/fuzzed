@@ -76,7 +76,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     }
 
     PropertiesMenu.prototype._setupDragging = function() {
-        this._properties.draggable({
+        this._menu.draggable({
             containment:   '#' + Config.IDs.CONTENT,
             stack:         '.' + Config.Classes.NODE,
             cursor:        Config.Dragging.CURSOR,
@@ -98,7 +98,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     // clear the selection, leaving the nodes on the canvas
     Selection.prototype.clear = function() {
         _.each(this._nodes, function(node) {
-            node.deselect()
+            node.deselect();
         });
         this._empty();
         this._editor.properties.hide();

@@ -11,16 +11,25 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._maxInConnections  = this._maxInConnections  == undefined ? -1 : this._maxInConnections; // infinite
         this._maxOutConnections = this._maxOutConnections == undefined ?  1 : this._maxOutConnections;
 
-        // logical values
+        // logic
         this._editor     = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
         this._id         = this._generateId();
-        this._properties = this._defineProperties();
 
         // visuals
         var visuals            = this._setupVisualRepresentation();
         this._container        = visuals.container;
         this._nodeImage        = visuals.nodeImage;
         this._connectionHandle = visuals.connectionHandle;
+
+        // properties
+        this._properties       = this._defineProperties();
+    }
+
+    Node.prototype.addLabel = function(element) {
+        element
+            .addClass(Config.Classes.NODE_LABEL)
+            .width(Config.Grid.SIZE)
+            .appendTo(this._container);
     }
 
     Node.prototype.appendTo = function(domElement) {
@@ -138,7 +147,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         var targetNode = this;
         if (this._maxOutConnections != 0) {
             jsPlumb.makeTarget(this._container, {
-                anchor:   [ 0.5, 0, 0, -1, 0, imageTopOffset],
+                anchor:         [ 0.5, 0, 0, -1, 0, imageTopOffset],
                 maxConnections: this._maxOutConnections,
                 dropOptions: {
                     accept: function(draggable) {
@@ -263,20 +272,18 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             }),
             new Properties.Text(this, {
                 name:  'Probability',
-                value: '0' 
+                type:  'number',
+                min:   0,
+                max:   1,
+                step:  0.01,
+                value: 0
+            }),
+            new Properties.Text(this, {
+                name:  'Cost',
+                type:  'number',
+                value: 1
             }),
         ];
-    }
-
-    Event.prototype._setupVisualRepresentation = function() {
-        var visuals = Event.Super._setupVisualRepresentation.call(this);
-
-        // add label for events
-        jQuery('<span>Event</span>')
-            .addClass(Config.Classes.NODE_LABEL)
-            .appendTo(visuals.container);
-
-        return visuals;
     }
 
     /*
@@ -313,7 +320,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     function MultiEvent() {
         // no incoming connections allowed
         this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
-        
+
         MultiEvent.Super.constructor.apply(this, arguments);
     }
     MultiEvent.Extends(Event);
