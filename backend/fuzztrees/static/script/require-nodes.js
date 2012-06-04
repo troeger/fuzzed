@@ -329,6 +329,19 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         return Config.Types.MULTI_EVENT;
     }
 
+    MultiEvent.prototype._defineProperties = function() {
+        var properties = MultiEvent.Super._defineProperties.call(this);
+        properties.splice(1, 0, new Properties.Text(this, {
+            name:  'Cardinality',
+            type:  'number',
+            value: 1,
+            min:   1,
+            step:  1
+        }));
+
+        return properties;
+    }
+
     /*
      *  Undeveloped Event
      */
@@ -440,6 +453,19 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         return Config.Types.CHOICE_EVENT;
     }
 
+    ChoiceEvent.prototype._defineProperties = function() {
+        var properties = ChoiceEvent.Super._defineProperties.call(this);
+        properties.splice(1, 0, new Properties.Text(this, {
+            name:  'Cardinality',
+            type:  'number',
+            value: 1,
+            min:   1,
+            step:  1
+        }));
+
+        return properties;
+    }
+
     /*
      *  RedundancyEvent
      */
@@ -450,6 +476,19 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     RedundancyEvent.prototype.type = function() {
         return Config.Types.REDUNDANCY_EVENT;
+    }
+
+    RedundancyEvent.prototype._defineProperties = function() {
+        var properties = RedundancyEvent.Super._defineProperties.call(this);
+        properties.splice(1, 0, new Properties.Text(this, {
+            name:  'Cardinality',
+            type:  'number',
+            value: 1,
+            min:   1,
+            step:  1
+        }));
+
+        return properties;
     }
 
     /*
