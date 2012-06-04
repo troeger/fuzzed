@@ -21,13 +21,14 @@
 		</div>
 
 		<div data-role="content">
-			<ul data-role="listview" data-insert="true" class="ui-listview-inset ui-corner-all ui-shadow">
+			<ul data-role="listview" data-split-icon="gear" class="ui-listview-inset ui-corner-all ui-shadow">
 			{% for g in graphs %}
 			<li>
 				<a data-ajax="false" class="ui-link-inherit" href="/editor/{{ g.pk }}">
 					<h3 class="ui-li-heading">{{ g }}</h3>
 					<p class="ui-li-desc">Created on: {{ g.created }}</p>
 				</a>
+				<a href="/editor/{{ g.pk }}">Foo</a>
 			</li>
 			{% endfor %}
 			</ul>
