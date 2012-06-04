@@ -46,22 +46,22 @@ define(['require-config', 'require-oop'], function(Config) {
     Text.Extends(Property);
 
     Text.prototype.show = function(container) {
-        var id             = _.uniqueId('label');
-        var fieldcontainer = jQuery('<div data-role="fieldcontain">');
-        var label          = jQuery('<label>');
-        var input          = jQuery('<input data-mini="true" type="' + this._type + '">');
+        var id               = _.uniqueId('label');
+        this._fieldcontainer = jQuery('<div data-role="fieldcontain">');
+        this._inputLabel     = jQuery('<label>');
+        this._input          = jQuery('<input data-mini="true" type="' + this._type + '">');
 
-        fieldcontainer
-            .append(label, input)
+        this._fieldcontainer
+            .append(this._inputLabel, this._input)
             .appendTo(container)
             .fieldcontain();
 
-        label
+        this._inputLabel
             .attr('for', id)
             .html(this._name)
             .addClass(Config.Classes.PROPERTY_LABEL);
 
-        input
+        this._input
             .attr('id', id)
             .attr('min', this._min)
             .attr('max', this._max)
@@ -73,41 +73,46 @@ define(['require-config', 'require-oop'], function(Config) {
             .textinput()
 
             // callbacks
-            .blur(function(eventObject) {
-                this._onBlur(eventObject, this);
-            }.bind(this))
-
-            .change(function(eventObject) {
-                // TODO: send properties changed command here
-                if (this._type === 'number') {
-                    var n = parseFloat(input.val());
-
-                    this._value = Math.max(this._min, Math.min(n, this._max));
-                    input.val(this._value)
-
-                } else {
-                    this._value = input.val();
-                }
-
-                this._onChange(eventObject, this);
-            }.bind(this))
-
-            .focus(function(eventObject) {
-                this._onFocus(eventObject, this);
-            }.bind(this))
-
-            .keyup(function(eventObject) {
-                if (this._hasLabel) {
-                    this._value = input.val();
-                    this._label.html(this._value);
-                }
-
-                this._onKeyup(eventObject, this);
-            }.bind(this));
+            .blur(this._blur.bind(this))
+            .change(this._change.bind(this))
+            .focus(this._focus.bind(this))
+            .keyup(this._keyup.bind(this));
     }
 
     Text.prototype.value = function() {
         return this._value;
+    }
+
+    Text.prototype._blur = function(eventObject) {
+        this._onBlur(eventObject, this);
+    }
+
+    Text.prototype._change = function(eventObject) {
+        // TODO: send properties changed command here
+        if (this._type === 'number') {
+            var n = parseFloat(this._input.val());
+
+            this._value = Math.max(this._min, Math.min(n, this._max));
+            this._input.val(this._value)
+
+        } else {
+            this._value = this._input.val();
+        }
+
+        this._onChange(eventObject, this); 
+    }
+
+    Text.prototype._focus = function(eventObject) {
+        this._onFocus(eventObject, this);
+    }
+
+    Text.prototype._keyup = function(eventObject) {
+        if (this._hasLabel) {
+            this._value = this._input.val();
+            this._label.html(this._value);
+        }
+
+        this._onKeyup(eventObject, this);
     }
 
     return {

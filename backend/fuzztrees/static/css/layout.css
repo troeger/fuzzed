@@ -37,7 +37,7 @@
     z-index:   100;
 }
 
-#FuzzedProperties input[type="text"][disabled] {
+#FuzzedProperties input[disabled] {
     background-color:   transparent;
     border:             none;
     outline:            none;
