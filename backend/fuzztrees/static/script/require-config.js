@@ -2,8 +2,27 @@ define(function() {
     var GRID_SIZE = 60;
 
     return {
-        ShapeMenu: {
-            THUMBNAIL_SCALE_FACTOR: 0.7
+        Classes: {
+            NODE:             'fuzzed-node',
+            NODE_THUMBNAIL:   'fuzzed-node-thumbnail',
+            NODE_IMAGE:       'fuzzed-node-image',
+            NODE_LABEL:       'fuzzed-node-label',
+            NODE_DROP_ACTIVE: 'fuzzed-node-drop-active',
+            NODE_HALO_CONNECT:'fuzzed-node-halo-connect',
+
+            JSPLUMB_ENDPOINT:       'jsplumb-endpoint',
+            JSPLUMB_ENDPOINT_HOVER: 'jsplumb-endpoint-hover',
+
+            PROPERTIES:                 'fuzzed-properties',
+            PROPERTY_LABEL:             'fuzzed-property-label',
+            PROPERTY_LABEL_PROBABILITY: 'fuzzed-node-label-probability',
+            PROPERTY_TEXT:              'fuzzed-property-text' 
+        },
+
+        Dragging: {
+            OPACITY:        0.5,
+            CURSOR:         'move',
+            SNAP_TOLERANCE: 10
         },
 
         Grid: {
@@ -12,6 +31,14 @@ define(function() {
             STROKE:       '#ddd',
             STROKE_WIDTH: 1,
             STROKE_STYLE: '7 3' // svg dash-array value
+        },
+
+        IDs: {
+            CONTENT:         'FuzzedContent',
+            TOOLBAR:         'FuzzedToolbar',
+            SHAPES_MENU:     'FuzzedShapes',
+            CANVAS:          'FuzzedCanvas',
+            PROPERTIES_MENU: 'FuzzedProperties'
         },
 
         JSPlumb: {
@@ -25,6 +52,12 @@ define(function() {
             ENDPOINT_STYLE:  'Dot'
         },
 
+        Keys: {
+            EDITOR:      'editor',
+            CONSTRUCTOR: 'constructor',
+            NODE:        'node'
+        },
+
         Node: {
             LABEL_HEIGHT:    15,
             STROKE_NORMAL:   '#000000',
@@ -32,16 +65,43 @@ define(function() {
             STROKE_SELECTED: '#FF9640'
         },
 
-        Dragging: {
-            OPACITY:        0.5,
-            CURSOR:         'move',
-            SNAP_TOLERANCE: 10
+        Properties: {
+            Defaults: {
+                Basic: {
+                    disabled:     false,
+                    mirror:       null,
+                    mirrorPrefix: '',
+                    mirrorSuffix: '',
+                    mirrorClass:  [],
+                    name:         '',
+                    value:        ''
+                },
+
+                Number: {
+                    type: 'text',
+                    max:   Number.MAX_VALUE,
+                    min:  -Number.MAX_VALUE,
+                    step: 1 
+                },
+
+                Pattern: {
+                    pattern:  '[.*]'
+                }
+            },
+
+            Events: [
+                'blur',
+                'change',
+                'click',
+                'focus',
+                'keydown',
+                'keyup',
+                'select'
+            ]
         },
 
-        Keys: {
-            EDITOR:      'editor',
-            CONSTRUCTOR: 'constructor',
-            NODE:        'node'
+        ShapeMenu: {
+            THUMBNAIL_SCALE_FACTOR: 0.7
         },
 
         Types: {
@@ -58,30 +118,6 @@ define(function() {
             CHOICE_EVENT:      'choice',
             REDUNDANCY_EVENT:  'redundancy',
             HOUSE_EVENT:       'house'
-        },
-
-        IDs: {
-            CONTENT:         'FuzzedContent',
-            TOOLBAR:         'FuzzedToolbar',
-            SHAPES_MENU:     'FuzzedShapes',
-            CANVAS:          'FuzzedCanvas',
-            PROPERTIES_MENU: 'FuzzedProperties'
-        },
-
-        Classes: {
-            NODE:             'fuzzed-node',
-            NODE_THUMBNAIL:   'fuzzed-node-thumbnail',
-            NODE_IMAGE:       'fuzzed-node-image',
-            NODE_LABEL:       'fuzzed-node-label',
-            NODE_DROP_ACTIVE: 'fuzzed-node-drop-active',
-            NODE_HALO_CONNECT:'fuzzed-node-halo-connect',
-
-            JSPLUMB_ENDPOINT:       'jsplumb-endpoint',
-            JSPLUMB_ENDPOINT_HOVER: 'jsplumb-endpoint-hover',
-
-            PROPERTIES:       'fuzzed-properties',
-            PROPERTY_LABEL:   'fuzzed-property-label',
-            PROPERTY_TEXT:    'fuzzed-property-text' 
         }
     };
 });

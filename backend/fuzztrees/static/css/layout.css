@@ -70,16 +70,19 @@
 .fuzzed-node-label {
     display:          block;
     position:         relative;
-    height:           15px;
     line-height:      15px;
     background-color: rgba(255, 255, 255, 0.7);
     z-index:          100; /* above connections */
     font-weight:      bold;
     font-size:        0.8em;
     text-align:       center;
-    overflow:         hidden;
-    text-overflow:    ellipsis;
-    white-space:      nowrap;
+    word-wrap:        break-word;
+    margin-bottom:    3px;
+}
+
+.fuzzed-node-label-probability {
+    font-weight: normal;
+    font-style:  italic;
 }
 
 .fuzzed-node-drop-active {
@@ -129,7 +132,7 @@
 #FuzzedProperties .fuzzed-property-text {
     font-size:   12px;
     line-height: 1;
-    width:       64%;
+    width:       63%;
 }
 
 #FuzzedProperties input[disabled] {

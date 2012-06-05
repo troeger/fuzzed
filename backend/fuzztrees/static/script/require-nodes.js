@@ -259,23 +259,28 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     Event.prototype._defineProperties = function() {
         return [
             new Properties.Text({
-                name:    'Name',
-                value:   'Event',
-                labelOn: this._container
-            }),
+                name:   'Name',
+                value:  'Event',
+                mirror: this._container
+            }, this),
+
             new Properties.Text({
-                name:  'Probability',
-                type:  'number',
-                min:   0,
-                max:   1,
-                step:  0.01,
-                value: 0
-            }),
+                name:         'Probability',
+                type:         'number',
+                min:          0,
+                max:          1,
+                step:         0.01,
+                value:        0,
+                mirror:       this._container,
+                mirrorPrefix: 'p=',
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
+            }, this),
+
             new Properties.Text({
                 name:  'Cost',
                 type:  'number',
                 value: 1
-            }),
+            }, this),
         ];
     }
 
@@ -330,7 +335,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             value: 1,
             min:   1,
             step:  1
-        }));
+        }, this));
 
         return properties;
     }
@@ -454,7 +459,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             value: 1,
             min:   1,
             step:  1
-        }));
+        }, this));
 
         return properties;
     }
@@ -479,7 +484,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             value: 1,
             min:   1,
             step:  1
-        }));
+        }, this));
 
         return properties;
     }
