@@ -25,13 +25,6 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._properties       = this._defineProperties();
     }
 
-    Node.prototype.addLabel = function(element) {
-        element
-            .addClass(Config.Classes.NODE_LABEL)
-            .width(Config.Grid.SIZE)
-            .appendTo(this._container);
-    }
-
     Node.prototype.appendTo = function(domElement) {
         // some visual stuff, interaction and endpoints need to go here since they require the elements to be
         // already in the DOM. This is why we cannot initialize all of it already in the constructor
@@ -265,12 +258,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     Event.prototype._defineProperties = function() {
         return [
-            new Properties.Text(this, {
-                name:  'Name',
-                value: 'Event',
-                label: true
+            new Properties.Text({
+                name:    'Name',
+                value:   'Event',
+                labelOn: this._container
             }),
-            new Properties.Text(this, {
+            new Properties.Text({
                 name:  'Probability',
                 type:  'number',
                 min:   0,
@@ -278,7 +271,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                 step:  0.01,
                 value: 0
             }),
-            new Properties.Text(this, {
+            new Properties.Text({
                 name:  'Cost',
                 type:  'number',
                 value: 1
@@ -331,7 +324,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     MultiEvent.prototype._defineProperties = function() {
         var properties = MultiEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text(this, {
+        properties.splice(1, 0, new Properties.Text({
             name:  'Cardinality',
             type:  'number',
             value: 1,
@@ -455,7 +448,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     ChoiceEvent.prototype._defineProperties = function() {
         var properties = ChoiceEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text(this, {
+        properties.splice(1, 0, new Properties.Text({
             name:  'Cardinality',
             type:  'number',
             value: 1,
@@ -480,7 +473,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     RedundancyEvent.prototype._defineProperties = function() {
         var properties = RedundancyEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text(this, {
+        properties.splice(1, 0, new Properties.Text({
             name:  'Cardinality',
             type:  'number',
             value: 1,

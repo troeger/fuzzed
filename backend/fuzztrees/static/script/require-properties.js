@@ -3,18 +3,16 @@ define(['require-config', 'require-oop'], function(Config) {
     /*
      *  Abstract Property
      */
-    function Property(node, options) {
+    function Property(options) {
         // skip inheritance call
         if (this.constructor === Property) return;
 
-        this._node     = node;
-        this._name     = options.name  || '';
-        this._type     = options.type  || 'text';
-        this._hasLabel = options.label || false;
+        this._name    = options.name    || '';
+        this._type    = options.type    || 'text';
+        this._labelOn = options.labelOn || null;
 
-
-        this._value    = typeof options.value === 'undefined' ? ''   : options.value;
-        this._edit     = typeof options.edit  === 'undefined' ? true : options.edit;
+        this._value = typeof options.value === 'undefined' ? ''   : options.value;
+        this._edit  = typeof options.edit  === 'undefined' ? true : options.edit;
 
         if (this._type === 'number') {
             this._min  = typeof options.min  === 'undefined' ? 0 : options.min;
@@ -22,9 +20,12 @@ define(['require-config', 'require-oop'], function(Config) {
             this._step = typeof options.step === 'undefined' ? 1 : options.step;
         }
 
-        if (this._hasLabel) {
+        if (this._labelOn) {
             this._label = jQuery('<span>').html(this._value);
-            this._node.addLabel(this._label);
+            this._label
+                .addClass(Config.Classes.NODE_LABEL)
+                .width(Config.Grid.SIZE)
+                .appendTo(this._labelOn);
         }
     }
 
@@ -35,8 +36,8 @@ define(['require-config', 'require-oop'], function(Config) {
     /*
      *  Text Property
      */
-    function Text(node, options) {
-        Text.Super.constructor.call(this, node, options);
+    function Text(options) {
+        Text.Super.constructor.call(this, options);
 
         this._onBlur   = options.onBlur   || jQuery.noop;
         this._onChange = options.onChange || jQuery.noop;
@@ -107,7 +108,7 @@ define(['require-config', 'require-oop'], function(Config) {
     }
 
     Text.prototype._keyup = function(eventObject) {
-        if (this._hasLabel) {
+        if (this._labelOn) {
             this._value = this._input.val();
             this._label.html(this._value);
         }

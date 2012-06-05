@@ -31,19 +31,10 @@
     position:  absolute;
     top:       0;
     right:     0;
-    width:     300px;
-    min-width: 300px;
+    width:     250px;
+    min-width: 250px;
     overflow:  auto;
     z-index:   100;
-}
-
-#FuzzedProperties input[disabled] {
-    background-color:   transparent;
-    border:             none;
-    outline:            none;
-    -webkit-box-shadow: none;
-    -moz-box-shadow:    none;
-    box-shadow:         none;
 }
 
 .fuzzed-node-thumbnail-cell {
@@ -70,10 +61,10 @@
 }
 
 .fuzzed-node-image {
-    display: inline-block;
+    display:  inline-block;
     position: relative;
-    margin:  3px;
-    z-index: 100;
+    margin:   3px;
+    z-index:  100;
 }
 
 .fuzzed-node-label {
@@ -81,10 +72,10 @@
     position:         relative;
     height:           15px;
     line-height:      15px;
-    font-weight:      bold;
-    font-size:        0.8em;
     background-color: rgba(255, 255, 255, 0.7);
     z-index:          100; /* above connections */
+    font-weight:      bold;
+    font-size:        0.8em;
     text-align:       center;
     overflow:         hidden;
     text-overflow:    ellipsis;
@@ -124,12 +115,28 @@
     outline: none;
 }
 
+#FuzzedProperties .ui-field-contain {
+    margin: 5px 0;
+}
+
 #FuzzedProperties .fuzzed-property-label {
     vertical-align: middle;
     font-weight:    bold;
     width:          30%;
+    font-size:      12px;
 }
 
 #FuzzedProperties .fuzzed-property-text {
-    width: 64%;
+    font-size:   12px;
+    line-height: 1;
+    width:       64%;
+}
+
+#FuzzedProperties input[disabled] {
+    background-color:   transparent;
+    border:             none;
+    outline:            none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow:    none;
+    box-shadow:         none;
 }
