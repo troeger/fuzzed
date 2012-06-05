@@ -5,13 +5,19 @@
 <div data-role="dialog">
 <div data-theme="c" data-role="header"><h1>Edit properties</h1></div>
 	<div data-role="content">
-		<form method="POST" action="/dashboard/{{ graph.pk }}">{% csrf_token %}
-			<label for="title">Graph title:</label>
-			<input type="text" name="newtitle" id="title" value="{{ graph.name }}" data-mini="true" />
-			<button type="submit" name="change">Change title</button>
-			<button data-theme="a" type="submit" name="delete">Delete</button>
+		<form method="POST" action="/dashboard/">{% csrf_token %}
+			<input type="hidden" name="graph" value="{{ graph.pk }}" />
+			<fieldset class="ui-grid-a">
+				<div class="ui-block-a">
+					<input type="text" name="newtitle" id="title" value="{{ graph.name }}"/>
+				</div>
+				<div class="ui-block-b">
+					<input data-theme="e" type="submit" name="change" value="Change title"/>
+				</div>
+			</fieldset>
+			<button data-theme="e" type="submit" name="delete">Delete graph</button>
+			<button type="submit" data-rel="back">Cancel</button>
 		</form>
-		<a data-role="button" data-rel="back" href="#">Cancel</a>
 	</div>
 </div>
 </body>

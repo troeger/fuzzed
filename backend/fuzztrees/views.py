@@ -41,20 +41,19 @@ def dashboard(request):
 			c.save()
 		else:
 			return HttpResponseBadRequest()
+	elif "delete" in request.POST and "graph" in request.POST:
+		g=get_object_or_404(Graph, pk=request.POST["graph"], owner=request.user)
+		g.delete()
+	elif "change" in request.POST and "newtitle" in request.POST and "graph" in request.POST:
+		g=get_object_or_404(Graph, pk=request.POST["graph"], owner=request.user)
+		g.name=request.POST["newtitle"]
+		g.save()		
 	graphs=request.user.graphs.all()
 	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
 
-def dashboard_action(request, graph_id):
+def dashboard_popup(request, graph_id):
 	g=get_object_or_404(Graph, pk=graph_id, owner=request.user)
-	if "delete" in request.POST:
-		g.delete()
-		return HttpResponseRedirect('/dashboard/')
-	elif "change" in request.POST and "newtitle" in request.POST:
-		g.name=request.POST["newtitle"]
-		g.save()		
-		return HttpResponseRedirect('/dashboard/')
-	else:
-		return render_to_response('dashboard_popup.html', {'graph': g}, context_instance=RequestContext(request))	
+	return render_to_response('dashboard_popup.html', {'graph': g}, context_instance=RequestContext(request))	
 
 def teaser(request):
     return render_to_response('teaser.html', {}, context_instance=RequestContext(request))
