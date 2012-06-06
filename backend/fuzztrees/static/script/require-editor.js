@@ -50,8 +50,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
      */
     function PropertiesMenu() {
         // menu is the container and properties the actual element where properties will bea added
-        this._menu       = jQuery('#' + Config.IDs.PROPERTIES_MENU);
-        this._properties = this._menu.find('.' + Config.Classes.PROPERTIES);
+        this._menu = jQuery('#' + Config.IDs.PROPERTIES_MENU);
+        this._list = this._menu.find('.ui-listview');
 
         this._setupDragging();
     }
@@ -64,15 +64,36 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         if (!_.isArray(nodes)) nodes = [nodes];
 
         if (force || typeof(nodes) === 'undefined' || _.any(nodes, function(node) { return node.properties().length > 0})) {
-            this._properties.empty();
+            this._list.children().not(':eq(0)').remove(); // empty all but first (Properties headline)
             this._menu.show();
 
             _.each(nodes, function(node) {
+                var frame = this._makePropertyFrame(node)
+                this._list.append(frame);
+
                 _.each(node.properties(), function(property) {
-                    property.show(this._properties);
+                    property.show(frame.children('form'));
                 }.bind(this));
             }.bind(this));
+
+            this._list.listview('refresh');
         }
+    }
+
+    PropertiesMenu.prototype._makePropertyFrame = function(node) {
+        var li    = jQuery('<li>');
+
+        var title = jQuery('<h3>')
+            .html(node.name())
+            .appendTo(li);
+
+        var form  = jQuery('<form>')
+            .attr('action', '#')
+            .attr('method', 'get')
+            .addClass(Config.Classes.PROPERTIES)
+            .appendTo(li);
+
+        return li;
     }
 
     PropertiesMenu.prototype._setupDragging = function() {
