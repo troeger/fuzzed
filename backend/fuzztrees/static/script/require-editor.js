@@ -91,7 +91,13 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
             .attr('action', '#')
             .attr('method', 'get')
             .addClass(Config.Classes.PROPERTIES)
-            .appendTo(li);
+            .appendTo(li)
+            .keydown(function(eventObject) {
+                if (eventObject.which === jQuery.ui.keyCode.ENTER) {
+                    eventObject.preventDefault();
+                    return false;
+                }
+            });
 
         return li;
     }
