@@ -358,7 +358,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     function MultiFaultEvent() {
         // no incoming connections allowed
         this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
-        
+
         MultiEvent.Super.constructor.apply(this, arguments);
     }
     MultiFaultEvent.Extends(Event);
@@ -438,6 +438,20 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     VotingOrGate.prototype.type = function() {
         return Config.Types.VOTING_OR_GATE;
+    }
+
+    VotingOrGate.prototype._defineProperties = function() {
+        return [
+            new Properties.Text({
+                name:         'Count',
+                type:         'number',
+                value:        1,
+                min:          0,
+                mirror:       this._container,
+                mirrorPrefix: 'k=',
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
+            }, this)
+        ];
     }
 
     /*
