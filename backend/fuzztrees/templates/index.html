@@ -23,18 +23,18 @@
 <body>
 	<div data-role="page">
 
-		<div data-theme="c" data-role="header" id="toolbar">
+		<div data-theme="d" data-role="header" id="toolbar">
 			<h1>FuzzTrees</h1>
 		</div>
 
-		<div data-role="content">	
-			<div data-theme="c" style="margin-top: 100px; margin-left: auto; margin-right: auto; width: 580px">
-				<form data-ajax="false" style="text-align:center" action="/login/" method="get" id="openid_form">
+		<div data-role="content" style="text-align: center">	
+			<h1>Welcome !</h1>
+			<h3>Please sign-in or create a new account by using one of these authentication providers.</h3>
+			<div style="margin-top: 50px; margin-left: auto; margin-right: auto; width: 580px">
+				<form data-ajax="false" action="/login/" method="get" id="openid_form">
 					<input type="hidden" name="action" value="verify" />
 					<fieldset>
-						<legend>Sign-in or Create New Account</legend>
 						<div id="openid_choice">
-							<p>Please click your account provider:</p>
 							<div id="openid_btns"></div>
 						</div>
 						<div id="openid_input_area">
@@ -49,6 +49,9 @@
 				</form>
 			</div>	
 		</div>	
+
+		{% include "footer.html" %}
+
 	</div>	
 </body>
 </html>
