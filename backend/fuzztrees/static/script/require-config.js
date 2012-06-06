@@ -1,5 +1,5 @@
 define(function() {
-    var GRID_SIZE = 60;
+    var GRID_SIZE = 70;
 
     return {
         Classes: {
