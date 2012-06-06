@@ -16,7 +16,8 @@ define(function() {
             PROPERTIES:                 'fuzzed-properties',
             PROPERTY_LABEL:             'fuzzed-property-label',
             PROPERTY_LABEL_PROBABILITY: 'fuzzed-node-label-probability',
-            PROPERTY_TEXT:              'fuzzed-property-text' 
+            PROPERTY_SELECT:            'fuzzed-property-select',
+            PROPERTY_TEXT:              'fuzzed-property-text'
         },
 
         Dragging: {
@@ -119,7 +120,11 @@ define(function() {
                 },
 
                 Pattern: {
-                    pattern:  '[.*]'
+                    pattern: '[.*]'
+                },
+
+                Select: {
+                    options:  []
                 }
             },
 

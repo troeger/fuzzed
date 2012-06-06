@@ -280,11 +280,26 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
             }, this),
 
+            new Properties.Select({
+                name:         'Probability',
+                options:      [
+                                'very unlikely',
+                                'unlikely',
+                                'likely',
+                                'very likely',
+                                'unknown'
+                              ],
+                value:        'unknown',
+                mirror:       this._container,
+                mirrorPrefix: 'p2=',
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
+            }, this),
+
             new Properties.Text({
                 name:  'Cost',
                 type:  'number',
                 value: 1
-            }, this),
+            }, this)
         ];
     }
 

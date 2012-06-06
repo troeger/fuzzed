@@ -81,6 +81,7 @@
 }
 
 .fuzzed-node-label-probability {
+    font-size:   11px;
     font-weight: normal;
     font-style:  italic;
 }
@@ -127,6 +128,20 @@
     font-weight:    bold;
     width:          30%;
     font-size:      12px;
+}
+
+#FuzzedProperties div.ui-select {
+    width:        63%;
+    padding-left: 0.4em;
+}
+
+#FuzzedProperties div.ui-select span.ui-btn-text {
+    font-size:   12px;
+    font-weight: normal;
+}
+
+#FuzzedProperties div.ui-select span.ui-btn-inner {
+    padding: 0.35em 35px 0.35em 11px;
 }
 
 #FuzzedProperties .fuzzed-property-text {

@@ -24,8 +24,16 @@ define(['require-config', 'require-oop'], function(Config) {
         }
     }
 
+    Property.prototype.input = function() {
+        return this._input;
+    }
+
     Property.prototype.name = function() {
         return this._options.name;
+    }
+
+    Property.prototype.mirror = function() {
+        return this._mirror;
     }
 
     Property.prototype.options = function() {
@@ -42,7 +50,7 @@ define(['require-config', 'require-oop'], function(Config) {
             .append(this._label, this._input)
             .appendTo(container)
             .fieldcontain();
-        this._input.textinput();
+        this._input[this._plugin()]();
 
         this._setupCallbacks(this._input);
 
@@ -51,6 +59,14 @@ define(['require-config', 'require-oop'], function(Config) {
 
     Property.prototype.value = function() {
         return this._value;
+    }
+
+    Property.prototype._mirrorString = function() {
+        return this._options.mirrorPrefix + this._value + this._options.mirrorSuffix;
+    }
+
+    Property.prototype._plugin = function() {
+        throw 'Abstract Method - overwrite in subclass with name of jQuery Mobile form element function name';
     }
 
     Property.prototype._setupCallbacks = function(input) {
@@ -96,8 +112,43 @@ define(['require-config', 'require-oop'], function(Config) {
         return mirror;
     }
 
-    Property.prototype._mirrorString = function() {
-        return this._options.mirrorPrefix + this._value + this._options.mirrorSuffix;
+    /*
+     *  Select Property
+     */
+    function Select(options, node) {
+        Select.Super.constructor.call(this, options, node);
+
+        this._options = jQuery.extend({}, Config.Properties.Defaults.Select, this._options);
+        if (_.indexOf(this._options.options, this._value) === -1) this._options.options.unshift(this._value);
+    }
+    Select.Extends(Property);
+
+    Select.prototype._change = function() {
+        this._value = this._input.val();
+        if (this._mirror) this._mirror.html(this._mirrorString());
+    }
+
+    Select.prototype._plugin = function() {
+        return 'selectmenu';
+    }
+
+    Select.prototype._setupInput = function() {
+        var select = jQuery('<select>')
+            .attr('data-mini', 'true')
+            .attr('id',        this._id)
+            .attr('disabled',  this._options.disabled)
+            .val(this._value)
+            .addClass(Config.Classes.PROPERTY_SELECT);
+
+        _.each(this._options.options, function(option) {
+            jQuery('<option>')
+                .attr('value', option)
+                .attr('selected', option === this._value ? 'selected' : undefined)
+                .html(option)
+                .appendTo(select);
+        }.bind(this));
+
+        return select;
     }
 
     /*
@@ -118,18 +169,6 @@ define(['require-config', 'require-oop'], function(Config) {
     }
     Text.Extends(Property);
 
-    Text.prototype._setupInput = function() {
-        return jQuery('<input data-mini="true" type="' + this._options.type + '">')
-            .attr('id',       this._id)
-            .attr('min',      this._options.min)
-            .attr('max',      this._options.max)
-            .attr('step',     this._options.step)
-            .attr('disabled', this._options.disabled)
-
-            .val(this._value)
-            .addClass(Config.Classes.PROPERTY_TEXT);
-    }
-
     Text.prototype._change = function(eventObject) {
         // TODO: send properties changed command here
         if (this._options.type === 'number') {
@@ -143,7 +182,7 @@ define(['require-config', 'require-oop'], function(Config) {
             this._value = this._input.val();
         }
 
-        this._mirror.html(this._mirrorString());
+        if (this._mirror) this._mirror.html(this._mirrorString());
     }
 
     Text.prototype._keyup = function(eventObject) {
@@ -153,16 +192,24 @@ define(['require-config', 'require-oop'], function(Config) {
         }
     }
 
-    /*
-     *  Select Property
-     */
-    function Select(options, node) {
-
+    Text.prototype._plugin = function() {
+        return 'textinput';
     }
-    Select.Extends(Property);
+
+    Text.prototype._setupInput = function() {
+        return jQuery('<input data-mini="true" type="' + this._options.type + '">')
+            .attr('id',       this._id)
+            .attr('min',      this._options.min)
+            .attr('max',      this._options.max)
+            .attr('step',     this._options.step)
+            .attr('disabled', this._options.disabled)
+
+            .val(this._value)
+            .addClass(Config.Classes.PROPERTY_TEXT);
+    }
 
     return {
-        Text:   Text,
-        Select: Select
+        Select: Select,
+        Text:   Text
     };
 });
