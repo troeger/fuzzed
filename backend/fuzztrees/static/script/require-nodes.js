@@ -341,21 +341,6 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     /*
-     *  Undeveloped Event
-     */
-    function UndevelopedEvent() {
-        // no incoming connections allowed
-        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
-
-        UndevelopedEvent.Super.constructor.apply(this, arguments);
-    }
-    UndevelopedEvent.Extends(Event);
-
-    UndevelopedEvent.prototype.type = function() {
-       return Config.Types.UNDEVELOPED_EVENT;
-    }
-
-    /*
      *  Fault Event
      */
     function FaultEvent() {
@@ -365,6 +350,34 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     FaultEvent.prototype.type = function() {
        return Config.Types.FAULT_EVENT;
+    }
+
+    /*
+     *  Fault Event
+     */
+    function MultiFaultEvent() {
+        // no incoming connections allowed
+        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
+        
+        MultiEvent.Super.constructor.apply(this, arguments);
+    }
+    MultiFaultEvent.Extends(Event);
+
+    MultiFaultEvent.prototype.type = function() {
+       return Config.Types.MULTI_FAULT_EVENT;
+    }
+
+    MultiFaultEvent.prototype._defineProperties = function() {
+        var properties = MultiFaultEvent.Super._defineProperties.call(this);
+        properties.splice(1, 0, new Properties.Text({
+            name:  'Cardinality',
+            type:  'number',
+            value: 1,
+            min:   1,
+            step:  1
+        }, this));
+
+        return properties;
     }
 
     /*
@@ -490,6 +503,21 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     /*
+     *  Undeveloped Event
+     */
+    function UndevelopedEvent() {
+        // no incoming connections allowed
+        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
+
+        UndevelopedEvent.Super.constructor.apply(this, arguments);
+    }
+    UndevelopedEvent.Extends(Event);
+
+    UndevelopedEvent.prototype.type = function() {
+       return Config.Types.UNDEVELOPED_EVENT;
+    }
+
+    /*
      *  House Event
      */
     function HouseEvent() {
@@ -509,8 +537,8 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      */
     jQuery('#' + Config.Types.BASIC_EVENT)      .data(Config.Keys.CONSTRUCTOR, BasicEvent);
     jQuery('#' + Config.Types.MULTI_EVENT)      .data(Config.Keys.CONSTRUCTOR, MultiEvent);
-    jQuery('#' + Config.Types.UNDEVELOPED_EVENT).data(Config.Keys.CONSTRUCTOR, UndevelopedEvent);
     jQuery('#' + Config.Types.FAULT_EVENT)      .data(Config.Keys.CONSTRUCTOR, FaultEvent);
+    jQuery('#' + Config.Types.MULTI_FAULT_EVENT).data(Config.Keys.CONSTRUCTOR, MultiFaultEvent);
     jQuery('#' + Config.Types.AND_GATE)         .data(Config.Keys.CONSTRUCTOR, AndGate);
     jQuery('#' + Config.Types.OR_GATE)          .data(Config.Keys.CONSTRUCTOR, OrGate);
     jQuery('#' + Config.Types.XOR_GATE)         .data(Config.Keys.CONSTRUCTOR, XorGate);
@@ -519,6 +547,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     jQuery('#' + Config.Types.INHIBIT_GATE)     .data(Config.Keys.CONSTRUCTOR, InhibitGate);
     jQuery('#' + Config.Types.CHOICE_EVENT)     .data(Config.Keys.CONSTRUCTOR, ChoiceEvent);
     jQuery('#' + Config.Types.REDUNDANCY_EVENT) .data(Config.Keys.CONSTRUCTOR, RedundancyEvent);
+    jQuery('#' + Config.Types.UNDEVELOPED_EVENT).data(Config.Keys.CONSTRUCTOR, UndevelopedEvent);
     jQuery('#' + Config.Types.HOUSE_EVENT)      .data(Config.Keys.CONSTRUCTOR, HouseEvent);
 
     /*

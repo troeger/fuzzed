@@ -107,8 +107,8 @@ define(function() {
         Types: {
             BASIC_EVENT:       'basic',
             MULTI_EVENT:       'multi',
-            UNDEVELOPED_EVENT: 'undeveloped',
             FAULT_EVENT:       'fault',
+            MULTI_FAULT_EVENT: 'multi_fault',
             AND_GATE:          'and',
             PRIORITY_AND_GATE: 'p-and',
             OR_GATE:           'or',
@@ -117,6 +117,7 @@ define(function() {
             INHIBIT_GATE:      'inhibit',
             CHOICE_EVENT:      'choice',
             REDUNDANCY_EVENT:  'redundancy',
+            UNDEVELOPED_EVENT: 'undeveloped',
             HOUSE_EVENT:       'house'
         }
     };
