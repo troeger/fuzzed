@@ -62,7 +62,41 @@ define(function() {
             LABEL_HEIGHT:    15,
             STROKE_NORMAL:   '#000000',
             STROKE_HOVER:    '#409FFF',
-            STROKE_SELECTED: '#FF9640'
+            STROKE_SELECTED: '#FF9640',
+
+            Names: {
+                BASIC_EVENT:       'Basic Event',
+                MULTI_EVENT:       'Multi Event',
+                FAULT_EVENT:       'Fault Event',
+                MULTI_FAULT_EVENT: 'Multi Fault Event',
+                AND_GATE:          'AND Gate',
+                PRIORITY_AND_GATE: 'Priority AND Gate',
+                OR_GATE:           'OR Gate',
+                XOR_GATE:          'XOR Gate',
+                VOTING_OR_GATE:    'Voting OR Gate',
+                INHIBIT_GATE:      'Inhibit Gate',
+                CHOICE_EVENT:      'Choice Event',
+                REDUNDANCY_EVENT:  'Redundancy Event',
+                UNDEVELOPED_EVENT: 'Undeveloped Event',
+                HOUSE_EVENT:       'House Event'
+            },
+
+            Types: {
+                BASIC_EVENT:       'basic',
+                MULTI_EVENT:       'multi',
+                FAULT_EVENT:       'fault',
+                MULTI_FAULT_EVENT: 'multi_fault',
+                AND_GATE:          'and',
+                PRIORITY_AND_GATE: 'p-and',
+                OR_GATE:           'or',
+                XOR_GATE:          'xor',
+                VOTING_OR_GATE:    'v-or',
+                INHIBIT_GATE:      'inhibit',
+                CHOICE_EVENT:      'choice',
+                REDUNDANCY_EVENT:  'redundancy',
+                UNDEVELOPED_EVENT: 'undeveloped',
+                HOUSE_EVENT:       'house'
+            },
         },
 
         Properties: {
@@ -102,23 +136,6 @@ define(function() {
 
         ShapeMenu: {
             THUMBNAIL_SCALE_FACTOR: 0.7
-        },
-
-        Types: {
-            BASIC_EVENT:       'basic',
-            MULTI_EVENT:       'multi',
-            FAULT_EVENT:       'fault',
-            MULTI_FAULT_EVENT: 'multi_fault',
-            AND_GATE:          'and',
-            PRIORITY_AND_GATE: 'p-and',
-            OR_GATE:           'or',
-            XOR_GATE:          'xor',
-            VOTING_OR_GATE:    'v-or',
-            INHIBIT_GATE:      'inhibit',
-            CHOICE_EVENT:      'choice',
-            REDUNDANCY_EVENT:  'redundancy',
-            UNDEVELOPED_EVENT: 'undeveloped',
-            HOUSE_EVENT:       'house'
         }
     };
 });

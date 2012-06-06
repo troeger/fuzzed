@@ -56,6 +56,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         return this;
     }
 
+    Node.prototype.name = function() {
+        throw 'Abstract Method - override name (human readable) in subclass';
+    }
+
     Node.prototype.properties = function() {
         return this._properties;
     }
@@ -260,7 +264,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         return [
             new Properties.Text({
                 name:   'Name',
-                value:  'Event',
+                value:  this.name(),
                 mirror: this._container
             }, this),
 
@@ -308,8 +312,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
     BasicEvent.Extends(Event);
 
+    BasicEvent.prototype.name = function() {
+        return Config.Node.Names.BASIC_EVENT;
+    }
+
     BasicEvent.prototype.type = function() {
-        return Config.Types.BASIC_EVENT;
+        return Config.Node.Types.BASIC_EVENT;
     }
 
     /*
@@ -323,8 +331,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
     MultiEvent.Extends(Event);
 
+    MultiEvent.prototype.name = function() {
+        return Config.Node.Names.MULTI_EVENT;
+    }
+
     MultiEvent.prototype.type = function() {
-        return Config.Types.MULTI_EVENT;
+        return Config.Node.Types.MULTI_EVENT;
     }
 
     MultiEvent.prototype._defineProperties = function() {
@@ -348,8 +360,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
     FaultEvent.Extends(Event);
 
+    FaultEvent.prototype.name = function() {
+        return Config.Node.Names.FAULT_EVENT;
+    }
+
     FaultEvent.prototype.type = function() {
-       return Config.Types.FAULT_EVENT;
+       return Config.Node.Types.FAULT_EVENT;
     }
 
     /*
@@ -363,8 +379,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
     MultiFaultEvent.Extends(Event);
 
+    MultiFaultEvent.prototype.name = function() {
+        return Config.Node.Names.MULTI_FAULT_EVENT;
+    }
+
     MultiFaultEvent.prototype.type = function() {
-       return Config.Types.MULTI_FAULT_EVENT;
+       return Config.Node.Types.MULTI_FAULT_EVENT;
     }
 
     MultiFaultEvent.prototype._defineProperties = function() {
@@ -388,8 +408,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     } 
     AndGate.Extends(Gate);
 
+    AndGate.prototype.name = function() {
+        return Config.Node.Names.AND_GATE;
+    }
+
     AndGate.prototype.type = function() {
-       return Config.Types.AND_GATE;
+       return Config.Node.Types.AND_GATE;
     }
 
     /*
@@ -400,8 +424,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     } 
     OrGate.Extends(Gate);
 
+    OrGate.prototype.name = function() {
+        return Config.Node.Names.OR_GATE;
+    }
+
     OrGate.prototype.type = function() {
-        return Config.Types.OR_GATE;
+        return Config.Node.Types.OR_GATE;
     }
 
     /*
@@ -412,8 +440,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     } 
     XorGate.Extends(Gate);
 
+    XorGate.prototype.name = function() {
+        return Config.Node.Names.XOR_GATE;
+    }
+
     XorGate.prototype.type = function() {
-        return Config.Types.XOR_GATE;
+        return Config.Node.Types.XOR_GATE;
     }
 
     /*
@@ -424,8 +456,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     } 
     PriorityAndGate.Extends(Gate);
 
+    PriorityAndGate.prototype.name = function() {
+        return Config.Node.Names.PRIORITY_AND_GATE;
+    }
+
     PriorityAndGate.prototype.type = function() {
-        return Config.Types.PRIORITY_AND_GATE;
+        return Config.Node.Types.PRIORITY_AND_GATE;
     }
 
     /*
@@ -436,8 +472,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     } 
     VotingOrGate.Extends(Gate);
 
+    VotingOrGate.prototype.name = function() {
+        return Config.Node.Names.VOTING_OR_GATE;
+    }
+
     VotingOrGate.prototype.type = function() {
-        return Config.Types.VOTING_OR_GATE;
+        return Config.Node.Types.VOTING_OR_GATE;
     }
 
     VotingOrGate.prototype._defineProperties = function() {
@@ -462,8 +502,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     } 
     InhibitGate.Extends(Gate);
 
+    InhibitGate.prototype.name = function() {
+        return Config.Node.Names.INHIBIT_GATE;
+    }
+
     InhibitGate.prototype.type = function() {
-        return Config.Types.INHIBIT_GATE;
+        return Config.Node.Types.INHIBIT_GATE;
     }
 
     /*
@@ -474,8 +518,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     } 
     ChoiceEvent.Extends(Event);
 
+    ChoiceEvent.prototype.name = function() {
+        return Config.Node.Names.CHOICE_EVENT;
+    }
+
     ChoiceEvent.prototype.type = function() {
-        return Config.Types.CHOICE_EVENT;
+        return Config.Node.Types.CHOICE_EVENT;
     }
 
     ChoiceEvent.prototype._defineProperties = function() {
@@ -499,8 +547,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     } 
     RedundancyEvent.Extends(Event);
 
+    RedundancyEvent.prototype.name = function() {
+        return Config.Node.Names.REDUNDANCY_EVENT;
+    }
+
     RedundancyEvent.prototype.type = function() {
-        return Config.Types.REDUNDANCY_EVENT;
+        return Config.Node.Types.REDUNDANCY_EVENT;
     }
 
     RedundancyEvent.prototype._defineProperties = function() {
@@ -527,8 +579,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
     UndevelopedEvent.Extends(Event);
 
+    UndevelopedEvent.prototype.name = function() {
+        return Config.Node.Names.UNDEVELOPED_EVENT;
+    }
+
     UndevelopedEvent.prototype.type = function() {
-       return Config.Types.UNDEVELOPED_EVENT;
+       return Config.Node.Types.UNDEVELOPED_EVENT;
     }
 
     /*
@@ -542,27 +598,31 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
     HouseEvent.Extends(Event);
 
+    HouseEvent.prototype.name = function() {
+        return Config.Node.Names.HOUSE_EVENT;
+    }
+
     HouseEvent.prototype.type = function() {
-       return Config.Types.HOUSE_EVENT;
+       return Config.Node.Types.HOUSE_EVENT;
     }
 
     /*
      *  Associate the constructors with the thumbnails in the shape menu
      */
-    jQuery('#' + Config.Types.BASIC_EVENT)      .data(Config.Keys.CONSTRUCTOR, BasicEvent);
-    jQuery('#' + Config.Types.MULTI_EVENT)      .data(Config.Keys.CONSTRUCTOR, MultiEvent);
-    jQuery('#' + Config.Types.FAULT_EVENT)      .data(Config.Keys.CONSTRUCTOR, FaultEvent);
-    jQuery('#' + Config.Types.MULTI_FAULT_EVENT).data(Config.Keys.CONSTRUCTOR, MultiFaultEvent);
-    jQuery('#' + Config.Types.AND_GATE)         .data(Config.Keys.CONSTRUCTOR, AndGate);
-    jQuery('#' + Config.Types.OR_GATE)          .data(Config.Keys.CONSTRUCTOR, OrGate);
-    jQuery('#' + Config.Types.XOR_GATE)         .data(Config.Keys.CONSTRUCTOR, XorGate);
-    jQuery('#' + Config.Types.PRIORITY_AND_GATE).data(Config.Keys.CONSTRUCTOR, PriorityAndGate);
-    jQuery('#' + Config.Types.VOTING_OR_GATE)   .data(Config.Keys.CONSTRUCTOR, VotingOrGate);
-    jQuery('#' + Config.Types.INHIBIT_GATE)     .data(Config.Keys.CONSTRUCTOR, InhibitGate);
-    jQuery('#' + Config.Types.CHOICE_EVENT)     .data(Config.Keys.CONSTRUCTOR, ChoiceEvent);
-    jQuery('#' + Config.Types.REDUNDANCY_EVENT) .data(Config.Keys.CONSTRUCTOR, RedundancyEvent);
-    jQuery('#' + Config.Types.UNDEVELOPED_EVENT).data(Config.Keys.CONSTRUCTOR, UndevelopedEvent);
-    jQuery('#' + Config.Types.HOUSE_EVENT)      .data(Config.Keys.CONSTRUCTOR, HouseEvent);
+    jQuery('#' + Config.Node.Types.BASIC_EVENT)      .data(Config.Keys.CONSTRUCTOR, BasicEvent);
+    jQuery('#' + Config.Node.Types.MULTI_EVENT)      .data(Config.Keys.CONSTRUCTOR, MultiEvent);
+    jQuery('#' + Config.Node.Types.FAULT_EVENT)      .data(Config.Keys.CONSTRUCTOR, FaultEvent);
+    jQuery('#' + Config.Node.Types.MULTI_FAULT_EVENT).data(Config.Keys.CONSTRUCTOR, MultiFaultEvent);
+    jQuery('#' + Config.Node.Types.AND_GATE)         .data(Config.Keys.CONSTRUCTOR, AndGate);
+    jQuery('#' + Config.Node.Types.OR_GATE)          .data(Config.Keys.CONSTRUCTOR, OrGate);
+    jQuery('#' + Config.Node.Types.XOR_GATE)         .data(Config.Keys.CONSTRUCTOR, XorGate);
+    jQuery('#' + Config.Node.Types.PRIORITY_AND_GATE).data(Config.Keys.CONSTRUCTOR, PriorityAndGate);
+    jQuery('#' + Config.Node.Types.VOTING_OR_GATE)   .data(Config.Keys.CONSTRUCTOR, VotingOrGate);
+    jQuery('#' + Config.Node.Types.INHIBIT_GATE)     .data(Config.Keys.CONSTRUCTOR, InhibitGate);
+    jQuery('#' + Config.Node.Types.CHOICE_EVENT)     .data(Config.Keys.CONSTRUCTOR, ChoiceEvent);
+    jQuery('#' + Config.Node.Types.REDUNDANCY_EVENT) .data(Config.Keys.CONSTRUCTOR, RedundancyEvent);
+    jQuery('#' + Config.Node.Types.UNDEVELOPED_EVENT).data(Config.Keys.CONSTRUCTOR, UndevelopedEvent);
+    jQuery('#' + Config.Node.Types.HOUSE_EVENT)      .data(Config.Keys.CONSTRUCTOR, HouseEvent);
 
     /*
      *  Return the collection of all nodes for require
