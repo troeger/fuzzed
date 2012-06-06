@@ -134,7 +134,7 @@ define(['require-config', 'require-oop'], function(Config) {
         // TODO: send properties changed command here
         if (this._options.type === 'number') {
             var n = parseFloat(this._input.val());
-            if (Number.isNaN(n)) n = this._options.min;
+            if (isNaN(n)) n = this._options.min;
 
             this._value = Math.max(this._options.min, Math.min(n, this._options.max));
             this._input.val(this._value)
