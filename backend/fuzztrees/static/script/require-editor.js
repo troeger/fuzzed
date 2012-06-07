@@ -58,16 +58,25 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
     PropertiesMenu.prototype.hide = function() {
         this._menu.hide();
+
+        _.each(this._nodes, function(node, index) {
+            _.each(node.properties(), function(property) {
+                property.hide();
+            })
+        });
+        this._list.children(':not(:eq(0))').remove();
+
+        delete this._nodes;
     }
 
     PropertiesMenu.prototype.show = function(nodes, force) {
-        if (!_.isArray(nodes)) nodes = [nodes];
+        if (!_.isArray(nodes)) this._nodes = [nodes];
+        else                   this._nodes =  nodes;
 
-        if (force || typeof(nodes) === 'undefined' || _.any(nodes, function(node) { return node.properties().length > 0})) {
-            this._list.children().not(':eq(0)').remove(); // empty all but first (Properties headline)
+        if (force || typeof(this._nodes) === 'undefined' || _.any(this._nodes, function(node) { return node.properties().length > 0})) {
             this._menu.show();
 
-            _.each(nodes, function(node) {
+            _.each(this._nodes, function(node) {
                 var frame = this._makePropertyFrame(node)
                 this._list.append(frame);
 
@@ -78,6 +87,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
 
             this._list.listview('refresh');
         }
+
+        return this;
     }
 
     PropertiesMenu.prototype._makePropertyFrame = function(node) {

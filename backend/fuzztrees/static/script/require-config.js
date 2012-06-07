@@ -124,7 +124,15 @@ define(function() {
                 },
 
                 Select: {
-                    options:  []
+                    options: []
+                },
+
+                SingleChoice: {
+                    chosen: 0,
+                },
+
+                Text: {
+                    type: ''
                 }
             },
 

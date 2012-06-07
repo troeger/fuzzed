@@ -73,9 +73,6 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     Node.prototype.select = function() {
         this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
-        _.each(this._properties, function(property) {
-            property.show();
-        });
         return this;
     }
 
