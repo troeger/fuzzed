@@ -110,11 +110,6 @@
     opacity: 1;
 }
 
-/* FIX: For some reasons endpoints sometimes get this class when dragging connections */
-.jsplumb-endpoint.fuzzed-node-drop-active {
-    outline: none;
-}
-
 #FuzzedProperties .ui-field-contain {
     margin: 5px 0;
 }
