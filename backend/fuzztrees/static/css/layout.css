@@ -86,10 +86,6 @@
     font-style:  italic;
 }
 
-.fuzzed-node-drop-active {
-    outline: #409FFF solid 3px;
-}
-
 .fuzzed-node-halo-connect {
     width:            10px;
     height:           10px;

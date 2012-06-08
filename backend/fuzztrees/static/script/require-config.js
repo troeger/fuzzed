@@ -45,6 +45,7 @@ define(function() {
         JSPlumb: {
             STROKE:         '#000',
             STROKE_HOVER:   '#409FFF',
+            STROKE_DISABLED:'#CCC',
             STROKE_WIDTH:   2,
             STROKE_STYLE:   'Flowchart',
 

@@ -18,6 +18,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._editor     = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
         this._id         = this._generateId();
 
+        // state
+        this._disabled = false;
+
         // visuals
         var visuals            = this._setupVisualRepresentation();
         this._container        = visuals.container;
@@ -80,6 +83,16 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             property.show();
         });
         return this;
+    }
+
+    Node.prototype.disable = function() {
+        this._disabled = true;
+        this._container.find('path').css('stroke', Config.JSPlumb.STROKE_DISABLED);
+    }
+
+    Node.prototype.enable = function() {
+        this._disabled = false;
+        this._container.find('path').css('stroke', Config.JSPlumb.STROKE);
     }
 
     Node.prototype.type = function() {
@@ -165,7 +178,23 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                 parent: this._container,
                 anchor:   [ 0.5, 0, 0, 1, 0, imageBottomOffset],
                 maxConnections: this._maxInConnections,
-                connectorStyle: this._connectorStyle
+                connectorStyle: this._connectorStyle,
+                dragOptions: {
+                    drag: function() {
+                        // disable all nodes that can not be targeted
+                        var nodesToDisable = jQuery('.' + Config.Classes.NODE + ':not(.'+ Config.Classes.NODE_DROP_ACTIVE + ')');
+                        nodesToDisable.each(function(index, node){
+                            jQuery(node).data('node').disable();
+                        });
+                    },
+                    stop: function() {
+                        // re-enable disabled nodes
+                        var nodesToEnable = jQuery('.' + Config.Classes.NODE + ':not(.'+ Config.Classes.NODE_DROP_ACTIVE + ')');
+                        nodesToEnable.each(function(index, node){
+                            jQuery(node).data('node').enable();
+                        });
+                    }
+                }
             });
         }
 
@@ -206,12 +235,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         // hovering over a node
         this._container.hover(
             function() {
-                if (!_this._editor.selection.contains(_this)) {
+                if (!_this._disabled && !_this._editor.selection.contains(_this)) {
                     _this._container.find('path').css('stroke', Config.Node.STROKE_HOVER);
                 }
             },
             function() {
-                if (!_this._editor.selection.contains(_this)) {
+                if (!_this._disabled && !_this._editor.selection.contains(_this)) {
                     _this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
                 }
             }
