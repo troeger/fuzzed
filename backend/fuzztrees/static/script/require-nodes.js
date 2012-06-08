@@ -8,8 +8,11 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         if (this.constructor === Node) return;
 
         // endpoints (default configuration)
-        this._maxInConnections  = this._maxInConnections  == undefined ? -1 : this._maxInConnections; // infinite
-        this._maxOutConnections = this._maxOutConnections == undefined ?  1 : this._maxOutConnections;
+        this._maxInConnections  = typeof this._maxInConnections  === 'undefined' ? -1 : this._maxInConnections; // infinite
+        this._maxOutConnections = typeof this._maxOutConnections === 'undefined' ?  1 : this._maxOutConnections;
+        // connector (default configuration)
+        this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
+        jsPlumb.extend(this._connectorStyle, jsPlumb.Defaults.PaintStyle);
 
         // logic
         this._editor     = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
@@ -136,7 +139,8 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             jsPlumb.makeSource(this._connectionHandle, {
                 parent: this._container,
                 anchor:   [ 0.5, 0, 0, 1, 0, imageBottomOffset],
-                maxConnections: this._maxInConnections
+                maxConnections: this._maxInConnections,
+                connectorStyle: this._connectorStyle
             });
         }
 
@@ -529,6 +533,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      *  ChoiceEvent
      */
     function ChoiceEvent() {
+        // outgoing connections are dashed
+        this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
+        this._connectorStyle = jsPlumb.extend({ dashstyle: "4 2"}, this._connectorStyle);
+
         ChoiceEvent.Super.constructor.apply(this, arguments);
     } 
     ChoiceEvent.Extends(Event);
@@ -558,6 +566,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      *  RedundancyEvent
      */
     function RedundancyEvent() {
+        // outgoing connections are dashed
+        this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
+        this._connectorStyle = jsPlumb.extend({ dashstyle: "4 2"}, this._connectorStyle);
+
         RedundancyEvent.Super.constructor.apply(this, arguments);
     } 
     RedundancyEvent.Extends(Event);
