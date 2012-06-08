@@ -19,7 +19,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._id         = this._generateId();
 
         // state
-        this._disabled = false;
+        this._disabled    = false;
+        this._highlighted = false;
+        this._selected    = false;
 
         // visuals
         var visuals            = this._setupVisualRepresentation();
@@ -41,11 +43,6 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._setupDragging();
         this._setupMouse();
 
-        return this;
-    }
-
-    Node.prototype.deselect = function() {
-        this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
         return this;
     }
 
@@ -78,21 +75,64 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype.select = function() {
+        // don't allow selection of disabled nodes
+        if (this._disabled) return this;
+
+        this._selected = true;
+
         this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+
         _.each(this._properties, function(property) {
             property.show();
         });
         return this;
     }
 
+    Node.prototype.deselect = function() {
+        this._selected = false;
+
+        if (this._highlighted) {
+            this._nodeImage.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+        } else {
+            this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+        }
+
+        return this;
+    }
+
     Node.prototype.disable = function() {
         this._disabled = true;
-        this._container.find('path').css('stroke', Config.JSPlumb.STROKE_DISABLED);
+        this._container.find('path').css('stroke', Config.Node.STROKE_DISABLED);
+
+        return this;
     }
 
     Node.prototype.enable = function() {
         this._disabled = false;
-        this._container.find('path').css('stroke', Config.JSPlumb.STROKE);
+
+        if (this._selected) {
+            this._container.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+        } else if (this._highlighted) {
+            this._container.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+        } else {
+            this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+        }
+
+        return this;
+    }
+
+    Node.prototype.highlight = function(highlight) {
+        this._highlighted = typeof highlight === 'undefined' ? true : highlight;
+        // don't highlight selected or disabled nodes (visually)
+        if (this._selected || this._disabled) return this;
+
+        if (this._highlighted) {
+            this._container.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+        } else {
+            this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+        }
+
+        return this;
     }
 
     Node.prototype.type = function() {
@@ -235,14 +275,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         // hovering over a node
         this._container.hover(
             function() {
-                if (!_this._disabled && !_this._editor.selection.contains(_this)) {
-                    _this._container.find('path').css('stroke', Config.Node.STROKE_HOVER);
-                }
+                _this.highlight();
             },
             function() {
-                if (!_this._disabled && !_this._editor.selection.contains(_this)) {
-                    _this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
-                }
+                _this.highlight(false);
             }
         );
     }

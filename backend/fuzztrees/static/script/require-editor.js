@@ -286,7 +286,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
                 lineWidth:   Config.JSPlumb.STROKE_WIDTH
             },
             HoverPaintStyle: {
-                strokeStyle: Config.JSPlumb.STROKE_HOVER
+                strokeStyle: Config.JSPlumb.STROKE_HIGHLIGHTED
             },
             Connector:       Config.JSPlumb.STROKE_STYLE,
             Anchors:         ['BottomMiddle', 'TopMiddle']
