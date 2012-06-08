@@ -158,3 +158,13 @@
     -moz-box-shadow:    none;
     box-shadow:         none;
 }
+
+#printtitle {display: none;}
+
+@media print {
+	#FuzzedShapes {display: none;}
+	#FuzzedProperties {display: none;}
+	#FuzzedCanvas {overflow: visible;}
+	#printtitle {display: block; text-align: center;}
+	.ui-header {display: none;}
+}
