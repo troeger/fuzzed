@@ -45,6 +45,7 @@ define(function() {
         JSPlumb: {
             STROKE:             '#000',
             STROKE_HIGHLIGHTED: '#409FFF',
+            STROKE_SELECTED:    '#FF9640',
             STROKE_DISABLED:    '#CCC',
             STROKE_WIDTH:       2,
             STROKE_STYLE:       'Flowchart',
@@ -99,7 +100,7 @@ define(function() {
                 REDUNDANCY_EVENT:  'redundancy',
                 UNDEVELOPED_EVENT: 'undeveloped',
                 HOUSE_EVENT:       'house'
-            },
+            }
         },
 
         Properties: {

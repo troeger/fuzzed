@@ -201,7 +201,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
             stack:       '.' + Config.Classes.NODE,
             start:       function() {
-                _this._editor.selection.of(_this);
+                _this._editor.selection.ofNodes(_this);
             }
         });
     }
@@ -268,7 +268,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._container.click(
             function(eventObject) {
                 eventObject.stopPropagation();
-                _this._editor.selection.of(_this);
+                _this._editor.selection.ofNodes(_this);
             }
         );
 
