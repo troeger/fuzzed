@@ -86,6 +86,31 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         throw 'Abstract Method - override type in subclass';
     }
 
+    Node.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections to same node
+        if (this == otherNode) return false;
+
+        // there is already a connection between these nodes
+        var connections = jsPlumb.getConnections({
+            //XXX: the selector should suffice, but due to a bug in jsPlumb we need the IDs here
+            source: this._container.attr('id'),
+            target: otherNode._container.attr('id')
+        });
+        if (connections.length != 0) return false;
+
+        // no connection if endpoint is full
+        var endpoints = jsPlumb.getEndpoints(otherNode._container);
+        if (endpoints) {
+            //XXX: find a better way to determine endpoint
+            var targetEndpoint = _.find(endpoints, function(endpoint){
+                return endpoint.isTarget || endpoint._makeTargetCreator
+            });
+            if (targetEndpoint && targetEndpoint.isFull()) return false;
+        }
+
+        return true;
+    }
+
     Node.prototype._defineProperties = function() {
         // the basic node does not have any properties therefore the empty array
         // overwrite in subclasses in order to set any
@@ -159,33 +184,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                         var sourceNode = jQuery('.' + Config.Classes.NODE + ':has(#' + elid + ')').data('node');
                         if (typeof sourceNode === 'undefined') return false;
 
-                        // no connections to same node
-                        if (targetNode == sourceNode) return false;
-
-                        if (targetNode instanceof Gate && sourceNode instanceof Gate) return false;
-                        if (targetNode instanceof Event && sourceNode instanceof Event) return false;
-
-                        // there is already a connection between these nodes
-                        var connections = jsPlumb.getConnections({
-                            //XXX: the selector should suffice, but due to a bug in jsPlumb we need the IDs here
-                            source: sourceNode._container.attr('id'),
-                            target: targetNode._container.attr('id')
-                        });
-                        if (connections.length != 0) return false;
-
-                        // no connection if endpoint is full
-                        var endpoints = jsPlumb.getEndpoints(targetNode._container);
-                        if (endpoints) {
-                            //XXX: find a better way to determine endpoint
-                            var targetEndpoint = _.find(endpoints, function(endpoint){
-                                return endpoint.isTarget || endpoint._makeTargetCreator
-                            });
-                            if (targetEndpoint && targetEndpoint.isFull()) return false;
-                        }
-
-                        //TODO: type-dependent checks
-
-                        return true;
+                        return sourceNode.allowsConnectionsTo(targetNode);
                     },
                     activeClass: Config.Classes.NODE_DROP_ACTIVE
                 }
@@ -264,6 +263,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
     Event.Extends(Node);
 
+    Event.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections between Event nodes
+        if (otherNode instanceof Event) return false;
+        return Event.Super.allowsConnectionsTo.call(this, otherNode);
+    }
+
     Event.prototype._defineProperties = function() {
         return [
             new Properties.Text({
@@ -319,6 +324,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         Gate.Super.constructor.apply(this, arguments);
     }
     Gate.Extends(Node);
+
+    Gate.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections between Event nodes
+        if (otherNode instanceof Gate) return false;
+        return Gate.Super.allowsConnectionsTo.call(this, otherNode);
+    }
 
     /*
      *  Basic Event
@@ -549,6 +560,14 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         return Config.Node.Types.CHOICE_EVENT;
     }
 
+    ChoiceEvent.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections to gates
+        if (otherNode instanceof Gate) return false;
+
+        // allow connections to other events, but also check basic conditions
+        return otherNode instanceof Event && Node.prototype.allowsConnectionsTo.call(this, otherNode);
+    }
+
     ChoiceEvent.prototype._defineProperties = function() {
         var properties = ChoiceEvent.Super._defineProperties.call(this);
         properties.splice(1, 0, new Properties.Text({
@@ -580,6 +599,14 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     RedundancyEvent.prototype.type = function() {
         return Config.Node.Types.REDUNDANCY_EVENT;
+    }
+
+    RedundancyEvent.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections to gates
+        if (otherNode instanceof Gate) return false;
+
+        // allow connections to other events, but also check basic conditions
+        return otherNode instanceof Event && Node.prototype.allowsConnectionsTo.call(this, otherNode);
     }
 
     RedundancyEvent.prototype._defineProperties = function() {
