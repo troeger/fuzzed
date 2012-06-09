@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>FuzzTrees Modeling</title>
+<title>FuzzTrees Modeling (&alpha; version)</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
 
 	<style type="text/css">
@@ -24,13 +24,47 @@
 	<div data-role="page">
 
 		<div data-theme="d" data-role="header" id="toolbar">
-			<h1>FuzzTrees</h1>
+			<h1>FuzzTrees modeling (&alpha; version)</h1>
 		</div>
 
 		<div data-role="content" style="text-align: center">	
-			<h1>Welcome !</h1>
-			<h3>Please sign-in or create a new account by<br/> using one of these authentication providers.</h3>
-			<div style="margin-top: 50px; margin-left: auto; margin-right: auto; width: 580px">
+			<h1>Welcome to FuzzTrees !</h1>
+			<div style="text-align: middle; margin-bottom: 50px; margin-left: auto; margin-right: auto; width: 400px">
+					<div data-mini="true" data-role="collapsible">
+					   <h3>Dependability Modeling with Fault Trees and RBDs</h3>
+					   <p>
+					   If you need a quick way for drawing and analyzing a system reliability 
+					   model, this one is for you. We offer a free basic account so
+					   that you can just start.
+					    </p>
+					</div>
+					<div data-mini="true" data-role="collapsible">
+					   <h3>Modeling with uncertainties - Introducing FuzzTrees</h3>
+					   <p>
+					   Our novel concept for fault tree modeling allows you to express
+					   configurable and uncertain parts of the system in a reliability
+					   model. Our analysis engine tells you which configuration options
+					   give the best cost-dependability ratio.
+					   </p>
+					</div>
+					<div data-mini="true" data-role="collapsible">
+					   <h3>Graph sharing for teaching and collaboration</h3>
+					   <p>
+					   Graphs can be easily shared between users, which supports the usage
+					   for teaching and collaboration projects. We support the export as 
+					   graphic, eMail attachment or project file. 
+					   </p>
+					</div>
+					<div data-mini="true" data-role="collapsible">
+					   <h3>... and this is just the beginning ...</h3>
+					   <p>
+					   We are just starting. Please keep in touch by registering for our 
+					   newsletter in the user settings dialog. 
+					   </p>
+					</div>
+			</div>	
+			<h3>Please sign-in with one of these providers.</h3>
+			<div style="margin-top: 0px; margin-left: auto; margin-right: auto; width: 580px">
 				<form data-ajax="false" action="/login/" method="get" id="openid_form">
 					<input type="hidden" name="action" value="verify" />
 					<fieldset>
@@ -47,7 +81,7 @@
 						</noscript>
 					</fieldset>
 				</form>
-			</div>	
+			</div>
 		</div>	
 
 		{% include "footer.html" %}
