@@ -21,6 +21,10 @@ def about(request):
 	return render_to_response('about.html', {}, context_instance=RequestContext(request))
 
 @login_required
+def settings(request):
+	return render_to_response('settings.html', {}, context_instance=RequestContext(request))
+
+@login_required
 def dashboard(request):
 	if "new" in request.POST:
 		if request.POST['new']=='faulttree':
