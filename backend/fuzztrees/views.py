@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate as backend_auth
 from django.contrib.auth import login as backend_login
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib import auth
@@ -19,6 +20,7 @@ def index(request):
 def about(request):
 	return render_to_response('about.html', {}, context_instance=RequestContext(request))
 
+@login_required
 def dashboard(request):
 	if "new" in request.POST:
 		if request.POST['new']=='faulttree':
@@ -54,6 +56,7 @@ def dashboard(request):
 	graphs=request.user.graphs.all()
 	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
 
+@login_required
 def dashboard_popup(request, graph_id):
 	g=get_object_or_404(Graph, pk=graph_id, owner=request.user)
 	return render_to_response('dashboard_popup.html', {'graph': g}, context_instance=RequestContext(request))	
@@ -61,6 +64,7 @@ def dashboard_popup(request, graph_id):
 def teaser(request):
     return render_to_response('teaser.html', {}, context_instance=RequestContext(request))
 
+@login_required
 def editor(request, graph_id):
 	g=get_object_or_404(Graph, pk=graph_id, owner=request.user)
 	return render_to_response('editor.html', {'graph' : g, 'node_types' : NODE_TYPES}, context_instance=RequestContext(request))
