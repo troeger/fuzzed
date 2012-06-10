@@ -5,7 +5,7 @@ from django.template import RequestContext
 from django.contrib import auth
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
-import os, urllib, random, string
+import os, urllib, random, string, datetime
 from fuzztrees.models import Graph, GraphTypes, History, Commands
 
 from fuzztrees.models import User
@@ -87,8 +87,9 @@ def login(request):
 			elif AX.email in user.openid_ax:
 				newuser=User(username=unicode(user.openid_ax[AX.email],'utf-8'))
 			else:
-				randomstring=''.join([random.choice(string.letters + string.digits) for i in range(8)])
-				newuser=User(username=randomstring)
+				d=datetime.datetime.now()
+				randomname="Anonymous%u%u%u%u"%(d.hour,d.minute,d.second,d.microsecond)
+				newuser=User(username=randomname)
 			newuser.is_active=True
 			newuser.save()
 			linkOpenID(newuser, user.openid_claim)
