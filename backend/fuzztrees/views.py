@@ -16,6 +16,9 @@ def index(request):
 		auth.logout(request)
 	return render_to_response('index.html', {}, context_instance=RequestContext(request))
 
+def about(request):
+	return render_to_response('about.html', {}, context_instance=RequestContext(request))
+
 def dashboard(request):
 	if "new" in request.POST:
 		if request.POST['new']=='faulttree':
