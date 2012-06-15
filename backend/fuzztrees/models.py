@@ -67,7 +67,14 @@ class Graph(models.Model):
 		print "|"*indent + "-%s (%s)"%(tree['name'], tree['id'])
 		if "children" in tree:
 			for subtree in tree['children']:
-				self.dump(subtree, indent+1)		
+				self.dump(subtree, indent+1)
+
+	def toJsonDict(self):
+		d={'id': self.pk, 'name': self.name, 'type': GRAPH_JS_TYPE[self.type]}
+		if self.nodes and self.nodes.filter(root=True):
+			root=self.nodes.filter(root=True)[0]
+			d['root']=root.getTreeDict()
+		return d
 		
 class Node(models.Model):
 	name = models.CharField(max_length=255)
