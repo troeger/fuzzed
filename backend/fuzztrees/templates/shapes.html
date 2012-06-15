@@ -6,7 +6,7 @@
 				{% for key, node in node_types.items %}
 					<div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell">
 						&nbsp
-						<div id="{{ node.type }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}">
+						<div id="{{ node.type }}" typeId="{{ key }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}">
 							{% include node.image %}
 							<!-- <embed src="{{ STATIC_URL }}img/nodes/{{ node.image }}" type="image/svg+xml" /> -->
 						</div>
