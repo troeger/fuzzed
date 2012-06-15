@@ -93,13 +93,14 @@ def graph(request, graph_id):
 				g=Graph.objects.get(pk=graph_id, owner=request.user, deleted=False)
 			except:
 				return HttpResponseNotFound()
-			top=g.nodes.get(root=True)
+			#top=g.nodes.get(root=True)
 			#fan={'id': 'fan', 'name': 'Fan'}
 			#chip={'id': 'chip', 'name': 'Chip'}
 			#cpu={'id': 'cpu', 'name': 'CPU', 'children': [fan, chip]}
 			#disc={'id': 'disc', 'name': 'Disc'}
 			#tree={'id': 'tree', 'name': 'TOP', 'children': [cpu, disc]}	
-			data=json.dumps(top.getTreeDict())
+			#data=json.dumps(top.getTreeDict())
+			data=json.dumps(g.toJsonDict())
 			return HttpResponse(data, 'application/javascript')
 		return HttpResponseNotAllowed(['GET']) 
 	

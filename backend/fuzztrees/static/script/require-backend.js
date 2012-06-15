@@ -1,4 +1,4 @@
-define(['require-config'], function (Config) {
+define(['require-config', 'require-graph'], function (Config, Graph) {
 
     var URLHelper = {
         fullUrlForGraphs: function() {
@@ -31,8 +31,7 @@ define(['require-config'], function (Config) {
     }
 
 
-    function Backend() {
-    }
+    var Backend = {}
 
     /*
         Function: createGraph
@@ -47,7 +46,7 @@ define(['require-config'], function (Config) {
                             new Graph.
             errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.prototype.createGraph = function(type, name, callback, errorCallback) {
+    Backend.createGraph = function(type, name, callback, errorCallback) {
         var url = URLHelper.fullUrlForGraphs();
         var data = {
             'type': type,
@@ -67,18 +66,17 @@ define(['require-config'], function (Config) {
 
          Parameters:
              id            - ID of the Graph to fetch.
-             callback      - [optional] Callback function for asynchronous requests.
+             callback      - Callback function for asynchronous requests.
                              Will be called when the request returns with the fetched Graph object.
              errorCallback - [optional] Callback that gets called in case of an ajax-error.
-
-         Returns:
-            The fetched Graph object.
      */
-    Backend.prototype.getGraph = function(id, callback, errorCallback) {
+    Backend.getGraph = function(id, callback, errorCallback) {
         var url = URLHelper.fullUrlForGraph(id)
         var ajaxCallback = function(json) {
             //TODO: Figure format
-            console.log(data);
+            var graph = new Graph(json['id']);
+            //TODO: fill graph
+            callback(graph);
         };
 
         jQuery.getJSON(url, ajaxCallback).fail(errorCallback || jQuery.noop);
@@ -94,7 +92,7 @@ define(['require-config'], function (Config) {
              position      - Position object containing an 'x' and an 'y' field specifying the Node's position.
              errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.prototype.addNode = function(graph, type, position, errorCallback) {
+    Backend.addNode = function(graph, type, position, errorCallback) {
         var url = URLHelper.fullUrlForNodes(graph);
         var data = {
             'type': type,
@@ -117,7 +115,7 @@ define(['require-config'], function (Config) {
              node          - The Node that should be deleted.
              errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.prototype.deleteNode = function(node, errorCallback) {
+    Backend.deleteNode = function(node, errorCallback) {
         var url = URLHelper.fullUrlForNode(node);
 
         jQuer.ajax({
@@ -136,7 +134,7 @@ define(['require-config'], function (Config) {
              value         - The new value for the property.
              errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.prototype.changeNodeProperty = function(node, key, value, errorCallback) {
+    Backend.changeNodeProperty = function(node, key, value, errorCallback) {
         var url = URLHelper.fullUrlForNode(node);
         var data = {
             'key': key,
@@ -155,7 +153,7 @@ define(['require-config'], function (Config) {
              position      - New position object (with 'x' and 'y' fields) of the node.
              errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.prototype.changeNodePosition = function(node, position, errorCallback) {
+    Backend.changeNodePosition = function(node, position, errorCallback) {
         var url = URLHelper.fullUrlForNode(node);
         var data = {
             'xcoord': position.x,
@@ -174,7 +172,7 @@ define(['require-config'], function (Config) {
              newType       - The new type of the node. See Config.Node.Types
              errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.prototype.changeNodeType = function(node, newType, errorCallback) {
+    Backend.changeNodeType = function(node, newType, errorCallback) {
         var url = URLHelper.fullUrlForNode(node);
         var data = {
             'type': newType
@@ -191,7 +189,7 @@ define(['require-config'], function (Config) {
      edge          - The Edge that should be deleted.
      errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.prototype.deleteEdge = function(edge, errorCallback) {
+    Backend.deleteEdge = function(edge, errorCallback) {
         var url = URLHelper.fullUrlForEdge(edge);
 
         jQuer.ajax({
@@ -211,7 +209,7 @@ define(['require-config'], function (Config) {
                         Will be called when the request returns with the ID of the new Edge.
         errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.prototype.addEdge = function(sourceNode, targetNode, callback, errorCallback) {
+    Backend.addEdge = function(sourceNode, targetNode, callback, errorCallback) {
         var url = URLHelper.fullUrlForEdges(sourceNode);
         var data = {
             'destination': targetNode.id()
