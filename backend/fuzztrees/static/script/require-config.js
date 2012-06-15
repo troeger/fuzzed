@@ -20,6 +20,12 @@ define(function() {
             PROPERTY_TEXT:              'fuzzed-property-text'
         },
 
+        Backend: {
+            BASE_URL:   '/api',
+            GRAPHS_URL: '/graphs',
+            NODES_URL:  '/nodes'
+        },
+
         Dragging: {
             OPACITY:        0.5,
             CURSOR:         'move',
