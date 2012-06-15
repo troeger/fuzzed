@@ -70,7 +70,7 @@ class Graph(models.Model):
 				self.dump(subtree, indent+1)
 
 	def toJsonDict(self):
-		nodesArray = [n.toJsonDict for n in self.nodes.filter(deleted=False)]
+		nodesArray = [n.toJsonDict() for n in self.nodes.filter(deleted=False)]
 		dict = {'id': self.pk, 'name': self.name, 'type': GRAPH_JS_TYPE[self.type], 'nodes': nodesArray}
 #		if self.nodes and self.nodes.filter(root=True):
 #			root=self.nodes.filter(root=True)[0]
