@@ -23,7 +23,8 @@ define(function() {
         Backend: {
             BASE_URL:   '/api',
             GRAPHS_URL: '/graphs',
-            NODES_URL:  '/nodes'
+            NODES_URL:  '/nodes',
+            EDGES_URL:  '/edges'
         },
 
         Dragging: {

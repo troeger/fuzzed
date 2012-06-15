@@ -1,4 +1,4 @@
-define(['require-config', 'require-nodes'], function (Config, Nodes) {
+define(['require-config'], function (Config) {
 
     var URLHelper = {
         fullUrlForGraphs: function() {
@@ -12,11 +12,21 @@ define(['require-config', 'require-nodes'], function (Config, Nodes) {
         fullUrlForNodes: function(graph) {
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/'
                 + graph().id() + Config.Backend.NODES_URL;
-        }
+        },
 
         fullUrlForNode: function(node) {
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/'
                 + node.graph().id() + Config.Backend.NODES_URL + '/' + node.id();
+        },
+
+        fullUrlForEdges: function(node) {
+            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + node.graph().id()
+                + Config.Backend.NODES_URL + '/' + node.id() + Config.Backend.EDGES_URL;
+        },
+
+        fullUrlForEdge: function(edge) {
+            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + node.graph().id()
+                + Config.Backend.NODES_URL + '/' + node.id() + Config.Backend.EDGES_URL + '/' + edge.id();
         }
     }
 
@@ -44,7 +54,7 @@ define(['require-config', 'require-nodes'], function (Config, Nodes) {
             'name': name
         };
         var ajaxCallback = function(data) {
-            //TODO: Fetch graph ID. Maybe returning the graph URL in the backend is not a good idea.
+            //TODO: Fetch graph ID.
             console.log(data);
         };
 
@@ -81,21 +91,18 @@ define(['require-config', 'require-nodes'], function (Config, Nodes) {
          Parameters:
              graph         - The Graph the node should be added to.
              type          - The type of the node. See Config.Node.Types
-             parent        - [optional] The parent Node in the graph hierarchy.
              position      - Position object containing an 'x' and an 'y' field specifying the Node's position.
              errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.prototype.addNode = function(graph, type, parent, position, errorCallback) {
+    Backend.prototype.addNode = function(graph, type, position, errorCallback) {
         var url = URLHelper.fullUrlForNodes(graph);
         var data = {
             'type': type,
             'xcoord': position.x,
             'ycoord': position.y
         };
-        //TODO: see if this works with require
-        if (parent instanceof Node) data['parent'] = parent.id();
         var ajaxCallback = function(data) {
-            //TODO: Fetch node ID. Maybe returning the graph URL in the backend is not a good idea.
+            //TODO: Fetch node ID.
             console.log(data);
         };
 
@@ -117,27 +124,6 @@ define(['require-config', 'require-nodes'], function (Config, Nodes) {
             type: 'DELETE',
             url:  url
         }).fail(errorCallback || jQuery.noop);
-    }
-
-    /*
-         Function: relinkNode
-             Links the given Node to a new parent Node.
-
-         Parameters:
-             node          - The Node that should be deleted.
-             newParent     - The new parent Node in the graph hierarchy.
-             errorCallback - [optional] Callback that gets called in case of an ajax-error.
-     */
-    Backend.prototype.relinkNode = function(node, newParent, errorCallback) {
-        var url = URLHelper.fullUrlForNode(node);
-        var data = {
-            'parent': newParent,
-            //TODO: why?
-            'xcoord': node.position().x,
-            'ycoord': node.position().y
-        }
-
-        jQuery.post(url, data).fail(errorCallback || jQuery.noop);
     }
 
     /*
@@ -195,6 +181,47 @@ define(['require-config', 'require-nodes'], function (Config, Nodes) {
         }
 
         jQuery.post(url, data).fail(errorCallback || jQuery.noop);
+    }
+
+    /*
+     Function: deleteEdge
+     Deletes a given Edge in the backend.
+
+     Parameters:
+     edge          - The Edge that should be deleted.
+     errorCallback - [optional] Callback that gets called in case of an ajax-error.
+     */
+    Backend.prototype.deleteEdge = function(edge, errorCallback) {
+        var url = URLHelper.fullUrlForEdge(edge);
+
+        jQuer.ajax({
+            type: 'DELETE',
+            url:  url
+        }).fail(errorCallback || jQuery.noop);
+    }
+
+    /*
+     Function: addEdge
+        Adds a new Edge from a given sourceNode to a given targetNode.
+
+     Parameters:
+        sourceNode    - Source Node of the new edge.
+        targetNode    - Target Node of the new edge.
+        callback      - Callback function for asynchronous requests.
+                        Will be called when the request returns with the ID of the new Edge.
+        errorCallback - [optional] Callback that gets called in case of an ajax-error.
+     */
+    Backend.prototype.addEdge = function(sourceNode, targetNode, callback, errorCallback) {
+        var url = URLHelper.fullUrlForEdges(sourceNode);
+        var data = {
+            'destination': targetNode.id()
+        };
+        var ajaxCallback = function(data) {
+            //TODO: Fetch node ID.
+            console.log(data);
+        };
+
+        jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
     }
 
     return Backend;

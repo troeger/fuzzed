@@ -109,25 +109,20 @@ def nodes(request, graph_id):
 	"""
 	Add new node to graph stored in the backend
 	API Request:            POST /api/graphs/[graphID]/nodes
-	API Request Parameters: parent=[parentID], type=[NODE_TYPE], xcoord, ycoord
+	API Request Parameters: type=[NODE_TYPE], xcoord, ycoord
 	API Response:           no body, status code 201, location URI for new node and its ID
 	"""
 	if request.is_ajax():
 		if request.method == 'POST':
-			if 'parent' in request.POST and 'type' in request.POST and 'xcoord' in request.POST and 'ycoord' in request.POST:
+			if 'type' in request.POST and 'xcoord' in request.POST and 'ycoord' in request.POST:
 				try:
 					t=int(request.POST['type'])
 					assert(t in NODE_TYPES)
 					g=Graph.objects.get(pk=graph_id, deleted=False)
-					p=Node.objects.get(pk=request.POST['parent'], deleted=False)
 					n=Node(type=t, graph=g, xcoord=request.POST['xcoord'], ycoord=request.POST['ycoord'] )
 					n.save()
 					c=History(command=Commands.ADD_NODE, graph=g, node=n)
 					c.save()
-					e=Edge(src=p, dest=n)
-					e.save()
-					c2=History(command=Commands.ADD_EDGE, graph=g, edge=e)
-					c2.save()
 					transaction.commit()
 				except Exception, e:
 					transaction.rollback()
@@ -145,11 +140,6 @@ def node(request, graph_id, node_id):
 	Delete node from graph stored in the backend
 	API Request:  DELETE /api/graphs/[graphID]/nodes/[nodeID], no body
 	API Response: no body, status code 204
-
-	Link node to another parent in the graph	
-	API Request:            POST /api/graphs/[graphID]/nodes/[nodeID] 
-	API Request Parameters: parent=[nodeID],  xcoord=..., ycoord=...
-	API Response:           no body, status code 204
 
 	Change property of a node
 	API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]
@@ -197,37 +187,7 @@ def node(request, graph_id, node_id):
 			else:
 				return HttpResponse(status=204)
 		elif request.method == 'POST':
-			if 'parent' in request.POST and 'xcoord' in request.POST and 'ycoord' in request.POST:
-				# relink node
-				try:
-					# - Change node position
-					c=History(command=Commands.CHANGE_COORD, graph=g, oldxcoord=n.xcoord, oldycoord=n.ycoord)
-					c.save()
-					n.xcoord=request.POST['xcoord']
-					n.ycoord=request.POST['ycoord']					
-					n.save()
-					# - get new parent node and remove edge from old parent to this node
-					p=Node.objects.get(pk=request.POST['parent'], deleted=False)				
-					# -> this will throw an exception if the node has more than one incoming edge
-					# -> this is good, since it would mean that we have more than one parent,
-					# -> which is not modelled in the current API
-					e=Edge.objects.get(dest=n, deleted=False)
-					e.deleted=True
-					e.save()
-					c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
-					c.save()
-					# - link new parent with this node
-					new_e=Edge(src=p, dest=n)
-					new_e.save()
-					c=History(command=Commands.ADD_EDGE, graph=g, edge=new_e)
-					c.save()
-					transaction.commit()
-				except:
-					transaction.rollback()
-					return HttpResponseBadRequest()						
-				else:
-					return HttpResponse(status=204)
-			elif 'xcoord' in request.POST and 'ycoord' in request.POST:
+			if 'xcoord' in request.POST and 'ycoord' in request.POST:
 				#TODO reposition node
 				return HttpResponse(status=204)
 			elif 'key' in request.POST and 'val' in request.POST:
@@ -238,6 +198,65 @@ def node(request, graph_id, node_id):
 				return HttpResponse(status=204)
 			else:
 				return HttpResponseBadRequest()
-		return HttpResponseNotAllowed(['DELETE','POST']) 
-	
-	
+		return HttpResponseNotAllowed(['DELETE','POST'])
+
+@login_required
+@transaction.commit_manually
+def edges(request, graph_id, node_id):
+	"""
+	Add new edge to a node stored in the backend
+	API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]/edges
+	API Request Parameters: destination=[nodeID]
+	API Response:           no body, status code 201, location URI for new edge and its ID
+	"""
+	if request.is_ajax():
+		if request.method == 'POST':
+			if 'destination' in request.POST:
+				try:
+					g=Graph.objects.get(pk=graph_id, deleted=False)
+					n=Node.objects.get(pk=node_id, deleted=False)
+					d=Node.objects.get(pk=request.POST['destination'], deleted=False)
+					e=Edge(src=n, dest=d)
+					e.save()
+					c=History(command=Commands.ADD_EDGE, graph=g, edge=e)
+					c.save()
+					transaction.commit()
+				except Exception, e:
+					transaction.rollback()
+					return HttpResponseBadRequest()
+				else:
+					response=HttpResponse(status=201)
+					response['Location']=reverse('edge', args=[g.pk, n.pk, e.pk])
+					response['ID'] = e.pk
+					return response
+		return HttpResponseNotAllowed(['POST'])
+
+@login_required
+def edge(request, graph_id, node_id, edge_id):
+	"""
+	Delete the given edge that belongs to the given node
+	API Request:  DELETE /api/graphs/[graphID]/nodes/[nodeID]/edges/[edgeID], no body
+	API Response: no body, status code 204
+	"""
+	if request.is_ajax():
+		try:
+			g=Graph.objects.get(pk=graph_id, deleted=False)
+			n=Node.objects.get(pk=node_id, deleted=False)
+			e=Edge.objects.get(pk=edge_id, src=n, deleted=False)
+		except:
+			return HttpResponseBadRequest()
+
+		if request.method == 'DELETE':
+			try:
+				e.deleted=true
+				e.save()
+				c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
+				c.save()
+				transaction.commit()
+			except:
+				transaction.rollback()
+				return HttpResponseBadRequest()
+			else:
+				return HttpResponse(status=204)
+
+		return HttpResponseNotAllowed(['DELETE'])
