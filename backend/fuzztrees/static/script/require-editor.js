@@ -389,14 +389,19 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
     }
 
     Editor.prototype._shapeDropped = function(uiEvent, uiObject) {
-        var node        = new (uiObject.draggable.data(Config.Keys.CONSTRUCTOR))();
+        //var node        = new (uiObject.draggable.data(Config.Keys.CONSTRUCTOR))();
+        var typeId    = uiObject.draggable.attr('typeId');
         var offset      = this._canvas.offset();
-        var coordinates = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
+        var gridCoords  = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
 
-        node
-            .moveTo(coordinates.x * Config.Grid.SIZE, coordinates.y * Config.Grid.SIZE)
-            .appendTo(this._canvas);
-        this.selection.ofNodes(node);
+        // create node in the backend and append it to the DOM afterwards
+        var editor = this;
+        Backend.addNode(this._graph, typeId, gridCoords, function(node) {
+            node._editor = editor;
+            node.moveTo(gridCoords.x * Config.Grid.SIZE, gridCoords.y * Config.Grid.SIZE)
+                .appendTo(editor._canvas);
+            editor.selection.ofNodes(node);
+        });
     }
 
     return Editor;

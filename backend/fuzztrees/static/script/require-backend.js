@@ -1,4 +1,4 @@
-define(['require-config', 'require-graph'], function (Config, Graph) {
+define(['require-config', 'require-graph', 'require-nodes'], function (Config, Graph, Nodes) {
 
     var URLHelper = {
         fullUrlForGraphs: function() {
@@ -11,7 +11,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
 
         fullUrlForNodes: function(graph) {
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/'
-                + graph().id() + Config.Backend.NODES_URL;
+                + graph.id() + Config.Backend.NODES_URL;
         },
 
         fullUrlForNode: function(node) {
@@ -90,21 +90,24 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
              graph         - The Graph the node should be added to.
              type          - The type of the node. See Config.Node.Types
              position      - Position object containing an 'x' and an 'y' field specifying the Node's position.
+             callback      - Callback function for asynchronous request.
+                             Will be called with the created Node object when the request returns.
              errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.addNode = function(graph, type, position, errorCallback) {
+    Backend.addNode = function(graph, typeId, position, callback, errorCallback) {
         var url = URLHelper.fullUrlForNodes(graph);
         var data = {
-            'type': type,
+            'type': typeId,
             'xcoord': position.x,
             'ycoord': position.y
         };
-        var ajaxCallback = function(data) {
-            //TODO: Fetch node ID.
-            console.log(data);
+        var ajaxCallback = function(jsonNode) {
+            var node = Nodes.newNodeForType(jsonNode.type, jsonNode.id);
+            graph.addNode(node);
+            callback(node);
         };
 
-        jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
+        jQuery.post(url, data, ajaxCallback, 'json').fail(errorCallback || jQuery.noop);
     }
 
     /*

@@ -3,7 +3,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     /*
      *  Abstract Node Base Class
      */
-    function Node() {
+    function Node(id) {
         // pass here on inheritance calls
         if (this.constructor === Node) return;
 
@@ -15,8 +15,9 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         jsPlumb.extend(this._connectorStyle, jsPlumb.Defaults.PaintStyle);
 
         // logic
-        this._editor     = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
-        this._id         = this._generateId();
+        this._editor     = undefined; // will be set when appending
+        this._graph      = undefined; // will be set when adding to a Graph
+        this._id         = id;
 
         // state
         this._disabled    = false;
@@ -726,22 +727,47 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     /*
-     *  Associate the constructors with the thumbnails in the shape menu
+        Function: newNodeWithType
+            Factory method. Returns a new Node of the given type.
+
+        Parameter:
+            type - String specifying the type of the new Node. See Config.Node.Types.
+
+        Returns:
+            A new Node of the given type
      */
-    jQuery('#' + Config.Node.Types.BASIC_EVENT)      .data(Config.Keys.CONSTRUCTOR, BasicEvent);
-    jQuery('#' + Config.Node.Types.MULTI_EVENT)      .data(Config.Keys.CONSTRUCTOR, MultiEvent);
-    jQuery('#' + Config.Node.Types.FAULT_EVENT)      .data(Config.Keys.CONSTRUCTOR, FaultEvent);
-    jQuery('#' + Config.Node.Types.MULTI_FAULT_EVENT).data(Config.Keys.CONSTRUCTOR, MultiFaultEvent);
-    jQuery('#' + Config.Node.Types.AND_GATE)         .data(Config.Keys.CONSTRUCTOR, AndGate);
-    jQuery('#' + Config.Node.Types.OR_GATE)          .data(Config.Keys.CONSTRUCTOR, OrGate);
-    jQuery('#' + Config.Node.Types.XOR_GATE)         .data(Config.Keys.CONSTRUCTOR, XorGate);
-    jQuery('#' + Config.Node.Types.PRIORITY_AND_GATE).data(Config.Keys.CONSTRUCTOR, PriorityAndGate);
-    jQuery('#' + Config.Node.Types.VOTING_OR_GATE)   .data(Config.Keys.CONSTRUCTOR, VotingOrGate);
-    jQuery('#' + Config.Node.Types.INHIBIT_GATE)     .data(Config.Keys.CONSTRUCTOR, InhibitGate);
-    jQuery('#' + Config.Node.Types.CHOICE_EVENT)     .data(Config.Keys.CONSTRUCTOR, ChoiceEvent);
-    jQuery('#' + Config.Node.Types.REDUNDANCY_EVENT) .data(Config.Keys.CONSTRUCTOR, RedundancyEvent);
-    jQuery('#' + Config.Node.Types.UNDEVELOPED_EVENT).data(Config.Keys.CONSTRUCTOR, UndevelopedEvent);
-    jQuery('#' + Config.Node.Types.HOUSE_EVENT)      .data(Config.Keys.CONSTRUCTOR, HouseEvent);
+    function newNodeWithType(type, id) {
+        switch(type) {
+            case Config.Node.Types.BASIC_EVENT:
+                return new BasicEvent(id);
+            case Config.Node.Types.MULTI_EVENT:
+                return new MultiEvent(id);
+            case Config.Node.Types.FAULT_EVENT:
+                return new FaultEvent(id);
+            case Config.Node.Types.MULTI_FAULT_EVENT:
+                return new MultiFaultEvent(id);
+            case Config.Node.Types.AND_GATE:
+                return new AndGate(id);
+            case Config.Node.Types.PRIORITY_AND_GATE:
+                return new PriorityAndGate(id);
+            case Config.Node.Types.OR_GATE:
+                return new OrGate(id);
+            case Config.Node.Types.XOR_GATE:
+                return new XorGate(id);
+            case Config.Node.Types.VOTING_OR_GATE:
+                return new VotingOrGate(id);
+            case Config.Node.Types.INHIBIT_GATE:
+                return new InhibitGate(id);
+            case Config.Node.Types.CHOICE_EVENT:
+                return new ChoiceEvent(id);
+            case Config.Node.Types.REDUNDANCY_EVENT:
+                return new RedundancyEvent(id);
+            case Config.Node.Types.UNDEVELOPED_EVENT:
+                return new UndevelopedEvent(id);
+            case Config.Node.Types.HOUSE_EVENT:
+                return new HouseEvent(id);
+        }
+    }
 
     /*
      *  Return the collection of all nodes for require
@@ -760,6 +786,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         InhibitGate:      InhibitGate,
         ChoiceEvent:      ChoiceEvent,
         RedundancyEvent:  RedundancyEvent,
-        HouseEvent:       HouseEvent
+        HouseEvent:       HouseEvent,
+        newNodeForType:   newNodeWithType
     };
 })
