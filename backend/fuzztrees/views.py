@@ -26,6 +26,7 @@ def settings(request):
 
 @login_required
 def dashboard(request):
+	#TODO: we should use the API for this
 	if "new" in request.POST:
 		if request.POST['new']=='faulttree':
 			g=Graph(owner=request.user)
