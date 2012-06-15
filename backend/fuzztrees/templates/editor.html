@@ -37,7 +37,7 @@
 
 		require(["require-fuzzed"], function(FuzzEd) {
 			jQuery(document).ready(function() {
-				new FuzzEd.Editor({{ graph.pk }});
+				FuzzEd.Editor.createFromGraphId({{ graph.pk }});
 			});
 		});
 	</script>

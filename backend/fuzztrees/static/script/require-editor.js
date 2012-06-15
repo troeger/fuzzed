@@ -1,4 +1,4 @@
-define(['require-config', 'require-nodes'], function(Config, Nodes) {
+define(['require-config', 'require-nodes', 'require-backend'], function(Config, Nodes, Backend) {
 
     /*
      *  ShapeMenu
@@ -239,8 +239,8 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     /*
      *  Editor
      */
-    function Editor(_id_) {
-        this._graphId = _id_;
+    function Editor(graph) {
+        this._graph = graph;
 
         // locate own DOM elements and bind Editor instance to canvas
         this._canvas     = jQuery('#' + Config.IDs.CANVAS);
@@ -259,8 +259,22 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         this._setupKeyBindings();
     }
 
-    Editor.prototype.graphId = function() {
-        return this._graphId;
+    // asynchronous factory method
+    Editor.createFromGraphId = function(graphId) {
+        Backend.getGraph(graphId,
+            // success
+            function(graph) {
+                return new Editor(graph);
+            },
+            // failure
+            function(error) {
+                console.log(error);
+            }
+        );
+    }
+
+    Editor.prototype.graph = function() {
+        return this._graph;
     }
 
     Editor.prototype.toGrid = function(first, second) {
