@@ -53,7 +53,7 @@ def graphs(request):
 	Add new graph in the backend
 	API Request:            POST /api/graphs
 	API Request Parameters: type=[GRAPH_TYPE], name=[graph name]
-	API Response:           no body, status code 201, location URI for new graph
+	API Response:           no body, status code 201, location URI for new graph and its ID
 	"""	
 	if request.is_ajax():
 		if request.method == 'POST':
@@ -73,6 +73,7 @@ def graphs(request):
 				else:		
 					response=HttpResponse(status=201)
 					response['Location']=reverse('graph', args=[g.pk])
+					response['ID'] = g.pk
 					return response
 			else:
 				return HttpResponseBadRequest()
@@ -109,7 +110,7 @@ def nodes(request, graph_id):
 	Add new node to graph stored in the backend
 	API Request:            POST /api/graphs/[graphID]/nodes
 	API Request Parameters: parent=[parentID], type=[NODE_TYPE], xcoord, ycoord
-	API Response:           no body, status code 201, location URI for new node
+	API Response:           no body, status code 201, location URI for new node and its ID
 	"""
 	if request.is_ajax():
 		if request.method == 'POST':
@@ -134,6 +135,7 @@ def nodes(request, graph_id):
 				else:					
 					response=HttpResponse(status=201)
 					response['Location']=reverse('node', args=[g.pk, n.pk])
+					response['ID'] = n.pk
 					return response
 		return HttpResponseNotAllowed(['POST']) 
 
