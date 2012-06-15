@@ -1,11 +1,12 @@
 from django.contrib.auth import authenticate as backend_auth
 from django.contrib.auth import login as backend_login
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib import auth
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
-import os, urllib, random, string
+import os, urllib, random, string, datetime
 from fuzztrees.models import Graph, GraphTypes, History, Commands
 
 from fuzztrees.models import User
@@ -16,6 +17,14 @@ def index(request):
 		auth.logout(request)
 	return render_to_response('index.html', {}, context_instance=RequestContext(request))
 
+def about(request):
+	return render_to_response('about.html', {}, context_instance=RequestContext(request))
+
+@login_required
+def settings(request):
+	return render_to_response('settings.html', {}, context_instance=RequestContext(request))
+
+@login_required
 def dashboard(request):
 	if "new" in request.POST:
 		if request.POST['new']=='faulttree':
@@ -51,6 +60,7 @@ def dashboard(request):
 	graphs=request.user.graphs.all()
 	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
 
+@login_required
 def dashboard_popup(request, graph_id):
 	g=get_object_or_404(Graph, pk=graph_id, owner=request.user)
 	return render_to_response('dashboard_popup.html', {'graph': g}, context_instance=RequestContext(request))	
@@ -58,6 +68,7 @@ def dashboard_popup(request, graph_id):
 def teaser(request):
     return render_to_response('teaser.html', {}, context_instance=RequestContext(request))
 
+@login_required
 def editor(request, graph_id):
 	g=get_object_or_404(Graph, pk=graph_id, owner=request.user)
 	return render_to_response('editor.html', {'graph' : g, 'node_types' : NODE_TYPES}, context_instance=RequestContext(request))
@@ -84,8 +95,9 @@ def login(request):
 			elif AX.email in user.openid_ax:
 				newuser=User(username=unicode(user.openid_ax[AX.email],'utf-8'))
 			else:
-				randomstring=''.join([random.choice(string.letters + string.digits) for i in range(8)])
-				newuser=User(username=randomstring)
+				d=datetime.datetime.now()
+				randomname="Anonymous%u%u%u%u"%(d.hour,d.minute,d.second,d.microsecond)
+				newuser=User(username=randomname)
 			newuser.is_active=True
 			newuser.save()
 			linkOpenID(newuser, user.openid_claim)

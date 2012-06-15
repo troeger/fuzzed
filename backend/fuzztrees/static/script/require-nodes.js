@@ -8,12 +8,20 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         if (this.constructor === Node) return;
 
         // endpoints (default configuration)
-        this._maxInConnections  = this._maxInConnections  == undefined ? -1 : this._maxInConnections; // infinite
-        this._maxOutConnections = this._maxOutConnections == undefined ?  1 : this._maxOutConnections;
+        this._maxInConnections  = typeof this._maxInConnections  === 'undefined' ? -1 : this._maxInConnections; // infinite
+        this._maxOutConnections = typeof this._maxOutConnections === 'undefined' ?  1 : this._maxOutConnections;
+        // connector (default configuration)
+        this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
+        jsPlumb.extend(this._connectorStyle, jsPlumb.Defaults.PaintStyle);
 
         // logic
         this._editor     = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
         this._id         = this._generateId();
+
+        // state
+        this._disabled    = false;
+        this._highlighted = false;
+        this._selected    = false;
 
         // visuals
         var visuals            = this._setupVisualRepresentation();
@@ -35,11 +43,6 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._setupDragging();
         this._setupMouse();
 
-        return this;
-    }
-
-    Node.prototype.deselect = function() {
-        this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
         return this;
     }
 
@@ -72,12 +75,89 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype.select = function() {
+        // don't allow selection of disabled nodes
+        if (this._disabled) return this;
+
+        this._selected = true;
         this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+        
+        return this;
+    }
+
+    Node.prototype.deselect = function() {
+        this._selected = false;
+
+        if (this._highlighted) {
+            this._nodeImage.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+        } else {
+            this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+        }
+
+        return this;
+    }
+
+    Node.prototype.disable = function() {
+        this._disabled = true;
+        this._container.find('path').css('stroke', Config.Node.STROKE_DISABLED);
+
+        return this;
+    }
+
+    Node.prototype.enable = function() {
+        this._disabled = false;
+
+        if (this._selected) {
+            this._container.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+        } else if (this._highlighted) {
+            this._container.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+        } else {
+            this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+        }
+
+        return this;
+    }
+
+    Node.prototype.highlight = function(highlight) {
+        this._highlighted = typeof highlight === 'undefined' ? true : highlight;
+        // don't highlight selected or disabled nodes (visually)
+        if (this._selected || this._disabled) return this;
+
+        if (this._highlighted) {
+            this._container.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+        } else {
+            this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+        }
+
         return this;
     }
 
     Node.prototype.type = function() {
         throw 'Abstract Method - override type in subclass';
+    }
+
+    Node.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections to same node
+        if (this == otherNode) return false;
+
+        // there is already a connection between these nodes
+        var connections = jsPlumb.getConnections({
+            //XXX: the selector should suffice, but due to a bug in jsPlumb we need the IDs here
+            source: this._container.attr('id'),
+            target: otherNode._container.attr('id')
+        });
+        if (connections.length != 0) return false;
+
+        // no connection if endpoint is full
+        var endpoints = jsPlumb.getEndpoints(otherNode._container);
+        if (endpoints) {
+            //XXX: find a better way to determine endpoint
+            var targetEndpoint = _.find(endpoints, function(endpoint){
+                return endpoint.isTarget || endpoint._makeTargetCreator
+            });
+            if (targetEndpoint && targetEndpoint.isFull()) return false;
+        }
+
+        return true;
     }
 
     Node.prototype._defineProperties = function() {
@@ -117,7 +197,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
             stack:       '.' + Config.Classes.NODE,
             start:       function() {
-                _this._editor.selection.of(_this);
+                _this._editor.selection.ofNodes(_this);
             }
         });
     }
@@ -133,7 +213,24 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
             jsPlumb.makeSource(this._connectionHandle, {
                 parent: this._container,
                 anchor:   [ 0.5, 0, 0, 1, 0, imageBottomOffset],
-                maxConnections: this._maxInConnections
+                maxConnections: this._maxInConnections,
+                connectorStyle: this._connectorStyle,
+                dragOptions: {
+                    drag: function() {
+                        // disable all nodes that can not be targeted
+                        var nodesToDisable = jQuery('.' + Config.Classes.NODE + ':not(.'+ Config.Classes.NODE_DROP_ACTIVE + ')');
+                        nodesToDisable.each(function(index, node){
+                            jQuery(node).data('node').disable();
+                        });
+                    },
+                    stop: function() {
+                        // re-enable disabled nodes
+                        var nodesToEnable = jQuery('.' + Config.Classes.NODE + ':not(.'+ Config.Classes.NODE_DROP_ACTIVE + ')');
+                        nodesToEnable.each(function(index, node){
+                            jQuery(node).data('node').enable();
+                        });
+                    }
+                }
             });
         }
 
@@ -152,33 +249,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                         var sourceNode = jQuery('.' + Config.Classes.NODE + ':has(#' + elid + ')').data('node');
                         if (typeof sourceNode === 'undefined') return false;
 
-                        // no connections to same node
-                        if (targetNode == sourceNode) return false;
-
-                        if (targetNode instanceof Gate && sourceNode instanceof Gate) return false;
-                        if (targetNode instanceof Event && sourceNode instanceof Event) return false;
-
-                        // there is already a connection between these nodes
-                        var connections = jsPlumb.getConnections({
-                            //XXX: the selector should suffice, but due to a bug in jsPlumb we need the IDs here
-                            source: sourceNode._container.attr('id'),
-                            target: targetNode._container.attr('id')
-                        });
-                        if (connections.length != 0) return false;
-
-                        // no connection if endpoint is full
-                        var endpoints = jsPlumb.getEndpoints(targetNode._container);
-                        if (endpoints) {
-                            //XXX: find a better way to determine endpoint
-                            var targetEndpoint = _.find(endpoints, function(endpoint){
-                                return endpoint.isTarget || endpoint._makeTargetCreator
-                            });
-                            if (targetEndpoint && targetEndpoint.isFull()) return false;
-                        }
-
-                        //TODO: type-dependent checks
-
-                        return true;
+                        return sourceNode.allowsConnectionsTo(targetNode);
                     },
                     activeClass: Config.Classes.NODE_DROP_ACTIVE
                 }
@@ -193,21 +264,17 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._container.click(
             function(eventObject) {
                 eventObject.stopPropagation();
-                _this._editor.selection.of(_this);
+                _this._editor.selection.ofNodes(_this);
             }
         );
 
         // hovering over a node
         this._container.hover(
             function() {
-                if (!_this._editor.selection.contains(_this)) {
-                    _this._container.find('path').css('stroke', Config.Node.STROKE_HOVER);
-                }
+                _this.highlight();
             },
             function() {
-                if (!_this._editor.selection.contains(_this)) {
-                    _this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
-                }
+                _this.highlight(false);
             }
         );
     }
@@ -256,6 +323,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         Event.Super.constructor.apply(this, arguments);
     }
     Event.Extends(Node);
+
+    Event.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections between Event nodes
+        if (otherNode instanceof Event) return false;
+        return Event.Super.allowsConnectionsTo.call(this, otherNode);
+    }
 
     Event.prototype._defineProperties = function() {
         return [
@@ -316,6 +389,12 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         Gate.Super.constructor.apply(this, arguments);
     }
     Gate.Extends(Node);
+
+    Gate.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections between Event nodes
+        if (otherNode instanceof Gate) return false;
+        return Gate.Super.allowsConnectionsTo.call(this, otherNode);
+    }
 
     /*
      *  Basic Event
@@ -530,6 +609,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      *  ChoiceEvent
      */
     function ChoiceEvent() {
+        // outgoing connections are dashed
+        this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
+        this._connectorStyle = jsPlumb.extend({ dashstyle: "4 2"}, this._connectorStyle);
+
         ChoiceEvent.Super.constructor.apply(this, arguments);
     } 
     ChoiceEvent.Extends(Event);
@@ -540,6 +623,14 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     ChoiceEvent.prototype.type = function() {
         return Config.Node.Types.CHOICE_EVENT;
+    }
+
+    ChoiceEvent.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections to gates
+        if (otherNode instanceof Gate) return false;
+
+        // allow connections to other events, but also check basic conditions
+        return otherNode instanceof Event && Node.prototype.allowsConnectionsTo.call(this, otherNode);
     }
 
     ChoiceEvent.prototype._defineProperties = function() {
@@ -559,6 +650,10 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
      *  RedundancyEvent
      */
     function RedundancyEvent() {
+        // outgoing connections are dashed
+        this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
+        this._connectorStyle = jsPlumb.extend({ dashstyle: "4 2"}, this._connectorStyle);
+
         RedundancyEvent.Super.constructor.apply(this, arguments);
     } 
     RedundancyEvent.Extends(Event);
@@ -569,6 +664,14 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
     RedundancyEvent.prototype.type = function() {
         return Config.Node.Types.REDUNDANCY_EVENT;
+    }
+
+    RedundancyEvent.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections to gates
+        if (otherNode instanceof Gate) return false;
+
+        // allow connections to other events, but also check basic conditions
+        return otherNode instanceof Event && Node.prototype.allowsConnectionsTo.call(this, otherNode);
     }
 
     RedundancyEvent.prototype._defineProperties = function() {

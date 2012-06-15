@@ -43,10 +43,12 @@ define(function() {
         },
 
         JSPlumb: {
-            STROKE:         '#000',
-            STROKE_HOVER:   '#409FFF',
-            STROKE_WIDTH:   2,
-            STROKE_STYLE:   'Flowchart',
+            STROKE:             '#000',
+            STROKE_HIGHLIGHTED: '#409FFF',
+            STROKE_SELECTED:    '#FF9640',
+            STROKE_DISABLED:    '#CCC',
+            STROKE_WIDTH:       2,
+            STROKE_STYLE:       'Flowchart',
 
             ENDPOINT_RADIUS: 7,
             ENDPOINT_FILL:   '#409FFF',
@@ -60,10 +62,11 @@ define(function() {
         },
 
         Node: {
-            LABEL_HEIGHT:    15,
-            STROKE_NORMAL:   '#000000',
-            STROKE_HOVER:    '#409FFF',
-            STROKE_SELECTED: '#FF9640',
+            LABEL_HEIGHT:       15,
+            STROKE_NORMAL:      '#000000',
+            STROKE_HIGHLIGHTED: '#409FFF',
+            STROKE_SELECTED:    '#FF9640',
+            STROKE_DISABLED:    '#CCC',
 
             Names: {
                 BASIC_EVENT:       'Basic Event',
@@ -97,7 +100,7 @@ define(function() {
                 REDUNDANCY_EVENT:  'redundancy',
                 UNDEVELOPED_EVENT: 'undeveloped',
                 HOUSE_EVENT:       'house'
-            },
+            }
         },
 
         Properties: {

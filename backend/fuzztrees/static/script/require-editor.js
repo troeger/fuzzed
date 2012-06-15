@@ -130,6 +130,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
      */
     function Selection() {
         this._nodes  = []; // node objects; not DOM elements
+        this._connections = [] // jsPlumb Connection objects
         this._editor = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
     }
 
@@ -138,18 +139,35 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         _.each(this._nodes, function(node) {
             node.deselect();
         });
+
+        // reset connection and endpoint styles
+        _.each(this._connections, function(connection) {
+            connection.setPaintStyle({
+                strokeStyle: Config.JSPlumb.STROKE
+            });
+            connection.setHoverPaintStyle({
+                strokeStyle: Config.JSPlumb.STROKE_HIGHLIGHTED
+            });
+
+            _.each(connection.endpoints, function(endpoint) {
+                endpoint.setPaintStyle({
+                    fillStyle: Config.JSPlumb.ENDPOINT_FILL
+                });
+            })
+        });
+
         this._empty();
         this._editor.properties.hide();
 
         return this;
     }
 
-    Selection.prototype.contains = function(node) {
-        return _.indexOf(this._nodes, node) >= 0;
+    Selection.prototype.contains = function(element) {
+        return _.indexOf(this._nodes, element) >= 0 || _.indexOf(this._connections, element) >= 0;
     }
 
     // make a new selection of the given node(s)
-    Selection.prototype.of = function(nodes) {
+    Selection.prototype.ofNodes = function(nodes) {
         this.clear();
 
         if (_.isArray(nodes)) {
@@ -166,11 +184,45 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         return this;
     }
 
+    // make a new selection of the given connections(s)
+    Selection.prototype.ofConnections = function(connections) {
+        this.clear();
+
+        if (_.isArray(connections)) {
+            this._connections = connections;
+        } else {
+            this._connections.push(connections);
+        }
+
+        // mark connections and their endpoints as selected
+        _.each(this._connections, function(connection) {
+            connection.setPaintStyle({
+                strokeStyle: Config.JSPlumb.STROKE_SELECTED
+            });
+            connection.setHoverPaintStyle({
+                strokeStyle: Config.JSPlumb.STROKE_SELECTED
+            });
+
+            _.each(connection.endpoints, function(endpoint) {
+                endpoint.setPaintStyle({
+                    fillStyle: Config.JSPlumb.STROKE_SELECTED
+                });
+            })
+        });
+
+        return this;
+    }
+
     // remove the current contained nodes from the canvas and clear the selection
     Selection.prototype.remove = function() {
         _.each(this._nodes, function(node) {
             node.remove();
         })
+
+        _.each(this._connections, function(connection) {
+            jsPlumb.detach(connection);
+        })
+
         this._empty();
         this._editor.properties.hide();
 
@@ -180,6 +232,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
     // helper function to empty the selected nodes
     Selection.prototype._empty = function() {
         this._nodes = [];
+        this._connections = [];
         return this;
     }
 
@@ -297,10 +350,18 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
                 lineWidth:   Config.JSPlumb.STROKE_WIDTH
             },
             HoverPaintStyle: {
-                strokeStyle: Config.JSPlumb.STROKE_HOVER
+                strokeStyle: Config.JSPlumb.STROKE_HIGHLIGHTED
             },
             Connector:       Config.JSPlumb.STROKE_STYLE,
-            Anchors:         ['BottomMiddle', 'TopMiddle']
+            Anchors:         ['BottomMiddle', 'TopMiddle'],
+            ConnectionsDetachable: false
+        });
+
+        var editor = this;
+        // listen for clicks on connections for selections
+        jsPlumb.bind('click', function(connection, event) {
+            event.stopPropagation();
+            editor.selection.ofConnections(connection);
         });
     }
 
@@ -321,7 +382,7 @@ define(['require-config', 'require-nodes'], function(Config, Nodes) {
         node
             .moveTo(coordinates.x * Config.Grid.SIZE, coordinates.y * Config.Grid.SIZE)
             .appendTo(this._canvas);
-        this.selection.of(node);
+        this.selection.ofNodes(node);
     }
 
     return Editor;

@@ -28,9 +28,46 @@
 		</div>
 
 		<div data-role="content" style="text-align: center">	
-			<h1>Welcome !</h1>
-			<h3>Please sign-in or create a new account by using one of these authentication providers.</h3>
-			<div style="margin-top: 50px; margin-left: auto; margin-right: auto; width: 580px">
+			<h1>Welcome to FuzzTrees !</h1>
+			<div style="text-align: middle; margin-bottom: 50px; margin-left: auto; margin-right: auto; width: 450px">
+				<div data-mini="true" data-role="collapsible">
+				   <h3>This is a public preview. See what we are working on ...</h3>
+					<div data-mini="true" data-role="collapsible">
+					   <h3>Dependability Modeling with Fault Trees and RBDs</h3>
+					   <p>
+					   If you need a quick way for drawing and analyzing your system's 
+					   availability characteristics, this one is for you. 
+					   We offer a free basic account so that you can just start.
+					    </p>
+					</div>
+					<div data-mini="true" data-role="collapsible">
+					   <h3>Modeling with uncertainties - Introducing FuzzTrees</h3>
+					   <p>
+					   Our novel concept for fault tree modeling allows you to express
+					   configurable and uncertain parts of the system. 
+					   Our analysis engine tells you which configuration options
+					   give the best cost-dependability ratio.
+					   </p>
+					</div>
+					<div data-mini="true" data-role="collapsible">
+					   <h3>Graph sharing for teaching and collaboration</h3>
+					   <p>
+					   Graphs can be easily shared between users to support academic
+					   teaching and professional collaboration projects. 
+					   We support the export as graphic, eMail attachment or project file. 
+					   </p>
+					</div>
+					<div data-mini="true" data-role="collapsible">
+					   <h3>... much more ...</h3>
+					   <p>
+					   This is a public preview version, where nearly nothing works so far. 
+					   Please join us in this journey with your <a href="http://fuzztrees.uservoice.com">feedback</a> and comments.
+					   </p>
+					</div>
+				</div>
+			</div>	
+			<h3>Please sign-in with one of these providers.</h3>
+			<div style="margin-top: 0px; margin-left: auto; margin-right: auto; width: 580px">
 				<form data-ajax="false" action="/login/" method="get" id="openid_form">
 					<input type="hidden" name="action" value="verify" />
 					<fieldset>
@@ -47,7 +84,7 @@
 						</noscript>
 					</fieldset>
 				</form>
-			</div>	
+			</div>
 		</div>	
 
 		{% include "footer.html" %}
