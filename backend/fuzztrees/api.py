@@ -1,12 +1,14 @@
 from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadRequest, HttpResponseNotFound
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from fuzztrees.models import Graph, Node, Edge, History, GRAPH_JS_TYPE, Commands
 from nodes_config import NODE_TYPES
 import json
 
 @login_required
+@csrf_exempt
 def undos(request, graph_id):
 	"""
 	Fetch undo command stack from backend
@@ -27,6 +29,7 @@ def undos(request, graph_id):
 		return HttpResponseNotAllowed(['GET', 'POST']) 
 
 @login_required
+@csrf_exempt
 def redos(request, graph_id):
 	"""
 	Fetch redo command stack from backend
@@ -48,6 +51,7 @@ def redos(request, graph_id):
 
 @login_required
 @transaction.commit_manually
+@csrf_exempt
 def graphs(request):
 	"""
 	Add new graph in the backend
@@ -105,13 +109,14 @@ def graph(request, graph_id):
 		return HttpResponseNotAllowed(['GET']) 
 	
 @login_required
-@transaction.commit_manually
+@transaction.commit_on_success
+@csrf_exempt
 def nodes(request, graph_id):
 	"""
 	Add new node to graph stored in the backend
 	API Request:            POST /api/graphs/[graphID]/nodes
 	API Request Parameters: type=[NODE_TYPE], xcoord, ycoord
-	API Response:           no body, status code 201, location URI for new node and its ID
+	API Response:           JSON objection containing the node's ID, status code 201, location URI for new node
 	"""
 	if request.is_ajax():
 		if request.method == 'POST':
@@ -124,18 +129,17 @@ def nodes(request, graph_id):
 					n.save()
 					c=History(command=Commands.ADD_NODE, graph=g, node=n)
 					c.save()
-					transaction.commit()
-				except Exception, e:
-					transaction.rollback()
+				except:
 					return HttpResponseBadRequest()			
-				else:					
-					response=HttpResponse(status=201)
+				else:
+					responseBody = json.dumps(n.toJsonDict())
+					response=HttpResponse(responseBody, 'application/javascript', status=201)
 					response['Location']=reverse('node', args=[g.pk, n.pk])
-					response['ID'] = n.pk
 					return response
 		return HttpResponseNotAllowed(['POST']) 
 
-@login_required	
+@login_required
+@csrf_exempt
 def node(request, graph_id, node_id):
 	"""
 	Delete node from graph stored in the backend
@@ -203,6 +207,7 @@ def node(request, graph_id, node_id):
 
 @login_required
 @transaction.commit_manually
+@csrf_exempt
 def edges(request, graph_id, node_id):
 	"""
 	Add new edge to a node stored in the backend
