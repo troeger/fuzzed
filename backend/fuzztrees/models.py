@@ -70,11 +70,12 @@ class Graph(models.Model):
 				self.dump(subtree, indent+1)
 
 	def toJsonDict(self):
-		d={'id': self.pk, 'name': self.name, 'type': GRAPH_JS_TYPE[self.type]}
-		if self.nodes and self.nodes.filter(root=True):
-			root=self.nodes.filter(root=True)[0]
-			d['root']=root.getTreeDict()
-		return d
+		nodesArray = [n.toJsonDict for n in self.nodes.filter(deleted=False)]
+		dict = {'id': self.pk, 'name': self.name, 'type': GRAPH_JS_TYPE[self.type], 'nodes': nodesArray}
+#		if self.nodes and self.nodes.filter(root=True):
+#			root=self.nodes.filter(root=True)[0]
+#			d['root']=root.getTreeDict()
+		return dict
 		
 class Node(models.Model):
 	name = models.CharField(max_length=255)
@@ -93,6 +94,12 @@ class Node(models.Model):
 				return self.name
 		else:
 			return NODE_TYPES[self.type]['type'] + "_" + str(self.pk)
+
+	def toJsonDict(self):
+		pos = {'x': self.xcoord, 'y': self.ycoord}
+		edgesArray = [e.toJsonDict for e in self.outgoing.all().filter(deleted=False)]
+		return {'id': self.pk, 'name': self.name,'type': NODE_TYPES[self.type]['type'] ,'isRoot': self.root, 'position': pos, 'outgoingEdges': edgesArray}
+
 	def getChildren(self):
 		edges=self.outgoing.all().filter(deleted=False)
 		if len(edges)>0:
@@ -115,6 +122,9 @@ class Edge(models.Model):
 	deleted = models.BooleanField(default=False)
 	def __unicode__(self):
 		return str(self.src) + "->" + str(self.dest)
+
+	def toJsonDict(self):
+		return {'source': self.src.pk, 'target': self.dest.pk}
 
 class Property(models.Model):
 	node = models.ForeignKey(Node, null=True, related_name='properties')
