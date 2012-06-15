@@ -36,10 +36,15 @@ define(['require-config', 'require-oop'], function(Config) {
         return this._options;
     }
 
-    Property.prototype.show = function(container) {
+    Property.prototype.show = function(container, index) {
         this._container = container;
 
-        this._container.append(this._element);
+        if (typeof index === 'undefined' || container.children().length === 0) {
+            this._container.append(this._element)
+        } else {
+            this._container.children().eq(index || 0).before(this._element);
+        }
+
         this._afterAppend();
         this._setupCallbacks();
 
@@ -92,7 +97,7 @@ define(['require-config', 'require-oop'], function(Config) {
     Property.prototype._setupLabel = function(_id, text) {
         return jQuery('<label>')
             .attr('for', _id || this._id)
-            .html(text || this._options.name)
+            .html(text || this.options().name)
             .addClass(Config.Classes.PROPERTY_LABEL);
     }
 
@@ -127,14 +132,17 @@ define(['require-config', 'require-oop'], function(Config) {
 
         // sanitize the options of this object and the options of the select (options.options)
         this._options = jQuery.extend({}, Config.Properties.Defaults.Select, this._options);
-        if (_.indexOf(this._options.options, this._value) === -1) this._options.options.unshift(this._value);
+        
+        var options   = this.options().options;
+        var value     = this.options().value;
+        if (_.indexOf(options, value) === -1) options.unshift(value);
 
         this._selectElement = this._element.find('select');
         this._setupMirror();
     }
     Select.Extends(Property);
 
-    Select.prototype.show = function(container) {
+    Select.prototype.show = function(container, index) {
         /*
          *  Nasty hack here - I am sorry guys, when you find this and are annoyed by it get a free beer
          *  by writing to murxman@gmail.com :). Reason: jQuery Mobile in the as-is version would nest 
@@ -145,7 +153,7 @@ define(['require-config', 'require-oop'], function(Config) {
         this._options.value = this.value();
         this._element = this._setupElement();
         this._selectElement = this._element.find('select');
-        Select.Super.show.call(this, container);
+        Select.Super.show.call(this, container, index);
     }
 
     Select.prototype.value = function() {
@@ -193,58 +201,115 @@ define(['require-config', 'require-oop'], function(Config) {
      *  SingleChoice
      */
     function SingleChoice(options, node) {
-        if (typeof options.choices === 'undefined' || options.choices.length < 2) {
+        var choices = options.choices;
+
+        // check whether choice are present and that there are at least two to choose from
+        if (typeof choices === 'undefined' || choices.length < 2) {
             throw 'Parameter Error - please provide at least two choices to choose from';
         }
-        SingleChoice.Super.constructor.call(this, options, node);
 
-        this._options = jQuery.extend({}, Config.Properties.Defaults.SingleChoice, this._options);
-        this._chosen  = this._options.chosen;
-        this._radios  = this._element.find('input[type="radio"]');
+        // which one is preselected?
+        this._selected = 0;
+        for (var i = 0, iLen = choices.length; i < iLen; ++i) {
+            if (choices[i].selected) {
+                this._selected = i;
+                break;
+            }
+        }
+        SingleChoice.Super.constructor.call(this, options, node);
+        this._radios = this._element.find('input:radio');
         this._setupMirror();
     }
     SingleChoice.Extends(Property);
 
+    SingleChoice.prototype.hide = function() {
+        this._choice().hide();
+        SingleChoice.Super.hide.call(this);
+    }
+
+    SingleChoice.prototype.show = function(container, index) {
+        this._element = this._setupElement();
+        this._radios  = this._element.find('input:radio');
+        SingleChoice.Super.show.call(this, container, index);
+
+        this._choice().show(container);
+        if (this.options().mirror) this._setupChoiceHandler(this._choice());
+    }
+
     SingleChoice.prototype.value = function() {
-        return this._options.choices[this._chosen].value();
+        return this.options().choices[this._selected].input.value();
     }
 
     SingleChoice.prototype._afterAppend = function() {
-        this._element.fieldcontain();
+        this._element.trigger('create');
     }
 
     SingleChoice.prototype._callbackElement = function() {
         return this._radios;
     }
 
+    SingleChoice.prototype._change = function(eventObject) {
+        var index = this._container.children().index(this._choice()._element);
+
+        this._choice().hide();
+        this._selected = this._radios.index(eventObject.target);
+        this._choice().show(this._container, index);
+
+        if (this.options().mirror) {
+            this._mirror.html(this._mirrorString());
+            this._setupChoiceHandler(this._choice());
+        }
+    }
+
+    SingleChoice.prototype._choice = function() {
+        return this.options().choices[this._selected].input;
+    }
+
+    SingleChoice.prototype._setupChoiceHandler = function(choice) {
+        var _this = this;
+        var choiceOptions = choice.options();
+
+        _.each(Config.Properties.Events, function(eventName) {
+            if (choice['_' + eventName] || choiceOptions[eventName]) {
+                choice._callbackElement().bind(eventName, function() {
+                    _this._mirror.html(_this._mirrorString());
+                });
+            }
+        })
+    }
+
     SingleChoice.prototype._setupElement = function() {
         var fieldcontain = this._setupFieldcontain();
         var fieldset     = this._setupFieldset();
-        var legend       = this._setupLegend();
 
-        _.each(this._options.choices, function(choice, index) {
+        _.each(this.options().choices, function(choice, index) {
             var _id   = this._id + '-' + index;
-            var radio = this._setupRadio(_id);
-            var label = this._setupLabel(_id, choice.name);
+            var input = jQuery('<input type="radio">')
+                .attr('data-mini', true)
+                .attr('name', this._id)
+                .attr('id', _id)
+                .attr('value', choice.name)
+                .attr('checked', index === this._selected ? 'checked' : undefined);
+            var label = jQuery('<label>')
+                .attr('for', _id)
+                .html(choice.name);
 
-            fieldset.append(radio, label);
+            fieldset.append(input, label);
         }.bind(this));
 
-        return fieldcontain.append(fieldset.append(legend));
+        return fieldcontain.append(fieldset);
     }
 
     SingleChoice.prototype._setupFieldset = function() {
-        return jQuery('<fieldset>')
-            .attr('data-role', 'controlgroup')
-            .attr('data-type', 'horizontal');
-    }
+        var fieldset = jQuery('<fieldset>').attr('data-role', 'controlgroup');
+        var legend   = jQuery('<legend>').html(this.name());
 
-    SingleChoice.prototype._setupLegend = function() {
-        return jQuery('<legend>').html(this._options.name);
-    }
+        fieldset.append(legend);
+        _.each(this.options().choices, function(choice) {
 
-    SingleChoice.prototype._setupRadio = function(_id) {
-        return jQuery('<input type="radio">').attr('id', _id);
+        })
+
+        return fieldset;
     }
 
     /*

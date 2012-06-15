@@ -265,32 +265,36 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
                 mirror: this._container
             }, this),
 
-            new Properties.Text({
-                name:         'Probability',
-                type:         'number',
-                min:          0,
-                max:          1,
-                step:         0.01,
-                value:        0,
+            new Properties.SingleChoice({
+                name:        'Probability',
                 mirror:       this._container,
                 mirrorPrefix: 'p=',
-                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
-            }, this),
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
 
-            new Properties.Select({
-                name:         'Probability',
-                options:      [
-                                'very unlikely',
-                                'unlikely',
-                                'likely',
-                                'very likely',
-                                'unknown'
-                              ],
-                value:        'unknown',
-                mirror:       this._container,
-                mirrorPrefix: 'p2=',
-                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
-            }, this),
+                choices: [{
+                    name:     'Exact',
+                    selected:  true,
+                    input: new Properties.Text({
+                                type:  'number',
+                                min:   0,
+                                max:   1,
+                                step:  0.01,
+                                value: 0,
+                        }, this),
+                }, {
+                    name: 'Fuzzy',
+                    input: new Properties.Select({
+                        options: [
+                                    'very unlikely',
+                                    'unlikely',
+                                    'likely',
+                                    'very likely',
+                                    'unknown'
+                                ],
+                        value:  'unknown',
+                    }, this)
+                }]
+            }),
 
             new Properties.Text({
                 name:  'Cost',

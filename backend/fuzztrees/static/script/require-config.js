@@ -127,10 +127,6 @@ define(function() {
                     options: []
                 },
 
-                SingleChoice: {
-                    chosen: 0,
-                },
-
                 Text: {
                     type: ''
                 }

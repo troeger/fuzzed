@@ -31,7 +31,7 @@
 	<script src="{{ STATIC_URL }}lib/requirejs/require-1.0.8.min.js" type="text/javascript" language="javascript"></script>
 	<script type="text/javascript" language="javascript">
 		require.config({
-			baseUrl: "../static/script/",
+			baseUrl:      "../static/script/",
 			waitSeconds: 5
 		});
 
@@ -45,11 +45,13 @@
 
 <body>
 	<div data-role="page">
+
 		<div data-theme="d" data-role="header" id="toolbar">
 			<a href="/dashboard/" data-icon="home">Dashboard</a>
 			<h1>{{ graph.name }}</h1>
 			<a href="/?logout" data-icon="delete" data-ajax="false">Logout</a>
 		</div>
+
 
 		<div id="FuzzedContent">
 			{% include "content.html" %}

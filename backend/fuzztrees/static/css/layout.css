@@ -130,6 +130,7 @@
     font-size:      12px;
 }
 
+/* Select */
 #FuzzedProperties div.ui-select {
     width:        63%;
     padding-left: 0.4em;
@@ -144,6 +145,24 @@
     padding: 0.35em 35px 0.35em 11px;
 }
 
+/* Single Choice */
+#FuzzedProperties div.ui-controlgroup-label {
+    width:       34%;
+    font-size:   12px;
+    font-weight: bold;
+    float:       left;
+}
+
+#FuzzedProperties div.ui-controlgroup-controls {
+    width:   63%;
+    display: inline-block;
+}
+
+#FuzzedProperties span.ui-btn-inner {
+    padding: 0.35em 36px 0.35em;
+}
+
+/* Text */
 #FuzzedProperties .fuzzed-property-text {
     font-size:   12px;
     line-height: 1;
