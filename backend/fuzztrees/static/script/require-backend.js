@@ -1,4 +1,4 @@
-define(['require-config', 'require-graph', 'require-nodes'], function (Config, Graph, Nodes) {
+define(['require-config', 'require-graph'], function (Config, Graph) {
 
     var URLHelper = {
         fullUrlForGraphs: function() {
@@ -14,9 +14,9 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
                 + graph.id() + Config.Backend.NODES_URL;
         },
 
-        fullUrlForNode: function(graph, node) {
+        fullUrlForNode: function(node) {
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/'
-                + graph.id() + Config.Backend.NODES_URL + '/' + node.id();
+                + node.graph().id() + Config.Backend.NODES_URL + '/' + node.id();
         },
 
         fullUrlForEdges: function(node) {
@@ -34,24 +34,22 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
 
     /*
          Function: addNode
-             Adds a new node to the given graph.
+             Adds a new node to the backend of this graph.
 
          Parameters:
-             graph    - The graph the node should be added to.
              node     - The node object
              position - Position object containing an 'x' and an 'y' field specifying the node's position.
              success  - [optional] Will be called on successful node creation transmission to server
              error    - [optional] Callback that gets called in case of an ajax-error.
              complete - [optional] Callback that is invoked when the ajax request completes successful or errornous
      */
-    Backend.addNode = function(graph, node, position, success, error, complete) {
-        var url = URLHelper.fullUrlForNodes(graph);
+    Backend.addNode = function(node, position, success, error, complete) {
+        var url = URLHelper.fullUrlForNodes(node.graph());
         var data = {
             'type':   node.type(),
             'xcoord': position.x,
             'ycoord': position.y
         };
-        graph.addNode(node);
 
         jQuery.ajax({
             url:      url,
@@ -67,17 +65,18 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
 
     /*
          Function: deleteNode
-             Deletes a given Node in the backend.
+             Deletes a given node in the backend.
 
          Parameters:
              node     - The node that should be deleted.
-             succes   - [optional] Callback that is being called on successful deletion on backend
+             succes   - [optional] Callback that is being called on successful deletion on backend.
              error    - [optional] Callback that gets called in case of an ajax-error.
              complete - [optional] Callback that is invoked in both cases either in an successful or errornous ajax call.
      */
-    Backend.deleteNode = function(graph, node, success, error, complete) {
-        var url = URLHelper.fullUrlForNode(graph, node);
+    Backend.deleteNode = function(node, success, error, complete) {
+        var url = URLHelper.fullUrlForNode(node);
 
+        node.graph().deleteNode(node);
         jQuery.ajax({
             url:      url,
             type:     'DELETE',
@@ -108,10 +107,6 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
 
             // fill graph
             var graph = new Graph(json.id);
-            _.each(json.nodes, function(jsonNode) {
-                graph.addNode(Nodes.newNodeForType(jsonNode.type, jsonNode.id));
-            });
-
             // call the passed success function if present
             if (success) success(graph, json);
         };
@@ -128,6 +123,35 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
 
             success:  successCallback,
             error:    errorCallback,
+            complete: complete || jQuery.noop
+        });
+    }
+
+    /*
+         Function: moveNode
+             Changes the position of a given node.
+
+         Parameters:
+             node     - The node that shall be moved
+             position - The node's destination
+             success  - [optional] Function that is invoked when the node's move was successfully transmitted.
+             error    - [optional] Callback that gets called in case of an ajax-error.
+             complete - [optional] Callback that is always invoked no matter if ajax request was successful or errornous.
+     */
+    Backend.moveNode = function(node, position, success, error, complete) {
+        var url = URLHelper.fullUrlForNode(node);
+        var data = {
+            xcoord: position.x,
+            ycoord: position.y
+        }
+
+        jQuery.ajax({
+            url:      url,
+            type:     'POST',
+            dataType: 'json',
+
+            success:  success  || jQuery.noop,
+            error:    error    || jQuery.noop,
             complete: complete || jQuery.noop
         });
     }
@@ -181,24 +205,6 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
         jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
     }
 
-    /*
-         Function: changeNodePosition
-             Changes the position of a given Node.
-
-         Parameters:
-             node          - The Node that should be deleted.
-             position      - New position object (with 'x' and 'y' fields) of the node.
-             errorCallback - [optional] Callback that gets called in case of an ajax-error.
-     */
-    Backend.changeNodePosition = function(node, position, errorCallback) {
-        var url = URLHelper.fullUrlForNode(node);
-        var data = {
-            'xcoord': position.x,
-            'ycoord': position.y
-        }
-
-        jQuery.post(url, data).fail(errorCallback || jQuery.noop);
-    }
 
     /*
          Function: changeNodeType
@@ -258,8 +264,6 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
 
         jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
     }
-
-    Backend.pro
 
     return Backend;
 });

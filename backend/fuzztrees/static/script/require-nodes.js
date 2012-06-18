@@ -1,4 +1,4 @@
-define(['require-config', 'require-properties', 'require-oop'], function(Config, Properties) {
+define(['require-config', 'require-properties', 'require-backend', 'require-oop'], function(Config, Properties, Backend) {
 
     /*
      *  Abstract Node Base Class
@@ -16,6 +16,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
         // logic
         this._editor     = undefined; // will be set when appending
+        this._graph      = undefined; // will be set as soon as it get added to a concrete graph
         this._id         = id;
 
         // state
@@ -104,6 +105,13 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         return this;
     }
 
+    Node.prototype.graph = function(newGraph) {
+        if (typeof newGraph === 'undefined') return this._graph;
+
+        this._graph = newGraph;
+        return this;
+    }
+
     Node.prototype.highlight = function(highlight) {
         this._highlighted = typeof highlight === 'undefined' ? true : highlight;
         // don't highlight selected or disabled nodes (visually)
@@ -186,17 +194,26 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype._setupDragging = function() {
-        var _this = this;
-
         jsPlumb.draggable(this._container, {
             containment: 'parent',
             opacity:     Config.Dragging.OPACITY,
             cursor:      Config.Dragging.CURSOR,
             grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
             stack:       '.' + Config.Classes.NODE,
+
+            // start dragging callback
             start:       function() {
-                _this._editor.selection.ofNodes(_this);
-            }
+                this._editor.selection.ofNodes(this);
+            }.bind(this),
+
+            // stop dragging callback
+            stop:        function(eventObject, uiHelpers) {
+                var coordinates = this._editor.toGrid({
+                    x: uiHelpers.position.left,
+                    y: uiHelpers.position.top
+                });
+                //Backend.moveNode(this, coordinates);
+            }.bind(this)
         });
     }
 

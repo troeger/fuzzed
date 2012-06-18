@@ -216,7 +216,7 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
     // remove the current contained nodes from the canvas and clear the selection
     Selection.prototype.remove = function() {
         _.each(this._nodes, function(node) {
-            Backend.deleteNode(this._editor.graph(), node, undefined, function(a,b,c){console.log(a,b,c)});
+            Backend.deleteNode(node);
             node.remove();
         }.bind(this))
 
@@ -345,9 +345,13 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         Backend.getGraph(graphId,
             // success
             function(graph, json) {
+                var jsonNodes = json.nodes;
                 this.graph(graph);
 
-                var jsonNodes = json.nodes;
+                _.each(jsonNodes, function(jsonNode) {
+                    graph.addNode(Nodes.newNodeForType(jsonNode.type, jsonNode.id));
+                });
+
                 _.each(graph.getNodes(), function(node, index) {
                     var position = this.toPixel(jsonNodes[index].position);
                     node
@@ -444,9 +448,10 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         node.moveTo(pixelCoords.x, pixelCoords.y)
             .appendTo(this._canvas)
             ._editor = this;
+        this.graph().addNode(node);
         this.selection.ofNodes(node);
 
-        Backend.addNode(this.graph(), node, gridCoords, function(json) {
+        Backend.addNode(node, gridCoords, function(json) {
             node.id(json.id);
         });
     }
