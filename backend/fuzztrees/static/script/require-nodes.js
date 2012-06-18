@@ -212,7 +212,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                     x: uiHelpers.position.left,
                     y: uiHelpers.position.top
                 });
-                //Backend.moveNode(this, coordinates);
+                Backend.moveNode(this, coordinates, null, function(error, a, b){console.log(error, a, b)});
             }.bind(this)
         });
     }

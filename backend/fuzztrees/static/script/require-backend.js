@@ -150,6 +150,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             type:     'POST',
             dataType: 'json',
 
+            data:     data,
             success:  success  || jQuery.noop,
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop

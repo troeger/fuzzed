@@ -140,7 +140,7 @@ def nodes(request, graph_id):
 		return HttpResponseNotAllowed(['POST']) 
 
 @login_required
-@transaction.commit_manually
+@transaction.commit_on_success
 @csrf_exempt
 def node(request, graph_id, node_id):
 	"""
@@ -187,15 +187,22 @@ def node(request, graph_id, node_id):
 				n.save()
 				c=History(command=Commands.DEL_NODE, graph=g, node=n)
 				c.save()
-				transaction.commit()
 			except:
-				transaction.rollback()
 				return HttpResponseBadRequest()						
 			else:
 				return HttpResponse(status=204)
 		elif request.method == 'POST':
 			if 'xcoord' in request.POST and 'ycoord' in request.POST:
-				#TODO reposition node
+				try:
+					oldxcoord=n.xcoord
+					oldycoord=n.ycoord
+					n.xcoord = request.POST['xcoord']
+					n.ycoord = request.POST['ycoord']
+					n.save()
+					c=History(command=Commands.CHANGE_COORD, graph=g, node=n, oldxcoord=oldxcoord, oldycoord=oldycoord)
+					c.save()
+				except:
+					return HttpResponseBadRequest()
 				return HttpResponse(status=204)
 			elif 'key' in request.POST and 'val' in request.POST:
 				#TODO change node property
