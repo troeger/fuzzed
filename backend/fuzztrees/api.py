@@ -140,6 +140,7 @@ def nodes(request, graph_id):
 		return HttpResponseNotAllowed(['POST']) 
 
 @login_required
+@transaction.commit_manually
 @csrf_exempt
 def node(request, graph_id, node_id):
 	"""

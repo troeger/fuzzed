@@ -216,9 +216,9 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
     // remove the current contained nodes from the canvas and clear the selection
     Selection.prototype.remove = function() {
         _.each(this._nodes, function(node) {
-            Backend.deleteNode(node);
+            Backend.deleteNode(this._editor.graph(), node, undefined, function(a,b,c){console.log(a,b,c)});
             node.remove();
-        })
+        }.bind(this))
 
         _.each(this._connections, function(connection) {
             jsPlumb.detach(connection);
@@ -355,7 +355,6 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
                         .moveTo(position.x, position.y)
                         ._editor = this;
                 }.bind(this));
-
             }.bind(this),
 
             // error
@@ -447,7 +446,9 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
             ._editor = this;
         this.selection.ofNodes(node);
 
-        Backend.addNode(this.graph(), node, gridCoords);
+        Backend.addNode(this.graph(), node, gridCoords, function(json) {
+            node.id(json.id);
+        });
     }
 
     return Editor;

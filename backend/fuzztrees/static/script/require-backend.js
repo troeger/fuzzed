@@ -14,9 +14,9 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
                 + graph.id() + Config.Backend.NODES_URL;
         },
 
-        fullUrlForNode: function(node) {
+        fullUrlForNode: function(graph, node) {
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/'
-                + node.graph().id() + Config.Backend.NODES_URL + '/' + node.id();
+                + graph.id() + Config.Backend.NODES_URL + '/' + node.id();
         },
 
         fullUrlForEdges: function(node) {
@@ -37,12 +37,12 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
              Adds a new node to the given graph.
 
          Parameters:
-             graph         - The Graph the node should be added to.
-             type          - The type of the node. See Config.Node.Types
-             position      - Position object containing an 'x' and an 'y' field specifying the Node's position.
-             callback      - Callback function for asynchronous request.
-                             Will be called with the created Node object when the request returns.
-             errorCallback - [optional] Callback that gets called in case of an ajax-error.
+             graph    - The graph the node should be added to.
+             node     - The node object
+             position - Position object containing an 'x' and an 'y' field specifying the node's position.
+             success  - [optional] Will be called on successful node creation transmission to server
+             error    - [optional] Callback that gets called in case of an ajax-error.
+             complete - [optional] Callback that is invoked when the ajax request completes successful or errornous
      */
     Backend.addNode = function(graph, node, position, success, error, complete) {
         var url = URLHelper.fullUrlForNodes(graph);
@@ -75,12 +75,18 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
              error    - [optional] Callback that gets called in case of an ajax-error.
              complete - [optional] Callback that is invoked in both cases either in an successful or errornous ajax call.
      */
-    Backend.deleteNode = function(node, errorCallback) {
-        var url = URLHelper.fullUrlForNode(node);
+    Backend.deleteNode = function(graph, node, success, error, complete) {
+        var url = URLHelper.fullUrlForNode(graph, node);
 
-        jQuer.ajax({
-            type: 'DELETE',
-        }).fail(errorCallback || jQuery.noop);
+        jQuery.ajax({
+            url:      url,
+            type:     'DELETE',
+            dataType: 'json',
+
+            success:  success  || jQuery.noop,
+            error:    error    || jQuery.noop,
+            complete: complete || jQuery.noop
+        });
     }
 
     /*

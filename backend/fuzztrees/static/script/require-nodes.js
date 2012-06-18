@@ -169,11 +169,6 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         return [];
     }
 
-    Node.prototype._generateId = function() {
-        // epoch timestamp will do
-        return new Date().getTime();
-    }
-
     Node.prototype._resize = function() {
         // find the node's svg element and path groups
         var image = this._container.children('.' + Config.Classes.NODE_IMAGE);
