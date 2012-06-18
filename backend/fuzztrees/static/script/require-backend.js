@@ -30,7 +30,6 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
         }
     }
 
-
     var Backend = {}
 
     /*
@@ -65,21 +64,42 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
              Fetch a Graph object from the backend.
 
          Parameters:
-             id            - ID of the Graph to fetch.
-             callback      - Callback function for asynchronous requests.
-                             Will be called when the request returns with the fetched Graph object.
-             errorCallback - [optional] Callback that gets called in case of an ajax-error.
+             id       - ID of the Graph to fetch.
+             succes   - [optional] Callback function for a successful asynchronous request for a graph with given id.
+             error    - [optional] Callback that gets called in case of an unsuccessful retrieval of the graph from
+                        the database. Will create a new graph in the backend anyway.
+             complete - [optional] Callback that gets invoked in either a successful or errornous graph request.
      */
-    Backend.getGraph = function(id, callback, errorCallback) {
-        var url = URLHelper.fullUrlForGraph(id)
-        var ajaxCallback = function(json) {
+    Backend.getGraph = function(id, success, error, complete) {
+        var url = URLHelper.fullUrlForGraph(id);
+
+        var successCallback = function(json) {
             //TODO: Figure format
-            var graph = new Graph(json['id']);
-            //TODO: fill graph
-            callback(graph);
+
+            // fill graph
+            var graph = new Graph(json.id);
+            _.each(json.nodes, function(jsonNode) {
+                graph.addNode(Nodes.newNodeForType(jsonNode.type, jsonNode.id));
+            });
+
+            // call the passed success function if present
+            if (success) success(graph, json);
         };
 
-        jQuery.getJSON(url, ajaxCallback).fail(errorCallback || jQuery.noop);
+        var errorCallback = function(response, textStatus, errorThrown) {
+            // TODO: do proper create graph here on backend
+            var graph = new Graph(id);
+            if (error) error(graph, response, textStatus, errorThrown);
+        }
+
+        jQuery.ajax({
+            url:      url,
+            dataType: 'json',
+
+            success:  successCallback,
+            error:    errorCallback,
+            complete: complete || jQuery.noop
+        });
     }
 
     /*
@@ -224,6 +244,8 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
 
         jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
     }
+
+    Backend.pro
 
     return Backend;
 });

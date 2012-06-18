@@ -34,6 +34,31 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._properties       = this._defineProperties();
     }
 
+    Node.prototype.allowsConnectionsTo = function(otherNode) {
+        // no connections to same node
+        if (this == otherNode) return false;
+
+        // there is already a connection between these nodes
+        var connections = jsPlumb.getConnections({
+            //XXX: the selector should suffice, but due to a bug in jsPlumb we need the IDs here
+            source: this._container.attr('id'),
+            target: otherNode._container.attr('id')
+        });
+        if (connections.length != 0) return false;
+
+        // no connection if endpoint is full
+        var endpoints = jsPlumb.getEndpoints(otherNode._container);
+        if (endpoints) {
+            //XXX: find a better way to determine endpoint
+            var targetEndpoint = _.find(endpoints, function(endpoint){
+                return endpoint.isTarget || endpoint._makeTargetCreator
+            });
+            if (targetEndpoint && targetEndpoint.isFull()) return false;
+        }
+
+        return true;
+    }
+
     Node.prototype.appendTo = function(domElement) {
         // some visual stuff, interaction and endpoints need to go here since they require the elements to be
         // already in the DOM. This is why we cannot initialize all of it already in the constructor
@@ -44,44 +69,6 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         this._setupDragging();
         this._setupMouse();
 
-        return this;
-    }
-
-    Node.prototype.id = function() {
-        return this._id;
-    }
-
-    Node.prototype.moveTo = function(x, y) {
-        this._container.css({
-            left: x || 0,
-            top:  y || 0
-        });
-
-        return this;
-    }
-
-    Node.prototype.name = function() {
-        throw 'Abstract Method - override name (human readable) in subclass';
-    }
-
-    Node.prototype.properties = function() {
-        return this._properties;
-    }
-
-    Node.prototype.remove = function() {
-        _.each(jsPlumb.getEndpoints(this._container), function(endpoint) {
-            jsPlumb.deleteEndpoint(endpoint);
-        })
-        this._container.remove();
-    }
-
-    Node.prototype.select = function() {
-        // don't allow selection of disabled nodes
-        if (this._disabled) return this;
-
-        this._selected = true;
-        this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
-        
         return this;
     }
 
@@ -132,33 +119,49 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         return this;
     }
 
-    Node.prototype.type = function() {
-        throw 'Abstract Method - override type in subclass';
+    Node.prototype.id = function(newId) {
+        if (typeof newId === 'undefined') return this._id;
+
+        this._id = newId;
+        return this;
     }
 
-    Node.prototype.allowsConnectionsTo = function(otherNode) {
-        // no connections to same node
-        if (this == otherNode) return false;
-
-        // there is already a connection between these nodes
-        var connections = jsPlumb.getConnections({
-            //XXX: the selector should suffice, but due to a bug in jsPlumb we need the IDs here
-            source: this._container.attr('id'),
-            target: otherNode._container.attr('id')
+    Node.prototype.moveTo = function(x, y) {
+        this._container.css({
+            left: x || 0,
+            top:  y || 0
         });
-        if (connections.length != 0) return false;
 
-        // no connection if endpoint is full
-        var endpoints = jsPlumb.getEndpoints(otherNode._container);
-        if (endpoints) {
-            //XXX: find a better way to determine endpoint
-            var targetEndpoint = _.find(endpoints, function(endpoint){
-                return endpoint.isTarget || endpoint._makeTargetCreator
-            });
-            if (targetEndpoint && targetEndpoint.isFull()) return false;
-        }
+        return this;
+    }
 
-        return true;
+    Node.prototype.name = function() {
+        throw 'Abstract Method - override name (human readable) in subclass';
+    }
+
+    Node.prototype.properties = function() {
+        return this._properties;
+    }
+
+    Node.prototype.remove = function() {
+        _.each(jsPlumb.getEndpoints(this._container), function(endpoint) {
+            jsPlumb.deleteEndpoint(endpoint);
+        })
+        this._container.remove();
+    }
+
+    Node.prototype.select = function() {
+        // don't allow selection of disabled nodes
+        if (this._disabled) return this;
+
+        this._selected = true;
+        this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+        
+        return this;
+    }
+
+    Node.prototype.type = function() {
+        throw 'Abstract Method - override type in subclass';
     }
 
     Node.prototype._defineProperties = function() {
@@ -736,7 +739,7 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         Returns:
             A new Node of the given type
      */
-    function newNodeWithType(type, id) {
+    function newNodeForType(type, id) {
         switch(type) {
             case Config.Node.Types.BASIC_EVENT:
                 return new BasicEvent(id);
@@ -787,6 +790,6 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
         ChoiceEvent:      ChoiceEvent,
         RedundancyEvent:  RedundancyEvent,
         HouseEvent:       HouseEvent,
-        newNodeForType:   newNodeWithType
+        newNodeForType:   newNodeForType
     };
 })

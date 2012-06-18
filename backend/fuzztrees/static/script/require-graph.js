@@ -1,11 +1,15 @@
 define(['require-config'], function(Config) {
 
     function Graph(id) {
-        this._id = id;
+        this._id    = id;
         this._nodes = [];
         this._edges = [];
     }
 
+    /*
+        Function: id
+            Retrieves the id of the graph
+     */
     Graph.prototype.id = function() {
         return this._id;
     }
@@ -22,6 +26,13 @@ define(['require-config'], function(Config) {
         node._graph = this;
     }
 
+    /*
+        Function: getNodes
+            Get all the nodes of the graph.
+     */
+    Graph.prototype.getNodes = function() {
+        return this._nodes;
+    }
 
     return Graph;
 });

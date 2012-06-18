@@ -239,9 +239,7 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
     /*
      *  Editor
      */
-    function Editor(graph) {
-        this._graph = graph;
-
+    function Editor(graphId) {
         // locate own DOM elements and bind Editor instance to canvas
         this._canvas     = jQuery('#' + Config.IDs.CANVAS);
         this._background = this._canvas.svg().svg('get');
@@ -258,6 +256,26 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         this._setupJsPlumb();
         this._setupKeyBindings();
         this._setupAjaxHandler();
+
+        Backend.getGraph(graphId,
+            // success
+            function(graph, json) {
+                this._graph = graph;
+
+                var jsonNodes = json.nodes;
+                _.each(graph.getNodes(), function(node, index) {
+                    var position = this.toPixel(jsonNodes[index].position);
+                    node.appendTo(this._canvas).moveTo(position.x, position.y);
+                }.bind(this));
+
+            }.bind(this),
+
+            // error
+            function(graph, response, textStatus, errorThrown) {
+                this._graph = graph;
+                alert('Could not find your graph in the database, created a new one');
+            }.bind(this)
+        );
     }
 
     // asynchronous factory method
@@ -289,14 +307,33 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
 
         // however the first parameter could also be an object
         // of the form {x: NUMBER, y: NUMBER} (convenience reasons)
-        } else if (typeof first === 'object') {
+        } else if (_.isObject(first)) {
             x = first.x;
             y = first.y;
         }
 
         return {
-            x: Math.round((first  - Config.Grid.HALF_SIZE) / Config.Grid.SIZE),
-            y: Math.round((second - Config.Grid.HALF_SIZE) / Config.Grid.SIZE)
+            x: Math.round((x - Config.Grid.HALF_SIZE) / Config.Grid.SIZE),
+            y: Math.round((y - Config.Grid.HALF_SIZE) / Config.Grid.SIZE)
+        }
+    }
+
+    Editor.prototype.toPixel = function(first, second) {
+        var x = Number.NaN;
+        var y = Number.NaN;
+
+        if (_.isNumber(first) && _.isNumber(second)) {
+            x = first;
+            y = second;
+
+        } else if (_.isObject(first)) {
+            x = first.x;
+            y = first.y;
+        }
+
+        return {
+            x: x * Config.Grid.SIZE,
+            y: y * Config.Grid.SIZE
         }
     }
 
@@ -400,10 +437,9 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
     }
 
     Editor.prototype._shapeDropped = function(uiEvent, uiObject) {
-        //var node        = new (uiObject.draggable.data(Config.Keys.CONSTRUCTOR))();
-        var typeId    = uiObject.draggable.attr('typeId');
-        var offset      = this._canvas.offset();
-        var gridCoords  = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
+        var typeId     = uiObject.draggable.attr('typeId');
+        var offset     = this._canvas.offset();
+        var gridCoords = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
 
         // create node in the backend and append it to the DOM afterwards
         var editor = this;
