@@ -110,6 +110,10 @@
     visibility: visible;
 }
 
+.fuzzed-ajax-loader {
+    visibility: hidden;
+}
+
 .jsplumb-endpoint {
     opacity: 0;
     z-index: 50; /* above connection, below image */

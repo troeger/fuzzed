@@ -257,6 +257,7 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         this._setupCanvas();
         this._setupJsPlumb();
         this._setupKeyBindings();
+        this._setupAjaxHandler();
     }
 
     // asynchronous factory method
@@ -386,6 +387,16 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
                 this.selection.remove();
             }
         }.bind(this));
+    }
+
+    Editor.prototype._setupAjaxHandler = function() {
+        jQuery('.fuzzed-ajax-loader').ajaxStart(function() {
+            jQuery(this).css('visibility', 'visible');
+        });
+
+        jQuery('.fuzzed-ajax-loader').ajaxStop(function() {
+            jQuery(this).css('visibility', 'hidden');
+        });
     }
 
     Editor.prototype._shapeDropped = function(uiEvent, uiObject) {
