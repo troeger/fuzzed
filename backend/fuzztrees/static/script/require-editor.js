@@ -129,9 +129,9 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
      *  Selection
      */
     function Selection() {
-        this._nodes  = []; // node objects; not DOM elements
+        this._nodes       = []; // node objects; not DOM elements
         this._connections = [] // jsPlumb Connection objects
-        this._editor = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
+        this._editor      = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
     }
 
     // clear the selection, leaving the nodes on the canvas
@@ -216,6 +216,7 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
     // remove the current contained nodes from the canvas and clear the selection
     Selection.prototype.remove = function() {
         _.each(this._nodes, function(node) {
+            Backend.deleteNode(node);
             node.remove();
         })
 
@@ -257,43 +258,15 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         this._setupKeyBindings();
         this._setupAjaxHandler();
 
-        Backend.getGraph(graphId,
-            // success
-            function(graph, json) {
-                this._graph = graph;
-
-                var jsonNodes = json.nodes;
-                _.each(graph.getNodes(), function(node, index) {
-                    var position = this.toPixel(jsonNodes[index].position);
-                    node.appendTo(this._canvas).moveTo(position.x, position.y);
-                }.bind(this));
-
-            }.bind(this),
-
-            // error
-            function(graph, response, textStatus, errorThrown) {
-                this._graph = graph;
-                alert('Could not find your graph in the database, created a new one');
-            }.bind(this)
-        );
+        // fetch the content from the backend
+        this._loadGraph(graphId);
     }
 
-    // asynchronous factory method
-    Editor.createFromGraphId = function(graphId) {
-        Backend.getGraph(graphId,
-            // success
-            function(graph) {
-                return new Editor(graph);
-            },
-            // failure
-            function(error) {
-                console.log(error);
-            }
-        );
-    }
+    Editor.prototype.graph = function(newGraph) {
+        if (typeof newGraph === 'undefined') return this._graph;
 
-    Editor.prototype.graph = function() {
-        return this._graph;
+        this._graph = newGraph;
+        return this;
     }
 
     Editor.prototype.toGrid = function(first, second) {
@@ -368,6 +341,43 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         }
     }
 
+    Editor.prototype._loadGraph = function(graphId) {
+        Backend.getGraph(graphId,
+            // success
+            function(graph, json) {
+                this.graph(graph);
+
+                var jsonNodes = json.nodes;
+                _.each(graph.getNodes(), function(node, index) {
+                    var position = this.toPixel(jsonNodes[index].position);
+                    node
+                        .appendTo(this._canvas)
+                        .moveTo(position.x, position.y)
+                        ._editor = this;
+                }.bind(this));
+
+            }.bind(this),
+
+            // error
+            function(graph, response, textStatus, errorThrown) {
+                this.graph(graph);
+                alert('Could not find your graph in the database, created a new one');
+            }.bind(this)
+        );
+
+        return this;
+    }
+
+    Editor.prototype._setupAjaxHandler = function() {
+        jQuery('.fuzzed-ajax-loader').ajaxStart(function() {
+            jQuery(this).css('visibility', 'visible');
+        });
+
+        jQuery('.fuzzed-ajax-loader').ajaxStop(function() {
+            jQuery(this).css('visibility', 'hidden');
+        });
+    }
+
     Editor.prototype._setupBackground = function() {
         this._drawGrid();
 
@@ -426,29 +436,18 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         }.bind(this));
     }
 
-    Editor.prototype._setupAjaxHandler = function() {
-        jQuery('.fuzzed-ajax-loader').ajaxStart(function() {
-            jQuery(this).css('visibility', 'visible');
-        });
-
-        jQuery('.fuzzed-ajax-loader').ajaxStop(function() {
-            jQuery(this).css('visibility', 'hidden');
-        });
-    }
-
     Editor.prototype._shapeDropped = function(uiEvent, uiObject) {
-        var typeId     = uiObject.draggable.attr('typeId');
-        var offset     = this._canvas.offset();
-        var gridCoords = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
+        var node        = Nodes.newNodeForType(uiObject.draggable.attr('id'));
+        var offset      = this._canvas.offset();
+        var gridCoords  = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
+        var pixelCoords = this.toPixel(gridCoords);
 
-        // create node in the backend and append it to the DOM afterwards
-        var editor = this;
-        Backend.addNode(this._graph, typeId, gridCoords, function(node) {
-            node._editor = editor;
-            node.moveTo(gridCoords.x * Config.Grid.SIZE, gridCoords.y * Config.Grid.SIZE)
-                .appendTo(editor._canvas);
-            editor.selection.ofNodes(node);
-        });
+        node.moveTo(pixelCoords.x, pixelCoords.y)
+            .appendTo(this._canvas)
+            ._editor = this;
+        this.selection.ofNodes(node);
+
+        Backend.addNode(this.graph(), node, gridCoords);
     }
 
     return Editor;

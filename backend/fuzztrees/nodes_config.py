@@ -71,5 +71,9 @@ NODE_TYPES = {
     }
 }
 
+NODE_TYPE_IDS = {}
+for node_id, node in NODE_TYPES.items():
+    NODE_TYPE_IDS[node['type']] = node_id
+
 def nodeTypeChoices():
     return map(lambda (type, entry): (type, entry['name']), NODE_TYPES.iteritems())

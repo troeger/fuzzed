@@ -33,30 +33,54 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
     var Backend = {}
 
     /*
-        Function: createGraph
-            Creates a new Graph in the backend. Will be asynchronous if a callback
-            function was given
+         Function: addNode
+             Adds a new node to the given graph.
 
-        Parameters:
-            type          - Type of the Graph. See Config.Graph.Types.
-            name          - Name of the Graph.
-            callback      - Callback function for asynchronous requests.
-                            Will be called when the request returns with the ID of the
-                            new Graph.
-            errorCallback - [optional] Callback that gets called in case of an ajax-error.
+         Parameters:
+             graph         - The Graph the node should be added to.
+             type          - The type of the node. See Config.Node.Types
+             position      - Position object containing an 'x' and an 'y' field specifying the Node's position.
+             callback      - Callback function for asynchronous request.
+                             Will be called with the created Node object when the request returns.
+             errorCallback - [optional] Callback that gets called in case of an ajax-error.
      */
-    Backend.createGraph = function(type, name, callback, errorCallback) {
-        var url = URLHelper.fullUrlForGraphs();
+    Backend.addNode = function(graph, node, position, success, error, complete) {
+        var url = URLHelper.fullUrlForNodes(graph);
         var data = {
-            'type': type,
-            'name': name
+            'type':   node.type(),
+            'xcoord': position.x,
+            'ycoord': position.y
         };
-        var ajaxCallback = function(data) {
-            //TODO: Fetch graph ID.
-            console.log(data);
-        };
+        graph.addNode(node);
 
-        jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
+        jQuery.ajax({
+            url:      url,
+            type:     'POST',
+            dataType: 'json', 
+
+            data:     data, 
+            success:  success  || jQuery.noop,
+            error:    error    || jQuery.noop,
+            complete: complete || jQuery.noop
+        });
+    }
+
+    /*
+         Function: deleteNode
+             Deletes a given Node in the backend.
+
+         Parameters:
+             node     - The node that should be deleted.
+             succes   - [optional] Callback that is being called on successful deletion on backend
+             error    - [optional] Callback that gets called in case of an ajax-error.
+             complete - [optional] Callback that is invoked in both cases either in an successful or errornous ajax call.
+     */
+    Backend.deleteNode = function(node, errorCallback) {
+        var url = URLHelper.fullUrlForNode(node);
+
+        jQuer.ajax({
+            type: 'DELETE',
+        }).fail(errorCallback || jQuery.noop);
     }
 
     /*
@@ -102,50 +126,7 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
         });
     }
 
-    /*
-         Function: addNode
-             Adds a new Node to a given Graph.
-
-         Parameters:
-             graph         - The Graph the node should be added to.
-             type          - The type of the node. See Config.Node.Types
-             position      - Position object containing an 'x' and an 'y' field specifying the Node's position.
-             callback      - Callback function for asynchronous request.
-                             Will be called with the created Node object when the request returns.
-             errorCallback - [optional] Callback that gets called in case of an ajax-error.
-     */
-    Backend.addNode = function(graph, typeId, position, callback, errorCallback) {
-        var url = URLHelper.fullUrlForNodes(graph);
-        var data = {
-            'type': typeId,
-            'xcoord': position.x,
-            'ycoord': position.y
-        };
-        var ajaxCallback = function(jsonNode) {
-            var node = Nodes.newNodeForType(jsonNode.type, jsonNode.id);
-            graph.addNode(node);
-            callback(node);
-        };
-
-        jQuery.post(url, data, ajaxCallback, 'json').fail(errorCallback || jQuery.noop);
-    }
-
-    /*
-         Function: deleteNode
-             Deletes a given Node in the backend.
-
-         Parameters:
-             node          - The Node that should be deleted.
-             errorCallback - [optional] Callback that gets called in case of an ajax-error.
-     */
-    Backend.deleteNode = function(node, errorCallback) {
-        var url = URLHelper.fullUrlForNode(node);
-
-        jQuer.ajax({
-            type: 'DELETE',
-            url:  url
-        }).fail(errorCallback || jQuery.noop);
-    }
+    /* TODO From here on*/
 
     /*
          Function: changeNodeProperty
@@ -165,6 +146,33 @@ define(['require-config', 'require-graph', 'require-nodes'], function (Config, G
         }
 
         jQuery.post(url, data).fail(errorCallback || jQuery.noop);
+    }
+
+    /*
+        Function: createGraph
+            Creates a new Graph in the backend. Will be asynchronous if a callback
+            function was given
+
+        Parameters:
+            type          - Type of the Graph. See Config.Graph.Types.
+            name          - Name of the Graph.
+            callback      - Callback function for asynchronous requests.
+                            Will be called when the request returns with the ID of the
+                            new Graph.
+            errorCallback - [optional] Callback that gets called in case of an ajax-error.
+     */
+    Backend.createGraph = function(type, name, callback, errorCallback) {
+        var url = URLHelper.fullUrlForGraphs();
+        var data = {
+            'type': type,
+            'name': name
+        };
+        var ajaxCallback = function(data) {
+            //TODO: Fetch graph ID.
+            console.log(data);
+        };
+
+        jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
     }
 
     /*

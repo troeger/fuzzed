@@ -16,7 +16,6 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
 
         // logic
         this._editor     = undefined; // will be set when appending
-        this._graph      = undefined; // will be set when adding to a Graph
         this._id         = id;
 
         // state
@@ -262,24 +261,23 @@ define(['require-config', 'require-properties', 'require-oop'], function(Config,
     }
 
     Node.prototype._setupMouse = function() {
-        var _this = this;
-
         // click on the node
-        this._container.click(
-            function(eventObject) {
+        this._container.click(function(eventObject) {
                 eventObject.stopPropagation();
-                _this._editor.selection.ofNodes(_this);
-            }
-        );
+                this._editor.selection.ofNodes(this);
+        }.bind(this));
 
         // hovering over a node
         this._container.hover(
+            // mouse in
             function() {
-                _this.highlight();
-            },
+                this.highlight();
+            }.bind(this),
+
+            // mouse out
             function() {
-                _this.highlight(false);
-            }
+                this.highlight(false);
+            }.bind(this)
         );
     }
 

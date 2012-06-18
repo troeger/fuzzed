@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from fuzztrees.models import Graph, Node, Edge, History, GRAPH_JS_TYPE, Commands
-from nodes_config import NODE_TYPES
+from nodes_config import NODE_TYPES, NODE_TYPE_IDS
 import json
 
 @login_required
@@ -118,11 +118,12 @@ def nodes(request, graph_id):
 	API Request Parameters: type=[NODE_TYPE], xcoord, ycoord
 	API Response:           JSON objection containing the node's ID, status code 201, location URI for new node
 	"""
+
 	if request.is_ajax():
 		if request.method == 'POST':
 			if 'type' in request.POST and 'xcoord' in request.POST and 'ycoord' in request.POST:
 				try:
-					t=int(request.POST['type'])
+					t=NODE_TYPE_IDS[request.POST['type']]
 					assert(t in NODE_TYPES)
 					g=Graph.objects.get(pk=graph_id, deleted=False)
 					n=Node(type=t, graph=g, xcoord=request.POST['xcoord'], ycoord=request.POST['ycoord'] )

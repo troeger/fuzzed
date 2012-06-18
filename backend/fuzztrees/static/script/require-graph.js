@@ -23,7 +23,6 @@ define(['require-config'], function(Config) {
      */
     Graph.prototype.addNode = function(node) {
         this._nodes.push(node);
-        node._graph = this;
     }
 
     /*
