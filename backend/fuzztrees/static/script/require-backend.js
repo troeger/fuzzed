@@ -25,8 +25,9 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         },
 
         fullUrlForEdge: function(edge) {
+            var node = edge.source.data(Config.Keys.NODE);
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + node.graph().id()
-                + Config.Backend.NODES_URL + '/' + node.id() + Config.Backend.EDGES_URL + '/' + edge.id();
+                + Config.Backend.NODES_URL + '/' + node.id() + Config.Backend.EDGES_URL + '/' + edge._hpiID;
         }
     }
 
@@ -75,9 +76,9 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
     Backend.addNode = function(node, position, success, error, complete) {
         var url = URLHelper.fullUrlForNodes(node.graph());
         var data = {
-            'type':   node.type(),
-            'xcoord': position.x,
-            'ycoord': position.y
+            type:   node.type(),
+            xcoord: position.x,
+            ycoord: position.y
         };
 
         jQuery.ajax({
@@ -86,6 +87,30 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             dataType: 'json', 
 
             data:     data, 
+            success:  success  || jQuery.noop,
+            error:    error    || jQuery.noop,
+            complete: complete || jQuery.noop
+        });
+    }
+
+    /*
+     Function: deleteEdge
+     Deletes a given edge in the backend.
+
+     Parameters:
+     edge     - The edge that should be deleted.
+     success  - [optional] Function that is invoked when the ajax request was successful
+     error    - [optional] Callback that gets called in case of an ajax-error.
+     complete - [optional] Callback that gets invoked in both cases - a successful and an errornous ajax-call.
+     */
+    Backend.deleteEdge = function(edge, success, error, complete) {
+        var url = URLHelper.fullUrlForEdge(edge);
+
+        jQuery.ajax({
+            url:      url,
+            type:     'DELETE',
+            dataType: 'json',
+
             success:  success  || jQuery.noop,
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop
@@ -105,7 +130,6 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
     Backend.deleteNode = function(node, success, error, complete) {
         var url = URLHelper.fullUrlForNode(node);
 
-        node.graph().deleteNode(node);
         jQuery.ajax({
             url:      url,
             type:     'DELETE',
@@ -252,23 +276,6 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         }
 
         jQuery.post(url, data).fail(errorCallback || jQuery.noop);
-    }
-
-    /*
-     Function: deleteEdge
-     Deletes a given Edge in the backend.
-
-     Parameters:
-     edge          - The Edge that should be deleted.
-     errorCallback - [optional] Callback that gets called in case of an ajax-error.
-     */
-    Backend.deleteEdge = function(edge, errorCallback) {
-        var url = URLHelper.fullUrlForEdge(edge);
-
-        jQuer.ajax({
-            type: 'DELETE',
-            url:  url
-        }).fail(errorCallback || jQuery.noop);
     }
 
     return Backend;

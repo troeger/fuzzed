@@ -114,7 +114,7 @@ def nodes(request, graph_id):
 	Add new node to graph stored in the backend
 	API Request:            POST /api/graphs/[graphID]/nodes
 	API Request Parameters: type=[NODE_TYPE], xcoord, ycoord
-	API Response:           JSON objection containing the node's ID, status code 201, location URI for new node
+	API Response:           JSON object containing the node's ID, status code 201, location URI for new node
 	"""
 
 	if request.is_ajax():
@@ -129,7 +129,7 @@ def nodes(request, graph_id):
 					c=History(command=Commands.ADD_NODE, graph=g, node=n)
 					c.save()
 				except:
-					return HttpResponseBadRequest()			
+					return HttpResponseBadRequest()
 				else:
 					responseBody = json.dumps(n.toJsonDict())
 					response=HttpResponse(responseBody, 'application/javascript', status=201)
@@ -226,7 +226,6 @@ def edges(request, graph_id, node_id):
 		if request.method == 'POST':
 			if 'destination' in request.POST:
 				try:
-					print request, request.POST
 					g=Graph.objects.get(pk=graph_id, deleted=False)
 					n=Node.objects.get(pk=node_id, deleted=False)
 					d=Node.objects.get(pk=request.POST['destination'], deleted=False)
@@ -237,13 +236,15 @@ def edges(request, graph_id, node_id):
 				except Exception, e:
 					return HttpResponseBadRequest()
 				else:
-					response=HttpResponse(status=201)
+					responseBody = json.dumps(e.toJsonDict())
+					response=HttpResponse(responseBody, status=201)
 					response['Location']=reverse('edge', args=[g.pk, n.pk, e.pk])
-					response['ID'] = e.pk
 					return response
 		return HttpResponseNotAllowed(['POST'])
 
 @login_required
+@transaction.commit_on_success 
+@csrf_exempt
 def edge(request, graph_id, node_id, edge_id):
 	"""
 	Delete the given edge that belongs to the given node
@@ -260,13 +261,11 @@ def edge(request, graph_id, node_id, edge_id):
 
 		if request.method == 'DELETE':
 			try:
-				e.deleted=true
+				e.deleted=True
 				e.save()
 				c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
 				c.save()
-				transaction.commit()
 			except:
-				transaction.rollback()
 				return HttpResponseBadRequest()
 			else:
 				return HttpResponse(status=204)

@@ -71,7 +71,6 @@ class Graph(models.Model):
 
 	def toJsonDict(self):
 		nodesArray = [n.toJsonDict() for n in self.nodes.filter(deleted=False)]
-		print nodesArray
 #		if self.nodes and self.nodes.filter(root=True):
 #			root=self.nodes.filter(root=True)[0]
 #			d['root']=root.getTreeDict()
@@ -126,7 +125,7 @@ class Edge(models.Model):
 		return str(self.src) + "->" + str(self.dest)
 
 	def toJsonDict(self):
-		return {'source': self.src.pk, 'target': self.dest.pk}
+		return {'id': self.pk, 'source': self.src.pk, 'target': self.dest.pk}
 
 class Property(models.Model):
 	node = models.ForeignKey(Node, null=True, related_name='properties')

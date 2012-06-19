@@ -3,7 +3,7 @@ define(['require-config'], function(Config) {
     function Graph(id) {
         this._id    = id;
         this._nodes = {};
-        this._edges = [];
+        this._edges = {};
     }
 
     /*
@@ -22,7 +22,7 @@ define(['require-config'], function(Config) {
             edge - Edge to be added
      */
     Graph.prototype.addEdge = function(edge) {
-        this._edges.push(edge);
+        this._edges[edge.id] = edge;
     }
 
     /*
@@ -45,7 +45,7 @@ define(['require-config'], function(Config) {
             edge - Edge to remove from this graph.
      */
     Graph.prototype.deleteEdge = function(edge) {
-        this._edges = _.without(this._edges, edge);
+        delete this._edges[edge.id];
     }
 
     /*

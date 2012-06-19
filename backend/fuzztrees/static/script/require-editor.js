@@ -217,6 +217,7 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
     Selection.prototype.remove = function() {
         _.each(this._nodes, function(node) {
             Backend.deleteNode(node);
+            node.graph().deleteNode(node);
             node.remove();
         }.bind(this))
 
@@ -342,12 +343,19 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
     }
 
     Editor.prototype._edgeConnected = function(edge) {
-        Backend.addEdge(edge.source.data(Config.Keys.NODE), edge.target.data(Config.Keys.NODE));
-        this.graph().addEdge(edge);
+        var connection = edge.connection;
+
+        Backend.addEdge(edge.source.data(Config.Keys.NODE), edge.target.data(Config.Keys.NODE), function(json) {
+            connection._hpiID = json.id;
+        });
+        this.graph().addEdge(edge.connection);
     }
 
     Editor.prototype._edgeDetached = function(edge) {
+        var connection = edge.connection;
 
+        this.graph().deleteEdge(connection);
+        Backend.deleteEdge(connection);
     }
 
     Editor.prototype._loadGraph = function(graphId) {
@@ -384,10 +392,13 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         // connect the nodes again
         _.each(jsonNodes, function(jsonNodes) {
             _.each(jsonNodes.outgoingEdges, function(edge) {
-                jsPlumb.connect({
+
+                var connection = jsPlumb.connect({
                     source: graph.getNodeById(edge.source).container(),
                     target: graph.getNodeById(edge.target).container()
                 });
+                connection._hpiID = edge.id;
+                graph.addEdge(connection);
             }.bind(this));
         }.bind(this));
     }
@@ -425,12 +436,11 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
             EndpointStyle: {
                 fillStyle:   Config.JSPlumb.ENDPOINT_FILL
             },
-            Endpoint:        [Config.JSPlumb.ENDPOINT_STYLE, 
-                {
-                    radius:     Config.JSPlumb.ENDPOINT_RADIUS,
-                    cssClass:   Config.Classes.JSPLUMB_ENDPOINT,
-                    hoverClass: Config.Classes.JSPLUMB_ENDPOINT_HOVER
-                }],
+            Endpoint:        [Config.JSPlumb.ENDPOINT_STYLE, {
+                radius:      Config.JSPlumb.ENDPOINT_RADIUS,
+                cssClass:    Config.Classes.JSPLUMB_ENDPOINT,
+                hoverClass:  Config.Classes.JSPLUMB_ENDPOINT_HOVER
+            }],
             PaintStyle: {
                 strokeStyle: Config.JSPlumb.STROKE,
                 lineWidth:   Config.JSPlumb.STROKE_WIDTH
