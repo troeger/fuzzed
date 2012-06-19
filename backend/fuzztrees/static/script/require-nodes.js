@@ -72,6 +72,10 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         return this;
     }
 
+    Node.prototype.container = function() {
+        return this._container;
+    }
+
     Node.prototype.deselect = function() {
         this._selected = false;
 

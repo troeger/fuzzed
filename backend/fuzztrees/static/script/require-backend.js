@@ -33,6 +33,35 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
     var Backend = {}
 
     /*
+     Function: addEdge
+        Adds a new edge from a given source node to a given target node.
+
+     Parameters:
+        sourceNode - Source node of the new edge.
+        targetNode - Target node of the new edge.
+        success    - [optional] Will be called when the request was successful. Provides e.g. the ID of the new edge.
+        error      - [optional] Callback that gets called in case of an ajax-error.
+        complete   - [optional] Callback that is invoked in both cases - a succesful or an errornous ajax request
+     */
+    Backend.addEdge = function(sourceNode, targetNode, success, error, complete) {
+        var url = URLHelper.fullUrlForEdges(sourceNode);
+        var data = {
+            'destination': targetNode.id()
+        };
+
+        jQuery.ajax({
+            url:      url,
+            type:     'POST',
+            dataType: 'json',
+
+            data:     data,
+            success:  success  || jQuery.noop,
+            error:    error    || jQuery.noop,
+            complete: complete || jQuery.noop
+        });
+    }
+
+    /*
          Function: addNode
              Adds a new node to the backend of this graph.
 
@@ -240,30 +269,6 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             type: 'DELETE',
             url:  url
         }).fail(errorCallback || jQuery.noop);
-    }
-
-    /*
-     Function: addEdge
-        Adds a new Edge from a given sourceNode to a given targetNode.
-
-     Parameters:
-        sourceNode    - Source Node of the new edge.
-        targetNode    - Target Node of the new edge.
-        callback      - Callback function for asynchronous requests.
-                        Will be called when the request returns with the ID of the new Edge.
-        errorCallback - [optional] Callback that gets called in case of an ajax-error.
-     */
-    Backend.addEdge = function(sourceNode, targetNode, callback, errorCallback) {
-        var url = URLHelper.fullUrlForEdges(sourceNode);
-        var data = {
-            'destination': targetNode.id()
-        };
-        var ajaxCallback = function(data) {
-            //TODO: Fetch node ID.
-            console.log(data);
-        };
-
-        jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
     }
 
     return Backend;

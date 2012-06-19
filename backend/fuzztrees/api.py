@@ -50,7 +50,7 @@ def redos(request, graph_id):
 		return HttpResponseNotAllowed(['GET', 'POST']) 
 
 @login_required
-@transaction.commit_manually
+@transaction.commit_on_success
 @csrf_exempt
 def graphs(request):
 	"""
@@ -70,9 +70,7 @@ def graphs(request):
 					g.save()
 					c=History(command=Commands.ADD_GRAPH, graph=g)
 					c.save()
-					transaction.commit()
 				except:
-					transaction.rollback()
 					return HttpResponseBadRequest()	
 				else:		
 					response=HttpResponse(status=201)
@@ -215,7 +213,7 @@ def node(request, graph_id, node_id):
 		return HttpResponseNotAllowed(['DELETE','POST'])
 
 @login_required
-@transaction.commit_manually
+@transaction.commit_on_success
 @csrf_exempt
 def edges(request, graph_id, node_id):
 	"""
@@ -228,6 +226,7 @@ def edges(request, graph_id, node_id):
 		if request.method == 'POST':
 			if 'destination' in request.POST:
 				try:
+					print request, request.POST
 					g=Graph.objects.get(pk=graph_id, deleted=False)
 					n=Node.objects.get(pk=node_id, deleted=False)
 					d=Node.objects.get(pk=request.POST['destination'], deleted=False)
@@ -235,9 +234,7 @@ def edges(request, graph_id, node_id):
 					e.save()
 					c=History(command=Commands.ADD_EDGE, graph=g, edge=e)
 					c.save()
-					transaction.commit()
 				except Exception, e:
-					transaction.rollback()
 					return HttpResponseBadRequest()
 				else:
 					response=HttpResponse(status=201)

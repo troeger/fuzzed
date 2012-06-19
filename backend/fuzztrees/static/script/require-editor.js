@@ -341,34 +341,55 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         }
     }
 
+    Editor.prototype._edgeConnected = function(edge) {
+        Backend.addEdge(edge.source.data(Config.Keys.NODE), edge.target.data(Config.Keys.NODE));
+        this.graph().addEdge(edge);
+    }
+
+    Editor.prototype._edgeDetached = function(edge) {
+
+    }
+
     Editor.prototype._loadGraph = function(graphId) {
-        Backend.getGraph(graphId,
-            // success
-            function(graph, json) {
-                var jsonNodes = json.nodes;
-                this.graph(graph);
-
-                _.each(jsonNodes, function(jsonNode) {
-                    graph.addNode(Nodes.newNodeForType(jsonNode.type, jsonNode.id));
-                });
-
-                _.each(graph.getNodes(), function(node, index) {
-                    var position = this.toPixel(jsonNodes[index].position);
-                    node
-                        .appendTo(this._canvas)
-                        .moveTo(position.x, position.y)
-                        ._editor = this;
-                }.bind(this));
-            }.bind(this),
-
-            // error
-            function(graph, response, textStatus, errorThrown) {
-                this.graph(graph);
-                alert('Could not find your graph in the database, created a new one');
-            }.bind(this)
+        Backend.getGraph(graphId, 
+            this._loadGraphFromJson.bind(this), 
+            this._loadGraphError.bind(this),
+            this._setupPersistanceEvents.bind(this)
         );
-
         return this;
+    }
+
+    Editor.prototype._loadGraphError = function(graph, response, textStatus, errorThrown) {
+        this.graph(graph);
+        alert('Could not find your graph in the database, creating a new one');
+    }
+
+    Editor.prototype._loadGraphFromJson = function(graph, json) {
+        var jsonNodes = json.nodes;
+        this.graph(graph);
+
+        // parse the json nodes and convert them to node objects
+        _.each(jsonNodes, function(jsonNode) {
+            graph.addNode(Nodes.newNodeForType(jsonNode.type, jsonNode.id));
+        });
+
+        // draw the nodes on the canvas
+        _.each(graph.getNodes(), function(node, index) {
+            var position = this.toPixel(jsonNodes[index].position);
+            node.appendTo(this._canvas)
+                .moveTo(position.x, position.y)
+                ._editor = this;
+        }.bind(this));
+
+        // connect the nodes again
+        _.each(jsonNodes, function(jsonNodes) {
+            _.each(jsonNodes.outgoingEdges, function(edge) {
+                jsPlumb.connect({
+                    source: graph.getNodeById(edge.source).container(),
+                    target: graph.getNodeById(edge.target).container()
+                });
+            }.bind(this));
+        }.bind(this));
     }
 
     Editor.prototype._setupAjaxHandler = function() {
@@ -437,6 +458,11 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
                 this.selection.remove();
             }
         }.bind(this));
+    }
+
+    Editor.prototype._setupPersistanceEvents = function() {
+        jsPlumb.bind('jsPlumbConnection', this._edgeConnected.bind(this));
+        jsPlumb.bind('jsPlumbConnectionDetached', this._edgeDetached.bind(this));
     }
 
     Editor.prototype._shapeDropped = function(uiEvent, uiObject) {

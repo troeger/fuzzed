@@ -71,11 +71,11 @@ class Graph(models.Model):
 
 	def toJsonDict(self):
 		nodesArray = [n.toJsonDict() for n in self.nodes.filter(deleted=False)]
-		dict = {'id': self.pk, 'name': self.name, 'type': GRAPH_JS_TYPE[self.type], 'nodes': nodesArray}
+		print nodesArray
 #		if self.nodes and self.nodes.filter(root=True):
 #			root=self.nodes.filter(root=True)[0]
 #			d['root']=root.getTreeDict()
-		return dict
+		return {'id': self.pk, 'name': self.name, 'type': GRAPH_JS_TYPE[self.type], 'nodes': nodesArray}
 		
 class Node(models.Model):
 	name = models.CharField(max_length=255)
@@ -86,6 +86,7 @@ class Node(models.Model):
 	xcoord = models.IntegerField()
 	ycoord = models.IntegerField()
 	optional = models.BooleanField(default=False)
+
 	def __unicode__(self):
 		if self.type == 1:
 			if self.root:
@@ -97,7 +98,7 @@ class Node(models.Model):
 
 	def toJsonDict(self):
 		pos = {'x': self.xcoord, 'y': self.ycoord}
-		edgesArray = [e.toJsonDict for e in self.outgoing.all().filter(deleted=False)]
+		edgesArray = [e.toJsonDict() for e in self.outgoing.all().filter(deleted=False)]
 		return {'id': self.pk, 'name': self.name,'type': NODE_TYPES[self.type]['type'] ,'isRoot': self.root, 'position': pos, 'outgoingEdges': edgesArray}
 
 	def getChildren(self):
@@ -120,6 +121,7 @@ class Edge(models.Model):
 	src  = models.ForeignKey(Node, null=False, related_name='outgoing')
 	dest = models.ForeignKey(Node, null=False, related_name='incoming')
 	deleted = models.BooleanField(default=False)
+
 	def __unicode__(self):
 		return str(self.src) + "->" + str(self.dest)
 
@@ -132,6 +134,7 @@ class Property(models.Model):
 	key = models.CharField(max_length=255)
 	val = models.CharField(max_length=255)
 	deleted = models.BooleanField(default=False)
+
 	def __unicode__(self):
 		if self.node:
 			return "Node "+str(node)+":%s = %s"%(self.key, self.val)
