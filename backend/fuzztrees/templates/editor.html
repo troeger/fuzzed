@@ -43,8 +43,9 @@
 	</script>
 </head>
 
-<body>
-	<div data-role="page">
+<body data-role="page">
+	{% include "splash.html" %}
+	<div>
 		<div id="printtitle">www.fuzztrees.net - {{ graph.name }}</div>
 
 		<div data-theme="d" data-role="header" id="toolbar">

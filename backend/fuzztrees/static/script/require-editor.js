@@ -362,9 +362,14 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         Backend.getGraph(graphId, 
             this._loadGraphFromJson.bind(this), 
             this._loadGraphError.bind(this),
-            this._setupPersistanceEvents.bind(this)
+            this._loadGraphCompleted.bind(this)
         );
         return this;
+    }
+
+    Editor.prototype._loadGraphCompleted = function() {
+        this._setupPersistanceEvents.bind(this);
+        jQuery('#' + Config.IDs.SPLASH).fadeOut(Config.Splash.FADE_TIME);
     }
 
     Editor.prototype._loadGraphError = function(graph, response, textStatus, errorThrown) {

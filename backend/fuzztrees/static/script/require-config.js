@@ -42,6 +42,7 @@ define(function() {
         },
 
         IDs: {
+            SPLASH:          'FuzzedSplash',
             CONTENT:         'FuzzedContent',
             TOOLBAR:         'FuzzedToolbar',
             SHAPES_MENU:     'FuzzedShapes',
@@ -155,6 +156,10 @@ define(function() {
 
         ShapeMenu: {
             THUMBNAIL_SCALE_FACTOR: 0.7
+        },
+
+        Splash: {
+            FADE_TIME: 500
         }
     };
 });
