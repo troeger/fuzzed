@@ -356,41 +356,19 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                 mirror: this._container
             }, this),
 
-            new Properties.SingleChoice({
-                name:        'Probability',
+            new Properties.Text({
+                name:     'Cost',
+                value:    1,
+                disabled: true
+            }, this),
+
+            new Properties.Text({
+                name:         'Probability',
                 mirror:       this._container,
                 mirrorPrefix: 'p=',
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
-
-                choices: [{
-                    name:     'Exact',
-                    selected:  true,
-                    input: new Properties.Text({
-                                type:  'number',
-                                min:   0,
-                                max:   1,
-                                step:  0.01,
-                                value: 0,
-                        }, this),
-                }, {
-                    name: 'Fuzzy',
-                    input: new Properties.Select({
-                        options: [
-                                    'very unlikely',
-                                    'unlikely',
-                                    'likely',
-                                    'very likely',
-                                    'unknown'
-                                ],
-                        value:  'unknown',
-                    }, this)
-                }]
-            }),
-
-            new Properties.Text({
-                name:  'Cost',
-                type:  'number',
-                value: 1
+                value:        0,
+                disabled:     true
             }, this)
         ];
     }
@@ -433,6 +411,53 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         return Config.Node.Types.BASIC_EVENT;
     }
 
+    BasicEvent.prototype._defineProperties = function() {
+        return [
+            new Properties.Text({
+                name:   'Name',
+                value:  this.name(),
+                mirror: this._container
+            }, this),
+
+            new Properties.Text({
+                name:  'Cost',
+                type:  'number',
+                value: 1
+            }, this),
+
+            new Properties.SingleChoice({
+                name:        'Probability',
+                mirror:       this._container,
+                mirrorPrefix: 'p=',
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
+
+                choices: [{
+                    name:     'Exact',
+                    selected:  true,
+                    input: new Properties.Text({
+                        type:  'number',
+                        min:   0,
+                        max:   1,
+                        step:  0.01,
+                        value: 0,
+                    }, this),
+                }, {
+                    name: 'Fuzzy',
+                    input: new Properties.Select({
+                        options: [
+                            'very unlikely',
+                            'unlikely',
+                            'likely',
+                            'very likely',
+                            'unknown'
+                        ],
+                        value:  'unknown',
+                    }, this)
+                }]
+            })
+        ];
+    }
+
     /*
      *  Multi Event
      */
@@ -453,19 +478,61 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     }
 
     MultiEvent.prototype._defineProperties = function() {
-        var properties = MultiEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text({
-            name:         'Cardinality',
-            type:         'number',
-            value:        1,
-            min:          1,
-            step:         1,
-            mirror:       this._container,
-            mirrorPrefix: '#',
-            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
-        }, this));
+        return [
+            new Properties.Text({
+                name:   'Name',
+                value:  this.name(),
+                mirror: this._container
+            }, this),
 
-        return properties;
+            new Properties.Text({
+                name:  'Cost',
+                type:  'number',
+                value: 1
+            }, this),
+
+            new Properties.SingleChoice({
+                name:        'Probability',
+                mirror:       this._container,
+                mirrorPrefix: 'p=',
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
+
+                choices: [{
+                    name:     'Exact',
+                    selected:  true,
+                    input: new Properties.Text({
+                        type:  'number',
+                        min:   0,
+                        max:   1,
+                        step:  0.01,
+                        value: 0,
+                    }, this),
+                }, {
+                    name: 'Fuzzy',
+                    input: new Properties.Select({
+                        options: [
+                            'very unlikely',
+                            'unlikely',
+                            'likely',
+                            'very likely',
+                            'unknown'
+                        ],
+                        value:  'unknown',
+                    }, this)
+                }]
+            }),
+
+            new Properties.Text({
+                name:         'Cardinality',
+                type:         'number',
+                value:        1,
+                min:          1,
+                step:         1,
+                mirror:       this._container,
+                mirrorPrefix: '#',
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
+            }, this)
+        ];
     }
 
     /*
@@ -505,7 +572,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
     MultiFaultEvent.prototype._defineProperties = function() {
         var properties = MultiFaultEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text({
+        properties.push(new Properties.Text({
             name:         'Cardinality',
             type:         'number',
             value:        1,
@@ -687,7 +754,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
     RedundancyEvent.prototype._defineProperties = function() {
         var properties = RedundancyEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text({
+        properties.push(new Properties.Text({
             name:         'Cardinality',
             type:         'number',
             value:        1,
