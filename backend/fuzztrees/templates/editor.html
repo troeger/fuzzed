@@ -46,11 +46,11 @@
 <body data-role="page">
 	{% include "splash.html" %}
 	<div>
-		<div id="printtitle">www.fuzztrees.net - {{ graph.name }}</div>
+		<div id="printtitle">www.fuzztrees.net - {{ graph }}</div>
 
 		<div data-theme="d" data-role="header" id="toolbar">
 			<a href="/dashboard/" data-icon="back">Dashboard</a>
-			<h1>{{ graph.name }}&nbsp;&nbsp;<img class="fuzzed-ajax-loader" src="{{ STATIC_URL }}img/ajax-loader.gif"></h1>
+			<h1>{{ graph }}&nbsp;&nbsp;<img class="fuzzed-ajax-loader" src="{{ STATIC_URL }}img/ajax-loader.gif"></h1>
 		</div>
 
 
