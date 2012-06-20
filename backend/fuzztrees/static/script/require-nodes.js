@@ -455,11 +455,14 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     MultiEvent.prototype._defineProperties = function() {
         var properties = MultiEvent.Super._defineProperties.call(this);
         properties.splice(1, 0, new Properties.Text({
-            name:  'Cardinality',
-            type:  'number',
-            value: 1,
-            min:   1,
-            step:  1
+            name:         'Cardinality',
+            type:         'number',
+            value:        1,
+            min:          1,
+            step:         1,
+            mirror:       this._container,
+            mirrorPrefix: '#',
+            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
         }, this));
 
         return properties;
@@ -503,11 +506,14 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     MultiFaultEvent.prototype._defineProperties = function() {
         var properties = MultiFaultEvent.Super._defineProperties.call(this);
         properties.splice(1, 0, new Properties.Text({
-            name:  'Cardinality',
-            type:  'number',
-            value: 1,
-            min:   1,
-            step:  1
+            name:         'Cardinality',
+            type:         'number',
+            value:        1,
+            min:          1,
+            step:         1,
+            mirror:       this._container,
+            mirrorPrefix: '#',
+            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
         }, this));
 
         return properties;
@@ -651,19 +657,6 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         return otherNode instanceof Event && Node.prototype.allowsConnectionsTo.call(this, otherNode);
     }
 
-    ChoiceEvent.prototype._defineProperties = function() {
-        var properties = ChoiceEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text({
-            name:  'Cardinality',
-            type:  'number',
-            value: 1,
-            min:   1,
-            step:  1
-        }, this));
-
-        return properties;
-    }
-
     /*
      *  RedundancyEvent
      */
@@ -695,11 +688,14 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     RedundancyEvent.prototype._defineProperties = function() {
         var properties = RedundancyEvent.Super._defineProperties.call(this);
         properties.splice(1, 0, new Properties.Text({
-            name:  'Cardinality',
-            type:  'number',
-            value: 1,
-            min:   1,
-            step:  1
+            name:         'Cardinality',
+            type:         'number',
+            value:        1,
+            min:          1,
+            step:         1,
+            mirror:       this._container,
+            mirrorPrefix: 'k=',
+            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
         }, this));
 
         return properties;
