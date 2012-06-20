@@ -368,7 +368,8 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
     }
 
     Editor.prototype._loadGraphCompleted = function() {
-        this._setupPersistanceEvents.bind(this);
+        console.log()
+        this._setupPersistanceEvents();
         jQuery('#' + Config.IDs.SPLASH).fadeOut(Config.Splash.FADE_TIME);
     }
 
