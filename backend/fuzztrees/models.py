@@ -183,7 +183,7 @@ class Property(models.Model):
 
 class History(models.Model):
 	command = models.PositiveSmallIntegerField(choices=COMMAND_TYPE, null=False)
-	graph = models.ForeignKey(Graph, null=False, related_name='commands')
+	graph = models.ForeignKey(Graph, null=False, related_name='commands')  # mandatory for cascading delete
 	node = models.ForeignKey(Node, null=True)
 	edge = models.ForeignKey(Edge, null=True)
 	prop = models.ForeignKey(Property, null=True)

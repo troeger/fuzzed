@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
-from fuzztrees.models import Graph, Node, Edge, History, GRAPH_JS_TYPE, Commands
+from fuzztrees.models import *
 from nodes_config import NODE_TYPES, NODE_TYPE_IDS
 import json
 
