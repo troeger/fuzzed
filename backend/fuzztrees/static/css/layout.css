@@ -99,14 +99,15 @@
 }
 
 .fuzzed-node-labels {
-    position: absolute;
+    position:         absolute;
+    z-index:          100; /* above connections */
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .fuzzed-node-label {
     display:          block;
     position:         relative;
     line-height:      15px;
-    z-index:          100; /* above connections */
     font-weight:      bold;
     font-size:        0.8em;
     text-align:       center;

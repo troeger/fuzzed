@@ -112,9 +112,9 @@ define(['require-config', 'require-oop'], function(Config) {
                 mirrorClasses = [mirrorClasses];
             }
 
-            var container = mirror.children('.' + Config.Classes.NODE_LABELS);
-            if (container.length === 0) {
-                container = jQuery('<div>')
+            this._labels = mirror.children('.' + Config.Classes.NODE_LABELS);
+            if (this._labels.length === 0) {
+                this._labels = jQuery('<div>')
                     .addClass(Config.Classes.NODE_LABELS)
                     .appendTo(mirror)
                     .width(Config.Node.LABEL_WIDTH)
@@ -126,13 +126,14 @@ define(['require-config', 'require-oop'], function(Config) {
 
             this._mirror = jQuery('<span>')
                 .html(this._mirrorString())
-                .addClass(Config.Classes.NODE_LABEL);
+                .addClass(Config.Classes.NODE_LABEL)
+                .appendTo(this._labels);
 
             _.each(mirrorClasses, function(mirrorClass) {
                 this._mirror.addClass(mirrorClass);
             }.bind(this));
 
-            return this._mirror.appendTo(container);
+            return this._mirror.appendTo(this._labels);
         }
 
         return null;

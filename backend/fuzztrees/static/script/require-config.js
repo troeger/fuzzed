@@ -1,6 +1,6 @@
 define(function() {
     var GRID_SIZE   = 55;
-    var LABEL_WIDTH = GRID_SIZE * 3;
+    var LABEL_WIDTH = GRID_SIZE << 1;
 
     return {
         Classes: {
