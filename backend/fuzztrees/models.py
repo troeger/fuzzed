@@ -42,10 +42,10 @@ COMMAND_TYPE = (
 )
 
 class Graph(models.Model):
+	type = models.PositiveSmallIntegerField(choices=GRAPH_TYPE)
 	name = models.CharField(max_length=255)
 	owner = models.ForeignKey(User, related_name='graphs')
 	deleted = models.BooleanField(default=False)
-	type = models.PositiveSmallIntegerField(choices=GRAPH_TYPE)
 
 	def created(self):
 		try:
@@ -71,19 +71,19 @@ class Graph(models.Model):
 
 	def toJsonDict(self):
 		nodesArray = [n.toJsonDict() for n in self.nodes.filter(deleted=False)]
-#		if self.nodes and self.nodes.filter(root=True):
-#			root=self.nodes.filter(root=True)[0]
-#			d['root']=root.getTreeDict()
 		return {'id': self.pk, 'name': self.name, 'type': GRAPH_JS_TYPE[self.type], 'nodes': nodesArray}
 		
 class Node(models.Model):
-	name = models.CharField(max_length=255)
-	graph = models.ForeignKey(Graph, null=False, related_name='nodes')
-	root = models.BooleanField(default=False)
-	deleted = models.BooleanField(default=False)
+	client_id = models.BigIntegerField()
 	type = models.PositiveSmallIntegerField(choices=nodeTypeChoices())
 	xcoord = models.IntegerField()
 	ycoord = models.IntegerField()
+	graph = models.ForeignKey(Graph, null=False, related_name='nodes')
+	deleted = models.BooleanField(default=False)
+
+	# TODO: move to properties
+	name = models.CharField(max_length=255)
+	root = models.BooleanField(default=False)
 	optional = models.BooleanField(default=False)
 
 	def __unicode__(self):
@@ -98,7 +98,7 @@ class Node(models.Model):
 	def toJsonDict(self):
 		pos = {'x': self.xcoord, 'y': self.ycoord}
 		edgesArray = [e.toJsonDict() for e in self.outgoing.all().filter(deleted=False)]
-		return {'id': self.pk, 'name': self.name,'type': NODE_TYPES[self.type]['type'] ,'isRoot': self.root, 'position': pos, 'outgoingEdges': edgesArray}
+		return {'id': self.client_id, 'name': self.name,'type': NODE_TYPES[self.type]['type'] ,'isRoot': self.root, 'position': pos, 'outgoingEdges': edgesArray}
 
 	def getChildren(self):
 		edges=self.outgoing.all().filter(deleted=False)
@@ -117,6 +117,7 @@ class Node(models.Model):
 		return d
 
 class Edge(models.Model):
+	client_id = models.BigIntegerField()
 	src  = models.ForeignKey(Node, null=False, related_name='outgoing')
 	dest = models.ForeignKey(Node, null=False, related_name='incoming')
 	deleted = models.BooleanField(default=False)
@@ -125,7 +126,7 @@ class Edge(models.Model):
 		return str(self.src) + "->" + str(self.dest)
 
 	def toJsonDict(self):
-		return {'id': self.pk, 'source': self.src.pk, 'target': self.dest.pk}
+		return {'id': self.client_id, 'source': self.src.client_id, 'target': self.dest.client_id}
 
 class Property(models.Model):
 	node = models.ForeignKey(Node, null=True, related_name='properties')

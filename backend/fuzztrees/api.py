@@ -121,10 +121,11 @@ def nodes(request, graph_id):
 		if request.method == 'POST':
 			if 'type' in request.POST and 'xcoord' in request.POST and 'ycoord' in request.POST:
 				try:
+					client_id=int(request.POST['id'])
 					t=NODE_TYPE_IDS[request.POST['type']]
 					assert(t in NODE_TYPES)
 					g=Graph.objects.get(pk=graph_id, deleted=False)
-					n=Node(type=t, graph=g, xcoord=request.POST['xcoord'], ycoord=request.POST['ycoord'] )
+					n=Node(client_id=client_id, type=t, graph=g, xcoord=request.POST['xcoord'], ycoord=request.POST['ycoord'])
 					n.save()
 					c=History(command=Commands.ADD_NODE, graph=g, node=n)
 					c.save()
@@ -164,7 +165,7 @@ def node(request, graph_id, node_id):
 	if request.is_ajax():
 		try:
 			g=Graph.objects.get(pk=graph_id, deleted=False)
-			n=Node.objects.get(pk=node_id, deleted=False)
+			n=Node.objects.get(client_id=node_id, deleted=False)
 		except:
 			return HttpResponseBadRequest()						
 		if request.method == 'DELETE':
@@ -226,10 +227,11 @@ def edges(request, graph_id, node_id):
 		if request.method == 'POST':
 			if 'destination' in request.POST:
 				try:
+					client_id=int(request.POST['id'])
 					g=Graph.objects.get(pk=graph_id, deleted=False)
-					n=Node.objects.get(pk=node_id, deleted=False)
-					d=Node.objects.get(pk=request.POST['destination'], deleted=False)
-					e=Edge(src=n, dest=d)
+					n=Node.objects.get(client_id=node_id, deleted=False)
+					d=Node.objects.get(client_id=request.POST['destination'], deleted=False)
+					e=Edge(client_id=client_id, src=n, dest=d)
 					e.save()
 					c=History(command=Commands.ADD_EDGE, graph=g, edge=e)
 					c.save()
@@ -254,8 +256,8 @@ def edge(request, graph_id, node_id, edge_id):
 	if request.is_ajax():
 		try:
 			g=Graph.objects.get(pk=graph_id, deleted=False)
-			n=Node.objects.get(pk=node_id, deleted=False)
-			e=Edge.objects.get(pk=edge_id, src=n, deleted=False)
+			n=Node.objects.get(client_id=node_id, deleted=False)
+			e=Edge.objects.get(client_id=edge_id, src=n, deleted=False)
 		except:
 			return HttpResponseBadRequest()
 
