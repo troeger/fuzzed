@@ -1,5 +1,6 @@
 define(function() {
-    var GRID_SIZE = 70;
+    var GRID_SIZE   = 55;
+    var LABEL_WIDTH = GRID_SIZE << 1;
 
     return {
         Classes: {
@@ -7,6 +8,7 @@ define(function() {
             NODE_THUMBNAIL:          'fuzzed-node-thumbnail',
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_LABEL:              'fuzzed-node-label',
+            NODE_LABELS:             'fuzzed-node-labels',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
             NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
             NODE_OPTIONAL_INDICATOR: 'fuzzed-node-optional-indicator',
@@ -72,6 +74,8 @@ define(function() {
 
         Node: {
             LABEL_HEIGHT:            15,
+            LABEL_WIDTH:             LABEL_WIDTH,
+            HALF_LABEL_WIDTH:        LABEL_WIDTH >> 1,
             STROKE_NORMAL:           '#000000',
             STROKE_HIGHLIGHTED:      '#409FFF',
             STROKE_SELECTED:         '#FF9640',

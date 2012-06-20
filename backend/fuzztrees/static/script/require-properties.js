@@ -102,23 +102,38 @@ define(['require-config', 'require-oop'], function(Config) {
     }
 
     Property.prototype._setupMirror = function() {
+        var mirror        = this.options().mirror;
+        var mirrorClasses = this.options().mirrorClass
+
         // if a container on where to mirror the value was given
         // we need to create a container and append it to it
-        if (this.options().mirror) {
-            if (typeof this.options().mirrorClass === 'string') {
-                this.options().mirrorClass = [this.options().mirrorClass];
+        if (mirror) {
+            if (typeof mirrorClasses === 'string') {
+                mirrorClasses = [mirrorClasses];
+            }
+
+            this._labels = mirror.children('.' + Config.Classes.NODE_LABELS);
+            if (this._labels.length === 0) {
+                this._labels = jQuery('<div>')
+                    .addClass(Config.Classes.NODE_LABELS)
+                    .appendTo(mirror)
+                    .width(Config.Node.LABEL_WIDTH)
+                    .css({
+                        top:  Config.Grid.SIZE,
+                        left: Config.Grid.HALF_SIZE - Config.Node.HALF_LABEL_WIDTH
+                });
             }
 
             this._mirror = jQuery('<span>')
                 .html(this._mirrorString())
                 .addClass(Config.Classes.NODE_LABEL)
-                .width(Config.Grid.SIZE);
+                .appendTo(this._labels);
 
-            _.each(this.options().mirrorClass, function(mirrorClass) {
+            _.each(mirrorClasses, function(mirrorClass) {
                 this._mirror.addClass(mirrorClass);
             }.bind(this));
 
-            return this._mirror.appendTo(this.options().mirror);
+            return this._mirror.appendTo(this._labels);
         }
 
         return null;

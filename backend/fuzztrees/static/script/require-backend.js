@@ -27,7 +27,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         fullUrlForEdge: function(edge) {
             var node = edge.source.data(Config.Keys.NODE);
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + node.graph().id()
-                + Config.Backend.NODES_URL + '/' + node.id() + Config.Backend.EDGES_URL + '/' + edge._hpiID;
+                + Config.Backend.NODES_URL + '/' + node.id() + Config.Backend.EDGES_URL + '/' + edge._fuzzedID;
         }
     }
 
@@ -44,10 +44,11 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         error      - [optional] Callback that gets called in case of an ajax-error.
         complete   - [optional] Callback that is invoked in both cases - a succesful or an errornous ajax request
      */
-    Backend.addEdge = function(sourceNode, targetNode, success, error, complete) {
+    Backend.addEdge = function(edgeID, sourceNode, targetNode, success, error, complete) {
         var url = URLHelper.fullUrlForEdges(sourceNode);
         var data = {
-            'destination': targetNode.id()
+            id:          edgeID,
+            destination: targetNode.id()
         };
 
         jQuery.ajax({
@@ -76,6 +77,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
     Backend.addNode = function(node, position, success, error, complete) {
         var url = URLHelper.fullUrlForNodes(node.graph());
         var data = {
+            id:     node.id(),
             type:   node.type(),
             xcoord: position.x,
             ycoord: position.y

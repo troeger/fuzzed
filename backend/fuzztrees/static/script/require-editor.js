@@ -344,10 +344,8 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
 
     Editor.prototype._edgeConnected = function(edge) {
         var connection = edge.connection;
-
-        Backend.addEdge(edge.source.data(Config.Keys.NODE), edge.target.data(Config.Keys.NODE), function(json) {
-            connection._hpiID = json.id;
-        });
+        connection._fuzzedID = new Date().getTime();
+        Backend.addEdge(connection._fuzzedID, edge.source.data(Config.Keys.NODE), edge.target.data(Config.Keys.NODE));
         this.graph().addEdge(edge.connection);
     }
 
@@ -368,7 +366,6 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
     }
 
     Editor.prototype._loadGraphCompleted = function() {
-        console.log()
         this._setupPersistanceEvents();
         jQuery('#' + Config.IDs.SPLASH).fadeOut(Config.Splash.FADE_TIME);
     }
@@ -384,7 +381,7 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
 
         // parse the json nodes and convert them to node objects
         _.each(jsonNodes, function(jsonNode) {
-            graph.addNode(Nodes.newNodeForType(jsonNode.type, jsonNode.id));
+            graph.addNode(Nodes.newNodeForType(jsonNode.type, {id: jsonNode.id}));
         });
 
         // draw the nodes on the canvas
@@ -398,12 +395,11 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         // connect the nodes again
         _.each(jsonNodes, function(jsonNodes) {
             _.each(jsonNodes.outgoingEdges, function(edge) {
-
                 var connection = jsPlumb.connect({
                     source: graph.getNodeById(edge.source).container(),
                     target: graph.getNodeById(edge.target).container()
                 });
-                connection._hpiID = edge.id;
+                connection._fuzzedID = edge.id;
                 graph.addEdge(connection);
             }.bind(this));
         }.bind(this));
@@ -493,9 +489,7 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         this.graph().addNode(node);
         this.selection.ofNodes(node);
 
-        Backend.addNode(node, gridCoords, function(json) {
-            node.id(json.id);
-        });
+        Backend.addNode(node, gridCoords);
     }
 
     return Editor;

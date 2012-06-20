@@ -3,7 +3,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  Abstract Node Base Class
      */
-    function Node(id) {
+    function Node(options) {
+        options = jQuery.extend({}, options);
         // pass here on inheritance calls
         if (this.constructor === Node) return;
 
@@ -17,7 +18,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         // logic
         this._editor     = undefined; // will be set when appending
         this._graph      = undefined; // will be set as soon as it get added to a concrete graph
-        this._id         = id;
+        this._id         = options.id || new Date().getTime();
         this._optional   = false;
 
         // state
@@ -434,41 +435,19 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                 mirror: this._container
             }, this),
 
-            new Properties.SingleChoice({
-                name:        'Probability',
+            new Properties.Text({
+                name:     'Cost',
+                value:    1,
+                disabled: true
+            }, this),
+
+            new Properties.Text({
+                name:         'Probability',
                 mirror:       this._container,
                 mirrorPrefix: 'p=',
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
-
-                choices: [{
-                    name:     'Exact',
-                    selected:  true,
-                    input: new Properties.Text({
-                                type:  'number',
-                                min:   0,
-                                max:   1,
-                                step:  0.01,
-                                value: 0
-                        }, this)
-                }, {
-                    name: 'Fuzzy',
-                    input: new Properties.Select({
-                        options: [
-                                    'very unlikely',
-                                    'unlikely',
-                                    'likely',
-                                    'very likely',
-                                    'unknown'
-                                ],
-                        value:  'unknown'
-                    }, this)
-                }]
-            }),
-
-            new Properties.Text({
-                name:  'Cost',
-                type:  'number',
-                value: 1
+                value:        0,
+                disabled:     true
             }, this)
         ];
     }
@@ -511,6 +490,53 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         return Config.Node.Types.BASIC_EVENT;
     }
 
+    BasicEvent.prototype._defineProperties = function() {
+        return [
+            new Properties.Text({
+                name:   'Name',
+                value:  this.name(),
+                mirror: this._container
+            }, this),
+
+            new Properties.Text({
+                name:  'Cost',
+                type:  'number',
+                value: 1
+            }, this),
+
+            new Properties.SingleChoice({
+                name:        'Probability',
+                mirror:       this._container,
+                mirrorPrefix: 'p=',
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
+
+                choices: [{
+                    name:     'Exact',
+                    selected:  true,
+                    input: new Properties.Text({
+                        type:  'number',
+                        min:   0,
+                        max:   1,
+                        step:  0.01,
+                        value: 0
+                    }, this)
+                }, {
+                    name: 'Fuzzy',
+                    input: new Properties.Select({
+                        options: [
+                            'very unlikely',
+                            'unlikely',
+                            'likely',
+                            'very likely',
+                            'unknown'
+                        ],
+                        value:  'unknown'
+                    }, this)
+                }]
+            })
+        ];
+    }
+
     /*
      *  Multi Event
      */
@@ -531,16 +557,61 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     }
 
     MultiEvent.prototype._defineProperties = function() {
-        var properties = MultiEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text({
-            name:  'Cardinality',
-            type:  'number',
-            value: 1,
-            min:   1,
-            step:  1
-        }, this));
+        return [
+            new Properties.Text({
+                name:   'Name',
+                value:  this.name(),
+                mirror: this._container
+            }, this),
 
-        return properties;
+            new Properties.Text({
+                name:  'Cost',
+                type:  'number',
+                value: 1
+            }, this),
+
+            new Properties.SingleChoice({
+                name:        'Probability',
+                mirror:       this._container,
+                mirrorPrefix: 'p=',
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
+
+                choices: [{
+                    name:     'Exact',
+                    selected:  true,
+                    input: new Properties.Text({
+                        type:  'number',
+                        min:   0,
+                        max:   1,
+                        step:  0.01,
+                        value: 0
+                    }, this)
+                }, {
+                    name: 'Fuzzy',
+                    input: new Properties.Select({
+                        options: [
+                            'very unlikely',
+                            'unlikely',
+                            'likely',
+                            'very likely',
+                            'unknown'
+                        ],
+                        value:  'unknown'
+                    }, this)
+                }]
+            }),
+
+            new Properties.Text({
+                name:         'Cardinality',
+                type:         'number',
+                value:        1,
+                min:          1,
+                step:         1,
+                mirror:       this._container,
+                mirrorPrefix: '#',
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
+            }, this)
+        ];
     }
 
     /*
@@ -580,12 +651,15 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
     MultiFaultEvent.prototype._defineProperties = function() {
         var properties = MultiFaultEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text({
-            name:  'Cardinality',
-            type:  'number',
-            value: 1,
-            min:   1,
-            step:  1
+        properties.push(new Properties.Text({
+            name:         'Cardinality',
+            type:         'number',
+            value:        1,
+            min:          1,
+            step:         1,
+            mirror:       this._container,
+            mirrorPrefix: '#',
+            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
         }, this));
 
         return properties;
@@ -729,19 +803,6 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         return otherNode instanceof Event && Node.prototype.allowsConnectionsTo.call(this, otherNode);
     }
 
-    ChoiceEvent.prototype._defineProperties = function() {
-        var properties = ChoiceEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text({
-            name:  'Cardinality',
-            type:  'number',
-            value: 1,
-            min:   1,
-            step:  1
-        }, this));
-
-        return properties;
-    }
-
     /*
      *  RedundancyEvent
      */
@@ -772,12 +833,15 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
     RedundancyEvent.prototype._defineProperties = function() {
         var properties = RedundancyEvent.Super._defineProperties.call(this);
-        properties.splice(1, 0, new Properties.Text({
-            name:  'Cardinality',
-            type:  'number',
-            value: 1,
-            min:   1,
-            step:  1
+        properties.push(new Properties.Text({
+            name:         'Cardinality',
+            type:         'number',
+            value:        1,
+            min:          1,
+            step:         1,
+            mirror:       this._container,
+            mirrorPrefix: 'k=',
+            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
         }, this));
 
         return properties;
@@ -831,36 +895,36 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         Returns:
             A new Node of the given type
      */
-    function newNodeForType(type, id) {
+    function newNodeForType(type, options) {
         switch(type) {
             case Config.Node.Types.BASIC_EVENT:
-                return new BasicEvent(id);
+                return new BasicEvent(options);
             case Config.Node.Types.MULTI_EVENT:
-                return new MultiEvent(id);
+                return new MultiEvent(options);
             case Config.Node.Types.FAULT_EVENT:
-                return new FaultEvent(id);
+                return new FaultEvent(options);
             case Config.Node.Types.MULTI_FAULT_EVENT:
-                return new MultiFaultEvent(id);
+                return new MultiFaultEvent(options);
             case Config.Node.Types.AND_GATE:
-                return new AndGate(id);
+                return new AndGate(options);
             case Config.Node.Types.PRIORITY_AND_GATE:
-                return new PriorityAndGate(id);
+                return new PriorityAndGate(options);
             case Config.Node.Types.OR_GATE:
-                return new OrGate(id);
+                return new OrGate(options);
             case Config.Node.Types.XOR_GATE:
-                return new XorGate(id);
+                return new XorGate(options);
             case Config.Node.Types.VOTING_OR_GATE:
-                return new VotingOrGate(id);
+                return new VotingOrGate(options);
             case Config.Node.Types.INHIBIT_GATE:
-                return new InhibitGate(id);
+                return new InhibitGate(options);
             case Config.Node.Types.CHOICE_EVENT:
-                return new ChoiceEvent(id);
+                return new ChoiceEvent(options);
             case Config.Node.Types.REDUNDANCY_EVENT:
-                return new RedundancyEvent(id);
+                return new RedundancyEvent(options);
             case Config.Node.Types.UNDEVELOPED_EVENT:
-                return new UndevelopedEvent(id);
+                return new UndevelopedEvent(options);
             case Config.Node.Types.HOUSE_EVENT:
-                return new HouseEvent(id);
+                return new HouseEvent(options);
         }
     }
 
@@ -882,6 +946,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         ChoiceEvent:      ChoiceEvent,
         RedundancyEvent:  RedundancyEvent,
         HouseEvent:       HouseEvent,
+
         newNodeForType:   newNodeForType
     };
 })
