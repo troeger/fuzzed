@@ -61,7 +61,7 @@ define(function() {
 
             ENDPOINT_RADIUS: 7,
             ENDPOINT_FILL:   '#409FFF',
-            ENDPOINT_STYLE:  'Dot'
+            ENDPOINT_STYLE:  'Blank'
         },
 
         Keys: {
