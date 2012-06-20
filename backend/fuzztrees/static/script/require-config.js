@@ -3,12 +3,13 @@ define(function() {
 
     return {
         Classes: {
-            NODE:             'fuzzed-node',
-            NODE_THUMBNAIL:   'fuzzed-node-thumbnail',
-            NODE_IMAGE:       'fuzzed-node-image',
-            NODE_LABEL:       'fuzzed-node-label',
-            NODE_DROP_ACTIVE: 'fuzzed-node-drop-active',
-            NODE_HALO_CONNECT:'fuzzed-node-halo-connect',
+            NODE:                    'fuzzed-node',
+            NODE_THUMBNAIL:          'fuzzed-node-thumbnail',
+            NODE_IMAGE:              'fuzzed-node-image',
+            NODE_LABEL:              'fuzzed-node-label',
+            NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
+            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
+            NODE_OPTIONAL_INDICATOR: 'fuzzed-node-optional-indicator',
 
             JSPLUMB_ENDPOINT:       'jsplumb-endpoint',
             JSPLUMB_ENDPOINT_HOVER: 'jsplumb-endpoint-hover',
@@ -70,11 +71,12 @@ define(function() {
         },
 
         Node: {
-            LABEL_HEIGHT:       15,
-            STROKE_NORMAL:      '#000000',
-            STROKE_HIGHLIGHTED: '#409FFF',
-            STROKE_SELECTED:    '#FF9640',
-            STROKE_DISABLED:    '#CCC',
+            LABEL_HEIGHT:            15,
+            STROKE_NORMAL:           '#000000',
+            STROKE_HIGHLIGHTED:      '#409FFF',
+            STROKE_SELECTED:         '#FF9640',
+            STROKE_DISABLED:         '#CCC',
+            OPTIONAL_INDICATOR_FILL: '#FFF',
 
             Names: {
                 BASIC_EVENT:       'Basic Event',

@@ -18,6 +18,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         this._editor     = undefined; // will be set when appending
         this._graph      = undefined; // will be set as soon as it get added to a concrete graph
         this._id         = id;
+        this._optional   = false;
 
         // state
         this._disabled    = false;
@@ -25,10 +26,11 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         this._selected    = false;
 
         // visuals
-        var visuals            = this._setupVisualRepresentation();
-        this._container        = visuals.container;
-        this._nodeImage        = visuals.nodeImage;
-        this._connectionHandle = visuals.connectionHandle;
+        var visuals             = this._setupVisualRepresentation();
+        this._container         = visuals.container;
+        this._nodeImage         = visuals.nodeImage;
+        this._connectionHandle  = visuals.connectionHandle;
+        this._optionalIndicator = visuals.optionalIndicator;
 
         // properties
         this._properties       = this._defineProperties();
@@ -81,8 +83,16 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
         if (this._highlighted) {
             this._nodeImage.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+            this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
+            if (!this._optional) {
+                this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
+            }
         } else {
             this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+            this._optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
+            if (!this._optional) {
+                this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
+            }
         }
 
         return this;
@@ -91,6 +101,10 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     Node.prototype.disable = function() {
         this._disabled = true;
         this._container.find('path').css('stroke', Config.Node.STROKE_DISABLED);
+        this._optionalIndicator.attr('stroke', Config.Node.STROKE_DISABLED);
+        if (!this._optional) {
+            this._optionalIndicator.attr('fill', Config.Node.STROKE_DISABLED);
+        }
 
         return this;
     }
@@ -100,10 +114,22 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
         if (this._selected) {
             this._container.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+            this._optionalIndicator.attr('stroke', Config.Node.STROKE_SELECTED);
+            if (!this._optional) {
+                this._optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
+            }
         } else if (this._highlighted) {
             this._container.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+            this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
+            if (!this._optional) {
+                this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
+            }
         } else {
             this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+            this._optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
+            if (!this._optional) {
+                this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
+            }
         }
 
         return this;
@@ -123,8 +149,16 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
         if (this._highlighted) {
             this._container.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+            this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
+            if (!this._optional) {
+                this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
+            }
         } else {
             this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+            this._optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
+            if (!this._optional) {
+                this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
+            }
         }
 
         return this;
@@ -167,8 +201,24 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
         this._selected = true;
         this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
-        
+        this._optionalIndicator.attr('stroke', Config.Node.STROKE_SELECTED);
+        if (!this._optional) {
+            this._optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
+        }
+
         return this;
+    }
+
+    Node.prototype.setOptional = function(optional) {
+        this._optional = optional;
+
+        if (optional) {
+            this._optionalIndicator.attr('fill', Config.Node.OPTIONAL_INDICATOR_FILL);
+        } else if (this._highlighted) {
+            this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
+        } else {
+            this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
+        }
     }
 
     Node.prototype.type = function() {
@@ -301,12 +351,32 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         // get the thumbnail, clone it and wrap it with a container (for labels)
         var container = jQuery('<div>');
         var nodeImage = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
+        var optionalIndicatorWrapper = jQuery('<div>').svg();
+        var optionalIndicator = optionalIndicatorWrapper.svg('get');
 
         container
             .attr('id', nodeImage.attr('id') + this._id)
             .addClass(Config.Classes.NODE)
             .css('position', 'absolute')
             .data(Config.Keys.NODE, this);
+
+        //TODO: config
+        var optionalIndicatorCircle = optionalIndicator.circle(null, 7, 7, 6, {
+            strokeWidth: 2,
+            fill: this._optional ? Config.Node.OPTIONAL_INDICATOR_FILL : Config.Node.STROKE_NORMAL,
+            stroke: Config.Node.STROKE_NORMAL
+        });
+
+        // external method for changing attributes of the circle later
+        optionalIndicator.attr = function(attr, value) {
+            var setting = {}
+            setting[attr] = value;
+            optionalIndicator.change(optionalIndicatorCircle, setting);
+        };
+
+        optionalIndicatorWrapper
+            .addClass(Config.Classes.NODE_OPTIONAL_INDICATOR)
+            .appendTo(container);
 
         nodeImage
             // cleanup the thumbnail's specific properties
@@ -324,9 +394,10 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         }
 
         return {
-            container:        container,
-            nodeImage:        nodeImage,
-            connectionHandle: connectionHandle
+            container:         container,
+            nodeImage:         nodeImage,
+            connectionHandle:  connectionHandle,
+            optionalIndicator: optionalIndicator
         };
     }
 
@@ -370,8 +441,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                                 min:   0,
                                 max:   1,
                                 step:  0.01,
-                                value: 0,
-                        }, this),
+                                value: 0
+                        }, this)
                 }, {
                     name: 'Fuzzy',
                     input: new Properties.Select({
@@ -382,7 +453,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                                     'very likely',
                                     'unknown'
                                 ],
-                        value:  'unknown',
+                        value:  'unknown'
                     }, this)
                 }]
             }),

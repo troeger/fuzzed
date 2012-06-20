@@ -94,7 +94,7 @@
 .fuzzed-node-image {
     display:  inline-block;
     position: relative;
-    margin:   3px;
+    margin:   0px 3px 3px 3px;
     z-index:  100;
 }
 
@@ -119,17 +119,17 @@
 
 .fuzzed-node-halo-connect {
     /* XXX: this is a temporary solution */
-    width:                 15px;
-    height:                15px;
+    width:                  15px;
+    height:                 15px;
     -webkit-border-radius:  7px;
     -moz-border-radius:     7px;
     border-radius:          7px;
     background-color:       #409FFF;
     position:               absolute;
     visibility:             hidden;
-    top:                   28px;
-    left:                  28px;
-    z-index:              150; /* above image, TODO: let halo care about that */
+    top:                    28px;
+    left:                   28px;
+    z-index:                150; /* above image, TODO: let halo care about that */
     cursor:                 move;
 }
 
@@ -139,6 +139,13 @@
 
 .fuzzed-node:hover .fuzzed-node-halo-connect {
     visibility: visible;
+}
+
+.fuzzed-node-optional-indicator {
+    width:   14px;
+    height:  14px;
+    margin:  0 auto;
+    z-index: 100; /* above connection */
 }
 
 .fuzzed-ajax-loader {
