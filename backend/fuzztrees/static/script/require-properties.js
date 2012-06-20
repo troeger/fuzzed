@@ -119,7 +119,7 @@ define(['require-config', 'require-oop'], function(Config) {
                     .appendTo(mirror)
                     .width(Config.Node.LABEL_WIDTH)
                     .css({
-                        top:  Config.Grid.SIZE,
+                        top:  Config.Grid.SIZE + Config.Node.OPTIONAL_INDICATOR_RADIUS * 2,
                         left: Config.Grid.HALF_SIZE - Config.Node.HALF_LABEL_WIDTH
                 });
             }

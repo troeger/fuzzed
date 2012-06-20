@@ -1,5 +1,5 @@
 define(function() {
-    var GRID_SIZE   = 55;
+    var GRID_SIZE   = 54;
     var LABEL_WIDTH = GRID_SIZE << 1;
 
     return {
@@ -73,14 +73,15 @@ define(function() {
         },
 
         Node: {
-            LABEL_HEIGHT:            15,
-            LABEL_WIDTH:             LABEL_WIDTH,
-            HALF_LABEL_WIDTH:        LABEL_WIDTH >> 1,
-            STROKE_NORMAL:           '#000000',
-            STROKE_HIGHLIGHTED:      '#409FFF',
-            STROKE_SELECTED:         '#FF9640',
-            STROKE_DISABLED:         '#CCC',
-            OPTIONAL_INDICATOR_FILL: '#FFF',
+            LABEL_HEIGHT:              15,
+            LABEL_WIDTH:               LABEL_WIDTH,
+            HALF_LABEL_WIDTH:          LABEL_WIDTH >> 1,
+            STROKE_NORMAL:             '#000000',
+            STROKE_HIGHLIGHTED:        '#409FFF',
+            STROKE_SELECTED:           '#FF9640',
+            STROKE_DISABLED:           '#CCC',
+            OPTIONAL_INDICATOR_FILL:   '#FFF',
+            OPTIONAL_INDICATOR_RADIUS: Math.round(GRID_SIZE / 10),
 
             Names: {
                 BASIC_EVENT:       'Basic Event',

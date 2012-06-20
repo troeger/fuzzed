@@ -369,7 +369,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
             .data(Config.Keys.NODE, this);
 
         //TODO: config
-        var optionalIndicatorCircle = optionalIndicator.circle(null, 7, 7, 6, {
+        var radius = Config.Node.OPTIONAL_INDICATOR_RADIUS;
+        var optionalIndicatorCircle = optionalIndicator.circle(null, radius+1, radius+1, radius, {
             strokeWidth: 2,
             fill: this._optional ? Config.Node.OPTIONAL_INDICATOR_FILL : Config.Node.STROKE_NORMAL,
             stroke: Config.Node.STROKE_NORMAL

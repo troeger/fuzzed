@@ -146,8 +146,8 @@
 }
 
 .fuzzed-node-optional-indicator {
-    width:   14px;
-    height:  14px;
+    width:   12px;
+    height:  12px;
     margin:  0 auto;
     z-index: 100; /* above connection */
 }
