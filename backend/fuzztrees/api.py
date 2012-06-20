@@ -196,7 +196,7 @@ def node(request, graph_id, node_id):
 					return HttpResponseBadRequest()
 				return HttpResponse(status=204)
 			elif 'key' in request.POST and 'val' in request.POST:
-				#TODO change node property
+				setNodeProperty(n, request.POST['key'], request.POST['val'] )
 				return HttpResponse(status=204)
 			elif 'type' in request.POST:
 				#TODO change node type			
