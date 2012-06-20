@@ -279,8 +279,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
     Node.prototype._setupEndpoints = function() {
         // get upper and lower image offsets
-        var imageTopOffset    = this._nodeImage.offset().top - this._container.offset().top;
-        var imageBottomOffset = imageTopOffset + this._nodeImage.height();
+        var optionalIndicatorWrapper = jQuery(this._optionalIndicator._container);
+        var imageTopOffset    = optionalIndicatorWrapper.offset().top - this._container.offset().top;
+        var imageBottomOffset = this._nodeImage.offset().top - this._container.offset().top + this._nodeImage.height();
 
         // make node source
         if (this._maxInConnections != 0) {
