@@ -306,8 +306,8 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         }
 
         return {
-            x: x * Config.Grid.SIZE,
-            y: y * Config.Grid.SIZE
+            x: x * Config.Grid.SIZE + Config.Grid.SIZE / 2,
+            y: y * Config.Grid.SIZE + Config.Grid.SIZE / 2
         }
     }
 
@@ -487,8 +487,8 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         var gridCoords  = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
         var pixelCoords = this.toPixel(gridCoords);
 
-        node.moveTo(pixelCoords.x, pixelCoords.y)
-            .appendTo(this._canvas)
+        node.appendTo(this._canvas)
+            .moveTo(pixelCoords.x, pixelCoords.y)
             ._editor = this;
         this.graph().addNode(node);
         this.selection.ofNodes(node);

@@ -172,9 +172,13 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     }
 
     Node.prototype.moveTo = function(x, y) {
+        var image = this._nodeImage;
+        var offsetX = image.position().left + image.outerWidth(true) / 2;
+        var offsetY = image.position().top  + image.outerHeight(true) / 2;
+
         this._container.css({
-            left: x || 0,
-            top:  y || 0
+            left: x - offsetX || 0,
+            top:  y - offsetY || 0
         });
 
         return this;
@@ -262,9 +266,11 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
             // stop dragging callback
             stop:        function(eventObject, uiHelpers) {
+                var editorOffset = this._editor._canvas.offset();
                 var coordinates = this._editor.toGrid({
-                    x: uiHelpers.position.left,
-                    y: uiHelpers.position.top
+                    //XXX: find a better way (give node position function...)
+                    x: this._nodeImage.offset().left - editorOffset.left,
+                    y: this._nodeImage.offset().top - editorOffset.top
                 });
                 Backend.moveNode(this, coordinates);
             }.bind(this)
