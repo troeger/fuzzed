@@ -248,6 +248,7 @@ def renameGraph(g, newName):
 	p.saveWithChangeEvent('name', newName)
 
 def setNodeProperty(node, key, value):
-	p=Property.objects.get(node=node, key=key)
-	p.saveWithChangeEvent(key, value)
+	p, created=Property.objects.get_or_create(node=node, key=key, defaults={'val':value})
+	if not created:
+		p.saveWithChangeEvent(key, value)
 

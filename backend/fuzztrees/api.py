@@ -142,7 +142,7 @@ def node(request, graph_id, node_id):
 
 	Change property of a node
 	API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]
-	API Request Parameters: key=... , val=...
+	API Request Parameters: key=... , value=...
 	API Response:           no body, status code 204
 
 	Change position of a node
@@ -160,7 +160,7 @@ def node(request, graph_id, node_id):
 			g=Graph.objects.get(pk=graph_id, deleted=False)
 			n=Node.objects.get(client_id=node_id, deleted=False)
 		except:
-			return HttpResponseBadRequest()						
+			return HttpResponseBadRequest()
 		if request.method == 'DELETE':
 			# delete node
 			try:
@@ -196,8 +196,9 @@ def node(request, graph_id, node_id):
 				except:
 					return HttpResponseBadRequest()
 				return HttpResponse(status=204)
-			elif 'key' in request.POST and 'val' in request.POST:
-				setNodeProperty(n, request.POST['key'], request.POST['val'] )
+			elif 'key' in request.POST and 'value' in request.POST:
+				print n, request.POST
+				setNodeProperty(n, request.POST['key'], request.POST['value'])
 				return HttpResponse(status=204)
 			elif 'type' in request.POST:
 				#TODO change node type			

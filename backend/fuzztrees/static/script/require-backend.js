@@ -77,11 +77,19 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
     Backend.addNode = function(node, position, success, error, complete) {
         var url = URLHelper.fullUrlForNodes(node.graph());
         var data = {
-            id:     node.id(),
-            type:   node.type(),
-            xcoord: position.x,
-            ycoord: position.y
+            id:         node.id(),
+            type:       node.type(),
+            xcoord:     position.x,
+            ycoord:     position.y
         };
+
+        var successCallback = function(json) {
+            //XXX: improve this later (send properties already in data)
+            _.each(node.properties(), function(property) {
+                Backend.changeProperty(node, property.name(), property.value());
+            });
+            if (success) success(json);
+        }
 
         jQuery.ajax({
             url:      url,
@@ -89,6 +97,37 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             dataType: 'json', 
 
             data:     data, 
+            success:  successCallback,
+            error:    error    || jQuery.noop,
+            complete: complete || jQuery.noop
+        });
+    }
+
+    /*
+         Function: changeProperty
+             Changes a property of a given node.
+
+         Parameters:
+             node     - The node that's property was changed.
+             key      - The name of the property.
+             value    - The new value for the property.
+             success  - [optional] Callback that gets called on successfall change of the property.
+             error    - [optional] Callback that gets called in case of an ajax-error.
+             complete - [optional] Callback that gets called in both cases - successful and errornous property change.
+     */
+    Backend.changeProperty = function(node, key, value, success, error, complete) {
+        var url = URLHelper.fullUrlForNode(node);
+        var data = {
+            'key': key,
+            'value': value
+        }
+
+        jQuery.ajax({
+            url:      url,
+            type:     'POST',
+            dataType: 'json',
+
+            data:     data,
             success:  success  || jQuery.noop,
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop
@@ -213,26 +252,6 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
     }
 
     /* TODO From here on*/
-
-    /*
-         Function: changeNodeProperty
-             Changes a property of a given Node.
-
-         Parameters:
-             node          - The Node that should be deleted.
-             key           - The name of the property.
-             value         - The new value for the property.
-             errorCallback - [optional] Callback that gets called in case of an ajax-error.
-     */
-    Backend.changeNodeProperty = function(node, key, value, errorCallback) {
-        var url = URLHelper.fullUrlForNode(node);
-        var data = {
-            'key': key,
-            'value': value
-        }
-
-        jQuery.post(url, data).fail(errorCallback || jQuery.noop);
-    }
 
     /*
         Function: createGraph

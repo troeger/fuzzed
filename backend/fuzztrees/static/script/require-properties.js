@@ -1,4 +1,4 @@
-define(['require-config', 'require-oop'], function(Config) {
+define(['require-config', 'require-backend', 'require-oop'], function(Config, Backend) {
 
     /*
      *  Abstract Property
@@ -67,6 +67,12 @@ define(['require-config', 'require-oop'], function(Config) {
 
     Property.prototype._mirrorString = function() {
         return this._options.mirrorPrefix + this.value() + this._options.mirrorSuffix;
+    }
+
+    Property.prototype._sendChange = function() {
+        if (this.name()) {
+            Backend.changeProperty(this._node, this.name(), this.value());
+        }
     }
 
     Property.prototype._setupCallbacks = function() {
@@ -191,6 +197,7 @@ define(['require-config', 'require-oop'], function(Config) {
         if (this.options().mirror) {
             this._mirror.html(this._mirrorString());
         }
+        this._sendChange();
     }
 
     Radio.prototype._setupElement = function() {
@@ -269,6 +276,7 @@ define(['require-config', 'require-oop'], function(Config) {
     Select.prototype._change = function() {
         // update the mirror if we have one
         if (this._mirror) this._mirror.html(this._mirrorString());
+        this._sendChange();
     }
 
     Select.prototype._setupElement = function() {
@@ -356,6 +364,8 @@ define(['require-config', 'require-oop'], function(Config) {
             this._mirror.html(this._mirrorString());
             this._setupChoiceHandler(this._choice());
         }
+
+        this._sendChange();
     }
 
     SingleChoice.prototype._choice = function() {
@@ -370,9 +380,10 @@ define(['require-config', 'require-oop'], function(Config) {
             if (choice['_' + eventName] || choiceOptions[eventName]) {
                 choice._callbackElement().bind(eventName, function() {
                     _this._mirror.html(_this._mirrorString());
+                    _this._sendChange();
                 });
             }
-        })
+        });
     }
 
     SingleChoice.prototype._setupElement = function() {
@@ -448,12 +459,14 @@ define(['require-config', 'require-oop'], function(Config) {
         }
 
         if (this._mirror) this._mirror.html(this._mirrorString());
+        this._sendChange();
     }
 
     Text.prototype._keyup = function(eventObject) {
         if (this._mirror) {
             this._mirror.html(this._mirrorString());
         }
+        this._sendChange();
     }
 
     Text.prototype._setupElement = function() {

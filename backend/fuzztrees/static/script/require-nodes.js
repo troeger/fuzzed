@@ -3,10 +3,10 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  Abstract Node Base Class
      */
-    function Node(options) {
-        options = jQuery.extend({}, options);
+    function Node(properties) {
         // pass here on inheritance calls
         if (this.constructor === Node) return;
+        properties = jQuery.extend({}, properties);
 
         // endpoints (default configuration)
         this._maxInConnections  = typeof this._maxInConnections  === 'undefined' ? -1 : this._maxInConnections; // infinite
@@ -18,7 +18,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         // logic
         this._editor     = undefined; // will be set when appending
         this._graph      = undefined; // will be set as soon as it get added to a concrete graph
-        this._id         = options.id || new Date().getTime();
+        this._id         = properties.id || new Date().getTime();
         this._optional   = false;
 
         // state
@@ -34,7 +34,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         this._optionalIndicator = visuals.optionalIndicator;
 
         // properties
-        this._properties       = this._defineProperties();
+        this._properties = this._defineProperties(properties);
     }
 
     Node.prototype.allowsConnectionsTo = function(otherNode) {
@@ -230,7 +230,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         throw 'Abstract Method - override type in subclass';
     }
 
-    Node.prototype._defineProperties = function() {
+    Node.prototype._defineProperties = function(properties) {
         // the basic node does not have any properties therefore the empty array
         // overwrite in subclasses in order to set any
         return [];
@@ -413,12 +413,12 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  Abstract Event Base Class
      */
-    function Event() {
+    function Event(properties) {
         if (this.constructor === Event) return;
         this._maxInConnections  = this._maxInConnections  == undefined ?  1 : this._maxInConnections;
         this._maxOutConnections = this._maxOutConnections == undefined ? -1 : this._maxOutConnections;
 
-        Event.Super.constructor.apply(this, arguments);
+        Event.Super.constructor.call(this, properties);
     }
     Event.Extends(Node);
 
@@ -428,17 +428,17 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         return Event.Super.allowsConnectionsTo.call(this, otherNode);
     }
 
-    Event.prototype._defineProperties = function() {
+    Event.prototype._defineProperties = function(properties) {
         return [
             new Properties.Text({
                 name:   'Name',
-                value:  this.name(),
+                value:  properties.Name || this.name(),
                 mirror: this._container
             }, this),
 
             new Properties.Text({
                 name:     'Cost',
-                value:    1,
+                value:    properties.Cost || 1,
                 disabled: true
             }, this),
 
@@ -447,7 +447,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                 mirror:       this._container,
                 mirrorPrefix: 'p=',
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
-                value:        0,
+                value:        properties.Probability || 0,
                 disabled:     true
             }, this)
         ];
@@ -456,13 +456,13 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  Abstract Gate Base Class
      */
-    function Gate() {
+    function Gate(properties) {
         if (this.constructor === Gate) return;
 
         this._maxInConnections  = this._maxInConnections  == undefined ? -1 : this._maxInConnections;
         this._maxOutConnections = this._maxOutConnections == undefined ?  1 : this._maxOutConnections;
 
-        Gate.Super.constructor.apply(this, arguments);
+        Gate.Super.constructor.call(this, properties);
     }
     Gate.Extends(Node);
 
@@ -475,11 +475,10 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  Basic Event
      */
-    function BasicEvent() {
+    function BasicEvent(properties) {
         // no incoming connections allowed
         this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
-
-        BasicEvent.Super.constructor.apply(this, arguments);
+        BasicEvent.Super.constructor.call(this, properties);
     }
     BasicEvent.Extends(Event);
 
@@ -491,18 +490,21 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         return Config.Node.Types.BASIC_EVENT;
     }
 
-    BasicEvent.prototype._defineProperties = function() {
+    BasicEvent.prototype._defineProperties = function(properties) {
+        var probability   = parseFloat(properties.Probability);
+        var exactSelected = typeof properties.Probability === 'undefined' || !isNaN(probability);
+
         return [
             new Properties.Text({
                 name:   'Name',
-                value:  this.name(),
+                value:  properties.Name || this.name(),
                 mirror: this._container
             }, this),
 
             new Properties.Text({
                 name:  'Cost',
                 type:  'number',
-                value: 1
+                value: properties.Cost || 1
             }, this),
 
             new Properties.SingleChoice({
@@ -513,25 +515,26 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
                 choices: [{
                     name:     'Exact',
-                    selected:  true,
+                    selected:  exactSelected,
                     input: new Properties.Text({
                         type:  'number',
                         min:   0,
                         max:   1,
                         step:  0.01,
-                        value: 0
+                        value: probability || 0
                     }, this)
                 }, {
-                    name: 'Fuzzy',
+                    name:     'Fuzzy',
+                    selected: !exactSelected,
                     input: new Properties.Select({
                         options: [
-                            'very unlikely',
-                            'unlikely',
-                            'likely',
+                            'very',
+                            'more or less',
+                            'slightly',
                             'very likely',
-                            'unknown'
+                            'highly'
                         ],
-                        value:  'unknown'
+                        value: properties.Probability
                     }, this)
                 }]
             }, this)
@@ -541,8 +544,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  Basic Event Set
      */
-    function BasicEventSet() {
-        BasicEventSet.Super.constructor.apply(this, arguments);
+    function BasicEventSet(properties) {
+        BasicEventSet.Super.constructor.call(this, properties);
     }
     BasicEventSet.Extends(BasicEvent);
 
@@ -554,14 +557,14 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         return Config.Node.Types.BASIC_EVENT_SET;
     }
 
-    BasicEventSet.prototype._defineProperties = function() {
-        var properties = BasicEventSet.Super._defineProperties.call(this);
+    BasicEventSet.prototype._defineProperties = function(properties) {
+        var parentProperties = BasicEventSet.Super._defineProperties.call(this, properties);
 
-        properties.push(
+        parentProperties.push(
             new Properties.Text({
                 name:         'Cardinality',
                 type:         'number',
-                value:        1,
+                value:        properties.Cardinality || 1,
                 min:          1,
                 step:         1,
                 mirror:       this._container,
@@ -570,14 +573,14 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
             }, this)
         );
 
-        return properties;
+        return parentProperties;
     }
 
     /*
      *  Intermediate Event
      */
-    function IntermediateEvent() {
-        IntermediateEvent.Super.constructor.apply(this, arguments);
+    function IntermediateEvent(properties) {
+        IntermediateEvent.Super.constructor.call(this, properties);
     }
     IntermediateEvent.Extends(Event);
 
@@ -592,11 +595,11 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  Intermediate Event Set
      */
-    function IntermediateEventSet() {
+    function IntermediateEventSet(properties) {
         // no incoming connections allowed
         this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
 
-        IntermediateEventSet.Super.constructor.apply(this, arguments);
+        IntermediateEventSet.Super.constructor.call(this, properties);
     }
     IntermediateEventSet.Extends(IntermediateEvent);
 
@@ -608,13 +611,13 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
        return Config.Node.Types.INTERMEDIATE_EVENT_SET;
     }
 
-    IntermediateEventSet.prototype._defineProperties = function() {
-        var properties = IntermediateEventSet.Super._defineProperties.call(this);
+    IntermediateEventSet.prototype._defineProperties = function(properties) {
+        var parentProperties = IntermediateEventSet.Super._defineProperties.call(this, properties);
 
-        properties.push(new Properties.Text({
+        parentProperties.push(new Properties.Text({
             name:         'Cardinality',
             type:         'number',
-            value:        1,
+            value:        properties.Cardinality || 1,
             min:          1,
             step:         1,
             mirror:       this._container,
@@ -622,14 +625,14 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
             mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
         }, this));
 
-        return properties;
+        return parentProperties;
     }
 
     /*
      *  AndGate
      */
-    function AndGate() {
-        AndGate.Super.constructor.apply(this, arguments);
+    function AndGate(properties) {
+        AndGate.Super.constructor.call(this, properties);
     } 
     AndGate.Extends(Gate);
 
@@ -644,8 +647,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  OrGate
      */
-    function OrGate() {
-        OrGate.Super.constructor.apply(this, arguments);
+    function OrGate(properties) {
+        OrGate.Super.constructor.call(this, properties);
     } 
     OrGate.Extends(Gate);
 
@@ -660,8 +663,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  XorGate
      */
-    function XorGate() {
-        XorGate.Super.constructor.apply(this, arguments);
+    function XorGate(properties) {
+        XorGate.Super.constructor.call(this, properties);
     } 
     XorGate.Extends(Gate);
 
@@ -676,8 +679,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  PriorityAndGate
      */
-    function PriorityAndGate() {
-        PriorityAndGate.Super.constructor.apply(this, arguments);
+    function PriorityAndGate(properties) {
+        PriorityAndGate.Super.constructor.call(this, properties);
     } 
     PriorityAndGate.Extends(Gate);
 
@@ -692,8 +695,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  VotingOrGate
      */
-    function VotingOrGate() {
-        VotingOrGate.Super.constructor.apply(this, arguments);
+    function VotingOrGate(properties) {
+        VotingOrGate.Super.constructor.call(this, properties);
     } 
     VotingOrGate.Extends(Gate);
 
@@ -705,12 +708,12 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         return Config.Node.Types.VOTING_OR_GATE;
     }
 
-    VotingOrGate.prototype._defineProperties = function() {
+    VotingOrGate.prototype._defineProperties = function(properties) {
         return [
             new Properties.Text({
                 name:         'Count',
                 type:         'number',
-                value:        1,
+                value:        properties.Count || 1,
                 min:          0,
                 mirror:       this._container,
                 mirrorPrefix: 'k=',
@@ -722,8 +725,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  InhibitGate
      */
-    function InhibitGate() {
-        InhibitGate.Super.constructor.apply(this, arguments);
+    function InhibitGate(properties) {
+        InhibitGate.Super.constructor.call(this, properties);
     } 
     InhibitGate.Extends(Gate);
 
@@ -738,12 +741,12 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  ChoiceEvent
      */
-    function ChoiceEvent() {
+    function ChoiceEvent(properties) {
         // outgoing connections are dashed
         this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
         this._connectorStyle = jsPlumb.extend({ dashstyle: "4 2"}, this._connectorStyle);
 
-        ChoiceEvent.Super.constructor.apply(this, arguments);
+        ChoiceEvent.Super.constructor.call(this, properties);
     } 
     ChoiceEvent.Extends(Event);
 
@@ -766,12 +769,12 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  RedundancyEvent
      */
-    function RedundancyEvent() {
+    function RedundancyEvent(properties) {
         // outgoing connections are dashed
         this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
         this._connectorStyle = jsPlumb.extend({ dashstyle: "4 2"}, this._connectorStyle);
 
-        RedundancyEvent.Super.constructor.apply(this, arguments);
+        RedundancyEvent.Super.constructor.call(this, properties);
     } 
     RedundancyEvent.Extends(Event);
 
@@ -791,12 +794,13 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         return otherNode instanceof Event && Node.prototype.allowsConnectionsTo.call(this, otherNode);
     }
 
-    RedundancyEvent.prototype._defineProperties = function() {
-        var properties = RedundancyEvent.Super._defineProperties.call(this);
-        properties.push(new Properties.Text({
+    RedundancyEvent.prototype._defineProperties = function(properties) {
+        var parentProperties = RedundancyEvent.Super._defineProperties.call(this, properties);
+
+        parentProperties.push(new Properties.Text({
             name:         'Cardinality',
             type:         'number',
-            value:        1,
+            value:        parseInt(properties.Cardinality) || 1,
             min:          1,
             step:         1,
             mirror:       this._container,
@@ -804,17 +808,17 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
             mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
         }, this));
 
-        return properties;
+        return parentProperties;
     }
 
     /*
      *  Undeveloped Event
      */
-    function UndevelopedEvent() {
+    function UndevelopedEvent(properties) {
         // no incoming connections allowed
         this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
 
-        UndevelopedEvent.Super.constructor.apply(this, arguments);
+        UndevelopedEvent.Super.constructor.call(this, properties);
     }
     UndevelopedEvent.Extends(Event);
 
@@ -829,11 +833,11 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  House Event
      */
-    function HouseEvent() {
+    function HouseEvent(properties) {
         // no incoming connections allowed
         this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
 
-        HouseEvent.Super.constructor.apply(this, arguments);
+        HouseEvent.Super.constructor.call(this, properties);
     }
     HouseEvent.Extends(Event);
 
@@ -855,36 +859,36 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         Returns:
             A new Node of the given type
      */
-    function newNodeForType(type, options) {
+    function newNodeForType(type, properties) {
         switch(type) {
             case Config.Node.Types.BASIC_EVENT:
-                return new BasicEvent(options);
+                return new BasicEvent(properties);
             case Config.Node.Types.BASIC_EVENT_SET:
-                return new BasicEventSet(options);
+                return new BasicEventSet(properties);
             case Config.Node.Types.INTERMEDIATE_EVENT:
-                return new IntermediateEvent(options);
+                return new IntermediateEvent(properties);
             case Config.Node.Types.INTERMEDIATE_EVENT_SET:
-                return new IntermediateEventSet(options);
+                return new IntermediateEventSet(properties);
             case Config.Node.Types.AND_GATE:
-                return new AndGate(options);
+                return new AndGate(properties);
             case Config.Node.Types.PRIORITY_AND_GATE:
-                return new PriorityAndGate(options);
+                return new PriorityAndGate(properties);
             case Config.Node.Types.OR_GATE:
-                return new OrGate(options);
+                return new OrGate(properties);
             case Config.Node.Types.XOR_GATE:
-                return new XorGate(options);
+                return new XorGate(properties);
             case Config.Node.Types.VOTING_OR_GATE:
-                return new VotingOrGate(options);
+                return new VotingOrGate(properties);
             case Config.Node.Types.INHIBIT_GATE:
-                return new InhibitGate(options);
+                return new InhibitGate(properties);
             case Config.Node.Types.CHOICE_EVENT:
-                return new ChoiceEvent(options);
+                return new ChoiceEvent(properties);
             case Config.Node.Types.REDUNDANCY_EVENT:
-                return new RedundancyEvent(options);
+                return new RedundancyEvent(properties);
             case Config.Node.Types.UNDEVELOPED_EVENT:
-                return new UndevelopedEvent(options);
+                return new UndevelopedEvent(properties);
             case Config.Node.Types.HOUSE_EVENT:
-                return new HouseEvent(options);
+                return new HouseEvent(properties);
         }
     }
 
