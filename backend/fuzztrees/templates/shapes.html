@@ -4,7 +4,7 @@
 		<li>
 			<div class="ui-grid-a">
 				{% for key, node in node_types.items %}
-					<div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell">
+					<div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell" title="{{ node.help }}">
 						&nbsp
 						<div id="{{ node.type }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}">
 							{% include node.image %}
