@@ -455,7 +455,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                         value:  'unknown',
                     }, this)
                 }]
-            })
+            }, this)
         ];
     }
 

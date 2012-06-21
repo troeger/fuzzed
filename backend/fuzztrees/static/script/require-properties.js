@@ -39,7 +39,7 @@ define(['require-config', 'require-oop'], function(Config) {
     Property.prototype.show = function(container, index) {
         this._container = container;
 
-        if (typeof index === 'undefined' || container.children().length === 0) {
+        if (typeof index === 'undefined' || container.children().length === 0 || container.children().length <= index) {
             this._container.append(this._element)
         } else {
             this._container.children().eq(index || 0).before(this._element);
