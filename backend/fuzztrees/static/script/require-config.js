@@ -141,6 +141,10 @@ define(function() {
                     pattern: '[.*]'
                 },
 
+                Radio: {
+                    options: []
+                },
+
                 Select: {
                     options: []
                 },

@@ -140,6 +140,88 @@ define(['require-config', 'require-oop'], function(Config) {
     }
 
     /*
+     *  Radio Property
+     */
+    function Radio(options, node) {
+        // sanitize options
+        this._options = jQuery.extend({}, Config.Properties.Defaults.Radio, options);
+        if (this._options.options.length < 2) {
+            throw 'Parameter Error - provide at least two radio button options';
+        }
+
+        var valueIndex = _.indexOf(this._options.options, this._options.value)
+        // value not set? then preselect the first
+        if (typeof this._options.value === 'undefined') {
+            this._options.value = this._options.options[0];
+
+        // value set but not in the options? show at first position
+        } else if (valueIndex < 0) {
+            this._options.options.unshift(this._options.value);
+        }
+
+        Radio.Super.constructor.call(this, options, node);
+
+        this._radios   = this._element.find('input:radio');
+        this._selected = _.indexOf(this.options().options, this.options().value);
+        this._setupMirror();
+    }
+    Radio.Extends(Property);
+
+    Radio.prototype.show = function(container, index) {
+        this._element = this._setupElement();
+        this._radios  = this._element.find('input:radio');
+        Radio.Super.show.call(this, container, index);
+    }
+
+    Radio.prototype.value = function() {
+        return this._radios.eq(this._selected).val();
+    }
+
+    Radio.prototype._afterAppend = function() {
+        this._element.trigger('create');
+    }
+
+    Radio.prototype._callbackElement = function() {
+        return this._radios;
+    }
+
+    Radio.prototype._change = function(eventObject) {
+        this._selected = this._radios.index(eventObject.target);
+
+        if (this.options().mirror) {
+            this._mirror.html(this._mirrorString());
+        }
+    }
+
+    Radio.prototype._setupElement = function() {
+        var fieldcontain = this._setupFieldcontain();
+        var fieldset     = this._setupFieldset();
+
+        _.each(this.options().options, function(option, index) {
+            var _id   = this._id + '-' + index;
+            var input = jQuery('<input type="radio">')
+                .attr('data-mini', true)
+                .attr('name', this._id)
+                .attr('id', _id)
+                .attr('value', option)
+                .attr('checked', index === this._selected ? 'checked' : undefined);
+            var label = jQuery('<label>')
+                .attr('for', _id)
+                .html(option);
+
+            fieldset.append(input, label);
+        }.bind(this));
+
+        return fieldcontain.append(fieldset);
+    }
+
+    Radio.prototype._setupFieldset = function() {
+        return jQuery('<fieldset>')
+            .attr('data-role', 'controlgroup')
+            .append(jQuery('<legend>').html(this.name()));
+    }
+
+    /*
      *  Select Property
      */
     function Select(options, node) {
@@ -316,15 +398,9 @@ define(['require-config', 'require-oop'], function(Config) {
     }
 
     SingleChoice.prototype._setupFieldset = function() {
-        var fieldset = jQuery('<fieldset>').attr('data-role', 'controlgroup');
-        var legend   = jQuery('<legend>').html(this.name());
-
-        fieldset.append(legend);
-        _.each(this.options().choices, function(choice) {
-
-        })
-
-        return fieldset;
+        return jQuery('<fieldset>')
+            .attr('data-role', 'controlgroup')
+            .append(jQuery('<legend>').html(this.name()));
     }
 
     /*
@@ -399,6 +475,7 @@ define(['require-config', 'require-oop'], function(Config) {
     }
 
     return {
+        Radio:        Radio,
         Select:       Select,
         SingleChoice: SingleChoice,
         Text:         Text

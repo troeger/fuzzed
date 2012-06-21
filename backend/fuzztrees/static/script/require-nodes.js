@@ -542,12 +542,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
      *  Multi Event
      */
     function MultiEvent() {
-        // no incoming connections allowed
-        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
-
         MultiEvent.Super.constructor.apply(this, arguments);
     }
-    MultiEvent.Extends(Event);
+    MultiEvent.Extends(BasicEvent);
 
     MultiEvent.prototype.name = function() {
         return Config.Node.Names.MULTI_EVENT;
@@ -558,50 +555,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     }
 
     MultiEvent.prototype._defineProperties = function() {
-        return [
-            new Properties.Text({
-                name:   'Name',
-                value:  this.name(),
-                mirror: this._container
-            }, this),
+        var properties = MultiEvent.Super._defineProperties.call(this);
 
-            new Properties.Text({
-                name:  'Cost',
-                type:  'number',
-                value: 1
-            }, this),
-
-            new Properties.SingleChoice({
-                name:        'Probability',
-                mirror:       this._container,
-                mirrorPrefix: 'p=',
-                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
-
-                choices: [{
-                    name:     'Exact',
-                    selected:  true,
-                    input: new Properties.Text({
-                        type:  'number',
-                        min:   0,
-                        max:   1,
-                        step:  0.01,
-                        value: 0
-                    }, this)
-                }, {
-                    name: 'Fuzzy',
-                    input: new Properties.Select({
-                        options: [
-                            'very unlikely',
-                            'unlikely',
-                            'likely',
-                            'very likely',
-                            'unknown'
-                        ],
-                        value:  'unknown'
-                    }, this)
-                }]
-            }),
-
+        properties.push(
             new Properties.Text({
                 name:         'Cardinality',
                 type:         'number',
@@ -612,7 +568,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                 mirrorPrefix: '#',
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
             }, this)
-        ];
+        );
+
+        return properties;
     }
 
     /*
@@ -640,7 +598,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
         MultiEvent.Super.constructor.apply(this, arguments);
     }
-    MultiFaultEvent.Extends(Event);
+    MultiFaultEvent.Extends(FaultEvent);
 
     MultiFaultEvent.prototype.name = function() {
         return Config.Node.Names.MULTI_FAULT_EVENT;
@@ -652,6 +610,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
     MultiFaultEvent.prototype._defineProperties = function() {
         var properties = MultiFaultEvent.Super._defineProperties.call(this);
+
         properties.push(new Properties.Text({
             name:         'Cardinality',
             type:         'number',
