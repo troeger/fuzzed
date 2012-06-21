@@ -7,7 +7,7 @@ from django.contrib import auth
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
 import os, urllib, random, string, datetime
-from fuzztrees.models import Graph, GraphTypes, History, Commands
+from fuzztrees.models import Graph, GraphTypes, History, Commands, createFuzzTreeGraph, delGraph, renameGraph
 
 from fuzztrees.models import User
 from nodes_config import NODE_TYPES
@@ -26,39 +26,22 @@ def settings(request):
 
 @login_required
 def dashboard(request):
-	#TODO: we should use the API for this
 	if "new" in request.POST:
 		if request.POST['new']=='faulttree':
-			g=Graph(owner=request.user)
-			g.type=GraphTypes.FAULT_TREE
-			g.name="New Fault Tree"
-			g.save()
-			c=History(command=Commands.ADD_GRAPH, graph=g)
-			c.save()
+			return HttpResponseBadRequest()
 		elif request.POST['new']=='fuzztree':
-			g=Graph(owner=request.user)
-			g.type=GraphTypes.FUZZ_TREE
-			g.name="New FuzzTree"
-			g.save()
-			c=History(command=Commands.ADD_GRAPH, graph=g)
-			c.save()
+			createFuzzTreeGraph(request.user, "New FuzzTree")
 		elif request.POST['new']=='rbd':
-			g=Graph(owner=request.user)
-			g.type=GraphTypes.RBD
-			g.name="New Reliability Block Diagram"
-			g.save()
-			c=History(command=Commands.ADD_GRAPH, graph=g)
-			c.save()
+			return HttpResponseBadRequest()
 		else:
 			return HttpResponseBadRequest()
 	elif "delete" in request.POST and "graph" in request.POST:
 		g=get_object_or_404(Graph, pk=request.POST["graph"], owner=request.user)
-		g.delete()
+		delGraph(g)
 	elif "change" in request.POST and "newtitle" in request.POST and "graph" in request.POST:
 		g=get_object_or_404(Graph, pk=request.POST["graph"], owner=request.user)
-		g.name=request.POST["newtitle"]
-		g.save()		
-	graphs=request.user.graphs.all()
+		renameGraph(g, request.POST["newtitle"])
+	graphs=request.user.graphs.all().filter(deleted=False)
 	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
 
 @login_required
@@ -104,12 +87,5 @@ def login(request):
 			linkOpenID(newuser, user.openid_claim)
 			return HttpResponseRedirect('/login/?openid_identifier=%s'%urllib.quote_plus(request.session['openid_identifier']))	
 	backend_login(request, user)
-	#allgraphs=user.graphs.all()
-	#if len(allgraphs)==0:
-	#	g=Graph(owner=user, type=1)
-	#	g.save()
-	#	return HttpResponseRedirect('/editor/%u'%g.pk)
-	#else:
-	#	return HttpResponseRedirect('/editor/%u'%allgraphs[0].pk)
 	return HttpResponseRedirect('/dashboard/')
 	

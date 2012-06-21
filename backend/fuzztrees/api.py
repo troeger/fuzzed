@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
-from fuzztrees.models import Graph, Node, Edge, History, GRAPH_JS_TYPE, Commands
+from fuzztrees.models import *
 from nodes_config import NODE_TYPES, NODE_TYPE_IDS
 import json
 
@@ -65,11 +65,10 @@ def graphs(request):
 				# add new graph		
 				try:
 					t=int(request.POST['type'])
-					assert(t in GRAPH_JS_TYPE)
-					g=Graph(name=request.POST['name'], owner=request.user, type=t)
-					g.save()
-					c=History(command=Commands.ADD_GRAPH, graph=g)
-					c.save()
+					if t==GraphTypes.FUZZ_TREE:
+						createFuzzTreeGraph(request.user, request.POST['name'])
+					else:
+						return HttpResponseBadRequest()	
 				except:
 					return HttpResponseBadRequest()	
 				else:		
@@ -95,13 +94,6 @@ def graph(request, graph_id):
 				g=Graph.objects.get(pk=graph_id, owner=request.user, deleted=False)
 			except:
 				return HttpResponseNotFound()
-			#top=g.nodes.get(root=True)
-			#fan={'id': 'fan', 'name': 'Fan'}
-			#chip={'id': 'chip', 'name': 'Chip'}
-			#cpu={'id': 'cpu', 'name': 'CPU', 'children': [fan, chip]}
-			#disc={'id': 'disc', 'name': 'Disc'}
-			#tree={'id': 'tree', 'name': 'TOP', 'children': [cpu, disc]}	
-			#data=json.dumps(top.getTreeDict())
 			data=json.dumps(g.toJsonDict())
 			return HttpResponse(data, 'application/javascript')
 		return HttpResponseNotAllowed(['GET']) 
@@ -204,7 +196,7 @@ def node(request, graph_id, node_id):
 					return HttpResponseBadRequest()
 				return HttpResponse(status=204)
 			elif 'key' in request.POST and 'val' in request.POST:
-				#TODO change node property
+				setNodeProperty(n, request.POST['key'], request.POST['val'] )
 				return HttpResponse(status=204)
 			elif 'type' in request.POST:
 				#TODO change node type			

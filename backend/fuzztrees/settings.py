@@ -166,4 +166,3 @@ LOGGING = {
 AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
         'openid2rp.django.auth.Backend' )
-

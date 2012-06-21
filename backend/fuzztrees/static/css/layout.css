@@ -94,7 +94,7 @@
 .fuzzed-node-image {
     display:  inline-block;
     position: relative;
-    margin:   3px;
+    margin:   0px 3px 3px 3px;
     z-index:  100;
 }
 
@@ -123,17 +123,17 @@
 
 .fuzzed-node-halo-connect {
     /* XXX: this is a temporary solution */
-    width:                 15px;
-    height:                15px;
-    -webkit-border-radius:  7px;
-    -moz-border-radius:     7px;
-    border-radius:          7px;
+    width:                  13px;
+    height:                 13px;
+    -webkit-border-radius:  6px;
+    -moz-border-radius:     6px;
+    border-radius:          6px;
     background-color:       #409FFF;
     position:               absolute;
     visibility:             hidden;
-    top:                   28px;
-    left:                  28px;
-    z-index:              150; /* above image, TODO: let halo care about that */
+    top:                    29px;
+    left:                   21px;
+    z-index:                150; /* above image, TODO: let halo care about that */
     cursor:                 move;
 }
 
@@ -143,6 +143,13 @@
 
 .fuzzed-node:hover .fuzzed-node-halo-connect {
     visibility: visible;
+}
+
+.fuzzed-node-optional-indicator {
+    width:   12px;
+    height:  12px;
+    margin:  0 auto;
+    z-index: 100; /* above connection */
 }
 
 .fuzzed-ajax-loader {

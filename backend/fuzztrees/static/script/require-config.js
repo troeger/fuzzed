@@ -1,16 +1,17 @@
 define(function() {
-    var GRID_SIZE   = 55;
+    var GRID_SIZE   = 54;
     var LABEL_WIDTH = GRID_SIZE << 1;
 
     return {
         Classes: {
-            NODE:             'fuzzed-node',
-            NODE_THUMBNAIL:   'fuzzed-node-thumbnail',
-            NODE_IMAGE:       'fuzzed-node-image',
-            NODE_LABELS:      'fuzzed-node-labels',
-            NODE_LABEL:       'fuzzed-node-label',
-            NODE_DROP_ACTIVE: 'fuzzed-node-drop-active',
-            NODE_HALO_CONNECT:'fuzzed-node-halo-connect',
+            NODE:                    'fuzzed-node',
+            NODE_THUMBNAIL:          'fuzzed-node-thumbnail',
+            NODE_IMAGE:              'fuzzed-node-image',
+            NODE_LABEL:              'fuzzed-node-label',
+            NODE_LABELS:             'fuzzed-node-labels',
+            NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
+            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
+            NODE_OPTIONAL_INDICATOR: 'fuzzed-node-optional-indicator',
 
             JSPLUMB_ENDPOINT:       'jsplumb-endpoint',
             JSPLUMB_ENDPOINT_HOVER: 'jsplumb-endpoint-hover',
@@ -62,7 +63,7 @@ define(function() {
 
             ENDPOINT_RADIUS: 7,
             ENDPOINT_FILL:   '#409FFF',
-            ENDPOINT_STYLE:  'Dot'
+            ENDPOINT_STYLE:  'Blank'
         },
 
         Keys: {
@@ -72,13 +73,15 @@ define(function() {
         },
 
         Node: {
-            LABEL_HEIGHT:       15,
-            LABEL_WIDTH:        LABEL_WIDTH,
-            HALF_LABEL_WIDTH:   LABEL_WIDTH >> 1,
-            STROKE_NORMAL:      '#000000',
-            STROKE_HIGHLIGHTED: '#409FFF',
-            STROKE_SELECTED:    '#FF9640',
-            STROKE_DISABLED:    '#CCC',
+            LABEL_HEIGHT:              15,
+            LABEL_WIDTH:               LABEL_WIDTH,
+            HALF_LABEL_WIDTH:          LABEL_WIDTH >> 1,
+            STROKE_NORMAL:             '#000000',
+            STROKE_HIGHLIGHTED:        '#409FFF',
+            STROKE_SELECTED:           '#FF9640',
+            STROKE_DISABLED:           '#CCC',
+            OPTIONAL_INDICATOR_FILL:   '#FFF',
+            OPTIONAL_INDICATOR_RADIUS: Math.round(GRID_SIZE / 10),
 
             Names: {
                 BASIC_EVENT:       'Basic Event',
