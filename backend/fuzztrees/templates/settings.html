@@ -17,11 +17,20 @@
 	<div data-role="page">
 
 		<div data-theme="d" data-role="header" id="toolbar">
-			<h1>FuzzTrees - Settings</h1>
+			<h1>FuzzTrees - Your Settings</h1>
 			<a href="/" class="ui-btn-left" data-icon="back" data-rel="back">Back</a>
 		</div>
 
 		<div data-role="content">
+			<form method="POST" action="/dashboard/">{% csrf_token %}
+				<label for="username">User name:</label>
+				<input class="ui-disabled" type="text" name="username" id="username" value="{{ user.username }}"/>
+				<label for="email">E-Mail:</label>
+				<input data-inline="true" type="email" name="email" id="email" value="{{ user.email }}"/>
+				<label data-inline="true" for="newsletter">Keep me informed about updates.</label>
+				<input data-inline="true" type="checkbox" name="newsletter" id="newsletter" {% if user.get_profile.newsletter = True %}checked{% endif %}/>
+				<input data-icon="check" data-theme="e" data-inline="true" type="submit" name="settings_save" value="Save"/>
+			</form>
 		</div>
 
 		{% include "footer.html" %}

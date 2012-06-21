@@ -22,7 +22,7 @@ def about(request):
 
 @login_required
 def settings(request):
-	return render_to_response('settings.html', {}, context_instance=RequestContext(request))
+	return render_to_response('settings.html', {'user': request.user}, context_instance=RequestContext(request))
 
 @login_required
 def dashboard(request):
@@ -41,6 +41,19 @@ def dashboard(request):
 	elif "change" in request.POST and "newtitle" in request.POST and "graph" in request.POST:
 		g=get_object_or_404(Graph, pk=request.POST["graph"], owner=request.user)
 		renameGraph(g, request.POST["newtitle"])
+	elif "settings_save" in request.POST:
+		if "email" in request.POST:
+			request.user.email=request.POST["email"];
+		if "newsletter" in request.POST:
+			if request.POST["newsletter"] == "on":
+				prof=request.user.get_profile()
+				prof.newsletter=True
+				prof.save()
+			else:
+				prof=request.user.get_profile()
+				prof.newsletter=False
+				prof.save()
+		request.user.save()		
 	graphs=request.user.graphs.all().filter(deleted=False)
 	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
 

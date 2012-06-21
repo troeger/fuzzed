@@ -166,3 +166,5 @@ LOGGING = {
 AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
         'openid2rp.django.auth.Backend' )
+
+AUTH_PROFILE_MODULE = 'fuzztrees.UserProfile'
