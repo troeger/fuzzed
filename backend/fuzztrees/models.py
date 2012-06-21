@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 from django.shortcuts import get_object_or_404
 
 from nodes_config import NODE_TYPES, NODE_TYPE_IDS, nodeTypeChoices
@@ -45,6 +46,16 @@ COMMAND_TYPE = (
 	(Commands.CHANGE_PROP, 'Change node property'),
 	(Commands.CMD_GROUP, 'Start of command group')		
 )
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
+    newsletter = models.BooleanField(default=False)
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+post_save.connect(create_user_profile, sender=User)
 
 class Graph(models.Model):
 	type = models.PositiveSmallIntegerField(choices=GRAPH_TYPE)
