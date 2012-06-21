@@ -19,7 +19,13 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         this._editor     = undefined; // will be set when appending
         this._graph      = undefined; // will be set as soon as it get added to a concrete graph
         this._id         = properties.id || new Date().getTime();
-        this._optional   = properties.Optional === 'yes' ? true : false;
+        if (properties.Optional === 'yes') {
+            this._optional = true;
+        } else if (properties.Optional === 'no') {
+            this._optional = false;
+        } else {
+            this._optional = undefined;
+        }
 
         // state
         this._disabled    = false;
@@ -391,6 +397,11 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         optionalIndicatorWrapper
             .addClass(Config.Classes.NODE_OPTIONAL_INDICATOR)
             .appendTo(container);
+
+        // hide the optional indicator for nodes with undefined value
+        if (typeof this._optional === 'undefined') {
+            optionalIndicatorWrapper.css('visibility', 'hidden');
+        }
 
         nodeImage
             // cleanup the thumbnail's specific properties
