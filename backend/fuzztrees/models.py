@@ -220,7 +220,7 @@ def createFuzzTreeGraph(owner, title):
 	p=Property(graph=g, key='name', val=title)
 	p.save()
 	# create root node
-	n=Node(graph=g, type=NODE_TYPE_IDS['fault'], xcoord=10, ycoord=1)
+	n=Node(graph=g, type=NODE_TYPE_IDS['intermediate'], xcoord=10, ycoord=1)
 	n.saveWithAddEvent()
 	# set root node name, disable configurability indication
 	p=Property(node=n)

@@ -15,8 +15,8 @@ NODE_TYPES = {
     },
     3: {
         'name': u'Intermediate Event',
-        'type': 'fault',
-        'image': 'fault_event.svg',
+        'type': 'intermediate',
+        'image': 'intermediate_event.svg',
         'help': 'Failure resulting from a combination of previous events.',
         'optional': 'False'
     },

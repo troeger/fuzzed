@@ -86,7 +86,7 @@ define(function() {
             Names: {
                 BASIC_EVENT:       'Basic Event',
                 BASIC_EVENT_SET:   'Basic Event Set',
-                FAULT_EVENT:       'Fault Event',
+                INTERMEDIATE_EVENT:'Intermediate Event',
                 MULTI_FAULT_EVENT: 'Multi Fault Event',
                 AND_GATE:          'AND Gate',
                 PRIORITY_AND_GATE: 'Priority AND Gate',
@@ -103,7 +103,7 @@ define(function() {
             Types: {
                 BASIC_EVENT:       'basic',
                 BASIC_EVENT_SET:   'basic-set',
-                FAULT_EVENT:       'fault',
+                INTERMEDIATE_EVENT:'intermediate',
                 MULTI_FAULT_EVENT: 'multi_fault',
                 AND_GATE:          'and',
                 PRIORITY_AND_GATE: 'p-and',

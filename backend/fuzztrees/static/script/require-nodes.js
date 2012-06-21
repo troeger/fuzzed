@@ -576,17 +576,17 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  Fault Event
      */
-    function FaultEvent() {
-        FaultEvent.Super.constructor.apply(this, arguments);
+    function IntermediateEvent() {
+        IntermediateEvent.Super.constructor.apply(this, arguments);
     }
-    FaultEvent.Extends(Event);
+    IntermediateEvent.Extends(Event);
 
-    FaultEvent.prototype.name = function() {
-        return Config.Node.Names.FAULT_EVENT;
+    IntermediateEvent.prototype.name = function() {
+        return Config.Node.Names.INTERMEDIATE_EVENT;
     }
 
-    FaultEvent.prototype.type = function() {
-       return Config.Node.Types.FAULT_EVENT;
+    IntermediateEvent.prototype.type = function() {
+       return Config.Node.Types.INTERMEDIATE_EVENT;
     }
 
     /*
@@ -598,7 +598,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
         MultiFaultEvent.Super.constructor.apply(this, arguments);
     }
-    MultiFaultEvent.Extends(FaultEvent);
+    MultiFaultEvent.Extends(IntermediateEvent);
 
     MultiFaultEvent.prototype.name = function() {
         return Config.Node.Names.MULTI_FAULT_EVENT;
@@ -861,8 +861,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                 return new BasicEvent(options);
             case Config.Node.Types.BASIC_EVENT_SET:
                 return new BasicEventSet(options);
-            case Config.Node.Types.FAULT_EVENT:
-                return new FaultEvent(options);
+            case Config.Node.Types.INTERMEDIATE_EVENT:
+                return new IntermediateEvent(options);
             case Config.Node.Types.MULTI_FAULT_EVENT:
                 return new MultiFaultEvent(options);
             case Config.Node.Types.AND_GATE:
@@ -896,7 +896,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         BasicEvent:       BasicEvent,
         BasicEventSet:    BasicEventSet,
         UndevelopedEvent: UndevelopedEvent,
-        FaultEvent:       FaultEvent,
+        IntermediateEvent:IntermediateEvent,
         AndGate:          AndGate,
         OrGate:           OrGate,
         XorGate:          XorGate,
