@@ -539,7 +539,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     }
 
     /*
-     *  Multi Event
+     *  Basic Event Set
      */
     function BasicEventSet() {
         BasicEventSet.Super.constructor.apply(this, arguments);
@@ -574,7 +574,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     }
 
     /*
-     *  Fault Event
+     *  Intermediate Event
      */
     function IntermediateEvent() {
         IntermediateEvent.Super.constructor.apply(this, arguments);
@@ -590,26 +590,26 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     }
 
     /*
-     *  Fault Event
+     *  Intermediate Event Set
      */
-    function MultiFaultEvent() {
+    function IntermediateEventSet() {
         // no incoming connections allowed
         this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
 
-        MultiFaultEvent.Super.constructor.apply(this, arguments);
+        IntermediateEventSet.Super.constructor.apply(this, arguments);
     }
-    MultiFaultEvent.Extends(IntermediateEvent);
+    IntermediateEventSet.Extends(IntermediateEvent);
 
-    MultiFaultEvent.prototype.name = function() {
-        return Config.Node.Names.MULTI_FAULT_EVENT;
-    }
-
-    MultiFaultEvent.prototype.type = function() {
-       return Config.Node.Types.MULTI_FAULT_EVENT;
+    IntermediateEventSet.prototype.name = function() {
+        return Config.Node.Names.INTERMEDIATE_EVENT_SET;
     }
 
-    MultiFaultEvent.prototype._defineProperties = function() {
-        var properties = MultiFaultEvent.Super._defineProperties.call(this);
+    IntermediateEventSet.prototype.type = function() {
+       return Config.Node.Types.INTERMEDIATE_EVENT_SET;
+    }
+
+    IntermediateEventSet.prototype._defineProperties = function() {
+        var properties = IntermediateEventSet.Super._defineProperties.call(this);
 
         properties.push(new Properties.Text({
             name:         'Cardinality',
@@ -863,8 +863,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                 return new BasicEventSet(options);
             case Config.Node.Types.INTERMEDIATE_EVENT:
                 return new IntermediateEvent(options);
-            case Config.Node.Types.MULTI_FAULT_EVENT:
-                return new MultiFaultEvent(options);
+            case Config.Node.Types.INTERMEDIATE_EVENT_SET:
+                return new IntermediateEventSet(options);
             case Config.Node.Types.AND_GATE:
                 return new AndGate(options);
             case Config.Node.Types.PRIORITY_AND_GATE:

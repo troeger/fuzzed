@@ -22,8 +22,8 @@ NODE_TYPES = {
     },
     4: {
         'name': u'Intermediate Event Set',
-        'type': 'multi_fault',
-        'image': 'multi_fault_event.svg',
+        'type': 'intermediate-set',
+        'image': 'intermediate_event_set.svg',
         'help': 'Set of intermediate events',
         'optional': 'False'
     },
