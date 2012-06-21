@@ -237,7 +237,7 @@ def createFuzzTreeGraph(owner, title):
 	p=Property(node=n)
 	p.saveWithChangeEvent('name', 'System Failure')
 	p=Property(node=n)
-	p.saveWithChangeEvent('optional', 'Undefined')
+	p.saveWithChangeEvent('optional', 'undefined')
 
 def delGraph(g):
 	g.deleted=True
