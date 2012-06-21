@@ -521,7 +521,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                         min:   0,
                         max:   1,
                         step:  0.01,
-                        value: probability || 0
+                        value: exactSelected ? probability : 0
                     }, this)
                 }, {
                     name:     'Fuzzy',
@@ -534,7 +534,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                             'very likely',
                             'highly'
                         ],
-                        value: properties.Probability
+                        value: !exactSelected ? properties.Probability : 'very'
                     }, this)
                 }]
             }, this)
