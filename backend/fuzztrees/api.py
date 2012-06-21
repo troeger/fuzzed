@@ -6,6 +6,7 @@ from django.db import transaction
 from fuzztrees.models import *
 from nodes_config import NODE_TYPES, NODE_TYPE_IDS
 import json
+import traceback
 
 @login_required
 @csrf_exempt
@@ -220,10 +221,16 @@ def edges(request, graph_id, node_id):
 			if 'destination' in request.POST:
 				try:
 					client_id=int(request.POST['id'])
+					print client_id
 					g=Graph.objects.get(pk=graph_id, deleted=False)
+					print g
+					print node_id
 					n=Node.objects.get(client_id=node_id, deleted=False)
+					print n
 					d=Node.objects.get(client_id=request.POST['destination'], deleted=False)
+					print d
 					e=Edge(client_id=client_id, src=n, dest=d)
+					print e
 					e.save()
 					c=History(command=Commands.ADD_EDGE, graph=g, edge=e)
 					c.save()

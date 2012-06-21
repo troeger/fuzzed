@@ -88,7 +88,6 @@ class Graph(models.Model):
 
 	def toJsonDict(self):
 		nodesArray = [n.toJsonDict() for n in self.nodes.all().filter(deleted=False)]
-		print nodesArray
 		return {'id': self.pk, 'name': str(self), 'type': GRAPH_JS_TYPE[self.type], 'nodes': nodesArray}
 
 	def saveWithAddEvent(self):

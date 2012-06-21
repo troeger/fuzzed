@@ -8,8 +8,8 @@ NODE_TYPES = {
     },
     2: {
         'name': u'Basic Event Set',
-        'type': 'multi',
-        'image': 'multi_event.svg',
+        'type': 'basic-set',
+        'image': 'basic_event_set.svg',
         'help': 'Set of basic events with identical properties',
         'optional': 'False'
     },
