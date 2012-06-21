@@ -539,8 +539,13 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     }
 
     BasicEvent.prototype._defineProperties = function(properties) {
-        var probability   = parseFloat(properties.Probability);
-        var exactSelected = typeof properties.Probability === 'undefined' || !isNaN(probability);
+        var probability = parseFloat(properties.Probability);
+        if (isNaN(probability) && properties.Probability) {
+            probability = properties.Probability;
+        } else if (isNaN(probability) && !properties.Probability) {
+            probability = 0;
+        }
+        var exactSelected = typeof probability === 'number';
 
         return [
             new Properties.Text({
@@ -569,7 +574,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                         min:   0,
                         max:   1,
                         step:  0.01,
-                        value: exactSelected ? probability : 0
+                        value: probability
                     }, this)
                 }, {
                     name:     'Fuzzy',
