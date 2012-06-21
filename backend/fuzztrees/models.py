@@ -2,8 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 
+from nodes_config import NODE_TYPES, NODE_TYPE_IDS, nodeTypeChoices
 
-from nodes_config import NODE_TYPES, nodeTypeChoices
+import random
 
 class GraphTypes():
 	FAULT_TREE=1
@@ -75,20 +76,22 @@ class Graph(models.Model):
 				self.dump(subtree, indent+1)
 
 	def toJsonDict(self):
-		nodesArray = [n.toJsonDict() for n in self.nodes.filter(deleted=False)]
+		nodesArray = [n.toJsonDict() for n in self.nodes.all().filter(deleted=False)]
 		print nodesArray
 		return {'id': self.pk, 'name': str(self), 'type': GRAPH_JS_TYPE[self.type], 'nodes': nodesArray}
 
-	def saveAddEvent(self):
+	def saveWithAddEvent(self):
+		self.save()
 		c=History(command=Commands.ADD_GRAPH, graph=self)
 		c.save()
 
-	def saveDeleteEvent(self):
+	def saveWithDeleteEvent(self):
+		self.save()
 		c=History(command=Commands.DEL_GRAPH, graph=self)
 		c.save()
 
 class Node(models.Model):
-	client_id = models.BigIntegerField()
+	client_id = models.BigIntegerField(default=random.randint(1,1000))
 	type = models.PositiveSmallIntegerField(choices=nodeTypeChoices())
 	xcoord = models.IntegerField()
 	ycoord = models.IntegerField()
@@ -105,7 +108,7 @@ class Node(models.Model):
 	def toJsonDict(self):
 		pos = {'x': self.xcoord, 'y': self.ycoord}
 		edgesArray = [e.toJsonDict() for e in self.outgoing.all().filter(deleted=False)]
-		props = dict([p.toTuple() for p in self.properties])
+		props = dict([p.toTuple() for p in self.properties.all()])
 		return {'id': self.client_id, 'type': NODE_TYPES[self.type]['type'] , 'position': pos, 'properties': props, 'outgoingEdges': edgesArray}
 
 	def getChildren(self):
@@ -125,12 +128,14 @@ class Node(models.Model):
 			d['children']=kids
 		return d
 
-	def saveAddEvent(self):
-		c=History(command=Commands.ADD_NODE, node=self)
+	def saveWithAddEvent(self):
+		self.save()
+		c=History(command=Commands.ADD_NODE, node=self, graph=self.graph)
 		c.save()
 
-	def saveDeleteEvent(self):
-		c=History(command=Commands.DEL_NODE, node=self)
+	def saveWithDeleteEvent(self):
+		self.save()
+		c=History(command=Commands.DEL_NODE, node=self, graph=self.graph)
 		c.save()
 
 
@@ -146,11 +151,13 @@ class Edge(models.Model):
 	def toJsonDict(self):
 		return {'id': self.client_id, 'source': self.src.client_id, 'target': self.dest.client_id}
 
-	def saveAddEvent(self):
+	def saveWithAddEvent(self):
+		self.save()
 		c=History(command=Commands.ADD_EDGE, edge=self)
 		c.save()
 
-	def saveDeleteEvent(self):
+	def saveWithDeleteEvent(self):
+		self.save()
 		c=History(command=Commands.DEL_EDGE, edge=self)
 		c.save()
 
@@ -165,21 +172,32 @@ class Property(models.Model):
 
 	def __unicode__(self):
 		if self.node:
-			return "Node "+str(node)+":%s = %s"%(self.key, self.val)
+			return "Node "+str(self.node.pk)+" : %s = %s"%(self.key, self.val)
 		elif self.graph:
-			return "Graph "+str(graph)+":%s = %s"%(self.key, self.val)
+			return "Graph "+str(self.graph.pk)+" : %s = %s"%(self.key, self.val)
 		else:
-			return "Edge "+str(edge)+":%s = %s"%(self.key, self.val)
+			return "Edge "+str(self.edge.pk)+" : %s = %s"%(self.key, self.val)
 
 	def toTuple(self):
 		return (self.key, self.val)
 
-	def saveChangeEvent(self, graph):
+	def saveWithChangeEvent(self, key, val):
 		h=History(command=Commands.CHANGE_PROP, prop=self)
 		h.oldkey=self.key
 		h.oldval=self.val
-		h.graph=graph
-		h.save()
+		if self.graph:
+			h.graph=self.graph
+		elif self.node:
+			h.graph=self.node.graph
+		elif self.edge:
+			if self.edge.src:
+				h.graph=self.edge.src.graph
+			elif self.edge.dest:
+				h.graph=self.edge.dest.graph
+		h.save()		# will fail if due to some error the graph property was not filled
+		self.key=key
+		self.val=val
+		self.save()
 
 class History(models.Model):
 	command = models.PositiveSmallIntegerField(choices=COMMAND_TYPE, null=False)
@@ -195,28 +213,29 @@ class History(models.Model):
 	insert_date = models.DateTimeField(null=False, blank=False, auto_now_add=True, editable=False)
 
 def createFuzzTreeGraph(owner, title):
+	# create graph
 	g=Graph(owner=owner)
 	g.type=GraphTypes.FUZZ_TREE
-	g.save()
-	g.saveAddEvent()
-	p=Property(graph=g, key='name', val=title)
-	p.saveChangeEvent(g)    # change from empty property to filled propery
-	p.save()
+	g.saveWithAddEvent()
+	# set graph name
+	p=Property(graph=g)
+	p.saveWithChangeEvent('name', title)    # change from empty property to filled propery
+	# create root node
+	n=Node(graph=g, type=NODE_TYPE_IDS['fault'], xcoord=10, ycoord=2)
+	n.saveWithAddEvent()
+	# set root node name
+	p=Property(node=n)
+	p.saveWithChangeEvent('name', 'System Failure')
 
 def delGraph(g):
 	g.deleted=True
-	g.save()
-	g.saveDeleteEvent()
+	g.saveWithDeleteEvent()
 
 def renameGraph(g, newName):
 	p=get_object_or_404(Property, graph=g, key='name')
-	p.saveChangeEvent(g)
-	p.val=newName
-	p.save()
+	p.saveWithChangeEvent('name', newName)
 
 def setNodeProperty(node, key, value):
 	p=Property.objects.get(node=node, key=key)
-	p.saveChangeEvent(node.graph)
-	p.val=value
-	p.save()
+	p.saveWithChangeEvent(key, value)
 
