@@ -158,7 +158,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         var url = URLHelper.fullUrlForGraph(id);
 
         var successCallback = function(json) {
-            //TODO: Figure format
+            //TODO: Figure diagram kind here
 
             // fill graph
             var graph = new Graph(json.id);

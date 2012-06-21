@@ -379,6 +379,8 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         var jsonNodes = json.nodes;
         this.graph(graph);
 
+        console.log(json);
+
         // parse the json nodes and convert them to node objects
         _.each(jsonNodes, function(jsonNode) {
             graph.addNode(Nodes.newNodeForType(jsonNode.type, {id: jsonNode.id}));

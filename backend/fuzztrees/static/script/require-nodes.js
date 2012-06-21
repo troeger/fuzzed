@@ -541,21 +541,21 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     /*
      *  Multi Event
      */
-    function MultiEvent() {
-        MultiEvent.Super.constructor.apply(this, arguments);
+    function BasicEventSet() {
+        BasicEventSet.Super.constructor.apply(this, arguments);
     }
-    MultiEvent.Extends(BasicEvent);
+    BasicEventSet.Extends(BasicEvent);
 
-    MultiEvent.prototype.name = function() {
-        return Config.Node.Names.MULTI_EVENT;
-    }
-
-    MultiEvent.prototype.type = function() {
-        return Config.Node.Types.MULTI_EVENT;
+    BasicEventSet.prototype.name = function() {
+        return Config.Node.Names.BASIC_EVENT_SET;
     }
 
-    MultiEvent.prototype._defineProperties = function() {
-        var properties = MultiEvent.Super._defineProperties.call(this);
+    BasicEventSet.prototype.type = function() {
+        return Config.Node.Types.BASIC_EVENT_SET;
+    }
+
+    BasicEventSet.prototype._defineProperties = function() {
+        var properties = BasicEventSet.Super._defineProperties.call(this);
 
         properties.push(
             new Properties.Text({
@@ -596,7 +596,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         // no incoming connections allowed
         this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
 
-        MultiEvent.Super.constructor.apply(this, arguments);
+        MultiFaultEvent.Super.constructor.apply(this, arguments);
     }
     MultiFaultEvent.Extends(FaultEvent);
 
@@ -859,8 +859,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         switch(type) {
             case Config.Node.Types.BASIC_EVENT:
                 return new BasicEvent(options);
-            case Config.Node.Types.MULTI_EVENT:
-                return new MultiEvent(options);
+            case Config.Node.Types.BASIC_EVENT_SET:
+                return new BasicEventSet(options);
             case Config.Node.Types.FAULT_EVENT:
                 return new FaultEvent(options);
             case Config.Node.Types.MULTI_FAULT_EVENT:
@@ -894,7 +894,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     return {
         // classes
         BasicEvent:       BasicEvent,
-        MultiEvent:       MultiEvent,
+        BasicEventSet:    BasicEventSet,
         UndevelopedEvent: UndevelopedEvent,
         FaultEvent:       FaultEvent,
         AndGate:          AndGate,
