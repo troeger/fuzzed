@@ -180,6 +180,7 @@
 #FuzzedProperties div.ui-select {
     width:        63%;
     padding-left: 0.4em;
+    margin:       5px 0;
 }
 
 #FuzzedProperties div.ui-select span.ui-btn-text {

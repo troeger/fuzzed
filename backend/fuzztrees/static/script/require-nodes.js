@@ -19,7 +19,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         this._editor     = undefined; // will be set when appending
         this._graph      = undefined; // will be set as soon as it get added to a concrete graph
         this._id         = properties.id || new Date().getTime();
-        this._optional   = false;
+        this._optional   = properties.Optional === 'yes' ? true : false;
 
         // state
         this._disabled    = false;
@@ -449,6 +449,18 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
                 value:        properties.Probability || 0,
                 disabled:     true
+            }, this),
+
+            new Properties.Radio({
+                name:     'Optional',
+                options:  [
+                    'no',
+                    'yes'
+                ],
+                value:    properties.Optional || 'no',
+                change:   function() {
+                    this.setOptional(!this._optional);
+                }.bind(this)
             }, this)
         ];
     }
@@ -537,6 +549,18 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                         value: !exactSelected ? properties.Probability : 'very'
                     }, this)
                 }]
+            }, this),
+
+            new Properties.Radio({
+                name:     'Optional',
+                options:  [
+                    'no',
+                    'yes'
+                ],
+                value:    properties.Optional || 'no',
+                change:   function() {
+                    this.setOptional(!this._optional);
+                }.bind(this)
             }, this)
         ];
     }
@@ -560,7 +584,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     BasicEventSet.prototype._defineProperties = function(properties) {
         var parentProperties = BasicEventSet.Super._defineProperties.call(this, properties);
 
-        parentProperties.push(
+        parentProperties.splice(-2, 0,
             new Properties.Text({
                 name:         'Cardinality',
                 type:         'number',
