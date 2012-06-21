@@ -40,6 +40,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     Node.prototype.allowsConnectionsTo = function(otherNode) {
         // no connections to same node
         if (this == otherNode) return false;
+        if (otherNode instanceof TopEvent) return false;
 
         // there is already a connection between these nodes
         var connections = jsPlumb.getConnections({
@@ -485,6 +486,41 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     }
 
     /*
+     *  Top Event
+     */ 
+    function TopEvent(properties) {
+        TopEvent.Super.constructor.call(this, properties);
+    }
+    TopEvent.Extends(Event);
+
+    TopEvent.prototype.name = function() {
+        return Config.Node.Names.TOP_EVENT;
+    }
+
+    TopEvent.prototype.type = function() {
+        return Config.Node.Types.TOP_EVENT;
+    }
+
+    TopEvent.prototype._defineProperties = function(properties) {
+        return [
+            new Properties.Text({
+                name:   'Name',
+                value:  properties.Name || this.name(),
+                mirror: this._container
+            }, this),
+
+            new Properties.Text({
+                name:         'Probability',
+                mirror:       this._container,
+                mirrorPrefix: 'p=',
+                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
+                value:        properties.Probability || 0,
+                disabled:     true
+            }, this),
+        ];
+    }
+
+    /*
      *  Basic Event
      */
     function BasicEvent(properties) {
@@ -913,6 +949,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                 return new UndevelopedEvent(properties);
             case Config.Node.Types.HOUSE_EVENT:
                 return new HouseEvent(properties);
+            case Config.Node.Types.TOP_EVENT:
+                return new TopEvent(properties);
         }
     }
 
@@ -934,6 +972,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         ChoiceEvent:      ChoiceEvent,
         RedundancyEvent:  RedundancyEvent,
         HouseEvent:       HouseEvent,
+        TopEvent:         TopEvent,
 
         newNodeForType:   newNodeForType
     };

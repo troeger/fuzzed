@@ -84,6 +84,7 @@ define(function() {
             OPTIONAL_INDICATOR_RADIUS: Math.round(GRID_SIZE / 10),
 
             Names: {
+                TOP_EVENT:              'Top Event',
                 BASIC_EVENT:            'Basic Event',
                 BASIC_EVENT_SET:        'Basic Event Set',
                 INTERMEDIATE_EVENT:     'Intermediate Event',
@@ -101,6 +102,7 @@ define(function() {
             },
 
             Types: {
+                TOP_EVENT:              'top',
                 BASIC_EVENT:            'basic',
                 BASIC_EVENT_SET:        'basic-set',
                 INTERMEDIATE_EVENT:     'intermediate',

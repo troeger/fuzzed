@@ -96,6 +96,12 @@ NODE_TYPES = {
         'image': 'house_event.svg',
         'help':  'An event that is expected to occur and typically does not denote a failure',
         'optional': 'False'
+    },
+    15: {
+        'name': u'Top Event',
+        'type': 'top',
+        'image': 'intermediate_event.svg',
+        'hidden': True
     }
 }
 

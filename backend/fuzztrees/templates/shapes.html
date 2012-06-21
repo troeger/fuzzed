@@ -4,6 +4,8 @@
 		<li>
 			<div class="ui-grid-a">
 				{% for key, node in node_types.items %}
+
+					{% if not 'hidden' in node or not node.hidden %}
 					<div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell" title="{{ node.help }}">
 						&nbsp
 						<div id="{{ node.type }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}">
@@ -11,7 +13,16 @@
 						</div>
 						&nbsp
 						<span class="fuzzed-node-thumbnail-label">{{ node.name }}</span>
-					</div> 
+					</div>
+
+					{% else %}
+					<div class="fuzzed-node-thumbnail-cell" style="display:none">
+						<div id="{{ node.type }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}">
+							{% include node.image %}
+						</div>
+					<div>
+					{% endif %}
+
 				{% endfor %}
 			</div>
 		<li>

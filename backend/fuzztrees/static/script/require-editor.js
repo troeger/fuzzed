@@ -215,18 +215,27 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
 
     // remove the current contained nodes from the canvas and clear the selection
     Selection.prototype.remove = function() {
+        var containsTop = false;
+
         _.each(this._nodes, function(node) {
-            Backend.deleteNode(node);
-            node.graph().deleteNode(node);
-            node.remove();
-        }.bind(this))
+            if (!(node instanceof Nodes.TopEvent)) {
+                Backend.deleteNode(node);
+                node.graph().deleteNode(node);
+                node.remove();
+
+            } else {
+                containsTop = true;
+            }
+        }.bind(this));
 
         _.each(this._connections, function(connection) {
             jsPlumb.detach(connection);
-        })
+        });
 
-        this._empty();
-        this._editor.properties.hide();
+        if (!containsTop) {
+            this._empty();
+            this._editor.properties.hide();
+        }
 
         return this;
     }
