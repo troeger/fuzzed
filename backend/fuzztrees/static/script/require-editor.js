@@ -462,7 +462,7 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
             HoverPaintStyle: {
                 strokeStyle: Config.JSPlumb.STROKE_HIGHLIGHTED
             },
-            Connector:       Config.JSPlumb.STROKE_STYLE,
+            Connector:       [Config.JSPlumb.CONNECTOR_STYLE, {stub: Config.JSPlumb.CONNECTOR_STUB}],
             Anchors:         ['BottomMiddle', 'TopMiddle'],
             ConnectionsDetachable: false
         });

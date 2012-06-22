@@ -59,7 +59,9 @@ define(function() {
             STROKE_SELECTED:    '#FF9640',
             STROKE_DISABLED:    '#CCC',
             STROKE_WIDTH:       2,
-            STROKE_STYLE:       'Flowchart',
+
+            CONNECTOR_STYLE:    'Flowchart',
+            CONNECTOR_STUB:     5, // min. distance in px before connector bends
 
             ENDPOINT_RADIUS: 7,
             ENDPOINT_FILL:   '#409FFF',
