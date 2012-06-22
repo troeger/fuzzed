@@ -123,21 +123,16 @@
 
 .fuzzed-node-halo-connect {
     /* XXX: this is a temporary solution */
-    width:                  13px;
-    height:                 13px;
-    -webkit-border-radius:  6px;
-    -moz-border-radius:     6px;
-    border-radius:          6px;
     background-color:       #409FFF;
     position:               absolute;
     visibility:             hidden;
-    top:                    29px;
-    left:                   21px;
+    top:                    50px;
+    left:                   18px;
     z-index:                150; /* above image, TODO: let halo care about that */
     cursor:                 move;
 }
 
-.fuzzed-node-halo-connect:hover {
+.fuzzed-node-selected .fuzzed-node-halo-connect {
     background-color:       #FF9640;
 }
 

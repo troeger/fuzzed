@@ -5,6 +5,7 @@ define(function() {
     return {
         Classes: {
             NODE:                    'fuzzed-node',
+            NODE_SELECTED:           'fuzzed-node-selected',
             NODE_THUMBNAIL:          'fuzzed-node-thumbnail',
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_LABEL:              'fuzzed-node-label',

@@ -89,6 +89,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     Node.prototype.deselect = function() {
         this._selected = false;
 
+        this._container.removeClass(Config.Classes.NODE_SELECTED);
+
         if (this._highlighted) {
             this._nodeImage.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
             this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
@@ -212,6 +214,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         if (this._disabled) return this;
 
         this._selected = true;
+        this._container.addClass(Config.Classes.NODE_SELECTED);
         this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
         this._optionalIndicator.attr('stroke', Config.Node.STROKE_SELECTED);
         if (!this._optional) {
@@ -415,7 +418,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
             .appendTo(container);
 
         if (this._maxInConnections != 0) {
-            var connectionHandle = jQuery('<span></span>')
+            var connectionHandle = jQuery('<span class="ui-icon ui-icon-plus ui-icon-shadow"></span>')
                 .addClass(Config.Classes.NODE_HALO_CONNECT)
                 .appendTo(container);
         }
