@@ -762,6 +762,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
      *  XorGate
      */
     function XorGate(properties) {
+        // visuals
+        this._connectorOffset = jQuery.extend({top: 0, bottom: -5}, this._connectorOffset);
+
         XorGate.Super.constructor.call(this, properties);
     } 
     XorGate.Extends(Gate);
@@ -794,6 +797,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
      *  VotingOrGate
      */
     function VotingOrGate(properties) {
+        // visuals
+        this._connectorOffset = jQuery.extend({top: 0, bottom: -5}, this._connectorOffset);
+        
         VotingOrGate.Super.constructor.call(this, properties);
     } 
     VotingOrGate.Extends(Gate);
