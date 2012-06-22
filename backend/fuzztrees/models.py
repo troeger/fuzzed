@@ -101,7 +101,7 @@ class Graph(models.Model):
 		c.save()
 
 class Node(models.Model):
-	client_id = models.BigIntegerField(default=random.randint(1,1000))
+	client_id = models.BigIntegerField(default=0) # top nodes always get the 0 ID, frontend must not reassign the 0
 	type = models.PositiveSmallIntegerField(choices=nodeTypeChoices())
 	xcoord = models.IntegerField()
 	ycoord = models.IntegerField()

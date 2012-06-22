@@ -158,7 +158,7 @@ def node(request, graph_id, node_id):
 	if request.is_ajax():
 		try:
 			g=Graph.objects.get(pk=graph_id, deleted=False)
-			n=Node.objects.get(client_id=node_id, deleted=False)
+			n=Node.objects.get(graph=g, client_id=node_id, deleted=False)
 		except:
 			return HttpResponseBadRequest()
 		if request.method == 'DELETE':
@@ -222,8 +222,8 @@ def edges(request, graph_id, node_id):
 				try:
 					client_id=int(request.POST['id'])
 					g=Graph.objects.get(pk=graph_id, deleted=False)
-					n=Node.objects.get(client_id=node_id, deleted=False)
-					d=Node.objects.get(client_id=request.POST['destination'], deleted=False)
+					n=Node.objects.get(graph=g, client_id=node_id, deleted=False)
+					d=Node.objects.get(graph=g, client_id=request.POST['destination'], deleted=False)
 					e=Edge(client_id=client_id, src=n, dest=d)
 					e.save()
 					c=History(command=Commands.ADD_EDGE, graph=g, edge=e)
@@ -249,7 +249,7 @@ def edge(request, graph_id, node_id, edge_id):
 	if request.is_ajax():
 		try:
 			g=Graph.objects.get(pk=graph_id, deleted=False)
-			n=Node.objects.get(client_id=node_id, deleted=False)
+			n=Node.objects.get(graph=g, client_id=node_id, deleted=False)
 			e=Edge.objects.get(client_id=edge_id, src=n, deleted=False)
 		except:
 			return HttpResponseBadRequest()

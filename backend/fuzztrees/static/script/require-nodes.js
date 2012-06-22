@@ -18,10 +18,10 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         // logic
         this._editor     = undefined; // will be set when appending
         this._graph      = undefined; // will be set as soon as it get added to a concrete graph
-        this._id         = properties.id || new Date().getTime();
-        if (properties.Optional === 'yes') {
+        this._id         = properties.id || new Date().getTime() + 1; // make sure the 0 is not reassigned; it's reserved for the top event
+        if (properties.optional === 'yes') {
             this._optional = true;
-        } else if (properties.Optional === 'no') {
+        } else if (properties.optional === 'no') {
             this._optional = false;
         } else {
             this._optional = undefined;
@@ -484,7 +484,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                     'no',
                     'yes'
                 ],
-                value:    properties.Optional || 'no',
+                value:    properties.optional || 'no',
                 change:   function() {
                     this.setOptional(!this._optional);
                 }.bind(this)
@@ -624,7 +624,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                     'no',
                     'yes'
                 ],
-                value:    properties.Optional || 'no',
+                value:    properties.optional || 'no',
                 change:   function() {
                     this.setOptional(!this._optional);
                 }.bind(this)
