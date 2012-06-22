@@ -62,7 +62,7 @@ define(function() {
             STROKE_WIDTH:       2,
 
             CONNECTOR_STYLE:    'Flowchart',
-            CONNECTOR_STUB:     5, // min. distance in px before connector bends
+            CONNECTOR_STUB:     10, // min. distance in px before connector bends
 
             ENDPOINT_RADIUS: 7,
             ENDPOINT_FILL:   '#409FFF',
