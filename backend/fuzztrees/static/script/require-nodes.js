@@ -434,6 +434,12 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         this._maxInConnections  = this._maxInConnections  == undefined ?  1 : this._maxInConnections;
         this._maxOutConnections = this._maxOutConnections == undefined ? -1 : this._maxOutConnections;
 
+        var defaultProperties = {
+            optional: 'no'
+        }
+
+        properties = jQuery.extend(defaultProperties, properties);
+
         Event.Super.constructor.call(this, properties);
     }
     Event.Extends(Node);
