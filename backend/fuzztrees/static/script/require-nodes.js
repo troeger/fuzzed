@@ -226,6 +226,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
         if (optional) {
             this._optionalIndicator.attr('fill', Config.Node.OPTIONAL_INDICATOR_FILL);
+        } else if (this._selected) {
+            this._optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
         } else if (this._highlighted) {
             this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
         } else {
