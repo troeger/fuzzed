@@ -33,6 +33,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         this._selected    = false;
 
         // visuals
+        this._connectorOffset = jQuery.extend({top: 0, bottom: 0}, this._connectorOffset);
+
         var visuals             = this._setupVisualRepresentation();
         this._container         = visuals.container;
         this._nodeImage         = visuals.nodeImage;
@@ -293,19 +295,21 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     Node.prototype._setupEndpoints = function() {
         // get upper and lower image offsets
         if (typeof this._optional === 'undefined') {
-            var imageTopOffset    = this._nodeImage.offset().top - this._container.offset().top;
+            var topOffset    = this._nodeImage.offset().top - this._container.offset().top;
         } else {
             var optionalIndicatorWrapper = jQuery(this._optionalIndicator._container);
-            var imageTopOffset    = optionalIndicatorWrapper.offset().top - this._container.offset().top;
+            var topOffset    = optionalIndicatorWrapper.offset().top - this._container.offset().top;
         }
-        var imageBottomOffset = this._nodeImage.offset().top - this._container.offset().top + this._nodeImage.height();
+        topOffset -= this._connectorOffset.top;
+        var bottomOffset = this._nodeImage.offset().top - this._container.offset().top + this._nodeImage.height();
+        bottomOffset += this._connectorOffset.bottom;
 
         // make node source
         if (this._maxInConnections != 0) {
             //TODO: we can use an halo icon instead later
             jsPlumb.makeSource(this._connectionHandle, {
                 parent: this._container,
-                anchor:   [ 0.5, 0, 0, 1, 0, imageBottomOffset],
+                anchor:   [ 0.5, 0, 0, 1, 0, bottomOffset],
                 maxConnections: this._maxInConnections,
                 connectorStyle: this._connectorStyle,
                 dragOptions: {
@@ -331,7 +335,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         var targetNode = this;
         if (this._maxOutConnections != 0) {
             jsPlumb.makeTarget(this._container, {
-                anchor:         [ 0.5, 0, 0, -1, 0, imageTopOffset],
+                anchor:         [ 0.5, 0, 0, -1, 0, topOffset],
                 maxConnections: this._maxOutConnections,
                 dropOptions: {
                     accept: function(draggable) {
@@ -739,6 +743,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
      *  OrGate
      */
     function OrGate(properties) {
+        // visuals
+        this._connectorOffset = jQuery.extend({top: 0, bottom: -5}, this._connectorOffset);
+
         OrGate.Super.constructor.call(this, properties);
     } 
     OrGate.Extends(Gate);
