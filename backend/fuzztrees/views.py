@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib import auth
-from django.http import HttpResponseRedirect, HttpResponseBadRequest
+from django.http import HttpResponseRedirect
+from fuzztrees.middleware import HttpResponseBadRequest
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
 import os, urllib, random, string, datetime
 from fuzztrees.models import Graph, GraphTypes, History, Commands, createFuzzTreeGraph, delGraph, renameGraph
@@ -28,13 +29,13 @@ def settings(request):
 def dashboard(request):
 	if "new" in request.POST:
 		if request.POST['new']=='faulttree':
-			return HttpResponseBadRequest()
+			raise HttpResponseBadRequest()
 		elif request.POST['new']=='fuzztree':
 			createFuzzTreeGraph(request.user, "New FuzzTree")
 		elif request.POST['new']=='rbd':
-			return HttpResponseBadRequest()
+			raise HttpResponseBadRequest()
 		else:
-			return HttpResponseBadRequest()
+			raise HttpResponseBadRequest()
 	elif "delete" in request.POST and "graph" in request.POST:
 		g=get_object_or_404(Graph, pk=request.POST["graph"], owner=request.user)
 		delGraph(g)

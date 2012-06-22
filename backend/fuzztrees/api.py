@@ -1,4 +1,5 @@
-from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadRequest, HttpResponseNotFound
+from fuzztrees.middleware import *
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +10,7 @@ import json
 import traceback
 
 @login_required
+@transaction.commit_on_success
 @csrf_exempt
 def undos(request, graph_id):
 	"""
@@ -23,13 +25,14 @@ def undos(request, graph_id):
 	if request.is_ajax():
 		if request.method == 'GET':
 			#TODO: Fetch undo stack for the graph
-			return HttpResponse(status=200)
+			return HttpResponse()
 		elif request.method == 'POST':
 			#TODO: Perform top command on undo stack
-			return HttpResponse(status=204)
-		return HttpResponseNotAllowed(['GET', 'POST']) 
+			return HttpResponseNoResponse()
+		raise HttpResponseNotAllowedAnswer(['GET', 'POST']) 
 
 @login_required
+@transaction.commit_on_success
 @csrf_exempt
 def redos(request, graph_id):
 	"""
@@ -44,15 +47,15 @@ def redos(request, graph_id):
 	if request.is_ajax():
 		if request.method == 'GET':
 			#TODO Fetch redo stack for the graph
-			return HttpResponse(status=200)
+			return HttpResponse()
 		elif request.method == 'POST':
 			#TODO Perform top command on redo stack
-			return HttpResponse(status=204)
-		return HttpResponseNotAllowed(['GET', 'POST']) 
+			return HttpResponseNoResponse()
+		raise HttpResponseNotAllowedAnswer(['GET', 'POST']) 
 
 @login_required
-@transaction.commit_on_success
 @csrf_exempt
+@transaction.commit_on_success
 def graphs(request):
 	"""
 	Add new graph in the backend
@@ -69,17 +72,17 @@ def graphs(request):
 					if t==GraphTypes.FUZZ_TREE:
 						createFuzzTreeGraph(request.user, request.POST['name'])
 					else:
-						return HttpResponseBadRequest()	
+						raise HttpResponseBadRequestAnswer()	
 				except:
-					return HttpResponseBadRequest()	
+					raise HttpResponseBadRequestAnswer()	
 				else:		
-					response=HttpResponse(status=201)
+					response=HttpResponseCreated()
 					response['Location']=reverse('graph', args=[g.pk])
 					response['ID'] = g.pk
 					return response
 			else:
-				return HttpResponseBadRequest()
-		return HttpResponseNotAllowed(['POST']) 
+				raise HttpResponseBadRequestAnswer()
+		raise HttpResponseNotAllowedAnswer(['POST']) 
 
 @login_required
 def graph(request, graph_id):
@@ -94,10 +97,10 @@ def graph(request, graph_id):
 			try:
 				g=Graph.objects.get(pk=graph_id, owner=request.user, deleted=False)
 			except:
-				return HttpResponseNotFound()
+				raise HttpResponseNotFoundAnswer()
 			data=json.dumps(g.toJsonDict())
 			return HttpResponse(data, 'application/javascript')
-		return HttpResponseNotAllowed(['GET']) 
+		raise HttpResponseNotAllowedAnswer(['GET']) 
 	
 @login_required
 @transaction.commit_on_success
@@ -123,13 +126,13 @@ def nodes(request, graph_id):
 					c=History(command=Commands.ADD_NODE, graph=g, node=n)
 					c.save()
 				except:
-					return HttpResponseBadRequest()
+					raise HttpResponseBadRequestAnswer()
 				else:
 					responseBody = json.dumps(n.toJsonDict())
 					response=HttpResponse(responseBody, 'application/javascript', status=201)
 					response['Location']=reverse('node', args=[g.pk, n.pk])
 					return response
-		return HttpResponseNotAllowed(['POST']) 
+		raise HttpResponseNotAllowedAnswer(['POST']) 
 
 @login_required
 @transaction.commit_on_success
@@ -160,7 +163,7 @@ def node(request, graph_id, node_id):
 			g=Graph.objects.get(pk=graph_id, deleted=False)
 			n=Node.objects.get(graph=g, client_id=node_id, deleted=False)
 		except:
-			return HttpResponseBadRequest()
+			raise HttpResponseBadRequestAnswer()
 		if request.method == 'DELETE':
 			# delete node
 			try:
@@ -180,9 +183,9 @@ def node(request, graph_id, node_id):
 				c=History(command=Commands.DEL_NODE, graph=g, node=n)
 				c.save()
 			except:
-				return HttpResponseBadRequest()						
+				raise HttpResponseBadRequestAnswer()						
 			else:
-				return HttpResponse(status=204)
+				return HttpResponseNoResponse()
 		elif request.method == 'POST':
 			if 'xcoord' in request.POST and 'ycoord' in request.POST:
 				try:
@@ -194,17 +197,17 @@ def node(request, graph_id, node_id):
 					c=History(command=Commands.CHANGE_COORD, graph=g, node=n, oldxcoord=oldxcoord, oldycoord=oldycoord)
 					c.save()
 				except:
-					return HttpResponseBadRequest()
-				return HttpResponse(status=204)
+					raise HttpResponseBadRequestAnswer()
+				return HttpResponseNoResponse()
 			elif 'key' in request.POST and 'value' in request.POST:
 				setNodeProperty(n, request.POST['key'], request.POST['value'])
-				return HttpResponse(status=204)
+				return HttpResponseNoResponse()
 			elif 'type' in request.POST:
 				#TODO change node type			
-				return HttpResponse(status=204)
+				return HttpResponseNoResponse()
 			else:
-				return HttpResponseBadRequest()
-		return HttpResponseNotAllowed(['DELETE','POST'])
+				raise HttpResponseBadRequestAnswer()
+		raise HttpResponseNotAllowedAnswer(['DELETE','POST'])
 
 @login_required
 @transaction.commit_on_success
@@ -229,16 +232,16 @@ def edges(request, graph_id, node_id):
 					c=History(command=Commands.ADD_EDGE, graph=g, edge=e)
 					c.save()
 				except Exception, e:
-					return HttpResponseBadRequest()
+					raise HttpResponseBadRequestAnswer()
 				else:
 					responseBody = json.dumps(e.toJsonDict())
 					response=HttpResponse(responseBody, status=201)
 					response['Location']=reverse('edge', args=[g.pk, n.pk, e.pk])
 					return response
-		return HttpResponseNotAllowed(['POST'])
+		raise HttpResponseNotAllowedAnswer(['POST'])
 
 @login_required
-@transaction.commit_on_success 
+@transaction.commit_on_success
 @csrf_exempt
 def edge(request, graph_id, node_id, edge_id):
 	"""
@@ -252,7 +255,7 @@ def edge(request, graph_id, node_id, edge_id):
 			n=Node.objects.get(graph=g, client_id=node_id, deleted=False)
 			e=Edge.objects.get(client_id=edge_id, src=n, deleted=False)
 		except:
-			return HttpResponseBadRequest()
+			raise HttpResponseBadRequestAnswer()
 
 		if request.method == 'DELETE':
 			try:
@@ -261,8 +264,8 @@ def edge(request, graph_id, node_id, edge_id):
 				c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
 				c.save()
 			except:
-				return HttpResponseBadRequest()
+				raise HttpResponseBadRequestAnswer()
 			else:
-				return HttpResponse(status=204)
+				return HttpResponseNoResponse()
 
-		return HttpResponseNotAllowed(['DELETE'])
+		raise HttpResponseNotAllowedAnswer(['DELETE'])

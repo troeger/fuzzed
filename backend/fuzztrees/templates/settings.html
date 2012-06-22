@@ -28,7 +28,7 @@
 				<label for="email">E-Mail:</label>
 				<input data-inline="true" type="email" name="email" id="email" value="{{ user.email }}"/>
 				<label data-inline="true" for="newsletter">Keep me informed about updates.</label>
-				<input data-inline="true" type="checkbox" name="newsletter" id="newsletter" {% if user.get_profile.newsletter = True %}checked{% endif %}/>
+				<input data-inline="true" type="checkbox" name="newsletter" id="newsletter" {% if user.get_profile.newsletter %}checked{% endif %}/>
 				<input data-icon="check" data-theme="e" data-inline="true" type="submit" name="settings_save" value="Save"/>
 			</form>
 		</div>
