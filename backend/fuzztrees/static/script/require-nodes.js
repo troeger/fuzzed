@@ -613,13 +613,15 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                     selected: !exactSelected,
                     input: new Properties.Select({
                         options: [
-                            'very',
+                            'never',
+                            'very unlikely',
+                            'unlikely',
                             'more or less',
-                            'slightly',
+                            'likely',
                             'very likely',
-                            'highly'
+                            'always'
                         ],
-                        value: !exactSelected ? properties.Probability : 'very'
+                        value: !exactSelected ? properties.Probability : 'very unlikely'
                     }, this)
                 }]
             }, this),
