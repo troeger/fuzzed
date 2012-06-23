@@ -440,8 +440,10 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
      */
     function Event(properties) {
         if (this.constructor === Event) return;
-        this._maxInConnections  = this._maxInConnections  == undefined ?  1 : this._maxInConnections;
-        this._maxOutConnections = this._maxOutConnections == undefined ? -1 : this._maxOutConnections;
+        this._maxInConnections  = this._maxInConnections  == undefined ?    1 : this._maxInConnections;
+        this._maxOutConnections = this._maxOutConnections == undefined ?   -1 : this._maxOutConnections;
+        //XXX: little hack to prevent p mirroring for some special events
+        this._mirrorProbability = this._mirrorProbability == undefined ? true : this._mirrorProbability;
 
         var defaultProperties = {
             optional: 'no'
@@ -475,7 +477,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
             new Properties.Text({
                 name:         'Probability',
-                mirror:       this._container,
+                mirror:       this._mirrorProbability ? this._container : false,
                 mirrorPrefix: 'p=',
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
                 value:        properties.Probability || 0,
@@ -675,6 +677,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
      *  Intermediate Event
      */
     function IntermediateEvent(properties) {
+        //XXX
+        this._mirrorProbability = false;
+
         IntermediateEvent.Super.constructor.call(this, properties);
     }
     IntermediateEvent.Extends(Event);
@@ -799,7 +804,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     function VotingOrGate(properties) {
         // visuals
         this._connectorOffset = jQuery.extend({top: 0, bottom: -5}, this._connectorOffset);
-        
+
         VotingOrGate.Super.constructor.call(this, properties);
     } 
     VotingOrGate.Extends(Gate);
@@ -850,6 +855,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
         this._connectorStyle = jsPlumb.extend({ dashstyle: "4 2"}, this._connectorStyle);
 
+        //XXX
+        this._mirrorProbability = false;
+
         ChoiceEvent.Super.constructor.call(this, properties);
     } 
     ChoiceEvent.Extends(Event);
@@ -877,6 +885,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         // outgoing connections are dashed
         this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
         this._connectorStyle = jsPlumb.extend({ dashstyle: "4 2"}, this._connectorStyle);
+
+        //XXX
+        this._mirrorProbability = false;
 
         RedundancyEvent.Super.constructor.call(this, properties);
     } 
