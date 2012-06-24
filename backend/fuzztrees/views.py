@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib import auth
 from django.http import HttpResponseRedirect
+from django.core.mail import mail_managers
 from fuzztrees.middleware import HttpResponseBadRequest
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 import os, urllib, random, string, datetime
@@ -103,6 +104,7 @@ def login(request):
 			newuser.is_active=True
 			newuser.save()
 			linkOpenID(newuser, user.openid_claim)
+			mail_managers("New user", str(newuser), fail_silently=True)
 			return HttpResponseRedirect('/login/?openid_identifier=%s'%urllib.quote_plus(request.session['openid_identifier']))	
 	backend_login(request, user)
 	return HttpResponseRedirect('/dashboard/')
