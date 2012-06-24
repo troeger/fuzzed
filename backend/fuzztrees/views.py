@@ -50,10 +50,10 @@ def dashboard(request):
 				prof=request.user.get_profile()
 				prof.newsletter=True
 				prof.save()
-			else:
-				prof=request.user.get_profile()
-				prof.newsletter=False
-				prof.save()
+		else:
+			prof=request.user.get_profile()
+			prof.newsletter=False
+			prof.save()
 		request.user.save()		
 	graphs=request.user.graphs.all().filter(deleted=False)
 	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
@@ -72,13 +72,13 @@ def editor(request, graph_id):
 	return render_to_response('editor.html', {'graph' : g, 'node_types' : NODE_TYPES}, context_instance=RequestContext(request))
 
 def login(request):
-	#if request.POST:
-	#	if 'loginname' in request.POST and 'loginpw' in request.POST:
-	#		user=auth.authenticate(username=request.POST['loginname'], password=request.POST['loginpw'])
-	#		if user is not None:
-	#			if user.is_active:
-	#				auth.login(request, user)
-	if "openid_identifier" in request.GET:
+	if request.POST:
+		if 'loginname' in request.POST and 'loginpw' in request.POST:
+			user=auth.authenticate(username=request.POST['loginname'], password=request.POST['loginpw'])
+			if user is not None:
+				if user.is_active:
+					auth.login(request, user)
+	elif "openid_identifier" in request.GET:
 		# first stage of OpenID authentication
 		request.session['openid_identifier']=request.GET['openid_identifier']
 		return preAuthenticate(request.GET['openid_identifier'], "http://"+request.get_host()+"/login/?openidreturn")

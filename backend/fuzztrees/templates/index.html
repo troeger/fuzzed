@@ -29,7 +29,7 @@
 
 		<div data-role="content" style="text-align: center">	
 			<h1>Welcome to FuzzTrees !</h1>
-			<div style="text-align: middle; margin-bottom: 50px; margin-left: auto; margin-right: auto; width: 450px">
+			<div style="text-align: middle; margin-bottom: 50px; margin-left: auto; margin-right: auto; width: 600px">
 				<div data-mini="true" data-role="collapsible">
 				   <h3>This service is under development. We are working on ...</h3>
 					<div data-mini="true" data-role="collapsible">
@@ -66,8 +66,8 @@
 					</div>
 				</div>
 			</div>	
-			<h3>Please sign-in with one of these providers.</h3>
-			<div style="margin-top: 0px; margin-left: auto; margin-right: auto; width: 580px">
+			<div style="margin-top: 0px; margin-left: auto; margin-right: auto; width: 600px">
+				<h4>Please use one of these authentication providers.</h4>
 				<form data-ajax="false" action="/login/" method="get" id="openid_form">
 					<input type="hidden" name="action" value="verify" />
 					<fieldset>
@@ -83,6 +83,13 @@
 							Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
 						</noscript>
 					</fieldset>
+				</form>
+			</div>
+			<div style="margin-top: 0px; margin-left: auto; margin-right: auto; width: 300px">
+				<form data-mini="true" action="/login/" method="post" id="login_form">{% csrf_token %}
+					<input data-mini="true" type="text" id="loginname" name="loginname"/>
+					<input data-mini="true" type="password" id="loginpw" name="loginpw"/>
+					<input data-mini="true" data-inline="true" type="submit" data-icon="check" data-theme="e"  name="formlogin" value="Login"/>
 				</form>
 			</div>
 		</div>	
