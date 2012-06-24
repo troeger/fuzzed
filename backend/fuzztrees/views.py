@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django.contrib import auth
 from django.http import HttpResponseRedirect
 from fuzztrees.middleware import HttpResponseBadRequest
-from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
+from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 import os, urllib, random, string, datetime
 from fuzztrees.models import Graph, GraphTypes, History, Commands, createFuzzTreeGraph, delGraph, renameGraph
 
@@ -23,7 +23,7 @@ def about(request):
 
 @login_required
 def settings(request):
-	return render_to_response('settings.html', {'user': request.user}, context_instance=RequestContext(request))
+	return render_to_response('settings.html', {'user': request.user, 'openids': getOpenIDs(request.user)}, context_instance=RequestContext(request))
 
 @login_required
 def dashboard(request):
