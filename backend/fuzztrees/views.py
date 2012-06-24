@@ -16,7 +16,7 @@ from nodes_config import NODE_TYPES
 def index(request):
 	if "logout" in request.GET:
 		auth.logout(request)
-	return render_to_response('index.html', {}, context_instance=RequestContext(request))
+	return render_to_response('index.html', {'pwlogin': ('pwlogin' in request.GET)}, context_instance=RequestContext(request))
 
 def about(request):
 	return render_to_response('about.html', {}, context_instance=RequestContext(request))
@@ -27,12 +27,12 @@ def settings(request):
 
 @login_required
 def dashboard(request):
-	if "new" in request.POST:
-		if request.POST['new']=='faulttree':
+	if "new" in request.POST and "type" in request.POST and "title" in request.POST:
+		if request.POST['type']=='faulttree':
 			raise HttpResponseBadRequest()
-		elif request.POST['new']=='fuzztree':
-			createFuzzTreeGraph(request.user, "New FuzzTree")
-		elif request.POST['new']=='rbd':
+		elif request.POST['type']=='fuzztree':
+			createFuzzTreeGraph(request.user, request.POST['title'])
+		elif request.POST['type']=='rbd':
 			raise HttpResponseBadRequest()
 		else:
 			raise HttpResponseBadRequest()
@@ -59,9 +59,13 @@ def dashboard(request):
 	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
 
 @login_required
-def dashboard_popup(request, graph_id):
+def dash_new(request):
+	return render_to_response('dash_new.html', {'type':request.POST['type']}, context_instance=RequestContext(request))	
+
+@login_required
+def dash_change(request, graph_id):
 	g=get_object_or_404(Graph, pk=graph_id, owner=request.user)
-	return render_to_response('dashboard_popup.html', {'graph': g}, context_instance=RequestContext(request))	
+	return render_to_response('dash_change.html', {'graph': g}, context_instance=RequestContext(request))	
 
 def teaser(request):
     return render_to_response('teaser.html', {}, context_instance=RequestContext(request))

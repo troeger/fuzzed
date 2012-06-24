@@ -14,7 +14,7 @@ class GraphTypes():
 
 GRAPH_TYPE = (
     ( GraphTypes.FAULT_TREE, u'Fault Tree'),
-    ( GraphTypes.FUZZ_TREE, u'Fuzz Tree'),	
+    ( GraphTypes.FUZZ_TREE, u'FuzzTree'),	
     ( GraphTypes.RBD, u'Reliability Block Diagram')
 )
 
@@ -68,6 +68,12 @@ class Graph(models.Model):
 			return c.insert_date
 		except:
 			return "(Unknown)"
+
+	def graph_type(self):
+		for t, name in GRAPH_TYPE:
+			if t==self.type:
+				return name 
+		assert(False)	# safeguard
 
 	def __unicode__(self):
 		try:

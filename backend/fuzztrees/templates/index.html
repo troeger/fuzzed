@@ -85,6 +85,7 @@
 					</fieldset>
 				</form>
 			</div>
+			{% if pwlogin %}
 			<div style="margin-top: 0px; margin-left: auto; margin-right: auto; width: 300px">
 				<form data-mini="true" action="/login/" method="post" id="login_form">{% csrf_token %}
 					<input data-mini="true" type="text" id="loginname" name="loginname"/>
@@ -92,6 +93,7 @@
 					<input data-mini="true" data-inline="true" type="submit" data-icon="check" data-theme="e"  name="formlogin" value="Login"/>
 				</form>
 			</div>
+			{% endif %}
 		</div>	
 
 		{% include "footer.html" %}
