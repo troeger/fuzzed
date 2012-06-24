@@ -471,7 +471,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
             new Properties.Text({
                 name:     'Cost',
-                value:    properties.Cost || 1,
+                value:    properties.Cost || '--',
                 disabled: true
             }, this),
 
@@ -480,7 +480,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                 mirror:       this._mirrorProbability ? this._container : false,
                 mirrorPrefix: 'p=',
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
-                value:        properties.Probability || 0,
+                value:        properties.Probability || '--',
                 disabled:     true
             }, this),
 
@@ -546,7 +546,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                 mirror:       this._container,
                 mirrorPrefix: 'p=',
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
-                value:        properties.Probability || 0,
+                value:        properties.Probability || '',
                 disabled:     true
             }, this),
         ];
