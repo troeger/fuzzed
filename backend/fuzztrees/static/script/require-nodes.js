@@ -23,9 +23,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         } else {
             this._id = new Date().getTime() + 1; // make sure the 0 is not reassigned; it's reserved for the top event
         }
-        if (properties.optional === 'yes') {
+        if (properties.Optional === 'yes') {
             this._optional = true;
-        } else if (properties.optional === 'no') {
+        } else if (properties.Optional === 'no') {
             this._optional = false;
         } else {
             this._optional = undefined;
@@ -493,7 +493,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                     'no',
                     'yes'
                 ],
-                value:    properties.optional || 'no',
+                value:    properties.Optional || 'no',
                 change:   function() {
                     this.setOptional(!this._optional);
                 }.bind(this)
@@ -635,7 +635,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                     'no',
                     'yes'
                 ],
-                value:    properties.optional || 'no',
+                value:    properties.Optional || 'no',
                 change:   function() {
                     this.setOptional(!this._optional);
                 }.bind(this)
