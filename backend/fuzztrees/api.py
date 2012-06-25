@@ -99,6 +99,7 @@ def graph(request, graph_id):
 			except:
 				raise HttpResponseNotFoundAnswer()
 			data=json.dumps(g.toJsonDict())
+			#print data
 			return HttpResponse(data, 'application/javascript')
 		raise HttpResponseNotAllowedAnswer(['GET']) 
 	
