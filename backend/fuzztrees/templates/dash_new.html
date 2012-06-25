@@ -1,0 +1,30 @@
+<html>
+<head>
+</head>
+<body>
+<div data-role="dialog">
+
+<div data-theme="d" data-role="header">
+	<h1>New graph</h1>
+</div>
+
+	<div data-role="content">
+		<form method="POST" action="/dashboard/">{% csrf_token %}
+			<fieldset class="ui-grid-a">
+				<input type="hidden" name="type" value="{{type}}"/>
+				<div class="ui-block-a">
+					<input style="margin:0.6em" type="text" name="title" id="title"/>
+				</div>
+				<div class="ui-block-b">
+					<input data-icon="check" data-theme="e" type="submit" name="new" value="	{%ifequal type "faulttree"%}Create Fault Tree{%endifequal%}
+					{%ifequal type "fuzztree"%}Create FuzzTree{%endifequal%}
+					{%ifequal type "rbd"%}Create RBD{%endifequal%}
+					"/>
+				</div>
+			</fieldset>
+			<button type="submit" data-rel="back">Cancel</button>
+		</form>
+	</div>
+</div>
+</body>
+</html>
