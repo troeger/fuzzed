@@ -25,6 +25,18 @@
 			<form method="POST" action="/dashboard/">{% csrf_token %}
 				<label for="username">User name:</label>
 				<input class="ui-disabled" type="text" name="username" id="username" value="{{ user.username }}"/>
+
+				<fieldset class="ui-grid-a">
+					<div class="ui-block-a">
+						<label for="firstname">First name:</label>
+						<input type="text" name="firstname" id="firstname" value="{{ user.first_name }}"/>
+					</div>
+					<div class="ui-block-b">
+						<label for="lastname">Last name:</label>
+						<input type="text" name="lastname" id="lastname" value="{{ user.last_name }}"/>
+					</div>
+				</fieldset>
+
 				<label for="email">E-Mail:</label>
 				<input data-inline="true" type="email" name="email" id="email" value="{{ user.email }}"/>
 				<label data-inline="true" for="newsletter">Keep me informed about updates.</label>

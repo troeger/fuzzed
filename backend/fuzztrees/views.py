@@ -46,6 +46,10 @@ def dashboard(request):
 	elif "settings_save" in request.POST:
 		if "email" in request.POST:
 			request.user.email=request.POST["email"];
+		if "firstname" in request.POST:
+			request.user.first_name=request.POST["firstname"];			
+		if "lastname" in request.POST:
+			request.user.last_name=request.POST["lastname"];			
 		if "newsletter" in request.POST:
 			if request.POST["newsletter"] == "on":
 				prof=request.user.get_profile()
