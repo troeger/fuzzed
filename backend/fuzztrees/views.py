@@ -94,17 +94,28 @@ def login(request):
 	elif "openidreturn" in request.GET:
 		user = backend_auth(openidrequest=request)
 		if user.is_anonymous():		
-			# not know to the backend so far, create it transparently
+			username=None
+			# not known to the backend so far, create it transparently
 			if 'nickname' in user.openid_sreg:
-				newuser=User(username=unicode(user.openid_sreg['nickname'],'utf-8'))
-			elif 'email' in user.openid_sreg:
-				newuser=User(username=unicode(user.openid_sreg['email'],'utf-8'))
-			elif AX.email in user.openid_ax:
-				newuser=User(username=unicode(user.openid_ax[AX.email],'utf-8'))
-			else:
+				username=unicode(user.openid_sreg['nickname'],'utf-8')[:29]
+			if 'email' in user.openid_sreg:			
+				email=unicode(user.openid_sreg['email'],'utf-8')[:29]
+			if AX.email in user.openid_ax:
+				email=unicode(user.openid_ax[AX.email],'utf-8')[:29]
+			if not username and email:
+				newuser=User(username=email, email=email)
+			elif not username and not email:
 				d=datetime.datetime.now()
-				randomname="Anonymous%u%u%u%u"%(d.hour,d.minute,d.second,d.microsecond)
-				newuser=User(username=randomname)
+				username="Anonymous%u%u%u%u"%(d.hour,d.minute,d.second,d.microsecond)
+				newuser=User(username=username)
+			elif username and email:
+				newuser=User(username=username, email=email)
+			elif username and not email:
+				newuser=User(username=username)
+			if AX.first in user.openid_ax:
+				newuser.first_name=unicode(user.openid_ax[AX.first],'utf-8')[:29]
+			if AX.last in user.openid_ax:
+				newuser.last_name=unicode(user.openid_ax[AX.last],'utf-8')[:29]
 			newuser.is_active=True
 			newuser.save()
 			linkOpenID(newuser, user.openid_claim)
