@@ -516,7 +516,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
     Gate.prototype.allowsConnectionsTo = function(otherNode) {
         // no connections between Event nodes
-        if (otherNode instanceof Gate) return false;
+        //if (otherNode instanceof Gate) return false;
         return Gate.Super.allowsConnectionsTo.call(this, otherNode);
     }
 
