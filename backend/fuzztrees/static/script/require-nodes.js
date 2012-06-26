@@ -450,7 +450,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         this._mirrorProbability = this._mirrorProbability == undefined ? true : this._mirrorProbability;
 
         var defaultProperties = {
-            optional: 'no'
+            Optional: 'no'
         }
 
         properties = jQuery.extend(defaultProperties, properties);
