@@ -516,7 +516,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
     Gate.prototype.allowsConnectionsTo = function(otherNode) {
         // no connections between Event nodes
-        if (otherNode instanceof Gate) return false;
+        //if (otherNode instanceof Gate) return false;
         return Gate.Super.allowsConnectionsTo.call(this, otherNode);
     }
 
@@ -918,14 +918,21 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         var parentProperties = RedundancyEvent.Super._defineProperties.call(this, properties);
 
         parentProperties.push(new Properties.Text({
-            name:         'Cardinality',
-            type:         'number',
-            value:        parseInt(properties.Cardinality) || 1,
+            name:         'K-Formula',
+            value:        'f(x)=x',
+            mirror:       this._container,
+            mirrorPrefix: 'k-formula: ',
+            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
+        }, this));
+
+        parentProperties.push(new Properties.Range({
+            name:         'Range',
             min:          1,
+            value:        properties.Range ? JSON.parse(properties.Range) : [1, 2],
             step:         1,
             mirror:       this._container,
-            mirrorPrefix: 'k=',
-            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
+            mirrorPrefix: 'range: ',
+            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY 
         }, this));
 
         return parentProperties;

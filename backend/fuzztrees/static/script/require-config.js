@@ -21,7 +21,9 @@ define(function() {
             PROPERTY_LABEL:             'fuzzed-property-label',
             PROPERTY_LABEL_PROBABILITY: 'fuzzed-node-label-probability',
             PROPERTY_SELECT:            'fuzzed-property-select',
-            PROPERTY_TEXT:              'fuzzed-property-text'
+            PROPERTY_TEXT:              'fuzzed-property-text',
+            PROPERTY_RANGE_MIN:         'fuzzed-property-range-min',
+            PROPERTY_RANGE_MAX:         'fuzzed-property-range-max'
         },
 
         Backend: {
@@ -136,18 +138,20 @@ define(function() {
                 },
 
                 Number: {
-                    type: 'text',
-                    max:   Number.MAX_VALUE,
                     min:  -Number.MAX_VALUE,
+                    max:   Number.MAX_VALUE,
                     step: 1 
-                },
-
-                Pattern: {
-                    pattern: '[.*]'
                 },
 
                 Radio: {
                     options: []
+                },
+
+                Range: {
+                    min:   -Number.MAX_VALUE,
+                    max:    Number.MAX_VALUE,
+                    step:  1,
+                    value: [0, 1]
                 },
 
                 Select: {
@@ -155,7 +159,7 @@ define(function() {
                 },
 
                 Text: {
-                    type: ''
+                    type: 'text'
                 }
             },
 

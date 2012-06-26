@@ -116,10 +116,11 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
              complete - [optional] Callback that gets called in both cases - successful and errornous property change.
      */
     Backend.changeProperty = function(node, key, value, success, error, complete) {
+        console.log(value);
         var url = URLHelper.fullUrlForNode(node);
         var data = {
-            'key': key,
-            'value': value
+            'key':   key,
+            'value': _.isArray(value) ? JSON.stringify(value) : value
         }
 
         jQuery.ajax({

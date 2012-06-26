@@ -146,6 +146,94 @@ define(['require-config', 'require-backend', 'require-oop'], function(Config, Ba
     }
 
     /*
+     *  Range Property
+     */
+    function Range(options, node) {
+        this._options = jQuery.extend({}, Config.Properties.Defaults.Range, this._options);
+        Range.Super.constructor.call(this, options, node);
+
+        var inputs = this._element.find('input'); 
+        this._min  = inputs.eq(0);
+        this._max  = inputs.eq(1); 
+        this._setupMirror();
+    }
+    Range.Extends(Property);
+
+    Range.prototype.value = function() {
+        return [this._min.val(), this._max.val()];
+    }
+
+    Range.prototype._afterAppend = function() {
+        this._min.textinput();
+        this._max.textinput();
+        this._element.fieldcontain();
+    }
+
+    Range.prototype._callbackElement = function() {
+        return this._min.add(this._max);
+    }
+
+    Range.prototype._change = function(eventObject) {
+        var options = this.options();
+        var value   = this.value();
+        var min     = parseFloat(value[0]);
+        var max     = parseFloat(value[1]);
+
+        if (isNaN(min)) min = options.min;
+        if (isNaN(max)) max = options.max;
+
+        if (min > max && this._min.is(eventObject.target)) {
+            max = min;
+        } else if (min > max && this._max.is(eventObject.target)) {
+            min = max;
+        }
+
+        this._min.val(min);
+        this._max.val(max);
+        if (this._mirror) this._mirror.html(this._mirrorString());
+
+        this._sendChange();
+    }
+
+    Range.prototype._keyup = function(eventObject) {
+        if (this._mirror) this._mirror.html(this._mirrorString());
+    }
+
+    Range.prototype._mirrorString = function() {
+        var value = this.value(); 
+        return this._options.mirrorPrefix + value[0] + '-' + value[1] + this._options.mirrorSuffix;
+    }
+
+    Range.prototype._setupElement = function() {
+        var fieldcontain = this._setupFieldcontain();
+        var label        = this._setupLabel();
+        var options      = this.options();
+
+        var min = jQuery('<input type="number">')
+            .attr('data-mini', 'true')
+            .attr('id',        this._id)
+            .attr('min',       options.min)
+            .attr('max',       options.max)
+            .attr('step',      options.step)
+            .attr('disabled',  options.disabled)
+            .val(this._options.value[0])
+            .addClass(Config.Classes.PROPERTY_TEXT);
+
+        var max = min
+            .clone()
+            .attr('id',  this._id + '-max')
+            .val(options.value[1])
+            .addClass(Config.Classes.PROPERTY_RANGE_MAX);
+
+        min.addClass(Config.Classes.PROPERTY_RANGE_MIN);
+
+        return fieldcontain
+            .append(label)
+            .append(min)
+            .append(max);
+    }
+
+    /*
      *  Radio Property
      */
     function Radio(options, node) {
@@ -418,18 +506,17 @@ define(['require-config', 'require-backend', 'require-oop'], function(Config, Ba
      *  Text Property
      */
     function Text(options, node) {
-        Text.Super.constructor.call(this, options, node);
-
         // option sanitization for general text fields
-        this._options = jQuery.extend({}, Config.Properties.Defaults.Text, this._options);
+        options = jQuery.extend({}, Config.Properties.Defaults.Text, options);
 
-        // enrich with additional features when we it is a number or pattern field
-        if (this._options.type === 'number') {
-            this._options = jQuery.extend({}, Config.Properties.Defaults.Number, this._options);
-
-        } else if (this._type === 'pattern') {
-            this._options = jQuery.extend({}, Config.Properties.Defaults.Pattern, this._options);
+        // enrich with additional features when we it is a number field
+        if (options.type === 'number') {
+            options = jQuery.extend({}, Config.Properties.Defaults.Number, options);
+        } else {
+            options.type = 'text';
         }
+
+        Text.Super.constructor.call(this, options, node);
 
         this._input = this._element.find('input');
         this._setupMirror();
@@ -479,6 +566,7 @@ define(['require-config', 'require-backend', 'require-oop'], function(Config, Ba
             .attr('max',       this._options.max)
             .attr('step',      this._options.step)
             .attr('disabled',  this._options.disabled)
+            .attr('pattern',   this._options.pattern)
             .val(this._options.value)
             .addClass(Config.Classes.PROPERTY_TEXT);
 
@@ -489,6 +577,7 @@ define(['require-config', 'require-backend', 'require-oop'], function(Config, Ba
 
     return {
         Radio:        Radio,
+        Range:        Range,
         Select:       Select,
         SingleChoice: SingleChoice,
         Text:         Text
