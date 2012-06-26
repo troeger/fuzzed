@@ -921,7 +921,18 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
             name:         'K-Formula',
             value:        'f(x)=x',
             mirror:       this._container,
+            mirrorPrefix: 'k-formula: ',
             mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
+        }, this));
+
+        parentProperties.push(new Properties.Range({
+            name:         'Range',
+            min:          1,
+            value:        properties.Range ? JSON.parse(properties.Range) : [1, 2],
+            step:         1,
+            mirror:       this._container,
+            mirrorPrefix: 'range: ',
+            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY 
         }, this));
 
         return parentProperties;

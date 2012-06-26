@@ -100,8 +100,8 @@
 
 .fuzzed-node-labels {
     position:         absolute;
-    z-index:          100; /* above connections */
-    background-color: rgba(255, 255, 255, 0.5);
+    z-index:          110; /* above connections */
+    background-color: rgba(255, 255, 255, 0.7);
 }
 
 .fuzzed-node-label {
@@ -218,6 +218,15 @@
     -webkit-box-shadow: none;
     -moz-box-shadow:    none;
     box-shadow:         none;
+}
+
+/* Range */
+#FuzzedProperties .fuzzed-property-range-min {
+    width: 29%;
+}
+
+#FuzzedProperties .fuzzed-property-range-max {
+    width: 29%;
 }
 
 #printtitle {display: none;}
