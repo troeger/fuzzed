@@ -15,9 +15,14 @@ MANAGERS = ADMINS
 EMAIL_SUBJECT_PREFIX='[FuzzTrees] '
 
 if isProduction:
-	DEBUG=False
-	TEMPLATE_DEBUG=False
-	DATABASES = {
+    DEBUG=False
+    TEMPLATE_DEBUG=False
+    SEND_BROKEN_LINK_EMAILS = False     
+    EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+    SERVER_EMAIL = 'noreply@citemaster.net'
+    EMAIL_HOST='localhost'
+
+    DATABASES = {
 	    'default': {
 		'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
 		'NAME': 'fuzztrees',                      # Or path to database file if using sqlite3.
@@ -28,7 +33,7 @@ if isProduction:
 	    }
 	}
 
-	TEMPLATE_DIRS = (
+    TEMPLATE_DIRS = (
 	    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
 	    # Always use forward slashes, even on Windows.
 	    # Don't forget to use absolute paths, not relative paths.
@@ -36,15 +41,29 @@ if isProduction:
 	    '/var/www/fuzztrees.net/backend/fuzztrees/static/img/nodes'
 	)
 
-	SEND_BROKEN_LINK_EMAILS = False 	
-	EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
-	SERVER_EMAIL = 'noreply@citemaster.net'
-	EMAIL_HOST='localhost'
 else:
-	DEBUG=True
-	TEMPLATE_DEBUG=True
-	EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'	
+    DEBUG=True
+    TEMPLATE_DEBUG=True
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'	
 
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': 'fuzztrees/database.sqlite',                      # Or path to database file if using sqlite3.
+            'USER': '',                      # Not used with sqlite3.
+            'PASSWORD': '',                  # Not used with sqlite3.
+            'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+            'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        }
+    }
+
+    TEMPLATE_DIRS = (
+        # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+        # Always use forward slashes, even on Windows.
+        # Don't forget to use absolute paths, not relative paths.
+        'fuzztrees/templates',
+        'fuzztrees/static/img/nodes'
+    )
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
