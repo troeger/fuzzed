@@ -918,13 +918,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         var parentProperties = RedundancyEvent.Super._defineProperties.call(this, properties);
 
         parentProperties.push(new Properties.Text({
-            name:         'Cardinality',
-            type:         'number',
-            value:        parseInt(properties.Cardinality) || 1,
-            min:          1,
-            step:         1,
+            name:         'K-Formula',
+            value:        'f(x)=x',
             mirror:       this._container,
-            mirrorPrefix: 'k=',
             mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
         }, this));
 
