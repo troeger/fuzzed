@@ -1,6 +1,5 @@
 syntax: glob
 *.pyc
 .DS_Store
-
-
+.orig
 *.sqlite
