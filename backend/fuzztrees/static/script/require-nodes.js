@@ -23,9 +23,9 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         } else {
             this._id = new Date().getTime() + 1; // make sure the 0 is not reassigned; it's reserved for the top event
         }
-        if (properties.Optional === 'yes') {
+        if (properties.optional === 'yes') {
             this._optional = true;
-        } else if (properties.Optional === 'no') {
+        } else if (properties.optional === 'no') {
             this._optional = false;
         } else {
             this._optional = undefined;
@@ -450,7 +450,7 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         this._mirrorProbability = this._mirrorProbability == undefined ? true : this._mirrorProbability;
 
         var defaultProperties = {
-            Optional: 'no'
+            optional: 'no'
         }
 
         properties = jQuery.extend(defaultProperties, properties);
@@ -467,33 +467,37 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     Event.prototype._defineProperties = function(properties) {
         return [
             new Properties.Text({
-                name:   'Name',
-                value:  properties.Name || this.name(),
+                name:   'name',
+                displayname: 'Name',
+                value:  properties.name || this.name(),
                 mirror: this._container
             }, this),
 
             new Properties.Text({
-                name:     'Cost',
-                value:    properties.Cost || '--',
+                name:     'cost',
+                displayname: 'Cost',
+                value:    properties.cost || '--',
                 disabled: true
             }, this),
 
             new Properties.Text({
-                name:         'Probability',
+                name:         'probability',
+                displayname: 'Probability',
                 mirror:       this._mirrorProbability ? this._container : false,
                 mirrorPrefix: 'p=',
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
-                value:        properties.Probability || '--',
+                value:        properties.probability || '--',
                 disabled:     true
             }, this),
 
             new Properties.Radio({
-                name:     'Optional',
+                name:     'optional',
+                displayname: 'Optional',
                 options:  [
                     'no',
                     'yes'
                 ],
-                value:    properties.Optional || 'no',
+                value:    properties.optional || 'no',
                 change:   function() {
                     this.setOptional(!this._optional);
                 }.bind(this)
@@ -539,17 +543,19 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     TopEvent.prototype._defineProperties = function(properties) {
         return [
             new Properties.Text({
-                name:   'Name',
-                value:  properties.Name || this.name(),
+                name:   'name',
+                displayname: 'Name',
+                value:  properties.name || this.name(),
                 mirror: this._container
             }, this),
 
             new Properties.Text({
-                name:         'Probability',
+                name:         'probability',
+                displayname:  'Probability',
                 mirror:       this._container,
                 mirrorPrefix: 'p=',
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
-                value:        properties.Probability || '',
+                value:        properties.probability || '',
                 disabled:     true
             }, this),
         ];
@@ -574,35 +580,39 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     }
 
     BasicEvent.prototype._defineProperties = function(properties) {
-        var probability = parseFloat(properties.Probability);
-        if (isNaN(probability) && properties.Probability) {
-            probability = properties.Probability;
-        } else if (isNaN(probability) && !properties.Probability) {
+        var probability = parseFloat(properties.probability);
+        if (isNaN(probability) && properties.probability) {
+            probability = properties.probability;
+        } else if (isNaN(probability) && !properties.probability) {
             probability = 0;
         }
         var exactSelected = typeof probability === 'number';
 
         return [
             new Properties.Text({
-                name:   'Name',
-                value:  properties.Name || this.name(),
+                name:   'name',
+                displayname: 'Name',
+                value:  properties.name || this.name(),
                 mirror: this._container
             }, this),
 
             new Properties.Text({
-                name:  'Cost',
+                name:  'cost',
+                displayname: 'Cost',
                 type:  'number',
-                value: properties.Cost || 1
+                value: properties.cost || 1
             }, this),
 
             new Properties.SingleChoice({
-                name:        'Probability',
+                name:        'probability',
+                displayname:  'Probability',
                 mirror:       this._container,
                 mirrorPrefix: 'p=',
                 mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
 
                 choices: [{
-                    name:     'Exact',
+                    name:     'exact',
+                    displayname: 'Exact',
                     selected:  exactSelected,
                     input: new Properties.Text({
                         type:  'number',
@@ -612,7 +622,8 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                         value: exactSelected ? probability : 0
                     }, this)
                 }, {
-                    name:     'Fuzzy',
+                    name:     'fuzzy',
+                    displayname: 'Fuzzy',
                     selected: !exactSelected,
                     input: new Properties.Select({
                         options: [
@@ -624,18 +635,19 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
                             'very likely',
                             'always'
                         ],
-                        value: !exactSelected ? properties.Probability : 'very unlikely'
+                        value: !exactSelected ? properties.probability : 'very unlikely'
                     }, this)
                 }]
             }, this),
 
             new Properties.Radio({
-                name:     'Optional',
+                name:     'optional',
+                displayname: 'Optional',
                 options:  [
                     'no',
                     'yes'
                 ],
-                value:    properties.Optional || 'no',
+                value:    properties.optional || 'no',
                 change:   function() {
                     this.setOptional(!this._optional);
                 }.bind(this)
@@ -664,9 +676,10 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
 
         parentProperties.splice(-2, 0,
             new Properties.Text({
-                name:         'Cardinality',
+                name:         'cardinality',
+                displayname:  'Cardinality',
                 type:         'number',
-                value:        properties.Cardinality || 1,
+                value:        properties.cardinality || 1,
                 min:          1,
                 step:         1,
                 mirror:       this._container,
@@ -720,9 +733,10 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         var parentProperties = IntermediateEventSet.Super._defineProperties.call(this, properties);
 
         parentProperties.push(new Properties.Text({
-            name:         'Cardinality',
+            name:         'cardinality',
+            displayname:  'Cardinality',
             type:         'number',
-            value:        properties.Cardinality || 1,
+            value:        properties.cardinality || 1,
             min:          1,
             step:         1,
             mirror:       this._container,
@@ -825,9 +839,10 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
     VotingOrGate.prototype._defineProperties = function(properties) {
         return [
             new Properties.Text({
-                name:         'Count',
+                name:         'count',
+                displayname:  'Count',
                 type:         'number',
-                value:        properties.Count || 1,
+                value:        properties.count || 1,
                 min:          0,
                 mirror:       this._container,
                 mirrorPrefix: 'k=',
@@ -918,20 +933,22 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
         var parentProperties = RedundancyEvent.Super._defineProperties.call(this, properties);
 
         parentProperties.push(new Properties.Text({
-            name:         'K-Formula',
-            value:        'f(x)=x',
+            name:         'kformula',
+            displayname:  'K-Formula',
+            mirrorPrefix: 'k: ',
+            value:        'N-2',
             mirror:       this._container,
-            mirrorPrefix: 'k-formula: ',
             mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
         }, this));
 
         parentProperties.push(new Properties.Range({
-            name:         'Range',
+            name:         'range',
+            displayname:  'N-Range',
+            mirrorPrefix: 'N: ',
             min:          1,
-            value:        properties.Range ? JSON.parse(properties.Range) : [1, 2],
+            value:        properties.range ? JSON.parse(properties.range) : [1, 2],
             step:         1,
             mirror:       this._container,
-            mirrorPrefix: 'range: ',
             mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY 
         }, this));
 

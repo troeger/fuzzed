@@ -134,7 +134,8 @@ define(function() {
                     mirrorSuffix: '',
                     mirrorClass:  [],
                     name:         '',
-                    value:        ''
+                    value:        '',
+                    displayname:  ''
                 },
 
                 Number: {

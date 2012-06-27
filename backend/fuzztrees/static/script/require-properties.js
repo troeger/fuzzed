@@ -28,6 +28,11 @@ define(['require-config', 'require-backend', 'require-oop'], function(Config, Ba
         return this._options.name;
     }
 
+    Property.prototype.displayname = function() {
+        return this._options.displayname;
+    }
+
+
     Property.prototype.mirror = function() {
         return this._mirror;
     }
@@ -103,7 +108,7 @@ define(['require-config', 'require-backend', 'require-oop'], function(Config, Ba
     Property.prototype._setupLabel = function(_id, text) {
         return jQuery('<label>')
             .attr('for', _id || this._id)
-            .html(text || this.options().name)
+            .html(text || this.options().displayname)
             .addClass(Config.Classes.PROPERTY_LABEL);
     }
 
@@ -313,7 +318,7 @@ define(['require-config', 'require-backend', 'require-oop'], function(Config, Ba
     Radio.prototype._setupFieldset = function() {
         return jQuery('<fieldset>')
             .attr('data-role', 'controlgroup')
-            .append(jQuery('<legend>').html(this.name()));
+            .append(jQuery('<legend>').html(this.displayname()));
     }
 
     /*
@@ -488,7 +493,7 @@ define(['require-config', 'require-backend', 'require-oop'], function(Config, Ba
                 .attr('checked', index === this._selected ? 'checked' : undefined);
             var label = jQuery('<label>')
                 .attr('for', _id)
-                .html(choice.name);
+                .html(choice.displayname);
 
             fieldset.append(input, label);
         }.bind(this));
