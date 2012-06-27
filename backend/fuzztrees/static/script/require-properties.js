@@ -504,7 +504,7 @@ define(['require-config', 'require-backend', 'require-oop'], function(Config, Ba
     SingleChoice.prototype._setupFieldset = function() {
         return jQuery('<fieldset>')
             .attr('data-role', 'controlgroup')
-            .append(jQuery('<legend>').html(this.name()));
+            .append(jQuery('<legend>').html(this.displayname()));
     }
 
     /*
