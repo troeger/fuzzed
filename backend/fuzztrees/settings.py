@@ -1,12 +1,9 @@
-import os.path
+import os.path, logging
 
 isProduction=False
 cwd=os.path.dirname(__file__)
 if cwd.startswith("/var/www/fuzztrees.net"):
 	isProduction=True
-
-DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ('Peter Troeger', 'peter.troeger@hpi.uni-potsdam.de'),
@@ -173,24 +170,40 @@ INSTALLED_APPS = (
     'fuzztrees'
 )
 
-# A sample logging configuration. The only tangible logging
-# performed by this configuration is to send an email to
-# the site admins on every HTTP 500 error when DEBUG=False.
-# See http://docs.djangoproject.com/en/dev/topics/logging for
-# more details on how to customize your logging configuration.
+class RequireDebugTrue(logging.Filter):
+    def filter(self, record):
+        return DEBUG
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s: %(message)s'
+        },
+    },    
     'filters': {
-        'require_debug_false': {
+        'require_django_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
+        },
+        'require_django_debug_true': {
+            '()': 'fuzztrees.settings.RequireDebugTrue'
         }
     },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
-            'filters': ['require_debug_false'],
+            'filters': ['require_django_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
+        },
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_django_debug_true'],
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
         }
     },
     'loggers': {
@@ -199,6 +212,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'fuzztrees': {
+            'handlers' : ['console'],
+            'level' : 'DEBUG',
+            'propagate': True,
+        }
     }
 }
 

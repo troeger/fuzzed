@@ -6,8 +6,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
 from fuzztrees.models import *
 from nodes_config import NODE_TYPES, NODE_TYPE_IDS
-import json
-import traceback
+import json, logging
+
+logger = logging.getLogger('fuzztrees')
 
 @login_required
 @transaction.commit_on_success
@@ -99,7 +100,8 @@ def graph(request, graph_id):
 			except:
 				raise HttpResponseNotFoundAnswer()
 			data=json.dumps(g.toJsonDict())
-			#print data
+			logger.debug("Returning graph in JSON:")
+			logger.debug(data)
 			return HttpResponse(data, 'application/javascript')
 		raise HttpResponseNotAllowedAnswer(['GET']) 
 	
