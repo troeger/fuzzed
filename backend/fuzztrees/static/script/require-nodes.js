@@ -552,9 +552,6 @@ define(['require-config', 'require-properties', 'require-backend', 'require-oop'
             new Properties.Text({
                 name:         'probability',
                 displayname:  'Probability',
-                mirror:       this._container,
-                mirrorPrefix: 'p=',
-                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
                 value:        properties.probability || '',
                 disabled:     true
             }, this),
