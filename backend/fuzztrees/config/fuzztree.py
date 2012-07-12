@@ -1,0 +1,256 @@
+
+FUZZTREE_CONFIG = {
+	'nodes': {
+		'node': {
+			'excludeFromShapesMenu': True,
+		    'optional': None,
+		    'numberOfIncomingConnections': -1, #infinite
+		    'numberOfOutgoingConnections':  1,
+		    'allowConnectionTo': ['node'],
+		    'name': {
+			    'type': 'text',
+		        'displayName': u'Name',
+			    'default': u'Node'
+		    }
+		},
+
+	    'event': {
+		    'inherits': 'node',
+		    'excludeFromShapesMenu': True,
+	        'optional': False,
+	        'numberOfIncomingConnections':  1,
+	        'numberOfOutgoingConnections': -1,
+	        'allowConnectionTo': ['gate'],
+	        'name': {
+		        # events show their names below the image
+		        'mirror': {
+			        'position': 'bottom',
+			        'style': ['bold']
+		        },
+	            'default': u'Event'
+	        },
+	        'cost': {
+		        'type': 'number',
+				'displayName': u'Cost',
+	            'min': 0,
+	            'step': 1,
+	            'default': 1,
+	            'disabled': True #only editable for basic events and sets
+	        }
+	    },
+
+	    'gate': {
+		    'inherits': 'node',
+		    'excludeFromShapesMenu': True,
+	        'optional': None,
+	        'numberOfIncomingConnections': -1,
+	        'numberOfOutgoingConnections':  1,
+	        'name': {
+		        'default': u'Gate'
+	        }
+	    },
+
+	    'basicEvent': {
+		    'inherits': 'event',
+		    'numberOfIncomingConnections': 0,
+			'image': 'basic_event.svg',
+	        'help': 'Initiating failure in a basic component',
+	        'name': {
+		        'default': u'Basic Event'
+	        },
+	        'cost': {
+		        'disabled': False
+	        }
+	    },
+
+	    'basicEventSet': {
+		    'inherits': 'basic_event',
+		    'image': 'basic_event_set.svg',
+		    'help': 'Set of basic events with identical properties',
+		    'name': {
+			    'default': u'Basic Event Set'
+		    },
+		    'cost': {
+			    'disabled': False
+		    },
+	        'cardinality': {
+		        'displayName': u'Cardinality',
+	            'type': 'number',
+	            'min': 1,
+	            'default': 1,
+	            'step': 1
+	        }
+	    },
+
+	    'intermediateEvent': {
+		    'inherits': 'event',
+		    'image': 'intermediate_event.svg',
+		    'help': 'Failure resulting from a combination of previous events',
+		    'name': {
+			    'default': u'Intermediate Event'
+		    }
+	    },
+
+	    'intermediateEventSet': {
+		    'inherits': 'intermediate_event',
+		    'numberOfIncomingConnections': 0,
+		    'image': 'intermediate_event_set.svg',
+		    'help': 'Set of intermediate events',
+		    'name': {
+			    'default': u'Intermediate Event Set'
+		    },
+		    'cardinality': {
+			    'displayName': u'Cardinality',
+			    'type': 'number',
+			    'min': 1,
+			    'default': 1,
+			    'step': 1
+		    }
+	    },
+
+		'redundancyEvent': {
+			'inherits': 'event',
+			'allowConnectionTo': ['node'],
+			'image': 'redundancy_event.svg',
+			'help': 'Placeholder for a voting OR gate over a chosen number of the input events',
+		    'connector': {
+			    'style': 'dashed'
+		    },
+		    'changedChildProperties': {
+			    'optional': None
+		    },
+			'name': {
+				'default': u'Redundancy Event'
+			}
+		},
+
+		'choiceEvent': {
+			'inherits': 'event',
+			'allowConnectionTo': ['event'],
+			'image': 'choice_event.svg',
+			'help': 'Placeholder for one of the input events',
+			'connector': {
+				'style': 'dashed'
+			},
+			'changedChildProperties': {
+				'optional': None
+			},
+			'name': {
+				'default': u'Choice Event'
+			}
+		},
+
+		'undevelopedEvent': {
+			'inherits': 'event',
+			'numberOfIncomingConnections': 0,
+			'image': 'undeveloped_event.svg',
+			'help': 'Event with no information available or insignificant impact',
+			'name': {
+				'default': u'Undeveloped Event'
+			}
+		},
+
+		'houseEvent': {
+			'inherits': 'event',
+			'numberOfIncomingConnections': 0,
+			'image': 'house_event.svg',
+			'help': 'An event that is expected to occur and typically does not denote a failure',
+			'name': {
+				'default': u'House Event'
+			}
+		},
+
+		'topEvent': {
+			'inherits': 'event',
+			'image': 'intermediate_event.svg',
+			'excludeFromShapesMenu': True,
+			'help': '',
+		    'optional': None,
+		    'name': {
+			    'default': u'Top Event'
+		    }
+		},
+
+	    'andGate': {
+		    'inherits': 'gate',
+		    'image': 'and_gate.svg',
+		    'help': 'Output event occurs if all input events occur',
+		    'name': {
+			    'default': u'AND Gate'
+		    }
+	    },
+
+	    'priorityAndGate': {
+		    'inherits': 'gate',
+		    'image': 'priority_and_gate.svg',
+		    'help': 'Output event occurs if all input events occur in the specific order',
+		    'name': {
+			    'default': u'Priority AND Gate'
+		    }
+	    },
+
+	    'orGate': {
+		    'inherits': 'gate',
+		    'image': 'or_gate.svg',
+		    'help': 'Output event occurs if one or more input events occur',
+		    'name': {
+			    'default': u'OR Gate'
+		    }
+	    },
+
+	    'xorGate': {
+		    'inherits': 'gate',
+		    'image': 'xor_gate.svg',
+		    'help': 'Output event occurs if exactly one of the input events occur',
+		    'name': {
+			    'default': u'XOR Gate'
+		    }
+	    },
+
+	    'votingOrGate': {
+		    'inherits': 'gate',
+		    'image': 'voting_or_gate.svg',
+		    'help': 'Output event occurs if the given number of input events occur',
+		    'name': {
+			    'default': u'Voting OR Gate'
+		    }
+	    },
+
+	    'inhibitGate': {
+		    'inherits': 'gate',
+		    'image': 'inhibit_gate.svg',
+		    'help': 'Output event occurs if the single input event occurs and the enabling condition is given',
+		    'name': {
+			    'default': u'Inhibit Gate'
+		    }
+	    }
+
+	},
+
+    'propertyDisplayOrder': [
+		'name',
+        'cost',
+        'probability',
+        'optional',
+        'count',
+        'k-formula',
+        'n-range'
+    ],
+
+    'shapeMenuNodeDisplayOrder': [
+	    'basicEvent',
+        'basicEventSet',
+        'intermediateEvent',
+        'intermediateEventSet',
+        'andGate',
+        'priorityAndGate',
+        'orGate',
+        'xorGate',
+        'votingOrGate',
+        'inhibitGate',
+        'choiceEvent',
+        'redundancyEvent',
+        'undevelopedEvent',
+        'houseEvent'
+    ]
+}
