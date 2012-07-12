@@ -36,6 +36,11 @@ FUZZTREE_CONFIG = {
 	            'step': 1,
 	            'default': 1,
 	            'disabled': True #only editable for basic events and sets
+	        },
+	        'probability': {
+		        'type': 'text',
+	            'displayName': u'Probability',
+	            'default': ''
 	        }
 	    },
 
@@ -60,6 +65,32 @@ FUZZTREE_CONFIG = {
 	        },
 	        'cost': {
 		        'disabled': False
+	        },
+	        'probability': {
+		        'type': 'option',
+		        'choices': {
+			        u'Exact': {
+						'type': 'number',
+			            'min': 0,
+			            'max': 1,
+			            'step': 0.01,
+			            'default': 0
+			        },
+		            u'Fuzzy': {
+						'type': 'select',
+		                'choices': [
+							u'never',
+		                    u'very unlikely',
+		                    u'unlikely',
+		                    u'more or less',
+		                    u'likely',
+		                    u'very likely',
+		                    u'always'
+		                ],
+		                'default': 'never'
+		            }
+		        },
+	            'default': u'Exact'
 	        }
 	    },
 
@@ -121,7 +152,19 @@ FUZZTREE_CONFIG = {
 		    },
 			'name': {
 				'default': u'Redundancy Event'
-			}
+			},
+		    'kFormula': {
+			    'type': 'text',
+		        'displayName': u'K-Formula',
+		        'default': u'N-2'
+		    },
+		    'nRange': {
+			    'type': 'range',
+		        'displayName': u'N-Range',
+		        'min': 1,
+		        'step': 1,
+		        'default': [1, 2] # min, max
+		    }
 		},
 
 		'choiceEvent': {
@@ -213,7 +256,14 @@ FUZZTREE_CONFIG = {
 		    'help': 'Output event occurs if the given number of input events occur',
 		    'name': {
 			    'default': u'Voting OR Gate'
-		    }
+		    },
+	        'count': {
+		        'type': 'number',
+	            'displayName': u'Count',
+	            'min': 1,
+	            'step': 1,
+	            'default': 2
+	        }
 	    },
 
 	    'inhibitGate': {
@@ -233,8 +283,8 @@ FUZZTREE_CONFIG = {
         'probability',
         'optional',
         'count',
-        'k-formula',
-        'n-range'
+        'kFormula',
+        'nRange'
     ],
 
     'shapeMenuNodeDisplayOrder': [
