@@ -20,20 +20,21 @@ class Generator(object):
 			# resolve parent inheritance
 			parent_type = node['inherits']
 			parent      = self.config['nodes'][parent_type]
-			self.__resolve_inheritance__(parent_type, parent)
+			parent      = self.__resolve_inheritance__(parent_type, parent)
 			del node['inherits']
 
 			# merge parent and node
-			self.config['nodes'][node_type] = self.__merge__(parent, node)
+			merged_node = self.__merge__(parent, node)
+			self.config['nodes'][node_type] = merged_node
 
 			# return merged node
-			return node
+			return merged_node
 
 		else:
 			return node
 
 	def __merge__(self, parent, node):
-		merged = {}
+		merged = copy.deepcopy(parent)
 		for key, value in node.iteritems():
 			if isinstance(value, collections.Mapping):
 				merged[key] = self.__merge__(parent.get(key, {}), value)
