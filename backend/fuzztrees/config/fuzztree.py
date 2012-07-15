@@ -95,7 +95,7 @@ FUZZTREE_CONFIG = {
 	    },
 
 	    'basicEventSet': {
-		    'inherits': 'basic_event',
+		    'inherits': 'basicEvent',
 		    'image': 'basic_event_set.svg',
 		    'help': 'Set of basic events with identical properties',
 		    'name': {
@@ -123,7 +123,7 @@ FUZZTREE_CONFIG = {
 	    },
 
 	    'intermediateEventSet': {
-		    'inherits': 'intermediate_event',
+		    'inherits': 'intermediateEvent',
 		    'numberOfIncomingConnections': 0,
 		    'image': 'intermediate_event_set.svg',
 		    'help': 'Set of intermediate events',
