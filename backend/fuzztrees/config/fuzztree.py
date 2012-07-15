@@ -57,6 +57,7 @@ FUZZTREE_CONFIG = {
 
 	    'basicEvent': {
 		    'inherits': 'event',
+			'excludeFromShapesMenu': False,
 		    'numberOfIncomingConnections': 0,
 			'image': 'basic_event.svg',
 	        'help': 'Initiating failure in a basic component',
@@ -115,6 +116,7 @@ FUZZTREE_CONFIG = {
 
 	    'intermediateEvent': {
 		    'inherits': 'event',
+			'excludeFromShapesMenu': False,
 		    'image': 'intermediate_event.svg',
 		    'help': 'Failure resulting from a combination of previous events',
 		    'name': {
@@ -141,6 +143,7 @@ FUZZTREE_CONFIG = {
 
 		'redundancyEvent': {
 			'inherits': 'event',
+			'excludeFromShapesMenu': False,
 			'allowConnectionTo': ['node'],
 			'image': 'redundancy_event.svg',
 			'help': 'Placeholder for a voting OR gate over a chosen number of the input events',
@@ -169,6 +172,7 @@ FUZZTREE_CONFIG = {
 
 		'choiceEvent': {
 			'inherits': 'event',
+			'excludeFromShapesMenu': False,
 			'allowConnectionTo': ['event'],
 			'image': 'choice_event.svg',
 			'help': 'Placeholder for one of the input events',
@@ -185,6 +189,7 @@ FUZZTREE_CONFIG = {
 
 		'undevelopedEvent': {
 			'inherits': 'event',
+			'excludeFromShapesMenu': False,
 			'numberOfIncomingConnections': 0,
 			'image': 'undeveloped_event.svg',
 			'help': 'Event with no information available or insignificant impact',
@@ -195,6 +200,7 @@ FUZZTREE_CONFIG = {
 
 		'houseEvent': {
 			'inherits': 'event',
+			'excludeFromShapesMenu': False,
 			'numberOfIncomingConnections': 0,
 			'image': 'house_event.svg',
 			'help': 'An event that is expected to occur and typically does not denote a failure',
@@ -216,6 +222,7 @@ FUZZTREE_CONFIG = {
 
 	    'andGate': {
 		    'inherits': 'gate',
+			'excludeFromShapesMenu': False,
 		    'image': 'and_gate.svg',
 		    'help': 'Output event occurs if all input events occur',
 		    'name': {
@@ -225,6 +232,7 @@ FUZZTREE_CONFIG = {
 
 	    'priorityAndGate': {
 		    'inherits': 'gate',
+			'excludeFromShapesMenu': False,
 		    'image': 'priority_and_gate.svg',
 		    'help': 'Output event occurs if all input events occur in the specific order',
 		    'name': {
@@ -234,6 +242,7 @@ FUZZTREE_CONFIG = {
 
 	    'orGate': {
 		    'inherits': 'gate',
+			'excludeFromShapesMenu': False,
 		    'image': 'or_gate.svg',
 		    'help': 'Output event occurs if one or more input events occur',
 		    'name': {
@@ -243,6 +252,7 @@ FUZZTREE_CONFIG = {
 
 	    'xorGate': {
 		    'inherits': 'gate',
+			'excludeFromShapesMenu': False,
 		    'image': 'xor_gate.svg',
 		    'help': 'Output event occurs if exactly one of the input events occur',
 		    'name': {
@@ -252,6 +262,7 @@ FUZZTREE_CONFIG = {
 
 	    'votingOrGate': {
 		    'inherits': 'gate',
+			'excludeFromShapesMenu': False,
 		    'image': 'voting_or_gate.svg',
 		    'help': 'Output event occurs if the given number of input events occur',
 		    'name': {
@@ -268,6 +279,7 @@ FUZZTREE_CONFIG = {
 
 	    'inhibitGate': {
 		    'inherits': 'gate',
+			'excludeFromShapesMenu': False,
 		    'image': 'inhibit_gate.svg',
 		    'help': 'Output event occurs if the single input event occurs and the enabling condition is given',
 		    'name': {
