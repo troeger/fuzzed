@@ -1,8 +1,7 @@
-FUZZTREE_CONFIG = {
+FAULTTREE_CONFIG = {
 	'nodes': {
 		'node': {
 			'excludeFromShapesMenu': True,
-		    'optional': None,
 		    'numberOfIncomingConnections': -1, #infinite
 		    'numberOfOutgoingConnections':  1,
 		    'allowConnectionTo': ['node'],
@@ -16,7 +15,6 @@ FUZZTREE_CONFIG = {
 	    'event': {
 		    'inherits': 'node',
 		    'excludeFromShapesMenu': True,
-	        'optional': False,
 	        'numberOfIncomingConnections':  1,
 	        'numberOfOutgoingConnections': -1,
 	        'allowConnectionTo': ['gate'],
@@ -27,14 +25,6 @@ FUZZTREE_CONFIG = {
 			        'style': ['bold']
 		        },
 	            'default': u'Event'
-	        },
-	        'cost': {
-		        'type': 'number',
-				'displayName': u'Cost',
-	            'min': 0,
-	            'step': 1,
-	            'default': 1,
-	            'disabled': True #only editable for basic events and sets
 	        },
 	        'probability': {
 		        'type': 'text',
@@ -47,7 +37,6 @@ FUZZTREE_CONFIG = {
 	    'gate': {
 		    'inherits': 'node',
 		    'excludeFromShapesMenu': True,
-	        'optional': None,
 	        'numberOfIncomingConnections': -1,
 	        'numberOfOutgoingConnections':  1,
 	        'name': {
@@ -64,35 +53,14 @@ FUZZTREE_CONFIG = {
 	        'name': {
 		        'default': u'Basic Event'
 	        },
-	        'cost': {
-		        'disabled': False
-	        },
 	        'probability': {
-		        'type': 'option',
-		        'choices': {
-			        u'Exact': {
-						'type': 'number',
-			            'min': 0,
-			            'max': 1,
-			            'step': 0.01,
-			            'default': 0
-			        },
-		            u'Fuzzy': {
-						'type': 'select',
-		                'choices': [
-							u'never',
-		                    u'very unlikely',
-		                    u'unlikely',
-		                    u'more or less',
-		                    u'likely',
-		                    u'very likely',
-		                    u'always'
-		                ],
-		                'default': 'never'
-		            }
-		        },
-	            'default': u'Exact'
-	        }
+				'type': 'number',
+				'displayname': u'Exact',
+	            'min': 0,
+	            'max': 1,
+	            'step': 0.01,
+	            'default': 0
+	        },
 	    },
 
 	    'basicEventSet': {
@@ -101,9 +69,6 @@ FUZZTREE_CONFIG = {
 		    'help': 'Set of basic events with identical properties',
 		    'name': {
 			    'default': u'Basic Event Set'
-		    },
-		    'cost': {
-			    'disabled': False
 		    },
 	        'cardinality': {
 		        'displayName': u'Cardinality',
@@ -140,52 +105,6 @@ FUZZTREE_CONFIG = {
 			    'step': 1
 		    }
 	    },
-
-		'redundancyEvent': {
-			'inherits': 'event',
-			'excludeFromShapesMenu': False,
-			'allowConnectionTo': ['node'],
-			'image': 'redundancy_event.svg',
-			'help': 'Placeholder for a voting OR gate over a chosen number of the input events',
-		    'connector': {
-			    'style': 'dashed'
-		    },
-		    'changedChildProperties': {
-			    'optional': None
-		    },
-			'name': {
-				'default': u'Redundancy Event'
-			},
-		    'kFormula': {
-			    'type': 'text',
-		        'displayName': u'K-Formula',
-		        'default': u'N-2'
-		    },
-		    'nRange': {
-			    'type': 'range',
-		        'displayName': u'N-Range',
-		        'min': 1,
-		        'step': 1,
-		        'default': [1, 2] # min, max
-		    }
-		},
-
-		'choiceEvent': {
-			'inherits': 'event',
-			'excludeFromShapesMenu': False,
-			'allowConnectionTo': ['event'],
-			'image': 'choice_event.svg',
-			'help': 'Placeholder for one of the input events',
-			'connector': {
-				'style': 'dashed'
-			},
-			'changedChildProperties': {
-				'optional': None
-			},
-			'name': {
-				'default': u'Choice Event'
-			}
-		},
 
 		'undevelopedEvent': {
 			'inherits': 'event',
@@ -292,10 +211,6 @@ FUZZTREE_CONFIG = {
 		'name',
         'cost',
         'probability',
-        'optional',
-        'count',
-        'kFormula',
-        'nRange'
     ],
 
     'shapeMenuNodeDisplayOrder': [
@@ -309,8 +224,6 @@ FUZZTREE_CONFIG = {
         'xorGate',
         'votingOrGate',
         'inhibitGate',
-        'choiceEvent',
-        'redundancyEvent',
         'undevelopedEvent',
         'houseEvent'
     ]
