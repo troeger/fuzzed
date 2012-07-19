@@ -1,4 +1,4 @@
-define(['require-config', 'require-nodes', 'require-backend'], function(Config, Nodes, Backend) {
+define(['require', 'require-config', 'require-nodes', 'require-backend'], function(require, Config, Nodes, Backend) {
 
     /*
      *  ShapeMenu
@@ -384,37 +384,51 @@ define(['require-config', 'require-nodes', 'require-backend'], function(Config, 
         alert('Could not find your graph in the database, creating a new one');
     }
 
-    Editor.prototype._loadGraphFromJson = function(graph, json) {
-        var jsonNodes = json.nodes;
-        this.graph(graph);
+    Editor.prototype._loadGraphFromJson = function(json) {
+        function constructGraph(Graph) {
+            var graph = new Graph(json.id);
+            var jsonNodes = json.nodes;
+            this.graph(graph);
 
-        // parse the json nodes and convert them to node objects
-        _.each(jsonNodes, function(jsonNode) {
-            var properties = jsonNode.properties;
-            properties.id  = jsonNode.id;
+            // parse the json nodes and convert them to node objects
+            _.each(jsonNodes, function(jsonNode) {
+                var properties = jsonNode.properties;
+                properties.id  = jsonNode.id;
 
-            graph.addNode(Nodes.newNodeForType(jsonNode.type, properties));
-        });
+                graph.addNode(Nodes.newNodeForType(jsonNode.type, properties));
+            });
 
-        // draw the nodes on the canvas
-        _.each(graph.getNodes(), function(node, index) {
-            var position = this.toPixel(jsonNodes[index].position);
-            node.appendTo(this._canvas)
-                .moveTo(position.x, position.y)
-                ._editor = this;
-        }.bind(this));
-
-        // connect the nodes again
-        _.each(jsonNodes, function(jsonNodes) {
-            _.each(jsonNodes.outgoingEdges, function(edge) {
-                var connection = jsPlumb.connect({
-                    source: graph.getNodeById(edge.source).container(),
-                    target: graph.getNodeById(edge.target).container()
-                });
-                connection._fuzzedID = edge.id;
-                graph.addEdge(connection);
+            // draw the nodes on the canvas
+            _.each(graph.getNodes(), function(node, index) {
+                var position = this.toPixel(jsonNodes[index].position);
+                node.appendTo(this._canvas)
+                    .moveTo(position.x, position.y)
+                    ._editor = this;
             }.bind(this));
-        }.bind(this));
+
+            // connect the nodes again
+            _.each(jsonNodes, function(jsonNodes) {
+                _.each(jsonNodes.outgoingEdges, function(edge) {
+                    var connection = jsPlumb.connect({
+                        source: graph.getNodeById(edge.source).container(),
+                        target: graph.getNodeById(edge.target).container()
+                    });
+                    connection._fuzzedID = edge.id;
+                    graph.addEdge(connection);
+                }.bind(this));
+            }.bind(this));
+        };
+
+        // pick the right graph class depending on the type
+        if (json.type == 'fuzztree') {
+            require(['require-fuzztreegraph'], constructGraph.bind(this));
+        } else if (json.type == 'faulttree') {
+            require(['require-faulttreegraph'], constructGraph.bind(this));
+        } else if (json.type == 'rbd') {
+            require(['require-rbdgraph'], constructGraph.bind(this));
+        } else {
+            require(['require-graph'], constructGraph.bind(this));
+        }
     }
 
     Editor.prototype._setupAjaxHandler = function() {

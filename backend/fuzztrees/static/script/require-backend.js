@@ -189,21 +189,17 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
 
          Parameters:
              id       - ID of the Graph to fetch.
-             succes   - [optional] Callback function for a successful asynchronous request for a graph with given id.
+             success  - [optional] Callback function for a successful asynchronous request for json representing a graph with given id.
              error    - [optional] Callback that gets called in case of an unsuccessful retrieval of the graph from
                         the database. Will create a new graph in the backend anyway.
-             complete - [optional] Callback that gets invoked in either a successful or errornous graph request.
+             complete - [optional] Callback that gets invoked in either a successful or erroneous graph request.
      */
     Backend.getGraph = function(id, success, error, complete) {
         var url = URLHelper.fullUrlForGraph(id);
 
         var successCallback = function(json) {
-            //TODO: Figure diagram kind here
-
-            // fill graph
-            var graph = new Graph(json.id);
             // call the passed success function if present
-            if (success) success(graph, json);
+            if (success) success(json);
         };
 
         var errorCallback = function(response, textStatus, errorThrown) {
