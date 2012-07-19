@@ -9,15 +9,32 @@
 		@import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
 	</style>
 
-    <script src="{{ STATIC_URL }}lib/jquery-ui/development-bundle/jquery-1.7.2.js" type="text/javascript" language="javascript"></script>
-    <script src="{{ STATIC_URL }}lib/jquery-mobile/jquery.mobile-1.1.0.min.js" type="text/javascript" language="javascript"></script>
-    <script src="{{ STATIC_URL }}lib/openid-selector/js/openid-jquery.js" type="text/javascript" language="javascript"></script>
-    <script src="{{ STATIC_URL }}lib/openid-selector/js/openid-en.js" type="text/javascript" language="javascript"></script>
+    <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
 	<script type="text/javascript">
-		$(document).ready(function() {
-			openid.img_path="{{ STATIC_URL }}lib/openid-selector/images/";
-			openid.init('openid_identifier');
-		});
+        require.config({
+            baseUrl: '{{ STATIC_URL }}',
+            waitSeconds: 5,
+            paths: {
+                'jquery.mobile': 'lib/jquery-mobile/jquery.mobile-1.1.0.min',
+                'openid-selector': 'lib/openid-selector/js'
+            },
+            // define dependencies for libs that are not AMD compatible
+            shim: {
+                'jquery.mobile': ['jquery'],
+                'openid-selector/openid-jquery': {
+                    deps: ['jquery'],
+                    exports: 'openid'
+                },
+                'openid-selector/openid-en': ['openid-selector/openid-jquery']
+            }
+        });
+
+        require(['openid-selector/openid-jquery', 'openid-selector/openid-en', 'jquery.mobile'], function() {
+            $(document).ready(function() {
+                openid.img_path="{{ STATIC_URL }}lib/openid-selector/images/";
+                openid.init('openid_identifier');
+            });
+        });
 	</script>
 </head>
 <body>
