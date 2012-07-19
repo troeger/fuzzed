@@ -31,7 +31,7 @@
 	<script src="{{ STATIC_URL }}lib/requirejs/require-1.0.8.min.js" type="text/javascript" language="javascript"></script>
 	<script type="text/javascript" language="javascript">
 		require.config({
-			baseUrl:      "../static/script/",
+			baseUrl:      "{{ STATIC_URL }}script/",
 			waitSeconds: 5,
             paths: {
                 text : '../lib/requirejs/plugins/text', //text is required
@@ -40,9 +40,9 @@
             }
 		});
 
-		require(["require-fuzzed"], function(FuzzEd) {
+		require(["require-editor"], function(Editor) {
 			jQuery(document).ready(function() {
-				new FuzzEd.Editor({{ graph.pk }});
+				new Editor({{ graph.pk }});
 			});
 		});
 	</script>
