@@ -1,4 +1,12 @@
-.error_container {
+body {
+	padding: 80px;
+}
+
+section {
+	padding-top: 40px;
+}
+
+.error_container .hero-unit {
 	margin-top: 35px;
 }
 
