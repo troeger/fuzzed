@@ -9,40 +9,53 @@
 		@import url("{{ STATIC_URL }}css/layout.css");
 	</style>
 
-    <!-- jQuery -->
-    <script src="{{ STATIC_URL }}lib/jquery-ui/development-bundle/jquery-1.7.2.js" type="text/javascript" language="javascript"></script>
-
-	<!-- jQueryUI -->
-	<script src="{{ STATIC_URL }}lib/jquery-ui/development-bundle/ui/jquery-ui-1.8.20.custom.js" type="text/javascript" language="javascript"></script>
-
-	<!-- jQuery Mobile -->
-    <script src="{{ STATIC_URL }}lib/jquery-mobile/jquery.mobile-1.1.0.min.js" type="text/javascript" language="javascript"></script>
-
-	<!-- jQuery SVG -->
-	<script src="{{ STATIC_URL }}lib/jquery-svg/jquery-svg-1.4.5.js" type="text/javascript" language="javascript"></script>
-
-	<!-- jsPlumb -->
-	<script src="{{ STATIC_URL }}lib/jsplumb/jsplumb-1.3.8.js" type="text/javascript" language="javascript"></script>
-
-	<!-- Underscore -->
-	<script src="{{ STATIC_URL }}lib/underscore/underscore-1.3.3.js" type="text/javascript" language="javascript"></script>
-
 	<!-- requirejs and own code -->
-	<script src="{{ STATIC_URL }}lib/requirejs/require-1.0.8.min.js" type="text/javascript" language="javascript"></script>
+	<script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
 	<script type="text/javascript" language="javascript">
 		require.config({
-			baseUrl:      "../static/script/",
+			baseUrl: '{{ STATIC_URL }}script/',
 			waitSeconds: 5,
             paths: {
-                text : '../lib/requirejs/plugins/text', //text is required
-                json : '../lib/requirejs/plugins/json', //alias to plugin
-                config: '../config'
+                // require plugins
+                'text' : '../lib/requirejs/plugins/text', // required by json plugin
+                'json' : '../lib/requirejs/plugins/json',
+                // jquery and plugins
+                'jquery': 'require-jquery',
+                'jquery.ui': '../lib/jquery-ui-1.8.21',
+                'jquery.mobile': '../lib/jquery-mobile/jquery.mobile-1.1.0.min',
+                'jquery.svg': '../lib/jquery-svg/jquery-svg-1.4.5',
+                // other libs
+                'underscore': '../lib/underscore/underscore-1.3.3',
+                'jsplumb': '../lib/jsplumb/jsplumb-1.3.8',
+                // shortcuts
+                'config': '../config'
+
+            },
+            // define dependencies for libs that are not AMD compatible
+            shim: {
+                'jquery.ui/jquery.ui.core': ['jquery'],
+                'jquery.ui/jquery.ui.widget': ['jquery'],
+                'jquery.ui/jquery.ui.mouse': ['jquery.ui/jquery.ui.core', 'jquery.ui/jquery.ui.widget'],
+                'jquery.ui/jquery.ui.draggable': ['jquery.ui/jquery.ui.mouse'],
+                'jquery.ui/jquery.ui.droppable': ['jquery.ui/jquery.ui.mouse'],
+
+                'jquery.mobile': ['jquery'],
+                'jquery.svg': ['jquery'],
+
+                'underscore': {
+                    exports: '_'
+                },
+
+                'jsplumb': {
+                    deps: ['jquery', 'jquery.ui/jquery.ui.draggable', 'jquery.ui/jquery.ui.droppable'],
+                    exports: 'jsPlumb'
+                }
             }
 		});
 
-		require(["require-fuzzed"], function(FuzzEd) {
+		require(['require-editor', 'jquery.mobile'], function(Editor) {
 			jQuery(document).ready(function() {
-				new FuzzEd.Editor({{ graph.pk }});
+				new Editor({{ graph.pk }});
 			});
 		});
 	</script>

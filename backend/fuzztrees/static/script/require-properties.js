@@ -1,4 +1,4 @@
-define(['require-config', 'require-backend', 'require-oop'], function(Config, Backend) {
+define(['require-config', 'require-backend', 'require-oop', 'underscore'], function(Config, Backend) {
 
     /*
      *  Abstract Property

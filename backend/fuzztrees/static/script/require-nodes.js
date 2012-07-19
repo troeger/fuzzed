@@ -1,4 +1,4 @@
-define(['require-config','json!config/fuzztree.json', 'require-properties', 'require-backend', 'require-oop'], function(Config, FuzztreeConfig, Properties, Backend) {
+define(['require-config','json!config/fuzztree.json', 'require-properties', 'require-backend', 'require-oop', 'jsplumb', 'jquery.svg'], function(Config, FuzztreeConfig, Properties, Backend) {
 
     //TODO: this is for testing
     console.log(FuzztreeConfig);
