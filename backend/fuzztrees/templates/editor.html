@@ -32,7 +32,12 @@
 	<script type="text/javascript" language="javascript">
 		require.config({
 			baseUrl:      "../static/script/",
-			waitSeconds: 5
+			waitSeconds: 5,
+            paths: {
+                text : '../lib/requirejs/plugins/text', //text is required
+                json : '../lib/requirejs/plugins/json', //alias to plugin
+                config: '../config'
+            }
 		});
 
 		require(["require-fuzzed"], function(FuzzEd) {
