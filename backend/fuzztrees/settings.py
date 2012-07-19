@@ -6,61 +6,61 @@ if cwd.startswith("/var/www/fuzztrees.net"):
 	isProduction=True
 
 ADMINS = (
-    ('Peter Troeger', 'peter.troeger@hpi.uni-potsdam.de'),
+	('Peter Troeger', 'peter.troeger@hpi.uni-potsdam.de'),
 )
 MANAGERS = ADMINS
 EMAIL_SUBJECT_PREFIX='[FuzzTrees] '
 
 if isProduction:
-    DEBUG=False
-    TEMPLATE_DEBUG=False
-    SEND_BROKEN_LINK_EMAILS = False     
-    EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
-    SERVER_EMAIL = 'noreply@citemaster.net'
-    EMAIL_HOST='localhost'
+	DEBUG=False
+	TEMPLATE_DEBUG=False
+	SEND_BROKEN_LINK_EMAILS = False     
+	EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+	SERVER_EMAIL = 'noreply@citemaster.net'
+	EMAIL_HOST='localhost'
 
-    DATABASES = {
-	    'default': {
+	DATABASES = {
+		'default': {
 		'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
 		'NAME': 'fuzztrees',                      # Or path to database file if using sqlite3.
 		'USER': 'fuzztrees',                      # Not used with sqlite3.
 		'PASSWORD': 'fuzztrees',                  # Not used with sqlite3.
 		'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
 		'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-	    }
+		}
 	}
 
-    TEMPLATE_DIRS = (
-	    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-	    # Always use forward slashes, even on Windows.
-	    # Don't forget to use absolute paths, not relative paths.
-	    '/var/www/fuzztrees.net/backend/fuzztrees/templates',
-	    '/var/www/fuzztrees.net/backend/fuzztrees/static/img/nodes'
+	TEMPLATE_DIRS = (
+		# Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+		# Always use forward slashes, even on Windows.
+		# Don't forget to use absolute paths, not relative paths.
+		'/var/www/fuzztrees.net/backend/fuzztrees/templates',
+		'/var/www/fuzztrees.net/backend/fuzztrees/static/img/nodes'
 	)
 
 else:
-    DEBUG=True
-    TEMPLATE_DEBUG=True
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'	
+	DEBUG=True
+	TEMPLATE_DEBUG=True
+	EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'	
 
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'fuzztrees/database.sqlite',                      # Or path to database file if using sqlite3.
-            'USER': '',                      # Not used with sqlite3.
-            'PASSWORD': '',                  # Not used with sqlite3.
-            'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-            'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-        }
-    }
+	DATABASES = {
+		'default': {
+			'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+			'NAME': 'fuzztrees/database.sqlite',                      # Or path to database file if using sqlite3.
+			'USER': '',                      # Not used with sqlite3.
+			'PASSWORD': '',                  # Not used with sqlite3.
+			'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+			'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+		}
+	}
 
-    TEMPLATE_DIRS = (
-        # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-        # Always use forward slashes, even on Windows.
-        # Don't forget to use absolute paths, not relative paths.
-        'fuzztrees/templates',
-        'fuzztrees/static/img/nodes'
-    )
+	TEMPLATE_DIRS = (
+		# Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+		# Always use forward slashes, even on Windows.
+		# Don't forget to use absolute paths, not relative paths.
+		'fuzztrees/templates',
+		'fuzztrees/static/img/nodes'
+	)
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -109,17 +109,17 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    'fuzztrees/static',
+	# Put strings here, like "/home/html/static" or "C:/www/django/static".
+	# Always use forward slashes, even on Windows.
+	# Don't forget to use absolute paths, not relative paths.
+	'fuzztrees/static',
 )
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+	'django.contrib.staticfiles.finders.FileSystemFinder',
+	'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -128,26 +128,26 @@ SECRET_KEY = 'ki4t8(rtjqg*fqe=%3f@9*8a2xq8uub9616sstri1afl^@@4hw'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
+	'django.template.loaders.filesystem.Loader',
+	'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.static',
-    'django.contrib.auth.context_processors.auth'
+	'django.core.context_processors.static',
+	'django.contrib.auth.context_processors.auth'
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'fuzztrees.middleware.HttpErrorMiddleware',
-    'fuzztrees.configgenerator.ConfigGenerator'
+	'django.middleware.common.CommonMiddleware',
+	'django.contrib.sessions.middleware.SessionMiddleware',
+	'django.middleware.csrf.CsrfViewMiddleware',
+	'django.contrib.auth.middleware.AuthenticationMiddleware',
+	'django.contrib.messages.middleware.MessageMiddleware',
+	# Uncomment the next line for simple clickjacking protection:
+	# 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'fuzztrees.middleware.HttpErrorMiddleware',
+	'fuzztrees.configgenerator.ConfigGenerator'
 )
 
 ROOT_URLCONF = 'fuzztrees.urls'
@@ -157,72 +157,72 @@ WSGI_APPLICATION = 'fuzztrees.wsgi.application'
 
 
 INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    # Uncomment the next line to enable the admin:
-    'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    'django.contrib.admindocs',
-    'openid2rp.django',
-    'fuzztrees'
+	'django.contrib.auth',
+	'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.sites',
+	'django.contrib.messages',
+	'django.contrib.staticfiles',
+	# Uncomment the next line to enable the admin:
+	'django.contrib.admin',
+	# Uncomment the next line to enable admin documentation:
+	'django.contrib.admindocs',
+	'openid2rp.django',
+	'fuzztrees'
 )
 
 class RequireDebugTrue(logging.Filter):
-    def filter(self, record):
-        return DEBUG
+	def filter(self, record):
+		return DEBUG
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-        },
-        'simple': {
-            'format': '%(levelname)s: %(message)s'
-        },
-    },    
-    'filters': {
-        'require_django_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        },
-        'require_django_debug_true': {
-            '()': 'fuzztrees.settings.RequireDebugTrue'
-        }
-    },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_django_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        },
-        'console': {
-            'level': 'DEBUG',
-            'filters': ['require_django_debug_true'],
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'fuzztrees': {
-            'handlers' : ['console'],
-            'level' : 'DEBUG',
-            'propagate': True,
-        }
-    }
+	'version': 1,
+	'disable_existing_loggers': False,
+	'formatters': {
+		'verbose': {
+			'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+		},
+		'simple': {
+			'format': '%(levelname)s: %(message)s'
+		},
+	},    
+	'filters': {
+		'require_django_debug_false': {
+			'()': 'django.utils.log.RequireDebugFalse'
+		},
+		'require_django_debug_true': {
+			'()': 'fuzztrees.settings.RequireDebugTrue'
+		}
+	},
+	'handlers': {
+		'mail_admins': {
+			'level': 'ERROR',
+			'filters': ['require_django_debug_false'],
+			'class': 'django.utils.log.AdminEmailHandler'
+		},
+		'console': {
+			'level': 'DEBUG',
+			'filters': ['require_django_debug_true'],
+			'class': 'logging.StreamHandler',
+			'formatter': 'simple'
+		}
+	},
+	'loggers': {
+		'django.request': {
+			'handlers': ['mail_admins'],
+			'level': 'ERROR',
+			'propagate': True,
+		},
+		'fuzztrees': {
+			'handlers' : ['console'],
+			'level' : 'DEBUG',
+			'propagate': True,
+		}
+	}
 }
 
 AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.ModelBackend',
-        'openid2rp.django.auth.Backend' )
+		'django.contrib.auth.backends.ModelBackend',
+		'openid2rp.django.auth.Backend' )
 
 AUTH_PROFILE_MODULE = 'fuzztrees.UserProfile'

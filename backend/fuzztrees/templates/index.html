@@ -1,18 +1,11 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
 <title>FuzzTrees Modeling</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	{% include "include/script.html" %}
+	{% include "include/style.html" %}
 
-	<style type="text/css">
-		@import url("{{ STATIC_URL }}css/layout.css");
-		@import url("{{ STATIC_URL }}lib/jquery-mobile/jquery.mobile-1.1.0.min.css");
-		@import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
-	</style>
-
-    <script src="{{ STATIC_URL }}lib/jquery-ui/development-bundle/jquery-1.7.2.js" type="text/javascript" language="javascript"></script>
-    <script src="{{ STATIC_URL }}lib/jquery-mobile/jquery.mobile-1.1.0.min.js" type="text/javascript" language="javascript"></script>
-    <script src="{{ STATIC_URL }}lib/openid-selector/js/openid-jquery.js" type="text/javascript" language="javascript"></script>
-    <script src="{{ STATIC_URL }}lib/openid-selector/js/openid-en.js" type="text/javascript" language="javascript"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
 			openid.img_path="{{ STATIC_URL }}lib/openid-selector/images/";
@@ -20,83 +13,80 @@
 		});
 	</script>
 </head>
+
 <body>
-	<div data-role="page">
+	{% include "util/toolbar.html" %}
 
-		<div data-theme="d" data-role="header" id="toolbar">
-			<h1>FuzzTrees</h1>
-		</div>
-
-		<div data-role="content" style="text-align: center">	
-			<h1>Welcome to FuzzTrees !</h1>
-			<div style="text-align: middle; margin-bottom: 50px; margin-left: auto; margin-right: auto; width: 600px">
+	<div class="container">
+<!-- 	<div id="workingOn" style="text-align: center">	
+		<h1>Welcome to FuzzTrees !</h1>
+		<div style="text-align: middle; margin-bottom: 50px; margin-left: auto; margin-right: auto; width: 600px">
+			<div data-mini="true" data-role="collapsible">
+			   <h3>This service is under development. We are working on ...</h3>
 				<div data-mini="true" data-role="collapsible">
-				   <h3>This service is under development. We are working on ...</h3>
-					<div data-mini="true" data-role="collapsible">
-					   <h3>Dependability Modeling with Fault Trees and RBDs</h3>
-					   <p>
-					   If you need a quick way for drawing and analyzing system 
-					   availability characteristics, this one is for you. 
-					   We already offer a free basic account so that you can just start.
-					    </p>
-					</div>
-					<div data-mini="true" data-role="collapsible">
-					   <h3>Modeling with uncertainties - Introducing FuzzTrees</h3>
-					   <p>
-					   Our novel concept for fault tree modeling allows you to express
-					   configurable and uncertain parts of the system. 
-					   We are working on an analysis engine that will tell you which configuration options give the best cost-dependability ratio.
-					   </p>
-					</div>
-					<div data-mini="true" data-role="collapsible">
-					   <h3>Graph sharing for teaching and collaboration</h3>
-					   <p>
-					   Graphs are planned to be easily sharable between users to support academic
-					   teaching and professional collaboration projects. 
-					   </p>
-					</div>
-					<div data-mini="true" data-role="collapsible">
-					   <h3>... much more ...</h3>
-					   <p>
-					   This is a public preview of our ongoing work. We are just at
-					   <a href="http://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">alpha stage</a>, so please bear with us. We would love to have your 
-					   <a href="http://fuzztrees.uservoice.com">feedback</a> and comments.
-					   </p>
-					</div>
+				   <h3>Dependability Modeling with Fault Trees and RBDs</h3>
+				   <p>
+				   If you need a quick way for drawing and analyzing system 
+				   availability characteristics, this one is for you. 
+				   We already offer a free basic account so that you can just start.
+					</p>
 				</div>
-			</div>	
-			<div style="margin-top: 0px; margin-left: auto; margin-right: auto; width: 600px">
-				<h4>Please use one of these authentication providers.</h4>
-				<form data-ajax="false" action="/login/" method="get" id="openid_form">
-					<input type="hidden" name="action" value="verify" />
-					<fieldset>
-						<div id="openid_choice">
-							<div id="openid_btns"></div>
-						</div>
-						<div id="openid_input_area">
-							<input id="openid_identifier" name="openid_identifier" type="text" value="http://" />
-							<input id="openid_submit" type="submit" value="Sign-In"/>
-						</div>
-						<noscript>
-							<p>OpenID is service that allows you to log-on to many different websites using a single indentity.
-							Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
-						</noscript>
-					</fieldset>
-				</form>
+				<div data-mini="true" data-role="collapsible">
+				   <h3>Modeling with uncertainties - Introducing FuzzTrees</h3>
+				   <p>
+				   Our novel concept for fault tree modeling allows you to express
+				   configurable and uncertain parts of the system. 
+				   We are working on an analysis engine that will tell you which configuration options give the best cost-dependability ratio.
+				   </p>
+				</div>
+				<div data-mini="true" data-role="collapsible">
+				   <h3>Graph sharing for teaching and collaboration</h3>
+				   <p>
+				   Graphs are planned to be easily sharable between users to support academic
+				   teaching and professional collaboration projects. 
+				   </p>
+				</div>
+				<div data-mini="true" data-role="collapsible">
+				   <h3>... much more ...</h3>
+				   <p>
+				   This is a public preview of our ongoing work. We are just at
+				   <a href="http://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">alpha stage</a>, so please bear with us. We would love to have your 
+				   <a href="http://fuzztrees.uservoice.com">feedback</a> and comments.
+				   </p>
+				</div>
 			</div>
-			{% if pwlogin %}
-			<div style="margin-top: 0px; margin-left: auto; margin-right: auto; width: 300px">
-				<form data-mini="true" action="/login/" method="post" id="login_form">{% csrf_token %}
-					<input data-mini="true" type="text" id="loginname" name="loginname"/>
-					<input data-mini="true" type="password" id="loginpw" name="loginpw"/>
-					<input data-mini="true" data-inline="true" type="submit" data-icon="check" data-theme="e"  name="formlogin" value="Login"/>
-				</form>
-			</div>
-			{% endif %}
 		</div>	
+		<div style="margin-top: 0px; margin-left: auto; margin-right: auto; width: 600px">
+			<h4>Please use one of these authentication providers.</h4>
+			<form data-ajax="false" action="/login/" method="get" id="openid_form">
+				<input type="hidden" name="action" value="verify" />
+				<fieldset>
+					<div id="openid_choice">
+						<div id="openid_btns"></div>
+					</div>
+					<div id="openid_input_area">
+						<input id="openid_identifier" name="openid_identifier" type="text" value="http://" />
+						<input id="openid_submit" type="submit" value="Sign-In"/>
+					</div>
+					<noscript>
+						<p>OpenID is service that allows you to log-on to many different websites using a single indentity.
+						Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.</p>
+					</noscript>
+				</fieldset>
+			</form>
+		</div>
+		{% if pwlogin %}
+		<div style="margin-top: 0px; margin-left: auto; margin-right: auto; width: 300px">
+			<form data-mini="true" action="/login/" method="post" id="login_form">{% csrf_token %}
+				<input data-mini="true" type="text" id="loginname" name="loginname"/>
+				<input data-mini="true" type="password" id="loginpw" name="loginpw"/>
+				<input data-mini="true" data-inline="true" type="submit" data-icon="check" data-theme="e"  name="formlogin" value="Login"/>
+			</form>
+		</div>
+		{% endif %}
+	</div>	 -->
 
-		{% include "footer.html" %}
-
-	</div>	
+		{% include "util/footer.html" %}
+	</div>
 </body>
 </html>
