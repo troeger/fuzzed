@@ -7,6 +7,7 @@ from django.core.exceptions import MiddlewareNotUsed
 
 from fuzztrees.config.fuzztree import FUZZTREE_CONFIG
 from fuzztrees.config.faulttree import FAULTTREE_CONFIG
+from fuzztrees.config.rbd import RBD_CONFIG
 
 class Generator(object):
 	def __init__(self, config):
@@ -54,5 +55,6 @@ class ConfigGenerator:
 	def __init__(self):
 		Generator(FUZZTREE_CONFIG).generate('fuzztree.json')
 		Generator(FAULTTREE_CONFIG).generate('faulttree.json')
+		Generator(RBD_CONFIG).generate('rbd.json')
 
 		raise MiddlewareNotUsed()
