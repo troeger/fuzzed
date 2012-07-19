@@ -25,7 +25,7 @@ FAULTTREE_CONFIG = {
 			        'style': ['bold']
 		        },
 	            'default': u'Event'
-	        }
+	        },
 	        'probability': {
 		        'type': 'text',
 	            'displayName': u'Probability',
