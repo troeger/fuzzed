@@ -1,6 +1,7 @@
 import json
 import copy
 import collections
+import os
 
 from django.core.exceptions import MiddlewareNotUsed
 
@@ -9,9 +10,9 @@ from fuzztrees.config.fuzztree import FUZZTREE_CONFIG
 class Generator(object):
 	def __init__(self, config):
 		self.config = copy.deepcopy(config)
-		self.flat()
+		self.__flat__()
 
-	def flat(self):
+	def __flat__(self):
 		for node_type, node in self.config['nodes'].items():
 			self.__resolve_inheritance__(node_type, node)
 
@@ -42,11 +43,14 @@ class Generator(object):
 				merged[key] = node[key]
 		return merged
 
-	def generate(self):
-		print self.config
+	def generate(self, name):
+		path = os.getcwd() + '/fuzztrees/static/config/' + name
+		handle = open(path, 'w')
+		handle.write(json.dumps(self.config))
+		handle.close()
 
 class ConfigGenerator:
 	def __init__(self):
-		Generator(FUZZTREE_CONFIG).generate()
+		Generator(FUZZTREE_CONFIG).generate('fuzztree.json')
 
 		raise MiddlewareNotUsed()
