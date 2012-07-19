@@ -1,4 +1,7 @@
-define(['require-config', 'require-properties', 'require-backend', 'require-oop'], function(Config, Properties, Backend) {
+define(['require-config','json!config/fuzztree.json', 'require-properties', 'require-backend', 'require-oop'], function(Config, FuzztreeConfig, Properties, Backend) {
+
+    //TODO: this is for testing
+    console.log(FuzztreeConfig);
 
     /*
      *  Abstract Node Base Class
