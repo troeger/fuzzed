@@ -1,30 +1,50 @@
+<!DOCTYPE html>
 <html>
+
 <head>
+	<title>Create a new Graph</title>
+	{% include "include/script.html" %}
+	{% include "include/style.html" %}
 </head>
+
 <body>
-<div data-role="dialog">
+	{% include "util/toolbar.html" %}
 
-<div data-theme="d" data-role="header">
-	<h1>New graph</h1>
-</div>
+	<div class="container">
 
-	<div data-role="content">
-		<form method="POST" action="/dashboard/">{% csrf_token %}
-			<fieldset class="ui-grid-a">
-				<input type="hidden" name="type" value="{{type}}"/>
-				<div class="ui-block-a">
-					<input style="margin:0.6em" type="text" name="title" id="title"/>
+		<div class="page-header">
+			<h1>
+				Create a new
+				<small>{{ name }}</small>
+			</h1>
+		</div>
+
+		<form method="POST" action="/dashboard/new/" class="form-horizontal">{% csrf_token %}
+			<fieldset>
+				<div class="control-group">
+					<div class="controls">
+						<strong>{{ name }}</strong>
+					</div>
 				</div>
-				<div class="ui-block-b">
-					<input data-icon="check" data-theme="e" type="submit" name="new" value="	{%ifequal type "faulttree"%}Create Fault Tree{%endifequal%}
-					{%ifequal type "fuzztree"%}Create FuzzTree{%endifequal%}
-					{%ifequal type "rbd"%}Create RBD{%endifequal%}
-					"/>
+
+				<div class="control-group">
+					<label class="control-label" for="title">Title</label>
+					<div class="controls">
+						<input type="text" class="input-xlarge" name="title" value="Reliability Diagram" id="title">
+					</div>
 				</div>
+
+				<div class="form-actions">
+					<button type="submit" name="save" class="btn btn-primary">Create</button>
+					<a href="/dashboard/"><button class="btn">Cancel</button></a>
+				</div>
+
+				<input type="hidden" name="type" value="{{ type }}">
 			</fieldset>
-			<button type="submit" data-rel="back">Cancel</button>
 		</form>
+
+	{% include "util/footer.html" %}
 	</div>
-</div>
+
 </body>
 </html>

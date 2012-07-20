@@ -100,8 +100,6 @@ def graph(request, graph_id):
 			except:
 				raise HttpResponseNotFoundAnswer()
 			data=json.dumps(g.toJsonDict())
-			logger.debug("Returning graph in JSON:")
-			logger.debug(data)
 			return HttpResponse(data, 'application/javascript')
 		raise HttpResponseNotAllowedAnswer(['GET']) 
 	
@@ -203,7 +201,6 @@ def node(request, graph_id, node_id):
 					raise HttpResponseBadRequestAnswer()
 				return HttpResponseNoResponse()
 			elif 'key' in request.POST and 'value' in request.POST:
-				logger.debug("Node '%s': Setting property '%s' to '%s'"%(str(n),request.POST['key'], request.POST['value']))
 				setNodeProperty(n, request.POST['key'], request.POST['value'])
 				return HttpResponseNoResponse()
 			elif 'type' in request.POST:

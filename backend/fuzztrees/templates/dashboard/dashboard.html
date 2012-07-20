@@ -16,24 +16,24 @@
 			</h1>
 		</div>
 
-		<section>
-			<form action="/dashboard/new/" method="post">{% csrf_token %}
-				<div class="btn-group pull-right">
-					<button type="submit" value="fuzztree" class="btn" disabled="true">
-						<i class="icon-file"></i>
-						New FaultTree
-					</button>
-					<button type="submit" value="fuzztree" class="btn">
-						<i class="icon-file"></i>
-						New FuzzTree
-					</button>
-					<button type="submit" value="fuzztree" class="btn" disabled="true">
-						<i class="icon-file"></i>
-						New RBD
-					</button>
-				</div>
-			<form>
+		<form action="/dashboard/new/" method="post">{% csrf_token %}
+			<div class="btn-group pull-right">
+				<button type="submit" name="type" value="faulttree" class="btn" disabled="true">
+					<i class="icon-file"></i>
+					New FaultTree
+				</button>
+				<button type="submit" name="type" value="fuzztree" class="btn">
+					<i class="icon-file"></i>
+					New FuzzTree
+				</button>
+				<button type="submit" name="type" value="rbd" class="btn" disabled="true">
+					<i class="icon-file"></i>
+					New RBD
+				</button>
+			</div>
+		<form>
 
+		<section>
 			<table class="table table-striped">
 				<thead>
 					<tr>
@@ -52,7 +52,7 @@
 							<td><strong><a href="/editor/{{ g.pk }}">{{ g }}</a></strong></td>
 							<td><span class="label">{{ g.graph_type }}</span></td>
 							<td>{{ g.created }}</td>
-							<td>
+							<td style="text-align: right;">
 								<a href="/dashboard/{{ g.pk }}">
 									<i class="icon-cog"></i>
 									Edit

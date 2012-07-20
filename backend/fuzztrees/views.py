@@ -17,7 +17,7 @@ from fuzztrees.middleware import HttpResponseBadRequest
 from nodes_config import NODE_TYPES
 
 def index(request):
-	if "logout" in request.GET:
+	if 'logout' in request.GET:
 		auth.logout(request)
 	return render_to_response('index.html', {'pwlogin': ('pwlogin' in request.GET)}, context_instance=RequestContext(request))
 
@@ -28,27 +28,9 @@ def about(request):
 def settings(request):
 	return render_to_response('settings.html', {'user': request.user, 'openids': getOpenIDs(request.user)}, context_instance=RequestContext(request))
 
-#@login_required
+@login_required
 def dashboard(request):
-	if "new" in request.POST and "type" in request.POST and "title" in request.POST:
-		if request.POST['type']=='faulttree':
-			raise HttpResponseBadRequest()
-		elif request.POST['type']=='fuzztree':
-			createFuzzTreeGraph(request.user, request.POST['title'])
-		elif request.POST['type']=='rbd':
-			raise HttpResponseBadRequest()
-		else:
-			raise HttpResponseBadRequest()
-
-	elif "delete" in request.POST and "graph" in request.POST:
-		g=get_object_or_404(Graph, pk=request.POST["graph"], owner=request.user)
-		delGraph(g)
-
-	elif "change" in request.POST and "newtitle" in request.POST and "graph" in request.POST:
-		g=get_object_or_404(Graph, pk=request.POST["graph"], owner=request.user)
-		renameGraph(g, request.POST["newtitle"])
-
-	elif "settings_save" in request.POST:
+	if "settings_save" in request.POST:
 		if "email" in request.POST:
 			request.user.email=request.POST["email"];
 		if "firstname" in request.POST:
@@ -70,16 +52,37 @@ def dashboard(request):
 	return render_to_response('dashboard/dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
 
 @login_required
-def dash_new(request):
-	return render_to_response('dash_new.html', {'type':request.POST['type']}, context_instance=RequestContext(request))	
+def dashboard_new(request):
+	# save the graph
+	if 'save' in request.POST and 'type' in request.POST and 'title' in request.POST:
+		if request.POST['type'] == 'fuzztree':
+			createFuzzTreeGraph(request.user, request.POST['title'])
+		return HttpResponseRedirect('/dashboard/')
+
+	# render the create diagram template
+	elif not 'type' in request.POST or 'type' in request.POST and request.POST['type'] == 'fuzztree':
+		parameters = {
+			'type': 'fuzztree',
+			'name': 'FuzzTree'
+		}
+		return render_to_response('dashboard/dashboard_new.html', parameters, context_instance=RequestContext(request))
+	
+	# something is not right with the request
+	raise HttpResponseBadRequest()
 
 @login_required
-def dash_change(request, graph_id):
-	g=get_object_or_404(Graph, pk=graph_id, owner=request.user)
-	return render_to_response('dash_change.html', {'graph': g}, context_instance=RequestContext(request))	
+def dashboard_edit(request, graph_id):
+	graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
 
-def teaser(request):
-    return render_to_response('teaser.html', {}, context_instance=RequestContext(request))
+	if 'delete' in request.POST:
+		delGraph(graph)
+		return HttpResponseRedirect('/dashboard/')
+
+	if 'save' in request.POST:
+		renameGraph(graph, request.POST['title'])
+		return HttpResponseRedirect('/dashboard/')
+
+	return render_to_response('dashboard/dashboard_edit.html', {'graph': graph}, context_instance=RequestContext(request))
 
 @login_required
 def editor(request, graph_id):
@@ -93,10 +96,12 @@ def login(request):
 			if user is not None:
 				if user.is_active:
 					auth.login(request, user)
+
 	elif "openid_identifier" in request.GET:
 		# first stage of OpenID authentication
 		request.session['openid_identifier']=request.GET['openid_identifier']
 		return preAuthenticate(request.GET['openid_identifier'], "http://"+request.get_host()+"/login/?openidreturn")
+
 	elif "openidreturn" in request.GET:
 		user = backend_auth(openidrequest=request)
 		if user.is_anonymous():		
@@ -127,6 +132,7 @@ def login(request):
 			linkOpenID(newuser, user.openid_claim)
 			mail_managers("New user", str(newuser), fail_silently=True)
 			return HttpResponseRedirect('/login/?openid_identifier=%s'%urllib.quote_plus(request.session['openid_identifier']))	
+
 	backend_login(request, user)
 	return HttpResponseRedirect('/dashboard/')
 	
