@@ -1,3 +1,5 @@
+import os, urllib, random, string, datetime
+
 from django.contrib.auth import authenticate as backend_auth
 from django.contrib.auth import login as backend_login
 from django.contrib.auth.decorators import login_required
@@ -6,12 +8,12 @@ from django.template import RequestContext
 from django.contrib import auth
 from django.http import HttpResponseRedirect
 from django.core.mail import mail_managers
-from fuzztrees.middleware import HttpResponseBadRequest
-from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
-import os, urllib, random, string, datetime
-from fuzztrees.models import Graph, GraphTypes, History, Commands, createFuzzTreeGraph, delGraph, renameGraph
 
-from fuzztrees.models import User
+from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
+
+from fuzztrees.models import Graph, GraphTypes, History, Commands, createFuzzTreeGraph, delGraph, renameGraph, User
+from fuzztrees.middleware import HttpResponseBadRequest
+
 from nodes_config import NODE_TYPES
 
 def index(request):
@@ -26,7 +28,7 @@ def about(request):
 def settings(request):
 	return render_to_response('settings.html', {'user': request.user, 'openids': getOpenIDs(request.user)}, context_instance=RequestContext(request))
 
-@login_required
+#@login_required
 def dashboard(request):
 	if "new" in request.POST and "type" in request.POST and "title" in request.POST:
 		if request.POST['type']=='faulttree':
@@ -37,12 +39,15 @@ def dashboard(request):
 			raise HttpResponseBadRequest()
 		else:
 			raise HttpResponseBadRequest()
+
 	elif "delete" in request.POST and "graph" in request.POST:
 		g=get_object_or_404(Graph, pk=request.POST["graph"], owner=request.user)
 		delGraph(g)
+
 	elif "change" in request.POST and "newtitle" in request.POST and "graph" in request.POST:
 		g=get_object_or_404(Graph, pk=request.POST["graph"], owner=request.user)
 		renameGraph(g, request.POST["newtitle"])
+
 	elif "settings_save" in request.POST:
 		if "email" in request.POST:
 			request.user.email=request.POST["email"];
@@ -61,7 +66,8 @@ def dashboard(request):
 			prof.save()
 		request.user.save()		
 	graphs=request.user.graphs.all().filter(deleted=False)
-	return render_to_response('dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
+
+	return render_to_response('dashboard/dashboard.html', {'graphs': graphs}, context_instance=RequestContext(request))
 
 @login_required
 def dash_new(request):

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<head>
+	<title>FuzzTrees - Dashboard</title>
+	{% include "include/script.html" %}
+	{% include "include/style.html" %}
+</head>
+
+<body>
+	{% include "util/toolbar.html" %}
+	<div class="container">
+
+		<div class="page-header">
+			<h1>
+				Dashboard
+			</h1>
+		</div>
+
+		<section>
+			<form action="/dashboard/new/" method="post">{% csrf_token %}
+				<div class="btn-group pull-right">
+					<button type="submit" value="fuzztree" class="btn" disabled="true">
+						<i class="icon-file"></i>
+						New FaultTree
+					</button>
+					<button type="submit" value="fuzztree" class="btn">
+						<i class="icon-file"></i>
+						New FuzzTree
+					</button>
+					<button type="submit" value="fuzztree" class="btn" disabled="true">
+						<i class="icon-file"></i>
+						New RBD
+					</button>
+				</div>
+			<form>
+
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Graph</th>
+						<th>Type</th>
+						<th>Created</th>
+						<th></th>
+					</tr>
+				</thead>
+
+				<tbody>
+					{% for g in graphs %}
+						<tr>
+							<td>{{ forloop.counter0 }}</td>
+							<td><strong><a href="/editor/{{ g.pk }}">{{ g }}</a></strong></td>
+							<td><span class="label">{{ g.graph_type }}</span></td>
+							<td>{{ g.created }}</td>
+							<td>
+								<a href="/dashboard/{{ g.pk }}">
+									<i class="icon-cog"></i>
+									Edit
+								</a>
+							</td>
+						</tr>
+					</a>
+					{% endfor %}
+				</tbody>
+			</table>
+		</section>
+
+		{% include "util/footer.html" %}
+	</div>
+</body>
+</html>

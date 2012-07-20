@@ -8,6 +8,14 @@
 						Home
 					</a>
 				</li>
+				{% if csrf_token %}
+				<li>
+					<a href="?logout">
+						<i class="icon-off icon-white"></i>
+						Logout
+					</a>
+				</li>
+				{% endif %}
 			</ul>
 			<a class="brand" anchor="#">FuzzEd</a>
 		</div>
