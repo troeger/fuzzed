@@ -53,13 +53,18 @@
 							<td><span class="label">{{ g.graph_type }}</span></td>
 							<td>{{ g.created }}</td>
 							<td style="text-align: right;">
-								<a href="/dashboard/{{ g.pk }}">
-									<i class="icon-cog"></i>
-									Edit
-								</a>
+								<form action="/dashboard/{{ g.pk }}/" method="POST">
+									<button type="submit" class="btn">
+										<i class="icon-cog"></i>
+										Edit
+									</button>
+									<button type="submit" name="delete" value="delete" class="btn btn-danger">
+										<i class="icon-trash"></i>
+										Delete
+									</button>
+								</form>
 							</td>
 						</tr>
-					</a>
 					{% endfor %}
 				</tbody>
 			</table>

@@ -74,12 +74,12 @@ def dashboard_new(request):
 def dashboard_edit(request, graph_id):
 	graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
 
-	if 'delete' in request.POST:
-		delGraph(graph)
-		return HttpResponseRedirect('/dashboard/')
-
 	if 'save' in request.POST:
 		renameGraph(graph, request.POST['title'])
+		return HttpResponseRedirect('/dashboard/')
+		
+	elif 'delete' in request.POST:
+		delGraph(graph)
 		return HttpResponseRedirect('/dashboard/')
 
 	return render_to_response('dashboard/dashboard_edit.html', {'graph': graph}, context_instance=RequestContext(request))
