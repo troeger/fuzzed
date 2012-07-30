@@ -6,6 +6,12 @@ FUZZTREE_CONFIG = {
 		    'numberOfIncomingConnections': -1, #infinite
 		    'numberOfOutgoingConnections':  1,
 		    'allowConnectionTo': ['node'],
+			'connector': {
+				'offset': {
+					'top': 0,
+					'bottom': 0
+				}
+			},
 		    'name': {
 			    'type': 'text',
 		        'displayName': u'Name',
@@ -148,7 +154,7 @@ FUZZTREE_CONFIG = {
 			'image': 'redundancy_event.svg',
 			'help': 'Placeholder for a voting OR gate over a chosen number of the input events',
 		    'connector': {
-			    'style': 'dashed'
+				'dashstyle': '4 2'
 		    },
 		    'changedChildProperties': {
 			    'optional': None
@@ -177,7 +183,7 @@ FUZZTREE_CONFIG = {
 			'image': 'choice_event.svg',
 			'help': 'Placeholder for one of the input events',
 			'connector': {
-				'style': 'dashed'
+				'dashstyle': '4 2'
 			},
 			'changedChildProperties': {
 				'optional': None
