@@ -1,10 +1,8 @@
-define(['require-graph', 'require-oop'], function(Graph) {
+define(['require-graph'], function(Graph) {
 
-    function RBDGraph(id) {
-        RBDGraph.Super.constructor.call(this, id);
-    }
+    var RBDGraph = Graph.extend({
 
-    RBDGraph.Extends(Graph);
+    });
 
     return RBDGraph;
 });

@@ -1,10 +1,8 @@
-define(['require-graph', 'require-oop'], function(Graph) {
+define(['require-graph'], function(Graph) {
 
-    function FaulttreeGraph(id) {
-        FaulttreeGraph.Super.constructor.call(this, id);
-    }
+    var FaulttreeGraph = Graph.extend({
 
-    FaulttreeGraph.Extends(Graph);
+    });
 
     return FaulttreeGraph;
 });

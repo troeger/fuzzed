@@ -1,10 +1,8 @@
-define(['require-graph', 'require-oop'], function(Graph) {
+define(['require-graph'], function(Graph) {
 
-    function FuzztreeGraph(id) {
-        FuzztreeGraph.Super.constructor.call(this, id);
-    }
+    var FuzztreeGraph = Graph.extend({
 
-    FuzztreeGraph.Extends(Graph);
+    });
 
     return FuzztreeGraph;
 });
