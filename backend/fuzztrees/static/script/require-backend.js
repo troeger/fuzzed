@@ -11,23 +11,23 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
 
         fullUrlForNodes: function(graph) {
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/'
-                + graph.id() + Config.Backend.NODES_URL;
+                + graph.id + Config.Backend.NODES_URL;
         },
 
         fullUrlForNode: function(node) {
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/'
-                + node.graph().id() + Config.Backend.NODES_URL + '/' + node.id();
+                + node.graph().id + Config.Backend.NODES_URL + '/' + node.id;
         },
 
         fullUrlForEdges: function(node) {
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + node.graph().id()
-                + Config.Backend.NODES_URL + '/' + node.id() + Config.Backend.EDGES_URL;
+            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + node.graph().id
+                + Config.Backend.NODES_URL + '/' + node.id + Config.Backend.EDGES_URL;
         },
 
         fullUrlForEdge: function(edge) {
             var node = edge.source.data(Config.Keys.NODE);
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + node.graph().id()
-                + Config.Backend.NODES_URL + '/' + node.id() + Config.Backend.EDGES_URL + '/' + edge._fuzzedID;
+            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + node.graph().id
+                + Config.Backend.NODES_URL + '/' + node.id + Config.Backend.EDGES_URL + '/' + edge._fuzzedID;
         }
     }
 
@@ -48,7 +48,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         var url = URLHelper.fullUrlForEdges(sourceNode);
         var data = {
             id:          edgeID,
-            destination: targetNode.id()
+            destination: targetNode.id
         };
 
         jQuery.ajax({
@@ -77,14 +77,15 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
     Backend.addNode = function(node, position, success, error, complete) {
         var url = URLHelper.fullUrlForNodes(node.graph());
         var data = {
-            id:         node.id(),
-            type:       node.type(),
+            id:         node.id,
+            type:       node.type,
             xcoord:     position.x,
             ycoord:     position.y
         };
 
         var successCallback = function(json) {
             //XXX: improve this later (send properties already in data)
+            //TODO: remove
             _.each(node.properties(), function(property) {
                 Backend.changeProperty(node, property.name(), property.value());
             });
@@ -115,6 +116,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
              error    - [optional] Callback that gets called in case of an ajax-error.
              complete - [optional] Callback that gets called in both cases - successful and errornous property change.
      */
+    //TODO: remove
     Backend.changeProperty = function(node, key, value, success, error, complete) {
         console.log(value);
         var url = URLHelper.fullUrlForNode(node);

@@ -1,37 +1,48 @@
 define(['require-config','json!config/fuzztree.json', 'require-properties', 'require-backend', 'require-oop', 'jsplumb', 'jquery.svg'], function(Config, FuzztreeConfig, Properties, Backend) {
 
-    //TODO: this is for testing
-    console.log(FuzztreeConfig);
+    /*
+     *  Mapping table for resolving note types into classes
+     */
+    var nodeTypeToClassMapping = {
+        'node': Node,
+        'event': Event,
+        'gate': Gate,
+        'basicEvent': BasicEvent,
+        'basicEventSet': BasicEventSet,
+        'intermediateEvent': IntermediateEvent,
+        'intermediateEventSet': IntermediateEventSet,
+        'redundancyEvent': RedundancyEvent,
+        'choiceEvent': ChoiceEvent,
+        'undevelopedEvent': UndevelopedEvent,
+        'houseEvent': HouseEvent,
+        'topEvent': TopEvent,
+        'andGate': AndGate,
+        'priorityAndGate': PriorityAndGate,
+        'orGate': OrGate,
+        'xorGate': XorGate,
+        'votingOrGate': VotingOrGate,
+        'inhibitGate': InhibitGate
+    }
 
     /*
      *  Abstract Node Base Class
      */
     function Node(properties) {
-        // pass here on inheritance calls
-        if (this.constructor === Node) return;
-        properties = jQuery.extend({}, properties);
+        this.type = typeof this.type === 'undefined' ? 'node' : this.type;
 
-        // endpoints (default configuration)
-        this._maxInConnections  = typeof this._maxInConnections  === 'undefined' ? -1 : this._maxInConnections; // infinite
-        this._maxOutConnections = typeof this._maxOutConnections === 'undefined' ?  1 : this._maxOutConnections;
-        // connector (default configuration)
-        this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
-        jsPlumb.extend(this._connectorStyle, jsPlumb.Defaults.PaintStyle);
+        // merge all members of the configuration (defaults) into this object
+        jQuery.extend(this, FuzztreeConfig.nodes[this.type]);
+
+        // merge all given properties into this object
+        jQuery.extend(this, properties);
+
 
         // logic
         this._editor     = undefined; // will be set when appending
         this._graph      = undefined; // will be set as soon as it get added to a concrete graph
-        if ('id' in properties) {
-            this._id = properties.id;
-        } else {
-            this._id = new Date().getTime() + 1; // make sure the 0 is not reassigned; it's reserved for the top event
-        }
-        if (properties.optional === 'yes') {
-            this._optional = true;
-        } else if (properties.optional === 'no') {
-            this._optional = false;
-        } else {
-            this._optional = undefined;
+
+        if (typeof this.id === 'undefined') {
+            this.id = new Date().getTime() + 1; // make sure the 0 is not reassigned; it's reserved for the top event
         }
 
         // state
@@ -40,21 +51,29 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         this._selected    = false;
 
         // visuals
-        this._connectorOffset = jQuery.extend({top: 0, bottom: 0}, this._connectorOffset);
+        //TODO: maybe move that to a better place
+        jsPlumb.extend(this.connector, jsPlumb.Defaults.PaintStyle);
 
-        var visuals             = this._setupVisualRepresentation();
+        var visuals            = this._setupVisualRepresentation();
         this._container         = visuals.container;
         this._nodeImage         = visuals.nodeImage;
         this._connectionHandle  = visuals.connectionHandle;
         this._optionalIndicator = visuals.optionalIndicator;
-
-        // properties
-        this._properties = this._defineProperties(properties);
     }
 
     Node.prototype.allowsConnectionsTo = function(otherNode) {
         // no connections to same node
         if (this == otherNode) return false;
+
+        // otherNode must be in the 'allowConnectionTo' list defined in the config
+        var allowed = false;
+        _.each(this.allowConnectionTo, function(nodeType) {
+            if (otherNode instanceof nodeTypeToClassMapping[nodeType]) allowed = true;
+        });
+        if (!allowed) return false;
+
+        // no connections to the top event
+        //TODO: this can not be covered with the config since 'allowConnectionTo' is the wrong direction
         if (otherNode instanceof TopEvent) return false;
 
         // there is already a connection between these nodes
@@ -103,13 +122,13 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         if (this._highlighted) {
             this._nodeImage.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
             this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
-            if (!this._optional) {
+            if (!this.optional) {
                 this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
             }
         } else {
             this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
             this._optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
-            if (!this._optional) {
+            if (!this.optional) {
                 this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
             }
         }
@@ -121,7 +140,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         this._disabled = true;
         this._container.find('path').css('stroke', Config.Node.STROKE_DISABLED);
         this._optionalIndicator.attr('stroke', Config.Node.STROKE_DISABLED);
-        if (!this._optional) {
+        if (!this.optional) {
             this._optionalIndicator.attr('fill', Config.Node.STROKE_DISABLED);
         }
 
@@ -134,19 +153,19 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         if (this._selected) {
             this._container.find('path').css('stroke', Config.Node.STROKE_SELECTED);
             this._optionalIndicator.attr('stroke', Config.Node.STROKE_SELECTED);
-            if (!this._optional) {
+            if (!this.optional) {
                 this._optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
             }
         } else if (this._highlighted) {
             this._container.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
             this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
-            if (!this._optional) {
+            if (!this.optional) {
                 this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
             }
         } else {
             this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
             this._optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
-            if (!this._optional) {
+            if (!this.optional) {
                 this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
             }
         }
@@ -169,24 +188,17 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         if (this._highlighted) {
             this._container.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
             this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
-            if (!this._optional) {
+            if (!this.optional) {
                 this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
             }
         } else {
             this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
             this._optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
-            if (!this._optional) {
+            if (!this.optional) {
                 this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
             }
         }
 
-        return this;
-    }
-
-    Node.prototype.id = function(newId) {
-        if (typeof newId === 'undefined') return this._id;
-
-        this._id = newId;
         return this;
     }
 
@@ -203,12 +215,11 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         return this;
     }
 
-    Node.prototype.name = function() {
-        throw 'Abstract Method - override name (human readable) in subclass';
-    }
-
     Node.prototype.properties = function() {
-        return this._properties;
+//        return this._properties;
+        //TODO: how to get all properties (attributes in the properties menu) of a node?
+        // iterating over the propertyDisplayOrder and checking whether a node has that property?
+        return {};
     }
 
     Node.prototype.remove = function() {
@@ -226,7 +237,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         this._container.addClass(Config.Classes.NODE_SELECTED);
         this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
         this._optionalIndicator.attr('stroke', Config.Node.STROKE_SELECTED);
-        if (!this._optional) {
+        if (!this.optional) {
             this._optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
         }
 
@@ -234,7 +245,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
     }
 
     Node.prototype.setOptional = function(optional) {
-        this._optional = optional;
+        this.optional = optional;
 
         if (optional) {
             this._optionalIndicator.attr('fill', Config.Node.OPTIONAL_INDICATOR_FILL);
@@ -245,16 +256,6 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         } else {
             this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
         }
-    }
-
-    Node.prototype.type = function() {
-        throw 'Abstract Method - override type in subclass';
-    }
-
-    Node.prototype._defineProperties = function(properties) {
-        // the basic node does not have any properties therefore the empty array
-        // overwrite in subclasses in order to set any
-        return [];
     }
 
     Node.prototype._resize = function() {
@@ -301,24 +302,24 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
 
     Node.prototype._setupEndpoints = function() {
         // get upper and lower image offsets
-        if (typeof this._optional === 'undefined') {
+        if (typeof this.optional === 'undefined' || this.optional == null) {
             var topOffset    = this._nodeImage.offset().top - this._container.offset().top;
         } else {
             var optionalIndicatorWrapper = jQuery(this._optionalIndicator._container);
             var topOffset    = optionalIndicatorWrapper.offset().top - this._container.offset().top;
         }
-        topOffset -= this._connectorOffset.top;
+        topOffset -= this.connector.offset.top;
         var bottomOffset = this._nodeImage.offset().top - this._container.offset().top + this._nodeImage.height();
-        bottomOffset += this._connectorOffset.bottom;
+        bottomOffset += this.connector.offset.bottom;
 
         // make node source
-        if (this._maxInConnections != 0) {
+        if (this.numberOfIncomingConnections != 0) {
             //TODO: we can use an halo icon instead later
             jsPlumb.makeSource(this._connectionHandle, {
                 parent: this._container,
                 anchor:   [ 0.5, 0, 0, 1, 0, bottomOffset],
-                maxConnections: this._maxInConnections,
-                connectorStyle: this._connectorStyle,
+                maxConnections: this.numberOfIncomingConnections,
+                connectorStyle: this.connector,
                 dragOptions: {
                     drag: function() {
                         // disable all nodes that can not be targeted
@@ -340,10 +341,10 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
 
         // make node target
         var targetNode = this;
-        if (this._maxOutConnections != 0) {
+        if (this.numberOfOutgoingConnections != 0) {
             jsPlumb.makeTarget(this._container, {
                 anchor:         [ 0.5, 0, 0, -1, 0, topOffset],
-                maxConnections: this._maxOutConnections,
+                maxConnections: this.numberOfOutgoingConnections,
                 dropOptions: {
                     accept: function(draggable) {
                         var elid = draggable.attr('elid');
@@ -385,12 +386,12 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
     Node.prototype._setupVisualRepresentation = function() {
         // get the thumbnail, clone it and wrap it with a container (for labels)
         var container = jQuery('<div>');
-        var nodeImage = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type()).clone();
+        var nodeImage = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type).clone();
         var optionalIndicatorWrapper = jQuery('<div>').svg();
         var optionalIndicator = optionalIndicatorWrapper.svg('get');
 
         container
-            .attr('id', nodeImage.attr('id') + this._id)
+            .attr('id', nodeImage.attr('id') + this.id)
             .addClass(Config.Classes.NODE)
             .css('position', 'absolute')
             .data(Config.Keys.NODE, this);
@@ -399,7 +400,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         var radius = Config.Node.OPTIONAL_INDICATOR_RADIUS;
         var optionalIndicatorCircle = optionalIndicator.circle(null, radius+1, radius+1, radius, {
             strokeWidth: 2,
-            fill: this._optional ? Config.Node.OPTIONAL_INDICATOR_FILL : Config.Node.STROKE_NORMAL,
+            fill: this.optional ? Config.Node.OPTIONAL_INDICATOR_FILL : Config.Node.STROKE_NORMAL,
             stroke: Config.Node.STROKE_NORMAL
         });
 
@@ -415,7 +416,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             .appendTo(container);
 
         // hide the optional indicator for nodes with undefined value
-        if (typeof this._optional === 'undefined') {
+        if (typeof this.optional === 'undefined' || this.optional == null) {
             optionalIndicatorWrapper.css('visibility', 'hidden');
         }
 
@@ -428,7 +429,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             .addClass(Config.Classes.NODE_IMAGE)
             .appendTo(container);
 
-        if (this._maxInConnections != 0) {
+        if (this.numberOfIncomingConnections != 0) {
             var connectionHandle = jQuery('<span class="ui-icon ui-icon-plus ui-icon-shadow"></span>')
                 .addClass(Config.Classes.NODE_HALO_CONNECT)
                 .appendTo(container);
@@ -446,552 +447,177 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      *  Abstract Event Base Class
      */
     function Event(properties) {
+        this.type = typeof this.type === 'undefined' ? 'event' : this.type;
+
+        //TODO: needed?
         if (this.constructor === Event) return;
-        this._maxInConnections  = this._maxInConnections  == undefined ?    1 : this._maxInConnections;
-        this._maxOutConnections = this._maxOutConnections == undefined ?   -1 : this._maxOutConnections;
-        //XXX: little hack to prevent p mirroring for some special events
-        this._mirrorProbability = this._mirrorProbability == undefined ? true : this._mirrorProbability;
 
-        var defaultProperties = {
-            optional: 'no'
-        }
-
-        properties = jQuery.extend(defaultProperties, properties);
         Event.Super.constructor.call(this, properties);
     }
     Event.Extends(Node);
-
-    Event.prototype.allowsConnectionsTo = function(otherNode) {
-        // no connections between Event nodes
-        if (otherNode instanceof Event) return false;
-        return Event.Super.allowsConnectionsTo.call(this, otherNode);
-    }
-
-    Event.prototype._defineProperties = function(properties) {
-        return [
-            new Properties.Text({
-                name:   'name',
-                displayname: 'Name',
-                value:  properties.name || this.name(),
-                mirror: this._container
-            }, this),
-
-            new Properties.Text({
-                name:     'cost',
-                displayname: 'Cost',
-                value:    properties.cost || '--',
-                disabled: true
-            }, this),
-
-            new Properties.Text({
-                name:         'probability',
-                displayname: 'Probability',
-                mirror:       this._mirrorProbability ? this._container : false,
-                mirrorPrefix: 'p=',
-                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
-                value:        properties.probability || '--',
-                disabled:     true
-            }, this),
-
-            new Properties.Radio({
-                name:     'optional',
-                displayname: 'Optional',
-                options:  [
-                    'no',
-                    'yes'
-                ],
-                value:    properties.optional || 'no',
-                change:   function() {
-                    this.setOptional(!this._optional);
-                }.bind(this)
-            }, this)
-        ];
-    }
 
     /*
      *  Abstract Gate Base Class
      */
     function Gate(properties) {
-        if (this.constructor === Gate) return;
+        this.type = typeof this.type === 'undefined' ? 'gate' : this.type;
 
-        this._maxInConnections  = this._maxInConnections  == undefined ? -1 : this._maxInConnections;
-        this._maxOutConnections = this._maxOutConnections == undefined ?  1 : this._maxOutConnections;
+        //TODO: needed?
+        if (this.constructor === Gate) return;
 
         Gate.Super.constructor.call(this, properties);
     }
     Gate.Extends(Node);
 
-    Gate.prototype.allowsConnectionsTo = function(otherNode) {
-        // no connections between Event nodes
-        //if (otherNode instanceof Gate) return false;
-        return Gate.Super.allowsConnectionsTo.call(this, otherNode);
-    }
-
     /*
      *  Top Event
      */ 
     function TopEvent(properties) {
+        this.type = 'topEvent';
+
         TopEvent.Super.constructor.call(this, properties);
     }
     TopEvent.Extends(Event);
-
-    TopEvent.prototype.name = function() {
-        return Config.Node.Names.TOP_EVENT;
-    }
-
-    TopEvent.prototype.type = function() {
-        return Config.Node.Types.TOP_EVENT;
-    }
-
-    TopEvent.prototype._defineProperties = function(properties) {
-        return [
-            new Properties.Text({
-                name:   'name',
-                displayname: 'Name',
-                value:  properties.name || this.name(),
-                mirror: this._container
-            }, this),
-
-            new Properties.Text({
-                name:         'probability',
-                displayname:  'Probability',
-                value:        properties.probability || '',
-                disabled:     true
-            }, this),
-        ];
-    }
 
     /*
      *  Basic Event
      */
     function BasicEvent(properties) {
-        // no incoming connections allowed
-        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
+        this.type = 'basicEvent';
+
         BasicEvent.Super.constructor.call(this, properties);
     }
     BasicEvent.Extends(Event);
-
-    BasicEvent.prototype.name = function() {
-        return Config.Node.Names.BASIC_EVENT;
-    }
-
-    BasicEvent.prototype.type = function() {
-        return Config.Node.Types.BASIC_EVENT;
-    }
-
-    BasicEvent.prototype._defineProperties = function(properties) {
-        var probability = parseFloat(properties.probability);
-        if (isNaN(probability) && properties.probability) {
-            probability = properties.probability;
-        } else if (isNaN(probability) && !properties.probability) {
-            probability = 0;
-        }
-        var exactSelected = typeof probability === 'number';
-
-        return [
-            new Properties.Text({
-                name:   'name',
-                displayname: 'Name',
-                value:  properties.name || this.name(),
-                mirror: this._container
-            }, this),
-
-            new Properties.Text({
-                name:  'cost',
-                displayname: 'Cost',
-                type:  'number',
-                value: properties.cost || 1
-            }, this),
-
-            new Properties.SingleChoice({
-                name:        'probability',
-                displayname:  'Probability',
-                mirror:       this._container,
-                mirrorPrefix: 'p=',
-                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY,
-
-                choices: [{
-                    name:     'exact',
-                    displayname: 'Exact',
-                    selected:  exactSelected,
-                    input: new Properties.Text({
-                        type:  'number',
-                        min:   0,
-                        max:   1,
-                        step:  0.01,
-                        value: exactSelected ? probability : 0
-                    }, this)
-                }, {
-                    name:     'fuzzy',
-                    displayname: 'Fuzzy',
-                    selected: !exactSelected,
-                    input: new Properties.Select({
-                        options: [
-                            'never',
-                            'very unlikely',
-                            'unlikely',
-                            'more or less',
-                            'likely',
-                            'very likely',
-                            'always'
-                        ],
-                        value: !exactSelected ? properties.probability : 'very unlikely'
-                    }, this)
-                }]
-            }, this),
-
-            new Properties.Radio({
-                name:     'optional',
-                displayname: 'Optional',
-                options:  [
-                    'no',
-                    'yes'
-                ],
-                value:    properties.optional || 'no',
-                change:   function() {
-                    this.setOptional(!this._optional);
-                }.bind(this)
-            }, this)
-        ];
-    }
 
     /*
      *  Basic Event Set
      */
     function BasicEventSet(properties) {
+        this.type = 'basicEventSet';
+
         BasicEventSet.Super.constructor.call(this, properties);
     }
     BasicEventSet.Extends(BasicEvent);
-
-    BasicEventSet.prototype.name = function() {
-        return Config.Node.Names.BASIC_EVENT_SET;
-    }
-
-    BasicEventSet.prototype.type = function() {
-        return Config.Node.Types.BASIC_EVENT_SET;
-    }
-
-    BasicEventSet.prototype._defineProperties = function(properties) {
-        var parentProperties = BasicEventSet.Super._defineProperties.call(this, properties);
-
-        parentProperties.splice(-2, 0,
-            new Properties.Text({
-                name:         'cardinality',
-                displayname:  'Cardinality',
-                type:         'number',
-                value:        properties.cardinality || 1,
-                min:          1,
-                step:         1,
-                mirror:       this._container,
-                mirrorPrefix: '#',
-                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
-            }, this)
-        );
-
-        return parentProperties;
-    }
 
     /*
      *  Intermediate Event
      */
     function IntermediateEvent(properties) {
-        //XXX
-        this._mirrorProbability = false;
+        this.type = 'intermediateEvent';
 
         IntermediateEvent.Super.constructor.call(this, properties);
     }
     IntermediateEvent.Extends(Event);
 
-    IntermediateEvent.prototype.name = function() {
-        return Config.Node.Names.INTERMEDIATE_EVENT;
-    }
-
-    IntermediateEvent.prototype.type = function() {
-       return Config.Node.Types.INTERMEDIATE_EVENT;
-    }
-
     /*
      *  Intermediate Event Set
      */
     function IntermediateEventSet(properties) {
-        // no incoming connections allowed
-        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
+        this.type = 'intermediateEventSet';
 
         IntermediateEventSet.Super.constructor.call(this, properties);
     }
     IntermediateEventSet.Extends(IntermediateEvent);
 
-    IntermediateEventSet.prototype.name = function() {
-        return Config.Node.Names.INTERMEDIATE_EVENT_SET;
-    }
-
-    IntermediateEventSet.prototype.type = function() {
-       return Config.Node.Types.INTERMEDIATE_EVENT_SET;
-    }
-
-    IntermediateEventSet.prototype._defineProperties = function(properties) {
-        var parentProperties = IntermediateEventSet.Super._defineProperties.call(this, properties);
-
-        parentProperties.push(new Properties.Text({
-            name:         'cardinality',
-            displayname:  'Cardinality',
-            type:         'number',
-            value:        properties.cardinality || 1,
-            min:          1,
-            step:         1,
-            mirror:       this._container,
-            mirrorPrefix: '#',
-            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
-        }, this));
-
-        return parentProperties;
-    }
-
     /*
      *  AndGate
      */
     function AndGate(properties) {
+        this.type = 'andGate';
+
         AndGate.Super.constructor.call(this, properties);
     } 
     AndGate.Extends(Gate);
-
-    AndGate.prototype.name = function() {
-        return Config.Node.Names.AND_GATE;
-    }
-
-    AndGate.prototype.type = function() {
-       return Config.Node.Types.AND_GATE;
-    }
 
     /*
      *  OrGate
      */
     function OrGate(properties) {
-        // visuals
-        this._connectorOffset = jQuery.extend({top: 0, bottom: -5}, this._connectorOffset);
+        this.type = 'orGate';
 
         OrGate.Super.constructor.call(this, properties);
     } 
     OrGate.Extends(Gate);
 
-    OrGate.prototype.name = function() {
-        return Config.Node.Names.OR_GATE;
-    }
-
-    OrGate.prototype.type = function() {
-        return Config.Node.Types.OR_GATE;
-    }
-
     /*
      *  XorGate
      */
     function XorGate(properties) {
-        // visuals
-        this._connectorOffset = jQuery.extend({top: 0, bottom: -5}, this._connectorOffset);
+        this.type = 'xorGate';
 
         XorGate.Super.constructor.call(this, properties);
     } 
     XorGate.Extends(Gate);
 
-    XorGate.prototype.name = function() {
-        return Config.Node.Names.XOR_GATE;
-    }
-
-    XorGate.prototype.type = function() {
-        return Config.Node.Types.XOR_GATE;
-    }
-
     /*
      *  PriorityAndGate
      */
     function PriorityAndGate(properties) {
+        this.type = 'priorityAndGate';
+
         PriorityAndGate.Super.constructor.call(this, properties);
     } 
     PriorityAndGate.Extends(Gate);
-
-    PriorityAndGate.prototype.name = function() {
-        return Config.Node.Names.PRIORITY_AND_GATE;
-    }
-
-    PriorityAndGate.prototype.type = function() {
-        return Config.Node.Types.PRIORITY_AND_GATE;
-    }
 
     /*
      *  VotingOrGate
      */
     function VotingOrGate(properties) {
-        // visuals
-        this._connectorOffset = jQuery.extend({top: 0, bottom: -5}, this._connectorOffset);
+        this.type = 'votingOrGate';
 
         VotingOrGate.Super.constructor.call(this, properties);
     } 
     VotingOrGate.Extends(Gate);
 
-    VotingOrGate.prototype.name = function() {
-        return Config.Node.Names.VOTING_OR_GATE;
-    }
-
-    VotingOrGate.prototype.type = function() {
-        return Config.Node.Types.VOTING_OR_GATE;
-    }
-
-    VotingOrGate.prototype._defineProperties = function(properties) {
-        return [
-            new Properties.Text({
-                name:         'count',
-                displayname:  'Count',
-                type:         'number',
-                value:        properties.count || 1,
-                min:          0,
-                mirror:       this._container,
-                mirrorPrefix: 'k=',
-                mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
-            }, this)
-        ];
-    }
-
     /*
      *  InhibitGate
      */
     function InhibitGate(properties) {
+        this.type = 'inhibitGate';
+
         InhibitGate.Super.constructor.call(this, properties);
     } 
     InhibitGate.Extends(Gate);
-
-    InhibitGate.prototype.name = function() {
-        return Config.Node.Names.INHIBIT_GATE;
-    }
-
-    InhibitGate.prototype.type = function() {
-        return Config.Node.Types.INHIBIT_GATE;
-    }
 
     /*
      *  ChoiceEvent
      */
     function ChoiceEvent(properties) {
-        // outgoing connections are dashed
-        this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
-        this._connectorStyle = jsPlumb.extend({ dashstyle: "4 2"}, this._connectorStyle);
-
-        //XXX
-        this._mirrorProbability = false;
+        this.type = 'choiceEvent';
 
         ChoiceEvent.Super.constructor.call(this, properties);
     } 
     ChoiceEvent.Extends(Event);
 
-    ChoiceEvent.prototype.name = function() {
-        return Config.Node.Names.CHOICE_EVENT;
-    }
-
-    ChoiceEvent.prototype.type = function() {
-        return Config.Node.Types.CHOICE_EVENT;
-    }
-
-    ChoiceEvent.prototype.allowsConnectionsTo = function(otherNode) {
-        // no connections to gates
-        if (otherNode instanceof Gate) return false;
-
-        // allow connections to other events, but also check basic conditions
-        return otherNode instanceof Event && Node.prototype.allowsConnectionsTo.call(this, otherNode);
-    }
-
     /*
-     *  RedundancyEvent
+     *  Redundancy Event
      */
     function RedundancyEvent(properties) {
-        // outgoing connections are dashed
-        this._connectorStyle = typeof this._connectorStyle === 'undefined' ? {} : this._connectorStyle;
-        this._connectorStyle = jsPlumb.extend({ dashstyle: "4 2"}, this._connectorStyle);
-
-        //XXX
-        this._mirrorProbability = false;
+        this.type = 'redundancyEvent';
 
         RedundancyEvent.Super.constructor.call(this, properties);
-    } 
+    }
     RedundancyEvent.Extends(Event);
-
-    RedundancyEvent.prototype.name = function() {
-        return Config.Node.Names.REDUNDANCY_EVENT;
-    }
-
-    RedundancyEvent.prototype.type = function() {
-        return Config.Node.Types.REDUNDANCY_EVENT;
-    }
-
-    RedundancyEvent.prototype.allowsConnectionsTo = function(otherNode) {
-        // no connections to gates
-        if (otherNode instanceof Gate) return false;
-
-        // allow connections to other events, but also check basic conditions
-        return otherNode instanceof Event && Node.prototype.allowsConnectionsTo.call(this, otherNode);
-    }
-
-    RedundancyEvent.prototype._defineProperties = function(properties) {
-        var parentProperties = RedundancyEvent.Super._defineProperties.call(this, properties);
-
-        parentProperties.push(new Properties.Text({
-            name:         'kformula',
-            displayname:  'K-Formula',
-            mirrorPrefix: 'k: ',
-            value:        'N-2',
-            mirror:       this._container,
-            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY
-        }, this));
-
-        parentProperties.push(new Properties.Range({
-            name:         'range',
-            displayname:  'N-Range',
-            mirrorPrefix: 'N: ',
-            min:          1,
-            value:        properties.range ? JSON.parse(properties.range) : [1, 2],
-            step:         1,
-            mirror:       this._container,
-            mirrorClass:  Config.Classes.PROPERTY_LABEL_PROBABILITY 
-        }, this));
-
-        return parentProperties;
-    }
 
     /*
      *  Undeveloped Event
      */
     function UndevelopedEvent(properties) {
-        // no incoming connections allowed
-        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
+        this.type = 'undevelopedEvent';
 
         UndevelopedEvent.Super.constructor.call(this, properties);
     }
     UndevelopedEvent.Extends(Event);
 
-    UndevelopedEvent.prototype.name = function() {
-        return Config.Node.Names.UNDEVELOPED_EVENT;
-    }
-
-    UndevelopedEvent.prototype.type = function() {
-       return Config.Node.Types.UNDEVELOPED_EVENT;
-    }
-
     /*
      *  House Event
      */
     function HouseEvent(properties) {
-        // no incoming connections allowed
-        this._maxInConnections = this._maxInConnections == undefined ? 0 : this._maxInConnections;
+        this.type = 'houseEvent';
 
         HouseEvent.Super.constructor.call(this, properties);
     }
     HouseEvent.Extends(Event);
-
-    HouseEvent.prototype.name = function() {
-        return Config.Node.Names.HOUSE_EVENT;
-    }
-
-    HouseEvent.prototype.type = function() {
-       return Config.Node.Types.HOUSE_EVENT;
-    }
 
     /*
         Function: newNodeWithType
@@ -1004,38 +630,8 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             A new Node of the given type
      */
     function newNodeForType(type, properties) {
-        switch(type) {
-            case Config.Node.Types.BASIC_EVENT:
-                return new BasicEvent(properties);
-            case Config.Node.Types.BASIC_EVENT_SET:
-                return new BasicEventSet(properties);
-            case Config.Node.Types.INTERMEDIATE_EVENT:
-                return new IntermediateEvent(properties);
-            case Config.Node.Types.INTERMEDIATE_EVENT_SET:
-                return new IntermediateEventSet(properties);
-            case Config.Node.Types.AND_GATE:
-                return new AndGate(properties);
-            case Config.Node.Types.PRIORITY_AND_GATE:
-                return new PriorityAndGate(properties);
-            case Config.Node.Types.OR_GATE:
-                return new OrGate(properties);
-            case Config.Node.Types.XOR_GATE:
-                return new XorGate(properties);
-            case Config.Node.Types.VOTING_OR_GATE:
-                return new VotingOrGate(properties);
-            case Config.Node.Types.INHIBIT_GATE:
-                return new InhibitGate(properties);
-            case Config.Node.Types.CHOICE_EVENT:
-                return new ChoiceEvent(properties);
-            case Config.Node.Types.REDUNDANCY_EVENT:
-                return new RedundancyEvent(properties);
-            case Config.Node.Types.UNDEVELOPED_EVENT:
-                return new UndevelopedEvent(properties);
-            case Config.Node.Types.HOUSE_EVENT:
-                return new HouseEvent(properties);
-            case Config.Node.Types.TOP_EVENT:
-                return new TopEvent(properties);
-        }
+        var nodeClass = nodeTypeToClassMapping[type];
+        return new nodeClass(properties);
     }
 
     /*

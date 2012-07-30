@@ -1,20 +1,12 @@
 define(['require-config'], function(Config) {
 
     function Graph(id) {
-        this._id    = id;
+        this.id     = id;
         this._nodes = {};
         this._edges = {};
     }
 
-    /*
-        Function: id
-            Retrieves the id of the graph
-     */
-    Graph.prototype.id = function() {
-        return this._id;
-    }
-
-    /*
+     /*
         Function: addEdge
             Adds a given edge to this graph.
 
@@ -34,7 +26,7 @@ define(['require-config'], function(Config) {
      */
     Graph.prototype.addNode = function(node) {
         node.graph(this);
-        this._nodes[node.id()] = node;
+        this._nodes[node.id] = node;
     }
 
     /*
@@ -56,11 +48,11 @@ define(['require-config'], function(Config) {
             node - Node to remove from this graph.
      */
     Graph.prototype.deleteNode = function(node) {
-        delete this._nodes[node.id()]
+        delete this._nodes[node.id]
     }
 
-    Graph.prototype.getNodeById = function(_id_) {
-        return this._nodes[_id_];
+    Graph.prototype.getNodeById = function(id) {
+        return this._nodes[id];
     }
 
     /*
