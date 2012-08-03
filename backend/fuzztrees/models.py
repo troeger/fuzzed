@@ -125,7 +125,9 @@ class Node(models.Model):
 		pos = {'x': self.xcoord, 'y': self.ycoord}
 		edgesArray = [e.toJsonDict() for e in self.outgoing.all().filter(deleted=False)]
 		props = dict([p.toTuple() for p in self.properties.all()])
-		return {'id': self.client_id, 'type': NODE_TYPES[self.type]['type'] , 'position': pos, 'properties': props, 'outgoingEdges': edgesArray}
+		# temporary removed properties in order to avoid errors in the frontend
+		#TODO: change model to include properties directly
+		return {'id': self.client_id, 'type': NODE_TYPES[self.type]['type'] , 'position': pos, 'outgoingEdges': edgesArray}
 
 	def getChildren(self):
 		edges=self.outgoing.all().filter(deleted=False)
