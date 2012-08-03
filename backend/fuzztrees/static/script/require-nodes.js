@@ -567,11 +567,12 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
     }
 
     /*
-        Function: newNodeWithType
+        Function: newNodeForType
             Factory method. Returns a new Node of the given type.
 
         Parameter:
             type - String specifying the type of the new Node. See Config.Node.Types.
+            properties - [optional] A dictionary of properties that should be merged into the new node.
 
         Returns:
             A new Node of the given type
@@ -579,6 +580,25 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
     function newNodeForType(type, properties) {
         var nodeClass = nodeTypeToClassMapping[type];
         return new nodeClass(properties);
+    }
+
+    /*
+     Function: newNodeFromJson
+     Factory method. Returns a new Node defined by the given JSON.
+
+     Parameter:
+     json - A JSON object defining the properties of the new node..
+            The node's class is determined using the 'type' property.
+            Default type is 'node'.
+
+     Returns:
+     A new Node.
+     */
+    function newNodeFromJson(json) {
+        var type = json.type || 'node';
+        var nodeClass = nodeTypeToClassMapping[type];
+        // the init method will merge the json attributes into the new node
+        return new nodeClass(json);
     }
 
     /*
@@ -601,6 +621,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         HouseEvent:       HouseEvent,
         TopEvent:         TopEvent,
 
-        newNodeForType:   newNodeForType
+        newNodeForType:   newNodeForType,
+        newNodeFromJson:  newNodeFromJson
     };
 })

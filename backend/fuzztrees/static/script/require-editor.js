@@ -390,12 +390,11 @@ define(['require', 'require-config', 'require-nodes', 'require-backend'], functi
             var jsonNodes = json.nodes;
             this.graph(graph);
 
+            //TODO: newFromJson for graph
+
             // parse the json nodes and convert them to node objects
             _.each(jsonNodes, function(jsonNode) {
-                var properties = jsonNode.properties;
-                properties.id  = jsonNode.id;
-
-                graph.addNode(Nodes.newNodeForType(jsonNode.type, properties));
+                graph.addNode(Nodes.newNodeFromJson(jsonNode));
             });
 
             // draw the nodes on the canvas
