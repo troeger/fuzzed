@@ -4,10 +4,9 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      *  Abstract Node Base Class
      */
     var Node = Class.extend({
+        type: 'node',
 
         init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'node' : this.type;
-
             // merge all members of the configuration (defaults) into this object
             jQuery.extend(this, FuzztreeConfig.nodes[this.type]);
 
@@ -428,170 +427,119 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      *  Abstract Event Base Class
      */
     var Event = Node.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'event' : this.type;
-            this._super(properties);
-        }
+        type: 'event'
     });
 
     /*
      *  Abstract Gate Base Class
      */
     var Gate = Node.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'gate' : this.type;
-            this._super(properties);
-        }
+        type: 'gate'
     });
 
     /*
      *  Top Event
      */
     var TopEvent = Event.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'topEvent': this.type;
-            this._super(properties);
-        }
+        type: 'topEvent'
     });
 
     /*
      *  Basic Event
      */
     var BasicEvent = Event.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'basicEvent': this.type;
-            this._super(properties);
-        }
+        type: 'basicEvent'
     });
 
     /*
      *  Basic Event Set
      */
     var BasicEventSet = BasicEvent.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'basicEventSet': this.type;
-            this._super(properties);
-        }
+        type: 'basicEventSet'
     });
 
     /*
      *  Intermediate Event
      */
     var IntermediateEvent = Event.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'intermediateEvent': this.type;
-            this._super(properties);
-        }
+        type: 'intermediateEvent'
     });
 
     /*
      *  Intermediate Event Set
      */
     var IntermediateEventSet = IntermediateEvent.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'intermediateEventSet': this.type;
-            this._super(properties);
-        }
+        type: 'intermediateEventSet'
     });
 
     /*
      *  AndGate
      */
     var AndGate = Gate.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'andGate': this.type;
-            this._super(properties);
-        }
+        type: 'andGate'
     });
 
     /*
      *  OrGate
      */
     var OrGate = Gate.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'orGate': this.type;
-            this._super(properties);
-        }
+        type: 'orGate'
     });
 
     /*
      *  XorGate
      */
     var XorGate = Gate.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'xorGate': this.type;
-            this._super(properties);
-        }
+        type: 'xorGate'
     });
 
     /*
      *  PriorityAndGate
      */
     var PriorityAndGate = Gate.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'priorityAndGate': this.type;
-            this._super(properties);
-        }
+        type: 'priorityAndGate'
     });
 
     /*
      *  VotingOrGate
      */
     var VotingOrGate = Gate.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'votingOrGate': this.type;
-            this._super(properties);
-        }
+        type: 'votingOrGate'
     });
 
     /*
      *  InhibitGate
      */
     var InhibitGate = Gate.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'inhibitGate': this.type;
-            this._super(properties);
-        }
+        type: 'inhibitGate'
     });
 
     /*
      *  ChoiceEvent
      */
     var ChoiceEvent = Event.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'choiceEvent': this.type;
-            this._super(properties);
-        }
+        type: 'choiceEvent'
     });
 
     /*
      *  Redundancy Event
      */
     var RedundancyEvent = Event.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'redundancyEvent': this.type;
-            this._super(properties);
-        }
+        type: 'redundancyEvent'
     });
 
     /*
      *  Undeveloped Event
      */
     var UndevelopedEvent = Event.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'undevelopedEvent': this.type;
-            this._super(properties);
-        }
+        type: 'undevelopedEvent'
     });
 
     /*
      *  House Event
      */
     var HouseEvent = Event.extend({
-        init: function(properties) {
-            this.type = typeof this.type === 'undefined' ? 'houseEvent': this.type;
-            this._super(properties);
-        }
+        type: 'houseEvent'
     });
 
     /*
