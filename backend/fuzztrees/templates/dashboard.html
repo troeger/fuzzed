@@ -9,8 +9,23 @@
 		@import url("{{ STATIC_URL }}css/layout.css");
 	</style>
 
-    <script src="{{ STATIC_URL }}lib/jquery-ui/development-bundle/jquery-1.7.2.js" type="text/javascript" language="javascript"></script>
-    <script src="{{ STATIC_URL }}lib/jquery-mobile/jquery.mobile-1.1.0.min.js" type="text/javascript" language="javascript"></script>
+    <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
+    <script type="text/javascript">
+        require.config({
+            baseUrl: '{{ STATIC_URL }}',
+            waitSeconds: 5,
+            paths: {
+                'jquery.mobile': 'lib/jquery-mobile/jquery.mobile-1.1.0.min'
+            },
+            // define dependencies for libs that are not AMD compatible
+            shim: {
+                'jquery.mobile': ['jquery']
+            }
+        });
+
+        // this side requires jquery mobile so be displayed properly
+        require(['jquery.mobile']);
+    </script>
 </head>
 
 <body>
