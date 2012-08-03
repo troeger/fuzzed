@@ -45,7 +45,14 @@ FAULTTREE_CONFIG = {
 		    'excludeFromShapesMenu': True,
 	        'numberOfIncomingConnections':  1,
 	        'numberOfOutgoingConnections': -1,
-	        'allowConnectionTo': ['gate']
+	        'allowConnectionTo': ['gate'],
+			'propertyMirrors': {
+				# events show their names below the image
+				'name': {
+					'position': 'bottom',
+					'style': ['bold']
+				}
+			}
 	    },
 
 	    'gate': {
