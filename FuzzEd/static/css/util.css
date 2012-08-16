@@ -1,0 +1,37 @@
+body {
+	padding: 80px;
+}
+
+section {
+	padding-top: 40px;
+}
+
+.error_container .hero-unit {
+	margin-top: 35px;
+}
+
+.footer {
+	margin-top: 35px;
+	padding: 35px 0px 35px 0px;
+	border-top: 1px solid #E5E5E5;
+}
+
+.footer p {
+	margin-bottom: 0;
+}
+
+.table td {
+	vertical-align: middle;
+}
+
+.table tbody tr:hover {
+	cursor: pointer;
+}
+
+.table tbody form {
+	margin: 0;
+}
+
+.table tbody button {
+	cursor: default;
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<title>FuzzTrees Modeling</title>
+	{% include "util/style.html" %}
+
+    <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
+	<script type="text/javascript">
+        require.config({
+            baseUrl: '{{ STATIC_URL }}',
+            waitSeconds: 5,
+            paths: {
+                'openid-selector': 'lib/openid-selector/js'
+            },
+            // define dependencies for libs that are not AMD compatible
+            shim: {
+                'openid-selector/openid-jquery': {
+                    deps: ['jquery'],
+                    exports: 'openid'
+                },
+                'openid-selector/openid-en': ['openid-selector/openid-jquery']
+            }
+        });
+
+        require(['openid-selector/openid-jquery', 'openid-selector/openid-en'], function() {
+            $(document).ready(function() {
+                openid.img_path="{{ STATIC_URL }}lib/openid-selector/images/";
+                openid.init('openid_identifier');
+            });
+        });
+	</script>
+</head>
+
+<body>
+	{% include "util/toolbar.html" %}
+
+	<div class="container">
+		<div class="page-header">
+			<h1>
+				Welcome to FuzzEd
+				<small>The Reliability Diagram Editor</small>
+			</h1>
+		</div>
+
+		<div class="alert alert-block">
+			<h4 class="alert-heading"><a href="http://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">Public Alpha</a></h4>
+			Feel free to try out everything. However, please excuse sudden service outages as the site is still under development.<br>
+			If you have any <a href="http://fuzztrees.uservoice.com">feedback</a> we would be happy to hear it. 
+		</div>
+
+		<section>
+			<div class="row">
+				<div class="span4">
+					<h3>Dependability Modeling <small>Fault Trees and RBDs</small></h3>
+					<p>
+						If you need a quick way for drawing and analyzing system 
+						availability characteristics, this one is for you. 
+						We already offer a free basic account so that you can just start.
+					</p>
+				</div>
+
+				<div class="span4">
+					<h3>Uncertainties in Modeling <small>Introducing FuzzTrees</small></h3>
+					<p>
+						Our novel concept for fault tree modeling allows you to express
+						configurable and uncertain parts of the system. 
+						We are working on an analysis engine that will tell you which 
+						configuration options give the best cost-dependability ratio.
+					</p>
+				</div>
+
+				<div class="span4">
+					<h3>Collaboration and Teaching <small>Share your Graphs</small></h3>
+					<p>
+						Graphs are planned to be easily sharable between users to support academic
+						teaching and professional collaboration projects. 
+					</p>
+				</div>
+			</div>
+		</section>
+		
+		<section>
+			<h6>Please use one of these authentication providers.</h6>
+
+			<form action="/login/" method="get" id="openid_form">
+				<input type="hidden" name="action" value="verify" />
+				<fieldset>
+					<div id="openid_choice">
+						<div id="openid_btns"></div>
+					</div>
+					<div id="openid_input_area">
+						<input id="openid_identifier" name="openid_identifier" type="text" value="http://" />
+						<input id="openid_submit" type="submit" value="Sign-In"/>
+					</div>
+					<noscript>
+						<p>
+							OpenID is service that allows you to log-on to many different websites using a single indentity.
+							Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.
+						</p>
+					</noscript>
+				</fieldset>
+			</form>
+
+			{% if pwlogin %}
+				<div>
+					<form action="/login/" method="post" id="login_form">{% csrf_token %}
+						<input type="text" id="loginname" name="loginname"/>
+						<input type="password" id="loginpw" name="loginpw"/>
+						<input type="submit" name="formlogin" value="Login"/>
+					</form>
+				</div>
+			{% endif %}
+		</section>
+
+		{% include "util/footer.html" %}
+	</div>
+</body>
+</html>
