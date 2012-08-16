@@ -5,16 +5,17 @@ from graph import Graph
 from node import Node
 from properties import Property
 
+import notations
+
 class Command(models.Model)
     """
-    [ABSTRACT] Command class
+    Class [abstract]: Command
 
-    Abstract base class for any command in the system. Required for type correctness
-    and contains meta data needed in every subtype.
+    Abstract base class for any command in the system. Required for type correctness and contains meta data needed in every subtype.
 
-    Attributes:
-    undoable    -- flag indicating whether this command can be undone (boolean, required, default: False)
-    insert_date -- timestamp of the moment the command was issued (datetime, constant, default: now)
+    Fields:
+    {bool} undoable - indicates if command can be undone (default: False)
+    {const datetime} insert_date - moment when the command was issued (default: now)
     """
     class Meta:
         app_label = 'FuzzEd'
@@ -25,49 +26,52 @@ class Command(models.Model)
 
     def do(self):
         """
-        [ABSTRACT] Method stub for application behaviour of commands.
-        Needs to be overwritten in subtypes.
+        Method [abstract]: do
 
-        Returns:
-        None
+        Stub for the command's do behaviour. Must be overwritten in sublasses.
+
+        Returns: {None}
         """
-        raise NotImplementedError('[Abstract Method] Implement do in subclass')
+        raise NotImplementedError('[Abstract Method] Implement in subclass')
 
     def undo(self):
         """
-        [ABSTRACT] Method stub for revert behaviour of commands.
-        Needs to be overwritten in subtypes.
+        Method [abstract]:
+        
+        Stub for the command's undo behaviour. Must be overwritten in sublcasses.
 
-        Returns:
-        None
+        Returns: {None}
         """
-        raise NotImplementedError('[Abstract Method] Implement undo in subclass')
+        raise NotImplementedError('[Abstract Method] Implement in subclass')
 
 class AddEdge(Command):
     """
-    AddEdge class
+    Class: AddEdge
+    
+    Extends: Command
 
-    Models the command of adding an edge.
+    Command that is issued when an edge was added to a graph.
 
-    Attributes:
-    edge - the edge that was added (Edge, required)
+    Fields:
+    {<Edge>} edge - the edge that was added
     """
     edge = models.ForeignKey(Edge, related_name='+')
 
     @staticmethod
-    def create_of(graph_id, from_node_id, to_node_id, client_id):
+    def create_of(graph_id, client_id, from_node_id, to_node_id):
         """
-        Convience method for issueing an add edge command. Note: the edge required 
-        for this command is CREATED AND SAVED when invoking this method.
+        Method [static]: create_of
 
-        Arguments:
-        graph_id     -- the graph that will contain this edge (string/integer, required)
-        from_node_id -- the id of the starting node of the edge (string/integer, required)
-        to_node_id   -- the id of the endpoint node of the edge (string/integer, required)
-        client_id    -- this is the id of the edge as assigned by the user (string/integer, required)
+        Convience factory method for issueing an add edge command from parameters as received from API calls. NOTE: the edge object that is required for this command is created and saved when invoking this method.
+
+        Parameters:
+        {str} graph_id - the id of the graph that will contain this edge
+        {str} client_id - the id of the edge as set on the client
+        {str} from_node_id - the client id(!) of the node the edge origins
+        {str} to_node_id - the client id(!) of the node that terminates the edge
 
         Returns:
-        AddEdge
+        {<AddEdge>} the add edge command instance
         """
         source = Node.objects.get(client_id=int(from_node_id), graph__pk=int(graph_id))
         target = Node.objects.get(client_id=int(to_node_id), graph__pk=int(graph_id))
@@ -78,43 +82,66 @@ class AddEdge(Command):
 
     def do(self):
         """
-        Marks the edge as not deleted. This makes only sense when this command is
-        reapplied/redone.
+        Method: do
+
+        Adds the edge to the graph by removing the deleted flag from the instance. As the edge is by default marked as not deleted the invokation of this method is only mandatory when redoing this command.
 
         Returns:
-        None
+        {None}
         """
         self.edge.deleted = False
         self.edge.save()
 
     def undo(self):
         """
-        Deletes the edge again by marking its deletion flag
+        Method: undo
+        
+        Deletes the edge by setting its deletion flag.
 
         Returns:
-        None
+        {None}
         """
         self.edge.deleted = True
         self.edge.save()
 
 class AddGraph(Command):
-    pass
+    """
+    Class: AddGraph
+
+    Extends: Command
+    
+    
+    """
 
 class AddNode(Command):
+    """
+    Class: AddNode
+    
+    Extends: Command
+
+    Command that is issued when a node was added to a graph.
+
+    Fields:
+    {<Node>} node - the node that was added
+    """
     node = models.ForeignKey(Node, related_name='+')
 
     @staticmethod
     def create_of(graph_id, node_id, kind, x, y):
         """
-        Convenience factory method for issueing an add node command. Note: this method
-        will CREATE AND SAVE the node object required for the command.
+        Method [static]: create_of
+
+        Convience factory method for issueing an add node command from parameters as received from API calls. NOTE: the node object that is required for this command is created and saved when invoking this method.
 
         Arguments:
-        graph_id -- the id of the graph that shall contain the node (string/integer, required)
-        node_id  -- the client id(!) of the node as received from the client (string/integer, required)
-        kind     -- a string identifying the node's kind (string/integer, required)
-        x        -- x coordinate of the created node (string/integer, required)
-        y        -- y coordinate of the created node (string/integer, required)
+        {str} graph_id - the id of the graph the node is added to
+        {str} node_id - the client id(!) of the node as set on the client
+        {str} kind - the node's identification string
+        {str} x - x coordinate of the added node
+        {str} y - y coordinate of the added node
+                      
+        Returns:
+        {<AddNode>} - the add node command instance
         """
         graph = Graph.objects.get(pk=int(graph_id))
         node  = Node(graph=graph, client_id=int(node_id), kind=kind, x=int(x), y=int(y))
@@ -124,161 +151,201 @@ class AddNode(Command):
 
     def do(self):
         """
-        Add the node to the graph by removing its deletion flag. Is only necessary to be executed when 
-        the reapplying/redoing this commmand.
-
+        Method: do
+        
+        Adds the node to the graph by removing the deleted flag from the instance. As the node is by default marked as not deleted the invokation of this method is only mandatory when redoing this command.
+        
         Returns:
-        None
+        {None}
         """
         self.node.deleted = False
         self.node.save()
 
     def undo(self):
         """
+        Method: do
+        
         Removes the node from the graph by setting its deletion flag.
 
         Returns:
-        None
+        {None}
         """
         self.node.deleted = True
         self.node.save()
 
 class DeleteEdge(Command):
     """
-    DeleteEdge class
+    Class: DeleteEdge
+    
+    Extends: Command
 
     Command that is issued when an edge is deleted.
 
-    Attributes:
-    edge -- the edge that was deleted (Edge, required)
+    Fields:
+    {<Edge>} edge - the edge that shall be deleted
     """
     edge = models.ForeignKey(Edge, related_name='+')
 
     @staticmethod
     def of(graph_id, edge_id):
         """
-        Convenience factory method for issueing a edge deletion command from unparsed user
-        request values.
+        Method [static]: of
+        
+        Convience factory method for issueing a delete node command from parameters as received from API calls. 
 
         Arguments:
-        graph_id -- the id of the graph the edge is in (string/integer, required)
-        edge_id  -- the client id(!) of the edge to be deleted (string/integer, required)
+        {str} graph_id - the id of the graph that contains the edge to be deleted
+        {str} edge_id - the client id(!) of the edge to be deleted
+        
+        Returns:
+        {<DeleteEdge>} - the delete edge command instance
         """
         return DeleteEdge(Edge.objects.get(client_id=int(edge_id), node__graph__pk=int(graph_id)))
 
     def do(self):
         """
-        Marks the edge as deleted by setting the flag
+        Method: do
+        
+        Deletes the edge from the graph by setting its deletion flag
 
         Returns:
-        None
+        {None}
         """
         self.edge.deleted = True
         self.edge.save()
 
     def undo(self):
         """
-        Restores the edge by removing the deletion flag
+        Method: undo
+        
+        Restores the edge by removing its deletion flag
 
         Returns:
-        None
+        {None}
         """
         self.edge.deleted = False
         self.edge.save()
 
 class DeleteGraph(Command):
     """
-    DeleteGraph class
+    Class: Delete Graph
+    
+    Extends: Command
 
     Command that is issued when a graph is deleted.
 
-    Attributes:
-    graph -- the graph that is deleted (Graph, required)
+    Fields:
+    {<Graph>} graph - the graph that shall be deleted
     """
     graph = models.ForeignKey(Graph, related_name='+')
 
     @staticmethod
     def of(graph_id):
         """
-        Convenience factory method for the creation of a delete graph command. Accepts
-        the graph identification values as for instance received from user requests.
+        Method [static]: of
+        
+        Convience factory method for issueing a delete graph command from parameters as received from API calls.
 
-        Arguments:
-        graph_id -- the id of the graph to be deleted (string/integer, required)
+        Parameters:
+            {str} graph_id - the id of the graph to be deleted
 
         Returns:
-        DeleteGraph
+            {<DeleteGraph>} - the delete graph command instance
         """
         return DeleteGraph(graph=Graph.objects.get(pk=int(graph_id)))
 
     def do(self):
         """
-        Applies the deletion by setting the deletion flag of the graph
+        Method: do
+        
+        Deletes the graph by setting its deletion flag
 
         Returns:
-        None
+        {None}
         """
         self.graph.deleted = True
         self.graph.save()
 
     def undo(self):
         """
-        Restores the graph by removing the deletion flag of the graph
+        Method: undo
+        
+        Restores the graph by removing its deletion flag
 
         Returns:
-        None
+        {None}
         """
         self.graph.deleted = False
         self.graph.save()
 
 class DeleteNode(Command):
     """
-    DeleteNode class
+    Class: DeleteNode
+    
+    Extends: Command
 
-    This class models the deletion command for a node. Its do method will
-    actually remove the node whereas undo restores it.
+    Command that is issued when a node is deleted
 
-    Attributes:
-    node -- the node that was deleted (Node, required)
+    Fields:
+    {<Node>} node - the node that shall be deleted
     """
     node = modelsForeignKey(Node, related_name='+')
 
     @staticmethod
     def of(graph_id, node_id):
         """
-        Convenience factory method for creating node deletion commands from values as e.g. received from
-        client side requests
+        Method [static]: of
+        
+        Convience factory method for issueing an add node command from parameters as received from API calls.
 
-        Arguments:
-        graph_id -- the id of the graph that contains the node to be deleted (string/integer, required)
-        node_id  -- the client id(!) of the node to be deleted (string/integer, required)
+        Parameters:
+        {str} graph_id - the id of the graph that contains the node to be deleted
+        {str} node_id - the client id(!) of the node to be deleted
 
         Returns:
-        DeleteNode
+        {<DeleteNode>}
         """
         return DeleteNode(node=Node.objects.get(client_id=int(node_id),graph__pk=int(graph_id)))
 
     def do(self):
         """
-        Removes the given node from its graph by setting its deletion flag
+        Method: do
+        
+        Removes the node from the containing graph by setting its deletion flag
 
         Returns:
-        None
+        {None}
         """
         self.node.deleted = True
         self.node.save()
 
     def undo(self):
         """
-        Restores the given node by removing the deletion flag
+        Method: undo
+        
+        Restores the given node by removing its deletion flag
 
         Returns:
-        None
+        {None}
         """
         self.node.deleted = False
         self.node.save()
 
 class MoveNode(Command):
+    """
+    Class: MoveNode
+    
+    Extends: Command
+    
+    Command that issued when a node is moved
+    
+    Fields:
+    {<Node>} node - the node that is moved
+    {int} old_x - the old x coordinate of the node
+    {int} old_y - the old y coordinate of the node
+    {int} new_x - the x coordinate the node was moved to
+    {int} new_y - the y coordinate the node was moved to
+    """
     node  = models.ForeignKey(Node, related_name='+')
     old_x = models.IntegerField()
     old_y = models.IntegerField()
@@ -287,51 +354,82 @@ class MoveNode(Command):
 
     @staticmethod
     def of(graph_id, node_id, new_x, new_y):
+        """
+        Method [static]: of
+        
+        Convience factory method for issueing a node move command from parameters as received from API calls.
+        
+        Parameters:
+        {str} graph_id - the id of the graph that contains the moved node
+        {str} node_id - the client id(!) of the moved node
+        {str} new_x - the x coordinate the node was moved to
+        {str} new_y - the y coordinate the node was moved to
+
+        Returns:
+        {<MoveNode>} the move node command instance
+        """
         node = Node.objects.get(client_id=int(node_id), graph__pk=int(graph_id))
 
         return MoveNode(node=node, old_x=node.x, old_y=node.y, new_x=new_x, new_y=new_y)
 
     def do(self):
+        """
+        Method: do
+        
+        Moves the node to its new coordinates by setting its new position.
+
+        Returns:
+        {None}
+        """
         self.node.x = self.new_x
         self.node.y = self.new_y
         self.node.save()
 
     def undo(self):
+        """
+        Method: undo
+        
+        Revokes the node's movement by restoring its old position.
+
+        Returns:
+        {None}
+        """
         self.node.x = self.old_x
         self.node.y = self.old_y
         self.node.save()
 
 class PropertyChanged(Command):
     """
-    PropertyChanged class
+    Class: PropertyChanged
+    
+    Extends: Command
 
-    This command models the value change of a node's property. Its do method will
-    apply the value change, whereas the undo method will set the property back to
-    its previous state.
+    Command that is issued when a property of a node changes
 
     Attributes:
-    property  -- the property whichs value changed (Property, required)
-    old_value -- the value of the property before the change (string, required)
-    new_value -- updated value of the property (string, required)
+    {<Property>} property - the property whichs value changed
+    {str} old_value - the previous value of the property
+    {str} new_value - the new value of the property
     """
     property  = models.ForeignKey(Property, related_name='+')
     old_value = models.CharField(max_length=255)
     new_value = models.CharField(max_length=255)
 
     @staticmethod
-    def create_of(graph_id, node_id, key, new_value):
+    def create_from(graph_id, node_id, key, new_value):
         """
-        Convenience factory method for issueing a property changed command from values as e.g. received from
-        client side requests. If the property does not yet exist it is being CREATED AND SAVED.
+        Method [static]: create_from
+        
+        Convience factory method for issueing a property changed command from parameters as received from API calls. NOTE: if the property does not yet exist it being created and saved.
 
-        Arguments:
-        graph_id  -- the id of the graph that contains the node thats property changed (string/integer, required)
-        node_id   -- the client id(!) of the node thats property changed (string/integer, required)
-        key       -- this is the name of the property that changed (string, required)
-        new_value -- is the new value of the property (string, required)
+        Parameters:
+        {str} graph_id - the id of the graph that contains the node thats property changed
+        {str] node_id - the client id(!) of the node thats property changed
+        {str} key - the name of the property that changed
+        {str} new_value - the value the property has been changed to
 
         Returns:
-        PropertyChanged
+        {<PropertyChanged>} - the property changed command instance
         """
         node_property, created = Property.objects.get_or_create(key=key, node__client_id=int(node_id), node__graph__pk=int(graph_id))
         if created:
@@ -341,20 +439,24 @@ class PropertyChanged(Command):
 
     def do(self):
         """
-        Apply the change to the property - i.e. set new_value
+        Method: do
+        
+        Apply the change to the property - i.e. set the new value
 
         Returns:
-        None
+        {None}
         """
         self.property.value = self.new_value
         self.property.save()
 
     def undo(self):
         """
-        Reverts the change -- i.e. set old_value
+        Method: undo
+        
+        Reverts the changes to the property - i.e. set old value
 
         Returns:
-        None
+        {None}
         """
         self.property.value = self.old_value
         self.property.save()

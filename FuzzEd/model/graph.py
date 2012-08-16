@@ -5,16 +5,15 @@ import notations
 
 class Graph(models.Model):
     """
-    Graph class
+    Class: Graph
 
-    Models a generic graph class for diagrams.
+    This class models a generic graph that is suitable for any diagram notation. It basically serves a container for its contained nodes and edges. Additionally, it provides functionality for serializing it.
 
-    Attributes:
-    kind    -- unique identifier that indicates of which notation this graph is e.g. fuzztree;
-               must be an element of the set of available notations (refer: notations module) (string, required)
-    owner   -- link to the user that owns this graph (User, required)
-    created -- timestamp of the moment this graph was created (datetime, required, constant, default: now)
-    deleted -- flag indicating whether this diagram was deleted/hidden from view (boolean, required, default: False)
+    Fields:
+    {str} kind - unique identifier that indicates the graph's notation (e.g. fuzztree). Must be an element of the set of available notations (See also: <notations>)
+    {<User>} owner - a link to the owner of the graph
+    {const datetime} created - timestamp of the moment of graph creation (default: now)
+    {bool} deleted - flag indicating whether this graph was deleted or not. Simplifies restoration of the graph if needed by toggling this member (default: False)
     """
     class Meta:
         app_label = 'FuzzEd'
@@ -33,17 +32,16 @@ class Graph(models.Model):
 
     def dump(self, tree=None, indent=0):
         """
-        Prints a indented version of this graph starting at the root node (node without incoming edges)
-        or a specific if passed.
+        Method: dump
+        
+        Prints a human readable, nested version of this graph starting from the root node (node without incoming edges). Alternatively, a specific node may be passed.
 
-        Arguments:
-        tree   -- a node encoded as dictionary from where the graph shall be printed;
-                  if no specific node is passed the root node is assumed (dictionary, default: None)
-        indent -- the number of space characters the tree is indented with when printed;
-                  in general no indention is assumed (integer, default: 0)
+        Parameters:
+        {dict} tree - a node of this graph encoded as dictionary from where the graph shall be printed. If no node is passed the root node is assumed (default: None)
+        {int} indent - number of space characters the node will be indented on the root level (default: 0)
 
         Returns:
-        None
+        {None}
         """
         if not tree:
             root = self.nodes.exclude(incoming_isnull=False)[0]
@@ -58,10 +56,12 @@ class Graph(models.Model):
 
     def to_json(self):
         """
-        Serializes the graph into a Python dictionary that is JSON conform.
+        Method: to_json
         
+        Serializes the graph into a Python dictionary that is JSON conform.
+
         Returns:
-        dictionary
+        {dict}
         """
         nodes = [node.to_json() for node in self.nodes.all().filter(deleted=False)]
         return {

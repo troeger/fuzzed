@@ -4,16 +4,15 @@ from node import Node
 
 class Property(models.Model):
     """
-    Property class
+    Class: Property
 
-    This class models the properties (i.e. the attributes) of the nodes of a diagram.
-    They are mainly a key-value tuple with additional meta info.
+    This class models generic properties (i.e. attributes) of the nodes of any diagram notation.They are basically key-values tuples that allow the dynamic addition or deletion of whole sets of new property names without having to alter the schema of nodes.
 
-    Attributes:
-    key     -- the name of the property (string, required)
-    value   -- the value of the property (string, required)
-    node    -- node that owns this property (Node, required)
-    deleted -- flag indicating whether the property shall be hidden from views (boolean, required, default: False)
+    Fields:
+    {str} key - the name of the property
+    {str} value - the value of the property
+    {<Node>} node - link to the node that owns the property
+    {bool} deleted - flag indicating whether this property is deleted or not. Simplifies the restoration of this property by just having to toggle this flag (default: False)
     """
     class Meta:
         app_label = 'FuzzEd'
@@ -28,9 +27,11 @@ class Property(models.Model):
 
     def to_tuple(self):
         """
-        Converts this property to a native python tuple.
+        Method: to_tuple
+        
+        Converts the property instance to a native Python tuple.
 
         Returns:
-        tuple(string, string)
+        {tuple(str, str)}
         """
         return (self.key, self.value)
