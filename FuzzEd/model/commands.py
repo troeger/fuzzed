@@ -5,7 +5,7 @@ from graph import Graph
 from node import Node
 from properties import Property
 
-class Command(models.Model)
+class Command(models.Model):
     """
     [ABSTRACT] Command class
 
@@ -241,7 +241,7 @@ class DeleteNode(Command):
     Attributes:
     node -- the node that was deleted (Node, required)
     """
-    node = modelsForeignKey(Node, related_name='+')
+    node = models.ForeignKey(Node, related_name='+')
 
     @staticmethod
     def of(graph_id, node_id):

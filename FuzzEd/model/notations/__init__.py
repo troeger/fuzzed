@@ -1,10 +1,8 @@
-from faulttree import FAULTTREE_CONFIG as FaultTree
-from fuzztree  import FUZZTREE_CONFIG as FuzzTree
-from rbd import RBD_CONFIG as RBD
+import faulttree, fuzztree, rbd
 
 # What notations are installed (meaning: available AND usable)
 # To extend this list import the notations and add the config to the list
-installed = [FaultTree, FuzzTree, RBD]
+installed = [faulttree.CONFIG, fuzztree.CONFIG, rbd.CONFIG]
 
 # A map that indexes the available notations by its kind identifier
 by_kind = {}

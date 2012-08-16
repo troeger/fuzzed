@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
 import notations
@@ -20,7 +21,7 @@ class Graph(models.Model):
         app_label = 'FuzzEd'
 
     kind    = models.CharField(max_length=127, choices=notations.choices)
-    owner   = models.ForeignKey(auth.User, related_name='graphs')
+    owner   = models.ForeignKey(User, related_name='graphs')
     created = models.DateTimeField(auto_now_add=True, editable=False)
     deleted = models.BooleanField(default=False)
 
@@ -70,3 +71,22 @@ class Graph(models.Model):
             'type':  self.kind, 
             'nodes': nodes
         }
+
+
+from commands import AddNode
+
+def __set_graph_defaults__(sender, instance, **kwargs):
+	notation = notations.by_kind[instance.kind]
+	if not 'defaults' in notation: return
+	defaults = notation['defaults']
+
+	# create default nodes for this graph
+	for index, node in enumerate(defaults['nodes']):
+		# use index as node ID
+		# this is unique since all other IDs are time stamps
+		command = AddNode.create_of(graph_id=instance.id, node_id=index, **node)
+		command.undoable = False
+		command.do()
+
+
+models.signals.post_init.connect(__set_graph_defaults__, sender=Graph)

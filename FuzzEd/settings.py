@@ -22,6 +22,7 @@ if is_production:
 
     DATABASES = {
         'default': {
+			#TODO: rename database to 'FuzzEd'?
             'ENGINE':   'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
             'NAME':     'fuzztrees',                              # Or path to database file if using sqlite3.
             'USER':     'fuzztrees',                              # Not used with sqlite3.
@@ -47,7 +48,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE':   'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME':     'fuzztrees/database.sqlite',  # Or path to database file if using sqlite3.
+            'NAME':     'FuzzEd/database.sqlite',     # Or path to database file if using sqlite3.
             'USER':     '',                           # Not used with sqlite3.
             'PASSWORD': '',                           # Not used with sqlite3.
             'HOST':     '',                           # Set to empty string for localhost. Not used with sqlite3.
@@ -59,8 +60,8 @@ else:
         # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
-        'fuzztrees/templates',
-        'fuzztrees/static/img/nodes'
+        'FuzzEd/templates',
+        'FuzzEd/static/img/nodes'
     )
 
 # Local time zone for this installation. Choices can be found here:
@@ -113,7 +114,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    'fuzztrees/static',
+    'FuzzEd/static',
 )
 
 # List of finder classes that know how to find static files in
@@ -147,14 +148,14 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     #Uncomment the next line for simple clickjacking protection:
     #'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'fuzztrees.middleware.HttpErrorMiddleware',
-    'fuzztrees.configgenerator.ConfigGenerator'
+    'FuzzEd.middleware.HttpErrorMiddleware',
+    'FuzzEd.model.notations.configgenerator.ConfigGenerator'
 )
 
-ROOT_URLCONF = 'fuzztrees.urls'
+ROOT_URLCONF = 'FuzzEd.urls'
 
 # Python dotted path to the WSGI application used by Django's runserver.
-WSGI_APPLICATION = 'fuzztrees.wsgi.application'
+WSGI_APPLICATION = 'FuzzEd.wsgi.application'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -166,7 +167,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'openid2rp.django',
-    'fuzztrees'
+    'FuzzEd'
 )
 
 class RequireDebugTrue(logging.Filter):
@@ -189,7 +190,7 @@ LOGGING = {
             '()': 'django.utils.log.RequireDebugFalse'
         },
         'require_django_debug_true': {
-            '()': 'fuzztrees.settings.RequireDebugTrue'
+            '()': 'FuzzEd.settings.RequireDebugTrue'
         }
     },
     'handlers': {
@@ -211,9 +212,9 @@ LOGGING = {
             'level':     'ERROR',
             'propagate': True,
         },
-        'fuzztrees': {
+        'FuzzEd': {
             'handlers':  ['console'],
-            'level': '   DEBUG',
+            'level': 	 'DEBUG',
             'propagate': True,
         }
     }
@@ -224,4 +225,4 @@ AUTHENTICATION_BACKENDS = (
     'openid2rp.django.auth.Backend'
 )
 
-AUTH_PROFILE_MODULE = 'fuzztrees.UserProfile'
+AUTH_PROFILE_MODULE = 'FuzzEd.UserProfile'

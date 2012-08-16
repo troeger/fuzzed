@@ -1,4 +1,4 @@
-RBD_CONFIG = {
+CONFIG = {
 	'kind': 'rbd',
 	'name': u'Reliability Block Diagram',
 	'nodes': {
