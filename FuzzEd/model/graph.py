@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 
@@ -82,3 +83,23 @@ def validate_kind(sender, instance, **kwargs):
 models.signals.pre_save.connect(validate_kind, sender=Graph)
 
 __all__ = ['Graph']
+
+
+from commands import AddNode
+
+def __set_graph_defaults__(sender, instance, **kwargs):
+    notation = notations.by_kind[instance.kind]
+    if not 'defaults' in notation:
+        return
+    defaults = notation['defaults']
+
+    # create default nodes for this graph
+    for index, node in enumerate(defaults['nodes']):
+    # use index as node ID
+    # this is unique since all other IDs are time stamps
+        command = AddNode.create_of(graph_id=instance.id, node_id=index, **node)
+        command.undoable = False
+        command.do()
+
+
+models.signals.post_init.connect(__set_graph_defaults__, sender=Graph)

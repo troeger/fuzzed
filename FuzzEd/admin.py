@@ -1,4 +1,4 @@
-import fuzztrees.models as model
+import FuzzEd.model as model
 import django.contrib
 
 django.contrib.admin.site.register(model.Graph)

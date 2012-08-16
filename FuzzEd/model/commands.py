@@ -4,10 +4,9 @@ from edge import Edge
 from graph import Graph
 from node import Node
 from properties import Property
-
 import notations
 
-class Command(models.Model)
+class Command(models.Model):
     """
     Class [abstract]: Command
 
@@ -117,14 +116,14 @@ class AddGraph(Command):
     Fields:
      {<Graph>} graph  - the graph that was added
     """
-    graph = modelsForeignKey(Graph, related_name='+')
+    graph = models.ForeignKey(Graph, related_name='+')
 
     @staticmethod
     def create_of(kind, name, owner):
         """
         Method [static]: create_of
         
-        Convience factory method for issueing an add graph command from parameters as received from API calls. NOTE: the graph object that is required for this command is created and saved when invoking this method.
+        Convenience factory method for issuing an add graph command from parameters as received from API calls. NOTE: the graph object that is required for this command is created and saved when invoking this method.
         
         Parameters:
          {str}  kind   - type identifier for the graph's notation
@@ -165,7 +164,7 @@ class AddNode(Command):
         """
         Method [static]: create_of
 
-        Convience factory method for issueing an add node command from parameters as received from API calls. NOTE: the node object that is required for this command is created and saved when invoking this method.
+        Convenience factory method for issuing an add node command from parameters as received from API calls. NOTE: the node object that is required for this command is created and saved when invoking this method.
 
         Arguments:
          {str} graph_id  - the id of the graph the node is added to
@@ -323,7 +322,7 @@ class DeleteNode(Command):
     Fields:
      {<Node>} node  - the node that shall be deleted
     """
-    node = modelsForeignKey(Node, related_name='+')
+    node = models.ForeignKey(Node, related_name='+')
 
     @staticmethod
     def of(graph_id, node_id):

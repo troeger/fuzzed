@@ -1,4 +1,5 @@
-from fuzztrees.middleware import *
+from FuzzEd.middleware import *
+from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 try:
     import json
@@ -6,13 +7,16 @@ try:
 except ImportError:
     import simplejson as json
 
-####
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
-from django.http import HttpResponse
-
+from FuzzEd.model import Graph, Node, Edge
+#TODO: replace with notation stuff
+from nodes_config import NODE_TYPES, NODE_TYPE_IDS
+import json, logging
 import FuzzEd.model as model
+
+logger = logging.getLogger('FuzzEd')
 
 @login_required
 @csrf_exempt

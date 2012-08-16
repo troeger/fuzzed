@@ -1,4 +1,4 @@
-FAULTTREE_CONFIG = {
+CONFIG = {
 	'kind': 'faulttree',
 	'name': u'Fault Tree',
 	'nodes': {
@@ -208,5 +208,18 @@ FAULTTREE_CONFIG = {
         'inhibitGate',
         'undevelopedEvent',
         'houseEvent'
-    ]
+    ],
+
+	# Field: defaults
+	#
+	#	Default elements and properties a new graph is initialized with.
+	'defaults': {
+		'nodes': [
+			{
+				'kind': 'topEvent',
+				'x': 10,
+				'y': 1
+			}
+		]
+	}
 }

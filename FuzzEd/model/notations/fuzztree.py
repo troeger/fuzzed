@@ -1,4 +1,4 @@
-FUZZTREE_CONFIG = {
+CONFIG = {
 	'kind': 'fuzztree',
 	'name': u'Fuzz Tree',
 	'nodes': {
@@ -291,5 +291,18 @@ FUZZTREE_CONFIG = {
         'redundancyEvent',
         'undevelopedEvent',
         'houseEvent'
-    ]
+    ],
+
+	# Field: defaults
+	#
+	#	Default elements and properties a new graph is initialized with.
+	'defaults': {
+		'nodes': [
+				{
+				'kind': 'topEvent',
+				'x': 10,
+				'y': 1
+			}
+		]
+	}
 }

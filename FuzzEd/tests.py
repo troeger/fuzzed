@@ -2,7 +2,9 @@ from django.utils import unittest
 from django.test.client import Client
 from django.contrib.auth.models import User
 from nodes_config import NODE_TYPES
-from fuzztrees.models import Graph, Node, Edge
+from FuzzEd.model.graph import Graph
+from FuzzEd.model.node import Node
+from FuzzEd.model.edge import Edge
 
 class ApiTestCase(unittest.TestCase):
 	graphid=1		# from fixture in initial_data.json

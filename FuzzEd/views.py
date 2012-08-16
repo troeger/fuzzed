@@ -10,10 +10,8 @@ from django.core.mail import mail_managers
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 
-from fuzztrees.models import Graph, GraphTypes, History, Commands, createFuzzTreeGraph, delGraph, renameGraph, User
-from fuzztrees.middleware import HttpResponseBadRequest
-
-from nodes_config import NODE_TYPES
+from FuzzEd.model import Graph, Command, UserProfile, notations
+from FuzzEd.middleware import HttpResponseBadRequest
 
 def index(request):
 	if 'logout' in request.GET:
@@ -100,9 +98,10 @@ def dashboard_edit(request, graph_id):
 
 @login_required
 def editor(request, graph_id):
+	graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
 	parameters = {
-		'graph': get_object_or_404(Graph, pk=graph_id, owner=request.user),
-		'nodes_types': NODE_TYPES
+		'graph': graph,
+		'nodes_types': notations.by_kind[graph.kind]
 	}
 
 	return render_to_response('editor.html', parameters, context_instance=RequestContext(request))

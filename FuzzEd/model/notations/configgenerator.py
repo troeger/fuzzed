@@ -5,9 +5,7 @@ import os
 
 from django.core.exceptions import MiddlewareNotUsed
 
-from fuzztrees.config.fuzztree import FUZZTREE_CONFIG
-from fuzztrees.config.faulttree import FAULTTREE_CONFIG
-from fuzztrees.config.rbd import RBD_CONFIG
+from FuzzEd.model import notations
 
 class Generator(object):
 	def __init__(self, config):
@@ -47,15 +45,14 @@ class Generator(object):
 		return merged
 
 	def generate(self, name):
-		path = os.getcwd() + '/fuzztrees/static/config/' + name
+		path = os.getcwd() + '/FuzzEd/static/config/' + name
 		handle = open(path, 'w')
 		handle.write(json.dumps(self.config))
 		handle.close()
 
 class ConfigGenerator:
 	def __init__(self):
-		Generator(FUZZTREE_CONFIG).generate('fuzztree.json')
-		Generator(FAULTTREE_CONFIG).generate('faulttree.json')
-		Generator(RBD_CONFIG).generate('rbd.json')
+		for notation in notations.installed:
+			Generator(notation).generate(notation['kind'] + '.json')
 
 		raise MiddlewareNotUsed()
