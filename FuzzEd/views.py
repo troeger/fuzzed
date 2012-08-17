@@ -3,6 +3,7 @@ import os, urllib, random, string, datetime
 from django.contrib.auth import authenticate as backend_auth
 from django.contrib.auth import login as backend_login
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.contrib import auth
@@ -10,7 +11,7 @@ from django.core.mail import mail_managers
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 
-from FuzzEd.model import Graph, Command, UserProfile, notations
+from FuzzEd.models import Graph, notations
 from FuzzEd.middleware import HttpResponseBadRequest
 
 def index(request):

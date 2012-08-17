@@ -149,7 +149,7 @@ MIDDLEWARE_CLASSES = (
     #Uncomment the next line for simple clickjacking protection:
     #'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'FuzzEd.middleware.HttpErrorMiddleware',
-    'FuzzEd.model.notations.configgenerator.ConfigGenerator'
+    'FuzzEd.models.notations.configgenerator.ConfigGenerator'
 )
 
 ROOT_URLCONF = 'FuzzEd.urls'

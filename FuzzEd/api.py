@@ -10,11 +10,11 @@ except ImportError:
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
-from FuzzEd.model import Graph, Node, Edge
+from FuzzEd.models import Graph, Node, Edge
 #TODO: replace with notation stuff
 from nodes_config import NODE_TYPES, NODE_TYPE_IDS
 import json, logging
-import FuzzEd.model as model
+import FuzzEd.models as model
 
 logger = logging.getLogger('FuzzEd')
 
@@ -49,7 +49,7 @@ def graphs(request):
     try:
         # create a graph created command 
         post    = request.POST
-        command = model.commands.AddGraph.create_of(kind=post['kind'], name=post['name'], \
+        command = models.commands.AddGraph.create_of(kind=post['kind'], name=post['name'], \
                                                     owner=request.user, undoable=False)
         command.save()
 
