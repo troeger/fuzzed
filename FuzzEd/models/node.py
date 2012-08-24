@@ -61,6 +61,7 @@ class Node(models.Model):
 
         serialized['id']            = self.client_id
         serialized['kind']          = self.kind
+        serialized['position']      = {'x': self.x, 'y': self.y}
         serialized['outgoingEdges'] = [edge.to_json() for edge in self.outgoing.filter(deleted=False)]
 
         return serialized
