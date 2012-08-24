@@ -16,11 +16,11 @@
 					</div>
 
 					{% else %}
-					<div class="fuzzed-node-thumbnail-cell" style="display:none">
-						<div id="{{ node_kind }}" class="fuzzed-node-thumbnail fuzzed-{{ node_kind }}">
-							{% include node.image %}
-						</div>
-					</div>
+                    <div style="display: none">
+                        <div id="{{ node_kind }}">
+                            {% include node.image %}
+                        </div>
+                    </div>
 					{% endif %}
 
 				{% endfor %}
