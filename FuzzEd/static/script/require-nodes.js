@@ -4,11 +4,11 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      *  Abstract Node Base Class
      */
     var Node = Class.extend({
-        type: 'node',
-
         init: function(properties) {
+            this.kind = properties.kind || 'node';
+
             // merge all members of the configuration (defaults) into this object
-            jQuery.extend(this, FuzztreeConfig.nodes[this.type]);
+            jQuery.extend(this, FuzztreeConfig.nodes[this.kind]);
 
             // merge all given properties into this object
             jQuery.extend(this, properties);
@@ -44,8 +44,8 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
 
             // otherNode must be in the 'allowConnectionTo' list defined in the config
             var allowed = false;
-            _.each(this.allowConnectionTo, function(nodeType) {
-                if (otherNode instanceof nodeTypeToClassMapping[nodeType]) allowed = true;
+            _.each(this.allowConnectionTo, function(nodeKind) {
+                if (otherNode instanceof nodeKindToClassMapping[nodeKind]) allowed = true;
             });
             if (!allowed) return false;
 
@@ -364,7 +364,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         _setupVisualRepresentation: function() {
             // get the thumbnail, clone it and wrap it with a container (for labels)
             var container = jQuery('<div>');
-            var nodeImage = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.type).clone();
+            var nodeImage = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.kind).clone();
             var optionalIndicatorWrapper = jQuery('<div>').svg();
             var optionalIndicator = optionalIndicatorWrapper.svg('get');
 
@@ -427,125 +427,176 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      *  Abstract Event Base Class
      */
     var Event = Node.extend({
-        type: 'event'
+        init: function(properties) {
+            properties.kind = properties.kind || 'event';
+            return this._super(properties);
+        }
     });
 
     /*
      *  Abstract Gate Base Class
      */
     var Gate = Node.extend({
-        type: 'gate'
+        init: function(properties) {
+            properties.kind = properties.kind || 'gate';
+            return this._super(properties);
+        }
     });
 
     /*
      *  Top Event
      */
     var TopEvent = Event.extend({
-        type: 'topEvent'
+        init: function(properties) {
+            properties.kind = properties.kind || 'topEvent';
+            return this._super(properties);
+        }
     });
 
     /*
      *  Basic Event
      */
     var BasicEvent = Event.extend({
-        type: 'basicEvent'
+        init: function(properties) {
+            properties.kind = properties.kind || 'basicEvent';
+            return this._super(properties);
+        }
     });
 
     /*
      *  Basic Event Set
      */
     var BasicEventSet = BasicEvent.extend({
-        type: 'basicEventSet'
+        init: function(properties) {
+            properties.kind = properties.kind || 'basicEventSet';
+            return this._super(properties);
+        }
     });
 
     /*
      *  Intermediate Event
      */
     var IntermediateEvent = Event.extend({
-        type: 'intermediateEvent'
+        init: function(properties) {
+            properties.kind = properties.kind || 'intermediateEvent';
+            return this._super(properties);
+        }
     });
 
     /*
      *  Intermediate Event Set
      */
     var IntermediateEventSet = IntermediateEvent.extend({
-        type: 'intermediateEventSet'
+        init: function(properties) {
+            properties.kind = properties.kind || 'intermediateEventSet';
+            return this._super(properties);
+        }
     });
 
     /*
      *  AndGate
      */
     var AndGate = Gate.extend({
-        type: 'andGate'
+        init: function(properties) {
+            properties.kind = properties.kind || 'andGate';
+            return this._super(properties);
+        }
     });
 
     /*
      *  OrGate
      */
     var OrGate = Gate.extend({
-        type: 'orGate'
+        init: function(properties) {
+            properties.kind = properties.kind || 'orGate';
+            return this._super(properties);
+        }
     });
 
     /*
      *  XorGate
      */
     var XorGate = Gate.extend({
-        type: 'xorGate'
+        init: function(properties) {
+            properties.kind = properties.kind || 'xorGate';
+            return this._super(properties);
+        }
     });
 
     /*
      *  PriorityAndGate
      */
     var PriorityAndGate = Gate.extend({
-        type: 'priorityAndGate'
+        init: function(properties) {
+            properties.kind = properties.kind || 'priorityAndGate';
+            return this._super(properties);
+        }
     });
 
     /*
      *  VotingOrGate
      */
     var VotingOrGate = Gate.extend({
-        type: 'votingOrGate'
+        init: function(properties) {
+            properties.kind = properties.kind || 'votingOrGate';
+            return this._super(properties);
+        }
     });
 
     /*
      *  InhibitGate
      */
     var InhibitGate = Gate.extend({
-        type: 'inhibitGate'
+        init: function(properties) {
+            properties.kind = properties.kind || 'inhibitGate';
+            return this._super(properties);
+        }
     });
 
     /*
      *  ChoiceEvent
      */
     var ChoiceEvent = Event.extend({
-        type: 'choiceEvent'
+        init: function(properties) {
+            properties.kind = properties.kind || 'choiceEvent';
+            return this._super(properties);
+        }
     });
 
     /*
      *  Redundancy Event
      */
     var RedundancyEvent = Event.extend({
-        type: 'redundancyEvent'
+        init: function(properties) {
+            properties.kind = properties.kind || 'redundancyEvent';
+            return this._super(properties);
+        }
     });
 
     /*
      *  Undeveloped Event
      */
     var UndevelopedEvent = Event.extend({
-        type: 'undevelopedEvent'
+        init: function(properties) {
+            properties.kind = properties.kind || 'undevelopedEvent';
+            return this._super(properties);
+        }
     });
 
     /*
      *  House Event
      */
     var HouseEvent = Event.extend({
-        type: 'houseEvent'
+        init: function(properties) {
+            properties.kind = properties.kind || 'houseEvent';
+            return this._super(properties);
+        }
     });
 
     /*
-     *  Mapping table for resolving note types into classes
+     *  Mapping table for resolving note kinds into classes
      */
-    var nodeTypeToClassMapping = {
+    var nodeKindToClassMapping = {
         'node': Node,
         'event': Event,
         'gate': Gate,
@@ -567,18 +618,18 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
     }
 
     /*
-        Function: newNodeForType
-            Factory method. Returns a new Node of the given type.
+        Function: newNodeOfKind
+            Factory method. Returns a new Node of the given kind.
 
         Parameter:
-            type - String specifying the type of the new Node. See Config.Node.Types.
+            kind - String specifying the kind of the new Node. See Config.Node.Kinds.
             properties - [optional] A dictionary of properties that should be merged into the new node.
 
         Returns:
-            A new Node of the given type
+            A new Node of the given kind
      */
-    function newNodeForType(type, properties) {
-        var nodeClass = nodeTypeToClassMapping[type];
+    function newNodeOfKind(kind, properties) {
+        var nodeClass = nodeKindToClassMapping[kind];
         return new nodeClass(properties);
     }
 
@@ -588,15 +639,15 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
 
      Parameter:
      json - A JSON object defining the properties of the new node..
-            The node's class is determined using the 'type' property.
-            Default type is 'node'.
+            The node's class is determined using the 'kind' property.
+            Default kind is 'node'.
 
      Returns:
      A new Node.
      */
     function newNodeFromJson(json) {
-        var type = json.type || 'node';
-        var nodeClass = nodeTypeToClassMapping[type];
+        var kind = json.kind || 'node';
+        var nodeClass = nodeKindToClassMapping[kind];
         // the init method will merge the json attributes into the new node
         return new nodeClass(json);
     }
@@ -621,7 +672,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         HouseEvent:       HouseEvent,
         TopEvent:         TopEvent,
 
-        newNodeForType:   newNodeForType,
+        newNodeOfKind:    newNodeOfKind,
         newNodeFromJson:  newNodeFromJson
     };
 })
