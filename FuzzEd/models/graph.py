@@ -95,9 +95,9 @@ from commands import AddNode
 
 @receiver(post_save, sender=Graph)
 def __set_graph_defaults__(sender, instance, **kwargs):
-    # don't add defaults if it was already done
+    # don't add defaults if it was already done (if there are nodes)
     #TODO: find a better way?
-    if instance.nodes:
+    for node in instance.nodes.all():
         return
 
     notation = notations.by_kind[instance.kind]
