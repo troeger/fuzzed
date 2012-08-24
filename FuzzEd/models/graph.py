@@ -86,6 +86,11 @@ from commands import AddNode
 
 @receiver(post_save, sender=Graph)
 def __set_graph_defaults__(sender, instance, **kwargs):
+    # don't add defaults if it was already done
+    #TODO: find a better way?
+    if instance.nodes:
+        return
+
     notation = notations.by_kind[instance.kind]
     if not 'defaults' in notation:
         return
@@ -96,5 +101,4 @@ def __set_graph_defaults__(sender, instance, **kwargs):
         # use index as node ID
         # this is unique since all other IDs are time stamps
         command = AddNode.create_of(graph_id=instance.pk, node_id=index, **node)
-        command.undoable = False
         command.do()
