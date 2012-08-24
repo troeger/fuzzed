@@ -10,11 +10,9 @@ except ImportError:
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
-from FuzzEd.models import Graph, Node, Edge
-#TODO: replace with notation stuff
-from nodes_config import NODE_TYPES, NODE_TYPE_IDS
-import json, logging
-import FuzzEd.models as model
+
+from FuzzEd.models import Graph, Node, Edge, notations, commands
+import logging
 
 logger = logging.getLogger('FuzzEd')
 
@@ -49,7 +47,7 @@ def graphs(request):
     try:
         # create a graph created command 
         post    = request.POST
-        command = models.commands.AddGraph.create_of(kind=post['kind'], name=post['name'], \
+        command = commands.AddGraph.create_of(kind=post['kind'], name=post['name'], \
                                                     owner=request.user, undoable=False)
         command.save()
 
@@ -149,29 +147,34 @@ def nodes(request, graph_id):
     """
     Add new node to graph stored in the backend
     API Request:            POST /api/graphs/[graphID]/nodes
-    API Request Parameters: type=[NODE_TYPE], xcoord, ycoord
+    API Request Parameters: type=[NODE_TYPE], x, y
     API Response:           JSON object containing the node's ID, status code 201, location URI for new node
     """
 
     if request.is_ajax():
         if request.method == 'POST':
-            if 'type' in request.POST and 'xcoord' in request.POST and 'ycoord' in request.POST:
+            if 'kind' in request.POST and 'x' in request.POST and 'y' in request.POST:
                 try:
-                    client_id=int(request.POST['id'])
-                    t=NODE_TYPE_IDS[request.POST['type']]
-                    assert(t in NODE_TYPES)
-                    g=Graph.objects.get(pk=graph_id, deleted=False)
-                    n=Node(client_id=client_id, type=t, graph=g, xcoord=request.POST['xcoord'], ycoord=request.POST['ycoord'])
-                    n.save()
-                    c=History(command=Commands.ADD_NODE, graph=g, node=n)
-                    c.save()
+                    client_id = int(request.POST['id'])
+                    kind = request.POST['kind']
+                    x = request.POST['x']
+                    y = request.POST['y']
+
+                    # assure that this kind of node is allowed for this kind of graph
+                    graph = Graph.objects.get(pk=graph_id, deleted=False)
+                    notation = notations.by_kind(graph.kind)
+                    assert(kind in notation['nodes'].keys)
+
+                    command = commands.AddNode.create_of(graph_id, client_id, kind, x, y)
+                    command.save()
                 except:
                     raise HttpResponseBadRequestAnswer()
                 else:
-                    responseBody = json.dumps(n.toJsonDict())
+                    responseBody = json.dumps(command.node.toJsonDict())
                     response=HttpResponse(responseBody, 'application/javascript', status=201)
-                    response['Location']=reverse('node', args=[g.pk, n.pk])
+                    response['Location']=reverse('node', args=[graph.pk, command.node.pk])
                     return response
+
         raise HttpResponseNotAllowedAnswer(['POST']) 
 
 @login_required
