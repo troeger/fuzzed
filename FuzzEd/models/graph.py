@@ -72,7 +72,7 @@ class Graph(models.Model):
         return json.dumps(self.__to_json_dict__())
 
     def __to_json_dict__(self):
-        nodes = [node.__to_json__dict() for node in self.nodes.all().filter(deleted=False)]
+        nodes = [node.__to_json_dict__() for node in self.nodes.all().filter(deleted=False)]
         return {
             'id':    self.pk,
             'name':  unicode(self),
