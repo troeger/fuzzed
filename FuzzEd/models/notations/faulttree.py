@@ -207,7 +207,8 @@ CONFIG = {
         'votingOrGate',
         'inhibitGate',
         'undevelopedEvent',
-        'houseEvent'
+        'houseEvent',
+        'topEvent'
     ],
 
 	# Field: defaults

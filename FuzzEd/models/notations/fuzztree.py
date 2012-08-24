@@ -290,7 +290,8 @@ CONFIG = {
         'choiceEvent',
         'redundancyEvent',
         'undevelopedEvent',
-        'houseEvent'
+        'houseEvent',
+        'topEvent'
     ],
 
 	# Field: defaults
