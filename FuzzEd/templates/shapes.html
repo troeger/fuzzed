@@ -5,7 +5,7 @@
 			<div class="ui-grid-a">
                 {% for node_kind, node in nodes.items %}
 
-					{% if not node.excludeFromShapeMenu %}
+					{% if not node.excludeFromShapesMenu %}
 					<div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell" title="{{node.help }}">
 						&nbsp
 						<div id="{{ node_kind }}" class="fuzzed-node-thumbnail fuzzed-{{ node_kind }}">
@@ -20,11 +20,11 @@
 						<div id="{{ node_kind }}" class="fuzzed-node-thumbnail fuzzed-{{ node_kind }}">
 							{% include node.image %}
 						</div>
-					<div>
+					</div>
 					{% endif %}
 
 				{% endfor %}
 			</div>
-		<li>
+		</li>
 	</ul>
 </div>
