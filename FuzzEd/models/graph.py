@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models.signals import post_init
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import notations
@@ -28,11 +28,7 @@ class Graph(models.Model):
     deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
-        try:
-            Property.objects.get(graph=self, key='name').value
-
-        except ObjectDoesNotExist:
-            return 'Graph_%s' % (self.pk)
+        return self.name
 
     def dump(self, tree=None, indent=0):
         """
@@ -88,7 +84,7 @@ __all__ = ['Graph']
 
 from commands import AddNode
 
-@receiver(post_init, sender=Graph)
+@receiver(post_save, sender=Graph)
 def __set_graph_defaults__(sender, instance, **kwargs):
     notation = notations.by_kind[instance.kind]
     if not 'defaults' in notation:
@@ -99,6 +95,6 @@ def __set_graph_defaults__(sender, instance, **kwargs):
     for index, node in enumerate(defaults['nodes']):
         # use index as node ID
         # this is unique since all other IDs are time stamps
-        command = AddNode.create_of(graph_id=instance.id, node_id=index, **node)
+        command = AddNode.create_of(graph_id=instance.pk, node_id=index, **node)
         command.undoable = False
         command.do()
