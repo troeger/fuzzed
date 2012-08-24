@@ -1,6 +1,13 @@
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 
+try:
+    import json
+# backwards compatibility with older versions of CPython
+except ImportError:
+    import simplejson as json
+
+
 from graph import Graph
 
 import notations
@@ -42,11 +49,14 @@ class Node(models.Model):
         """
         Method: to_json
         
-        Serializes the values of this node into a python dictionary that is JSON conform.
+        Serializes the values of this node into a JSON object.
 
         Returns:
-         {dict} the node as dictionary
+         {str} the node in JSON representation
         """
+        return json.dumps(self.__to_json_dict__())
+
+    def __to_json_dict__(self):
         serialized = dict([prop.to_tuple() for prop in self.properties.filter(deleted=False)])
 
         serialized['id']            = self.client_id

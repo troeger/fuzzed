@@ -1,12 +1,6 @@
 from FuzzEd.middleware import *
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
-try:
-    import json
-# backwards compatibility with older versions of CPython
-except ImportError:
-    import simplejson as json
-
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db import transaction
@@ -85,10 +79,10 @@ def graph(request, graph_id):
         if request.method == 'GET':
             # fetch graph 
             try:
-                g=Graph.objects.get(pk=graph_id, owner=request.user, deleted=False)
+                graph = Graph.objects.get(pk=graph_id, owner=request.user, deleted=False)
             except:
                 raise HttpResponseNotFoundAnswer()
-            data=json.dumps(g.toJsonDict())
+            data = graph.to_json()
             return HttpResponse(data, 'application/javascript')
         raise HttpResponseNotAllowedAnswer(['GET'])
 
@@ -170,7 +164,7 @@ def nodes(request, graph_id):
                 except:
                     raise HttpResponseBadRequestAnswer()
                 else:
-                    responseBody = json.dumps(command.node.toJsonDict())
+                    responseBody = command.node.to_json()
                     response=HttpResponse(responseBody, 'application/javascript', status=201)
                     response['Location']=reverse('node', args=[graph.pk, command.node.pk])
                     return response
@@ -277,7 +271,7 @@ def edges(request, graph_id, node_id):
                 except Exception, e:
                     raise HttpResponseBadRequestAnswer()
                 else:
-                    responseBody = json.dumps(e.toJsonDict())
+                    responseBody = e.to_json()
                     response=HttpResponse(responseBody, status=201)
                     response['Location']=reverse('edge', args=[g.pk, n.pk, e.pk])
                     return response

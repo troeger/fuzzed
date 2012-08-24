@@ -4,6 +4,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+try:
+    import json
+# backwards compatibility with older versions of CPython
+except ImportError:
+    import simplejson as json
+
 import notations
 
 class Graph(models.Model):
@@ -58,16 +64,19 @@ class Graph(models.Model):
         """
         Method: to_json
         
-        Serializes the graph into a Python dictionary that is JSON conform.
+        Serializes the graph into a JSON object.
 
         Returns:
-         {dict} the graph as dictionary
+         {dict} the graph in JSON representation
         """
-        nodes = [node.to_json() for node in self.nodes.all().filter(deleted=False)]
+        return json.dumps(self.__to_json_dict__())
+
+    def __to_json_dict__(self):
+        nodes = [node.__to_json__dict() for node in self.nodes.all().filter(deleted=False)]
         return {
-            'id':    self.pk, 
-            'name':  unicode(self), 
-            'type':  self.kind, 
+            'id':    self.pk,
+            'name':  unicode(self),
+            'type':  self.kind,
             'nodes': nodes
         }
 

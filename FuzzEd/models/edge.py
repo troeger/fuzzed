@@ -1,5 +1,11 @@
 from django.db import models
 
+try:
+    import json
+# backwards compatibility with older versions of CPython
+except ImportError:
+    import simplejson as json
+
 from node import Node
 
 class Edge(models.Model):
@@ -34,8 +40,11 @@ class Edge(models.Model):
         Returns:
          {dict} the edge as dictionary
         """
+        json.dumps(self.__to_json_dict__())
+
+    def __to_json_dict__(self):
         return {
-            'id':     self.client_id, 
-            'source': self.source.client_id, 
+            'id':     self.client_id,
+            'source': self.source.client_id,
             'target': self.target.client_id
         }
