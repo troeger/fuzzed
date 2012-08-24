@@ -11,7 +11,7 @@ from django.core.mail import mail_managers
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 
-from FuzzEd.models import Graph, notations
+from FuzzEd.models import Graph, notations, commands
 from FuzzEd.middleware import HttpResponseBadRequest
 
 def index(request):
@@ -66,8 +66,9 @@ def dashboard(request):
 def dashboard_new(request):
 	# save the graph
 	if 'save' in request.POST and 'type' in request.POST and 'title' in request.POST:
-		if request.POST['type'] == 'fuzztree':
-			createFuzzTreeGraph(request.user, request.POST['title'])
+		command = commands.AddGraph.create_of(kind=request.POST['type'], name=request.POST['title'], \
+																		 owner=request.user)
+		command.save()
 
 		return redirect('dashboard')
 
@@ -78,14 +79,14 @@ def dashboard_new(request):
 			'name': 'FuzzTree'
 		}
 		return render_to_response('dashboard/dashboard_new.html', parameters, context_instance=RequestContext(request))
-	
+
 	# something is not right with the request
 	raise HttpResponseBadRequest()
 
 @login_required
 def dashboard_edit(request, graph_id):
 	graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
-	
+
 	if 'delete' in request.POST:
 		deleted_graph = str(graph)
 		delGraph(graph)
