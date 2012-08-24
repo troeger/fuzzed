@@ -90,7 +90,7 @@ def dashboard_edit(request, graph_id):
 	if request.method == 'DELETE':
 		deleted_graph = str(graph)
 		delCommand = commands.DeleteGraph.of(graph.pk)
-		delCommand.do() #TODO: save()?
+		delCommand.do()
 		return render_to_response('dashboard/dashboard.html', {'deleted_graph': deleted_graph})
 
 	if request.method == 'POST' and 'save' in request.POST:

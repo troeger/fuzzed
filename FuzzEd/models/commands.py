@@ -78,7 +78,6 @@ class AddEdge(Command):
         target = Node.objects.get(client_id=int(to_node_id), graph__pk=int(graph_id))
         edge   = Edge(client_id=int(client_id), source=source, target=target)
 
-        edge.save()
         return AddEdge(edge=edge)
 
     def do(self):
@@ -92,6 +91,7 @@ class AddEdge(Command):
         """
         self.edge.deleted = False
         self.edge.save()
+        self.save()
 
     def undo(self):
         """
@@ -134,13 +134,13 @@ class AddGraph(Command):
          {<AddGraph>} the add graph command instance
         """
         graph = Graph(kind=kind, name=name, owner=owner)
-        graph.save()
 
         return AddGraph(graph=graph)
 
     def do(self):
         self.graph.deleted = False
         self.graph.save()
+        self.save()
 
     def undo(self):
         self.graph.deleted = True
@@ -171,8 +171,8 @@ class ChangeGraph(Command):
         Convenience factory method for issuing an change graph command from parameters as received from API calls.
 
         Parameters:
-         {str}     graph_id       - type identifier for the graph's notation
-         {kw_args} new_properties -
+         {str}    graph_id       - type identifier for the graph's notation
+         {kwargs} new_properties - new properties (key-value-pairs) to be stored for that graph
 
         Returns:
          {<ChangeGraph>} the change graph command instance
@@ -180,6 +180,7 @@ class ChangeGraph(Command):
         graph = Graph.objects.get(pk=graph_id)
         instance = ChangeGraph(graph=graph)
         instance.new_properties = new_properties
+        return instance
 
     def do(self):
         for key, value in self.new_properties:
@@ -230,7 +231,6 @@ class AddNode(Command):
         """
         graph = Graph.objects.get(pk=int(graph_id))
         node  = Node(graph=graph, client_id=int(node_id), kind=kind, x=int(x), y=int(y))
-        node.save()
         
         return AddNode(node=node)
 
@@ -245,6 +245,7 @@ class AddNode(Command):
         """
         self.node.deleted = False
         self.node.save()
+        self.save()
 
     def undo(self):
         """
@@ -298,6 +299,7 @@ class DeleteEdge(Command):
         """
         self.edge.deleted = True
         self.edge.save()
+        self.save()
 
     def undo(self):
         """
@@ -350,6 +352,7 @@ class DeleteGraph(Command):
         """
         self.graph.deleted = True
         self.graph.save()
+        self.save()
 
     def undo(self):
         """
@@ -403,6 +406,7 @@ class DeleteNode(Command):
         """
         self.node.deleted = True
         self.node.save()
+        self.save()
 
     def undo(self):
         """
@@ -416,6 +420,7 @@ class DeleteNode(Command):
         self.node.deleted = False
         self.node.save()
 
+#TODO: this will become ChangeNode
 class MoveNode(Command):
     """
     Class: MoveNode
@@ -469,6 +474,7 @@ class MoveNode(Command):
         self.node.x = self.new_x
         self.node.y = self.new_y
         self.node.save()
+        self.save()
 
     def undo(self):
         """
@@ -483,6 +489,7 @@ class MoveNode(Command):
         self.node.y = self.old_y
         self.node.save()
 
+#TODO: this will become ChangeNode
 class PropertyChanged(Command):
     """
     Class: PropertyChanged
@@ -517,8 +524,6 @@ class PropertyChanged(Command):
          {<PropertyChanged>}  - the property changed command instance
         """
         node_property, created = Property.objects.get_or_create(key=key, node__client_id=int(node_id), node__graph__pk=int(graph_id))
-        if created:
-            node_property.save()
 
         return PropertyChanged(property=node_property, old_value=node_property.value, new_value=new_value)
 
@@ -533,6 +538,7 @@ class PropertyChanged(Command):
         """
         self.property.value = self.new_value
         self.property.save()
+        self.save()
 
     def undo(self):
         """

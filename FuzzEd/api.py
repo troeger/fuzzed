@@ -49,7 +49,7 @@ def graphs(request):
         post    = request.POST
         command = commands.AddGraph.create_of(kind=post['kind'], name=post['name'], \
                                                     owner=request.user, undoable=False)
-        command.save()
+        command.do()
 
         # prepare the response
         graph_id             = command.graph.pk
@@ -166,7 +166,7 @@ def nodes(request, graph_id):
                     assert(kind in notation['nodes'].keys)
 
                     command = commands.AddNode.create_of(graph_id, client_id, kind, x, y)
-                    command.save()
+                    command.do()
                 except:
                     raise HttpResponseBadRequestAnswer()
                 else:
