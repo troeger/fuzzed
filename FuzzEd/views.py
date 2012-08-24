@@ -68,7 +68,7 @@ def dashboard_new(request):
 	if 'save' in request.POST and 'type' in request.POST and 'title' in request.POST:
 		command = commands.AddGraph.create_of(kind=request.POST['type'], name=request.POST['title'], \
 																		 owner=request.user)
-		command.save()
+		command.do()
 
 		return redirect('dashboard')
 
@@ -87,7 +87,7 @@ def dashboard_new(request):
 def dashboard_edit(request, graph_id):
 	graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
 
-	if request.method == 'DELETE':
+	if request.method == 'DELETE' or (request.method == 'POST' and 'delete' in request.POST):
 		deleted_graph = str(graph)
 		delCommand = commands.DeleteGraph.of(graph.pk)
 		delCommand.do()
