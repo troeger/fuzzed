@@ -3,12 +3,12 @@
 		<li data-role="list-divider">Shapes</li>
 		<li>
 			<div class="ui-grid-a">
-				{% for key, node in node_types.items %}
+                {% for node_kind, node in nodes.items %}
 
-					{% if not 'hidden' in node or not node.hidden %}
-					<div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell" title="{{ node.help }}">
+					{% if not node.excludeFromShapeMenu %}
+					<div class="ui-block-{% cycle 'a' 'b' %} fuzzed-node-thumbnail-cell" title="{{node.help }}">
 						&nbsp
-						<div id="{{ node.type }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}">
+						<div id="{{ node_kind }}" class="fuzzed-node-thumbnail fuzzed-{{ node_kind }}">
 							{% include node.image %}
 						</div>
 						&nbsp
@@ -17,7 +17,7 @@
 
 					{% else %}
 					<div class="fuzzed-node-thumbnail-cell" style="display:none">
-						<div id="{{ node.type }}" class="fuzzed-node-thumbnail fuzzed-{{ node.type }}">
+						<div id="{{ node_kind }}" class="fuzzed-node-thumbnail fuzzed-{{ node_kind }}">
 							{% include node.image %}
 						</div>
 					<div>

@@ -104,9 +104,13 @@ def dashboard_edit(request, graph_id):
 @login_required
 def editor(request, graph_id):
 	graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
+	notation = notations.by_kind[graph.kind]
+	nodes = notation['nodes']
+
 	parameters = {
 		'graph': graph,
-		'nodes_types': notations.by_kind[graph.kind]
+		'graph_notation': notation,
+		'nodes': {node: nodes[node] for node in notation['shapeMenuNodeDisplayOrder']}
 	}
 
 	return render_to_response('editor.html', parameters, context_instance=RequestContext(request))
