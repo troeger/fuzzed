@@ -57,7 +57,7 @@
 							<td>{{ g.created }}</td>
 							<td style="text-align: right;">
 								<form action="/dashboard/{{ g.pk }}/" method="POST">{% csrf_token %}
-									<button type="submit" name="save" value="save" class="btn">
+									<button type="submit" name="edit" value="edit" class="btn">
 										<i class="icon-cog"></i>
 										Edit
 									</button>

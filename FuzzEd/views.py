@@ -94,14 +94,12 @@ def dashboard_edit(request, graph_id):
 		return render_to_response('dashboard/dashboard.html', {'deleted_graph': deleted_graph})
 
 	if request.method == 'POST' and 'save' in request.POST:
-		#TODO: edit view?
-
-		#renameCommand = commands.ChangeGraph.of(graph.pk, name=request.POST['title'])
-		#renameCommand.do()
-
+		renameCommand = commands.ChangeGraph.of(graph.pk, name=request.POST['title'])
+		renameCommand.do()
 		return redirect('dashboard')	
 
-	return render_to_response('dashboard/dashboard_edit.html', {'graph': graph}, context_instance=RequestContext(request))
+	if request.method == 'POST' and 'edit' in request.POST:
+		return render_to_response('dashboard/dashboard_edit.html', {'graph': graph}, context_instance=RequestContext(request))
 
 @login_required
 def editor(request, graph_id):
