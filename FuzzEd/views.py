@@ -87,13 +87,18 @@ def dashboard_new(request):
 def dashboard_edit(request, graph_id):
 	graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
 
-	if 'delete' in request.POST:
+	if request.method == 'DELETE':
 		deleted_graph = str(graph)
-		delGraph(graph)
+		delCommand = commands.DeleteGraph.of(graph.pk)
+		delCommand.do() #TODO: save()?
 		return render_to_response('dashboard/dashboard.html', {'deleted_graph': deleted_graph})
 
-	if 'save' in request.POST:
-		renameGraph(graph, request.POST['title'])
+	if request.method == 'POST' and 'save' in request.POST:
+		#TODO: edit view?
+
+		#renameCommand = commands.ChangeGraph.of(graph.pk, name=request.POST['title'])
+		#renameCommand.do()
+
 		return redirect('dashboard')	
 
 	return render_to_response('dashboard/dashboard_edit.html', {'graph': graph}, context_instance=RequestContext(request))
