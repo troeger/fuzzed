@@ -18,7 +18,8 @@
 			</h1>
 		</div>
 
-		<form method="POST" action="/dashboard/new/" class="form-horizontal">{% csrf_token %}
+		<form method="POST" action="/dashboard/new/" class="form-horizontal">
+			{% csrf_token %}
 			<fieldset>
 				<div class="control-group">
 					<div class="controls">
@@ -34,11 +35,11 @@
 				</div>
 
 				<div class="form-actions">
-					<button type="submit" name="save" class="btn btn-primary">Create</button>
-					<a href="/dashboard/"><button class="btn">Cancel</button></a>
+					<button type="submit" name="save" value="save" class="btn btn-primary">Create</button>
+					<a class="btn" href="/dashboard/">Cancel</a>
 				</div>
 
-				<input type="hidden" name="type" value="{{ type }}">
+				<input type="hidden" name="kind" value="{{ kind }}">
 			</fieldset>
 		</form>
 

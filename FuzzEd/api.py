@@ -1,16 +1,21 @@
-from FuzzEd.middleware import *
-from django.http import HttpResponse
-from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
+from django.core.urlresolvers import reverse
+
 from django.db import transaction
 
-from FuzzEd.models import Graph, Node, Edge, notations, commands
-import logging
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+from django.shortcuts import get_object_or_404
 
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
+
+from FuzzEd.models import Graph, Node, Edge, notations, commands
+
+import logging
 logger = logging.getLogger('FuzzEd')
 
 @login_required
+@require_POST
 @csrf_exempt
 @transaction.commit_on_success
 def graphs(request):
@@ -19,7 +24,7 @@ def graphs(request):
     
     This function is the API call handler for requests to create a new graph. The request structure must be as follows:
     
-    Request:            POST on /api/graphs
+    Request:            POST - /api/graphs
     Request Parameters: kind = <GRAPH_KIND>, name = <GRAPH_NAME>
     Response:           201 - Location = <GRAPH_URI>, ID = <GRAPH_ID>
     
@@ -31,19 +36,14 @@ def graphs(request):
     """ 
     # we do not accept non AJAX requests
     if not request.is_ajax():
-        raise HttpResponseBadRequestAnswer
-
-    # request must be a POST
-    if request.method != 'POST':
-        raise HttpResponseNotAllowedAnswer(['POST'])
+        return HttpResponseBadRequest()
 
     # try to create the graph like we normally would
     try:
         # create a graph created command 
         post    = request.POST
-        command = commands.AddGraph.create_of(kind=post['kind'], name=post['name'], \
-                                                    owner=request.user, undoable=False)
-        command.do()
+        commands.AddGraph.create_of(kind=post['kind'], name=post['name'], \
+                                    owner=request.user, undoable=False).do()
 
         # prepare the response
         graph_id             = command.graph.pk
@@ -55,41 +55,48 @@ def graphs(request):
 
     # something was not right with the request parameters
     except ValueError, KeyError:
-        raise HttpResponseBadRequestAnswer
+        return HttpResponseBadRequest()
 
     # Should not be reachable, just for error tracing reasons here
-    raise HttpResponseServerError()
+    return HttpResponseServerError()
 
 @login_required
+@require_GET
 @csrf_exempt
 @transaction.commit_on_success
 def graph(request, graph_id):
     """
     Function: graph
     
+    The function provides the JSON serialized version of the graph with the given id given that the graph is owned by the requesting user and it is not marked as deleted.
+    
+    Request:            GET - /api/graphs/<GRAPH_ID>
+    Request Parameters: None
+    Response:           200 - <GRAPH_AS_JSON>
+    
     Parameters:
      {HTTPRequest} request   - the django request object
-     {int}         graph_id  -
+     {int}         graph_id  - the id of the graph to be fetched
     
-    Fetch serialized current graph from backend
-    API Request:  GET /api/graphs/[graphID] , no body
-    API Response: JSON body with serialized graph
+    Returns:
+     {HTTPResponse} a django response object
     """
-    if request.is_ajax():
-        if request.method == 'GET':
-            # fetch graph 
-            try:
-                graph = Graph.objects.get(pk=graph_id, owner=request.user, deleted=False)
-            except:
-                raise HttpResponseNotFoundAnswer()
-            data = graph.to_json()
-            return HttpResponse(data, 'application/javascript')
-        raise HttpResponseNotAllowedAnswer(['GET'])
+    # only AJAX requests are permitted...
+    if not request.is_ajax():
+        return HttpResponseBadRequest()
+    
+    # fetch graph and write back JSON-serialized representation
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    return HttpResponse(graph.to_json(), 'application/javascript')
 
 @login_required
+@require_http_methods(["GET", "POST"])
 @csrf_exempt
 @transaction.commit_on_success
 def undos(request, graph_id):
+    #
+    # TODO: IS NOT WORKING YET
+    #
     """
     Fetch undo command stack from backend
     API Request:  GET /api/graphs/[graphID]/undos, no body
@@ -99,19 +106,25 @@ def undos(request, graph_id):
     API Request:  POST /api/graphs/[graphID]/undos, no body
     API Response: no body, status code 204
     """
-    if request.is_ajax():
-        if request.method == 'GET':
-            #TODO: Fetch undo stack for the graph
-            return HttpResponse()
-        elif request.method == 'POST':
-            #TODO: Perform top command on undo stack
-            return HttpResponseNoResponse()
-        raise HttpResponseNotAllowedAnswer(['GET', 'POST']) 
+    if not request.is_ajax():
+        return HttpResponseBadRequest()
+
+    if request.method == 'GET':
+        #TODO: Fetch undo stack for the graph
+        return HttpResponse(status=204)
+        
+    else:
+        #TODO: Perform top command on undo stack
+        return HttpResponseNoContent(status=204)
 
 @login_required
+@require_http_methods(["GET", "POST"])
 @csrf_exempt
 @transaction.commit_on_success
 def redos(request, graph_id):
+    #
+    # TODO: IS NOT WORKING YET
+    #
     """
     Fetch redo command stack from backend
     API Request:  GET /api/graphs/[graphID]/redos, no body
@@ -121,18 +134,15 @@ def redos(request, graph_id):
     API Request:  POST /api/graphs/[graphID]/redos, no body
     API Response: no body, status code 204
     """
-    if request.is_ajax():
-        if request.method == 'GET':
-            #TODO Fetch redo stack for the graph
-            return HttpResponse()
-        elif request.method == 'POST':
-            #TODO Perform top command on redo stack
-            return HttpResponseNoResponse()
-        raise HttpResponseNotAllowedAnswer(['GET', 'POST']) 
+    if not request.is_ajax():
+        return HttpResponseBadRequest()
 
-
-
-
+    if request.method == 'GET':
+        #TODO Fetch redo stack for the graph
+        return HttpResponseNoContent()
+    else:
+        #TODO Perform top command on redo stack
+        return HttpResponseNoContent()
     
 @login_required
 @csrf_exempt

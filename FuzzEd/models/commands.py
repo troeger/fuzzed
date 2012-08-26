@@ -119,7 +119,7 @@ class AddGraph(Command):
     graph = models.ForeignKey(Graph, related_name='+')
 
     @staticmethod
-    def create_of(kind, name, owner):
+    def create_of(kind, name, owner, undoable=False):
         """
         Method [static]: create_of
         
@@ -133,9 +133,10 @@ class AddGraph(Command):
         Returns:
          {<AddGraph>} the add graph command instance
         """
-        graph = Graph(kind=kind, name=name, owner=owner)
+        graph = Graph(kind=kind, name=name, owner=owner, deleted=True)
+        graph.save()
 
-        return AddGraph(graph=graph)
+        return AddGraph(graph=graph, undoable=undoable)
 
     def do(self):
         self.graph.deleted = False
@@ -145,59 +146,7 @@ class AddGraph(Command):
     def undo(self):
         self.graph.deleted = True
         self.graph.save()
-
-class ChangeGraph(Command):
-    """
-	Class: ChangeGraph
-
-	Extends: Command
-
-	Command that is issued when a graph was changed.
-
-	Fields:
-	 {<Graph>} graph  - the graph that was changed
-	"""
-    graph = models.ForeignKey(Graph, related_name='+')
-
-    #TODO: persist?
-    new_properties = {}
-    old_properties = {}
-
-    @staticmethod
-    def of(graph_id, **new_properties):
-        """
-        Method [static]: of
-
-        Convenience factory method for issuing an change graph command from parameters as received from API calls.
-
-        Parameters:
-         {str}    graph_id       - type identifier for the graph's notation
-         {kwargs} new_properties - new properties (key-value-pairs) to be stored for that graph
-
-        Returns:
-         {<ChangeGraph>} the change graph command instance
-        """
-        graph = Graph.objects.get(pk=graph_id)
-        instance = ChangeGraph(graph=graph)
-        instance.new_properties = new_properties
-        return instance
-
-    def do(self):
-        for key, value in self.new_properties:
-            if key not in self.old_properties:
-                # remember old value for undo
-                self.old_properties[key] = self.graph[key]
-            # store new value
-            self.graph[key] = value
-
-        self.graph.save()
         self.save()
-
-    def undo(self):
-        for key, value in self.old_properties:
-            self.graph[key] = value
-
-        self.graph.save()
 
 class AddNode(Command):
     """
@@ -258,6 +207,59 @@ class AddNode(Command):
         """
         self.node.deleted = True
         self.node.save()
+
+class ChangeGraph(Command):
+    """
+    Class: ChangeGraph
+
+    Extends: Command
+
+    Command that is issued when a graph was changed.
+
+    Fields:
+     {<Graph>} graph  - the graph that was changed
+    """
+    graph = models.ForeignKey(Graph, related_name='+')
+
+    #TODO: persist?
+    new_properties = {}
+    old_properties = {}
+
+    @staticmethod
+    def of(graph_id, **new_properties):
+        """
+        Method [static]: of
+
+        Convenience factory method for issuing an change graph command from parameters as received from API calls.
+
+        Parameters:
+         {str}    graph_id       - type identifier for the graph's notation
+         {kwargs} new_properties - new properties (key-value-pairs) to be stored for that graph
+
+        Returns:
+         {<ChangeGraph>} the change graph command instance
+        """
+        graph = Graph.objects.get(pk=graph_id)
+        instance = ChangeGraph(graph=graph)
+        instance.new_properties = new_properties
+        return instance
+
+    def do(self):
+        for key, value in self.new_properties:
+            if key not in self.old_properties:
+                # remember old value for undo
+                self.old_properties[key] = self.graph[key]
+            # store new value
+            self.graph[key] = value
+
+        self.graph.save()
+        self.save()
+
+    def undo(self):
+        for key, value in self.old_properties:
+            self.graph[key] = value
+
+        self.graph.save()
 
 class DeleteEdge(Command):
     """
