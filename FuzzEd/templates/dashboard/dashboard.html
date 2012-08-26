@@ -1,79 +1,76 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <head>
-	<title>FuzzTrees - Dashboard</title>
-	{% include "util/style.html" %}
+    <title>FuzzTrees - Dashboard</title>
+    {% include "util/style.html" %}
 </head>
 
 <body>
-	{% include "util/toolbar.html" %}
-	<div class="container">
+    {% include "util/toolbar.html" %}
+    <div class="container">
 
-		<div class="page-header">
-			<h1>
-				Dashboard
-			</h1>
-		</div>
+        <div class="page-header">
+            <h1>
+                Dashboard
+            </h1>
+        </div>
 
-		{% if deleted_graph %}
-			DELETED
-		{% endif %}
+        <form action="/dashboard/new/" method="post">{% csrf_token %}
+            <div class="btn-group pull-right">
+                <button type="submit" name="kind" value="faulttree" class="btn" disabled="true">
+                    <i class="icon-file"></i>
+                    New FaultTree
+                </button>
+                <button type="submit" name="kind" value="fuzztree" class="btn">
+                    <i class="icon-file"></i>
+                    New FuzzTree
+                </button>
+                <button type="submit" name="kind" value="rbd" class="btn" disabled="true">
+                    <i class="icon-file"></i>
+                    New RBD
+                </button>
+            </div>
+        </form>
 
-		<form action="/dashboard/new/" method="post">{% csrf_token %}
-			<div class="btn-group pull-right">
-				<button type="submit" name="type" value="faulttree" class="btn" disabled="true">
-					<i class="icon-file"></i>
-					New FaultTree
-				</button>
-				<button type="submit" name="type" value="fuzztree" class="btn">
-					<i class="icon-file"></i>
-					New FuzzTree
-				</button>
-				<button type="submit" name="type" value="rbd" class="btn" disabled="true">
-					<i class="icon-file"></i>
-					New RBD
-				</button>
-			</div>
-		</form>
+        <section>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Graph</th>
+                        <th>Kind</th>
+                        <th>Created</th>
+                        <th></th>
+                    </tr>
+                </thead>
 
-		<section>
-			<table class="table">
-				<thead>
-					<tr>
-						<th>#</th>
-						<th>Graph</th>
-						<th>Type</th>
-						<th>Created</th>
-						<th></th>
-					</tr>
-				</thead>
+                <tbody>
+                    {% for name, graph in graphs %}
+                        <tr onclick="document.location = '/editor/{{ graph.pk }}';">
+                            <td>{{ forloop.counter }}</td>
+                            <td><strong>{{ graph }}</strong></td>
+                            <td><span class="label">{{ name }}</span></td>
+                            <td>{{ graph.created }}</td>
+                            <td style="text-align: right;">
+                                <form action="/dashboard/{{ graph.pk }}/" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" name="edit" value="edit" class="btn">
+                                        <i class="icon-cog"></i>
+                                        Edit
+                                    </button>
+                                    <button type="submit" name="delete" value="delete" class="btn btn-danger">
+                                        <i class="icon-white icon-trash"></i>
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
 
-				<tbody>
-					{% for g in graphs %}
-						<tr onclick="document.location = '/editor/{{ g.pk }}';">
-							<td>{{ forloop.counter }}</td>
-							<td><strong>{{ g }}</strong></td>
-							<td><span class="label">{{ g.graph_type }}</span></td>
-							<td>{{ g.created }}</td>
-							<td style="text-align: right;">
-								<form action="/dashboard/{{ g.pk }}/" method="POST">{% csrf_token %}
-									<button type="submit" name="edit" value="edit" class="btn">
-										<i class="icon-cog"></i>
-										Edit
-									</button>
-									<button type="submit" name="delete" value="delete" class="btn btn-danger">
-										<i class="icon-white icon-trash"></i>
-										Delete
-									</button>
-								</form>
-							</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</section>
-
-		{% include "util/footer.html" %}
-	</div>
+        {% include "util/footer.html" %}
+    </div>
 </body>
 </html>

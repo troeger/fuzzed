@@ -22,7 +22,7 @@ if is_production:
 
     DATABASES = {
         'default': {
-			#TODO: rename database to 'FuzzEd'?
+            #TODO: rename database to 'FuzzEd'?
             'ENGINE':   'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
             'NAME':     'fuzztrees',                              # Or path to database file if using sqlite3.
             'USER':     'fuzztrees',                              # Not used with sqlite3.
@@ -148,7 +148,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     #Uncomment the next line for simple clickjacking protection:
     #'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'FuzzEd.middleware.HttpErrorMiddleware',
     'FuzzEd.models.notations.configgenerator.ConfigGenerator'
 )
 
@@ -214,7 +213,7 @@ LOGGING = {
         },
         'FuzzEd': {
             'handlers':  ['console'],
-            'level': 	 'DEBUG',
+            'level':     'DEBUG',
             'propagate': True,
         }
     }
