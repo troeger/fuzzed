@@ -1,17 +1,18 @@
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import reverse
 
 from django.db import transaction
 
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 # NOTE: it is important to use our custom exceptions!
 # REASON: transaction.commit_on_success will always commit if we do not throw an exception
 # REASON: django.http however is a regular return
+from FuzzEd.middleware import HttpResponseBadRequestAnswer, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, Edge, notations, commands
 
 import logging
@@ -39,7 +40,7 @@ def graphs(request):
     """ 
     # we do not accept non AJAX requests
     if not request.is_ajax():
-        return HttpResponseBadRequest()
+        raise HttpResponseBadRequestAnswer()
 
     # try to create the graph like we normally would
     try:
@@ -58,15 +59,14 @@ def graphs(request):
 
     # something was not right with the request parameters
     except ValueError, KeyError:
-        return HttpResponseBadRequest()
+        raise HttpResponseBadRequestAnswer()
 
     # Should not be reachable, just for error tracing reasons here
-    return HttpResponseServerError()
+    raise HttpResponseServerErrorAnswer()
 
 @login_required
 @require_GET
 @csrf_exempt
-@transaction.commit_on_success
 def graph(request, graph_id):
     """
     Function: graph
@@ -86,7 +86,7 @@ def graph(request, graph_id):
     """
     # only AJAX requests are permitted...
     if not request.is_ajax():
-        return HttpResponseBadRequest()
+        raise HttpResponseBadRequestAnswer()
     
     # fetch graph and write back JSON-serialized representation
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
@@ -110,15 +110,15 @@ def undos(request, graph_id):
     API Response: no body, status code 204
     """
     if not request.is_ajax():
-        return HttpResponseBadRequest()
+        raise HttpResponseBadRequestAnswer()
 
     if request.method == 'GET':
         #TODO: Fetch undo stack for the graph
-        return HttpResponse(status=204)
+        raise HttpResponseNoResponseAnswer()
         
     else:
         #TODO: Perform top command on undo stack
-        return HttpResponseNoContent(status=204)
+        raise HttpResponseNoResponseAnswer()
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -138,51 +138,71 @@ def redos(request, graph_id):
     API Response: no body, status code 204
     """
     if not request.is_ajax():
-        return HttpResponseBadRequest()
+        raise HttpResponseBadRequestAnswer()
 
     if request.method == 'GET':
         #TODO Fetch redo stack for the graph
-        return HttpResponseNoContent()
+        raise HttpResponseNoResponseAnswer()
     else:
         #TODO Perform top command on redo stack
-        return HttpResponseNoContent()
+        raise HttpResponseNoResponseAnswer()
     
 @login_required
+@require_POST
 @csrf_exempt
 @transaction.commit_on_success
 def nodes(request, graph_id):
     """
-    Add new node to graph stored in the backend
-    API Request:            POST /api/graphs/[graphID]/nodes
-    API Request Parameters: type=[NODE_TYPE], x, y
-    API Response:           JSON object containing the node's ID, status code 201, location URI for new node
+    Function: nodes
+    
+    This function creates a new node in the graph with the provided it. In order to be able to create the node four data items about the node are needed: its kind, its position (x and y coordinate) and an id as assigned by the client (calculated by the client to prevent waiting for round-trip). The response contains the JSON serialized representation of the newly created node and its new location URI.
+    
+    Request:            POST - /api/graphs/<GRAPH_ID>/nodes
+    Request Parameters: client_id = <INT>, kind = <NODE_TYPE>, x = <INT>, y = <INT>
+    Response:           201 - <NODE_AS_JSON>, Location = <NODE_URI>
+    
+    Parameters:
+     {HTTPRequest} request   - the django request object
+     {int}         graph_id  - the id of the graph where the node shall be added
+    
+    Returns:
+     {HTTPResponse} a django response object
     """
+    # we do not accept non-AJAX requests
+    if not request.is_ajax():
+        raise HttpResponseBadRequestAnswer()
 
-    if request.is_ajax():
-        if request.method == 'POST':
-            if 'kind' in request.POST and 'x' in request.POST and 'y' in request.POST:
-                try:
-                    client_id = int(request.POST['id'])
-                    kind = request.POST['kind']
-                    x = request.POST['x']
-                    y = request.POST['y']
+    POST = request.POST
+    # if client_id, kind, x or y is not provided we are not able to create the node
+    if not POST.get('client_id') or not POST.get('kind') or not POST.get('x') or not POST.get('y'):
+        raise HttpResponseBadRequestAnswer()
 
-                    # assure that this kind of node is allowed for this kind of graph
-                    graph = Graph.objects.get(pk=graph_id, deleted=False)
-                    notation = notations.by_kind(graph.kind)
-                    assert(kind in notation['nodes'].keys)
+    try:
+        client_id = int(POST['id'])
+        kind      = POST['kind']
+        x         = int(POST['x'])
+        y         = int(POST['y'])
+        graph     = Graph.objects.get(pk=graph_id, deleted=False)
+        assert(kind in notations.by_kind[graph.kind]['nodes'])
 
-                    command = commands.AddNode.create_of(graph_id, client_id, kind, x, y)
-                    command.do()
-                except:
-                    raise HttpResponseBadRequestAnswer()
-                else:
-                    responseBody = command.node.to_json()
-                    response=HttpResponse(responseBody, 'application/javascript', status=201)
-                    response['Location']=reverse('node', args=[graph.pk, command.node.pk])
-                    return response
+        command = commands.AddNode.create_of(graph_id, client_id, kind, x, y)
+        command.do()
 
-        raise HttpResponseNotAllowedAnswer(['POST']) 
+        response = HttpResponse(command.node.to_json(), 'application/javascript', status=201)
+        response['Location'] = reverse('node', args=[graph.pk, command.node.pk])
+        return response
+
+    # a int conversion of one of the parameters failed or kind is not supported by the graph
+    except ValueError, AssertionError:
+        raise HttpResponseBadRequestAnswer()
+
+    # the looked up graph does not exist
+    except ObjectDoesNotExist:
+        raise HttpResponseNotFoundAnswer()
+
+    # should never happen, but for completeness enlisted here
+    except MultipleObjectsReturned:
+        raise HttpResponseServerErrorAnswer()
 
 @login_required
 @csrf_exempt

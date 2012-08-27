@@ -50,9 +50,6 @@ def settings(request):
         except KeyError:
             return HttpResponseBadRequest()
 
-    elif POST.get('cancel'):
-        return redirect('dashboard')
-
     return render(request, 'util/settings.html')
 
 @login_required
@@ -96,10 +93,6 @@ def dashboard_edit(request, graph_id):
         commands.ChangeGraph.of(graph_id, name=POST.get('title')).do()
         return redirect('dashboard')
 
-    # user decided to cancel the changes to the graph, go back to main page
-    if POST.get('cancel'):
-        return redirect('dashboard')
-
     # deletion requested? do it and go back to dashboard
     if POST.get('delete') or request.method == 'DELETE':
         commands.DeleteGraph.of(graph_id).do()
@@ -117,6 +110,7 @@ def dashboard_edit(request, graph_id):
     raise HttpResponseBadRequest()
 
 @login_required
+# TODO: not yet working
 def editor(request, graph_id):
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
     notation = notations.by_kind[graph.kind]
@@ -134,8 +128,6 @@ def editor(request, graph_id):
 def login(request):
     GET  = request.GET
     POST = request.POST
-
-    print GET, POST
 
     # user data was transmitted, try login the user one
     if 'loginname' in POST and 'loginpw' in POST:

@@ -2,13 +2,13 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanen
 
 class HttpResponseRedirectAnswer(Exception):
     def __init__(self, target):
-        self.target=target
+        self.target = target
     def result(self):
         return HttpResponseRedirect(target)
 
 class HttpResponsePermanentRedirectAnswer(Exception):
     def __init__(self, target):
-        self.target=target
+        self.target = target
     def result(self):
         return HttpResponsePermanentRedirect(target)
 
@@ -30,7 +30,7 @@ class HttpResponseForbiddenAnswer(Exception):
 
 class HttpResponseNotAllowedAnswer(Exception):
     def __init__(self, allowedMethods):
-        self.allowedMethods=allowedMethods
+        self.allowedMethods = allowedMethods
     def result(self):
         return HttpResponseNotAllowed(allowedMethods) 
 
@@ -38,19 +38,19 @@ class HttpResponseGoneAnswer(Exception):
     def result(self):
         return HttpResponseGone()
 
-class HttpResponseServerAnswer(Exception):
+class HttpResponseServerErrorAnswer(Exception):
     def result(self):
         return HttpResponseServerError()
 
 class HttpResponseCreated(HttpResponse):
-    status_code=201
+    status_code = 201
 
 class HttpResponseCreatedAnswer(Exception):
     def result(self):
         return HttpResponseCreated() 
 
 class HttpResponseNoResponse(HttpResponse):
-    status_code=204
+    status_code = 204
 
 class HttpResponseNoResponseAnswer(Exception):
     def result(self):
@@ -61,4 +61,5 @@ class HttpErrorMiddleware(object):
         if hasattr(exception, 'result'):
             return exception.result()
         else:
-            return None     # default exception handling kicks in
+            # default exception handling kicks in
+            return None

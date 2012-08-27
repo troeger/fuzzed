@@ -76,7 +76,8 @@ class AddEdge(Command):
         """
         source = Node.objects.get(client_id=int(from_node_id), graph__pk=int(graph_id))
         target = Node.objects.get(client_id=int(to_node_id), graph__pk=int(graph_id))
-        edge   = Edge(client_id=int(client_id), source=source, target=target)
+        edge   = Edge(client_id=int(client_id), source=source, target=target, deleted=True)
+        edge.save()
 
         return AddEdge(edge=edge)
 
@@ -104,6 +105,7 @@ class AddEdge(Command):
         """
         self.edge.deleted = True
         self.edge.save()
+        self.save()
 
 class AddGraph(Command):
     """
@@ -179,7 +181,9 @@ class AddNode(Command):
          {<AddNode>} - the add node command instance
         """
         graph = Graph.objects.get(pk=int(graph_id))
-        node  = Node(graph=graph, client_id=int(node_id), kind=kind, x=int(x), y=int(y))
+        node  = Node(graph=graph, client_id=int(node_id), \
+                     kind=kind, x=int(x), y=int(y), deleted=True)
+        node.save()
         
         return AddNode(node=node)
 
@@ -207,6 +211,7 @@ class AddNode(Command):
         """
         self.node.deleted = True
         self.node.save()
+        self.save()
 
 class ChangeGraph(Command):
     """
