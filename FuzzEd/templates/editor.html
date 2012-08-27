@@ -1,20 +1,20 @@
 <html xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 
 <head>
-	<title>FuzzTrees - {{ graph.name }}</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FuzzTrees - {{ graph.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<style type="text/css">
-		@import url("{{ STATIC_URL }}lib/jquery-mobile/jquery.mobile-1.1.0.min.css");
-		@import url("{{ STATIC_URL }}css/layout.css");
-	</style>
+    <style type="text/css">
+        @import url("{{ STATIC_URL }}lib/jquery-mobile/jquery.mobile-1.1.0.min.css");
+        @import url("{{ STATIC_URL }}css/layout.css");
+    </style>
 
-	<!-- requirejs and own code -->
-	<script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
-	<script type="text/javascript" language="javascript">
-		require.config({
-			baseUrl: '{{ STATIC_URL }}script/',
-			waitSeconds: 5,
+    <!-- requirejs and own code -->
+    <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
+    <script type="text/javascript" language="javascript">
+        require.config({
+            baseUrl: '{{ STATIC_URL }}script/',
+            waitSeconds: 5,
             paths: {
                 // require plugins
                 'text' : '../lib/requirejs/plugins/text', // required by json plugin
@@ -51,30 +51,30 @@
                     exports: 'jsPlumb'
                 }
             }
-		});
+        });
 
-		require(['require-editor', 'jquery.mobile'], function(Editor) {
-			jQuery(document).ready(function() {
-				new Editor({{ graph.pk }});
-			});
-		});
-	</script>
+        require(['require-editor', 'jquery.mobile'], function(Editor) {
+            jQuery(document).ready(function() {
+                new Editor({{ graph.pk }});
+            });
+        });
+    </script>
 </head>
 
 <body data-role="page">
-	{% include "splash.html" %}
-	<div>
-		<div id="printtitle">www.fuzztrees.net - {{ graph }}</div>
+    {% include "splash.html" %}
+    <div>
+        <div id="printtitle">www.fuzztrees.net - {{ graph }}</div>
 
-		<div data-theme="d" data-role="header" id="toolbar">
-			<a href="/dashboard/" data-icon="back">Dashboard</a>
-			<h1>{{ graph }}&nbsp;&nbsp;<img class="fuzzed-ajax-loader" src="{{ STATIC_URL }}img/ajax-loader.gif"></h1>
-		</div>
+        <div data-theme="d" data-role="header" id="toolbar">
+            <a href="/dashboard/" data-icon="back">Dashboard</a>
+            <h1>{{ graph }}&nbsp;&nbsp;<img class="fuzzed-ajax-loader" src="{{ STATIC_URL }}img/ajax-loader.gif"></h1>
+        </div>
 
 
-		<div id="FuzzedContent">
-			{% include "content.html" %}
-		</div>
-	</div>
+        <div id="FuzzedContent">
+            {% include "content.html" %}
+        </div>
+    </div>
 </body>
 </html>

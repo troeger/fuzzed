@@ -4,16 +4,16 @@ from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.mail import mail_managers
-
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 
 from FuzzEd.models import Graph, notations, commands
 
+@require_GET
 def index(request):
     if 'logout' in request.GET:
         auth.logout(request)
@@ -23,59 +23,59 @@ def index(request):
 
     return render(request, 'index.html', {'pwlogin': ('pwlogin' in request.GET)})
 
+@require_GET
 def about(request):
     return render(request, 'util/about.html')
 
 @login_required
+@require_http_methods(['GET', 'POST'])
 def settings(request):
-    parameters = {
-        'user':    request.user,
-        'openids': getOpenIDs(request.user)
-    }
+    POST = request.POST
 
-    return render(request, 'settings.html', parameters)
+    if POST.get('save'):
+        user    = request.user
+        profile = user.get_profile()
+
+        try:
+            user.first_name    = POST['first_name']
+            user.last_name     = POST['last_name']
+            user.email         = POST['email']
+            profile.newsletter = bool(POST.get('newsletter'))
+
+            profile.save()
+            user.save()
+
+            return redirect('dashboard')
+
+        except KeyError:
+            return HttpResponseBadRequest()
+
+    elif POST.get('cancel'):
+        return redirect('dashboard')
+
+    return render(request, 'util/settings.html')
 
 @login_required
+@require_GET
 def dashboard(request):
-    post = request.POST
-
-    if 'settings_save' in post:
-        if 'email' in post:
-            request.user.email = post['email']
-
-        if 'firstname' in post:
-            request.user.first_name = post['firstname']
-
-        if 'lastname' in post:
-            request.user.last_name = post['lastname']
-
-        if 'newsletter' in post and post['newsletter'] == 'on':
-            profile = request.user.get_profile()
-            profile.newsletter = True
-            profile.save()
-        else:
-            profile = request.user.get_profile()
-            profile.newsletter = False
-            profile.save()
-        request.user.save()
-
     graphs = request.user.graphs.all().filter(deleted=False).order_by('-created')
     parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs]}
 
     return render(request, 'dashboard/dashboard.html', parameters)
 
 @login_required
+@require_POST
 def dashboard_new(request):
-    post = request.POST
+    POST = request.POST
 
     # save the graph
-    if post.get('save') and post.get('kind') and post.get('title'):
-        commands.AddGraph.create_of(kind=post['kind'], name=post['title'], owner=request.user).do()
+    if POST.get('save') and POST.get('kind') and POST.get('title'):
+        commands.AddGraph.create_of(kind=POST['kind'], name=POST['title'], owner=request.user).do()
         return redirect('dashboard')
 
     # render the create diagram if fuzztree
-    elif post.get('kind') in notations.by_kind:
-        kind = post['kind']
+    elif POST.get('kind') in notations.by_kind:
+        kind = POST['kind']
         parameters = {
             'kind': kind,
             'name': notations.by_kind[kind]['name']
@@ -86,34 +86,27 @@ def dashboard_new(request):
     return HttpResponseBadRequest()
 
 @login_required
+@require_http_methods(['GET', 'POST', 'DELETE'])
 def dashboard_edit(request, graph_id):
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
-    post = request.POST
+    POST = request.POST
 
     # the owner made changes to the graph's field, better save it (if we can)
-    if post.get('save'):
-        try:
-            commands.ChangeGraph.of(graph_id, name=post.get('title')).do()
-            return redirect('dashboard')
-
-        except ObjectDoesNotExist, MultipleObjectsReturned:
-            return HttpResponseBadRequest()
+    if POST.get('save'):
+        commands.ChangeGraph.of(graph_id, name=POST.get('title')).do()
+        return redirect('dashboard')
 
     # user decided to cancel the changes to the graph, go back to main page
-    if post.get('cancel'):
+    if POST.get('cancel'):
         return redirect('dashboard')
 
     # deletion requested? do it and go back to dashboard
-    if post.get('delete') or request.method == 'DELETE':
-        try:
-            commands.DeleteGraph.of(graph_id).do()
-            return redirect('dashboard')
-
-        except ObjectDoesNotExist, MultipleObjectsReturned:
-            return HttpResponseBadRequest()
+    if POST.get('delete') or request.method == 'DELETE':
+        commands.DeleteGraph.of(graph_id).do()
+        return redirect('dashboard')
 
     # please show the edit page to the user on get requests
-    if post.get('edit') or request.method == 'GET':
+    if POST.get('edit') or request.method == 'GET':
         parameters = {
             'graph': graph,
             'kind':  notations.by_kind[graph.kind]['name']
@@ -121,7 +114,7 @@ def dashboard_edit(request, graph_id):
         return render(request, 'dashboard/dashboard_edit.html', parameters)
 
     # something was not quite right here
-    return HttpResponseBadRequest()
+    raise HttpResponseBadRequest()
 
 @login_required
 def editor(request, graph_id):
@@ -137,50 +130,80 @@ def editor(request, graph_id):
 
     return render_to_response('editor.html', parameters, context_instance=RequestContext(request))
 
+@require_http_methods(['GET', 'POST'])
 def login(request):
-    if request.POST:
-        if 'loginname' in request.POST and 'loginpw' in request.POST:
-            user=auth.authenticate(username=request.POST['loginname'], password=request.POST['loginpw'])
-            if user is not None:
-                if user.is_active:
-                    auth.login(request, user)
+    GET  = request.GET
+    POST = request.POST
 
-    elif 'openid_identifier' in request.GET:
+    print GET, POST
+
+    # user data was transmitted, try login the user one
+    if 'loginname' in POST and 'loginpw' in POST:
+        user = auth.authenticate(username=POST['loginname'], password=POST['loginpw'])
+        # user found? sign-on
+        if user is not None and user.is_active:
+            auth.login(request, user)
+
+    elif 'openid_identifier' in GET:
         # first stage of OpenID authentication
-        request.session['openid_identifier']=request.GET['openid_identifier']
-        return preAuthenticate(request.GET['openid_identifier'], 'http://' + request.get_host() + '/login/?openidreturn')
+        open_id = GET['openid_identifier']
+        request.session['openid_identifier'] = open_id
 
-    elif 'openidreturn' in request.GET:
+        return preAuthenticate(open_id, 'http://%s/login/?openidreturn' % request.get_host())
+
+    elif 'openidreturn' in GET:
         user = auth.authenticate(openidrequest=request)
-        if user.is_anonymous():     
-            username=None
+
+        if user.is_anonymous():    
+            user_name = None
+            email     = None
+
+            user_sreg = user.openid_sreg
+            user_ax   = user.openid_ax
+
             # not known to the backend so far, create it transparently
-            if 'nickname' in user.openid_sreg:
-                username=unicode(user.openid_sreg['nickname'],'utf-8')[:29]
-            if 'email' in user.openid_sreg:         
-                email=unicode(user.openid_sreg['email'],'utf-8')[:29]
-            if AX.email in user.openid_ax:
-                email=unicode(user.openid_ax[AX.email],'utf-8')[:29]
-            if not username and email:
-                newuser=User(username=email, email=email)
+            if 'nickname' in user_sreg:
+                user_name = unicode(user_sreg['nickname'],'utf-8')[:29]
+
+            if 'email' in user_sreg:         
+                email = unicode(user_sreg['email'],'utf-8')[:29]
+
+            if AX.email in user_ax:
+                email = unicode(user_ax[AX.email],'utf-8')[:29]
+
+            # no username given, register user with his e-mail address as username
+            if not user_name and email:
+                new_user = User(username=email, email=email)
+
+            # both, username and e-mail were not given, use a timestamp as username
             elif not username and not email:
-                d=datetime.datetime.now()
-                username='Anonymous%u%u%u%u' % (d.hour,d.minute,d.second,d.microsecond)
-                newuser=User(username=username)
-            elif username and email:
-                newuser=User(username=username, email=email)
-            elif username and not email:
-                newuser=User(username=username)
-            if AX.first in user.openid_ax:
-                newuser.first_name=unicode(user.openid_ax[AX.first],'utf-8')[:29]
-            if AX.last in user.openid_ax:
-                newuser.last_name=unicode(user.openid_ax[AX.last],'utf-8')[:29]
-            newuser.is_active=True
-            newuser.save()
-            linkOpenID(newuser, user.openid_claim)
-            mail_managers('New user', str(newuser), fail_silently=True)
-            return redirect('/login/?openid_identifier=%s'%urllib.quote_plus(request.session['openid_identifier'])) 
+                now = datetime.datetime.now()
+                user_name = 'Anonymous %u%u%u%u' % (now.hour, now.minute,\
+                                                    now.second, now.microsecond)
+                new_user = User(username=user_name)
+
+            # username and e-mail were given; great - register as is
+            elif user_name and email:
+                new_user = User(username=user_name, email=email)
+
+            # username given but no e-mail - at least we know how to call him
+            elif user_name and not email:
+                new_user = User(username=user_name)
+
+            if AX.first in user_ax:
+                new_user.first_name = unicode(user_ax[AX.first],'utf-8')[:29]
+
+            if AX.last in user_ax:
+                new_user.last_name=unicode(user_ax[AX.last],'utf-8')[:29]
+
+            new_user.is_active = True
+            new_user.save()
+
+            linkOpenID(new_user, user.openid_claim)
+            mail_managers('New user', str(new_user), fail_silently=True)
+
+            return redirect('/login/?openid_identifier=%s' % 
+                            urllib.quote_plus(request.session['openid_identifier'])) 
 
     auth.login(request, user)
-
     return redirect('dashboard')

@@ -9,6 +9,9 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
+# NOTE: it is important to use our custom exceptions!
+# REASON: transaction.commit_on_success will always commit if we do not throw an exception
+# REASON: django.http however is a regular return
 from FuzzEd.models import Graph, Node, Edge, notations, commands
 
 import logging

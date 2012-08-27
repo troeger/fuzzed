@@ -1,23 +1,21 @@
 [
-  {
-    "model": "auth.user",
-    "pk": 1,
-    "fields": {
-        "username" : "admin",
-        "password" : "pbkdf2_sha256$10000$10000$mAedDC259RWNsD/MElFRcfS5yKEJR/nLkIpc+8h2d1k=",
-        "is_active" : true,
-        "is_superuser" : true,
-        "is_staff": true
+    {
+        "model": "auth.user",
+        "pk": 1,
+        "fields": {
+            "username" : "admin",
+            "password" : "pbkdf2_sha256$10000$10000$mAedDC259RWNsD/MElFRcfS5yKEJR/nLkIpc+8h2d1k=",
+            "is_active" : true,
+            "is_superuser" : true,
+            "is_staff": true
+        }
+    },
+    {
+        "model": "auth.user",
+        "pk": 2,
+        "fields": {
+        	"username" : "testadmin",
+        	"password" : "pbkdf2_sha256$10000$JNt1EZn2g72p$vX3UFh7g4mPa313pWW4lf4YxkUhL534V8/kxFaQ1XvM="
+        }
     }
-  },
-  {
-    "model": "auth.user",
-    "pk": 2,
-    "fields": {
-    	"username" : "testadmin",
-    	"password" : "pbkdf2_sha256$10000$JNt1EZn2g72p$vX3UFh7g4mPa313pWW4lf4YxkUhL534V8/kxFaQ1XvM="
-    }
-  }
 ]
-
-
