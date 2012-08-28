@@ -87,5 +87,23 @@ CONFIG = {
     'shapeMenuNodeDisplayOrder': [
         'block',
         'outOf'
-    ]
+    ],
+
+        # Field: defaults
+    #
+    # Default elements and properties a new graph is initialized with.
+    'defaults': {
+        'nodes': [
+            {
+                'kind': 'startNode',
+                'x': 5,
+                'y': 1
+            },
+            {
+                'kind': 'endNode',
+                'x': 10,
+                'y': 1
+            }
+        ]
+    }
 }

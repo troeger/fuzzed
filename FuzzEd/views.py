@@ -67,8 +67,9 @@ def dashboard_new(request):
     POST = request.POST
 
     # save the graph
-    if POST.get('save') and POST.get('kind') and POST.get('title'):
-        commands.AddGraph.create_of(kind=POST['kind'], name=POST['title'], owner=request.user).do()
+    if POST.get('save') and POST.get('kind') and POST.get('name'):
+        commands.AddGraph.create_from(kind=POST['kind'], name=POST['name'], \
+                                      owner=request.user).do()
         return redirect('dashboard')
 
     # render the create diagram if fuzztree
@@ -97,7 +98,7 @@ def dashboard_edit(request, graph_id):
 
     # deletion requested? do it and go back to dashboard
     if POST.get('delete') or request.method == 'DELETE':
-        commands.DeleteGraph.of(graph_id).do()
+        commands.DeleteGraph.create_from(graph_id).do()
         return redirect('dashboard')
 
     # please show the edit page to the user on get requests

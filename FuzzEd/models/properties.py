@@ -29,9 +29,20 @@ class Property(models.Model):
         """
         Method: to_tuple
         
-        Converts the property instance to a native Python tuple.
+        Converts the property instance to a native tuple.
 
         Returns:
          {tuple(str, str)} the property as tuple
         """
         return (self.key, self.value)
+
+    def to_dict(self):
+        """
+        Method: to_dict
+
+        Converts the property instance into a native dictionary
+
+        Returns:
+         {dict} the property as dictionary
+        """
+        return {self.key: self.value}

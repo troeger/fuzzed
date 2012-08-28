@@ -58,10 +58,10 @@ class AddEdge(Command):
     """
     edge = models.ForeignKey(Edge, related_name='+')
 
-    @staticmethod
-    def create_of(graph_id, client_id, from_id, to_id):
+    @classmethod
+    def create_from(cls, graph_id, client_id, from_id, to_id):
         """
-        Method [static]: create_of
+        Method [static]: create_from
 
         Convience factory method for issueing an add edge command from parameters as received from API calls. NOTE: the edge object that is required for this command is created and saved when invoking this method.
 
@@ -79,7 +79,7 @@ class AddEdge(Command):
         edge   = Edge(client_id=int(client_id), source=source, target=target, deleted=True)
         edge.save()
 
-        return AddEdge(edge=edge)
+        return cls(edge=edge)
 
     def do(self):
         """
@@ -120,10 +120,10 @@ class AddGraph(Command):
     """
     graph = models.ForeignKey(Graph, related_name='+')
 
-    @staticmethod
-    def create_of(kind, name, owner, undoable=False):
+    @classmethod
+    def create_from(cls, kind, name, owner, undoable=False):
         """
-        Method [static]: create_of
+        Method [static]: create_from
         
         Convenience factory method for issuing an add graph command from parameters as received from API calls. NOTE: the graph object that is required for this command is created and saved when invoking this method.
         
@@ -138,7 +138,7 @@ class AddGraph(Command):
         graph = Graph(kind=kind, name=name, owner=owner, deleted=True)
         graph.save()
 
-        return AddGraph(graph=graph, undoable=undoable)
+        return cls(graph=graph, undoable=undoable)
 
     def do(self):
         self.graph.deleted = False
@@ -163,10 +163,10 @@ class AddNode(Command):
     """
     node = models.ForeignKey(Node, related_name='+')
 
-    @staticmethod
-    def create_of(graph_id, node_id, kind, x, y):
+    @classmethod
+    def create_from(cls, graph_id, node_id, kind, x, y):
         """
-        Method [static]: create_of
+        Method [static]: create_from
 
         Convenience factory method for issuing an add node command from parameters as received from API calls. NOTE: the node object that is required for this command is created and saved when invoking this method.
 
@@ -185,7 +185,7 @@ class AddNode(Command):
                      kind=kind, x=int(x), y=int(y), deleted=True)
         node.save()
         
-        return AddNode(node=node)
+        return cls(node=node)
 
     def do(self):
         """
@@ -221,8 +221,8 @@ class ChangeNode(Command):
 
     Command that is issued when properties of a node change
     """
-    @staticmethod
-    def create_from(graph_id, node_id, **updated_properties):
+    @classmethod
+    def create_from(cls, graph_id, node_id, **updated_properties):
         """
         Method [static]: create_from
         
@@ -235,12 +235,13 @@ class ChangeNode(Command):
          {str} new_value  - the value the property has been changed to
 
         Returns:
-         {<PropertyChanged>}  - the property changed command instance
+         {<ChangeNode>}  - the property changed command instance
         """
-        command = PropertiesChanged()
+        command = cls()
         command.save()
 
         for key, value in updated_properties:
+            # TODO: treat x and y keys extra (move node)
             node_property, created = Property.objects.get_or_create(key=key, \
                                                                     node__client_id=int(node_id),\
                                                                     node__graph__pk=int(graph_id))
@@ -287,10 +288,10 @@ class PropertyChange(models.Model):
     Small inline container class to model arbitrary number of property changes. 
     
     Attributes:
-     {ChangeNode} command   - the command this property change belongs to
-     {Property}   property  - the actual property that changed
-     {str}        old_value - the value of the property before the change
-     {str}        new_value - the updated value
+     {<ChangeNode>} command   - the command this property change belongs to
+     {<Property>}   property  - the actual property that changed
+     {str}          old_value - the value of the property before the change
+     {str}          new_value - the updated value
     """
     class Meta:
         app_label = 'FuzzEd'
@@ -313,10 +314,10 @@ class DeleteEdge(Command):
     """
     edge = models.ForeignKey(Edge, related_name='+')
 
-    @staticmethod
-    def of(graph_id, edge_id):
+    @classmethod
+    def create_from(cls, graph_id, edge_id):
         """
-        Method [static]: of
+        Method [static]: create_from
         
         Convience factory method for issueing a delete node command from parameters as received from API calls. 
 
@@ -327,7 +328,7 @@ class DeleteEdge(Command):
         Returns:
          {<DeleteEdge>}  - the delete edge command instance
         """
-        return DeleteEdge(Edge.objects.get(client_id=int(edge_id), node__graph__pk=int(graph_id)))
+        return cls(Edge.objects.get(client_id=int(edge_id), node__graph__pk=int(graph_id)))
 
     def do(self):
         """
@@ -367,10 +368,10 @@ class DeleteGraph(Command):
     """
     graph = models.ForeignKey(Graph, related_name='+')
 
-    @staticmethod
-    def of(graph_id):
+    @classmethod
+    def create_from(cls, graph_id):
         """
-        Method [static]: of
+        Method [static]: create_from
         
         Convience factory method for issueing a delete graph command from parameters as received from API calls.
 
@@ -380,7 +381,7 @@ class DeleteGraph(Command):
         Returns:
          {<DeleteGraph>}  - the delete graph command instance
         """
-        return DeleteGraph(graph=Graph.objects.get(pk=int(graph_id)))
+        return cls(graph=Graph.objects.get(pk=int(graph_id)))
 
     def do(self):
         """
@@ -420,10 +421,10 @@ class DeleteNode(Command):
     """
     node = models.ForeignKey(Node, related_name='+')
 
-    @staticmethod
-    def of(graph_id, node_id):
+    @classmethod
+    def create_from(cls, graph_id, node_id):
         """
-        Method [static]: of
+        Method [static]: create_from
         
         Convience factory method for issueing an add node command from parameters as received from API calls.
 
@@ -434,7 +435,7 @@ class DeleteNode(Command):
         Returns:
          {<DeleteNode>} the delete node command instance
         """
-        return DeleteNode(node=Node.objects.get(client_id=int(node_id),graph__pk=int(graph_id)))
+        return cls(node=Node.objects.get(client_id=int(node_id),graph__pk=int(graph_id)))
 
     def do(self):
         """
@@ -461,71 +462,61 @@ class DeleteNode(Command):
         self.node.deleted = False
         self.node.save()
 
-#TODO: this will become ChangeNode
-class MoveNode(Command):
+class RenameGraph(Command):
     """
-    Class: MoveNode
+    Class: RenameGraph
     
     Extends: Command
-    
-    Command that issued when a node is moved
-    
-    Fields:
-     {<Node>} node   - the node that is moved
-     {int}    old_x  - the old x coordinate of the node
-     {int}    old_y  - the old y coordinate of the node
-     {int}    new_x  - the x coordinate the node was moved to
-     {int}    new_y  - the y coordinate the node was moved to
-    """
-    node  = models.ForeignKey(Node, related_name='+')
-    old_x = models.IntegerField()
-    old_y = models.IntegerField()
-    new_x = models.IntegerField()
-    new_y = models.IntegerField()
 
-    @staticmethod
-    def of(graph_id, node_id, new_x, new_y):
+    Command that is issued when a graph is renamed
+
+    Fields:
+     {<Node>} node  - the node that shall be deleted
+    """
+    graph    = models.ForeignKey(Graph, related_name='+')
+    old_name = models.CharField(max_length=255)
+    new_name = models.CharField(max_length=255)
+
+    @classmethod
+    def create_from(cls, graph_id, new_name):
         """
-        Method [static]: of
+        Method [static]: create_from
         
-        Convience factory method for issueing a node move command from parameters as received from API calls.
-        
+        Convience factory method for issueing an add node command from parameters as received from API calls.
+
         Parameters:
-         {str} graph_id  - the id of the graph that contains the moved node
-         {str} node_id   - the client id(!) of the moved node
-         {str} new_x     - the x coordinate the node was moved to
-         {str} new_y     - the y coordinate the node was moved to
+         {str} graph_id  - the id of the graph to be renamed
+         {str} new_name  - the new name given to the graph
 
         Returns:
-         {<MoveNode>} the move node command instance
+         {<RenameGraph>} the rename graph instance
         """
-        node = Node.objects.get(client_id=int(node_id), graph__pk=int(graph_id))
+        graph = Graph.objects.get(pk=int(graph_id))
 
-        return MoveNode(node=node, old_x=node.x, old_y=node.y, new_x=new_x, new_y=new_y)
+        return cls(graph=graph, old_name=graph.name, new_name=new_name)
 
     def do(self):
         """
         Method: do
         
-        Moves the node to its new coordinates by setting its new position.
+        Assigns a new name for the graph
 
         Returns:
          {None}
         """
-        self.node.x = self.new_x
-        self.node.y = self.new_y
-        self.node.save()
+        self.graph.name = self.new_value
+        self.graph.save()
         self.save()
 
     def undo(self):
         """
         Method: undo
         
-        Revokes the node's movement by restoring its old position.
+        Restores the old name of the graph
 
         Returns:
          {None}
         """
-        self.node.x = self.old_x
-        self.node.y = self.old_y
-        self.node.save()
+        self.graph.name = self.old_value
+        self.graph.save()
+        self.save()

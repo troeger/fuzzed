@@ -15,6 +15,7 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 # REASON: bypassed this behaviour by throwing exception that send correct HTTP status to the 
 # REASON: user (refer to middleware.py)
 
+from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, Edge, notations, commands
 
@@ -22,6 +23,7 @@ import logging
 logger = logging.getLogger('FuzzEd')
 
 @login_required
+@require_ajax
 @require_POST
 @csrf_exempt
 @transaction.commit_on_success
@@ -41,10 +43,6 @@ def graphs(request):
     Returns:
      {HTTPResponse} a django response object
     """ 
-    # we do not accept non AJAX requests
-    if not request.is_ajax():
-        raise HttpResponseBadRequestAnswer()
-
     # try to create the graph like we normally would
     try:
         # create a graph created command 
@@ -68,6 +66,7 @@ def graphs(request):
     raise HttpResponseServerErrorAnswer()
 
 @login_required
+@require_ajax
 @require_GET
 @csrf_exempt
 def graph(request, graph_id):
@@ -87,21 +86,25 @@ def graph(request, graph_id):
     Returns:
      {HTTPResponse} a django response object
     """
-    # only AJAX requests are permitted...
-    if not request.is_ajax():
-        raise HttpResponseBadRequestAnswer()
-    
     # fetch graph and write back JSON-serialized representation
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     return HttpResponse(graph.to_json(), 'application/javascript')
 
+def properties(**kwargs):
+    pass
+
+def property(**kwargs):
+    pass
+
 @login_required
+@require_ajax
 @require_http_methods(["GET", "POST"])
 @csrf_exempt
 @transaction.commit_on_success
 def undos(request, graph_id):
     #
     # TODO: IS NOT WORKING YET
+    # TODO: UPDATE DOC STRING
     #
     """
     Fetch undo command stack from backend
@@ -112,9 +115,6 @@ def undos(request, graph_id):
     API Request:  POST /api/graphs/[graphID]/undos, no body
     API Response: no body, status code 204
     """
-    if not request.is_ajax():
-        raise HttpResponseBadRequestAnswer()
-
     if request.method == 'GET':
         #TODO: Fetch undo stack for the graph
         raise HttpResponseNoResponseAnswer()
@@ -124,12 +124,14 @@ def undos(request, graph_id):
         raise HttpResponseNoResponseAnswer()
 
 @login_required
+@require_ajax
 @require_http_methods(["GET", "POST"])
 @csrf_exempt
 @transaction.commit_on_success
 def redos(request, graph_id):
     #
     # TODO: IS NOT WORKING YET
+    # TODO: UPDATE DOC STRING
     #
     """
     Fetch redo command stack from backend
@@ -140,9 +142,6 @@ def redos(request, graph_id):
     API Request:  POST /api/graphs/[graphID]/redos, no body
     API Response: no body, status code 204
     """
-    if not request.is_ajax():
-        raise HttpResponseBadRequestAnswer()
-
     if request.method == 'GET':
         #TODO Fetch redo stack for the graph
         raise HttpResponseNoResponseAnswer()
@@ -151,6 +150,7 @@ def redos(request, graph_id):
         raise HttpResponseNoResponseAnswer()
     
 @login_required
+@require_ajax
 @require_POST
 @csrf_exempt
 @transaction.commit_on_success
@@ -171,10 +171,6 @@ def nodes(request, graph_id):
     Returns:
      {HTTPResponse} a django response object
     """
-    # we do not accept non-AJAX requests
-    if not request.is_ajax():
-        raise HttpResponseBadRequestAnswer()
-
     POST = request.POST
     try:
         kind = POST['kind']
@@ -202,6 +198,7 @@ def nodes(request, graph_id):
         raise HttpResponseServerErrorAnswer()
 
 @login_required
+@require_ajax
 @csrf_exempt
 @transaction.commit_on_success
 def node(request, graph_id, node_id):
@@ -277,6 +274,7 @@ def node(request, graph_id, node_id):
         raise HttpResponseNotAllowedAnswer(['DELETE','POST'])
 
 @login_required
+@require_ajax
 @require_POST
 @csrf_exempt
 @transaction.commit_on_success
@@ -297,10 +295,6 @@ def edges(request, graph_id):
     Returns:
      {HTTPResponse} a django response object
     """
-    # we only accept AJAX requests
-    if not request.is_ajax():
-        raise HttpResponseBadRequestAnswer()
-
     POST = request.POST
     try:
         command = commands.AddEdge.create_of(graph_id=graph_id, client_id=POST['id'], \
@@ -326,6 +320,7 @@ def edges(request, graph_id):
         raise HttpResponseServerErrorAnswer()
 
 @login_required
+@require_ajax
 @require_http_methods(['DELETE'])
 @transaction.commit_on_success
 @csrf_exempt
@@ -347,9 +342,6 @@ def edge(request, graph_id, edge_id):
     Returns:
      {HTTPResponse} a django response object
     """
-    if not request.is_ajax():
-        raise HttpResponseBadRequestAnswer()
-
     try:
         commands.DeleteEdge(graph_id, edge_id).do()
         return HttpResponse(status=204)

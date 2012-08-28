@@ -29,7 +29,8 @@ class Edge(models.Model):
     deleted   = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return  '%s -> %s' % (str(self.source), str(self.target))
+        prefix = '[DELETED] ' if self.deleted else ''
+        return  '%s%s -> %s' % (prefix, str(self.source), str(self.target))
 
     def to_json(self):
         """
@@ -42,7 +43,15 @@ class Edge(models.Model):
         """
         json.dumps(self.__to_json_dict__())
 
-    def __to_json_dict__(self):
+    def to_dict(self):
+        """
+        Method: to_dict
+        
+        Represents this edge as a native dictionary
+        
+        Returns:
+         {dict} the edge as dictionary
+        """
         return {
             'id':     self.client_id,
             'source': self.source.client_id,

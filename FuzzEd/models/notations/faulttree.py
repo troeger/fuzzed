@@ -213,7 +213,7 @@ CONFIG = {
 
     # Field: defaults
     #
-    #   Default elements and properties a new graph is initialized with.
+    # Default elements and properties a new graph is initialized with.
     'defaults': {
         'nodes': [
             {
