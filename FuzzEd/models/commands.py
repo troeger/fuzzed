@@ -59,7 +59,7 @@ class AddEdge(Command):
     edge = models.ForeignKey(Edge, related_name='+')
 
     @staticmethod
-    def create_of(graph_id, client_id, from_node_id, to_node_id):
+    def create_of(graph_id, client_id, from_id, to_id):
         """
         Method [static]: create_of
 
@@ -74,8 +74,8 @@ class AddEdge(Command):
         Returns:
          {<AddEdge>} the add edge command instance
         """
-        source = Node.objects.get(client_id=int(from_node_id), graph__pk=int(graph_id))
-        target = Node.objects.get(client_id=int(to_node_id), graph__pk=int(graph_id))
+        source = Node.objects.get(client_id=int(from_id), graph__pk=int(graph_id))
+        target = Node.objects.get(client_id=int(to_id), graph__pk=int(graph_id))
         edge   = Edge(client_id=int(client_id), source=source, target=target, deleted=True)
         edge.save()
 
@@ -213,58 +213,92 @@ class AddNode(Command):
         self.node.save()
         self.save()
 
-class ChangeGraph(Command):
+class ChangeNode(Command):
     """
-    Class: ChangeGraph
-
+    Class: ChangeNode
+    
     Extends: Command
 
-    Command that is issued when a graph was changed.
-
-    Fields:
-     {<Graph>} graph  - the graph that was changed
+    Command that is issued when properties of a node change
     """
-    graph = models.ForeignKey(Graph, related_name='+')
-
-    #TODO: persist?
-    new_properties = {}
-    old_properties = {}
-
     @staticmethod
-    def of(graph_id, **new_properties):
+    def create_from(graph_id, node_id, **updated_properties):
         """
-        Method [static]: of
-
-        Convenience factory method for issuing an change graph command from parameters as received from API calls.
+        Method [static]: create_from
+        
+        Convience factory method for issueing a property changed command from parameters as received from API calls. NOTE: if the property does not yet exist it being created and saved.
 
         Parameters:
-         {str}    graph_id       - type identifier for the graph's notation
-         {kwargs} new_properties - new properties (key-value-pairs) to be stored for that graph
+         {str} graph_id   - the id of the graph that contains the node thats property changed
+         {str] node_id    - the client id(!) of the node thats property changed
+         {str} key        - the name of the property that changed
+         {str} new_value  - the value the property has been changed to
 
         Returns:
-         {<ChangeGraph>} the change graph command instance
+         {<PropertyChanged>}  - the property changed command instance
         """
-        graph = Graph.objects.get(pk=graph_id)
-        instance = ChangeGraph(graph=graph)
-        instance.new_properties = new_properties
-        return instance
+        command = PropertiesChanged()
+        command.save()
+
+        for key, value in updated_properties:
+            node_property, created = Property.objects.get_or_create(key=key, \
+                                                                    node__client_id=int(node_id),\
+                                                                    node__graph__pk=int(graph_id))
+            property_change = PropertyChange(command=command, property=node_property,\
+                                             old_value=node_property.value, new_value=value)
+            property_change.save()
+
+        return command
 
     def do(self):
-        for key, value in self.new_properties:
-            if key not in self.old_properties:
-                # remember old value for undo
-                self.old_properties[key] = self.graph[key]
-            # store new value
-            self.graph[key] = value
+        """
+        Method: do
+        
+        Apply the change to the property - i.e. set the new value
 
-        self.graph.save()
+        Returns:
+         {None}
+        """
+        for change in self.changes:
+            change.property.value = change.new_value
+            change.property.save()
         self.save()
 
     def undo(self):
-        for key, value in self.old_properties:
-            self.graph[key] = value
+        """
+        Method: undo
+        
+        Reverts the changes to the property - i.e. set old value
 
-        self.graph.save()
+        Returns:
+         {None}
+        """
+        for change in self.changes:
+            change.property.value = change.old_value
+            change.property.save()
+        self.save()
+
+class PropertyChange(models.Model):
+    """
+    Class: PropertyChange
+    
+    Extends: models.Model
+    
+    Small inline container class to model arbitrary number of property changes. 
+    
+    Attributes:
+     {ChangeNode} command   - the command this property change belongs to
+     {Property}   property  - the actual property that changed
+     {str}        old_value - the value of the property before the change
+     {str}        new_value - the updated value
+    """
+    class Meta:
+        app_label = 'FuzzEd'
+
+    command   = models.ForeignKey(ChangeNode, related_name='changes')
+    property  = models.ForeignKey(Property, related_name='+')
+    old_value = models.CharField(max_length=255)
+    new_value = models.CharField(max_length=255)
 
 class DeleteEdge(Command):
     """
@@ -495,66 +529,3 @@ class MoveNode(Command):
         self.node.x = self.old_x
         self.node.y = self.old_y
         self.node.save()
-
-#TODO: this will become ChangeNode
-class PropertyChanged(Command):
-    """
-    Class: PropertyChanged
-    
-    Extends: Command
-
-    Command that is issued when a property of a node changes
-
-    Attributes:
-     {<Property>} property   - the property whichs value changed
-     {str}        old_value  - the previous value of the property
-     {str}        new_value  - the new value of the property
-    """
-    property  = models.ForeignKey(Property, related_name='+')
-    old_value = models.CharField(max_length=255)
-    new_value = models.CharField(max_length=255)
-
-    @staticmethod
-    def create_from(graph_id, node_id, key, new_value):
-        """
-        Method [static]: create_from
-        
-        Convience factory method for issueing a property changed command from parameters as received from API calls. NOTE: if the property does not yet exist it being created and saved.
-
-        Parameters:
-         {str} graph_id   - the id of the graph that contains the node thats property changed
-         {str] node_id    - the client id(!) of the node thats property changed
-         {str} key        - the name of the property that changed
-         {str} new_value  - the value the property has been changed to
-
-        Returns:
-         {<PropertyChanged>}  - the property changed command instance
-        """
-        node_property, created = Property.objects.get_or_create(key=key, node__client_id=int(node_id), node__graph__pk=int(graph_id))
-
-        return PropertyChanged(property=node_property, old_value=node_property.value, new_value=new_value)
-
-    def do(self):
-        """
-        Method: do
-        
-        Apply the change to the property - i.e. set the new value
-
-        Returns:
-         {None}
-        """
-        self.property.value = self.new_value
-        self.property.save()
-        self.save()
-
-    def undo(self):
-        """
-        Method: undo
-        
-        Reverts the changes to the property - i.e. set old value
-
-        Returns:
-         {None}
-        """
-        self.property.value = self.old_value
-        self.property.save()

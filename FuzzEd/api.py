@@ -3,16 +3,19 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import reverse
 
 from django.db import transaction
-
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 # NOTE: it is important to use our custom exceptions!
-# REASON: transaction.commit_on_success will always commit if we do not throw an exception
-# REASON: django.http however is a regular return
-from FuzzEd.middleware import HttpResponseBadRequestAnswer, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
+# 
+# REASON: django.http responses are regular returns, transaction.commit_on_success will therefore  
+# REASON: always commit changes even if we return errornous responses (400, 404, ...). We can
+# REASON: bypassed this behaviour by throwing exception that send correct HTTP status to the 
+# REASON: user (refer to middleware.py)
+
+from FuzzEd.middleware import HttpResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, Edge, notations, commands
 
 import logging
@@ -58,7 +61,7 @@ def graphs(request):
         return response
 
     # something was not right with the request parameters
-    except ValueError, KeyError:
+    except (ValueError, KeyError):
         raise HttpResponseBadRequestAnswer()
 
     # Should not be reachable, just for error tracing reasons here
@@ -173,27 +176,21 @@ def nodes(request, graph_id):
         raise HttpResponseBadRequestAnswer()
 
     POST = request.POST
-    # if client_id, kind, x or y is not provided we are not able to create the node
-    if not POST.get('client_id') or not POST.get('kind') or not POST.get('x') or not POST.get('y'):
-        raise HttpResponseBadRequestAnswer()
-
     try:
-        client_id = int(POST['id'])
-        kind      = POST['kind']
-        x         = int(POST['x'])
-        y         = int(POST['y'])
-        graph     = Graph.objects.get(pk=graph_id, deleted=False)
+        kind = POST['kind']
         assert(kind in notations.by_kind[graph.kind]['nodes'])
 
-        command = commands.AddNode.create_of(graph_id, client_id, kind, x, y)
+        command = commands.AddNode.create_of(graph_id=graph_id, client_id=POST['id'], \
+                                             kind=kind, x=POST['x'], y=POST['y'])
         command.do()
+        node = command.node
 
-        response = HttpResponse(command.node.to_json(), 'application/javascript', status=201)
-        response['Location'] = reverse('node', args=[graph.pk, command.node.pk])
+        response = HttpResponse(node.to_json(), 'application/javascript', status=201)
+        response['Location'] = reverse('node', args=[node.graph.pk, node.pk])
         return response
 
     # a int conversion of one of the parameters failed or kind is not supported by the graph
-    except ValueError, AssertionError:
+    except (ValueError, AssertionError, KeyError):
         raise HttpResponseBadRequestAnswer()
 
     # the looked up graph does not exist
@@ -280,62 +277,88 @@ def node(request, graph_id, node_id):
         raise HttpResponseNotAllowedAnswer(['DELETE','POST'])
 
 @login_required
+@require_POST
 @csrf_exempt
 @transaction.commit_on_success
-def edges(request, graph_id, node_id):
+def edges(request, graph_id):
     """
-    Add new edge to a node stored in the backend
-    API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]/edges
-    API Request Parameters: destination=[nodeID]
-    API Response:           no body, status code 201, location URI for new edge and its ID
+    Function: edges
+    
+    This API handler creates a new edge in the graph with the given id. The edge links the two nodes 'source' and 'destination' with each other that are provided in the POST body. Additionally, a request to this URL MUST provide an id for this edge that was assigned by the client (no wait for round-trip). The response contains the JSON serialized representation of the new edge and it location URI.
+    
+    Request:            POST - /api/graphs/<GRAPH_ID>/edges
+    Request Parameters: client_id = <INT>, source = <INT>, destination = <INT>
+    Response:           201 - <EDGE_AS_JSON>, Location = <EDGE_URI>
+    
+    Parameters:
+     {HTTPRequest} request   - the django request object
+     {int}         graph_id  - the id of the graph where the edge shall be added
+    
+    Returns:
+     {HTTPResponse} a django response object
     """
-    if request.is_ajax():
-        if request.method == 'POST':
-            if 'destination' in request.POST:
-                try:
-                    client_id=int(request.POST['id'])
-                    g=Graph.objects.get(pk=graph_id, deleted=False)
-                    n=Node.objects.get(graph=g, client_id=node_id, deleted=False)
-                    d=Node.objects.get(graph=g, client_id=request.POST['destination'], deleted=False)
-                    e=Edge(client_id=client_id, src=n, dest=d)
-                    e.save()
-                    c=History(command=Commands.ADD_EDGE, graph=g, edge=e)
-                    c.save()
-                except Exception, e:
-                    raise HttpResponseBadRequestAnswer()
-                else:
-                    responseBody = e.to_json()
-                    response=HttpResponse(responseBody, status=201)
-                    response['Location']=reverse('edge', args=[g.pk, n.pk, e.pk])
-                    return response
-        raise HttpResponseNotAllowedAnswer(['POST'])
+    # we only accept AJAX requests
+    if not request.is_ajax():
+        raise HttpResponseBadRequestAnswer()
+
+    POST = request.POST
+    try:
+        command = commands.AddEdge.create_of(graph_id=graph_id, client_id=POST['id'], \
+                                             from_id=POST['source'], to_id=POST['destination'])
+        command.do()
+
+        edge = command.edge
+        response = HttpResponse(edge.to_json(), 'application/javascript', status=201)
+        response['Location'] = reverse('edge', args[edge.pk])
+
+        return response
+
+    # some values in the request were not parsable
+    except (ValueError, KeyError):
+        raise HttpResponseBadRequestAnswer()
+
+    # either the graph, the source or the destination node are not in the database
+    except ObjectDoesNotExist:
+        raise HttpResponseNotFoundAnswer()
+
+    # should never happen, just for completeness reasons here
+    except MultipleObjectsReturned:
+        raise HttpResponseServerErrorAnswer()
 
 @login_required
+@require_http_methods(['DELETE'])
 @transaction.commit_on_success
 @csrf_exempt
-def edge(request, graph_id, node_id, edge_id):
+def edge(request, graph_id, edge_id):
     """
-    Delete the given edge that belongs to the given node
-    API Request:  DELETE /api/graphs/[graphID]/nodes/[nodeID]/edges/[edgeID], no body
-    API Response: no body, status code 204
+    Function: edge
+    
+    This API handler deletes the edge from the graph using the both provided ids. The id of the edge hereby referes to the previously assigned client side id and NOT the database id. The response to this request does not contain any body.
+    
+    Request:            DELETE - /api/graphs/<GRAPH_ID>/edge/<EDGE_ID>
+    Request Parameters: None
+    Response:           204
+    
+    Parameters:
+     {HTTPRequest} request   - the django request object
+     {int}         graph_id  - the id of the graph where the edge shall be deleted
+     {int}         edge_id   - the id of the edge to be deleted
+    
+    Returns:
+     {HTTPResponse} a django response object
     """
-    if request.is_ajax():
-        try:
-            g=Graph.objects.get(pk=graph_id, deleted=False)
-            n=Node.objects.get(graph=g, client_id=node_id, deleted=False)
-            e=Edge.objects.get(client_id=edge_id, src=n, deleted=False)
-        except:
-            raise HttpResponseBadRequestAnswer()
+    if not request.is_ajax():
+        raise HttpResponseBadRequestAnswer()
 
-        if request.method == 'DELETE':
-            try:
-                e.deleted=True
-                e.save()
-                c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
-                c.save()
-            except:
-                raise HttpResponseBadRequestAnswer()
-            else:
-                return HttpResponseNoResponse()
+    try:
+        commands.DeleteEdge(graph_id, edge_id).do()
+        return HttpResponse(status=204)
 
-        raise HttpResponseNotAllowedAnswer(['DELETE'])
+    except ValueError:
+        raise HttpResponseBadRequestAnswer()
+
+    except ObjectDoesNotExist:
+        raise HttpResponseNotFoundAnswer()
+
+    except MultipleObjectsReturned:
+        raise HttpResponseServerErrorAnswer()

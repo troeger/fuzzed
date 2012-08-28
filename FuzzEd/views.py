@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 from django.core.mail import mail_managers
+
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
@@ -86,11 +87,12 @@ def dashboard_new(request):
 @require_http_methods(['GET', 'POST', 'DELETE'])
 def dashboard_edit(request, graph_id):
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
-    POST = request.POST
+    POST  = request.POST
 
     # the owner made changes to the graph's field, better save it (if we can)
     if POST.get('save'):
-        commands.ChangeGraph.of(graph_id, name=POST.get('title')).do()
+        graph.name = POST.get('name', '')
+        graph.save()
         return redirect('dashboard')
 
     # deletion requested? do it and go back to dashboard
