@@ -14,7 +14,36 @@
 </head>
 
 <body>
-    {% include "util/toolbar.html" %}
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <ul class="nav pull-right">
+                    <li class="{% block navigation_home %}{% endblock %}">
+                        <a href="/">
+                            <i class="icon-home icon-white"></i>
+                            Home
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="{% block navigation_settings %}{% endblock %}">
+                        <a href="/settings">
+                            <i class="icon-wrench icon-white"></i>
+                            Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/?logout">
+                            <i class="icon-off icon-white"></i>
+                            Logout
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <a class="brand" anchor="#">FuzzEd</a>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         {% block content %}{% endblock %}
 
