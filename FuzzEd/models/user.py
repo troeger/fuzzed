@@ -16,7 +16,7 @@ class UserProfile(models.Model):
      {User} - the wrapped django user
      {bool} - flag indicating whether a newsletter is desired
     """
-    user       = models.OneToOneField(auth.User)
+    user       = models.OneToOneField(auth.User, related_name='profile')
     newsletter = models.BooleanField(default=False)
 
     class Meta:

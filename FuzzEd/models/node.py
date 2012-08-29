@@ -9,6 +9,7 @@ try:
 # backwards compatibility with older versions of Python
 except ImportError:
     import simplejson as json
+import sys
 
 from graph import Graph
 import notations
@@ -30,8 +31,11 @@ class Node(models.Model):
     class Meta:
         app_label = 'FuzzEd'
 
-    # default nodes always get auto incrementing IDs starting with 0, elsewise JS Unix timestamps
-    client_id = models.BigIntegerField(default=0)
+    # Nodes that are created by the server (e.g. default nodes in the notation) should receive ids
+    # starting at -sys.maxint and autoincrement from there on. The whole negative number range is 
+    # reserved for the server. IDs from the client MUST be zero or greater (usually UNIX timestamp 
+    # in milliseconds from JS)
+    client_id = models.BigIntegerField(default=-sys.maxint)
     kind      = models.CharField(max_length=127, choices=notations.node_choices)
     graph     = models.ForeignKey(Graph, null=False, related_name='nodes')
     x         = models.IntegerField(default=0)
@@ -80,7 +84,7 @@ class Node(models.Model):
 
 # the handler will ensure that the kind of the node is present in its containing graph notation
 @receiver(pre_save, sender=Node)
-def validate_kind(sender, instance, **kwargs):
+def validate(sender, instance, **kwargs):
     graph = instance.graph
     if not instance.kind in notations.by_kind[graph.kind]['nodes']:
         raise ValueError('Graph %s does not support nodes of type %s' % (graph, instance.kind))

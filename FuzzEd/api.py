@@ -13,7 +13,7 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 # REASON: django.http responses are regular returns, transaction.commit_on_success will therefore  
 # REASON: always commit changes even if we return errornous responses (400, 404, ...). We can
 # REASON: bypass this behaviour by throwing exception that send correct HTTP status to the user 
-# REASON: but abort the transaction. The exception answers can be found in middleware.py
+# REASON: but abort the transaction. The custom exceptions can be found in middleware.py
 
 from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer

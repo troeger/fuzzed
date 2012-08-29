@@ -15,6 +15,17 @@ from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 from FuzzEd.models import Graph, notations, commands
 
 def index(request):
+    """
+    Function: index
+    
+    This is the view handler for loading the landing page of the editor. The index.html is rendered unless the user is already signed in and being redirected to his or her dashboard.
+    
+    Parameters:
+     {HttpRequest} request - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
     if 'logout' in request.GET:
         auth.logout(request)
 
@@ -24,41 +35,81 @@ def index(request):
     return render(request, 'index.html', {'pwlogin': ('pwlogin' in request.GET)})
 
 def about(request):
+    """
+    Function: about
+    
+    Simple rendering of the about page.
+    
+    Parameters:
+     {HttpRequest} request - a django request
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
     return render(request, 'util/about.html')
 
 @login_required
 def settings(request):
+    """
+    Function: settings
+    
+    This view handler shows user its settings page. However, if the user is doing some changes to its profile and posts the changes to this handler, it will change the underlying user object and redirect afterwards to the dashboard.
+    
+    Parameters:
+     {HttpRequest} request - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
     POST = request.POST
 
     if POST.get('save'):
         user    = request.user
-        profile = user.get_profile()
+        profile = user.profile
 
-        try:
-            user.first_name    = POST['first_name']
-            user.last_name     = POST['last_name']
-            user.email         = POST['email']
-            profile.newsletter = bool(POST.get('newsletter'))
+        user.first_name    = POST.get('first_name', user.first_name)
+        user.last_name     = POST.get('last_name', user.last_name)
+        user.email         = POST.get('email', user.email)
+        profile.newsletter = bool(POST.get('newsletter'))
 
-            profile.save()
-            user.save()
+        profile.save()
+        user.save()
 
-            return redirect('dashboard')
-
-        except KeyError:
-            return HttpResponseBadRequest()
+        return redirect('dashboard')
 
     return render(request, 'util/settings.html')
 
 @login_required
 def dashboard(request):
-    graphs = request.user.graphs.all().filter(deleted=False).order_by('-created')
+    """
+    Function: dashboard
+    
+    This view handler renders the dashboard of the user. It lists all the graphs of the user that are not marked as deleted ordered descending by its creation date. Also, a user is able to create new graphs and edit or delete existing graphs from here.
+    
+    Parameters:
+     {HttpRequest} request - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    graphs = request.user.graphs.filter(deleted=False).order_by('-created')
     parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs]}
 
     return render(request, 'dashboard/dashboard.html', parameters)
 
 @login_required
 def dashboard_new(request):
+    """
+    Function: dashboard_new
+    
+    This handler is responsible for rendering a dialog to the user to create a new diagram. It is also responsible for processing a save request of such a 'new diagram' request and forwards the user to the dashboard after doing so.
+    
+    Parameters:
+     {HttpRequest} request - a django http request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
     POST = request.POST
 
     # save the graph
@@ -81,6 +132,18 @@ def dashboard_new(request):
 
 @login_required
 def dashboard_edit(request, graph_id):
+    """
+    Function: dashboard_edit
+    
+    This handler function is responsible for allowing the user to edit the properties of an already existing graph. Therefore the system renders a edit dialog to the user where changes can be made and saved or the graph can be deleted.
+    
+    Parameters:
+     {HttpResponse} request  - a django request object
+     {int}          graph_id - the graph to be edited
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
     POST  = request.POST
 
@@ -91,7 +154,7 @@ def dashboard_edit(request, graph_id):
         return redirect('dashboard')
 
     # deletion requested? do it and go back to dashboard
-    if POST.get('delete') or request.method == 'DELETE':
+    if POST.get('delete'):
         commands.DeleteGraph.create_from(graph_id).do()
         return redirect('dashboard')
 
@@ -123,6 +186,17 @@ def editor(request, graph_id):
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
+    """
+    Function: login
+    
+    View handler for loging in a user using OpenID. If the user is not yet know to the system a new profile is created for him using his or her personal information as provided by the OpenID provider.
+    
+    Parameters:
+     {HttpRequest} request - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
     GET  = request.GET
     POST = request.POST
 

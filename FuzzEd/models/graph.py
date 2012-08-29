@@ -8,9 +8,10 @@ from django.dispatch import receiver
 
 try:
     import json
-# backwards compatibility with older versions of CPython
+# backwards compatibility with older versions of Python
 except ImportError:
     import simplejson as json
+import sys
 
 import notations
 
@@ -95,7 +96,7 @@ def set_graph_defaults(sender, instance, **kwargs):
     for index, node in enumerate(defaults['nodes']):
         # use index as node ID
         # this is unique since all other IDs are time stamps
-        command = AddNode.create_from(graph_id=instance.pk, node_id=index, **node)
+        command = AddNode.create_from(graph_id=instance.pk, node_id=index - sys.maxint, **node)
         command.undoable = False
         command.do()
 
