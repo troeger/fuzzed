@@ -314,9 +314,11 @@ def edge(request, graph_id, edge_id):
     except MultipleObjectsReturned:
         raise HttpResponseServerErrorAnswer()
 
+# TODO: PROVIDE ALL PROPERTIES OF A NODE (/nodes/<id>/properties)
 def properties(**kwargs):
     pass
 
+# TODO: PROVIDE THE VALUE OF A PROPERTY WITH GIVEN KEY (/nodes/<id>/properties/<key>)
 def property(**kwargs):
     pass
 

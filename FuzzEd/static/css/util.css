@@ -1,9 +1,22 @@
-body {
-	padding: 80px;
-}
-
 section {
 	padding-top: 40px;
+}
+
+#FuzzEdSplash {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#FuzzEdSplashContent {
+	text-align: center;
+	vertical-align: middle;
+}
+
+.FuzzEdContent {
+	padding-top: 80px;
 }
 
 .footer {

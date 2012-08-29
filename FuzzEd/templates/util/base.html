@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>{% block title %}FuzzEd{% endblock %}</title>
+
     <style type="text/css">
+        {% block style %}
         @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap.min.css");
         @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap-responsive.min.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         @import url("{{ STATIC_URL }}css/util.css");
+        {% endblock %}
     </style>
-    {% block style %}{% endblock %}
     
+    {% block script %}
     <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
     <script src="{{ STATIC_URL }}lib/bootstrap/js/bootstrap-2.0.4.min.js" type="text/javascript" language="javascript"></script>
-    {% block script %}{% endblock %}
+    {% endblock %}
 </head>
 
 <body>
@@ -46,10 +51,14 @@
         </div>
     </div>
     
-    <div class="container">
+    {% block body %}
+    <div class="FuzzEdContent container">
         {% block content %}{% endblock %}
 
-        {% include "util/footer.html" %}
+        {% block footer %}
+            {% include "util/footer.html" %}
+        {% endblock %}
     </div>
+    {% endblock %}
 </body>
 </html>
