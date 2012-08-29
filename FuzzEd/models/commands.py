@@ -138,7 +138,7 @@ class AddGraph(Command):
         graph = Graph(kind=kind, name=name, owner=owner, deleted=True)
         graph.save()
 
-        return cls(graph=graph, undoable=undoable)
+        return cls(graph=graph)
 
     def do(self):
         self.graph.deleted = False
