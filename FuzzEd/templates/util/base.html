@@ -8,8 +8,10 @@
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         @import url("{{ STATIC_URL }}css/util.css");
     </style>
-
     {% block style %}{% endblock %}
+    
+    <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
+    <script src="{{ STATIC_URL }}lib/bootstrap/js/bootstrap-2.0.4.min.js" type="text/javascript" language="javascript"></script>
     {% block script %}{% endblock %}
 </head>
 

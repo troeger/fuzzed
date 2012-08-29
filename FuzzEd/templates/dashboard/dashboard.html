@@ -6,6 +6,51 @@
 
 {% block navigation_home %}active{% endblock %}
 
+{% block script %}
+<script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
+<script type="text/javascript" language="javascript">
+    require.config({
+        baseUrl: '{{ STATIC_URL }}script/',
+        waitSeconds: 5,
+        paths: {
+            'jquery':    'require-jquery',
+            'bootstrap': '../lib/bootstrap/js/bootstrap-2.0.4.min'
+
+        }
+    });
+
+    require(['bootstrap'], function() {
+        var graph_to_delete = null;
+
+        function delete_clicked(event) {
+            event.stopPropagation();
+
+            graph_to_delete = jQuery(this).closest('form');
+            var dialog      = jQuery('#delete_dialog')
+            var name        = dialog.find('#delete_name');
+
+            name.html(graph_to_delete.closest('tr').find('strong.graph_name').html())
+            dialog.modal().show();
+        }
+
+        function delete_confirmed(event) {
+            console.log(graph_to_delete);
+            
+            graph_to_delete.find('input.delete_flag')
+                           .attr('name',  'delete')
+                           .attr('value', 'delete');
+            graph_to_delete.submit();
+            graph_to_delete = null;
+        }
+
+        jQuery(document).ready(function() {
+            jQuery('button.require-dialog').click(delete_clicked);
+            jQuery('#confirm_delete').click(delete_confirmed);
+        });
+    });
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
     <h1>
@@ -13,7 +58,8 @@
     </h1>
 </div>
 
-<form action="/dashboard/new/" method="post">{% csrf_token %}
+<form action="/dashboard/new/" method="post">
+    {% csrf_token %}
     <div class="btn-group pull-right">
         <button type="submit" name="kind" value="faulttree" class="btn" disabled="true">
             <i class="icon-file"></i>
@@ -43,20 +89,21 @@
         </thead>
 
         <tbody>
-            {% for name, graph in graphs %}
+            {% for name, graph in graphs %} 
                 <tr onclick="document.location = '/editor/{{ graph.pk }}';">
                     <td>{{ forloop.counter }}</td>
-                    <td><strong>{{ graph }}</strong></td>
+                    <td><strong class="graph_name">{{ graph }}</strong></td>
                     <td><span class="label">{{ name }}</span></td>
                     <td>{{ graph.created }}</td>
                     <td style="text-align: right;">
                         <form action="/dashboard/{{ graph.pk }}/" method="POST">
                             {% csrf_token %}
+                            <input type="hidden" class="delete_flag">
                             <button type="submit" name="edit" value="edit" class="btn">
-                                <i class="icon-cog"></i>
-                                Edit
+                                <i class="icon-wrench"></i>
+                                Settings
                             </button>
-                            <button type="submit" name="delete" value="delete" class="btn btn-danger">
+                            <button type="button" class="btn btn-danger require-dialog">
                                 <i class="icon-white icon-trash"></i>
                                 Delete
                             </button>
@@ -67,4 +114,26 @@
         </tbody>
     </table>
 </section>
+
+<!-- hidden modal dialog for graph deletion confirmation -->
+<div class="modal hide fade" id="delete_dialog" role="dialog" aria-labelledby="header" aria-hidden="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="header">Confirmation</h3>
+    </div>
+    
+    <div class="modal-body">
+        <p>Are you sure you want to delete <strong id="delete_name"></strong>?</p>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-danger" id="confirm_delete">
+            <i class="icon-white icon-trash"></i>
+            Delete
+        </button>
+        <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">
+            Cancel
+        </button>
+    </div>
+</div>
 {% endblock %}
