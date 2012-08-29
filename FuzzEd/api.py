@@ -12,8 +12,8 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 # 
 # REASON: django.http responses are regular returns, transaction.commit_on_success will therefore  
 # REASON: always commit changes even if we return errornous responses (400, 404, ...). We can
-# REASON: bypassed this behaviour by throwing exception that send correct HTTP status to the 
-# REASON: user (refer to middleware.py)
+# REASON: bypass this behaviour by throwing exception that send correct HTTP status to the user 
+# REASON: but abort the transaction. The exception answers can be found in middleware.py
 
 from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
@@ -22,17 +22,27 @@ from FuzzEd.models import Graph, Node, Edge, notations, commands
 import logging
 logger = logging.getLogger('FuzzEd')
 
+try:
+    import json
+# backwards compatibility with older python versions
+except ImportError:
+    import simplejson as json
+
 @login_required
 @require_ajax
-@require_POST
+@require_http_methods(['GET', 'POST'])
 @csrf_exempt
 @transaction.commit_on_success
 def graphs(request):
     """
     Function: graphs
     
-    This function is the API call handler for requests to create a new graph. The request structure must be as follows:
+    This API handler is responsible for all graphes of the user. It operates in two modes: receiving a GET request will return a JSON encoded list of all the graphs of the user. A POST request instead, will create a new graph (requires the below stated parameters) and returns its ID and URI.
     
+    Request:            GET - /api/graphs
+    Request Parameters: None
+    Response:           200 - <GRAPHS_AS_JSON>
+                               
     Request:            POST - /api/graphs
     Request Parameters: kind = <GRAPH_KIND>, name = <GRAPH_NAME>
     Response:           201 - Location = <GRAPH_URI>, ID = <GRAPH_ID>
@@ -42,13 +52,21 @@ def graphs(request):
                               
     Returns:
      {HTTPResponse} a django response object
-    """ 
-    # try to create the graph like we normally would
+    """
+    # the user is asking for all of its graphs
+    if request.method == 'GET':
+        graphs      = Graph.objects.filter(owner=request.user, deleted=False)
+        json_graphs = {
+            'graphs': [graph.to_dict() for graph in graphs]
+        }
+
+        return HttpResponse(json.dumps(json_graphs), 'application/javascript')
+
+    # the request was a post, we are asked to create a new graph
     try:
         # create a graph created command 
-        post    = request.POST
-        commands.AddGraph.create_of(kind=post['kind'], name=post['name'], \
-                                    owner=request.user, undoable=False).do()
+        post = request.POST
+        commands.AddGraph.create_of(kind=post['kind'], name=post['name'], owner=request.user).do()
 
         # prepare the response
         graph_id             = command.graph.pk
@@ -73,7 +91,7 @@ def graph(request, graph_id):
     """
     Function: graph
     
-    The function provides the JSON serialized version of the graph with the given id given that the graph is owned by the requesting user and it is not marked as deleted.
+    The function provides the JSON serialized version of the graph with the provided id given that the graph is owned by the requesting user and it is not marked as deleted.
     
     Request:            GET - /api/graphs/<GRAPH_ID>
     Request Parameters: None
@@ -86,68 +104,9 @@ def graph(request, graph_id):
     Returns:
      {HTTPResponse} a django response object
     """
-    # fetch graph and write back JSON-serialized representation
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+
     return HttpResponse(graph.to_json(), 'application/javascript')
-
-def properties(**kwargs):
-    pass
-
-def property(**kwargs):
-    pass
-
-@login_required
-@require_ajax
-@require_http_methods(["GET", "POST"])
-@csrf_exempt
-@transaction.commit_on_success
-def undos(request, graph_id):
-    #
-    # TODO: IS NOT WORKING YET
-    # TODO: UPDATE DOC STRING
-    #
-    """
-    Fetch undo command stack from backend
-    API Request:  GET /api/graphs/[graphID]/undos, no body
-    API Response: JSON body with command array of undo stack
-
-    Tell the backend that an undo has been issued in the model
-    API Request:  POST /api/graphs/[graphID]/undos, no body
-    API Response: no body, status code 204
-    """
-    if request.method == 'GET':
-        #TODO: Fetch undo stack for the graph
-        raise HttpResponseNoResponseAnswer()
-        
-    else:
-        #TODO: Perform top command on undo stack
-        raise HttpResponseNoResponseAnswer()
-
-@login_required
-@require_ajax
-@require_http_methods(["GET", "POST"])
-@csrf_exempt
-@transaction.commit_on_success
-def redos(request, graph_id):
-    #
-    # TODO: IS NOT WORKING YET
-    # TODO: UPDATE DOC STRING
-    #
-    """
-    Fetch redo command stack from backend
-    API Request:  GET /api/graphs/[graphID]/redos, no body
-    API Response: JSON body with command array of redo stack
-
-    Tell the backend that an redo has been issued in the model
-    API Request:  POST /api/graphs/[graphID]/redos, no body
-    API Response: no body, status code 204
-    """
-    if request.method == 'GET':
-        #TODO Fetch redo stack for the graph
-        raise HttpResponseNoResponseAnswer()
-    else:
-        #TODO Perform top command on redo stack
-        raise HttpResponseNoResponseAnswer()
     
 @login_required
 @require_ajax
@@ -354,3 +313,62 @@ def edge(request, graph_id, edge_id):
 
     except MultipleObjectsReturned:
         raise HttpResponseServerErrorAnswer()
+
+def properties(**kwargs):
+    pass
+
+def property(**kwargs):
+    pass
+
+@login_required
+@require_ajax
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
+@transaction.commit_on_success
+def undos(request, graph_id):
+    #
+    # TODO: IS NOT WORKING YET
+    # TODO: UPDATE DOC STRING
+    #
+    """
+    Fetch undo command stack from backend
+    API Request:  GET /api/graphs/[graphID]/undos, no body
+    API Response: JSON body with command array of undo stack
+
+    Tell the backend that an undo has been issued in the model
+    API Request:  POST /api/graphs/[graphID]/undos, no body
+    API Response: no body, status code 204
+    """
+    if request.method == 'GET':
+        #TODO: Fetch undo stack for the graph
+        raise HttpResponseNoResponseAnswer()
+        
+    else:
+        #TODO: Perform top command on undo stack
+        raise HttpResponseNoResponseAnswer()
+
+@login_required
+@require_ajax
+@require_http_methods(["GET", "POST"])
+@csrf_exempt
+@transaction.commit_on_success
+def redos(request, graph_id):
+    #
+    # TODO: IS NOT WORKING YET
+    # TODO: UPDATE DOC STRING
+    #
+    """
+    Fetch redo command stack from backend
+    API Request:  GET /api/graphs/[graphID]/redos, no body
+    API Response: JSON body with command array of redo stack
+
+    Tell the backend that an redo has been issued in the model
+    API Request:  POST /api/graphs/[graphID]/redos, no body
+    API Response: no body, status code 204
+    """
+    if request.method == 'GET':
+        #TODO Fetch redo stack for the graph
+        raise HttpResponseNoResponseAnswer()
+    else:
+        #TODO Perform top command on redo stack
+        raise HttpResponseNoResponseAnswer()

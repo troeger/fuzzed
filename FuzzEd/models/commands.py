@@ -66,10 +66,10 @@ class AddEdge(Command):
         Convience factory method for issueing an add edge command from parameters as received from API calls. NOTE: the edge object that is required for this command is created and saved when invoking this method.
 
         Parameters:
-         {str} graph_id      - the id of the graph that will contain this edge
-         {str} client_id     - the id of the edge as set on the client
-         {str} from_node_id  - the client id(!) of the node the edge origins
-         {str} to_node_id    - the client id(!) of the node that terminates the edge
+         {str} graph_id  - the id of the graph that will contain this edge
+         {str} client_id - the id of the edge as set on the client
+         {str} from_id   - the client id(!) of the node the edge origins
+         {str} to_id     - the client id(!) of the node that terminates the edge
 
         Returns:
          {<AddEdge>} the add edge command instance
@@ -121,16 +121,16 @@ class AddGraph(Command):
     graph = models.ForeignKey(Graph, related_name='+')
 
     @classmethod
-    def create_from(cls, kind, name, owner, undoable=False):
+    def create_from(cls, kind, name, owner):
         """
         Method [static]: create_from
         
         Convenience factory method for issuing an add graph command from parameters as received from API calls. NOTE: the graph object that is required for this command is created and saved when invoking this method.
         
         Parameters:
-         {str}  kind   - type identifier for the graph's notation
-         {str}  name   - name of the graph
-         {User} owner  - the user that owns this graph
+         {str}  kind     - type identifier for the graph's notation
+         {str}  name     - name of the graph
+         {User} owner    - the user that owns this graph
         
         Returns:
          {<AddGraph>} the add graph command instance

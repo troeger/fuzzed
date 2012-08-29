@@ -1,50 +1,39 @@
-<!DOCTYPE html>
-<html>
+{% extends "util/base.html" %}
 
-<head>
-    <title>Create a new Graph</title>
-    {% include "util/style.html" %}
-</head>
+{% block title %}
+    {{ block.super }} - Create a Graph
+{% endblock %}
 
-<body>
-    {% include "util/toolbar.html" %}
+{% block content %}
+<div class="page-header">
+    <h1>
+        Create
+        <small>a new {{ name }} diagram</small>
+    </h1>
+</div>
 
-    <div class="container">
-
-        <div class="page-header">
-            <h1>
-                Create a new
-                <small>{{ name }}</small>
-            </h1>
+<form method="POST" action="/dashboard/new/" class="form-horizontal">
+    {% csrf_token %}
+    <fieldset>
+        <div class="control-group">
+            <div class="controls">
+                <strong>{{ name }}</strong>
+            </div>
         </div>
 
-        <form method="POST" action="/dashboard/new/" class="form-horizontal">
-            {% csrf_token %}
-            <fieldset>
-                <div class="control-group">
-                    <div class="controls">
-                        <strong>{{ name }}</strong>
-                    </div>
-                </div>
+        <div class="control-group">
+            <label class="control-label" for="name">Title</label>
+            <div class="controls">
+                <input type="text" class="input-xlarge" name="name" value="Reliability Diagram" id="name">
+            </div>
+        </div>
 
-                <div class="control-group">
-                    <label class="control-label" for="name">Title</label>
-                    <div class="controls">
-                        <input type="text" class="input-xlarge" name="name" value="Reliability Diagram" id="name">
-                    </div>
-                </div>
+        <div class="form-actions">
+            <button type="submit" name="save" value="save" class="btn btn-primary">Create</button>
+            <a class="btn" href="/dashboard/">Cancel</a>
+        </div>
 
-                <div class="form-actions">
-                    <button type="submit" name="save" value="save" class="btn btn-primary">Create</button>
-                    <a class="btn" href="/dashboard/">Cancel</a>
-                </div>
-
-                <input type="hidden" name="kind" value="{{ kind }}">
-            </fieldset>
-        </form>
-
-    {% include "util/footer.html" %}
-    </div>
-
-</body>
-</html>
+        <input type="hidden" name="kind" value="{{ kind }}">
+    </fieldset>
+</form>
+{% endblock %}

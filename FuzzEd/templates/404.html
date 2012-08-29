@@ -1,21 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "util/base_error.html" %}
 
-<head>
-<title>404 - Not Found</title>
-{% include "util/style.html" %}
-</head>
+{% block title %}404 - Not Found{% endblock %}
 
-<body>
-    <div class="container error_container">
-        <div class="hero-unit">
-            <h1>404</h1>
-            <h3>“Computers are useless. They can only give you answers.” — Pablo Picasso</h3>
-            <h6>Not quite right, we cannot give you an answer to your request. Sorry! Maybe, try a different URL.</h6>
-        </div>
-
-        {% include "util/footer.html" %}
-    </div>
-</body>
-
-</html>
+{% block content %}
+<h1>404</h1>
+<h3>“Computers are useless. They can only give you answers.” — Pablo Picasso</h3>
+<h6>Not quite right, we cannot give you an answer to your request. Sorry! Maybe, try a different URL.</h6>
+{% endblock %}

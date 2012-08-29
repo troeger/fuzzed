@@ -8,13 +8,12 @@ from django.core.mail import mail_managers
 
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.http import require_http_methods
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 
 from FuzzEd.models import Graph, notations, commands
 
-@require_GET
 def index(request):
     if 'logout' in request.GET:
         auth.logout(request)
@@ -24,12 +23,10 @@ def index(request):
 
     return render(request, 'index.html', {'pwlogin': ('pwlogin' in request.GET)})
 
-@require_GET
 def about(request):
     return render(request, 'util/about.html')
 
 @login_required
-@require_http_methods(['GET', 'POST'])
 def settings(request):
     POST = request.POST
 
@@ -54,7 +51,6 @@ def settings(request):
     return render(request, 'util/settings.html')
 
 @login_required
-@require_GET
 def dashboard(request):
     graphs = request.user.graphs.all().filter(deleted=False).order_by('-created')
     parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs]}
@@ -62,7 +58,6 @@ def dashboard(request):
     return render(request, 'dashboard/dashboard.html', parameters)
 
 @login_required
-@require_POST
 def dashboard_new(request):
     POST = request.POST
 
@@ -85,7 +80,6 @@ def dashboard_new(request):
     return HttpResponseBadRequest()
 
 @login_required
-@require_http_methods(['GET', 'POST', 'DELETE'])
 def dashboard_edit(request, graph_id):
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
     POST  = request.POST

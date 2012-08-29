@@ -1,71 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "util/base.html" %}
 
-<head>
-    <title>FuzzTrees Modeling - Settings</title>
-    {% include "util/style.html" %}
-</head>
+{% block title %}
+    {{ block.super }} - Settings
+{% endblock %}
 
-<body>
-    {% include "util/toolbar.html" %}
+{% block content %}
+<div class="page-header">
+    <h1>
+        Settings
+        <small>of your account</small>
+    </h1>
+</div>
 
-    <div class="container">
-        <div class="page-header">
-            <h1>
-                Settings
-                <small>of your account</small>
-            </h1>
+<form method="POST" action="/settings/" class="form-horizontal">
+    {% csrf_token %}
+    <fieldset>
+        <div class="control-group">
+            <label class="control-label" for="user_name"></label>
+            <div class="controls" id="user_name">
+                <strong>{{ user.username }}</strong>
+            </div>
         </div>
 
-        <form method="POST" action="/settings/" class="form-horizontal">
-            {% csrf_token %}
-            <fieldset>
-                <div class="control-group">
-                    <label class="control-label" for="user_name"></label>
-                    <div class="controls" id="user_name">
-                        <strong>{{ user.username }}</strong>
-                    </div>
-                </div>
+        <div class="control-group">
+            <label class="control-label" for="first_name">First Name</label>
+            <div class="controls">
+                <input type="text" class="input-xlarge" name="first_name" value="{{ user.first_name }}" id="first_name">
+            </div>
+        </div>
 
-                <div class="control-group">
-                    <label class="control-label" for="first_name">First Name</label>
-                    <div class="controls">
-                        <input type="text" class="input-xlarge" name="first_name" value="{{ user.first_name }}" id="first_name">
-                    </div>
-                </div>
+        <div class="control-group">
+            <label class="control-label" for="last_name">Last Name</label>
+            <div class="controls">
+                <input type="text" class="input-xlarge" name="last_name" value="{{ user.last_name }}" id="last_name">
+            </div>
+        </div>
 
-                <div class="control-group">
-                    <label class="control-label" for="last_name">Last Name</label>
-                    <div class="controls">
-                        <input type="text" class="input-xlarge" name="last_name" value="{{ user.last_name }}" id="last_name">
-                    </div>
-                </div>
+        <div class="control-group">
+            <label class="control-label" for="email">E-Mail</label>
+            <div class="controls">
+                <input class="input-xlarge" type="email" name="email" value="{{ user.email }}" id="email">
+            </div>
+        </div>
 
-                <div class="control-group">
-                    <label class="control-label" for="email">E-Mail</label>
-                    <div class="controls">
-                        <input class="input-xlarge" type="email" name="email" value="{{ user.email }}" id="email">
-                    </div>
-                </div>
+        <div class="control-group">
+            <div class="controls">
+                <label class="checkbox" for="email">
+                    <input class="input-xlarge" type="checkbox" name="newsletter"
+                    {% if user.get_profile.newsletter %} checked{% endif %}>
+                    Subscribe to Newsletter</input>
+                </label>
+            </div>
+        </div>
 
-                <div class="control-group">
-                    <div class="controls">
-                        <label class="checkbox" for="email">
-                            <input class="input-xlarge" type="checkbox" name="newsletter"
-                            {% if user.get_profile.newsletter %} checked{% endif %}>
-                            Subscribe to Newsletter</input>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" name="save" value="save" class="btn btn-primary">Save</button>
-                    <button class="btn" onclick="history.go(-1); return false;">Cancel</button>
-                </div>
-            </fieldset>
-        </form>
-
-        {% include "util/footer.html" %}
-    </div>
-</body>
-</html>
+        <div class="form-actions">
+            <button type="submit" name="save" value="save" class="btn btn-primary">Save</button>
+            <button class="btn" onclick="history.go(-1); return false;">Cancel</button>
+        </div>
+    </fieldset>
+</form>
+{% endblock %}

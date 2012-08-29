@@ -1,76 +1,68 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-<head>
-    <title>FuzzTrees - Dashboard</title>
-    {% include "util/style.html" %}
-</head>
+{% extends "util/base.html" %}
 
-<body>
-    {% include "util/toolbar.html" %}
-    <div class="container">
+{% block title %}
+    {{ block.super }} - Dashboard
+{% endblock %}
 
-        <div class="page-header">
-            <h1>
-                Dashboard
-            </h1>
-        </div>
+{% block content %}
+<div class="page-header">
+    <h1>
+        Dashboard
+    </h1>
+</div>
 
-        <form action="/dashboard/new/" method="post">{% csrf_token %}
-            <div class="btn-group pull-right">
-                <button type="submit" name="kind" value="faulttree" class="btn" disabled="true">
-                    <i class="icon-file"></i>
-                    New FaultTree
-                </button>
-                <button type="submit" name="kind" value="fuzztree" class="btn">
-                    <i class="icon-file"></i>
-                    New FuzzTree
-                </button>
-                <button type="submit" name="kind" value="rbd" class="btn" disabled="true">
-                    <i class="icon-file"></i>
-                    New RBD
-                </button>
-            </div>
-        </form>
-
-        <section>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Graph</th>
-                        <th>Kind</th>
-                        <th>Created</th>
-                        <th></th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {% for name, graph in graphs %}
-                        <tr onclick="document.location = '/editor/{{ graph.pk }}';">
-                            <td>{{ forloop.counter }}</td>
-                            <td><strong>{{ graph }}</strong></td>
-                            <td><span class="label">{{ name }}</span></td>
-                            <td>{{ graph.created }}</td>
-                            <td style="text-align: right;">
-                                <form action="/dashboard/{{ graph.pk }}/" method="POST">
-                                    {% csrf_token %}
-                                    <button type="submit" name="edit" value="edit" class="btn">
-                                        <i class="icon-cog"></i>
-                                        Edit
-                                    </button>
-                                    <button type="submit" name="delete" value="delete" class="btn btn-danger">
-                                        <i class="icon-white icon-trash"></i>
-                                        Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </section>
-
-        {% include "util/footer.html" %}
+<form action="/dashboard/new/" method="post">{% csrf_token %}
+    <div class="btn-group pull-right">
+        <button type="submit" name="kind" value="faulttree" class="btn" disabled="true">
+            <i class="icon-file"></i>
+            New FaultTree
+        </button>
+        <button type="submit" name="kind" value="fuzztree" class="btn">
+            <i class="icon-file"></i>
+            New FuzzTree
+        </button>
+        <button type="submit" name="kind" value="rbd" class="btn" disabled="true">
+            <i class="icon-file"></i>
+            New RBD
+        </button>
     </div>
-</body>
-</html>
+</form>
+
+<section>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Graph</th>
+                <th>Kind</th>
+                <th>Created</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for name, graph in graphs %}
+                <tr onclick="document.location = '/editor/{{ graph.pk }}';">
+                    <td>{{ forloop.counter }}</td>
+                    <td><strong>{{ graph }}</strong></td>
+                    <td><span class="label">{{ name }}</span></td>
+                    <td>{{ graph.created }}</td>
+                    <td style="text-align: right;">
+                        <form action="/dashboard/{{ graph.pk }}/" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" name="edit" value="edit" class="btn">
+                                <i class="icon-cog"></i>
+                                Edit
+                            </button>
+                            <button type="submit" name="delete" value="delete" class="btn btn-danger">
+                                <i class="icon-white icon-trash"></i>
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

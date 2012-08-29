@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<title>{% block title %}{% endblock %}</title>
+<style type="text/css">
+    @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap.min.css");
+    @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap-responsive.min.css");
+    @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
+    @import url("{{ STATIC_URL }}css/util.css");
+</style>
+</head>
+
+<body>
+    <div class="container error_container">
+        <div class="hero-unit">
+            {% block content %}{% endblock %}
+
+        </div>
+        {% include "util/footer.html" %}
+</body>
+</html>
