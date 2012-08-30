@@ -6,8 +6,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # admin
-    url(r'^admin/doc/$', include('django.contrib.admindocs.urls')),
-    url(r'^admin/$', include(admin.site.urls)),
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/', include(admin.site.urls)),
 
     # web page
     url(r'^$', 'FuzzEd.views.index', name='index'),
