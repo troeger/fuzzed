@@ -169,7 +169,7 @@ def nodes(request, graph_id):
         kind = POST['kind']
         assert(kind in notations.by_kind[graph.kind]['nodes'])
 
-        command = commands.AddNode.create_from(graph_id=graph_id, client_id=POST['id'], \
+        command = commands.AddNode.create_from(graph_id=graph_id, node_id=POST['id'], \
                                              kind=kind, x=POST['x'], y=POST['y'])
         command.do()
         node = command.node
@@ -228,36 +228,36 @@ def node(request, graph_id, node_id):
                 for e in n.outgoing.all():
                     e.deleted=True
                     e.save()
-                    c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
-                    c.save()
+                    #c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
+                    #c.save()
                 for e in n.incoming.all():
                     e.deleted=True
                     e.save()
-                    c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
-                    c.save()
+                    #c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
+                    #c.save()
                 n.deleted=True
                 n.save()
-                c=History(command=Commands.DEL_NODE, graph=g, node=n)
-                c.save()
+                #c=History(command=Commands.DEL_NODE, graph=g, node=n)
+                #c.save()
             except:
                 raise HttpResponseBadRequestAnswer()                        
             else:
                 return HttpResponseNoResponse()
         elif request.method == 'POST':
-            if 'xcoord' in request.POST and 'ycoord' in request.POST:
+            if 'xcoord' in request.POST and 'ycoord' in request.POST and 'parent' in request.POST:
                 try:
-                    oldxcoord=n.xcoord
-                    oldycoord=n.ycoord
-                    n.xcoord = request.POST['xcoord']
-                    n.ycoord = request.POST['ycoord']
+                    oldxcoord=n.x
+                    oldycoord=n.y
+                    n.x = request.POST['xcoord']
+                    n.y = request.POST['ycoord']
                     n.save()
-                    c=History(command=Commands.CHANGE_COORD, graph=g, node=n, oldxcoord=oldxcoord, oldycoord=oldycoord)
-                    c.save()
+                    #c=History(command=Commands.CHANGE_COORD, graph=g, node=n, oldxcoord=oldxcoord, oldycoord=oldycoord)
+                    #c.save()
                 except:
                     raise HttpResponseBadRequestAnswer()
                 return HttpResponseNoResponse()
             elif 'key' in request.POST and 'value' in request.POST:
-                setNodeProperty(n, request.POST['key'], request.POST['value'])
+                #setNodeProperty(n, request.POST['key'], request.POST['value'])
                 return HttpResponseNoResponse()
             elif 'type' in request.POST:
                 #TODO change node type          

@@ -8,6 +8,8 @@ from FuzzEd.models.edge import Edge
 class ApiTestCase(TestCase):
     fixtures = ['test_data.json']
     graphid=1       # from fixture 
+    nodeid='99'     # from fixture
+    node2id='4711'
 
     def setUp(self):
         self.c=Client()
@@ -23,21 +25,21 @@ class ApiTestCase(TestCase):
 
 
 
-    def testGetRedos(self):
-        response=self.c.get('/api/graphs/%u/redos'%self.graphid,
-                            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-        self.assertEqual(response.status_code, 200)
+    # def testGetRedos(self):
+    #     response=self.c.get('/api/graphs/%u/redos'%self.graphid,
+    #                         **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+    #     self.assertEqual(response.status_code, 200)
 
-    def testGetUndos(self):
-        response=self.c.get('/api/graphs/%u/undos'%self.graphid,
-                            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
-        self.assertEqual(response.status_code, 200)
+    # def testGetUndos(self):
+    #     response=self.c.get('/api/graphs/%u/undos'%self.graphid,
+    #                         **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+    #     self.assertEqual(response.status_code, 200)
 
     def testCreateNode(self):
         oldncount=Graph.objects.get(pk=self.graphid).nodes.count()
         parent=Node.objects.get(pk=5) # from fixture, gate for CPU components
         response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
-                             {'parent':parent.pk, 'kind': 'orGate', 'xcoord':10, 'ycoord':7},    # Basic event
+                             {'parent':parent.pk, 'kind': 'orGate', 'id':self.nodeid, 'x':10, 'y':7},    # Basic event
                              **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 201)
         self.assertIn('Location', response)
@@ -54,29 +56,27 @@ class ApiTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def testDeleteNode(self):
-        response=self.c.delete('/api/graphs/%u/nodes/%u'%(self.graphid, 7),
+        response=self.c.delete('/api/graphs/%u/nodes/%s'%(self.graphid, self.nodeid),
                                **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 204)
-        #TODO: Check if really gone, including edge from 5
+        #TODO: Check if really gone, including edge 
 
     def testRelocateNode(self):
-        response=self.c.post('/api/graphs/%u/nodes/6'%self.graphid,
-                            {'parent':2, 'ycoord': 8, 'xcoord':10}, # OR gate for TOP event, from fixture
+        response=self.c.post('/api/graphs/%u/nodes/%s'%(self.graphid, self.nodeid),
+                            {'parent':self.node2id, 'ycoord': 8, 'xcoord':10}, # OR gate for TOP event, from fixture
                             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 204)
         #TODO: Check if really done, including edge rearrangement
 
     def testPropertyChange(self):
-        nodeid=Node.objects.filter(deleted=False)[0].pk
-        response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, nodeid),
-                            {'key':'foo', 'val':'bar'},
+        response=self.c.post('/api/graphs/%u/nodes/%s'%(self.graphid, self.nodeid),
+                            {'key':'foo', 'value':'bar'},
                             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 204)
         #TODO: Check if really done
 
     def testMorphNode(self):
-        morphid=Node.objects.filter(deleted=False)[0].pk
-        response=self.c.post('/api/graphs/%u/nodes/%u'%(self.graphid, morphid),
+        response=self.c.post('/api/graphs/%u/nodes/%s'%(self.graphid, self.nodeid),
                             data={"type":"t"},
                             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 204)
