@@ -1,0 +1,64 @@
+{% extends "util/base.html" %}
+
+{% block title %}
+    {{ block.super }} - {{ graph.name }}
+{% endblock %}
+
+{% block script %}
+<!-- requirejs and own code -->
+<script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
+<script type="text/javascript" language="javascript">
+    require.config({
+        baseUrl: '{{ STATIC_URL }}script/',
+        waitSeconds: 5,
+        paths: {
+            // require plugins
+            'text' : '../lib/requirejs/plugins/text', // required by json plugin
+            'json' : '../lib/requirejs/plugins/json',
+            // jquery and plugins
+            'jquery': 'require-jquery',
+            'jquery.ui': '../lib/jquery-ui-1.8.21',
+            'jquery.svg': '../lib/jquery-svg/jquery-svg-1.4.5',
+            // other libs
+            'underscore': '../lib/underscore/underscore-1.3.3',
+            'jsplumb': '../lib/jsplumb/jsplumb-1.3.8',
+            // shortcuts
+            'config': '../config'
+
+        },
+        // define dependencies for libs that are not AMD compatible
+        shim: {
+            'jquery.ui/jquery.ui.core': ['jquery'],
+            'jquery.ui/jquery.ui.widget': ['jquery'],
+            'jquery.ui/jquery.ui.mouse': ['jquery.ui/jquery.ui.core', 'jquery.ui/jquery.ui.widget'],
+            'jquery.ui/jquery.ui.draggable': ['jquery.ui/jquery.ui.mouse'],
+            'jquery.ui/jquery.ui.droppable': ['jquery.ui/jquery.ui.mouse'],
+
+            'jquery.svg': ['jquery'],
+
+            'underscore': {
+                exports: '_'
+            },
+
+            'jsplumb': {
+                deps: ['jquery', 'jquery.ui/jquery.ui.draggable', 'jquery.ui/jquery.ui.droppable'],
+                exports: 'jsPlumb'
+            }
+        }
+    });
+
+    require(['require-editor'], function(Editor) {
+        jQuery(document).ready(function() {
+            //new Editor({{ graph.pk }});
+        });
+    });
+</script>
+{% endblock %}
+
+{% block body %}
+    {% include "editor/editor_splash.html" with greetings=greetings %}
+{% endblock %}
+
+{% block footer %}
+    {% comment %}Footer is not needed here, so we clear it here{% endcomment %}
+{% endblock %}

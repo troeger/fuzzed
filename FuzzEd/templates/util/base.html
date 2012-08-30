@@ -1,24 +1,64 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{% block title %}FuzzEd{% endblock %}</title>
+
     <style type="text/css">
+        {% block style %}
         @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap.min.css");
         @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap-responsive.min.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         @import url("{{ STATIC_URL }}css/util.css");
+        {% endblock %}
     </style>
-
-    {% block style %}{% endblock %}
-    {% block script %}{% endblock %}
+    
+    {% block script %}
+    <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
+    <script src="{{ STATIC_URL }}lib/bootstrap/js/bootstrap-2.0.4.min.js" type="text/javascript" language="javascript"></script>
+    {% endblock %}
 </head>
 
 <body>
-    {% include "util/toolbar.html" %}
-    <div class="container">
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <ul class="nav pull-right">
+                    <li class="{% block navigation_home %}{% endblock %}">
+                        <a href="/">
+                            <i class="icon-home icon-white"></i>
+                            Home
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="{% block navigation_settings %}{% endblock %}">
+                        <a href="/settings">
+                            <i class="icon-wrench icon-white"></i>
+                            Settings
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/?logout">
+                            <i class="icon-off icon-white"></i>
+                            Logout
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <a class="brand" anchor="#">FuzzEd</a>
+            </div>
+        </div>
+    </div>
+    
+    {% block body %}
+    <div class="container space-top">
         {% block content %}{% endblock %}
 
-        {% include "util/footer.html" %}
+        {% block footer %}
+            {% include "util/footer.html" %}
+        {% endblock %}
     </div>
+    {% endblock %}
 </body>
 </html>

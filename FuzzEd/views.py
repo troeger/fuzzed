@@ -14,6 +14,16 @@ from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 
 from FuzzEd.models import Graph, notations, commands
 
+GREETINGS = [
+    "Loading the FuzzEd User Experience",
+    "Trying to find your Data... it was here somewhere",
+    "Fiddeling with your Graph... Stand by!",
+    "Loading good Karma into your Browser",
+    "Calculating the Answer to Life...",
+    "Man, this takes like for ever to load...",
+    "Time to grab some Coffee!"
+]
+
 def index(request):
     """
     Function: index
@@ -47,37 +57,6 @@ def about(request):
      {HttpResponse} a django response object
     """
     return render(request, 'util/about.html')
-
-@login_required
-def settings(request):
-    """
-    Function: settings
-    
-    This view handler shows user its settings page. However, if the user is doing some changes to its profile and posts the changes to this handler, it will change the underlying user object and redirect afterwards to the dashboard.
-    
-    Parameters:
-     {HttpRequest} request - a django request object
-    
-    Returns:
-     {HttpResponse} a django response object
-    """
-    POST = request.POST
-
-    if POST.get('save'):
-        user    = request.user
-        profile = user.profile
-
-        user.first_name    = POST.get('first_name', user.first_name)
-        user.last_name     = POST.get('last_name', user.last_name)
-        user.email         = POST.get('email', user.email)
-        profile.newsletter = bool(POST.get('newsletter'))
-
-        profile.save()
-        user.save()
-
-        return redirect('dashboard')
-
-    return render(request, 'util/settings.html')
 
 @login_required
 def dashboard(request):
@@ -170,19 +149,62 @@ def dashboard_edit(request, graph_id):
     raise HttpResponseBadRequest()
 
 @login_required
-# TODO: not yet working
+def settings(request):
+    """
+    Function: settings
+    
+    This view handler shows user its settings page. However, if the user is doing some changes to its profile and posts the changes to this handler, it will change the underlying user object and redirect afterwards to the dashboard.
+    
+    Parameters:
+     {HttpRequest} request - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    POST = request.POST
+
+    if POST.get('save'):
+        user    = request.user
+        profile = user.profile
+
+        user.first_name    = POST.get('first_name', user.first_name)
+        user.last_name     = POST.get('last_name', user.last_name)
+        user.email         = POST.get('email', user.email)
+        profile.newsletter = bool(POST.get('newsletter'))
+
+        profile.save()
+        user.save()
+
+        return redirect('dashboard')
+
+    return render(request, 'util/settings.html')
+
+@login_required
 def editor(request, graph_id):
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
+    """
+    Function: editor
+    
+    View handler for loading the editor. It just tries to locate the graph to be opened in the editor and passes it to its according view.
+    
+    Parameters:
+     {HttpRequest} request  - a django request object
+     {int}         graph_id - the id of the graph to be opened in the editor
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user)
     notation = notations.by_kind[graph.kind]
-    nodes = notation['nodes']
+    nodes    = notation['nodes']
 
     parameters = {
-        'graph': graph,
+        'graph':          graph,
         'graph_notation': notation,
-        'nodes': {node: nodes[node] for node in notation['shapeMenuNodeDisplayOrder']}
+        'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
+        'greetings':      GREETINGS
     }
 
-    return render_to_response('editor.html', parameters, context_instance=RequestContext(request))
+    return render(request, 'editor/editor.html', parameters)
 
 @require_http_methods(['GET', 'POST'])
 def login(request):

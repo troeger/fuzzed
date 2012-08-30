@@ -82,6 +82,8 @@ def graphs(request):
     except (ValueError, KeyError):
         raise HttpResponseBadRequestAnswer()
 
+    # Should not be reachable, just for error tracing reasons here
+    raise HttpResponseServerErrorAnswer()
 
 @login_required
 @require_ajax
@@ -346,9 +348,11 @@ def edge(request, graph_id, edge_id):
     except MultipleObjectsReturned:
         raise HttpResponseServerErrorAnswer()
 
+# TODO: PROVIDE ALL PROPERTIES OF A NODE (/nodes/<id>/properties)
 def properties(**kwargs):
     pass
 
+# TODO: PROVIDE THE VALUE OF A PROPERTY WITH GIVEN KEY (/nodes/<id>/properties/<key>)
 def property(**kwargs):
     pass
 

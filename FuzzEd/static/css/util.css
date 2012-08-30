@@ -1,13 +1,10 @@
-body {
-	padding: 80px;
-}
-
 section {
 	padding-top: 40px;
 }
 
-.error_container .hero-unit {
-	margin-top: 35px;
+.center-vertical {
+	text-align: center;
+	vertical-align: middle;
 }
 
 .footer {
@@ -18,6 +15,22 @@ section {
 
 .footer p {
 	margin-bottom: 0;
+}
+
+.overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.space-top {
+	padding-top: 80px;
+}
+
+.space-bottom {
+	padding-bottom: 80px;
 }
 
 .table td {

@@ -14,6 +14,8 @@ import sys
 from graph import Graph
 import notations
 
+# TODO: CREATE ALL THE PROPERTIES OF THIS NODE ON CREATION (OR FACTORY METHOD?)
+
 class Node(models.Model):
     """
     Class: Node
