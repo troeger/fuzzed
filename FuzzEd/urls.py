@@ -6,8 +6,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # admin
-    url(r'^admin/doc/$', include('django.contrib.admindocs.urls')),
-    url(r'^admin/$', include(admin.site.urls)),
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/', include(admin.site.urls)),
 
     # web page
     url(r'^$', 'FuzzEd.views.index', name='index'),
@@ -37,6 +37,8 @@ urlpatterns = patterns('',
 
     url(r'^api/graphs/(?P<graph_id>\d+)/redos$','FuzzEd.api.redos', name='redos'),
     url(r'^api/graphs/(?P<graph_id>\d+)/undos$','FuzzEd.api.undos', name='undos'),
+
+    url(r'^api/graphs/(?P<graph_id>\d+)/cutsets$', 'FuzzEd.api.cutsets', name='cutsets'),
 )
 
 urlpatterns += staticfiles_urlpatterns()

@@ -16,8 +16,9 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 # REASON: but abort the transaction. The custom exceptions can be found in middleware.py
 
 from FuzzEd.decorators import require_ajax
-from FuzzEd.middleware import HttpResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
+from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, Edge, notations, commands
+from FuzzEd.backend import MinBool
 
 import logging
 logger = logging.getLogger('FuzzEd')
@@ -66,7 +67,8 @@ def graphs(request):
     try:
         # create a graph created command 
         post = request.POST
-        commands.AddGraph.create_of(kind=post['kind'], name=post['name'], owner=request.user).do()
+        command = commands.AddGraph.create_from(kind=post['kind'], name=post['name'], owner=request.user)
+        command.do()
 
         # prepare the response
         graph_id             = command.graph.pk
@@ -131,11 +133,12 @@ def nodes(request, graph_id):
      {HTTPResponse} a django response object
     """
     POST = request.POST
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)    
     try:
         kind = POST['kind']
         assert(kind in notations.by_kind[graph.kind]['nodes'])
 
-        command = commands.AddNode.create_of(graph_id=graph_id, client_id=POST['id'], \
+        command = commands.AddNode.create_from(graph_id=graph_id, node_id=POST['id'], \
                                              kind=kind, x=POST['x'], y=POST['y'])
         command.do()
         node = command.node
@@ -194,36 +197,36 @@ def node(request, graph_id, node_id):
                 for e in n.outgoing.all():
                     e.deleted=True
                     e.save()
-                    c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
-                    c.save()
+                    #c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
+                    #c.save()
                 for e in n.incoming.all():
                     e.deleted=True
                     e.save()
-                    c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
-                    c.save()
+                    #c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
+                    #c.save()
                 n.deleted=True
                 n.save()
-                c=History(command=Commands.DEL_NODE, graph=g, node=n)
-                c.save()
+                #c=History(command=Commands.DEL_NODE, graph=g, node=n)
+                #c.save()
             except:
                 raise HttpResponseBadRequestAnswer()                        
             else:
                 return HttpResponseNoResponse()
         elif request.method == 'POST':
-            if 'xcoord' in request.POST and 'ycoord' in request.POST:
+            if 'xcoord' in request.POST and 'ycoord' in request.POST and 'parent' in request.POST:
                 try:
-                    oldxcoord=n.xcoord
-                    oldycoord=n.ycoord
-                    n.xcoord = request.POST['xcoord']
-                    n.ycoord = request.POST['ycoord']
+                    oldxcoord=n.x
+                    oldycoord=n.y
+                    n.x = request.POST['xcoord']
+                    n.y = request.POST['ycoord']
                     n.save()
-                    c=History(command=Commands.CHANGE_COORD, graph=g, node=n, oldxcoord=oldxcoord, oldycoord=oldycoord)
-                    c.save()
+                    #c=History(command=Commands.CHANGE_COORD, graph=g, node=n, oldxcoord=oldxcoord, oldycoord=oldycoord)
+                    #c.save()
                 except:
                     raise HttpResponseBadRequestAnswer()
                 return HttpResponseNoResponse()
             elif 'key' in request.POST and 'value' in request.POST:
-                setNodeProperty(n, request.POST['key'], request.POST['value'])
+                #setNodeProperty(n, request.POST['key'], request.POST['value'])
                 return HttpResponseNoResponse()
             elif 'type' in request.POST:
                 #TODO change node type          
@@ -343,11 +346,11 @@ def undos(request, graph_id):
     """
     if request.method == 'GET':
         #TODO: Fetch undo stack for the graph
-        raise HttpResponseNoResponseAnswer()
+        return HttpResponseNoResponse()
         
     else:
         #TODO: Perform top command on undo stack
-        raise HttpResponseNoResponseAnswer()
+        return HttpResponseNoResponse()
 
 @login_required
 @require_ajax
@@ -370,7 +373,31 @@ def redos(request, graph_id):
     """
     if request.method == 'GET':
         #TODO Fetch redo stack for the graph
-        raise HttpResponseNoResponseAnswer()
+        return HttpResponseNoResponse()
     else:
         #TODO Perform top command on redo stack
-        raise HttpResponseNoResponseAnswer()
+        return HttpResponseNoResponse()
+
+@login_required
+@require_ajax
+@require_GET
+@csrf_exempt
+@transaction.commit_on_success
+def cutsets(request, graph_id):
+    """
+    The function provides all cut sets of the given graph.
+    It currently performs the computation (of unknown duration) synchronousely,
+    so the client is expected to perform an asynchronous REST call on its own
+
+    API Request:  GET /api/graphs/[graphID]/cutsets, no body
+    API Response: JSON body with list of dicts, one dict per cut set, 'nodes' key has list of client_id's value
+    """
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    # derive boolean formula with client IDs
+    print graph.to_dict()
+    tree='(b or c or a) and (c or a and b) and (d) or (e)'
+    reducer = MinBool()
+    cutsets=reducer.simplify(tree)
+    #TODO: convert to JSON and return it
+    #TODO: check the command stack if meanwhile the graph was modified
+    return HttpResponse()
