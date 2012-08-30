@@ -109,37 +109,6 @@ def graph(request, graph_id):
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
     return HttpResponse(graph.to_json(), 'application/javascript')
-
-@login_required
-@require_ajax
-@require_GET
-@csrf_exempt
-def cutsets(request, graph_id):
-    """
-    Function: cutsets
-
-    The function provides all cut sets of the given graph.
-    It currently performs the computation (of unknown duration) synchronousely,
-    so the client is expected to perform an asynchronous REST call on its own
-
-    Request:            GET - /api/graphs/<GRAPH_ID>/cutsets
-    Request Parameters: None
-    Response:           200 - JSON list of dictionaries, each dictionary describes one cut set
-    Parameters:
-     {HTTPRequest} request   - the django request object
-     {int}         graph_id  - the id of the graph where the node shall be added
-    
-    Returns:
-     {HTTPResponse} a django response object
-    """
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    # derive boolean formula with pk's, since they are shorter than the client IDs to be returned
-    # create convtable on the fly
-    tree='(b or c or a) and (c or a and b) and (d) or (e)'
-    reducer = MinBool()
-    cutsets=reducer.simplify(tree, convtable)
-    #TODO: convert to JSON and return it
-    #TODO: check the command stack if meanwhile the graph was modified
     
 @login_required
 @require_ajax
@@ -408,3 +377,27 @@ def redos(request, graph_id):
     else:
         #TODO Perform top command on redo stack
         return HttpResponseNoResponse()
+
+@login_required
+@require_ajax
+@require_GET
+@csrf_exempt
+@transaction.commit_on_success
+def cutsets(request, graph_id):
+    """
+    The function provides all cut sets of the given graph.
+    It currently performs the computation (of unknown duration) synchronousely,
+    so the client is expected to perform an asynchronous REST call on its own
+
+    API Request:  GET /api/graphs/[graphID]/cutsets, no body
+    API Response: JSON body with list of dicts, one dict per cut set, 'nodes' key has list of client_id's value
+    """
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    # derive boolean formula with client IDs
+    print graph.to_dict()
+    tree='(b or c or a) and (c or a and b) and (d) or (e)'
+    reducer = MinBool()
+    cutsets=reducer.simplify(tree)
+    #TODO: convert to JSON and return it
+    #TODO: check the command stack if meanwhile the graph was modified
+    return HttpResponse()

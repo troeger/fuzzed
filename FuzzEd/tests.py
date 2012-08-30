@@ -105,4 +105,10 @@ class ApiTestCase(TestCase):
                                 data={"kind": "foo", "name":"Third graph"},
                                 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 400)
+
+    def testCutSet(self):
+        response=self.c.get('/api/graphs/%u/cutsets'%self.graphid,
+                            **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+        self.assertEqual(response.status_code, 200)
+
         

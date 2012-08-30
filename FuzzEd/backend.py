@@ -5,8 +5,7 @@ class MinBool(ast.NodeVisitor):
         self.current=[]
         self.result=[]
 
-    def simplify(self, boolterm, convtable):
-        self.convtable = convtable
+    def simplify(self, boolterm):
         res = minbool.simplify(boolterm)
         self.visit(res.ast())
         return self.result
@@ -18,7 +17,7 @@ class MinBool(ast.NodeVisitor):
         self.current=[]
 
     def visit_Name(self, name):
-        self.current.append(self.convtable[name.id])
+        self.current.append(str(name.id))
 
     def visit_Or(self, boolop):
         self.generic_visit(boolop)
