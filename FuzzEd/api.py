@@ -22,8 +22,6 @@ from FuzzEd.models import Graph, Node, Edge, notations, commands
 import logging
 logger = logging.getLogger('FuzzEd')
 
-import minbool # for cut set determination
-
 try:
     import json
 # backwards compatibility with older python versions
@@ -109,35 +107,6 @@ def graph(request, graph_id):
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
     return HttpResponse(graph.to_json(), 'application/javascript')
-
-@login_required
-@require_ajax
-@require_GET
-@csrf_exempt
-def cutsets(request, graph_id):
-    """
-    Function: cutsets
-
-    The function provides all cut sets of the given graph.
-    It currently performs the computation (of unknown duration) synchronousely,
-    so the client is expected to perform an asynchronous REST call on its own
-
-    Request:            GET - /api/graphs/<GRAPH_ID>/cutsets
-    Request Parameters: None
-    Response:           200 - JSON list of dictionaries, each dictionary describes one cut set
-    Parameters:
-     {HTTPRequest} request   - the django request object
-     {int}         graph_id  - the id of the graph where the node shall be added
-    
-    Returns:
-     {HTTPResponse} a django response object
-    """
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    # derive boolean formula with pk's, since they are shorter than the client IDs to be returned
-    boolform="1 and 3 or (4 and 5)"
-    result = minbool.simplify(boolform)  # this may take forever
-    #TODO: check the command stack if meanwhile the graph was modified
-    
     
 @login_required
 @require_ajax
