@@ -14,6 +14,16 @@ from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 
 from FuzzEd.models import Graph, notations, commands
 
+GREETINGS = [
+    "Loading the FuzzEd User Experience",
+    "Trying to find your Data... it was here somewhere",
+    "Fiddeling with your Graph... Stand by!",
+    "Loading good Karma into your Browser",
+    "Calculating the Answer to Life...",
+    "Man, this takes like for ever to load...",
+    "Time to grab some Coffee!"
+]
+
 def index(request):
     """
     Function: index
@@ -171,6 +181,18 @@ def settings(request):
 
 @login_required
 def editor(request, graph_id):
+    """
+    Function: editor
+    
+    View handler for loading the editor. It just tries to locate the graph to be opened in the editor and passes it to its according view.
+    
+    Parameters:
+     {HttpRequest} request  - a django request object
+     {int}         graph_id - the id of the graph to be opened in the editor
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
     graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user)
     notation = notations.by_kind[graph.kind]
     nodes    = notation['nodes']
@@ -178,7 +200,8 @@ def editor(request, graph_id):
     parameters = {
         'graph':          graph,
         'graph_notation': notation,
-        'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']]
+        'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
+        'greetings':      GREETINGS
     }
 
     return render(request, 'editor/editor.html', parameters)

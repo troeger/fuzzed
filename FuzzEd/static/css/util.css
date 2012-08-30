@@ -2,21 +2,9 @@ section {
 	padding-top: 40px;
 }
 
-#FuzzEdSplash {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-}
-
-#FuzzEdSplashContent {
+.center-vertical {
 	text-align: center;
 	vertical-align: middle;
-}
-
-.FuzzEdContent {
-	padding-top: 80px;
 }
 
 .footer {
@@ -27,6 +15,22 @@ section {
 
 .footer p {
 	margin-bottom: 0;
+}
+
+.overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.space-top {
+	padding-top: 80px;
+}
+
+.space-bottom {
+	padding-bottom: 80px;
 }
 
 .table td {
