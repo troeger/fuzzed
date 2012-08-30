@@ -14,7 +14,8 @@ EMAIL_SUBJECT_PREFIX = '[FuzzTrees] '
 
 if is_production:
     DEBUG =                   False
-    TEMPLATE_DEBUG =          False
+#    TEMPLATE_DEBUG =          False
+    TEMPLATE_DEBUG = True
     SEND_BROKEN_LINK_EMAILS = False     
     EMAIL_BACKEND =           'django.core.mail.backends.smtp.EmailBackend'
     SERVER_EMAIL =            'noreply@citemaster.net'

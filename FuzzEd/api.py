@@ -16,13 +16,12 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 # REASON: but abort the transaction. The custom exceptions can be found in middleware.py
 
 from FuzzEd.decorators import require_ajax
-from FuzzEd.middleware import HttpResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
+from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, Edge, notations, commands
+from FuzzEd.backend import MinBool
 
 import logging
 logger = logging.getLogger('FuzzEd')
-
-import minbool # for cut set determination
 
 try:
     import json
@@ -68,7 +67,8 @@ def graphs(request):
     try:
         # create a graph created command 
         post = request.POST
-        commands.AddGraph.create_of(kind=post['kind'], name=post['name'], owner=request.user).do()
+        command = commands.AddGraph.create_from(kind=post['kind'], name=post['name'], owner=request.user)
+        command.do()
 
         # prepare the response
         graph_id             = command.graph.pk
@@ -82,8 +82,6 @@ def graphs(request):
     except (ValueError, KeyError):
         raise HttpResponseBadRequestAnswer()
 
-    # Should not be reachable, just for error tracing reasons here
-    raise HttpResponseServerErrorAnswer()
 
 @login_required
 @require_ajax
@@ -134,10 +132,12 @@ def cutsets(request, graph_id):
     """
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     # derive boolean formula with pk's, since they are shorter than the client IDs to be returned
-    boolform="1 and 3 or (4 and 5)"
-    result = minbool.simplify(boolform)  # this may take forever
+    # create convtable on the fly
+    tree='(b or c or a) and (c or a and b) and (d) or (e)'
+    reducer = MinBool()
+    cutsets=reducer.simplify(tree, convtable)
+    #TODO: convert to JSON and return it
     #TODO: check the command stack if meanwhile the graph was modified
-    
     
 @login_required
 @require_ajax
@@ -162,11 +162,12 @@ def nodes(request, graph_id):
      {HTTPResponse} a django response object
     """
     POST = request.POST
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)    
     try:
         kind = POST['kind']
         assert(kind in notations.by_kind[graph.kind]['nodes'])
 
-        command = commands.AddNode.create_of(graph_id=graph_id, client_id=POST['id'], \
+        command = commands.AddNode.create_from(graph_id=graph_id, client_id=POST['id'], \
                                              kind=kind, x=POST['x'], y=POST['y'])
         command.do()
         node = command.node
@@ -372,11 +373,11 @@ def undos(request, graph_id):
     """
     if request.method == 'GET':
         #TODO: Fetch undo stack for the graph
-        raise HttpResponseNoResponseAnswer()
+        return HttpResponseNoResponse()
         
     else:
         #TODO: Perform top command on undo stack
-        raise HttpResponseNoResponseAnswer()
+        return HttpResponseNoResponse()
 
 @login_required
 @require_ajax
@@ -399,7 +400,7 @@ def redos(request, graph_id):
     """
     if request.method == 'GET':
         #TODO Fetch redo stack for the graph
-        raise HttpResponseNoResponseAnswer()
+        return HttpResponseNoResponse()
     else:
         #TODO Perform top command on redo stack
-        raise HttpResponseNoResponseAnswer()
+        return HttpResponseNoResponse()

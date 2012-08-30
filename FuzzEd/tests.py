@@ -1,13 +1,13 @@
-from django.utils import unittest
+from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
-from nodes_config import NODE_TYPES
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
 from FuzzEd.models.edge import Edge
 
-class ApiTestCase(unittest.TestCase):
-    graphid=1       # from fixture in initial_data.json
+class ApiTestCase(TestCase):
+    fixtures = ['test_data.json']
+    graphid=1       # from fixture 
 
     def setUp(self):
         self.c=Client()
@@ -20,6 +20,8 @@ class ApiTestCase(unittest.TestCase):
         response=self.c.get('/api/graphs/9999',
                             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 404)
+
+
 
     def testGetRedos(self):
         response=self.c.get('/api/graphs/%u/redos'%self.graphid,
@@ -35,19 +37,19 @@ class ApiTestCase(unittest.TestCase):
         oldncount=Graph.objects.get(pk=self.graphid).nodes.count()
         parent=Node.objects.get(pk=5) # from fixture, gate for CPU components
         response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
-                             {'parent':parent.pk, 'type':1, 'xcoord':10, 'ycoord':7},    # Basic event
+                             {'parent':parent.pk, 'kind': 'orGate', 'xcoord':10, 'ycoord':7},    # Basic event
                              **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 201)
         self.assertIn('Location', response)
         self.assertEqual(oldncount+1, Graph.objects.get(pk=self.graphid).nodes.count() )
         # test invalid parent ID
         response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
-                             {'parent':-1, 'type':1, 'xcoord':10, 'ycoord':7},
+                             {'parent':-1, 'kind': 'orGate', 'xcoord':10, 'ycoord':7},
                              **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 400)
         # Check invalid type
         response=self.c.post('/api/graphs/%u/nodes'%self.graphid,
-                             {'parent':parent.pk, 'type':9999, 'xcoord':10, 'ycoord':7},
+                             {'parent':parent.pk, 'kind': 'fooVar', 'xcoord':10, 'ycoord':7},
                              **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 400)
 
@@ -94,13 +96,13 @@ class ApiTestCase(unittest.TestCase):
                 
     def testCreateGraph(self):
         response=self.c.post(   '/api/graphs',
-                                data={"type":1, "name":"Second graph"},
+                                data={"kind": "fuzztree", "name":"Second graph"},
                                 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 201)
         self.assertIn('Location', response)
         # test invalid type
         response=self.c.post(   '/api/graphs',
-                                data={"type":99999, "name":"Third graph"},
+                                data={"kind": "foo", "name":"Third graph"},
                                 **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 400)
         

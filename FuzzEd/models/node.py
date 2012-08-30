@@ -49,7 +49,7 @@ class Node(models.Model):
 
         except ObjectDoesNotExist:
             return '%s%s_%s' % (prefix, self.pk,\
-                                notations.by_kind[graph.kind]['nodes'][self.kind]['name'])
+                                notations.by_kind[self.graph.kind]['nodes'][self.kind]['name'])
 
     def to_json(self):
         """
@@ -84,10 +84,12 @@ class Node(models.Model):
 
 # the handler will ensure that the kind of the node is present in its containing graph notation
 @receiver(pre_save, sender=Node)
-def validate(sender, instance, **kwargs):
-    graph = instance.graph
-    if not instance.kind in notations.by_kind[graph.kind]['nodes']:
-        raise ValueError('Graph %s does not support nodes of type %s' % (graph, instance.kind))
+def validate(sender, instance, raw, **kwargs):
+    # raw is true if fixture loading happens, where the graph does not exist so far
+    if not raw:
+        graph = instance.graph
+        if not instance.kind in notations.by_kind[graph.kind]['nodes']:
+            raise ValueError('Graph %s does not support nodes of type %s' % (graph, instance.kind))
 
 # ensures that the validate handler is not exported
 __all__ = ['Node']
