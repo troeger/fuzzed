@@ -2,21 +2,11 @@ section {
     padding-top: 40px;
 }
 
-#FuzzEdShapes {
-    top: 50px;
-    left: 10px;
-}
-
-#FuzzEdProperties {
-    top: 50px;
-    right: 10px;
-}
-
 .brand {
     color: white !important;
 }
 
-.fuzzed-shape {
+.fuzzed-shape-cell {
     text-align: center;
     width: 90px;
     vertical-align: top;
@@ -24,32 +14,62 @@ section {
 
 .fuzzed-shape-label {
     display: block;
+    margin-bottom: 10px;
+
     font-size: 11px;
     font-weight: bold;
-    color: #666;
-    margin-bottom: 10px;
+    color: #333;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+}
+
+.canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    z-index: 0;
+}
+
+.center-vertical {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.footer {
+    margin-top: 35px;
+    padding: 35px 0px 35px 0px;
+    border-top: 1px solid #E5E5E5;
+}
+
+.footer p {
+    margin-bottom: 0;
 }
 
 .menu {
-    position: absolute;
+    position: fixed;
     min-height: 50px;
     padding: 42px 7px 7px 7px;
 
     z-index: 0;
 
-    border: 1px solid #2C2C2C;
+    border: 1px solid #CCC;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
     border-radius: 4px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
 
-    background-color: #eee;
-    background-image: linear-gradient(to bottom, #efefef, #eee);
-    background-image: -moz-linear-gradient(top, #efefef, #eee);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#efefef), to(#eee));
-    background-image: -webkit-linear-gradient(top, #efefef, #eee);
-    background-image: -o-linear-gradient(top, #efefef, #eee);
+    background-color: whiteSmoke;
+    background-image: linear-gradient(top,white,#E6E6E6);
+    background-image: -ms-linear-gradient(top,white,#E6E6E6);
+    background-image: -moz-linear-gradient(top,white,#E6E6E6);
+    background-image: -webkit-gradient(linear,0 0,0 100%,from(white),to(#E6E6E6));
+    background-image: -webkit-linear-gradient(top,white,#E6E6E6);
+    background-image: -o-linear-gradient(top,white,#E6E6E6);
     background-repeat: repeat-x;
-    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffefefef', endColorstr='#ffeeeeee', GradientType=0);
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffffff',endColorstr='#e6e6e6',GradientType=0);
+    filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 
     box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 10px rgba(0, 0, 0, 0.1);
     -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 10px rgba(0, 0, 0, 0.1);
@@ -84,37 +104,13 @@ section {
     
     background-color: #2C2C2C;
     background-image: linear-gradient(to bottom, #333, #222);
+    background-image: -ms-linear-gradient(top,#333,#222);
     background-image: -moz-linear-gradient(top, #333, #222);
     background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333), to(#222));
     background-image: -webkit-linear-gradient(top, #333, #222);
     background-image: -o-linear-gradient(top, #333, #222);
     background-repeat: repeat-x;
     filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff333333', endColorstr='#ff222222', GradientType=0);
-}
-
-.canvas {
-    position: relative;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: white;
-    z-index: 0;
-}
-
-.center-vertical {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.footer {
-    margin-top: 35px;
-    padding: 35px 0px 35px 0px;
-    border-top: 1px solid #E5E5E5;
-}
-
-.footer p {
-    margin-bottom: 0;
 }
 
 .overlay {

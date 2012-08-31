@@ -1,9 +1,9 @@
-<div id="FuzzEdShapes" class="menu" header="Shapes">
+<div id="FuzzEdShapes" class="menu" header="Shapes" style="top: 50px; left: 10px;">
     <table>
     {% for kind, node in nodes %}
         {% if not node.excludeFromShapesMenu %}
             {% cycle '<tr>' '' %}
-                <td class="right-tooltip fuzzed-shape" title="{{ node.help }}">
+                <td class="right-tooltip fuzzed-shape-cell" title="{{ node.help }}">
                     {% include node.image %}
                     <span class="fuzzed-shape-label">{{ node.name }}</div>
                 </td>

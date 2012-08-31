@@ -24,39 +24,25 @@ define(['require-config', 'require-oop'], function(Config, Class) {
         }
     });
 
-
     /**
      * Class: ShapeMenu
      */
     var ShapeMenu = Menu.extend({
 
-        _shapes: undefined,
-
         init: function() {
             this._container = jQuery('#' + Config.IDs.SHAPES_MENU);
-            this._shapes = jQuery('#' + Config.IDs.SHAPES_MENU);
 
             this._setupThumbnails();
-
             this._super();
         },
 
         /* Section: Internal */
 
         _setupThumbnails: function() {
-            var thumbnails = this._shapes.find('.' + Config.Classes.NODE_THUMBNAIL);
-            var svgs       = thumbnails.children('svg');
-
-            // scale the icons down
-            svgs.width (svgs.width()  * Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR);
-            svgs.height(svgs.height() * Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR);
-            svgs.each(function() {
-                var g = jQuery(this).children('g');
-                g.attr('transform', 'scale(' + Config.ShapeMenu.THUMBNAIL_SCALE_FACTOR + ') ' + g.attr('transform'));
-            });
+            var svgs = this._container.find('svg');
 
             // make shapes in the menu draggable
-            thumbnails.draggable({
+            svgs.draggable({
                 helper:   'clone',
                 opacity:  Config.Dragging.OPACITY,
                 cursor:   Config.Dragging.CURSOR,
@@ -80,7 +66,6 @@ define(['require-config', 'require-oop'], function(Config, Class) {
             this._list = this._container.find('.ui-listview');
 
             this._setupDragging();
-
             this._super();
         },
 

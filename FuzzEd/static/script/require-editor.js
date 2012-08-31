@@ -40,6 +40,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
 
         graph: function(newGraph) {
             if (typeof newGraph === 'undefined') return this._graph;
+            // TODO: on set full rendering of new graph required
             this._graph = newGraph;
             return this;
         },
@@ -192,12 +193,13 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
 
             // pick the right graph class depending on the type
             if (json.type == 'fuzztree') {
-                require(['require-fuzztreegraph'], constructGraph.bind(this));
+                require(['require-fuzztree'], constructGraph.bind(this));
             } else if (json.type == 'faulttree') {
-                require(['require-faulttreegraph'], constructGraph.bind(this));
+                require(['require-faulttree'], constructGraph.bind(this));
             } else if (json.type == 'rbd') {
-                require(['require-rbdgraph'], constructGraph.bind(this));
+                require(['require-rbdg'], constructGraph.bind(this));
             } else {
+                // TODO: maybe an "unknown graph type"-error here?
                 require(['require-graph'], constructGraph.bind(this));
             }
         },
@@ -214,7 +216,6 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
 
         _setupBackground: function() {
             this._drawGrid();
-
             // clicks on the canvas clear the selection
             this._canvas.click(this.selection.clear.bind(this.selection));
             // redraw the background grid when the window resizes
@@ -224,7 +225,8 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
         _setupCanvas: function() {
             // make canvas droppable for shapes from the shape menu
             this._canvas.droppable({
-                accept:    '.' + Config.Classes.NODE_THUMBNAIL,
+                accept:    'svg',
+                //accept:    '.' + Config.Classes.NODE_THUMBNAIL,
                 tolerance: 'fit',
                 drop:      this._shapeDropped.bind(this)
             });
