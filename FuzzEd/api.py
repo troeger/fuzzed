@@ -393,11 +393,9 @@ def cutsets(request, graph_id):
     API Response: JSON body with list of dicts, one dict per cut set, 'nodes' key has list of client_id's value
     """
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    # derive boolean formula with client IDs
-    print graph.to_dict()
-    tree='(b or c or a) and (c or a and b) and (d) or (e)'
+    #tree='(b or c or a) and (c or a and b) and (d) or (e)'
+    tree=graph.to_bool_term()
     reducer = MinBool()
     cutsets=reducer.simplify(tree)
-    #TODO: convert to JSON and return it
     #TODO: check the command stack if meanwhile the graph was modified
-    return HttpResponse()
+    return HttpResponse(json.dumps(cutsets), 'application/javascript')

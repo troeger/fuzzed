@@ -19,6 +19,9 @@ class MinBool(ast.NodeVisitor):
     def visit_Name(self, name):
         self.current.append(str(name.id))
 
+    def visit_Num(self, num):
+        self.current.append(num.n)
+
     def visit_Or(self, boolop):
         self.generic_visit(boolop)
 

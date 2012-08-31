@@ -75,6 +75,10 @@ class Graph(models.Model):
             'edges': edges
         }
 
+    def to_bool_term(self):
+        root = self.nodes.get(kind__exact = 'topEvent')
+        return root.to_bool_term()
+
 from commands import AddNode
 
 # validation handler that ensures that the graph kind is known

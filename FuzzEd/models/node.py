@@ -9,7 +9,7 @@ try:
 # backwards compatibility with older versions of Python
 except ImportError:
     import simplejson as json
-import sys
+import sys, ast
 
 from graph import Graph
 import notations
@@ -83,6 +83,22 @@ class Node(models.Model):
         serialized['incoming'] = [edge.client_id for edge in self.incoming.filter(deleted=False)]
 
         return serialized
+
+    def to_bool_term(self):
+        edgeset = self.outgoing.filter(deleted=False).all()
+        children=[]
+        for edge in edgeset:
+            children.append(edge.target.to_bool_term())
+        if self.kind == 'orGate':
+            return "("+" or ".join(children)+")"
+        elif self.kind == 'andGate':        
+            return "("+" and ".join(children)+")"
+        elif self.kind in ['basicEvent']:
+            return str(self.client_id)
+        elif self.kind == 'topEvent':
+            return str(children[0])
+        else:
+            raise ValueError('Node %s has unsupported kind' % (str(self)))
 
 # the handler will ensure that the kind of the node is present in its containing graph notation
 @receiver(pre_save, sender=Node)
