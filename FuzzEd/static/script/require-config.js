@@ -48,12 +48,12 @@ define(function() {
         },
 
         IDs: {
-            SPLASH:          'FuzzedSplash',
+            CANVAS:          'FuzzEdCanvas',
             CONTENT:         'FuzzedContent',
-            TOOLBAR:         'FuzzedToolbar',
+            PROPERTIES_MENU: 'FuzzedProperties',
             SHAPES_MENU:     'FuzzedShapes',
-            CANVAS:          'FuzzedCanvas',
-            PROPERTIES_MENU: 'FuzzedProperties'
+            SPLASH:          'FuzzEdSplash',
+            TOOLBAR:         'FuzzedToolbar'
         },
 
         JSPlumb: {
@@ -180,7 +180,7 @@ define(function() {
         },
 
         Splash: {
-            FADE_TIME: 500
+            FADE_TIME: 1000
         }
     };
 });

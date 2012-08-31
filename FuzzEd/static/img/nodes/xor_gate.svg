@@ -1,81 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="50"
-   height="50.3125"
-   id="svg4011"
-   version="1.1"
-   inkscape:version="0.48.2 r9819"
-   sodipodi:docname="xor_gate.svg">
-  <defs
-     id="defs4013" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="4.1519968"
-     inkscape:cx="13.461473"
-     inkscape:cy="31.442156"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     showgrid="true"
-     showguides="false"
-     inkscape:window-width="1440"
-     inkscape:window-height="852"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0">
-    <inkscape:grid
-       type="xygrid"
-       id="grid4019"
-       empspacing="5"
-       visible="true"
-       enabled="true"
-       snapvisiblegridlinesonly="true" />
-  </sodipodi:namedview>
-  <metadata
-     id="metadata4016">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     inkscape:label="Ebene 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(0.625,-1002.375)">
-    <path
-       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.9998771;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 0.37493856,1051.6876 c 0,0 15.84160844,-4.8 24.00006144,-4.8 8.158453,0 24.000061,4.8 24.000061,4.8 0,0 0,-19.2001 -9.600025,-33.6002 -3.765438,-5.6481 -14.400036,-14.4 -14.400036,-14.4 0,0 -10.634597,8.7519 -14.4000371,14.4 -9.60002434,14.4001 -9.60002434,33.6002 -9.60002434,33.6002 z"
-       id="path5464"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cacscsc" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:1.96003079;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 0.35501537,1051.7075 24.01998463,-44.72 24.019985,44.72 0,0"
-       id="path6683"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccc" />
-  </g>
+<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
+     width="35" height="35" version="1.1">
+     <g id="xor-gate">
+        <path style="fill:#ffffff; stroke:#000000; stroke-width:1.4;"
+              d="M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z" id="xor-background" />
+        <path style="fill-opacity:0.0; stroke:#000000; stroke-width:1.4;"
+              d="M 0.7,34.3 L 17.5,1.4 34.3,34.3" id="xor" />
+    </g>
 </svg>

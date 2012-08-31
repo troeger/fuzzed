@@ -15,8 +15,6 @@
     </style>
     
     {% block script %}
-    <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
-    <script src="{{ STATIC_URL }}lib/bootstrap/js/bootstrap-2.0.4.min.js" type="text/javascript" language="javascript"></script>
     {% endblock %}
 </head>
 
@@ -24,6 +22,7 @@
     <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
+                <a class="brand" anchor="#">FuzzEd</a>
                 <ul class="nav pull-right">
                     <li class="{% block navigation_home %}{% endblock %}">
                         <a href="/">
@@ -46,7 +45,6 @@
                     </li>
                     {% endif %}
                 </ul>
-                <a class="brand" anchor="#">FuzzEd</a>
             </div>
         </div>
     </div>

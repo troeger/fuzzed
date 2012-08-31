@@ -1,0 +1,14 @@
+<div id="FuzzEdShapes" class="menu" header="Shapes" style="top: 50px; left: 10px;">
+    <table>
+    {% for kind, node in nodes %}
+        {% if not node.excludeFromShapesMenu %}
+            {% cycle '<tr>' '' %}
+                <td class="right-tooltip" style="text-align:center; width:90px; vertical-align: top;" title="{{ node.help }}">
+                    {% include node.image %}
+                    <div style="font-size:11px; font-weight:bold; color:#666; margin-bottom: 10px;">{{ node.name }}</div>
+                </td>
+            {% cycle '' '</tr>' %}
+        {% endif %}
+    {% endfor %}
+    </table>
+</div>

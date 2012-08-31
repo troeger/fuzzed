@@ -61,7 +61,10 @@ class Graph(models.Model):
          {dict} the graph as dictionary
         """
         nodes = [node.to_dict() for node in self.nodes.filter(deleted=False)]
-        edges = sum([node.outgoing.filter(deleted=False) for node in nodes], [])
+        edges = []
+        for node in self.nodes.all():
+            edges.extend(node.outgoing.filter(deleted=False))
+        #edges = sum([node.outgoing.filter(deleted=False) for node in self.nodes.all()], [])
 
         return {
             'id':    self.pk,

@@ -2,6 +2,82 @@ section {
 	padding-top: 40px;
 }
 
+.brand {
+	color: white !important;
+}
+
+.menu {
+	position: absolute;
+	min-height: 50px;
+	padding: 42px 7px 7px 7px;
+
+	z-index: 0;
+
+	border: 1px solid #2C2C2C;
+    border-radius: 4px;
+	-webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+
+	background-color: #eee;
+  	background-image: linear-gradient(to bottom, #efefef, #eee);
+  	background-image: -moz-linear-gradient(top, #efefef, #eee);
+  	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#efefef), to(#eee));
+  	background-image: -webkit-linear-gradient(top, #efefef, #eee);
+  	background-image: -o-linear-gradient(top, #efefef, #eee);
+  	background-repeat: repeat-x;
+	filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ffefefef', endColorstr='#ffeeeeee', GradientType=0);
+
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 10px rgba(0, 0, 0, 0.1);
+	-webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 10px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 10px rgba(0, 0, 0, 0.1);
+}
+
+.menu::after {
+	content: attr(header);
+
+	position: absolute;
+	top: -1px;
+	left: 0;
+	width: 100%;
+	padding: 5px 15px;
+
+	color: #999;
+	font-size: 14px;
+	font-weight: 200;
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-o-text-overflow: ellipsis;
+
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+
+	border: 1px solid #2C2C2C;
+    border-radius: 4px 4px 0px 0px;
+	-webkit-border-radius: 4px 4px 0px 0px;
+    -moz-border-radius: 4px 4px 0px 0px;
+  	
+  	background-color: #2C2C2C;
+  	background-image: linear-gradient(to bottom, #333, #222);
+  	background-image: -moz-linear-gradient(top, #333, #222);
+  	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333), to(#222));
+  	background-image: -webkit-linear-gradient(top, #333, #222);
+  	background-image: -o-linear-gradient(top, #333, #222);
+  	background-repeat: repeat-x;
+	filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff333333', endColorstr='#ff222222', GradientType=0);
+}
+
+.canvas {
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: white;
+	z-index: 0;
+}
+
 .center-vertical {
 	text-align: center;
 	vertical-align: middle;
@@ -23,6 +99,8 @@ section {
 	left: 0;
 	width: 100%;
 	height: 100%;
+	z-index: 1000;
+	background-color: white;
 }
 
 .space-top {
