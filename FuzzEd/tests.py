@@ -110,7 +110,7 @@ class ApiTestCase(TestCase):
         response=self.c.get('/api/graphs/%u/cutsets'%self.graphid,
                             **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
         self.assertEqual(response.status_code, 200)
-        self.assertIn("[[88, 12345], [99, 12345]]", response.content)
+        self.assertIn('[{"nodes": [88, 12345]}, {"nodes": [99, 12345]}]', response.content)
 
 
         
