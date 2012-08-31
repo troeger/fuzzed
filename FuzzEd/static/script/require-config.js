@@ -3,19 +3,26 @@ define(function() {
     var LABEL_WIDTH = GRID_SIZE << 1;
 
     return {
-        Classes: {
-            NODE:                    'fuzzed-node',
-            NODE_SELECTED:           'fuzzed-node-selected',
-            NODE_THUMBNAIL:          'fuzzed-node-thumbnail',
-            NODE_IMAGE:              'fuzzed-node-image',
-            NODE_LABEL:              'fuzzed-node-label',
-            NODE_LABELS:             'fuzzed-node-labels',
-            NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
-            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
-            NODE_OPTIONAL_INDICATOR: 'fuzzed-node-optional-indicator',
+        Backend: {
+            BASE_URL:   '/api',
+            GRAPHS_URL: '/graphs',
+            NODES_URL:  '/nodes',
+            EDGES_URL:  '/edges'
+        },
 
-            JSPLUMB_ENDPOINT:       'jsplumb-endpoint',
-            JSPLUMB_ENDPOINT_HOVER: 'jsplumb-endpoint-hover',
+        Classes: {
+            NODE:                       'fuzzed-node',
+            NODE_SELECTED:              'fuzzed-node-selected',
+            NODE_THUMBNAIL:             'fuzzed-node-thumbnail',
+            NODE_IMAGE:                 'fuzzed-node-image',
+            NODE_LABEL:                 'fuzzed-node-label',
+            NODE_LABELS:                'fuzzed-node-labels',
+            NODE_DROP_ACTIVE:           'fuzzed-node-drop-active',
+            NODE_HALO_CONNECT:          'fuzzed-node-halo-connect',
+            NODE_OPTIONAL_INDICATOR:    'fuzzed-node-optional-indicator',
+
+            JSPLUMB_ENDPOINT:           'jsplumb-endpoint',
+            JSPLUMB_ENDPOINT_HOVER:     'jsplumb-endpoint-hover',
 
             PROPERTIES:                 'fuzzed-properties',
             PROPERTY_LABEL:             'fuzzed-property-label',
@@ -26,17 +33,10 @@ define(function() {
             PROPERTY_RANGE_MAX:         'fuzzed-property-range-max'
         },
 
-        Backend: {
-            BASE_URL:   '/api',
-            GRAPHS_URL: '/graphs',
-            NODES_URL:  '/nodes',
-            EDGES_URL:  '/edges'
-        },
-
         Dragging: {
             OPACITY:        0.5,
             CURSOR:         'move',
-            SNAP_TOLERANCE: 10
+            SNAP_TOLERANCE: 0
         },
 
         Grid: {
@@ -49,11 +49,9 @@ define(function() {
 
         IDs: {
             CANVAS:          'FuzzEdCanvas',
-            CONTENT:         'FuzzedContent',
-            PROPERTIES_MENU: 'FuzzedProperties',
-            SHAPES_MENU:     'FuzzedShapes',
-            SPLASH:          'FuzzEdSplash',
-            TOOLBAR:         'FuzzedToolbar'
+            PROPERTIES_MENU: 'FuzzEdProperties',
+            SHAPES_MENU:     'FuzzEdShapes',
+            SPLASH:          'FuzzEdSplash'
         },
 
         JSPlumb: {
@@ -176,7 +174,7 @@ define(function() {
         },
 
         ShapeMenu: {
-            THUMBNAIL_SCALE_FACTOR: 0.7
+            THUMBNAIL_SCALE_FACTOR: 1
         },
 
         Splash: {

@@ -152,6 +152,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
 
         _loadGraphError: function(graph, response, textStatus, errorThrown) {
             this.graph(graph);
+            // TODO: this alert is weird. just do it or 404?
             alert('Could not find your graph in the database');
         },
 

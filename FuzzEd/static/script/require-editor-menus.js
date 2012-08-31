@@ -13,11 +13,11 @@ define(['require-config', 'require-oop'], function(Config, Class) {
 
         _setupDragging: function() {
             this._container.draggable({
-                containment:   '#' + Config.IDs.CONTENT,
+                containment:   'body',
                 stack:         '.' + Config.Classes.NODE,
                 cursor:        Config.Dragging.CURSOR,
                 scroll:        false,
-                snap:          '#' + Config.IDs.CONTENT,
+                snap:          'body',
                 snapMode:      'inner',
                 snapTolerance: Config.Dragging.SNAP_TOLERANCE
             });
