@@ -1,6 +1,6 @@
 import urllib, datetime
 
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
@@ -175,6 +175,7 @@ def settings(request):
         profile.save()
         user.save()
 
+        messages.add_message(request, messages.INFO, 'Settings saved.')
         return redirect('dashboard')
 
     return render(request, 'util/settings.html')

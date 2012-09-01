@@ -13,11 +13,18 @@
         @import url("{{ STATIC_URL }}css/util.css");
         {% endblock %}
     </style>
-    
+
     {% block script %}
     <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
     <script src="{{ STATIC_URL }}lib/bootstrap/js/bootstrap-2.0.4.min.js" type="text/javascript" language="javascript"></script>
     {% endblock %}
+
+    <script type="text/javascript">
+        $(document).ready( function(){
+            $(".alert").fadeIn().delay(700).fadeOut();
+        });
+    </script>
+
 </head>
 
 <body>
@@ -53,6 +60,12 @@
     
     {% block body %}
     <div class="container space-top">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert hide">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
         {% block content %}{% endblock %}
 
         {% block footer %}
