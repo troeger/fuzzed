@@ -21,7 +21,7 @@
 
     <script type="text/javascript">
         $(document).ready( function(){
-            $(".alert").fadeIn().delay(700).fadeOut();
+            $(".alert").fadeIn().delay(1500).fadeOut();
         });
     </script>
 
@@ -61,9 +61,25 @@
     {% block body %}
     <div class="container space-top">
         {% if messages %}
+            <div style="position: absolute; top: 8%; width: 93%">
             {% for message in messages %}
-                <div class="alert hide">{{ message }}</div>
+                {% if message.tags == "success" %}
+                    <div class="alert alert-success hide">
+                    <i class="icon-ok-sign"></i>
+                {% elif message.tags == "info"%}
+                    <div class="alert alert-info hide">
+                    <i class="icon-info-sign"></i>                
+                {% elif message.tags == "warning"%}
+                    <div class="alert hide">
+                    <i class="icon-warning-sign"></i>                
+                {% elif message.tags == "error"%}
+                    <div class="alert alert-error hide">
+                    <i class="icon-warning-sign"></i>                
+                {% endif %}
+                {{ message }}
+                </div>
             {% endfor %}
+            </div>
         {% endif %}
 
         {% block content %}{% endblock %}

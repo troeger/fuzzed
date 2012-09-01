@@ -175,7 +175,7 @@ def settings(request):
         profile.save()
         user.save()
 
-        messages.add_message(request, messages.INFO, 'Settings saved.')
+        messages.add_message(request, messages.SUCCESS, 'Settings saved.')
         return redirect('dashboard')
 
     return render(request, 'util/settings.html')
