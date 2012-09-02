@@ -1,0 +1,76 @@
+#FuzzedCanvas {
+    position:         relative;
+    height:           100%;
+    overflow:         auto;
+    background-color: white;
+    z-index:          0;
+}
+
+.fuzzed-node {
+    text-align: center;;
+}
+
+.fuzzed-node-image {
+    display:  inline-block;
+    position: relative;
+    margin:   0px 3px 3px 3px;
+    z-index:  100;
+}
+
+.fuzzed-node-labels {
+    position:         absolute;
+    z-index:          110; /* above connections */
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.fuzzed-node-label {
+    display:          block;
+    position:         relative;
+    line-height:      15px;
+    font-weight:      bold;
+    font-size:        0.8em;
+    text-align:       center;
+    word-wrap:        break-word;
+    margin-bottom:    3px;
+}
+
+.fuzzed-node-label-probability {
+    font-size:   11px;
+    font-weight: normal;
+    font-style:  italic;
+}
+
+.fuzzed-node-halo-connect {
+    /* XXX: this is a temporary solution */
+    background-color:       #409FFF;
+    position:               absolute;
+    visibility:             hidden;
+    top:                    50px;
+    left:                   18px;
+    z-index:                150; /* above image, TODO: let halo care about that */
+    cursor:                 move;
+}
+
+.fuzzed-node-selected .fuzzed-node-halo-connect {
+    background-color:       #FF9640;
+}
+
+.fuzzed-node:hover .fuzzed-node-halo-connect {
+    visibility: visible;
+}
+
+.fuzzed-node-optional-indicator {
+    width:   12px;
+    height:  12px;
+    margin:  0 auto;
+    z-index: 100; /* above connection */
+}
+
+.jsplumb-endpoint {
+    opacity: 0;
+    z-index: 50; /* above connection, below image */
+}
+
+.jsplumb-endpoint.jsplumb-endpoint-hover {
+    opacity: 1;
+}
