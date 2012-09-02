@@ -33,31 +33,6 @@
     margin:      4px;
 }
 
-#FuzzedContent {
-    position: absolute;
-    top:      39px;
-    bottom:   0;
-    width:    100%;
-}
-
-#FuzzedShapes {
-	position:  absolute;
-    top:       0;
-    left:      0;
-    width:     200px;
-    min-width: 200px;
-    overflow:  auto;
-    z-index:   100;
-}
-
-#FuzzedCanvas {
-	position:         relative;
-	height:           100%;
-	overflow:         auto;
-    background-color: white;
-    z-index:          0;
-}
-
 #FuzzedProperties {
     position:  absolute;
     top:       0;
@@ -66,25 +41,6 @@
     min-width: 250px;
     overflow:  auto;
     z-index:   100;
-}
-
-.fuzzed-node-thumbnail-cell {
-    text-align: center;
-    font-size:  0.7em;
-    margin:     10px 0px;
-}
-
-.fuzzed-node-thumbnail {
-    display: inline-block;
-}
-
-.fuzzed-node-thumbnail svg {
-    margin:  3px 0 5px 0;
-}
-
-.fuzzed-node-thumbnail-label {
-    /* here be dragons - nasty workaround for the draggable centering problem */
-    display: block;
 }
 
 .fuzzed-node {

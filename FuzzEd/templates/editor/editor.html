@@ -4,6 +4,11 @@
     {{ block.super }} - {{ graph.name }}
 {% endblock %}
 
+{% block style %}
+    @import url("{{ STATIC_URL }}css/editor/editor.css");
+    @import url("{{ STATIC_URL }}css/editor/shapes.css");
+{% endblock %}
+
 {% block script %}
 <!-- requirejs and own code -->
 <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
@@ -49,7 +54,7 @@
 
     require(['require-editor'], function(Editor) {
         jQuery(document).ready(function() {
-            //new Editor({{ graph.pk }});
+            new Editor({{ graph.pk }});
         });
     });
 </script>
@@ -57,6 +62,10 @@
 
 {% block body %}
     {% include "editor/editor_splash.html" with greetings=greetings %}
+
+    <div id="FuzzedContent">
+        {% include "editor/content.html" %}
+    </div>
 {% endblock %}
 
 {% block footer %}

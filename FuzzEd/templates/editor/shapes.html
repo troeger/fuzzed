@@ -1,0 +1,34 @@
+<div id="FuzzedShapes" class="well well-small">
+    <h3>Shapes</h3>
+    <hr />
+    {# first add all invisible entries #}
+    {% for node_kind, node in nodes %}
+        {% if node.excludeFromShapesMenu %}
+            <div style="display: none">
+                <div id="{{ node_kind }}">
+                    {% include node.image %}
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    {# then all visible entries #}
+    {% for node_kind, node in nodes %}
+        {% if not node.excludeFromShapesMenu %}
+            {% if forloop.counter0|divisibleby:"2" %}
+                <div class="row-fluid">
+            {% endif %}
+
+            <div class="span6" style="text-align: center">
+                <div id="{{ node_kind }}" class="fuzzed-node-thumbnail fuzzed-{{ node_kind }}">
+                    {% include node.image %}
+                </div>
+                <span class="fuzzed-node-thumbnail-label">{{ node.name }}</span>
+            </div>
+
+            {% if forloop.counter|divisibleby:"2" %}
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+</div>
