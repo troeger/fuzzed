@@ -100,6 +100,49 @@ class Node(models.Model):
         else:
             raise ValueError('Node %s has unsupported kind' % (str(self)))
 
+    def get_attr(self, key):
+        """
+        Method: get_attr
+
+        Use this method to fetch a node's attribute. It looks in the node object and its related properties.
+
+        Parameters:
+            {string} key - The name of the attribute.
+
+        Returns:
+            {attr} The found attribute. Raises a ValueError if no attribute for the given key exist.
+        """
+        if hasattr(self, key):
+            return getattr(self, key)
+        else:
+            try:
+                prop = self.properties.get(key=key)
+                return prop.value
+            except Exception:
+                raise ValueError()
+
+    def set_attr(self, key, value):
+        """
+        Method: set_attr
+
+        Use this method to set a node's attribute. It looks in the node object and its related properties for
+        an attribute with the given name and changes it. If non exist, a new property is added saving this attribute.
+
+        Parameters:
+            {string} key - The name of the attribute.
+            {attr} value - The new value that should be stored.
+        """
+        if hasattr(self, key):
+            # special treatment for numeric fields
+            if key == 'x' or key == 'y':
+                setattr(self, key, int(value))
+            else:
+                setattr(self, key, value)
+        else:
+            prop = self.properties.get_or_create(key=key)
+            prop.value = value
+            prop.save()
+
 # the handler will ensure that the kind of the node is present in its containing graph notation
 @receiver(pre_save, sender=Node)
 def validate(sender, instance, raw, **kwargs):
