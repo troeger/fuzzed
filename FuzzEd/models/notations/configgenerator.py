@@ -2,14 +2,18 @@ import json
 import copy
 import collections
 import os
+import xml.dom.minidom as xml
 
 from django.core.exceptions import MiddlewareNotUsed
 
 from FuzzEd.models import notations
+from FuzzEd.settings import STATICFILES_DIRS
 
 class Generator(object):
     def __init__(self, config):
         self.config = copy.deepcopy(config)
+        self.kind   = config['kind']
+        self.nodes  = config['nodes']
         self.__flat__()
 
     def __flat__(self):
@@ -44,16 +48,37 @@ class Generator(object):
                 merged[key] = node[key]
         return merged
 
-    def generate(self, name):
-        # TODO: improve this; use the STATIC_URL dir from settings.py and define CONFIG subdir also
-        path = os.getcwd() + '/FuzzEd/static/config/' + name
-        handle = open(path, 'w')
-        handle.write(json.dumps(self.config))
-        handle.close()
+    def generate(self):
+        cwd = os.getcwd()
+
+        for directory in STATICFILES_DIRS:
+            # generate the configuration files
+            path = '%s/%s/config/%s.json' % (cwd, directory, self.kind)
+            handle = open(path, 'w')
+            handle.write(json.dumps(self.config))
+            handle.close()
+
+            # adjust the svgs
+            for node_kind, node in self.nodes.items():
+                if not 'image' in node: continue
+
+                img_path         = '%s/%s/img/nodes/%s' % (cwd, directory, node['image'])
+
+                img_read_handle  = open(img_path, 'r')
+                document = xml.parse(img_read_handle)
+                img_read_handle.close()
+
+                svg      = document.getElementsByTagName('svg')[0]
+                svg.setAttribute('id', node_kind)
+                svg.setAttribute('label', node['name'])
+
+                img_write_handle = open(img_path, 'w')
+                img_write_handle.write(document.toxml())
+                img_write_handle.close()
 
 class ConfigGenerator:
     def __init__(self):
         for notation in notations.installed:
-            Generator(notation).generate(notation['kind'] + '.json')
+            Generator(notation).generate()
 
         raise MiddlewareNotUsed()

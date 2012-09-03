@@ -5,6 +5,7 @@
             {% cycle '<tr>' '' %}
                 <td class="right-tooltip" title="{{ node.help }}">
                     {% include node.image %}
+                    <span>{{ node.name }}</span>
                 </td>
             {% cycle '' '</tr>' %}
         {% else %}

@@ -70,9 +70,7 @@
     vertical-align: top;
 }
 
-#FuzzEdShapes td svg::after {
-    content: attr(label);
-    
+#FuzzEdShapes td span {
     display: block;
     margin-bottom: 10px;
 
