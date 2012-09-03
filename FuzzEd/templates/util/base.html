@@ -6,31 +6,28 @@
     <title>{% block title %}FuzzEd{% endblock %}</title>
 
     <style type="text/css">
+        {% block style %}
         @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap.min.css");
         @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap-responsive.min.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         @import url("{{ STATIC_URL }}css/util.css");
-        {% block style %}
         {% endblock %}
     </style>
 
     {% block script %}
-    <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
-    <script src="{{ STATIC_URL }}lib/bootstrap/js/bootstrap-2.0.4.min.js" type="text/javascript" language="javascript"></script>
-    {% endblock %}
-
     <script type="text/javascript">
         $(document).ready( function(){
             $(".alert").fadeIn().delay(1500).fadeOut();
         });
     </script>
-
+    {% endblock %}
 </head>
 
 <body>
     <div class="navbar navbar-fixed-top">
         <div class="navbar-inner">
             <div class="container">
+                <a class="brand" anchor="#">FuzzEd</a>
                 <ul class="nav pull-right">
                     <li class="{% block navigation_home %}{% endblock %}">
                         <a href="/">
@@ -53,7 +50,6 @@
                     </li>
                     {% endif %}
                 </ul>
-                <a class="brand" anchor="#">FuzzEd</a>
             </div>
         </div>
     </div>

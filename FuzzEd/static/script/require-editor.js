@@ -1,4 +1,5 @@
-define(['require', 'require-config', 'require-nodes', 'require-backend', 'require-editor-menus', 'require-editor-selection', 'require-oop'],
+define(['require', 'require-config', 'require-nodes', 'require-backend', 
+        'require-editor-menus', 'require-editor-selection', 'require-oop'],
     function(require, Config, Nodes, Backend, Menus, Selection, Class) {
 
     /*
@@ -13,7 +14,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend', 'requir
         _background: undefined,
 
         init: function(graphId) {
-            // locate own DOM elements and bind Editor instance to canvas
+            // locate predefined DOM elements and bind Editor instance to canvas
             this._canvas     = jQuery('#' + Config.IDs.CANVAS);
             this._background = this._canvas.svg().svg('get');
             this._canvas.data(Config.Keys.EDITOR, this);
@@ -24,8 +25,8 @@ define(['require', 'require-config', 'require-nodes', 'require-backend', 'requir
             this.selection  = new Selection();
 
             // run a few sub initializer
-            this._setupBackground();
             this._setupCanvas();
+            this._setupBackground();
             this._setupJsPlumb();
             this._setupKeyBindings();
             this._setupAjaxHandler();
@@ -39,6 +40,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend', 'requir
 
         graph: function(newGraph) {
             if (typeof newGraph === 'undefined') return this._graph;
+            // TODO: on set full rendering of new graph required
             this._graph = newGraph;
             return this;
         },
@@ -67,6 +69,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend', 'requir
                 y: Math.round((y - Config.Grid.HALF_SIZE) / Config.Grid.SIZE)
             }
         },
+
         toPixel: function(first, second) {
             var x = Number.NaN;
             var y = Number.NaN;
@@ -150,7 +153,8 @@ define(['require', 'require-config', 'require-nodes', 'require-backend', 'requir
 
         _loadGraphError: function(graph, response, textStatus, errorThrown) {
             this.graph(graph);
-            alert('Could not find your graph in the database, creating a new one');
+            // TODO: this alert is weird. just do it or 404?
+            alert('Could not find your graph in the database');
         },
 
         _loadGraphFromJson: function(json) {
@@ -189,12 +193,13 @@ define(['require', 'require-config', 'require-nodes', 'require-backend', 'requir
 
             // pick the right graph class depending on the type
             if (json.type == 'fuzztree') {
-                require(['require-fuzztreegraph'], constructGraph.bind(this));
+                require(['require-fuzztree'], constructGraph.bind(this));
             } else if (json.type == 'faulttree') {
-                require(['require-faulttreegraph'], constructGraph.bind(this));
+                require(['require-faulttree'], constructGraph.bind(this));
             } else if (json.type == 'rbd') {
-                require(['require-rbdgraph'], constructGraph.bind(this));
+                require(['require-rbdg'], constructGraph.bind(this));
             } else {
+                // TODO: maybe an "unknown graph type"-error here?
                 require(['require-graph'], constructGraph.bind(this));
             }
         },
@@ -211,7 +216,6 @@ define(['require', 'require-config', 'require-nodes', 'require-backend', 'requir
 
         _setupBackground: function() {
             this._drawGrid();
-
             // clicks on the canvas clear the selection
             this._canvas.click(this.selection.clear.bind(this.selection));
             // redraw the background grid when the window resizes
@@ -221,7 +225,8 @@ define(['require', 'require-config', 'require-nodes', 'require-backend', 'requir
         _setupCanvas: function() {
             // make canvas droppable for shapes from the shape menu
             this._canvas.droppable({
-                accept:    '.' + Config.Classes.NODE_THUMBNAIL,
+                accept:    'svg',
+                //accept:    '.' + Config.Classes.NODE_THUMBNAIL,
                 tolerance: 'fit',
                 drop:      this._shapeDropped.bind(this)
             });
@@ -262,6 +267,9 @@ define(['require', 'require-config', 'require-nodes', 'require-backend', 'requir
                 // hitting delete removes the current selection from the canvas
                 if (eventObject.which === jQuery.ui.keyCode.DELETE) {
                     this.selection.remove();
+
+                } else if (eventObject.which === jQuery.ui.keyCode.ESCAPE) {
+                    this.selection.clear()
                 }
             }.bind(this));
         },

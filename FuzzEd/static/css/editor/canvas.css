@@ -1,5 +1,6 @@
-#FuzzedCanvas {
+#FuzzEdCanvas {
     position:         relative;
+    width:            100%;
     height:           100%;
     overflow:         auto;
     background-color: white;
@@ -7,7 +8,7 @@
 }
 
 .fuzzed-node {
-    text-align: center;;
+    text-align: center;
 }
 
 .fuzzed-node-image {

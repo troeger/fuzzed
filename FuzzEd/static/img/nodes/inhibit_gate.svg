@@ -1,74 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="50"
-   height="50.3125"
-   id="svg4011"
-   version="1.1"
-   inkscape:version="0.48.2 r9819"
-   sodipodi:docname="inhibit_gate.svg">
-  <defs
-     id="defs4013" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="3.68"
-     inkscape:cx="-56.875819"
-     inkscape:cy="25.430943"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     showgrid="true"
-     showguides="false"
-     inkscape:window-width="1600"
-     inkscape:window-height="1178"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0">
-    <inkscape:grid
-       type="xygrid"
-       id="grid4019"
-       empspacing="5"
-       visible="true"
-       enabled="true"
-       snapvisiblegridlinesonly="true" />
-  </sodipodi:namedview>
-  <metadata
-     id="metadata4016">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     inkscape:label="Ebene 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(0.625,-1002.375)">
-    <path
-       style="fill:#ffffff;stroke:#000000;stroke-width:1.99987709999999996;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;fill-opacity:1"
-       d="m 24.375,1003.6874 -24.00006144,14.4 0,19.2001 24.00006144,14.4001 24.000061,-14.4001 0,-19.2001 z"
-       id="path5384"
-       inkscape:connector-curvature="0" />
-  </g>
+<svg xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg"
+     width="36" height="36" version="1.1">
+    <g id="inhibit-gate">
+    <path style="fill:#ffffff; stroke:#000000; stroke-width:1.4;"
+          d="M 17.5,0.7 L 34.3,11 34.3,24 17.5,34.3 0.7,24 0.7,11 z" />
+    </g>
 </svg>
