@@ -16,11 +16,12 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 # REASON: but abort the transaction. The custom exceptions can be found in middleware.py
 
 from FuzzEd.decorators import require_ajax
-from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
+from FuzzEd.middleware import HttpResponse,HttpResponseNotAllowedAnswer, HttpResponseNoResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, Edge, notations, commands
 from FuzzEd.backend import MinBool
 
 import logging
+
 logger = logging.getLogger('FuzzEd')
 
 try:
@@ -30,9 +31,9 @@ except ImportError:
     import simplejson as json
 
 @login_required
+@csrf_exempt
 @require_ajax
 @require_http_methods(['GET', 'POST'])
-@csrf_exempt
 @transaction.commit_on_success
 def graphs(request):
     """
@@ -86,9 +87,9 @@ def graphs(request):
     raise HttpResponseServerErrorAnswer()
 
 @login_required
+@csrf_exempt
 @require_ajax
 @require_GET
-@csrf_exempt
 def graph(request, graph_id):
     """
     Function: graph
@@ -111,9 +112,9 @@ def graph(request, graph_id):
     return HttpResponse(graph.to_json(), 'application/javascript')
     
 @login_required
+@csrf_exempt
 @require_ajax
 @require_POST
-@csrf_exempt
 @transaction.commit_on_success
 def nodes(request, graph_id):
     """
@@ -160,85 +161,50 @@ def nodes(request, graph_id):
         raise HttpResponseServerErrorAnswer()
 
 @login_required
-@require_ajax
 @csrf_exempt
+@require_ajax
+@require_http_methods(['DELETE', 'POST'])
 @transaction.commit_on_success
 def node(request, graph_id, node_id):
     """
-    Delete node from graph stored in the backend
-    API Request:  DELETE /api/graphs/[graphID]/nodes/[nodeID], no body
-    API Response: no body, status code 204
+    Function: node
+        API handler for all actions on one specific node. This includes changing attributes of a node
+        or deleting it.
 
-    Change property of a node
-    API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]
-    API Request Parameters: key=... , value=...
-    API Response:           no body, status code 204
+        Request:            POST - /api/graphs/<GRAPH_ID>/nodes/<NODE_ID>
+        Request Parameters: any key-value pairs of attributes that should be changed
+        Response:           204 - JSON representation of the node
 
-    Change position of a node
-    API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]
-    API Request Parameters: xcoord=... , ycoord=...
-    API Response:           no body, status code 204
+        Request:            DELETE - /api/graphs/<GRAPH_ID>/nodes/<NODE_ID>
+        Request Parameters: none
+        Response:           204
 
-    Morph node to another type
-    API Request:            POST /api/graphs/[graphID]/nodes/[nodeID]
-    API Request Parameters: type=[NODE_TYPE]
-    API Response:           no body, status code 204
+    Parameters:
+        {HTTPRequest} request   - the django request object
+        {int}         graph_id  - the id of the graph where the edge shall be added
+        {int}         node_id   - the id of the node that should be changed/deleted
+
+    Returns:
+        {HTTPResponse} a django response object
     """
-    if request.is_ajax():
-        try:
-            g=Graph.objects.get(pk=graph_id, deleted=False)
-            n=Node.objects.get(graph=g, client_id=node_id, deleted=False)
-        except:
-            raise HttpResponseBadRequestAnswer()
-        if request.method == 'DELETE':
-            # delete node
-            try:
-                # remove edges explicitly to keep history
-                for e in n.outgoing.all():
-                    e.deleted=True
-                    e.save()
-                    #c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
-                    #c.save()
-                for e in n.incoming.all():
-                    e.deleted=True
-                    e.save()
-                    #c=History(command=Commands.DEL_EDGE, graph=g, edge=e)
-                    #c.save()
-                n.deleted=True
-                n.save()
-                #c=History(command=Commands.DEL_NODE, graph=g, node=n)
-                #c.save()
-            except:
-                raise HttpResponseBadRequestAnswer()                        
-            else:
-                return HttpResponseNoResponse()
-        elif request.method == 'POST':
-            if 'xcoord' in request.POST and 'ycoord' in request.POST and 'parent' in request.POST:
-                try:
-                    oldxcoord=n.x
-                    oldycoord=n.y
-                    n.x = request.POST['xcoord']
-                    n.y = request.POST['ycoord']
-                    n.save()
-                    #c=History(command=Commands.CHANGE_COORD, graph=g, node=n, oldxcoord=oldxcoord, oldycoord=oldycoord)
-                    #c.save()
-                except:
-                    raise HttpResponseBadRequestAnswer()
-                return HttpResponseNoResponse()
-            elif 'key' in request.POST and 'value' in request.POST:
-                #setNodeProperty(n, request.POST['key'], request.POST['value'])
-                return HttpResponseNoResponse()
-            elif 'type' in request.POST:
-                #TODO change node type          
-                return HttpResponseNoResponse()
-            else:
-                raise HttpResponseBadRequestAnswer()
-        raise HttpResponseNotAllowedAnswer(['DELETE','POST'])
+    node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id, deleted=False)
+
+    if request.method == 'POST':
+        command = commands.ChangeNode.create_from(graph_id, node_id, **request.POST.dict())
+        command.do()
+        # return the updated node object
+        return HttpResponse(node.to_json(), 'application/javascript', status=204)
+
+    elif request.method == 'DELETE':
+        command = commands.DeleteNode.create_from(graph_id, node_id)
+        command.do()
+        return HttpResponse(status=204)
+
 
 @login_required
+@csrf_exempt
 @require_ajax
 @require_POST
-@csrf_exempt
 @transaction.commit_on_success
 def edges(request, graph_id):
     """
@@ -282,10 +248,10 @@ def edges(request, graph_id):
         raise HttpResponseServerErrorAnswer()
 
 @login_required
+@csrf_exempt
 @require_ajax
 @require_http_methods(['DELETE'])
 @transaction.commit_on_success
-@csrf_exempt
 def edge(request, graph_id, edge_id):
     """
     Function: edge
@@ -326,9 +292,9 @@ def property(**kwargs):
     pass
 
 @login_required
+@csrf_exempt
 @require_ajax
 @require_http_methods(["GET", "POST"])
-@csrf_exempt
 @transaction.commit_on_success
 def undos(request, graph_id):
     #
@@ -353,9 +319,9 @@ def undos(request, graph_id):
         return HttpResponseNoResponse()
 
 @login_required
+@csrf_exempt
 @require_ajax
 @require_http_methods(["GET", "POST"])
-@csrf_exempt
 @transaction.commit_on_success
 def redos(request, graph_id):
     #
@@ -379,9 +345,9 @@ def redos(request, graph_id):
         return HttpResponseNoResponse()
 
 @login_required
+@csrf_exempt
 @require_ajax
 @require_GET
-@csrf_exempt
 @transaction.commit_on_success
 def cutsets(request, graph_id):
     """

@@ -221,6 +221,9 @@ class ChangeNode(Command):
 
     Command that is issued when properties of a node change
     """
+
+    node = models.ForeignKey(Node, related_name='+')
+
     @classmethod
     def create_from(cls, graph_id, node_id, **updated_properties):
         """
@@ -237,16 +240,18 @@ class ChangeNode(Command):
         Returns:
          {<ChangeNode>}  - the property changed command instance
         """
-        command = cls()
+        node = Node.objects.get(client_id=node_id, graph_id=graph_id)
+        command = cls(node=node)
         command.save()
 
-        for key, value in updated_properties:
-            # TODO: treat x and y keys extra (move node)
-            node_property, created = Property.objects.get_or_create(key=key, \
-                                                                    node__client_id=int(node_id),\
-                                                                    node__graph__pk=int(graph_id))
-            property_change = PropertyChange(command=command, property=node_property,\
-                                             old_value=node_property.value, new_value=value)
+        for key, value in updated_properties.items():
+            old_val = ''
+            try:
+                old_val = node.get_attr(key)
+            except ValueError:
+                pass
+
+            property_change = PropertyChange(command=command, key=key, old_value=old_val, new_value=value)
             property_change.save()
 
         return command
@@ -255,28 +260,26 @@ class ChangeNode(Command):
         """
         Method: do
         
-        Apply the change to the property - i.e. set the new value
+        Apply the change to the node or it's corresponding property - i.e. set the new value
 
         Returns:
          {None}
         """
-        for change in self.changes:
-            change.property.value = change.new_value
-            change.property.save()
+        for change in self.changes.all():
+            self.node.set_attr(change.key, change.new_value)
         self.save()
 
     def undo(self):
         """
         Method: undo
         
-        Reverts the changes to the property - i.e. set old value
+        Reverts the changes to the node or it's corresponding property - i.e. set old value
 
         Returns:
          {None}
         """
         for change in self.changes:
-            change.property.value = change.old_value
-            change.property.save()
+            self.node.set_attr(change.old_value)
         self.save()
 
 class PropertyChange(models.Model):
@@ -289,7 +292,6 @@ class PropertyChange(models.Model):
     
     Attributes:
      {<ChangeNode>} command   - the command this property change belongs to
-     {<Property>}   property  - the actual property that changed
      {str}          old_value - the value of the property before the change
      {str}          new_value - the updated value
     """
@@ -297,7 +299,7 @@ class PropertyChange(models.Model):
         app_label = 'FuzzEd'
 
     command   = models.ForeignKey(ChangeNode, related_name='changes')
-    property  = models.ForeignKey(Property, related_name='+')
+    key       = models.CharField(max_length=255)
     old_value = models.CharField(max_length=255)
     new_value = models.CharField(max_length=255)
 

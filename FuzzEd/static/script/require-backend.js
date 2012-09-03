@@ -234,8 +234,8 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
     Backend.moveNode = function(node, position, success, error, complete) {
         var url = URLHelper.fullUrlForNode(node);
         var data = {
-            xcoord: position.x,
-            ycoord: position.y
+            x: position.x,
+            y: position.y
         }
 
         jQuery.ajax({
