@@ -172,10 +172,9 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
 
                 // draw the nodes on the canvas
                 _.each(graph.getNodes(), function(node, index) {
-                    var position = this.toPixel(jsonNodes[index].position);
+                    node._editor = this;
                     node.appendTo(this._canvas)
-                        .moveTo(position.x, position.y)
-                        ._editor = this;
+                        .moveTo(node.x, node.y)
                 }.bind(this));
 
                 // connect the nodes again
@@ -283,15 +282,14 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
             var node        = Nodes.newNodeForType(uiObject.draggable.attr('id'));
             var offset      = this._canvas.offset();
             var gridCoords  = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
-            var pixelCoords = this.toPixel(gridCoords);
 
+            node._editor = this;
             node.appendTo(this._canvas)
-                .moveTo(pixelCoords.x, pixelCoords.y)
-                ._editor = this;
+                .moveTo(gridCoords.x, gridCoords.y)
             this.graph().addNode(node);
             this.selection.ofNodes(node);
 
-            Backend.addNode(node, gridCoords);
+            Backend.addNode(node);
         }
     });
 

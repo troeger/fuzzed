@@ -95,13 +95,17 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         },
 
         moveTo: function(x, y) {
+            this.x = x;
+            this.y = y;
+
+            var pixelPos = this._editor.toPixel(x, y);
             var image = this._nodeImage;
             var offsetX = image.position().left + image.outerWidth(true) / 2;
             var offsetY = image.position().top  + image.outerHeight(true) / 2;
 
             this._container.css({
-                left: x - offsetX || 0,
-                top:  y - offsetY || 0
+                left: pixelPos.x - offsetX || 0,
+                top:  pixelPos.y - offsetY || 0
             });
 
             return this;

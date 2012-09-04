@@ -69,18 +69,17 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
 
          Parameters:
              node     - The node object
-             position - Position object containing an 'x' and an 'y' field specifying the node's position.
              success  - [optional] Will be called on successful node creation transmission to server
              error    - [optional] Callback that gets called in case of an ajax-error.
              complete - [optional] Callback that is invoked when the ajax request completes successful or erroneous
      */
-    Backend.addNode = function(node, position, success, error, complete) {
+    Backend.addNode = function(node, success, error, complete) {
         var url = URLHelper.fullUrlForNodes(node.graph());
         var data = {
             id:         node.id,
-            kind:       node.type,
-            x:          position.x,
-            y:          position.y
+            kind:       node.kind,
+            x:          node.x,
+            y:          node.y
         };
 
         var successCallback = function(json) {
