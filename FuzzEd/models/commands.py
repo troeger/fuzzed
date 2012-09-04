@@ -74,9 +74,10 @@ class AddEdge(Command):
         Returns:
          {<AddEdge>} the add edge command instance
         """
-        source = Node.objects.get(client_id=int(from_id), graph__pk=int(graph_id))
-        target = Node.objects.get(client_id=int(to_id), graph__pk=int(graph_id))
-        edge   = Edge(client_id=int(client_id), source=source, target=target, deleted=True)
+        graph  = Graph.objects.get(pk=int(graph_id))
+        source = Node.objects.get(client_id=int(from_id), graph=graph)
+        target = Node.objects.get(client_id=int(to_id), graph=graph)
+        edge   = Edge(client_id=int(client_id), graph=graph, source=source, target=target, deleted=True)
         edge.save()
 
         return cls(edge=edge)
@@ -240,7 +241,7 @@ class ChangeNode(Command):
         Returns:
          {<ChangeNode>}  - the property changed command instance
         """
-        node = Node.objects.get(client_id=node_id, graph_id=graph_id)
+        node = Node.objects.get(client_id=node_id, graph__pk=graph_id)
         command = cls(node=node)
         command.save()
 
@@ -332,7 +333,7 @@ class DeleteEdge(Command):
         Returns:
          {<DeleteEdge>}  - the delete edge command instance
         """
-        edge = Edge.objects.get(client_id=int(edge_id), source__graph__pk=int(graph_id))
+        edge = Edge.objects.get(client_id=int(edge_id), graph__pk=int(graph_id))
         return cls(edge=edge)
 
     def do(self):

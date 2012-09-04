@@ -60,12 +60,10 @@ class Graph(models.Model):
         Returns:
          {dict} the graph as dictionary
         """
-        nodeset = self.nodes.filter(deleted=False).all()
-        nodes   = [node.to_dict() for node in nodeset]
-        edges   = []
-        for node in nodeset:
-            edgeset = node.outgoing.filter(deleted=False).all()
-            edges.extend([edge.to_dict() for edge in edgeset])
+        node_set = self.nodes.filter(deleted=False)
+        edge_set = self.edges.filter(deleted=False)
+        nodes   = [node.to_dict() for node in node_set]
+        edges   = [edge.to_dict() for edge in edge_set]
 
         return {
             'id':    self.pk,

@@ -7,6 +7,7 @@ except ImportError:
     import simplejson as json
 
 from node import Node
+from graph import Graph
 
 class Edge(models.Model):
     """
@@ -24,8 +25,9 @@ class Edge(models.Model):
         app_label = 'FuzzEd'
 
     client_id = models.BigIntegerField()
-    source    = models.ForeignKey(Node, null=False, related_name='outgoing')
-    target    = models.ForeignKey(Node, null=False, related_name='incoming')
+    graph     = models.ForeignKey(Graph, null=False, related_name='edges')
+    source    = models.ForeignKey(Node,  null=False, related_name='outgoing')
+    target    = models.ForeignKey(Node,  null=False, related_name='incoming')
     deleted   = models.BooleanField(default=False)
     #TODO: maybe add a reference to the graph. this would simplify the JSON-serialization of the graph
 
@@ -55,6 +57,7 @@ class Edge(models.Model):
         """
         return {
             'id':     self.client_id,
+            'graph':  self.graph.pk,
             'source': self.source.client_id,
             'target': self.target.client_id
         }
