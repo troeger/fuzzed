@@ -140,8 +140,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
         _loadGraph: function(graphId) {
             Backend.getGraph(graphId,
                 this._loadGraphFromJson.bind(this),
-                this._loadGraphError.bind(this),
-                this._loadGraphCompleted.bind(this)
+                this._loadGraphError.bind(this)
             );
             return this;
         },
@@ -185,6 +184,8 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
                     edge._fuzzedID = jsonEdge.id;
                     graph.addEdge(edge);
                 }.bind(this));
+
+                this._loadGraphCompleted();
             }
 
             // pick the right graph class depending on the type

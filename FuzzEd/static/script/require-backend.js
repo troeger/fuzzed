@@ -24,7 +24,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         },
 
         fullUrlForEdge: function(edge) {
-            var graph = edge.source.data(Config.Keys.NODE).graph;
+            var graph = edge.source.data(Config.Keys.NODE).graph();
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + graph.id
                 + Config.Backend.EDGES_URL + '/' + edge._fuzzedID;
         }

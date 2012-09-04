@@ -271,7 +271,7 @@ def edge(request, graph_id, edge_id):
      {HTTPResponse} a django response object
     """
     try:
-        commands.DeleteEdge(graph_id, edge_id).do()
+        commands.DeleteEdge.create_from(graph_id=graph_id, edge_id=edge_id).do()
         return HttpResponse(status=204)
 
     except ValueError:

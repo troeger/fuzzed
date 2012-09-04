@@ -332,7 +332,8 @@ class DeleteEdge(Command):
         Returns:
          {<DeleteEdge>}  - the delete edge command instance
         """
-        return cls(Edge.objects.get(client_id=int(edge_id), node__graph__pk=int(graph_id)))
+        edge = Edge.objects.get(client_id=int(edge_id), source__graph__pk=int(graph_id))
+        return cls(edge=edge)
 
     def do(self):
         """
