@@ -46,10 +46,17 @@
     background-color:       #409FFF;
     position:               absolute;
     visibility:             hidden;
-    top:                    50px;
-    left:                   18px;
+    top:                    56px;
+    left:                   19px;
     z-index:                150; /* above image, TODO: let halo care about that */
     cursor:                 move;
+    -webkit-border-radius:  7px;
+    -moz-border-radius:     7px;
+    border-radius:          7px;
+    /* fix for bootstrap icon looking strange in a circle */
+    width:                  15px;
+    height:                 15px;
+    background-position:    -407px -96px;
 }
 
 .fuzzed-node-selected .fuzzed-node-halo-connect {

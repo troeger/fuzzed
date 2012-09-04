@@ -416,7 +416,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             nodeImage.groups = nodeImage.find('g');
 
             if (this.numberOfIncomingConnections != 0) {
-                var connectionHandle = jQuery('<span class="ui-icon ui-icon-plus ui-icon-shadow"></span>')
+                var connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
                     .addClass(Config.Classes.NODE_HALO_CONNECT)
                     .appendTo(container);
             }
