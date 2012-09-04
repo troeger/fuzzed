@@ -1,5 +1,5 @@
 define(function() {
-    var GRID_SIZE   = 54;
+    var GRID_SIZE   = 53;
     var LABEL_WIDTH = GRID_SIZE << 1;
 
     return {

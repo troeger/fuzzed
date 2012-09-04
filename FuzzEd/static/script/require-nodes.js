@@ -288,14 +288,16 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
         _setupEndpoints: function() {
             // get upper and lower image offsets
             if (typeof this.optional === 'undefined' || this.optional == null) {
-                var topOffset    = this._nodeImage.offset().top - this._container.offset().top;
+                var topOffset = this._nodeImage.offset().top - this._container.offset().top;
             } else {
                 var optionalIndicatorWrapper = jQuery(this._optionalIndicator._container);
-                var topOffset    = optionalIndicatorWrapper.offset().top - this._container.offset().top;
+                var topOffset = optionalIndicatorWrapper.offset().top - this._container.offset().top;
+                topOffset += 1; // fine-tuning
             }
             topOffset -= this.connector.offset.top;
             var bottomOffset = this._nodeImage.offset().top - this._container.offset().top + this._nodeImage.height();
             bottomOffset += this.connector.offset.bottom;
+            bottomOffset -= 2; // fine-tuning
 
             // make node source
             if (this.numberOfIncomingConnections != 0) {
