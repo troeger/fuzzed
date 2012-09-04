@@ -132,7 +132,7 @@ CONFIG = {
         'topEvent': {
             'inherits': 'event',
             'name': u'Top Event',
-            'image': 'intermediate_event.svg',
+            'image': 'top_event.svg',
             'excludeFromShapesMenu': True
         },
 
