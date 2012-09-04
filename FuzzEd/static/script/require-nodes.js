@@ -124,13 +124,13 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             this._container.removeClass(Config.Classes.NODE_SELECTED);
 
             if (this._highlighted) {
-                this._nodeImage.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+                this._nodeImage.primitives.css('stroke', Config.Node.STROKE_HIGHLIGHTED);
                 this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
                 if (!this.optional) {
                     this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
                 }
             } else {
-                this._nodeImage.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+                this._nodeImage.primitives.css('stroke', Config.Node.STROKE_NORMAL);
                 this._optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
                 if (!this.optional) {
                     this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
@@ -142,7 +142,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
 
         disable: function() {
             this._disabled = true;
-            this._container.find('path').css('stroke', Config.Node.STROKE_DISABLED);
+            this._nodeImage.primitives.css('stroke', Config.Node.STROKE_DISABLED);
             this._optionalIndicator.attr('stroke', Config.Node.STROKE_DISABLED);
             if (!this.optional) {
                 this._optionalIndicator.attr('fill', Config.Node.STROKE_DISABLED);
@@ -155,19 +155,19 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             this._disabled = false;
 
             if (this._selected) {
-                this._container.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+                this._nodeImage.primitives.css('stroke', Config.Node.STROKE_SELECTED);
                 this._optionalIndicator.attr('stroke', Config.Node.STROKE_SELECTED);
                 if (!this.optional) {
                     this._optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
                 }
             } else if (this._highlighted) {
-                this._container.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+                this._nodeImage.primitives.css('stroke', Config.Node.STROKE_HIGHLIGHTED);
                 this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
                 if (!this.optional) {
                     this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
                 }
             } else {
-                this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+                this._nodeImage.primitives.css('stroke', Config.Node.STROKE_NORMAL);
                 this._optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
                 if (!this.optional) {
                     this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
@@ -183,13 +183,13 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             if (this._selected || this._disabled) return this;
 
             if (this._highlighted) {
-                this._container.find('path').css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+                this._nodeImage.primitives.css('stroke', Config.Node.STROKE_HIGHLIGHTED);
                 this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
                 if (!this.optional) {
                     this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
                 }
             } else {
-                this._container.find('path').css('stroke', Config.Node.STROKE_NORMAL);
+                this._nodeImage.primitives.css('stroke', Config.Node.STROKE_NORMAL);
                 this._optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
                 if (!this.optional) {
                     this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
@@ -205,7 +205,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
 
             this._selected = true;
             this._container.addClass(Config.Classes.NODE_SELECTED);
-            this._nodeImage.find('path').css('stroke', Config.Node.STROKE_SELECTED);
+            this._nodeImage.primitives.css('stroke', Config.Node.STROKE_SELECTED);
             this._optionalIndicator.attr('stroke', Config.Node.STROKE_SELECTED);
             if (!this.optional) {
                 this._optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
@@ -237,19 +237,16 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
 
 
         _resize: function() {
-            // find the node's svg element and path groups
-            var image = this._container.children('.' + Config.Classes.NODE_IMAGE);
-            var svg   = image.children('svg');
-            var g     = svg.children('g');
-
             // calculate the scale factor
-            var marginOffset = image.outerWidth(true) - image.width();
-            var scaleFactor  = (Config.Grid.SIZE - marginOffset) / svg.height();
+            var marginOffset = this._nodeImage.outerWidth(true) - this._nodeImage.width();
+            var scaleFactor  = (Config.Grid.SIZE - marginOffset) / this._nodeImage.height();
 
             // resize the svg and the groups
-            svg.width (svg.width()  * scaleFactor);
-            svg.height(svg.height() * scaleFactor);
-            g.attr('transform', 'scale(' + scaleFactor + ') ' + g.attr('transform'));
+            this._nodeImage.width(this._nodeImage.width()  * scaleFactor);
+            this._nodeImage.height(this._nodeImage.height() * scaleFactor);
+            this._nodeImage.groups.attr(
+                'transform', 'scale(' + scaleFactor + ') ' + this._nodeImage.groups.attr('transform')
+            );
         },
 
         _setupDragging: function() {
@@ -406,6 +403,10 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
                 // add new classes for the actual node
                 .addClass(Config.Classes.NODE_IMAGE)
                 .appendTo(container);
+
+            // links to primitive shapes and groups of the SVG for later manipulation (highlighting, ...)
+            nodeImage.primitives = nodeImage.find('rect, circle, path');
+            nodeImage.groups = nodeImage.find('g');
 
             if (this.numberOfIncomingConnections != 0) {
                 var connectionHandle = jQuery('<span class="ui-icon ui-icon-plus ui-icon-shadow"></span>')
