@@ -104,39 +104,6 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
     }
 
     /*
-         Function: changeProperty
-             Changes a property of a given node.
-
-         Parameters:
-             node     - The node that's property was changed.
-             key      - The name of the property.
-             value    - The new value for the property.
-             success  - [optional] Callback that gets called on successfall change of the property.
-             error    - [optional] Callback that gets called in case of an ajax-error.
-             complete - [optional] Callback that gets called in both cases - successful and errornous property change.
-     */
-    //TODO: remove
-    Backend.changeProperty = function(node, key, value, success, error, complete) {
-        console.log(value);
-        var url = URLHelper.fullUrlForNode(node);
-        var data = {
-            'key':   key,
-            'value': _.isArray(value) ? JSON.stringify(value) : value
-        }
-
-        jQuery.ajax({
-            url:      url,
-            type:     'POST',
-            dataType: 'json',
-
-            data:     data,
-            success:  success  || jQuery.noop,
-            error:    error    || jQuery.noop,
-            complete: complete || jQuery.noop
-        });
-    }
-
-    /*
      Function: deleteEdge
      Deletes a given edge in the backend.
 
@@ -220,29 +187,25 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
     }
 
     /*
-         Function: moveNode
-             Changes the position of a given node.
+         Function: changeNode
+             Changes the properties of a given node.
 
          Parameters:
-             node     - The node that shall be moved
-             position - The node's destination
-             success  - [optional] Function that is invoked when the node's move was successfully transmitted.
-             error    - [optional] Callback that gets called in case of an ajax-error.
-             complete - [optional] Callback that is always invoked no matter if ajax request was successful or errornous.
+             node       - The node that shall be moved
+             properties - The node's properties that should be changed
+             success    - [optional] Function that is invoked when the node's move was successfully transmitted.
+             error      - [optional] Callback that gets called in case of an ajax-error.
+             complete   - [optional] Callback that is always invoked no matter if ajax request was successful or erroneous.
      */
-    Backend.moveNode = function(node, position, success, error, complete) {
+    Backend.changeNode = function(node, properties, success, error, complete) {
         var url = URLHelper.fullUrlForNode(node);
-        var data = {
-            x: position.x,
-            y: position.y
-        }
 
         jQuery.ajax({
             url:      url,
             type:     'POST',
             dataType: 'json',
 
-            data:     data,
+            data:     properties,
             success:  success  || jQuery.noop,
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop
@@ -276,25 +239,6 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         };
 
         jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
-    }
-
-
-    /*
-         Function: changeNodeType
-             Changes the type of a given Node.
-
-         Parameters:
-             node          - The Node that should be deleted.
-             newType       - The new type of the node. See Config.Node.Types
-             errorCallback - [optional] Callback that gets called in case of an ajax-error.
-     */
-    Backend.changeNodeType = function(node, newType, errorCallback) {
-        var url = URLHelper.fullUrlForNode(node);
-        var data = {
-            'type': newType
-        }
-
-        jQuery.post(url, data).fail(errorCallback || jQuery.noop);
     }
 
     return Backend;

@@ -280,7 +280,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
                         x: this._nodeImage.offset().left - editorOffset.left,
                         y: this._nodeImage.offset().top - editorOffset.top
                     });
-                    Backend.moveNode(this, coordinates);
+                    Backend.changeNode(this, coordinates);
                 }.bind(this)
             });
         },
