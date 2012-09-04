@@ -279,7 +279,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
         },
 
         _shapeDropped: function(uiEvent, uiObject) {
-            var node        = Nodes.newNodeForType(uiObject.draggable.attr('id'));
+            var node        = Nodes.newNodeOfKind(uiObject.draggable.attr('id'));
             var offset      = this._canvas.offset();
             var gridCoords  = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
 

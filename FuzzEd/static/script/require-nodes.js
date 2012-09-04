@@ -436,6 +436,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var Event = Node.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'event';
             return this._super(properties);
         }
@@ -446,6 +447,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var Gate = Node.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'gate';
             return this._super(properties);
         }
@@ -456,6 +458,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var TopEvent = Event.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'topEvent';
             return this._super(properties);
         }
@@ -466,6 +469,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var BasicEvent = Event.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'basicEvent';
             return this._super(properties);
         }
@@ -476,6 +480,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var BasicEventSet = BasicEvent.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'basicEventSet';
             return this._super(properties);
         }
@@ -486,6 +491,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var IntermediateEvent = Event.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'intermediateEvent';
             return this._super(properties);
         }
@@ -496,6 +502,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var IntermediateEventSet = IntermediateEvent.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'intermediateEventSet';
             return this._super(properties);
         }
@@ -506,6 +513,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var AndGate = Gate.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'andGate';
             return this._super(properties);
         }
@@ -516,6 +524,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var OrGate = Gate.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'orGate';
             return this._super(properties);
         }
@@ -526,6 +535,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var XorGate = Gate.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'xorGate';
             return this._super(properties);
         }
@@ -536,6 +546,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var PriorityAndGate = Gate.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'priorityAndGate';
             return this._super(properties);
         }
@@ -546,6 +557,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var VotingOrGate = Gate.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'votingOrGate';
             return this._super(properties);
         }
@@ -556,6 +568,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var InhibitGate = Gate.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'inhibitGate';
             return this._super(properties);
         }
@@ -566,6 +579,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var ChoiceEvent = Event.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'choiceEvent';
             return this._super(properties);
         }
@@ -576,6 +590,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var RedundancyEvent = Event.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'redundancyEvent';
             return this._super(properties);
         }
@@ -586,6 +601,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var UndevelopedEvent = Event.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'undevelopedEvent';
             return this._super(properties);
         }
@@ -596,6 +612,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
      */
     var HouseEvent = Event.extend({
         init: function(properties) {
+            properties = properties || {};
             properties.kind = properties.kind || 'houseEvent';
             return this._super(properties);
         }
