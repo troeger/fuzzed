@@ -242,11 +242,14 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             var scaleFactor  = (Config.Grid.SIZE - marginOffset) / this._nodeImage.height();
 
             // resize the svg and the groups
-            this._nodeImage.width(this._nodeImage.width()  * scaleFactor);
-            this._nodeImage.height(this._nodeImage.height() * scaleFactor);
-            this._nodeImage.groups.attr(
-                'transform', 'scale(' + scaleFactor + ') ' + this._nodeImage.groups.attr('transform')
-            );
+            this._nodeImage.attr('width', this._nodeImage.width()  * scaleFactor);
+            this._nodeImage.attr('height', this._nodeImage.height() * scaleFactor);
+
+            var newTransform = 'scale(' + scaleFactor + ')';
+            if (this._nodeImage.groups.attr('transform')) {
+                newTransform += ' ' + this._nodeImage.groups.attr('transform');
+            }
+            this._nodeImage.groups.attr('transform', newTransform);
         },
 
         _setupDragging: function() {
