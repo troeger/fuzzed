@@ -267,6 +267,7 @@ class ChangeNode(Command):
         """
         for change in self.changes.all():
             self.node.set_attr(change.key, change.new_value)
+        self.node.save()
         self.save()
 
     def undo(self):
@@ -280,6 +281,7 @@ class ChangeNode(Command):
         """
         for change in self.changes:
             self.node.set_attr(change.old_value)
+        self.node.save()
         self.save()
 
 class PropertyChange(models.Model):
