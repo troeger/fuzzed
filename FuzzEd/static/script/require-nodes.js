@@ -254,6 +254,9 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
                 newTransform += ' ' + this._nodeImage.groups.attr('transform');
             }
             this._nodeImage.groups.attr('transform', newTransform);
+
+            // XXX: In Webkit browsers the container div does not resize properly. This should fix it.
+            this._container.width(this._nodeImage.width());
         },
 
         _setupDragging: function() {
