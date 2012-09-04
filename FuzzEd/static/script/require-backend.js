@@ -19,15 +19,14 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
                 + node.graph().id + Config.Backend.NODES_URL + '/' + node.id;
         },
 
-        fullUrlForEdges: function(node) {
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + node.graph().id
-                + Config.Backend.NODES_URL + '/' + node.id + Config.Backend.EDGES_URL;
+        fullUrlForEdges: function(graph) {
+            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + graph.id + Config.Backend.EDGES_URL;
         },
 
         fullUrlForEdge: function(edge) {
-            var node = edge.source.data(Config.Keys.NODE);
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + node.graph().id
-                + Config.Backend.NODES_URL + '/' + node.id + Config.Backend.EDGES_URL + '/' + edge._fuzzedID;
+            var graph = edge.source.data(Config.Keys.NODE).graph;
+            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + graph.id
+                + Config.Backend.EDGES_URL + '/' + edge._fuzzedID;
         }
     }
 
@@ -42,12 +41,13 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         targetNode - Target node of the new edge.
         success    - [optional] Will be called when the request was successful. Provides e.g. the ID of the new edge.
         error      - [optional] Callback that gets called in case of an ajax-error.
-        complete   - [optional] Callback that is invoked in both cases - a succesful or an errornous ajax request
+        complete   - [optional] Callback that is invoked in both cases - a successful or an erroneous ajax request
      */
     Backend.addEdge = function(edgeID, sourceNode, targetNode, success, error, complete) {
-        var url = URLHelper.fullUrlForEdges(sourceNode);
+        var url = URLHelper.fullUrlForEdges(sourceNode.graph());
         var data = {
             id:          edgeID,
+            source:      sourceNode.id,
             destination: targetNode.id
         };
 

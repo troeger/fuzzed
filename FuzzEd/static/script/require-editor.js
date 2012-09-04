@@ -160,13 +160,12 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
         _loadGraphFromJson: function(json) {
             function constructGraph(Graph) {
                 var graph = new Graph(json.id);
-                var jsonNodes = json.nodes;
                 this.graph(graph);
 
                 //TODO: newFromJson for graph
 
                 // parse the json nodes and convert them to node objects
-                _.each(jsonNodes, function(jsonNode) {
+                _.each(json.nodes, function(jsonNode) {
                     graph.addNode(Nodes.newNodeFromJson(jsonNode));
                 });
 
@@ -178,17 +177,15 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
                 }.bind(this));
 
                 // connect the nodes again
-                _.each(jsonNodes, function(jsonNodes) {
-                    _.each(jsonNodes.outgoingEdges, function(edge) {
-                        var connection = jsPlumb.connect({
-                            source: graph.getNodeById(edge.source).container(),
-                            target: graph.getNodeById(edge.target).container()
-                        });
-                        connection._fuzzedID = edge.id;
-                        graph.addEdge(connection);
-                    }.bind(this));
+                _.each(json.edges, function(jsonEdge) {
+                    var edge = jsPlumb.connect({
+                        source: graph.getNodeById(jsonEdge.source).container(),
+                        target: graph.getNodeById(jsonEdge.target).container()
+                    });
+                    edge._fuzzedID = jsonEdge.id;
+                    graph.addEdge(edge);
                 }.bind(this));
-            };
+            }
 
             // pick the right graph class depending on the type
             if (json.type == 'fuzztree') {

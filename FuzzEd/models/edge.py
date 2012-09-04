@@ -27,6 +27,7 @@ class Edge(models.Model):
     source    = models.ForeignKey(Node, null=False, related_name='outgoing')
     target    = models.ForeignKey(Node, null=False, related_name='incoming')
     deleted   = models.BooleanField(default=False)
+    #TODO: maybe add a reference to the graph. this would simplify the JSON-serialization of the graph
 
     def __unicode__(self):
         prefix = '[DELETED] ' if self.deleted else ''
@@ -41,7 +42,7 @@ class Edge(models.Model):
         Returns:
          {dict} the edge as dictionary
         """
-        json.dumps(self.__to_json_dict__())
+        json.dumps(self.to_dict())
 
     def to_dict(self):
         """
