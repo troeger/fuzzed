@@ -65,8 +65,8 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
             }
 
             return {
-                x: Math.round((x - Config.Grid.HALF_SIZE) / Config.Grid.SIZE),
-                y: Math.round((y - Config.Grid.HALF_SIZE) / Config.Grid.SIZE)
+                x: Math.round(x / Config.Grid.SIZE),
+                y: Math.round(y / Config.Grid.SIZE)
             }
         },
 
@@ -84,8 +84,8 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
             }
 
             return {
-                x: x * Config.Grid.SIZE + Config.Grid.SIZE / 2,
-                y: y * Config.Grid.SIZE + Config.Grid.SIZE / 2
+                x: x * Config.Grid.SIZE,
+                y: y * Config.Grid.SIZE
             }
         },
 
@@ -105,7 +105,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
             });
 
             // horizontal lines
-            for (var y = Config.Grid.HALF_SIZE; y < height; y += Config.Grid.SIZE) {
+            for (var y = Config.Grid.SIZE; y < height; y += Config.Grid.SIZE) {
                 this._background.line(0, y, width, y, {
                     stroke:          Config.Grid.STROKE,
                     strokeWidth:     Config.Grid.STROKE_WIDTH,
@@ -114,7 +114,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
             }
 
             // vertical lines
-            for (var x = Config.Grid.HALF_SIZE; x < width; x += Config.Grid.SIZE) {
+            for (var x = Config.Grid.SIZE; x < width; x += Config.Grid.SIZE) {
                 this._background.line(x, 0, x, height, {
                     stroke:          Config.Grid.STROKE,
                     strokeWidth:     Config.Grid.STROKE_WIDTH,
