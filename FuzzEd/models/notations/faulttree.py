@@ -1,3 +1,4 @@
+# TODO: needs rework
 CONFIG = {
     'kind': 'faulttree',
     'name': u'Fault Tree',

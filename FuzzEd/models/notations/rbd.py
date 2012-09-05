@@ -1,3 +1,4 @@
+# TODO: needs rework
 CONFIG = {
     'kind': 'rbd',
     'name': u'Reliability Block Diagram',

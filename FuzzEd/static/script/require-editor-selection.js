@@ -5,9 +5,9 @@ define(['require-config', 'require-nodes', 'require-backend', 'require-oop'], fu
      */
     var Selection = Class.extend({
 
-        _nodes: [], // node objects; not DOM elements
-        _connections: [], // jsPlumb Connection objects
-        _editor: undefined,
+        _nodes: [],         // node objects; not DOM elements
+        _connections: [],   // jsPlumb Connection objects
+        _editor: undefined, // being retrieved in the constructor
 
         init: function() {
             this._editor = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
@@ -47,7 +47,8 @@ define(['require-config', 'require-nodes', 'require-backend', 'require-oop'], fu
         },
 
         contains: function(element) {
-            return _.indexOf(this._nodes, element) >= 0 || _.indexOf(this._connections, element) >= 0;
+            return _.indexOf(this._nodes, element) >= 0 
+                || _.indexOf(this._connections, element) >= 0;
         },
 
         /**

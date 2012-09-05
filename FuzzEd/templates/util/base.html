@@ -15,9 +15,12 @@
     </style>
 
     {% block script %}
+    {{ block.super }}
+    <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
     <script type="text/javascript">
-        $(document).ready( function(){
-            $(".alert").fadeIn().delay(1500).fadeOut();
+        jQuery(document).ready( function(){
+            // TODO: make this well
+            jQuery(".alert").fadeIn().delay(1500).fadeOut();
         });
     </script>
     {% endblock %}
@@ -57,7 +60,7 @@
     {% block body %}
     <div class="container space-top">
         {% if messages %}
-            <div style="position: absolute; top: 8%; width: 93%">
+            <div style="position: relative; margin-top: -40px; top: 0; width: 100%">
             {% for message in messages %}
                 {% if message.tags == "success" %}
                     <div class="alert alert-success hide">

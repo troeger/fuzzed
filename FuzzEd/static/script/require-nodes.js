@@ -1,4 +1,6 @@
-define(['require-config','json!config/fuzztree.json', 'require-properties', 'require-backend', 'require-oop', 'jsplumb', 'jquery.svg'], function(Config, FuzztreeConfig, Properties, Backend, Class) {
+define(['require-config','json!config/fuzztree.json', 'require-properties', 'require-backend', 
+        'require-oop', 'jsplumb', 'jquery.svg'], 
+        function(Config, FuzztreeConfig, Properties, Backend, Class) {
 
     /*
      *  Abstract Node Base Class
@@ -13,13 +15,13 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             // merge all given properties into this object
             jQuery.extend(this, properties);
 
-
             // logic
-            this._editor     = undefined; // will be set when appending
-            this._graph      = undefined; // will be set as soon as it get added to a concrete graph
+            this._editor = undefined; // will be set when appending
+            this._graph  = undefined; // will be set as soon as it get added to a concrete graph
 
             if (typeof this.id === 'undefined') {
-                this.id = new Date().getTime() + 1; // make sure the 0 is not reassigned; it's reserved for the top event
+                // make sure the 0 is not reassigned; it's reserved for the top event
+                this.id = new Date().getTime() + 1; 
             }
 
             // state
@@ -28,10 +30,10 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             this._selected    = false;
 
             // visuals
-            //TODO: maybe move that to a better place
+            // TODO: maybe move that to a better place
             jsPlumb.extend(this.connector, jsPlumb.Defaults.PaintStyle);
 
-            var visuals            = this._setupVisualRepresentation();
+            var visuals             = this._setupVisualRepresentation();
             this._container         = visuals.container;
             this._nodeImage         = visuals.nodeImage;
             this._connectionHandle  = visuals.connectionHandle;
@@ -50,7 +52,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             if (!allowed) return false;
 
             // no connections to the top event
-            //TODO: this can not be covered with the config since 'allowConnectionTo' is the wrong direction
+            // TODO: this can not be covered with the config since 'allowConnectionTo' is the wrong direction
             if (otherNode instanceof TopEvent) return false;
 
             // there is already a connection between these nodes

@@ -23,6 +23,7 @@ for notation in installed:
     node_category_choices = ()
 
     for node_kind, node in nodes.items():
+        if not 'name' in node: continue
         node_category_choices += ((node_kind, node['name']),)
 
     node_category += (node_category_choices,)
