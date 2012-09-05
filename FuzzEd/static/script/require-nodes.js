@@ -1,6 +1,6 @@
-define(['require-config','json!config/fuzztree.json', 'require-properties', 'require-backend', 
-        'require-oop', 'jsplumb', 'jquery.svg'], 
-        function(Config, FuzztreeConfig, Properties, Backend, Class) {
+define(['require-config','json!config/fuzztree.json', 'require-mirror', 'require-properties', 
+        'require-backend', 'require-oop', 'jsplumb', 'jquery.svg'], 
+        function(Config, FuzztreeConfig, Mirror, Properties, Backend, Class) {
 
     /*
      *  Abstract Node Base Class
@@ -38,6 +38,8 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             this._nodeImage         = visuals.nodeImage;
             this._connectionHandle  = visuals.connectionHandle;
             this._optionalIndicator = visuals.optionalIndicator;
+
+            this._setupProperties();
         },
 
         allowsConnectionsTo: function(otherNode) {
@@ -234,14 +236,6 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             }
         },
 
-        properties: function() {
-            // return this._properties;
-            //TODO: how to get all properties (attributes in the properties menu) of a node?
-            // iterating over the propertyDisplayOrder and checking whether a node has that property?
-            return {};
-        },
-
-
         _resize: function() {
             // calculate the scale factor
             var marginOffset = this._nodeImage.outerWidth(true) - this._nodeImage.width();
@@ -370,6 +364,19 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
                     this.highlight(false);
                 }.bind(this)
             );
+        },
+
+        _setupMirror: function(property) {
+            var mirrorProperties = this.propertyMirrors[property];
+
+            if (typeof mirrorProperties === 'undefined') return undefined;
+            return new Mirror(this._container, mirrorProperties)
+        },
+
+        _setupProperties: function() {
+            _.each(FuzztreeConfig.propertiesDisplayOrder, function(property) {
+                var mirror = this._setupMirror(property);
+            }.bind(this))
         },
 
         _setupVisualRepresentation: function() {

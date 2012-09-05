@@ -15,15 +15,20 @@ define(function() {
         },
 
         Classes: {
+            JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
+            JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover',
+
+            MIRROR:                  'fuzzed-mirror',
+            MIRROR_BOLD:             'fuzzed-mirror-bold',
+            MIRROR_ITALIC:           'fuzzed-mirror-italic',
+            MIRROR_LARGE:            'fuzzed-mirror-large',
+
             NODE:                    'fuzzed-node',
             NODE_SELECTED:           'fuzzed-node-selected',
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
             NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
-            NODE_OPTIONAL_INDICATOR: 'fuzzed-node-optional-indicator',
-
-            JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
-            JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover'
+            NODE_OPTIONAL_INDICATOR: 'fuzzed-node-optional-indicator'
         },
 
         Dragging: {
@@ -34,6 +39,8 @@ define(function() {
 
         Grid: {
             SIZE:         GRID_SIZE,
+            HALF_SIZE:    GRID_SIZE >> 1,
+            DOUBLE_SIZE:  GRID_SIZE << 1,
             STROKE:       DISABLED_COLOR,
             STROKE_WIDTH: 1,
             STROKE_STYLE: '7 3' // svg dash-array value

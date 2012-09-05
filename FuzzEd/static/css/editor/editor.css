@@ -4,3 +4,23 @@
     bottom:   0;
     width:    100%;
 }
+
+.fuzzed-mirror {
+    background-color: rgba(255,255,255,0.6);
+    display: block;
+    font-size: 11px;
+    word-wrap: break-word;
+    margin-bottom: -3px;
+}
+
+.fuzzed-mirror-italic {
+    font-style: italic;
+}
+
+.fuzzed-mirror-bold {
+    font-weight: bold;
+}
+
+.fuzzed-mirror-large {
+    font-size: 13px;
+}

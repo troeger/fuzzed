@@ -55,7 +55,7 @@ CONFIG = {
                 # events show their names below the image
                 'name': {
                     'position': 'bottom',
-                    'style': ['bold']
+                    'style': ['bold', 'large']
                 },
                 'probability': {
                     'position': 'bottom',
