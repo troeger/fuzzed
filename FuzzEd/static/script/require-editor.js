@@ -183,6 +183,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
                     });
                     edge._fuzzedID = jsonEdge.id;
                     graph.addEdge(edge);
+
                 }.bind(this));
 
                 this._loadGraphCompleted();

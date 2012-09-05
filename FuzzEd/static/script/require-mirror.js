@@ -9,8 +9,13 @@ define(['require-config', 'require-oop'], function(Config, Class) {
             this._container = container;
             this._mirror    = jQuery('<span>')
                 .addClass(Config.Classes.MIRROR)
-                .css('width', Config.Grid.DOUBLE_SIZE)
-                .css('margin-left', -Config.Grid.HALF_SIZE);
+                // The label should be double the grid/node width so that there would be a large 
+                // text box below the node. This requires us to offset them by a quarter of its 
+                // size (already partially centered below the node). However, we need to fiddle a 
+                // little bit with the width and the offset in order to not cover the grid lines 
+                // behind the box.
+                .css('width', Config.Grid.DOUBLE_SIZE - (Config.Grid.STROKE_WIDTH << 2))
+                .css('margin-left', -Config.Grid.HALF_SIZE + Config.Grid.STROKE_WIDTH);
             this._prefix    = properties.prefix || '';
             this._suffix    = properties.suffix || '';
 
@@ -28,10 +33,8 @@ define(['require-config', 'require-oop'], function(Config, Class) {
             // add the mirror to the container at specified location (bottom or top)
             if (properties.position === 'bottom') {
                 this._container.append(this._mirror);
-
             } else if (properties.position === 'top') {
                 this._container.prepend(this._mirror);
-
             } else {
                 throw 'Unknown position for mirror ' + properties.position;
             }

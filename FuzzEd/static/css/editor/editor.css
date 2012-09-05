@@ -6,11 +6,12 @@
 }
 
 .fuzzed-mirror {
-    background-color: rgba(255,255,255,0.6);
+    background-color: white;
     display: block;
     font-size: 11px;
     word-wrap: break-word;
     margin-bottom: -3px;
+    z-index: 110; /* above connection */
 }
 
 .fuzzed-mirror-italic {
@@ -23,4 +24,49 @@
 
 .fuzzed-mirror-large {
     font-size: 13px;
+}
+
+.fuzzed-node {
+    text-align: center;
+    z-index: 100; /* above connection */
+}
+
+.fuzzed-node-halo-connect {
+    /* XXX: this is a temporary solution */
+    background-color:       #409FFF;
+    position:               absolute;
+    visibility:             hidden;
+    top:                    56px;
+    left:                   19px;
+    z-index:                150; /* above image, TODO: let halo care about that */
+    cursor:                 move;
+    -webkit-border-radius:  7px;
+    -moz-border-radius:     7px;
+    border-radius:          7px;
+    /* fix for bootstrap icon looking strange in a circle */
+    width:                  15px;
+    height:                 15px;
+    background-position:    -407px -96px;
+}
+
+.fuzzed-node-selected .fuzzed-node-halo-connect {
+    background-color: #FF9640;
+}
+
+.fuzzed-node:hover .fuzzed-node-halo-connect {
+    visibility: visible;
+}
+
+.fuzzed-node-optional-indicator {
+    width:   12px;
+    height:  12px;
+    margin:  0 auto;
+}
+
+.jsplumb-endpoint {
+    opacity: 0;
+}
+
+.jsplumb-endpoint.jsplumb-endpoint-hover {
+    opacity: 1;
 }
