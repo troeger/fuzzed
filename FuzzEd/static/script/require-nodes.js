@@ -207,6 +207,10 @@ define(['require-config','json!config/fuzztree.json', 'require-mirror', 'require
             return this;
         },
 
+        properties: function() {
+            return {}
+        },
+
         select: function() {
             // don't allow selection of disabled nodes
             if (this._disabled) return this;
