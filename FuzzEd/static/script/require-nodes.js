@@ -267,7 +267,7 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
                 opacity:     Config.Dragging.OPACITY,
                 cursor:      Config.Dragging.CURSOR,
                 grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
-                stack:       '.' + Config.Classes.NODE,
+                stack:       'svg',
 
                 // start dragging callback
                 start:       function() {
@@ -412,7 +412,6 @@ define(['require-config','json!config/fuzztree.json', 'require-properties', 'req
             nodeImage
                 // cleanup the thumbnail's specific properties
                 .removeClass('ui-draggable')
-                .removeClass(Config.Classes.NODE_THUMBNAIL)
                 .removeAttr('id')
                 // add new classes for the actual node
                 .addClass(Config.Classes.NODE_IMAGE)

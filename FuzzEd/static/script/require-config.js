@@ -1,6 +1,10 @@
 define(function() {
     var GRID_SIZE   = 53;
-    var LABEL_WIDTH = GRID_SIZE << 1;
+
+    var STROKE_COLOR      = '#000';
+    var HIGHLIGHTED_COLOR = '#409FFF';
+    var SELECTED_COLOR    = '#FF9640';
+    var DISABLED_COLOR    = '#CCC';
 
     return {
         Backend: {
@@ -11,26 +15,15 @@ define(function() {
         },
 
         Classes: {
-            NODE:                       'fuzzed-node',
-            NODE_SELECTED:              'fuzzed-node-selected',
-            NODE_THUMBNAIL:             'fuzzed-node-thumbnail',
-            NODE_IMAGE:                 'fuzzed-node-image',
-            NODE_LABEL:                 'fuzzed-node-label',
-            NODE_LABELS:                'fuzzed-node-labels',
-            NODE_DROP_ACTIVE:           'fuzzed-node-drop-active',
-            NODE_HALO_CONNECT:          'fuzzed-node-halo-connect',
-            NODE_OPTIONAL_INDICATOR:    'fuzzed-node-optional-indicator',
+            NODE:                    'fuzzed-node',
+            NODE_SELECTED:           'fuzzed-node-selected',
+            NODE_IMAGE:              'fuzzed-node-image',
+            NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
+            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
+            NODE_OPTIONAL_INDICATOR: 'fuzzed-node-optional-indicator',
 
-            JSPLUMB_ENDPOINT:           'jsplumb-endpoint',
-            JSPLUMB_ENDPOINT_HOVER:     'jsplumb-endpoint-hover',
-
-            PROPERTIES:                 'fuzzed-properties',
-            PROPERTY_LABEL:             'fuzzed-property-label',
-            PROPERTY_LABEL_PROBABILITY: 'fuzzed-node-label-probability',
-            PROPERTY_SELECT:            'fuzzed-property-select',
-            PROPERTY_TEXT:              'fuzzed-property-text',
-            PROPERTY_RANGE_MIN:         'fuzzed-property-range-min',
-            PROPERTY_RANGE_MAX:         'fuzzed-property-range-max'
+            JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
+            JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover'
         },
 
         Dragging: {
@@ -41,8 +34,7 @@ define(function() {
 
         Grid: {
             SIZE:         GRID_SIZE,
-            HALF_SIZE:    GRID_SIZE >> 1,
-            STROKE:       '#ddd',
+            STROKE:       DISABLED_COLOR,
             STROKE_WIDTH: 1,
             STROKE_STYLE: '7 3' // svg dash-array value
         },
@@ -56,17 +48,17 @@ define(function() {
         },
 
         JSPlumb: {
-            STROKE:             '#000',
-            STROKE_HIGHLIGHTED: '#409FFF',
-            STROKE_SELECTED:    '#FF9640',
-            STROKE_DISABLED:    '#CCC',
+            STROKE:             STROKE_COLOR,
+            STROKE_HIGHLIGHTED: HIGHLIGHTED_COLOR,
+            STROKE_SELECTED:    SELECTED_COLOR,
+            STROKE_DISABLED:    DISABLED_COLOR,
             STROKE_WIDTH:       2,
 
             CONNECTOR_STYLE:    'Flowchart',
             CONNECTOR_STUB:     10, // min. distance in px before connector bends
 
             ENDPOINT_RADIUS: 7,
-            ENDPOINT_FILL:   '#409FFF',
+            ENDPOINT_FILL:   HIGHLIGHTED_COLOR,
             ENDPOINT_STYLE:  'Blank'
         },
 
@@ -77,51 +69,12 @@ define(function() {
         },
 
         Node: {
-            LABEL_HEIGHT:              15,
-            LABEL_WIDTH:               LABEL_WIDTH,
-            HALF_LABEL_WIDTH:          LABEL_WIDTH >> 1,
-            STROKE_NORMAL:             '#000000',
-            STROKE_HIGHLIGHTED:        '#409FFF',
-            STROKE_SELECTED:           '#FF9640',
-            STROKE_DISABLED:           '#CCC',
+            STROKE_NORMAL:             STROKE_COLOR,
+            STROKE_HIGHLIGHTED:        HIGHLIGHTED_COLOR,
+            STROKE_SELECTED:           SELECTED_COLOR,
+            STROKE_DISABLED:           DISABLED_COLOR,
             OPTIONAL_INDICATOR_FILL:   '#FFF',
-            OPTIONAL_INDICATOR_RADIUS: Math.round(GRID_SIZE / 10),
-
-            Names: {
-                TOP_EVENT:              'Top Event',
-                BASIC_EVENT:            'Basic Event',
-                BASIC_EVENT_SET:        'Basic Event Set',
-                INTERMEDIATE_EVENT:     'Intermediate Event',
-                INTERMEDIATE_EVENT_SET: 'Intermediate Event Set',
-                AND_GATE:               'AND Gate',
-                PRIORITY_AND_GATE:      'Priority AND Gate',
-                OR_GATE:                'OR Gate',
-                XOR_GATE:               'XOR Gate',
-                VOTING_OR_GATE:         'Voting OR Gate',
-                INHIBIT_GATE:           'Inhibit Gate',
-                CHOICE_EVENT:           'Choice Event',
-                REDUNDANCY_EVENT:       'Redundancy Event',
-                UNDEVELOPED_EVENT:      'Undeveloped Event',
-                HOUSE_EVENT:            'House Event'
-            },
-
-            Types: {
-                TOP_EVENT:              'top',
-                BASIC_EVENT:            'basic',
-                BASIC_EVENT_SET:        'basic-set',
-                INTERMEDIATE_EVENT:     'intermediate',
-                INTERMEDIATE_EVENT_SET: 'intermediate-set',
-                AND_GATE:               'and',
-                PRIORITY_AND_GATE:      'p-and',
-                OR_GATE:                'or',
-                XOR_GATE:               'xor',
-                VOTING_OR_GATE:         'v-or',
-                INHIBIT_GATE:           'inhibit',
-                CHOICE_EVENT:           'choice',
-                REDUNDANCY_EVENT:       'redundancy',
-                UNDEVELOPED_EVENT:      'undeveloped',
-                HOUSE_EVENT:            'house'
-            }
+            OPTIONAL_INDICATOR_RADIUS: Math.round(GRID_SIZE / 10)
         },
 
         Properties: {
@@ -172,10 +125,6 @@ define(function() {
                 'keyup',
                 'select'
             ]
-        },
-
-        ShapeMenu: {
-            THUMBNAIL_SCALE_FACTOR: 1
         },
 
         Splash: {

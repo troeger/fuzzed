@@ -223,7 +223,6 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
             // make canvas droppable for shapes from the shape menu
             this._canvas.droppable({
                 accept:    'svg',
-                //accept:    '.' + Config.Classes.NODE_THUMBNAIL,
                 tolerance: 'fit',
                 drop:      this._shapeDropped.bind(this)
             });

@@ -14,7 +14,7 @@ define(['require-config', 'require-oop'], function(Config, Class) {
         _setupDragging: function() {
             this._container.draggable({
                 containment:   'body',
-                stack:         '.' + Config.Classes.NODE,
+                stack:         'svg',
                 cursor:        Config.Dragging.CURSOR,
                 scroll:        false,
                 snap:          'body',
