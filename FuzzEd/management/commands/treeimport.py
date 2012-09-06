@@ -51,7 +51,7 @@ class Command(BaseCommand):
 				# Add edges now, since all nodes in the line are in the DB
 				parent=self.nodes[linenodes[0]]
 				for ln in linenodes[1:]:
-					n=Edge(source=parent, target=self.nodes[ln], client_id=self.client_id.next())
+					n=Edge(graph=self.g, source=parent, target=self.nodes[ln], client_id=self.client_id.next())
 					print n
 					n.save()
 			elif line.startswith("T"):
