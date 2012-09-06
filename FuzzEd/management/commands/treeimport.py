@@ -46,7 +46,7 @@ class Command(BaseCommand):
 			fname=args[1]
 		owner = User.objects.get(username__exact = uname)
 		data=open(fname)
-		self.g=Graph(name=fname.split("/")[-1], kind="faulttree", owner=owner)
+		self.g=Graph(name=fname.split("/")[-1], kind="fuzztree", owner=owner)
 		self.g.save()
 		for line in data:
 			if line.startswith("G"):
