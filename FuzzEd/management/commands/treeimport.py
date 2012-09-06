@@ -37,10 +37,16 @@ class Command(BaseCommand):
 
 
 	def handle(self, *args, **options):
-		assert(len(args)==2)
-		owner = User.objects.get(username__exact = args[0])
-		data=open(args[1])
-		self.g=Graph(name=args[1], kind="faulttree", owner=owner)
+		uname="admin"
+		fname="FuzzEd/fixtures/europe-1.txt"
+		if len(args)==1:
+			uname=args[0]
+		elif len(args)==2:
+			uname=args[0]
+			fname=args[1]
+		owner = User.objects.get(username__exact = uname)
+		data=open(fname)
+		self.g=Graph(name=fname.split("/")[-1], kind="faulttree", owner=owner)
 		self.g.save()
 		for line in data:
 			if line.startswith("G"):
