@@ -281,12 +281,12 @@ CONFIG = {
                 'kFormula': {
                     'position': 'bottom',
                     'style': ['italic'],
-                    'prefix': 'k:'
+                    'prefix': 'k: '
                 },
                 'nRange': {
                     'position': 'bottom',
                     'style': ['italic'],
-                    'prefix': 'N:'
+                    'prefix': 'N: '
                 }
             },
 

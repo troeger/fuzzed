@@ -1,14 +1,19 @@
-define(['require-config', 'require-oop'], function(Config, Class) {
+define(['require-config', 'require-oop', 'json!config/fuzztree.json'], 
+        function(Config, Class, FuzztreeConfig) {
 
     /**
      * Class: Menu
      */
     var Menu = Class.extend({
-
         _container: undefined,
 
         init: function() {
+            this._container = this._setupContainer();
             this._setupDragging();
+        },
+
+        _setupContainer: function() {
+            throw '[ABSTRACT] Override in subclass';
         },
 
         _setupDragging: function() {
@@ -28,15 +33,15 @@ define(['require-config', 'require-oop'], function(Config, Class) {
      * Class: ShapeMenu
      */
     var ShapeMenu = Menu.extend({
-
         init: function() {
-            this._container = jQuery('#' + Config.IDs.SHAPES_MENU);
-
-            this._setupThumbnails();
             this._super();
+            this._setupThumbnails();
         },
 
         /* Section: Internal */
+        _setupContainer: function() {
+            return jQuery('#' + Config.IDs.SHAPES_MENU);
+        },
 
         _setupThumbnails: function() {
             var svgs = this._container.find('svg');
@@ -58,81 +63,63 @@ define(['require-config', 'require-oop'], function(Config, Class) {
      * Class: PropertiesMenu
      */
     var PropertiesMenu = Menu.extend({
-
-        _list: undefined,
+        _form:      undefined,
 
         init: function() {
-            this._container = jQuery('#' + Config.IDs.PROPERTIES_MENU);
-            this._list = this._container.find('.ui-listview');
-
-            this._setupDragging();
             this._super();
+            this._form = this._container.find('form');
         },
 
         /* Section: Visibility */
-
         hide: function() {
             this._container.hide();
 
-            _.each(this._nodes, function(node, index) {
-                _.each(node.properties(), function(property) {
-                    property.hide();
+            _.each(this._nodes, function(node) {
+                _.each(node.propertyMenuEntries, function(menuEntry) {
+                    // TODO: remove me, here fordev purposes (the if)
+                    if (typeof menuEntry === 'undefined') return;
+                    menuEntry.hide();
                 })
             });
-            this._list.children(':not(:eq(0))').remove();
-
             delete this._nodes;
+
+            return this;
         },
 
         show: function(nodes, force) {
             if (!_.isArray(nodes)) this._nodes = [nodes];
             else                   this._nodes =  nodes;
 
-            if (force || typeof(this._nodes) === 'undefined' || _.any(this._nodes, function(node) { return node.properties().length > 0})) {
-                this._container.show();
-
+            if (this._haveEntries(this._nodes) || force) {
                 _.each(this._nodes, function(node) {
-                    var frame = this._makePropertyFrame(node)
-                    this._list.append(frame);
+                    _.each(FuzztreeConfig.propertiesDisplayOrder, function(property) {
+                        var menuEntry = node.propertyMenuEntries[property];
 
-                    _.each(node.properties(), function(property) {
-                        property.show(frame.children('form'));
+                        if (typeof menuEntry !== 'undefined') {
+                            menuEntry.show(this._form);
+                        }
                     }.bind(this));
                 }.bind(this));
 
-                this._list.listview('refresh');
+                this._container.show();
             }
 
             return this;
         },
 
-        /* Section: Internals */
+        _haveEntries: function(nodes) {
+            return _.any(nodes, function(node) {
+                return !(_.isEmpty(node.propertyMenuEntries));
+            })
+        },
 
-        _makePropertyFrame: function(node) {
-            var li    = jQuery('<li>');
-
-            var title = jQuery('<h3>')
-                .html(node.name())
-                .appendTo(li);
-
-            var form  = jQuery('<form>')
-                .attr('action', '#')
-                .attr('method', 'get')
-                .addClass(Config.Classes.PROPERTIES)
-                .appendTo(li)
-                .keydown(function(eventObject) {
-                    if (eventObject.which === jQuery.ui.keyCode.ENTER) {
-                        eventObject.preventDefault();
-                        return false;
-                    }
-                });
-
-            return li;
+        _setupContainer: function() {
+            return jQuery('#' + Config.IDs.PROPERTIES_MENU);
         }
     });
 
     return {
-        ShapeMenu: ShapeMenu,
+        ShapeMenu:      ShapeMenu,
         PropertiesMenu: PropertiesMenu
     }
 });

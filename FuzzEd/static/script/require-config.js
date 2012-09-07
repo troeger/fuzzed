@@ -1,6 +1,6 @@
 define(function() {
-    var GRID_SIZE   = 53;
-
+    var GRID_SIZE         = 53;
+    
     var STROKE_COLOR      = '#000';
     var HIGHLIGHTED_COLOR = '#409FFF';
     var SELECTED_COLOR    = '#FF9640';
@@ -64,9 +64,9 @@ define(function() {
             CONNECTOR_STYLE:    'Flowchart',
             CONNECTOR_STUB:     10, // min. distance in px before connector bends
 
-            ENDPOINT_RADIUS: 7,
-            ENDPOINT_FILL:   HIGHLIGHTED_COLOR,
-            ENDPOINT_STYLE:  'Blank'
+            ENDPOINT_RADIUS:    7,
+            ENDPOINT_FILL:      HIGHLIGHTED_COLOR,
+            ENDPOINT_STYLE:     'Blank'
         },
 
         Keys: {
@@ -80,49 +80,12 @@ define(function() {
             STROKE_HIGHLIGHTED:        HIGHLIGHTED_COLOR,
             STROKE_SELECTED:           SELECTED_COLOR,
             STROKE_DISABLED:           DISABLED_COLOR,
+
             OPTIONAL_INDICATOR_FILL:   '#FFF',
             OPTIONAL_INDICATOR_RADIUS: Math.round(GRID_SIZE / 10)
         },
 
         Properties: {
-            Defaults: {
-                Basic: {
-                    disabled:     false,
-                    mirror:       null,
-                    mirrorPrefix: '',
-                    mirrorSuffix: '',
-                    mirrorClass:  [],
-                    name:         '',
-                    value:        '',
-                    displayname:  ''
-                },
-
-                Number: {
-                    min:  -Number.MAX_VALUE,
-                    max:   Number.MAX_VALUE,
-                    step: 1 
-                },
-
-                Radio: {
-                    options: []
-                },
-
-                Range: {
-                    min:   -Number.MAX_VALUE,
-                    max:    Number.MAX_VALUE,
-                    step:  1,
-                    value: [0, 1]
-                },
-
-                Select: {
-                    options: []
-                },
-
-                Text: {
-                    type: 'text'
-                }
-            },
-
             Events: [
                 'blur',
                 'change',

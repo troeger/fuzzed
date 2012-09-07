@@ -226,7 +226,7 @@ def edges(request, graph_id):
     POST = request.POST
     try:
         command = commands.AddEdge.create_from(graph_id=graph_id, client_id=POST['id'], \
-                                             from_id=POST['source'], to_id=POST['destination'])
+                                               from_id=POST['source'], to_id=POST['destination'])
         command.do()
 
         edge = command.edge

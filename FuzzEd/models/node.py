@@ -139,7 +139,7 @@ class Node(models.Model):
             else:
                 setattr(self, key, value)
         else:
-            prop = self.properties.get_or_create(key=key)
+            prop, created = self.properties.get_or_create(key=key)
             prop.value = value
             prop.save()
 

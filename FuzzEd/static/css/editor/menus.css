@@ -79,3 +79,18 @@
     color: #333;
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
 }
+
+#FuzzEdProperties .form-horizontal .controls {
+    margin-left: 100px;
+}
+
+#FuzzEdProperties .form-horizontal .control-label {
+    width: 80px;
+
+    font-weight: bold;
+    color: #333;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}

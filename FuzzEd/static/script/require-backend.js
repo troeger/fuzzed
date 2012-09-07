@@ -82,22 +82,13 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             y:          node.y
         };
 
-        var successCallback = function(json) {
-            //XXX: improve this later (send properties already in data)
-            //TODO: remove
-            _.each(node.properties(), function(property) {
-                Backend.changeProperty(node, property.name(), property.value());
-            });
-            if (success) success(json);
-        }
-
         jQuery.ajax({
             url:      url,
             type:     'POST',
             dataType: 'json', 
 
             data:     data, 
-            success:  successCallback,
+            success:  success  || jQuery.noop,
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop
         });

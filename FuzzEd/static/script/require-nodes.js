@@ -1,7 +1,6 @@
-define(['require-config','json!config/fuzztree.json', 'require-mirror', 'require-properties', 
+define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'require-properties', 
         'require-backend', 'require-oop', 'jsplumb', 'jquery.svg'], 
         function(Config, FuzztreeConfig, Mirror, Properties, Backend, Class) {
-
     /*
      *  Abstract Node Base Class
      */
@@ -39,7 +38,8 @@ define(['require-config','json!config/fuzztree.json', 'require-mirror', 'require
             this._connectionHandle  = visuals.connectionHandle;
             this._optionalIndicator = visuals.optionalIndicator;
 
-            this._setupProperties();
+            this.propertyMirrors     = this._setupMirrors(this.propertyMirrors);
+            this.propertyMenuEntries = this._setupPropertyMenuEntries(this.propertyMenuEntries);
         },
 
         allowsConnectionsTo: function(otherNode) {
@@ -265,7 +265,7 @@ define(['require-config','json!config/fuzztree.json', 'require-mirror', 'require
                 opacity:     Config.Dragging.OPACITY,
                 cursor:      Config.Dragging.CURSOR,
                 grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
-                stack:       'svg',
+                stack:       '.' + Config.Classes.NODE,
 
                 // start dragging callback
                 start:       function() {
@@ -370,17 +370,33 @@ define(['require-config','json!config/fuzztree.json', 'require-mirror', 'require
             );
         },
 
-        _setupMirror: function(property) {
-            var mirrorProperties = this.propertyMirrors[property];
+        _setupMirrors: function(propertyMirrors) {
+            var mirrors = {};
 
-            if (typeof mirrorProperties === 'undefined') return undefined;
-            return new Mirror(this._container, mirrorProperties)
+            _.each(FuzztreeConfig.propertiesDisplayOrder, function(property) {
+                var mirrorDefinition = propertyMirrors[property];
+
+                if (typeof mirrorDefinition === 'undefined') return;
+                mirrors[property] = new Mirror(this._container, mirrorDefinition);
+            }.bind(this))
+
+            return mirrors;
         },
 
-        _setupProperties: function() {
+        _setupPropertyMenuEntries: function(propertyMenuEntries) {
+            var menuEntries = {};
+
             _.each(FuzztreeConfig.propertiesDisplayOrder, function(property) {
-                var mirror = this._setupMirror(property);
-            }.bind(this))
+                var menuEntry = propertyMenuEntries[property];
+                if (typeof menuEntry === 'undefined') return;
+
+                var mirror = this.propertyMirrors[property]
+
+                menuEntry.property = property;
+                menuEntries[property] = Properties.newFrom(this, mirror, menuEntry);
+            }.bind(this));
+
+            return menuEntries;
         },
 
         _setupVisualRepresentation: function() {
