@@ -372,6 +372,7 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
 
         _setupMirrors: function(propertyMirrors) {
             var mirrors = {};
+            if (typeof propertyMirrors === 'undefined') return mirrors;
 
             _.each(FuzztreeConfig.propertiesDisplayOrder, function(property) {
                 var mirrorDefinition = propertyMirrors[property];
@@ -385,6 +386,7 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
 
         _setupPropertyMenuEntries: function(propertyMenuEntries) {
             var menuEntries = {};
+            if (typeof propertyMenuEntries === 'undefined') return menuEntries;
 
             _.each(FuzztreeConfig.propertiesDisplayOrder, function(property) {
                 var menuEntry = propertyMenuEntries[property];
