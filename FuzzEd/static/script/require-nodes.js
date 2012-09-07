@@ -13,6 +13,9 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
 
             // merge all given properties into this object
             jQuery.extend(this, properties);
+            if (typeof this.optional === 'string') {
+                this.optional = this.optional === 'false' ? false : true;
+            }
 
             // logic
             this._editor = undefined; // will be set when appending
@@ -397,6 +400,12 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
                 menuEntry.property = property;
                 menuEntries[property] = Properties.newFrom(this, mirror, menuEntry);
             }.bind(this));
+
+            if (_.has(menuEntries, 'optional')) {
+                menuEntries.optional.change = function() {
+                    this.setOptional(this.optional);
+                }.bind(this)
+            }
 
             return menuEntries;
         },

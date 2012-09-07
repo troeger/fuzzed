@@ -648,7 +648,6 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             // iterate over the handable input events (Config.Properties.Events), figure if we 
             // have defined such an event handler (_<EVENT>, e.g. _change) and bind it as well as 
             // user defined handler (<EVENT>, e.g. change)
-
             _.each(Config.Properties.Events, function(eventType) {
                 var typeCallback = this['_' + eventType];
                 if (typeof typeCallback !== 'undefined') {
@@ -657,7 +656,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
                 var userCallback = this[eventType];
                 if (typeof userCallback !== 'undefined') {
-                    this.input.bind(eventType, userCallback.bind(this));
+                    this.input.bind(eventType, userCallback);
                 }
             }.bind(this));
         },
@@ -696,7 +695,6 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
     var Checkbox = Property.extend({
         _change: function() {
-            console.log("change");
             this._mirror();
             this._value(this.input.attr('checked') ? true : false);
             this._sendChange();
