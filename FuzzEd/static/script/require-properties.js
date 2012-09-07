@@ -757,9 +757,9 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
     function newFrom(node, mirror, propertyDefinition) {
         var kind = propertyDefinition.kind;
 
-        if (propertyDefinition.kind === 'number') {
+        if (kind === 'number') {
             return new Number(node, mirror, propertyDefinition);
-        } else {
+        } else if (kind === 'text') {
             return new Text(node, mirror, propertyDefinition);
         }
     }
