@@ -694,6 +694,24 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         }
     });
 
+    var Checkbox = Property.extend({
+        _change: function() {
+            console.log("change");
+            this._mirror();
+            this._value(this.input.attr('checked') ? true : false);
+            this._sendChange();
+        },
+
+        _setupInput: function() {
+            var input = jQuery('<input type="checkbox">')
+                .attr('id', this.id)
+                .attr('disabled', this.disabled ? 'disabled' : undefined)
+                .attr('checked', this._value() ? 'checked' : undefined);
+
+            return input;
+        }
+    });
+
     var Number = Property.extend({
         min:  undefined,
         max:  undefined,
@@ -759,7 +777,9 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
         if (kind === 'number') {
             return new Number(node, mirror, propertyDefinition);
-        } else if (kind === 'text') {
+        } else if (kind === 'checkbox') {
+            return new Checkbox(node, mirror, propertyDefinition);
+        } else {
             return new Text(node, mirror, propertyDefinition);
         }
     }
@@ -769,8 +789,9 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         // Range:        Range,
         // Select:       Select,
         // SingleChoice: SingleChoice,
-        Number:  Number,
-        Text:    Text,
+        Checkbox: Checkbox,
+        Number:   Number,
+        Text:     Text,
 
         newFrom: newFrom
     };

@@ -44,9 +44,8 @@ CONFIG = {
                     'disabled': True
                 },
                 'optional': {
-                    'kind': 'radio',
-                    'displayName': u'Optional',
-                    'choices': [False, True]
+                    'kind': 'checkbox',
+                    'displayName': u'Optional'
                 }
             },
 
