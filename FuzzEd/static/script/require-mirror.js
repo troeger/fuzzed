@@ -38,8 +38,6 @@ define(['require-config', 'require-oop'], function(Config, Class) {
             } else {
                 throw 'Unknown position for mirror ' + properties.position;
             }
-
-            this.show('test');
         },
 
         show: function(text) {

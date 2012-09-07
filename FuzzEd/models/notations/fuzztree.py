@@ -35,9 +35,8 @@ CONFIG = {
                 'cost': {
                     'kind': 'number',
                     'displayName': u'Cost',
-                    'disabled': True, #only editable for basic events and sets
                     'min': 0,
-                    'step': 1,
+                    'step': 1
                 },
                 'probability': {
                     'kind': 'text',
@@ -78,9 +77,6 @@ CONFIG = {
             'help': 'Initiating failure in a basic component',
 
             'propertyMenuEntries': {
-                'cost': {
-                    'disabled': False
-                },
                 'probability': {
                     'kind': 'option',
                     'disabled': False,

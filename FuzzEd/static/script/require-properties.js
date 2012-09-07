@@ -590,7 +590,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
     //             .append(input);
     //     }
     // });
-
+    // 
     var Property = Class.extend({
         id:       undefined,
         input:    undefined,
@@ -694,11 +694,49 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         }
     });
 
-    var Text = Property.extend({
+    var Number = Property.extend({
+        min:  undefined,
+        max:  undefined,
+        step: undefined,
+
         init: function(node, mirror, propertyDefinition) {
+            this.min  = this._getFloat(propertyDefinition, 'min',  -window.Number.MAX_VALUE);
+            this.max  = this._getFloat(propertyDefinition, 'max',   window.Number.MAX_VALUE);
+            this.step = this._getFloat(propertyDefinition, 'step', 1);
+
             this._super(node, mirror, propertyDefinition);
         },
 
+        _getFloat: function(definition, key, defaultValue) {
+            if (!_.has(definition, key)) return defaultValue;
+
+            var number = parseFloat(definition[key]);
+            if (isNaN(number)) return defaultValue;
+            return number;
+        },
+
+        _change: function() {
+            this._keyup();
+            this._sendChange();
+        },
+
+        _keyup: function() {
+            this._mirror();
+            this._value(this.input.val());
+        },
+
+        _setupInput: function() {
+            return jQuery('<input type="number" class="input-medium">')
+                .attr('id',       this.id)
+                .attr('min',      this.min)
+                .attr('max',      this.max)
+                .attr('step',     this.step)
+                .attr('disabled', this.disabled ? 'disabled' : undefined)
+                .val(this._value())
+        }
+    });
+
+    var Text = Property.extend({
         _blur: function() {
             this._sendChange();
         },
@@ -719,7 +757,9 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
     function newFrom(node, mirror, propertyDefinition) {
         var kind = propertyDefinition.kind;
 
-        if (propertyDefinition.kind === 'text') {
+        if (propertyDefinition.kind === 'number') {
+            return new Number(node, mirror, propertyDefinition);
+        } else {
             return new Text(node, mirror, propertyDefinition);
         }
     }
@@ -729,6 +769,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         // Range:        Range,
         // Select:       Select,
         // SingleChoice: SingleChoice,
+        Number:  Number,
         Text:    Text,
 
         newFrom: newFrom

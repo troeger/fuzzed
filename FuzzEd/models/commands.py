@@ -244,8 +244,6 @@ class ChangeNode(Command):
         command = cls(node=node)
         command.save()
 
-        print updated_properties, 1, updated_properties.items()
-
         for key, value in updated_properties.items():
             old_value = ''
 
@@ -253,8 +251,6 @@ class ChangeNode(Command):
                 old_value = node.get_attr(key)
             except ValueError:
                 pass
-
-            print key, 1, old_value, 1, value
 
             property_change = PropertyChange(command=command, key=key, \
                                              old_value=old_value, new_value=value)
