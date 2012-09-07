@@ -13,8 +13,13 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
 
             // merge all given properties into this object
             jQuery.extend(this, properties);
+
+            // TODO: improve me! I need to get proper values from Backend/general Backend parsing
             if (typeof this.optional === 'string') {
                 this.optional = this.optional === 'false' ? false : true;
+            }
+            if (typeof this.nRange === 'string') {
+                this.nRange = this.nRange.split(',');
             }
 
             // logic
@@ -380,7 +385,7 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
             _.each(FuzztreeConfig.propertiesDisplayOrder, function(property) {
                 var mirrorDefinition = propertyMirrors[property];
 
-                if (typeof mirrorDefinition === 'undefined') return;
+                if (typeof mirrorDefinition === 'undefined' || mirrorDefinition === null) return;
                 mirrors[property] = new Mirror(this._container, mirrorDefinition);
             }.bind(this))
 
@@ -393,7 +398,7 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
 
             _.each(FuzztreeConfig.propertiesDisplayOrder, function(property) {
                 var menuEntry = propertyMenuEntries[property];
-                if (typeof menuEntry === 'undefined') return;
+                if (typeof menuEntry === 'undefined' || menuEntry === null) return;
 
                 var mirror = this.propertyMirrors[property]
 

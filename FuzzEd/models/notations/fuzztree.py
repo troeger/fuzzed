@@ -308,7 +308,11 @@ CONFIG = {
             'name': u'Top Event',
             'image': 'top_event.svg',
             'excludeFromShapesMenu': True,
-            'optional': None
+            'optional': None,
+
+            'propertyMenuEntries': {
+                'optional': None
+            }
         }
 
         # 'inhibitGate': {
