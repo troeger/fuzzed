@@ -1,4 +1,5 @@
 from django.db import models
+from FuzzEd.lib.jsonfield import JSONField
 
 from node import Node
 
@@ -10,7 +11,7 @@ class Property(models.Model):
 
     Fields:
      {str}    key      - the name of the property
-     {str}    value    - the value of the property
+     {json}   value    - the value of the property
      {<Node>} node     - link to the node that owns the property
      {bool}   deleted  - flag indicating whether this property is deleted or not. Simplifies the restoration of this property by just having to toggle this flag (default: False)
     """
@@ -18,7 +19,7 @@ class Property(models.Model):
         app_label = 'FuzzEd'
 
     key     = models.CharField(max_length=255)
-    value   = models.CharField(max_length=255)
+    value   = JSONField()
     node    = models.ForeignKey(Node, related_name='properties')
     deleted = models.BooleanField(default=False)
 
