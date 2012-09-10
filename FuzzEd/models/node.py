@@ -133,11 +133,7 @@ class Node(models.Model):
             {attr} value - The new value that should be stored.
         """
         if hasattr(self, key):
-            # special treatment for numeric fields
-            if key == 'x' or key == 'y':
-                setattr(self, key, int(value))
-            else:
-                setattr(self, key, value)
+            setattr(self, key, value)
         else:
             prop, created = self.properties.get_or_create(key=key)
             prop.value = value

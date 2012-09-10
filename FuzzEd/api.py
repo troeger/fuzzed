@@ -190,7 +190,11 @@ def node(request, graph_id, node_id):
     node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id, deleted=False)
 
     if request.method == 'POST':
-        command = commands.ChangeNode.create_from(graph_id, node_id, **request.POST.dict())
+        # Interpret all parameters as json-formatted. This will also correctly parse
+        # numerical values like 'x' and 'y'.
+        paramsDict = {key : json.loads(value) for key, value in request.POST.iteritems()}
+
+        command = commands.ChangeNode.create_from(graph_id, node_id, **paramsDict)
         command.do()
         # return the updated node object
         return HttpResponse(node.to_json(), 'application/javascript', status=204)
