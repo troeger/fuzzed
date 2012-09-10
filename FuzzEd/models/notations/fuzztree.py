@@ -44,9 +44,8 @@ CONFIG = {
                     'disabled': True
                 },
                 'optional': {
-                    'kind': 'radio',
-                    'displayName': u'Optional',
-                    'choices': [False, True]
+                    'kind': 'checkbox',
+                    'displayName': u'Optional'
                 }
             },
 
@@ -309,7 +308,11 @@ CONFIG = {
             'name': u'Top Event',
             'image': 'top_event.svg',
             'excludeFromShapesMenu': True,
-            'optional': None
+            'optional': None,
+
+            'propertyMenuEntries': {
+                'optional': None
+            }
         }
 
         # 'inhibitGate': {

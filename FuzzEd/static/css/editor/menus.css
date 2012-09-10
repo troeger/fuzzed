@@ -94,3 +94,11 @@
     text-overflow: ellipsis;
     -o-text-overflow: ellipsis;
 }
+
+#FuzzEdProperties input[type="checkbox"] {
+    margin: 9px 0 0 2px;
+}
+
+#FuzzEdProperties form.form-inline input.input-mini:not(:first-child) {
+    margin-left: 18px;
+}

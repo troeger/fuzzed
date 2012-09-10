@@ -591,6 +591,14 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
     //     }
     // });
     // 
+    function _getFloat(definition, key, defaultValue) {
+        if (!_.has(definition, key)) return defaultValue;
+
+        var number = parseFloat(definition[key]);
+        if (isNaN(number)) return defaultValue;
+        return number;
+    }
+    
     var Property = Class.extend({
         id:       undefined,
         input:    undefined,
@@ -648,7 +656,6 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             // iterate over the handable input events (Config.Properties.Events), figure if we 
             // have defined such an event handler (_<EVENT>, e.g. _change) and bind it as well as 
             // user defined handler (<EVENT>, e.g. change)
-
             _.each(Config.Properties.Events, function(eventType) {
                 var typeCallback = this['_' + eventType];
                 if (typeof typeCallback !== 'undefined') {
@@ -657,7 +664,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
                 var userCallback = this[eventType];
                 if (typeof userCallback !== 'undefined') {
-                    this.input.bind(eventType, userCallback.bind(this));
+                    this.input.bind(eventType, userCallback);
                 }
             }.bind(this));
         },
@@ -694,26 +701,37 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         }
     });
 
+    var Checkbox = Property.extend({
+        _change: function() {
+            this._mirror();
+            this._value(this.input.attr('checked') ? true : false);
+            this._sendChange();
+        },
+
+        _setupInput: function() {
+            var input = jQuery('<input type="checkbox">')
+                .attr('id', this.id)
+                .attr('disabled', this.disabled ? 'disabled' : undefined)
+                .attr('checked', this._value() ? 'checked' : undefined);
+
+            return input;
+        }
+    });
+
     var Number = Property.extend({
         min:  undefined,
         max:  undefined,
         step: undefined,
 
         init: function(node, mirror, propertyDefinition) {
-            this.min  = this._getFloat(propertyDefinition, 'min',  -window.Number.MAX_VALUE);
-            this.max  = this._getFloat(propertyDefinition, 'max',   window.Number.MAX_VALUE);
+            this.min  = this._getFloat(propertyDefinition, 'min', -window.Number.MAX_VALUE);
+            this.max  = this._getFloat(propertyDefinition, 'max',  window.Number.MAX_VALUE);
             this.step = this._getFloat(propertyDefinition, 'step', 1);
 
             this._super(node, mirror, propertyDefinition);
         },
 
-        _getFloat: function(definition, key, defaultValue) {
-            if (!_.has(definition, key)) return defaultValue;
-
-            var number = parseFloat(definition[key]);
-            if (isNaN(number)) return defaultValue;
-            return number;
-        },
+        _getFloat: _getFloat,
 
         _change: function() {
             this._keyup();
@@ -733,6 +751,88 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
                 .attr('step',     this.step)
                 .attr('disabled', this.disabled ? 'disabled' : undefined)
                 .val(this._value())
+        }
+    });
+
+    var Range = Property.extend({
+        _lower: undefined,
+        _upper: undefined,
+
+        init: function(node, mirror, propertyDefinition) {
+            this.min  = this._getFloat(propertyDefinition, 'min', -window.Number.MAX_VALUE);
+            this.max  = this._getFloat(propertyDefinition, 'max',  window.Number.MAX_VALUE);
+            this.step = this._getFloat(propertyDefinition, 'step', 1)
+
+            this._super(node, mirror, propertyDefinition);
+        },
+
+        _change: function(eventObject) {
+            var lower = parseFloat(this._lower.val());
+            var upper = parseFloat(this._upper.val());
+
+            if (isNaN(lower) || isNaN(upper)) return;
+
+            if (lower > upper && this._lower.is(eventObject.target)) {
+                upper = lower;
+            } else if (lower > upper && this._upper.is(eventObject.target)) {
+                lower = upper;
+            }
+
+            this._lower.val(lower);
+            this._upper.val(upper);
+            this._mirror();
+            this._value([lower, upper]);
+            this._sendChange();
+        },
+
+        _createNumberInput: function() {
+            return jQuery('<input type="number" class="input-mini">')
+                .attr('min',      this.min)
+                .attr('max',      this.max)
+                .attr('step',     this.step)
+                .attr('disabled', this.disabled ? 'disabled' : undefined);
+        },
+
+        _getFloat: _getFloat,
+
+        _mirror: function() {
+            if (typeof this.mirror !== 'undefined') {
+                this.mirror.show(this._lower.val() + '-' + this._upper.val());
+            }
+        },
+
+        _sendChange: function() {
+            if (this.name) {
+                properties = {};
+                properties[this.property] = '' + this._value();
+
+                Backend.changeNode(this.node, properties);
+            }
+        },
+
+        _setupInput: function() {
+            var value = this._value();
+            var inlineForm = jQuery('<form class="form-inline">');
+            var lower = this._createNumberInput().val(value[0]);
+            var upper = this._createNumberInput().val(value[1]);
+
+            return inlineForm.append(lower, upper);
+        },
+
+        _setupVisual: function() {
+            var group      = this._setupControlGroup();
+            var inlineForm = this._setupInput();
+            var inputs     = inlineForm.children('input');
+
+            this._lower = inputs.eq(0);
+            this._upper = inputs.eq(1);
+
+            group.children('.controls').append(inlineForm);
+
+            return {
+                visual: group,
+                input:  inputs
+            };
         }
     });
 
@@ -759,7 +859,11 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
         if (kind === 'number') {
             return new Number(node, mirror, propertyDefinition);
-        } else if (kind === 'text') {
+        } else if (kind === 'checkbox') {
+            return new Checkbox(node, mirror, propertyDefinition);
+        } else if (kind === 'range') {
+            return new Range(node, mirror, propertyDefinition);
+        } else {
             return new Text(node, mirror, propertyDefinition);
         }
     }
@@ -767,10 +871,11 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
     return {
         // Radio:        Radio,
         // Range:        Range,
-        // Select:       Select,
         // SingleChoice: SingleChoice,
-        Number:  Number,
-        Text:    Text,
+        Checkbox: Checkbox,
+        Number:   Number,
+        Range:    Range,
+        Text:     Text,
 
         newFrom: newFrom
     };
