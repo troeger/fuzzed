@@ -27,10 +27,15 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             var graph = edge.source.data(Config.Keys.NODE).graph();
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + graph.id
                 + Config.Backend.EDGES_URL + '/' + edge._fuzzedID;
-        }
-    }
+        },
 
-    var Backend = {}
+        fullUrlForCutsets: function(graph) {
+            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + graph.id
+                + Config.Backend.CUTSETS_URL;
+        }
+    };
+
+    var Backend = {};
 
     /*
      Function: addEdge
@@ -61,7 +66,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop
         });
-    }
+    };
 
     /*
          Function: addNode
@@ -92,7 +97,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop
         });
-    }
+    };
 
     /*
      Function: deleteEdge
@@ -116,7 +121,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop
         });
-    }
+    };
 
     /*
          Function: deleteNode
@@ -140,7 +145,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop
         });
-    }
+    };
 
     /*
          Function: getGraph
@@ -165,7 +170,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             // TODO: do proper create graph here on backend
             var graph = new Graph(id);
             if (error) error(graph, response, textStatus, errorThrown);
-        }
+        };
 
         jQuery.ajax({
             url:      url,
@@ -175,7 +180,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             error:    errorCallback,
             complete: complete || jQuery.noop
         });
-    }
+    };
 
     /*
          Function: changeNode
@@ -201,7 +206,7 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop
         });
-    }
+    };
 
     /* TODO From here on*/
 
@@ -230,7 +235,23 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         };
 
         jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
-    }
+    };
+
+    /*
+         Function: calculateCutsets
+             Tells the server to calculate the minimal cutsets for the given graph and passes
+             the results to the provided callback.
+
+         Parameters:
+             graph         - The graph for which the cutsets should be calculated.
+             callback      - Callback function for asynchronous requests.
+                             Will be called when the request returns with the cutsets.
+             errorCallback - [optional] Callback that gets called in case of an error.
+     */
+    Backend.calculateCutsets = function(graph, callback, errorCallback) {
+        var url = URLHelper.fullUrlForCutsets(graph);
+        jQuery.get(url, callback, 'json').fail(errorCallback || jQuery.noop);
+    };
 
     return Backend;
 });

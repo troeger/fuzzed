@@ -8,6 +8,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
     var Editor = Class.extend({
         shapes:     undefined,
         properties: undefined,
+        cutsets:    undefined,
         selection:  undefined,
 
         _canvas:     undefined,
@@ -22,11 +23,13 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
             // create manager objects for the bars and the selection
             this.shapes     = new Menus.ShapeMenu();
             this.properties = new Menus.PropertiesMenu();
+            this.cutsets    = new Menus.CutsetsMenu(this);
             this.selection  = new Selection();
 
             // run a few sub initializer
             this._setupCanvas();
             this._setupBackground();
+            this._setupCutsetsMenu();
             this._setupJsPlumb();
             this._setupKeyBindings();
             this._setupAjaxHandler();
@@ -227,6 +230,19 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
                 tolerance: 'fit',
                 drop:      this._shapeDropped.bind(this)
             });
+        },
+
+        _setupCutsetsMenu: function() {
+            // callback that is fired when backend returns cutsets
+            function loadCutsetsIntoMenu(cutsets) {
+                this.cutsets.displayCutsets(cutsets);
+                this.cutsets.show();
+            }
+
+            // register for clicks on the corresponding nav action
+            jQuery('#' + Config.IDs.NAVBAR_ACTION_CALCULATE_MINIMAL_CUTSETS).click(function() {
+                Backend.calculateCutsets(this.graph(), loadCutsetsIntoMenu.bind(this));
+            }.bind(this));
         },
 
         _setupJsPlumb: function() {

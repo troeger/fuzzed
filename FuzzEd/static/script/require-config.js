@@ -8,10 +8,11 @@ define(function() {
 
     return {
         Backend: {
-            BASE_URL:   '/api',
-            GRAPHS_URL: '/graphs',
-            NODES_URL:  '/nodes',
-            EDGES_URL:  '/edges'
+            BASE_URL:       '/api',
+            GRAPHS_URL:     '/graphs',
+            NODES_URL:      '/nodes',
+            EDGES_URL:      '/edges',
+            CUTSETS_URL:    '/cutsets'
         },
 
         Classes: {
@@ -47,11 +48,13 @@ define(function() {
         },
 
         IDs: {
-            CANVAS:          'FuzzEdCanvas',
-            CONTENT:         'FuzzEdContent',
-            PROPERTIES_MENU: 'FuzzEdProperties',
-            SHAPES_MENU:     'FuzzEdShapes',
-            SPLASH:          'FuzzEdSplash'
+            CANVAS:                                     'FuzzEdCanvas',
+            CONTENT:                                    'FuzzEdContent',
+            PROPERTIES_MENU:                            'FuzzEdProperties',
+            SHAPES_MENU:                                'FuzzEdShapes',
+            CUTSETS_MENU:                               'FuzzEdCutsets',
+            SPLASH:                                     'FuzzEdSplash',
+            NAVBAR_ACTION_CALCULATE_MINIMAL_CUTSETS:    'FuzzEdNavbarActionCalculateMinimalCutsets'
         },
 
         JSPlumb: {

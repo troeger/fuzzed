@@ -32,6 +32,7 @@
             <div class="container">
                 <a class="brand" anchor="#">FuzzEd</a>
                 <ul class="nav pull-right">
+                    {% block navigation_fields %}{% endblock %}
                     <li class="{% block navigation_home %}{% endblock %}">
                         <a href="/">
                             <i class="icon-home icon-white"></i>
