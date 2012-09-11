@@ -77,7 +77,7 @@ CONFIG = {
 
             'propertyMenuEntries': {
                 'probability': {
-                    'kind': 'option',
+                    'kind': 'compound',
                     'disabled': False,
 
                     'choices': {
