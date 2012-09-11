@@ -718,6 +718,17 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         }
     });
 
+    var Compound = Property.extend({
+        init: function(node, mirror, propertyDefinition) {
+
+            this._super(node, mirror, propertyDefinition);
+        },
+
+        _setupInput: function() {
+
+        }
+    });
+
     var Number = Property.extend({
         min:  undefined,
         max:  undefined,
@@ -836,6 +847,45 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         }
     });
 
+    var Select = Property.extend({
+        choices: undefined,
+
+        init: function(node, mirror, propertyDefinition) {
+            this.choices = propertyDefinition.choices;
+            if (typeof this.choices === 'undefined' || this.choices.length < 2) {
+                throw 'Not enough choices for Select property';
+            }
+
+            this._super(node, mirror, propertyDefinition);
+        },
+
+        _change: function() {
+            this._value(this.input.val());
+            this._mirror();
+            this._sendChange();
+        },
+
+        _setupInput: function() {
+            var value    = this._value();
+            var select   = jQuery('<select>');
+            var selected = typeof value !== 'undefined' ? value : this.choices[0];
+
+            // is the selected value no part of the available choices? add it to them!
+            if (_.indexOf(this.choices, selected) < 0) this.choices.unshift(value);
+
+            // model each choice as an option of the select
+            _.each(this.choices, function(choice) {
+                jQuery('<option>')
+                    .html(choice)
+                    .attr('value', choice)
+                    .attr('selected', choice === selected ? 'selected', undefined)
+                    .appendTo(select);
+            })
+
+            return select;
+        }
+    });
+
     var Text = Property.extend({
         _blur: function() {
             this._sendChange();
@@ -852,7 +902,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
                 .attr('disabled', this.disabled ? 'disabled' : undefined)
                 .val(this._value());
         }
-    })
+    });
 
     function newFrom(node, mirror, propertyDefinition) {
         var kind = propertyDefinition.kind;
@@ -863,18 +913,19 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             return new Checkbox(node, mirror, propertyDefinition);
         } else if (kind === 'range') {
             return new Range(node, mirror, propertyDefinition);
+        } else if (kind === 'select') {
+            return new Select(node, mirror, propertyDefinition);
         } else {
             return new Text(node, mirror, propertyDefinition);
         }
     }
 
     return {
-        // Radio:        Radio,
-        // Range:        Range,
-        // SingleChoice: SingleChoice,
         Checkbox: Checkbox,
+        Compound: Compound,
         Number:   Number,
         Range:    Range,
+        Select:   Select,
         Text:     Text,
 
         newFrom: newFrom
