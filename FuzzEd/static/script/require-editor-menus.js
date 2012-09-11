@@ -141,8 +141,22 @@ define(['require-config', 'require-oop', 'json!config/fuzztree.json'],
 
                 // create list entry for the menu
                 var entry = jQuery('<li><a href="#">' + nodeNames.join(', ') + '</a></li>');
-                // remember the corresponding nodes for that entry
-                entry.data('nodes', nodes);
+
+                // highlight the corresponding nodes on hover
+                entry.hover(
+                    // in
+                    function() {
+                        var allNodes = this._editor._nodes;
+                        _.invoke(allNodes, 'disable');
+                        _.invoke(nodes, 'highlight');
+                    }.bind(this),
+                    // out
+                    function() {
+                        var allNodes = this._editor._nodes;
+                        _.invoke(allNodes, 'enable');
+                        _.invoke(nodes, 'highlight', false);
+                    }.bind(this)
+                );
 
                 listElement.append(entry);
             }.bind(this));
