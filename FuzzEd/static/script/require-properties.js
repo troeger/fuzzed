@@ -26,10 +26,6 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             this.name     = propertyDefinition.displayName || '';
             this.node     = node;
             this.property = propertyDefinition.property;
-
-            if (typeof propertyDefinition._value !== 'undefined') {
-                this._value = propertyDefinition._value;
-            }
             
             jQuery.extend(this, this._setupVisual());
             this._mirror();
@@ -154,10 +150,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             this.property = propertyDefinition.property;
 
             _.each(_.keys(this.choices), function(choice) {
-                var compoundPropertyDefintion = this.choices[choice];
-                compoundPropertyDefintion.property = this.property;
+                var compoundPropertyDefinition = this.choices[choice];
+                compoundPropertyDefinition.property = this.property;
 
-                this.choices[choice] = newFrom(node, mirror, compoundPropertyDefintion);
+                this.choices[choice] = newFrom(node, mirror, compoundPropertyDefinition);
             }.bind(this));
 
             propertyDefinition.property = propertyDefinition.property + 'Selected';
