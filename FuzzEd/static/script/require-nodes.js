@@ -9,7 +9,7 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
             this.kind = properties.kind || 'node';
 
             // merge all members of the configuration (defaults) into this object
-            jQuery.extend(this, FuzztreeConfig.nodes[this.kind]);
+            jQuery.extend(true, this, FuzztreeConfig.nodes[this.kind]);
 
             // merge all given properties into this object
             jQuery.extend(this, properties);
