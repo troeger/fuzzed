@@ -14,14 +14,6 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
             // merge all given properties into this object
             jQuery.extend(this, properties);
 
-            // TODO: improve me! I need to get proper values from Backend/general Backend parsing
-            if (typeof this.optional === 'string') {
-                this.optional = this.optional === 'false' ? false : true;
-            }
-            if (typeof this.nRange === 'string') {
-                this.nRange = this.nRange.split(',');
-            }
-
             // logic
             this._editor = undefined; // will be set when appending
             this._graph  = undefined; // will be set as soon as it get added to a concrete graph

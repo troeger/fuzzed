@@ -75,18 +75,15 @@ CONFIG = {
             'image': 'basic_event.svg',
             'help': 'Initiating failure in a basic component',
 
+            'probability': 0,
+            'probabilitySelected': 'Exact',
+
             'propertyMenuEntries': {
                 'probability': {
                     'kind': 'compound',
                     'disabled': False,
 
                     'choices': {
-                        u'Exact': {
-                            'kind': 'number',
-                            'min': 0,
-                            'max': 1,
-                            'step': 0.01
-                        },
                         u'Fuzzy': {
                             'kind': 'select',
                             'choices': [
@@ -98,6 +95,12 @@ CONFIG = {
                                 u'very likely',
                                 u'always'
                             ]
+                        },
+                        u'Exact': {
+                            'kind': 'number',
+                            'min': 0,
+                            'max': 1,
+                            'step': 0.01
                         }
                     }
                 }
