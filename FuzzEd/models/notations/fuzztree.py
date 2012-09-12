@@ -189,7 +189,13 @@ CONFIG = {
 
             'name': u'OR Gate',
             'image': 'or_gate.svg',
-            'help': 'Output event occurs if one or more input events occur'
+            'help': 'Output event occurs if one or more input events occur',
+
+            'connector': {
+                'offset': {
+                    'bottom': -7
+                }
+            }
         },
 
         'xorGate': {
