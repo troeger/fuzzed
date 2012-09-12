@@ -118,8 +118,68 @@ define(['require-config', 'require-oop', 'json!config/fuzztree.json'],
         }
     });
 
+    /**
+     * Class: CutsetsMenu
+     */
+    var CutsetsMenu = Menu.extend({
+        init: function(editor) {
+            this._super();
+            this._editor = editor;
+        },
+
+        displayCutsets: function(cutsets) {
+            var listElement = this._container.find('ul');
+
+            _.each(cutsets, function(cutset) {
+                var nodeIDs = cutset['nodes'];
+                var nodes = _.map(nodeIDs, function(id) {
+                    return this._editor.graph().getNodeById(id);
+                }.bind(this));
+                var nodeNames = _.map(nodes, function(node) {
+                    return node.name;
+                })
+
+                // create list entry for the menu
+                var entry = jQuery('<li><a href="#">' + nodeNames.join(', ') + '</a></li>');
+
+                // highlight the corresponding nodes on hover
+                entry.hover(
+                    // in
+                    function() {
+                        var allNodes = this._editor._nodes;
+                        _.invoke(allNodes, 'disable');
+                        _.invoke(nodes, 'highlight');
+                    }.bind(this),
+                    // out
+                    function() {
+                        var allNodes = this._editor._nodes;
+                        _.invoke(allNodes, 'enable');
+                        _.invoke(nodes, 'highlight', false);
+                    }.bind(this)
+                );
+
+                listElement.append(entry);
+            }.bind(this));
+        },
+
+        /* Section: Visibility */
+        hide: function() {
+            this._container.hide();
+        },
+
+        show: function() {
+            this._container.show();
+        },
+
+        /* Section: Internal */
+        _setupContainer: function() {
+            return jQuery('#' + Config.IDs.CUTSETS_MENU);
+        }
+    });
+
     return {
         ShapeMenu:      ShapeMenu,
-        PropertiesMenu: PropertiesMenu
+        PropertiesMenu: PropertiesMenu,
+        CutsetsMenu:     CutsetsMenu
     }
 });
