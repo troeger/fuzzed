@@ -199,6 +199,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             newChoice._mirror();
             newChoice._sendChange();
 
+            this._value(this._active().html());
             this._sendChange();
         },
 
