@@ -18,6 +18,7 @@ define(function() {
         Classes: {
             JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
             JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover',
+            JSPLUMB_CONNECTOR:       '_jsPlumb_connector',
 
             MIRROR:                  'fuzzed-mirror',
             MIRROR_BOLD:             'fuzzed-mirror-bold',

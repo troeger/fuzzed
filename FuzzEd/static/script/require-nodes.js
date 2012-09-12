@@ -265,7 +265,7 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
                 opacity:     Config.Dragging.OPACITY,
                 cursor:      Config.Dragging.CURSOR,
                 grid:        [Config.Grid.SIZE, Config.Grid.SIZE],
-                stack:       '.' + Config.Classes.NODE,
+                stack:       '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
 
                 // start dragging callback
                 start:       function() {
