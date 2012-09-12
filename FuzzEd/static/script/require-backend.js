@@ -199,9 +199,11 @@ define(['require-config', 'require-graph'], function (Config, Graph) {
         jQuery.ajax({
             url:      url,
             type:     'POST',
+            data:{
+                properties: JSON.stringify(properties)
+            },
             dataType: 'json',
 
-            data:     JSON.stringify(properties),
             success:  success  || jQuery.noop,
             error:    error    || jQuery.noop,
             complete: complete || jQuery.noop

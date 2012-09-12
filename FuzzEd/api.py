@@ -192,8 +192,7 @@ def node(request, graph_id, node_id):
     if request.method == 'POST':
         # Interpret all parameters as json-formatted. This will also correctly parse
         # numerical values like 'x' and 'y'.
-        print 'stuff', [(key,value) for key, value in request.POST.iteritems()]
-        paramsDict = {key : json.loads(value) for key, value in request.POST.iteritems()}
+        paramsDict = json.loads(request.POST.get('properties', {}))
 
         command = commands.ChangeNode.create_from(graph_id, node_id, **paramsDict)
         command.do()
