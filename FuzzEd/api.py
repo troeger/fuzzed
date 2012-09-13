@@ -18,7 +18,7 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse,HttpResponseNotAllowedAnswer, HttpResponseNoResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, Edge, notations, commands
-from FuzzEd.backend import MinBool
+from FuzzEd import backend
 
 import logging
 
@@ -364,8 +364,10 @@ def cutsets(request, graph_id):
     """
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     #tree='(b or c or a) and (c or a and b) and (d) or (e)'
-    tree=graph.to_bool_term()
-    reducer = MinBool()
-    cutsets=reducer.simplify(tree)
+    # minbool is NP-complete, so more than 10 basic events are not feasible for computation
+    nodecount = graph.nodes.all().filter(kind__exact="basicEvent", deleted__exact=False).count()
+    if nodecount >= 10:
+        raise HttpResponseServerErrorAnswer()
+    result=backend.getcutsets(graph.to_bool_term())
     #TODO: check the command stack if meanwhile the graph was modified
-    return HttpResponse(json.dumps(cutsets), 'application/javascript')
+    return HttpResponse(json.dumps(result), 'application/javascript')
