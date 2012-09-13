@@ -86,6 +86,7 @@
             "deleted": false,
             "source": 1,
             "target": 2,
+            "graph": 1,
             "client_id": 65
         }
     },
@@ -96,6 +97,7 @@
             "deleted": false,
             "source": 2,
             "target": 3,
+            "graph": 1,
             "client_id": 66
         }
     },
@@ -106,6 +108,7 @@
             "deleted": false,
             "source": 2,
             "target": 4,
+            "graph": 1,
             "client_id": 77
         }
     },
@@ -116,6 +119,7 @@
             "deleted": false,
             "source": 4,
             "target": 5,
+            "graph": 1,
             "client_id": 88
         }
     },
@@ -126,6 +130,7 @@
             "deleted": false,
             "source": 4,
             "target": 6,
+            "graph": 1,
             "client_id": 99
         }
     },
