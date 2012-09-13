@@ -129,6 +129,7 @@ define(['require-config', 'require-oop', 'json!config/fuzztree.json'],
 
         displayCutsets: function(cutsets) {
             var listElement = this._container.find('ul');
+            listElement.empty()
 
             _.each(cutsets, function(cutset) {
                 var nodeIDs = cutset['nodes'];
