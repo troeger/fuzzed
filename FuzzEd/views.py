@@ -262,7 +262,7 @@ def login(request):
                 new_user = User(username=email, email=email)
 
             # both, username and e-mail were not given, use a timestamp as username
-            elif not username and not email:
+            elif not user_name and not email:
                 now = datetime.datetime.now()
                 user_name = 'Anonymous %u%u%u%u' % (now.hour, now.minute,\
                                                     now.second, now.microsecond)

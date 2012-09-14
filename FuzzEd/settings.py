@@ -13,7 +13,7 @@ MANAGERS = ADMINS
 EMAIL_SUBJECT_PREFIX = '[FuzzTrees] '
 
 if is_production:
-    DEBUG =                   False
+    DEBUG =                   True
     TEMPLATE_DEBUG =          DEBUG
     SEND_BROKEN_LINK_EMAILS = False     
     EMAIL_BACKEND =           'django.core.mail.backends.smtp.EmailBackend'
