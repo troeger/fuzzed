@@ -6,6 +6,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.forms.fields import Field
 from django.forms.util import ValidationError as FormValidationError
 
+# Tell South hwo to serialize this stuff
+from south.modelsinspector import add_introspection_rules
+add_introspection_rules([], ["^FuzzEd.lib.jsonfield\.fields\.(JSONField|JSONCharField)"])
 
 class JSONFormField(Field):
     def clean(self, value):
@@ -78,10 +81,3 @@ class JSONCharField(JSONFieldBase, models.CharField):
     """JSONCharField is a generic textfield that serializes/unserializes JSON objects,
     stored in the database like a CharField, which enables it to be used
     e.g. in unique keys"""
-
-
-try:
-    from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ["^jsonfield\.fields\.(JSONField|JSONCharField)"])
-except ImportError:
-    pass
