@@ -28,7 +28,9 @@
 </script>
 {% endblock %}
 
-{% block navigation_home %}active{% endblock %}
+{%block navigation_home %}hidden{% endblock %}
+{%block navigation_settings %}hidden{% endblock %}
+{%block navigation_logout %}hidden{% endblock %}
 
 {% block content %}
 <div class="page-header">
@@ -47,7 +49,7 @@
 <section>
     <div class="row">
         <div class="span4">
-            <h3>Dependability Modeling <small>Fault Trees and RBDs</small></h3>
+            <h3>Dependability Modeling <br/><small>Fault Trees and RBDs</small></h3>
             <p>
                 If you need a quick way for drawing and analyzing system 
                 availability characteristics, this one is for you. 
@@ -56,7 +58,7 @@
         </div>
 
         <div class="span4">
-            <h3>Uncertainties in Modeling <small>Introducing FuzzTrees</small></h3>
+            <h3>Uncertainties in Modeling <br/><small>Introducing FuzzTrees</small></h3>
             <p>
                 Our novel concept for fault tree modeling allows you to express
                 configurable and uncertain parts of the system. 
@@ -66,7 +68,7 @@
         </div>
 
         <div class="span4">
-            <h3>Collaboration and Teaching <small>Share your Graphs</small></h3>
+            <h3>Collaboration and Teaching </br><small>Share your Graphs</small></h3>
             <p>
                 Graphs are planned to be easily sharable between users to support academic
                 teaching and professional collaboration projects. 

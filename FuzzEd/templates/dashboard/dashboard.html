@@ -4,8 +4,6 @@
     {{ block.super }} - Dashboard
 {% endblock %}
 
-{% block navigation_home %}active{% endblock %}
-
 {% block script %}
 {{ block.super }}
 <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
@@ -51,6 +49,8 @@
     });
 </script>
 {% endblock %}
+
+{%block navigation_home %}hidden{% endblock %}
 
 {% block content %}
 <div class="page-header">

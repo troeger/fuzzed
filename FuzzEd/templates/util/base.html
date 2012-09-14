@@ -32,27 +32,25 @@
             <div class="container">
                 <a class="brand" anchor="#">FuzzEd</a>
                 <ul class="nav pull-right">
-                    {% block navigation_fields %}{% endblock %}
                     <li class="{% block navigation_home %}{% endblock %}">
                         <a href="/">
                             <i class="icon-home icon-white"></i>
-                            Home
+                            Dashboard
                         </a>
                     </li>
-                    {% if user.is_authenticated %}
-                    <li class="{% block navigation_settings %}{% endblock %}">
+                    {% block navigation_fields%}{%endblock%}
+                     <li class="{% block navigation_settings %}{% endblock %}">
                         <a href="/settings">
                             <i class="icon-wrench icon-white"></i>
-                            Settings
+                            Account
                         </a>
                     </li>
-                    <li>
+                    <li  class="{% block navigation_logout %}{% endblock %}">
                         <a href="/?logout">
                             <i class="icon-off icon-white"></i>
                             Logout
                         </a>
                     </li>
-                    {% endif %}
                 </ul>
             </div>
         </div>
