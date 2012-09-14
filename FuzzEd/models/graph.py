@@ -38,7 +38,7 @@ class Graph(models.Model):
     deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return '%s%s' % ('[DELETED] ' if self.deleted else '', self.name)
+        return unicode('%s%s' % ('[DELETED] ' if self.deleted else '', self.name))
 
     def to_json(self):
         """
