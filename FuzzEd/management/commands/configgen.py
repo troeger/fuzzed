@@ -3,8 +3,7 @@ import copy
 import collections
 import os
 import xml.dom.minidom as xml
-
-from django.core.exceptions import MiddlewareNotUsed
+from django.core.management.base import BaseCommand, CommandError
 
 from FuzzEd.models import notations
 from FuzzEd.settings import STATICFILES_DIRS
@@ -76,9 +75,10 @@ class Generator(object):
                 img_write_handle.write(document.toxml())
                 img_write_handle.close()
 
-class ConfigGenerator:
-    def __init__(self):
+class Command(BaseCommand):
+    help = 'Updates internal data structures when the graph configurations were changed'
+
+    def handle(self, *args, **options):
         for notation in notations.installed:
             Generator(notation).generate()
 
-        raise MiddlewareNotUsed()
