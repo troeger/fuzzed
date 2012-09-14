@@ -13,9 +13,8 @@ MANAGERS = ADMINS
 EMAIL_SUBJECT_PREFIX = '[FuzzTrees] '
 
 if is_production:
-    DEBUG =                   False
-#    TEMPLATE_DEBUG =          False
-    TEMPLATE_DEBUG = True
+    DEBUG =                   True
+    TEMPLATE_DEBUG =          DEBUG
     SEND_BROKEN_LINK_EMAILS = False     
     EMAIL_BACKEND =           'django.core.mail.backends.smtp.EmailBackend'
     SERVER_EMAIL =            'noreply@citemaster.net'
@@ -37,8 +36,8 @@ if is_production:
         # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
-        '/var/www/fuzztrees.net/backend/fuzztrees/templates',
-        '/var/www/fuzztrees.net/backend/fuzztrees/static/img/nodes'
+        '/var/www/fuzztrees.net/FuzzEd/templates',
+        '/var/www/fuzztrees.net/FuzzEd/static/img/nodes'
     )
 
 else:
