@@ -54,11 +54,6 @@ CONFIG = {
                 'name': {
                     'position': 'bottom',
                     'style': ['bold', 'large']
-                },
-                'probability': {
-                    'position': 'bottom',
-                    'style': ['italic'],
-                    'prefix': 'p='
                 }
             }
         },
@@ -104,7 +99,18 @@ CONFIG = {
                         }
                     }
                 }
+            },
+
+            'propertyMirrors': {
+                'probability': {
+                    'position': 'bottom',
+                    'style': ['italic'],
+                    'prefix': 'p='
+                }
             }
+
+
+
         },
 
         'basicEventSet': {
@@ -145,7 +151,6 @@ CONFIG = {
             'inherits': 'intermediateEvent',
 
             'name': u'Intermediate Event Set',
-            'numberOfIncomingConnections': 0,
             'image': 'intermediate_event_set.svg',
             'help': 'Set of intermediate events',
             'cardinality': 1,
