@@ -240,6 +240,20 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
             }
         },
 
+        /**
+         *  Method: _getPositionOnCanvas
+         *      Returns the (pixel) position of the node (center of the node image) relative to the canvas.
+         *  Returns:
+         *      Object containing the 'x' and 'y' position.
+         */
+        _getPositionOnCanvas: function() {
+            var editorOffset = this._editor._canvas.offset();
+            var x = this._nodeImage.offset().left + this._nodeImage.width() / 2 - editorOffset.left;
+            var y = this._nodeImage.offset().top + this._nodeImage.height() / 2 - editorOffset.top;
+
+            return {'x': x, 'y': y};
+        },
+
         _resize: function() {
             // calculate the scale factor
             var marginOffset = this._nodeImage.outerWidth(true) - this._nodeImage.width();
@@ -274,12 +288,7 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
 
                 // stop dragging callback
                 stop:        function(eventObject, uiHelpers) {
-                    var editorOffset = this._editor._canvas.offset();
-                    var coordinates = this._editor.toGrid({
-                        //XXX: find a better way (give node position function...)
-                        x: this._nodeImage.offset().left - editorOffset.left,
-                        y: this._nodeImage.offset().top - editorOffset.top
-                    });
+                    var coordinates = this._editor.toGrid(this._getPositionOnCanvas());
                     Backend.changeNode(this, coordinates);
                 }.bind(this)
             });
