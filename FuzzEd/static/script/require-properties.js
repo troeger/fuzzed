@@ -250,6 +250,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             this._sendChange();
         },
 
+        _inputValue: function() {
+            return parseFloat(this._super());
+        },
+
         _keyup: function() {
             this._mirror();
             this._value(this._inputValue());
@@ -308,7 +312,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         _getFloat: _getFloat,
 
         _inputValue: function() {
-            return [this._lower.val(), this._upper.val()];
+            return [parseFloat(this._lower.val()), parseFloat(this._upper.val())];
         },
 
         _mirror: function() {
