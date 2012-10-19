@@ -256,14 +256,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
         _getFloat: _getFloat,
 
-        _change: function() {
-            this._keyup();
-            this._sendChange();
-        },
-
         _keyup: function() {
             this._mirror();
             this._value(this._inputValue());
+            this._sendChange();
         },
 
         _setupInput: function() {
@@ -287,6 +283,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             this.step = this._getFloat(propertyDefinition, 'step', 1)
 
             this._super(node, mirror, propertyDefinition);
+        },
+
+        _keyup: function(eventObject) {
+            this._change(eventObject);
         },
 
         _change: function(eventObject) {
@@ -386,13 +386,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
     });
 
     var Text = Property.extend({
-        _blur: function() {
-            this._sendChange();
-        },
-
         _keyup: function() {
             this._mirror();
             this._value(this._inputValue());
+            this._sendChange();
         },
 
         _setupInput: function() {
