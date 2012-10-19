@@ -1,9 +1,11 @@
 from django.db import models
+from FuzzEd.lib.jsonfield import JSONField
 
 from edge import Edge
 from graph import Graph
 from node import Node
 from properties import Property
+
 import notations
 
 class Command(models.Model):
@@ -182,8 +184,7 @@ class AddNode(Command):
          {<AddNode>} - the add node command instance
         """
         graph = Graph.objects.get(pk=int(graph_id))
-        node  = Node(graph=graph, client_id=int(node_id), \
-                     kind=kind, x=int(x), y=int(y), deleted=True)
+        node  = Node(graph=graph, client_id=int(node_id), kind=kind, x=int(x), y=int(y), deleted=True)
         node.save()
         
         return cls(node=node)
@@ -304,8 +305,8 @@ class PropertyChange(models.Model):
 
     command   = models.ForeignKey(ChangeNode, related_name='changes')
     key       = models.CharField(max_length=255)
-    old_value = models.CharField(max_length=255)
-    new_value = models.CharField(max_length=255)
+    old_value = JSONField()
+    new_value = JSONField()
 
 class DeleteEdge(Command):
     """

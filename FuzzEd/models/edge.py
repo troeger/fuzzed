@@ -33,7 +33,7 @@ class Edge(models.Model):
 
     def __unicode__(self):
         prefix = '[DELETED] ' if self.deleted else ''
-        return  '%s%s -> %s' % (prefix, str(self.source), str(self.target))
+        return  unicode('%s%s -> %s' % (prefix, str(self.source), str(self.target)))
 
     def to_json(self):
         """

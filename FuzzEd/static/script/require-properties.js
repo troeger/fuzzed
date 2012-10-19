@@ -63,10 +63,21 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
         _sendChange: function() {
             if (this.property) {
-                properties = {};
-                properties[this.property] = this._value();
+                var property = this.property;
+                var value = this._value();
 
-                Backend.changeNode(this.node, properties);
+                // update function that will be called after 1 sec. of inactivity
+                var sendChange = function() {
+                    var properties = {};
+                    properties[property] = value;
+                    Backend.changeNode(this.node, properties);
+                }.bind(this);
+
+                // discard old timeout
+                clearTimeout(this._sendChangeTimeout);
+
+                // create a new one
+                this._sendChangeTimeout = setTimeout(sendChange, 1000);
             }
         },
 
@@ -144,7 +155,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         init: function(node, mirror, propertyDefinition) {
             this.choices  = propertyDefinition.choices;
             if (typeof this.choices === 'undefined' || _.keys(this.choices).length < 2) {
-                throw 'Not enough choices for Compound property';
+                throw 'Not enough choices for compound property';
             }
             this.node     = node;
             this.property = propertyDefinition.property;
@@ -245,14 +256,14 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
         _getFloat: _getFloat,
 
-        _change: function() {
-            this._keyup();
-            this._sendChange();
-        },
-
         _keyup: function() {
             this._mirror();
             this._value(this._inputValue());
+            this._sendChange();
+        },
+
+        _inputValue: function() {
+            return parseFloat(this._super());
         },
 
         _setupInput: function() {
@@ -276,6 +287,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             this.step = this._getFloat(propertyDefinition, 'step', 1)
 
             this._super(node, mirror, propertyDefinition);
+        },
+
+        _keyup: function(eventObject) {
+            this._change(eventObject);
         },
 
         _change: function(eventObject) {
@@ -308,7 +323,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         _getFloat: _getFloat,
 
         _inputValue: function() {
-            return [this._lower.val(), this._upper.val()];
+            return [parseFloat(this._lower.val()), parseFloat(this._upper.val())];
         },
 
         _mirror: function() {
@@ -375,13 +390,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
     });
 
     var Text = Property.extend({
-        _blur: function() {
-            this._sendChange();
-        },
-
         _keyup: function() {
             this._mirror();
             this._value(this._inputValue());
+            this._sendChange();
         },
 
         _setupInput: function() {

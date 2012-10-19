@@ -54,11 +54,6 @@ CONFIG = {
                 'name': {
                     'position': 'bottom',
                     'style': ['bold', 'large']
-                },
-                'probability': {
-                    'position': 'bottom',
-                    'style': ['italic'],
-                    'prefix': 'p='
                 }
             }
         },
@@ -104,7 +99,18 @@ CONFIG = {
                         }
                     }
                 }
+            },
+
+            'propertyMirrors': {
+                'probability': {
+                    'position': 'bottom',
+                    'style': ['italic'],
+                    'prefix': 'p='
+                }
             }
+
+
+
         },
 
         'basicEventSet': {
@@ -145,7 +151,6 @@ CONFIG = {
             'inherits': 'intermediateEvent',
 
             'name': u'Intermediate Event Set',
-            'numberOfIncomingConnections': 0,
             'image': 'intermediate_event_set.svg',
             'help': 'Set of intermediate events',
             'cardinality': 1,
@@ -212,21 +217,21 @@ CONFIG = {
             'name': u'Voting OR Gate',
             'image': 'voting_or_gate.svg',
             'help': 'Output event occurs if the given number of input events occur',
-            'count': 1,
+            'kN': [1, 2],
 
             'propertyMenuEntries': {
-                'count': {
-                    'kind': 'number',
-                    'displayName': u'Count',
+                'kN': {
+                    'kind': 'range',
+                    'displayName': u'k-out-of-N',
                     'min': 1,
                     'step': 1
                 }
             },
             'propertyMirrors': {
-                'cardinality': {
+                'kN': {
                     'position': 'bottom',
                     'style': ['italic'],
-                    'prefix': 'k='
+                    'prefix': 'k/N: '
                 }
             }
         },
@@ -338,7 +343,7 @@ CONFIG = {
         'cost',
         'probability',
         'optional',
-        'count',
+        'kN',
         'cardinality',
         'kFormula',
         'nRange'

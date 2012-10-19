@@ -55,6 +55,7 @@ class Generator(object):
             path = '%s/%s/config/%s.json' % (cwd, directory, self.kind)
             handle = open(path, 'w')
             handle.write(json.dumps(self.config))
+            print "Writing "+path
             handle.close()
 
             # adjust the svgs
