@@ -63,10 +63,21 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
         _sendChange: function() {
             if (this.property) {
-                properties = {};
-                properties[this.property] = this._value();
+                var property = this.property;
+                var value = this._value();
 
-                Backend.changeNode(this.node, properties);
+                // update function that will be called after 1 sec. of inactivity
+                var sendChange = function() {
+                    var properties = {};
+                    properties[property] = value;
+                    Backend.changeNode(this.node, properties);
+                }.bind(this);
+
+                // discard old timeout
+                clearTimeout(this._sendChangeTimeout);
+
+                // create a new one
+                this._sendChangeTimeout = setTimeout(sendChange, 1000);
             }
         },
 
