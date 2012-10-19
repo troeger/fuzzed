@@ -155,7 +155,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         init: function(node, mirror, propertyDefinition) {
             this.choices  = propertyDefinition.choices;
             if (typeof this.choices === 'undefined' || _.keys(this.choices).length < 2) {
-                throw 'Not enough choices for Compound property';
+                throw 'Not enough choices for compound property';
             }
             this.node     = node;
             this.property = propertyDefinition.property;
@@ -262,6 +262,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             this._sendChange();
         },
 
+        _inputValue: function() {
+            return parseFloat(this._super());
+        },
+
         _setupInput: function() {
             return jQuery('<input type="number" class="input-medium">')
                 .attr('id',       this.id)
@@ -319,7 +323,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         _getFloat: _getFloat,
 
         _inputValue: function() {
-            return [this._lower.val(), this._upper.val()];
+            return [parseFloat(this._lower.val()), parseFloat(this._upper.val())];
         },
 
         _mirror: function() {
