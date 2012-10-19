@@ -63,10 +63,21 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
         _sendChange: function() {
             if (this.property) {
-                properties = {};
-                properties[this.property] = this._value();
+                var property = this.property;
+                var value = this._value();
 
-                Backend.changeNode(this.node, properties);
+                // update function that will be called after 1 sec. of inactivity
+                var sendChange = function() {
+                    var properties = {};
+                    properties[property] = value;
+                    Backend.changeNode(this.node, properties);
+                }.bind(this);
+
+                // discard old timeout
+                clearTimeout(this._sendChangeTimeout);
+
+                // create a new one
+                this._sendChangeTimeout = setTimeout(sendChange, 1000);
             }
         },
 
@@ -245,14 +256,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
         _getFloat: _getFloat,
 
-        _change: function() {
-            this._keyup();
-            this._sendChange();
-        },
-
         _keyup: function() {
             this._mirror();
             this._value(this._inputValue());
+            this._sendChange();
         },
 
         _setupInput: function() {
@@ -276,6 +283,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             this.step = this._getFloat(propertyDefinition, 'step', 1)
 
             this._super(node, mirror, propertyDefinition);
+        },
+
+        _keyup: function(eventObject) {
+            this._change(eventObject);
         },
 
         _change: function(eventObject) {
@@ -375,13 +386,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
     });
 
     var Text = Property.extend({
-        _blur: function() {
-            this._sendChange();
-        },
-
         _keyup: function() {
             this._mirror();
             this._value(this._inputValue());
+            this._sendChange();
         },
 
         _setupInput: function() {
