@@ -144,7 +144,7 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         init: function(node, mirror, propertyDefinition) {
             this.choices  = propertyDefinition.choices;
             if (typeof this.choices === 'undefined' || _.keys(this.choices).length < 2) {
-                throw 'Not enough choices for Compound property';
+                throw 'Not enough choices for compound property';
             }
             this.node     = node;
             this.property = propertyDefinition.property;
