@@ -226,7 +226,7 @@ class ChangeNode(Command):
     node = models.ForeignKey(Node, related_name='+')
 
     @classmethod
-    def create_from(cls, graph_id, node_id, **updated_properties):
+    def create_from(cls, graph_id, node_id, updated_properties):
         """
         Method [static]: create_from
         
