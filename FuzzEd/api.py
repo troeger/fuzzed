@@ -187,9 +187,8 @@ def node(request, graph_id, node_id):
     Returns:
         {HTTPResponse} a django response object
     """
-    node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id, deleted=False)
-
     try:
+        node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id, deleted=False)
         if request.method == 'POST':
             # Interpret all parameters as json-formatted. This will also correctly parse
             # numerical values like 'x' and 'y'.
