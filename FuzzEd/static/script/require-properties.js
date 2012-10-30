@@ -267,7 +267,14 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
         },
 
         _inputValue: function() {
-            return parseFloat(this._super());
+            var value;
+            if (this._super() == "") {
+                // allow null values in case the user cleared the field
+                value = null;
+            } else {
+                value = parseFloat(this._super());
+            }
+            return value;
         },
 
         _setupInput: function() {
