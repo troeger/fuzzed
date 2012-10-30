@@ -256,6 +256,10 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
         _getFloat: _getFloat,
 
+        _change: function() {
+            this._mirror();
+        },
+
         _keyup: function() {
             this._mirror();
             this._value(this._inputValue());
