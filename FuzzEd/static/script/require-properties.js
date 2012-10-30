@@ -266,6 +266,12 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             this._sendChange();
         },
 
+        _blur: function() {
+            // reset input value to actual value
+            // (necessary if the user entered a value which is not within the bounds)
+            this.input.val(this._inputValue());
+        },
+
         _inputValue: function() {
             var value;
             if (this._super() == "") {
@@ -273,6 +279,9 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
                 value = null;
             } else {
                 value = parseFloat(this._super());
+                // keep value within bounds
+                if (value < this.min) value = this.min;
+                if (value > this.max) value = this.max;
             }
             return value;
         },
