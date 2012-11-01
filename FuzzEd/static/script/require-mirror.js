@@ -41,7 +41,14 @@ define(['require-config', 'require-oop'], function(Config, Class) {
         },
 
         show: function(text) {
-            this._mirror.html(this._prefix + text + this._suffix);
+            if (typeof text === 'undefined' || text === null || text === '') {
+                this._mirror.css('display', 'none');
+            } else {
+                // remove 'display: none' from element to show it again
+                // '.show()' won't work because this sets display to 'inline', but we need 'block'
+                this._mirror.css('display', '');
+                this._mirror.html(this._prefix + text + this._suffix);
+            }
         }
     })
 
