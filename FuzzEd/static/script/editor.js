@@ -192,17 +192,7 @@ define(['require', 'config', 'node', 'backend',
                 this._loadGraphCompleted();
             }
 
-            // pick the right graph class depending on the type
-            if (json.type == 'fuzztree') {
-                require(['require-fuzztree'], constructGraph.bind(this));
-            } else if (json.type == 'faulttree') {
-                require(['require-faulttree'], constructGraph.bind(this));
-            } else if (json.type == 'rbd') {
-                require(['require-rbdg'], constructGraph.bind(this));
-            } else {
-                // TODO: maybe an "unknown graph type"-error here?
-                require(['graph'], constructGraph.bind(this));
-            }
+            require(['graph'], constructGraph.bind(this));
         },
 
         _setupAjaxHandler: function() {
