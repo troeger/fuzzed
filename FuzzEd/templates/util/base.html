@@ -32,6 +32,7 @@
             <div class="container">
                 <a class="brand" anchor="#">FuzzEd</a>
                 <ul class="nav pull-right">
+                    {%  if user.is_authenticated %}
                     <li class="{% block navigation_home %}{% endblock %}">
                         <a href="/">
                             <i class="icon-home icon-white"></i>
@@ -51,6 +52,7 @@
                             Logout
                         </a>
                     </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

@@ -12,7 +12,7 @@ from django.views.decorators.http import require_http_methods
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
 
-from FuzzEd.models import Graph, notations, commands
+from FuzzEd.models import Graph, Edge, notations, commands
 
 GREETINGS = [
     "Loading the FuzzEd User Experience",
@@ -135,6 +135,40 @@ def dashboard_edit(request, graph_id):
     # deletion requested? do it and go back to dashboard
     if POST.get('delete'):
         commands.DeleteGraph.create_from(graph_id).do()
+        return redirect('dashboard')
+
+    # duplication requested
+    if POST.get('duplicate'):
+        # add new graph object
+        oldgraph=Graph.objects.get(pk=graph_id)
+        cmd = commands.AddGraph.create_from(kind=oldgraph.kind, name=oldgraph.name+" (copy)", owner=request.user)
+        cmd.do()    
+        newgraph=cmd.graph
+        # copy all nodes and their properties
+        nodemapping={}
+        for node in oldgraph.nodes.all():
+            # first cache the old node's properties
+            props = node.properties.all()
+            # create node copy by overwriting the ID field
+            oldid=node.pk
+            node.pk=None
+            node.graph=newgraph
+            node.save()
+            nodemapping[oldid]=node
+            # now save the propery objects for the new node
+            for prop in props:
+                prop.pk=None
+                prop.node=node
+                prop.save()
+        clientid=1
+        for oldedge in oldgraph.edges.all():
+            e=Edge()
+            e.source=nodemapping[oldedge.source.pk]
+            e.target=nodemapping[oldedge.target.pk]
+            e.graph=newgraph
+            e.client_id=clientid
+            e.save()    
+            clientid+=1
         return redirect('dashboard')
 
     # please show the edit page to the user on get requests

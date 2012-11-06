@@ -127,6 +127,23 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
             this.node[this.property] = value;
 
             return this;
+        },
+
+        /**
+         *  Method: _warn
+         *      Highlight the control group. Use this to notify the user that he/she entered a wrong value.
+         *
+         *  Parameters:
+         *      warn - [optional] Boolean to indicate whether to set or remove warning state. (Default: true)
+         */
+        _warn: function(warn) {
+            if (typeof warn === 'undefined') warn = true;
+
+            if (warn) {
+                this.visual.addClass('error');
+            } else {
+                this.visual.removeClass('error');
+            }
         }
     });
 
@@ -256,14 +273,47 @@ define(['require-config', 'require-backend', 'require-oop', 'underscore'],
 
         _getFloat: _getFloat,
 
+        _change: function() {
+            this._keyup();
+        },
+
         _keyup: function() {
             this._mirror();
+            this._validate();
             this._value(this._inputValue());
             this._sendChange();
         },
 
+        _blur: function() {
+            // reset input value to actual value
+            // (necessary if the user entered a value which is not within the bounds)
+            this.input.val(this._inputValue());
+            this._validate();
+        },
+
         _inputValue: function() {
-            return parseFloat(this._super());
+            var value;
+            if (this._super() == "") {
+                // allow null values in case the user cleared the field
+                value = null;
+            } else {
+                value = parseFloat(this._super());
+                // keep value within bounds
+                if (value < this.min) value = this.min;
+                if (value > this.max) value = this.max;
+            }
+            return value;
+        },
+
+        /**
+         *  Method: _validate
+         *      Check the validity of the input and warn in case of an invalid value.
+         */
+        _validate: function() {
+            if (this._inputValue() != this.input.val())
+                this._warn(true);
+            else
+                this._warn(false);
         },
 
         _setupInput: function() {

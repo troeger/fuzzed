@@ -7,6 +7,10 @@ define(function() {
     var DISABLED_COLOR    = '#CCC';
 
     return {
+        Attributes: {
+            HEADER: 'header'
+        },
+
         Backend: {
             BASE_URL:       '/api',
             GRAPHS_URL:     '/graphs',
@@ -19,6 +23,10 @@ define(function() {
             JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
             JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover',
             JSPLUMB_CONNECTOR:       '_jsPlumb_connector',
+
+            MENU_CONTROLS:           'menu-controls',
+            MENU_CLOSE:              'menu-close',
+            MENU_MINIMIZE:           'menu-minimize',
 
             MIRROR:                  'fuzzed-mirror',
             MIRROR_BOLD:             'fuzzed-mirror-bold',
@@ -77,6 +85,11 @@ define(function() {
             EDITOR:      'editor',
             CONSTRUCTOR: 'constructor',
             NODE:        'node'
+        },
+
+        Menus: {
+            ANIMATION_DURATION:     200,
+            PROPERTIES_MENU_OFFSET: 20
         },
 
         Node: {

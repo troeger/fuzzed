@@ -187,22 +187,24 @@ def node(request, graph_id, node_id):
     Returns:
         {HTTPResponse} a django response object
     """
-    node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id, deleted=False)
+    try:
+        node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id, deleted=False)
+        if request.method == 'POST':
+            # Interpret all parameters as json-formatted. This will also correctly parse
+            # numerical values like 'x' and 'y'.
+            parameters = json.loads(request.POST.get('properties', {}))
+            logger.debug("Changing node %s in graph %s to %s"%(str(node_id),str(graph_id),parameters))
+            command = commands.ChangeNode.create_from(graph_id, node_id, parameters)
+            command.do()
+            # return the updated node object
+            return HttpResponse(node.to_json(), 'application/javascript', status=204)
 
-    if request.method == 'POST':
-        # Interpret all parameters as json-formatted. This will also correctly parse
-        # numerical values like 'x' and 'y'.
-        parameters = json.loads(request.POST.get('properties', {}))
-
-        command = commands.ChangeNode.create_from(graph_id, node_id, **parameters)
-        command.do()
-        # return the updated node object
-        return HttpResponse(node.to_json(), 'application/javascript', status=204)
-
-    elif request.method == 'DELETE':
-        command = commands.DeleteNode.create_from(graph_id, node_id)
-        command.do()
-        return HttpResponse(status=204)
+        elif request.method == 'DELETE':
+            command = commands.DeleteNode.create_from(graph_id, node_id)
+            command.do()
+            return HttpResponse(status=204)
+    except Exception, e:
+        logger.error("Exception: "+str(e))
 
 
 @login_required

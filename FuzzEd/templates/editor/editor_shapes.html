@@ -1,4 +1,8 @@
-<div id="FuzzEdShapes" class="menu" header="Shapes" style="top: 50px; left: 10px;">
+<div id="FuzzEdShapes" class="menu" header="Shapes">
+    <div class="menu-controls">
+        <span class="menu-minimize"></span>
+    </div>
+
     <table>
     {% for kind, node in nodes %}
         {% if not node.excludeFromShapesMenu %}
