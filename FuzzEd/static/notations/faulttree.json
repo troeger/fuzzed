@@ -1,0 +1,228 @@
+{
+    "kind": "faulttree",
+    "name": "Fault Tree",
+    "nodes": {
+        "node": {
+            "excludeFromShapesMen": true,
+            "name": "Node",
+            "numberOfIncomingConnections": -1,
+            "numberOfOutgoingConnections":  1,
+            "allowConnectionTo": ["node"],
+            "propertyMenuEntries": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name"
+                },
+                "cost": {
+                    "kind": "number",
+                    "displayName": "Cost",
+                    "min": 0,
+                    "step": 1,
+                    "disabled": true
+                },
+                "probability": {
+                    "kind": "text",
+                    "displayName": "Probability",
+                    "disabled": true
+                },
+                "cardinality": {
+                    "displayName": "Cardinality",
+                    "kind": "number",
+                    "min": 1,
+                    "step": 1
+                },
+                "count": {
+                    "kind": "number",
+                    "displayName": "Count",
+                    "min": 1,
+                    "step": 1
+                }
+            }
+        },
+
+        "event": {
+            "inherits": "node",
+            "name": "Event",
+            "probability": null,
+            "excludeFromShapesMen": true,
+            "numberOfIncomingConnections":  1,
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["gate"],
+            "propertyMirrors": {
+                "name": {
+                    "position": "bottom",
+                    "style": ["bold"]
+                }
+            }
+        },
+
+        "gate": {
+            "inherits": "node",
+            "name": "Gate",
+            "excludeFromShapesMen": true,
+            "numberOfIncomingConnections": -1,
+            "numberOfOutgoingConnections":  1
+        },
+
+        "basicEvent": {
+            "inherits": "event",
+            "name": "Basic Event",
+            "probability": 0,
+            "excludeFromShapesMen": false,
+            "numberOfIncomingConnections": 0,
+            "image": "basic_event.svg",
+            "help": "Initiating failure in a basic component",
+            "propertyMenuEntries": {
+                "probability": {
+                    "kind": "number",
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01,
+                    "disabled": false
+                }
+            }
+        },
+
+        "basicEventSet": {
+            "inherits": "basicEvent",
+            "name": "Basic Event Set",
+            "cardinality": 1,
+            "excludeFromShapesMen": false,
+            "image": "basic_event_set.svg",
+            "help": "Set of basic events with identical properties"
+        },
+
+        "intermediateEvent": {
+            "inherits": "event",
+            "name": "Intermediate Event",
+            "excludeFromShapesMen": false,
+            "image": "intermediate_event.svg",
+            "help": "Failure resulting from a combination of previous events"
+        },
+
+        "intermediateEventSet": {
+            "inherits": "intermediateEvent",
+            "name": "Intermediate Event Set",
+            "cardinality": 1,
+            "excludeFromShapesMen": false,
+            "numberOfIncomingConnections": 0,
+            "image": "intermediate_event_set.svg",
+            "help": "Set of intermediate events"
+        },
+
+        "undevelopedEvent": {
+            "inherits": "event",
+            "name": "Undeveloped Event",
+            "excludeFromShapesMen": false,
+            "numberOfIncomingConnections": 0,
+            "image": "undeveloped_event.svg",
+            "help": "Event with no information available or insignificant impact"
+        },
+
+        "houseEvent": {
+            "inherits": "event",
+            "name": "House Event",
+            "excludeFromShapesMen": false,
+            "numberOfIncomingConnections": 0,
+            "image": "house_event.svg",
+            "help": "An event that is expected to occur and typically does not denote a failure"
+        },
+
+        "topEvent": {
+            "inherits": "event",
+            "name": "Top Event",
+            "image": "top_event.svg",
+            "excludeFromShapesMen": true
+        },
+
+        "andGate": {
+            "inherits": "gate",
+            "name": "AND Gate",
+            "excludeFromShapesMen": false,
+            "image": "and_gate.svg",
+            "help": "Output event occurs if all input events occur"
+        },
+
+        "priorityAndGate": {
+            "inherits": "gate",
+            "name": "Priority AND Gate",
+            "excludeFromShapesMen": false,
+            "image": "priority_and_gate.svg",
+            "help": "Output event occurs if all input events occur in the specific order"
+        },
+
+        "orGate": {
+            "inherits": "gate",
+            "name": "OR Gate",
+            "excludeFromShapesMen": false,
+            "image": "or_gate.svg",
+            "help": "Output event occurs if one or more input events occur",
+
+            "connector": {
+                "offset": {
+                    "bottom": -7
+                }
+            }
+        },
+
+        "xorGate": {
+            "inherits": "gate",
+            "name": "XOR Gate",
+            "excludeFromShapesMen": false,
+            "image": "xor_gate.svg",
+            "help": "Output event occurs if exactly one of the input events occur"
+        },
+
+        "votingOrGate": {
+            "inherits": "gate",
+            "name": "Voting OR Gate",
+            "count": 2,
+            "excludeFromShapesMen": false,
+            "image": "voting_or_gate.svg",
+            "help": "Output event occurs if the given number of input events occur"
+        },
+
+        "inhibitGate": {
+            "inherits": "gate",
+            "name": "Inhibit Gate",
+            "excludeFromShapesMen": false,
+            "image": "inhibit_gate.svg",
+            "help": "Output event occurs if the single input event occurs and the enabling condition is given"
+        }
+
+    },
+
+    "propertiesDisplayOrder": [
+        "name",
+        "cost",
+        "probability",
+        "cardinality",
+        "count"
+    ],
+
+    "shapeMenuNodeDisplayOrder": [
+        "basicEvent",
+        "basicEventSet",
+        "intermediateEvent",
+        "intermediateEventSet",
+        "andGate",
+        "priorityAndGate",
+        "orGate",
+        "xorGate",
+        "votingOrGate",
+        "inhibitGate",
+        "undevelopedEvent",
+        "houseEvent",
+        "topEvent"
+    ],
+
+    "defaults": {
+        "nodes": [
+            {
+                "kind": "topEvent",
+                "x": 10,
+                "y": 1
+            }
+        ]
+    }
+}

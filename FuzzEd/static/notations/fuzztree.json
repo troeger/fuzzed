@@ -1,0 +1,367 @@
+{
+    "kind": "fuzztree",
+    "name": "Fuzz Tree",
+    "nodes": {
+        "node": {
+            "optional": null,
+            "numberOfIncomingConnections": -1,
+            "numberOfOutgoingConnections":  1,
+            "allowConnectionTo": ["node"],
+
+            "connector": {
+                "offset": {
+                    "top":    0,
+                    "bottom": 0
+                }
+            }
+        },
+
+        "event": {
+            "inherits": "node",
+
+            "optional": false,
+            "numberOfIncomingConnections":  1,
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["gate"],
+
+            "cost": 1,
+            "probability": 0,
+
+            "propertyMenuEntries": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name"
+                },
+                "cost": {
+                    "kind": "number",
+                    "displayName": "Cost",
+                    "min": 0,
+                    "step": 1
+                },
+                "probability": {
+                    "kind": "text",
+                    "displayName": "Probability",
+                    "disabled": true
+                },
+                "optional": {
+                    "kind": "checkbox",
+                    "displayName": "Optional"
+                }
+            },
+
+            "propertyMirrors": {
+
+                "name": {
+                    "position": "bottom",
+                    "style": ["bold", "large"]
+                }
+            }
+        },
+
+        "gate": {
+            "inherits": "node"
+        },
+
+        "basicEvent": {
+            "inherits": "event",
+
+            "name": "Basic Event",
+            "numberOfIncomingConnections": 0,
+            "image": "basic_event.svg",
+            "help": "Initiating failure in a basic component",
+
+            "probability": 0,
+            "probabilitySelected": "Exact",
+
+            "propertyMenuEntries": {
+                "probability": {
+                    "kind": "compound",
+                    "disabled": false,
+
+                    "choices": {
+                        "Fuzzy": {
+                            "kind": "select",
+                            "choices": [
+                                "never",
+                                "very unlikely",
+                                "unlikely",
+                                "more or less",
+                                "likely",
+                                "very likely",
+                                "always"
+                            ]
+                        },
+                        "Exact": {
+                            "kind": "number",
+                            "min": 0,
+                            "max": 1,
+                            "step": 0.01
+                        }
+                    }
+                }
+            },
+
+            "propertyMirrors": {
+                "probability": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "p="
+                }
+            }
+        },
+
+        "basicEventSet": {
+            "inherits": "basicEvent",
+
+            "name": "Basic Event Set",
+            "image": "basic_event_set.svg",
+            "help": "Set of basic events with identical properties",
+            "cardinality": 1,
+
+            "propertyMenuEntries": {
+                "cardinality": {
+                    "kind": "number",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1
+                }
+            },
+
+            "propertyMirrors": {
+                "cardinality": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "#"
+                }
+            }
+        },
+
+        "intermediateEvent": {
+            "inherits": "event",
+
+            "name": "Intermediate Event",
+            "image": "intermediate_event.svg",
+            "help": "Failure resulting from a combination of previous events"
+        },
+
+        "intermediateEventSet": {
+            "inherits": "intermediateEvent",
+
+            "name": "Intermediate Event Set",
+            "image": "intermediate_event_set.svg",
+            "help": "Set of intermediate events",
+            "cardinality": 1,
+
+            "propertyMenuEntries": {
+                "cardinality": {
+                    "kind": "number",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1
+                }
+            },
+
+            "propertyMirrors": {
+                "cardinality": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "#"
+                }
+            }
+        },
+
+        "andGate": {
+            "inherits": "gate",
+
+            "name": "AND Gate",
+            "image": "and_gate.svg",
+            "help": "Output event occurs if all input events occur"
+        },
+
+        "priorityAndGate": {
+            "inherits": "gate",
+
+            "name": "Priority AND Gate",
+            "image": "priority_and_gate.svg",
+            "help": "Output event occurs if all input events occur in the specific order"
+        },
+
+        "orGate": {
+            "inherits": "gate",
+
+            "name": "OR Gate",
+            "image": "or_gate.svg",
+            "help": "Output event occurs if one or more input events occur",
+
+            "connector": {
+                "offset": {
+                    "bottom": -7
+                }
+            }
+        },
+
+        "xorGate": {
+            "inherits": "gate",
+
+            "name": "XOR Gate",
+            "image": "xor_gate.svg",
+            "help": "Output event occurs if exactly one of the input events occur"
+        },
+
+        "votingOrGate": {
+            "inherits": "gate",
+
+            "name": "Voting OR Gate",
+            "image": "voting_or_gate.svg",
+            "help": "Output event occurs if the given number of input events occur",
+            "kN": [1, 2],
+
+            "propertyMenuEntries": {
+                "kN": {
+                    "kind": "range",
+                    "displayName": "k-out-of-N",
+                    "min": 1,
+                    "step": 1
+                }
+            },
+            "propertyMirrors": {
+                "kN": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "k/N: "
+                }
+            }
+        },
+
+        "undevelopedEvent": {
+            "inherits": "event",
+
+            "name": "Undeveloped Event",
+            "numberOfIncomingConnections": 0,
+            "image": "undeveloped_event.svg",
+            "help": "Event with no information available or insignificant impact"
+        },
+
+        "choiceEvent": {
+            "inherits": "event",
+
+            "name": "Choice Event",
+            "allowConnectionTo": ["event"],
+            "image": "choice_event.svg",
+            "help": "Placeholder for one of the input events",
+
+            "connector": {
+                "dashstyle": "4 2"
+            },
+
+            "changedChildProperties": {
+                "optional": null
+            }
+        },
+
+        "redundancyEvent": {
+            "inherits": "event",
+
+            "name": "Redundancy Event",
+            "allowConnectionTo": ["node"],
+            "image": "redundancy_event.svg",
+            "help": "Placeholder for a voting OR gate over a chosen number of the input events",
+
+            "kFormula": "N-2",
+            "nRange": [1, 2],
+
+            "propertyMenuEntries": {
+                "kFormula": {
+                    "kind": "text",
+                    "displayName": "K-Formula"
+                },
+                "nRange": {
+                    "kind": "range",
+                    "displayName": "N-Range",
+                    "min": 1,
+                    "step": 1
+                }
+            },
+
+            "propertyMirrors": {
+                "kFormula": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "k: "
+                },
+                "nRange": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "N: "
+                }
+            },
+
+            "connector": {
+                "dashstyle": "4 2"
+            },
+
+            "changedChildProperties": {
+                "optional": null
+            }
+        },
+
+        "houseEvent": {
+            "inherits": "event",
+            "name": "House Event",
+            "excludeFromShapesMen": false,
+            "numberOfIncomingConnections": 0,
+            "image": "house_event.svg",
+            "help": "An event that is expected to occur and typically does not denote a failure"
+        },
+
+        "topEvent": {
+            "inherits": "event",
+            "name": "Top Event",
+            "image": "top_event.svg",
+            "excludeFromShapesMen": true,
+            "optional": null,
+
+            "propertyMenuEntries": {
+                "optional": null
+            }
+        }
+    },
+
+    "propertiesDisplayOrder": [
+        "name",
+        "cost",
+        "probability",
+        "optional",
+        "kN",
+        "cardinality",
+        "kFormula",
+        "nRange"
+    ],
+
+    "shapeMenuNodeDisplayOrder": [
+        "basicEvent",
+        "basicEventSet",
+        "intermediateEvent",
+        "intermediateEventSet",
+        "andGate",
+        "priorityAndGate",
+        "orGate",
+        "xorGate",
+        "votingOrGate",
+        "undevelopedEvent",
+        "choiceEvent",
+        "redundancyEvent",
+        "houseEvent",
+        "topEvent"
+    ],
+
+    "defaults": {
+        "nodes": [
+            {
+                "kind": "topEvent",
+                "x": 10,
+                "y": 1
+            }
+        ]
+    }
+}

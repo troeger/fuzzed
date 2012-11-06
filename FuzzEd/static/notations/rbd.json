@@ -1,0 +1,106 @@
+{
+    "kind": "rbd",
+    "name": "Reliability Block Diagram",
+    "nodes": {
+        "node": {
+            "name": "Node",
+            "excludeFromShapesMen": true,
+            "numberOfIncomingConnections": -1,
+            "numberOfOutgoingConnections": -1,
+            "propertyMenuEntries": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name"
+                }
+            },
+            "propertyMirrors": {
+                "name": {
+                    "position": "bottom",
+                    "style": ["bold"]
+                }
+            }
+        },
+
+        "startNode": {
+            "inherits": "node",
+            "name": "Start",
+            "image": "node.svg",
+            "numberOfIncomingConnections":  0,
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["endNode", "block", "outOf"]
+        },
+
+        "endNode": {
+            "inherits": "node",
+            "name": "End",
+            "image": "node.svg",
+            "numberOfIncomingConnections": -1,
+            "numberOfOutgoingConnections":  0
+        },
+
+        "block": {
+            "inherits": "node",
+            "name": "Block",
+            "excludeFromShapesMen": false,
+            "image": "block.svg",
+            "propertyMenuEntries": {
+                "probability": {
+                    "kind": "number",
+                    "displayName": "Probability",
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
+                }
+            },
+            "probabilityMirrors": {
+                "probability": {
+                    "position": "bottom",
+                    "style": ["italic"]
+                }
+            }
+        },
+
+        "outOf": {
+            "inherits": "node",
+            "name": "out of",
+            "excludeFromShapesMen": false,
+            "image": "out_of.svg",
+            "allowConnectionTo": ["block", "endNode"],
+            "propertyMenuEntries": {
+                "outOf": {
+                    "kind": "range",
+                    "displayName": "Out Of",
+                    "min": 1,
+                    "step": 1,
+                    "default": [1, 1]
+                }
+            }
+        }
+    },
+
+    "propertyDisplayOrder": [
+        "name",
+        "probability",
+        "outOf"
+    ],
+
+    "shapeMenuNodeDisplayOrder": [
+        "block",
+        "outOf"
+    ],
+
+    "defaults": {
+        "nodes": [
+            {
+                "kind": "startNode",
+                "x": 5,
+                "y": 1
+            },
+            {
+                "kind": "endNode",
+                "x": 10,
+                "y": 1
+            }
+        ]
+    }
+}

@@ -1,4 +1,4 @@
-define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'require-properties', 
+define(['require-config', 'json!notations/fuzztree.json', 'require-mirror', 'require-properties',
         'require-backend', 'require-oop', 'jsplumb', 'jquery.svg'], 
         function(Config, FuzztreeConfig, Mirror, Properties, Backend, Class) {
     /*
@@ -46,7 +46,7 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
             // no connections to same node
             if (this == otherNode) return false;
 
-            // otherNode must be in the 'allowConnectionTo' list defined in the config
+            // otherNode must be in the 'allowConnectionTo' list defined in the notations
             var allowed = false;
             _.each(this.allowConnectionTo, function(nodeKind) {
                 if (otherNode instanceof nodeKindToClassMapping[nodeKind]) allowed = true;
@@ -54,7 +54,7 @@ define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'requir
             if (!allowed) return false;
 
             // no connections to the top event
-            // TODO: this can not be covered with the config since 'allowConnectionTo' is the wrong direction
+            // TODO: this can not be covered with the notations since 'allowConnectionTo' is the wrong direction
             if (otherNode instanceof TopEvent) return false;
 
             // there is already a connection between these nodes

@@ -52,7 +52,7 @@ class Generator(object):
 
         for directory in STATICFILES_DIRS:
             # generate the configuration files
-            path = '%s/%s/config/%s.json' % (cwd, directory, self.kind)
+            path = '%s/%s/notations/%s.json' % (cwd, directory, self.kind)
             handle = open(path, 'w')
             handle.write(json.dumps(self.config))
             print "Writing "+path
