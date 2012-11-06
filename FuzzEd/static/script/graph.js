@@ -41,9 +41,12 @@ define(['config', 'class'], function(Config, Class) {
                 var BaseClass = this.nodeClassFor(inherits);
             }
 
-            var newClass = BaseClass.extend(definition);
+            var newClass = BaseClass.extend({
+                init: function(properties) {
+                    this._super(jQuery.extend(true, definition, properties);
+                }
+            });
 
-            jQuery.extend(true, newClass, definition);
             this._nodeClasses[definition.kind] = newClass;
 
             return newClass;
