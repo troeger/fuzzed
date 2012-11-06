@@ -1,4 +1,4 @@
-define(['require-config', 'require-nodes', 'require-backend', 'require-oop', 'underscore'], function(Config, Nodes, Backend, Class) {
+define(['config', 'node', 'backend', 'oop', 'underscore'], function(Config, Nodes, Backend, Class) {
 
     /**
      * Class: Selection

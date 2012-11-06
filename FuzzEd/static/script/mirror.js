@@ -1,4 +1,4 @@
-define(['require-config', 'require-oop'], function(Config, Class) {
+define(['config', 'oop'], function(Config, Class) {
     var Mirror = Class.extend({
         _container: undefined,
         _mirror:    undefined,

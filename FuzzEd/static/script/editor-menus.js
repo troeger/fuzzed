@@ -1,4 +1,4 @@
-define(['require-config', 'require-oop', 'json!notations/fuzztree.json'],
+define(['config', 'oop', 'json!notations/fuzztree.json'],
         function(Config, Class, FuzztreeConfig) {
 
     /**

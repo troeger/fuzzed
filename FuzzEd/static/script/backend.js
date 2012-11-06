@@ -1,4 +1,4 @@
-define(['require-config', 'require-graph'], function (Config, Graph) {
+define(['config', 'graph'], function (Config, Graph) {
 
     var URLHelper = {
         fullUrlForGraphs: function() {

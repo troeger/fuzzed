@@ -1,5 +1,5 @@
-define(['require', 'require-config', 'require-nodes', 'require-backend', 
-        'require-editor-menus', 'require-editor-selection', 'require-oop'],
+define(['require', 'config', 'node', 'backend',
+        'editor-menus', 'editor-selection', 'oop'],
     function(require, Config, Nodes, Backend, Menus, Selection, Class) {
 
     /*
@@ -201,7 +201,7 @@ define(['require', 'require-config', 'require-nodes', 'require-backend',
                 require(['require-rbdg'], constructGraph.bind(this));
             } else {
                 // TODO: maybe an "unknown graph type"-error here?
-                require(['require-graph'], constructGraph.bind(this));
+                require(['graph'], constructGraph.bind(this));
             }
         },
 

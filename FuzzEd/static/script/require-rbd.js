@@ -1,4 +1,4 @@
-define(['require-graph'], function(Graph) {
+define(['graph'], function(Graph) {
 
     var RBDGraph = Graph.extend({
 

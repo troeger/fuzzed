@@ -1,4 +1,4 @@
-define(['require-config', 'json!notations/fuzztree.json', 'require-mirror', 'require-properties',
+define(['require-config', 'json!config/fuzztree.json', 'require-mirror', 'require-properties', 
         'require-backend', 'require-oop', 'jsplumb', 'jquery.svg'], 
         function(Config, FuzztreeConfig, Mirror, Properties, Backend, Class) {
     /*
@@ -46,7 +46,7 @@ define(['require-config', 'json!notations/fuzztree.json', 'require-mirror', 'req
             // no connections to same node
             if (this == otherNode) return false;
 
-            // otherNode must be in the 'allowConnectionTo' list defined in the notations
+            // otherNode must be in the 'allowConnectionTo' list defined in the config
             var allowed = false;
             _.each(this.allowConnectionTo, function(nodeKind) {
                 if (otherNode instanceof nodeKindToClassMapping[nodeKind]) allowed = true;
@@ -54,7 +54,7 @@ define(['require-config', 'json!notations/fuzztree.json', 'require-mirror', 'req
             if (!allowed) return false;
 
             // no connections to the top event
-            // TODO: this can not be covered with the notations since 'allowConnectionTo' is the wrong direction
+            // TODO: this can not be covered with the config since 'allowConnectionTo' is the wrong direction
             if (otherNode instanceof TopEvent) return false;
 
             // there is already a connection between these nodes
@@ -104,6 +104,7 @@ define(['require-config', 'json!notations/fuzztree.json', 'require-mirror', 'req
 
             var pixelPos = this._editor.toPixel(x, y);
             var image = this._nodeImage;
+            console.log(image.position().top);
             var offsetX = image.position().left + image.outerWidth(true) / 2;
             var offsetY = image.position().top  + image.outerHeight(true) / 2;
 
@@ -240,20 +241,6 @@ define(['require-config', 'json!notations/fuzztree.json', 'require-mirror', 'req
             }
         },
 
-        /**
-         *  Method: _getPositionOnCanvas
-         *      Returns the (pixel) position of the node (center of the node image) relative to the canvas.
-         *  Returns:
-         *      Object containing the 'x' and 'y' position.
-         */
-        _getPositionOnCanvas: function() {
-            var editorOffset = this._editor._canvas.offset();
-            var x = this._nodeImage.offset().left + this._nodeImage.width() / 2 - editorOffset.left;
-            var y = this._nodeImage.offset().top + this._nodeImage.height() / 2 - editorOffset.top;
-
-            return {'x': x, 'y': y};
-        },
-
         _resize: function() {
             // calculate the scale factor
             var marginOffset = this._nodeImage.outerWidth(true) - this._nodeImage.width();
@@ -288,7 +275,12 @@ define(['require-config', 'json!notations/fuzztree.json', 'require-mirror', 'req
 
                 // stop dragging callback
                 stop:        function(eventObject, uiHelpers) {
-                    var coordinates = this._editor.toGrid(this._getPositionOnCanvas());
+                    var editorOffset = this._editor._canvas.offset();
+                    var coordinates = this._editor.toGrid({
+                        //XXX: find a better way (give node position function...)
+                        x: this._nodeImage.offset().left - editorOffset.left,
+                        y: this._nodeImage.offset().top - editorOffset.top
+                    });
                     Backend.changeNode(this, coordinates);
                 }.bind(this)
             });

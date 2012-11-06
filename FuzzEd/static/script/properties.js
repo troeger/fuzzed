@@ -1,4 +1,4 @@
-define(['require-config', 'require-backend', 'require-oop', 'underscore'], 
+define(['config', 'backend', 'oop', 'underscore'],
        function(Config, Backend, Class) {
 
     function _getFloat(definition, key, defaultValue) {
