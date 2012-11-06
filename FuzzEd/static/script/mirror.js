@@ -1,4 +1,4 @@
-define(['config', 'oop'], function(Config, Class) {
+define(['config', 'class'], function(Config, Class) {
     var Mirror = Class.extend({
         _container: undefined,
         _mirror:    undefined,

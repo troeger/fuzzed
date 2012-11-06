@@ -1,5 +1,5 @@
 define(['require', 'config', 'node', 'backend',
-        'editor-menus', 'editor-selection', 'oop'],
+        'editor-menus', 'editor-selection', 'class'],
     function(require, Config, Nodes, Backend, Menus, Selection, Class) {
 
     /*
