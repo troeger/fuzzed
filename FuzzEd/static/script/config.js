@@ -63,7 +63,8 @@ define(function() {
             SHAPES_MENU:                                'FuzzEdShapes',
             CUTSETS_MENU:                               'FuzzEdCutsets',
             SPLASH:                                     'FuzzEdSplash',
-            NAVBAR_ACTION_CALCULATE_MINIMAL_CUTSETS:    'FuzzEdNavbarActionCalculateMinimalCutsets'
+            NAVBAR_ACTIONS:                             'FuzzEdNavbarActions',
+            NAVBAR_ACTION_CUTSETS:                      'FuzzEdNavbarActionCutsets'
         },
 
         JSPlumb: {

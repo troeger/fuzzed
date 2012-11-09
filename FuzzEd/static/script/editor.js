@@ -1,53 +1,43 @@
-define(['require', 'config', 'node', 'backend',
-        'editor-menus', 'editor-selection', 'class'],
-    function(require, Config, Nodes, Backend, Menus, Selection, Class) {
+define(['class', 'editor-menus', 'editor-selection', 'config', 'backend'],
+function(Class, Menus, Selection, Config, Backend) {
 
     /*
      *  Class: Editor
      */
-    var Editor = Class.extend({
-        shapes:     undefined,
+    return Class.extend({
+        canvas:     undefined,
+        graph:      undefined,
         properties: undefined,
-        cutsets:    undefined,
         selection:  undefined,
+        shapes:     undefined,
 
-        _canvas:     undefined,
         _background: undefined,
+        _navbarActionsGroup: undefined,
 
         init: function(graphId) {
+            if (typeof graphId !== 'number') throw 'You need a graph ID to initialize the editor.';
+
             // locate predefined DOM elements and bind Editor instance to canvas
-            this._canvas     = jQuery('#' + Config.IDs.CANVAS);
-            this._background = this._canvas.svg().svg('get');
-            this._canvas.data(Config.Keys.EDITOR, this);
+            this.canvas = jQuery('#' + Config.IDs.CANVAS);
+            this.canvas.data(Config.Keys.EDITOR, this);
+
+            this._background         = this.canvas.svg().svg('get');
+            this._navbarActionsGroup = jQuery('#' + Config.IDs.NAVBAR_ACTIONS);
 
             // create manager objects for the bars and the selection
-            this.shapes     = new Menus.ShapeMenu();
             this.properties = new Menus.PropertiesMenu();
-            this.cutsets    = new Menus.CutsetsMenu(this);
+            this.shapes     = new Menus.ShapeMenu();
             this.selection  = new Selection();
 
             // run a few sub initializer
-            this._setupCanvas();
-            this._setupBackground();
-            this._setupCutsetsMenu();
-            this._setupJsPlumb();
-            this._setupKeyBindings();
-            this._setupAjaxHandler();
+            this._setupBackground()
+                ._setupCanvas()
+                ._setupJsPlumb()
+                ._setupKeyBindings();
 
             // fetch the content from the backend
-            //TODO: init editor with a graph instance instead
             this._loadGraph(graphId);
         },
-
-        /* Section: Accessors */
-
-        graph: function(newGraph) {
-            if (typeof newGraph === 'undefined') return this._graph;
-            // TODO: on set full rendering of new graph required
-            this._graph = newGraph;
-            return this;
-        },
-
 
         /* Section: Coordinate conversion */
 
@@ -92,12 +82,11 @@ define(['require', 'config', 'node', 'backend',
             }
         },
 
-
         /* Section: Internals */
 
         _drawGrid: function() {
-            var height = this._canvas.height();
-            var width  = this._canvas.width();
+            var height = this.canvas.height();
+            var width  = this.canvas.width();
 
             // clear old background and resize svg container to current canvas size
             // important when window was resized in the mean time
@@ -124,20 +113,26 @@ define(['require', 'config', 'node', 'backend',
                     strokeDashArray: Config.Grid.STROKE_STYLE
                 });
             }
+
+            return this;
         },
 
         _edgeConnected: function(edge) {
             var connection = edge.connection;
             connection._fuzzedID = new Date().getTime();
             Backend.addEdge(connection._fuzzedID, edge.source.data(Config.Keys.NODE), edge.target.data(Config.Keys.NODE));
-            this.graph().addEdge(edge.connection);
+            this.graph.addEdge(edge.connection);
+
+            return this;
         },
 
         _edgeDetached: function(edge) {
             var connection = edge.connection;
 
-            this.graph().deleteEdge(connection);
+            this.graph.deleteEdge(connection);
             Backend.deleteEdge(connection);
+
+            return this;
         },
 
         _loadGraph: function(graphId) {
@@ -145,97 +140,46 @@ define(['require', 'config', 'node', 'backend',
                 this._loadGraphFromJson.bind(this),
                 this._loadGraphError.bind(this)
             );
+
             return this;
         },
 
         _loadGraphCompleted: function() {
-            this._setupPersistanceEvents();
+            // setup JsPlumb events here, so that it does not save the edges from the graph loading
+            this._setupJsPlumbEvents();
+            // fade out the splash screen
             jQuery('#' + Config.IDs.SPLASH).fadeOut(Config.Splash.FADE_TIME);
         },
 
         _loadGraphError: function(graph, response, textStatus, errorThrown) {
-            this.graph(graph);
-            // TODO: this alert is weird. just do it or 404?
-            alert('Could not find your graph in the database');
+            alert('Could not load graph, reason: ' + textStatus + ' ' + errorThrown);
+            throw 'Could not load the graph from the backend';
         },
 
         _loadGraphFromJson: function(json) {
-            function constructGraph(Graph) {
-                var graph = new Graph(json.id);
-                this.graph(graph);
-
-                //TODO: newFromJson for graph
-
-                // parse the json nodes and convert them to node objects
-                _.each(json.nodes, function(jsonNode) {
-                    graph.addNode(Nodes.newNodeFromJson(jsonNode));
-                });
-
-                // draw the nodes on the canvas
-                _.each(graph.getNodes(), function(node, index) {
-                    node._editor = this;
-                    node.appendTo(this._canvas)
-                        .moveTo(node.x, node.y)
-                }.bind(this));
-
-                // connect the nodes again
-                _.each(json.edges, function(jsonEdge) {
-                    var edge = jsPlumb.connect({
-                        source: graph.getNodeById(jsonEdge.source).container(),
-                        target: graph.getNodeById(jsonEdge.target).container()
-                    });
-                    edge._fuzzedID = jsonEdge.id;
-                    graph.addEdge(edge);
-
-                }.bind(this));
-
-                this._loadGraphCompleted();
-            }
-
-            require(['graph'], constructGraph.bind(this));
-        },
-
-        _setupAjaxHandler: function() {
-            jQuery('.fuzzed-ajax-loader').ajaxStart(function() {
-                jQuery(this).css('visibility', 'visible');
-            });
-
-            jQuery('.fuzzed-ajax-loader').ajaxStop(function() {
-                jQuery(this).css('visibility', 'hidden');
-            });
+            this.graph = new Graph(json);
+            this._loadGraphCompleted();
         },
 
         _setupBackground: function() {
             this._drawGrid();
-            // clicks on the canvas clear the selection
-            this._canvas.click(this.selection.clear.bind(this.selection));
+            // clicks on the canvas clears the selection
+            this.canvas.click(this.selection.clear.bind(this.selection));
             // redraw the background grid when the window resizes
             jQuery(window).resize(this._drawGrid.bind(this));
         },
 
         _setupCanvas: function() {
             // make canvas droppable for shapes from the shape menu
-            this._canvas.droppable({
+            this.canvas.droppable({
                 accept:    'svg',
                 tolerance: 'fit',
                 drop:      this._shapeDropped.bind(this)
             });
         },
 
-        _setupCutsetsMenu: function() {
-            // callback that is fired when backend returns cutsets
-            function loadCutsetsIntoMenu(cutsets) {
-                this.cutsets.displayCutsets(cutsets);
-                this.cutsets.show();
-            }
-
-            // register for clicks on the corresponding nav action
-            jQuery('#' + Config.IDs.NAVBAR_ACTION_CALCULATE_MINIMAL_CUTSETS).click(function() {
-                Backend.calculateCutsets(this.graph(), loadCutsetsIntoMenu.bind(this));
-            }.bind(this));
-        },
-
         _setupJsPlumb: function() {
+            //TODO: check whether we need to move this to the specific notation files
             jsPlumb.importDefaults({
                 EndpointStyle: {
                     fillStyle:   Config.JSPlumb.ENDPOINT_FILL
@@ -265,6 +209,11 @@ define(['require', 'config', 'node', 'backend',
             });
         },
 
+        _setupJsPlumbEvents: function() {
+            jsPlumb.bind('jsPlumbConnection', this._edgeConnected.bind(this));
+            jsPlumb.bind('jsPlumbConnectionDetached', this._edgeDetached.bind(this));
+        },
+
         _setupKeyBindings: function() {
             jQuery(document).keydown(function(eventObject) {
                 // hitting delete removes the current selection from the canvas
@@ -277,25 +226,18 @@ define(['require', 'config', 'node', 'backend',
             }.bind(this));
         },
 
-        _setupPersistanceEvents: function() {
-            jsPlumb.bind('jsPlumbConnection', this._edgeConnected.bind(this));
-            jsPlumb.bind('jsPlumbConnectionDetached', this._edgeDetached.bind(this));
-        },
-
         _shapeDropped: function(uiEvent, uiObject) {
             var node        = Nodes.newNodeOfKind(uiObject.draggable.attr('id'));
-            var offset      = this._canvas.offset();
+            var offset      = this.canvas.offset();
             var gridCoords  = this.toGrid(uiEvent.pageX - offset.left, uiEvent.pageY - offset.top);
 
             node._editor = this;
-            node.appendTo(this._canvas)
+            node.appendTo(this.canvas)
                 .moveTo(gridCoords.x, gridCoords.y)
-            this.graph().addNode(node);
+            this.graph.addNode(node);
             this.selection.ofNodes(node);
 
             Backend.addNode(node);
         }
     });
-
-    return Editor;
 });
