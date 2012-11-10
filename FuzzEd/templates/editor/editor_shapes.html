@@ -8,13 +8,13 @@
         {% if not node.excludeFromShapesMenu %}
             {% cycle '<tr>' '' %}
                 <td class="right-tooltip" title="{{ node.help }}">
-                    {% include node.image %}
+                    {% include graph.kind|add:'/'|add:node.image %}
                     <span>{{ node.name }}</span>
                 </td>
             {% cycle '' '</tr>' %}
         {% else %}
             <td style="display: none">
-                {% include node.image %}
+                {% include graph.kind|add:'/'|add:node.image %}
             </td>
         {% endif %}
     {% endfor %}
