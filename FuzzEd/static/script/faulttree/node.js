@@ -1,4 +1,4 @@
-define(['node'], function(AbstractNode) {
+define(['../node'], function(AbstractNode) {
 
     /**
      *  Concrete faulttree implementation

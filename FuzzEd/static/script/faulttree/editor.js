@@ -1,4 +1,5 @@
-define(['editor', 'editor-menus', 'config', 'backend'], function(Editor, Menus, Config, Backend) {
+define(['editor', 'faulttree/graph', 'menus', 'config', 'backend'],
+function(Editor, FaulttreeGraph, Menus, Config, Backend) {
     /**
      * Class: CutsetsMenu
      */
@@ -65,6 +66,10 @@ define(['editor', 'editor-menus', 'config', 'backend'], function(Editor, Menus, 
 
             this.cutsets = new CutsetsMenu();
             this._setupCutsetsActionEntry();
+        },
+
+        _graphClass: function() {
+            return FaulttreeGraph;
         },
 
         _setupCutsetsActionEntry: function() {
