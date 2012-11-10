@@ -1,36 +1,67 @@
 define(['config', 'class'], function(Config, Class) {
 
     var Graph = Class.extend({
-        init: function(kind, id) {
-            this.id           = id;
-            this._nodeClasses = {};
-            this._nodes       = {};
-            this._edges       = {};
+        id:     undefined,
+        edges:  {},
+        nodes:  {},
+        name:   undefined,
 
-            // load base class corresponding to graph kind and register it
-            this._nodeClasses['node'] = require(kind + '-node');
-            // fetch the notation json file
-            this._notation = require('json!notations/' + kind);
+        _nodeClasses: {},
+
+        init: function(json) {
+            this.id   = json.id;
+            this.name = json.name;
+
+            this._nodeClasses['node'] = this._nodeClass();
+            this._loadFromJson(json);
         },
 
-        /**
-         *
-         * Section: Factories
+        /*
+         Function: addEdge
+         Adds a given edge to this graph.
+
+         Parameters:
+         edge - Edge to be added
          */
+        addEdge: function(edge) {
+            var connection = edge.connection;
+            var fuzzedId = new Date().getTime() + 1;
+
+            connection._fuzzedID = fuzzedId;
+            Backend.addEdge(fuzzedId, edge.source.data(Config.Keys.NODE), edge.target.data(Config.Keys.NODE));
+            this.edges[fuzzedId] = connection;
+
+            return this;
+        },
 
         /*
-         Function: newNodeOfKind
-         Returns a new Node of the given kind identifier.
+         Function: deleteEdge
+         Deletes the given edges from the graph if present
 
-         Parameter:
-         kind - String specifying the kind of the new Node. See Config.Node.Kinds.
-         properties - [optional] A dictionary of properties that should be merged into the new node.
-
-         Returns:
-         A new Node of the given kind
+         Parameters:
+         edge - Edge to remove from this graph.
          */
-        newNodeOfKind: function(kind, properties) {
-            return new (this.nodeClassFor(kind))(properties);
+        deleteEdge: function(edge) {
+            var connection = edge.connection;
+
+            Backend.deleteEdge(connection);
+            delete this._edges[connection._fuzzedID];
+
+            return this;
+        },
+
+        /*
+         Function: addNode
+         Adds a given node to this graph.
+
+         Parameters:
+         node - Node to add to this graph.
+         */
+        addNode: function(kind, properties) {
+            var node = new (this.nodeClassFor(kind))(this, properties);
+            this.nodes[node.id] = node;
+
+            return node;
         },
 
         newNodeClassForKind: function(definition) {
@@ -43,7 +74,7 @@ define(['config', 'class'], function(Config, Class) {
 
             var newClass = BaseClass.extend({
                 init: function(properties) {
-                    this._super(jQuery.extend(true, definition, properties);
+                    this._super(jQuery.extend(true, definition, properties));
                 }
             });
 
@@ -68,65 +99,48 @@ define(['config', 'class'], function(Config, Class) {
 
             if (typeof nodeClass !== 'undefined') return nodeClass;
 
-            var notationDefinition = this._notation.nodes[kind];
+            var notationDefinition = this._notation().nodes[kind];
             if (typeof notationDefinition === 'undefined')
                 throw 'No definition for node of kind ' + kind;
 
             return this.newNodeClassForKind(notationDefinition);
         },
 
-        /*
-         Function: newNodeFromJson
-         Factory method. Returns a new Node defined by the given JSON.
+        /* Section: Internal */
 
-         Parameter:
-         json - A JSON object defining the properties of the new node..
-         The node's class is determined using the 'kind' property.
-         Default kind is 'node'.
+        _loadFromJson: function(json) {
+            // parse the json nodes and convert them to node objects
+            _.each(json.nodes, function(jsonNode) {
+                this.addNode(jsonNode.kind, jsonNode);
+            }.bind(this));
 
-         Returns:
-         A new Node.
-         */
-        newNodeFromJson: function(json) {
-            var kind = json.kind || 'node';
-            var nodeClass = nodeKindToClassMapping[kind];
-            // the init method will merge the json attributes into the new node
-            return new nodeClass(json);
+            //TODO: put into DOM
+
+            // connect the nodes again
+            _.each(json.edges, function(jsonEdge) {
+                var edge = jsPlumb.connect({
+                    source: graph.getNodeById(jsonEdge.source).container(),
+                    target: graph.getNodeById(jsonEdge.target).container()
+                });
+                edge._fuzzedID = jsonEdge.id;
+                graph.addEdge(edge);
+
+            }.bind(this));
+
+            this._setupJsPlumbEvents().bind(this);
         },
 
-
-        /*
-         Function: addEdge
-         Adds a given edge to this graph.
-
-         Parameters:
-         edge - Edge to be added
-         */
-        addEdge: function(edge) {
-            this._edges[edge.id] = edge;
+        _nodeClass: function() {
+            throw '[ABSTRACT] Subclass responsibility';
         },
 
-        /*
-         Function: addNode
-         Adds a given node to this graph.
-
-         Parameters:
-         node - Node to add to this graph.
-         */
-        addNode: function(node) {
-            node.graph(this);
-            this._nodes[node.id] = node;
+        _notation: function() {
+            throw '[ABSTRACT] Subclass responsibility';
         },
 
-        /*
-         Function: deleteEdge
-         Deletes the given edges from the graph if present
-
-         Parameters:
-         edge - Edge to remove from this graph.
-         */
-        deleteEdge: function(edge) {
-            delete this._edges[edge.id];
+        _setupJsPlumbEvents: function() {
+            jsPlumb.bind('jsPlumbConnection', this.addEdge.bind(this));
+            jsPlumb.bind('jsPlumbConnectionDetached', this.deleteEdge.bind(this));
         },
 
         /*

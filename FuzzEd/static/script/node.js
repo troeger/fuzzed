@@ -5,7 +5,8 @@ define(['config', 'mirror', 'properties', 'backend', 'class', 'jsplumb', 'jquery
      *  Abstract Node Base Class
      */
     return Class.extend({
-        init: function(properties) {
+        init: function(graph, properties) {
+            //TODO: use me, where me is 'graph' parameter
             this.kind = properties.kind || 'node';
 
             // merge all members of the configuration (defaults) into this object
@@ -94,7 +95,7 @@ define(['config', 'mirror', 'properties', 'backend', 'class', 'jsplumb', 'jquery
         remove: function() {
             _.each(jsPlumb.getEndpoints(this._container), function(endpoint) {
                 jsPlumb.deleteEndpoint(endpoint);
-            })
+            });
             this._container.remove();
         },
 
@@ -247,7 +248,7 @@ define(['config', 'mirror', 'properties', 'backend', 'class', 'jsplumb', 'jquery
          *      Object containing the 'x' and 'y' position.
          */
         _getPositionOnCanvas: function() {
-            var editorOffset = this._editor._canvas.offset();
+            var editorOffset = this._editor.canvas.offset();
             var x = this._nodeImage.offset().left + this._nodeImage.width() / 2 - editorOffset.left;
             var y = this._nodeImage.offset().top + this._nodeImage.height() / 2 - editorOffset.top;
 

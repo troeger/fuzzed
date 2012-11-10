@@ -1,4 +1,4 @@
-define(['class', 'editor-menus', 'editor-selection', 'config', 'backend'],
+define(['class', 'menus', 'selection', 'config', 'backend'],
 function(Class, Menus, Selection, Config, Backend) {
 
     /*
@@ -117,22 +117,8 @@ function(Class, Menus, Selection, Config, Backend) {
             return this;
         },
 
-        _edgeConnected: function(edge) {
-            var connection = edge.connection;
-            connection._fuzzedID = new Date().getTime();
-            Backend.addEdge(connection._fuzzedID, edge.source.data(Config.Keys.NODE), edge.target.data(Config.Keys.NODE));
-            this.graph.addEdge(edge.connection);
-
-            return this;
-        },
-
-        _edgeDetached: function(edge) {
-            var connection = edge.connection;
-
-            this.graph.deleteEdge(connection);
-            Backend.deleteEdge(connection);
-
-            return this;
+        _graphClass: function() {
+            throw '[ABSTRACT] Subclass responsibility';
         },
 
         _loadGraph: function(graphId) {
@@ -145,8 +131,6 @@ function(Class, Menus, Selection, Config, Backend) {
         },
 
         _loadGraphCompleted: function() {
-            // setup JsPlumb events here, so that it does not save the edges from the graph loading
-            this._setupJsPlumbEvents();
             // fade out the splash screen
             jQuery('#' + Config.IDs.SPLASH).fadeOut(Config.Splash.FADE_TIME);
         },
@@ -157,7 +141,15 @@ function(Class, Menus, Selection, Config, Backend) {
         },
 
         _loadGraphFromJson: function(json) {
-            this.graph = new Graph(json);
+            this.graph = new (this._graphClass())(json);
+
+            // draw the nodes on the canvas
+            _.each(_.values(this.graph.nodes), function(id, node) {
+                //TODO: register for move events
+                node.appendTo(this.canvas)
+                    .moveTo(node.x, node.y);
+            }.bind(this));
+
             this._loadGraphCompleted();
         },
 
@@ -165,7 +157,7 @@ function(Class, Menus, Selection, Config, Backend) {
             this._drawGrid();
             // clicks on the canvas clears the selection
             this.canvas.click(this.selection.clear.bind(this.selection));
-            // redraw the background grid when the window resizes
+            // redraw the background grid when the window is being resized
             jQuery(window).resize(this._drawGrid.bind(this));
         },
 
@@ -201,17 +193,11 @@ function(Class, Menus, Selection, Config, Backend) {
                 ConnectionsDetachable: false
             });
 
-            var editor = this;
             // listen for clicks on connections for selections
             jsPlumb.bind('click', function(connection, event) {
                 event.stopPropagation();
-                editor.selection.ofConnections(connection);
-            });
-        },
-
-        _setupJsPlumbEvents: function() {
-            jsPlumb.bind('jsPlumbConnection', this._edgeConnected.bind(this));
-            jsPlumb.bind('jsPlumbConnectionDetached', this._edgeDetached.bind(this));
+                this.selection.ofConnections(connection);
+            }.bind(this));
         },
 
         _setupKeyBindings: function() {

@@ -37,7 +37,7 @@ if is_production:
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
         '/var/www/fuzztrees.net/FuzzEd/templates',
-        '/var/www/fuzztrees.net/FuzzEd/static/img/nodes'
+        '/var/www/fuzztrees.net/FuzzEd/static/img'
     )
 
 else:
