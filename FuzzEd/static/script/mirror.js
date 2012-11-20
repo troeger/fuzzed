@@ -1,4 +1,4 @@
-define(['config', 'class'], function(Config, Class) {
+define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
     var Mirror = Class.extend({
         _container: undefined,
         _mirror:    undefined,
@@ -14,8 +14,8 @@ define(['config', 'class'], function(Config, Class) {
                 // size (already partially centered below the node). However, we need to fiddle a 
                 // little bit with the width and the offset in order to not cover the grid lines 
                 // behind the box.
-                .css('width', Config.Grid.DOUBLE_SIZE - (Config.Grid.STROKE_WIDTH << 2))
-                .css('margin-left', -Config.Grid.HALF_SIZE + Config.Grid.STROKE_WIDTH);
+                .css('width', Canvas.gridSize * 2 - Config.Grid.STROKE_WIDTH * 4)
+                .css('margin-left', -(Canvas.gridSize / 2) + Config.Grid.STROKE_WIDTH);
             this._prefix    = properties.prefix || '';
             this._suffix    = properties.suffix || '';
 
@@ -28,7 +28,7 @@ define(['config', 'class'], function(Config, Class) {
                 } else if (style === 'large') {
                     this._mirror.addClass(Config.Classes.MIRROR_LARGE);
                 }
-            }.bind(this))
+            }.bind(this));
 
             // add the mirror to the container at specified location (bottom or top)
             if (properties.position === 'bottom') {
@@ -38,6 +38,8 @@ define(['config', 'class'], function(Config, Class) {
             } else {
                 throw 'Unknown position for mirror ' + properties.position;
             }
+
+            return this;
         },
 
         show: function(text) {
@@ -49,8 +51,10 @@ define(['config', 'class'], function(Config, Class) {
                 this._mirror.css('display', '');
                 this._mirror.html(this._prefix + text + this._suffix);
             }
+
+            return this;
         }
-    })
+    });
 
     return Mirror;
-})
+});

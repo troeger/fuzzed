@@ -61,9 +61,7 @@ define(function() {
         },
 
         Grid: {
-            SIZE:         GRID_SIZE,
-            HALF_SIZE:    GRID_SIZE >> 1,
-            DOUBLE_SIZE:  GRID_SIZE << 1,
+            SIZE:         53,
             STROKE:       DISABLED_COLOR,
             STROKE_WIDTH: 1,
             STROKE_STYLE: '7 3' // svg dash-array value

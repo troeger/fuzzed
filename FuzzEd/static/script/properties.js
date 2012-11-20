@@ -1,5 +1,5 @@
-define(['config', 'backend', 'class', 'underscore'],
-       function(Config, Backend, Class) {
+define(['config', 'class', 'underscore'],
+       function(Config, Class) {
 
     function _getFloat(definition, key, defaultValue) {
         if (!_.has(definition, key)) return defaultValue;
@@ -70,12 +70,12 @@ define(['config', 'backend', 'class', 'underscore'],
                 var sendChange = function() {
                     var properties = {};
                     properties[property] = value;
-                    Backend.changeNode(this.node, properties);
+
+                    jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, this.node.id, properties);
                 }.bind(this);
 
                 // discard old timeout
                 clearTimeout(this._sendChangeTimeout);
-
                 // create a new one
                 this._sendChangeTimeout = setTimeout(sendChange, 1000);
             }
