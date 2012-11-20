@@ -47,6 +47,20 @@ define(function() {
             SNAP_TOLERANCE: 0
         },
 
+        Events: {
+            CANVAS_CLICKED:           'canvas-clicked',
+            CANVAS_SHAPE_DROPPED:     'canvas-shape-dropped',
+
+            NODE_PROPERTY_CHANGED:    'node-property-changed',
+
+            GRAPH_NODE_ADDED:         'graph-node-added',
+            GRAPH_NODE_DELETED:       'graph-node-deleted',
+            GRAPH_EDGE_ADDED:         'graph-edge-added',
+            GRAPH_EDGE_DELETED:       'graph-edge-deleted',
+
+            EDITOR_CALCULATE_CUTSETS: 'editor-calculate-cutsets'
+        },
+
         Grid: {
             SIZE:         GRID_SIZE,
             HALF_SIZE:    GRID_SIZE >> 1,
@@ -57,14 +71,14 @@ define(function() {
         },
 
         IDs: {
-            CANVAS:                                     'FuzzEdCanvas',
-            CONTENT:                                    'FuzzEdContent',
-            PROPERTIES_MENU:                            'FuzzEdProperties',
-            SHAPES_MENU:                                'FuzzEdShapes',
-            CUTSETS_MENU:                               'FuzzEdCutsets',
-            SPLASH:                                     'FuzzEdSplash',
-            NAVBAR_ACTIONS:                             'FuzzEdNavbarActions',
-            NAVBAR_ACTION_CUTSETS:                      'FuzzEdNavbarActionCutsets'
+            CANVAS:                'FuzzEdCanvas',
+            CONTENT:               'FuzzEdContent',
+            PROPERTIES_MENU:       'FuzzEdProperties',
+            SHAPES_MENU:           'FuzzEdShapes',
+            CUTSETS_MENU:          'FuzzEdCutsets',
+            SPLASH:                'FuzzEdSplash',
+            NAVBAR_ACTIONS:        'FuzzEdNavbarActions',
+            NAVBAR_ACTION_CUTSETS: 'FuzzEdNavbarActionCutsets'
         },
 
         JSPlumb: {
@@ -83,7 +97,6 @@ define(function() {
         },
 
         Keys: {
-            EDITOR:      'editor',
             CONSTRUCTOR: 'constructor',
             NODE:        'node'
         },

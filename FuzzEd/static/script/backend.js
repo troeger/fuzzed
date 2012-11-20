@@ -1,259 +1,230 @@
-define(['config', 'graph'], function (Config, Graph) {
+define(['singleton', 'config'], function (Singleton, Config) {
+    return Singleton.extend({
+        _graphId: undefined,
 
-    var URLHelper = {
-        fullUrlForGraphs: function() {
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL;
+        init: function(graphId) {
+            this._graphId = graphId;
         },
 
-        fullUrlForGraph: function(graphID) {
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + graphID;
+        activate: function() {
+            jQuery(document)
+                .on(Config.Events.NODE_PROPERTY_CHANGED,    this.nodePropertyChanged.bind(this))
+                .on(Config.Events.GRAPH_NODE_ADDED,         this.graphNodeAdded.bind(this))
+                .on(Config.Events.GRAPH_NODE_DELETED,       this.graphNodeDeleted.bind(this))
+                .on(Config.Events.GRAPH_EDGE_ADDED,         this.graphEdgeAdded.bind(this))
+                .on(Config.Events.GRAPH_EDGE_DELETED,       this.graphEdgeDeleted.bind(this))
+                .on(Config.Events.EDITOR_CALCULATE_CUTSETS, this.calculateCutsets.bind(this));
         },
 
-        fullUrlForNodes: function(graph) {
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/'
-                + graph.id + Config.Backend.NODES_URL;
+        deactivate: function() {
+            jQuery(document)
+                .off(Config.Events.NODE_PROPERTY_CHANGED)
+                .off(Config.Events.GRAPH_NODE_ADDED)
+                .off(Config.Events.GRAPH_NODE_DELETED)
+                .off(Config.Events.GRAPH_EDGE_ADDED)
+                .off(Config.Events.GRAPH_EDGE_DELETED)
+                .off(Config.Events.EDITOR_CALCULATE_CUTSETS);
         },
 
-        fullUrlForNode: function(node) {
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/'
-                + node.graph().id + Config.Backend.NODES_URL + '/' + node.id;
-        },
-
-        fullUrlForEdges: function(graph) {
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + graph.id + Config.Backend.EDGES_URL;
-        },
-
-        fullUrlForEdge: function(edge) {
-            var graph = edge.source.data(Config.Keys.NODE).graph();
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + graph.id
-                + Config.Backend.EDGES_URL + '/' + edge._fuzzedID;
-        },
-
-        fullUrlForCutsets: function(graph) {
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + graph.id
-                + Config.Backend.CUTSETS_URL;
-        }
-    };
-
-    var Backend = {};
-
-    /*
-     Function: addEdge
-        Adds a new edge from a given source node to a given target node.
-
-     Parameters:
-        sourceNode - Source node of the new edge.
-        targetNode - Target node of the new edge.
-        success    - [optional] Will be called when the request was successful. Provides e.g. the ID of the new edge.
-        error      - [optional] Callback that gets called in case of an ajax-error.
-        complete   - [optional] Callback that is invoked in both cases - a successful or an erroneous ajax request
-     */
-    Backend.addEdge = function(edgeID, sourceNode, targetNode, success, error, complete) {
-        var url = URLHelper.fullUrlForEdges(sourceNode.graph());
-        var data = {
-            id:          edgeID,
-            source:      sourceNode.id,
-            destination: targetNode.id
-        };
-
-        jQuery.ajax({
-            url:      url,
-            type:     'POST',
-            dataType: 'json',
-
-            data:     data,
-            success:  success  || jQuery.noop,
-            error:    error    || jQuery.noop,
-            complete: complete || jQuery.noop
-        });
-    };
-
-    /*
-         Function: addNode
-             Adds a new node to the backend of this graph.
+        /*
+         Function: graphEdgeAdded
+            Adds a new edge from a given source node to a given target node.
 
          Parameters:
-             node     - The node object
-             success  - [optional] Will be called on successful node creation transmission to server
+             edgeId       - ID of the edge.
+             sourceNodeId - Source node of the new edge.
+             targetNodeId - Target node of the new edge.
+             success      - [optional] Will be called when the request was successful. Provides e.g. the ID of the new edge.
+             error        - [optional] Callback that gets called in case of an ajax-error.
+             complete     - [optional] Callback that is invoked in both cases - a successful or an erroneous ajax request
+         */
+        graphEdgeAdded: function(edgeId, sourceNodeId, targetNodeId, success, error, complete) {
+            var data = {
+                id:          edgeId,
+                source:      sourceNodeId,
+                destination: targetNodeId
+            };
+
+            jQuery.ajax({
+                url:      this._fullUrlForEdge(edgeId),
+                type:     'POST',
+                dataType: 'json',
+
+                data:     data,
+                success:  success  || jQuery.noop,
+                error:    error    || jQuery.noop,
+                complete: complete || jQuery.noop
+            });
+        },
+
+        /*
+             Function: graphNodeAdded
+                 Adds a new node to the backend of this graph.
+
+             Parameters:
+                 nodeId   - The node ID.
+                 kind     - The node kind.
+                 success  - [optional] Will be called on successful node creation transmission to server.
+                 error    - [optional] Callback that gets called in case of an ajax-error.
+                 complete - [optional] Callback that is invoked when the ajax request completes successful or erroneous.
+         */
+        graphNodeAdded: function(nodeId, kind, success, error, complete) {
+            var data = {
+                id:   nodeId,
+                kind: kind
+            };
+
+            jQuery.ajax({
+                url:      this._fullUrlForNode(nodeId),
+                type:     'POST',
+                dataType: 'json',
+
+                data:     data,
+                success:  success  || jQuery.noop,
+                error:    error    || jQuery.noop,
+                complete: complete || jQuery.noop
+            });
+        },
+
+        /*
+         Function: graphEdgeDeleted
+             Deletes a given edge in the backend.
+
+         Parameters:
+             edgeId   - The ID of the edge that should be deleted.
+             success  - [optional] Function that is invoked when the ajax request was successful
              error    - [optional] Callback that gets called in case of an ajax-error.
-             complete - [optional] Callback that is invoked when the ajax request completes successful or erroneous
-     */
-    Backend.addNode = function(node, success, error, complete) {
-        var url = URLHelper.fullUrlForNodes(node.graph());
-        var data = {
-            id:         node.id,
-            kind:       node.kind,
-            x:          node.x,
-            y:          node.y
-        };
+             complete - [optional] Callback that gets invoked in both cases - a successful and an errornous ajax-call.
+         */
+        graphEdgeDeleted: function(edgeId, success, error, complete) {
+            jQuery.ajax({
+                url:      this._fullUrlForEdge(edgeId),
+                type:     'DELETE',
+                dataType: 'json',
 
-        jQuery.ajax({
-            url:      url,
-            type:     'POST',
-            dataType: 'json', 
+                success:  success  || jQuery.noop,
+                error:    error    || jQuery.noop,
+                complete: complete || jQuery.noop
+            });
+        },
 
-            data:     data, 
-            success:  success  || jQuery.noop,
-            error:    error    || jQuery.noop,
-            complete: complete || jQuery.noop
-        });
-    };
-
-    /*
-     Function: deleteEdge
-     Deletes a given edge in the backend.
-
-     Parameters:
-     edge     - The edge that should be deleted.
-     success  - [optional] Function that is invoked when the ajax request was successful
-     error    - [optional] Callback that gets called in case of an ajax-error.
-     complete - [optional] Callback that gets invoked in both cases - a successful and an errornous ajax-call.
-     */
-    Backend.deleteEdge = function(edge, success, error, complete) {
-        var url = URLHelper.fullUrlForEdge(edge);
-
-        jQuery.ajax({
-            url:      url,
-            type:     'DELETE',
-            dataType: 'json',
-
-            success:  success  || jQuery.noop,
-            error:    error    || jQuery.noop,
-            complete: complete || jQuery.noop
-        });
-    };
-
-    /*
-         Function: deleteNode
+        /*
+         Function: graphNodeDeleted
              Deletes a given node in the backend.
 
          Parameters:
-             node     - The node that should be deleted.
+             nodeId   - The ID of the node that should be deleted.
              succes   - [optional] Callback that is being called on successful deletion on backend.
              error    - [optional] Callback that gets called in case of an ajax-error.
              complete - [optional] Callback that is invoked in both cases either in an successful or errornous ajax call.
-     */
-    Backend.deleteNode = function(node, success, error, complete) {
-        var url = URLHelper.fullUrlForNode(node);
+         */
+        graphNodeDeleted: function(nodeId, success, error, complete) {
+            jQuery.ajax({
+                url:      this._fullUrlForNode(nodeId),
+                type:     'DELETE',
+                dataType: 'json',
 
-        jQuery.ajax({
-            url:      url,
-            type:     'DELETE',
-            dataType: 'json',
+                success:  success  || jQuery.noop,
+                error:    error    || jQuery.noop,
+                complete: complete || jQuery.noop
+            });
+        },
 
-            success:  success  || jQuery.noop,
-            error:    error    || jQuery.noop,
-            complete: complete || jQuery.noop
-        });
-    };
-
-    /*
-         Function: getGraph
-             Fetch a Graph object from the backend.
-
-         Parameters:
-             id       - ID of the Graph to fetch.
-             success  - [optional] Callback function for a successful asynchronous request for json representing a graph with given id.
-             error    - [optional] Callback that gets called in case of an unsuccessful retrieval of the graph from
-                        the database. Will create a new graph in the backend anyway.
-             complete - [optional] Callback that gets invoked in either a successful or erroneous graph request.
-     */
-    Backend.getGraph = function(id, success, error, complete) {
-        var url = URLHelper.fullUrlForGraph(id);
-
-        var successCallback = function(json) {
-            // call the passed success function if present
-            if (success) success(json);
-        };
-
-        var errorCallback = function(response, textStatus, errorThrown) {
-            // TODO: do proper create graph here on backend
-            var graph = new Graph(id);
-            if (error) error(graph, response, textStatus, errorThrown);
-        };
-
-        jQuery.ajax({
-            url:      url,
-            dataType: 'json',
-
-            success:  successCallback,
-            error:    errorCallback,
-            complete: complete || jQuery.noop
-        });
-    };
-
-    /*
-         Function: changeNode
+        /*
+         Function: nodePropertyChanged
              Changes the properties of a given node.
 
          Parameters:
-             node       - The node that shall be moved
+             nodeId     - The node that shall be moved
              properties - The node's properties that should be changed
              success    - [optional] Function that is invoked when the node's move was successfully transmitted.
              error      - [optional] Callback that gets called in case of an ajax-error.
              complete   - [optional] Callback that is always invoked no matter if ajax request was successful or erroneous.
-     */
-    Backend.changeNode = function(node, properties, success, error, complete) {
-        var url = URLHelper.fullUrlForNode(node);
+         */
+        nodePropertyChanged: function(nodeId, properties, success, error, complete) {
+            jQuery.ajax({
+                url:      this._fullUrlForNode(nodeId),
+                type:     'POST',
+                data:{
+                    properties: JSON.stringify(properties)
+                },
+                dataType: 'json',
 
-        jQuery.ajax({
-            url:      url,
-            type:     'POST',
-            data:{
-                properties: JSON.stringify(properties)
-            },
-            dataType: 'json',
+                success:  success  || jQuery.noop,
+                error:    error    || jQuery.noop,
+                complete: complete || jQuery.noop
+            });
+        },
 
-            success:  success  || jQuery.noop,
-            error:    error    || jQuery.noop,
-            complete: complete || jQuery.noop
-        });
-    };
-
-    /* TODO From here on*/
-
-    /*
-        Function: createGraph
-            Creates a new Graph in the backend. Will be asynchronous if a callback
-            function was given
-
-        Parameters:
-            type          - Type of the Graph. See Config.Graph.Types.
-            name          - Name of the Graph.
-            callback      - Callback function for asynchronous requests.
-                            Will be called when the request returns with the ID of the
-                            new Graph.
-            errorCallback - [optional] Callback that gets called in case of an ajax-error.
-     */
-    Backend.createGraph = function(type, name, callback, errorCallback) {
-        var url = URLHelper.fullUrlForGraphs();
-        var data = {
-            'type': type,
-            'name': name
-        };
-        var ajaxCallback = function(data) {
-            //TODO: Fetch graph ID.
-            console.log(data);
-        };
-
-        jQuery.post(url, data, ajaxCallback).fail(errorCallback || jQuery.noop);
-    };
-
-    /*
-         Function: calculateCutsets
-             Tells the server to calculate the minimal cutsets for the given graph and passes
-             the results to the provided callback.
+        /*
+         Function: getGraph
+             Fetch a Graph object from the backend.
 
          Parameters:
-             graph         - The graph for which the cutsets should be calculated.
-             callback      - Callback function for asynchronous requests.
-                             Will be called when the request returns with the cutsets.
-             errorCallback - [optional] Callback that gets called in case of an error.
-     */
-    Backend.calculateCutsets = function(graph, callback, errorCallback) {
-        var url = URLHelper.fullUrlForCutsets(graph);
-        jQuery.get(url, callback, 'json').fail(errorCallback || jQuery.noop);
-    };
+             success  - [optional] Callback function for a successful asynchronous request for json representing a graph with given id.
+             error    - [optional] Callback that gets called in case of an unsuccessful retrieval of the graph from
+                        the database. Will create a new graph in the backend anyway.
+             complete - [optional] Callback that gets invoked in either a successful or erroneous graph request.
+         */
+        getGraph: function(success, error, complete) {
+            jQuery.ajax({
+                url:      this._fullUrlForGraph(),
+                dataType: 'json',
 
-    return Backend;
+                success:  success  || jQuery.noop,
+                error:    error    || jQuery.noop,
+                complete: complete || jQuery.noop
+            });
+        },
+
+        /*
+             Function: calculateCutsets
+                 Tells the server to calculate the minimal cutsets for the given graph and passes
+                 the results to the provided callback.
+
+             Parameters:
+                 success  - [optional] Callback function for asynchronous requests.
+                            Will be called when the request returns with the cutsets.
+                 error    - [optional] Callback that gets called in case of an error.
+                 complete - [optional] Callback that gets invoked in either a successful or erroneous request.
+         */
+        calculateCutsets: function(success, error, complete) {
+            jQuery.ajax({
+                url:      this._fullUrlForCutsets(),
+                dataType: 'json',
+
+                success:  success  || jQuery.noop,
+                error:    error    || jQuery.noop,
+                complete: complete || jQuery.noop
+            });
+        },
+
+        /* Section: Internal */
+
+        /* Section: Helper */
+
+        _fullUrlForGraph: function() {
+            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + this._graphId;
+        },
+
+        _fullUrlForNodes: function() {
+            return this._fullUrlForGraph() + Config.Backend.NODES_URL;
+        },
+
+        _fullUrlForNode: function(nodeId) {
+            return this._fullUrlForNodes() + '/' + nodeId;
+        },
+
+        _fullUrlForEdges: function() {
+            return this._fullUrlForGraph() + Config.Backend.EDGES_URL;
+        },
+
+        _fullUrlForEdge: function(edgeId) {
+            return this._fullUrlForEdges() + '/' + edgeId;
+        },
+
+        _fullUrlForCutsets: function() {
+            return this._fullUrlForGraph() + Config.Backend.CUTSETS_URL;
+        }
+    });
 });
