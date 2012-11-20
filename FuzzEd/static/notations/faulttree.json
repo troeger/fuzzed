@@ -3,7 +3,7 @@
     "name": "Fault Tree",
     "nodes": {
         "node": {
-            "excludeFromShapesMen": true,
+            "excludeFromShapesMenu": true,
             "name": "Node",
             "numberOfIncomingConnections": -1,
             "numberOfOutgoingConnections":  1,
@@ -44,7 +44,7 @@
             "inherits": "node",
             "name": "Event",
             "probability": null,
-            "excludeFromShapesMen": true,
+            "excludeFromShapesMenu": true,
             "numberOfIncomingConnections":  1,
             "numberOfOutgoingConnections": -1,
             "allowConnectionTo": ["gate"],
@@ -59,7 +59,7 @@
         "gate": {
             "inherits": "node",
             "name": "Gate",
-            "excludeFromShapesMen": true,
+            "excludeFromShapesMenu": true,
             "numberOfIncomingConnections": -1,
             "numberOfOutgoingConnections":  1
         },
@@ -68,7 +68,7 @@
             "inherits": "event",
             "name": "Basic Event",
             "probability": 0,
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "numberOfIncomingConnections": 0,
             "image": "basic_event.svg",
             "help": "Initiating failure in a basic component",
@@ -87,7 +87,7 @@
             "inherits": "basicEvent",
             "name": "Basic Event Set",
             "cardinality": 1,
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "image": "basic_event_set.svg",
             "help": "Set of basic events with identical properties"
         },
@@ -95,7 +95,7 @@
         "intermediateEvent": {
             "inherits": "event",
             "name": "Intermediate Event",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "image": "intermediate_event.svg",
             "help": "Failure resulting from a combination of previous events"
         },
@@ -104,7 +104,7 @@
             "inherits": "intermediateEvent",
             "name": "Intermediate Event Set",
             "cardinality": 1,
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "numberOfIncomingConnections": 0,
             "image": "intermediate_event_set.svg",
             "help": "Set of intermediate events"
@@ -113,7 +113,7 @@
         "undevelopedEvent": {
             "inherits": "event",
             "name": "Undeveloped Event",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "numberOfIncomingConnections": 0,
             "image": "undeveloped_event.svg",
             "help": "Event with no information available or insignificant impact"
@@ -122,7 +122,7 @@
         "houseEvent": {
             "inherits": "event",
             "name": "House Event",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "numberOfIncomingConnections": 0,
             "image": "house_event.svg",
             "help": "An event that is expected to occur and typically does not denote a failure"
@@ -132,13 +132,14 @@
             "inherits": "event",
             "name": "Top Event",
             "image": "top_event.svg",
-            "excludeFromShapesMen": true
+            "excludeFromShapesMenu": true,
+            "numberOfIncomingConnections": 0
         },
 
         "andGate": {
             "inherits": "gate",
             "name": "AND Gate",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "image": "and_gate.svg",
             "help": "Output event occurs if all input events occur"
         },
@@ -146,7 +147,7 @@
         "priorityAndGate": {
             "inherits": "gate",
             "name": "Priority AND Gate",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "image": "priority_and_gate.svg",
             "help": "Output event occurs if all input events occur in the specific order"
         },
@@ -154,7 +155,7 @@
         "orGate": {
             "inherits": "gate",
             "name": "OR Gate",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "image": "or_gate.svg",
             "help": "Output event occurs if one or more input events occur",
 
@@ -168,7 +169,7 @@
         "xorGate": {
             "inherits": "gate",
             "name": "XOR Gate",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "image": "xor_gate.svg",
             "help": "Output event occurs if exactly one of the input events occur"
         },
@@ -177,7 +178,7 @@
             "inherits": "gate",
             "name": "Voting OR Gate",
             "count": 2,
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "image": "voting_or_gate.svg",
             "help": "Output event occurs if the given number of input events occur"
         },
@@ -185,7 +186,7 @@
         "inhibitGate": {
             "inherits": "gate",
             "name": "Inhibit Gate",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "image": "inhibit_gate.svg",
             "help": "Output event occurs if the single input event occurs and the enabling condition is given"
         }

@@ -4,7 +4,7 @@
     "nodes": {
         "node": {
             "name": "Node",
-            "excludeFromShapesMen": true,
+            "excludeFromShapesMenu": true,
             "numberOfIncomingConnections": -1,
             "numberOfOutgoingConnections": -1,
             "propertyMenuEntries": {
@@ -41,7 +41,7 @@
         "block": {
             "inherits": "node",
             "name": "Block",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "image": "block.svg",
             "propertyMenuEntries": {
                 "probability": {
@@ -63,7 +63,7 @@
         "outOf": {
             "inherits": "node",
             "name": "out of",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "image": "out_of.svg",
             "allowConnectionTo": ["block", "endNode"],
             "propertyMenuEntries": {

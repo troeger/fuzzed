@@ -308,7 +308,7 @@
         "houseEvent": {
             "inherits": "event",
             "name": "House Event",
-            "excludeFromShapesMen": false,
+            "excludeFromShapesMenu": false,
             "numberOfIncomingConnections": 0,
             "image": "house_event.svg",
             "help": "An event that is expected to occur and typically does not denote a failure"
@@ -318,7 +318,8 @@
             "inherits": "event",
             "name": "Top Event",
             "image": "top_event.svg",
-            "excludeFromShapesMen": true,
+            "excludeFromShapesMenu": true,
+            "numberOfIncomingConnections": 0,
             "optional": null,
 
             "propertyMenuEntries": {
