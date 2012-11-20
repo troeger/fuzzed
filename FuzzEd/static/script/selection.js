@@ -9,8 +9,8 @@ define(['config', 'node', 'backend', 'class', 'underscore'], function(Config, No
         _connections: [],   // jsPlumb Connection objects
         _editor: undefined, // being retrieved in the constructor
 
-        init: function() {
-            this._editor = jQuery('#' + Config.IDs.CANVAS).data(Config.Keys.EDITOR);
+        init: function(editor) {
+            this._editor = editor;
         },
 
         /* Section: API */
