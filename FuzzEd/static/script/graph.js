@@ -13,7 +13,8 @@ define(['config', 'class'], function(Config, Class) {
             this.name = json.name;
 
             this._nodeClasses['node'] = this._nodeClass();
-            this._loadFromJson(json);
+            this._loadFromJson(json)
+                ._registerEventHandlers();
         },
 
         /*
@@ -114,8 +115,6 @@ define(['config', 'class'], function(Config, Class) {
                 this.addNode(jsonNode.kind, jsonNode);
             }.bind(this));
 
-            //TODO: put into DOM
-
             // connect the nodes again
             _.each(json.edges, function(jsonEdge) {
                 var edge = jsPlumb.connect({
@@ -127,7 +126,7 @@ define(['config', 'class'], function(Config, Class) {
 
             }.bind(this));
 
-            this._setupJsPlumbEvents().bind(this);
+            return this;
         },
 
         _nodeClass: function() {
@@ -138,9 +137,20 @@ define(['config', 'class'], function(Config, Class) {
             throw '[ABSTRACT] Subclass responsibility';
         },
 
-        _setupJsPlumbEvents: function() {
+        _registerEventHandlers: function() {
             jsPlumb.bind('jsPlumbConnection', this.addEdge.bind(this));
             jsPlumb.bind('jsPlumbConnectionDetached', this.deleteEdge.bind(this));
+            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
+        },
+
+        _shapeDropped: function(kind, position) {
+            var node = this.graph.addNode(kind)
+                .moveTo(position);
+
+            //TODO: move
+            this.selection.ofNodes(node);
+
+            Backend.addNode(node);
         },
 
         /*
