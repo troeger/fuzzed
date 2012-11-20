@@ -9,6 +9,7 @@ define(['singleton', 'config'], function(Singleton, Config) {
      */
     return new Singleton.extend({
         container: undefined,
+        gridSize:  Config.Grid.SIZE,
 
         _background: undefined,
 
@@ -39,8 +40,8 @@ define(['singleton', 'config'], function(Singleton, Config) {
             }
 
             return {
-                x: Math.round(x / Config.Grid.SIZE),
-                y: Math.round(y / Config.Grid.SIZE)
+                x: Math.round(x / this.gridSize),
+                y: Math.round(y / this.gridSize)
             }
         },
 
@@ -58,8 +59,8 @@ define(['singleton', 'config'], function(Singleton, Config) {
             }
 
             return {
-                x: x * Config.Grid.SIZE,
-                y: y * Config.Grid.SIZE
+                x: x * this.gridSize,
+                y: y * this.gridSize
             }
         },
 
@@ -78,7 +79,7 @@ define(['singleton', 'config'], function(Singleton, Config) {
             });
 
             // horizontal lines
-            for (var y = Config.Grid.SIZE; y < height; y += Config.Grid.SIZE) {
+            for (var y = this.gridSize; y < height; y += this.gridSize) {
                 this._background.line(0, y, width, y, {
                     stroke:          Config.Grid.STROKE,
                     strokeWidth:     Config.Grid.STROKE_WIDTH,
@@ -87,7 +88,7 @@ define(['singleton', 'config'], function(Singleton, Config) {
             }
 
             // vertical lines
-            for (var x = Config.Grid.SIZE; x < width; x += Config.Grid.SIZE) {
+            for (var x = this.gridSize; x < width; x += this.gridSize) {
                 this._background.line(x, 0, x, height, {
                     stroke:          Config.Grid.STROKE,
                     strokeWidth:     Config.Grid.STROKE_WIDTH,
