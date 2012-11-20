@@ -50,7 +50,6 @@ define(['config', 'class'], function(Config, Class) {
         deleteEdge: function(edge) {
             var id = edge.connection._fuzzedID;
 
-            Backend.deleteEdge(connection);
             jQuery(document).trigger(Config.Events.GRAPH_EDGE_DELETED, id);
             delete this._edges[id];
 
@@ -66,7 +65,7 @@ define(['config', 'class'], function(Config, Class) {
             properties - Properties that should be merged into the new node.
          */
         addNode: function(kind, properties) {
-            var node = new (this.nodeClassFor(kind))(this, properties);
+            var node = new (this.nodeClassFor(kind))(properties, this._notation().propertyDisplayOrder);
             jQuery(document).trigger(Config.Events.GRAPH_NODE_ADDED, node.id);
             this.nodes[node.id] = node;
 
@@ -82,6 +81,8 @@ define(['config', 'class'], function(Config, Class) {
          */
         deleteNode: function(nodeId) {
             jQuery(document).trigger(Config.Events.GRAPH_NODE_DELETED, nodeId);
+
+            this._nodes[nodeId].remove();
             delete this._nodes[nodeId];
 
             return this;
