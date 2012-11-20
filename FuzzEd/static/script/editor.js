@@ -50,6 +50,7 @@ function(Class, Canvas, Menus, Selection, Config, Backend) {
         _loadGraphCompleted: function() {
             // fade out the splash screen
             jQuery('#' + Config.IDs.SPLASH).fadeOut(Config.Splash.FADE_TIME);
+            // activate the backend AFTER the graph is fully loaded to prevent backend calls during graph construction
             this._backend.activate();
         },
 

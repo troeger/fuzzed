@@ -1,6 +1,6 @@
 define(['config', 'class'], function(Config, Class) {
 
-    var Graph = Class.extend({
+    return Class.extend({
         id:     undefined,
         edges:  {},
         nodes:  {},
@@ -19,17 +19,22 @@ define(['config', 'class'], function(Config, Class) {
 
         /*
          Function: addEdge
-         Adds a given edge to this graph.
+            Adds a given edge to this graph.
 
          Parameters:
-         edge - Edge to be added
+            edge - Edge to be added
          */
         addEdge: function(edge) {
             var connection = edge.connection;
             var fuzzedId = new Date().getTime() + 1;
 
             connection._fuzzedID = fuzzedId;
-            Backend.addEdge(fuzzedId, edge.source.data(Config.Keys.NODE), edge.target.data(Config.Keys.NODE));
+            jQuery(document).trigger(
+                Config.Events.GRAPH_EDGE_ADDED,
+                fuzzedId,
+                edge.source.data(Config.Keys.NODE),
+                edge.target.data(Config.Keys.NODE)
+            );
             this.edges[fuzzedId] = connection;
 
             return this;
@@ -37,51 +42,49 @@ define(['config', 'class'], function(Config, Class) {
 
         /*
          Function: deleteEdge
-         Deletes the given edges from the graph if present
+            Deletes the given edges from the graph if present
 
          Parameters:
-         edge - Edge to remove from this graph.
+            edge - Edge to remove from this graph.
          */
         deleteEdge: function(edge) {
-            var connection = edge.connection;
+            var id = edge.connection._fuzzedID;
 
             Backend.deleteEdge(connection);
-            delete this._edges[connection._fuzzedID];
+            jQuery(document).trigger(Config.Events.GRAPH_EDGE_DELETED, id);
+            delete this._edges[id];
 
             return this;
         },
 
         /*
          Function: addNode
-         Adds a given node to this graph.
+            Adds a given node to this graph.
 
          Parameters:
-         node - Node to add to this graph.
+            kind       - String naming the kind of the node, e.g., 'basicEvent'.
+            properties - Properties that should be merged into the new node.
          */
         addNode: function(kind, properties) {
             var node = new (this.nodeClassFor(kind))(this, properties);
+            jQuery(document).trigger(Config.Events.GRAPH_NODE_ADDED, node.id);
             this.nodes[node.id] = node;
 
             return node;
         },
 
-        newNodeClassForKind: function(definition) {
-            var BaseClass = this._nodeClasses['node'];
-            var inherits = definition.inherits;
+        /*
+         Function: deleteNode
+         Deletes the given node from the graph if present
 
-            if (inherits) {
-                var BaseClass = this.nodeClassFor(inherits);
-            }
+         Parameters:
+         node - Node to remove from this graph.
+         */
+        deleteNode: function(nodeId) {
+            jQuery(document).trigger(Config.Events.GRAPH_NODE_DELETED, nodeId);
+            delete this._nodes[nodeId];
 
-            var newClass = BaseClass.extend({
-                init: function(properties) {
-                    this._super(jQuery.extend(true, definition, properties));
-                }
-            });
-
-            this._nodeClasses[definition.kind] = newClass;
-
-            return newClass;
+            return this;
         },
 
         /*
@@ -104,10 +107,29 @@ define(['config', 'class'], function(Config, Class) {
             if (typeof notationDefinition === 'undefined')
                 throw 'No definition for node of kind ' + kind;
 
-            return this.newNodeClassForKind(notationDefinition);
+            return this._newNodeClassForKind(notationDefinition);
         },
 
         /* Section: Internal */
+
+        _newNodeClassForKind: function(definition) {
+            var BaseClass = this._nodeClasses['node'];
+            var inherits = definition.inherits;
+
+            if (inherits) {
+                var BaseClass = this.nodeClassFor(inherits);
+            }
+
+            var newClass = BaseClass.extend({
+                init: function(properties) {
+                    this._super(jQuery.extend(true, definition, properties));
+                }
+            });
+
+            this._nodeClasses[definition.kind] = newClass;
+
+            return newClass;
+        },
 
         _loadFromJson: function(json) {
             // parse the json nodes and convert them to node objects
@@ -144,38 +166,11 @@ define(['config', 'class'], function(Config, Class) {
         },
 
         _shapeDropped: function(kind, position) {
-            var node = this.graph.addNode(kind)
-                .moveTo(position);
+            var node = this.addNode(kind)
+                           .moveTo(position);
 
             //TODO: move
             this.selection.ofNodes(node);
-
-            Backend.addNode(node);
-        },
-
-        /*
-         Function: deleteNode
-         Deletes the given node from the graph if present
-
-         Parameters:
-         node - Node to remove from this graph.
-         */
-        deleteNode: function(node) {
-            delete this._nodes[node.id]
-        },
-
-        getNodeById: function(id) {
-            return this._nodes[id];
-        },
-
-        /*
-         Function: getNodes
-         Get all the nodes of the graph.
-         */
-        getNodes: function() {
-            return _.values(this._nodes);
         }
     });
-
-    return Graph;
 });
