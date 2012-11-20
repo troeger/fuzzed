@@ -170,8 +170,7 @@ define(['config', 'class'], function(Config, Class) {
             var node = this.addNode(kind)
                            .moveTo(position);
 
-            //TODO: move
-            this.selection.ofNodes(node);
+            //TODO: select the node
         }
     });
 });

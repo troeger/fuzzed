@@ -1,5 +1,5 @@
-define(['class', 'canvas', 'menus', 'selection', 'config', 'backend'],
-function(Class, Canvas, Menus, Selection, Config, Backend) {
+define(['class', 'canvas', 'menus', 'config', 'backend'],
+function(Class, Canvas, Menus, Config, Backend) {
 
     /*
      *  Class: Editor
@@ -7,7 +7,6 @@ function(Class, Canvas, Menus, Selection, Config, Backend) {
     return Class.extend({
         graph:      undefined,
         properties: undefined,
-        selection:  undefined,
         shapes:     undefined,
 
         _backend:            undefined,
@@ -19,10 +18,9 @@ function(Class, Canvas, Menus, Selection, Config, Backend) {
             this._backend = new Backend(graphId);
             this._navbarActionsGroup = jQuery('#' + Config.IDs.NAVBAR_ACTIONS);
 
-            // create manager objects for the bars and the selection
+            // create manager objects for the bars
             this.properties = new Menus.PropertiesMenu();
             this.shapes     = new Menus.ShapeMenu();
-            this.selection  = new Selection(this);
 
             // run a few sub initializer
             this._setupJsPlumb()
@@ -86,26 +84,10 @@ function(Class, Canvas, Menus, Selection, Config, Backend) {
                 Anchors:         ['BottomMiddle', 'TopMiddle'],
                 ConnectionsDetachable: false
             });
-
-            // listen for clicks on connections for selections
-            //TODO: move to selection
-            jsPlumb.bind('click', function(connection, event) {
-                event.stopPropagation();
-                this.selection.ofConnections(connection);
-            }.bind(this));
         },
 
-        //TODO move to selection
         _setupKeyBindings: function() {
-            jQuery(document).keydown(function(eventObject) {
-                // hitting delete removes the current selection from the canvas
-                if (eventObject.which === jQuery.ui.keyCode.DELETE) {
-                    this.selection.remove();
-
-                } else if (eventObject.which === jQuery.ui.keyCode.ESCAPE) {
-                    this.selection.clear()
-                }
-            }.bind(this));
+            //TODO: interact with selection
         }
     });
 });

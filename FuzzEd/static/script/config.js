@@ -48,7 +48,6 @@ define(function() {
         },
 
         Events: {
-            CANVAS_CLICKED:           'canvas-clicked',
             CANVAS_SHAPE_DROPPED:     'canvas-shape-dropped',
 
             NODE_PROPERTY_CHANGED:    'node-property-changed',

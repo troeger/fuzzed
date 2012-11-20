@@ -48,7 +48,7 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                 return otherNode instanceof this.graph.nodeClassFor(nodeKind);
             });
             if (!allowed) return false;
-            
+
             // there is already a connection between these nodes
             var connections = jsPlumb.getConnections({
                 //TODO: the selector should suffice, but due to a bug in jsPlumb we need the IDs here
@@ -210,8 +210,7 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
 
                 // start dragging callback
                 start: function() {
-                    //TODO: move
-                    this._editor.selection.ofNodes(this);
+                    //TODO: add dragged node to selection
                 }.bind(this),
 
                 // stop dragging callback
@@ -301,13 +300,6 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
         },
 
         _setupMouse: function() {
-            // click on the node
-            this.container.click(function(eventObject) {
-                eventObject.stopPropagation();
-                //TODO: move to selection
-                this._editor.selection.ofNodes(this);
-            }.bind(this));
-
             // hovering over a node
             this.container.hover(
                 // mouse in

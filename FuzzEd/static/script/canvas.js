@@ -102,8 +102,6 @@ define(['singleton', 'config'], function(Singleton, Config) {
         _setupBackground: function() {
             this._background = this.container.svg().svg('get');
             this._drawGrid();
-            // clicks on the canvas clears the selection
-            this.canvas.click(function() {jQuery(document).trigger(Config.Events.CANVAS_CLICKED);}.bind(this));
             // redraw the background grid when the window is being resized
             jQuery(window).resize(this._drawGrid.bind(this));
 
