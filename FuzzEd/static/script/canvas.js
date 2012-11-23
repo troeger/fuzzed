@@ -1,4 +1,4 @@
-define(['singleton', 'config'], function(Singleton, Config) {
+define(['class', 'config', 'jquery.svg', 'jquery.ui/jquery.ui.droppable'], function(Class, Config) {
 
     /**
      *  Class: Canvas
@@ -7,7 +7,7 @@ define(['singleton', 'config'], function(Singleton, Config) {
      *      Config.Events.CANVAS_CLICKED        - The canvas itself was clicked.
      *      Config.Events.CANVAS_SHAPE_DROPPED - An SVG element was dropped onto the canvas.
      */
-    return new Singleton.extend({
+    var Canvas = Class.extend({
         container: undefined,
         gridSize:  Config.Grid.SIZE,
 
@@ -67,8 +67,8 @@ define(['singleton', 'config'], function(Singleton, Config) {
         /* Section: Internals */
 
         _drawGrid: function() {
-            var height = this.canvas.height();
-            var width  = this.canvas.width();
+            var height = this.container.height();
+            var width  = this.container.width();
 
             // clear old background and resize svg container to current canvas size
             // important when window was resized in the mean time
@@ -110,18 +110,20 @@ define(['singleton', 'config'], function(Singleton, Config) {
 
         _setupCanvas: function() {
             // make canvas droppable for shapes from the shape menu
-            this.canvas.droppable({
+            this.container.droppable({
                 accept:    'svg',
                 tolerance: 'fit',
                 drop:      function(uiEvent, uiObject) {
                     var kind     = uiObject.draggable.attr('id');
                     var offset   = this.container.offset();
                     var position = {x: uiEvent.pageX - offset.left, y: uiEvent.pageY - offset.top};
-                    jQuery(document).trigger(Config.Events.CANVAS_SHAPE_DROPPED, kind, position);
+                    jQuery(document).trigger(Config.Events.CANVAS_SHAPE_DROPPED, [kind, position]);
                 }.bind(this)
             });
 
             return this;
         }
     });
+
+    return new Canvas();
 });

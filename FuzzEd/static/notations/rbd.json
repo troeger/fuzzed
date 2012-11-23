@@ -18,6 +18,12 @@
                     "position": "bottom",
                     "style": ["bold"]
                 }
+            },
+            "connector": {
+                "offset": {
+                    "top":    0,
+                    "bottom": 0
+                }
             }
         },
 

@@ -1,22 +1,32 @@
-define(['editor', 'faulttree/graph', 'menus', 'config', 'backend'],
-function(Editor, FaulttreeGraph, Menus, Config, Backend) {
+define(['editor', 'faulttree/graph', 'menus', 'faulttree/config'],
+function(Editor, FaulttreeGraph, Menus, Config) {
     /**
      * Class: CutsetsMenu
      */
     var CutsetsMenu = Menus.Menu.extend({
-        //TODO: this should be 'show(cutsets)'
-        displayCutsets: function(cutsets) {
-            var listElement = this._container.find('ul');
-            listElement.empty();
+        _graph: undefined,
+
+        init: function(graph) {
+            this._super();
+            this._graph = graph;
+        },
+
+        show: function(cutsets) {
+            if (typeof cutsets === 'undefined') {
+                this.container.show();
+                return this;
+            }
+
+            var listElement = this.container.find('ul').empty();
 
             _.each(cutsets, function(cutset) {
                 var nodeIDs = cutset['nodes'];
                 var nodes = _.map(nodeIDs, function(id) {
-                    return this._editor.graph().getNodeById(id);
+                    return this._graph.getNodeById(id);
                 }.bind(this));
                 var nodeNames = _.map(nodes, function(node) {
                     return node.name;
-                })
+                });
 
                 // create list entry for the menu
                 var entry = jQuery('<li><a href="#">' + nodeNames.join(', ') + '</a></li>');
@@ -25,21 +35,23 @@ function(Editor, FaulttreeGraph, Menus, Config, Backend) {
                 entry.hover(
                     // in
                     function() {
-                        var allNodes = this._editor._nodes;
+                        var allNodes = this._graph.getNodes();
                         _.invoke(allNodes, 'disable');
                         _.invoke(nodes, 'highlight');
                     }.bind(this),
 
                     // out
                     function() {
-                        var allNodes = this._editor._nodes;
+                        var allNodes = this._graph.getNodes();
                         _.invoke(allNodes, 'enable');
-                        _.invoke(nodes, 'highlight', false);
+                        _.invoke(nodes, 'unhighlight');
                     }.bind(this)
                 );
 
                 listElement.append(entry);
             }.bind(this));
+
+            this._super();
         },
 
         _setupContainer: function() {
@@ -79,15 +91,9 @@ function(Editor, FaulttreeGraph, Menus, Config, Backend) {
                 '</li>');
             this._navbarActionsGroup.append(navbarActionsEntry);
 
-            // callback that is fired when backend returns cutsets
-            function loadCutsetsIntoMenu(cutsets) {
-                this.cutsets.displayCutsets(cutsets);
-                this.cutsets.show();
-            }
-
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
-                Backend.calculateCutsets(this.graph(), loadCutsetsIntoMenu.bind(this));
+                jQuery(document).trigger(Config.Events.EDITOR_CALCULATE_CUTSETS, this.cutsets.show.bind(this.cutsets));
             }.bind(this));
 
             return this;

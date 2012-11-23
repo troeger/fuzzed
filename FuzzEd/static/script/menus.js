@@ -5,13 +5,13 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
      * Class: Menu
      */
     var Menu = Class.extend({
-        _container:    undefined,
+        container:    undefined,
         _controls:     undefined,
         _navbar:       undefined,
         _navbarButton: undefined,
 
         init: function() {
-            this._container = this._setupContainer();
+            this.container = this._setupContainer();
             this._controls  = this._setupControls();
             this._navbar    = this._setupNavbar();
 
@@ -20,7 +20,7 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
 
         /* Section: Visibility */
         hide: function() {
-            this._container.hide();
+            this.container.hide();
             return this;
         },
 
@@ -28,15 +28,15 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
             if (this._isMinimized()) return this;
 
             // create a button in the toolbar
-            this._navbarButton = jQuery('<li><a href="#">' + this._container.attr(Config.Attributes.HEADER) + '</a></li>')
+            this._navbarButton = jQuery('<li><a href="#">' + this.container.attr(Config.Attributes.HEADER) + '</a></li>')
                 .css('visibility', 'hidden')
                 .prependTo(this._navbar)
                 // .offset() here will closure the position where the window was minimized
-                .click(this._container.offset(), this.maximize.bind(this));
+                .click(this.container.offset(), this.maximize.bind(this));
 
             // animate the window minimizing towards the navigation button
             var navButtonPosition = this._navbarButton.offset();
-            this._container.animate({
+            this.container.animate({
                 top:    navButtonPosition.top,
                 left:   navButtonPosition.left,
                 width:  0,
@@ -45,11 +45,11 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
                 duration: Config.Menus.ANIMATION_DURATION,
                 complete: function() {
                     this._navbarButton.css('visibility', '');
-                    this._container.hide();
+                    this.container.hide();
                     // width and height have to be remove here so that the css will fall back to auto
                     // so that changes to the bounding box of the menu will be reflected when maximizing
-                    this._container.css('width', '');
-                    this._container.css('height', '');
+                    this.container.css('width', '');
+                    this.container.css('height', '');
                 }.bind(this)
             });
             return this;
@@ -63,17 +63,17 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
                 // those lines might seem weird but they are very necessary
                 // if the window changed its bounding box while being minimized (e.g. properties menu)
                 // we need to capture this change here first...
-                width:  this._container.width(),
-                height: this._container.height()
+                width:  this.container.width(),
+                height: this.container.height()
             }, eventObject.data);
 
             // ... then we resize the window to zero...
-            this._container.width(0);
-            this._container.height(0);
-            this._container.show();
+            this.container.width(0);
+            this.container.height(0);
+            this.container.show();
 
             // ... so that this animation can finally resize it back to the captured value :O
-            this._container.animate(destinationTransformation, {
+            this.container.animate(destinationTransformation, {
                 duration: Config.Menus.ANIMATION_DURATION
             });
             return this;
@@ -83,7 +83,7 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
             // prevent that the menu is shown again as long it is minimized
             if (this._isMinimized()) return this;
 
-            this._container.show();
+            this.container.show();
             return this;
         },
 
@@ -97,7 +97,7 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
         },
 
         _setupControls: function() {
-            var controls = this._container.find('.' + Config.Classes.MENU_CONTROLS);
+            var controls = this.container.find('.' + Config.Classes.MENU_CONTROLS);
 
             controls.find('.' + Config.Classes.MENU_MINIMIZE)
                 .addClass('icon-white icon-minus-sign')
@@ -111,7 +111,7 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
         },
 
         _setupDragging: function() {
-            this._container.draggable({
+            this.container.draggable({
                 containment:   'body',
                 stack:         'svg',
                 cursor:        Config.Dragging.CURSOR,
@@ -142,7 +142,7 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
         },
 
         _setupThumbnails: function() {
-            var svgs = this._container.find('svg');
+            var svgs = this.container.find('svg');
 
             // make shapes in the menu draggable
             svgs.draggable({
@@ -165,7 +165,7 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
 
         init: function() {
             this._super();
-            this._form = this._container.find('form');
+            this._form = this.container.find('form');
         },
 
         maximize: function(eventObject) {
@@ -173,7 +173,7 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
             this._navbarButton = undefined;
 
             this.show(this._nodes);
-            this._container.animate(eventObject.data, {
+            this.container.animate(eventObject.data, {
                 duration: Config.Menus.ANIMATION_DURATION
             });
             return this;
@@ -181,7 +181,7 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
 
         /* Section: Visibility */
         hide: function() {
-            this._container.hide();
+            this.container.hide();
 
             _.each(this._nodes, function(node) {
                 _.each(node.propertyMenuEntries, function(menuEntry) {
@@ -214,12 +214,12 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
                 if (this._isMinimized()) return this;
 
                 // fix the left offset (jQueryUI bug with draggable and right)
-                if (this._container.css('left') === 'auto') {
-                    var offset =  - this._container.outerWidth(true) - Config.Menus.PROPERTIES_MENU_OFFSET;
-                    this._container.css('left', jQuery('body').outerWidth(true) + offset);
+                if (this.container.css('left') === 'auto') {
+                    var offset =  - this.container.outerWidth(true) - Config.Menus.PROPERTIES_MENU_OFFSET;
+                    this.container.css('left', jQuery('body').outerWidth(true) + offset);
                 }
 
-                this._container.show();
+                this.container.show();
             }
 
             return this;

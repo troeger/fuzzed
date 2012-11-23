@@ -38,6 +38,7 @@ define(function() {
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
             NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
+            //TODO: move
             NODE_OPTIONAL_INDICATOR: 'fuzzed-node-optional-indicator'
         },
 
@@ -55,9 +56,7 @@ define(function() {
             GRAPH_NODE_ADDED:         'graph-node-added',
             GRAPH_NODE_DELETED:       'graph-node-deleted',
             GRAPH_EDGE_ADDED:         'graph-edge-added',
-            GRAPH_EDGE_DELETED:       'graph-edge-deleted',
-
-            EDITOR_CALCULATE_CUTSETS: 'editor-calculate-cutsets'
+            GRAPH_EDGE_DELETED:       'graph-edge-deleted'
         },
 
         Grid: {
@@ -72,10 +71,8 @@ define(function() {
             CONTENT:               'FuzzEdContent',
             PROPERTIES_MENU:       'FuzzEdProperties',
             SHAPES_MENU:           'FuzzEdShapes',
-            CUTSETS_MENU:          'FuzzEdCutsets',
             SPLASH:                'FuzzEdSplash',
-            NAVBAR_ACTIONS:        'FuzzEdNavbarActions',
-            NAVBAR_ACTION_CUTSETS: 'FuzzEdNavbarActionCutsets'
+            NAVBAR_ACTIONS:        'FuzzEdNavbarActions'
         },
 
         JSPlumb: {
@@ -109,6 +106,7 @@ define(function() {
             STROKE_SELECTED:           SELECTED_COLOR,
             STROKE_DISABLED:           DISABLED_COLOR,
 
+            //TODO: move
             OPTIONAL_INDICATOR_FILL:   '#FFF',
             OPTIONAL_INDICATOR_RADIUS: Math.round(GRID_SIZE / 10)
         },

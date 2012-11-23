@@ -61,7 +61,7 @@ else:
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
         'FuzzEd/templates',
-        'FuzzEd/static/img/nodes'
+        'FuzzEd/static/img'
     )
 
 # Local time zone for this installation. Choices can be found here:

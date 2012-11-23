@@ -1,5 +1,5 @@
-define(['singleton', 'config'], function (Singleton, Config) {
-    return Singleton.extend({
+define(['class', 'config'], function (Class, Config) {
+    return Class.extend({
         _graphId: undefined,
 
         init: function(graphId) {
@@ -38,7 +38,7 @@ define(['singleton', 'config'], function (Singleton, Config) {
              error        - [optional] Callback that gets called in case of an ajax-error.
              complete     - [optional] Callback that is invoked in both cases - a successful or an erroneous ajax request
          */
-        graphEdgeAdded: function(edgeId, sourceNodeId, targetNodeId, success, error, complete) {
+        graphEdgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
             var data = {
                 id:          edgeId,
                 source:      sourceNodeId,
@@ -68,14 +68,16 @@ define(['singleton', 'config'], function (Singleton, Config) {
                  error    - [optional] Callback that gets called in case of an ajax-error.
                  complete - [optional] Callback that is invoked when the ajax request completes successful or erroneous.
          */
-        graphNodeAdded: function(nodeId, kind, success, error, complete) {
+        graphNodeAdded: function(event, nodeId, kind, x, y, success, error, complete) {
             var data = {
                 id:   nodeId,
-                kind: kind
+                kind: kind,
+                x:    x,
+                y:    y
             };
 
             jQuery.ajax({
-                url:      this._fullUrlForNode(nodeId),
+                url:      this._fullUrlForNodes(),
                 type:     'POST',
                 dataType: 'json',
 
@@ -96,7 +98,7 @@ define(['singleton', 'config'], function (Singleton, Config) {
              error    - [optional] Callback that gets called in case of an ajax-error.
              complete - [optional] Callback that gets invoked in both cases - a successful and an errornous ajax-call.
          */
-        graphEdgeDeleted: function(edgeId, success, error, complete) {
+        graphEdgeDeleted: function(event, edgeId, success, error, complete) {
             jQuery.ajax({
                 url:      this._fullUrlForEdge(edgeId),
                 type:     'DELETE',
@@ -118,7 +120,7 @@ define(['singleton', 'config'], function (Singleton, Config) {
              error    - [optional] Callback that gets called in case of an ajax-error.
              complete - [optional] Callback that is invoked in both cases either in an successful or errornous ajax call.
          */
-        graphNodeDeleted: function(nodeId, success, error, complete) {
+        graphNodeDeleted: function(event, nodeId, success, error, complete) {
             jQuery.ajax({
                 url:      this._fullUrlForNode(nodeId),
                 type:     'DELETE',
@@ -141,7 +143,7 @@ define(['singleton', 'config'], function (Singleton, Config) {
              error      - [optional] Callback that gets called in case of an ajax-error.
              complete   - [optional] Callback that is always invoked no matter if ajax request was successful or erroneous.
          */
-        nodePropertyChanged: function(nodeId, properties, success, error, complete) {
+        nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
             jQuery.ajax({
                 url:      this._fullUrlForNode(nodeId),
                 type:     'POST',
@@ -188,7 +190,7 @@ define(['singleton', 'config'], function (Singleton, Config) {
                  error    - [optional] Callback that gets called in case of an error.
                  complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
-        calculateCutsets: function(success, error, complete) {
+        calculateCutsets: function(event, success, error, complete) {
             jQuery.ajax({
                 url:      this._fullUrlForCutsets(),
                 dataType: 'json',

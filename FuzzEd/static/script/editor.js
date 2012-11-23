@@ -1,5 +1,5 @@
-define(['class', 'canvas', 'menus', 'config', 'backend'],
-function(Class, Canvas, Menus, Config, Backend) {
+define(['class', 'menus', 'config', 'backend', 'canvas'],
+function(Class, Menus, Config, Backend) {
 
     /*
      *  Class: Editor
@@ -37,7 +37,7 @@ function(Class, Canvas, Menus, Config, Backend) {
         },
 
         _loadGraph: function(graphId) {
-            Backend.getGraph(
+            this._backend.getGraph(
                 this._loadGraphFromJson.bind(this),
                 this._loadGraphError.bind(this)
             );
@@ -50,6 +50,8 @@ function(Class, Canvas, Menus, Config, Backend) {
             jQuery('#' + Config.IDs.SPLASH).fadeOut(Config.Splash.FADE_TIME);
             // activate the backend AFTER the graph is fully loaded to prevent backend calls during graph construction
             this._backend.activate();
+
+            return this;
         },
 
         _loadGraphError: function(response, textStatus, errorThrown) {
@@ -60,6 +62,8 @@ function(Class, Canvas, Menus, Config, Backend) {
         _loadGraphFromJson: function(json) {
             this.graph = new (this._graphClass())(json);
             this._loadGraphCompleted();
+
+            return this;
         },
 
         _setupJsPlumb: function() {
@@ -84,6 +88,8 @@ function(Class, Canvas, Menus, Config, Backend) {
                 Anchors:         ['BottomMiddle', 'TopMiddle'],
                 ConnectionsDetachable: false
             });
+
+            return this;
         },
 
         _setupKeyBindings: function() {

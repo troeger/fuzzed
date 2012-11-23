@@ -37,6 +37,12 @@
                     "min": 1,
                     "step": 1
                 }
+            },
+            "connector": {
+                "offset": {
+                    "top":    0,
+                    "bottom": 0
+                }
             }
         },
 

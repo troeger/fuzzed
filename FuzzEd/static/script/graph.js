@@ -1,4 +1,4 @@
-define(['config', 'class'], function(Config, Class) {
+define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
 
     return Class.extend({
         id:     undefined,
@@ -12,7 +12,6 @@ define(['config', 'class'], function(Config, Class) {
             this.id   = json.id;
             this.name = json.name;
 
-            this._nodeClasses['node'] = this._nodeClass();
             this._loadFromJson(json)
                 ._registerEventHandlers();
         },
@@ -31,9 +30,9 @@ define(['config', 'class'], function(Config, Class) {
             connection._fuzzedID = fuzzedId;
             jQuery(document).trigger(
                 Config.Events.GRAPH_EDGE_ADDED,
-                fuzzedId,
+                [fuzzedId,
                 edge.source.data(Config.Keys.NODE),
-                edge.target.data(Config.Keys.NODE)
+                edge.target.data(Config.Keys.NODE)]
             );
             this.edges[fuzzedId] = connection;
 
@@ -62,11 +61,11 @@ define(['config', 'class'], function(Config, Class) {
 
          Parameters:
             kind       - String naming the kind of the node, e.g., 'basicEvent'.
-            properties - Properties that should be merged into the new node.
+            properties - [optional] Properties that should be merged into the new node.
          */
-        addNode: function(kind, properties) {
-            var node = new (this.nodeClassFor(kind))(properties, this._notation().propertyDisplayOrder);
-            jQuery(document).trigger(Config.Events.GRAPH_NODE_ADDED, node.id);
+        addNode: function(kind, properties, success) {
+            var node = new (this.nodeClassFor(kind))(properties, this._notation().propertiesDisplayOrder);
+            jQuery(document).trigger(Config.Events.GRAPH_NODE_ADDED, [node.id, kind, node.x, node.y]);
             this.nodes[node.id] = node;
 
             return node;
@@ -108,13 +107,23 @@ define(['config', 'class'], function(Config, Class) {
             if (typeof notationDefinition === 'undefined')
                 throw 'No definition for node of kind ' + kind;
 
+            notationDefinition.kind = kind;
+
             return this._newNodeClassForKind(notationDefinition);
+        },
+
+        getNodes: function() {
+            return _.values(this._nodes);
+        },
+
+        getNodeById: function(nodeId) {
+            return this._nodes[nodeId];
         },
 
         /* Section: Internal */
 
         _newNodeClassForKind: function(definition) {
-            var BaseClass = this._nodeClasses['node'];
+            var BaseClass = this._nodeClass();
             var inherits = definition.inherits;
 
             if (inherits) {
@@ -122,8 +131,8 @@ define(['config', 'class'], function(Config, Class) {
             }
 
             var newClass = BaseClass.extend({
-                init: function(properties) {
-                    this._super(jQuery.extend(true, definition, properties));
+                init: function(properties, propertiesDisplayOrder) {
+                    this._super(jQuery.extend(true, {}, definition, properties), propertiesDisplayOrder);
                 }
             });
 
@@ -166,9 +175,8 @@ define(['config', 'class'], function(Config, Class) {
             jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
         },
 
-        _shapeDropped: function(kind, position) {
-            var node = this.addNode(kind)
-                           .moveTo(position);
+        _shapeDropped: function(event, kind, position) {
+            var node = this.addNode(kind, Canvas.toGrid(position));
 
             //TODO: select the node
         }

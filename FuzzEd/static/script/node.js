@@ -27,10 +27,10 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
             // visuals
             jsPlumb.extend(this.connector, jsPlumb.Defaults.PaintStyle);
             this._setupVisualRepresentation();
-            this.container.appendTo(Canvas.container);
             // some visual stuff, interaction and endpoints need to go here since they require the elements to be
             // already in the DOM.
             this._resize()
+                ._moveContainerToPixel(Canvas.toPixel(this.x, this.y))
                 ._setupEndpoints()
                 ._setupDragging()
                 ._setupMouse()
@@ -76,6 +76,8 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                 jsPlumb.deleteEndpoint(endpoint);
             });
             this.container.remove();
+
+            return this;
         },
 
         /**
@@ -90,17 +92,10 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
             this.x = gridPos.x;
             this.y = gridPos.y;
 
-            var image = this._nodeImage;
-            var offsetX = image.position().left + image.outerWidth(true) / 2;
-            var offsetY = image.position().top  + image.outerHeight(true) / 2;
-
-            this.container.css({
-                left: position.x - offsetX || 0,
-                top:  position.y - offsetY || 0
-            });
+            this._moveContainerToPixel(position);
 
             // call home
-            jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, {'x': this.x, 'y': this.y});
+            jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },
@@ -175,10 +170,24 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
          *      Object containing the 'x' and 'y' position.
          */
         _getPositionOnCanvas: function() {
+            var canvasOffset = Canvas.container.offset();
             return {
-                'x': this._nodeImage.offset().left + this._nodeImage.width() / 2,
-                'y': this._nodeImage.offset().top + this._nodeImage.height() / 2
+                'x': this._nodeImage.offset().left - canvasOffset.left + this._nodeImage.width()  / 2,
+                'y': this._nodeImage.offset().top  - canvasOffset.top  + this._nodeImage.height() / 2
             };
+        },
+
+        _moveContainerToPixel: function(position) {
+            var image = this._nodeImage;
+            var offsetX = image.position().left + image.outerWidth(true)  / 2;
+            var offsetY = image.position().top  + image.outerHeight(true) / 2;
+
+            this.container.css({
+                left: position.x - offsetX || 0,
+                top:  position.y - offsetY || 0
+            });
+
+            return this;
         },
 
         _resize: function() {
@@ -198,6 +207,8 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
 
             // XXX: In Webkit browsers the container div does not resize properly. This should fix it.
             this.container.width(this._nodeImage.width());
+
+            return this;
         },
 
         _setupDragging: function() {
@@ -218,6 +229,8 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                     this.moveTo(this._getPositionOnCanvas());
                 }.bind(this)
             });
+
+            return this;
         },
 
         _connectorOffset: function() {
@@ -354,7 +367,7 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                 .addClass(Config.Classes.NODE_IMAGE);
 
             this.container = jQuery('<div>')
-                .attr('id', this._nodeImage.attr('id') + this.id)
+                .attr('id', this.kind + this.id)
                 .addClass(Config.Classes.NODE)
                 .css('position', 'absolute')
                 .data(Config.Keys.NODE, this)
@@ -369,6 +382,8 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                     .addClass(Config.Classes.NODE_HALO_CONNECT)
                     .appendTo(this.container);
             }
+
+            this.container.appendTo(Canvas.container);
 
             return this;
         }
