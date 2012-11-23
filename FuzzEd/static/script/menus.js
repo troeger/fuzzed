@@ -1,5 +1,5 @@
-define(['config', 'class', 'json!notations/fuzztree.json'],
-        function(Config, Class, FuzztreeConfig) {
+define(['config', 'class'],
+        function(Config, Class) {
 
     /**
      * Class: Menu
@@ -161,10 +161,12 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
      * Class: PropertiesMenu
      */
     var PropertiesMenu = Menu.extend({
-        _form:      undefined,
+        _form:         undefined,
+        _displayOrder: undefined,
 
-        init: function() {
+        init: function(displayOrder) {
             this._super();
+            this._displayOrder = displayOrder;
             this._form = this.container.find('form');
         },
 
@@ -185,8 +187,6 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
 
             _.each(this._nodes, function(node) {
                 _.each(node.propertyMenuEntries, function(menuEntry) {
-                    // TODO: remove me, here fordev purposes (the if)
-                    if (typeof menuEntry === 'undefined') return;
                     menuEntry.hide();
                 })
             });
@@ -202,7 +202,7 @@ define(['config', 'class', 'json!notations/fuzztree.json'],
 
             if (this._haveEntries(this._nodes) || force) {
                 _.each(this._nodes, function(node) {
-                    _.each(FuzztreeConfig.propertiesDisplayOrder, function(property) {
+                    _.each(this._displayOrder, function(property) {
                         var menuEntry = node.propertyMenuEntries[property];
 
                         if (typeof menuEntry !== 'undefined') {

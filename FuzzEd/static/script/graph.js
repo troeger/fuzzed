@@ -64,7 +64,7 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             properties - [optional] Properties that should be merged into the new node.
          */
         addNode: function(kind, properties, success) {
-            var node = new (this.nodeClassFor(kind))(properties, this._notation().propertiesDisplayOrder);
+            var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
             jQuery(document).trigger(Config.Events.GRAPH_NODE_ADDED, [node.id, kind, node.x, node.y]);
             this.nodes[node.id] = node;
 
@@ -103,13 +103,21 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
 
             if (typeof nodeClass !== 'undefined') return nodeClass;
 
-            var notationDefinition = this._notation().nodes[kind];
+            var notationDefinition = this.getNotation().nodes[kind];
             if (typeof notationDefinition === 'undefined')
                 throw 'No definition for node of kind ' + kind;
 
             notationDefinition.kind = kind;
 
             return this._newNodeClassForKind(notationDefinition);
+        },
+
+        getNotation: function() {
+            throw '[ABSTRACT] Subclass responsibility';
+        },
+
+        getNodeClass: function() {
+            throw '[ABSTRACT] Subclass responsibility';
         },
 
         getNodes: function() {
@@ -123,7 +131,7 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
         /* Section: Internal */
 
         _newNodeClassForKind: function(definition) {
-            var BaseClass = this._nodeClass();
+            var BaseClass = this.getNodeClass();
             var inherits = definition.inherits;
 
             if (inherits) {
@@ -165,14 +173,6 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             }.bind(this));
 
             return this;
-        },
-
-        _nodeClass: function() {
-            throw '[ABSTRACT] Subclass responsibility';
-        },
-
-        _notation: function() {
-            throw '[ABSTRACT] Subclass responsibility';
         },
 
         _registerEventHandlers: function() {

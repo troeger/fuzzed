@@ -3,41 +3,10 @@
     "name": "Fault Tree",
     "nodes": {
         "node": {
-            "excludeFromShapesMenu": true,
-            "name": "Node",
             "numberOfIncomingConnections": -1,
             "numberOfOutgoingConnections":  1,
             "allowConnectionTo": ["node"],
-            "propertyMenuEntries": {
-                "name": {
-                    "kind": "text",
-                    "displayName": "Name"
-                },
-                "cost": {
-                    "kind": "number",
-                    "displayName": "Cost",
-                    "min": 0,
-                    "step": 1,
-                    "disabled": true
-                },
-                "probability": {
-                    "kind": "text",
-                    "displayName": "Probability",
-                    "disabled": true
-                },
-                "cardinality": {
-                    "displayName": "Cardinality",
-                    "kind": "number",
-                    "min": 1,
-                    "step": 1
-                },
-                "count": {
-                    "kind": "number",
-                    "displayName": "Count",
-                    "min": 1,
-                    "step": 1
-                }
-            },
+
             "connector": {
                 "offset": {
                     "top":    0,
@@ -48,78 +17,192 @@
 
         "event": {
             "inherits": "node",
-            "name": "Event",
-            "probability": null,
-            "excludeFromShapesMenu": true,
+
             "numberOfIncomingConnections":  1,
             "numberOfOutgoingConnections": -1,
             "allowConnectionTo": ["gate"],
+
+            "probability": 0,
+
+            "propertyMenuEntries": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name"
+                },
+                "probability": {
+                    "kind": "text",
+                    "displayName": "Probability",
+                    "disabled": true
+                }
+            },
+
             "propertyMirrors": {
                 "name": {
                     "position": "bottom",
-                    "style": ["bold"]
+                    "style": ["bold", "large"]
                 }
             }
         },
 
         "gate": {
-            "inherits": "node",
-            "name": "Gate",
-            "excludeFromShapesMenu": true,
-            "numberOfIncomingConnections": -1,
-            "numberOfOutgoingConnections":  1
+            "inherits": "node"
         },
 
         "basicEvent": {
             "inherits": "event",
+
             "name": "Basic Event",
-            "probability": 0,
-            "excludeFromShapesMenu": false,
             "numberOfIncomingConnections": 0,
             "image": "basic_event.svg",
             "help": "Initiating failure in a basic component",
+
+            "probability": 0,
+
             "propertyMenuEntries": {
                 "probability": {
                     "kind": "number",
+                    "disabled": false,
                     "min": 0,
                     "max": 1,
-                    "step": 0.01,
-                    "disabled": false
+                    "step": 0.01
+                }
+            },
+
+            "propertyMirrors": {
+                "probability": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "p="
                 }
             }
         },
 
         "basicEventSet": {
             "inherits": "basicEvent",
+
             "name": "Basic Event Set",
-            "cardinality": 1,
-            "excludeFromShapesMenu": false,
             "image": "basic_event_set.svg",
-            "help": "Set of basic events with identical properties"
+            "help": "Set of basic events with identical properties",
+            "cardinality": 1,
+
+            "propertyMenuEntries": {
+                "cardinality": {
+                    "kind": "number",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1
+                }
+            },
+
+            "propertyMirrors": {
+                "cardinality": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "#"
+                }
+            }
         },
 
         "intermediateEvent": {
             "inherits": "event",
+
             "name": "Intermediate Event",
-            "excludeFromShapesMenu": false,
             "image": "intermediate_event.svg",
             "help": "Failure resulting from a combination of previous events"
         },
 
         "intermediateEventSet": {
             "inherits": "intermediateEvent",
+
             "name": "Intermediate Event Set",
-            "cardinality": 1,
-            "excludeFromShapesMenu": false,
-            "numberOfIncomingConnections": 0,
             "image": "intermediate_event_set.svg",
-            "help": "Set of intermediate events"
+            "help": "Set of intermediate events",
+            "cardinality": 1,
+
+            "propertyMenuEntries": {
+                "cardinality": {
+                    "kind": "number",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1
+                }
+            },
+
+            "propertyMirrors": {
+                "cardinality": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "#"
+                }
+            }
+        },
+
+        "andGate": {
+            "inherits": "gate",
+
+            "name": "AND Gate",
+            "image": "and_gate.svg",
+            "help": "Output event occurs if all input events occur"
+        },
+
+        "priorityAndGate": {
+            "inherits": "gate",
+
+            "name": "Priority AND Gate",
+            "image": "priority_and_gate.svg",
+            "help": "Output event occurs if all input events occur in the specific order"
+        },
+
+        "orGate": {
+            "inherits": "gate",
+
+            "name": "OR Gate",
+            "image": "or_gate.svg",
+            "help": "Output event occurs if one or more input events occur",
+
+            "connector": {
+                "offset": {
+                    "bottom": -7
+                }
+            }
+        },
+
+        "xorGate": {
+            "inherits": "gate",
+
+            "name": "XOR Gate",
+            "image": "xor_gate.svg",
+            "help": "Output event occurs if exactly one of the input events occur"
+        },
+
+        "votingOrGate": {
+            "inherits": "gate",
+
+            "name": "Voting OR Gate",
+            "image": "voting_or_gate.svg",
+            "help": "Output event occurs if the given number of input events occur",
+            "kN": [1, 2],
+
+            "propertyMenuEntries": {
+                "kN": {
+                    "kind": "range",
+                    "displayName": "k-out-of-N",
+                    "min": 1,
+                    "step": 1
+                }
+            },
+            "propertyMirrors": {
+                "kN": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "k/N: "
+                }
+            }
         },
 
         "undevelopedEvent": {
             "inherits": "event",
             "name": "Undeveloped Event",
-            "excludeFromShapesMenu": false,
             "numberOfIncomingConnections": 0,
             "image": "undeveloped_event.svg",
             "help": "Event with no information available or insignificant impact"
@@ -139,72 +222,20 @@
             "name": "Top Event",
             "image": "top_event.svg",
             "excludeFromShapesMenu": true,
-            "numberOfOutgoingConnections": 0
-        },
+            "numberOfOutgoingConnections": 0,
+            "optional": null,
 
-        "andGate": {
-            "inherits": "gate",
-            "name": "AND Gate",
-            "excludeFromShapesMenu": false,
-            "image": "and_gate.svg",
-            "help": "Output event occurs if all input events occur"
-        },
-
-        "priorityAndGate": {
-            "inherits": "gate",
-            "name": "Priority AND Gate",
-            "excludeFromShapesMenu": false,
-            "image": "priority_and_gate.svg",
-            "help": "Output event occurs if all input events occur in the specific order"
-        },
-
-        "orGate": {
-            "inherits": "gate",
-            "name": "OR Gate",
-            "excludeFromShapesMenu": false,
-            "image": "or_gate.svg",
-            "help": "Output event occurs if one or more input events occur",
-
-            "connector": {
-                "offset": {
-                    "bottom": -7
-                }
+            "propertyMenuEntries": {
+                "optional": null
             }
-        },
-
-        "xorGate": {
-            "inherits": "gate",
-            "name": "XOR Gate",
-            "excludeFromShapesMenu": false,
-            "image": "xor_gate.svg",
-            "help": "Output event occurs if exactly one of the input events occur"
-        },
-
-        "votingOrGate": {
-            "inherits": "gate",
-            "name": "Voting OR Gate",
-            "count": 2,
-            "excludeFromShapesMenu": false,
-            "image": "voting_or_gate.svg",
-            "help": "Output event occurs if the given number of input events occur"
-        },
-
-        "inhibitGate": {
-            "inherits": "gate",
-            "name": "Inhibit Gate",
-            "excludeFromShapesMenu": false,
-            "image": "inhibit_gate.svg",
-            "help": "Output event occurs if the single input event occurs and the enabling condition is given"
         }
-
     },
 
     "propertiesDisplayOrder": [
         "name",
-        "cost",
         "probability",
-        "cardinality",
-        "count"
+        "kN",
+        "cardinality"
     ],
 
     "shapeMenuNodeDisplayOrder": [
@@ -217,7 +248,6 @@
         "orGate",
         "xorGate",
         "votingOrGate",
-        "inhibitGate",
         "undevelopedEvent",
         "houseEvent",
         "topEvent"

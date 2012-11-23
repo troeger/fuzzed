@@ -18,10 +18,6 @@ function(Class, Menus, Config, Backend) {
             this._backend = new Backend(graphId);
             this._navbarActionsGroup = jQuery('#' + Config.IDs.NAVBAR_ACTIONS);
 
-            // create manager objects for the bars
-            this.properties = new Menus.PropertiesMenu();
-            this.shapes     = new Menus.ShapeMenu();
-
             // run a few sub initializer
             this._setupJsPlumb()
                 ._setupKeyBindings();
@@ -46,8 +42,14 @@ function(Class, Menus, Config, Backend) {
         },
 
         _loadGraphCompleted: function() {
+            // create manager objects for the bars
+            this.properties = new Menus.PropertiesMenu(this.graph.getNotation().propertyMenuDisplayOrder);
+            this.shapes     = new Menus.ShapeMenu();
+
             // fade out the splash screen
-            jQuery('#' + Config.IDs.SPLASH).fadeOut(Config.Splash.FADE_TIME);
+            jQuery('#' + Config.IDs.SPLASH).fadeOut(Config.Splash.FADE_TIME, function() {
+                jQuery(this).remove();
+            });
             // activate the backend AFTER the graph is fully loaded to prevent backend calls during graph construction
             this._backend.activate();
 
