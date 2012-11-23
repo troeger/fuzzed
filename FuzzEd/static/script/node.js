@@ -31,6 +31,7 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
             // already in the DOM.
             this._resize()
                 ._moveContainerToPixel(Canvas.toPixel(this.x, this.y))
+                ._setupConnectionHandle()
                 ._setupEndpoints()
                 ._setupDragging()
                 ._setupMouse()
@@ -327,7 +328,7 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
 
         _setupMirrors: function(propertyMirrors, propertiesDisplayOrder) {
             this.propertyMirrors = {};
-            if (typeof propertyMirrors === 'undefined') return this.propertyMirrors;
+            if (typeof propertyMirrors === 'undefined') return this;
 
             _.each(propertiesDisplayOrder, function(property) {
                 var mirrorDefinition = propertyMirrors[property];
@@ -335,6 +336,20 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                 if (typeof mirrorDefinition === 'undefined' || mirrorDefinition === null) return;
                 this.propertyMirrors[property] = new Mirror(this.container, mirrorDefinition);
             }.bind(this));
+
+            return this;
+        },
+
+        _setupConnectionHandle: function() {
+            if (this.numberOfIncomingConnections != 0) {
+                this._connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
+                    .addClass(Config.Classes.NODE_HALO_CONNECT)
+                    .css({
+                        'top':  this._nodeImage.position().top  + this._nodeImage.outerHeight(true),
+                        'left': this._nodeImage.position().left + this._nodeImage.outerWidth(true) / 2
+                    })
+                    .appendTo(this.container);
+            }
 
             return this;
         },
@@ -376,12 +391,6 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
             // links to primitive shapes and groups of the SVG for later manipulation (highlighting, ...)
             this._nodeImage.primitives = this._nodeImage.find('rect, circle, path');
             this._nodeImage.groups = this._nodeImage.find('g');
-
-            if (this.numberOfIncomingConnections != 0) {
-                this._connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
-                    .addClass(Config.Classes.NODE_HALO_CONNECT)
-                    .appendTo(this.container);
-            }
 
             this.container.appendTo(Canvas.container);
 

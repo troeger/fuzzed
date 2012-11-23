@@ -37,8 +37,6 @@
     background-color:       #409FFF;
     position:               absolute;
     visibility:             hidden;
-    top:                    56px;
-    left:                   19px;
     z-index:                150; /* above image, TODO: let halo care about that */
     cursor:                 move;
     -webkit-border-radius:  7px;
@@ -47,6 +45,7 @@
     /* fix for bootstrap icon looking strange in a circle */
     width:                  15px;
     height:                 15px;
+    margin:                 -8px 0 0 -7px;
     background-position:    -407px -96px;
 }
 

@@ -319,7 +319,7 @@
             "name": "Top Event",
             "image": "top_event.svg",
             "excludeFromShapesMenu": true,
-            "numberOfIncomingConnections": 0,
+            "numberOfOutgoingConnections": 0,
             "optional": null,
 
             "propertyMenuEntries": {
