@@ -45,8 +45,8 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
             if (this == otherNode) return false;
 
             // otherNode must be in the 'allowConnectionTo' list defined in the notations
-            var allowed = _.any(this.allowsConnectionsTo, function(nodeKind) {
-                return otherNode instanceof this.graph.nodeClassFor(nodeKind);
+            var allowed = _.any(this.allowConnectionTo, function(nodeClass) {
+                return otherNode instanceof nodeClass;
             });
             if (!allowed) return false;
 

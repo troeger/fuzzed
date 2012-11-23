@@ -46,7 +46,7 @@ define(['class', 'config'], function (Class, Config) {
             };
 
             jQuery.ajax({
-                url:      this._fullUrlForEdge(edgeId),
+                url:      this._fullUrlForEdges(),
                 type:     'POST',
                 dataType: 'json',
 

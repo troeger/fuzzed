@@ -24,17 +24,17 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             edge - Edge to be added
          */
         addEdge: function(edge) {
-            var connection = edge.connection;
-            var fuzzedId = new Date().getTime() + 1;
+            if (typeof edge._fuzzedId === 'undefined') {
+                edge._fuzzedId = new Date().getTime() + 1;
+            }
 
-            connection._fuzzedID = fuzzedId;
             jQuery(document).trigger(
                 Config.Events.GRAPH_EDGE_ADDED,
-                [fuzzedId,
-                edge.source.data(Config.Keys.NODE),
-                edge.target.data(Config.Keys.NODE)]
+                [edge._fuzzedId,
+                edge.source.data(Config.Keys.NODE).id,
+                edge.target.data(Config.Keys.NODE).id]
             );
-            this.edges[fuzzedId] = connection;
+            this.edges[edge._fuzzedId] = edge;
 
             return this;
         },
@@ -47,7 +47,7 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             edge - Edge to remove from this graph.
          */
         deleteEdge: function(edge) {
-            var id = edge.connection._fuzzedID;
+            var id = edge.connection._fuzzedId;
 
             jQuery(document).trigger(Config.Events.GRAPH_EDGE_DELETED, id);
             delete this._edges[id];
@@ -117,7 +117,7 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
         },
 
         getNodeById: function(nodeId) {
-            return this._nodes[nodeId];
+            return this.nodes[nodeId];
         },
 
         /* Section: Internal */
@@ -138,6 +138,12 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
 
             this._nodeClasses[definition.kind] = newClass;
 
+            // replace the node kind strings in the allowConnection field with actual classes
+            // this allows for instanceof checks later
+            _.each(definition.allowConnectionTo, function(kind, index) {
+                definition.allowConnectionTo[index] = this.nodeClassFor(kind);
+            }.bind(this));
+
             return newClass;
         },
 
@@ -150,11 +156,11 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             // connect the nodes again
             _.each(json.edges, function(jsonEdge) {
                 var edge = jsPlumb.connect({
-                    source: graph.getNodeById(jsonEdge.source).container(),
-                    target: graph.getNodeById(jsonEdge.target).container()
+                    source: this.getNodeById(jsonEdge.source).container,
+                    target: this.getNodeById(jsonEdge.target).container
                 });
-                edge._fuzzedID = jsonEdge.id;
-                graph.addEdge(edge);
+                edge._fuzzedId = jsonEdge.id;
+                this.addEdge(edge);
 
             }.bind(this));
 
@@ -170,8 +176,12 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
         },
 
         _registerEventHandlers: function() {
-            jsPlumb.bind('jsPlumbConnection', this.addEdge.bind(this));
-            jsPlumb.bind('jsPlumbConnectionDetached', this.deleteEdge.bind(this));
+            jsPlumb.bind('jsPlumbConnection', function(edge) {
+                this.addEdge(edge.connection);
+            }.bind(this));
+            jsPlumb.bind('jsPlumbConnectionDetached', function(edge) {
+                this.deleteEdge(edge.connection);
+            }.bind(this));
             jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
         },
 
