@@ -70,3 +70,8 @@
 .jsplumb-endpoint.jsplumb-endpoint-hover {
     opacity: 1;
 }
+
+.ui-selectable-helper {
+    position: absolute;
+    border: 1px gray dashed;
+}

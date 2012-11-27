@@ -1,10 +1,9 @@
-define(['class', 'config', 'jquery.svg', 'jquery.ui/jquery.ui.droppable'], function(Class, Config) {
+define(['class', 'config', 'jquery.svg', 'jquery.ui/jquery.ui.droppable', 'jquery.ui/jquery.ui.selectable'], function(Class, Config) {
 
     /**
      *  Class: Canvas
      *      TODO
      *  Events:
-     *      Config.Events.CANVAS_CLICKED        - The canvas itself was clicked.
      *      Config.Events.CANVAS_SHAPE_DROPPED - An SVG element was dropped onto the canvas.
      */
     var Canvas = Class.extend({
@@ -119,6 +118,16 @@ define(['class', 'config', 'jquery.svg', 'jquery.ui/jquery.ui.droppable'], funct
                     var position = {x: uiEvent.pageX - offset.left, y: uiEvent.pageY - offset.top};
                     jQuery(document).trigger(Config.Events.CANVAS_SHAPE_DROPPED, [kind, position]);
                 }.bind(this)
+            });
+
+            this.container.selectable({
+                filter: '.' + Config.Classes.NODE,
+                selecting: function(event, ui) {
+                    jQuery(ui.selecting).data(Config.Keys.NODE).select();
+                },
+                unselecting: function(event, ui) {
+                    jQuery(ui.unselecting).data(Config.Keys.NODE).deselect();
+                }
             });
 
             return this;

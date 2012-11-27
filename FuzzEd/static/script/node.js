@@ -34,6 +34,7 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                 ._setupConnectionHandle()
                 ._setupEndpoints()
                 ._setupDragging()
+                ._setupSelection()
                 ._setupMouse()
                 // properties (that can be changed via menu)
                 ._setupMirrors(this.propertyMirrors, propertiesDisplayOrder)
@@ -191,6 +192,24 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
             return this;
         },
 
+        _moveByOffset: function(offset, done) {
+            if (typeof this._initialPosition === 'undefined') {
+                this._initialPosition = this.container.position();
+            }
+            var newPosition = {
+                x: this._initialPosition.left + offset.left + this._nodeImage.outerWidth(true)  / 2,
+                y: this._initialPosition.top + offset.top + this._nodeImage.outerHeight(true) / 2
+            };
+
+            if (done) {
+                this._initialPosition = undefined;
+                return this.moveTo(newPosition);
+            }
+
+            jsPlumb.repaintEverything();
+            return this._moveContainerToPixel(newPosition);
+        },
+
         _resize: function() {
             // calculate the scale factor
             var marginOffset = this._nodeImage.outerWidth(true) - this._nodeImage.width();
@@ -221,14 +240,56 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                 stack:       '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
 
                 // start dragging callback
-                start: function() {
-                    //TODO: add dragged node to selection
+                start: function(event) {
+                    this._initialPosition = this.container.position();
+
+                    //XXX: add dragged node to selection
+                    // This uses the jQuery.ui.selectable internal functions.
+                    // We need to trigger them manually because jQuery.ui.draggable doesn't propagate these events.
+                    if (!this.container.hasClass('ui-selected')) {
+                        Canvas.container.data('selectable')._mouseStart(event);
+                        Canvas.container.data('selectable')._mouseStop(event);
+                    }
+                }.bind(this),
+
+                drag: function(event, ui) {
+                    // tell all selected nodes to move as well
+                    var offset = {
+                        left: ui.position.left - this._initialPosition.left,
+                        top:  ui.position.top  - this._initialPosition.top
+                    }
+                    jQuery('.ui-selected').not(this.container).each(function(index, node) {
+                        jQuery(node).data(Config.Keys.NODE)._moveByOffset(offset, false);
+                    });
                 }.bind(this),
 
                 // stop dragging callback
-                stop: function() {
-                    this.moveTo(this._getPositionOnCanvas());
+                stop: function(event, ui) {
+                    this.moveTo(this._getPositionOnCanvas())
+
+                    var offset = {
+                        left: ui.position.left - this._initialPosition.left,
+                        top:  ui.position.top  - this._initialPosition.top
+                    };
+                    // final move is necessary to propagate the changes to the backend
+                    jQuery('.ui-selected').not(this.container).each(function(index, node) {
+                        jQuery(node).data(Config.Keys.NODE)._moveByOffset(offset, true);
+                    });
+
+                    this._initialPosition = undefined;
                 }.bind(this)
+            });
+
+            return this;
+        },
+
+        _setupSelection: function() {
+            //XXX: select a node on click
+            // This uses the jQuery.ui.selectable internal functions.
+            // We need to trigger them manually because only jQuery.ui.draggable gets the mouseDown events on nodes.
+            this.container.click(function(event) {
+                Canvas.container.data('selectable')._mouseStart(event);
+                Canvas.container.data('selectable')._mouseStop(event);
             });
 
             return this;
