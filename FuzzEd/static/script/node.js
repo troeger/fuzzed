@@ -5,14 +5,16 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
      *  Abstract Node Base Class
      */
     return Class.extend({
-        container: undefined,
-        id:        undefined,
+        container:     undefined,
+        id:            undefined,
+        incomingEdges: undefined,
+        outgoingEdges: undefined,
 
-        _disabled:    false,
-        _highlighted: false,
-        _selected:    false,
-        _nodeImage:   undefined,
-        _connectionHandle : undefined,
+        _disabled:         false,
+        _highlighted:      false,
+        _selected:         false,
+        _nodeImage:        undefined,
+        _connectionHandle: undefined,
 
         init: function(properties, propertiesDisplayOrder) {
             // merge all presets of the configuration and data from the backend into this object
@@ -23,6 +25,9 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                 // make sure the 0 is not reassigned; it's reserved for the top event
                 this.id = new Date().getTime() + 1;
             }
+
+            this.incomingEdges = [];
+            this.outgoingEdges = [];
 
             // visuals
             jsPlumb.extend(this.connector, jsPlumb.Defaults.PaintStyle);

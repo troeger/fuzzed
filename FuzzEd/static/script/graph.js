@@ -28,13 +28,19 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
                 edge._fuzzedId = new Date().getTime() + 1;
             }
 
+            var sourceNode = edge.source.data(Config.Keys.NODE);
+            var targetNode = edge.target.data(Config.Keys.NODE);
+
             jQuery(document).trigger(
                 Config.Events.GRAPH_EDGE_ADDED,
                 [edge._fuzzedId,
-                edge.source.data(Config.Keys.NODE).id,
-                edge.target.data(Config.Keys.NODE).id]
+                sourceNode.id,
+                targetNode.id]
             );
             this.edges[edge._fuzzedId] = edge;
+
+            sourceNode.outgoingEdges.push(edge);
+            targetNode.incomingEdges.push(edge);
 
             return this;
         },
@@ -47,10 +53,15 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             edge - Edge to remove from this graph.
          */
         deleteEdge: function(edge) {
-            var id = edge.connection._fuzzedId;
+            var id         = edge._fuzzedId;
+            var sourceNode = edge.source.data(Config.Keys.NODE);
+            var targetNode = edge.target.data(Config.Keys.NODE);
+
+            sourceNode.outgoingEdges = _.without(sourceNode.outgoingEdges, edge);
+            targetNode.incomingEdges = _.without(targetNode.incomingEdges, edge);
 
             jQuery(document).trigger(Config.Events.GRAPH_EDGE_DELETED, id);
-            delete this._edges[id];
+            delete this.edges[id];
 
             return this;
         },
@@ -81,6 +92,10 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
         deleteNode: function(nodeId) {
             var node = this.nodes[nodeId];
             if (node.deletable === false) return this;
+
+            _.each(_.union(node.incomingEdges, node.outgoingEdges), function(edge) {
+                this.deleteEdge(edge);
+            }.bind(this));
 
             jQuery(document).trigger(Config.Events.GRAPH_NODE_DELETED, nodeId);
 

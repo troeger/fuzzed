@@ -95,7 +95,6 @@ function(Class, Menus, Canvas, Config, Backend) {
         },
 
         _setupKeyBindings: function() {
-            //TODO: interact with selection
             jQuery(document).keydown(function(event) {
 
                 if (event.which == jQuery.ui.keyCode.ESCAPE) {
