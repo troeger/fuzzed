@@ -1,5 +1,5 @@
-define(['class', 'menus', 'config', 'backend', 'canvas'],
-function(Class, Menus, Config, Backend) {
+define(['class', 'menus', 'canvas', 'config', 'backend', 'canvas'],
+function(Class, Menus, Canvas, Config, Backend) {
 
     /*
      *  Class: Editor
@@ -96,6 +96,22 @@ function(Class, Menus, Config, Backend) {
 
         _setupKeyBindings: function() {
             //TODO: interact with selection
+            jQuery(document).keydown(function(event) {
+
+                if (event.which == jQuery.ui.keyCode.ESCAPE) {
+                    event.preventDefault();
+                    //XXX: deselect everything
+                    // This uses the jQuery.ui.selectable internal functions.
+                    // We need to trigger them manually in order to simulate a click on the canvas.
+                    Canvas.container.data('selectable')._mouseStart(event);
+                    Canvas.container.data('selectable')._mouseStop(event);
+                } else if (event.which == jQuery.ui.keyCode.DELETE) {
+                    event.preventDefault();
+                    jQuery('.ui-selected, ' + Config.Classes.NODE).each(function(index, element) {
+                        this.graph.deleteNode(jQuery(element).data(Config.Keys.NODE).id);
+                    }.bind(this));
+                }
+            }.bind(this));
         }
     });
 });

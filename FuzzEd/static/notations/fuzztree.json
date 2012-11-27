@@ -7,6 +7,7 @@
             "numberOfIncomingConnections": -1,
             "numberOfOutgoingConnections":  1,
             "allowConnectionTo": ["node"],
+            "deletable": true,
 
             "connector": {
                 "offset": {
@@ -321,6 +322,7 @@
             "excludeFromShapesMenu": true,
             "numberOfOutgoingConnections": 0,
             "optional": null,
+            "deletable": false,
 
             "propertyMenuEntries": {
                 "optional": null

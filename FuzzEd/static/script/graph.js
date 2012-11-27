@@ -79,10 +79,13 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
          node - Node to remove from this graph.
          */
         deleteNode: function(nodeId) {
+            var node = this.nodes[nodeId];
+            if (node.deletable === false) return this;
+
             jQuery(document).trigger(Config.Events.GRAPH_NODE_DELETED, nodeId);
 
-            this._nodes[nodeId].remove();
-            delete this._nodes[nodeId];
+            node.remove();
+            delete this.nodes[nodeId];
 
             return this;
         },
