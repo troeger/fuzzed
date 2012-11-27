@@ -24,7 +24,7 @@
             'json' :      '../lib/requirejs/plugins/json',
             // jquery and plugins
             'jquery':     'require-jquery',
-            'jquery.ui':  '../lib/jquery-ui-1.8.21',
+            'jquery.ui':  '../lib/jquery-ui-1.9.1',
             'jquery.svg': '../lib/jquery-svg/jquery-svg-1.4.5',
             // other libs
             'bootstrap':  '../lib/bootstrap/js/bootstrap-2.0.4.min',
@@ -36,11 +36,12 @@
         },
         // define dependencies for libs that are not AMD compatible
         shim: {
-            'jquery.ui/jquery.ui.core':      ['jquery'],
-            'jquery.ui/jquery.ui.widget':    ['jquery'],
-            'jquery.ui/jquery.ui.mouse':     ['jquery.ui/jquery.ui.core', 'jquery.ui/jquery.ui.widget'],
-            'jquery.ui/jquery.ui.draggable': ['jquery.ui/jquery.ui.mouse'],
-            'jquery.ui/jquery.ui.droppable': ['jquery.ui/jquery.ui.mouse'],
+            'jquery.ui/jquery.ui.core':       ['jquery'],
+            'jquery.ui/jquery.ui.widget':     ['jquery'],
+            'jquery.ui/jquery.ui.mouse':      ['jquery.ui/jquery.ui.core', 'jquery.ui/jquery.ui.widget'],
+            'jquery.ui/jquery.ui.draggable':  ['jquery.ui/jquery.ui.mouse'],
+            'jquery.ui/jquery.ui.droppable':  ['jquery.ui/jquery.ui.mouse'],
+            'jquery.ui/jquery.ui.selectable': ['jquery.ui/jquery.ui.mouse'],
 
             'jquery.svg': ['jquery'],
 
