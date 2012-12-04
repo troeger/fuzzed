@@ -187,7 +187,7 @@ define(['config', 'class'],
         /* Section: Visibility */
 
         show: function() {
-            var selected = jQuery('.' + Config.Classes.JQUERY_UI_SELECTED);
+            var selected = jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + '.' + Config.Classes.NODE);
             this._removeEntries();
 
             // display the properties menu only if there is exactly one node selected
@@ -214,7 +214,7 @@ define(['config', 'class'],
         },
 
         _setupSelection: function() {
-            jQuery(document).on(Config.Events.CANVAS_NODES_SELECTED, this.show.bind(this));
+            jQuery(document).on(Config.Events.CANVAS_SELECTION_STOPPED, this.show.bind(this));
 
             return this;
         },

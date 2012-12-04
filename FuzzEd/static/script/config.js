@@ -1,7 +1,7 @@
 define(function() {
     var GRID_SIZE         = 53;
     
-    var STROKE_COLOR      = '#000';
+    var DEFAULT_COLOR     = '#000';
     var HIGHLIGHTED_COLOR = '#409FFF';
     var SELECTED_COLOR    = '#FF9640';
     var DISABLED_COLOR    = '#CCC';
@@ -24,7 +24,8 @@ define(function() {
 
             JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
             JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover',
-            JSPLUMB_CONNECTOR:       '_jsPlumb_connector',
+            JSPLUMB_CONNECTOR:       'jsplumb-connector',
+            JSPLUMB_CONNECTOR_HOVER: 'jsplumb-connector-hover',
 
             MENU_CONTROLS:           'menu-controls',
             MENU_CLOSE:              'menu-close',
@@ -49,8 +50,10 @@ define(function() {
         },
 
         Events: {
-            CANVAS_NODES_SELECTED:    'canvas-nodes-selected',
+            CANVAS_SELECTION_STOPPED: 'canvas-selection-stopped',
             CANVAS_SHAPE_DROPPED:     'canvas-shape-dropped',
+            CANVAS_EDGE_SELECTED:     'canvas-edge-selected',
+            CANVAS_EDGE_UNSELECTED:   'canvas-edge-unselected',
 
             NODE_PROPERTY_CHANGED:    'node-property-changed',
 
@@ -77,14 +80,14 @@ define(function() {
         },
 
         JSPlumb: {
-            STROKE:             STROKE_COLOR,
-            STROKE_HIGHLIGHTED: HIGHLIGHTED_COLOR,
-            STROKE_SELECTED:    SELECTED_COLOR,
-            STROKE_DISABLED:    DISABLED_COLOR,
-            STROKE_WIDTH:       2,
+            STROKE_COLOR:             DEFAULT_COLOR,
+            STROKE_COLOR_HIGHLIGHTED: HIGHLIGHTED_COLOR,
+            STROKE_COLOR_SELECTED:    SELECTED_COLOR,
+            STROKE_COLOR_DISABLED:    DISABLED_COLOR,
+            STROKE_WIDTH:             2,
 
             CONNECTOR_STYLE:    'Flowchart',
-            CONNECTOR_STUB:     10, // min. distance in px before connector bends
+            CONNECTOR_OPTIONS:  {stub: 10 /* min. distance in px before connector bends */},
 
             ENDPOINT_RADIUS:    7,
             ENDPOINT_FILL:      HIGHLIGHTED_COLOR,
@@ -92,8 +95,9 @@ define(function() {
         },
 
         Keys: {
-            CONSTRUCTOR: 'constructor',
-            NODE:        'node',
+            CONSTRUCTOR:   'constructor',
+            NODE:          'node',
+            CONNECTION_ID: 'fuzzed-id',
             SELECTABLE:  'selectable'
         },
 
@@ -103,7 +107,7 @@ define(function() {
         },
 
         Node: {
-            STROKE_NORMAL:             STROKE_COLOR,
+            STROKE_NORMAL:             DEFAULT_COLOR,
             STROKE_HIGHLIGHTED:        HIGHLIGHTED_COLOR,
             STROKE_SELECTED:           SELECTED_COLOR,
             STROKE_DISABLED:           DISABLED_COLOR

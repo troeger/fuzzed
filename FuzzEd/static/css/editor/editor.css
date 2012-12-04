@@ -71,6 +71,14 @@
     opacity: 1;
 }
 
+.jsplumb-connector.ui-selected {
+    z-index: 50;
+}
+
+.jsplumb-connector.jsplumb-connector-hover {
+    z-index: 100; /* above selection, below mirror */
+}
+
 .ui-selectable-helper {
     position: absolute;
     border: 1px gray dashed;

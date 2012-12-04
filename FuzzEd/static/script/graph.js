@@ -28,6 +28,9 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
                 edge._fuzzedId = new Date().getTime() + 1;
             }
 
+            // store the ID in an attribute so we can retrieve it later from the DOM element
+            jQuery(edge.canvas).attr(Config.Keys.CONNECTION_ID, edge._fuzzedId);
+
             var sourceNode = edge.source.data(Config.Keys.NODE);
             var targetNode = edge.target.data(Config.Keys.NODE);
 
@@ -146,6 +149,10 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             return this.nodes[nodeId];
         },
 
+        getEdgeById: function(edgeId) {
+            return this.edges[edgeId];
+        },
+
         /* Section: Internal */
 
         _newNodeClassForKind: function(definition) {
@@ -186,6 +193,7 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
                     target: this.getNodeById(jsonEdge.target).container
                 });
                 edge._fuzzedId = jsonEdge.id;
+
                 this.addEdge(edge);
 
             }.bind(this));
@@ -197,10 +205,15 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             jsPlumb.bind('jsPlumbConnection', function(edge) {
                 this.addEdge(edge.connection);
             }.bind(this));
+
             jsPlumb.bind('jsPlumbConnectionDetached', function(edge) {
                 this.deleteEdge(edge.connection);
             }.bind(this));
-            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
+
+            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED,   this._shapeDropped.bind(this));
+
+            jQuery(document).on(Config.Events.CANVAS_EDGE_SELECTED,   this._edgeSelected.bind(this));
+            jQuery(document).on(Config.Events.CANVAS_EDGE_UNSELECTED, this._edgeUnselected.bind(this));
         },
 
         _shapeDropped: function(event, kind, position) {
@@ -208,6 +221,34 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             node.container.click();
 
             //TODO: select the node
+        },
+
+        _edgeSelected: function(event, edgeId) {
+            var edge = this.getEdgeById(edgeId);
+            //XXX: Normally we could use jsPlumb's 'Connection Type' mechanism which allows the definition of
+            //     different styles and toggeling between them. Unfortunately this causes the connector to get
+            //     completely redrawn (replace DOM element) which prevents us from associating it with the connection
+            //     object (via DOM attribute). So we need to toggle the styles manually for the moment.
+            edge.setPaintStyle({
+                strokeStyle: Config.JSPlumb.STROKE_COLOR_SELECTED,
+                lineWidth:   Config.JSPlumb.STROKE_WIDTH
+            });
+            edge.setHoverPaintStyle({
+                strokeStyle: Config.JSPlumb.STROKE_COLOR_SELECTED,
+                lineWidth:   Config.JSPlumb.STROKE_WIDTH
+            });
+        },
+
+        _edgeUnselected: function(event, edgeId) {
+            var edge = this.getEdgeById(edgeId);
+            edge.setPaintStyle({
+                strokeStyle: Config.JSPlumb.STROKE_COLOR,
+                lineWidth:   Config.JSPlumb.STROKE_WIDTH
+            });
+            edge.setHoverPaintStyle({
+                strokeStyle: Config.JSPlumb.STROKE_COLOR_HIGHLIGHTED,
+                lineWidth:   Config.JSPlumb.STROKE_WIDTH
+            });
         }
     });
 });

@@ -69,7 +69,6 @@ function(Class, Menus, Canvas, Config, Backend) {
         },
 
         _setupJsPlumb: function() {
-            //TODO: check whether we need to move this to the specific notation files
             jsPlumb.importDefaults({
                 EndpointStyle: {
                     fillStyle:   Config.JSPlumb.ENDPOINT_FILL
@@ -80,16 +79,18 @@ function(Class, Menus, Canvas, Config, Backend) {
                     hoverClass:  Config.Classes.JSPLUMB_ENDPOINT_HOVER
                 }],
                 PaintStyle: {
-                    strokeStyle: Config.JSPlumb.STROKE,
+                    strokeStyle: Config.JSPlumb.STROKE_COLOR,
                     lineWidth:   Config.JSPlumb.STROKE_WIDTH
                 },
                 HoverPaintStyle: {
-                    strokeStyle: Config.JSPlumb.STROKE_HIGHLIGHTED
+                    strokeStyle: Config.JSPlumb.STROKE_COLOR_HIGHLIGHTED
                 },
-                Connector:       [Config.JSPlumb.CONNECTOR_STYLE, {stub: Config.JSPlumb.CONNECTOR_STUB}],
-                Anchors:         ['BottomMiddle', 'TopMiddle'],
+                HoverClass:      Config.Classes.JSPLUMB_CONNECTOR_HOVER,
+                Connector:       [Config.JSPlumb.CONNECTOR_STYLE, Config.JSPlumb.CONNECTOR_OPTIONS],
                 ConnectionsDetachable: false
             });
+
+            jsPlumb.connectorClass = Config.Classes.JSPLUMB_CONNECTOR;
 
             return this;
         },
@@ -106,11 +107,20 @@ function(Class, Menus, Canvas, Config, Backend) {
                     Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
                 } else if (event.which == jQuery.ui.keyCode.DELETE) {
                     event.preventDefault();
-                    jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + ', ' + Config.Classes.NODE).each(function(index, element) {
+
+                    // delete selected nodes
+                    jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + '.' + Config.Classes.NODE).each(function(index, element) {
                         this.graph.deleteNode(jQuery(element).data(Config.Keys.NODE).id);
                     }.bind(this));
 
                     this.properties.hide();
+
+                    // delete selected edges
+                    jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + '.' + Config.Classes.JSPLUMB_CONNECTOR).each(function(index, element) {
+                        var edge = this.graph.getEdgeById(jQuery(element).attr(Config.Keys.CONNECTION_ID));
+                        jsPlumb.detach(edge);
+                        this.graph.deleteEdge(edge);
+                    }.bind(this));
                 }
             }.bind(this));
 
