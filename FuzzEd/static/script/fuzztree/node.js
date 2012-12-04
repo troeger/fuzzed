@@ -1,21 +1,20 @@
-define(['../node', 'config'], function(AbstractNode, Config) {
+define(['faulttree/node', 'fuzztree/config'], function(FaulttreeNode, Config) {
 
     //TODO: see if it makes sense to inherit from faulttree node
 
     /**
      *  Concrete fuzztree node implementation
      */
-    return AbstractNode.extend({
-        _optionalIndicator: undefined,
-
+    return FaulttreeNode.extend({
+        optionalIndicator: undefined,
 
         select: function() {
             // don't allow selection of disabled nodes
             if (this._disabled) return this;
 
-            this._optionalIndicator.attr('stroke', Config.Node.STROKE_SELECTED);
+            this.optionalIndicator.attr('stroke', Config.Node.STROKE_SELECTED);
             if (!this.optional) {
-                this._optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
+                this.optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
             }
 
             return this._super();
@@ -23,18 +22,18 @@ define(['../node', 'config'], function(AbstractNode, Config) {
 
         deselect: function() {
             var color = this._highlighted ? Config.Node.STROKE_HIGHLIGHTED : Config.Node.STROKE_NORMAL;
-            this._optionalIndicator.attr('stroke', color);
+            this.optionalIndicator.attr('stroke', color);
             if (!this.optional) {
-                this._optionalIndicator.attr('fill', color);
+                this.optionalIndicator.attr('fill', color);
             }
 
             return this._super();
         },
 
         disable: function() {
-            this._optionalIndicator.attr('stroke', Config.Node.STROKE_DISABLED);
+            this.optionalIndicator.attr('stroke', Config.Node.STROKE_DISABLED);
             if (!this.optional) {
-                this._optionalIndicator.attr('fill', Config.Node.STROKE_DISABLED);
+                this.optionalIndicator.attr('fill', Config.Node.STROKE_DISABLED);
             }
 
             return this._super();
@@ -48,9 +47,9 @@ define(['../node', 'config'], function(AbstractNode, Config) {
                 color = Config.Node.STROKE_HIGHLIGHTED;
             }
 
-            this._optionalIndicator.attr('stroke', color);
+            this.optionalIndicator.attr('stroke', color);
             if (!this.optional) {
-                this._optionalIndicator.attr('fill', color);
+                this.optionalIndicator.attr('fill', color);
             }
 
             return this._super();
@@ -59,9 +58,9 @@ define(['../node', 'config'], function(AbstractNode, Config) {
         highlight: function() {
             if (this._selected || this._disabled) return this;
 
-            this._optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
+            this.optionalIndicator.attr('stroke', Config.Node.STROKE_HIGHLIGHTED);
             if (!this.optional) {
-                this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
+                this.optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
             }
 
             return this._super();
@@ -70,9 +69,9 @@ define(['../node', 'config'], function(AbstractNode, Config) {
         unhighlight: function() {
             if (this._selected || this._disabled) return this;
 
-            this._optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
+            this.optionalIndicator.attr('stroke', Config.Node.STROKE_NORMAL);
             if (!this.optional) {
-                this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
+                this.optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
             }
 
             return this._super();
@@ -82,13 +81,13 @@ define(['../node', 'config'], function(AbstractNode, Config) {
             this.optional = optional;
 
             if (optional) {
-                this._optionalIndicator.attr('fill', Config.Node.OPTIONAL_INDICATOR_FILL);
+                this.optionalIndicator.attr('fill', Config.Node.OPTIONAL_INDICATOR_FILL);
             } else if (this._selected) {
-                this._optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
+                this.optionalIndicator.attr('fill', Config.Node.STROKE_SELECTED);
             } else if (this._highlighted) {
-                this._optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
+                this.optionalIndicator.attr('fill', Config.Node.STROKE_HIGHLIGHTED);
             } else {
-                this._optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
+                this.optionalIndicator.attr('fill', Config.Node.STROKE_NORMAL);
             }
         },
 
@@ -97,32 +96,31 @@ define(['../node', 'config'], function(AbstractNode, Config) {
 
             var optionalIndicatorWrapper = jQuery('<div>').svg();
             var optionalIndicator = optionalIndicatorWrapper.svg('get');
-
-            //TODO: config
             var radius = Config.Node.OPTIONAL_INDICATOR_RADIUS;
-            var optionalIndicatorCircle = optionalIndicator.circle(null, radius+1, radius+1, radius, {
-                strokeWidth: 2,
+
+            var optionalIndicatorCircle = optionalIndicator.circle(null, radius + 1, radius + 1, radius, {
+                strokeWidth: Config.Node.OPTIONAL_INDICATOR_STROKE,
                 fill: this.optional ? Config.Node.OPTIONAL_INDICATOR_FILL : Config.Node.STROKE_NORMAL,
                 stroke: Config.Node.STROKE_NORMAL
             });
 
             // external method for changing attributes of the circle later
             optionalIndicator.attr = function(attr, value) {
-                var setting = {}
+                var setting = {};
                 setting[attr] = value;
                 optionalIndicator.change(optionalIndicatorCircle, setting);
             };
 
             optionalIndicatorWrapper
                 .addClass(Config.Classes.NODE_OPTIONAL_INDICATOR)
-                .appendTo(container);
+                .appendTo(this.container);
 
             // hide the optional indicator for nodes with undefined value
             if (typeof this.optional === 'undefined' || this.optional == null) {
                 optionalIndicatorWrapper.css('visibility', 'hidden');
             }
 
-            this._optionalIndicator = optionalIndicator;
+            this.optionalIndicator = optionalIndicator;
         },
 
         _setupPropertyMenuEntries: function(propertyMenuEntries, propertiesDisplayOrder) {
@@ -139,10 +137,7 @@ define(['../node', 'config'], function(AbstractNode, Config) {
             var offsets = this._super();
 
             if (typeof this.optional !== 'undefined' && this.optional != null) {
-                var optionalIndicatorWrapper = jQuery(this._optionalIndicator._container);
-                var topOffset = optionalIndicatorWrapper.offset().top - this._container.offset().top;
-
-                offsets.out.y = topOffset;
+                offsets.out.y = jQuery(this.optionalIndicator._container).offset().top - this.container.offset().top;
             }
 
             return offsets;
