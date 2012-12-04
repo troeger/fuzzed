@@ -39,9 +39,7 @@ define(function() {
             NODE_SELECTED:           'fuzzed-node-selected',
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
-            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
-            //TODO: move
-            NODE_OPTIONAL_INDICATOR: 'fuzzed-node-optional-indicator'
+            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect'
         },
 
         Dragging: {
@@ -108,11 +106,7 @@ define(function() {
             STROKE_NORMAL:             STROKE_COLOR,
             STROKE_HIGHLIGHTED:        HIGHLIGHTED_COLOR,
             STROKE_SELECTED:           SELECTED_COLOR,
-            STROKE_DISABLED:           DISABLED_COLOR,
-
-            //TODO: move
-            OPTIONAL_INDICATOR_FILL:   '#FFF',
-            OPTIONAL_INDICATOR_RADIUS: Math.round(GRID_SIZE / 10)
+            STROKE_DISABLED:           DISABLED_COLOR
         },
 
         Properties: {

@@ -109,6 +109,8 @@ function(Class, Menus, Canvas, Config, Backend) {
                     jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + ', ' + Config.Classes.NODE).each(function(index, element) {
                         this.graph.deleteNode(jQuery(element).data(Config.Keys.NODE).id);
                     }.bind(this));
+                    
+                    this.properties.hide();
                 }
             }.bind(this));
 

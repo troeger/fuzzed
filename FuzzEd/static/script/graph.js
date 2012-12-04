@@ -205,6 +205,7 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
 
         _shapeDropped: function(event, kind, position) {
             var node = this.addNode(kind, Canvas.toGrid(position));
+            node.container.click();
 
             //TODO: select the node
         }
