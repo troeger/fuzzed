@@ -1,4 +1,4 @@
-define(['class', 'config', 'jquery.svg', 'jquery.ui/jquery.ui.droppable', 'jquery.ui/jquery.ui.selectable'], function(Class, Config) {
+define(['class', 'config', 'jquery.svgdom', 'jquery.ui/jquery.ui.droppable', 'jquery.ui/jquery.ui.selectable'], function(Class, Config) {
 
     /**
      *  Class: Canvas
@@ -121,12 +121,28 @@ define(['class', 'config', 'jquery.svg', 'jquery.ui/jquery.ui.droppable', 'jquer
             });
 
             this.container.selectable({
-                filter: '.' + Config.Classes.NODE,
+                filter: '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
                 selecting: function(event, ui) {
-                    jQuery(ui.selecting).data(Config.Keys.NODE).select();
+                    var selection = jQuery(ui.selecting);
+                    if (selection.hasClass(Config.Classes.NODE)) {
+                        selection.data(Config.Keys.NODE).select();
+                    }
+
+                    if (selection.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
+                        var edgeId = selection.attr(Config.Keys.CONNECTION_ID);
+                        jQuery(document).trigger(Config.Events.CANVAS_EDGE_SELECTED, edgeId);
+                    }
                 },
                 unselecting: function(event, ui) {
-                    jQuery(ui.unselecting).data(Config.Keys.NODE).deselect();
+                    var unselection = jQuery(ui.unselecting);
+                    if (unselection.hasClass(Config.Classes.NODE)) {
+                        unselection.data(Config.Keys.NODE).deselect();
+                    }
+
+                    if (unselection.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
+                        var edgeId = unselection.attr(Config.Keys.CONNECTION_ID);
+                        jQuery(document).trigger(Config.Events.CANVAS_EDGE_UNSELECTED, edgeId);
+                    }
                 }
             });
 
