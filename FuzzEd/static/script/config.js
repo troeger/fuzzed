@@ -20,6 +20,8 @@ define(function() {
         },
 
         Classes: {
+            JQUERY_UI_SELECTED:      'ui-selected',
+
             JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
             JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover',
             JSPLUMB_CONNECTOR:       '_jsPlumb_connector',
@@ -49,6 +51,7 @@ define(function() {
         },
 
         Events: {
+            CANVAS_NODES_SELECTED:    'canvas-nodes-selected',
             CANVAS_SHAPE_DROPPED:     'canvas-shape-dropped',
 
             NODE_PROPERTY_CHANGED:    'node-property-changed',
@@ -92,7 +95,8 @@ define(function() {
 
         Keys: {
             CONSTRUCTOR: 'constructor',
-            NODE:        'node'
+            NODE:        'node',
+            SELECTABLE:  'selectable'
         },
 
         Menus: {

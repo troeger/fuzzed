@@ -161,13 +161,16 @@ define(['config', 'class'],
      * Class: PropertiesMenu
      */
     var PropertiesMenu = Menu.extend({
-        _form:         undefined,
         _displayOrder: undefined,
+        _form:         undefined,
+        _node:         undefined,
 
         init: function(displayOrder) {
             this._super();
             this._displayOrder = displayOrder;
             this._form = this.container.find('form');
+
+            this._setupSelection();
         },
 
         maximize: function(eventObject) {
@@ -182,57 +185,61 @@ define(['config', 'class'],
         },
 
         /* Section: Visibility */
-        hide: function() {
-            this.container.hide();
 
-            _.each(this._nodes, function(node) {
-                _.each(node.propertyMenuEntries, function(menuEntry) {
-                    menuEntry.hide();
-                })
-            });
-            delete this._nodes;
+        show: function() {
+            var selected = jQuery('.' + Config.Classes.JQUERY_UI_SELECTED);
 
-            return this;
-        },
-
-        show: function(nodes, force) {
-            //TODO: this should be 'show(nodes)', force is obsolete (check for undefined)
-            if (!_.isArray(nodes)) this._nodes = [nodes];
-            else                   this._nodes =  nodes;
-
-            if (this._haveEntries(this._nodes) || force) {
-                _.each(this._nodes, function(node) {
-                    _.each(this._displayOrder, function(property) {
-                        var menuEntry = node.propertyMenuEntries[property];
-
-                        if (typeof menuEntry !== 'undefined') {
-                            menuEntry.show(this._form);
-                        }
-                    }.bind(this));
-                }.bind(this));
-
-                if (this._isMinimized()) return this;
-
-                // fix the left offset (jQueryUI bug with draggable and right)
-                if (this.container.css('left') === 'auto') {
-                    var offset =  - this.container.outerWidth(true) - Config.Menus.PROPERTIES_MENU_OFFSET;
-                    this.container.css('left', jQuery('body').outerWidth(true) + offset);
-                }
-
-                this.container.show();
+            // display the properties menu only if there is exactly one node selected
+            // and the menu is not minimized; otherwise hide the menu
+            if (selected.length == 1 && !this._isMinimized()) {
+                return this._removeEntries()
+                           ._show(selected);
             }
 
-            return this;
+            return this.hide();
         },
 
-        _haveEntries: function(nodes) {
-            return _.any(nodes, function(node) {
-                return !(_.isEmpty(node.propertyMenuEntries));
-            })
+        _removeEntries: function() {
+            if (!this._node) return this;
+
+            _.each(this._node.propertyMenuEntries, function(menuEntry) {
+                menuEntry.hide();
+            }.bind(this));
+
+            return this;
         },
 
         _setupContainer: function() {
             return jQuery('#' + Config.IDs.PROPERTIES_MENU);
+        },
+
+        _setupSelection: function() {
+            jQuery(document).on(Config.Events.CANVAS_NODES_SELECTED, this.show.bind(this));
+
+            return this;
+        },
+
+        _show: function(selected) {
+            this._node = selected.data(Config.Keys.NODE);
+
+            // this node does not have any properties to display, go home!
+            if (_.isEmpty(this._node.propertyMenuEntries)) return this;
+
+            _.each(this._displayOrder, function(property) {
+                var menuEntry = this._node.propertyMenuEntries[property];
+
+                // has the node such a property? display it!
+                if (typeof menuEntry !== 'undefined') menuEntry.show(this._form);
+            }.bind(this));
+
+            // fix the left offset (jQueryUI bug with draggable menus and CSS right property)
+            if (this.container.css('left') === 'auto') {
+                var offset =  - this.container.outerWidth(true) - Config.Menus.PROPERTIES_MENU_OFFSET;
+                this.container.css('left', jQuery('body').outerWidth(true) + offset);
+            }
+            this.container.show();
+
+            return this;
         }
     });
 

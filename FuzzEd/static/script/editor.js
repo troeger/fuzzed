@@ -43,7 +43,7 @@ function(Class, Menus, Canvas, Config, Backend) {
 
         _loadGraphCompleted: function() {
             // create manager objects for the bars
-            this.properties = new Menus.PropertiesMenu(this.graph.getNotation().propertyMenuDisplayOrder);
+            this.properties = new Menus.PropertiesMenu(this.graph.getNotation().propertiesDisplayOrder);
             this.shapes     = new Menus.ShapeMenu();
 
             // fade out the splash screen
@@ -102,15 +102,17 @@ function(Class, Menus, Canvas, Config, Backend) {
                     //XXX: deselect everything
                     // This uses the jQuery.ui.selectable internal functions.
                     // We need to trigger them manually in order to simulate a click on the canvas.
-                    Canvas.container.data('selectable')._mouseStart(event);
-                    Canvas.container.data('selectable')._mouseStop(event);
+                    Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
+                    Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
                 } else if (event.which == jQuery.ui.keyCode.DELETE) {
                     event.preventDefault();
-                    jQuery('.ui-selected, ' + Config.Classes.NODE).each(function(index, element) {
+                    jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + ', ' + Config.Classes.NODE).each(function(index, element) {
                         this.graph.deleteNode(jQuery(element).data(Config.Keys.NODE).id);
                     }.bind(this));
                 }
             }.bind(this));
+
+            return this;
         }
     });
 });

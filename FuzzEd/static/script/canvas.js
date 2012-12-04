@@ -1,4 +1,5 @@
-define(['class', 'config', 'jquery.svg', 'jquery.ui/jquery.ui.droppable', 'jquery.ui/jquery.ui.selectable'], function(Class, Config) {
+define(['class', 'config', 'jquery.svg', 'jquery.ui/jquery.ui.droppable', 'jquery.ui/jquery.ui.selectable'],
+function(Class, Config) {
 
     /**
      *  Class: Canvas
@@ -127,6 +128,9 @@ define(['class', 'config', 'jquery.svg', 'jquery.ui/jquery.ui.droppable', 'jquer
                 },
                 unselecting: function(event, ui) {
                     jQuery(ui.unselecting).data(Config.Keys.NODE).deselect();
+                },
+                stop: function(event, ui) {
+                    jQuery(document).trigger(Config.Events.CANVAS_NODES_SELECTED);
                 }
             });
 

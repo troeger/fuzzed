@@ -1,5 +1,5 @@
 define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
-    function(Config, Properties, Mirror, Canvas, Class) {
+function(Config, Properties, Mirror, Canvas, Class) {
 
     /*
      *  Abstract Node Base Class
@@ -123,7 +123,6 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
             var color = this._highlighted ? Config.Node.STROKE_HIGHLIGHTED : Config.Node.STROKE_NORMAL;
 
             this.container.removeClass(Config.Classes.NODE_SELECTED);
-
             this._nodeImage.primitives.css('stroke', color);
 
             return this;
@@ -251,9 +250,9 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                     //XXX: add dragged node to selection
                     // This uses the jQuery.ui.selectable internal functions.
                     // We need to trigger them manually because jQuery.ui.draggable doesn't propagate these events.
-                    if (!this.container.hasClass('ui-selected')) {
-                        Canvas.container.data('selectable')._mouseStart(event);
-                        Canvas.container.data('selectable')._mouseStop(event);
+                    if (!this.container.hasClass(Config.Classes.JQUERY_UI_SELECTED)) {
+                        Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
+                        Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
                     }
                 }.bind(this),
 
@@ -263,7 +262,7 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                         left: ui.position.left - this._initialPosition.left,
                         top:  ui.position.top  - this._initialPosition.top
                     }
-                    jQuery('.ui-selected').not(this.container).each(function(index, node) {
+                    jQuery('.' + Config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
                         jQuery(node).data(Config.Keys.NODE)._moveByOffset(offset, false);
                     });
                 }.bind(this),
@@ -277,7 +276,7 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
                         top:  ui.position.top  - this._initialPosition.top
                     };
                     // final move is necessary to propagate the changes to the backend
-                    jQuery('.ui-selected').not(this.container).each(function(index, node) {
+                    jQuery('.' + Config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
                         jQuery(node).data(Config.Keys.NODE)._moveByOffset(offset, true);
                     });
 
@@ -293,8 +292,8 @@ define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.
             // This uses the jQuery.ui.selectable internal functions.
             // We need to trigger them manually because only jQuery.ui.draggable gets the mouseDown events on nodes.
             this.container.click(function(event) {
-                Canvas.container.data('selectable')._mouseStart(event);
-                Canvas.container.data('selectable')._mouseStop(event);
+                Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
+                Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
             });
 
             return this;
