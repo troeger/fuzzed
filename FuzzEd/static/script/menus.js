@@ -188,12 +188,12 @@ define(['config', 'class'],
 
         show: function() {
             var selected = jQuery('.' + Config.Classes.JQUERY_UI_SELECTED);
+            this._removeEntries();
 
             // display the properties menu only if there is exactly one node selected
             // and the menu is not minimized; otherwise hide the menu
             if (selected.length == 1 && !this._isMinimized()) {
-                return this._removeEntries()
-                           ._show(selected);
+                return this._show(selected);
             }
 
             return this.hide();
@@ -223,7 +223,10 @@ define(['config', 'class'],
             this._node = selected.data(Config.Keys.NODE);
 
             // this node does not have any properties to display, go home!
-            if (_.isEmpty(this._node.propertyMenuEntries)) return this;
+            if (_.isEmpty(this._node.propertyMenuEntries)) {
+                this.hide();
+                return this;
+            }
 
             _.each(this._displayOrder, function(property) {
                 var menuEntry = this._node.propertyMenuEntries[property];
