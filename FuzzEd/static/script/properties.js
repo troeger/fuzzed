@@ -161,8 +161,8 @@ define(['config', 'class', 'underscore'],
         _setupInput: function() {
             return jQuery('<input type="checkbox">')
                 .attr('id', this.id)
-                .attr('disabled', this.disabled ? 'disabled' : undefined)
-                .attr('checked', this._value() ? 'checked' : undefined);
+                .attr('disabled', this.disabled ? 'disabled' : null)
+                .attr('checked', this._value() ? 'checked' : null);
         }
     });
 
@@ -322,7 +322,7 @@ define(['config', 'class', 'underscore'],
                 .attr('min',      this.min)
                 .attr('max',      this.max)
                 .attr('step',     this.step)
-                .attr('disabled', this.disabled ? 'disabled' : undefined)
+                .attr('disabled', this.disabled ? 'disabled' : null)
                 .val(this._value())
         }
     });
@@ -367,7 +367,7 @@ define(['config', 'class', 'underscore'],
                 .attr('min',      this.min)
                 .attr('max',      this.max)
                 .attr('step',     this.step)
-                .attr('disabled', this.disabled ? 'disabled' : undefined);
+                .attr('disabled', this.disabled ? 'disabled' : null);
         },
 
         _getFloat: _getFloat,
@@ -431,7 +431,7 @@ define(['config', 'class', 'underscore'],
                 select.append(jQuery('<option>')
                     .html(choice)
                     .attr('value', choice)
-                    .attr('selected', choice === selected ? 'selected' : undefined)
+                    .attr('selected', choice === selected ? 'selected' : null)
                     .appendTo(select));
             })
 
@@ -449,7 +449,7 @@ define(['config', 'class', 'underscore'],
         _setupInput: function() {
             return jQuery('<input type="text" class="input-medium">')
                 .attr('id', this.id)
-                .attr('disabled', this.disabled ? 'disabled' : undefined)
+                .attr('disabled', this.disabled ? 'disabled' : null)
                 .val(this._value());
         }
     });
