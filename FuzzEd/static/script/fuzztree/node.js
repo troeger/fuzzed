@@ -1,7 +1,4 @@
 define(['faulttree/node', 'fuzztree/config'], function(FaulttreeNode, Config) {
-
-    //TODO: see if it makes sense to inherit from faulttree node
-
     /**
      *  Concrete fuzztree node implementation
      */

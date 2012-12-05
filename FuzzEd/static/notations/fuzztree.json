@@ -3,11 +3,12 @@
     "name": "Fuzz Tree",
     "nodes": {
         "node": {
-            "optional": null,
-            "numberOfIncomingConnections": -1,
-            "numberOfOutgoingConnections":  1,
+            "numberOfOutgoingConnections": -1,
+            "numberOfIncomingConnections":  1,
             "allowConnectionTo": ["node"],
             "deletable": true,
+
+            "optional": null,
 
             "connector": {
                 "offset": {
@@ -19,12 +20,9 @@
 
         "event": {
             "inherits": "node",
-
-            "optional": false,
-            "numberOfIncomingConnections":  1,
-            "numberOfOutgoingConnections": -1,
             "allowConnectionTo": ["gate"],
 
+            "optional": false,
             "cost": 1,
             "probability": 0,
 
@@ -67,7 +65,7 @@
             "inherits": "event",
 
             "name": "Basic Event",
-            "numberOfIncomingConnections": 0,
+            "numberOfOutgoingConnections": 0,
             "image": "basic_event.svg",
             "help": "Initiating failure in a basic component",
 
@@ -238,7 +236,7 @@
             "inherits": "event",
 
             "name": "Undeveloped Event",
-            "numberOfIncomingConnections": 0,
+            "numberOfOutgoingConnections": 0,
             "image": "undeveloped_event.svg",
             "help": "Event with no information available or insignificant impact"
         },
@@ -309,8 +307,7 @@
         "houseEvent": {
             "inherits": "event",
             "name": "House Event",
-            "excludeFromShapesMenu": false,
-            "numberOfIncomingConnections": 0,
+            "numberOfOutgoingConnections": 0,
             "image": "house_event.svg",
             "help": "An event that is expected to occur and typically does not denote a failure"
         },
@@ -320,7 +317,7 @@
             "name": "Top Event",
             "image": "top_event.svg",
             "excludeFromShapesMenu": true,
-            "numberOfOutgoingConnections": 0,
+            "numberOfIncomingConnections": 0,
             "optional": null,
             "deletable": false,
 

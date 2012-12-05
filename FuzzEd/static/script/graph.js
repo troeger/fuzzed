@@ -160,7 +160,7 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             var inherits = definition.inherits;
 
             if (inherits) {
-                var BaseClass = this.nodeClassFor(inherits);
+                BaseClass = this.nodeClassFor(inherits);
             }
 
             var newClass = BaseClass.extend({
@@ -210,17 +210,18 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
                 this.deleteEdge(edge.connection);
             }.bind(this));
 
-            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED,   this._shapeDropped.bind(this));
-
+            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
             jQuery(document).on(Config.Events.CANVAS_EDGE_SELECTED,   this._edgeSelected.bind(this));
             jQuery(document).on(Config.Events.CANVAS_EDGE_UNSELECTED, this._edgeUnselected.bind(this));
+
+            return this;
         },
 
         _shapeDropped: function(event, kind, position) {
-            var node = this.addNode(kind, Canvas.toGrid(position));
-            node.container.click();
+            this.addNode(kind, Canvas.toGrid(position))
+                .container.click();
 
-            //TODO: select the node
+            return this;
         },
 
         _edgeSelected: function(event, edgeId) {

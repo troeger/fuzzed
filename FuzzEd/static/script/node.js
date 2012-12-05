@@ -306,32 +306,64 @@ function(Config, Properties, Mirror, Canvas, Class) {
             return {
                 'in': {
                     'x': 0,
-                    'y': bottomOffset
+                    'y': topOffset
                 },
                 'out': {
                     'x': 0,
-                    'y': topOffset
+                    'y': bottomOffset
                 }
             }
         },
 
-        _setupEndpoints: function() {
-            var offset = this._connectorOffset();
+        _connectorAnchors: function() {
+            return {
+                'in':  [0.5, 0, 0, -1],
+                'out': [0.5, 0, 0,  1]
+            }
+        },
 
-            this._setupIncomingEndpoint(offset.in)
-                ._setupOutgoingEndpoint(offset.out);
+        _setupEndpoints: function() {
+            var anchors = this._connectorAnchors();
+            var offset  = this._connectorOffset();
+
+            this._setupIncomingEndpoint(anchors.in,  offset.in)
+                ._setupOutgoingEndpoint(anchors.out, offset.out);
 
             return this;
         },
 
-        _setupIncomingEndpoint: function(connectionOffset) {
+        _setupIncomingEndpoint: function(anchors, connectionOffset) {
             if (this.numberOfIncomingConnections == 0) return this;
+            // make node target
+            jsPlumb.makeTarget(this.container, {
+                anchor:         anchors.concat([connectionOffset.x, connectionOffset.y]),
+                maxConnections: this.numberOfIncomingConnections,
+                dropOptions: {
+                    accept: function(draggable) {
+                        var elid = draggable.attr('elid');
+                        if (typeof elid === 'undefined') return false;
+
+                        // this is not a connection-dragging-scenario
+                        var sourceNode = jQuery('.' + Config.Classes.NODE + ':has(#' + elid + ')').data('node');
+                        if (typeof sourceNode === 'undefined') return false;
+
+                        return sourceNode.allowsConnectionsTo(this);
+                    }.bind(this),
+                    activeClass: Config.Classes.NODE_DROP_ACTIVE
+                }
+            });
+
+            return this;
+        },
+
+        _setupOutgoingEndpoint: function(anchors, connectionOffset) {
+            if (this.numberOfOutgoingConnections == 0) return this;
 
             // make node source
             jsPlumb.makeSource(this._connectionHandle, {
                 parent:         this.container,
-                anchor:         [ 0.5, 0, 0, 1, connectionOffset.x, connectionOffset.y],
-                maxConnections: this.numberOfIncomingConnections,
+                anchor:         anchors.concat([connectionOffset.x, connectionOffset.y]),
+                maxConnections: this.numberOfOutgoingConnections,
                 connectorStyle: this.connector,
                 dragOptions: {
                     drag: function() {
@@ -348,30 +380,6 @@ function(Config, Properties, Mirror, Canvas, Class) {
                             jQuery(node).data(Config.Keys.NODE).enable();
                         });
                     }
-                }
-            });
-
-            return this;
-        },
-
-        _setupOutgoingEndpoint: function(connectionOffset) {
-            if (this.numberOfOutgoingConnections == 0) return this;
-            // make node target
-            jsPlumb.makeTarget(this.container, {
-                anchor:         [ 0.5, 0, 0, -1, connectionOffset.x, connectionOffset.y],
-                maxConnections: this.numberOfOutgoingConnections,
-                dropOptions: {
-                    accept: function(draggable) {
-                        var elid = draggable.attr('elid');
-                        if (typeof elid === 'undefined') return false;
-
-                        // this is not a connection-dragging-scenario
-                        var sourceNode = jQuery('.' + Config.Classes.NODE + ':has(#' + elid + ')').data('node');
-                        if (typeof sourceNode === 'undefined') return false;
-
-                        return sourceNode.allowsConnectionsTo(this);
-                    }.bind(this),
-                    activeClass: Config.Classes.NODE_DROP_ACTIVE
                 }
             });
 
@@ -406,7 +414,7 @@ function(Config, Properties, Mirror, Canvas, Class) {
         },
 
         _setupConnectionHandle: function() {
-            if (this.numberOfIncomingConnections != 0) {
+            if (this.numberOfOutgoingConnections != 0) {
                 this._connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
                     .addClass(Config.Classes.NODE_HALO_CONNECT)
                     .css({

@@ -3,22 +3,26 @@
     "name": "Reliability Block Diagram",
     "nodes": {
         "node": {
-            "name": "Node",
-            "excludeFromShapesMenu": true,
             "numberOfIncomingConnections": -1,
             "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": [],
+
+            "name": "Node",
+
             "propertyMenuEntries": {
                 "name": {
                     "kind": "text",
                     "displayName": "Name"
                 }
             },
+
             "propertyMirrors": {
                 "name": {
                     "position": "bottom",
-                    "style": ["bold"]
+                    "style": ["bold", "large"]
                 }
             },
+
             "connector": {
                 "offset": {
                     "top":    0,
@@ -27,21 +31,23 @@
             }
         },
 
-        "startNode": {
+        "start": {
             "inherits": "node",
             "name": "Start",
-            "image": "node.svg",
-            "numberOfIncomingConnections":  0,
-            "numberOfOutgoingConnections": -1,
-            "allowConnectionTo": ["endNode", "block", "outOf"]
+            "image": "start.svg",
+            "numberOfIncomingConnections": 0,
+            "allowConnectionTo": ["end", "block", "out_of"],
+            "excludeFromShapesMenu": true,
+            "deletable": false
         },
 
-        "endNode": {
+        "end": {
             "inherits": "node",
             "name": "End",
-            "image": "node.svg",
-            "numberOfIncomingConnections": -1,
-            "numberOfOutgoingConnections":  0
+            "image": "end.svg",
+            "numberOfOutgoingConnections": 0,
+            "excludeFromShapesMenu": true,
+            "deletable": false
         },
 
         "block": {
@@ -49,61 +55,80 @@
             "name": "Block",
             "excludeFromShapesMenu": false,
             "image": "block.svg",
+            "allowConnectionTo": ["end", "block", "out_of"],
+
+            "probability": 0,
+
             "propertyMenuEntries": {
                 "probability": {
                     "kind": "number",
                     "displayName": "Probability",
+                    "disabled": false,
                     "min": 0,
                     "max": 1,
                     "step": 0.01
                 }
             },
-            "probabilityMirrors": {
+
+            "propertyMirrors": {
                 "probability": {
                     "position": "bottom",
-                    "style": ["italic"]
+                    "style": ["italic"],
+                    "prefix": "p="
                 }
             }
         },
 
-        "outOf": {
+        "out_of": {
             "inherits": "node",
-            "name": "out of",
+            "name": "Out of",
             "excludeFromShapesMenu": false,
             "image": "out_of.svg",
-            "allowConnectionTo": ["block", "endNode"],
+            "allowConnectionTo": ["block", "end"],
+            "numberOfOutgoingConnections": 1,
+
+            "out_of": [1, 1],
+
             "propertyMenuEntries": {
-                "outOf": {
+                "out_of": {
                     "kind": "range",
-                    "displayName": "Out Of",
+                    "displayName": "Out of",
                     "min": 1,
-                    "step": 1,
-                    "default": [1, 1]
+                    "step": 1
+                }
+            },
+
+            "propertyMirrors": {
+                "out_of": {
+                    "position": "bottom",
+                    "style": ["italic"]
                 }
             }
         }
     },
 
-    "propertyDisplayOrder": [
-        "name",
-        "probability",
-        "outOf"
-    ],
-
     "shapeMenuNodeDisplayOrder": [
         "block",
-        "outOf"
+        "out_of",
+        "start",
+        "end"
+    ],
+
+    "propertiesDisplayOrder": [
+        "name",
+        "probability",
+        "out_of"
     ],
 
     "defaults": {
         "nodes": [
             {
-                "kind": "startNode",
+                "kind": "start",
                 "x": 5,
                 "y": 1
             },
             {
-                "kind": "endNode",
+                "kind": "end",
                 "x": 10,
                 "y": 1
             }

@@ -4,7 +4,6 @@ except ImportError:
     import simplejson as json
 
 import os
-from django.conf import settings
 from django.contrib.staticfiles import finders
 
 def read_notations():
