@@ -113,7 +113,7 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
             var offsets = this._super();
 
             if (typeof this.optional !== 'undefined' && this.optional != null) {
-                offsets.out.y = jQuery(this.optionalIndicator._container).offset().top - this.container.offset().top;
+                offsets.in.y = jQuery(this.optionalIndicator._container).offset().top - this.container.offset().top;
             }
 
             return offsets;
