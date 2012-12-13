@@ -47,12 +47,11 @@ class Node(models.Model):
     def __unicode__(self):
         prefix = '[DELETED] ' if self.deleted else ''
         try:
-	    name = unicode(self.properties.get(key='name').value)
+            name = unicode(self.properties.get(key='name').value)
             return unicode('%s%s' % (prefix, name))
 
         except ObjectDoesNotExist:
-            return unicode('%s%s_%s' % (prefix, self.pk,\
-                                notations.by_kind[self.graph.kind]['nodes'][self.kind]['name']))
+            return unicode('%s%s_%s' % (prefix, self.pk, notations.by_kind[self.graph.kind]['nodes'][self.kind]['name']))
 
     def to_json(self):
         """
