@@ -221,6 +221,7 @@
             "image": "top_event.svg",
             "excludeFromShapesMenu": true,
             "numberOfIncomingConnections": 0,
+            "numberOfOutgoingConnections": 1,
             "optional": null,
             "deletable": false,
 

@@ -140,7 +140,15 @@
 
             "name": "Intermediate Event",
             "image": "intermediate_event.svg",
-            "help": "Failure resulting from a combination of previous events"
+            "help": "Failure resulting from a combination of previous events",
+
+            "cost": null,
+            "propertyMenuEntries": {
+                "cost": null
+            },
+            "propertyMirrors": {
+                "cost": null
+            }
         },
 
         "intermediateEventSet": {
@@ -157,7 +165,8 @@
                     "displayName": "Cardinality",
                     "min": 1,
                     "step": 1
-                }
+                },
+                "cost": null
             },
 
             "propertyMirrors": {
@@ -165,7 +174,8 @@
                     "position": "bottom",
                     "style": ["italic"],
                     "prefix": "#"
-                }
+                },
+                "cost": null
             }
         },
 
@@ -262,7 +272,8 @@
             "inherits": "event",
 
             "name": "Redundancy Event",
-            "allowConnectionTo": ["node"],
+            "allowConnectionTo": ["basicEventSet"],
+            "numberOfOutgoingConnections": 1,
             "image": "redundancy_event.svg",
             "help": "Placeholder for a voting OR gate over a chosen number of the input events",
 
@@ -318,6 +329,7 @@
             "image": "top_event.svg",
             "excludeFromShapesMenu": true,
             "numberOfIncomingConnections": 0,
+            "numberOfOutgoingConnections": 1,
             "optional": null,
             "deletable": false,
 
