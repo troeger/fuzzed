@@ -110,7 +110,7 @@ define(['faulttree/node', 'fuzztree/config'], function(FaulttreeNode, Config) {
 
             optionalIndicatorWrapper
                 .addClass(Config.Classes.NODE_OPTIONAL_INDICATOR)
-                .appendTo(this.container);
+                .prependTo(this.container);
 
             // hide the optional indicator for nodes with undefined value
             if (typeof this.optional === 'undefined' || this.optional == null) {
