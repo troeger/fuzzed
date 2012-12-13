@@ -144,14 +144,6 @@
             "help": "Output event occurs if all input events occur"
         },
 
-        "priorityAndGate": {
-            "inherits": "gate",
-
-            "name": "Priority AND Gate",
-            "image": "priority_and_gate.svg",
-            "help": "Output event occurs if all input events occur in the specific order"
-        },
-
         "orGate": {
             "inherits": "gate",
 
@@ -244,7 +236,6 @@
         "intermediateEvent",
         "intermediateEventSet",
         "andGate",
-        "priorityAndGate",
         "orGate",
         "xorGate",
         "votingOrGate",
