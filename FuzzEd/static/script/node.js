@@ -296,7 +296,7 @@ function(Properties, Mirror, Canvas, Class) {
             this.container.click(function(event) {
                 Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
                 Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
-            });
+            }.bind(this));
 
             return this;
         },
@@ -378,14 +378,14 @@ function(Properties, Mirror, Canvas, Class) {
                         nodesToDisable.each(function(index, node){
                             jQuery(node).data(this.config.Keys.NODE).disable();
                         }.bind(this));
-                    },
+                    }.bind(this),
                     stop: function() {
                         // re-enable disabled nodes
                         var nodesToEnable = jQuery('.' + this.config.Classes.NODE + ':not(.'+ this.config.Classes.NODE_DROP_ACTIVE + ')');
                         nodesToEnable.each(function(index, node){
                             jQuery(node).data(this.config.Keys.NODE).enable();
                         }.bind(this));
-                    }
+                    }.bind(this)
                 }
             });
 
