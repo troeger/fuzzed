@@ -114,41 +114,34 @@ function(Properties, Mirror, Canvas, Class) {
             if (this._disabled) return this;
 
             this._selected = true;
-            this.container.addClass(this.config.Classes.NODE_SELECTED);
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_SELECTED);
-
-            return this;
+            return this._visualSelect();
         },
 
         deselect: function() {
             this._selected = false;
-            var color = this._highlighted ? this.config.Node.STROKE_HIGHLIGHTED : this.config.Node.STROKE_NORMAL;
 
-            this.container.removeClass(this.config.Classes.NODE_SELECTED);
-            this._nodeImage.primitives.css('stroke', color);
-
-            return this;
+            if (this._highlighted) {
+                return this._visualHighlight();
+            } else {
+                return this._visualReset();
+            }
         },
 
         enable: function() {
             this._disabled = false;
-            var color = this.config.Node.STROKE_NORMAL;
+
             if (this._selected) {
-                color = this.config.Node.STROKE_SELECTED;
+                return this._visualSelect();
             } else if (this._highlighted) {
-                color = this.config.Node.STROKE_HIGHLIGHTED;
+                return this._visualHighlight();
+            } else {
+                return this._visualReset();
             }
-
-            this._nodeImage.primitives.css('stroke', color);
-
-            return this;
         },
 
         disable: function() {
             this._disabled = true;
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_DISABLED);
-
-            return this;
+            return this._visualDisable();
         },
 
         highlight: function() {
@@ -156,9 +149,7 @@ function(Properties, Mirror, Canvas, Class) {
             // don't highlight selected or disabled nodes (visually)
             if (this._selected || this._disabled) return this;
 
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_HIGHLIGHTED);
-
-            return this;
+            return this._visualHighlight();
         },
 
         unhighlight: function() {
@@ -166,6 +157,34 @@ function(Properties, Mirror, Canvas, Class) {
             // don't highlight selected or disabled nodes (visually)
             if (this._selected || this._disabled) return this;
 
+            return this._visualReset();
+        },
+
+        _visualSelect: function() {
+            this._visualReset();
+
+            this.container.addClass(this.config.Classes.NODE_SELECTED);
+            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_SELECTED);
+
+            return this;
+        },
+
+        _visualHighlight: function() {
+            this._visualReset();
+
+            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_HIGHLIGHTED);
+
+            return this;
+        },
+
+        _visualDisable: function() {
+            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_DISABLED);
+
+            return this;
+        },
+
+        _visualReset: function() {
+            this.container.removeClass(this.config.Classes.NODE_SELECTED);
             this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_NORMAL);
 
             return this;

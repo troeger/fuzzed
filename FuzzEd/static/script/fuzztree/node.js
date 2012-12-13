@@ -5,75 +5,6 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
     return FaulttreeNode.extend({
         optionalIndicator: undefined,
 
-        select: function() {
-            // don't allow selection of disabled nodes
-            if (this._disabled) return this;
-
-            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_SELECTED);
-            if (!this.optional) {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_SELECTED);
-            }
-
-            return this._super();
-        },
-
-        deselect: function() {
-            var color = this._highlighted ? this.config.Node.STROKE_HIGHLIGHTED : this.config.Node.STROKE_NORMAL;
-            this.optionalIndicator.attr('stroke', color);
-            if (!this.optional) {
-                this.optionalIndicator.attr('fill', color);
-            }
-
-            return this._super();
-        },
-
-        disable: function() {
-            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_DISABLED);
-            if (!this.optional) {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_DISABLED);
-            }
-
-            return this._super();
-        },
-
-        enable: function() {
-            var color = this.config.Node.STROKE_NORMAL;
-            if (this._selected) {
-                color = this.config.Node.STROKE_SELECTED;
-            } else if (this._highlighted) {
-                color = this.config.Node.STROKE_HIGHLIGHTED;
-            }
-
-            this.optionalIndicator.attr('stroke', color);
-            if (!this.optional) {
-                this.optionalIndicator.attr('fill', color);
-            }
-
-            return this._super();
-        },
-
-        highlight: function() {
-            if (this._selected || this._disabled) return this;
-
-            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_HIGHLIGHTED);
-            if (!this.optional) {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_HIGHLIGHTED);
-            }
-
-            return this._super();
-        },
-
-        unhighlight: function() {
-            if (this._selected || this._disabled) return this;
-
-            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_NORMAL);
-            if (!this.optional) {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_NORMAL);
-            }
-
-            return this._super();
-        },
-
         setOptional: function(optional) {
             this.optional = optional;
 
@@ -90,6 +21,50 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
 
         getConfig: function() {
             return Config;
+        },
+
+        _visualSelect: function() {
+            this._super();
+
+            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_SELECTED);
+            if (!this.optional) {
+                this.optionalIndicator.attr('fill', this.config.Node.STROKE_SELECTED);
+            }
+
+            return this;
+        },
+
+        _visualHighlight: function() {
+            this._super();
+
+            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_HIGHLIGHTED);
+            if (!this.optional) {
+                this.optionalIndicator.attr('fill', this.config.Node.STROKE_HIGHLIGHTED);
+            }
+
+            return this;
+        },
+
+        _visualDisable: function() {
+            this._super();
+
+            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_DISABLED);
+            if (!this.optional) {
+                this.optionalIndicator.attr('fill', this.config.Node.STROKE_DISABLED);
+            }
+
+            return this;
+        },
+
+        _visualReset: function() {
+            this._super();
+
+            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_NORMAL);
+            if (!this.optional) {
+                this.optionalIndicator.attr('fill', this.config.Node.STROKE_NORMAL);
+            }
+
+            return this;
         },
 
         _setupVisualRepresentation: function() {
