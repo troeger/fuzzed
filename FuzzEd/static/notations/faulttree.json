@@ -1,0 +1,265 @@
+{
+    "kind": "faulttree",
+    "name": "Fault Tree",
+    "nodes": {
+        "node": {
+            "numberOfIncomingConnections":  1,
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["node"],
+            "deletable": true,
+
+            "connector": {
+                "offset": {
+                    "top":    0,
+                    "bottom": 0
+                }
+            }
+        },
+
+        "event": {
+            "inherits": "node",
+
+            "allowConnectionTo": ["gate"],
+
+            "probability": 0,
+
+            "propertyMenuEntries": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name"
+                },
+                "probability": {
+                    "kind": "text",
+                    "displayName": "Probability",
+                    "disabled": true
+                }
+            },
+
+            "propertyMirrors": {
+                "name": {
+                    "position": "bottom",
+                    "style": ["bold", "large"]
+                }
+            }
+        },
+
+        "gate": {
+            "inherits": "node"
+        },
+
+        "basicEvent": {
+            "inherits": "event",
+
+            "name": "Basic Event",
+            "numberOfOutgoingConnections": 0,
+            "image": "basic_event.svg",
+            "help": "Initiating failure in a basic component",
+
+            "probability": 0,
+
+            "propertyMenuEntries": {
+                "probability": {
+                    "kind": "number",
+                    "disabled": false,
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.01
+                }
+            },
+
+            "propertyMirrors": {
+                "probability": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "p="
+                }
+            }
+        },
+
+        "basicEventSet": {
+            "inherits": "basicEvent",
+
+            "name": "Basic Event Set",
+            "image": "basic_event_set.svg",
+            "help": "Set of basic events with identical properties",
+            "cardinality": 1,
+
+            "propertyMenuEntries": {
+                "cardinality": {
+                    "kind": "number",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1
+                }
+            },
+
+            "propertyMirrors": {
+                "cardinality": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "#"
+                }
+            }
+        },
+
+        "intermediateEvent": {
+            "inherits": "event",
+
+            "name": "Intermediate Event",
+            "image": "intermediate_event.svg",
+            "help": "Failure resulting from a combination of previous events"
+        },
+
+        "intermediateEventSet": {
+            "inherits": "intermediateEvent",
+
+            "name": "Intermediate Event Set",
+            "image": "intermediate_event_set.svg",
+            "help": "Set of intermediate events",
+            "cardinality": 1,
+
+            "propertyMenuEntries": {
+                "cardinality": {
+                    "kind": "number",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1
+                }
+            },
+
+            "propertyMirrors": {
+                "cardinality": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "#"
+                }
+            }
+        },
+
+        "andGate": {
+            "inherits": "gate",
+
+            "name": "AND Gate",
+            "image": "and_gate.svg",
+            "help": "Output event occurs if all input events occur"
+        },
+
+        "priorityAndGate": {
+            "inherits": "gate",
+
+            "name": "Priority AND Gate",
+            "image": "priority_and_gate.svg",
+            "help": "Output event occurs if all input events occur in the specific order"
+        },
+
+        "orGate": {
+            "inherits": "gate",
+
+            "name": "OR Gate",
+            "image": "or_gate.svg",
+            "help": "Output event occurs if one or more input events occur",
+
+            "connector": {
+                "offset": {
+                    "bottom": -7
+                }
+            }
+        },
+
+        "xorGate": {
+            "inherits": "gate",
+
+            "name": "XOR Gate",
+            "image": "xor_gate.svg",
+            "help": "Output event occurs if exactly one of the input events occur"
+        },
+
+        "votingOrGate": {
+            "inherits": "gate",
+
+            "name": "Voting OR Gate",
+            "image": "voting_or_gate.svg",
+            "help": "Output event occurs if the given number of input events occur",
+            "kN": [1, 2],
+
+            "propertyMenuEntries": {
+                "kN": {
+                    "kind": "range",
+                    "displayName": "k-out-of-N",
+                    "min": 1,
+                    "step": 1
+                }
+            },
+            "propertyMirrors": {
+                "kN": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "k/N: "
+                }
+            }
+        },
+
+        "undevelopedEvent": {
+            "inherits": "event",
+            "name": "Undeveloped Event",
+            "numberOfOutgoingConnections": 0,
+            "image": "undeveloped_event.svg",
+            "help": "Event with no information available or insignificant impact"
+        },
+
+        "houseEvent": {
+            "inherits": "event",
+            "name": "House Event",
+            "numberOfOutgoingConnections": 0,
+            "image": "house_event.svg",
+            "help": "An event that is expected to occur and typically does not denote a failure"
+        },
+
+        "topEvent": {
+            "inherits": "event",
+            "name": "Top Event",
+            "image": "top_event.svg",
+            "excludeFromShapesMenu": true,
+            "numberOfIncomingConnections": 0,
+            "numberOfOutgoingConnections": 1,
+            "optional": null,
+            "deletable": false,
+
+            "propertyMenuEntries": {
+                "optional": null
+            }
+        }
+    },
+
+    "propertiesDisplayOrder": [
+        "name",
+        "probability",
+        "kN",
+        "cardinality"
+    ],
+
+    "shapeMenuNodeDisplayOrder": [
+        "basicEvent",
+        "basicEventSet",
+        "intermediateEvent",
+        "intermediateEventSet",
+        "andGate",
+        "priorityAndGate",
+        "orGate",
+        "xorGate",
+        "votingOrGate",
+        "undevelopedEvent",
+        "houseEvent",
+        "topEvent"
+    ],
+
+    "defaults": {
+        "nodes": [
+            {
+                "kind": "topEvent",
+                "x": 10,
+                "y": 1
+            }
+        ]
+    }
+}

@@ -62,7 +62,7 @@
 <form action="/dashboard/new/" method="post">
     {% csrf_token %}
     <div class="btn-group pull-right">
-        <button type="submit" name="kind" value="faulttree" class="btn" disabled="true">
+        <button type="submit" name="kind" value="faulttree" class="btn">
             <i class="icon-file"></i>
             New FaultTree
         </button>
@@ -70,7 +70,7 @@
             <i class="icon-file"></i>
             New FuzzTree
         </button>
-        <button type="submit" name="kind" value="rbd" class="btn" disabled="true">
+        <button type="submit" name="kind" value="rbd" class="btn">
             <i class="icon-file"></i>
             New RBD
         </button>

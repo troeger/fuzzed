@@ -8,15 +8,23 @@
         {% if not node.excludeFromShapesMenu %}
             {% cycle '<tr>' '' %}
                 <td class="right-tooltip" title="{{ node.help }}">
-                    {% include node.image %}
+                    {% include graph.kind|add:'/'|add:node.image %}
                     <span>{{ node.name }}</span>
                 </td>
-            {% cycle '' '</tr>' %}
-        {% else %}
-            <td style="display: none">
-                {% include node.image %}
-            </td>
+            {% cycle '' '</tr>' as row_terminator %}
         {% endif %}
     {% endfor %}
+    {% cycle row_terminator %}
+
+    {% for kind, node in nodes %}
+        {% if node.excludeFromShapesMenu %}
+            {% cycle '<tr>' '' %}
+                <td style="display: none">
+                    {% include graph.kind|add:'/'|add:node.image %}
+                </td>
+            {% cycle '' '</tr>' as hidden_row_terminator %}
+        {% endif %}
+    {% endfor %}
+    {% cycle hidden_row_terminator %}
     </table>
 </div>
