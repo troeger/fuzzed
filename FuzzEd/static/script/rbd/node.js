@@ -10,11 +10,11 @@ define(['rbd/config', 'node'], function(Config, AbstractNode) {
 
             return {
                 'in': {
-                    'x': this.config.JSPlumb.STROKE_WIDTH,
+                    'x': this.config.JSPlumb.STROKE_WIDTH + (this.connector.offset.left || 0),
                     'y': topOffset
                 },
                 'out': {
-                    'x': width - this.config.JSPlumb.STROKE_WIDTH,
+                    'x': width - this.config.JSPlumb.STROKE_WIDTH + (this.connector.offset.right || 0),
                     'y': topOffset
                 }
             }
@@ -33,11 +33,13 @@ define(['rbd/config', 'node'], function(Config, AbstractNode) {
 
         _setupConnectionHandle: function() {
             if (this.numberOfOutgoingConnections != 0) {
+                var leftOffset = -this.config.JSPlumb.STROKE_WIDTH + (this.connector.offset.right || 0);
+
                 this._connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
                     .addClass(this.config.Classes.NODE_HALO_CONNECT)
                     .css({
                         'top':  this._nodeImage.position().top  + this._nodeImage.outerHeight(true) / 2,
-                        'left': this._nodeImage.position().left + this._nodeImage.outerWidth() - this.config.JSPlumb.STROKE_WIDTH
+                        'left':  this._nodeImage.position().left + this._nodeImage.outerWidth() + leftOffset
                     })
                     .appendTo(this.container);
             }

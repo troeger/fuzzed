@@ -1,5 +1,5 @@
 <?xml version="1.0" ?><svg height="36" id="start" label="Start" version="1.1" width="36" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
     <g>
-        <circle cx="17.5" cy="17.5" r="16.8" style="fill:#ffffff; stroke:#000000; stroke-width:1.4;"/>
+        <circle cx="17.5" cy="17.5" r="9" style="fill:#ffffff; stroke:#000000; stroke-width:2.8;"/>
     </g>
 </svg>

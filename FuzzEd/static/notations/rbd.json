@@ -38,7 +38,13 @@
             "numberOfIncomingConnections": 0,
             "allowConnectionTo": ["end", "block", "out_of"],
             "excludeFromShapesMenu": true,
-            "deletable": false
+            "deletable": false,
+
+            "connector": {
+                "offset": {
+                    "right": -9.1
+                }
+            }
         },
 
         "end": {
@@ -47,7 +53,13 @@
             "image": "end.svg",
             "numberOfOutgoingConnections": 0,
             "excludeFromShapesMenu": true,
-            "deletable": false
+            "deletable": false,
+
+            "connector": {
+                "offset": {
+                    "left":   8.1
+                }
+            }
         },
 
         "block": {

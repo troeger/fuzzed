@@ -1,6 +1,5 @@
 <?xml version="1.0" ?><svg height="36" id="out_of" label="Out of" version="1.1" width="36" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
     <g>
         <circle cx="17.5" cy="17.5" r="16.8" style="fill:#ffffff; stroke:#000000; stroke-width:1.4;"/>
-        <path d="M 0 17.5 L 35 17.5 z" style="fill:#ffffff; stroke:#000000; stroke-width:1.4;"/>
     </g>
 </svg>
