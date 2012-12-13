@@ -144,6 +144,7 @@ def dashboard_edit(request, graph_id):
         cmd = commands.AddGraph.create_from(kind=oldgraph.kind, name=oldgraph.name+" (copy)", owner=request.user)
         cmd.do()    
         newgraph=cmd.graph
+        # TODO: Don't copy nodes which already exist (by client id) in target, duplicate only properties
         # copy all nodes and their properties
         nodemapping={}
         for node in oldgraph.nodes.all():
@@ -160,15 +161,12 @@ def dashboard_edit(request, graph_id):
                 prop.pk=None
                 prop.node=node
                 prop.save()
-        clientid=1
-        for oldedge in oldgraph.edges.all():
-            e=Edge()
-            e.source=nodemapping[oldedge.source.pk]
-            e.target=nodemapping[oldedge.target.pk]
-            e.graph=newgraph
-            e.client_id=clientid
-            e.save()    
-            clientid+=1
+        for edge in oldgraph.edges.all():
+            edge.pk=None
+            edge.source=nodemapping[edge.source.pk]
+            edge.target=nodemapping[edge.target.pk]
+            edge.graph=newgraph
+            edge.save()    
         return redirect('dashboard')
 
     # please show the edit page to the user on get requests
