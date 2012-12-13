@@ -1,6 +1,7 @@
-define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
+define(['canvas', 'class'], function(Canvas, Class) {
 
     return Class.extend({
+        config: undefined,
         id:     undefined,
         edges:  {},
         nodes:  {},
@@ -9,8 +10,9 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
         _nodeClasses: {},
 
         init: function(json) {
-            this.id   = json.id;
-            this.name = json.name;
+            this.id     = json.id;
+            this.name   = json.name;
+            this.config = this.getConfig();
 
             this._loadFromJson(json)
                 ._registerEventHandlers();
@@ -29,13 +31,13 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             }
 
             // store the ID in an attribute so we can retrieve it later from the DOM element
-            jQuery(edge.canvas).attr(Config.Keys.CONNECTION_ID, edge._fuzzedId);
+            jQuery(edge.canvas).attr(this.config.Keys.CONNECTION_ID, edge._fuzzedId);
 
-            var sourceNode = edge.source.data(Config.Keys.NODE);
-            var targetNode = edge.target.data(Config.Keys.NODE);
+            var sourceNode = edge.source.data(this.config.Keys.NODE);
+            var targetNode = edge.target.data(this.config.Keys.NODE);
 
             jQuery(document).trigger(
-                Config.Events.GRAPH_EDGE_ADDED,
+                this.config.Events.GRAPH_EDGE_ADDED,
                 [edge._fuzzedId,
                 sourceNode.id,
                 targetNode.id]
@@ -57,13 +59,13 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
          */
         deleteEdge: function(edge) {
             var id         = edge._fuzzedId;
-            var sourceNode = edge.source.data(Config.Keys.NODE);
-            var targetNode = edge.target.data(Config.Keys.NODE);
+            var sourceNode = edge.source.data(this.config.Keys.NODE);
+            var targetNode = edge.target.data(this.config.Keys.NODE);
 
             sourceNode.outgoingEdges = _.without(sourceNode.outgoingEdges, edge);
             targetNode.incomingEdges = _.without(targetNode.incomingEdges, edge);
 
-            jQuery(document).trigger(Config.Events.GRAPH_EDGE_DELETED, id);
+            jQuery(document).trigger(this.config.Events.GRAPH_EDGE_DELETED, id);
             delete this.edges[id];
 
             return this;
@@ -79,7 +81,7 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
          */
         addNode: function(kind, properties, success) {
             var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
-            jQuery(document).trigger(Config.Events.GRAPH_NODE_ADDED, [node.id, kind, node.x, node.y]);
+            jQuery(document).trigger(this.config.Events.GRAPH_NODE_ADDED, [node.id, kind, node.x, node.y]);
             this.nodes[node.id] = node;
 
             return node;
@@ -100,7 +102,7 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
                 this.deleteEdge(edge);
             }.bind(this));
 
-            jQuery(document).trigger(Config.Events.GRAPH_NODE_DELETED, nodeId);
+            jQuery(document).trigger(this.config.Events.GRAPH_NODE_DELETED, nodeId);
 
             node.remove();
             delete this.nodes[nodeId];
@@ -154,6 +156,10 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
         },
 
         /* Section: Internal */
+
+        getConfig: function() {
+            throw '[ABSTRACT] subclass responsibility';
+        },
 
         _newNodeClassForKind: function(definition) {
             var BaseClass = this.getNodeClass();
@@ -210,9 +216,9 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
                 this.deleteEdge(edge.connection);
             }.bind(this));
 
-            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
-            jQuery(document).on(Config.Events.CANVAS_EDGE_SELECTED,   this._edgeSelected.bind(this));
-            jQuery(document).on(Config.Events.CANVAS_EDGE_UNSELECTED, this._edgeUnselected.bind(this));
+            jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED,   this._shapeDropped.bind(this));
+            jQuery(document).on(this.config.Events.CANVAS_EDGE_SELECTED,   this._edgeSelected.bind(this));
+            jQuery(document).on(this.config.Events.CANVAS_EDGE_UNSELECTED, this._edgeUnselected.bind(this));
 
             return this;
         },
@@ -231,24 +237,24 @@ define(['canvas', 'config', 'class'], function(Canvas, Config, Class) {
             //     completely redrawn (replace DOM element) which prevents us from associating it with the connection
             //     object (via DOM attribute). So we need to toggle the styles manually for the moment.
             edge.setPaintStyle({
-                strokeStyle: Config.JSPlumb.STROKE_COLOR_SELECTED,
-                lineWidth:   Config.JSPlumb.STROKE_WIDTH
+                strokeStyle: this.config.JSPlumb.STROKE_COLOR_SELECTED,
+                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
             });
             edge.setHoverPaintStyle({
-                strokeStyle: Config.JSPlumb.STROKE_COLOR_SELECTED,
-                lineWidth:   Config.JSPlumb.STROKE_WIDTH
+                strokeStyle: this.config.JSPlumb.STROKE_COLOR_SELECTED,
+                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
             });
         },
 
         _edgeUnselected: function(event, edgeId) {
             var edge = this.getEdgeById(edgeId);
             edge.setPaintStyle({
-                strokeStyle: Config.JSPlumb.STROKE_COLOR,
-                lineWidth:   Config.JSPlumb.STROKE_WIDTH
+                strokeStyle: this.config.JSPlumb.STROKE_COLOR,
+                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
             });
             edge.setHoverPaintStyle({
-                strokeStyle: Config.JSPlumb.STROKE_COLOR_HIGHLIGHTED,
-                lineWidth:   Config.JSPlumb.STROKE_WIDTH
+                strokeStyle: this.config.JSPlumb.STROKE_COLOR_HIGHLIGHTED,
+                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
             });
         }
     });

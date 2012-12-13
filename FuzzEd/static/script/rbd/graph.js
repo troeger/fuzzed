@@ -1,6 +1,11 @@
-define(['graph', 'rbd/node', 'json!notations/rbd.json'], function(Graph, RbdNode, RbdNotation) {
+define(['graph', 'rbd/node', 'rbd/config', 'json!notations/rbd.json'],
+function(Graph, RbdNode, RbdConfig, RbdNotation) {
 
     return Graph.extend({
+        getConfig: function() {
+            return RbdConfig;
+        },
+
         getNodeClass: function() {
             return RbdNode;
         },

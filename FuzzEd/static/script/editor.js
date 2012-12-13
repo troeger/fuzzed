@@ -1,10 +1,11 @@
-define(['class', 'menus', 'canvas', 'config', 'backend', 'canvas'],
-function(Class, Menus, Canvas, Config, Backend) {
+define(['class', 'menus', 'canvas', 'backend', 'canvas'],
+function(Class, Menus, Canvas, Backend) {
 
     /*
      *  Class: Editor
      */
     return Class.extend({
+        config:     undefined,
         graph:      undefined,
         properties: undefined,
         shapes:     undefined,
@@ -15,8 +16,9 @@ function(Class, Menus, Canvas, Config, Backend) {
         init: function(graphId) {
             if (typeof graphId !== 'number') throw 'You need a graph ID to initialize the editor.';
 
+            this.config = this.getConfig();
             this._backend = new Backend(graphId);
-            this._navbarActionsGroup = jQuery('#' + Config.IDs.NAVBAR_ACTIONS);
+            this._navbarActionsGroup = jQuery('#' + this.config.IDs.NAVBAR_ACTIONS);
 
             // run a few sub initializer
             this._setupJsPlumb()
@@ -28,7 +30,11 @@ function(Class, Menus, Canvas, Config, Backend) {
 
         /* Section: Internals */
 
-        _graphClass: function() {
+        getConfig: function() {
+            throw '[ABSTRACT] Subclass responsibility';
+        },
+
+        getGraphClass: function() {
             throw '[ABSTRACT] Subclass responsibility';
         },
 
@@ -47,7 +53,7 @@ function(Class, Menus, Canvas, Config, Backend) {
             this.shapes     = new Menus.ShapeMenu();
 
             // fade out the splash screen
-            jQuery('#' + Config.IDs.SPLASH).fadeOut(Config.Splash.FADE_TIME, function() {
+            jQuery('#' + this.config.IDs.SPLASH).fadeOut(this.config.Splash.FADE_TIME, function() {
                 jQuery(this).remove();
             });
             // activate the backend AFTER the graph is fully loaded to prevent backend calls during graph construction
@@ -62,7 +68,7 @@ function(Class, Menus, Canvas, Config, Backend) {
         },
 
         _loadGraphFromJson: function(json) {
-            this.graph = new (this._graphClass())(json);
+            this.graph = new (this.getGraphClass())(json);
             this._loadGraphCompleted();
 
             return this;
@@ -71,26 +77,26 @@ function(Class, Menus, Canvas, Config, Backend) {
         _setupJsPlumb: function() {
             jsPlumb.importDefaults({
                 EndpointStyle: {
-                    fillStyle:   Config.JSPlumb.ENDPOINT_FILL
+                    fillStyle:   this.config.JSPlumb.ENDPOINT_FILL
                 },
-                Endpoint:        [Config.JSPlumb.ENDPOINT_STYLE, {
-                    radius:      Config.JSPlumb.ENDPOINT_RADIUS,
-                    cssClass:    Config.Classes.JSPLUMB_ENDPOINT,
-                    hoverClass:  Config.Classes.JSPLUMB_ENDPOINT_HOVER
+                Endpoint:        [this.config.JSPlumb.ENDPOINT_STYLE, {
+                    radius:      this.config.JSPlumb.ENDPOINT_RADIUS,
+                    cssClass:    this.config.Classes.JSPLUMB_ENDPOINT,
+                    hoverClass:  this.config.Classes.JSPLUMB_ENDPOINT_HOVER
                 }],
                 PaintStyle: {
-                    strokeStyle: Config.JSPlumb.STROKE_COLOR,
-                    lineWidth:   Config.JSPlumb.STROKE_WIDTH
+                    strokeStyle: this.config.JSPlumb.STROKE_COLOR,
+                    lineWidth:   this.config.JSPlumb.STROKE_WIDTH
                 },
                 HoverPaintStyle: {
-                    strokeStyle: Config.JSPlumb.STROKE_COLOR_HIGHLIGHTED
+                    strokeStyle: this.config.JSPlumb.STROKE_COLOR_HIGHLIGHTED
                 },
-                HoverClass:      Config.Classes.JSPLUMB_CONNECTOR_HOVER,
-                Connector:       [Config.JSPlumb.CONNECTOR_STYLE, Config.JSPlumb.CONNECTOR_OPTIONS],
+                HoverClass:      this.config.Classes.JSPLUMB_CONNECTOR_HOVER,
+                Connector:       [this.config.JSPlumb.CONNECTOR_STYLE, this.config.JSPlumb.CONNECTOR_OPTIONS],
                 ConnectionsDetachable: false
             });
 
-            jsPlumb.connectorClass = Config.Classes.JSPLUMB_CONNECTOR;
+            jsPlumb.connectorClass = this.config.Classes.JSPLUMB_CONNECTOR;
 
             return this;
         },
@@ -103,21 +109,21 @@ function(Class, Menus, Canvas, Config, Backend) {
                     //XXX: deselect everything
                     // This uses the jQuery.ui.selectable internal functions.
                     // We need to trigger them manually in order to simulate a click on the canvas.
-                    Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
-                    Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
+                    Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+                    Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
                 } else if (event.which == jQuery.ui.keyCode.DELETE) {
                     event.preventDefault();
 
                     // delete selected nodes
-                    jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + '.' + Config.Classes.NODE).each(function(index, element) {
-                        this.graph.deleteNode(jQuery(element).data(Config.Keys.NODE).id);
+                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE).each(function(index, element) {
+                        this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
                     }.bind(this));
 
                     this.properties.hide();
 
                     // delete selected edges
-                    jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + '.' + Config.Classes.JSPLUMB_CONNECTOR).each(function(index, element) {
-                        var edge = this.graph.getEdgeById(jQuery(element).attr(Config.Keys.CONNECTION_ID));
+                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR).each(function(index, element) {
+                        var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Keys.CONNECTION_ID));
                         jsPlumb.detach(edge);
                         this.graph.deleteEdge(edge);
                     }.bind(this));

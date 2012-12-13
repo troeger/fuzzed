@@ -1,4 +1,4 @@
-define(['node', 'rbd/config'], function(AbstractNode, Config) {
+define(['rbd/config', 'node'], function(Config, AbstractNode) {
 
     /**
      *  Concrete rbd implementation
@@ -10,11 +10,11 @@ define(['node', 'rbd/config'], function(AbstractNode, Config) {
 
             return {
                 'in': {
-                    'x': Config.JSPlumb.STROKE_WIDTH,
+                    'x': this.config.JSPlumb.STROKE_WIDTH,
                     'y': topOffset
                 },
                 'out': {
-                    'x': width - Config.JSPlumb.STROKE_WIDTH,
+                    'x': width - this.config.JSPlumb.STROKE_WIDTH,
                     'y': topOffset
                 }
             }
@@ -27,13 +27,17 @@ define(['node', 'rbd/config'], function(AbstractNode, Config) {
             }
         },
 
+        getConfig: function() {
+            return Config;
+        },
+
         _setupConnectionHandle: function() {
             if (this.numberOfOutgoingConnections != 0) {
                 this._connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
-                    .addClass(Config.Classes.NODE_HALO_CONNECT)
+                    .addClass(this.config.Classes.NODE_HALO_CONNECT)
                     .css({
                         'top':  this._nodeImage.position().top  + this._nodeImage.outerHeight(true) / 2,
-                        'left': this._nodeImage.position().left + this._nodeImage.outerWidth() - Config.JSPlumb.STROKE_WIDTH
+                        'left': this._nodeImage.position().left + this._nodeImage.outerWidth() - this.config.JSPlumb.STROKE_WIDTH
                     })
                     .appendTo(this.container);
             }

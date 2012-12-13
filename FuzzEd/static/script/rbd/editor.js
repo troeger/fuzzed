@@ -1,20 +1,14 @@
-define(['editor', 'rbd/graph', 'rbd/config'], function(Editor, RbdGraph, Config) {
+define(['editor', 'rbd/graph', 'rbd/config'], function(Editor, RbdGraph, RbdConfig) {
     /**
      * Class: RbdEditor
      */
     return Editor.extend({
-        _graphClass: function() {
-            return RbdGraph;
+        getConfig: function() {
+            return RbdConfig;
         },
 
-        _setupJsPlumb: function() {
-            this._super();
-
-            jsPlumb.importDefaults({
-                Connector: [Config.JSPlumb.CONNECTOR_STYLE, {stub: Config.JSPlumb.CONNECTOR_STUB}]
-            });
-
-            return this;
+        getGraphClass: function() {
+            return RbdGraph;
         }
     });
 });

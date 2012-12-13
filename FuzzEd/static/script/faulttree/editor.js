@@ -1,5 +1,5 @@
 define(['editor', 'faulttree/graph', 'menus', 'faulttree/config'],
-function(Editor, FaulttreeGraph, Menus, Config) {
+function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
     /**
      * Class: CutsetsMenu
      */
@@ -52,18 +52,19 @@ function(Editor, FaulttreeGraph, Menus, Config) {
             }.bind(this));
 
             this._super();
+            return this;
         },
 
         _setupContainer: function() {
             return jQuery(
-                '<div id="' + Config.IDs.CUTSETS_MENU + '" class="menu" header="Cutsets">\
+                '<div id="' + FaulttreeConfig.IDs.CUTSETS_MENU + '" class="menu" header="Cutsets">\
                     <div class="menu-controls">\
                         <span class="menu-minimize"></span>\
                         <span class="menu-close"></span>\
                     </div>\
                     <ul class="nav-list unstyled"></ul>\
                 </div>'
-            ).appendTo(jQuery('#' + Config.IDs.CONTENT));
+            ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
         }
     });
 
@@ -80,20 +81,24 @@ function(Editor, FaulttreeGraph, Menus, Config) {
             this._setupCutsetsActionEntry();
         },
 
-        _graphClass: function() {
+        getConfig: function() {
+            return FaulttreeConfig;
+        },
+
+        getGraphClass: function() {
             return FaulttreeGraph;
         },
 
         _setupCutsetsActionEntry: function() {
             var navbarActionsEntry = jQuery(
                 '<li>' +
-                    '<a id="' + Config.IDs.NAVBAR_ACTION_CUTSETS + '" href="#">Calculate cutsets</a>' +
+                    '<a id="' + FaulttreeConfig.IDs.NAVBAR_ACTION_CUTSETS + '" href="#">Calculate cutsets</a>' +
                 '</li>');
             this._navbarActionsGroup.append(navbarActionsEntry);
 
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
-                jQuery(document).trigger(Config.Events.EDITOR_CALCULATE_CUTSETS, this.cutsets.show.bind(this.cutsets));
+                jQuery(document).trigger(FaulttreeConfig.Events.EDITOR_CALCULATE_CUTSETS, this.cutsets.show.bind(this.cutsets));
             }.bind(this));
 
             return this;

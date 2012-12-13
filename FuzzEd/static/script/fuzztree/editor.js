@@ -1,11 +1,15 @@
-define(['faulttree/editor', 'fuzztree/graph'],
-function(FaulttreeEditor, FuzztreeGraph) {
+define(['faulttree/editor', 'fuzztree/graph', 'fuzztree/config'],
+function(FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
 
     /**
      * Class: FaultTreeEditor
      */
     return FaulttreeEditor.extend({
-        _graphClass: function() {
+        getConfig: function() {
+            return FuzztreeConfig;
+        },
+
+        getGraphClass: function() {
             return FuzztreeGraph;
         }
     });

@@ -1,10 +1,11 @@
-define(['config', 'properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
-function(Config, Properties, Mirror, Canvas, Class) {
+define(['properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
+function(Properties, Mirror, Canvas, Class) {
 
     /*
      *  Abstract Node Base Class
      */
     return Class.extend({
+        config:        undefined,
         container:     undefined,
         id:            undefined,
         incomingEdges: undefined,
@@ -25,6 +26,7 @@ function(Config, Properties, Mirror, Canvas, Class) {
                 // make sure the 0 is not reassigned; it's reserved for the top event
                 this.id = new Date().getTime() + 1;
             }
+            this.config = this.getConfig();
 
             this.incomingEdges = [];
             this.outgoingEdges = [];
@@ -102,7 +104,7 @@ function(Config, Properties, Mirror, Canvas, Class) {
             this._moveContainerToPixel(position);
 
             // call home
-            jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+            jQuery(document).trigger(this.config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },
@@ -112,17 +114,17 @@ function(Config, Properties, Mirror, Canvas, Class) {
             if (this._disabled) return this;
 
             this._selected = true;
-            this.container.addClass(Config.Classes.NODE_SELECTED);
-            this._nodeImage.primitives.css('stroke', Config.Node.STROKE_SELECTED);
+            this.container.addClass(this.config.Classes.NODE_SELECTED);
+            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_SELECTED);
 
             return this;
         },
 
         deselect: function() {
             this._selected = false;
-            var color = this._highlighted ? Config.Node.STROKE_HIGHLIGHTED : Config.Node.STROKE_NORMAL;
+            var color = this._highlighted ? this.config.Node.STROKE_HIGHLIGHTED : this.config.Node.STROKE_NORMAL;
 
-            this.container.removeClass(Config.Classes.NODE_SELECTED);
+            this.container.removeClass(this.config.Classes.NODE_SELECTED);
             this._nodeImage.primitives.css('stroke', color);
 
             return this;
@@ -130,11 +132,11 @@ function(Config, Properties, Mirror, Canvas, Class) {
 
         enable: function() {
             this._disabled = false;
-            var color = Config.Node.STROKE_NORMAL;
+            var color = this.config.Node.STROKE_NORMAL;
             if (this._selected) {
-                color = Config.Node.STROKE_SELECTED;
+                color = this.config.Node.STROKE_SELECTED;
             } else if (this._highlighted) {
-                color = Config.Node.STROKE_HIGHLIGHTED;
+                color = this.config.Node.STROKE_HIGHLIGHTED;
             }
 
             this._nodeImage.primitives.css('stroke', color);
@@ -144,7 +146,7 @@ function(Config, Properties, Mirror, Canvas, Class) {
 
         disable: function() {
             this._disabled = true;
-            this._nodeImage.primitives.css('stroke', Config.Node.STROKE_DISABLED);
+            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_DISABLED);
 
             return this;
         },
@@ -154,7 +156,7 @@ function(Config, Properties, Mirror, Canvas, Class) {
             // don't highlight selected or disabled nodes (visually)
             if (this._selected || this._disabled) return this;
 
-            this._nodeImage.primitives.css('stroke', Config.Node.STROKE_HIGHLIGHTED);
+            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_HIGHLIGHTED);
 
             return this;
         },
@@ -164,7 +166,7 @@ function(Config, Properties, Mirror, Canvas, Class) {
             // don't highlight selected or disabled nodes (visually)
             if (this._selected || this._disabled) return this;
 
-            this._nodeImage.primitives.css('stroke', Config.Node.STROKE_NORMAL);
+            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_NORMAL);
 
             return this;
         },
@@ -238,10 +240,10 @@ function(Config, Properties, Mirror, Canvas, Class) {
         _setupDragging: function() {
             jsPlumb.draggable(this.container, {
                 containment: 'parent',
-                opacity:     Config.Dragging.OPACITY,
-                cursor:      Config.Dragging.CURSOR,
+                opacity:     this.config.Dragging.OPACITY,
+                cursor:      this.config.Dragging.CURSOR,
                 grid:        [Canvas.gridSize, Canvas.gridSize],
-                stack:       '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
+                stack:       '.' + this.config.Classes.NODE + ', .' + this.config.Classes.JSPLUMB_CONNECTOR,
 
                 // start dragging callback
                 start: function(event) {
@@ -250,9 +252,9 @@ function(Config, Properties, Mirror, Canvas, Class) {
                     //XXX: add dragged node to selection
                     // This uses the jQuery.ui.selectable internal functions.
                     // We need to trigger them manually because jQuery.ui.draggable doesn't propagate these events.
-                    if (!this.container.hasClass(Config.Classes.JQUERY_UI_SELECTED)) {
-                        Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
-                        Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
+                    if (!this.container.hasClass(this.config.Classes.JQUERY_UI_SELECTED)) {
+                        Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+                        Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
                     }
                 }.bind(this),
 
@@ -261,24 +263,24 @@ function(Config, Properties, Mirror, Canvas, Class) {
                     var offset = {
                         left: ui.position.left - this._initialPosition.left,
                         top:  ui.position.top  - this._initialPosition.top
-                    }
-                    jQuery('.' + Config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
-                        jQuery(node).data(Config.Keys.NODE)._moveByOffset(offset, false);
-                    });
+                    };
+                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
+                        jQuery(node).data(this.config.Keys.NODE)._moveByOffset(offset, false);
+                    }.bind(this));
                 }.bind(this),
 
                 // stop dragging callback
                 stop: function(event, ui) {
-                    this.moveTo(this._getPositionOnCanvas())
+                    this.moveTo(this._getPositionOnCanvas());
 
                     var offset = {
                         left: ui.position.left - this._initialPosition.left,
                         top:  ui.position.top  - this._initialPosition.top
                     };
                     // final move is necessary to propagate the changes to the backend
-                    jQuery('.' + Config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
-                        jQuery(node).data(Config.Keys.NODE)._moveByOffset(offset, true);
-                    });
+                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
+                        jQuery(node).data(this.config.Keys.NODE)._moveByOffset(offset, true);
+                    }.bind(this));
 
                     this._initialPosition = undefined;
                 }.bind(this)
@@ -292,8 +294,8 @@ function(Config, Properties, Mirror, Canvas, Class) {
             // This uses the jQuery.ui.selectable internal functions.
             // We need to trigger them manually because only jQuery.ui.draggable gets the mouseDown events on nodes.
             this.container.click(function(event) {
-                Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
-                Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
+                Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+                Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
             });
 
             return this;
@@ -322,6 +324,10 @@ function(Config, Properties, Mirror, Canvas, Class) {
             }
         },
 
+        getConfig: function() {
+            throw '[ABSTRACT] subclass responsibility';
+        },
+
         _setupEndpoints: function() {
             var anchors = this._connectorAnchors();
             var offset  = this._connectorOffset();
@@ -344,12 +350,12 @@ function(Config, Properties, Mirror, Canvas, Class) {
                         if (typeof elid === 'undefined') return false;
 
                         // this is not a connection-dragging-scenario
-                        var sourceNode = jQuery('.' + Config.Classes.NODE + ':has(#' + elid + ')').data('node');
+                        var sourceNode = jQuery('.' + this.config.Classes.NODE + ':has(#' + elid + ')').data('node');
                         if (typeof sourceNode === 'undefined') return false;
 
                         return sourceNode.allowsConnectionsTo(this);
                     }.bind(this),
-                    activeClass: Config.Classes.NODE_DROP_ACTIVE
+                    activeClass: this.config.Classes.NODE_DROP_ACTIVE
                 }
             });
 
@@ -368,17 +374,17 @@ function(Config, Properties, Mirror, Canvas, Class) {
                 dragOptions: {
                     drag: function() {
                         // disable all nodes that can not be targeted
-                        var nodesToDisable = jQuery('.' + Config.Classes.NODE + ':not(.'+ Config.Classes.NODE_DROP_ACTIVE + ')');
+                        var nodesToDisable = jQuery('.' + this.config.Classes.NODE + ':not(.'+ this.config.Classes.NODE_DROP_ACTIVE + ')');
                         nodesToDisable.each(function(index, node){
-                            jQuery(node).data(Config.Keys.NODE).disable();
-                        });
+                            jQuery(node).data(this.config.Keys.NODE).disable();
+                        }.bind(this));
                     },
                     stop: function() {
                         // re-enable disabled nodes
-                        var nodesToEnable = jQuery('.' + Config.Classes.NODE + ':not(.'+ Config.Classes.NODE_DROP_ACTIVE + ')');
+                        var nodesToEnable = jQuery('.' + this.config.Classes.NODE + ':not(.'+ this.config.Classes.NODE_DROP_ACTIVE + ')');
                         nodesToEnable.each(function(index, node){
-                            jQuery(node).data(Config.Keys.NODE).enable();
-                        });
+                            jQuery(node).data(this.config.Keys.NODE).enable();
+                        }.bind(this));
                     }
                 }
             });
@@ -416,7 +422,7 @@ function(Config, Properties, Mirror, Canvas, Class) {
         _setupConnectionHandle: function() {
             if (this.numberOfOutgoingConnections != 0) {
                 this._connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
-                    .addClass(Config.Classes.NODE_HALO_CONNECT)
+                    .addClass(this.config.Classes.NODE_HALO_CONNECT)
                     .css({
                         'top':  this._nodeImage.position().top  + this._nodeImage.outerHeight(true),
                         'left': this._nodeImage.position().left + this._nodeImage.outerWidth(true) / 2
@@ -435,7 +441,7 @@ function(Config, Properties, Mirror, Canvas, Class) {
                 var menuEntry = propertyMenuEntries[property];
                 if (typeof menuEntry === 'undefined' || menuEntry === null) return;
 
-                var mirror = this.propertyMirrors[property]
+                var mirror = this.propertyMirrors[property];
 
                 menuEntry.property = property;
                 this.propertyMenuEntries[property] = Properties.newFrom(this, mirror, menuEntry);
@@ -446,19 +452,19 @@ function(Config, Properties, Mirror, Canvas, Class) {
 
         _setupVisualRepresentation: function() {
             // get the thumbnail, clone it and wrap it with a container (for labels)
-            this._nodeImage = jQuery('#' + Config.IDs.SHAPES_MENU + ' #' + this.kind)
+            this._nodeImage = jQuery('#' + this.config.IDs.SHAPES_MENU + ' #' + this.kind)
                 .clone()
                 // cleanup the thumbnail's specific properties
                 .removeClass('ui-draggable')
                 .removeAttr('id')
                 // add new classes for the actual node
-                .addClass(Config.Classes.NODE_IMAGE);
+                .addClass(this.config.Classes.NODE_IMAGE);
 
             this.container = jQuery('<div>')
                 .attr('id', this.kind + this.id)
-                .addClass(Config.Classes.NODE)
+                .addClass(this.config.Classes.NODE)
                 .css('position', 'absolute')
-                .data(Config.Keys.NODE, this)
+                .data(this.config.Keys.NODE, this)
                 .append(this._nodeImage);
 
             // links to primitive shapes and groups of the SVG for later manipulation (highlighting, ...)
