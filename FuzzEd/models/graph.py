@@ -77,34 +77,11 @@ class Graph(models.Model):
         root = self.nodes.get(kind__exact = 'topEvent')
         return root.to_bool_term()
 
-from commands import AddNode
-
 # validation handler that ensures that the graph kind is known
 @receiver(pre_save, sender=Graph)
 def validate_kind(sender, instance, **kwargs):
     if not instance.kind in notations.by_kind:
         raise ValueError('Graph %s may not be of kind %s' % (instance, instance.kind))
-
-# preinitialize the graph with default nodes
-@receiver(post_save, sender=Graph)
-def set_graph_defaults(sender, instance, **kwargs):
-    # TODO: find a better way!
-    # don't add defaults if it was already done (if there are nodes)
-    for node in instance.nodes.all():
-        return
-
-    notation = notations.by_kind[instance.kind]
-    if not 'defaults' in notation:
-        return
-    defaults = notation['defaults']
-
-    # create default nodes for this graph
-    for index, node in enumerate(defaults['nodes']):
-        # use index as node ID
-        # this is unique since all other IDs are time stamps
-        command = AddNode.create_from(graph_id=instance.pk, node_id=index, **node)
-        command.undoable = False
-        command.do()
 
 # ensures that the signal handler are not exported
 __all__ = ['Graph']

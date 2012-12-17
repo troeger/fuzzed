@@ -141,10 +141,12 @@ def dashboard_edit(request, graph_id):
     if POST.get('duplicate'):
         # add new graph object
         oldgraph=Graph.objects.get(pk=graph_id)
-        cmd = commands.AddGraph.create_from(kind=oldgraph.kind, name=oldgraph.name+" (copy)", owner=request.user)
+        cmd = commands.AddGraph.create_from(kind=oldgraph.kind, 
+                                            name=oldgraph.name+" (copy)", 
+                                            owner=request.user,
+                                            add_default_nodes=False)
         cmd.do()    
         newgraph=cmd.graph
-        # TODO: Don't copy nodes which already exist (by client id) in target, duplicate only properties
         # copy all nodes and their properties
         nodemapping={}
         for node in oldgraph.nodes.all():
