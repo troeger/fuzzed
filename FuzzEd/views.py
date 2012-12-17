@@ -141,7 +141,10 @@ def dashboard_edit(request, graph_id):
     if POST.get('duplicate'):
         # add new graph object
         oldgraph=Graph.objects.get(pk=graph_id)
-        cmd = commands.AddGraph.create_from(kind=oldgraph.kind, name=oldgraph.name+" (copy)", owner=request.user)
+        cmd = commands.AddGraph.create_from(kind=oldgraph.kind, 
+                                            name=oldgraph.name+" (copy)", 
+                                            owner=request.user,
+                                            add_default_nodes=False)
         cmd.do()    
         newgraph=cmd.graph
         # copy all nodes and their properties
@@ -160,15 +163,12 @@ def dashboard_edit(request, graph_id):
                 prop.pk=None
                 prop.node=node
                 prop.save()
-        clientid=1
-        for oldedge in oldgraph.edges.all():
-            e=Edge()
-            e.source=nodemapping[oldedge.source.pk]
-            e.target=nodemapping[oldedge.target.pk]
-            e.graph=newgraph
-            e.client_id=clientid
-            e.save()    
-            clientid+=1
+        for edge in oldgraph.edges.all():
+            edge.pk=None
+            edge.source=nodemapping[edge.source.pk]
+            edge.target=nodemapping[edge.target.pk]
+            edge.graph=newgraph
+            edge.save()    
         return redirect('dashboard')
 
     # please show the edit page to the user on get requests

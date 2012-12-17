@@ -124,7 +124,7 @@ class AddGraph(Command):
     graph = models.ForeignKey(Graph, related_name='+')
 
     @classmethod
-    def create_from(cls, kind, name, owner):
+    def create_from(cls, kind, name, owner, add_default_nodes=True):
         """
         Method [static]: create_from
         
@@ -140,7 +140,16 @@ class AddGraph(Command):
         """
         graph = Graph(kind=kind, name=name, owner=owner, deleted=True)
         graph.save()
-
+        if add_default_nodes:
+            # preinitialize the graph with default nodes
+            notation = notations.by_kind[kind]
+            if 'defaults' in notation:
+                for index, node in enumerate(notation['defaults']['nodes']):
+                    # use index as node ID
+                    # this is unique since all other IDs are time stamps
+                    command = AddNode.create_from(graph_id=graph.pk, node_id=index, **node)
+                    command.undoable = False
+                    command.do()
         return cls(graph=graph)
 
     def do(self):

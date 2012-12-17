@@ -23,26 +23,29 @@
             'text' :      '../lib/requirejs/plugins/text', // required by json plugin
             'json' :      '../lib/requirejs/plugins/json',
             // jquery and plugins
-            'jquery':     'require-jquery',
-            'jquery.ui':  '../lib/jquery-ui-1.8.21',
-            'jquery.svg': '../lib/jquery-svg/jquery-svg-1.4.5',
+            'jquery':        'require-jquery',
+            'jquery.ui':     '../lib/jquery-ui-1.9.1',
+            'jquery.svg':    '../lib/jquery-svg/jquery-svg-1.4.5',
+            'jquery.svgdom': '../lib/jquery-svg/jquery-svgdom-1.4.5',
             // other libs
             'bootstrap':  '../lib/bootstrap/js/bootstrap-2.0.4.min',
             'underscore': '../lib/underscore/underscore-1.3.3',
-            'jsplumb':    '../lib/jsplumb/jsplumb-1.3.8',
-            // shortcuts
-            'config':     '../config'
+            'jsplumb':    '../lib/jsplumb/jsplumb-1.3.16',
+
+            'notations':  '../notations'
 
         },
         // define dependencies for libs that are not AMD compatible
         shim: {
-            'jquery.ui/jquery.ui.core': ['jquery'],
-            'jquery.ui/jquery.ui.widget': ['jquery'],
-            'jquery.ui/jquery.ui.mouse': ['jquery.ui/jquery.ui.core', 'jquery.ui/jquery.ui.widget'],
-            'jquery.ui/jquery.ui.draggable': ['jquery.ui/jquery.ui.mouse'],
-            'jquery.ui/jquery.ui.droppable': ['jquery.ui/jquery.ui.mouse'],
+            'jquery.ui/jquery.ui.core':       ['jquery'],
+            'jquery.ui/jquery.ui.widget':     ['jquery'],
+            'jquery.ui/jquery.ui.mouse':      ['jquery.ui/jquery.ui.core', 'jquery.ui/jquery.ui.widget'],
+            'jquery.ui/jquery.ui.draggable':  ['jquery.ui/jquery.ui.mouse'],
+            'jquery.ui/jquery.ui.droppable':  ['jquery.ui/jquery.ui.mouse'],
+            'jquery.ui/jquery.ui.selectable': ['jquery.ui/jquery.ui.mouse'],
 
-            'jquery.svg': ['jquery'],
+            'jquery.svg':    ['jquery'],
+            'jquery.svgdom': ['jquery.svg'],
 
             'underscore': {
                 exports: '_'
@@ -55,7 +58,7 @@
         }
     });
 
-    require(['require-editor', 'bootstrap' /* needed for dropdown menu */], function(Editor) {
+    require(['{{ graph.kind }}/editor', 'bootstrap' /* needed for dropdown menu */], function(Editor) {
         jQuery(document).ready(function() {
             new Editor({{ graph.pk }});
         });
@@ -69,8 +72,7 @@
         <a href="#" class="dropdown-toggle" data-toggle="dropdown">
             <i class="icon-cog icon-white"></i> Actions <b class="caret"></b>
         </a>
-        <ul class="dropdown-menu">
-            <li><a id="FuzzEdNavbarActionCalculateMinimalCutsets" href="#">Calculate cutsets</a></li>
+        <ul id="FuzzEdNavbarActions" class="dropdown-menu">
         </ul>
     </li>
 </li>
@@ -83,7 +85,6 @@
         {% include "editor/editor_canvas.html" %}
         {% include "editor/editor_shapes.html" %}
         {% include "editor/editor_properties.html" %}
-        {% include "editor/editor_cutsets.html" %}
     </div>
 {% endblock %}
 

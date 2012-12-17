@@ -9,10 +9,13 @@ try:
 # backwards compatibility with older versions of Python
 except ImportError:
     import simplejson as json
-import sys, ast
+import sys, ast, time
 
 from graph import Graph
 import notations
+
+def new_client_id():
+    return str( int(time.mktime(time.gmtime())))
 
 # TODO: CREATE ALL THE PROPERTIES OF THIS NODE ON CREATION (OR FACTORY METHOD?)
 
@@ -47,12 +50,11 @@ class Node(models.Model):
     def __unicode__(self):
         prefix = '[DELETED] ' if self.deleted else ''
         try:
-	    name = unicode(self.properties.get(key='name').value)
+            name = unicode(self.properties.get(key='name').value)
             return unicode('%s%s' % (prefix, name))
 
         except ObjectDoesNotExist:
-            return unicode('%s%s_%s' % (prefix, self.pk,\
-                                notations.by_kind[self.graph.kind]['nodes'][self.kind]['name']))
+            return unicode('%s%s_%s' % (prefix, self.pk, notations.by_kind[self.graph.kind]['nodes'][self.kind]['name']))
 
     def to_json(self):
         """
