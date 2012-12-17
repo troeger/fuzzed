@@ -13,30 +13,20 @@ function(Properties, Mirror, Canvas, Class) {
      */
     return Class.extend({
         /**
-         *  Group: public
+         *  Group: Members
          *
          *  Properties:
-         *    {Object}     config         - An object containing node configuration constants as found in <Config>.
-         *    {DOMElement} container      - The DOM element that contains all other visual DOM elements of the node
-         *                                  such as its image, mirrors, ...
-         *    {int}        id             - A client-side generated id - i.e. UNIX-timestamp - to uniquely identify the
-         *                                  node in the frontend. It does NOT correlate with database ids in the
-         *                                  backend.
-         *    {Array[Edge]} incomingEdges - An enumeration of all edges linking TO this node (this node is the target
-         *                                  target of the edge).
-         *    {Array[Edge]} outgoingEdges - An enumeration of all edges linking FROM this node (this node is the source
-         *                                  of the edge).
-         */
-        config:        undefined,
-        container:     undefined,
-        id:            undefined,
-        incomingEdges: undefined,
-        outgoingEdges: undefined,
-
-        /**
-         *  Group: private
-         *
-         *  Properties:
+         *    {Object}     config            - An object containing node configuration constants. If not set otherwise,
+         *                                     defaults to <Node::getConfig()>.
+         *    {DOMElement} container         - The DOM element that contains all other visual DOM elements of the node
+         *                                     such as its image, mirrors, ...
+         *    {int}        id                - A client-side generated id - i.e. UNIX-timestamp - to uniquely identify
+         *                                     the node in the frontend. It does NOT correlate with database ids in the
+         *                                     backend. Introduced to save roundtrips and to later allow an offline mode
+         *    {Array[<Edge>]} incomingEdges  - An enumeration of all edges linking TO this node (this node is the target
+         *                                     target of the edge).
+         *    {Array[<Edge>]} outgoingEdges  - An enumeration of all edges linking FROM this node (this node is the
+         *                                     source of the edge).
          *    {bool}       _disabled         - Boolean flag indicating whether this node may be a target for a
          *                                     currently drawn edge. True disables connection and therefore fades out
          *                                     the node.
@@ -46,6 +36,12 @@ function(Properties, Mirror, Canvas, Class) {
          *    {DOMElement} _connectionHandle - DOM element containing the visual representation of the handle where one
          *                                     can pull out new edges.
          */
+        config:        undefined,
+        container:     undefined,
+        id:            undefined,
+        incomingEdges: undefined,
+        outgoingEdges: undefined,
+
         _disabled:         false,
         _highlighted:      false,
         _selected:         false,
@@ -53,13 +49,28 @@ function(Properties, Mirror, Canvas, Class) {
         _connectionHandle: undefined,
 
         /**
+         * Group: Initialization
+         */
+
+        /**
          * Constructor: init
          *
+         * The constructor of the abstract node class. It will merge the state of the properties, assign a client-side
+         * id, setup the visual representation and enable interaction via mouse and keyboard. Calling the constructor
+         * as-is, will result in an exception.
+         *
          * Parameters:
-         *   {Object}        properties             - An object containing
-         *   {Array[string]} propertiesDisplayOrder - An enumeration of property names, sorted by the order in which
-         *                                            the property with the respective name shall appear in the property
-         *                                            menu. May contain names of properties that the node does not have.
+         *   {Object}     properties             - An object containing default values for the node's properties. E.g.:
+         *                                         {x: 1, y: 20, name: 'foo'}. The values will be merged into the node
+         *                                         recursively, creating deep copies of complex structures like arrays
+         *                                         or other objects. Mainly required for restoring the state of a node
+         *                                         when loading a graph from the backend.
+         *   {Array[str]} propertiesDisplayOrder - An enumeration of property names, sorted by the order in which the
+         *                                         property with the respective name shall appear in the property menu.
+         *                                         May contain names of properties that the node does not have.
+         *
+         * Returns:
+         *   This {<Node>} instance.
          */
         init: function(properties, propertiesDisplayOrder) {
             // merge all presets of the configuration and data from the backend into this object
@@ -92,6 +103,45 @@ function(Properties, Mirror, Canvas, Class) {
                 ._setupPropertyMenuEntries(this.propertyMenuEntries, propertiesDisplayOrder);
         },
 
+        /**
+         * Method: _setupMouse
+         *
+         * Small helper method for setting up mouse hover highlighting (highlight while hovering, unhighlight on mouse
+         * out.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        _setupMouse: function() {
+            // hovering over a node
+            this.container.hover(
+                // mouse in
+                this.highlight.bind(this),
+                // mouse out
+                this.unhighlight.bind(this)
+            );
+
+            return this;
+        },
+
+        /**
+         * Group: Logic
+         */
+
+        /**
+         * Method: allowsConnectionTo
+         *
+         * This method checks if it is allowed to draw an object between this node (source) and the other node passed
+         * as parameter (target). Connections are allowed if and only if, the node does not connect to itself, the
+         * outgoing connections of this node, respectively the incoming connections of the other node are not exceeded
+         * and the notation file allows a connection between these two nodes.
+         *
+         * Parameters:
+         *   {<Node>} otherNode - the node instance to connect to
+         *
+         * Returns:
+         *   {bool} - true, if the connection is allowed; false otherwise
+         */
         allowsConnectionsTo: function(otherNode) {
             // no connections to same node
             if (this == otherNode) return false;
@@ -124,21 +174,50 @@ function(Properties, Mirror, Canvas, Class) {
             return true;
         },
 
-        remove: function() {
-            _.each(jsPlumb.getEndpoints(this.container), function(endpoint) {
-                jsPlumb.deleteEndpoint(endpoint);
-            });
-            this.container.remove();
-
-            return this;
+        /**
+         * Method: getConfig
+         *
+         * This method is abstract. All non abstract subclasses MUST override this method. It is an error to call this
+         * function otherwise. The expected return value of this function is an Object containing at least all key-value
+         * pairs as defined in <Config> (return it when in doubt). This Object is used for the initialization of node
+         * instances and contains static values such as e.g. colors, pixel values, CSS class names, ... that are shared
+         * with other classes like <Editor> or <Graph>. Ensure that all notation specific subclasses use them very same
+         * reference to the config object.
+         *
+         * NOTE: Wondering about the reason for this seemingly overly complex config access mechanism? Rest assured we
+         * understand you. An attempt for explanation. When using JavaScript "classes" and AMD closures you run quickly
+         * into scoping issues when also trying to facilitate inheritance. An Example: Imagine you would like to
+         * subclass this class <Node> by another class called Derivative. In Derivative you would like to change some
+         * very basic config options. These options shall already be taken into account when executing the abstract base
+         * constructor. However, since you required the config already in the base class in form of an AMD closure,
+         * there is no way you could possibly obtain the reference to the config in Derived without requiring it again
+         * and trying to overwrite presumably constant values. Before the base class reads from the config, in a
+         * asynchronous system... For this reason, we worked around it, by requiring the most specific subclass to
+         * return the "most up-to-date" config, which that in turn can be easily accessed by the base class.
+         *
+         * Throws:
+         *   Subclass Responsibility
+         */
+        getConfig: function() {
+            throw '[ABSTRACT] Subclass Responsibility';
         },
 
         /**
+         * Group: Visual representation
+         */
+
+        /**
          * Method: moveTo
-         *     Moves the node's visual representation to the given coordinates and reports to backend.
+         *   Moves the node's visual representation to the given coordinates and reports to backend.
          *
-         * Parameters
-         *     position - Position in form {x: ..., y:...} containing the pixel coordinates the nodes should move to.
+         * Parameters:
+         *   Position {Object} of the form {x: ..., y:...} containing pixel coordinates.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         *
+         * Triggers:
+         *   <Config::Events::NODE_PROPERTY_CHANGES>
          */
         moveTo: function(position) {
             var gridPos = Canvas.toGrid(position);
@@ -153,24 +232,81 @@ function(Properties, Mirror, Canvas, Class) {
             return this;
         },
 
-        select: function() {
-            // don't allow selection of disabled nodes
-            if (this._disabled) return this;
+        /**
+         * Method: remove
+         *
+         * Removes the complete visual representation of this node from the canvas.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        remove: function() {
+            _.each(jsPlumb.getEndpoints(this.container), function(endpoint) {
+                jsPlumb.deleteEndpoint(endpoint);
+            });
+            this.container.remove();
 
-            this._selected = true;
-            return this._visualSelect();
+            return this;
         },
 
-        deselect: function() {
-            this._selected = false;
+        /**
+         * Method: _resize
+         *
+         * This method is a small helper for resizing the node image after being dropped onto the canvas. It will scale
+         * all parts of the image from the shape menu size up to the canvas' grid size.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        _resize: function() {
+            // calculate the scale factor
+            var marginOffset = this._nodeImage.outerWidth(true) - this._nodeImage.width();
+            var scaleFactor  = (Canvas.gridSize - marginOffset) / this._nodeImage.height();
 
-            if (this._highlighted) {
-                return this._visualHighlight();
-            } else {
-                return this._visualReset();
+            // resize the svg and the groups
+            this._nodeImage.attr('width', this._nodeImage.width()  * scaleFactor);
+            this._nodeImage.attr('height', this._nodeImage.height() * scaleFactor);
+
+            var newTransform = 'scale(' + scaleFactor + ')';
+            if (this._nodeImage.groups.attr('transform')) {
+                newTransform += ' ' + this._nodeImage.groups.attr('transform');
             }
+            this._nodeImage.groups.attr('transform', newTransform);
+
+            // XXX: In Webkit browsers the container div does not resize properly. This should fix it.
+            this.container.width(this._nodeImage.width());
+
+            return this;
         },
 
+        /**
+         * Group: Highlighting
+         */
+
+        /**
+         * Method: disable
+         *
+         * Disables the node visually (fade out) to make it appear to be not interactive for the user. Sets the node's
+         * <Node::_disabled> flag to true.
+         *
+         * Returns:
+         *   This <Node> instance for chaining.
+         */
+        disable: function() {
+            this._disabled = true;
+            return this._visualDisable();
+        },
+
+        /**
+         * Method: enable
+         *
+         * This method node re-enables the node visually and makes appear interactive to the user. Should usually be
+         * called subsequently to <Node::disabled()>. Modifies the node's <Node::_disabled> flag to false. The method
+         * takes other visual states like highlighted and selected into account.
+         *
+         * Returns:
+         *   This <Node> instance for chaining.
+         */
         enable: function() {
             this._disabled = false;
 
@@ -183,27 +319,65 @@ function(Properties, Mirror, Canvas, Class) {
             }
         },
 
-        disable: function() {
-            this._disabled = true;
-            return this._visualDisable();
+        /**
+         * Method: _visualDisable
+         *
+         * Does the dirty work for visually disabling a node - changes the stroke of all SVG primitives (e.g. path,
+         * circle, ...) to the color specified in the <Config>.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        _visualDisable: function() {
+            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_DISABLED);
+
+            return this;
         },
 
-        highlight: function() {
-            this._highlighted = true;
-            // don't highlight selected or disabled nodes (visually)
-            if (this._selected || this._disabled) return this;
+        /**
+         * Method: select
+         *
+         * Marks the node as selected - meaning: it will set the <Node::_selected> member to true and change the node's
+         * visual appearance (<Node::_visualSelect()>). A node can only be selected if it is not already disabled.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        select: function() {
+            // don't allow selection of disabled nodes
+            if (this._disabled) return this;
 
-            return this._visualHighlight();
+            this._selected = true;
+            return this._visualSelect();
         },
 
-        unhighlight: function() {
-            this._highlighted = false;
-            // don't highlight selected or disabled nodes (visually)
-            if (this._selected || this._disabled) return this;
+        /**
+         * Method: deselect
+         *
+         * This method deselects the node - meaning: sets the <Node::_selected> flag to false and reset it visual
+         * appearance as long is it not also selected.
+         * @return {*}
+         */
+        deselect: function() {
+            this._selected = false;
 
-            return this._visualReset();
+            if (this._highlighted) {
+                return this._visualHighlight();
+            } else {
+                return this._visualReset();
+            }
         },
 
+        /**
+         * Method: _visualSelect
+         *
+         * Does the dirty work for visually selecting a node. At first it reset any previously assigned style by
+         * calling <Node::_visualReset()>. Then it paints all strokes of the SVG primitives of the node's image using
+         * the color specified in the <Config>.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining
+         */
         _visualSelect: function() {
             this._visualReset();
 
@@ -213,26 +387,77 @@ function(Properties, Mirror, Canvas, Class) {
             return this;
         },
 
+        /**
+         * Method: highlight
+         *
+         * This method highlights the node visually as long as the node is not already disabled or selected. It is for
+         * instance called when the user hovers over a node. Modifies the node's <Node::_highlighted> flag to true.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        highlight: function() {
+            this._highlighted = true;
+            // don't highlight selected or disabled nodes (visually)
+            if (this._selected || this._disabled) return this;
+
+            return this._visualHighlight();
+        },
+
+        /**
+         * Method: unhighlight
+         *
+         * Unhighlights the node' visual appearance. The method is for instance calls when the user leaves a hovered
+         * node. Modifies the node's <Node::_highlighted> flag to false. Unhighlighting is only possible if the node is
+         * not also selected or disabled.
+         *
+         * P.S.: The weird word unhighlighting is an adoption of the jQueryUI dev team speak, all credits to them :)!
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        unhighlight: function() {
+            this._highlighted = false;
+            // don't highlight selected or disabled nodes (visually)
+            if (this._selected || this._disabled) return this;
+
+            return this._visualReset();
+        },
+
+        /**
+         * Method: _visualHighlight
+         *
+         * Does the dirty work for visually changing the appearance of a highlighted node. Removes at first all already
+         * applied styles by calling <Node::_visualReset()> and then changes the stroke color of all SVG primitives of
+         * the node's image to the color specified in the <Config>.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
         _visualHighlight: function() {
             this._visualReset();
-
             this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_HIGHLIGHTED);
 
             return this;
         },
 
-        _visualDisable: function() {
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_DISABLED);
-
-            return this;
-        },
-
+        /**
+         * Small helper method to reset all applied visual changes of the _visual*** method group. Therefore, removes
+         * added CSS classes and sets the node's stroke to its initial color.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
         _visualReset: function() {
             this.container.removeClass(this.config.Classes.NODE_SELECTED);
             this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_NORMAL);
 
             return this;
         },
+
+
+
+        //TODO: write comment from here on
 
         /**
          *  Method: _getPositionOnCanvas
@@ -277,27 +502,6 @@ function(Properties, Mirror, Canvas, Class) {
 
             jsPlumb.repaintEverything();
             return this._moveContainerToPixel(newPosition);
-        },
-
-        _resize: function() {
-            // calculate the scale factor
-            var marginOffset = this._nodeImage.outerWidth(true) - this._nodeImage.width();
-            var scaleFactor  = (Canvas.gridSize - marginOffset) / this._nodeImage.height();
-
-            // resize the svg and the groups
-            this._nodeImage.attr('width', this._nodeImage.width()  * scaleFactor);
-            this._nodeImage.attr('height', this._nodeImage.height() * scaleFactor);
-
-            var newTransform = 'scale(' + scaleFactor + ')';
-            if (this._nodeImage.groups.attr('transform')) {
-                newTransform += ' ' + this._nodeImage.groups.attr('transform');
-            }
-            this._nodeImage.groups.attr('transform', newTransform);
-
-            // XXX: In Webkit browsers the container div does not resize properly. This should fix it.
-            this.container.width(this._nodeImage.width());
-
-            return this;
         },
 
         _setupDragging: function() {
@@ -387,10 +591,6 @@ function(Properties, Mirror, Canvas, Class) {
             }
         },
 
-        getConfig: function() {
-            throw '[ABSTRACT] subclass responsibility';
-        },
-
         _setupEndpoints: function() {
             var anchors = this._connectorAnchors();
             var offset  = this._connectorOffset();
@@ -451,19 +651,6 @@ function(Properties, Mirror, Canvas, Class) {
                     }.bind(this)
                 }
             });
-
-            return this;
-        },
-
-        _setupMouse: function() {
-            // hovering over a node
-            this.container.hover(
-                // mouse in
-                this.highlight.bind(this),
-
-                // mouse out
-                this.unhighlight.bind(this)
-            );
 
             return this;
         },
