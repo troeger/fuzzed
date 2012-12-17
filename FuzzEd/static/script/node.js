@@ -1,22 +1,66 @@
 define(['properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
 function(Properties, Mirror, Canvas, Class) {
 
-    /*
-     *  Abstract Node Base Class
+    /**
+     *  Class: {Abstract} Node
+     *
+     *  This class models the abstract base class for all nodes. It provides basic functionality for CRUD operations,
+     *  setting up visual representation, dragging, selection, <Mirrors>, <Properties> and defines basic connection
+     *  rules. Other classes, like e.g. <Editor> and <Graph>, rely on the interface provided by this class. It is
+     *  therefore strongly recommended to inherit from <Node> and to add custom behaviour. Any non abstract subclass
+     *  MUST implement <Node::getConfig()>.
+     *
      */
     return Class.extend({
+        /**
+         *  Group: public
+         *
+         *  Properties:
+         *    {Object}     config         - An object containing node configuration constants as found in <Config>.
+         *    {DOMElement} container      - The DOM element that contains all other visual DOM elements of the node
+         *                                  such as its image, mirrors, ...
+         *    {int}        id             - A client-side generated id - i.e. UNIX-timestamp - to uniquely identify the
+         *                                  node in the frontend. It does NOT correlate with database ids in the
+         *                                  backend.
+         *    {Array[Edge]} incomingEdges - An enumeration of all edges linking TO this node (this node is the target
+         *                                  target of the edge).
+         *    {Array[Edge]} outgoingEdges - An enumeration of all edges linking FROM this node (this node is the source
+         *                                  of the edge).
+         */
         config:        undefined,
         container:     undefined,
         id:            undefined,
         incomingEdges: undefined,
         outgoingEdges: undefined,
 
+        /**
+         *  Group: private
+         *
+         *  Properties:
+         *    {bool}       _disabled         - Boolean flag indicating whether this node may be a target for a
+         *                                     currently drawn edge. True disables connection and therefore fades out
+         *                                     the node.
+         *    {bool}       _highlighted      - Boolean flag that is true when the node needs to be highlighted on hover.
+         *    {bool}       _selected         - Boolean flag that is true when the node is selected - i.e. clicked.
+         *    {DOMElement} _nodeImage        - DOM element that contains the actual image/svg of the node.
+         *    {DOMElement} _connectionHandle - DOM element containing the visual representation of the handle where one
+         *                                     can pull out new edges.
+         */
         _disabled:         false,
         _highlighted:      false,
         _selected:         false,
         _nodeImage:        undefined,
         _connectionHandle: undefined,
 
+        /**
+         * Constructor: init
+         *
+         * Parameters:
+         *   {Object}        properties             - An object containing
+         *   {Array[string]} propertiesDisplayOrder - An enumeration of property names, sorted by the order in which
+         *                                            the property with the respective name shall appear in the property
+         *                                            menu. May contain names of properties that the node does not have.
+         */
         init: function(properties, propertiesDisplayOrder) {
             // merge all presets of the configuration and data from the backend into this object
             jQuery.extend(true, this, properties);
