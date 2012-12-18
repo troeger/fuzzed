@@ -1,4 +1,7 @@
 define(['canvas', 'class'], function(Canvas, Class) {
+    /**
+     *  Package: Base
+     */
 
     /**
      *  Class: Graph
