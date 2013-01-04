@@ -15,7 +15,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *  Group: Members
          *
          *  Properties:
-         *    {Object}  config      - An object containing graph configuration constants as found in <Config>.
+         *    {Config}  config      - An object containing graph configuration constants as found in <Config>.
          *    {int}     id          - A server-side generated ID.
          *    {Object}  edges       - A map that stores all edges of the graph by their ID. Edges are jsPlumb Connection
          *                            objects, the ID is the _fuzzedId assigned to them.
