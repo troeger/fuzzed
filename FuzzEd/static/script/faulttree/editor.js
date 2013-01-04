@@ -120,7 +120,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
     /**
      *  Class: FaultTreeEditor
-     *    Fault-tree-specific <Base::Editor> class. The fault tree editor distinguishes from the 'normal' editor by
+     *    Faulttree-specific <Base::Editor> class. The fault tree editor distinguishes from the 'normal' editor by
      *    their ability to calculate minimal cutsets for the displayed graph.
      *
      *  Extends: <Base::Editor>
