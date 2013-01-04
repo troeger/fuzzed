@@ -133,7 +133,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
             }
 
             // store the ID in an attribute so we can retrieve it later from the DOM element
-            jQuery(edge.canvas).attr(this.config.Keys.CONNECTION_ID, edge._fuzzedId);
+            jQuery(edge.canvas).attr(this.config.Attributes.CONNECTION_ID, edge._fuzzedId);
 
             var sourceNode = edge.source.data(this.config.Keys.NODE);
             var targetNode = edge.target.data(this.config.Keys.NODE);

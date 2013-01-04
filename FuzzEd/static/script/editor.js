@@ -232,7 +232,7 @@ function(Class, Menus, Canvas, Backend) {
 
                     // delete selected edges
                     jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR).each(function(index, element) {
-                        var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Keys.CONNECTION_ID));
+                        var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
                         jsPlumb.detach(edge);
                         this.graph.deleteEdge(edge);
                     }.bind(this));
