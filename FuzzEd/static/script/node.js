@@ -829,6 +829,7 @@ function(Properties, Mirror, Canvas, Class) {
          */
         _visualDisable: function() {
             this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_DISABLED);
+            this._nodeImage.css('opacity', this.config.Dragging.OPACITY);
 
             return this;
         },
@@ -860,6 +861,7 @@ function(Properties, Mirror, Canvas, Class) {
         _visualReset: function() {
             this.container.removeClass(this.config.Classes.NODE_SELECTED);
             this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_NORMAL);
+            this._nodeImage.css('opacity', 1);
 
             return this;
         },
