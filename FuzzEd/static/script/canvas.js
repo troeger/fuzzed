@@ -130,7 +130,7 @@ function(Class, Config) {
                     }
 
                     if (selection.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        var edgeId = selection.attr(Config.Keys.CONNECTION_ID);
+                        var edgeId = selection.attr(Config.Attributes.CONNECTION_ID);
                         jQuery(document).trigger(Config.Events.CANVAS_EDGE_SELECTED, edgeId);
                     }
                 },
@@ -141,7 +141,7 @@ function(Class, Config) {
                     }
 
                     if (unselection.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        var edgeId = unselection.attr(Config.Keys.CONNECTION_ID);
+                        var edgeId = unselection.attr(Config.Attributes.CONNECTION_ID);
                         jQuery(document).trigger(Config.Events.CANVAS_EDGE_UNSELECTED, edgeId);
                     }
                 },
