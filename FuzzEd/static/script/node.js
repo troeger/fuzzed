@@ -297,6 +297,7 @@ function(Properties, Mirror, Canvas, Class) {
                 maxConnections: this.numberOfOutgoingConnections,
                 connectorStyle: this.connector,
                 dragOptions: {
+                    cursor: this.config.Dragging.CURSOR_EDGE,
                     // XXX: have to use drag callback here instead of start
                     // The activeClass assigned in <Node::_setupIncomingEndpoint> is unfortunately assigned only AFTER
                     // the execution of the start callback by jsPlumb.

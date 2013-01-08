@@ -114,11 +114,13 @@ define(function() {
          *  Constants:
          *    {Number} OPACITY        - Opacity of the node when dragging it.
          *    {String} CURSOR         - The cursor style while dragging.
+         *    {String} CURSOR_EDGE    - The cursor style while dragging edges.
          *    {Number} SNAP_TOLERANCE - The distance to the border of the editor in which a menu snaps to it.
          */
         Dragging: {
             OPACITY:        0.5,
             CURSOR:         'move',
+            CURSOR_EDGE:    'crosshair',
             SNAP_TOLERANCE: 0
         },
 
