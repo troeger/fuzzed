@@ -177,20 +177,22 @@ define(function() {
          *    IDs of certain DOM-elements.
          *
          *  Constants:
-         *    {String} CANVAS           - The DOM element containing the canvas.
-         *    {String} CONTENT          - The container element for the content (without navbar).
-         *    {String} PROPERTIES_MENU  - The container for the properties menu.
-         *    {String} SHAPES_MENU      - The container for the shapes menu.
-         *    {String} SPLASH           - The splash screen element.
-         *    {String} NAVBAR_ACTIONS   - The list element that contains the action buttons in the navbar.
+         *    {String} CANVAS                    - The DOM element containing the canvas.
+         *    {String} CONTENT                   - The container element for the content (without navbar).
+         *    {String} PROPERTIES_MENU           - The container for the properties menu.
+         *    {String} SHAPES_MENU               - The container for the shapes menu.
+         *    {String} SPLASH                    - The splash screen element.
+         *    {String} NAVBAR_ACTIONS            - The list element that contains the action buttons in the navbar.
+         *    {String} NAVBAR_ACTION_GRID_TOGGLE - The list element that contains the grid toggle item.
          */
         IDs: {
-            CANVAS:                'FuzzEdCanvas',
-            CONTENT:               'FuzzEdContent',
-            PROPERTIES_MENU:       'FuzzEdProperties',
-            SHAPES_MENU:           'FuzzEdShapes',
-            SPLASH:                'FuzzEdSplash',
-            NAVBAR_ACTIONS:        'FuzzEdNavbarActions'
+            CANVAS:                    'FuzzEdCanvas',
+            CONTENT:                   'FuzzEdContent',
+            PROPERTIES_MENU:           'FuzzEdProperties',
+            SHAPES_MENU:               'FuzzEdShapes',
+            SPLASH:                    'FuzzEdSplash',
+            NAVBAR_ACTIONS:            'FuzzEdNavbarActions',
+            NAVBAR_ACTION_GRID_TOGGLE: 'FuzzEdNavbarActionGridToggle'
         },
 
         /**

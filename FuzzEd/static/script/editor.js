@@ -53,7 +53,8 @@ function(Class, Menus, Canvas, Backend) {
 
             // run a few sub initializer
             this._setupJsPlumb()
-                ._setupKeyBindings();
+                ._setupKeyBindings()
+                ._setupGridToggleAction();
 
             // fetch the content from the backend
             this._loadGraph(graphId);
@@ -164,6 +165,29 @@ function(Class, Menus, Canvas, Backend) {
         /**
          *  Group: Setup
          */
+
+        /**
+         *  Method: _setupGridToggleAction
+         *
+         *  Adds a button to the action group that allows to toggle the visibility of the background grid.
+         *
+         *  Returns:
+         *    This {<Node>} instance for chaining.
+         */
+        _setupGridToggleAction: function() {
+            var navbarActionsEntry = jQuery(
+                '<li>' +
+                    '<a id="' + this.config.IDs.NAVBAR_ACTION_GRID_TOGGLE + '" href="#">Toggle grid</a>' +
+                '</li>');
+            this._navbarActionsGroup.append(navbarActionsEntry);
+
+            // register for clicks on the corresponding nav action
+            navbarActionsEntry.click(function() {
+                jQuery('#' + this.config.IDs.CANVAS).children('svg').toggle();
+            }.bind(this));
+
+            return this;
+        },
 
         /**
          *  Method: _setupJsPlumb
