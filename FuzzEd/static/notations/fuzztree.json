@@ -324,9 +324,17 @@
             "numberOfOutgoingConnections": 1,
             "optional": null,
             "deletable": false,
+            "decompositions": 1,
 
             "propertyMenuEntries": {
-                "optional": null
+                "optional": null,
+
+                "decompositions": {
+                    "kind": "number",
+                    "displayName": "Decompose",
+                    "min": 1,
+                    "step": 1
+                }
             }
         }
     },
@@ -339,7 +347,8 @@
         "kN",
         "cardinality",
         "kFormula",
-        "nRange"
+        "nRange",
+        "decompositions"
     ],
 
     "shapeMenuNodeDisplayOrder": [

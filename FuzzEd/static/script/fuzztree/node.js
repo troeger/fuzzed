@@ -17,6 +17,8 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
             } else {
                 this.optionalIndicator.attr('fill', this.config.Node.STROKE_NORMAL);
             }
+
+            return this;
         },
 
         getConfig: function() {
@@ -95,8 +97,9 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
             if (typeof this.optional === 'undefined' || this.optional == null) {
                 optionalIndicatorWrapper.css('visibility', 'hidden');
             }
-
             this.optionalIndicator = optionalIndicator;
+
+            return this;
         },
 
         _setupPropertyMenuEntries: function(propertyMenuEntries, propertiesDisplayOrder) {
@@ -107,6 +110,8 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
                     this.setOptional(this.optional);
                 }.bind(this)
             }
+
+            return this;
         },
 
         _connectorOffset: function() {

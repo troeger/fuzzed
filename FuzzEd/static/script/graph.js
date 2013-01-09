@@ -1,14 +1,47 @@
 define(['canvas', 'class'], function(Canvas, Class) {
+    /**
+     *  Package: Base
+     */
 
+    /**
+     *  Class: Graph
+     *
+     *  This class models the _abstract_ base class for all graphs. It manages all graph elements (Edges and <Nodes>)
+     *  and provide methods for adding and deleting them. Further it can generate <Node> classes
+     *  for given kinds of nodes.
+     */
     return Class.extend({
-        config: undefined,
-        id:     undefined,
-        edges:  {},
-        nodes:  {},
-        name:   undefined,
-
+        /**
+         *  Group: Members
+         *
+         *  Properties:
+         *    {Config}  config      - An object containing graph configuration constants as found in <Config>.
+         *    {int}     id          - A server-side generated ID.
+         *    {Object}  edges       - A map that stores all edges of the graph by their ID. Edges are jsPlumb Connection
+         *                            objects, the ID is the _fuzzedId assigned to them.
+         *    {Object}  nodes       - A map that stores all <Nodes> of the graph by their ID.
+         *    {str}     name        - The name of the graph, specified by the user when creating it.
+         *    {Object} _nodeClasses - A map caching all node classes already generated and storing them by their kind.
+         */
+        config:       undefined,
+        id:           undefined,
+        edges:        {},
+        nodes:        {},
+        name:         undefined,
         _nodeClasses: {},
 
+
+        /**
+         *  Group: Initialization
+         */
+
+        /**
+         *  Constructor: init
+         *
+         *  Parameters:
+         *    {JSON} json - The JSON representation of the graph. This is usually fetched from the backend and used
+         *                  to restore the graph in the frontend.
+         */
         init: function(json) {
             this.id     = json.id;
             this.name   = json.name;
@@ -18,12 +51,81 @@ define(['canvas', 'class'], function(Canvas, Class) {
                 ._registerEventHandlers();
         },
 
-        /*
-         Function: addEdge
-            Adds a given edge to this graph.
+        /**
+         *  Method: _loadFromJson
+         *    Extracts and restores the <Nodes> and edges from the given JSON representation of the graph.
+         *
+         *  Parameters:
+         *    {JSON} json - The JSON representation of the graph, containing nodes and edges.
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
+         */
+        _loadFromJson: function(json) {
+            // parse the json nodes and convert them to node objects
+            _.each(json.nodes, function(jsonNode) {
+                this.addNode(jsonNode.kind, jsonNode);
+            }.bind(this));
 
-         Parameters:
-            edge - Edge to be added
+            // connect the nodes again
+            _.each(json.edges, function(jsonEdge) {
+                var edge = jsPlumb.connect({
+                    source: this.getNodeById(jsonEdge.source).container,
+                    target: this.getNodeById(jsonEdge.target).container
+                });
+                edge._fuzzedId = jsonEdge.id;
+
+                this.addEdge(edge);
+
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _registerEventHandlers
+         *    Register on <Canvas> events in order to recognize shape drops and node/edge selection and register to
+         *    jsPlumb events in order to recognize connection events.
+         *    This should be done _after_ the initial graph loading from the backend to avoid the creation
+         *    of duplicate nodes/edges.
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
+         */
+        _registerEventHandlers: function() {
+            jsPlumb.bind('jsPlumbConnection', function(edge) {
+                this.addEdge(edge.connection);
+            }.bind(this));
+
+            jsPlumb.bind('jsPlumbConnectionDetached', function(edge) {
+                this.deleteEdge(edge.connection);
+            }.bind(this));
+
+            jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED,   this._shapeDropped.bind(this));
+            jQuery(document).on(this.config.Events.CANVAS_EDGE_SELECTED,   this._edgeSelected.bind(this));
+            jQuery(document).on(this.config.Events.CANVAS_EDGE_UNSELECTED, this._edgeUnselected.bind(this));
+
+            return this;
+        },
+
+
+        /**
+         *  Group: Graph manipulation
+         */
+
+        /*
+         *  Method: addEdge
+         *    Adds a given edge to this graph. It will also assign a unique _fuzzedId to it and store it by this
+         *    ID in the <edges> member.
+         *
+         *  Parameters:
+         *    {jsPlumb::Connection} edge - Edge to be added to the graph.
+         *
+         *  Triggers:
+         *    <Config::Events::GRAPH_EDGE_ADDED>
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
          */
         addEdge: function(edge) {
             if (typeof edge._fuzzedId === 'undefined') {
@@ -31,7 +133,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
             }
 
             // store the ID in an attribute so we can retrieve it later from the DOM element
-            jQuery(edge.canvas).attr(this.config.Keys.CONNECTION_ID, edge._fuzzedId);
+            jQuery(edge.canvas).attr(this.config.Attributes.CONNECTION_ID, edge._fuzzedId);
 
             var sourceNode = edge.source.data(this.config.Keys.NODE);
             var targetNode = edge.target.data(this.config.Keys.NODE);
@@ -51,11 +153,17 @@ define(['canvas', 'class'], function(Canvas, Class) {
         },
 
         /*
-         Function: deleteEdge
-            Deletes the given edges from the graph if present
-
-         Parameters:
-            edge - Edge to remove from this graph.
+         *  Method: deleteEdge
+         *    Deletes the given edges from the graph if present.
+         *
+         *  Parameters:
+         *    {jsPlumb::Connection} edge - Edge to be removed from this graph.
+         *
+         *  Triggers:
+         *    <Config::Events::GRAPH_EDGE_DELETED>
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
          */
         deleteEdge: function(edge) {
             var id         = edge._fuzzedId;
@@ -72,14 +180,20 @@ define(['canvas', 'class'], function(Canvas, Class) {
         },
 
         /*
-         Function: addNode
-            Adds a given node to this graph.
-
-         Parameters:
-            kind       - String naming the kind of the node, e.g., 'basicEvent'.
-            properties - [optional] Properties that should be merged into the new node.
+         *  Method: addNode
+         *    Adds a given node to this graph.
+         *
+         *  Parameters:
+         *    {str}    kind       - The kind of the node, e.g., 'basicEvent'.
+         *    {Object} properties - [optional] Properties that should be merged into the new node.
+         *
+         *  Triggers:
+         *    <Config::Events::GRAPH_NODE_ADDED>
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
          */
-        addNode: function(kind, properties, success) {
+        addNode: function(kind, properties) {
             var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
             jQuery(document).trigger(this.config.Events.GRAPH_NODE_ADDED, [node.id, kind, node.x, node.y]);
             this.nodes[node.id] = node;
@@ -88,11 +202,17 @@ define(['canvas', 'class'], function(Canvas, Class) {
         },
 
         /*
-         Function: deleteNode
-         Deletes the given node from the graph if present
-
-         Parameters:
-         node - Node to remove from this graph.
+         *  Method: deleteNode
+         *    Deletes the given node from the graph if present.
+         *
+         *  Parameters:
+         *    {int} nodeId - ID of the <Node> that should be removed from this graph.
+         *
+         *  Triggers:
+         *    <Config::Events::GRAPH_NODE_DELETED>
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
          */
         deleteNode: function(nodeId) {
             var node = this.nodes[nodeId];
@@ -110,16 +230,21 @@ define(['canvas', 'class'], function(Canvas, Class) {
             return this;
         },
 
+
+        /**
+         *  Group: Accessors
+         */
+
         /*
-         Function: nodeClassFor
-         Returns the class for the given kind. If the class does not yet exist it is created from the notation
-         definition. It is an error if the given node kind does not exist in the notation.
-
-         Parameter:
-         kind - String specifying the kind of the node class to be retrieved.
-
-         Returns:
-         The class for the given kind identifier.
+         *  Method: nodeClassFor
+         *    Returns the <Node> class for the given kind. If the class does not yet exist it is created from the
+         *    notation definition. It is an error if the given node kind does not exist in the notation.
+         *
+         *  Parameters:
+         *    {str} kind - The kind of the node class to be retrieved, e.g., 'basicEvent'.
+         *
+         *  Returns:
+         *    The class for the given kind.
          */
         nodeClassFor: function(kind) {
             var nodeClass = this._nodeClasses[kind];
@@ -135,32 +260,101 @@ define(['canvas', 'class'], function(Canvas, Class) {
             return this._newNodeClassForKind(notationDefinition);
         },
 
+        /**
+         *  Method: getNotation
+         *    _Abstract_ method that returns the Notation object for the specific graph. Subclasses need to overwrite
+         *    this method.
+         *
+         *  Returns:
+         *    The Notation for the graph.
+         */
         getNotation: function() {
             throw '[ABSTRACT] Subclass responsibility';
         },
 
+        /**
+         *  Method: getNodeClass
+         *    _Abstract_ method that returns the class of the abstract base node that should be used by <Node>
+         *    subclasses generated by this graph. Subclasses need to overwrite this method.
+         *
+         *  Returns:
+         *    The abstract <Node> class for all <Nodes> of this graph.
+         */
         getNodeClass: function() {
             throw '[ABSTRACT] Subclass responsibility';
         },
 
+        /**
+         *  Method: getNodes
+         *
+         *  Returns:
+         *    An Array containing all <Nodes> of the graph.
+         *
+         */
         getNodes: function() {
             return _.values(this._nodes);
         },
 
+        /**
+         *  Method: getNodeById
+         *
+         *  Parameters:
+         *    {int} nodeId - ID of the <Node> that should be returned.
+         *
+         *  Returns:
+         *    The <Node> with the given ID.
+         */
         getNodeById: function(nodeId) {
             return this.nodes[nodeId];
         },
 
+        /**
+         *  Method: getEdgeById
+         *
+         *  Parameters:
+         *    {int} edgeId - ID of the edge that should be returned.
+         *
+         *  Returns:
+         *    The edge (<jsPlumb::Connection> object) with the given ID.
+         */
         getEdgeById: function(edgeId) {
             return this.edges[edgeId];
         },
 
-        /* Section: Internal */
-
+        /**
+         *  Method: getConfig
+         *    _Abstract_ method that returns the graph-specific <Config> object.
+         *    Subclasses need to overwrite this method.
+         *
+         *  Returns:
+         *    The graph-specific <Config> object.
+         *
+         *  See also:
+         *    <Node::getConfig>
+         */
         getConfig: function() {
             throw '[ABSTRACT] subclass responsibility';
         },
 
+
+        /**
+         *  Group: Node class generation
+         */
+
+        /**
+         *  Method: _newNodeClassForKind
+         *    Constructs a new <Node> class from the given JSON node definition. It considers the inheritance relation
+         *    specified in the definition and constructs the base classes (if not already done) as well. If no
+         *    super class is specified, the base class returned by <getNodeClass> is used. Properties defined in the
+         *    definition parameter will become members of the newly created class. Created classes will be cached
+         *    in the <_nodeClasses> field so that they do not need to be regenerated every time.
+         *
+         *  Parameters:
+         *    {JSON} definition - Node definition taken from the graph-specific notation file.
+         *
+         *  Returns:
+         *    The newly created <Node> subclass.
+         */
         _newNodeClassForKind: function(definition) {
             var BaseClass = this.getNodeClass();
             var inherits = definition.inherits;
@@ -186,54 +380,40 @@ define(['canvas', 'class'], function(Canvas, Class) {
             return newClass;
         },
 
-        _loadFromJson: function(json) {
-            // parse the json nodes and convert them to node objects
-            _.each(json.nodes, function(jsonNode) {
-                this.addNode(jsonNode.kind, jsonNode);
-            }.bind(this));
 
-            // connect the nodes again
-            _.each(json.edges, function(jsonEdge) {
-                var edge = jsPlumb.connect({
-                    source: this.getNodeById(jsonEdge.source).container,
-                    target: this.getNodeById(jsonEdge.target).container
-                });
-                edge._fuzzedId = jsonEdge.id;
+        /**
+         *  Group: Event handling
+         */
 
-                this.addEdge(edge);
-
-            }.bind(this));
-
-            return this;
-        },
-
-        _registerEventHandlers: function() {
-            jsPlumb.bind('jsPlumbConnection', function(edge) {
-                this.addEdge(edge.connection);
-            }.bind(this));
-
-            jsPlumb.bind('jsPlumbConnectionDetached', function(edge) {
-                this.deleteEdge(edge.connection);
-            }.bind(this));
-
-            jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED,   this._shapeDropped.bind(this));
-            jQuery(document).on(this.config.Events.CANVAS_EDGE_SELECTED,   this._edgeSelected.bind(this));
-            jQuery(document).on(this.config.Events.CANVAS_EDGE_UNSELECTED, this._edgeUnselected.bind(this));
-
-            return this;
-        },
-
+        /**
+         *  Method: _shapeDropped
+         *    Callback that gets called every time a new shape (from the <ShapeMenu>) is dropped on the <Canvas>.
+         *    It will create a new <Node> of the corresponding kind at the drop location.
+         *
+         *  Parameters:
+         *    {jQuery::Event} event    - The event object passed by the jQuery event handling framework.
+         *    {str}           kind     - The kind associated with the dropped shape, e.g., 'basicEvent'.
+         *    {Object}        position - An object containing the pixel position of the
+         *                               dropped shape ({'x': ..., 'y': ...}).
+         */
         _shapeDropped: function(event, kind, position) {
             this.addNode(kind, Canvas.toGrid(position))
-                .container.click();
-
-            return this;
+                .container.click(); // emulate a click in order to select the new node
         },
 
+        /**
+         *  Method: _edgeSelected
+         *    Callback that gets called when an edge is selected.
+         *    It will change the visual representation to the 'selected' style specified in the <Config>.
+         *
+         *  Parameters:
+         *    {jQuery::Event} event  - The event object passed by the jQuery event handling framework.
+         *    {int}           edgeId - The _fuzzedId of the edge that has been selected.
+         */
         _edgeSelected: function(event, edgeId) {
             var edge = this.getEdgeById(edgeId);
             //XXX: Normally we could use jsPlumb's 'Connection Type' mechanism which allows the definition of
-            //     different styles and toggeling between them. Unfortunately this causes the connector to get
+            //     different styles and toggling between them. Unfortunately this causes the connector to get
             //     completely redrawn (replace DOM element) which prevents us from associating it with the connection
             //     object (via DOM attribute). So we need to toggle the styles manually for the moment.
             edge.setPaintStyle({
@@ -246,6 +426,15 @@ define(['canvas', 'class'], function(Canvas, Class) {
             });
         },
 
+        /**
+         *  Method: _edgeUnselected
+         *    Callback that gets called when an edge is unselected.
+         *    It will change the visual representation back to normal.
+         *
+         *  Parameters:
+         *    {jQuery::Event} event  - The event object passed by the jQuery event handling framework.
+         *    {int}           edgeId - The _fuzzedId of the edge that has been unselected.
+         */
         _edgeUnselected: function(event, edgeId) {
             var edge = this.getEdgeById(edgeId);
             edge.setPaintStyle({
