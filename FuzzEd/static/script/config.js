@@ -104,7 +104,9 @@ define(function() {
             NODE_SELECTED:           'fuzzed-node-selected',
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
-            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect'
+            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
+
+            PROPERTY_WARNING:        'error'
         },
 
         /**
@@ -268,26 +270,6 @@ define(function() {
             STROKE_HIGHLIGHTED:        HIGHLIGHTED_COLOR,
             STROKE_SELECTED:           SELECTED_COLOR,
             STROKE_DISABLED:           DISABLED_COLOR
-        },
-
-        /**
-         *  Group: Properties
-         *    Configurations used for properties.
-         *
-         *  Constants:
-         *    {Array} Events - A list of input events a property may react to by implementing
-         *                     the corresponding callback function.
-         */
-        Properties: {
-            Events: [
-                'blur',
-                'change',
-                'click',
-                'focus',
-                'keydown',
-                'keyup',
-                'select'
-            ]
         },
 
         /**
