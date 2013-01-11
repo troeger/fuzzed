@@ -67,7 +67,7 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
             return this;
         },
 
-        blurEvents: function() { return []; },
+        blurEvents: function() { return ['blur']; },
 
         blurred: function(event, ui) {
             this.fix(event, ui);
@@ -217,7 +217,6 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
 
         _initialValue: undefined,
 
-        blurEvents:   function() { return ['blur']; },
         changeEvents: function() { return ['keyup', 'change']; },
 
         inputValue: function(newValue) {
@@ -267,7 +266,6 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         _register:     undefined,
         _initialValue: undefined,
 
-        blurEvents:   function() { return ['blur']; },
         changeEvents: function() { return ['keyup', 'change']; },
 
         fix: function(event) {
@@ -359,7 +357,6 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
     });
 
     var Text = Property.extend({
-        blurEvents:   function() { return ['blur']; },
         changeEvents: function() { return ['keyup', 'change']; },
 
         inputValue: function(newValue) {
