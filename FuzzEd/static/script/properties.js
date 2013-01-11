@@ -1,10 +1,10 @@
 define(['config', 'class', 'underscore'], function(Config, Class) {
 
-    function defaultFloat(object, key, defaultValue) {
+    var defaultFloat = function(object, key, defaultValue) {
         var value = window.parseFloat(object[key]);
 
         return window.isNaN(value) ? defaultValue : value;
-    }
+    };
 
     var Property = Class.extend({
         id:            undefined,
@@ -191,6 +191,25 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         }
     });
 
+    var Checkbox = Property.extend({
+        blurEvents:   function() { return ['blur']; },
+        changeEvents: function() { return ['change']; },
+
+        inputValue: function(newValue) {
+            if (typeof newValue === 'undefined') return this.input.attr('checked') ? true : false;
+            this.input.attr('checked', newValue ? 'checked' : null);
+
+            return this;
+        },
+
+        _setupInput: function() {
+            return jQuery('<input type="checkbox">')
+                .attr('id', this.id)
+                .attr('disabled', this.options.disabled ? 'disabled' : null)
+                .attr('checked', this.value() ? 'checked' : null);
+        }
+    });
+
     var Number = Property.extend({
         min:  undefined,
         max:  undefined,
@@ -350,7 +369,7 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
             return this;
         },
 
-        _setupInput: function(newValue) {
+        _setupInput: function() {
             return jQuery('<input type="text" class="input-medium">')
                 .attr('id', this.id)
                 .attr('disabled', this.options.disabled ? 'disabled' : null)
@@ -358,22 +377,24 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         }
     });
 
-    function newFrom(node, mirror, propertyDefinition) {
+    var newFrom = function(node, mirror, propertyDefinition) {
         var kind = propertyDefinition.kind;
 
-        if      (kind === 'number') return new Number(node, mirror, propertyDefinition)
-        else if (kind === 'range')  return new  Range(node, mirror, propertyDefinition)
-        else if (kind === 'text')   return new   Text(node, mirror, propertyDefinition);
+             if (kind === 'checkbox') return new Checkbox(node, mirror, propertyDefinition)
+        else if (kind === 'number')   return new   Number(node, mirror, propertyDefinition)
+        else if (kind === 'range')    return new    Range(node, mirror, propertyDefinition)
+        else if (kind === 'text')     return new     Text(node, mirror, propertyDefinition);
 
         return new Text(node, mirror, propertyDefinition);
         //throw 'Unknown property kind: ' + kind;
-    }
+    };
 
     return {
-        Number:  Number,
-        Range:   Range,
-        Text:    Text,
+        Checkbox: Checkbox,
+        Number:   Number,
+        Range:    Range,
+        Text:     Text,
 
-        newFrom: newFrom
+        newFrom:  newFrom
     };
 });
