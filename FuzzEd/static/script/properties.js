@@ -13,6 +13,7 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         options:       undefined,
 
         _editing:      undefined,
+        _editTarget:   undefined,
         _preEditValue: undefined,
         _mirror:       undefined,
         _timer:        undefined,
@@ -45,7 +46,7 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         },
 
         hide: function() {
-            if (this._editing) this.blurred();
+            if (this._editing) this._editTarget.blur();
             this._visual.remove();
 
             return this;
@@ -85,6 +86,7 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
             this.mirror();
 
             this._editing      = false;
+            this._editTarget   = undefined;
             this._preEditValue = undefined;
 
             return this;
@@ -94,7 +96,10 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
 
         changed: function(event, ui) {
             if (!this._editing) { this._preEditValue = this.value(); }
-            this._editing = true;
+
+            this._editing    = true;
+            this._editTarget = event.target;
+
             this.fix(event, ui);
 
             if (this.validate(event, ui)) {
@@ -110,6 +115,10 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
             this.mirror();
 
             return this;
+        },
+
+        registerOn: function() {
+            return this.input;
         },
 
         fix: function(event, ui) { return this; },
@@ -155,12 +164,14 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         },
 
         _setupCallbacks: function() {
+            var register = this.registerOn();
+
             _.each(this.blurEvents(), function(event) {
-                this.input.on(event, this.blurred.bind(this));
+                register.on(event, this.blurred.bind(this));
             }.bind(this));
 
             _.each(this.changeEvents(), function(event) {
-                this.input.on(event, this.changed.bind(this));
+                register.on(event, this.changed.bind(this));
             }.bind(this));
         },
 
@@ -200,8 +211,8 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         validate: function() {
             var value = this.inputValue();
 
-            return !window.isNaN(value) && (value.toString() == this.input.val()) && this.options.min <= value
-                 && value <= this.options.max && (value - this._initialValue) % this.options.step == 0;
+            return !window.isNaN(value) && this.options.min <= value && value <= this.options.max
+                && (value - this._initialValue) % this.options.step == 0;
         },
 
         _preSetup: function() {
@@ -231,6 +242,103 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         }
     });
 
+    var Range = Property.extend({
+        _lower:        undefined,
+        _upper:        undefined,
+        _register:     undefined,
+        _initialValue: undefined,
+
+        blurEvents:   function() { return ['blur']; },
+        changeEvents: function() { return ['keyup', 'change']; },
+
+        fix: function(event) {
+            if (event.type !== 'change' && event.type !== 'blur') return this;
+
+            var value = this.inputValue();
+            var lower = value[0];
+            var upper = value[1];
+
+            if (window.isNaN(lower) || window.isNaN(upper)) return this;
+
+            if (upper < lower && this._upper.is(event.target) && upper >= this.options.min) {
+                this._lower.val(upper);
+            } else if (lower > upper && this._lower.is(event.target) && lower <= this.options.max) {
+                this._upper.val(lower);
+            }
+
+            return this;
+        },
+
+        inputValue: function(newValue) {
+            if (typeof newValue === 'undefined')
+                return [window.parseFloat(this._lower.val()), window.parseFloat(this._upper.val())];
+            this._lower.val(newValue[0]);
+            this._upper.val(newValue[1]);
+
+            return this;
+        },
+
+        mirror: function() {
+            if (typeof this._mirror !== 'undefined') {
+                var value = this.value();
+                this._mirror.show(value[0] + '-' + value[1]);
+            }
+
+            return this;
+        },
+
+        registerOn: function() {
+            return this._register;
+        },
+
+        validate: function() {
+            var value = this.inputValue();
+            var lower = value[0];
+            var upper = value[1];
+
+            return !window.isNaN(lower) && !window.isNaN(upper)
+                && this.options.min <= lower && this.options.min <= upper
+                && lower <= this.options.max && upper <= this.options.max
+                && (lower - this._initialValue[0]) % this.options.step == 0
+                && (upper - this._initialValue[1]) % this.options.step == 0;
+        },
+
+        _preSetup: function() {
+            this.options.min  = defaultFloat(this.options, 'min', -window.Number.MAX_VALUE);
+            this.options.max  = defaultFloat(this.options, 'max',  window.Number.MAX_VALUE);
+            this.options.step = defaultFloat(this.options, 'step', 1);
+
+            return this;
+        },
+
+        _postSetup: function() {
+            this._lower        = this.input.children().eq(0);
+            this._upper        = this.input.children().eq(1);
+            this._register     = jQuery(this._lower).add(this._upper);
+            this._initialValue = this.value();
+
+            return this;
+        },
+
+        _setupBoundsInput: function(value) {
+            return jQuery('<input type="number" class="input-mini">')
+                .attr('min',      this.options.min)
+                .attr('max',      this.options.max)
+                .attr('step',     this.options.step)
+                .attr('disabled', this.options.disabled ? 'disabled' : null)
+                .val(value);
+        },
+
+        _setupInput: function() {
+            var value = this.value();
+            var form  = jQuery('<form class="form-inline">');
+            var lower = this._setupBoundsInput(value[0]).attr('id', this.id);
+            var upper = this._setupBoundsInput(value[1]);
+
+            return form.append(lower, upper);
+        }
+    });
+
     var Text = Property.extend({
         blurEvents:   function() { return ['blur']; },
         changeEvents: function() { return ['keyup', 'change']; },
@@ -254,6 +362,7 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         var kind = propertyDefinition.kind;
 
         if      (kind === 'number') return new Number(node, mirror, propertyDefinition)
+        else if (kind === 'range')  return new  Range(node, mirror, propertyDefinition)
         else if (kind === 'text')   return new   Text(node, mirror, propertyDefinition);
 
         return new Text(node, mirror, propertyDefinition);
@@ -262,6 +371,7 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
 
     return {
         Number:  Number,
+        Range:   Range,
         Text:    Text,
 
         newFrom: newFrom
