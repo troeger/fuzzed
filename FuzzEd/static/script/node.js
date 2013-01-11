@@ -159,7 +159,7 @@ function(Properties, Mirror, Canvas, Class) {
             var scaleFactor  = (Canvas.gridSize - marginOffset) / this._nodeImage.height();
 
             // resize the svg and the groups
-            this._nodeImage.attr('width', this._nodeImage.width()  * scaleFactor);
+            this._nodeImage.attr('width',  this._nodeImage.width()  * scaleFactor);
             this._nodeImage.attr('height', this._nodeImage.height() * scaleFactor);
 
             var newTransform = 'scale(' + scaleFactor + ')';

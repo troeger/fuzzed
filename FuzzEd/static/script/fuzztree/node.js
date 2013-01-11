@@ -103,13 +103,12 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
         },
 
         _setupPropertyMenuEntries: function(propertyMenuEntries, propertiesDisplayOrder) {
-            this._super(propertyMenuEntries, propertiesDisplayOrder);
-
-            if (_.has(this.propertyMenuEntries, 'optional')) {
+            if (this.propertyMenuEntries['optional']) {
                 this.propertyMenuEntries.optional.change = function() {
                     this.setOptional(this.optional);
-                }.bind(this)
+                }.bind(this);
             }
+            this._super(propertyMenuEntries, propertiesDisplayOrder);
 
             return this;
         },
