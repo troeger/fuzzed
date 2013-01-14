@@ -9,6 +9,9 @@ from distutils.command.clean import clean as _clean
 
 import os
 
+# check FuzzEd/__init__.py for the project version number
+from FuzzEd import __version__
+
 def build_naturaldocs():
 	# Build natural docs in 'docs' subdirectory
 	if not os.path.exists("docs"):
@@ -39,7 +42,7 @@ class clean(_clean):
 
 setup(
 	name = 'FuzzEd',
-	version = '0.2',
+	version = __version__,
 	install_requires=[
 		'django',
 		'south',
