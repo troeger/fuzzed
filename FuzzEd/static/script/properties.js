@@ -493,6 +493,57 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         _setupMiniNumber: setupMiniNumber
     });
 
+    var Select = Property.extend({
+        _options: undefined,
+
+        changeEvents: function() { return ['change']; },
+
+        inputValue: function(newValue) {
+            if (typeof newValue === 'undefined') return this.input.val();
+            this._options
+                .attr('selected', null)
+                .filter("[value='" + newValue + "']")
+                .attr('selected', 'selected');
+
+            return this;
+        },
+
+        _preSetup: function() {
+            var value = this.value();
+
+            if (!this.options.choices || this.options.choices.length < 2) {
+                throw '[VALUE ERROR] not enough choices: ' + this.options.choices;
+            } else if (typeof value !== 'undefined' && _.indexOf(this.options.choices, value) === -1) {
+                throw '[VALUE ERROR] no choice for value: ' + value + '/' + this.options.choices;
+            }
+
+            return this;
+        },
+
+        _postSetup: function() {
+            this._options = this.input.children('options');
+
+            return this;
+        },
+
+        _setupInput: function() {
+            var value    = this.value();
+            var select   = jQuery('<select class="input-medium">');
+            var selected = typeof value !== 'undefined' ? value : this.options.choices[0];
+
+            // model each choice as an option of the select
+            _.each(this.options.choices, function(choice) {
+                select.append(jQuery('<option>')
+                    .html(choice)
+                    .attr('value', choice)
+                    .attr('selected', choice === selected ? 'selected' : null)
+                    .appendTo(select));
+            });
+
+            return select;
+        }
+    });
+
     var Text = Property.extend({
         changeEvents: function() { return ['keyup', 'change']; },
 
@@ -518,6 +569,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         else if (kind === 'neighborhood') return new Neighborhood(node, mirror, propertyDefinition);
         else if (kind === 'number')       return new Number(node, mirror, propertyDefinition);
         else if (kind === 'range')        return new Range(node, mirror, propertyDefinition);
+        else if (kind === 'select')       return new Select(node, mirror, propertyDefinition);
         else if (kind === 'text')         return new Text(node, mirror, propertyDefinition);
 
         return new Text(node, mirror, propertyDefinition);
