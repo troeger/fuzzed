@@ -406,6 +406,8 @@ function(Properties, Mirror, Canvas, Class) {
 
                     // forget the initial position of the nodes to allow new dragging
                     initialPositions = {};
+
+                    jQuery(document).trigger(this.config.Events.NODE_DRAG_STOPPED);
                 }.bind(this)
             });
 

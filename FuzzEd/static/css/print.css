@@ -1,7 +1,3 @@
-#FuzzEdContent {
-    top: 0 !important; /* avoid free area formally used by menu */
-}
-
 #FuzzEdCanvas {
     overflow: visible !important;
     height:   auto    !important;

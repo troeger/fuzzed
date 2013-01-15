@@ -222,10 +222,10 @@ define(['canvas', 'class'], function(Canvas, Class) {
                 this.deleteEdge(edge);
             }.bind(this));
 
-            jQuery(document).trigger(this.config.Events.GRAPH_NODE_DELETED, nodeId);
-
             node.remove();
             delete this.nodes[nodeId];
+
+            jQuery(document).trigger(this.config.Events.GRAPH_NODE_DELETED, nodeId);
 
             return this;
         },

@@ -135,6 +135,7 @@ define(function() {
          *    {String} CANVAS_EDGE_UNSELECTED   - Event triggered when an edge got unselected.
          *
          *    {String} NODE_PROPERTY_CHANGED    - Event triggered when a property of a node changed.
+         *    {String} NODE_DRAG_STOPPED        - Event triggered when a dragged node is dropped again.
          *
          *    {String} GRAPH_NODE_ADDED         - Event triggered when a node was added to the graph.
          *    {String} GRAPH_NODE_DELETED       - Event triggered when a node was deleted from the graph.
@@ -148,6 +149,7 @@ define(function() {
             CANVAS_EDGE_UNSELECTED:   'canvas-edge-unselected',
 
             NODE_PROPERTY_CHANGED:    'node-property-changed',
+            NODE_DRAG_STOPPED:        'node-drag-stopped',
 
             GRAPH_NODE_ADDED:         'graph-node-added',
             GRAPH_NODE_DELETED:       'graph-node-deleted',
