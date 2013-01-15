@@ -82,6 +82,8 @@ define(function() {
          *    {String} NODE_DROP_ACTIVE        - Class assigned to nodes that are valid connection targets
          *                                       (when dragging a new connection).
          *    {String} NODE_HALO_CONNECT       - Class of the connection handle.
+         *
+         *    {String} PROPERTY_WARNING        - Class for property input fields if they are erroneous.
          */
         Classes: {
             JQUERY_UI_SELECTED:      'ui-selected',

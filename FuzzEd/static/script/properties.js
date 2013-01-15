@@ -1,9 +1,16 @@
-define(['config', 'class', 'underscore'], function(Config, Class) {
+define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, Class) {
+    var get = function(object, key, defaultValue) {
+        var value = object[key];
+        return (typeof value !== 'undefined' ? value : defaultValue);
+    };
 
-    var defaultFloat = function(object, key, defaultValue) {
-        var value = window.parseFloat(object[key]);
-
-        return window.isNaN(value) ? defaultValue : value;
+    var setupMiniNumber = function(value) {
+        return jQuery('<input type="number" class="input-mini">')
+            .attr('min',      this.options.min)
+            .attr('max',      this.options.max)
+            .attr('step',     this.options.step)
+            .attr('disabled', this.options.disabled ? 'disabled' : null)
+            .val(value);
     };
 
     var Property = Class.extend({
@@ -210,6 +217,127 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         }
     });
 
+    var Neighborhood = Property.extend({
+        _value:        undefined,
+        _epsilon:      undefined,
+        _register:     undefined,
+
+        _initialValue: undefined,
+
+        changeEvents: function() { return ['keyup', 'change']; },
+
+        fix: function(event) {
+            if (event.type !== 'change' && event.type !== 'blur') return this;
+
+            var inputValue = this.inputValue();
+            var value      = inputValue[0];
+            var epsilon    = inputValue[1];
+
+            if (window.isNaN(value) || window.isNaN(epsilon)) return this;
+            value   = new Decimal(value);
+            epsilon = new Decimal(epsilon);
+
+            // fix value
+            if (value.plus(epsilon).gt(this.options.max) && this._value.is(event.target)) {
+                this._epsilon.val(this.options.max.minus(value));
+            } else if (value.minus(epsilon).lt(this.options.min) && this._value.is(event.target)) {
+                this._epsilon.val(value.minus(this.options.min));
+
+            // fix epsilon
+            } else if (value.plus(epsilon).gt(this.options.max) && this._epsilon.is(event.target)) {
+                this._value.val(this.options.max.minus(epsilon));
+            } else if (value.minus(epsilon).lt(this.options.min) && this._epsilon.is(event.target)) {
+                this._value.val(this.options.min.plus(epsilon));
+            }
+
+            return this;
+        },
+
+        inputValue: function(newValue) {
+            if (typeof newValue === 'undefined')
+                return [window.parseFloat(this._value.val()), window.parseFloat(this._epsilon.val())];
+            this._value.val(newValue[0]);
+            this._epsilon.val(newValue[1]);
+
+            return this;
+        },
+
+        mirror: function() {
+            if (typeof this._mirror !== 'undefined') {
+                var value = this.value();
+                this._mirror.show(value[0] + ' ± ' + value[1]);
+            }
+
+            return this;
+        },
+
+        registerOn: function() {
+            return this._register;
+        },
+
+        validate: function() {
+            var inputValue = this.inputValue();
+            var value      = inputValue[0];
+            var epsilon    = inputValue[1];
+
+            return !window.isNaN(value) && !window.isNaN(epsilon)
+                && this.options.min.lte(value) && this.options.epsilonMin.lte(epsilon)
+                && this.options.max.gte(value) && this.options.epsilonMax.gte(epsilon)
+                && (this.options.step ? this._initialValue[0].minus(value).mod(this.options.step).eq(0) : true)
+                && (this.options.step ? this._initialValue[1].minus(epsilon).mod(this.options.step).eq(0) : true);
+        },
+
+        _preSetup: function() {
+            this.options.min  = new Decimal(get(this.options, 'min', -Decimal.MAX_VALUE));
+            this.options.max  = new Decimal(get(this.options, 'max',  Decimal.MAX_VALUE));
+            this.options.step = this.options.step ? new Decimal(this.options.step) : null;
+
+            this.options.epsilonMin  = new Decimal(get(this.options, 'epsilonMin', 0));
+            this.options.epsilonMax  = new Decimal(get(this.options, 'epsilonMax', Decimal.MAX_VALUE));
+            this.options.epsilonStep = this.options.epsilonStep ? new Decimal(this.options.epsilonStep) : null;
+
+            if (this.options.min.gt(this.options.max)) {
+                throw '[VALUE ERROR] bounds violation min/max: ' + this.options.min + '/' + this.options.max;
+            }
+            else if (this.options.epsilonMin.isNeg()) {
+                throw '[VALUE ERROR] epsilon must be positive epsilonMin: ' + this.options.epsilonMin;
+            }
+            else if (this.options.epsilonMin.gt(this.options.epsilonMax)) {
+                throw '[VALUE ERROR] bounds violation epsilonMin/epsilonMax: '
+                    + this.options.epsilonMin + '/' + this.options.epsilonMax;
+            } else if (this.options.step && this.options.step.lte(0)) {
+                throw '[VALUE ERROR] step must be positive: ' + this.options.step;
+            } else if (this.options.epsilonStep && this.options.epsilonStep.lte(0)) {
+                throw '[VALUE ERROR] step of epsilon must be positive: ' + this.options.epsilonStep;
+            }
+
+            return this;
+        },
+
+        _postSetup: function() {
+            var value = this.value();
+
+            this._value        = this.input.children().eq(0);
+            this._epsilon      = this.input.children().eq(1);
+            this._register     = jQuery(this._value).add(this._epsilon);
+
+            this._initialValue = [new Decimal(value[0]), new Decimal(value[1])];
+
+            return this;
+        },
+
+        _setupInput: function() {
+            var value   = this.value();
+            var form    = jQuery('<form class="form-inline">');
+            var val     = this._setupMiniNumber(value[0]).attr('id', this.id);
+            var epsilon = this._setupMiniNumber(value[1]);
+
+            return form.append(val, epsilon);
+        },
+
+        _setupMiniNumber: setupMiniNumber
+    });
+
     var Number = Property.extend({
         min:  undefined,
         max:  undefined,
@@ -229,24 +357,28 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
         validate: function() {
             var value = this.inputValue();
 
-            return !window.isNaN(value) && this.options.min <= value && value <= this.options.max
-                && (value - this._initialValue) % this.options.step == 0;
+            return !window.isNaN(value) && this.options.min.lte(value) && this.options.max.gte(value)
+                && (this.options.step ? this._initialValue.minus(value).mod(this.options.step).eq(0) : true);
         },
 
         _preSetup: function() {
-            this.options.min  = defaultFloat(this.options, 'min', -window.Number.MAX_VALUE);
-            this.options.max  = defaultFloat(this.options, 'max',  window.Number.MAX_VALUE);
-            this.options.step = defaultFloat(this.options, 'step', 1);
+            this.options.min  = new Decimal(get(this.options, 'min', -Decimal.MAX_VALUE));
+            this.options.max  = new Decimal(get(this.options, 'max',  Decimal.MAX_VALUE));
+            this.options.step = this.options.step ? new Decimal(this.options.step) : null;
 
-            if (this.options.min > this.options.max) {
-                throw '[VALUE ERROR] bound violation min/max: ' + this.options.min + '/' + this.options.max;
+            if (this.options.min.gt(this.options.max)) {
+                throw '[VALUE ERROR] bounds violation min/max: ' + this.options.min + '/' + this.options.max;
+            } else if (this.options.step && this.options.step.lt(0)) {
+                throw '[VALUE ERROR] step must be positive: ' + this.options.step;
             }
 
             return this;
         },
 
         _postSetup: function() {
-            this._initialValue = this.value();
+            if (this.options.step) this._initialValue = new Decimal(this.value());
+
+            return this;
         },
 
         _setupInput: function() {
@@ -277,9 +409,12 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
 
             if (window.isNaN(lower) || window.isNaN(upper)) return this;
 
-            if (upper < lower && this._upper.is(event.target) && upper >= this.options.min) {
+            lower = new Decimal(lower);
+            upper = new Decimal(upper);
+
+            if (upper.lt(lower) && this._upper.is(event.target) && upper.gte(this.options.min)) {
                 this._lower.val(upper);
-            } else if (lower > upper && this._lower.is(event.target) && lower <= this.options.max) {
+            } else if (lower.gt(upper) && this._lower.is(event.target) && lower.lte(this.options.max)) {
                 this._upper.val(lower);
             }
 
@@ -314,46 +449,48 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
             var upper = value[1];
 
             return !window.isNaN(lower) && !window.isNaN(upper)
-                && this.options.min <= lower && this.options.min <= upper
-                && lower <= this.options.max && upper <= this.options.max
-                && (lower - this._initialValue[0]) % this.options.step == 0
-                && (upper - this._initialValue[1]) % this.options.step == 0;
+                && this.options.min.lte(lower) && this.options.min.lte(upper)
+                && this.options.max.gte(lower) && this.options.max.gte(upper)
+                && this._initialValue[0].minus(lower).mod(this.options.step).eq(0)
+                && this._initialValue[1].minus(upper).mod(this.options.step).eq(0)
         },
 
         _preSetup: function() {
-            this.options.min  = defaultFloat(this.options, 'min', -window.Number.MAX_VALUE);
-            this.options.max  = defaultFloat(this.options, 'max',  window.Number.MAX_VALUE);
-            this.options.step = defaultFloat(this.options, 'step', 1);
+            this.options.min  = new Decimal(get(this.options, 'min', -Decimal.MAX_VALUE));
+            this.options.max  = new Decimal(get(this.options, 'max',  Decimal.MAX_VALUE));
+            this.options.step = this.options.step ? new Decimal(this.options.step) : null;
+
+            if (this.options.min.gt(this.options.max)) {
+                throw '[VALUE ERROR] bounds violation min/max: ' + this.options.min + '/' + this.options.max;
+            } else if (this.options.step && this.options.step.lt(0)) {
+                throw '[VALUE ERROR] step must be positive: ' + this.options.step;
+            }
 
             return this;
         },
 
         _postSetup: function() {
+            var value = this.value();
+
             this._lower        = this.input.children().eq(0);
             this._upper        = this.input.children().eq(1);
             this._register     = jQuery(this._lower).add(this._upper);
-            this._initialValue = this.value();
+
+            this._initialValue = [new Decimal(value[0]), new Decimal(value[1])];
 
             return this;
-        },
-
-        _setupBoundsInput: function(value) {
-            return jQuery('<input type="number" class="input-mini">')
-                .attr('min',      this.options.min)
-                .attr('max',      this.options.max)
-                .attr('step',     this.options.step)
-                .attr('disabled', this.options.disabled ? 'disabled' : null)
-                .val(value);
         },
 
         _setupInput: function() {
             var value = this.value();
             var form  = jQuery('<form class="form-inline">');
-            var lower = this._setupBoundsInput(value[0]).attr('id', this.id);
-            var upper = this._setupBoundsInput(value[1]);
+            var lower = this._setupMiniNumber(value[0]).attr('id', this.id);
+            var upper = this._setupMiniNumber(value[1]);
 
             return form.append(lower, upper);
-        }
+        },
+
+        _setupMiniNumber: setupMiniNumber
     });
 
     var Text = Property.extend({
@@ -377,21 +514,23 @@ define(['config', 'class', 'underscore'], function(Config, Class) {
     var newFrom = function(node, mirror, propertyDefinition) {
         var kind = propertyDefinition.kind;
 
-             if (kind === 'checkbox') return new Checkbox(node, mirror, propertyDefinition)
-        else if (kind === 'number')   return new   Number(node, mirror, propertyDefinition)
-        else if (kind === 'range')    return new    Range(node, mirror, propertyDefinition)
-        else if (kind === 'text')     return new     Text(node, mirror, propertyDefinition);
+             if (kind === 'checkbox')     return new Checkbox(node, mirror, propertyDefinition);
+        else if (kind === 'neighborhood') return new Neighborhood(node, mirror, propertyDefinition);
+        else if (kind === 'number')       return new Number(node, mirror, propertyDefinition);
+        else if (kind === 'range')        return new Range(node, mirror, propertyDefinition);
+        else if (kind === 'text')         return new Text(node, mirror, propertyDefinition);
 
         return new Text(node, mirror, propertyDefinition);
         //throw 'Unknown property kind: ' + kind;
     };
 
     return {
-        Checkbox: Checkbox,
-        Number:   Number,
-        Range:    Range,
-        Text:     Text,
+        Checkbox:     Checkbox,
+        Neighborhood: Neighborhood,
+        Number:       Number,
+        Range:        Range,
+        Text:         Text,
 
-        newFrom:  newFrom
+        newFrom:      newFrom
     };
 });
