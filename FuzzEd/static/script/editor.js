@@ -25,10 +25,11 @@ function(Class, Menus, Canvas, Backend) {
          *                                            changes to the server.
          *    {jQuery Selector} _navbarActionsGroup - Navbar dropdown menu that contains the available actions.
          */
-        config:     undefined,
-        graph:      undefined,
-        properties: undefined,
-        shapes:     undefined,
+        config:              undefined,
+        graph:               undefined,
+        properties:          undefined,
+        shapes:              undefined,
+
         _backend:            undefined,
         _navbarActionsGroup: undefined,
 
