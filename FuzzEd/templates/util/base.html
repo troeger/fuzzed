@@ -11,6 +11,7 @@
         @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap-responsive.min.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         @import url("{{ STATIC_URL }}css/util.css");
+        @import url("{{ STATIC_URL }}css/print.css") print;
         {% endblock %}
     </style>
 
@@ -27,7 +28,7 @@
 </head>
 
 <body>
-    <div class="navbar navbar-fixed-top">
+    <div class="navbar navbar-fixed-top no-print">
         <div class="navbar-inner">
             <div class="container">
                 <a class="brand" anchor="#">FuzzEd</a>
@@ -61,7 +62,7 @@
     {% block body %}
     <div class="container space-top">
         {% if messages %}
-            <div style="position: relative; margin-top: -40px; top: 0; width: 100%">
+            <div class="no-print" style="position: relative; margin-top: -40px; top: 0; width: 100%">
             {% for message in messages %}
                 {% if message.tags == "success" %}
                     <div class="alert alert-success hide">
