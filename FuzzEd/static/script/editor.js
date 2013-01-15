@@ -24,6 +24,7 @@ function(Class, Menus, Canvas, Backend) {
          *    {Backend}        _backend                     - The instance of the <Backend> that is used to communicate
          *                                                    graph changes to the server.
          *    {jQuery Selector} _navbarActionsGroup         - Navbar dropdown menu that contains the available actions.
+         *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
          *    {jQuery Selector} _nodeOffsetPrintStylesheet  - The dynamically generated and maintained stylesheet
          *                                                    used to fix the node offset when printing the page.
          *    {Underscore Template} _nodeOffsetStylesheetTemplate - The underscore.js template used to generate the
@@ -35,6 +36,7 @@ function(Class, Menus, Canvas, Backend) {
         shapes:     undefined,
         _backend:                      undefined,
         _navbarActionsGroup:           undefined,
+        _currentMinNodeOffsets:        {'top': 0, 'left': 0},
         _nodeOffsetPrintStylesheet:    undefined,
         _nodeOffsetStylesheetTemplate: undefined,
 
@@ -318,8 +320,8 @@ function(Class, Menus, Canvas, Backend) {
             });
 
             return {
-                'top':  minTopOffset  + 1, // add a tolerance pixel to avoid cut edges
-                'left': minLeftOffset + 1
+                'top':  minTopOffset,
+                'left': minLeftOffset
             }
         },
 
@@ -331,9 +333,17 @@ function(Class, Menus, Canvas, Backend) {
          */
         _updatePrintOffsets: function(event) {
             var minOffsets = this._calculateContentOffsets();
+
+            if (minOffsets.top  == this._currentMinNodeOffsets.top &&
+                minOffsets.left == this._currentMinNodeOffsets.left) {
+                    // nothing changed
+                    return;
+                }
+
+            // replace the style text with the new transformation style
             this._nodeOffsetPrintStylesheet.text(this._nodeOffsetStylesheetTemplate({
-                'x': -minOffsets.left,
-                'y': -minOffsets.top
+                'x': -minOffsets.left + 1, // add a tolerance pixel to avoid cut edges,
+                'y': -minOffsets.top + 1
             }));
         }
     });
