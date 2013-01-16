@@ -68,6 +68,8 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         inputValue: function(newValue) { throw '[ABSTRACT] subclass responsiblity'; },
 
         value: function(newValue) {
+            if (typeof this.options.property === 'undefined') return this;
+
             if (typeof newValue === 'undefined') return this.node[this.options.property];
             this.node[this.options.property] = newValue;
 
@@ -217,6 +219,125 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         }
     });
 
+    var Compound = Property.extend({
+        _buttons: undefined,
+        _choices: undefined,
+
+        changeEvents: function() { return ['click']; },
+        registerOn: function() { return this._buttons; },
+
+        changed: function(event, ui) {
+            var previousSelection = this.value();
+            this._super(event, ui);
+            var currentSelection = this.inputValue();
+
+            if (previousSelection !== currentSelection) {
+                var previous  = this._choices[previousSelection];
+                previous.hide();
+
+                var siblings  = this._visual.nextAll();
+                siblings.remove();
+
+
+                var current   = this._choices[currentSelection];
+                var container = this._visual.parent();
+                current.show(container);
+                siblings.appendTo(container);
+                current.inputValue(this.options.defaults[currentSelection]).blurred();
+            }
+
+            return this;
+        },
+
+        fix: function(event) {
+            this.inputValue(event.target.innerHTML);
+
+            return this;
+        },
+
+        hide: function() {
+            this._choices[this.inputValue()].hide();
+            return this._super();
+        },
+
+        show: function(container) {
+            this._super(container);
+            this._choices[this.inputValue()].show(container);
+
+            return this;
+        },
+
+        inputValue: function(newValue) {
+            if (typeof newValue === 'undefined') return this._buttons.filter('.active').html();
+            this._buttons
+                .removeClass('active')
+                .filter(':contains(' + newValue + ')')
+                .addClass('active');
+
+            return this;
+        },
+
+        _preSetup: function() {
+            var property = this.options.property;
+            var defaults = this.options.defaults;
+            var mirror   = this._mirror;
+            var value    = this.node[property];
+
+            this.options.property += 'Selected';
+            this._mirror = undefined;
+
+            if (!_.isObject(this.options.choices)) {
+                throw '[TYPE ERROR] choices must be object, but was: ' + this.options.choices;
+            } else if (!_.has(this.options.choices, this.value())) {
+                throw '[VALUE ERROR] unknown choice: ' + this.options.property;
+            } else if (!_.isObject(this.options.defaults)) {
+                throw '[TYPE ERROR] defaults must be object, but was: ' + this.options.defaults;
+            }
+
+            this._choices = {};
+
+            _.each(this.options.choices, function(definition, choice) {
+                if (typeof defaults[choice] === 'undefined') {
+                    throw '[VALUE ERROR] missing default value for choice: ' + choice;
+                }
+
+                this.node[property] = choice === this.value() ? value : defaults[choice];
+                var compoundDefinition = jQuery.extend(true, { property: property }, definition);
+                var compound = newFrom(this.node, mirror, compoundDefinition);
+                compound.options.blur = function() {
+                    defaults[choice] = this.value();
+                }.bind(compound);
+                this._choices[choice] = compound;
+            }.bind(this));
+
+            this.node[property] = value;
+            this._choices[this.value()].mirror();
+
+            return this;
+        },
+
+        _postSetup: function() {
+            this._buttons = this.input.find('button');
+        },
+
+        _setupInput: function() {
+            var buttons  = jQuery('<div class="btn-group">');
+            var selected = this.value();
+
+            if (typeof selected === 'undefined') throw '[VALUE ERROR] no compound selected: ' + selected;
+
+            _.each(this.options.choices, function(definition, choice) {
+                jQuery('<button type="button" class="btn">')
+                    .html(choice)
+                    .addClass(choice === selected ? 'active' : null)
+                    .attr(this.options.disabled ? 'disabled' : null)
+                    .appendTo(buttons);
+            }.bind(this));
+
+            return buttons;
+        }
+    });
+
     var Neighborhood = Property.extend({
         _value:        undefined,
         _epsilon:      undefined,
@@ -338,7 +459,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         _setupMiniNumber: setupMiniNumber
     });
 
-    var Number = Property.extend({
+    var Numeric = Property.extend({
         min:  undefined,
         max:  undefined,
         step: undefined,
@@ -566,20 +687,21 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         var kind = propertyDefinition.kind;
 
              if (kind === 'checkbox')     return new Checkbox(node, mirror, propertyDefinition);
+        else if (kind === 'compound')     return new Compound(node, mirror, propertyDefinition);
         else if (kind === 'neighborhood') return new Neighborhood(node, mirror, propertyDefinition);
-        else if (kind === 'number')       return new Number(node, mirror, propertyDefinition);
+        else if (kind === 'number')       return new Numeric(node, mirror, propertyDefinition);
         else if (kind === 'range')        return new Range(node, mirror, propertyDefinition);
         else if (kind === 'select')       return new Select(node, mirror, propertyDefinition);
         else if (kind === 'text')         return new Text(node, mirror, propertyDefinition);
 
-        return new Text(node, mirror, propertyDefinition);
-        //throw 'Unknown property kind: ' + kind;
+        throw 'Unknown property kind: ' + kind;
     };
 
     return {
         Checkbox:     Checkbox,
+        Compound:     Compound,
         Neighborhood: Neighborhood,
-        Number:       Number,
+        Numeric:      Numeric,
         Range:        Range,
         Text:         Text,
 
