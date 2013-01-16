@@ -82,6 +82,10 @@ define(function() {
          *    {String} NODE_DROP_ACTIVE        - Class assigned to nodes that are valid connection targets
          *                                       (when dragging a new connection).
          *    {String} NODE_HALO_CONNECT       - Class of the connection handle.
+         *
+         *    {String} NO_PRINT                - Class assigned to elements that should not be printed.
+         *
+         *    {String} PROPERTY_WARNING        - Class for property input fields if they are erroneous.
          */
         Classes: {
             JQUERY_UI_SELECTED:      'ui-selected',
@@ -104,7 +108,11 @@ define(function() {
             NODE_SELECTED:           'fuzzed-node-selected',
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
-            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect'
+            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
+
+            NO_PRINT:                'no-print',
+
+            PROPERTY_WARNING:        'error'
         },
 
         /**
@@ -135,6 +143,7 @@ define(function() {
          *    {String} CANVAS_EDGE_UNSELECTED   - Event triggered when an edge got unselected.
          *
          *    {String} NODE_PROPERTY_CHANGED    - Event triggered when a property of a node changed.
+         *    {String} NODE_DRAG_STOPPED        - Event triggered when a dragged node is dropped again.
          *
          *    {String} GRAPH_NODE_ADDED         - Event triggered when a node was added to the graph.
          *    {String} GRAPH_NODE_DELETED       - Event triggered when a node was deleted from the graph.
@@ -148,6 +157,7 @@ define(function() {
             CANVAS_EDGE_UNSELECTED:   'canvas-edge-unselected',
 
             NODE_PROPERTY_CHANGED:    'node-property-changed',
+            NODE_DRAG_STOPPED:        'node-drag-stopped',
 
             GRAPH_NODE_ADDED:         'graph-node-added',
             GRAPH_NODE_DELETED:       'graph-node-deleted',
@@ -177,20 +187,22 @@ define(function() {
          *    IDs of certain DOM-elements.
          *
          *  Constants:
-         *    {String} CANVAS           - The DOM element containing the canvas.
-         *    {String} CONTENT          - The container element for the content (without navbar).
-         *    {String} PROPERTIES_MENU  - The container for the properties menu.
-         *    {String} SHAPES_MENU      - The container for the shapes menu.
-         *    {String} SPLASH           - The splash screen element.
-         *    {String} NAVBAR_ACTIONS   - The list element that contains the action buttons in the navbar.
+         *    {String} CANVAS                    - The DOM element containing the canvas.
+         *    {String} CONTENT                   - The container element for the content (without navbar).
+         *    {String} PROPERTIES_MENU           - The container for the properties menu.
+         *    {String} SHAPES_MENU               - The container for the shapes menu.
+         *    {String} SPLASH                    - The splash screen element.
+         *    {String} NAVBAR_ACTIONS            - The list element that contains the action buttons in the navbar.
+         *    {String} NAVBAR_ACTION_GRID_TOGGLE - The list element that contains the grid toggle item.
          */
         IDs: {
-            CANVAS:                'FuzzEdCanvas',
-            CONTENT:               'FuzzEdContent',
-            PROPERTIES_MENU:       'FuzzEdProperties',
-            SHAPES_MENU:           'FuzzEdShapes',
-            SPLASH:                'FuzzEdSplash',
-            NAVBAR_ACTIONS:        'FuzzEdNavbarActions'
+            CANVAS:                    'FuzzEdCanvas',
+            CONTENT:                   'FuzzEdContent',
+            PROPERTIES_MENU:           'FuzzEdProperties',
+            SHAPES_MENU:               'FuzzEdShapes',
+            SPLASH:                    'FuzzEdSplash',
+            NAVBAR_ACTIONS:            'FuzzEdNavbarActions',
+            NAVBAR_ACTION_GRID_TOGGLE: 'FuzzEdNavbarActionGridToggle'
         },
 
         /**
@@ -268,26 +280,6 @@ define(function() {
             STROKE_HIGHLIGHTED:        HIGHLIGHTED_COLOR,
             STROKE_SELECTED:           SELECTED_COLOR,
             STROKE_DISABLED:           DISABLED_COLOR
-        },
-
-        /**
-         *  Group: Properties
-         *    Configurations used for properties.
-         *
-         *  Constants:
-         *    {Array} Events - A list of input events a property may react to by implementing
-         *                     the corresponding callback function.
-         */
-        Properties: {
-            Events: [
-                'blur',
-                'change',
-                'click',
-                'focus',
-                'keydown',
-                'keyup',
-                'select'
-            ]
         },
 
         /**

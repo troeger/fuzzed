@@ -69,7 +69,7 @@
             "image": "basic_event.svg",
             "help": "Initiating failure in a basic component",
 
-            "probability": 0,
+            "probability": [0.5, 0],
             "probabilitySelected": "Exact",
 
             "propertyMenuEntries": {
@@ -88,14 +88,31 @@
                                 "likely",
                                 "very likely",
                                 "always"
-                            ]
+                            ],
+                            "values": {
+                                "never":         [0,    0],
+                                "very unlikely": [0.2,  0.1],
+                                "unlikely":      [0.33, 0.2],
+                                "more or less":  [0.5,  0.3],
+                                "likely":        [0.66, 0.2],
+                                "very likely":   [0.8,  0.1],
+                                "always":        [1,    0]
+                            }
                         },
                         "Exact": {
-                            "kind": "number",
+                            "kind": "neighborhood",
                             "min": 0,
                             "max": 1,
-                            "step": 0.01
+                            "step": 0.0001,
+                            "epsilonMin": 0,
+                            "epsilonMax": 1,
+                            "epsilonStep": 0.0001
                         }
+                    },
+
+                    "defaults": {
+                        "Fuzzy": [0.5, 0.3],
+                        "Exact": [0.5, 0]
                     }
                 }
             },
@@ -324,9 +341,17 @@
             "numberOfOutgoingConnections": 1,
             "optional": null,
             "deletable": false,
+            "decompositions": 1,
 
             "propertyMenuEntries": {
-                "optional": null
+                "optional": null,
+
+                "decompositions": {
+                    "kind": "number",
+                    "displayName": "Decompose",
+                    "min": 1,
+                    "step": 1
+                }
             }
         }
     },
@@ -339,7 +364,8 @@
         "kN",
         "cardinality",
         "kFormula",
-        "nRange"
+        "nRange",
+        "decompositions"
     ],
 
     "shapeMenuNodeDisplayOrder": [

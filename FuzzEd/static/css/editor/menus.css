@@ -99,11 +99,11 @@
 }
 
 #FuzzEdProperties .form-horizontal .controls {
-    margin-left: 100px;
+    margin-left: 110px;
 }
 
 #FuzzEdProperties .form-horizontal .control-label {
-    width: 80px;
+    width: 90px;
 
     font-weight: bold;
     color: #333;
@@ -115,6 +115,10 @@
 
 #FuzzEdProperties input[type="checkbox"] {
     margin: 9px 0 0 2px;
+}
+
+#FuzzEdProperties form.form-inline {
+    margin-bottom: 0;
 }
 
 #FuzzEdProperties form.form-inline input.input-mini:not(:first-child) {

@@ -9,10 +9,13 @@ try:
 # backwards compatibility with older versions of Python
 except ImportError:
     import simplejson as json
-import sys, ast
+import sys, ast, time
 
 from graph import Graph
 import notations
+
+def new_client_id():
+    return str( int(time.mktime(time.gmtime())))
 
 # TODO: CREATE ALL THE PROPERTIES OF THIS NODE ON CREATION (OR FACTORY METHOD?)
 

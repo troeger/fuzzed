@@ -8,6 +8,13 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
         setOptional: function(optional) {
             this.optional = optional;
 
+            // mark node optional (or remove mark)
+            if (optional) {
+                this.container.addClass(this.config.Classes.NODE_OPTIONAL);
+            } else {
+                this.container.removeClass(this.config.Classes.NODE_OPTIONAL);
+            }
+
             if (optional) {
                 this.optionalIndicator.attr('fill', this.config.Node.OPTIONAL_INDICATOR_FILL);
             } else if (this._selected) {
@@ -93,6 +100,9 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
                 .addClass(this.config.Classes.NODE_OPTIONAL_INDICATOR)
                 .prependTo(this.container);
 
+            // mark this node as optional
+            if (this.optional) this.container.addClass(this.config.Classes.NODE_OPTIONAL);
+
             // hide the optional indicator for nodes with undefined value
             if (typeof this.optional === 'undefined' || this.optional == null) {
                 optionalIndicatorWrapper.css('visibility', 'hidden');
@@ -103,13 +113,12 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
         },
 
         _setupPropertyMenuEntries: function(propertyMenuEntries, propertiesDisplayOrder) {
-            this._super(propertyMenuEntries, propertiesDisplayOrder);
-
-            if (_.has(this.propertyMenuEntries, 'optional')) {
+            if (this.propertyMenuEntries['optional']) {
                 this.propertyMenuEntries.optional.change = function() {
                     this.setOptional(this.optional);
-                }.bind(this)
+                }.bind(this);
             }
+            this._super(propertyMenuEntries, propertiesDisplayOrder);
 
             return this;
         },

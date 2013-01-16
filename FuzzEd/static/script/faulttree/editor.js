@@ -196,13 +196,13 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         _setupCutsetsActionEntry: function() {
             var navbarActionsEntry = jQuery(
                 '<li>' +
-                    '<a id="' + FaulttreeConfig.IDs.NAVBAR_ACTION_CUTSETS + '" href="#">Calculate cutsets</a>' +
+                    '<a id="' + this.config.IDs.NAVBAR_ACTION_CUTSETS + '" href="#">Calculate cutsets</a>' +
                 '</li>');
             this._navbarActionsGroup.append(navbarActionsEntry);
 
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
-                jQuery(document).trigger(FaulttreeConfig.Events.EDITOR_CALCULATE_CUTSETS, this.cutsets.show.bind(this.cutsets));
+                jQuery(document).trigger(this.config.Events.EDITOR_CALCULATE_CUTSETS, this.cutsets.show.bind(this.cutsets));
             }.bind(this));
 
             return this;

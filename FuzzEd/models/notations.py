@@ -22,7 +22,9 @@ def read_notations():
 notations = read_notations()
 
 # A map that indexes the available notations by its kind identifier
-by_kind = {notation['kind']: notation for notation in notations}
+# dict comprehension needs at least Python2.7
+#by_kind = {notation['kind']: notation for notation in notations}
+by_kind = dict([(notation['kind'], notation) for notation in notations])
 
 # This is a django.db.models.Field choice mapping for all available notations
 # The first element of each tuple is a unique string identifying the notation

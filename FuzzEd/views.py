@@ -141,10 +141,12 @@ def dashboard_edit(request, graph_id):
     if POST.get('duplicate'):
         # add new graph object
         oldgraph=Graph.objects.get(pk=graph_id)
-        cmd = commands.AddGraph.create_from(kind=oldgraph.kind, name=oldgraph.name+" (copy)", owner=request.user)
+        cmd = commands.AddGraph.create_from(kind=oldgraph.kind, 
+                                            name=oldgraph.name+" (copy)", 
+                                            owner=request.user,
+                                            add_default_nodes=False)
         cmd.do()    
         newgraph=cmd.graph
-        # TODO: Don't copy nodes which already exist (by client id) in target, duplicate only properties
         # copy all nodes and their properties
         nodemapping={}
         for node in oldgraph.nodes.all():
@@ -291,7 +293,15 @@ def login(request):
 
             # no username given, register user with his e-mail address as username
             if not user_name and email:
-                new_user = User(username=email, email=email)
+                # Google is using different claim IDs for the same user, if he comes
+                # from different originating domains
+                # This leads to a problem when user come from "www" or without "www"
+                # In this case, the new username already exists in the database
+                try:
+                    olduser = User.objects.get(username=email)
+                    new_user = User(username=email+"2", email=email)
+                except:
+                    new_user = User(username=email, email=email)
 
             # both, username and e-mail were not given, use a timestamp as username
             elif not user_name and not email:
@@ -315,6 +325,7 @@ def login(request):
                 new_user.last_name=unicode(user_ax[AX.last],'utf-8')[:29]
 
             new_user.is_active = True
+
             new_user.save()
 
             linkOpenID(new_user, user.openid_claim)
