@@ -76,7 +76,7 @@ function(Class, Config) {
             this._background.configure({
                 height: height,
                 width:  width,
-                class:  'no-print'
+                class:  Config.Classes.NO_PRINT
             });
 
             // horizontal lines
