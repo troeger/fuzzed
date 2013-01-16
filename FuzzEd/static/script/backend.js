@@ -14,6 +14,8 @@ define(['class', 'config'], function (Class, Config) {
                 .on(Config.Events.GRAPH_EDGE_ADDED,         this.graphEdgeAdded.bind(this))
                 .on(Config.Events.GRAPH_EDGE_DELETED,       this.graphEdgeDeleted.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_CUTSETS, this.calculateCutsets.bind(this));
+
+            return this;
         },
 
         deactivate: function() {
@@ -24,6 +26,8 @@ define(['class', 'config'], function (Class, Config) {
                 .off(Config.Events.GRAPH_EDGE_ADDED)
                 .off(Config.Events.GRAPH_EDGE_DELETED)
                 .off(Config.Events.EDITOR_CALCULATE_CUTSETS);
+
+            return this;
         },
 
         /*
@@ -55,6 +59,8 @@ define(['class', 'config'], function (Class, Config) {
                 error:    error    || jQuery.noop,
                 complete: complete || jQuery.noop
             });
+
+            return this;
         },
 
         /*
@@ -86,6 +92,8 @@ define(['class', 'config'], function (Class, Config) {
                 error:    error    || jQuery.noop,
                 complete: complete || jQuery.noop
             });
+
+            return this;
         },
 
         /*
@@ -108,6 +116,8 @@ define(['class', 'config'], function (Class, Config) {
                 error:    error    || jQuery.noop,
                 complete: complete || jQuery.noop
             });
+
+            return this;
         },
 
         /*
@@ -130,6 +140,8 @@ define(['class', 'config'], function (Class, Config) {
                 error:    error    || jQuery.noop,
                 complete: complete || jQuery.noop
             });
+
+            return this;
         },
 
         /*
@@ -156,6 +168,8 @@ define(['class', 'config'], function (Class, Config) {
                 error:    error    || jQuery.noop,
                 complete: complete || jQuery.noop
             });
+
+            return this;
         },
 
         /*
@@ -177,6 +191,8 @@ define(['class', 'config'], function (Class, Config) {
                 error:    error    || jQuery.noop,
                 complete: complete || jQuery.noop
             });
+
+            return this;
         },
 
         /*
@@ -199,6 +215,8 @@ define(['class', 'config'], function (Class, Config) {
                 error:    error    || jQuery.noop,
                 complete: complete || jQuery.noop
             });
+
+            return this;
         },
 
         /* Section: Internal */

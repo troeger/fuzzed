@@ -1,5 +1,5 @@
 define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
-    var Mirror = Class.extend({
+    return Class.extend({
         _container: undefined,
         _mirror:    undefined,
         _prefix:    undefined,
@@ -55,6 +55,4 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
             return this;
         }
     });
-
-    return Mirror;
 });
