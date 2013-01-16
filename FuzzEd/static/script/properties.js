@@ -614,16 +614,31 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
     });
 
     var Select = Property.extend({
-        _options: undefined,
+        _inverseValues: undefined,
+        _options:       undefined,
 
         changeEvents: function() { return ['change']; },
 
         inputValue: function(newValue) {
-            if (typeof newValue === 'undefined') return this.input.val();
+            if (typeof newValue === 'undefined') {
+                var val = this.input.val();
+                return this.options.values ? this.options.values[val] : val;
+            }
+
             this._options
                 .attr('selected', null)
-                .filter("[value='" + newValue + "']")
+                .filter("[value='" + this.options.values ? this._inverseValues[newValue] : newValue + "']")
                 .attr('selected', 'selected');
+
+            return this;
+        },
+
+        mirror: function() {
+            if (typeof this._mirror === 'undefined') return this;
+
+            var value = this.value();
+            if (this.options.values) this._mirror.show(this._inverseValues[value]);
+            else this._mirror.show(value);
 
             return this;
         },
@@ -633,8 +648,13 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
 
             if (!this.options.choices || this.options.choices.length < 2) {
                 throw '[VALUE ERROR] not enough choices: ' + this.options.choices;
-            } else if (typeof value !== 'undefined' && _.indexOf(this.options.choices, value) === -1) {
+            } else if (!this.options.values && _.indexOf(this.options.choices, value) === -1) {
                 throw '[VALUE ERROR] no choice for value: ' + value + '/' + this.options.choices;
+            } else if (typeof this.options.values !== 'undefined') {
+                if (!_.isObject(this.options.values)) {
+                    throw '[TYPE ERROR] values must be object, but was: ' + typeof this.options.values;
+                }
+                this._inverseValues = _.invert(this.options.values);
             }
 
             return this;
@@ -649,7 +669,14 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         _setupInput: function() {
             var value    = this.value();
             var select   = jQuery('<select class="input-medium">');
-            var selected = typeof value !== 'undefined' ? value : this.options.choices[0];
+            var selected = this.options.choices[0];
+
+            if (this.options.values) {
+                selected = this._inverseValues[value];
+                if (typeof selected === 'undefined') throw '[VALUE ERROR] no choice for value: ' + selected;
+            } else if (typeof value !== 'undefined') {
+                selected = value;
+            }
 
             // model each choice as an option of the select
             _.each(this.options.choices, function(choice) {
@@ -657,8 +684,8 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
                     .html(choice)
                     .attr('value', choice)
                     .attr('selected', choice === selected ? 'selected' : null)
-                    .appendTo(select));
-            });
+                );
+            }.bind(this));
 
             return select;
         }
