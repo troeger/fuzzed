@@ -1,6 +1,6 @@
-#FuzzEdCanvas {
-    overflow: visible !important;
-    height:   auto    !important;
+.no-print {
+    display:    none   !important;
+    visibility: hidden !important;
 }
 
 .menu {
@@ -8,8 +8,19 @@
     visibility: hidden !important;
 }
 
-.no-print {
-    display:    none   !important;
-    visibility: hidden !important;
+.fuzzed-node .fuzzed-node-optional-indicator circle {
+    fill: #000 !important;
 }
 
+.fuzzed-node.fuzzed-node-optional .fuzzed-node-optional-indicator circle {
+    fill: #fff !important;
+}
+
+rect, circle, line, path {
+    stroke: #000 !important;
+}
+
+#FuzzEdCanvas {
+    overflow: visible !important;
+    height:   auto    !important;
+}
