@@ -238,12 +238,11 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
                 var siblings  = this._visual.nextAll();
                 siblings.remove();
 
-
                 var current   = this._choices[currentSelection];
                 var container = this._visual.parent();
                 current.show(container);
                 siblings.appendTo(container);
-                current.inputValue(this.options.defaults[currentSelection]).blurred();
+                current.inputValue(this.options.defaults[currentSelection]).registerOn().blur();
             }
 
             return this;
