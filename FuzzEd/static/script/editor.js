@@ -30,10 +30,11 @@ function(Class, Menus, Canvas, Backend) {
          *    {Underscore Template} _nodeOffsetStylesheetTemplate - The underscore.js template used to generate the
          *                                                          CSS transformation for <_nodeOffsetPrintStylesheet>.
          */
-        config:     undefined,
-        graph:      undefined,
-        properties: undefined,
-        shapes:     undefined,
+        config:                        undefined,
+        graph:                         undefined,
+        properties:                    undefined,
+        shapes:                        undefined,
+
         _backend:                      undefined,
         _navbarActionsGroup:           undefined,
         _currentMinNodeOffsets:        {'top': 0, 'left': 0},

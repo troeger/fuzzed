@@ -84,6 +84,8 @@ define(function() {
          *    {String} NODE_HALO_CONNECT       - Class of the connection handle.
          *
          *    {String} NO_PRINT                - Class assigned to elements that should not be printed.
+         *
+         *    {String} PROPERTY_WARNING        - Class for property input fields if they are erroneous.
          */
         Classes: {
             JQUERY_UI_SELECTED:      'ui-selected',
@@ -108,7 +110,9 @@ define(function() {
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
             NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
 
-            NO_PRINT:                'no-print'
+            NO_PRINT:                'no-print',
+
+            PROPERTY_WARNING:        'error'
         },
 
         /**
@@ -276,26 +280,6 @@ define(function() {
             STROKE_HIGHLIGHTED:        HIGHLIGHTED_COLOR,
             STROKE_SELECTED:           SELECTED_COLOR,
             STROKE_DISABLED:           DISABLED_COLOR
-        },
-
-        /**
-         *  Group: Properties
-         *    Configurations used for properties.
-         *
-         *  Constants:
-         *    {Array} Events - A list of input events a property may react to by implementing
-         *                     the corresponding callback function.
-         */
-        Properties: {
-            Events: [
-                'blur',
-                'change',
-                'click',
-                'focus',
-                'keydown',
-                'keyup',
-                'select'
-            ]
         },
 
         /**
