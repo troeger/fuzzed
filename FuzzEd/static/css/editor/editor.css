@@ -6,6 +6,15 @@
     width:    100%;
 }
 
+#FuzzEdCanvas {
+    position:         relative;
+    width:            100%;
+    height:           100%;
+    overflow:         auto;
+    background-color: white;
+    z-index:          0;
+}
+
 .fuzzed-mirror {
     background-color: white;
     display: block;

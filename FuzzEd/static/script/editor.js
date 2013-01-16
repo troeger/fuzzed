@@ -15,22 +15,30 @@ function(Class, Menus, Canvas, Backend) {
          *  Group: Members
          *
          *  Properties:
-         *    {Object}         config               - Graph-specific <Config> object.
-         *    {Graph}          graph                - <Graph> instance to be edited.
-         *    {PropertiesMenu} properties           - The <Menu::PropertiesMenu> instance used by this editor for
-         *                                            changing the properties of nodes of the edited graph.
-         *    {ShapesMenu}     shapes               - The <Menu::ShapeMenu> instance use by this editor to show the
-         *                                            available shapes for the kind of the edited graph.
-         *    {Backend}        _backend             - The instance of the <Backend> that is used to communicate graph
-         *                                            changes to the server.
-         *    {jQuery Selector} _navbarActionsGroup - Navbar dropdown menu that contains the available actions.
+         *    {Object}         config                       - Graph-specific <Config> object.
+         *    {Graph}          graph                        - <Graph> instance to be edited.
+         *    {PropertiesMenu} properties                   - The <Menu::PropertiesMenu> instance used by this editor
+         *                                                    for changing the properties of nodes of the edited graph.
+         *    {ShapesMenu}     shapes                       - The <Menu::ShapeMenu> instance use by this editor to show
+         *                                                    the available shapes for the kind of the edited graph.
+         *    {Backend}        _backend                     - The instance of the <Backend> that is used to communicate
+         *                                                    graph changes to the server.
+         *    {jQuery Selector} _navbarActionsGroup         - Navbar dropdown menu that contains the available actions.
+         *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
+         *    {jQuery Selector} _nodeOffsetPrintStylesheet  - The dynamically generated and maintained stylesheet
+         *                                                    used to fix the node offset when printing the page.
+         *    {Underscore Template} _nodeOffsetStylesheetTemplate - The underscore.js template used to generate the
+         *                                                          CSS transformation for <_nodeOffsetPrintStylesheet>.
          */
         config:     undefined,
         graph:      undefined,
         properties: undefined,
         shapes:     undefined,
-        _backend:            undefined,
-        _navbarActionsGroup: undefined,
+        _backend:                      undefined,
+        _navbarActionsGroup:           undefined,
+        _currentMinNodeOffsets:        {'top': 0, 'left': 0},
+        _nodeOffsetPrintStylesheet:    undefined,
+        _nodeOffsetStylesheetTemplate: undefined,
 
         /**
          *  Group: Initialization
@@ -53,7 +61,9 @@ function(Class, Menus, Canvas, Backend) {
 
             // run a few sub initializer
             this._setupJsPlumb()
-                ._setupKeyBindings();
+                ._setupKeyBindings()
+                ._setupNodeOffsetPrintStylesheet()
+                ._setupEventCallbacks();
 
             // fetch the content from the backend
             this._loadGraph(graphId);
@@ -240,6 +250,101 @@ function(Class, Menus, Canvas, Backend) {
             }.bind(this));
 
             return this;
+        },
+
+        /**
+         *  Method: _setupNodeOffsetPrintStylesheet
+         *    Creates a print stylesheet which is used to compensate the node offsets on the canvas when printing.
+         *    Also sets up the CSS template which is used to change the transformation every time the content changes.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _setupNodeOffsetPrintStylesheet: function() {
+            // dynamically create a stylesheet, append it to the head and keep the reference to it
+            this._nodeOffsetPrintStylesheet = jQuery('<style>')
+                .attr('type',  'text/css')
+                .attr('media', 'print')
+                .appendTo('head');
+
+            // this style will transform all elements on the canvas by the given 'x' and 'y' offset
+            var transformCssTemplateText =
+                '#' + this.config.IDs.CANVAS + ' > * {\n' +
+                '   transform: translate(<%= x %>px,<%= y %>px);\n' +
+                '   -ms-transform: translate(<%= x %>px,<%= y %>px); /* IE 9 */\n' +
+                '   -webkit-transform: translate(<%= x %>px,<%= y %>px); /* Safari and Chrome */\n' +
+                '   -o-transform: translate(<%= x %>px,<%= y %>px); /* Opera */\n' +
+                '   -moz-transform: translate(<%= x %>px,<%= y %>px); /* Firefox */\n' +
+                '}';
+            // store this as a template so we can use it later to manipulate the offset
+            this._nodeOffsetStylesheetTemplate = _.template(transformCssTemplateText);
+
+            return this;
+        },
+
+        /**
+         *  Method: _setupEventCallbacks
+         *    Registers all event listeners of the editor.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _setupEventCallbacks: function() {
+            // events that trigger a re-calculation of the print offsets
+            jQuery(document).on(this.config.Events.NODE_DRAG_STOPPED,    this._updatePrintOffsets.bind(this));
+            jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED, this._updatePrintOffsets.bind(this));
+            jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED,   this._updatePrintOffsets.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Group: Print Offset Calculation
+         */
+
+        /**
+         *  Method: _calculateContentOffsets
+         *    Calculates the minimal offsets from top and left among all elements displayed on the canvas.
+         *
+         *  Returns:
+         *    An object containing the minimal top ('top') and minimal left ('left') offset to the browser borders.
+         */
+        _calculateContentOffsets: function() {
+            var minLeftOffset = Infinity;
+            var minTopOffset  = Infinity;
+
+            jQuery('.' + this.config.Classes.NODE + ', .' + this.config.Classes.MIRROR).each(function(index, element) {
+                var offset = jQuery(element).offset();
+                minLeftOffset = Math.min(minLeftOffset, offset.left);
+                minTopOffset  = Math.min(minTopOffset,  offset.top);
+            });
+
+            return {
+                'top':  minTopOffset,
+                'left': minLeftOffset
+            }
+        },
+
+        /**
+         *  Method: _updatePrintOffsets
+         *    Calculate the minimal offsets of elements on the canvas and updates the print stylesheet so that it will
+         *    compensate these offsets while printing (using CSS transforms).
+         *    This update is triggered every time a node was added, removed or moved on the canvas.
+         */
+        _updatePrintOffsets: function(event) {
+            var minOffsets = this._calculateContentOffsets();
+
+            if (minOffsets.top  == this._currentMinNodeOffsets.top &&
+                minOffsets.left == this._currentMinNodeOffsets.left) {
+                    // nothing changed
+                    return;
+                }
+
+            // replace the style text with the new transformation style
+            this._nodeOffsetPrintStylesheet.text(this._nodeOffsetStylesheetTemplate({
+                'x': -minOffsets.left + 1, // add a tolerance pixel to avoid cut edges,
+                'y': -minOffsets.top + 1
+            }));
         }
     });
 });

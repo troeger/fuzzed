@@ -82,6 +82,8 @@ define(function() {
          *    {String} NODE_DROP_ACTIVE        - Class assigned to nodes that are valid connection targets
          *                                       (when dragging a new connection).
          *    {String} NODE_HALO_CONNECT       - Class of the connection handle.
+         *
+         *    {String} NO_PRINT                - Class assigned to elements that should not be printed.
          */
         Classes: {
             JQUERY_UI_SELECTED:      'ui-selected',
@@ -104,7 +106,9 @@ define(function() {
             NODE_SELECTED:           'fuzzed-node-selected',
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
-            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect'
+            NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
+
+            NO_PRINT:                'no-print'
         },
 
         /**
@@ -135,6 +139,7 @@ define(function() {
          *    {String} CANVAS_EDGE_UNSELECTED   - Event triggered when an edge got unselected.
          *
          *    {String} NODE_PROPERTY_CHANGED    - Event triggered when a property of a node changed.
+         *    {String} NODE_DRAG_STOPPED        - Event triggered when a dragged node is dropped again.
          *
          *    {String} GRAPH_NODE_ADDED         - Event triggered when a node was added to the graph.
          *    {String} GRAPH_NODE_DELETED       - Event triggered when a node was deleted from the graph.
@@ -148,6 +153,7 @@ define(function() {
             CANVAS_EDGE_UNSELECTED:   'canvas-edge-unselected',
 
             NODE_PROPERTY_CHANGED:    'node-property-changed',
+            NODE_DRAG_STOPPED:        'node-drag-stopped',
 
             GRAPH_NODE_ADDED:         'graph-node-added',
             GRAPH_NODE_DELETED:       'graph-node-deleted',
