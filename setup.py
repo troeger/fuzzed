@@ -18,6 +18,12 @@ def build_naturaldocs():
 		os.mkdir("docs")
 	os.system("tools/NaturalDocs/NaturalDocs -i FuzzEd -o HTML docs -p docs")
 
+def build_django_require():
+	# fetch latest require.js from the internet
+	os.system("./manage.py require_init")
+	# Use Django collectstatic, which triggers django-require optimization
+	os.system("./manage.py collectstatic -v3 --noinput")
+
 def clean_pycs():
 	# Clean all pyc files recursively
 	for root, dirs, files in os.walk('FuzzEd'):
@@ -32,6 +38,7 @@ class build(_build):
 	def run(self):
 		_build.run(self)
 		build_naturaldocs()
+		build_django_require()
 
 # Our overloaded 'setup.py clean' command
 class clean(_clean):
@@ -46,7 +53,8 @@ setup(
 	install_requires=[
 		'django',
 		'south',
-		'openid2rp'
+		'openid2rp',
+		'django-require'
 	],
 	cmdclass={'build': build, 'clean': clean}
 )
