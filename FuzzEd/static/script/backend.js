@@ -1,11 +1,55 @@
 define(['class', 'config'], function (Class, Config) {
+    /**
+     * Class: Backend
+     *
+     * This small helper class is responsible for handling the communication with the Backend and so synchronize changes
+     * in the graph. The implementation is event driven. This means this helper will listen on custom events triggered
+     * by other entities and make according AJAX requests. Direct invocation of synchronization calls is highly
+     * discouraged in all cases. There should be always only Backend instance at the same time in existence to avoid
+     * data duplication in the backend.
+     */
     return Class.extend({
+        /**
+         * Group: Members
+         *
+         * Properties:
+         *   {Number} _graphId - The ID of the graph the Backend will synchronize changes for.
+         */
         _graphId: undefined,
 
+        /**
+         * Constructor: init
+         *
+         * Parameters:
+         *   {Number} graphId - The ID of the graph the Backend will synchronize changes for.
+         *
+         * Creates a new Backend instance and will capture the passed graphId.
+         */
         init: function(graphId) {
             this._graphId = graphId;
         },
 
+        /**
+         * Section: State
+         */
+
+        /**
+         * Method: activate
+         *
+         * Tells a <Backend> instance to start synchronizing changes. There MUST be one invocation off this method as
+         * data synchronization is turned off by default. Registers AJAX synchronization calls for all custom events
+         * listed below.
+         *
+         * On:
+         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::GRAPH_NODE_ADDED>
+         *   <Config::Events::GRAPH_NODE_DELETED>
+         *   <Config::Events::GRAPH_EDGE_DELETED>
+         *   <Config::Events::EDITOR_CALCULATE_CUTSETS>
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
         activate: function() {
             jQuery(document)
                 .on(Config.Events.NODE_PROPERTY_CHANGED,    this.nodePropertyChanged.bind(this))
@@ -18,6 +62,22 @@ define(['class', 'config'], function (Class, Config) {
             return this;
         },
 
+        /**
+         * Method: deactivate
+         *
+         * An invocation of this method will turn off all data synchronization with the Backend. Therefore un-registers
+         * all handlers for custom synchronization events.
+         *
+         * Off:
+         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::GRAPH_NODE_ADDED>
+         *   <Config::Events::GRAPH_NODE_DELETED>
+         *   <Config::Events::GRAPH_EDGE_DELETED>
+         *   <Config::Events::EDITOR_CALCULATE_CUTSETS>
+         *
+         * Returns:
+         *   This {<Backend>} instance for chaining.
+         */
         deactivate: function() {
             jQuery(document)
                 .off(Config.Events.NODE_PROPERTY_CHANGED)
@@ -30,17 +90,25 @@ define(['class', 'config'], function (Class, Config) {
             return this;
         },
 
-        /*
-         Function: graphEdgeAdded
-            Adds a new edge from a given source node to a given target node.
+        /**
+         * Section: Handlers
+         */
 
-         Parameters:
-             edgeId       - ID of the edge.
-             sourceNodeId - Source node of the new edge.
-             targetNodeId - Target node of the new edge.
-             success      - [optional] Will be called when the request was successful. Provides e.g. the ID of the new edge.
-             error        - [optional] Callback that gets called in case of an ajax-error.
-             complete     - [optional] Callback that is invoked in both cases - a successful or an erroneous ajax request
+        /**
+         * Method: graphEdgeAdded
+         *
+         * Adds a new edge from a given source node to a given target node.
+         *
+         * Parameters:
+         *   {Event}    event        - jQuery event object of the custom trigger.
+         *   {Number}   edgeId       - ID of the edge.
+         *   {Number}   sourceNodeId - Source node of the new edge.
+         *   {Number}   targetNodeId - Target node of the new edge.
+         *   {function} success      - [optional] Will be called when the request was successful. Provides e.g. the ID
+         *                             of the new edge.
+         *   {function} error        - [optional] Callback that gets called in case of an ajax-error.
+         *   {function} complete     - [optional] Callback that is invoked in both cases - a successful or an erroneous
+         *                             AJAX request.
          */
         graphEdgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
             var data = {
@@ -63,16 +131,21 @@ define(['class', 'config'], function (Class, Config) {
             return this;
         },
 
-        /*
-             Function: graphNodeAdded
-                 Adds a new node to the backend of this graph.
-
-             Parameters:
-                 nodeId   - The node ID.
-                 kind     - The node kind.
-                 success  - [optional] Will be called on successful node creation transmission to server.
-                 error    - [optional] Callback that gets called in case of an ajax-error.
-                 complete - [optional] Callback that is invoked when the ajax request completes successful or erroneous.
+        /**
+         * Method: graphNodeAdded
+         *
+         * Adds a new node to the backend of this graph.
+         *
+         * Parameters:
+         *   {Event}    event    - jQuery event object of the custom trigger.
+         *   {Number}   nodeId   - The node ID.
+         *   {String}   kind     - The node kind.
+         *   {Number}   x        - The grid x coordinate where the node was added.
+         *   {Number}   y        - The grid y coordinate where the node was added.
+         *   {function} success  - [optional] Will be called on successful node creation transmission to server.
+         *   {function} error    - [optional] Callback that gets called in case of an ajax-error.
+         *   {function} complete - [optional] Callback that is invoked when the ajax request completes successful or
+         *                         erroneous.
          */
         graphNodeAdded: function(event, nodeId, kind, x, y, success, error, complete) {
             var data = {
@@ -96,15 +169,17 @@ define(['class', 'config'], function (Class, Config) {
             return this;
         },
 
-        /*
-         Function: graphEdgeDeleted
-             Deletes a given edge in the backend.
-
-         Parameters:
-             edgeId   - The ID of the edge that should be deleted.
-             success  - [optional] Function that is invoked when the ajax request was successful
-             error    - [optional] Callback that gets called in case of an ajax-error.
-             complete - [optional] Callback that gets invoked in both cases - a successful and an errornous ajax-call.
+        /**
+         * Method: graphEdgeDeleted
+         *   Deletes a given edge in the backend.
+         *
+         * Parameters:
+         *   {Event}    event    - jQuery event object of the custom trigger.
+         *   {Number}   edgeId   - The ID of the edge that should be deleted.
+         *   {function} success  - [optional] Function that is invoked when the AJAX request was successful.
+         *   {function} error    - [optional] Callback that gets called in case of an AJAX error.
+         *   {function} complete - [optional] Callback that gets invoked in both cases - a successful and an errornous
+         *                         AJAX call.
          */
         graphEdgeDeleted: function(event, edgeId, success, error, complete) {
             jQuery.ajax({
@@ -120,15 +195,17 @@ define(['class', 'config'], function (Class, Config) {
             return this;
         },
 
-        /*
-         Function: graphNodeDeleted
-             Deletes a given node in the backend.
-
-         Parameters:
-             nodeId   - The ID of the node that should be deleted.
-             succes   - [optional] Callback that is being called on successful deletion on backend.
-             error    - [optional] Callback that gets called in case of an ajax-error.
-             complete - [optional] Callback that is invoked in both cases either in an successful or errornous ajax call.
+        /**
+         * Method: graphNodeDeleted
+         *
+         * Deletes a given node in the backend.
+         *
+         * Parameters:
+         *   {Event}    event    - jQuery event object of the custom trigger.
+         *   {Number}   nodeId   - The ID of the node that should be deleted.
+         *   {function} succes   - [optional] Callback that is being called on successful deletion on backend.
+         *   {function} error    - [optional] Callback that gets called in case of an ajax-error.
+         *   {function} complete - [optional] Callback that is invoked in both cases, successful and errornous requests.
          */
         graphNodeDeleted: function(event, nodeId, success, error, complete) {
             jQuery.ajax({
@@ -144,12 +221,14 @@ define(['class', 'config'], function (Class, Config) {
             return this;
         },
 
-        /*
-         Function: nodePropertyChanged
-             Changes the properties of a given node.
-
-         Parameters:
-             nodeId     - The node that shall be moved
+        /**
+         * Method: nodePropertyChanged
+         *
+         * Changes the properties of a given node.
+         *
+         * Parameters:
+         *   {Event}    event    - jQuery event object of the custom trigger.
+         * nodeId     - The node that shall be moved
              properties - The node's properties that should be changed
              success    - [optional] Function that is invoked when the node's move was successfully transmitted.
              error      - [optional] Callback that gets called in case of an ajax-error.
@@ -172,15 +251,17 @@ define(['class', 'config'], function (Class, Config) {
             return this;
         },
 
-        /*
-         Function: getGraph
-             Fetch a Graph object from the backend.
-
-         Parameters:
-             success  - [optional] Callback function for a successful asynchronous request for json representing a graph with given id.
-             error    - [optional] Callback that gets called in case of an unsuccessful retrieval of the graph from
-                        the database. Will create a new graph in the backend anyway.
-             complete - [optional] Callback that gets invoked in either a successful or erroneous graph request.
+        /**
+         * Method: getGraph
+         *
+         * Fetch a graph JSON object from the backend.
+         *
+         * Parameters:
+         *   {function} success  - [optional] Callback function for a successful asynchronous request for JSON
+         *                         representing a graph with given id.
+         *   {function} error    - [optional] Callback that gets called in case of an unsuccessful retrieval of the
+         *                         graph from the database. Will create a new graph in the backend anyway.
+         *   {function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
         getGraph: function(success, error, complete) {
             jQuery.ajax({
@@ -195,13 +276,14 @@ define(['class', 'config'], function (Class, Config) {
             return this;
         },
 
-        /*
-             Function: calculateCutsets
-                 Tells the server to calculate the minimal cutsets for the given graph and passes
-                 the results to the provided callback.
-
-             Parameters:
-                 success  - [optional] Callback function for asynchronous requests.
+        /**
+         * Method: calculateCutsets
+         *
+         * Ask the backend to calculate the minimal cutsets.
+         *
+         * Parameters:
+         *   {Event}    event    - jQuery event object of the custom trigger.
+         *   {function} success  - [optional] Callback function for asynchronous requests.
                             Will be called when the request returns with the cutsets.
                  error    - [optional] Callback that gets called in case of an error.
                  complete - [optional] Callback that gets invoked in either a successful or erroneous request.
@@ -219,12 +301,11 @@ define(['class', 'config'], function (Class, Config) {
             return this;
         },
 
-        /* Section: Internal */
+        /**
+         *  Section: URL Helper
+         */
 
-        /* Section: Helper */
-
-        _fullUrlForGraph: function() {
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + this._graphId;
+        _fullUrlForGraph: function() { return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + this._graphId;
         },
 
         _fullUrlForNodes: function() {

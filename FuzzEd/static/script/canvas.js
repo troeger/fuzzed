@@ -14,7 +14,7 @@ function(Class, Config) {
      *  Events:
      *      Config.Events.CANVAS_SHAPE_DROPPED - An SVG element was dropped onto the canvas.
      */
-    return new Class.extend({
+    return new (Class.extend({
         /**
          * Group: Members
          *
@@ -249,5 +249,5 @@ function(Class, Config) {
 
             return this;
         }
-    });
+    }));
 });
