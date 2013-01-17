@@ -28,8 +28,8 @@ define(['canvas', 'class'], function(Canvas, Class) {
         edges:        {},
         nodes:        {},
         name:         undefined,
-        _nodeClasses: {},
 
+        _nodeClasses: {},
 
         /**
          *  Group: Initialization
