@@ -56,6 +56,8 @@ setup(
 		'openid2rp',
 		'django-require'
 	],
+	packages = ['FuzzEd'],
+	include_package_data = True,
 	cmdclass={'build': build, 'clean': clean},
 	maintainer = "Peter Troeger",
 	maintainer_email ="peter.troeger@hpi.uni-potsdam.de",
