@@ -127,7 +127,8 @@ STATICFILES_FINDERS = (
 
 REQUIRE_BASE_URL = 'script'
 STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
-REQUIRE_BUILD_PROFILE = 'require_build_profile.js'
+REQUIRE_BUILD_PROFILE = '../lib/requirejs/require_build_profile.js'
+REQUIRE_JS = '../lib/requirejs/require-jquery.js'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'ki4t8(rtjqg*fqe=%3f@9*8a2xq8uub9616sstri1afl^@@4hw'
@@ -176,10 +177,6 @@ INSTALLED_APPS = (
     'require',
     'FuzzEd'
 )
-
-# do not demand django-require on production system
-if not is_production:
-    INSTALLED_APPS.append('require')
 
 
 class RequireDebugTrue(logging.Filter):

@@ -19,8 +19,6 @@ def build_naturaldocs():
 	os.system("tools/NaturalDocs/NaturalDocs -i FuzzEd -o HTML docs -p docs")
 
 def build_django_require():
-	# fetch latest require.js from the internet
-	os.system("./manage.py require_init")
 	# Use Django collectstatic, which triggers django-require optimization
 	os.system("./manage.py collectstatic -v3 --noinput")
 
