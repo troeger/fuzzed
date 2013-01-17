@@ -159,7 +159,7 @@ function(Properties, Mirror, Canvas, Class) {
             var scaleFactor  = (Canvas.gridSize - marginOffset) / this._nodeImage.height();
 
             // resize the svg and the groups
-            this._nodeImage.attr('width', this._nodeImage.width()  * scaleFactor);
+            this._nodeImage.attr('width',  this._nodeImage.width()  * scaleFactor);
             this._nodeImage.attr('height', this._nodeImage.height() * scaleFactor);
 
             var newTransform = 'scale(' + scaleFactor + ')';
@@ -191,7 +191,7 @@ function(Properties, Mirror, Canvas, Class) {
         _setupConnectionHandle: function() {
             if (this.numberOfOutgoingConnections != 0) {
                 this._connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
-                    .addClass(this.config.Classes.NODE_HALO_CONNECT)
+                    .addClass(this.config.Classes.NODE_HALO_CONNECT + ' ' + this.config.Classes.NO_PRINT)
                     .css({
                         'top':  this._nodeImage.yCenter + this._nodeImage.outerHeight(true) / 2,
                         'left': this._nodeImage.xCenter
@@ -406,6 +406,8 @@ function(Properties, Mirror, Canvas, Class) {
 
                     // forget the initial position of the nodes to allow new dragging
                     initialPositions = {};
+
+                    jQuery(document).trigger(this.config.Events.NODE_DRAG_STOPPED);
                 }.bind(this)
             });
 

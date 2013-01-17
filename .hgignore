@@ -4,3 +4,8 @@ syntax: glob
 *.orig
 *.sqlite
 .idea
+distribute-*
+FuzzEd/static-release/*
+docs/*
+FuzzEd.egg-info/*
+dist/*

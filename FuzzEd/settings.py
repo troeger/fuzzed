@@ -103,7 +103,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = 'static/'
+STATIC_ROOT = 'FuzzEd/static-release/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -125,6 +125,10 @@ STATICFILES_FINDERS = (
     #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
+REQUIRE_BASE_URL = 'script'
+STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
+REQUIRE_BUILD_PROFILE = 'require_build_profile.js'
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'ki4t8(rtjqg*fqe=%3f@9*8a2xq8uub9616sstri1afl^@@4hw'
 
@@ -138,7 +142,8 @@ TEMPLATE_LOADERS = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.contrib.auth.context_processors.auth',
-    'django.contrib.messages.context_processors.messages'
+    'django.contrib.messages.context_processors.messages',
+    'FuzzEd.contextprocessors.footer'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -168,8 +173,14 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'openid2rp.django',
     'south',
+    'require',
     'FuzzEd'
 )
+
+# do not demand django-require on production system
+if not is_production:
+    INSTALLED_APPS.append('require')
+
 
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):

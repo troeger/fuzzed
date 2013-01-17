@@ -8,7 +8,6 @@
     {{ block.super }}
     @import url("{{ STATIC_URL }}css/editor/editor.css");
     @import url("{{ STATIC_URL }}css/editor/menus.css");
-    @import url("{{ STATIC_URL }}css/editor/canvas.css");
 {% endblock %}
 
 {% block script %}
@@ -29,8 +28,9 @@
             'jquery.svgdom': '../lib/jquery-svg/jquery-svgdom-1.4.5',
             // other libs
             'bootstrap':  '../lib/bootstrap/js/bootstrap-2.0.4.min',
-            'underscore': '../lib/underscore/underscore-1.3.3',
+            'underscore': '../lib/underscore/underscore-1.4.3.min',
             'jsplumb':    '../lib/jsplumb/jsplumb-1.3.16',
+            'bignumber':  '../lib/bignumber/bignumber.min',
 
             'notations':  '../notations'
 
