@@ -177,6 +177,11 @@ INSTALLED_APPS = (
     'FuzzEd'
 )
 
+# do not demand django-require on production system
+if not is_production:
+    INSTALLED_APPS.append('require')
+
+
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):
         return DEBUG
