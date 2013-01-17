@@ -22,7 +22,7 @@ def build_django_require():
 	# fetch latest require.js from the internet
 	os.system("./manage.py require_init")
 	# Use Django collectstatic, which triggers django-require optimization
-	os.system("./manage.py collectstatic -v3 --noinput")
+#	os.system("./manage.py collectstatic -v3 --noinput")
 
 def clean_pycs():
 	# Clean all pyc files recursively
@@ -56,5 +56,8 @@ setup(
 		'openid2rp',
 		'django-require'
 	],
-	cmdclass={'build': build, 'clean': clean}
+	cmdclass={'build': build, 'clean': clean},
+	maintainer = "Peter Troeger",
+	maintainer_email ="peter.troeger@hpi.uni-potsdam.de",
+	url = "https://bitbucket.org/troeger/fuzztrees"
 )
