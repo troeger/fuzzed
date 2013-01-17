@@ -6,4 +6,5 @@ syntax: glob
 .idea
 distribute-*
 FuzzEd/static-release/*
+docs/*
 
