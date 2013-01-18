@@ -1,16 +1,21 @@
 #!/usr/bin/env python
 
-# Using distribute enhancements for setuptools
-import distribute_setup
-distribute_setup.use_setuptools()
 from setuptools import setup
 from distutils.command.build import build as _build
 from distutils.command.clean import clean as _clean
 
-import os
+import os, sys
 
 # check FuzzEd/__init__.py for the project version number
 from FuzzEd import __version__
+
+def check_pythonversion():
+	if sys.version_info.major == 2 and sys.version_info.minor < 7:
+		print("You must use Python 2.7, since django-require demands this")
+		exit(-1)
+	if sys.version_info.major > 2:
+		print("You must use Python 2, since django demands this")
+		exit(-1)
 
 def build_naturaldocs():
 	# Build natural docs in 'docs' subdirectory
@@ -45,6 +50,7 @@ class clean(_clean):
 		os.system("rm -rf docs")
 		clean_pycs()
 
+check_pythonversion()
 setup(
 	name = 'FuzzEd',
 	version = __version__,
