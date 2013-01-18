@@ -20,10 +20,10 @@ define(['class', 'config'], function (Class, Config) {
         /**
          * Constructor: init
          *
+         * Creates a new Backend instance and will capture the passed graphId.
+         *
          * Parameters:
          *   {Number} graphId - The ID of the graph the Backend will synchronize changes for.
-         *
-         * Creates a new Backend instance and will capture the passed graphId.
          */
         init: function(graphId) {
             this._graphId = graphId;
@@ -227,12 +227,14 @@ define(['class', 'config'], function (Class, Config) {
          * Changes the properties of a given node.
          *
          * Parameters:
-         *   {Event}    event    - jQuery event object of the custom trigger.
-         * nodeId     - The node that shall be moved
-             properties - The node's properties that should be changed
-             success    - [optional] Function that is invoked when the node's move was successfully transmitted.
-             error      - [optional] Callback that gets called in case of an ajax-error.
-             complete   - [optional] Callback that is always invoked no matter if ajax request was successful or erroneous.
+         *   {Event}    event      - jQuery event object of the custom trigger.
+         *   {Number}   nodeId     - The node that shall be moved.
+         *   {Object}   properties - The node's properties that should be changed. Keys stand for property names and
+         *                           their assigned values is the new state.
+         *   {function} success    - [optional] Callback that is called when the move was successfully saved.
+         *   {function} error      - [optional] Callback that gets called in case of an AJAX error.
+         *   {function} complete   - [optional] Callback that is always invoked no matter if AJAX request was successful
+         *                           or erroneous.
          */
         nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
             jQuery.ajax({
@@ -283,10 +285,9 @@ define(['class', 'config'], function (Class, Config) {
          *
          * Parameters:
          *   {Event}    event    - jQuery event object of the custom trigger.
-         *   {function} success  - [optional] Callback function for asynchronous requests.
-                            Will be called when the request returns with the cutsets.
-                 error    - [optional] Callback that gets called in case of an error.
-                 complete - [optional] Callback that gets invoked in either a successful or erroneous request.
+         *   {function} success  - [optional] Callback that is called when the calculation was successful.
+         *   {function} error    - [optional] Callback that gets called in case of an AJAX error.
+         *   {function} complete - [optional] Callback that gets invoked in both; successful or erroneous request.
          */
         calculateCutsets: function(event, success, error, complete) {
             jQuery.ajax({
@@ -305,25 +306,81 @@ define(['class', 'config'], function (Class, Config) {
          *  Section: URL Helper
          */
 
-        _fullUrlForGraph: function() { return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + this._graphId;
+        /**
+         * Method: _fullUrlForGraph
+         *
+         * Calculates the AJAX backend URL for this graph (see: <Backend::_graphId>).
+         *
+         * Returns:
+         *   The graph URL as {String}.
+         */
+        _fullUrlForGraph: function() {
+            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + this._graphId;
         },
 
+        /**
+         * Method: _fullUrlForNodes
+         *
+         * Calculates the AJAX backend URL for the graph's nodes. Allows to fetch all of them or to create a new one.
+         *
+         * Returns:
+         *   The graph's nodes URL as {String}.
+         */
         _fullUrlForNodes: function() {
             return this._fullUrlForGraph() + Config.Backend.NODES_URL;
         },
 
+        /**
+         * Method: _fullUrlForNode
+         *
+         * Calculates the AJAX backend URL for on particular node of the graph. Allows to fetch, modify or delete it.
+         *
+         * Parameters:
+         *   {Number} nodeId - The id of the node.
+         *
+         * Returns:
+         *   The node's URL as {String}.
+         */
         _fullUrlForNode: function(nodeId) {
             return this._fullUrlForNodes() + '/' + nodeId;
         },
 
+        /**
+         * Method: _fullUrlForEdges
+         *
+         * Calculates the AJAX backend URL for the graph's edges. Allows to fetch all of them or to create a new one.
+         *
+         * Returns:
+         *   The graph's edges URL as {String}.
+         */
         _fullUrlForEdges: function() {
             return this._fullUrlForGraph() + Config.Backend.EDGES_URL;
         },
 
+        /**
+         * Method: _fullUrlForEdge
+         *
+         * Calculates the AJAX backend URL for a particular edge of the graph. Allows to fetch, modify or delete it.
+         *
+         * Parameters:
+         *   {Number} edgeId - The id of the edge.
+         *
+         * Returns:
+         *   The edge's URL as {String}.
+         */
         _fullUrlForEdge: function(edgeId) {
             return this._fullUrlForEdges() + '/' + edgeId;
         },
 
+        /**
+         * Method: _fullUrlForCutsets
+         *
+         * Calculates the AJAX backend URL calculating the cutsets of a graph. Cutsets are only available in Fault- and
+         * Fuzztrees.
+         *
+         * Returns:
+         *   The cutset URL as {String}.
+         */
         _fullUrlForCutsets: function() {
             return this._fullUrlForGraph() + Config.Backend.CUTSETS_URL;
         }
