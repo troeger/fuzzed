@@ -12,6 +12,8 @@ ADMINS = (
 MANAGERS = ADMINS
 EMAIL_SUBJECT_PREFIX = '[FuzzTrees] '
 
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+
 if is_production:
     DEBUG =                   True
     TEMPLATE_DEBUG =          DEBUG
@@ -36,8 +38,7 @@ if is_production:
         # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
-        '/var/www/fuzztrees.net/FuzzEd/templates',
-        '/var/www/fuzztrees.net/FuzzEd/static/img'
+        PROJECT_ROOT+'/static-release/img',
     )
 
 else:
@@ -127,7 +128,8 @@ STATICFILES_FINDERS = (
 
 REQUIRE_BASE_URL = 'script'
 STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
-REQUIRE_BUILD_PROFILE = 'require_build_profile.js'
+REQUIRE_BUILD_PROFILE = '../lib/requirejs/require_build_profile.js'
+REQUIRE_JS = '../lib/requirejs/require-jquery.js'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'ki4t8(rtjqg*fqe=%3f@9*8a2xq8uub9616sstri1afl^@@4hw'
@@ -176,10 +178,6 @@ INSTALLED_APPS = (
     'require',
     'FuzzEd'
 )
-
-# do not demand django-require on production system
-if not is_production:
-    INSTALLED_APPS.append('require')
 
 
 class RequireDebugTrue(logging.Filter):
