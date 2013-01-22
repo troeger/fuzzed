@@ -1,0 +1,11 @@
+include distribute_setup.py
+include manage.py
+include setup.py
+recursive-include FuzzEd *.py
+graft FuzzEd/lib
+graft FuzzEd/management
+graft FuzzEd/migrations
+graft FuzzEd/models
+graft FuzzEd/static-release
+graft FuzzEd/templates
+

@@ -12,6 +12,8 @@ ADMINS = (
 MANAGERS = ADMINS
 EMAIL_SUBJECT_PREFIX = '[FuzzTrees] '
 
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+
 if is_production:
     DEBUG =                   True
     TEMPLATE_DEBUG =          DEBUG
@@ -36,8 +38,7 @@ if is_production:
         # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
-        '/var/www/fuzztrees.net/FuzzEd/templates',
-        '/var/www/fuzztrees.net/FuzzEd/static/img'
+        PROJECT_ROOT+'/static-release/img',
     )
 
 else:
@@ -103,7 +104,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = 'static/'
+STATIC_ROOT = 'FuzzEd/static-release/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -124,6 +125,11 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+
+REQUIRE_BASE_URL = 'script'
+STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
+REQUIRE_BUILD_PROFILE = '../lib/requirejs/require_build_profile.js'
+REQUIRE_JS = '../lib/requirejs/require-jquery.js'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'ki4t8(rtjqg*fqe=%3f@9*8a2xq8uub9616sstri1afl^@@4hw'
@@ -169,8 +175,10 @@ INSTALLED_APPS = (
     'django.contrib.admindocs',
     'openid2rp.django',
     'south',
+    'require',
     'FuzzEd'
 )
+
 
 class RequireDebugTrue(logging.Filter):
     def filter(self, record):
