@@ -38,8 +38,8 @@ define(['rbd/config', 'node'], function(Config, AbstractNode) {
                 this._connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
                     .addClass(this.config.Classes.NODE_HALO_CONNECT)
                     .css({
-                        'top':  this._nodeImage.position().top  + this._nodeImage.outerHeight(true) / 2,
-                        'left':  this._nodeImage.position().left + this._nodeImage.outerWidth() + leftOffset
+                        'top':  this._nodeImageContainer.position().top  + this._nodeImage.outerHeight(true) / 2,
+                        'left':  this._nodeImageContainer.position().left + this._nodeImage.outerWidth() + leftOffset
                     })
                     .appendTo(this.container);
             }
