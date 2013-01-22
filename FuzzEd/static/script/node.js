@@ -15,26 +15,28 @@ function(Properties, Mirror, Canvas, Class) {
          *  Group: Members
          *
          *  Properties:
-         *    {Object}     config            - An object containing node configuration constants. If not set otherwise,
-         *                                     defaults to <Node::getConfig()>.
-         *    {DOMElement} container         - The DOM element that contains all other visual DOM elements of the node
-         *                                     such as its image, mirrors, ...
-         *    {int}        id                - A client-side generated id - i.e. UNIX-timestamp - to uniquely identify
-         *                                     the node in the frontend. It does NOT correlate with database ids in the
-         *                                     backend. Introduced to save round-trips and to later allow for an
-         *                                     offline mode.
-         *    {Array[<Edge>]} incomingEdges  - An enumeration of all edges linking TO this node (this node is the target
-         *                                     target of the edge).
-         *    {Array[<Edge>]} outgoingEdges  - An enumeration of all edges linking FROM this node (this node is the
-         *                                     source of the edge).
-         *    {bool}       _disabled         - Boolean flag indicating whether this node may be a target for a
-         *                                     currently drawn edge. True disables connection and therefore fades out
-         *                                     the node.
-         *    {bool}       _highlighted      - Boolean flag that is true when the node needs to be highlighted on hover.
-         *    {bool}       _selected         - Boolean flag that is true when the node is selected - i.e. clicked.
-         *    {DOMElement} _nodeImage        - DOM element that contains the actual image/svg of the node.
-         *    {DOMElement} _connectionHandle - DOM element containing the visual representation of the handle where one
-         *                                     can pull out new edges.
+         *    {Object}     config              - An object containing node configuration constants. If not set otherwise,
+         *                                       defaults to <Node::getConfig()>.
+         *    {DOMElement} container           - The DOM element that contains all other visual DOM elements of the node
+         *                                       such as its image, mirrors, ...
+         *    {int}        id                  - A client-side generated id - i.e. UNIX-timestamp - to uniquely identify
+         *                                       the node in the frontend. It does NOT correlate with database ids in the
+         *                                       backend. Introduced to save round-trips and to later allow for an
+         *                                       offline mode.
+         *    {Array[<Edge>]} incomingEdges    - An enumeration of all edges linking TO this node (this node is the target
+         *                                       target of the edge).
+         *    {Array[<Edge>]} outgoingEdges    - An enumeration of all edges linking FROM this node (this node is the
+         *                                       source of the edge).
+         *    {bool}       _disabled           - Boolean flag indicating whether this node may be a target for a
+         *                                       currently drawn edge. True disables connection and therefore fades out
+         *                                       the node.
+         *    {bool}       _highlighted        - Boolean flag that is true when the node needs to be highlighted on hover.
+         *    {bool}       _selected           - Boolean flag that is true when the node is selected - i.e. clicked.
+         *    {DOMElement} _nodeImage          - DOM element that contains the actual image/svg of the node.
+         *    {DOMElement} _nodeImageContainer - A wrapper for the node image which is necessary to get position
+         *                                       calculation working in Firefox.
+         *    {DOMElement} _connectionHandle   - DOM element containing the visual representation of the handle where one
+         *                                       can pull out new edges.
          */
         config:        undefined,
         container:     undefined,
@@ -42,11 +44,12 @@ function(Properties, Mirror, Canvas, Class) {
         incomingEdges: undefined,
         outgoingEdges: undefined,
 
-        _disabled:         false,
-        _highlighted:      false,
-        _selected:         false,
-        _nodeImage:        undefined,
-        _connectionHandle: undefined,
+        _disabled:           false,
+        _highlighted:        false,
+        _selected:           false,
+        _nodeImage:          undefined,
+        _nodeImageContainer: undefined,
+        _connectionHandle:   undefined,
 
         /**
          * Group: Initialization
@@ -125,12 +128,15 @@ function(Properties, Mirror, Canvas, Class) {
                 // add new classes for the actual node
                 .addClass(this.config.Classes.NODE_IMAGE);
 
+            this._nodeImageContainer = jQuery('<div>')
+                .append(this._nodeImage);
+
             this.container = jQuery('<div>')
                 .attr('id', this.kind + this.id)
                 .addClass(this.config.Classes.NODE)
                 .css('position', 'absolute')
                 .data(this.config.Keys.NODE, this)
-                .append(this._nodeImage);
+                .append(this._nodeImageContainer);
 
             this.container.appendTo(Canvas.container);
 
@@ -172,8 +178,9 @@ function(Properties, Mirror, Canvas, Class) {
             this.container.width(this._nodeImage.width());
 
             // cache center of the image
-            this._nodeImage.xCenter = this._nodeImage.position().left + this._nodeImage.outerWidth(true)  / 2;
-            this._nodeImage.yCenter = this._nodeImage.position().top  + this._nodeImage.outerHeight(true) / 2;
+            // XXX: We need to use the node image's container's position because Firefox fails otherwise
+            this._nodeImage.xCenter = this._nodeImageContainer.position().left + this._nodeImage.outerWidth(true)  / 2;
+            this._nodeImage.yCenter = this._nodeImageContainer.position().top  + this._nodeImage.outerHeight(true) / 2;
 
             return this;
         },
