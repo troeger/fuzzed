@@ -550,7 +550,9 @@ function(Properties, Mirror, Canvas, Class) {
          *   {Object} with 'in' and 'out' keys containing {Objects} with pixel offsets of the connectors.
          */
         _connectorOffset: function() {
-            var topOffset = this._nodeImage.offset().top - this.container.offset().top;
+            // XXX: We need to use the offset of the image container because FF has difficulties to calculate the
+            //      offsets of inline SVG elements directly.
+            var topOffset = this._nodeImageContainer.offset().top - this.container.offset().top;
             var bottomOffset = topOffset + this._nodeImage.height() + this.connector.offset.bottom;
 
             return {
