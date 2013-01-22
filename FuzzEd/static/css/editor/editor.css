@@ -69,7 +69,7 @@
 .fuzzed-node-optional-indicator {
     width:   12px;
     height:  12px;
-    margin:  0 auto;
+    margin:  0 auto -1px auto; /* let it melt with the node image below */
 }
 
 .jsplumb-endpoint {

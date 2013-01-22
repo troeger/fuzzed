@@ -81,10 +81,14 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
 
             var optionalIndicatorWrapper = jQuery('<div>').svg();
             var optionalIndicator = optionalIndicatorWrapper.svg('get');
-            var radius = this.config.Node.OPTIONAL_INDICATOR_RADIUS;
 
-            var optionalIndicatorCircle = optionalIndicator.circle(null, radius + 1, radius + 1, radius, {
-                strokeWidth: this.config.Node.OPTIONAL_INDICATOR_STROKE,
+            var radius      = this.config.Node.OPTIONAL_INDICATOR_RADIUS;
+            var strokeWidth = this.config.Node.OPTIONAL_INDICATOR_STROKE;
+
+            optionalIndicator.configure({width: 2 * (radius + strokeWidth), height: 2 * (radius + strokeWidth)});
+
+            var optionalIndicatorCircle = optionalIndicator.circle(null, radius + strokeWidth/2, radius + strokeWidth/2, radius, {
+                strokeWidth: strokeWidth,
                 fill: this.optional ? this.config.Node.OPTIONAL_INDICATOR_FILL : this.config.Node.STROKE_NORMAL,
                 stroke: this.config.Node.STROKE_NORMAL
             });
