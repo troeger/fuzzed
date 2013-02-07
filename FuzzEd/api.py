@@ -21,7 +21,6 @@ from FuzzEd.models import Graph, Node, notations, commands
 from FuzzEd import backend
 
 import logging
-
 logger = logging.getLogger('FuzzEd')
 
 try:

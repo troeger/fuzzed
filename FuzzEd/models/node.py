@@ -4,7 +4,10 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
-from xml_fuzztree import TopEvent_ as XmlTopEvent, BasicEvent_ as XmlBasicEvent
+import logging
+logger = logging.getLogger('FuzzEd')
+
+from xml_fuzztree import TopEvent_ as XmlTopEvent, BasicEvent_ as XmlBasicEvent, And_ as XmlAndGate, Or_ as XmlOrGate, CrispProbability_ as XmlCrispProbability
 
 try:
     import json
@@ -106,10 +109,27 @@ class Node(models.Model):
             raise ValueError('Node %s has unsupported kind' % (str(self)))
 
     def to_xml(self):
-        if self.kind == "topEvent":
-            xmlnode=XmlTopEvent(id=self.id, name=str(self))
+        try:
+            name = self.properties.get(key='name').value
+        except:
+            name = ""
+        if self.kind == 'topEvent':
+            logger.debug("Adding top event XML")
+            xmlnode = XmlTopEvent(id=self.id, name=name)
+        elif self.kind == 'andGate':
+            logger.debug("Adding AND gate XML")
+            xmlnode = XmlAndGate(id=self.id, name=name)
+        elif self.kind == 'orGate':
+            logger.debug("Adding OR gate XML")
+            xmlnode = XmlOrGate(id=self.id, name=name)
+        elif self.kind == 'basicEvent':
+            logger.debug("Adding basic event XML")
+            xmlnode=XmlBasicEvent(id=self.id, name=name, costs=3, probability=XmlCrispProbability(value_=45))
         else:
-            xmlnode=XmlBasicEvent(id=self.id, name=str(self))
+            raise ValueError('Unsupported node %s for xml serialization'%str(self))
+        outgoing = self.outgoing.filter(deleted=False)
+        for edge in outgoing:
+            xmlnode.children.append(edge.target.to_xml())
         return xmlnode
 
     def get_attr(self, key):
