@@ -6,7 +6,8 @@ from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
-from xml_fuzztree import FuzzTree as XmlFuzzTree
+import pyxb.utils.domutils
+from xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlNamespace
 
 try:
     import json
@@ -98,6 +99,7 @@ class Graph(models.Model):
         # Find root node and start from there
         topEventNode = self.nodes.get(kind='topEvent')
         ft.topEvent = topEventNode.to_xml()
+        pyxb.utils.domutils.BindingDOMSupport.DeclareNamespace(XmlNamespace, 'ft')
         return ft.toxml("utf-8")
 
 # validation handler that ensures that the graph kind is known
