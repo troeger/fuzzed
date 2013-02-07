@@ -51,6 +51,17 @@ class Graph(models.Model):
         """
         return json.dumps(self.to_dict())
 
+    def to_xml(self):
+        """
+        Method: to_xml
+            Serializes the graph into its XML representation.
+
+        Returns:
+            {string} The XML representation of the graph
+        """
+        #TODO
+        return "<foo></foo>"
+
     def to_dict(self):
         """
         Method: to_dict

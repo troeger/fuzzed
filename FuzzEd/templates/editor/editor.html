@@ -74,7 +74,7 @@
         </a>
         <ul id="FuzzEdNavbarActions" class="dropdown-menu">
             {% if graph.kind == 'fuzztree' %}
-                <li><a>Save as XML <i class="icon-download"></i></a></li>
+                <li><a href="{% url download graph_id=graph.pk %}">Save as XML <i class="icon-download"></i></a></li>
             {% endif %}
         </ul>
     </li>
