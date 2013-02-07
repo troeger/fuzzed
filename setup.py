@@ -22,6 +22,12 @@ def check_pythonversion():
 		print("You must use Python 2, since django demands this")
 		exit(-1)
 
+def build_xmlschema_wrapper():
+	if os.path.exists("FuzzEd/models/xml_fuzztree.py"):
+		print ("Deleting old schema wrapper")
+		os.remove("FuzzEd/models/xml_fuzztree.py")
+	os.system("pyxbgen -u FuzzEd/static/xsd/fuzztree.xsd --binding-root=FuzzEd/models/ -m xml_fuzztree")
+
 def build_naturaldocs():
 	# Build natural docs in 'docs' subdirectory
 	if not os.path.exists("docs"):
@@ -58,6 +64,7 @@ def clean_pycs():
 class build(_build):
 	def run(self):
 		_build.run(self)
+		build_xmlschema_wrapper()
 		build_notations()
 		build_naturaldocs()
 		build_django_require()
@@ -78,7 +85,8 @@ setup(
 		'south',
 		'openid2rp',
 		'django-require',
-		'minbool'
+		'minbool',
+		'pyxb'
 	],
 	packages = ['FuzzEd'],
 	include_package_data = True,

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns:ft="de.hpi.dcl.fuzztree" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="de.hpi.dcl.fuzztree">
+<xsd:schema xmlns:ft="net.fuzztrees" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztrees">
   <xsd:complexType name="FuzzTree">
     <xsd:complexContent>
       <xsd:extension base="ft:Model">

@@ -6,6 +6,8 @@ from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
+import xml.etree.ElementTree as ET
+
 try:
     import json
 # backwards compatibility with older versions of Python
@@ -76,6 +78,10 @@ class Graph(models.Model):
     def to_bool_term(self):
         root = self.nodes.get(kind__exact = 'topEvent')
         return root.to_bool_term()
+
+    def to_xml(self):
+        xml = ET.Element('')
+        return ET.dump(xml)
 
 # validation handler that ensures that the graph kind is known
 @receiver(pre_save, sender=Graph)
