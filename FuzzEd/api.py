@@ -138,6 +138,9 @@ def download(request, graph_id):
     if format == 'xml':
         response.content = graph.to_xml()
         response['Content-Type'] = 'application/xml'
+    elif format == 'json':
+        response.content = graph.to_json()
+        response['Content-Type'] = 'application/javascript'
     else:
         raise HttpResponseNotFoundAnswer()
 
