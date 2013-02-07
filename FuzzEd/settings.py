@@ -12,6 +12,8 @@ ADMINS = (
 MANAGERS = ADMINS
 EMAIL_SUBJECT_PREFIX = '[FuzzTrees] '
 
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+
 if is_production:
     DEBUG =                   True
     TEMPLATE_DEBUG =          DEBUG
@@ -36,8 +38,7 @@ if is_production:
         # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
         # Always use forward slashes, even on Windows.
         # Don't forget to use absolute paths, not relative paths.
-        '/var/www/fuzztrees.net/FuzzEd/templates',
-        '/var/www/fuzztrees.net/FuzzEd/static/img'
+        PROJECT_ROOT+'/static-release/img',
     )
 
 else:

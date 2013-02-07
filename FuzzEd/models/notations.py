@@ -1,25 +1,5 @@
-try:
-    import json
-except ImportError:
-    import simplejson as json
-
 import os
-from django.contrib.staticfiles import finders
-
-def read_notations():
-    notations_dir = finders.find('notations')
-    file_list = os.listdir(notations_dir)
-    notations = []
-
-    for file in [os.path.join(notations_dir, file_name) for file_name in file_list]:
-        if os.path.isfile(file) and file.endswith('.json'):
-            handle = open(file)
-            notations.append(json.loads(handle.read()))
-            handle.close()
-
-    return notations
-
-notations = read_notations()
+from notations_data import notations
 
 # A map that indexes the available notations by its kind identifier
 # dict comprehension needs at least Python2.7
