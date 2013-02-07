@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
-import xml.etree.ElementTree as ET
+from xml_fuzztree import FuzzTree as XmlFuzzTree
 
 try:
     import json
@@ -80,8 +80,14 @@ class Graph(models.Model):
         return root.to_bool_term()
 
     def to_xml(self):
-        xml = ET.Element('')
-        return ET.dump(xml)
+        if self.kind != "fuzztree":
+            raise ApplicationError("No XML support for this graph type.")
+        #TODO: Add UI and model attribute for the decomposition number
+        ft = XmlFuzzTree(name = self.name, id = self.pk, decompositionNumber = 1)
+        # Find root node and start from there
+        topEventNode = self.nodes.get(kind='topEvent')
+        ft.topEvent = topEventNode.to_xml()
+        return ft.toxml("utf-8")
 
 # validation handler that ensures that the graph kind is known
 @receiver(pre_save, sender=Graph)

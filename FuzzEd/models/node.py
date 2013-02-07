@@ -4,6 +4,8 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
+from xml_fuzztree import TopEvent_ as XmlTopEvent, BasicEvent_ as XmlBasicEvent
+
 try:
     import json
 # backwards compatibility with older versions of Python
@@ -102,6 +104,13 @@ class Node(models.Model):
             return str(children[0])
         else:
             raise ValueError('Node %s has unsupported kind' % (str(self)))
+
+    def to_xml(self):
+        if self.kind == "topEvent":
+            xmlnode=XmlTopEvent(id=self.id, name=str(self))
+        else:
+            xmlnode=XmlBasicEvent(id=self.id, name=str(self))
+        return xmlnode
 
     def get_attr(self, key):
         """
