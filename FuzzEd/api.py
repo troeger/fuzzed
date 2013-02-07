@@ -110,7 +110,44 @@ def graph(request, graph_id):
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
     return HttpResponse(graph.to_json(), 'application/javascript')
-    
+
+@login_required
+@csrf_exempt
+@require_GET
+def download(request, graph_id):
+    """
+    Function: download
+        Downloads the graph represented in the specified format
+
+    Request:            GET - /api/graphs/<GRAPH_ID>/download
+    Request Parameters: [optional] format - Specifies the download format. Default is 'xml'.
+    Response:           TODO
+
+    Parameters:
+     {HTTPRequest} request   - the django request object
+     {int}         graph_id  - the id of the graph to be downloaded
+
+    Returns:
+     {HTTPResponse} a django response object
+    """
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    format = request.GET.get('format', 'xml')
+
+    response = HttpResponse()
+
+    if format == 'xml':
+        response.content = graph.to_xml()
+        response['Content-Type'] = 'application/xml'
+    elif format == 'json':
+        response.content = graph.to_json()
+        response['Content-Type'] = 'application/javascript'
+    else:
+        raise HttpResponseNotFoundAnswer()
+
+    response['Content-Disposition'] = 'attachment; filename=' + graph.name + '.' + format
+
+    return response
+
 @login_required
 @csrf_exempt
 @require_ajax
