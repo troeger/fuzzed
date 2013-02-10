@@ -1,7 +1,7 @@
 # FuzzEd/models/xml_fuzztree.py
 # -*- coding: utf-8 -*-
 # PyXB bindings for NM:84def04fabc9e327466e8c2ac467d44685334389
-# Generated 2013-02-07 13:09:41.006984 by PyXB version 1.2.1
+# Generated 2013-02-10 23:02:27.449444 by PyXB version 1.2.1
 # Namespace net.fuzztrees
 
 import pyxb
@@ -13,7 +13,7 @@ import pyxb.utils.domutils
 import sys
 
 # Unique identifier for bindings created at the same time
-_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:4031890c-711f-11e2-ac49-3c075444999d')
+_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:8ea87786-73cd-11e2-8adb-f81edfec58b7')
 
 # Import bindings for namespaces imported into schema
 import pyxb.binding.datatypes
@@ -66,11 +66,11 @@ class AnnotatedElement (pyxb.binding.basis.complexTypeDefinition):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'AnnotatedElement')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 28, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 28, 2)
     # Base type is pyxb.binding.datatypes.anyType
     
     # Element annotations uses Python identifier annotations
-    __annotations = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'annotations'), 'annotations', '__net_fuzztrees_AnnotatedElement_annotations', True, pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6), )
+    __annotations = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'annotations'), 'annotations', '__net_fuzztrees_AnnotatedElement_annotations', True, pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6), )
 
     
     annotations = property(__annotations.value, __annotations.set, None, None)
@@ -78,16 +78,16 @@ class AnnotatedElement (pyxb.binding.basis.complexTypeDefinition):
     
     # Attribute id uses Python identifier id
     __id = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'id'), 'id', '__net_fuzztrees_AnnotatedElement_id', pyxb.binding.datatypes.int, required=True)
-    __id._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 32, 4)
-    __id._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 32, 4)
+    __id._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 32, 4)
+    __id._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 32, 4)
     
     id = property(__id.value, __id.set, None, None)
 
     
     # Attribute name uses Python identifier name
     __name = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'name'), 'name', '__net_fuzztrees_AnnotatedElement_name', pyxb.binding.datatypes.string)
-    __name._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 33, 4)
-    __name._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 33, 4)
+    __name._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 33, 4)
+    __name._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 33, 4)
     
     name = property(__name.value, __name.set, None, None)
 
@@ -109,7 +109,7 @@ class Annotation (pyxb.binding.basis.complexTypeDefinition):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_EMPTY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'Annotation')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 108, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 108, 2)
     # Base type is pyxb.binding.datatypes.anyType
 
     _ElementMap = {
@@ -128,7 +128,7 @@ class Probability (pyxb.binding.basis.complexTypeDefinition):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_EMPTY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'Probability')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 109, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 109, 2)
     # Base type is pyxb.binding.datatypes.anyType
 
     _ElementMap = {
@@ -147,7 +147,7 @@ class EventSet_ (pyxb.binding.basis.complexTypeDefinition):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_EMPTY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'EventSet')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 183, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 183, 2)
     # Base type is pyxb.binding.datatypes.anyType
 
     _ElementMap = {
@@ -166,11 +166,11 @@ class Node (AnnotatedElement):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'Node')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 14, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 14, 2)
     # Base type is AnnotatedElement
     
     # Element children uses Python identifier children
-    __children = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'children'), 'children', '__net_fuzztrees_Node_children', True, pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10), )
+    __children = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'children'), 'children', '__net_fuzztrees_Node_children', True, pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10), )
 
     
     children = property(__children.value, __children.set, None, None)
@@ -200,7 +200,7 @@ class Model (AnnotatedElement):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'Model')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 23, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 23, 2)
     # Base type is AnnotatedElement
     
     # Element annotations (annotations) inherited from {net.fuzztrees}AnnotatedElement
@@ -227,13 +227,13 @@ class CrispProbability_ (Probability):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_EMPTY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'CrispProbability')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 130, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 130, 2)
     # Base type is Probability
     
     # Attribute value uses Python identifier value_
     __value = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'value'), 'value_', '__net_fuzztrees_CrispProbability__value', pyxb.binding.datatypes.double, required=True)
-    __value._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 133, 8)
-    __value._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 133, 8)
+    __value._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 133, 8)
+    __value._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 133, 8)
     
     value_ = property(__value.value, __value.set, None, None)
 
@@ -256,37 +256,37 @@ class TriangularFuzzyInterval_ (Probability):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_EMPTY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'TriangularFuzzyInterval')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 138, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 138, 2)
     # Base type is Probability
     
     # Attribute a uses Python identifier a
     __a = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'a'), 'a', '__net_fuzztrees_TriangularFuzzyInterval__a', pyxb.binding.datatypes.double, required=True)
-    __a._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 141, 8)
-    __a._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 141, 8)
+    __a._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 141, 8)
+    __a._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 141, 8)
     
     a = property(__a.value, __a.set, None, None)
 
     
     # Attribute b1 uses Python identifier b1
     __b1 = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'b1'), 'b1', '__net_fuzztrees_TriangularFuzzyInterval__b1', pyxb.binding.datatypes.double, required=True)
-    __b1._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 142, 8)
-    __b1._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 142, 8)
+    __b1._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 142, 8)
+    __b1._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 142, 8)
     
     b1 = property(__b1.value, __b1.set, None, None)
 
     
     # Attribute b2 uses Python identifier b2
     __b2 = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'b2'), 'b2', '__net_fuzztrees_TriangularFuzzyInterval__b2', pyxb.binding.datatypes.double, required=True)
-    __b2._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 143, 8)
-    __b2._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 143, 8)
+    __b2._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 143, 8)
+    __b2._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 143, 8)
     
     b2 = property(__b2.value, __b2.set, None, None)
 
     
     # Attribute c uses Python identifier c
     __c = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'c'), 'c', '__net_fuzztrees_TriangularFuzzyInterval__c', pyxb.binding.datatypes.double, required=True)
-    __c._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 144, 8)
-    __c._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 144, 8)
+    __c._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 144, 8)
+    __c._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 144, 8)
     
     c = property(__c.value, __c.set, None, None)
 
@@ -312,11 +312,11 @@ class FuzzTree_ (Model):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'FuzzTree')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 3, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 3, 2)
     # Base type is Model
     
     # Element topEvent uses Python identifier topEvent
-    __topEvent = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'topEvent'), 'topEvent', '__net_fuzztrees_FuzzTree__topEvent', False, pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 7, 10), )
+    __topEvent = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'topEvent'), 'topEvent', '__net_fuzztrees_FuzzTree__topEvent', False, pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 7, 10), )
 
     
     topEvent = property(__topEvent.value, __topEvent.set, None, None)
@@ -326,8 +326,8 @@ class FuzzTree_ (Model):
     
     # Attribute decompositionNumber uses Python identifier decompositionNumber
     __decompositionNumber = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'decompositionNumber'), 'decompositionNumber', '__net_fuzztrees_FuzzTree__decompositionNumber', pyxb.binding.datatypes.int, required=True)
-    __decompositionNumber._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 9, 8)
-    __decompositionNumber._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 9, 8)
+    __decompositionNumber._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 9, 8)
+    __decompositionNumber._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 9, 8)
     
     decompositionNumber = property(__decompositionNumber.value, __decompositionNumber.set, None, None)
 
@@ -354,7 +354,7 @@ class SinkNode (Node):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'SinkNode')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 115, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 115, 2)
     # Base type is Node
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -383,7 +383,7 @@ class ChildNode (Node):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'ChildNode')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 120, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 120, 2)
     # Base type is Node
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -412,7 +412,7 @@ class Gate (ChildNode):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'Gate')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 35, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 35, 2)
     # Base type is ChildNode
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -441,7 +441,7 @@ class TopEvent_ (SinkNode):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'TopEvent')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 52, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 52, 2)
     # Base type is SinkNode
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -470,7 +470,7 @@ class SourceNode (ChildNode):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'SourceNode')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 110, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 110, 2)
     # Base type is ChildNode
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -499,7 +499,7 @@ class ConfigurableNode (ChildNode):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'ConfigurableNode')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 125, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 125, 2)
     # Base type is ChildNode
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -528,7 +528,7 @@ class IntermediateEvent_ (ChildNode):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'IntermediateEvent')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 155, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 155, 2)
     # Base type is ChildNode
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -557,7 +557,7 @@ class BasicEvent_ (SourceNode):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'BasicEvent')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 40, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 40, 2)
     # Base type is SourceNode
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -565,7 +565,7 @@ class BasicEvent_ (SourceNode):
     # Element annotations (annotations) inherited from {net.fuzztrees}AnnotatedElement
     
     # Element probability uses Python identifier probability
-    __probability = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'probability'), 'probability', '__net_fuzztrees_BasicEvent__probability', False, pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 44, 10), )
+    __probability = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'probability'), 'probability', '__net_fuzztrees_BasicEvent__probability', False, pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 44, 10), )
 
     
     probability = property(__probability.value, __probability.set, None, None)
@@ -577,16 +577,16 @@ class BasicEvent_ (SourceNode):
     
     # Attribute optional uses Python identifier optional
     __optional = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'optional'), 'optional', '__net_fuzztrees_BasicEvent__optional', pyxb.binding.datatypes.boolean, unicode_default=u'false')
-    __optional._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 46, 8)
-    __optional._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 46, 8)
+    __optional._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 46, 8)
+    __optional._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 46, 8)
     
     optional = property(__optional.value, __optional.set, None, None)
 
     
     # Attribute costs uses Python identifier costs
     __costs = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'costs'), 'costs', '__net_fuzztrees_BasicEvent__costs', pyxb.binding.datatypes.double)
-    __costs._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 47, 8)
-    __costs._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 47, 8)
+    __costs._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 47, 8)
+    __costs._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 47, 8)
     
     costs = property(__costs.value, __costs.set, None, None)
 
@@ -610,7 +610,7 @@ class And_ (Gate):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'And')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 58, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 58, 2)
     # Base type is Gate
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -639,7 +639,7 @@ class Or_ (Gate):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'Or')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 64, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 64, 2)
     # Base type is Gate
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -668,7 +668,7 @@ class Xor_ (Gate):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'Xor')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 70, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 70, 2)
     # Base type is Gate
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -697,7 +697,7 @@ class VotingOr_ (Gate):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'VotingOr')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 76, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 76, 2)
     # Base type is Gate
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -710,8 +710,8 @@ class VotingOr_ (Gate):
     
     # Attribute k uses Python identifier k
     __k = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'k'), 'k', '__net_fuzztrees_VotingOr__k', pyxb.binding.datatypes.int, required=True)
-    __k._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 79, 8)
-    __k._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 79, 8)
+    __k._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 79, 8)
+    __k._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 79, 8)
     
     k = property(__k.value, __k.set, None, None)
 
@@ -734,7 +734,7 @@ class ChoiceEvent_ (ConfigurableNode):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'ChoiceEvent')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 84, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 84, 2)
     # Base type is ConfigurableNode
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -763,7 +763,7 @@ class RedundancyGate_ (ConfigurableNode):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'RedundancyGate')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 90, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 90, 2)
     # Base type is ConfigurableNode
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -776,24 +776,24 @@ class RedundancyGate_ (ConfigurableNode):
     
     # Attribute from uses Python identifier from_
     __from = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'from'), 'from_', '__net_fuzztrees_RedundancyGate__from', pyxb.binding.datatypes.int, required=True)
-    __from._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 93, 8)
-    __from._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 93, 8)
+    __from._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 93, 8)
+    __from._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 93, 8)
     
     from_ = property(__from.value, __from.set, None, None)
 
     
     # Attribute to uses Python identifier to
     __to = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'to'), 'to', '__net_fuzztrees_RedundancyGate__to', pyxb.binding.datatypes.int, required=True)
-    __to._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 94, 8)
-    __to._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 94, 8)
+    __to._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 94, 8)
+    __to._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 94, 8)
     
     to = property(__to.value, __to.set, None, None)
 
     
     # Attribute formula uses Python identifier formula
     __formula = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'formula'), 'formula', '__net_fuzztrees_RedundancyGate__formula', pyxb.binding.datatypes.string, required=True)
-    __formula._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 95, 8)
-    __formula._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 95, 8)
+    __formula._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 95, 8)
+    __formula._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 95, 8)
     
     formula = property(__formula.value, __formula.set, None, None)
 
@@ -818,7 +818,7 @@ class TransferIn_ (SourceNode):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'TransferIn')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 100, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 100, 2)
     # Base type is SourceNode
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -831,8 +831,8 @@ class TransferIn_ (SourceNode):
     
     # Attribute fromModelId uses Python identifier fromModelId
     __fromModelId = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'fromModelId'), 'fromModelId', '__net_fuzztrees_TransferIn__fromModelId', pyxb.binding.datatypes.int, required=True)
-    __fromModelId._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 103, 8)
-    __fromModelId._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 103, 8)
+    __fromModelId._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 103, 8)
+    __fromModelId._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 103, 8)
     
     fromModelId = property(__fromModelId.value, __fromModelId.set, None, None)
 
@@ -855,7 +855,7 @@ class UndevelopedEvent_ (SourceNode):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'UndevelopedEvent')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 149, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 149, 2)
     # Base type is SourceNode
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -884,7 +884,7 @@ class IntermediateEventSet_ (IntermediateEvent_):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'IntermediateEventSet')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 175, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 175, 2)
     # Base type is IntermediateEvent_
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -897,8 +897,8 @@ class IntermediateEventSet_ (IntermediateEvent_):
     
     # Attribute quantity uses Python identifier quantity
     __quantity = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'quantity'), 'quantity', '__net_fuzztrees_IntermediateEventSet__quantity', pyxb.binding.datatypes.int)
-    __quantity._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 178, 8)
-    __quantity._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 178, 8)
+    __quantity._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 178, 8)
+    __quantity._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 178, 8)
     
     quantity = property(__quantity.value, __quantity.set, None, None)
 
@@ -921,7 +921,7 @@ class BasicEventSet_ (BasicEvent_):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'BasicEventSet')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 161, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 161, 2)
     # Base type is BasicEvent_
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -940,8 +940,8 @@ class BasicEventSet_ (BasicEvent_):
     
     # Attribute quantity uses Python identifier quantity
     __quantity = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'quantity'), 'quantity', '__net_fuzztrees_BasicEventSet__quantity', pyxb.binding.datatypes.int)
-    __quantity._DeclarationLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 164, 8)
-    __quantity._UseLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 164, 8)
+    __quantity._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 164, 8)
+    __quantity._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 164, 8)
     
     quantity = property(__quantity.value, __quantity.set, None, None)
 
@@ -964,7 +964,7 @@ class HouseEvent_ (BasicEvent_):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'HouseEvent')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 169, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 169, 2)
     # Base type is BasicEvent_
     
     # Element children (children) inherited from {net.fuzztrees}Node
@@ -992,63 +992,63 @@ class HouseEvent_ (BasicEvent_):
 Namespace.addCategoryObject('typeBinding', u'HouseEvent', HouseEvent_)
 
 
-EventSet = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'EventSet'), EventSet_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 184, 2))
+EventSet = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'EventSet'), EventSet_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 184, 2))
 Namespace.addCategoryObject('elementBinding', EventSet.name().localName(), EventSet)
 
-CrispProbability = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'CrispProbability'), CrispProbability_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 137, 2))
+CrispProbability = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'CrispProbability'), CrispProbability_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 137, 2))
 Namespace.addCategoryObject('elementBinding', CrispProbability.name().localName(), CrispProbability)
 
-TriangularFuzzyInterval = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'TriangularFuzzyInterval'), TriangularFuzzyInterval_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 148, 2))
+TriangularFuzzyInterval = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'TriangularFuzzyInterval'), TriangularFuzzyInterval_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 148, 2))
 Namespace.addCategoryObject('elementBinding', TriangularFuzzyInterval.name().localName(), TriangularFuzzyInterval)
 
-FuzzTree = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'FuzzTree'), FuzzTree_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 13, 2))
+FuzzTree = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'FuzzTree'), FuzzTree_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 13, 2))
 Namespace.addCategoryObject('elementBinding', FuzzTree.name().localName(), FuzzTree)
 
-TopEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'TopEvent'), TopEvent_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 57, 2))
+TopEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'TopEvent'), TopEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 57, 2))
 Namespace.addCategoryObject('elementBinding', TopEvent.name().localName(), TopEvent)
 
-IntermediateEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'IntermediateEvent'), IntermediateEvent_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 160, 2))
+IntermediateEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'IntermediateEvent'), IntermediateEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 160, 2))
 Namespace.addCategoryObject('elementBinding', IntermediateEvent.name().localName(), IntermediateEvent)
 
-BasicEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'BasicEvent'), BasicEvent_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 51, 2))
+BasicEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'BasicEvent'), BasicEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 51, 2))
 Namespace.addCategoryObject('elementBinding', BasicEvent.name().localName(), BasicEvent)
 
-And = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'And'), And_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 63, 2))
+And = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'And'), And_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 63, 2))
 Namespace.addCategoryObject('elementBinding', And.name().localName(), And)
 
-Or = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'Or'), Or_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 69, 2))
+Or = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'Or'), Or_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 69, 2))
 Namespace.addCategoryObject('elementBinding', Or.name().localName(), Or)
 
-Xor = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'Xor'), Xor_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 75, 2))
+Xor = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'Xor'), Xor_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 75, 2))
 Namespace.addCategoryObject('elementBinding', Xor.name().localName(), Xor)
 
-VotingOr = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'VotingOr'), VotingOr_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 83, 2))
+VotingOr = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'VotingOr'), VotingOr_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 83, 2))
 Namespace.addCategoryObject('elementBinding', VotingOr.name().localName(), VotingOr)
 
-ChoiceEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'ChoiceEvent'), ChoiceEvent_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 89, 2))
+ChoiceEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'ChoiceEvent'), ChoiceEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 89, 2))
 Namespace.addCategoryObject('elementBinding', ChoiceEvent.name().localName(), ChoiceEvent)
 
-RedundancyGate = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'RedundancyGate'), RedundancyGate_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 99, 2))
+RedundancyGate = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'RedundancyGate'), RedundancyGate_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 99, 2))
 Namespace.addCategoryObject('elementBinding', RedundancyGate.name().localName(), RedundancyGate)
 
-TransferIn = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'TransferIn'), TransferIn_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 107, 2))
+TransferIn = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'TransferIn'), TransferIn_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 107, 2))
 Namespace.addCategoryObject('elementBinding', TransferIn.name().localName(), TransferIn)
 
-UndevelopedEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'UndevelopedEvent'), UndevelopedEvent_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 154, 2))
+UndevelopedEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'UndevelopedEvent'), UndevelopedEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 154, 2))
 Namespace.addCategoryObject('elementBinding', UndevelopedEvent.name().localName(), UndevelopedEvent)
 
-IntermediateEventSet = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'IntermediateEventSet'), IntermediateEventSet_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 182, 2))
+IntermediateEventSet = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'IntermediateEventSet'), IntermediateEventSet_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 182, 2))
 Namespace.addCategoryObject('elementBinding', IntermediateEventSet.name().localName(), IntermediateEventSet)
 
-BasicEventSet = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'BasicEventSet'), BasicEventSet_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 168, 2))
+BasicEventSet = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'BasicEventSet'), BasicEventSet_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 168, 2))
 Namespace.addCategoryObject('elementBinding', BasicEventSet.name().localName(), BasicEventSet)
 
-HouseEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'HouseEvent'), HouseEvent_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 174, 2))
+HouseEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'HouseEvent'), HouseEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 174, 2))
 Namespace.addCategoryObject('elementBinding', HouseEvent.name().localName(), HouseEvent)
 
 
 
-AnnotatedElement._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'annotations'), Annotation, scope=AnnotatedElement, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6)))
+AnnotatedElement._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'annotations'), Annotation, scope=AnnotatedElement, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6)))
 
 def _BuildAutomaton ():
     # Remove this helper function from the namespace after it's invoked
@@ -1057,12 +1057,12 @@ def _BuildAutomaton ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_0)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(AnnotatedElement._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(AnnotatedElement._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     transitions = []
@@ -1075,7 +1075,7 @@ AnnotatedElement._Automaton = _BuildAutomaton()
 
 
 
-Node._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'children'), ChildNode, scope=Node, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10)))
+Node._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'children'), ChildNode, scope=Node, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10)))
 
 def _BuildAutomaton_ ():
     # Remove this helper function from the namespace after it's invoked
@@ -1084,19 +1084,19 @@ def _BuildAutomaton_ ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(Node._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(Node._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(Node._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(Node._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1122,12 +1122,12 @@ def _BuildAutomaton_2 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_0)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(Model._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(Model._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     transitions = []
@@ -1140,7 +1140,7 @@ Model._Automaton = _BuildAutomaton_2()
 
 
 
-FuzzTree_._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'topEvent'), TopEvent_, scope=FuzzTree_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 7, 10)))
+FuzzTree_._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'topEvent'), TopEvent_, scope=FuzzTree_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 7, 10)))
 
 def _BuildAutomaton_3 ():
     # Remove this helper function from the namespace after it's invoked
@@ -1149,15 +1149,15 @@ def _BuildAutomaton_3 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_0)
     states = []
     final_update = set()
-    symbol = pyxb.binding.content.ElementUse(FuzzTree_._UseForTag(pyxb.namespace.ExpandedName(None, u'topEvent')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 7, 10))
+    symbol = pyxb.binding.content.ElementUse(FuzzTree_._UseForTag(pyxb.namespace.ExpandedName(None, u'topEvent')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 7, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = None
-    symbol = pyxb.binding.content.ElementUse(FuzzTree_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(FuzzTree_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1181,19 +1181,19 @@ def _BuildAutomaton_4 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(SinkNode._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(SinkNode._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(SinkNode._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(SinkNode._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1219,19 +1219,19 @@ def _BuildAutomaton_5 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(ChildNode._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(ChildNode._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(ChildNode._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(ChildNode._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1257,19 +1257,19 @@ def _BuildAutomaton_6 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(Gate._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(Gate._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(Gate._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(Gate._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1295,19 +1295,19 @@ def _BuildAutomaton_7 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(TopEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(TopEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(TopEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(TopEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1333,19 +1333,19 @@ def _BuildAutomaton_8 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(SourceNode._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(SourceNode._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(SourceNode._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(SourceNode._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1371,19 +1371,19 @@ def _BuildAutomaton_9 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(ConfigurableNode._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(ConfigurableNode._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(ConfigurableNode._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(ConfigurableNode._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1409,19 +1409,19 @@ def _BuildAutomaton_10 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(IntermediateEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(IntermediateEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(IntermediateEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(IntermediateEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1440,7 +1440,7 @@ IntermediateEvent_._Automaton = _BuildAutomaton_10()
 
 
 
-BasicEvent_._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'probability'), Probability, scope=BasicEvent_, location=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 44, 10)))
+BasicEvent_._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'probability'), Probability, scope=BasicEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 44, 10)))
 
 def _BuildAutomaton_11 ():
     # Remove this helper function from the namespace after it's invoked
@@ -1449,21 +1449,21 @@ def _BuildAutomaton_11 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = None
-    symbol = pyxb.binding.content.ElementUse(BasicEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(BasicEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = None
-    symbol = pyxb.binding.content.ElementUse(BasicEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(BasicEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     final_update = set()
-    symbol = pyxb.binding.content.ElementUse(BasicEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'probability')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 44, 10))
+    symbol = pyxb.binding.content.ElementUse(BasicEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'probability')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 44, 10))
     st_2 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_2)
     transitions = []
@@ -1495,19 +1495,19 @@ def _BuildAutomaton_12 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(And_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(And_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(And_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(And_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1533,19 +1533,19 @@ def _BuildAutomaton_13 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(Or_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(Or_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(Or_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(Or_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1571,19 +1571,19 @@ def _BuildAutomaton_14 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(Xor_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(Xor_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(Xor_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(Xor_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1609,19 +1609,19 @@ def _BuildAutomaton_15 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(VotingOr_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(VotingOr_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(VotingOr_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(VotingOr_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1647,19 +1647,19 @@ def _BuildAutomaton_16 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(ChoiceEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(ChoiceEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(ChoiceEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(ChoiceEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1685,19 +1685,19 @@ def _BuildAutomaton_17 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(RedundancyGate_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(RedundancyGate_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(RedundancyGate_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(RedundancyGate_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1723,19 +1723,19 @@ def _BuildAutomaton_18 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(TransferIn_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(TransferIn_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(TransferIn_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(TransferIn_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1761,19 +1761,19 @@ def _BuildAutomaton_19 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(UndevelopedEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(UndevelopedEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(UndevelopedEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(UndevelopedEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1799,19 +1799,19 @@ def _BuildAutomaton_20 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_0, False))
-    symbol = pyxb.binding.content.ElementUse(IntermediateEventSet_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(IntermediateEventSet_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = set()
     final_update.add(fac.UpdateInstruction(cc_1, False))
-    symbol = pyxb.binding.content.ElementUse(IntermediateEventSet_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(IntermediateEventSet_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     transitions = []
@@ -1837,21 +1837,21 @@ def _BuildAutomaton_21 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = None
-    symbol = pyxb.binding.content.ElementUse(BasicEventSet_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(BasicEventSet_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = None
-    symbol = pyxb.binding.content.ElementUse(BasicEventSet_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(BasicEventSet_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     final_update = set()
-    symbol = pyxb.binding.content.ElementUse(BasicEventSet_._UseForTag(pyxb.namespace.ExpandedName(None, u'probability')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 44, 10))
+    symbol = pyxb.binding.content.ElementUse(BasicEventSet_._UseForTag(pyxb.namespace.ExpandedName(None, u'probability')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 44, 10))
     st_2 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_2)
     transitions = []
@@ -1883,21 +1883,21 @@ def _BuildAutomaton_22 ():
     import pyxb.utils.fac as fac
 
     counters = set()
-    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     counters.add(cc_0)
-    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    cc_1 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     counters.add(cc_1)
     states = []
     final_update = None
-    symbol = pyxb.binding.content.ElementUse(HouseEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
+    symbol = pyxb.binding.content.ElementUse(HouseEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'children')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 18, 10))
     st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_0)
     final_update = None
-    symbol = pyxb.binding.content.ElementUse(HouseEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
+    symbol = pyxb.binding.content.ElementUse(HouseEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'annotations')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 30, 6))
     st_1 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_1)
     final_update = set()
-    symbol = pyxb.binding.content.ElementUse(HouseEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'probability')), pyxb.utils.utility.Location('/Users/peter/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 44, 10))
+    symbol = pyxb.binding.content.ElementUse(HouseEvent_._UseForTag(pyxb.namespace.ExpandedName(None, u'probability')), pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 44, 10))
     st_2 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
     states.append(st_2)
     transitions = []
