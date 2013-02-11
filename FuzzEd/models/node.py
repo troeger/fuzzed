@@ -110,6 +110,8 @@ class Node(models.Model):
             raise ValueError('Node %s has unsupported kind' % (str(self)))
 
     def to_xml(self):
+        # Merge object properties with defaults to get appropriate XML file
+        #print self.properties.all().values()
         try:
             name = self.properties.get(key='name').value
         except:
@@ -149,7 +151,7 @@ class Node(models.Model):
             xmlnode=ChoiceEvent(id=self.id, name=name)
         elif self.kind == 'redundancyEvent':
             logger.debug("Adding redundancy gate XML")
-            xmlnode=RedundancyGate(id=self.id, name=name, formula="x+2", from=2, to=7)
+            xmlnode=RedundancyGate(id=self.id, name=name, formula="x+2", start=2, end=7)
         elif self.kind == 'houseEvent':
             logger.debug("Adding house event XML")
             xmlnode=HouseEvent(id=self.id, name=name, costs=3, probability=CrispProbability(value_=45))

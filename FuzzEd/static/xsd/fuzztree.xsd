@@ -90,8 +90,8 @@
   <xsd:complexType name="RedundancyGate">
     <xsd:complexContent>
       <xsd:extension base="ft:ConfigurableNode">
-        <xsd:attribute name="from" type="xsd:int" use="required"/>
-        <xsd:attribute name="to" type="xsd:int" use="required"/>
+        <xsd:attribute name="start" type="xsd:int" use="required"/>
+        <xsd:attribute name="end" type="xsd:int" use="required"/>
         <xsd:attribute name="formula" type="xsd:string" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
