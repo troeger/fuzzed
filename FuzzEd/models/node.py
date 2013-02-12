@@ -111,7 +111,6 @@ class Node(models.Model):
 
     def to_xml(self):
         # Merge object properties with defaults to get appropriate XML file
-        #print self.properties.all().values()
         try:
             name = self.properties.get(key='name').value
         except:
@@ -131,12 +130,28 @@ class Node(models.Model):
         elif self.kind == 'votingOrGate':
             logger.debug("Adding Voting OR gate XML")
             xmlnode = VotingOr(id=self.id, name=name, k=3)
-        elif self.kind == 'basicEvent':
-            logger.debug("Adding basic event XML")
-            xmlnode=BasicEvent(id=self.id, name=name, costs=3, probability=CrispProbability(value_=45))
-        elif self.kind == 'basicEventSet':
-            logger.debug("Adding basic event set XML")
-            xmlnode=BasicEventSet(id=self.id, name=name, costs=3, probability=CrispProbability(value_=45))
+        elif self.kind == 'basicEvent' or self.kind == 'basicEventSet':
+            logger.debug("Adding %s XML with properties: %s"%(self.kind, str(self.properties.all())))
+            try:
+                costs = int(self.properties.get(key='cost').value)
+            except:
+                default = notations.by_kind[self.graph.kind]['nodes']['event']['cost']
+                logger.debug("No costs for this node, using default "+str(default))
+                costs = default
+            try:
+                prob = self.properties.get(key='probability').value
+                if prob[1] == 0:
+                    probability = CrispProbability(value_=prob[0])
+                else:
+                    probability = TriangularFuzzyInterval(a=prob[0]-prob[1],b1=prob[0],b2=prob[0],c=prob[0]+prob[1])
+            except:
+                default = notations.by_kind[self.graph.kind]['nodes']['basicEvent']['propertyMenuEntries']['probability']['defaults']['Exact']
+                logger.debug("No probability for this node, using default value "+str(default))
+                probability = CrispProbability(value_=default[0])
+            if self.kind == 'basicEvent':
+                xmlnode=BasicEvent(id=self.id, name=name, costs=costs, probability=probability)
+            elif self.kind == 'basicEventSet':
+                xmlnode=BasicEventSet(id=self.id, name=name, costs=costs, probability=probability)
         elif self.kind == 'intermediateEvent':
             logger.debug("Adding intermediate event XML")
             xmlnode=IntermediateEvent(id=self.id, name=name)
