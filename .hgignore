@@ -9,3 +9,5 @@ FuzzEd/static-release/*
 docs/*
 FuzzEd.egg-info/*
 dist/*
+build/*
+
