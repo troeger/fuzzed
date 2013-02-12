@@ -18,9 +18,9 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands
-from FuzzEd import backend
+from FuzzEd import backend, settings
 
-import logging
+import logging, json, urllib, urllib2
 
 logger = logging.getLogger('FuzzEd')
 
@@ -29,6 +29,73 @@ try:
 # backwards compatibility with older python versions
 except ImportError:
     import simplejson as json
+
+@login_required
+@csrf_exempt
+#@require_ajax
+@require_http_methods(['GET'])
+def calc_topevent(request, graph_id):
+    """
+    Function: calc_topevent
+    
+    This API handler is responsible for starting an analysis run in the analysis engine.
+    It is intended to return immediately with job information for the frontend.
+    If the analysis engine cannot start the job (most likely due to broken XML data generated here),
+    the view returns HTTP error code 500 to the front-end.
+    """
+    import pdb; pdb.set_trace()
+    g = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    try:
+        post_data = urllib.urlencode(g.to_xml())
+        post_data = post_data.encode('utf-8')
+        result = urllib2.urlopen('%s'%(settings.CALC_TOPEVENT_SERVER), post_data)  
+        # If I got 400 from the analyis engine, it means that I messed up the XML
+        if result.getcode() == 400:
+            raise HttpResponseServerErrorAnswer()
+    except:
+        # Something went really wrong here
+        raise HttpResponseServerErrorAnswer()
+
+    # determine job id from response
+    #TODO: Replace this mock with real information from the analysis server
+    response = "{'jobid' : 4711, 'num_configurations' : 50, 'num_nodes' : 34000453}"
+    info = json.loads(response)
+    # store job information for this graph
+    j = Job(name=info['jobid'], configurations=info['configurationa'], nodes=info['nodes'], graph=g, kind=Job.TOPEVENT_JOB)
+    j.save()
+
+    # return URL for job status information
+    response = HttpResponse(status=201) 
+    response['Location'] = urlresolvers.reverse('jobstatus', args=[j.pk])
+    return response
+
+@login_required
+@csrf_exempt
+#@require_ajax
+@require_http_methods(['GET'])
+def jobstatus(request, job_id):
+    try:
+        j = Job.objects.get(pk=job_id)
+        # Prevent cross-checking of jobs by different users
+        assert(j.graph.owner == request.user)
+    except:
+        # Inform the frontend that the job no longer exists
+        # TODO: Add reason for cancellation to body as plain text 
+        raise HttpResponseNotFoundAnswer()
+    # query status from analysis engine, based on job type
+    if j.kind == Job.TOPEVENT_JOB:
+        try:
+            result = urllib2.request.urlopen('%s/%s'%(settings.CALC_TOPEVENT_SERVER, j.name))  
+            if result.getcode() == 202:
+                # Backend is not finished with this computation
+                return HttpResponse(status=202)
+            elif result.getcode() == 200:
+                # Computation done
+                #TODO: Reformulate the result data to JSON for the frontend
+                return HttpResponse(result.read())
+        except:
+            # Something went really wrong here
+            raise HttpResponseServerErrorAnswer()
 
 @login_required
 @csrf_exempt

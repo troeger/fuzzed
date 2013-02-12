@@ -236,3 +236,5 @@ AUTHENTICATION_BACKENDS = (
 )
 
 AUTH_PROFILE_MODULE = 'FuzzEd.UserProfile'
+
+CALC_TOPEVENT_SERVER = "http://localhost:8080"
