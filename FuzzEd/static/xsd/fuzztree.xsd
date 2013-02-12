@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns:ft="net.fuzztrees" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztrees">
+<xsd:schema xmlns:ft="net.fuzztree" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztree">
   <xsd:complexType name="FuzzTree">
     <xsd:complexContent>
       <xsd:extension base="ft:Model">
         <xsd:sequence>
           <xsd:element maxOccurs="1" minOccurs="1" name="topEvent" type="ft:TopEvent"/>
         </xsd:sequence>
-        <xsd:attribute name="decompositionNumber" type="xsd:int" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -44,7 +43,7 @@
           <xsd:element maxOccurs="1" minOccurs="1" name="probability" type="ft:Probability"/>
         </xsd:sequence>
         <xsd:attribute default="false" name="optional" type="xsd:boolean"/>
-        <xsd:attribute name="costs" type="xsd:double"/>
+        <xsd:attribute name="costs" type="xsd:int"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -93,6 +92,7 @@
         <xsd:attribute name="start" type="xsd:int" use="required"/>
         <xsd:attribute name="end" type="xsd:int" use="required"/>
         <xsd:attribute name="formula" type="xsd:string" use="required"/>
+        <xsd:attribute name="costFormula" type="xsd:string"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -154,7 +154,10 @@
   <xsd:element name="UndevelopedEvent" type="ft:UndevelopedEvent"/>
   <xsd:complexType name="IntermediateEvent">
     <xsd:complexContent>
-      <xsd:extension base="ft:ChildNode"/>
+      <xsd:extension base="ft:ChildNode">
+        <xsd:attribute name="costs" type="xsd:int"/>
+        <xsd:attribute name="optional" type="xsd:boolean"/>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:element name="IntermediateEvent" type="ft:IntermediateEvent"/>
@@ -180,6 +183,4 @@
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:element name="IntermediateEventSet" type="ft:IntermediateEventSet"/>
-  <xsd:complexType name="EventSet"/>
-  <xsd:element name="EventSet" type="ft:EventSet"/>
 </xsd:schema>
