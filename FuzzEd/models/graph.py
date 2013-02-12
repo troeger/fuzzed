@@ -95,7 +95,7 @@ class Graph(models.Model):
         if self.kind != "fuzztree":
             raise ApplicationError("No XML support for this graph type.")
         #TODO: Add UI and model attribute for the decomposition number
-        ft = XmlFuzzTree(name = self.name, id = self.pk, decompositionNumber = 1)
+        ft = XmlFuzzTree(name = self.name, id = self.pk)
         # Find root node and start from there
         topEventNode = self.nodes.get(kind='topEvent')
         ft.topEvent = topEventNode.to_xml()
