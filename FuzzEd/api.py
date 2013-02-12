@@ -42,17 +42,16 @@ def calc_topevent(request, graph_id):
     If the analysis engine cannot start the job (most likely due to broken XML data generated here),
     the view returns HTTP error code 500 to the front-end.
     """
-    import pdb; pdb.set_trace()
     g = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     try:
-        post_data = urllib.urlencode(g.to_xml())
-        post_data = post_data.encode('utf-8')
-        result = urllib2.urlopen('%s'%(settings.CALC_TOPEVENT_SERVER), post_data)  
+        response = urllib2.urlopen('%s'%(settings.CALC_TOPEVENT_SERVER), g.to_xml())  
         # If I got 400 from the analyis engine, it means that I messed up the XML
-        if result.getcode() == 400:
+        if response.getcode() == 400:
+            logger.error("Got HTTP status 400 from analysis server - broken graph XML generation ?")
             raise HttpResponseServerErrorAnswer()
-    except:
+    except Exception, e:
         # Something went really wrong here
+        logger.error("Unspecified problem in calling the analysis server: "+str(e))
         raise HttpResponseServerErrorAnswer()
 
     # determine job id from response
@@ -60,10 +59,11 @@ def calc_topevent(request, graph_id):
     response = "{'jobid' : 4711, 'num_configurations' : 50, 'num_nodes' : 34000453}"
     info = json.loads(response)
     # store job information for this graph
-    j = Job(name=info['jobid'], configurations=info['configurationa'], nodes=info['nodes'], graph=g, kind=Job.TOPEVENT_JOB)
+    j = Job(name=info['jobid'], configurations=info['configurations'], nodes=info['nodes'], graph=g, kind=Job.TOPEVENT_JOB)
     j.save()
 
     # return URL for job status information
+    logger.debug("Got new job '%s' with ID %u for graph %u"%(j.name, j.pk, g.pk))
     response = HttpResponse(status=201) 
     response['Location'] = urlresolvers.reverse('jobstatus', args=[j.pk])
     return response
@@ -86,8 +86,11 @@ def jobstatus(request, job_id):
         try:
             result = urllib2.request.urlopen('%s/%s'%(settings.CALC_TOPEVENT_SERVER, j.name))  
             if result.getcode() == 202:
-                # Backend is not finished with this computation
+                # Analysis engine is not finished with this computation
                 return HttpResponse(status=202)
+            elif result.getcode() == 404:
+                # Analysis engine does not know this job
+                return HttpResponse(status=404)
             elif result.getcode() == 200:
                 # Computation done
                 #TODO: Reformulate the result data to JSON for the frontend
