@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns:ft="net.fuzztree" xmlns:fta="net.fuzztree.analysis" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztree.analysis">
+  <xsd:import namespace="net.fuzztree" schemaLocation="fuzztree.xsd"/>
+  <xsd:complexType name="AnalysisResult">
+    <xsd:sequence>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="errors" type="fta:AnalysisError"/>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="warnings" type="fta:AnalysisWarning"/>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="configurations" type="fta:Configuration"/>
+    </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:int" use="required"/>
+    <xsd:attribute name="modelId" type="xsd:int" use="required"/>
+    <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
+    <xsd:attribute default="true" name="validResult" type="xsd:boolean" use="required"/>
+    <xsd:attribute name="decompositionNumber" type="xsd:int" use="required"/>
+  </xsd:complexType>
+  <xsd:element name="AnalysisResult" type="fta:AnalysisResult"/>
+  <xsd:complexType name="AnalysisError">
+    <xsd:attribute name="message" type="xsd:string" use="required"/>
+    <xsd:attribute name="elementId" type="xsd:int"/>
+  </xsd:complexType>
+  <xsd:element name="AnalysisError" type="fta:AnalysisError"/>
+  <xsd:complexType name="AnalysisWarning">
+    <xsd:attribute name="message" type="xsd:string" use="required"/>
+    <xsd:attribute name="elementId" type="xsd:int"/>
+  </xsd:complexType>
+  <xsd:element name="AnalysisWarning" type="fta:AnalysisWarning"/>
+  <xsd:complexType name="Configuration">
+    <xsd:sequence>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="choices" type="fta:IntegerToChoiceMap"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="result" type="fta:ConfigurationResult"/>
+    </xsd:sequence>
+    <xsd:attribute name="costs" type="xsd:int"/>
+  </xsd:complexType>
+  <xsd:element name="Configuration" type="fta:Configuration"/>
+  <xsd:complexType abstract="true" name="Choice"/>
+  <xsd:complexType name="OptionalElementChoice">
+    <xsd:complexContent>
+      <xsd:extension base="fta:Choice">
+        <xsd:attribute name="elementConsidered" type="xsd:boolean" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="OptionalElementChoice" type="fta:OptionalElementChoice"/>
+  <xsd:complexType name="RedundancyGateChoice">
+    <xsd:complexContent>
+      <xsd:extension base="fta:Choice">
+        <xsd:attribute name="chosenNumber" type="xsd:int" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="RedundancyGateChoice" type="fta:RedundancyGateChoice"/>
+  <xsd:complexType name="ChoiceEventChoice">
+    <xsd:complexContent>
+      <xsd:extension base="fta:Choice">
+        <xsd:attribute name="chosenElementId" type="xsd:int" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="ChoiceEventChoice" type="fta:ChoiceEventChoice"/>
+  <xsd:complexType name="ConfigurationInstance">
+    <xsd:complexContent>
+      <xsd:extension base="ft:Annotation">
+        <xsd:sequence>
+          <xsd:element maxOccurs="1" minOccurs="1" name="configuration" type="fta:Configuration"/>
+        </xsd:sequence>
+        <xsd:attribute name="ancestorModelId" type="xsd:int" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="ConfigurationInstance" type="fta:ConfigurationInstance"/>
+  <xsd:complexType name="IntegerToChoiceMap">
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="1" name="value" type="fta:Choice"/>
+    </xsd:sequence>
+    <xsd:attribute name="key" type="xsd:int" use="required"/>
+  </xsd:complexType>
+  <xsd:element name="IntegerToChoiceMap" type="fta:IntegerToChoiceMap"/>
+  <xsd:complexType name="Interval">
+    <xsd:attribute name="lowerBound" type="xsd:double" use="required"/>
+    <xsd:attribute name="upperBound" type="xsd:double" use="required"/>
+  </xsd:complexType>
+  <xsd:element name="Interval" type="fta:Interval"/>
+  <xsd:complexType name="ConfigurationResult">
+    <xsd:sequence>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="alphaCutResults" type="fta:DoubleToIntervalMap"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="ConfigurationResult" type="fta:ConfigurationResult"/>
+  <xsd:complexType name="DoubleToIntervalMap">
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="1" name="value" type="fta:Interval"/>
+    </xsd:sequence>
+    <xsd:attribute name="key" type="xsd:double" use="required"/>
+  </xsd:complexType>
+  <xsd:element name="DoubleToIntervalMap" type="fta:DoubleToIntervalMap"/>
+  <xsd:complexType name="TransferInResult">
+    <xsd:complexContent>
+      <xsd:extension base="ft:Annotation">
+        <xsd:sequence>
+          <xsd:element maxOccurs="1" minOccurs="1" name="analysisResult" type="fta:AnalysisResult"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="TransferInResult" type="fta:TransferInResult"/>
+</xsd:schema>

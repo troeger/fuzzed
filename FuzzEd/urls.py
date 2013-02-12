@@ -24,6 +24,8 @@ urlpatterns = patterns('',
     url(r'^api/graphs$','FuzzEd.api.graphs', name='graphs'),
     url(r'^api/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.graph', name='graph'),
 
+    url(r'^api/graphs/(?P<graph_id>\d+)/download$', 'FuzzEd.api.download', name='download'),
+
     url(r'^api/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.nodes', name='nodes'),
     url(r'^api/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$', 'FuzzEd.api.node', name='node'),
 

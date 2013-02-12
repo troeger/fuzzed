@@ -73,6 +73,10 @@
             <i class="icon-cog icon-white"></i> Actions <b class="caret"></b>
         </a>
         <ul id="FuzzEdNavbarActions" class="dropdown-menu">
+            {% if graph.kind == 'fuzztree' %}
+                <li><a href="{% url download graph_id=graph.pk %}?format=xml">Save as XML <i class="icon-download"></i></a></li>
+            {% endif %}
+            <li><a href="{% url download graph_id=graph.pk %}?format=json">Save as JSON <i class="icon-download"></i></a></li>
         </ul>
     </li>
 </li>

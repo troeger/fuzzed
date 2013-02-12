@@ -4,6 +4,12 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
+import logging
+logger = logging.getLogger('FuzzEd')
+
+from xml_fuzztree import *
+#TopEvent_ as XmlTopEvent, BasicEvent_ as XmlBasicEvent, And_ as XmlAndGate, Or_ as XmlOrGate, Xor_ as XmlXorGate, VotingOr_ as XmlVotingOrGate, CrispProbability_ as XmlCrispProbability
+
 try:
     import json
 # backwards compatibility with older versions of Python
@@ -102,6 +108,59 @@ class Node(models.Model):
             return str(children[0])
         else:
             raise ValueError('Node %s has unsupported kind' % (str(self)))
+
+    def to_xml(self):
+        # Merge object properties with defaults to get appropriate XML file
+        #print self.properties.all().values()
+        try:
+            name = self.properties.get(key='name').value
+        except:
+            name = ""
+        if self.kind == 'topEvent':
+            logger.debug("Adding top event XML")
+            xmlnode = TopEvent(id=self.id, name=name)
+        elif self.kind == 'andGate':
+            logger.debug("Adding AND gate XML")
+            xmlnode = And(id=self.id, name=name)
+        elif self.kind == 'orGate':
+            logger.debug("Adding OR gate XML")
+            xmlnode = Or(id=self.id, name=name)
+        elif self.kind == 'xorGate':
+            logger.debug("Adding XOR gate XML")
+            xmlnode = Xor(id=self.id, name=name)
+        elif self.kind == 'votingOrGate':
+            logger.debug("Adding Voting OR gate XML")
+            xmlnode = VotingOr(id=self.id, name=name, k=3)
+        elif self.kind == 'basicEvent':
+            logger.debug("Adding basic event XML")
+            xmlnode=BasicEvent(id=self.id, name=name, costs=3, probability=CrispProbability(value_=45))
+        elif self.kind == 'basicEventSet':
+            logger.debug("Adding basic event set XML")
+            xmlnode=BasicEventSet(id=self.id, name=name, costs=3, probability=CrispProbability(value_=45))
+        elif self.kind == 'intermediateEvent':
+            logger.debug("Adding intermediate event XML")
+            xmlnode=IntermediateEvent(id=self.id, name=name)
+        elif self.kind == 'intermediateEventSet':
+            logger.debug("Adding intermediate event set XML")
+            xmlnode=IntermediateEventSet(id=self.id, name=name)
+        elif self.kind == 'undevelopedEvent':
+            logger.debug("Adding undeveloped event XML")
+            xmlnode=UndevelopedEvent(id=self.id, name=name)
+        elif self.kind == 'choiceEvent':
+            logger.debug("Adding choice event XML")
+            xmlnode=ChoiceEvent(id=self.id, name=name)
+        elif self.kind == 'redundancyEvent':
+            logger.debug("Adding redundancy gate XML")
+            xmlnode=RedundancyGate(id=self.id, name=name, formula="x+2", start=2, end=7)
+        elif self.kind == 'houseEvent':
+            logger.debug("Adding house event XML")
+            xmlnode=HouseEvent(id=self.id, name=name, costs=3, probability=CrispProbability(value_=45))
+        else:
+            raise ValueError('Unsupported node %s for xml serialization'%str(self))
+        outgoing = self.outgoing.filter(deleted=False)
+        for edge in outgoing:
+            xmlnode.children.append(edge.target.to_xml())
+        return xmlnode
 
     def get_attr(self, key):
         """

@@ -6,6 +6,9 @@ from django.db import models
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
+import pyxb.utils.domutils
+from xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlNamespace
+
 try:
     import json
 # backwards compatibility with older versions of Python
@@ -51,6 +54,17 @@ class Graph(models.Model):
         """
         return json.dumps(self.to_dict())
 
+    def to_xml(self):
+        """
+        Method: to_xml
+            Serializes the graph into its XML representation.
+
+        Returns:
+            {string} The XML representation of the graph
+        """
+        #TODO
+        return "<foo></foo>"
+
     def to_dict(self):
         """
         Method: to_dict
@@ -76,6 +90,17 @@ class Graph(models.Model):
     def to_bool_term(self):
         root = self.nodes.get(kind__exact = 'topEvent')
         return root.to_bool_term()
+
+    def to_xml(self):
+        if self.kind != "fuzztree":
+            raise ApplicationError("No XML support for this graph type.")
+        #TODO: Add UI and model attribute for the decomposition number
+        ft = XmlFuzzTree(name = self.name, id = self.pk, decompositionNumber = 1)
+        # Find root node and start from there
+        topEventNode = self.nodes.get(kind='topEvent')
+        ft.topEvent = topEventNode.to_xml()
+        pyxb.utils.domutils.BindingDOMSupport.DeclareNamespace(XmlNamespace, 'ft')
+        return ft.toxml("utf-8")
 
 # validation handler that ensures that the graph kind is known
 @receiver(pre_save, sender=Graph)
