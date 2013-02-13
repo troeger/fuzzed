@@ -149,7 +149,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             this._super(graphId);
 
             this.cutsets = new CutsetsMenu();
-            this._setupCutsetsActionEntry();
+            this._setupCutsetsActionEntry()
+                ._setupTobEventProbabilityActionEntry();
         },
 
         /**
@@ -203,6 +204,23 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
                 jQuery(document).trigger(this.config.Events.EDITOR_CALCULATE_CUTSETS, this.cutsets.show.bind(this.cutsets));
+            }.bind(this));
+
+            return this;
+        },
+
+
+        _setupTobEventProbabilityActionEntry: function() {
+            var navbarActionsEntry = jQuery(
+                '<li>' +
+                    '<a href="#">Calculate top event probability</a>' +
+                '</li>');
+            this._navbarActionsGroup.append(navbarActionsEntry);
+
+            // register for clicks on the corresponding nav action
+            navbarActionsEntry.click(function() {
+                //TODO: correct parameters
+                jQuery(document).trigger(this.config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY, function(job){console.log(job)});
             }.bind(this));
 
             return this;
