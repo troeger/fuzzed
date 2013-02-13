@@ -26,6 +26,10 @@ define(["class"], function(Class) {
         _timeout:         undefined,
 
         /**
+         *  Group: Initialization
+         */
+
+        /**
          *  Constructor: init
          *    Constructor for this Job instance.
          *
@@ -52,6 +56,10 @@ define(["class"], function(Class) {
         },
 
         /**
+         *  Group: Actions
+         */
+
+        /**
          *  Method: start
          *    Start querying this Job.
          */
@@ -67,6 +75,10 @@ define(["class"], function(Class) {
         cancel: function() {
             //TODO: call backend as soon as the call is available
         },
+
+        /**
+         *  Group: Internal
+         */
 
         /**
          *  Method: _query
