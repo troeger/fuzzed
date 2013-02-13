@@ -123,9 +123,12 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Members
          *
          *  Properties:
-         *    {<Job>}  _job  - <Job> instance of the backend job that is responsible for calculating the probability.
+         *    {<Job>}           _job              - <Job> instance of the backend job that is responsible for
+         *                                          calculating the probability.
+         *    {jQuery Selector} _contentContainer - jQuery reference to the content div inside the container.
          */
-        _job:  undefined,
+        _job:              undefined,
+        _contentContainer: undefined,
 
         /**
          *  Group: Initialization
@@ -137,6 +140,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         init: function() {
             this._super();
+            this._contentContainer = this.container.find('.content');
         },
 
         /**
@@ -154,8 +158,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    This menu instance for chaining.
          */
         show: function(job) {
-            //TODO: display job status
-            console.log(job);
+            job.successCallback = this._displayResult.bind(this);
+            job.updateCallback  = this._displayProgress.bind(this);
+            job.errorCallback   = this._displayError.bind(this);
+            job.updateCallback  = 5000;
+            job.start();
 
             this._super();
             return this;
@@ -179,12 +186,50 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                         <span class="menu-minimize"></span>\
                         <span class="menu-close"></span>\
                     </div>\
+                    <div class="content"></div>\
                 </div>'
             ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+        },
+
+        /**
+         *  Group: Display
+         */
+
+        /**
+         *  Method: _displayProgress
+         *    Display the job's progress in the menu's body.
+         *
+         *  Parameters:
+         *    {JSON} data - Data returned from the backend with information about the job's progress.
+         */
+        _displayProgress: function(data) {
+            //TODO
+            this._contentContainer.text(JSON.stringify(data));
+        },
+
+        /**
+         *  Method: _displayResult
+         *    Display the job's result in the menu's body.
+         *
+         *  Parameters:
+         *    {JSON} data - Data returned from the backend containing the result of the calculation.
+         */
+        _displayResult: function(data) {
+            //TODO
+            this._contentContainer.text(JSON.stringify(data));
+        },
+
+        /**
+         *  Method: _displayProgress
+         *    Display an error massage in the menu's body.
+         */
+        _displayError: function() {
+            //TODO
+            this._contentContainer.text("Not found");
         }
 
 
-    })
+    });
 
     /**
      *  Class: FaultTreeEditor
@@ -275,7 +320,10 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
-                jQuery(document).trigger(this.config.Events.EDITOR_CALCULATE_CUTSETS, this.cutsetsMenu.show.bind(this.cutsetsMenu));
+                jQuery(document).trigger(
+                    this.config.Events.EDITOR_CALCULATE_CUTSETS,
+                    this.cutsetsMenu.show.bind(this.cutsetsMenu)
+                );
             }.bind(this));
 
             return this;
