@@ -118,6 +118,74 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         }
     });
 
+    var ProbabilityMenu = Menus.Menu.extend({
+        /**
+         *  Group: Members
+         *
+         *  Properties:
+         *    {<Job>}  _job  - <Job> instance of the backend job that is responsible for calculating the probability.
+         */
+        _job:  undefined,
+
+        /**
+         *  Group: Initialization
+         */
+
+        /**
+         *  Constructor: init
+         *    Sets up the menu.
+         */
+        init: function() {
+            this._super();
+        },
+
+        /**
+         *  Group: Actions
+         */
+
+        /**
+         *  Method: show
+         *    Display the given job status (and finally its result).
+         *
+         *  Parameters:
+         *    {<Job>} job - The backend job that calculates the probability of the top event.
+         *
+         *  Returns:
+         *    This menu instance for chaining.
+         */
+        show: function(job) {
+            //TODO: display job status
+            console.log(job);
+
+            this._super();
+            return this;
+        },
+
+        /**
+         *  Group: Setup
+         */
+
+        /**
+         *  Method: _setupContainer
+         *    Sets up the DOM container element for this menu and appends it to the DOM.
+         *
+         *  Returns:
+         *    A jQuery object of the container.
+         */
+        _setupContainer: function() {
+            return jQuery(
+                '<div id="' + FaulttreeConfig.IDs.PROBABILITY_MENU + '" class="menu" header="Probability of Top Event">\
+                    <div class="menu-controls">\
+                        <span class="menu-minimize"></span>\
+                        <span class="menu-close"></span>\
+                    </div>\
+                </div>'
+            ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+        }
+
+
+    })
+
     /**
      *  Class: FaultTreeEditor
      *    Faulttree-specific <Base::Editor> class. The fault tree editor distinguishes from the 'normal' editor by
@@ -130,9 +198,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Members
          *
          *  Properties:
-         *    {CutsetMenu} cutsets - The <CutsetMenu> instance used to display the calculated minimal cutsets.
+         *    {<CutsetsMenu>}     cutsetsMenu     - The <CutsetsMenu> instance used to display the calculated minimal cutsets.
+         *    {<ProbabilityMenu>} probabilityMenu - The <ProbabilityMenu> instance used to display the probability of the top event.
          */
-        cutsets: undefined,
+        cutsetsMenu: undefined,
+        probabilityMenu: undefined,
 
         /**
          *  Group: Initialization
@@ -140,7 +210,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
         /**
          *  Constructor: init
-         *    Sets up the cutset menu in addition to <Base::Editor::init>.
+         *    Sets up the cutset and probability menus in addition to <Base::Editor::init>.
          *
          *  Parameters:
          *    {int} graphId - The ID of the graph that is going to be edited by this editor.
@@ -148,7 +218,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         init: function(graphId) {
             this._super(graphId);
 
-            this.cutsets = new CutsetsMenu();
+            this.cutsetsMenu = new CutsetsMenu();
+            this.probabilityMenu = new ProbabilityMenu()
+
             this._setupCutsetsActionEntry()
                 ._setupTobEventProbabilityActionEntry();
         },
@@ -203,7 +275,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
-                jQuery(document).trigger(this.config.Events.EDITOR_CALCULATE_CUTSETS, this.cutsets.show.bind(this.cutsets));
+                jQuery(document).trigger(this.config.Events.EDITOR_CALCULATE_CUTSETS, this.cutsetsMenu.show.bind(this.cutsetsMenu));
             }.bind(this));
 
             return this;
@@ -227,8 +299,10 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
-                //TODO: correct parameters
-                jQuery(document).trigger(this.config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY, function(job){console.log(job)});
+                jQuery(document).trigger(
+                    this.config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY,
+                    this.probabilityMenu.show.bind(this.probabilityMenu)
+                );
             }.bind(this));
 
             return this;

@@ -125,9 +125,16 @@
     margin-left: 18px;
 }
 
-#FuzzEdCutsets {
+#FuzzEdCutsetsMenu {
     display: none;
     top: 50px;
     left: 240px;
     min-width: 200px;
+}
+
+#FuzzEdProbabilityMenu {
+    display: none;
+    top: 50px;
+    left: 240px;
+    min-width: 220px;
 }
