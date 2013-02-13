@@ -46,13 +46,15 @@ define(function() {
          *    {String} NODES_URL   - Part of the sub-URL used to perform node-specific API calls.
          *    {String} EDGES_URL   - Part of the sub-URL used to perform edge-specific API calls.
          *    {String} CUTSETS_URL - Part of the sub-URL used to perform cutset-specific API calls.
+         *    {String} TOPEVENT_PROBABILITY_URL - Part of the sub-URL used to topevent calculation API calls.
          */
         Backend: {
-            BASE_URL:       '/api',
-            GRAPHS_URL:     '/graphs',
-            NODES_URL:      '/nodes',
-            EDGES_URL:      '/edges',
-            CUTSETS_URL:    '/cutsets'
+            BASE_URL:                 '/api',
+            GRAPHS_URL:               '/graphs',
+            NODES_URL:                '/nodes',
+            EDGES_URL:                '/edges',
+            CUTSETS_URL:              '/cutsets',
+            TOPEVENT_PROBABILITY_URL: '/calc/topevent'
         },
 
         /**
