@@ -203,6 +203,17 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
             });
         },
 
+        /**
+         *  Method: calculateTopeventProbability
+         *    Tell the backend to calculate the probability of the top event. This is an asynchronous request, i.e. the
+         *    success callback will get a <Job> object it can use to receive the final result.
+         *
+         *  Parameters:
+         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job submission
+         *                          was successful.
+         *    {Function} error    - [optional] Callback that gets called in case of an error.
+         *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
+         */
         calculateTopeventProbability: function(event, success, error, complete) {
             jQuery.ajax({
                 url:      this._fullUrlForTopeventProbability(),

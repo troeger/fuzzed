@@ -209,7 +209,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             return this;
         },
 
-
+        /**
+         *  Method: _setupTobEventProbabilityActionEntry
+         *    Adds an entry to the actions navbar group for calculating the probability of the top event.
+         *    Clicking will issue an asynchronous backend call which returns a <Job> object that can be queried for
+         *    the final result. The job object will be used to initialize the probability menu.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
         _setupTobEventProbabilityActionEntry: function() {
             var navbarActionsEntry = jQuery(
                 '<li>' +
