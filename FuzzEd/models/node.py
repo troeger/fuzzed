@@ -110,7 +110,14 @@ class Node(models.Model):
             raise ValueError('Node %s has unsupported kind' % (str(self)))
 
     def to_xml(self):
-        # Merge object properties with defaults to get appropriate XML file
+        """
+        Method: to_xml
+        
+        Serializes this node into an XML representation according to the schema file for the graph type
+        
+        Returns:
+         the node object
+        """
         try:
             name = self.properties.get(key='name').value
         except:
@@ -128,8 +135,14 @@ class Node(models.Model):
             logger.debug("Adding XOR gate XML")
             xmlnode = Xor(id=self.id, name=name)
         elif self.kind == 'votingOrGate':
-            logger.debug("Adding Voting OR gate XML")
-            xmlnode = VotingOr(id=self.id, name=name, k=3)
+            logger.debug("Adding %s XML with properties: %s"%(self.kind, str(self.properties.all())))
+            try:
+                kN = int(self.properties.get(key='kN').value)
+            except:
+                default = notations.by_kind[self.graph.kind]['nodes']['votingOrGate']['kN']
+                logger.debug("No costs for this node, using default "+str(default))
+                kN = default
+            xmlnode = VotingOr(id=self.id, name=name, k=kN[0])
         elif self.kind == 'basicEvent' or self.kind == 'basicEventSet':
             logger.debug("Adding %s XML with properties: %s"%(self.kind, str(self.properties.all())))
             try:
@@ -165,11 +178,39 @@ class Node(models.Model):
             logger.debug("Adding choice event XML")
             xmlnode=ChoiceEvent(id=self.id, name=name)
         elif self.kind == 'redundancyEvent':
-            logger.debug("Adding redundancy gate XML")
-            xmlnode=RedundancyGate(id=self.id, name=name, formula="x+2", start=2, end=7)
+            logger.debug("Adding %s XML with properties: %s"%(self.kind, str(self.properties.all())))
+            try:
+                kFormula = int(self.properties.get(key='kFormula').value)
+            except:
+                default = notations.by_kind[self.graph.kind]['nodes']['redundancyEvent']['kFormula']
+                logger.debug("No kFormula for this node, using default "+str(default))
+                kFormula = default
+            try:
+                nRange = int(self.properties.get(key='nRange').value)
+            except:
+                default = notations.by_kind[self.graph.kind]['nodes']['redundancyEvent']['nRange']
+                logger.debug("No nRange for this node, using default "+str(default))
+                nRange = default
+            xmlnode=RedundancyGate(id=self.id, name=name, formula=kFormula, start=nRange[0], end=nRange[1])
         elif self.kind == 'houseEvent':
-            logger.debug("Adding house event XML")
-            xmlnode=HouseEvent(id=self.id, name=name, costs=3, probability=CrispProbability(value_=45))
+            logger.debug("Adding %s XML with properties: %s"%(self.kind, str(self.properties.all())))
+            try:
+                costs = int(self.properties.get(key='cost').value)
+            except:
+                default = notations.by_kind[self.graph.kind]['nodes']['houseEvent']['cost']
+                logger.debug("No costs for this node, using default "+str(default))
+                costs = default
+            try:
+                prob = self.properties.get(key='probability').value
+                if prob[1] == 0:
+                    probability = CrispProbability(value_=prob[0])
+                else:
+                    probability = TriangularFuzzyInterval(a=prob[0]-prob[1],b1=prob[0],b2=prob[0],c=prob[0]+prob[1])
+            except:
+                default = notations.by_kind[self.graph.kind]['nodes']['houseEvent']['propertyMenuEntries']['probability']['defaults']['Exact']
+                logger.debug("No probability for this node, using default value "+str(default))
+                probability = CrispProbability(value_=default[0])
+            xmlnode=HouseEvent(id=self.id, name=name, costs=costs, probability=probability)
         else:
             raise ValueError('Unsupported node %s for xml serialization'%str(self))
         outgoing = self.outgoing.filter(deleted=False)
