@@ -1,4 +1,4 @@
-define(['class', 'config'], function (Class, Config) {
+define(['class', 'config', 'job'], function (Class, Config, Job) {
     return Class.extend({
         _graphId: undefined,
 
@@ -13,7 +13,8 @@ define(['class', 'config'], function (Class, Config) {
                 .on(Config.Events.GRAPH_NODE_DELETED,       this.graphNodeDeleted.bind(this))
                 .on(Config.Events.GRAPH_EDGE_ADDED,         this.graphEdgeAdded.bind(this))
                 .on(Config.Events.GRAPH_EDGE_DELETED,       this.graphEdgeDeleted.bind(this))
-                .on(Config.Events.EDITOR_CALCULATE_CUTSETS, this.calculateCutsets.bind(this));
+                .on(Config.Events.EDITOR_CALCULATE_CUTSETS, this.calculateCutsets.bind(this))
+                .on(Config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY, this.calculateTopeventProbability.bind(this));
         },
 
         deactivate: function() {
@@ -23,7 +24,8 @@ define(['class', 'config'], function (Class, Config) {
                 .off(Config.Events.GRAPH_NODE_DELETED)
                 .off(Config.Events.GRAPH_EDGE_ADDED)
                 .off(Config.Events.GRAPH_EDGE_DELETED)
-                .off(Config.Events.EDITOR_CALCULATE_CUTSETS);
+                .off(Config.Events.EDITOR_CALCULATE_CUTSETS)
+                .off(Config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY);
         },
 
         /*
@@ -201,6 +203,36 @@ define(['class', 'config'], function (Class, Config) {
             });
         },
 
+        /**
+         *  Method: calculateTopeventProbability
+         *    Tell the backend to calculate the probability of the top event. This is an asynchronous request, i.e. the
+         *    success callback will get a <Job> object it can use to receive the final result.
+         *
+         *  Parameters:
+         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job submission
+         *                          was successful.
+         *    {Function} error    - [optional] Callback that gets called in case of an error.
+         *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
+         */
+        calculateTopeventProbability: function(event, success, error, complete) {
+            jQuery.ajax({
+                url:      this._fullUrlForTopeventProbability(),
+                dataType: 'json',
+
+                statusCode: {
+                    201: function(data, status, req) {
+                        var jobUrl = req.getResponseHeader('location');
+                        if (typeof success !== 'undefined') {
+                            success(new Job(jobUrl));
+                        }
+                    }
+                },
+
+                error:    error    || jQuery.noop,
+                complete: complete || jQuery.noop
+            });
+        },
+
         /* Section: Internal */
 
         /* Section: Helper */
@@ -227,6 +259,10 @@ define(['class', 'config'], function (Class, Config) {
 
         _fullUrlForCutsets: function() {
             return this._fullUrlForGraph() + Config.Backend.CUTSETS_URL;
+        },
+
+        _fullUrlForTopeventProbability: function() {
+            return this._fullUrlForGraph() + Config.Backend.TOPEVENT_PROBABILITY_URL;
         }
     });
 });

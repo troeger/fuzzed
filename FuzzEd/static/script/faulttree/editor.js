@@ -118,6 +118,119 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         }
     });
 
+    var ProbabilityMenu = Menus.Menu.extend({
+        /**
+         *  Group: Members
+         *
+         *  Properties:
+         *    {<Job>}           _job              - <Job> instance of the backend job that is responsible for
+         *                                          calculating the probability.
+         *    {jQuery Selector} _contentContainer - jQuery reference to the content div inside the container.
+         */
+        _job:              undefined,
+        _contentContainer: undefined,
+
+        /**
+         *  Group: Initialization
+         */
+
+        /**
+         *  Constructor: init
+         *    Sets up the menu.
+         */
+        init: function() {
+            this._super();
+            this._contentContainer = this.container.find('.content');
+        },
+
+        /**
+         *  Group: Actions
+         */
+
+        /**
+         *  Method: show
+         *    Display the given job status (and finally its result).
+         *
+         *  Parameters:
+         *    {<Job>} job - The backend job that calculates the probability of the top event.
+         *
+         *  Returns:
+         *    This menu instance for chaining.
+         */
+        show: function(job) {
+            job.successCallback = this._displayResult.bind(this);
+            job.updateCallback  = this._displayProgress.bind(this);
+            job.errorCallback   = this._displayError.bind(this);
+            job.updateCallback  = 5000;
+            job.start();
+
+            this._super();
+            return this;
+        },
+
+        /**
+         *  Group: Setup
+         */
+
+        /**
+         *  Method: _setupContainer
+         *    Sets up the DOM container element for this menu and appends it to the DOM.
+         *
+         *  Returns:
+         *    A jQuery object of the container.
+         */
+        _setupContainer: function() {
+            return jQuery(
+                '<div id="' + FaulttreeConfig.IDs.PROBABILITY_MENU + '" class="menu" header="Probability of Top Event">\
+                    <div class="menu-controls">\
+                        <span class="menu-minimize"></span>\
+                        <span class="menu-close"></span>\
+                    </div>\
+                    <div class="content"></div>\
+                </div>'
+            ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+        },
+
+        /**
+         *  Group: Display
+         */
+
+        /**
+         *  Method: _displayProgress
+         *    Display the job's progress in the menu's body.
+         *
+         *  Parameters:
+         *    {JSON} data - Data returned from the backend with information about the job's progress.
+         */
+        _displayProgress: function(data) {
+            //TODO
+            this._contentContainer.text(JSON.stringify(data));
+        },
+
+        /**
+         *  Method: _displayResult
+         *    Display the job's result in the menu's body.
+         *
+         *  Parameters:
+         *    {JSON} data - Data returned from the backend containing the result of the calculation.
+         */
+        _displayResult: function(data) {
+            //TODO
+            this._contentContainer.text(JSON.stringify(data));
+        },
+
+        /**
+         *  Method: _displayProgress
+         *    Display an error massage in the menu's body.
+         */
+        _displayError: function() {
+            //TODO
+            this._contentContainer.text("Not found");
+        }
+
+
+    });
+
     /**
      *  Class: FaultTreeEditor
      *    Faulttree-specific <Base::Editor> class. The fault tree editor distinguishes from the 'normal' editor by
@@ -130,9 +243,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Members
          *
          *  Properties:
-         *    {CutsetMenu} cutsets - The <CutsetMenu> instance used to display the calculated minimal cutsets.
+         *    {<CutsetsMenu>}     cutsetsMenu     - The <CutsetsMenu> instance used to display the calculated minimal cutsets.
+         *    {<ProbabilityMenu>} probabilityMenu - The <ProbabilityMenu> instance used to display the probability of the top event.
          */
-        cutsets: undefined,
+        cutsetsMenu: undefined,
+        probabilityMenu: undefined,
 
         /**
          *  Group: Initialization
@@ -140,7 +255,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
         /**
          *  Constructor: init
-         *    Sets up the cutset menu in addition to <Base::Editor::init>.
+         *    Sets up the cutset and probability menus in addition to <Base::Editor::init>.
          *
          *  Parameters:
          *    {int} graphId - The ID of the graph that is going to be edited by this editor.
@@ -148,8 +263,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         init: function(graphId) {
             this._super(graphId);
 
-            this.cutsets = new CutsetsMenu();
-            this._setupCutsetsActionEntry();
+            this.cutsetsMenu = new CutsetsMenu();
+            this.probabilityMenu = new ProbabilityMenu()
+
+            this._setupCutsetsActionEntry()
+                ._setupTobEventProbabilityActionEntry();
         },
 
         /**
@@ -202,7 +320,37 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
-                jQuery(document).trigger(this.config.Events.EDITOR_CALCULATE_CUTSETS, this.cutsets.show.bind(this.cutsets));
+                jQuery(document).trigger(
+                    this.config.Events.EDITOR_CALCULATE_CUTSETS,
+                    this.cutsetsMenu.show.bind(this.cutsetsMenu)
+                );
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _setupTobEventProbabilityActionEntry
+         *    Adds an entry to the actions navbar group for calculating the probability of the top event.
+         *    Clicking will issue an asynchronous backend call which returns a <Job> object that can be queried for
+         *    the final result. The job object will be used to initialize the probability menu.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
+        _setupTobEventProbabilityActionEntry: function() {
+            var navbarActionsEntry = jQuery(
+                '<li>' +
+                    '<a href="#">Calculate top event probability</a>' +
+                '</li>');
+            this._navbarActionsGroup.append(navbarActionsEntry);
+
+            // register for clicks on the corresponding nav action
+            navbarActionsEntry.click(function() {
+                jQuery(document).trigger(
+                    this.config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY,
+                    this.probabilityMenu.show.bind(this.probabilityMenu)
+                );
             }.bind(this));
 
             return this;
