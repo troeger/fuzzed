@@ -19,6 +19,7 @@ from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands
 from FuzzEd import backend, settings
+from analysis import calcserver
 
 import logging, json, urllib, urllib2
 logger = logging.getLogger('FuzzEd')
@@ -40,33 +41,25 @@ def calc_topevent(request, graph_id):
     This API handler is responsible for starting an analysis run in the analysis engine.
     It is intended to return immediately with job information for the frontend.
     If the analysis engine cannot start the job (most likely due to broken XML data generated here),
-    the view returns HTTP error code 500 to the front-end.
+    the view returns HttpResponseServerErrorAnswer to the front-end.
     """
     g = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     try:
-        response = urllib2.urlopen('%s'%(settings.CALC_TOPEVENT_SERVER), g.to_xml())  
-        # If I got 400 from the analyis engine, it means that I messed up the XML
-        if response.getcode() == 400:
-            logger.error("Got HTTP status 400 from analysis server - broken graph XML generation ?")
-            raise HttpResponseServerErrorAnswer()
-    except Exception, e:
-        # Something went really wrong here
-        logger.error("Unspecified problem in calling the analysis server: "+str(e))
-        raise HttpResponseServerErrorAnswer()
-
-    # determine job id from response
-    #TODO: Replace this mock with real information from the analysis server
-    response = "{'jobid' : 4711, 'num_configurations' : 50, 'num_nodes' : 34000453}"
-    info = json.loads(response)
-    # store job information for this graph
-    j = Job(name=info['jobid'], configurations=info['configurations'], nodes=info['nodes'], graph=g, kind=Job.TOPEVENT_JOB)
-    j.save()
-
-    # return URL for job status information
-    logger.debug("Got new job '%s' with ID %u for graph %u"%(j.name, j.pk, g.pk))
-    response = HttpResponse(status=201) 
-    response['Location'] = urlresolvers.reverse('jobstatus', args=[j.pk])
-    return response
+        postdata=g.to_xml()
+        logger.debug("Sending XML to calcserver:\n"+postdata)
+        jobid, num_configurations, num_nodes = calcserver.createJob(postdata,1)
+        # store job information for this graph
+        j = Job(name=jobid, configurations=num_configurations, nodes=num_nodes, graph=g, kind=Job.TOPEVENT_JOB)
+        j.save()
+        # return URL for job status information
+        logger.debug("Got new job '%s' with ID %u for graph %u"%(j.name, j.pk, g.pk))
+        response = HttpResponse(status=201) 
+        response['Location'] = urlresolvers.reverse('jobstatus', args=[j.pk])
+        return response
+    except calcserver.InternalError as e:
+        logger.error("Exception while using calcserver: "+str(e))
+        #TODO: Perform some smarter error handling here
+        raise HttpResponseServerErrorAnswer()        
 
 @login_required
 @csrf_exempt
