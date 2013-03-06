@@ -197,7 +197,7 @@ class Node(models.Model):
             try:
                 costs = int(self.properties.get(key='cost').value)
             except:
-                default = notations.by_kind[self.graph.kind]['nodes']['houseEvent']['cost']
+                default = notations.by_kind[self.graph.kind]['nodes']['event']['cost']
                 logger.debug("No costs for this node, using default "+str(default))
                 costs = default
             try:
@@ -207,7 +207,7 @@ class Node(models.Model):
                 else:
                     probability = TriangularFuzzyInterval(a=prob[0]-prob[1],b1=prob[0],b2=prob[0],c=prob[0]+prob[1])
             except:
-                default = notations.by_kind[self.graph.kind]['nodes']['houseEvent']['propertyMenuEntries']['probability']['defaults']['Exact']
+                default = notations.by_kind[self.graph.kind]['nodes']['basicEvent']['propertyMenuEntries']['probability']['defaults']['Exact']
                 logger.debug("No probability for this node, using default value "+str(default))
                 probability = CrispProbability(value_=default[0])
             xmlnode=HouseEvent(id=self.id, name=name, costs=costs, probability=probability)
