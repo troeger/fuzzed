@@ -63,37 +63,6 @@ def calc_topevent(request, graph_id):
 
 @login_required
 @csrf_exempt
-#@require_ajax
-@require_http_methods(['GET'])
-def jobstatus(request, job_id):
-    try:
-        j = Job.objects.get(pk=job_id)
-        # Prevent cross-checking of jobs by different users
-        assert(j.graph.owner == request.user)
-    except:
-        # Inform the frontend that the job no longer exists
-        # TODO: Add reason for cancellation to body as plain text 
-        raise HttpResponseNotFoundAnswer()
-    # query status from analysis engine, based on job type
-    if j.kind == Job.TOPEVENT_JOB:
-        try:
-            result = urllib2.request.urlopen('%s/%s'%(settings.CALC_TOPEVENT_SERVER, j.name))  
-            if result.getcode() == 202:
-                # Analysis engine is not finished with this computation
-                return HttpResponse(status=202)
-            elif result.getcode() == 404:
-                # Analysis engine does not know this job
-                return HttpResponse(status=404)
-            elif result.getcode() == 200:
-                # Computation done
-                #TODO: Reformulate the result data to JSON for the frontend
-                return HttpResponse(result.read())
-        except:
-            # Something went really wrong here
-            raise HttpResponseServerErrorAnswer()
-
-@login_required
-@csrf_exempt
 @require_ajax
 @require_http_methods(['GET', 'POST'])
 @transaction.commit_on_success

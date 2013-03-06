@@ -43,7 +43,6 @@ urlpatterns = patterns('',
     url(r'^api/graphs/(?P<graph_id>\d+)/cutsets$', 'FuzzEd.api.cutsets', name='cutsets'),
 
     url(r'^api/graphs/(?P<graph_id>\d+)/calc/topevent$', 'FuzzEd.api.calc_topevent'),
-    url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.jobstatus', name='jobstatus'),
 )
 
 urlpatterns += staticfiles_urlpatterns()
