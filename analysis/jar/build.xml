@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create_run_jar" name="Create Runnable Jar for Project net.fuzztree">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <target name="create_run_jar">
+        <jar destfile="fuzzTreeAnalysis.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="net.fuzztree.Main"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="../code/net.fuzztree/bin"/>
+            <fileset dir="../code/net.fuzztree.analysis/bin"/>
+            <fileset dir="../code/net.fuzztree.model.fuzztree/bin"/>
+            <fileset dir="../code/net.fuzztree.model.analysis/bin"/>
+            <fileset dir="../code/net.fuzztree.webapp/bin"/>
+            <fileset dir="../code/net.fuzztree.test/bin"/>
+
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.core.runtime_3.8.0.v20120521-2346.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.osgi_3.8.1.v20120830-144521.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.equinox.common_3.6.100.v20120522-1841.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.core.jobs_3.5.300.v20120622-204750.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/runtime_registry_compatibility.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.equinox.registry_3.5.200.v20120522-1841.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.equinox.preferences_3.5.0.v20120522-1841.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.core.contenttype_3.4.200.v20120523-2004.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.equinox.app_1.3.100.v20120522-1841.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/javax.servlet_3.0.0.v201112011016.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/javax.servlet.jsp_2.2.0.v201112011158.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.emf.ecore_2.8.3.v20130125-0546.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.emf.common_2.8.0.v20130125-0546.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.emf.cdo_4.1.1.v20120727-1146.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.emf.ecore.xmi_2.8.1.v20130125-0546.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.emf.cdo.common_4.1.1.v20120821-1005.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.net4j.util_3.2.1.v20120727-1146.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/junit.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../code/net.fuzztree.test/lib/commons-logging-1.1.1.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../code/net.fuzztree.test/lib/httpclient-4.2.3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../code/net.fuzztree.test/lib/httpcore-4.2.2.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.jetty.continuation_8.1.3.v20120522.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.jetty.http_8.1.3.v20120522.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.jetty.io_8.1.3.v20120522.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.jetty.security_8.1.3.v20120522.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.jetty.server_8.1.3.v20120522.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.jetty.servlet_8.1.3.v20120522.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="lib/org.eclipse.jetty.util_8.1.3.v20120522.jar"/>
+        </jar>
+    </target>
+</project>
