@@ -158,7 +158,7 @@ class Node(models.Model):
                 else:
                     probability = TriangularFuzzyInterval(a=prob[0]-prob[1],b1=prob[0],b2=prob[0],c=prob[0]+prob[1])
             except:
-                default = notations.by_kind[self.graph.kind]['nodes']['basicEvent']['propertyMenuEntries']['probability']['defaults']['Exact']
+                default = notations.by_kind[self.graph.kind]['nodes']['basicEvent']['probability']
                 logger.debug("No probability for this node, using default value "+str(default))
                 probability = CrispProbability(value_=default[0])
             if self.kind == 'basicEvent':
