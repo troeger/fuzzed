@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fta:AnalysisResult xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fta="net.fuzztree.analysis" modelId="15022013" decompositionNumber="2">
+  <configurations>
+    <choices key="100">
+      <value xsi:type="fta:FeatureChoice" featureId="1"/>
+    </choices>
+    <result>
+      <alphaCutResults key="0.0">
+        <value lowerBound="0.1" upperBound="0.4"/>
+      </alphaCutResults>
+      <alphaCutResults key="0.5">
+        <value lowerBound="0.15" upperBound="0.35"/>
+      </alphaCutResults>
+      <alphaCutResults key="1.0">
+        <value lowerBound="0.2" upperBound="0.3"/>
+      </alphaCutResults>
+    </result>
+  </configurations>
+  <configurations>
+    <choices key="100">
+      <value xsi:type="fta:FeatureChoice" featureId="2"/>
+    </choices>
+    <result>
+      <alphaCutResults key="0.0">
+        <value lowerBound="0.3" upperBound="0.6"/>
+      </alphaCutResults>
+      <alphaCutResults key="0.5">
+        <value lowerBound="0.35" upperBound="0.5"/>
+      </alphaCutResults>
+      <alphaCutResults key="1.0">
+        <value lowerBound="0.4" upperBound="0.4"/>
+      </alphaCutResults>
+    </result>
+  </configurations>
+  <configurations>
+    <choices key="100">
+      <value xsi:type="fta:FeatureChoice" featureId="3"/>
+    </choices>
+    <result>
+      <alphaCutResults key="0.0">
+        <value lowerBound="0.2" upperBound="0.6"/>
+      </alphaCutResults>
+      <alphaCutResults key="0.5">
+        <value lowerBound="0.3" upperBound="0.55"/>
+      </alphaCutResults>
+      <alphaCutResults key="1.0">
+        <value lowerBound="0.4" upperBound="0.5"/>
+      </alphaCutResults>
+    </result>
+  </configurations>
+  <configurations>
+    <choices key="100">
+      <value xsi:type="fta:FeatureChoice" featureId="10"/>
+    </choices>
+    <result>
+      <alphaCutResults key="0.0">
+        <value lowerBound="0.03" upperBound="0.24"/>
+      </alphaCutResults>
+      <alphaCutResults key="0.5">
+        <value lowerBound="0.0525" upperBound="0.175"/>
+      </alphaCutResults>
+      <alphaCutResults key="1.0">
+        <value lowerBound="0.08" upperBound="0.12"/>
+      </alphaCutResults>
+    </result>
+  </configurations>
+  <configurations>
+    <choices key="100">
+      <value xsi:type="fta:FeatureChoice" featureId="11"/>
+    </choices>
+    <result>
+      <alphaCutResults key="0.0">
+        <value lowerBound="0.0001" upperBound="0.0256"/>
+      </alphaCutResults>
+      <alphaCutResults key="0.5">
+        <value lowerBound="0.00050625" upperBound="0.01500625"/>
+      </alphaCutResults>
+      <alphaCutResults key="1.0">
+        <value lowerBound="0.0016" upperBound="0.0081"/>
+      </alphaCutResults>
+    </result>
+  </configurations>
+  <configurations>
+    <choices key="100">
+      <value xsi:type="fta:FeatureChoice" featureId="20"/>
+    </choices>
+    <result>
+      <alphaCutResults key="0.0">
+        <value lowerBound="0.37" upperBound="0.76"/>
+      </alphaCutResults>
+      <alphaCutResults key="0.5">
+        <value lowerBound="0.4475" upperBound="0.675"/>
+      </alphaCutResults>
+      <alphaCutResults key="1.0">
+        <value lowerBound="0.52" upperBound="0.58"/>
+      </alphaCutResults>
+    </result>
+  </configurations>
+  <configurations>
+    <choices key="100">
+      <value xsi:type="fta:FeatureChoice" featureId="21"/>
+    </choices>
+    <result>
+      <alphaCutResults key="0.0">
+        <value lowerBound="0.271" upperBound="0.784"/>
+      </alphaCutResults>
+      <alphaCutResults key="0.5">
+        <value lowerBound="0.385875" upperBound="0.725375"/>
+      </alphaCutResults>
+      <alphaCutResults key="1.0">
+        <value lowerBound="0.488" upperBound="0.657"/>
+      </alphaCutResults>
+    </result>
+  </configurations>
+  <configurations>
+    <choices key="100">
+      <value xsi:type="fta:FeatureChoice" featureId="30"/>
+    </choices>
+    <result>
+      <alphaCutResults key="0.0">
+        <value lowerBound="0.34" upperBound="0.58"/>
+      </alphaCutResults>
+      <alphaCutResults key="0.5">
+        <value lowerBound="0.395" upperBound="0.5"/>
+      </alphaCutResults>
+      <alphaCutResults key="1.0">
+        <value lowerBound="0.44" upperBound="0.46"/>
+      </alphaCutResults>
+    </result>
+  </configurations>
+  <configurations>
+    <choices key="100">
+      <value xsi:type="fta:FeatureChoice" featureId="31"/>
+    </choices>
+    <result>
+      <alphaCutResults key="0.0">
+        <value lowerBound="0.404" upperBound="0.548"/>
+      </alphaCutResults>
+      <alphaCutResults key="0.5">
+        <value lowerBound="0.458" upperBound="0.5105"/>
+      </alphaCutResults>
+      <alphaCutResults key="1.0">
+        <value lowerBound="0.488" upperBound="0.5"/>
+      </alphaCutResults>
+    </result>
+  </configurations>
+  <configurations>
+    <choices key="100">
+      <value xsi:type="fta:FeatureChoice" featureId="40"/>
+    </choices>
+    <result>
+      <alphaCutResults key="0.0">
+        <value lowerBound="0.098" upperBound="0.552"/>
+      </alphaCutResults>
+      <alphaCutResults key="0.5">
+        <value lowerBound="0.171" upperBound="0.45"/>
+      </alphaCutResults>
+      <alphaCutResults key="1.0">
+        <value lowerBound="0.256" upperBound="0.35"/>
+      </alphaCutResults>
+    </result>
+  </configurations>
+</fta:AnalysisResult>
