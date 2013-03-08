@@ -74,9 +74,12 @@ def listJobs():
 	'''
 	conn=urllib.urlopen('%s/fuzztree/analysis/listJobs'%(baseUrl))	
 	if conn.getcode() == 200:
-		result = json.loads(conn.read())
-		# return as dict
-		return {jobid: status for jobid, status in result}
+		result=conn.read().strip()
+		if result == "()":
+			return {}
+		else:
+			resulttuples = json.loads(result)
+			return {jobid: status for jobid, status in resulttuples}
 	else:
 		raise InternalError("Unspecified internal error in calculation server")
 
