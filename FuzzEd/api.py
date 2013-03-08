@@ -19,7 +19,6 @@ from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands, Job
 from FuzzEd import backend, settings
-from FuzzEd.models import xml_analysis
 from analysis import calcserver
 
 import logging, json, urllib, urllib2
@@ -48,7 +47,7 @@ def calc_topevent(request, graph_id):
     try:
         postdata=g.to_xml()
         logger.debug("Sending XML to calcserver:\n"+postdata)
-        jobid, num_configurations, num_nodes = calcserver.createJob(postdata,1)
+        jobid, num_configurations, num_nodes = calcserver.createJob(postdata,10)
         # store job information for this graph
         j = Job(name=jobid, configurations=num_configurations, nodes=num_nodes, graph=g, kind=Job.TOPEVENT_JOB)
         j.save()
@@ -82,11 +81,8 @@ def jobstatus(request, job_id):
             if result == None:
                 return HttpResponse(status=202)
             else:
-                #TODO: Reformulate the result data to JSON for the frontend
-                logger.debug("Analysis result:\n"+str(result))
-                xml = xml_analysis.CreateFromDocument(result)
-                print xml
-                return HttpResponse(xml)
+                logger.debug("Analysis result:\n"+result)
+                return HttpResponse(result)
         except Exception as e:
             # Analysis engine does not know this job, or something else went wrong
             # for the frontend, this is basically an unspecified backend error
