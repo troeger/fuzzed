@@ -236,3 +236,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 AUTH_PROFILE_MODULE = 'FuzzEd.UserProfile'
+
+LOGIN_REDIRECT_URL = "/dashboard/"
+LOGIN_URL = "/"
