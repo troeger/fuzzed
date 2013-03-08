@@ -52,6 +52,9 @@ class HttpResponseCreatedAnswer(Exception):
 class HttpResponseNoResponse(HttpResponse):
     status_code = 204
 
+class HttpResponseAccepted(HttpResponse):
+    status_code = 202
+
 class HttpResponseNoResponseAnswer(Exception):
     def result(self):
         return HttpResponseNoResponse()

@@ -34,6 +34,7 @@ def createJob(xml, decompositionNumber, verifyOnly=False):
 def getJobResult(jobid):
 	'''
 	Returns job result as XML, or None if the job is still running.
+	Throws JobNotFoundError exception when the jobID is invalid.
 	'''
 	conn=urllib.urlopen('%s/fuzztree/analysis/getJobResult?jobId=%u'%(baseUrl, jobid))	
 	if conn.getcode() == 200:
