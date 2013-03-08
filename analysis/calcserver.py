@@ -1,10 +1,10 @@
 # This module provides pythonic access to the calculation analysis server
 # that is currently implemented in Java
 from FuzzEd import settings
+
 import json, urllib, logging
 
 logger = logging.getLogger('FuzzEd')
-
 
 baseUrl = settings.CALC_TOPEVENT_SERVER
 

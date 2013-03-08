@@ -1,7 +1,7 @@
 # FuzzEd/models/xml_analysis.py
 # -*- coding: utf-8 -*-
 # PyXB bindings for NM:0a49e237d692dded0ce0398c26bf115ddcebf747
-# Generated 2013-03-08 21:25:06.716197 by PyXB version 1.2.1
+# Generated 2013-03-08 22:34:13.877082 by PyXB version 1.2.1
 # Namespace net.fuzztree.analysis
 
 import pyxb
@@ -13,11 +13,11 @@ import pyxb.utils.domutils
 import sys
 
 # Unique identifier for bindings created at the same time
-_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:4408a4e1-882e-11e2-8f83-58b035ff3a58')
+_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:ebe9ae78-8837-11e2-9626-58b035ff3a58')
 
 # Import bindings for namespaces imported into schema
 import pyxb.binding.datatypes
-import _ft
+import xml_fuzztree
 
 Namespace = pyxb.namespace.NamespaceForURI(u'net.fuzztree.analysis', create_if_missing=True)
 Namespace.configureCategories(['typeBinding', 'elementBinding'])
@@ -92,7 +92,7 @@ class AnalysisResult_ (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute id uses Python identifier id
-    __id = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'id'), 'id', '__net_fuzztree_analysis_AnalysisResult__id', pyxb.binding.datatypes.int, required=True)
+    __id = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'id'), 'id', '__net_fuzztree_analysis_AnalysisResult__id', pyxb.binding.datatypes.int)
     __id._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/analysis.xsd', 10, 4)
     __id._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/analysis.xsd', 10, 4)
     
@@ -497,14 +497,14 @@ Namespace.addCategoryObject('typeBinding', u'ChoiceEventChoice', ChoiceEventChoi
 
 
 # Complex type {net.fuzztree.analysis}ConfigurationInstance with content type ELEMENT_ONLY
-class ConfigurationInstance_ (_ft.Annotation):
+class ConfigurationInstance_ (xml_fuzztree.Annotation):
     """Complex type {net.fuzztree.analysis}ConfigurationInstance with content type ELEMENT_ONLY"""
     _TypeDefinition = None
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'ConfigurationInstance')
     _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/analysis.xsd', 60, 2)
-    # Base type is _ft.Annotation
+    # Base type is xml_fuzztree.Annotation
     
     # Element configuration uses Python identifier configuration
     __configuration = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'configuration'), 'configuration', '__net_fuzztree_analysis_ConfigurationInstance__configuration', False, pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/analysis.xsd', 64, 10), )
@@ -521,11 +521,11 @@ class ConfigurationInstance_ (_ft.Annotation):
     ancestorModelId = property(__ancestorModelId.value, __ancestorModelId.set, None, None)
 
 
-    _ElementMap = _ft.Annotation._ElementMap.copy()
+    _ElementMap = xml_fuzztree.Annotation._ElementMap.copy()
     _ElementMap.update({
         __configuration.name() : __configuration
     })
-    _AttributeMap = _ft.Annotation._AttributeMap.copy()
+    _AttributeMap = xml_fuzztree.Annotation._AttributeMap.copy()
     _AttributeMap.update({
         __ancestorModelId.name() : __ancestorModelId
     })
@@ -533,14 +533,14 @@ Namespace.addCategoryObject('typeBinding', u'ConfigurationInstance', Configurati
 
 
 # Complex type {net.fuzztree.analysis}TransferInResult with content type ELEMENT_ONLY
-class TransferInResult_ (_ft.Annotation):
+class TransferInResult_ (xml_fuzztree.Annotation):
     """Complex type {net.fuzztree.analysis}TransferInResult with content type ELEMENT_ONLY"""
     _TypeDefinition = None
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'TransferInResult')
     _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/analysis.xsd', 96, 2)
-    # Base type is _ft.Annotation
+    # Base type is xml_fuzztree.Annotation
     
     # Element analysisResult uses Python identifier analysisResult
     __analysisResult = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'analysisResult'), 'analysisResult', '__net_fuzztree_analysis_TransferInResult__analysisResult', False, pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/analysis.xsd', 100, 10), )
@@ -549,11 +549,11 @@ class TransferInResult_ (_ft.Annotation):
     analysisResult = property(__analysisResult.value, __analysisResult.set, None, None)
 
 
-    _ElementMap = _ft.Annotation._ElementMap.copy()
+    _ElementMap = xml_fuzztree.Annotation._ElementMap.copy()
     _ElementMap.update({
         __analysisResult.name() : __analysisResult
     })
-    _AttributeMap = _ft.Annotation._AttributeMap.copy()
+    _AttributeMap = xml_fuzztree.Annotation._AttributeMap.copy()
     _AttributeMap.update({
         
     })

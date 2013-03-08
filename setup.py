@@ -23,14 +23,10 @@ def check_pythonversion():
 		exit(-1)
 
 def build_xmlschema_wrapper():
-	if os.path.exists("FuzzEd/models/xml_fuzztree.py"):
-		print ("Deleting old schema wrapper")
-		os.remove("FuzzEd/models/xml_fuzztree.py")
-	os.system("pyxbgen -u FuzzEd/static/xsd/fuzztree.xsd --binding-root=FuzzEd/models/ -m xml_fuzztree")
-	if os.path.exists("FuzzEd/models/xml_analysis.py"):
-		print ("Deleting old schema wrapper")
-		os.remove("FuzzEd/models/xml_analysis.py")
-	os.system("pyxbgen -u FuzzEd/static/xsd/analysis.xsd --binding-root=FuzzEd/models/ -m xml_analysis")
+	for f in ['xml_fuzztree.py', 'xml_analysis.py']:
+		if os.path.exists("FuzzEd/models/"+f):
+			os.remove("FuzzEd/models/"+f)
+	os.system("pyxbgen --binding-root=FuzzEd/models/ -u FuzzEd/static/xsd/analysis.xsd -m xml_analysis -u FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree")
 
 def build_naturaldocs():
 	# Build natural docs in 'docs' subdirectory

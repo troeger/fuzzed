@@ -19,6 +19,7 @@ from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands, Job
 from FuzzEd import backend, settings
+from FuzzEd.models import xml_analysis
 from analysis import calcserver
 
 import logging, json, urllib, urllib2
@@ -82,7 +83,10 @@ def jobstatus(request, job_id):
                 return HttpResponse(status=202)
             else:
                 #TODO: Reformulate the result data to JSON for the frontend
-                return HttpResponse(result)
+                logger.debug("Analysis result:\n"+str(result))
+                xml = xml_analysis.CreateFromDocument(result)
+                print xml
+                return HttpResponse(xml)
         except Exception as e:
             # Analysis engine does not know this job, or something else went wrong
             # for the frontend, this is basically an unspecified backend error
