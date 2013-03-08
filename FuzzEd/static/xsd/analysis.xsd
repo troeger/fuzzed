@@ -7,7 +7,7 @@
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="warnings" type="fta:AnalysisWarning"/>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="configurations" type="fta:Configuration"/>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:int" use="required"/>
+    <xsd:attribute name="id" type="xsd:int" use="optional"/>
     <xsd:attribute name="modelId" type="xsd:int" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
     <xsd:attribute default="true" name="validResult" type="xsd:boolean" use="optional"/>
