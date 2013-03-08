@@ -54,7 +54,7 @@ def calc_topevent(request, graph_id):
         # return URL for job status information
         logger.debug("Got new job '%s' with ID %u for graph %u"%(j.name, j.pk, g.pk))
         response = HttpResponse(status=201) 
-        response['Location'] = urlresolvers.reverse('jobstatus', args=[j.pk])
+        response['Location'] = reverse('jobstatus', args=[j.pk])
         return response
     except calcserver.InternalError as e:
         logger.error("Exception while using calcserver: "+str(e))
@@ -82,10 +82,11 @@ def jobstatus(request, job_id):
                 return HttpResponse(status=202)
             else:
                 #TODO: Reformulate the result data to JSON for the frontend
-                return HttpResponse(result.read())
-        except:
+                return HttpResponse(result)
+        except Exception as e:
             # Analysis engine does not know this job, or something else went wrong
             # for the frontend, this is basically an unspecified backend error
+            logger.error("Error while fetch calc server job status: "+str(e))
             raise HttpResponseServerErrorAnswer()
 
 @login_required
