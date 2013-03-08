@@ -1,7 +1,10 @@
 # This module provides pythonic access to the calculation analysis server
 # that is currently implemented in Java
 from FuzzEd import settings
-import json, urllib
+import json, urllib, logging
+
+logger = logging.getLogger('FuzzEd')
+
 
 baseUrl = settings.CALC_TOPEVENT_SERVER
 
@@ -23,9 +26,15 @@ def createJob(xml, decompositionNumber, verifyOnly=False):
 	conn=urllib.urlopen('%s/fuzztree/analysis/createJob?decompositionNumber=%u&verifyOnly=%s'%(baseUrl, decompositionNumber, verifyflag), post_data)	
 	if conn.getcode() == 200:
 		# Success, parse result to fetch job identifier
-		result = json.loads(conn.read())
-		logging.debug("Created job on calculation server: job id %u, %u configurations, %u nodes"%(result['jobid'], result['num_configurations'], result['num_nodes']))
-		return result
+		data = conn.read()
+		data = data.replace("'",'"')
+		logger.debug("Server result: "+str(data))
+		result = json.loads(data)
+		jobid = result['jobid']
+		num_configurations = result['num_configurations']
+		num_nodes = result['num_nodes']
+		logger.debug("Created job on calculation server: job id %u, %u configurations, %u nodes"%(jobid, num_configurations, num_nodes))
+		return jobid, num_configurations, num_nodes
 	elif conn.getcode() == 400:
 		raise InternalError("XML or decomposition number are ill-formatted")
 	else:
