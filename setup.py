@@ -27,6 +27,10 @@ def build_xmlschema_wrapper():
 		print ("Deleting old schema wrapper")
 		os.remove("FuzzEd/models/xml_fuzztree.py")
 	os.system("pyxbgen -u FuzzEd/static/xsd/fuzztree.xsd --binding-root=FuzzEd/models/ -m xml_fuzztree")
+	if os.path.exists("FuzzEd/models/xml_analysis.py"):
+		print ("Deleting old schema wrapper")
+		os.remove("FuzzEd/models/xml_analysis.py")
+	os.system("pyxbgen -u FuzzEd/static/xsd/analysis.xsd --binding-root=FuzzEd/models/ -m xml_analysis")
 
 def build_naturaldocs():
 	# Build natural docs in 'docs' subdirectory
