@@ -10,7 +10,7 @@
     <xsd:attribute name="id" type="xsd:int" use="required"/>
     <xsd:attribute name="modelId" type="xsd:int" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
-    <xsd:attribute default="true" name="validResult" type="xsd:boolean" use="required"/>
+    <xsd:attribute default="true" name="validResult" type="xsd:boolean" use="optional"/>
     <xsd:attribute name="decompositionNumber" type="xsd:int" use="required"/>
   </xsd:complexType>
   <xsd:element name="AnalysisResult" type="fta:AnalysisResult"/>
