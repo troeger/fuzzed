@@ -2,6 +2,8 @@ from django.db import models
 from graph import Graph
 
 class Job(models.Model):
+    class Meta:
+        app_label = 'FuzzEd'
 
     CUTSETS_JOB = 'C'                       
     TOPEVENT_JOB = 'T' 
