@@ -113,7 +113,9 @@ class Node(models.Model):
         """
         Method: to_xml
         
-        Serializes this node into an XML representation according to the schema file for the graph type
+        Serializes this node into an XML representation according to the schema file for the graph type.
+        Please note the the backend node ID is used instead of client_id, since the latter one is not
+        globally unique and may be too long for some XML processors.
         
         Returns:
          the node object

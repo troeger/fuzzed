@@ -1,7 +1,7 @@
 # This module provides pythonic access to the calculation analysis server
 # that is currently implemented in Java
 from FuzzEd import settings
-from FuzzEd.models import xml_analysis
+from FuzzEd.models import xml_analysis, Node
 
 import json, urllib, logging
 
@@ -22,10 +22,22 @@ class JobNotFoundError(Exception):
     pass
 
 def analysisResultAsJson(xmltext):
+    # load generating binding class with XML text
     xml = xml_analysis.CreateFromDocument(xmltext)
+    # Create dictionary to be converted to JSON
     result = {}
     result['decompositionNumber']=xml.decompositionNumber
     result['timestamp']=xml.timestamp
+    errors={}
+    for error in xml.errors:
+        client_id = Node.objects.get(pk=error.elementId).client_id
+        errors[client_id]=error.message
+    result['errors']=errors
+    warnings={}
+    for warning in xml.warnings:
+        client_id = Node.objects.get(pk=warning.elementId).client_id
+        warnings[client_id]=warning.message
+    result['warnings']=warnings
     for conf in xml.configurations:
         acutresults={}
         for acutresult in conf.result.alphaCutResults:
