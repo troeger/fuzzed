@@ -1,7 +1,7 @@
 # FuzzEd/models/xml_analysis.py
 # -*- coding: utf-8 -*-
 # PyXB bindings for NM:0a49e237d692dded0ce0398c26bf115ddcebf747
-# Generated 2013-03-09 14:40:11.440446 by PyXB version 1.2.1
+# Generated 2013-03-09 15:08:51.615603 by PyXB version 1.2.1
 # Namespace net.fuzztree.analysis
 
 import pyxb
@@ -13,7 +13,7 @@ import pyxb.utils.domutils
 import sys
 
 # Unique identifier for bindings created at the same time
-_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:dd50a68c-88be-11e2-826c-58b035ff3a58')
+_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:de9d7278-88c2-11e2-b30d-58b035ff3a58')
 
 # Import bindings for namespaces imported into schema
 import pyxb.binding.datatypes
@@ -92,7 +92,7 @@ class AnalysisResult_ (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute id uses Python identifier id
-    __id = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'id'), 'id', '__net_fuzztree_analysis_AnalysisResult__id', pyxb.binding.datatypes.int, required=True)
+    __id = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'id'), 'id', '__net_fuzztree_analysis_AnalysisResult__id', pyxb.binding.datatypes.int)
     __id._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/analysis.xsd', 10, 4)
     __id._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/analysis.xsd', 10, 4)
     
