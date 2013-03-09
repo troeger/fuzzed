@@ -176,7 +176,7 @@ class Node(models.Model):
             xmlnode=UndevelopedEvent(id=self.id, name=name)
         elif self.kind == 'choiceEvent':
             logger.debug("Adding choice event XML")
-            xmlnode=ChoiceEvent(id=self.id, name=name)
+            xmlnode=FeatureVariationPoint(id=self.id, name=name)
         elif self.kind == 'redundancyEvent':
             logger.debug("Adding %s XML with properties: %s"%(self.kind, str(self.properties.all())))
             try:
@@ -191,7 +191,7 @@ class Node(models.Model):
                 default = notations.by_kind[self.graph.kind]['nodes']['redundancyEvent']['nRange']
                 logger.debug("No nRange for this node, using default "+str(default))
                 nRange = default
-            xmlnode=RedundancyGate(id=self.id, name=name, formula=kFormula, start=nRange[0], end=nRange[1])
+            xmlnode=RedundancyVariationPoint(id=self.id, name=name, formula=kFormula, start=nRange[0], end=nRange[1])
         elif self.kind == 'houseEvent':
             logger.debug("Adding %s XML with properties: %s"%(self.kind, str(self.properties.all())))
             try:

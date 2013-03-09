@@ -4,7 +4,7 @@ from setuptools import setup
 from distutils.command.build import build as _build
 from distutils.command.clean import clean as _clean
 
-import os, sys
+import os, sys, shutil
 
 try:
     import json
@@ -23,6 +23,10 @@ def check_pythonversion():
 		exit(-1)
 
 def build_xmlschema_wrapper():
+	# Copy most recent schema files from calc server
+	shutil.copyfile("analysis/code/net.fuzztree.model.analysis/model/AnalysisXML.xsd","FuzzEd/static/xsd/analysis.xsd")
+	shutil.copyfile("analysis/code/net.fuzztree.model.fuzztree/model/FuzzTreeXML.xsd","FuzzEd/static/xsd/fuzztree.xsd")
+	# Remove old binding files and generate new ones
 	for f in ['xml_fuzztree.py', 'xml_analysis.py']:
 		if os.path.exists("FuzzEd/models/"+f):
 			os.remove("FuzzEd/models/"+f)

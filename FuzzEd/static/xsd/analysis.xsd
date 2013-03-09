@@ -7,7 +7,7 @@
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="warnings" type="fta:AnalysisWarning"/>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="configurations" type="fta:Configuration"/>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:int" use="optional"/>
+    <xsd:attribute name="id" type="xsd:int" use="required"/>
     <xsd:attribute name="modelId" type="xsd:int" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
     <xsd:attribute default="true" name="validResult" type="xsd:boolean" use="optional"/>
@@ -33,30 +33,30 @@
   </xsd:complexType>
   <xsd:element name="Configuration" type="fta:Configuration"/>
   <xsd:complexType abstract="true" name="Choice"/>
-  <xsd:complexType name="OptionalElementChoice">
+  <xsd:complexType name="InclusionChoice">
     <xsd:complexContent>
       <xsd:extension base="fta:Choice">
-        <xsd:attribute name="elementConsidered" type="xsd:boolean" use="required"/>
+        <xsd:attribute name="included" type="xsd:boolean" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  <xsd:element name="OptionalElementChoice" type="fta:OptionalElementChoice"/>
-  <xsd:complexType name="RedundancyGateChoice">
+  <xsd:element name="InclusionChoice" type="fta:InclusionChoice"/>
+  <xsd:complexType name="RedundancyChoice">
     <xsd:complexContent>
       <xsd:extension base="fta:Choice">
-        <xsd:attribute name="chosenNumber" type="xsd:int" use="required"/>
+        <xsd:attribute name="n" type="xsd:int" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  <xsd:element name="RedundancyGateChoice" type="fta:RedundancyGateChoice"/>
-  <xsd:complexType name="ChoiceEventChoice">
+  <xsd:element name="RedundancyChoice" type="fta:RedundancyChoice"/>
+  <xsd:complexType name="FeatureChoice">
     <xsd:complexContent>
       <xsd:extension base="fta:Choice">
-        <xsd:attribute name="chosenElementId" type="xsd:int" use="required"/>
+        <xsd:attribute name="featureId" type="xsd:int" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  <xsd:element name="ChoiceEventChoice" type="fta:ChoiceEventChoice"/>
+  <xsd:element name="FeatureChoice" type="fta:FeatureChoice"/>
   <xsd:complexType name="ConfigurationInstance">
     <xsd:complexContent>
       <xsd:extension base="ft:Annotation">
@@ -103,4 +103,14 @@
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:element name="TransferInResult" type="fta:TransferInResult"/>
+  <xsd:complexType name="TransferInChoice">
+    <xsd:complexContent>
+      <xsd:extension base="fta:Choice">
+        <xsd:sequence>
+          <xsd:element maxOccurs="1" minOccurs="1" name="chosenConfiguration" type="fta:Configuration"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="TransferInChoice" type="fta:TransferInChoice"/>
 </xsd:schema>
