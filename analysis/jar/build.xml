@@ -4,6 +4,8 @@
 
 	<property name="build" location="bin"/>
 	<property name="lib.dir" value="lib"/>
+	<property name="testsuite" value="default-test-suite"/>
+	
 	<path id="classpath">
 		<fileset dir="${lib.dir}" includes="**/*.jar"/>
 	</path>
@@ -29,6 +31,7 @@
 				<attribute name="Class-Path" value="."/>
 			</manifest>
 			<fileset dir="${build}"/>
+			<fileset dir="." includes="${testsuite}/**"/>			
 			<zipfileset src="../code/net.fuzztree.test/lib/commons-logging-1.1.1.jar" excludes="META-INF/*.SF" />
 			<zipfileset src="../code/net.fuzztree.test/lib/httpclient-4.2.3.jar" excludes="META-INF/*.SF" />
 			<zipfileset src="../code/net.fuzztree.test/lib/httpcore-4.2.2.jar" excludes="META-INF/*.SF" />
