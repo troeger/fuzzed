@@ -134,13 +134,13 @@
     </choices>
     <result>
       <alphaCutResults key="0.0">
-        <value lowerBound="0.404" upperBound="0.548"/>
+        <value lowerBound="0.352" upperBound="0.536"/>
       </alphaCutResults>
       <alphaCutResults key="0.5">
-        <value lowerBound="0.458" upperBound="0.5105"/>
+        <value lowerBound="0.40375" upperBound="0.481625"/>
       </alphaCutResults>
       <alphaCutResults key="1.0">
-        <value lowerBound="0.488" upperBound="0.5"/>
+        <value lowerBound="0.44" upperBound="0.46"/>
       </alphaCutResults>
     </result>
   </configurations>
