@@ -28,7 +28,7 @@
   </configurations>
   <configurations>
     <choices key="5">
-      <value xsi:type="fta:InclusionChoice"/>
+      <value xsi:type="fta:InclusionChoice" included="false"/>
     </choices>
     <choices key="6">
       <value xsi:type="fta:RedundancyChoice" n="4"/>
@@ -72,7 +72,7 @@
   </configurations>
   <configurations>
     <choices key="5">
-      <value xsi:type="fta:InclusionChoice"/>
+      <value xsi:type="fta:InclusionChoice" included="false"/>
     </choices>
     <choices key="6">
       <value xsi:type="fta:RedundancyChoice" n="5"/>
@@ -116,7 +116,7 @@
   </configurations>
   <configurations>
     <choices key="5">
-      <value xsi:type="fta:InclusionChoice"/>
+      <value xsi:type="fta:InclusionChoice" included="false"/>
     </choices>
     <choices key="6">
       <value xsi:type="fta:RedundancyChoice" n="4"/>
@@ -160,7 +160,7 @@
   </configurations>
   <configurations>
     <choices key="5">
-      <value xsi:type="fta:InclusionChoice"/>
+      <value xsi:type="fta:InclusionChoice" included="false"/>
     </choices>
     <choices key="6">
       <value xsi:type="fta:RedundancyChoice" n="5"/>

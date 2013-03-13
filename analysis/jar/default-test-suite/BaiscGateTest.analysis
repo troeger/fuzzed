@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fta:AnalysisResult xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fta="net.fuzztree.analysis" modelId="15022013" decompositionNumber="2">
+<fta:AnalysisResult xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fta="net.fuzztree.analysis" modelId="15022013" validResult="true" decompositionNumber="2">
   <configurations>
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="1"/>
