@@ -133,8 +133,8 @@
 }
 
 #FuzzEdProbabilityMenu {
-    display: none;
-    top: 50px;
-    left: 240px;
-    min-width: 220px;
+    display:    none;
+    top:        50px;
+    left:       240px;
+    min-width:  400px;
 }

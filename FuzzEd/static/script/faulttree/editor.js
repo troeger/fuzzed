@@ -1,4 +1,4 @@
-define(['editor', 'faulttree/graph', 'menus', 'faulttree/config'],
+define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts'],
 function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
     /**
      *  Package: Faulttree
@@ -203,10 +203,46 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {JSON} data - Data returned from the backend containing the result of the calculation.
          */
         _evaluateResult: function(data) {
-            if (typeof data.errors !== 'undefined') {
-                // errors is a dictionary with the index as key
+            if (typeof data.errors !== 'undefined' && _.size(data.errors) != 0) {
+                // errors is a dictionary with the node ID as key
+                //TODO: display validation result at the node
                 this._displayValidationErrors(_.values(data.errors));
+            } else {
+                var alphacuts = [];
+                _.each(data['alphacutresults'], function(alphacut) {
+                    alphacuts.push(this._convertToHighchartsFormat(alphacut));
+                }.bind(this));
+
+                this._displayResultWithHighcharts(alphacuts, data['decompositionNumber']);
             }
+        },
+
+        /**
+         *  Group: Conversion
+         */
+
+        /**
+         *  Methods: _convertToHighchartsFormat
+         *    Converts a data series of a configuration from API JSON to the Highcharts format.
+         *
+         *  Parameters:
+         *    {JSON} configuration - The data series in JSON format (e.g. "{"0.0": [0.2, 0.5], "1.0": [0.4, 0.4]}").
+         *
+         *  Returns:
+         *    An array-of-arrays representation of the input that can be used by Highcharts to plot the data.
+         */
+        _convertToHighchartsFormat: function(configuration) {
+            var dataPoints = [];
+            _.each(configuration, function(values, key) {
+                var y = parseFloat(key);
+                _.each(values, function(x) {
+                    dataPoints.push([x, y]);
+                });
+            });
+
+            return _.sortBy(dataPoints, function(point) {
+                return point[0];
+            });
         },
 
         /**
@@ -226,15 +262,70 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         },
 
         /**
-         *  Method: _displayResult
-         *    Display the job's result in the menu's body.
+         *  Method: _displayResultWithHighcharts
+         *    Display the job's result in the menu's body using Highcharts.
          *
          *  Parameters:
-         *    {JSON} data - Data returned from the backend containing the result of the calculation.
+         *    {Array} data                - A set of one or more data series to display in the Highchart.
+         *    {int}   decompositionNumber - [optional] Number of decompositions of the result. Used for calculating
+         *                                  the tick of the y-axis.
          */
-        _displayResult: function(data) {
-            //TODO
-            this._contentContainer.text(JSON.stringify(data));
+        _displayResultWithHighcharts: function(data, decompositionNumber) {
+            if (data.length == 0) return;
+
+            decompositionNumber = decompositionNumber || 5;
+
+            var series = [];
+
+            _.each(data, function(cutset, index) {
+                series.push({
+                    name: 'Configuration ' + (index + 1),
+                    data: cutset
+                });
+            });
+
+            //TODO: This is all pretty hard-coded. Put it into config instead.
+            var chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: this._contentContainer[0],
+                    type:     'line',
+                    height:   180
+                },
+
+                title: {
+                    text: null
+                },
+
+                credits: {
+                    style: {
+                        fontSize: '8px'
+                    }
+                },
+
+                xAxis: {
+                    min: 0,
+                    max: 1
+                },
+                yAxis: {
+                    min: 0,
+                    max: 1,
+                    title: {
+                        text: null
+                    },
+                    tickInterval: 1.0,
+                    minorTickInterval: 1.0 / decompositionNumber
+                },
+
+                plotOptions: {
+                    series: {
+                        marker: {
+                            radius: 1
+                        }
+                    }
+                },
+
+                series: series
+            });
         },
 
         /**
