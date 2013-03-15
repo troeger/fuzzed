@@ -89,6 +89,7 @@ define(["class"], function(Class) {
         _query: function() {
             jQuery.ajax({
                 url: this._url,
+                dataType: 'json',
                 statusCode: {
                     200: function(data) { // success
                         this.successCallback(data);

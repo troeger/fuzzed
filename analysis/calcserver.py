@@ -38,6 +38,7 @@ def analysisResultAsJson(xmltext):
         client_id = Node.objects.get(pk=warning.elementId).client_id
         warnings[client_id]=warning.message
     result['warnings']=warnings
+    configs = []
     for conf in xml.configurations:
         acutresults={}
         for acutresult in conf.result.alphaCutResults:
@@ -45,7 +46,8 @@ def analysisResultAsJson(xmltext):
             lowerBound = acutresult.content()[0].lowerBound
             upperBound = acutresult.content()[0].upperBound
             acutresults[acutresult.key]=(lowerBound, upperBound)
-        result['alphacutresults']=acutresults
+        configs.append(acutresults)
+    result['alphacutresults']=configs
     return json.dumps(result)
 
 def createJob(xml, decompositionNumber, verifyOnly=False):

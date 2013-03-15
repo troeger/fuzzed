@@ -30,6 +30,7 @@
             'bootstrap':  '../lib/bootstrap/js/bootstrap-2.0.4.min',
             'underscore': '../lib/underscore/underscore-1.4.3.min',
             'jsplumb':    '../lib/jsplumb/jsplumb-1.3.16',
+            'highcharts': '../lib/highcharts-2.3.5/highcharts',
             'bignumber':  '../lib/bignumber/bignumber.min',
 
             'notations':  '../notations'
@@ -54,6 +55,11 @@
             'jsplumb': {
                 deps: ['jquery', 'jquery.ui/jquery.ui.draggable', 'jquery.ui/jquery.ui.droppable'],
                 exports: 'jsPlumb'
+            },
+
+            'highcharts': {
+                deps: ['jquery'],
+                exports: 'Highcharts'
             }
         }
     });
