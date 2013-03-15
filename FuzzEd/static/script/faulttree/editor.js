@@ -158,9 +158,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    This menu instance for chaining.
          */
         show: function(job) {
-            job.successCallback = this._displayResult.bind(this);
+            job.successCallback = this._evaluateResult.bind(this);
             job.updateCallback  = this._displayProgress.bind(this);
-            job.errorCallback   = this._displayError.bind(this);
+            job.errorCallback   = this._displayNetworkError.bind(this);
             job.updateCallback  = 5000;
             job.start();
 
@@ -192,6 +192,24 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         },
 
         /**
+         *  Group: Evaluation
+         */
+
+        /**
+         *  Method: _evaluateResult
+         *    Evaluates the job result. Either displays the analysis results or the returned error message.
+         *
+         *  Parameters:
+         *    {JSON} data - Data returned from the backend containing the result of the calculation.
+         */
+        _evaluateResult: function(data) {
+            if (typeof data.errors !== 'undefined') {
+                // errors is a dictionary with the index as key
+                this._displayValidationErrors(_.values(data.errors));
+            }
+        },
+
+        /**
          *  Group: Display
          */
 
@@ -220,11 +238,28 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         },
 
         /**
-         *  Method: _displayProgress
-         *    Display an error massage in the menu's body.
+         *  Method: _displayValidationErrors
+         *    Display all errors that are thrown during graph validation.
+         *
+         *  Parameters:
+         *    {Array} errors - A list of error messages.
          */
-        _displayError: function() {
-            //TODO
+        _displayValidationErrors: function(errors) {
+            //TODO: This is a temporary solution. Should be replaced by error messages later.
+
+            var list = jQuery('<ul></ul>');
+            _.each(errors, function(error) {
+                jQuery('<li></li>').text(error).appendTo(list);
+            });
+            this._contentContainer.html(list);
+        },
+
+        /**
+         *  Method: _displayNetworkError
+         *    Display an error massage resulting from a network error (e.g. 404) in the menu's body.
+         */
+        _displayNetworkError: function() {
+            //TODO: This is a temporary solution. Should be replaced by error messages later.
             this._contentContainer.text("Not found");
         }
 
