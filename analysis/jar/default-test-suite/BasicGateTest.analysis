@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fta:AnalysisResult xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fta="net.fuzztree.analysis" modelId="15022013" validResult="true" decompositionNumber="2">
-  <configurations>
+  <configurations costs="0">
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="1"/>
     </choices>
@@ -16,7 +16,7 @@
       </alphaCutResults>
     </result>
   </configurations>
-  <configurations>
+  <configurations costs="0">
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="2"/>
     </choices>
@@ -32,7 +32,7 @@
       </alphaCutResults>
     </result>
   </configurations>
-  <configurations>
+  <configurations costs="0">
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="3"/>
     </choices>
@@ -48,7 +48,7 @@
       </alphaCutResults>
     </result>
   </configurations>
-  <configurations>
+  <configurations costs="0">
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="10"/>
     </choices>
@@ -64,7 +64,7 @@
       </alphaCutResults>
     </result>
   </configurations>
-  <configurations>
+  <configurations costs="0">
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="11"/>
     </choices>
@@ -80,7 +80,7 @@
       </alphaCutResults>
     </result>
   </configurations>
-  <configurations>
+  <configurations costs="0">
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="20"/>
     </choices>
@@ -96,7 +96,7 @@
       </alphaCutResults>
     </result>
   </configurations>
-  <configurations>
+  <configurations costs="0">
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="21"/>
     </choices>
@@ -112,7 +112,7 @@
       </alphaCutResults>
     </result>
   </configurations>
-  <configurations>
+  <configurations costs="0">
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="30"/>
     </choices>
@@ -128,7 +128,7 @@
       </alphaCutResults>
     </result>
   </configurations>
-  <configurations>
+  <configurations costs="0">
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="31"/>
     </choices>
@@ -144,7 +144,7 @@
       </alphaCutResults>
     </result>
   </configurations>
-  <configurations>
+  <configurations costs="0">
     <choices key="100">
       <value xsi:type="fta:FeatureChoice" featureId="40"/>
     </choices>
