@@ -5,32 +5,32 @@
     <choices key="10">
       <value xsi:type="fta:InclusionChoice" included="true"/>
     </choices>
-    <result>
-      <alphaCutResults key="0.0">
+    <probability>
+      <alphaCuts key="0.0">
         <value lowerBound="0.5" upperBound="0.5"/>
-      </alphaCutResults>
-      <alphaCutResults key="0.5">
+      </alphaCuts>
+      <alphaCuts key="0.5">
         <value lowerBound="0.5" upperBound="0.5"/>
-      </alphaCutResults>
-      <alphaCutResults key="1.0">
+      </alphaCuts>
+      <alphaCuts key="1.0">
         <value lowerBound="0.5" upperBound="0.5"/>
-      </alphaCutResults>
-    </result>
+      </alphaCuts>
+    </probability>
   </configurations>
   <configurations costs="0">
     <choices key="10">
       <value xsi:type="fta:InclusionChoice" included="false"/>
     </choices>
-    <result>
-      <alphaCutResults key="0.0">
+    <probability>
+      <alphaCuts key="0.0">
         <value lowerBound="0.0" upperBound="0.0"/>
-      </alphaCutResults>
-      <alphaCutResults key="0.5">
+      </alphaCuts>
+      <alphaCuts key="0.5">
         <value lowerBound="0.0" upperBound="0.0"/>
-      </alphaCutResults>
-      <alphaCutResults key="1.0">
+      </alphaCuts>
+      <alphaCuts key="1.0">
         <value lowerBound="0.0" upperBound="0.0"/>
-      </alphaCutResults>
-    </result>
+      </alphaCuts>
+    </probability>
   </configurations>
 </fta:AnalysisResult>
