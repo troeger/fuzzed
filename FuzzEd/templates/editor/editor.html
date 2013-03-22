@@ -8,6 +8,8 @@
     {{ block.super }}
     @import url("{{ STATIC_URL }}css/editor/editor.css");
     @import url("{{ STATIC_URL }}css/editor/menus.css");
+
+    @import url("{{ STATIC_URL }}css/jquery.ui.custom.css");
 {% endblock %}
 
 {% block script %}
@@ -44,6 +46,7 @@
             'jquery.ui/jquery.ui.draggable':  ['jquery.ui/jquery.ui.mouse'],
             'jquery.ui/jquery.ui.droppable':  ['jquery.ui/jquery.ui.mouse'],
             'jquery.ui/jquery.ui.selectable': ['jquery.ui/jquery.ui.mouse'],
+            'jquery.ui/jquery.ui.resizable':  ['jquery.ui/jquery.ui.mouse'],
 
             'jquery.svg':    ['jquery'],
             'jquery.svgdom': ['jquery.svg'],
