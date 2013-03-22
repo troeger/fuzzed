@@ -1,5 +1,5 @@
 .menu {
-    position: fixed;
+    position: absolute;
     min-height: 50px;
     min-width: 100px;
     padding: 42px 7px 7px 7px;
@@ -73,7 +73,7 @@
 }
 
 #FuzzEdShapes {
-    top: 50px;
+    top: 20px;
     left: 20px;
 }
 
@@ -95,7 +95,7 @@
 
 #FuzzEdProperties {
     display: none;
-    top: 50px;
+    top: 20px;
 }
 
 #FuzzEdProperties .form-horizontal .controls {
@@ -127,14 +127,14 @@
 
 #FuzzEdCutsetsMenu {
     display: none;
-    top: 50px;
+    top: 20px;
     left: 240px;
     min-width: 200px;
 }
 
 #FuzzEdProbabilityMenu {
     display:    none;
-    top:        50px;
+    top:        20px;
     left:       240px;
     min-width:  400px;
 }
