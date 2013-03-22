@@ -1,4 +1,4 @@
-define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts'],
+define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery.ui/jquery.ui.resizable'],
 function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
     /**
      *  Package: Faulttree
@@ -188,7 +188,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                     </div>\
                     <div class="content"></div>\
                 </div>'
-            ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+            )
+            .resizable()
+            .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
         },
 
         /**
@@ -326,6 +328,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
                 series: series
             });
+
+            // update the chart's size when resizing the menu
+            this.container.on("resize", function(event, ui) {
+                chart.setSize(
+                    this._contentContainer.width(),
+                    this._contentContainer.height(),
+                    false
+                );
+            }.bind(this));
         },
 
         /**
