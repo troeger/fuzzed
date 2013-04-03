@@ -20,7 +20,6 @@
 
         "event": {
             "inherits": "node",
-            "allowConnectionTo": ["gate"],
 
             "optional": false,
             "cost": 1,
@@ -35,7 +34,8 @@
                     "kind": "number",
                     "displayName": "Cost",
                     "min": 0,
-                    "step": 1
+                    "step": 1,
+                    "disabled": true
                 },
                 "probability": {
                     "kind": "text",
@@ -49,7 +49,6 @@
             },
 
             "propertyMirrors": {
-
                 "name": {
                     "position": "bottom",
                     "style": ["bold", "large"]
@@ -59,6 +58,24 @@
 
         "gate": {
             "inherits": "node"
+        },
+
+        "variationPoint": {
+            "inherits": "node",
+
+            "propertyMenuEntries": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name"
+                }
+            },
+
+            "propertyMirrors": {
+                "name": {
+                    "position": "bottom",
+                    "style": ["bold", "large"]
+                }
+            }
         },
 
         "basicEvent": {
@@ -232,21 +249,21 @@
             "name": "Voting OR Gate",
             "image": "voting_or_gate.svg",
             "help": "Output event occurs if the given number of input events occur",
-            "kN": [1, 2],
+            "kFormula": 1,
 
             "propertyMenuEntries": {
-                "kN": {
-                    "kind": "range",
-                    "displayName": "k-out-of-N",
+                "kFormula": {
+                    "kind": "number",
+                    "displayName": "K-Formula",
                     "min": 1,
                     "step": 1
                 }
             },
             "propertyMirrors": {
-                "kN": {
+                "kFormula": {
                     "position": "bottom",
                     "style": ["italic"],
-                    "prefix": "k/N: "
+                    "prefix": "k: "
                 }
             }
         },
@@ -260,12 +277,12 @@
             "help": "Event with no information available or insignificant impact"
         },
 
-        "choiceEvent": {
-            "inherits": "event",
+        "featureVariation": {
+            "inherits": "variationPoint",
 
-            "name": "Choice Event",
-            "allowConnectionTo": ["intermediateEvent"],
-            "image": "choice_event.svg",
+            "name": "Feature Variation",
+            "allowConnectionTo": ["event", "variationPoint"],
+            "image": "feature_variation.svg",
             "help": "Placeholder for one of the input events",
 
             "connector": {
@@ -277,13 +294,13 @@
             }
         },
 
-        "redundancyEvent": {
-            "inherits": "event",
+        "redundancyVariation": {
+            "inherits": "variationPoint",
 
-            "name": "Redundancy Event",
-            "allowConnectionTo": ["intermediateEvent", "basicEventSet"],
+            "name": "Redundancy Variation",
+            "allowConnectionTo": ["intermediateEventSet", "basicEventSet"],
             "numberOfOutgoingConnections": 1,
-            "image": "redundancy_event.svg",
+            "image": "redundancy_variation.svg",
             "help": "Placeholder for a voting OR gate over a chosen number of the input events",
 
             "kFormula": "N-2",
@@ -361,7 +378,6 @@
         "cost",
         "probability",
         "optional",
-        "kN",
         "cardinality",
         "kFormula",
         "nRange",
@@ -378,8 +394,8 @@
         "xorGate",
         "votingOrGate",
         "undevelopedEvent",
-        "choiceEvent",
-        "redundancyEvent",
+        "featureVariation",
+        "redundancyVariation",
         "houseEvent",
         "topEvent"
     ],

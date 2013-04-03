@@ -180,9 +180,31 @@
   <xsd:complexType abstract="true" name="InclusionVariationPoint">
     <xsd:complexContent>
       <xsd:extension base="ft:VariationPoint">
-        <xsd:attribute name="optional" type="xsd:boolean"/>
+        <xsd:attribute default="false" name="optional" type="xsd:boolean"/>
         <xsd:attribute name="costs" type="xsd:int"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
+  <xsd:complexType name="DecomposedFuzzyProbability">
+    <xsd:complexContent>
+      <xsd:extension base="ft:Probability">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="alphaCuts" type="ft:DoubleToIntervalMap"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="DecomposedFuzzyProbability" type="ft:DecomposedFuzzyProbability"/>
+  <xsd:complexType name="DoubleToIntervalMap">
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="1" name="value" type="ft:Interval"/>
+    </xsd:sequence>
+    <xsd:attribute name="key" type="xsd:double" use="required"/>
+  </xsd:complexType>
+  <xsd:element name="DoubleToIntervalMap" type="ft:DoubleToIntervalMap"/>
+  <xsd:complexType name="Interval">
+    <xsd:attribute name="lowerBound" type="xsd:double" use="required"/>
+    <xsd:attribute name="upperBound" type="xsd:double" use="required"/>
+  </xsd:complexType>
+  <xsd:element name="Interval" type="ft:Interval"/>
 </xsd:schema>
