@@ -128,6 +128,10 @@ function(Properties, Mirror, Canvas, Class) {
                 // add new classes for the actual node
                 .addClass(this.config.Classes.NODE_IMAGE);
 
+            // links to primitive shapes and groups of the SVG for later manipulation (highlighting, ...)
+            this._nodeImage.primitives = this._nodeImage.find('rect, circle, path');
+            this._nodeImage.groups     = this._nodeImage.find('g');
+
             this._nodeImageContainer = jQuery('<div>')
                 .append(this._nodeImage);
 
@@ -156,10 +160,6 @@ function(Properties, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         _setupNodeImage: function() {
-            // links to primitive shapes and groups of the SVG for later manipulation (highlighting, ...)
-            this._nodeImage.primitives = this._nodeImage.find('rect, circle, path');
-            this._nodeImage.groups     = this._nodeImage.find('g');
-
             // calculate the scale factor
             var marginOffset = this._nodeImage.outerWidth(true) - this._nodeImage.width();
             var scaleFactor  = (Canvas.gridSize - marginOffset) / this._nodeImage.height();

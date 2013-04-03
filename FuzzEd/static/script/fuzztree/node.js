@@ -11,18 +11,10 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
             // mark node optional (or remove mark)
             if (optional) {
                 this.container.addClass(this.config.Classes.NODE_OPTIONAL);
+                this._nodeImage.primitives.attr('stroke-dasharray', this.config.Node.OPTIONAL_STROKE_STYLE);
             } else {
                 this.container.removeClass(this.config.Classes.NODE_OPTIONAL);
-            }
-
-            if (optional) {
-                this.optionalIndicator.attr('fill', this.config.Node.OPTIONAL_INDICATOR_FILL);
-            } else if (this._selected) {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_SELECTED);
-            } else if (this._highlighted) {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_HIGHLIGHTED);
-            } else {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_NORMAL);
+                this._nodeImage.primitives.removeAttr('stroke-dasharray');
             }
 
             return this;
@@ -32,86 +24,9 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
             return Config;
         },
 
-        _visualSelect: function() {
-            this._super();
-
-            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_SELECTED);
-            if (!this.optional) {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_SELECTED);
-            }
-
-            return this;
-        },
-
-        _visualHighlight: function() {
-            this._super();
-
-            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_HIGHLIGHTED);
-            if (!this.optional) {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_HIGHLIGHTED);
-            }
-
-            return this;
-        },
-
-        _visualDisable: function() {
-            this._super();
-
-            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_DISABLED);
-            if (!this.optional) {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_DISABLED);
-            }
-
-            return this;
-        },
-
-        _visualReset: function() {
-            this._super();
-
-            this.optionalIndicator.attr('stroke', this.config.Node.STROKE_NORMAL);
-            if (!this.optional) {
-                this.optionalIndicator.attr('fill', this.config.Node.STROKE_NORMAL);
-            }
-
-            return this;
-        },
-
         _setupVisualRepresentation: function() {
             this._super();
-
-            var optionalIndicatorWrapper = jQuery('<div>').svg();
-            var optionalIndicator = optionalIndicatorWrapper.svg('get');
-
-            var radius      = this.config.Node.OPTIONAL_INDICATOR_RADIUS;
-            var strokeWidth = this.config.Node.OPTIONAL_INDICATOR_STROKE;
-
-            optionalIndicator.configure({width: 2 * (radius + strokeWidth), height: 2 * (radius + strokeWidth)});
-
-            var optionalIndicatorCircle = optionalIndicator.circle(null, radius + strokeWidth/2, radius + strokeWidth/2, radius, {
-                strokeWidth: strokeWidth,
-                fill: this.optional ? this.config.Node.OPTIONAL_INDICATOR_FILL : this.config.Node.STROKE_NORMAL,
-                stroke: this.config.Node.STROKE_NORMAL
-            });
-
-            // external method for changing attributes of the circle later
-            optionalIndicator.attr = function(attr, value) {
-                var setting = {};
-                setting[attr] = value;
-                optionalIndicator.change(optionalIndicatorCircle, setting);
-            };
-
-            optionalIndicatorWrapper
-                .addClass(this.config.Classes.NODE_OPTIONAL_INDICATOR)
-                .prependTo(this.container);
-
-            // mark this node as optional
-            if (this.optional) this.container.addClass(this.config.Classes.NODE_OPTIONAL);
-
-            // hide the optional indicator for nodes with undefined value
-            if (typeof this.optional === 'undefined' || this.optional == null) {
-                optionalIndicatorWrapper.css('visibility', 'hidden');
-            }
-            this.optionalIndicator = optionalIndicator;
+            this.setOptional(this.optional);
 
             return this;
         },
@@ -123,16 +38,6 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
                 }.bind(this);
             }
             return this._super(propertyMenuEntries, propertiesDisplayOrder);
-        },
-
-        _connectorOffset: function() {
-            var offsets = this._super();
-
-            if (typeof this.optional !== 'undefined' && this.optional != null) {
-                offsets.in.y = jQuery(this.optionalIndicator._container).offset().top - this.container.offset().top;
-            }
-
-            return offsets;
         }
     });
 });
