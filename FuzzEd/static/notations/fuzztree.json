@@ -264,7 +264,7 @@
             "inherits": "event",
 
             "name": "Choice Event",
-            "allowConnectionTo": ["event"],
+            "allowConnectionTo": ["intermediateEvent"],
             "image": "choice_event.svg",
             "help": "Placeholder for one of the input events",
 
