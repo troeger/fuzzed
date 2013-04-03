@@ -105,6 +105,8 @@
         "intermediateEvent": {
             "inherits": "event",
 
+            "allowConnectionTo": ["gate", "basicEvent"],
+
             "name": "Intermediate Event",
             "image": "intermediate_event.svg",
             "help": "Failure resulting from a combination of previous events"
