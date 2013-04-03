@@ -281,7 +281,7 @@
             "inherits": "event",
 
             "name": "Redundancy Event",
-            "allowConnectionTo": ["basicEventSet"],
+            "allowConnectionTo": ["intermediateEvent", "basicEventSet"],
             "numberOfOutgoingConnections": 1,
             "image": "redundancy_event.svg",
             "help": "Placeholder for a voting OR gate over a chosen number of the input events",
