@@ -19,8 +19,6 @@
         "event": {
             "inherits": "node",
 
-            "allowConnectionTo": ["gate"],
-
             "probability": 0,
 
             "propertyMenuEntries": {
@@ -105,8 +103,6 @@
         "intermediateEvent": {
             "inherits": "event",
 
-            "allowConnectionTo": ["gate", "basicEvent"],
-
             "name": "Intermediate Event",
             "image": "intermediate_event.svg",
             "help": "Failure resulting from a combination of previous events"
@@ -174,21 +170,21 @@
             "name": "Voting OR Gate",
             "image": "voting_or_gate.svg",
             "help": "Output event occurs if the given number of input events occur",
-            "kN": [1, 2],
+            "kFormula": 1,
 
             "propertyMenuEntries": {
-                "kN": {
-                    "kind": "range",
-                    "displayName": "k-out-of-N",
+                "kFormula": {
+                    "kind": "number",
+                    "displayName": "K-Formula",
                     "min": 1,
                     "step": 1
                 }
             },
             "propertyMirrors": {
-                "kN": {
+                "kFormula": {
                     "position": "bottom",
                     "style": ["italic"],
-                    "prefix": "k/N: "
+                    "prefix": "k: "
                 }
             }
         },
@@ -228,8 +224,8 @@
     "propertiesDisplayOrder": [
         "name",
         "probability",
-        "kN",
-        "cardinality"
+        "cardinality",
+        "kFormula"
     ],
 
     "shapeMenuNodeDisplayOrder": [
