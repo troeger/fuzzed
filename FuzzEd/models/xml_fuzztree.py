@@ -1,7 +1,7 @@
 # FuzzEd/models/xml_fuzztree.py
 # -*- coding: utf-8 -*-
 # PyXB bindings for NM:4e577dc0c998265d17f355c47a293bafde28b966
-# Generated 2013-03-09 15:08:51.615231 by PyXB version 1.2.1
+# Generated 2013-04-04 22:37:33.508559 by PyXB version 1.2.1
 # Namespace net.fuzztree [xmlns:ft]
 
 import pyxb
@@ -13,7 +13,7 @@ import pyxb.utils.domutils
 import sys
 
 # Unique identifier for bindings created at the same time
-_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:de9d7278-88c2-11e2-b30d-58b035ff3a58')
+_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:7a40b0e3-9d67-11e2-81b0-58b035ff3a58')
 
 # Import bindings for namespaces imported into schema
 import pyxb.binding.datatypes
@@ -138,6 +138,76 @@ class Probability (pyxb.binding.basis.complexTypeDefinition):
         
     }
 Namespace.addCategoryObject('typeBinding', u'Probability', Probability)
+
+
+# Complex type {net.fuzztree}DoubleToIntervalMap with content type ELEMENT_ONLY
+class DoubleToIntervalMap_ (pyxb.binding.basis.complexTypeDefinition):
+    """Complex type {net.fuzztree}DoubleToIntervalMap with content type ELEMENT_ONLY"""
+    _TypeDefinition = None
+    _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
+    _Abstract = False
+    _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'DoubleToIntervalMap')
+    _XSDLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 198, 2)
+    # Base type is pyxb.binding.datatypes.anyType
+    
+    # Element value uses Python identifier value_
+    __value = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'value'), 'value_', '__net_fuzztree_DoubleToIntervalMap__value', False, pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 200, 6), )
+
+    
+    value_ = property(__value.value, __value.set, None, None)
+
+    
+    # Attribute key uses Python identifier key
+    __key = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'key'), 'key', '__net_fuzztree_DoubleToIntervalMap__key', pyxb.binding.datatypes.double, required=True)
+    __key._DeclarationLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 202, 4)
+    __key._UseLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 202, 4)
+    
+    key = property(__key.value, __key.set, None, None)
+
+
+    _ElementMap = {
+        __value.name() : __value
+    }
+    _AttributeMap = {
+        __key.name() : __key
+    }
+Namespace.addCategoryObject('typeBinding', u'DoubleToIntervalMap', DoubleToIntervalMap_)
+
+
+# Complex type {net.fuzztree}Interval with content type EMPTY
+class Interval_ (pyxb.binding.basis.complexTypeDefinition):
+    """Complex type {net.fuzztree}Interval with content type EMPTY"""
+    _TypeDefinition = None
+    _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_EMPTY
+    _Abstract = False
+    _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'Interval')
+    _XSDLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 205, 2)
+    # Base type is pyxb.binding.datatypes.anyType
+    
+    # Attribute lowerBound uses Python identifier lowerBound
+    __lowerBound = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'lowerBound'), 'lowerBound', '__net_fuzztree_Interval__lowerBound', pyxb.binding.datatypes.double, required=True)
+    __lowerBound._DeclarationLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 206, 4)
+    __lowerBound._UseLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 206, 4)
+    
+    lowerBound = property(__lowerBound.value, __lowerBound.set, None, None)
+
+    
+    # Attribute upperBound uses Python identifier upperBound
+    __upperBound = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'upperBound'), 'upperBound', '__net_fuzztree_Interval__upperBound', pyxb.binding.datatypes.double, required=True)
+    __upperBound._DeclarationLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 207, 4)
+    __upperBound._UseLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 207, 4)
+    
+    upperBound = property(__upperBound.value, __upperBound.set, None, None)
+
+
+    _ElementMap = {
+        
+    }
+    _AttributeMap = {
+        __lowerBound.name() : __lowerBound,
+        __upperBound.name() : __upperBound
+    }
+Namespace.addCategoryObject('typeBinding', u'Interval', Interval_)
 
 
 # Complex type {net.fuzztree}Node with content type ELEMENT_ONLY
@@ -301,6 +371,34 @@ class TriangularFuzzyInterval_ (Probability):
         __c.name() : __c
     })
 Namespace.addCategoryObject('typeBinding', u'TriangularFuzzyInterval', TriangularFuzzyInterval_)
+
+
+# Complex type {net.fuzztree}DecomposedFuzzyProbability with content type ELEMENT_ONLY
+class DecomposedFuzzyProbability_ (Probability):
+    """Complex type {net.fuzztree}DecomposedFuzzyProbability with content type ELEMENT_ONLY"""
+    _TypeDefinition = None
+    _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
+    _Abstract = False
+    _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'DecomposedFuzzyProbability')
+    _XSDLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 188, 2)
+    # Base type is Probability
+    
+    # Element alphaCuts uses Python identifier alphaCuts
+    __alphaCuts = pyxb.binding.content.ElementDeclaration(pyxb.namespace.ExpandedName(None, u'alphaCuts'), 'alphaCuts', '__net_fuzztree_DecomposedFuzzyProbability__alphaCuts', True, pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 192, 10), )
+
+    
+    alphaCuts = property(__alphaCuts.value, __alphaCuts.set, None, None)
+
+
+    _ElementMap = Probability._ElementMap.copy()
+    _ElementMap.update({
+        __alphaCuts.name() : __alphaCuts
+    })
+    _AttributeMap = Probability._AttributeMap.copy()
+    _AttributeMap.update({
+        
+    })
+Namespace.addCategoryObject('typeBinding', u'DecomposedFuzzyProbability', DecomposedFuzzyProbability_)
 
 
 # Complex type {net.fuzztree}FuzzTree with content type ELEMENT_ONLY
@@ -807,7 +905,7 @@ class InclusionVariationPoint (VariationPoint):
     # Attribute name inherited from {net.fuzztree}AnnotatedElement
     
     # Attribute optional uses Python identifier optional
-    __optional = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'optional'), 'optional', '__net_fuzztree_InclusionVariationPoint_optional', pyxb.binding.datatypes.boolean)
+    __optional = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'optional'), 'optional', '__net_fuzztree_InclusionVariationPoint_optional', pyxb.binding.datatypes.boolean, unicode_default=u'false')
     __optional._DeclarationLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 183, 8)
     __optional._UseLocation = pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 183, 8)
     
@@ -1091,11 +1189,20 @@ class IntermediateEventSet_ (IntermediateEvent_):
 Namespace.addCategoryObject('typeBinding', u'IntermediateEventSet', IntermediateEventSet_)
 
 
+DoubleToIntervalMap = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'DoubleToIntervalMap'), DoubleToIntervalMap_, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 204, 2))
+Namespace.addCategoryObject('elementBinding', DoubleToIntervalMap.name().localName(), DoubleToIntervalMap)
+
+Interval = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'Interval'), Interval_, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 209, 2))
+Namespace.addCategoryObject('elementBinding', Interval.name().localName(), Interval)
+
 CrispProbability = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'CrispProbability'), CrispProbability_, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 127, 2))
 Namespace.addCategoryObject('elementBinding', CrispProbability.name().localName(), CrispProbability)
 
 TriangularFuzzyInterval = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'TriangularFuzzyInterval'), TriangularFuzzyInterval_, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 138, 2))
 Namespace.addCategoryObject('elementBinding', TriangularFuzzyInterval.name().localName(), TriangularFuzzyInterval)
+
+DecomposedFuzzyProbability = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'DecomposedFuzzyProbability'), DecomposedFuzzyProbability_, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 197, 2))
+Namespace.addCategoryObject('elementBinding', DecomposedFuzzyProbability.name().localName(), DecomposedFuzzyProbability)
 
 FuzzTree = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'FuzzTree'), FuzzTree_, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 12, 2))
 Namespace.addCategoryObject('elementBinding', FuzzTree.name().localName(), FuzzTree)
@@ -1171,12 +1278,34 @@ AnnotatedElement._Automaton = _BuildAutomaton()
 
 
 
-Node._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'children'), ChildNode, scope=Node, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 17, 10)))
+DoubleToIntervalMap_._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'value'), Interval_, scope=DoubleToIntervalMap_, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 200, 6)))
 
 def _BuildAutomaton_ ():
     # Remove this helper function from the namespace after it's invoked
     global _BuildAutomaton_
     del _BuildAutomaton_
+    import pyxb.utils.fac as fac
+
+    counters = set()
+    states = []
+    final_update = set()
+    symbol = pyxb.binding.content.ElementUse(DoubleToIntervalMap_._UseForTag(pyxb.namespace.ExpandedName(None, u'value')), pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 200, 6))
+    st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
+    states.append(st_0)
+    transitions = []
+    st_0._set_transitionSet(transitions)
+    return fac.Automaton(states, counters, False, containing_state=None)
+DoubleToIntervalMap_._Automaton = _BuildAutomaton_()
+
+
+
+
+Node._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'children'), ChildNode, scope=Node, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 17, 10)))
+
+def _BuildAutomaton_2 ():
+    # Remove this helper function from the namespace after it's invoked
+    global _BuildAutomaton_2
+    del _BuildAutomaton_2
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1206,15 +1335,15 @@ def _BuildAutomaton_ ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-Node._Automaton = _BuildAutomaton_()
+Node._Automaton = _BuildAutomaton_2()
 
 
 
 
-def _BuildAutomaton_2 ():
+def _BuildAutomaton_3 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_2
-    del _BuildAutomaton_2
+    global _BuildAutomaton_3
+    del _BuildAutomaton_3
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1231,17 +1360,44 @@ def _BuildAutomaton_2 ():
         fac.UpdateInstruction(cc_0, True) ]))
     st_0._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-Model._Automaton = _BuildAutomaton_2()
+Model._Automaton = _BuildAutomaton_3()
+
+
+
+
+DecomposedFuzzyProbability_._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'alphaCuts'), DoubleToIntervalMap_, scope=DecomposedFuzzyProbability_, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 192, 10)))
+
+def _BuildAutomaton_4 ():
+    # Remove this helper function from the namespace after it's invoked
+    global _BuildAutomaton_4
+    del _BuildAutomaton_4
+    import pyxb.utils.fac as fac
+
+    counters = set()
+    cc_0 = fac.CounterCondition(min=0L, max=None, metadata=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 192, 10))
+    counters.add(cc_0)
+    states = []
+    final_update = set()
+    final_update.add(fac.UpdateInstruction(cc_0, False))
+    symbol = pyxb.binding.content.ElementUse(DecomposedFuzzyProbability_._UseForTag(pyxb.namespace.ExpandedName(None, u'alphaCuts')), pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 192, 10))
+    st_0 = fac.State(symbol, is_initial=True, final_update=final_update, is_unordered_catenation=False)
+    states.append(st_0)
+    transitions = []
+    transitions.append(fac.Transition(st_0, [
+        fac.UpdateInstruction(cc_0, True) ]))
+    st_0._set_transitionSet(transitions)
+    return fac.Automaton(states, counters, True, containing_state=None)
+DecomposedFuzzyProbability_._Automaton = _BuildAutomaton_4()
 
 
 
 
 FuzzTree_._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'topEvent'), TopEvent_, scope=FuzzTree_, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 7, 10)))
 
-def _BuildAutomaton_3 ():
+def _BuildAutomaton_5 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_3
-    del _BuildAutomaton_3
+    global _BuildAutomaton_5
+    del _BuildAutomaton_5
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1265,15 +1421,15 @@ def _BuildAutomaton_3 ():
         fac.UpdateInstruction(cc_0, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, False, containing_state=None)
-FuzzTree_._Automaton = _BuildAutomaton_3()
+FuzzTree_._Automaton = _BuildAutomaton_5()
 
 
 
 
-def _BuildAutomaton_4 ():
+def _BuildAutomaton_6 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_4
-    del _BuildAutomaton_4
+    global _BuildAutomaton_6
+    del _BuildAutomaton_6
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1303,15 +1459,15 @@ def _BuildAutomaton_4 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-TopEvent_._Automaton = _BuildAutomaton_4()
+TopEvent_._Automaton = _BuildAutomaton_6()
 
 
 
 
-def _BuildAutomaton_5 ():
+def _BuildAutomaton_7 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_5
-    del _BuildAutomaton_5
+    global _BuildAutomaton_7
+    del _BuildAutomaton_7
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1341,15 +1497,15 @@ def _BuildAutomaton_5 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-ChildNode._Automaton = _BuildAutomaton_5()
+ChildNode._Automaton = _BuildAutomaton_7()
 
 
 
 
-def _BuildAutomaton_6 ():
+def _BuildAutomaton_8 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_6
-    del _BuildAutomaton_6
+    global _BuildAutomaton_8
+    del _BuildAutomaton_8
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1379,15 +1535,15 @@ def _BuildAutomaton_6 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-Gate._Automaton = _BuildAutomaton_6()
+Gate._Automaton = _BuildAutomaton_8()
 
 
 
 
-def _BuildAutomaton_7 ():
+def _BuildAutomaton_9 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_7
-    del _BuildAutomaton_7
+    global _BuildAutomaton_9
+    del _BuildAutomaton_9
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1417,15 +1573,15 @@ def _BuildAutomaton_7 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-VariationPoint._Automaton = _BuildAutomaton_7()
+VariationPoint._Automaton = _BuildAutomaton_9()
 
 
 
 
-def _BuildAutomaton_8 ():
+def _BuildAutomaton_10 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_8
-    del _BuildAutomaton_8
+    global _BuildAutomaton_10
+    del _BuildAutomaton_10
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1455,15 +1611,15 @@ def _BuildAutomaton_8 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-UndevelopedEvent_._Automaton = _BuildAutomaton_8()
+UndevelopedEvent_._Automaton = _BuildAutomaton_10()
 
 
 
 
-def _BuildAutomaton_9 ():
+def _BuildAutomaton_11 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_9
-    del _BuildAutomaton_9
+    global _BuildAutomaton_11
+    del _BuildAutomaton_11
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1493,15 +1649,15 @@ def _BuildAutomaton_9 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-And_._Automaton = _BuildAutomaton_9()
+And_._Automaton = _BuildAutomaton_11()
 
 
 
 
-def _BuildAutomaton_10 ():
+def _BuildAutomaton_12 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_10
-    del _BuildAutomaton_10
+    global _BuildAutomaton_12
+    del _BuildAutomaton_12
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1531,15 +1687,15 @@ def _BuildAutomaton_10 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-Or_._Automaton = _BuildAutomaton_10()
+Or_._Automaton = _BuildAutomaton_12()
 
 
 
 
-def _BuildAutomaton_11 ():
+def _BuildAutomaton_13 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_11
-    del _BuildAutomaton_11
+    global _BuildAutomaton_13
+    del _BuildAutomaton_13
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1569,15 +1725,15 @@ def _BuildAutomaton_11 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-Xor_._Automaton = _BuildAutomaton_11()
+Xor_._Automaton = _BuildAutomaton_13()
 
 
 
 
-def _BuildAutomaton_12 ():
+def _BuildAutomaton_14 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_12
-    del _BuildAutomaton_12
+    global _BuildAutomaton_14
+    del _BuildAutomaton_14
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1607,15 +1763,15 @@ def _BuildAutomaton_12 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-VotingOr_._Automaton = _BuildAutomaton_12()
+VotingOr_._Automaton = _BuildAutomaton_14()
 
 
 
 
-def _BuildAutomaton_13 ():
+def _BuildAutomaton_15 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_13
-    del _BuildAutomaton_13
+    global _BuildAutomaton_15
+    del _BuildAutomaton_15
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1645,15 +1801,15 @@ def _BuildAutomaton_13 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-FeatureVariationPoint_._Automaton = _BuildAutomaton_13()
+FeatureVariationPoint_._Automaton = _BuildAutomaton_15()
 
 
 
 
-def _BuildAutomaton_14 ():
+def _BuildAutomaton_16 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_14
-    del _BuildAutomaton_14
+    global _BuildAutomaton_16
+    del _BuildAutomaton_16
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1683,15 +1839,15 @@ def _BuildAutomaton_14 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-RedundancyVariationPoint_._Automaton = _BuildAutomaton_14()
+RedundancyVariationPoint_._Automaton = _BuildAutomaton_16()
 
 
 
 
-def _BuildAutomaton_15 ():
+def _BuildAutomaton_17 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_15
-    del _BuildAutomaton_15
+    global _BuildAutomaton_17
+    del _BuildAutomaton_17
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1721,15 +1877,15 @@ def _BuildAutomaton_15 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-TransferIn_._Automaton = _BuildAutomaton_15()
+TransferIn_._Automaton = _BuildAutomaton_17()
 
 
 
 
-def _BuildAutomaton_16 ():
+def _BuildAutomaton_18 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_16
-    del _BuildAutomaton_16
+    global _BuildAutomaton_18
+    del _BuildAutomaton_18
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1759,17 +1915,17 @@ def _BuildAutomaton_16 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-InclusionVariationPoint._Automaton = _BuildAutomaton_16()
+InclusionVariationPoint._Automaton = _BuildAutomaton_18()
 
 
 
 
 BasicEvent_._AddElement(pyxb.binding.basis.element(pyxb.namespace.ExpandedName(None, u'probability'), Probability, scope=BasicEvent_, location=pyxb.utils.utility.Location(u'/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/fuzztree.xsd', 45, 10)))
 
-def _BuildAutomaton_17 ():
+def _BuildAutomaton_19 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_17
-    del _BuildAutomaton_17
+    global _BuildAutomaton_19
+    del _BuildAutomaton_19
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1807,15 +1963,15 @@ def _BuildAutomaton_17 ():
     transitions = []
     st_2._set_transitionSet(transitions)
     return fac.Automaton(states, counters, False, containing_state=None)
-BasicEvent_._Automaton = _BuildAutomaton_17()
+BasicEvent_._Automaton = _BuildAutomaton_19()
 
 
 
 
-def _BuildAutomaton_18 ():
+def _BuildAutomaton_20 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_18
-    del _BuildAutomaton_18
+    global _BuildAutomaton_20
+    del _BuildAutomaton_20
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1845,15 +2001,15 @@ def _BuildAutomaton_18 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-IntermediateEvent_._Automaton = _BuildAutomaton_18()
+IntermediateEvent_._Automaton = _BuildAutomaton_20()
 
 
 
 
-def _BuildAutomaton_19 ():
+def _BuildAutomaton_21 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_19
-    del _BuildAutomaton_19
+    global _BuildAutomaton_21
+    del _BuildAutomaton_21
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1883,15 +2039,15 @@ def _BuildAutomaton_19 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-EventSet._Automaton = _BuildAutomaton_19()
+EventSet._Automaton = _BuildAutomaton_21()
 
 
 
 
-def _BuildAutomaton_20 ():
+def _BuildAutomaton_22 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_20
-    del _BuildAutomaton_20
+    global _BuildAutomaton_22
+    del _BuildAutomaton_22
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1929,15 +2085,15 @@ def _BuildAutomaton_20 ():
     transitions = []
     st_2._set_transitionSet(transitions)
     return fac.Automaton(states, counters, False, containing_state=None)
-BasicEventSet_._Automaton = _BuildAutomaton_20()
+BasicEventSet_._Automaton = _BuildAutomaton_22()
 
 
 
 
-def _BuildAutomaton_21 ():
+def _BuildAutomaton_23 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_21
-    del _BuildAutomaton_21
+    global _BuildAutomaton_23
+    del _BuildAutomaton_23
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -1975,15 +2131,15 @@ def _BuildAutomaton_21 ():
     transitions = []
     st_2._set_transitionSet(transitions)
     return fac.Automaton(states, counters, False, containing_state=None)
-HouseEvent_._Automaton = _BuildAutomaton_21()
+HouseEvent_._Automaton = _BuildAutomaton_23()
 
 
 
 
-def _BuildAutomaton_22 ():
+def _BuildAutomaton_24 ():
     # Remove this helper function from the namespace after it's invoked
-    global _BuildAutomaton_22
-    del _BuildAutomaton_22
+    global _BuildAutomaton_24
+    del _BuildAutomaton_24
     import pyxb.utils.fac as fac
 
     counters = set()
@@ -2013,5 +2169,5 @@ def _BuildAutomaton_22 ():
         fac.UpdateInstruction(cc_1, True) ]))
     st_1._set_transitionSet(transitions)
     return fac.Automaton(states, counters, True, containing_state=None)
-IntermediateEventSet_._Automaton = _BuildAutomaton_22()
+IntermediateEventSet_._Automaton = _BuildAutomaton_24()
 

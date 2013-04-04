@@ -11,4 +11,6 @@ docs/*
 FuzzEd.egg-info/*
 dist/*
 build/*
+analysis/jar/bin/*
+analysis/jar/fuzzTreeAnalysis.jar
 
