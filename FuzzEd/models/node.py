@@ -150,7 +150,7 @@ class Node(models.Model):
             try:
                 costs = int(self.properties.get(key='cost').value)
             except:
-                default = notations.by_kind[self.graph.kind]['nodes']['event']['cost']
+                default = notations.by_kind[self.graph.kind]['nodes']['basicEvent']['cost']
                 logger.debug("No costs for this node, using default "+str(default))
                 costs = default
             try:
