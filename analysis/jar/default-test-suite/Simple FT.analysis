@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fta:AnalysisResult xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:fta="net.fuzztree.analysis" modelId="7" timestamp="2013-04-04T15:32:19.815+0200" validResult="true" decompositionNumber="1">
+  <warnings message="Attribute 'name' is not set." elementId="36"/>
+  <warnings message="Attribute 'name' is not set." elementId="37"/>
+  <configurations>
+    <probability>
+      <alphaCuts key="0.0">
+        <value lowerBound="0.25" upperBound="0.25"/>
+      </alphaCuts>
+      <alphaCuts key="1.0">
+        <value lowerBound="0.25" upperBound="0.25"/>
+      </alphaCuts>
+    </probability>
+  </configurations>
+</fta:AnalysisResult>
