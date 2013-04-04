@@ -120,10 +120,10 @@ def inherit(node_name, node, nodes, node_cache):
 class build(_build):
     def run(self):
         _build.run(self)
-        #build_xmlschema_wrapper()
+        build_xmlschema_wrapper()
         build_notations()
-        #build_naturaldocs()
-        #build_django_require()
+        build_naturaldocs()
+        build_django_require()
 
 def clean_docs():
     os.system('rm -rf docs')
