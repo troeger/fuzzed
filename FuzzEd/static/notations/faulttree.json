@@ -19,17 +19,10 @@
         "event": {
             "inherits": "node",
 
-            "probability": 0,
-
             "propertyMenuEntries": {
                 "name": {
                     "kind": "text",
                     "displayName": "Name"
-                },
-                "probability": {
-                    "kind": "text",
-                    "displayName": "Probability",
-                    "disabled": true
                 }
             },
 
@@ -58,7 +51,7 @@
             "propertyMenuEntries": {
                 "probability": {
                     "kind": "number",
-                    "disabled": false,
+                    "displayName": "Probability",
                     "min": 0,
                     "max": 1,
                     "step": 0.01
@@ -80,6 +73,7 @@
             "name": "Basic Event Set",
             "image": "basic_event_set.svg",
             "help": "Set of basic events with identical properties",
+
             "cardinality": 1,
 
             "propertyMenuEntries": {
@@ -170,21 +164,22 @@
             "name": "Voting OR Gate",
             "image": "voting_or_gate.svg",
             "help": "Output event occurs if the given number of input events occur",
-            "kFormula": 1,
+
+            "k": 1,
 
             "propertyMenuEntries": {
-                "kFormula": {
+                "k": {
                     "kind": "number",
-                    "displayName": "K-Formula",
+                    "displayName": "k",
                     "min": 1,
                     "step": 1
                 }
             },
             "propertyMirrors": {
-                "kFormula": {
+                "k": {
                     "position": "bottom",
                     "style": ["italic"],
-                    "prefix": "k: "
+                    "prefix": "k="
                 }
             }
         },
@@ -198,9 +193,8 @@
         },
 
         "houseEvent": {
-            "inherits": "event",
+            "inherits": "basicEvent",
             "name": "House Event",
-            "numberOfOutgoingConnections": 0,
             "image": "house_event.svg",
             "help": "An event that is expected to occur and typically does not denote a failure"
         },
@@ -209,15 +203,11 @@
             "inherits": "event",
             "name": "Top Event",
             "image": "top_event.svg",
+
             "excludeFromShapesMenu": true,
             "numberOfIncomingConnections": 0,
             "numberOfOutgoingConnections": 1,
-            "optional": null,
-            "deletable": false,
-
-            "propertyMenuEntries": {
-                "optional": null
-            }
+            "deletable": false
         }
     },
 
@@ -225,7 +215,7 @@
         "name",
         "probability",
         "cardinality",
-        "kFormula"
+        "k"
     ],
 
     "shapeMenuNodeDisplayOrder": [
