@@ -123,7 +123,10 @@ class Node(models.Model):
         try:
             name = self.properties.get(key='name').value
         except:
-            name = "<unnamed>"
+            logger.debug("No name for this node")
+            # Handing over the empty value to the analysis server would lead to a warning, which is
+            # not truly a serious problem
+            name = "-"
         if self.kind == 'topEvent':
             logger.debug("Adding top event XML")
             xmlnode = TopEvent(id=self.id, name=name)
@@ -163,13 +166,21 @@ class Node(models.Model):
                 default = notations.by_kind[self.graph.kind]['nodes']['basicEvent']['probability']
                 logger.debug("No probability for this node, using default value "+str(default))
                 probability = CrispProbability(value_=default[0])
+            try:
+                optional = self.properties.get(key='optional').value
+            except:
+                optional = False
             if self.kind == 'basicEvent':
-                xmlnode=BasicEvent(id=self.id, name=name, costs=costs, probability=probability)
+                xmlnode=BasicEvent(id=self.id, name=name, costs=costs, probability=probability, optional=optional)
             elif self.kind == 'basicEventSet':
                 xmlnode=BasicEventSet(id=self.id, name=name, costs=costs, probability=probability)
         elif self.kind == 'intermediateEvent':
             logger.debug("Adding intermediate event XML")
-            xmlnode=IntermediateEvent(id=self.id, name=name)
+            try:
+                optional = self.properties.get(key='optional').value
+            except:
+                optional = False
+            xmlnode=IntermediateEvent(id=self.id, name=name, optional=optional)
         elif self.kind == 'intermediateEventSet':
             logger.debug("Adding intermediate event set XML")
             xmlnode=IntermediateEventSet(id=self.id, name=name)

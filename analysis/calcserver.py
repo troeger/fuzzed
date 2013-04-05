@@ -60,7 +60,10 @@ def analysisResultAsJson(xmltext):
             elif hasattr(choice.value_,'featureId'):
                 # This is a feature variation, with a choice for the chosen client node in this config
                 choices[client_id] =  Node.objects.get(pk=choice.value_.featureId).client_id
+            elif hasattr(choice.value_,'included'):
+                choices[client_id] =  choice.value_.included
             else:
+                logger.error("Internal error: Unsupported choice result in analysis XML")
                 assert False
         config['choices']=choices
         # in each configuration, there is one lower / upper bound result per alpha cut
