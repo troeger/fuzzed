@@ -1,7 +1,7 @@
 # FuzzEd/models/xml_analysis.py
 # -*- coding: utf-8 -*-
 # PyXB bindings for NM:0a49e237d692dded0ce0398c26bf115ddcebf747
-# Generated 2013-04-04 23:59:05.610623 by PyXB version 1.2.1
+# Generated 2013-04-05 17:16:25.785247 by PyXB version 1.2.1
 # Namespace net.fuzztree.analysis
 
 import pyxb
@@ -13,7 +13,7 @@ import pyxb.utils.domutils
 import sys
 
 # Unique identifier for bindings created at the same time
-_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:de2be080-9d72-11e2-a3de-58b035ff3a58')
+_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:c8339002-9e03-11e2-abab-58b035ff3a58')
 
 # Import bindings for namespaces imported into schema
 import pyxb.binding.datatypes
