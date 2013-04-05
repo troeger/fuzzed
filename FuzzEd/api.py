@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.cache import never_cache
 
 # NOTE: it is important to use our custom exceptions!
 # 
@@ -35,6 +36,7 @@ except ImportError:
 @require_ajax
 @require_http_methods(['GET', 'POST'])
 @transaction.commit_on_success
+@never_cache
 def graphs(request):
     """
     Function: graphs
@@ -90,6 +92,7 @@ def graphs(request):
 @csrf_exempt
 @require_ajax
 @require_GET
+@never_cache
 def graph(request, graph_id):
     """
     Function: graph
@@ -116,6 +119,7 @@ def graph(request, graph_id):
 @require_ajax
 @require_POST
 @transaction.commit_on_success
+@never_cache
 def nodes(request, graph_id):
     """
     Function: nodes
@@ -165,6 +169,7 @@ def nodes(request, graph_id):
 @require_ajax
 @require_http_methods(['DELETE', 'POST'])
 @transaction.commit_on_success
+@never_cache
 def node(request, graph_id, node_id):
     """
     Function: node
@@ -212,6 +217,7 @@ def node(request, graph_id, node_id):
 @require_ajax
 @require_POST
 @transaction.commit_on_success
+@never_cache
 def edges(request, graph_id):
     """
     Function: edges
@@ -258,6 +264,7 @@ def edges(request, graph_id):
 @require_ajax
 @require_http_methods(['DELETE'])
 @transaction.commit_on_success
+@never_cache
 def edge(request, graph_id, edge_id):
     """
     Function: edge
@@ -302,6 +309,7 @@ def property(**kwargs):
 @require_ajax
 @require_http_methods(["GET", "POST"])
 @transaction.commit_on_success
+@never_cache
 def undos(request, graph_id):
     #
     # TODO: IS NOT WORKING YET
@@ -329,6 +337,7 @@ def undos(request, graph_id):
 @require_ajax
 @require_http_methods(["GET", "POST"])
 @transaction.commit_on_success
+@never_cache
 def redos(request, graph_id):
     #
     # TODO: IS NOT WORKING YET
@@ -355,6 +364,7 @@ def redos(request, graph_id):
 @require_ajax
 @require_GET
 @transaction.commit_on_success
+@never_cache
 def cutsets(request, graph_id):
     """
     The function provides all cut sets of the given graph.
