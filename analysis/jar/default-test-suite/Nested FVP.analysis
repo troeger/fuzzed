@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<fta:AnalysisResult xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fta="net.fuzztree.analysis" modelId="20130403" timestamp="2013-04-03T15:59:00.808+0200" validResult="true" decompositionNumber="1">
-  <warnings message="Element should not be optional when parent is a FeatureVariationPoint." elementId="110"/>
-  <configurations costs="40">
+<fta:AnalysisResult xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fta="net.fuzztree.analysis" modelId="20130403" validResult="true" decompositionNumber="1">
+  <configurations costs="20">
     <choices key="110">
       <value xsi:type="fta:InclusionChoice" included="true"/>
     </choices>
@@ -20,7 +19,7 @@
       </alphaCuts>
     </probability>
   </configurations>
-  <configurations costs="20">
+  <configurations costs="0">
     <choices key="110">
       <value xsi:type="fta:InclusionChoice" included="false"/>
     </choices>
