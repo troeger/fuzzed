@@ -123,7 +123,7 @@ class Node(models.Model):
         try:
             name = self.properties.get(key='name').value
         except:
-            name = ""
+            name = "<unnamed>"
         if self.kind == 'topEvent':
             logger.debug("Adding top event XML")
             xmlnode = TopEvent(id=self.id, name=name)
@@ -176,21 +176,21 @@ class Node(models.Model):
         elif self.kind == 'undevelopedEvent':
             logger.debug("Adding undeveloped event XML")
             xmlnode=UndevelopedEvent(id=self.id, name=name)
-        elif self.kind == 'choiceEvent':
-            logger.debug("Adding choice event XML")
+        elif self.kind == 'featureVariation':
+            logger.debug("Adding feature variation XML")
             xmlnode=FeatureVariationPoint(id=self.id, name=name)
-        elif self.kind == 'redundancyEvent':
+        elif self.kind == 'redundancyVariation':
             logger.debug("Adding %s XML with properties: %s"%(self.kind, str(self.properties.all())))
             try:
-                kFormula = int(self.properties.get(key='kFormula').value)
+                kFormula = self.properties.get(key='kFormula').value
             except:
-                default = notations.by_kind[self.graph.kind]['nodes']['redundancyEvent']['kFormula']
+                default = notations.by_kind[self.graph.kind]['nodes']['redundancyVariation']['kFormula']
                 logger.debug("No kFormula for this node, using default "+str(default))
                 kFormula = default
             try:
-                nRange = int(self.properties.get(key='nRange').value)
+                nRange = self.properties.get(key='nRange').value
             except:
-                default = notations.by_kind[self.graph.kind]['nodes']['redundancyEvent']['nRange']
+                default = notations.by_kind[self.graph.kind]['nodes']['redundancyVariation']['nRange']
                 logger.debug("No nRange for this node, using default "+str(default))
                 nRange = default
             xmlnode=RedundancyVariationPoint(id=self.id, name=name, formula=kFormula, start=nRange[0], end=nRange[1])
