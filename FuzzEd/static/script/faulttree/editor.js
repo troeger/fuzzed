@@ -1,4 +1,4 @@
-define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery.ui/jquery.ui.resizable'],
+define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery.ui/jquery.ui.resizable', 'slickgrid'],
 function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
     /**
      *  Package: Faulttree
@@ -123,12 +123,18 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Members
          *
          *  Properties:
-         *    {<Job>}           _job              - <Job> instance of the backend job that is responsible for
-         *                                          calculating the probability.
-         *    {jQuery Selector} _contentContainer - jQuery reference to the content div inside the container.
+         *    {<Job>}           _job            - <Job> instance of the backend job that is responsible for
+         *                                        calculating the probability.
+         *    {jQuery Selector} _chartContainer - jQuery reference to the div inside the container containing the chart.
+         *    {jQuery Selector} _gridContainer  - jQuery reference to the div inside the container containing the table.
+         *    {Highchart}       _chart          - The Highchart instance displaying the result.
+         *    {SlickGrid}       _grid           - The SlickGrid instance displaying the result.
          */
         _job:              undefined,
-        _contentContainer: undefined,
+        _chartContainer:   undefined,
+        _gridContainer:    undefined,
+        _chart:            undefined,
+        _grid:             undefined,
 
         /**
          *  Group: Initialization
@@ -140,7 +146,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         init: function() {
             this._super();
-            this._contentContainer = this.container.find('.content');
+            this._chartContainer = this.container.find('.chart');
+            this._gridContainer  = this.container.find('.grid');
         },
 
         /**
@@ -186,11 +193,30 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                         <span class="menu-minimize"></span>\
                         <span class="menu-close"></span>\
                     </div>\
-                    <div class="content"></div>\
+                    <div class="chart"></div>\
+                    <div class="grid" style="width: 450px; padding-top: 5px;"></div>\
                 </div>'
             )
-            .resizable()
             .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+        },
+
+        _setupResizing: function() {
+            this.container.resizable({
+                minHeight: this.container.height(), // use current height as minimum
+                resize: function(event, ui) {
+                    // fit all available space with chart
+                    this._chartContainer.height(this.container.height() - this._gridContainer.outerHeight());
+
+                    this._chart.setSize(
+                        this._chartContainer.width(),
+                        this._chartContainer.height(),
+                        false
+                    );
+
+                    this._gridContainer.width(this._chartContainer.width());
+                    this._grid.resizeCanvas();
+                }.bind(this)
+            });
         },
 
         /**
@@ -210,12 +236,25 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 //TODO: display validation result at the node
                 this._displayValidationErrors(_.values(data.errors));
             } else {
-                var alphacuts = [];
-                _.each(data['configurations'], function(config) {
-                    alphacuts.push(this._convertToHighchartsFormat(config['alphacuts']));
+                var chartData = {};
+                var tableData = [];
+                var configName = "";
+
+                _.each(data['configurations'], function(config, index) {
+                    //TODO: better naming?
+                    configName = 'Configuration ' + (index + 1);
+                    var displayData = this._convertToDisplayFormat(config['alphacuts'])
+
+                    chartData[configName] = displayData['series'];
+                    // add the name to the statistics for displaying it in a table cell later
+                    displayData['statistics']['title'] = configName;
+                    tableData.push(displayData['statistics']);
                 }.bind(this));
 
-                this._displayResultWithHighcharts(alphacuts, data['decompositionNumber']);
+                this._displayResultWithHighcharts(chartData, data['decompositionNumber']);
+                this._displayResultWithSlickGrid(tableData);
+
+                this._setupResizing();
             }
         },
 
@@ -224,27 +263,42 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
 
         /**
-         *  Methods: _convertToHighchartsFormat
-         *    Converts a data series of a configuration from API JSON to the Highcharts format.
+         *  Methods: _convertToDisplayFormat
+         *    Converts a data series of a configuration from API JSON to the Highcharts format incl. statistics.
          *
          *  Parameters:
          *    {JSON} configuration - The data series in JSON format (e.g. "{"0.0": [0.2, 0.5], "1.0": [0.4, 0.4]}").
          *
          *  Returns:
-         *    An array-of-arrays representation of the input that can be used by Highcharts to plot the data.
+         *    An object containing an array-of-arrays representation of the input that can be used by Highcharts to
+         *    plot the data ('series'), and the 'min', 'max' and 'peak' probabilities in a 'statistics' field.
          */
-        _convertToHighchartsFormat: function(configuration) {
+        _convertToDisplayFormat: function(configuration) {
             var dataPoints = [];
+            var max = 0.0; var min = 1.0; var peak = 0.0; var peakY = 0.0;
             _.each(configuration, function(values, key) {
                 var y = parseFloat(key);
                 _.each(values, function(x) {
                     dataPoints.push([x, y]);
+                    // track statistics
+                    if (x < min) min = x;
+                    if (x > max) max = x;
+                    if (peakY < y) {peakY = y; peak = x}
                 });
             });
 
-            return _.sortBy(dataPoints, function(point) {
+            var series = _.sortBy(dataPoints, function(point) {
                 return point[0];
             });
+
+            return {
+                series: series,
+                statistics: {
+                    min:    min,
+                    max:    max,
+                    peak:   peak
+                }
+            }
         },
 
         /**
@@ -260,7 +314,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         _displayProgress: function(data) {
             //TODO
-            this._contentContainer.text(JSON.stringify(data));
+            this._chartContainer.text(JSON.stringify(data));
         },
 
         /**
@@ -279,17 +333,17 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             var series = [];
 
-            _.each(data, function(cutset, index) {
+            _.each(data, function(cutset, name) {
                 series.push({
-                    name: 'Configuration ' + (index + 1),
+                    name: name,
                     data: cutset
                 });
             });
 
             //TODO: This is all pretty hard-coded. Put it into config instead.
-            var chart = new Highcharts.Chart({
+            this._chart = new Highcharts.Chart({
                 chart: {
-                    renderTo: this._contentContainer[0],
+                    renderTo: this._chartContainer[0],
                     type:     'line',
                     height:   180
                 },
@@ -328,14 +382,51 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
                 series: series
             });
+        },
 
-            // update the chart's size when resizing the menu
-            this.container.on("resize", function(event, ui) {
-                chart.setSize(
-                    this._contentContainer.width(),
-                    this._contentContainer.height(),
-                    false
-                );
+        /**
+         *  Method: _displayResultWithSlickGrid
+         *    Display the job's result in the menu's body using SlickGrid.
+         *
+         *  Parameters:
+         *    {JSON} data - A set of one or more data series to display in the SlickGrid.
+         */
+        _displayResultWithSlickGrid: function(data) {
+            var columns = [
+                { id: 'title', name: 'Title',   field: 'title', sortable: true },
+                { id: 'min',   name: 'Minimum', field: 'min',   sortable: true },
+                { id: 'peak',  name: 'Peak',    field: 'peak',  sortable: true },
+                { id: 'max',   name: 'Maximum', field: 'max',   sortable: true }
+            ];
+
+            var options = {
+                enableCellNavigation:       true,
+                enableColumnReorder:        false,
+                multiColumnSort:            true,
+                autoHeight:                 true,
+                forceFitColumns:            true
+            }
+
+            this._grid = new Slick.Grid(this._gridContainer, data, columns, options);
+
+            // enable sorting of the grid
+            this._grid.onSort.subscribe(function(e, args) {
+                var cols = args.sortCols;
+
+                data.sort(function (dataRow1, dataRow2) {
+                    for (var i = 0, l = cols.length; i < l; i++) {
+                        var field = cols[i].sortCol.field;
+                        var sign = cols[i].sortAsc ? 1 : -1;
+                        var value1 = dataRow1[field], value2 = dataRow2[field];
+                        var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
+                        if (result != 0) {
+                            return result;
+                        }
+                    }
+                    return 0;
+                });
+
+                this._grid.invalidate();
             }.bind(this));
         },
 
@@ -353,7 +444,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             _.each(errors, function(error) {
                 jQuery('<li></li>').text(error).appendTo(list);
             });
-            this._contentContainer.html(list);
+            this._chartContainer.html(list);
         },
 
         /**
@@ -362,7 +453,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         _displayNetworkError: function() {
             //TODO: This is a temporary solution. Should be replaced by error messages later.
-            this._contentContainer.text("Not found");
+            this._chartContainer.text("Not found");
         }
 
 
