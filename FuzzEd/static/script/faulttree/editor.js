@@ -211,8 +211,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 this._displayValidationErrors(_.values(data.errors));
             } else {
                 var alphacuts = [];
-                _.each(data['alphacutresults'], function(alphacut) {
-                    alphacuts.push(this._convertToHighchartsFormat(alphacut));
+                _.each(data['configurations'], function(config) {
+                    alphacuts.push(this._convertToHighchartsFormat(config['alphacuts']));
                 }.bind(this));
 
                 this._displayResultWithHighcharts(alphacuts, data['decompositionNumber']);
