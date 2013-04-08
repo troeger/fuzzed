@@ -425,6 +425,14 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                     minorTickInterval: 1.0 / decompositionNumber
                 },
 
+                tooltip: {
+                    formatter: function() {
+                        return '<b>' + this.series.name + '</b><br/>' +
+                               '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
+                               '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
+                    }
+                },
+
                 plotOptions: {
                     series: {
                         marker: {
@@ -461,11 +469,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {JSON} data - A set of one or more data series to display in the SlickGrid.
          */
         _displayResultWithSlickGrid: function(data) {
+            function shorten(row, cell, value) {
+                return Highcharts.numberFormat(value, 5);
+            }
+
             var columns = [
                 { id: 'id',   name: 'ID',      field: 'id',   sortable: true },
-                { id: 'min',  name: 'Minimum', field: 'min',  sortable: true },
-                { id: 'peak', name: 'Peak',    field: 'peak', sortable: true },
-                { id: 'max',  name: 'Maximum', field: 'max',  sortable: true }
+                { id: 'min',  name: 'Minimum', field: 'min',  sortable: true, formatter: shorten },
+                { id: 'peak', name: 'Peak',    field: 'peak', sortable: true, formatter: shorten },
+                { id: 'max',  name: 'Maximum', field: 'max',  sortable: true, formatter: shorten }
             ];
 
             var options = {
