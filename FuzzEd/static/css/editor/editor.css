@@ -41,6 +41,17 @@
     z-index: 100; /* above connection */
 }
 
+.fuzzed-node .badge {
+    position:   absolute;
+    top:        0;
+    right:      0;
+    margin:     -7px -7px 0 0;
+}
+
+.fuzzed-node .badge-info {
+    background-color: #409FFF;
+}
+
 .fuzzed-node-halo-connect {
     /* XXX: this is a temporary solution */
     background-color:       #409FFF;
