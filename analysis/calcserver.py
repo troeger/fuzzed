@@ -52,16 +52,25 @@ def analysisResultAsJson(xmltext):
         # in each configuration, there is a particular choice for each of the variation points
         choices = {}
         for choice in conf.choices:
-            # determine the clent id of the node that represents this variation point
+            # determine the client id of the node that represents this variation point
             client_id = Node.objects.get(pk=choice.key).client_id
-            if hasattr(choice.value_,'n'):
+            if hasattr(choice.value_, 'n'):
                 # This is a redundancy variation, with some choice for N
-                choices[client_id] = choice.value_.n
-            elif hasattr(choice.value_,'featureId'):
+                choices[client_id] = {
+                    'type': 'RedundancyChoice',
+                    'value': choice.value_.n
+                }
+            elif hasattr(choice.value_, 'featureId'):
                 # This is a feature variation, with a choice for the chosen client node in this config
-                choices[client_id] =  Node.objects.get(pk=choice.value_.featureId).client_id
-            elif hasattr(choice.value_,'included'):
-                choices[client_id] =  choice.value_.included
+                choices[client_id] = {
+                    'type': 'FeatureChoice',
+                    'value': Node.objects.get(pk=choice.value_.featureId).client_id
+                }
+            elif hasattr(choice.value_, 'included'):
+                choices[client_id] = {
+                    'type': 'InclusionChoice',
+                    'value': choice.value_.included
+                }
             else:
                 logger.error("Internal error: Unsupported choice result in analysis XML")
                 assert False

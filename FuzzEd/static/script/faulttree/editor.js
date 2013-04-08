@@ -123,18 +123,22 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Members
          *
          *  Properties:
+         *    {<Editor>}        _editor         - The <Editor> instance.
          *    {<Job>}           _job            - <Job> instance of the backend job that is responsible for
          *                                        calculating the probability.
          *    {jQuery Selector} _chartContainer - jQuery reference to the div inside the container containing the chart.
          *    {jQuery Selector} _gridContainer  - jQuery reference to the div inside the container containing the table.
          *    {Highchart}       _chart          - The Highchart instance displaying the result.
          *    {SlickGrid}       _grid           - The SlickGrid instance displaying the result.
+         *    {Object}          _configNodeMap  - A dictionary mapping from configuration ID to a set of involved nodes.
          */
-        _job:              undefined,
-        _chartContainer:   undefined,
-        _gridContainer:    undefined,
-        _chart:            undefined,
-        _grid:             undefined,
+        _editor:         undefined,
+        _job:            undefined,
+        _chartContainer: undefined,
+        _gridContainer:  undefined,
+        _chart:          undefined,
+        _grid:           undefined,
+        _configNodeMap:  {},
 
         /**
          *  Group: Initialization
@@ -144,8 +148,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Constructor: init
          *    Sets up the menu.
          */
-        init: function() {
+        init: function(editor) {
             this._super();
+            this._editor = editor;
             this._chartContainer = this.container.find('.chart');
             this._gridContainer  = this.container.find('.grid');
         },
@@ -238,16 +243,19 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             } else {
                 var chartData = {};
                 var tableData = [];
-                var configName = "";
+                var configID = "";
 
                 _.each(data['configurations'], function(config, index) {
                     //TODO: better naming?
-                    configName = 'Configuration ' + (index + 1);
-                    var displayData = this._convertToDisplayFormat(config['alphacuts'])
+                    configID = 'Configuration ' + (index + 1);
+                    var displayData = this._convertToDisplayFormat(config['alphacuts']);
 
-                    chartData[configName] = displayData['series'];
+                    // remember the nodes involved in this config for later highlighting
+                    this._configNodeMap[configID] = this._getNodeSetForChoices(config['choices']);
+
+                    chartData[configID] = displayData['series'];
                     // add the name to the statistics for displaying it in a table cell later
-                    displayData['statistics']['title'] = configName;
+                    displayData['statistics']['id'] = configID;
                     tableData.push(displayData['statistics']);
                 }.bind(this));
 
@@ -301,6 +309,48 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             }
         },
 
+        _getNodeSetForChoices: function(choices, topNode) {
+            // start from top event if not further
+            if (typeof topNode === 'undefined') topNode = this._editor.graph.getNodeById(0);
+            // get children filtered by choice
+            var children = topNode.getChildren();
+            var nodes = [topNode];
+
+            if (topNode.id in choices) {
+                var choice = choices[topNode.id];
+
+                switch (choice.type) {
+                    case 'InclusionChoice':
+                        // if this node is not included (optional) ignore it and its children
+                        if (!choice.value) {
+                            children = [];
+                            nodes = [];
+                        }
+                        break;
+
+                    case 'FeatureChoice':
+                        // only pick the chosen child of a feature variation point
+                        children = [_.find(children, function(node) {return node.id == choice.value})];
+                        break;
+
+                    case 'RedundancyChoice':
+                        // do not highlight this node and its children if no child was chosen
+                        if (choice.value == 0) {
+                            nodes = [];
+                            children = [];
+                        }
+                        //TODO: remember the N!
+                        break;
+                }
+            }
+
+            _.each(children, function(child) {
+                nodes = nodes.concat(this._getNodeSetForChoices(choices, child));
+            }.bind(this));
+
+            return nodes;
+        },
+
         /**
          *  Group: Display
          */
@@ -315,6 +365,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         _displayProgress: function(data) {
             //TODO
             this._chartContainer.text(JSON.stringify(data));
+            this._gridContainer.empty();
         },
 
         /**
@@ -393,10 +444,10 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         _displayResultWithSlickGrid: function(data) {
             var columns = [
-                { id: 'title', name: 'Title',   field: 'title', sortable: true },
-                { id: 'min',   name: 'Minimum', field: 'min',   sortable: true },
-                { id: 'peak',  name: 'Peak',    field: 'peak',  sortable: true },
-                { id: 'max',   name: 'Maximum', field: 'max',   sortable: true }
+                { id: 'id',   name: 'ID',      field: 'id',   sortable: true },
+                { id: 'min',  name: 'Minimum', field: 'min',  sortable: true },
+                { id: 'peak', name: 'Peak',    field: 'peak', sortable: true },
+                { id: 'max',  name: 'Maximum', field: 'max',  sortable: true }
             ];
 
             var options = {
@@ -408,6 +459,32 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             }
 
             this._grid = new Slick.Grid(this._gridContainer, data, columns, options);
+
+            this._grid.setSelectionModel(new Slick.RowSelectionModel());
+
+            // highlight the corresponding nodes if a row of the grid is selected
+            this._grid.onSelectedRowsChanged.subscribe(function(e, args) {
+                // unhighlight all nodes
+                _.invoke(this._editor.graph.getNodes(), 'unhighlight');
+
+                // only highlight nodes if one config is selected
+                if (args.rows.length == 1) {
+                    var configID = args.grid.getDataItem(args.rows[0])['id'];
+                    _.each(this._configNodeMap[configID], function(node) {
+                        node.highlight();
+                    });
+                }
+            }.bind(this));
+
+            // highlight rows on mouse over
+            this._grid.onMouseEnter.subscribe(function(e, args) {
+                var row = args.grid.getCellFromEvent(e)['row'];
+                args.grid.setSelectedRows([row]);
+            });
+            // unhighlight cells on mouse out
+            this._grid.onMouseLeave.subscribe(function(e, args) {
+                args.grid.setSelectedRows([]);
+            });
 
             // enable sorting of the grid
             this._grid.onSort.subscribe(function(e, args) {
@@ -492,7 +569,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             this._super(graphId);
 
             this.cutsetsMenu = new CutsetsMenu();
-            this.probabilityMenu = new ProbabilityMenu()
+            this.probabilityMenu = new ProbabilityMenu(this);
 
             this._setupCutsetsActionEntry()
                 ._setupTobEventProbabilityActionEntry();
