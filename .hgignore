@@ -1,5 +1,6 @@
 syntax: glob
 *.pyc
+*.class
 .DS_Store
 *.orig
 *.sqlite
@@ -11,4 +12,7 @@ docs/*
 FuzzEd.egg-info/*
 dist/*
 build/*
-
+analysis/jar/bin/*
+analysis/jar/fuzzTreeAnalysis.jar
+FuzzEd/models/xml_analysis.py
+FuzzEd/models/xml_fuzztree.py

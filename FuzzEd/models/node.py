@@ -123,7 +123,10 @@ class Node(models.Model):
         try:
             name = self.properties.get(key='name').value
         except:
-            name = ""
+            logger.debug("No name for this node")
+            # Handing over the empty value to the analysis server would lead to a warning, which is
+            # not truly a serious problem
+            name = "-"
         if self.kind == 'topEvent':
             logger.debug("Adding top event XML")
             xmlnode = TopEvent(id=self.id, name=name)
@@ -150,7 +153,7 @@ class Node(models.Model):
             try:
                 costs = int(self.properties.get(key='cost').value)
             except:
-                default = notations.by_kind[self.graph.kind]['nodes']['event']['cost']
+                default = notations.by_kind[self.graph.kind]['nodes']['basicEvent']['cost']
                 logger.debug("No costs for this node, using default "+str(default))
                 costs = default
             try:
@@ -163,34 +166,42 @@ class Node(models.Model):
                 default = notations.by_kind[self.graph.kind]['nodes']['basicEvent']['probability']
                 logger.debug("No probability for this node, using default value "+str(default))
                 probability = CrispProbability(value_=default[0])
+            try:
+                optional = self.properties.get(key='optional').value
+            except:
+                optional = False
             if self.kind == 'basicEvent':
-                xmlnode=BasicEvent(id=self.id, name=name, costs=costs, probability=probability)
+                xmlnode=BasicEvent(id=self.id, name=name, costs=costs, probability=probability, optional=optional)
             elif self.kind == 'basicEventSet':
                 xmlnode=BasicEventSet(id=self.id, name=name, costs=costs, probability=probability)
         elif self.kind == 'intermediateEvent':
             logger.debug("Adding intermediate event XML")
-            xmlnode=IntermediateEvent(id=self.id, name=name)
+            try:
+                optional = self.properties.get(key='optional').value
+            except:
+                optional = False
+            xmlnode=IntermediateEvent(id=self.id, name=name, optional=optional)
         elif self.kind == 'intermediateEventSet':
             logger.debug("Adding intermediate event set XML")
             xmlnode=IntermediateEventSet(id=self.id, name=name)
         elif self.kind == 'undevelopedEvent':
             logger.debug("Adding undeveloped event XML")
             xmlnode=UndevelopedEvent(id=self.id, name=name)
-        elif self.kind == 'choiceEvent':
-            logger.debug("Adding choice event XML")
+        elif self.kind == 'featureVariation':
+            logger.debug("Adding feature variation XML")
             xmlnode=FeatureVariationPoint(id=self.id, name=name)
-        elif self.kind == 'redundancyEvent':
+        elif self.kind == 'redundancyVariation':
             logger.debug("Adding %s XML with properties: %s"%(self.kind, str(self.properties.all())))
             try:
-                kFormula = int(self.properties.get(key='kFormula').value)
+                kFormula = self.properties.get(key='kFormula').value
             except:
-                default = notations.by_kind[self.graph.kind]['nodes']['redundancyEvent']['kFormula']
+                default = notations.by_kind[self.graph.kind]['nodes']['redundancyVariation']['kFormula']
                 logger.debug("No kFormula for this node, using default "+str(default))
                 kFormula = default
             try:
-                nRange = int(self.properties.get(key='nRange').value)
+                nRange = self.properties.get(key='nRange').value
             except:
-                default = notations.by_kind[self.graph.kind]['nodes']['redundancyEvent']['nRange']
+                default = notations.by_kind[self.graph.kind]['nodes']['redundancyVariation']['nRange']
                 logger.debug("No nRange for this node, using default "+str(default))
                 nRange = default
             xmlnode=RedundancyVariationPoint(id=self.id, name=name, formula=kFormula, start=nRange[0], end=nRange[1])

@@ -23,32 +23,70 @@ class JobNotFoundError(Exception):
 
 def analysisResultAsJson(xmltext):
     # load generating binding class with XML text
-    xml = xml_analysis.CreateFromDocument(xmltext)
-    # Create dictionary to be converted to JSON
+    try:
+        xml = xml_analysis.CreateFromDocument(xmltext)
+    except Exception as e:
+        logger.debug("Exception while parsing analysis XML: "+str(e))
+    # Create result dictionary to be converted to JSON
     result = {}
     result['decompositionNumber']=xml.decompositionNumber
     result['timestamp']=xml.timestamp
+    # Result dictionary gets one entry for all error messages
     errors={}
     for error in xml.errors:
         client_id = Node.objects.get(pk=error.elementId).client_id
         errors[client_id]=error.message
+        logger.debug("Analysis error for %s: %s"%(client_id, error.message))
     result['errors']=errors
+    # Result dictionary gets one entry for all warning messages
     warnings={}
     for warning in xml.warnings:
         client_id = Node.objects.get(pk=warning.elementId).client_id
         warnings[client_id]=warning.message
+        logger.debug("Analysis warning for %s: %s"%(client_id, warning.message))
     result['warnings']=warnings
+    # Result dictionary gets one entry for all configurations and their results
     configs = []
     for conf in xml.configurations:
-        acutresults={}
-        for acutresult in conf.result.alphaCutResults:
+        config={}
+        # in each configuration, there is a particular choice for each of the variation points
+        choices = {}
+        for choice in conf.choices:
+            # determine the client id of the node that represents this variation point
+            client_id = Node.objects.get(pk=choice.key).client_id
+            if hasattr(choice.value_, 'n'):
+                # This is a redundancy variation, with some choice for N
+                choices[client_id] = {
+                    'type': 'RedundancyChoice',
+                    'value': choice.value_.n
+                }
+            elif hasattr(choice.value_, 'featureId'):
+                # This is a feature variation, with a choice for the chosen client node in this config
+                choices[client_id] = {
+                    'type': 'FeatureChoice',
+                    'value': Node.objects.get(pk=choice.value_.featureId).client_id
+                }
+            elif hasattr(choice.value_, 'included'):
+                choices[client_id] = {
+                    'type': 'InclusionChoice',
+                    'value': choice.value_.included
+                }
+            else:
+                logger.error("Internal error: Unsupported choice result in analysis XML")
+                assert False
+        config['choices']=choices
+        # in each configuration, there is one lower / upper bound result per alpha cut
+        acuts={}      
+        for acut in conf.probability.alphaCuts:
             # according to the schema, each alphacutresult has max one value
-            lowerBound = acutresult.content()[0].lowerBound
-            upperBound = acutresult.content()[0].upperBound
-            acutresults[acutresult.key]=(lowerBound, upperBound)
-        configs.append(acutresults)
-    result['alphacutresults']=configs
-    return json.dumps(result)
+            lowerBound = acut.value_.lowerBound
+            upperBound = acut.value_.upperBound
+            acuts[acut.key]=(lowerBound, upperBound)
+        config['alphacuts']=acuts
+        configs.append(config)
+    result['configurations']=configs
+    jsontext = json.dumps(result)
+    return jsontext
 
 def createJob(xml, decompositionNumber, verifyOnly=False):
     verifyflag = str(verifyOnly).lower()

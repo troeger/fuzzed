@@ -9,7 +9,7 @@ except ImportError:
 from setuptools import setup
 from distutils.command.build import build as _build
 from distutils.command.clean import clean as _clean
-
+from distutils.command.sdist import sdist as _sdist
 # check FuzzEd/__init__.py for the project version number
 from FuzzEd import __version__, util
 
@@ -22,10 +22,10 @@ def check_pythonversion():
     elif sys.version_info.major > 2:
         print(version_message)
         exit(-1)
-
 check_pythonversion()
 
 def build_xmlschema_wrapper():
+    print 'Building XML schema wrappers ...'
     # Copy most recent schema files from calc server
     shutil.copyfile('analysis/code/net.fuzztree.model.analysis/model/AnalysisXML.xsd', 'FuzzEd/static/xsd/analysis.xsd')
     shutil.copyfile('analysis/code/net.fuzztree.model.fuzztree/model/FuzzTreeXML.xsd', 'FuzzEd/static/xsd/fuzztree.xsd')
@@ -36,8 +36,8 @@ def build_xmlschema_wrapper():
 
         if os.path.exists(path_name):
             os.remove(path_name)
-    os.system('pyxbgen --binding-root=FuzzEd/models/ -u FuzzEd/static/xsd/analysis.xsd \
-              -m xml_analysis -u FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree')
+    os.system('pyxbgen --binding-root=FuzzEd/models/ -u FuzzEd/static/xsd/analysis.xsd '
+              '-m xml_analysis -u FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree')
 
 def build_naturaldocs():
     # Build natural docs in 'docs' subdirectory
@@ -45,7 +45,16 @@ def build_naturaldocs():
         os.mkdir('docs')
     os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -o HTML docs -p docs')
 
+def build_analysis_server():
+    print 'Building analysis server JAR file ...'
+    current = os.getcwd()
+    os.chdir('analysis/jar')
+    os.system('ant clean')
+    os.system('ant')
+    os.chdir(current)
+
 def build_django_require():
+    print 'Building compressed static files ...'
     # Use Django collectstatic, which triggers django-require optimization
     os.system('./manage.py collectstatic -v3 --noinput')
 
@@ -125,8 +134,6 @@ class build(_build):
         _build.run(self)
         build_xmlschema_wrapper()
         build_notations()
-        build_naturaldocs()
-        build_django_require()
 
 def clean_docs():
     os.system('rm -rf docs')
@@ -147,6 +154,13 @@ class clean(_clean):
         clean_docs()
         clean_pycs()
 
+# Our overloaded 'setup.py sdist' command
+class sdist(_sdist):
+    def run(self):
+        _sdist.run(self)
+        build_naturaldocs()
+        build_django_require()
+
 setup(
     name = 'FuzzEd',
     version = __version__,
@@ -162,7 +176,8 @@ setup(
     include_package_data = True,
     cmdclass={
         'build': build,
-        'clean': clean
+        'clean': clean,
+        'sdist': sdist
     },
     maintainer = 'Peter Troeger',
     maintainer_email = 'peter.troeger@hpi.uni-potsdam.de',
