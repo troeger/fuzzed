@@ -14,12 +14,15 @@ from distutils.command.clean import clean as _clean
 from FuzzEd import __version__, util
 
 def check_pythonversion():
-    if sys.version_info.major != 2:
-        print('You must use Python 2, since django demands this')
+    version_message = 'This Django project requires Python 2.7+'
+
+    if sys.version_info.major < 2 or sys.version_info.major == 2 and sys.version_info.minor < 7:
+        print version_message
         exit(-1)
-    if sys.version_info.major == 2 and sys.version_info.minor < 7:
-        print('You must use Python 2.7+, since django-require demands this')
+    elif sys.version_info.major > 2:
+        print(version_message)
         exit(-1)
+
 check_pythonversion()
 
 def build_xmlschema_wrapper():
