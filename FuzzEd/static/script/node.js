@@ -618,6 +618,10 @@ function(Properties, Mirror, Canvas, Class) {
         },
 
         /**
+         * Group: Accessors
+         */
+
+        /**
          * Method: getConfig
          *
          * This method is abstract. All non abstract subclasses MUST override this method. It is an error to call this
@@ -644,6 +648,20 @@ function(Properties, Mirror, Canvas, Class) {
          */
         getConfig: function() {
             throw '[ABSTRACT] Subclass Responsibility';
+        },
+
+        /**
+         * Method: getChildren
+         *
+         * Returns:
+         *   All direct children of this node.
+         */
+        getChildren: function() {
+            var children = [];
+            _.each(this.outgoingEdges, function(edge) {
+                children.push(edge.target.data(this.config.Keys.NODE));
+            }.bind(this));
+            return children;
         },
 
         /**
