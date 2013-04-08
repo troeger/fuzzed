@@ -123,22 +123,25 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Members
          *
          *  Properties:
-         *    {<Editor>}        _editor         - The <Editor> instance.
-         *    {<Job>}           _job            - <Job> instance of the backend job that is responsible for
-         *                                        calculating the probability.
-         *    {jQuery Selector} _chartContainer - jQuery reference to the div inside the container containing the chart.
-         *    {jQuery Selector} _gridContainer  - jQuery reference to the div inside the container containing the table.
-         *    {Highchart}       _chart          - The Highchart instance displaying the result.
-         *    {SlickGrid}       _grid           - The SlickGrid instance displaying the result.
-         *    {Object}          _configNodeMap  - A dictionary mapping from configuration ID to a set of involved nodes.
+         *    {<Editor>}        _editor            - The <Editor> instance.
+         *    {<Job>}           _job               - <Job> instance of the backend job that is responsible for
+         *                                           calculating the probability.
+         *    {jQuery Selector} _chartContainer    - jQuery reference to the div inside the container containing the chart.
+         *    {jQuery Selector} _gridContainer     - jQuery reference to the div inside the container containing the table.
+         *    {Highchart}       _chart             - The Highchart instance displaying the result.
+         *    {SlickGrid}       _grid              - The SlickGrid instance displaying the result.
+         *    {Object}          _configNodeMap     - A dictionary mapping from configuration ID to a set of involved nodes.
+         *    {Object}          _redundancyNodeMap - A dictionary mapping from configuration ID to a map of
+         *                                           node IDs to N values.
          */
-        _editor:         undefined,
-        _job:            undefined,
-        _chartContainer: undefined,
-        _gridContainer:  undefined,
-        _chart:          undefined,
-        _grid:           undefined,
-        _configNodeMap:  {},
+        _editor:            undefined,
+        _job:               undefined,
+        _chartContainer:    undefined,
+        _gridContainer:     undefined,
+        _chart:             undefined,
+        _grid:              undefined,
+        _configNodeMap:     {},
+        _redundancyNodeMap: {},
 
         /**
          *  Group: Initialization
@@ -253,6 +256,14 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                     // remember the nodes involved in this config for later highlighting
                     this._configNodeMap[configID] = this._getNodeSetForChoices(config['choices']);
 
+                    // remember the redundancy settings for this config for later highlighting
+                    this._redundancyNodeMap[configID] = {};
+                    _.each(config['choices'], function(choice, node) {
+                        if (choice.type == 'RedundancyChoice') {
+                            this._redundancyNodeMap[configID][node] = choice.value;
+                        }
+                    }.bind(this));
+
                     chartData[configID] = displayData['series'];
                     // add the name to the statistics for displaying it in a table cell later
                     displayData['statistics']['id'] = configID;
@@ -339,7 +350,6 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                             nodes = [];
                             children = [];
                         }
-                        //TODO: remember the N!
                         break;
                 }
             }
@@ -496,13 +506,21 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             this._grid.onSelectedRowsChanged.subscribe(function(e, args) {
                 // unhighlight all nodes
                 _.invoke(this._editor.graph.getNodes(), 'unhighlight');
+                // remove all badges
+                _.invoke(this._editor.graph.getNodes(), 'hideBadge');
 
                 // only highlight nodes if one config is selected
                 if (args.rows.length == 1) {
                     var configID = args.grid.getDataItem(args.rows[0])['id'];
+                    // highlight nodes
                     _.each(this._configNodeMap[configID], function(node) {
                         node.highlight();
                     });
+                    // show redundancy values
+                    _.each(this._redundancyNodeMap[configID], function(value, nodeID) {
+                        var node = this._editor.graph.getNodeById(nodeID);
+                        node.showBadge('N=' + value, 'info');
+                    }.bind(this))
                 }
             }.bind(this));
 

@@ -33,6 +33,8 @@ function(Properties, Mirror, Canvas, Class) {
          *    {bool}       _highlighted        - Boolean flag that is true when the node needs to be highlighted on hover.
          *    {bool}       _selected           - Boolean flag that is true when the node is selected - i.e. clicked.
          *    {DOMElement} _nodeImage          - DOM element that contains the actual image/svg of the node.
+         *    {DOMElement} _badge              - DOM element that contains the badge that can be used to display additional
+         *                                       information on a node.
          *    {DOMElement} _nodeImageContainer - A wrapper for the node image which is necessary to get position
          *                                       calculation working in Firefox.
          *    {DOMElement} _connectionHandle   - DOM element containing the visual representation of the handle where one
@@ -48,6 +50,7 @@ function(Properties, Mirror, Canvas, Class) {
         _highlighted:        false,
         _selected:           false,
         _nodeImage:          undefined,
+        _badge:              undefined,
         _nodeImageContainer: undefined,
         _connectionHandle:   undefined,
 
@@ -132,8 +135,12 @@ function(Properties, Mirror, Canvas, Class) {
             this._nodeImage.primitives = this._nodeImage.find('rect, circle, path');
             this._nodeImage.groups     = this._nodeImage.find('g');
 
+            this._badge = jQuery('<span class="badge"></span>')
+                .hide();
+
             this._nodeImageContainer = jQuery('<div>')
-                .append(this._nodeImage);
+                .append(this._nodeImage)
+                .append(this._badge);
 
             this.container = jQuery('<div>')
                 .attr('id', this.kind + this.id)
@@ -845,6 +852,45 @@ function(Properties, Mirror, Canvas, Class) {
             if (this._selected || this._disabled) return this;
 
             return this._visualReset();
+        },
+
+        /**
+         * Method: showBadge
+         *   Display a badge on the node.
+         *
+         * Parameters:
+         *   {String} text  - The text that should be displayed in the badge.
+         *   {String} style - [optional] The style (color) of the badge.
+         *                    See http://twitter.github.io/bootstrap/components.html#labels-badges.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        showBadge: function(text, style) {
+            this._badge
+                .text(text)
+                .addClass('badge')
+                .show();
+            if (typeof style !== 'undefined')
+                this._badge.addClass('badge-' + style);
+
+            return this;
+        },
+
+        /**
+         * Method: hideBadge
+         *   Hides the badge displayed on the node.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        hideBadge: function() {
+            this._badge
+                .text('')
+                .removeClass()
+                .hide();
+
+            return this;
         },
 
         /**
