@@ -292,7 +292,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *
          */
         getNodes: function() {
-            return _.values(this._nodes);
+            return _.values(this.nodes);
         },
 
         /**

@@ -74,12 +74,13 @@ classes should alter those!
 }
 
 .slick-cell.selected {
-  background-color: beige;
+  background-color: #80bdff;
 }
 
 .slick-cell.active {
-  border-color: gray;
-  border-style: solid;
+  /* no cell highlighting for the moment */
+  /*border-color: gray;*/
+  /*border-style: solid;*/
 }
 
 .slick-sortable-placeholder {
