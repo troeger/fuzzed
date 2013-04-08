@@ -133,6 +133,7 @@ class build(_build):
     def run(self):
         _build.run(self)
         build_xmlschema_wrapper()
+        build_analysis_server()
         build_notations()
 
 def clean_docs():

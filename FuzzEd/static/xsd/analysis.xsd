@@ -12,6 +12,7 @@
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
     <xsd:attribute name="validResult" type="xsd:boolean" use="required"/>
     <xsd:attribute name="decompositionNumber" type="xsd:int" use="required"/>
+    <xsd:attribute default="default" name="engine" type="xsd:string"/>
   </xsd:complexType>
   <xsd:element name="AnalysisResult" type="fta:AnalysisResult"/>
   <xsd:complexType name="AnalysisError">
@@ -28,6 +29,7 @@
     <xsd:sequence>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="choices" type="fta:IntegerToChoiceMap"/>
       <xsd:element maxOccurs="1" minOccurs="0" name="probability" type="ft:DecomposedFuzzyProbability"/>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="minimalCutSets" type="fta:CutSet"/>
     </xsd:sequence>
     <xsd:attribute name="costs" type="xsd:int" use="required"/>
   </xsd:complexType>
@@ -95,4 +97,11 @@
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:element name="TransferInChoice" type="fta:TransferInChoice"/>
+  <xsd:complexType name="CutSet">
+    <xsd:sequence>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="elementIds" type="xsd:int"/>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="negatedElementIds" type="xsd:int"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:element name="CutSet" type="fta:CutSet"/>
 </xsd:schema>
