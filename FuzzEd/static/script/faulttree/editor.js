@@ -391,6 +391,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 });
             });
 
+            var self = this;
+
             //TODO: This is all pretty hard-coded. Put it into config instead.
             this._chart = new Highcharts.Chart({
                 chart: {
@@ -427,6 +429,22 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                     series: {
                         marker: {
                             radius: 1
+                        },
+                        events: {
+                            // select the corresponding grid row of the hovered series
+                            // this will also highlight the corresponding nodes
+                            mouseOver: function() {
+                                var configID = this.name;
+                                _.each(self._grid.getData(), function(dataItem, index) {
+                                    if (dataItem.id == configID) {
+                                        self._grid.setSelectedRows([index]);
+                                    }
+                                });
+                            },
+                            // unselect all grid cells
+                            mouseOut: function() {
+                                self._grid.setSelectedRows([]);
+                            }
                         }
                     }
                 },
