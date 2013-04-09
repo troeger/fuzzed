@@ -292,7 +292,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 _.each(data['configurations'], function(config, index) {
                     //TODO: better naming?
                     configID = 'Configuration ' + (index + 1);
-                    var displayData = this._convertToDisplayFormat(config['alphacuts']);
+                    var displayData = this._convertToDisplayFormat(config);
 
                     // remember the nodes and edges involved in this config for later highlighting
                     this._collectNodesAndEdgesForConfiguration(configID, config['choices']);
@@ -327,7 +327,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Converts a data series of a configuration from API JSON to the Highcharts format incl. statistics.
          *
          *  Parameters:
-         *    {JSON} configuration - The data series in JSON format (e.g. "{"0.0": [0.2, 0.5], "1.0": [0.4, 0.4]}").
+         *    {JSON} configuration - The configuration object received from the backend, containing 'alphacuts'
+         *                           (e.g., "{"0.0": [0.2, 0.5], "1.0": [0.4, 0.4]}") and 'costs'.
          *
          *  Returns:
          *    An object containing an array-of-arrays representation of the input that can be used by Highcharts to
@@ -336,7 +337,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         _convertToDisplayFormat: function(configuration) {
             var dataPoints = [];
             var max = 0.0; var min = 1.0; var peak = 0.0; var peakY = 0.0;
-            _.each(configuration, function(values, key) {
+            _.each(configuration['alphacuts'], function(values, key) {
                 var y = parseFloat(key);
                 _.each(values, function(x) {
                     dataPoints.push([x, y]);
@@ -354,11 +355,12 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             return {
                 series: series,
                 statistics: {
-                    min:    min,
-                    max:    max,
-                    peak:   peak
+                    min:   min,
+                    max:   max,
+                    peak:  peak,
+                    costs: configuration['costs']
                 }
-            }
+            };
         },
 
         /**
@@ -552,10 +554,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             }
 
             var columns = [
-                { id: 'id',   name: 'ID',      field: 'id',   sortable: true },
-                { id: 'min',  name: 'Minimum', field: 'min',  sortable: true, formatter: shorten },
-                { id: 'peak', name: 'Peak',    field: 'peak', sortable: true, formatter: shorten },
-                { id: 'max',  name: 'Maximum', field: 'max',  sortable: true, formatter: shorten }
+                { id: 'id',    name: 'ID',      field: 'id',    sortable: true, minWidth: 110 },
+                { id: 'min',   name: 'Minimum', field: 'min',   sortable: true, formatter: shorten, defaultSortAsc: false },
+                { id: 'peak',  name: 'Peak',    field: 'peak',  sortable: true, formatter: shorten, defaultSortAsc: false },
+                { id: 'max',   name: 'Maximum', field: 'max',   sortable: true, formatter: shorten, defaultSortAsc: false },
+                { id: 'costs', name: 'Costs',   field: 'costs', sortable: true }
             ];
 
             var options = {

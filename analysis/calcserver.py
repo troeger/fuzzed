@@ -83,6 +83,7 @@ def analysisResultAsJson(xmltext):
             upperBound = acut.value_.upperBound
             acuts[acut.key]=(lowerBound, upperBound)
         config['alphacuts']=acuts
+        config['costs']=conf.costs
         configs.append(config)
     result['configurations']=configs
     jsontext = json.dumps(result)
