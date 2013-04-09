@@ -98,7 +98,7 @@ define(["class"], function(Class) {
                     202: function(data) { // not finished
                         this.updateCallback(data);
                         // query again later
-                        this._timeout = setTimeout(this._query, this.queryInterval);
+                        this._timeout = setTimeout(this._query.bind(this), this.queryInterval);
                     }.bind(this),
 
                     404: function() { // not found / canceled
