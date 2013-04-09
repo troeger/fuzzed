@@ -173,14 +173,50 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    This menu instance for chaining.
          */
         show: function(job) {
+            // clear the content
+            this._clear();
+
             job.successCallback = this._evaluateResult.bind(this);
             job.updateCallback  = this._displayProgress.bind(this);
             job.errorCallback   = this._displayNetworkError.bind(this);
-            job.updateCallback  = 5000;
+            job.queryInterval   = 500;
+
+            this._job = job;
             job.start();
 
             this._super();
             return this;
+        },
+
+        /**
+         *  Method: hide
+         *    Hide the menu and clear all its content.
+         *
+         *  Returns:
+         *    This menu instance for chaining.
+         */
+        hide: function() {
+            this._super();
+            // clear content
+            this._clear();
+
+            return this;
+        },
+
+        /**
+         *  Method: _clear
+         *    Clear the content of the menu and cancel any running jobs.
+         *
+         *  Returns:
+         *    This menu instance for chaining.
+         */
+        _clear: function() {
+            this._job.cancel();
+            this._chartContainer.empty();
+            this._gridContainer.empty();
+            this._chart = null; this._grid = null;
+            this._configNodeMap = {};
+            this._redundancyNodeMap = {};
         },
 
         /**
