@@ -131,6 +131,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {Highchart}       _chart             - The Highchart instance displaying the result.
          *    {SlickGrid}       _grid              - The SlickGrid instance displaying the result.
          *    {Object}          _configNodeMap     - A dictionary mapping from configuration ID to a set of involved nodes.
+         *    {Object}          _configNodeMap     - A dictionary mapping from configuration ID to a set of involved edges.
          *    {Object}          _redundancyNodeMap - A dictionary mapping from configuration ID to a map of
          *                                           node IDs to N values.
          */
@@ -141,6 +142,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         _chart:             undefined,
         _grid:              undefined,
         _configNodeMap:     {},
+        _configEdgeMap:     {},
         _redundancyNodeMap: {},
 
         /**
@@ -292,8 +294,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                     configID = 'Configuration ' + (index + 1);
                     var displayData = this._convertToDisplayFormat(config['alphacuts']);
 
-                    // remember the nodes involved in this config for later highlighting
-                    this._configNodeMap[configID] = this._getNodeSetForChoices(config['choices']);
+                    // remember the nodes and edges involved in this config for later highlighting
+                    this._collectNodesAndEdgesForConfiguration(configID, config['choices']);
 
                     // remember the redundancy settings for this config for later highlighting
                     this._redundancyNodeMap[configID] = {};
@@ -359,12 +361,25 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             }
         },
 
-        _getNodeSetForChoices: function(choices, topNode) {
+        /**
+         *  Method: _collectNodesAndEdgesForConfiguration
+         *    Traverse the graph and collect all nodes and edges which are part of the configuration defined by the
+         *    given set of choices. Remember those entities in the <_configNodeMap> and <_configEdgeMap> fields
+         *    under the given configID.
+         *
+         *  Parameters:
+         *    {String} configID - The name of the configuration that is used to store the nodes and edges in the maps.
+         *    {Array}  choices  - A map from node IDs to choice objects (with 'type' and 'value') used to filter
+         *                        the graph entities.
+         *    {<Node>} topNode  - [optional] The top node of the graph. Used for recursion. Defaults to the top event.
+         */
+        _collectNodesAndEdgesForConfiguration: function(configID, choices, topNode) {
             // start from top event if not further
             if (typeof topNode === 'undefined') topNode = this._editor.graph.getNodeById(0);
             // get children filtered by choice
             var children = topNode.getChildren();
             var nodes = [topNode];
+            var edges = topNode.incomingEdges;
 
             if (topNode.id in choices) {
                 var choice = choices[topNode.id];
@@ -375,6 +390,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                         if (!choice.value) {
                             children = [];
                             nodes = [];
+                            edges = [];
                         }
                         break;
 
@@ -388,16 +404,19 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                         if (choice.value == 0) {
                             nodes = [];
                             children = [];
+                            edges = [];
                         }
                         break;
                 }
             }
 
-            _.each(children, function(child) {
-                nodes = nodes.concat(this._getNodeSetForChoices(choices, child));
-            }.bind(this));
+            this._configNodeMap[configID] = nodes.concat(this._configNodeMap[configID] || []);
+            this._configEdgeMap[configID] = edges.concat(this._configEdgeMap[configID] || []);
 
-            return nodes;
+            // recursion
+            _.each(children, function(child) {
+                this._collectNodesAndEdgesForConfiguration(configID, choices, child);
+            }.bind(this));
         },
 
         /**
@@ -557,29 +576,20 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             // clear container
             this._gridContainer.empty();
 
+            // create new grid
             this._grid = new Slick.Grid(this._gridContainer, data, columns, options);
 
+            // make rows selectable
             this._grid.setSelectionModel(new Slick.RowSelectionModel());
 
             // highlight the corresponding nodes if a row of the grid is selected
             this._grid.onSelectedRowsChanged.subscribe(function(e, args) {
-                // unhighlight all nodes
-                _.invoke(this._editor.graph.getNodes(), 'unhighlight');
-                // remove all badges
-                _.invoke(this._editor.graph.getNodes(), 'hideBadge');
+                this._unhighlightConfiguration();
 
-                // only highlight nodes if one config is selected
+                // only highlight the configuration if only one config is selected
                 if (args.rows.length == 1) {
                     var configID = args.grid.getDataItem(args.rows[0])['id'];
-                    // highlight nodes
-                    _.each(this._configNodeMap[configID], function(node) {
-                        node.highlight();
-                    });
-                    // show redundancy values
-                    _.each(this._redundancyNodeMap[configID], function(value, nodeID) {
-                        var node = this._editor.graph.getNodeById(nodeID);
-                        node.showBadge('N=' + value, 'info');
-                    }.bind(this))
+                    this._highlightConfiguration(configID);
                 }
             }.bind(this));
 
@@ -612,6 +622,39 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
                 this._grid.invalidate();
             }.bind(this));
+        },
+
+        /**
+         *  Method: _highlightConfiguration
+         *    Highlight all nodes and edges that are part of the given configuration.
+         *    Also display the N value on redundancy nodes.
+         *
+         *  Parameters:
+         *    {String} configID - The ID of the configuration that should be highlighted.
+         */
+        _highlightConfiguration: function(configID) {
+            // highlight nodes
+            _.invoke(this._configNodeMap[configID], 'highlight');
+            // highlight edges
+            _.invoke(this._configEdgeMap[configID], 'setHover', true);
+            // show redundancy values
+            _.each(this._redundancyNodeMap[configID], function(value, nodeID) {
+                var node = this._editor.graph.getNodeById(nodeID);
+                node.showBadge('N=' + value, 'info');
+            }.bind(this))
+        },
+
+        /**
+         *  Method: _unhighlightConfiguration
+         *    Remove all highlights from the graph.
+         */
+        _unhighlightConfiguration: function() {
+            // unhighlight all nodes
+            _.invoke(this._editor.graph.getNodes(), 'unhighlight');
+            // unhighlight all edges
+            _.invoke(this._editor.graph.getEdges(), 'setHover', false);
+            // remove all badges
+            _.invoke(this._editor.graph.getNodes(), 'hideBadge');
         },
 
         /**
