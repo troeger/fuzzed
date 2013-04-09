@@ -38,6 +38,17 @@ define(['config'], function(Config) {
             CUTSETS_MENU:          'FuzzEdCutsetsMenu',
             PROBABILITY_MENU:      'FuzzEdProbabilityMenu',
             NAVBAR_ACTION_CUTSETS: 'FuzzEdNavbarActionCutsets'
+        },
+
+        /**
+         *  Group: Menus
+         *    Menu configurations.
+         *
+         *  Constants:
+         *    {Number} PROBABILITY_MENU_MAX_GRID_HEIGHT - Max. height of the grid that displays the configurations.
+         */
+        Menus: {
+            PROBABILITY_MENU_MAX_GRID_HEIGHT: 500
         }
     });
 });

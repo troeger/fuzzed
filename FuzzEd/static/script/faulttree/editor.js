@@ -215,6 +215,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             if (typeof this._job !== 'undefined') this._job.cancel();
             this._chartContainer.empty();
             this._gridContainer.empty();
+            // reset height in case it was set during grid creation
+            this._gridContainer.css('height', '');
             this._chart = null; this._grid = null;
             this._configNodeMap = {};
             this._redundancyNodeMap = {};
@@ -543,6 +545,13 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 multiColumnSort:            true,
                 autoHeight:                 true,
                 forceFitColumns:            true
+            }
+
+            // little workaround for constraining the height of the grid
+            var maxHeight = this._editor.getConfig().Menus.PROBABILITY_MENU_MAX_GRID_HEIGHT;
+            if ((data.length + 1) * 25 > maxHeight) {
+                options.autoHeight = false;
+                this._gridContainer.height(maxHeight);
             }
 
             // clear container
