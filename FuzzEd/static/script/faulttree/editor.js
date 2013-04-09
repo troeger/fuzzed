@@ -173,14 +173,53 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    This menu instance for chaining.
          */
         show: function(job) {
-            job.successCallback = this._evaluateResult.bind(this);
-            job.updateCallback  = this._displayProgress.bind(this);
-            job.errorCallback   = this._displayNetworkError.bind(this);
-            job.updateCallback  = 5000;
+            // clear the content
+            this._clear();
+
+            job.successCallback  = this._evaluateResult.bind(this);
+            job.updateCallback   = this._displayProgress.bind(this);
+            job.errorCallback    = this._displayNetworkError.bind(this);
+            job.notFoundCallback = this._displayNotFoundError.bind(this);
+            job.queryInterval    = 500;
+
+            this._job = job;
             job.start();
 
             this._super();
             return this;
+        },
+
+        /**
+         *  Method: hide
+         *    Hide the menu and clear all its content.
+         *
+         *  Returns:
+         *    This menu instance for chaining.
+         */
+        hide: function() {
+            this._super();
+            // clear content
+            this._clear();
+
+            return this;
+        },
+
+        /**
+         *  Method: _clear
+         *    Clear the content of the menu and cancel any running jobs.
+         *
+         *  Returns:
+         *    This menu instance for chaining.
+         */
+        _clear: function() {
+            if (typeof this._job !== 'undefined') this._job.cancel();
+            this._chartContainer.empty();
+            this._gridContainer.empty();
+            // reset height in case it was set during grid creation
+            this._gridContainer.css('height', '');
+            this._chart = null; this._grid = null;
+            this._configNodeMap = {};
+            this._redundancyNodeMap = {};
         },
 
         /**
@@ -373,8 +412,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {JSON} data - Data returned from the backend with information about the job's progress.
          */
         _displayProgress: function(data) {
-            //TODO
-            this._chartContainer.text(JSON.stringify(data));
+            var progressBar = jQuery(
+                '<div style="text-align: center;">' +
+                    '<p>Calculating probability...</p>' +
+                    '<div class="progress progress-striped active">' +
+                        '<div class="bar" style="width: 100%;"></div>' +
+                    '</div>' +
+                '</div>');
+
+            this._chartContainer.empty().append(progressBar);
             this._gridContainer.empty();
         },
 
@@ -400,6 +446,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                     data: cutset
                 });
             });
+
+            // clear container
+            this._chartContainer.empty();
 
             var self = this;
 
@@ -498,6 +547,16 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 forceFitColumns:            true
             }
 
+            // little workaround for constraining the height of the grid
+            var maxHeight = this._editor.getConfig().Menus.PROBABILITY_MENU_MAX_GRID_HEIGHT;
+            if ((data.length + 1) * 25 > maxHeight) {
+                options.autoHeight = false;
+                this._gridContainer.height(maxHeight);
+            }
+
+            // clear container
+            this._gridContainer.empty();
+
             this._grid = new Slick.Grid(this._gridContainer, data, columns, options);
 
             this._grid.setSelectionModel(new Slick.RowSelectionModel());
@@ -577,6 +636,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Display an error massage resulting from a network error (e.g. 404) in the menu's body.
          */
         _displayNetworkError: function() {
+            //TODO: This is a temporary solution. Should be replaced by error messages later.
+            this._chartContainer.text("Network error");
+        },
+
+        /**
+         *  Method: _displayNotFoundError
+         *    Display an error massage resulting from a 404 in the menu's body.
+         */
+        _displayNotFoundError: function() {
             //TODO: This is a temporary solution. Should be replaced by error messages later.
             this._chartContainer.text("Not found");
         }
@@ -703,6 +771,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY,
                     this.probabilityMenu.show.bind(this.probabilityMenu)
+                    //TODO: display errors
                 );
             }.bind(this));
 
