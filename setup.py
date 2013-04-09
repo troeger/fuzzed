@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, pprint, sys, shutil
+import os, pprint, sys, shutil, subprocess
 try:
     import json
 except ImportError:
@@ -24,6 +24,11 @@ def check_pythonversion():
         exit(-1)
 check_pythonversion()
 
+def check_javaversion():
+    output = subprocess.check_output('java -version', stderr=subprocess.STDOUT, shell=True)
+    if (not "version" in output) or (not "1.7" in output):
+        raise Exception("We need at least Java 1.7 to build the analysis server. We found "+output)
+
 def build_xmlschema_wrapper():
     print 'Building XML schema wrappers ...'
     # Copy most recent schema files from calc server
@@ -36,27 +41,38 @@ def build_xmlschema_wrapper():
 
         if os.path.exists(path_name):
             os.remove(path_name)
-    os.system('pyxbgen --binding-root=FuzzEd/models/ -u FuzzEd/static/xsd/analysis.xsd '
+    retcode = os.system('pyxbgen --binding-root=FuzzEd/models/ -u FuzzEd/static/xsd/analysis.xsd '
               '-m xml_analysis -u FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree')
+    if retcode != 0:
+        raise Exception("Execution of pyxbgen failed.\nTry 'sudo setup.py test' for installing all dependencies.")
 
 def build_naturaldocs():
     # Build natural docs in 'docs' subdirectory
     if not os.path.exists('docs'):
         os.mkdir('docs')
-    os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -o HTML docs -p docs')
+    retcode = os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -o HTML docs -p docs')
+    if retcode != 0:
+        raise Exception("Execution of NaturalDocs compiler failed.")
 
 def build_analysis_server():
     print 'Building analysis server JAR file ...'
+    check_javaversion()
     current = os.getcwd()
     os.chdir('analysis/jar')
-    os.system('ant clean')
+    retcode = os.system('ant clean')
+    if retcode != 0:
+        raise Exception("Execution of ANT failed. Is it installed ?")
     os.system('ant')
+    if retcode != 0:
+        raise Exception("Execution of ANT failed. Please check the previous output.")
     os.chdir(current)
 
 def build_django_require():
     print 'Building compressed static files ...'
     # Use Django collectstatic, which triggers django-require optimization
     os.system('./manage.py collectstatic -v3 --noinput')
+    if retcode != 0:
+        raise Exception("Execution of collectstatic failed. Please check the previous output.\nTry 'sudo setup.py test' for installing all dependencies.")
 
 def build_notations():
     notations_dir = 'FuzzEd/static/notations/'

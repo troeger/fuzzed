@@ -101,6 +101,7 @@
     <xsd:complexContent>
       <xsd:extension base="ft:VariationPoint">
         <xsd:attribute name="fromModelId" type="xsd:int" use="required"/>
+        <xsd:attribute default="0" name="maxCosts" type="xsd:int"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
