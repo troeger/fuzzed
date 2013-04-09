@@ -103,7 +103,9 @@ def graphs(request):
     """
     Function: graphs
     
-    This API handler is responsible for all graphes of the user. It operates in two modes: receiving a GET request will return a JSON encoded list of all the graphs of the user. A POST request instead, will create a new graph (requires the below stated parameters) and returns its ID and URI.
+    This API handler is responsible for all graphes of the user. It operates in two modes: receiving a GET request will
+    return a JSON encoded list of all the graphs of the user. A POST request instead, will create a new graph (requires
+    the below stated parameters) and returns its ID and URI.
     
     Request:            GET - /api/graphs
     Request Parameters: None
