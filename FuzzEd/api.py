@@ -19,21 +19,14 @@ from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, \
                               HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands, Job
-from FuzzEd import backend, settings
+from FuzzEd import backend
 from analysis import calcserver
+import logging, json
 
-import logging, json, urllib, urllib2
 logger = logging.getLogger('FuzzEd')
-
-try:
-    import json
-# backwards compatibility with older python versions
-except ImportError:
-    import simplejson as json
 
 @login_required
 @csrf_exempt
-#@require_ajax
 @require_http_methods(['GET'])
 def calc_topevent(request, graph_id):
     """
@@ -44,51 +37,62 @@ def calc_topevent(request, graph_id):
     If the analysis engine cannot start the job (most likely due to broken XML data generated here),
     the view returns HttpResponseServerErrorAnswer to the front-end.
     """
-    g = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+
     try:
-        postdata=g.to_xml()
-        logger.debug("Sending XML to calcserver:\n"+postdata)
-        jobid, num_configurations, num_nodes = calcserver.createJob(postdata,10)
+        post_data = graph.to_xml()
+        logger.debug('Sending XML to calcserver:\n' + post_data)
+        job_id, configuration_count, node_count = calcserver.createJob(post_data,10)
+
         # store job information for this graph
-        j = Job(name=jobid, configurations=num_configurations, nodes=num_nodes, graph=g, kind=Job.TOPEVENT_JOB)
-        j.save()
+        job = Job(name=job_id, configurations=configuration_count, nodes=node_count, graph=graph, kind=Job.TOPEVENT_JOB)
+        job.save()
+
         # return URL for job status information
-        logger.debug("Got new job '%s' with ID %u for graph %u"%(j.name, j.pk, g.pk))
+        logger.debug('Got new job \'%s\' with ID %u for graph %u' % (job.name, job.pk, graph.pk))
         response = HttpResponse(status=201) 
-        response['Location'] = reverse('jobstatus', args=[j.pk])
+        response['Location'] = reverse('job_status', args=[job.pk])
+
         return response
-    except calcserver.InternalError as e:
-        logger.error("Exception while using calcserver: "+str(e))
+
+    except calcserver.InternalError as exception:
+        logger.error('Exception while using calcserver: ' + str(exception))
         #TODO: Perform some smarter error handling here
         raise HttpResponseServerErrorAnswer()        
 
 @login_required
 @csrf_exempt
-#@require_ajax
 @require_http_methods(['GET'])
-def jobstatus(request, job_id):
+def job_status(request, job_id):
     try:
-        j = Job.objects.get(pk=job_id)
+        job = Job.objects.get(pk=job_id)
         # Prevent cross-checking of jobs by different users
-        assert(j.graph.owner == request.user)
+        assert(job.graph.owner == request.user)
+
     except:
         # Inform the frontend that the job no longer exists
         # TODO: Add reason for cancellation to body as plain text 
         raise HttpResponseNotFoundAnswer()
+
+    if job.kind != Job.TOPEVENT_JOB:
+        raise HttpResponseBadRequestAnswer()
+
     # query status from analysis engine, based on job type
-    if j.kind == Job.TOPEVENT_JOB:
-        try:
-            result = calcserver.getJobResult(j.name)
-            if result == None:
-                return HttpResponse(status=202)
-            else:
-                logger.debug("Analysis result:\n"+result)
-                return HttpResponse(result)
-        except Exception as e:
-            # Analysis engine does not know this job, or something else went wrong
-            # for the frontend, this is basically an unspecified backend error
-            logger.error("Error while fetch calc server job status: "+str(e))
-            raise HttpResponseServerErrorAnswer()
+    try:
+        result = calcserver.getJobResult(job.name)
+
+        if result is None:
+            return HttpResponse(status=202)
+
+        else:
+            logger.debug('Analysis result:\n' + result)
+            return HttpResponse(result)
+
+    except Exception as exception:
+        # Analysis engine does not know this job, or something else went wrong
+        # for the frontend, this is basically an unspecified backend error
+        logger.error('Error while fetch calc server job status: ' + str(exception))
+        raise HttpResponseServerErrorAnswer()
 
 @login_required
 @csrf_exempt
@@ -142,9 +146,6 @@ def graphs(request):
     # something was not right with the request parameters
     except (ValueError, KeyError):
         raise HttpResponseBadRequestAnswer()
-
-    # Should not be reachable, just for error tracing reasons here
-    raise HttpResponseServerErrorAnswer()
 
 @login_required
 @csrf_exempt
@@ -217,7 +218,10 @@ def nodes(request, graph_id):
     """
     Function: nodes
     
-    This function creates a new node in the graph with the provided it. In order to be able to create the node four data items about the node are needed: its kind, its position (x and y coordinate) and an id as assigned by the client (calculated by the client to prevent waiting for round-trip). The response contains the JSON serialized representation of the newly created node and its new location URI.
+    This function creates a new node in the graph with the provided it. In order to be able to create the node four data
+    items about the node are needed: its kind, its position (x and y coordinate) and an id as assigned by the client
+    (calculated by the client to prevent waiting for round-trip). The response contains the JSON serialized
+    representation of the newly created node and its new location URI.
     
     Request:            POST - /api/graphs/<GRAPH_ID>/nodes
     Request Parameters: client_id = <INT>, kind = <NODE_TYPE>, x = <INT>, y = <INT>
@@ -359,7 +363,9 @@ def edge(request, graph_id, edge_id):
     """
     Function: edge
     
-    This API handler deletes the edge from the graph using the both provided ids. The id of the edge hereby referes to the previously assigned client side id and NOT the database id. The response to this request does not contain any body.
+    This API handler deletes the edge from the graph using the both provided ids. The id of the edge hereby referes to
+    the previously assigned client side id and NOT the database id. The response to this request does not contain any
+    body.
     
     Request:            DELETE - /api/graphs/<GRAPH_ID>/edge/<EDGE_ID>
     Request Parameters: None
@@ -464,9 +470,11 @@ def cutsets(request, graph_id):
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     #tree='(b or c or a) and (c or a and b) and (d) or (e)'
     # minbool is NP-complete, so more than 10 basic events are not feasible for computation
-    nodecount = graph.nodes.all().filter(kind__exact="basicEvent", deleted__exact=False).count()
-    if nodecount >= 10:
+    node_count = graph.nodes.all().filter(kind__exact='basicEvent', deleted__exact=False).count()
+
+    if node_count >= 10:
         raise HttpResponseServerErrorAnswer()
-    result=backend.getcutsets(graph.to_bool_term())
+
+    result = backend.getcutsets(graph.to_bool_term())
     #TODO: check the command stack if meanwhile the graph was modified
     return HttpResponse(json.dumps(result), 'application/javascript')
