@@ -176,10 +176,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             // clear the content
             this._clear();
 
-            job.successCallback = this._evaluateResult.bind(this);
-            job.updateCallback  = this._displayProgress.bind(this);
-            job.errorCallback   = this._displayNetworkError.bind(this);
-            job.queryInterval   = 500;
+            job.successCallback  = this._evaluateResult.bind(this);
+            job.updateCallback   = this._displayProgress.bind(this);
+            job.errorCallback    = this._displayNetworkError.bind(this);
+            job.notFoundCallback = this._displayNotFoundError.bind(this);
+            job.queryInterval    = 500;
 
             this._job = job;
             job.start();
@@ -627,6 +628,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         _displayNetworkError: function() {
             //TODO: This is a temporary solution. Should be replaced by error messages later.
+            this._chartContainer.text("Network error");
+        },
+
+        /**
+         *  Method: _displayNotFoundError
+         *    Display an error massage resulting from a 404 in the menu's body.
+         */
+        _displayNotFoundError: function() {
+            //TODO: This is a temporary solution. Should be replaced by error messages later.
             this._chartContainer.text("Not found");
         }
 
@@ -752,6 +762,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY,
                     this.probabilityMenu.show.bind(this.probabilityMenu)
+                    //TODO: display errors
                 );
             }.bind(this));
 
