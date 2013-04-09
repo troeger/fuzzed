@@ -211,7 +211,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    This menu instance for chaining.
          */
         _clear: function() {
-            this._job.cancel();
+            if (typeof this._job !== 'undefined') this._job.cancel();
             this._chartContainer.empty();
             this._gridContainer.empty();
             this._chart = null; this._grid = null;
