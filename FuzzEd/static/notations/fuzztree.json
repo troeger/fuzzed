@@ -300,7 +300,7 @@
             "image": "redundancy_variation.svg",
             "help": "Placeholder for a voting OR gate over a chosen number of the input events",
 
-            "kFormula": "N-2",
+            "kFormula": "N-1",
             "nRange": [1, 2],
 
             "propertyMenuEntries": {
