@@ -206,7 +206,24 @@
             "help": "Connects the output of a related FaultTree, e.g. a subsystem, to this one",
 
             "numberOfIncomingConnections": 1,
-            "numberOfOutgoingConnections": 0
+            "numberOfOutgoingConnections": 0,
+
+            "transfer": -1,
+
+            "propertyMenuEntries": {
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer"
+                }
+            },
+
+            "propertyMirrors": {
+                "transfer": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "<- "
+                }
+            }
         },
 
         "topEvent": {
@@ -225,7 +242,8 @@
         "name",
         "probability",
         "cardinality",
-        "k"
+        "k",
+        "transfer"
     ],
 
     "shapeMenuNodeDisplayOrder": [

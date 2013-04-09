@@ -182,6 +182,8 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
             _.each(this.changeEvents(), function(event) {
                 register.on(event, this.changed.bind(this));
             }.bind(this));
+
+            return this;
         },
 
         _setupInput: function() { throw '[ABSTRACT] subclass responsibility'; },
@@ -678,6 +680,9 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
                 selected = value;
             }
 
+            select.attr('id', this.id)
+                .attr('disabled', this.options.disabled ? 'disabled': null);
+
             // model each choice as an option of the select
             _.each(this.options.choices, function(choice) {
                 select.append(jQuery('<option>')
@@ -709,6 +714,160 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         }
     });
 
+    var Transfer = Property.extend({
+        UNLINK_VALUE: -1,
+        UNLINK_TEXT:  'unlinked',
+
+        _graphId:       undefined,
+        _inverseValues: undefined,
+        _open:          undefined,
+        _options:       undefined,
+        _select:        undefined,
+        _selectAndOpen: undefined,
+
+        changeEvents: function() { return ['change']; },
+
+        changed: function(event, ui) {
+            this._super(event, ui);
+            this._removeUnlink();
+        },
+
+        inputValue: function(newValue) {
+            if (typeof newValue === 'undefined') {
+                return this._select.val();
+            }
+
+            this._options
+                .attr('selected', null)
+                .filter("[value='" + this._inverseValues[newValue] + "']")
+                .attr('selected', 'selected');
+
+            return this;
+        },
+
+        mirror: function() {
+            if (typeof this._mirror === 'undefined') return this;
+            this._mirror.show(this._inverseValues[this.value()]);
+
+            return this;
+        },
+
+        registerOn: function() {
+            return this._select;
+        },
+
+        _preSetup: function() {
+            this._graphId = parseInt(_.last(document.URL.split('/')));
+
+            this.node.showBadge('!', 'important');
+            this._setupSelect();
+
+            jQuery.ajax({
+                url:      Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL,
+                type:     'GET',
+                dataType: 'json',
+
+                success:  this._setupGraphOptions.bind(this),
+                error:    this._throwError.bind(this)
+            });
+
+            return this;
+        },
+
+        _removeUnlink: function() {
+            if (this.value() != this.UNLINK_VALUE) {
+                this._options.filter('[value="' + this.UNLINK_VALUE + '"]').remove();
+                delete this._inverseValues[this.UNLINK_VALUE];
+                this.node.hideBadge();
+            }
+
+            return this;
+        },
+
+        _setupCallbacks: function() {
+            if (!this.input.is(this._selectAndOpen)) {
+                return this;
+            }
+            this._setupOpenClick();
+            return this._super();
+        },
+
+        _setupGraphOptions: function(all) {
+            _.each(all.graphs, function(graph) {
+                if (graph.id === this._graphId) return;
+
+                this._select.append(jQuery('<option>')
+                    .html(graph.name)
+                    .attr('value', graph.id)
+                );
+                this._inverseValues[graph.id] = graph.name;
+            }.bind(this));
+
+            this._options = this._select.children('option');
+            this._options.attr('selected', null)
+                .filter('[value="' + this.value() + '"]')
+                .attr('selected', 'selected');
+
+            this.input.replaceWith(this._selectAndOpen);
+            this.input = this._selectAndOpen;
+
+            this._removeUnlink()
+                .mirror()
+                ._setupCallbacks();
+
+            return this;
+        },
+
+        _setupInput: function() {
+            return jQuery('<div class="progress progress-striped active">\
+                <div class="bar" style="width: 100%;"></div>\
+            </div>');
+        },
+
+        _setupOpenClick: function() {
+            this._open.click(function() {
+                var value = this.value();
+
+                if (value != this.UNLINK_VALUE) {
+                    window.open(Config.Backend.EDITOR_URL + '/' + value, '_blank');
+                }
+            }.bind(this));
+
+            return this;
+        },
+
+        _setupSelect: function() {
+            this._unlinked = jQuery('<option>').html(this.UNLINK_TEXT)
+                .attr('selected', 'selected')
+                .attr('value', this.UNLINK_VALUE);
+
+            this._select = jQuery('<select class="input-medium">').append(this._unlinked)
+                .attr('id', this.id)
+                .attr('disabled', this.options.disabled ? 'disabled' : null);
+
+            this._open = jQuery('<button type="button">')
+                .addClass('btn')
+                .addClass('input-medium')
+                .addClass(Config.Classes.PROPERTY_OPEN_BUTTON)
+                .html('Open in new tab');
+
+            this._selectAndOpen = jQuery('<div>')
+                .append(this._select)
+                .append(this._open);
+
+            this._options = this._unlinked;
+
+            this._inverseValues = {};
+            this._inverseValues[this.UNLINK_VALUE] = this.UNLINK_TEXT;
+
+            return this._select;
+        },
+
+        _throwError: function(xhr, textStatus, errorThrown) {
+            throw '[AJAX ERROR] Could not fetch graph for transfer, reason: ' + errorThrown;
+        }
+    });
+
     var newFrom = function(node, mirror, propertyDefinition) {
         var kind = propertyDefinition.kind;
 
@@ -719,6 +878,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         else if (kind === 'range')        return new Range(node, mirror, propertyDefinition);
         else if (kind === 'select')       return new Select(node, mirror, propertyDefinition);
         else if (kind === 'text')         return new Text(node, mirror, propertyDefinition);
+        else if (kind === 'transfer')     return new Transfer(node, mirror, propertyDefinition);
 
         throw 'Unknown property kind: ' + kind;
     };
@@ -730,6 +890,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         Numeric:      Numeric,
         Range:        Range,
         Text:         Text,
+        Transfer:     Transfer,
 
         newFrom:      newFrom
     };

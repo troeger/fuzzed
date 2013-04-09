@@ -49,6 +49,7 @@ define(function() {
          *    {String} TOPEVENT_PROBABILITY_URL - Part of the sub-URL used to topevent calculation API calls.
          */
         Backend: {
+            EDITOR_URL:               '/editor',
             BASE_URL:                 '/api',
             GRAPHS_URL:               '/graphs',
             NODES_URL:                '/nodes',
@@ -114,7 +115,8 @@ define(function() {
 
             NO_PRINT:                'no-print',
 
-            PROPERTY_WARNING:        'error'
+            PROPERTY_WARNING:        'error',
+            PROPERTY_OPEN_BUTTON:    'fuzzed-property-open'
         },
 
         /**
