@@ -278,7 +278,7 @@
             "inherits": "variationPoint",
 
             "name": "Feature Variation",
-            "allowConnectionTo": ["event", "variationPoint"],
+            "allowConnectionTo": ["event", "variationPoint", "transferIn"],
             "image": "feature_variation.svg",
             "help": "Placeholder for one of the input events",
 
@@ -346,6 +346,16 @@
             "help": "An event that is expected to occur and typically does not denote a failure"
         },
 
+        "transferIn": {
+            "inherits": "node",
+            "name": "Transfer In",
+            "image": "transfer_in.svg",
+            "help": "Connects the output of a related FuzzTree, e.g. a subsystem, to this one",
+
+            "numberOfIncomingConnections": 1,
+            "numberOfOutgoingConnections": 0
+        },
+
         "topEvent": {
             "inherits": "event",
             "name": "Top Event",
@@ -400,6 +410,7 @@
         "redundancyVariation",
         "houseEvent",
         "undevelopedEvent",
+        "transferIn",
         "topEvent"
     ],
 
