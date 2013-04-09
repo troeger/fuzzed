@@ -409,8 +409,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {JSON} data - Data returned from the backend with information about the job's progress.
          */
         _displayProgress: function(data) {
-            //TODO
-            this._chartContainer.text(JSON.stringify(data));
+            var progressBar = jQuery(
+                '<div style="text-align: center;">' +
+                    '<p>Calculating probability...</p>' +
+                    '<div class="progress progress-striped active">' +
+                        '<div class="bar" style="width: 100%;"></div>' +
+                    '</div>' +
+                '</div>');
+
+            this._chartContainer.empty().append(progressBar);
             this._gridContainer.empty();
         },
 
@@ -436,6 +443,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                     data: cutset
                 });
             });
+
+            // clear container
+            this._chartContainer.empty();
 
             var self = this;
 
@@ -533,6 +543,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 autoHeight:                 true,
                 forceFitColumns:            true
             }
+
+            // clear container
+            this._gridContainer.empty();
 
             this._grid = new Slick.Grid(this._gridContainer, data, columns, options);
 
