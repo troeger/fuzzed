@@ -353,7 +353,36 @@
             "help": "Connects the output of a related FuzzTree, e.g. a subsystem, to this one",
 
             "numberOfIncomingConnections": 1,
-            "numberOfOutgoingConnections": 0
+            "numberOfOutgoingConnections": 0,
+
+            "transferMaxCost": 1,
+            "transfer": -1,
+
+            "propertyMenuEntries": {
+                "transferMaxCost": {
+                    "kind": "number",
+                    "displayName": "Max Cost",
+                    "min": 0,
+                    "step": 1
+                },
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer"
+                }
+            },
+
+            "propertyMirrors": {
+                "transferMaxCost": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "max(c)="
+                },
+                "transfer": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "<- "
+                }
+            }
         },
 
         "topEvent": {
@@ -394,7 +423,9 @@
         "k",
         "kFormula",
         "nRange",
-        "decompositions"
+        "decompositions",
+        "transferMaxCost",
+        "transfer"
     ],
 
     "shapeMenuNodeDisplayOrder": [
