@@ -22,9 +22,15 @@ class JobNotFoundError(Exception):
     pass
 
 class AnalysisResultContentHandler(xml.sax.ContentHandler):
-    result = {}
 
     def __init__(self):
+        self.result = {}
+        self.configurations = []
+        self.warnings = {}
+        self.errors = {}
+        self.inChoice = False
+        self.inConfiguration = False
+        self.inAlphaCut = False
         xml.sax.ContentHandler.__init__(self)
 
     def startElement(self, name, attrs):
@@ -32,34 +38,72 @@ class AnalysisResultContentHandler(xml.sax.ContentHandler):
             self.resultAttrs={}
             for k,v in attrs.items():
                 if k in ['decompositionNumber','timestamp','validResult']:
-                    self.resultAttrs[k]=v
+                    self.result[k]=v
             logger.debug('Analysis result attributes: '+str(self.resultAttrs))
         elif name == "configurations":
             logger.debug('Diving into configuration')
             self.inConfiguration = True
-            self.configAttrs = {'costs': attrs.value('costs')}
+            self.choices = {}
+            self.config = {'costs': attrs.getValue('costs')}
         elif name == "choices" and self.inConfiguration:
             logger.debug("Diving into configuration choice setting")
             self.inChoice = True
-            self.choiceAttrs = {'key': attrs.value('key')}
-        elif name == 'value' and self.inChoice:
+            # The choice key is a node ID that must be translated
+            self.choiceKey = Node.objects.get(pk=attrs.getValue('key')).client_id
+        elif name == 'value' and self.inChoice and not self.inAlphaCut:
+            self.choiceAttributes={}
             for k,v in attrs.items():
-                self.choiceAttrs[k] = v
+                self.choiceAttributes[k] = v
+        elif name == 'probability' and self.inConfiguration:
+            self.inProbability = True
+            self.alphaCuts = {}
+        elif name == 'alphaCuts' and self.inProbability:
+            self.inAlphaCut = True
+            self.alphaCutKey = attrs.getValue('key')
+        elif name == 'value' and not self.inChoice and self.inAlphaCut:
+            self.alphaCutValues = [float(attrs.getValue('lowerBound')), float(attrs.getValue('upperBound'))]
+        elif name == 'errors':
+            nodeid = Node.objects.get(pk=attrs.getValue('elementId')).client_id
+            self.errors[nodeid] = attrs.getValue('message')
+        elif name == 'warnings':
+            nodeid = Node.objects.get(pk=attrs.getValue('elementId')).client_id
+            self.warnings[nodeid] = attrs.getValue('message')
 
     def endElement(self, name):
-        if 
+        if name == "choices":
+            self.inChoice = False
+            self.choices[self.choiceKey] = self.choiceAttributes
+        elif name == "configurations":
+            self.inConfiguration = False
+            self.config['choices'] = self.choices
+            self.configurations.append(self.config)
+        elif name == 'probability':
+            self.inProbability = False
+            self.config['alphaCuts'] = self.alphaCuts
+        elif name == 'alphaCuts':
+            self.inAlphaCut = False
+            self.alphaCuts[self.alphaCutKey] = self.alphaCutValues
  
     def characters(self, content):
         pass
+
+    def as_json(self):
+        self.result['configurations']=self.configurations
+        self.result['errors']=self.errors
+        self.result['warnings']=self.warnings
+        return json.dumps(self.result)
   
-def analysisResultAsJson2(xmltext):
+def analysisResultAsJson(xmltext):
     start = time.clock()
-    xml.sax.parseString(xmltext, AnalysisResultContentHandler())
+    parsedContent = AnalysisResultContentHandler()
+    result = xml.sax.parseString(xmltext, parsedContent)
+    json = parsedContent.as_json()
     passed = time.clock()-start
     logger.info("Analysis XML parsing with SAX took %s"%passed)
+    logger.debug("Analysis result from SAX parsing as JSON: "+json)
+    return json
 
-def analysisResultAsJson(xmltext):
-    analysisResultAsJson2(xmltext)
+def analysisResultAsJsonValidating(xmltext):
     # load generating binding class with XML text
     start = time.clock()
     try:
