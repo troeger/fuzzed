@@ -220,8 +220,8 @@
             "propertyMirrors": {
                 "transfer": {
                     "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "<- "
+                    "style": ["bold", "large"],
+                    "prefix": "◄ "
                 }
             }
         },

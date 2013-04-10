@@ -355,32 +355,32 @@
             "numberOfIncomingConnections": 1,
             "numberOfOutgoingConnections": 0,
 
-            "transferMaxCost": 1,
             "transfer": -1,
+            "transferMaxCost": 1,
 
             "propertyMenuEntries": {
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer"
+                },
                 "transferMaxCost": {
                     "kind": "number",
                     "displayName": "Max Cost",
                     "min": 0,
                     "step": 1
-                },
-                "transfer": {
-                    "kind": "transfer",
-                    "displayName": "Transfer"
                 }
             },
 
             "propertyMirrors": {
+                "transfer": {
+                    "position": "bottom",
+                    "style": ["bold", "large"],
+                    "prefix": "◄ "
+                },
                 "transferMaxCost": {
                     "position": "bottom",
                     "style": ["italic"],
                     "prefix": "max(c)="
-                },
-                "transfer": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "<- "
                 }
             }
         },
@@ -424,8 +424,8 @@
         "kFormula",
         "nRange",
         "decompositions",
-        "transferMaxCost",
-        "transfer"
+        "transfer",
+        "transferMaxCost"
     ],
 
     "shapeMenuNodeDisplayOrder": [
