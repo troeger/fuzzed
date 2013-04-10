@@ -301,7 +301,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                     this._redundancyNodeMap[configID] = {};
                     _.each(config['choices'], function(choice, node) {
                         if (choice.type == 'RedundancyChoice') {
-                            this._redundancyNodeMap[configID][node] = choice.value;
+                            this._redundancyNodeMap[configID][node] = choice['n'];
                         }
                     }.bind(this));
 
@@ -337,7 +337,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         _convertToDisplayFormat: function(configuration) {
             var dataPoints = [];
             var max = 0.0; var min = 1.0; var peak = 0.0; var peakY = 0.0;
-            _.each(configuration['alphacuts'], function(values, key) {
+            _.each(configuration['alphaCuts'], function(values, key) {
                 var y = parseFloat(key);
                 _.each(values, function(x) {
                     dataPoints.push([x, y]);
@@ -386,10 +386,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             if (topNode.id in choices) {
                 var choice = choices[topNode.id];
 
-                switch (choice.type) {
+                switch (choice['type']) {
                     case 'InclusionChoice':
                         // if this node is not included (optional) ignore it and its children
-                        if (!choice.value) {
+                        //TODO: this should be of boolean type, not string
+                        if (choice['included'] == 'false') {
                             children = [];
                             nodes = [];
                             edges = [];
@@ -398,12 +399,13 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
                     case 'FeatureChoice':
                         // only pick the chosen child of a feature variation point
-                        children = [_.find(children, function(node) {return node.id == choice.value})];
+                        children = [_.find(children, function(node) {return node.id == choice['featureId']})];
                         break;
 
                     case 'RedundancyChoice':
                         // do not highlight this node and its children if no child was chosen
-                        if (choice.value == 0) {
+                        //TODO: this should be of number type, not string
+                        if (choice['n'] == '0') {
                             nodes = [];
                             children = [];
                             edges = [];

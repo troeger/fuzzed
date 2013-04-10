@@ -3,7 +3,7 @@
 from FuzzEd import settings
 from FuzzEd.models import xml_analysis, Node
 
-import json, urllib, logging
+import json, urllib, logging, time, xml.sax
 
 logger = logging.getLogger('FuzzEd')
 
@@ -21,10 +21,99 @@ class JobNotFoundError(Exception):
     '''
     pass
 
+class AnalysisResultContentHandler(xml.sax.ContentHandler):
+
+    def __init__(self):
+        self.result = {}
+        self.configurations = []
+        self.warnings = {}
+        self.errors = {}
+        self.inChoice = False
+        self.inConfiguration = False
+        self.inAlphaCut = False
+        xml.sax.ContentHandler.__init__(self)
+
+    def startElement(self, name, attrs):
+        if "AnalysisResult" in name:
+            self.resultAttrs={}
+            for k,v in attrs.items():
+                if k in ['decompositionNumber','timestamp','validResult']:
+                    self.result[k]=v
+        elif name == "configurations":
+            self.inConfiguration = True
+            self.choices = {}
+            self.config = {'costs': int(attrs.getValue('costs'))}
+        elif name == "choices" and self.inConfiguration:
+            self.inChoice = True
+            # The choice key is a node ID that must be translated
+            self.choiceKey = int(Node.objects.get(pk=int(attrs.getValue('key'))).client_id)
+        elif name == 'value' and self.inChoice and not self.inAlphaCut:
+            self.choiceAttributes={}
+            for k,v in attrs.items():
+                if k=='xsi:type':
+                    # strip XML namespace prefix from type identifier string
+                    self.choiceAttributes['type']=v[v.find(':')+1:]
+                elif k=='featureId':
+                    # translate to client node ID
+                    self.choiceAttributes[k]=int(Node.objects.get(pk=int(v)).client_id)
+                else:
+                    # its the type-specific value setting
+                    self.choiceAttributes[k] = v
+        elif name == 'probability' and self.inConfiguration:
+            self.inProbability = True
+            self.alphaCuts = {}
+        elif name == 'alphaCuts' and self.inProbability:
+            self.inAlphaCut = True
+            self.alphaCutKey = attrs.getValue('key')
+        elif name == 'value' and not self.inChoice and self.inAlphaCut:
+            self.alphaCutValues = [float(attrs.getValue('lowerBound')), float(attrs.getValue('upperBound'))]
+        elif name == 'errors':
+            nodeid = int(Node.objects.get(pk=int(attrs.getValue('elementId'))).client_id)
+            self.errors[nodeid] = attrs.getValue('message')
+        elif name == 'warnings':
+            nodeid = int(Node.objects.get(pk=int(attrs.getValue('elementId'))).client_id)
+            self.warnings[nodeid] = attrs.getValue('message')
+
+    def endElement(self, name):
+        if name == "choices":
+            self.inChoice = False
+            self.choices[self.choiceKey] = self.choiceAttributes
+        elif name == "configurations":
+            self.inConfiguration = False
+            self.config['choices'] = self.choices
+            self.configurations.append(self.config)
+        elif name == 'probability':
+            self.inProbability = False
+            self.config['alphaCuts'] = self.alphaCuts
+        elif name == 'alphaCuts':
+            self.inAlphaCut = False
+            self.alphaCuts[self.alphaCutKey] = self.alphaCutValues
+ 
+    def characters(self, content):
+        pass
+
+    def as_json(self):
+        self.result['configurations']=self.configurations
+        self.result['errors']=self.errors
+        self.result['warnings']=self.warnings
+        return json.dumps(self.result)
+  
 def analysisResultAsJson(xmltext):
+    start = time.clock()
+    parsedContent = AnalysisResultContentHandler()
+    result = xml.sax.parseString(xmltext, parsedContent)
+    json = parsedContent.as_json()
+    passed = time.clock()-start
+    logger.info("Analysis XML parsing with SAX took %s"%passed)
+    return json
+
+def analysisResultAsJsonValidating(xmltext):
     # load generating binding class with XML text
+    start = time.clock()
     try:
         xml = xml_analysis.CreateFromDocument(xmltext)
+        passed = time.clock()-start
+        logger.info("Analysis XML parsing took %s"%passed)
     except Exception as e:
         logger.debug("Exception while parsing analysis XML: "+str(e))
     # Create result dictionary to be converted to JSON
@@ -87,6 +176,8 @@ def analysisResultAsJson(xmltext):
         configs.append(config)
     result['configurations']=configs
     jsontext = json.dumps(result)
+    passed = time.clock()-start
+    logger.info("Analysis XML to JSON generation took %s"%passed)
     return jsontext
 
 def createJob(xml, decompositionNumber, verifyOnly=False):
@@ -116,8 +207,11 @@ def getJobResult(jobid):
     '''
     conn=urllib.urlopen('%s/fuzztree/analysis/getJobResult?jobId=%u'%(baseUrl, int(jobid))) 
     if conn.getcode() == 200:
+        start = time.clock()
         resultXml = conn.read()
         logger.debug("Server result: "+str(resultXml))      
+        passed = time.clock()-start
+        logger.info("Reading analysis server results took %s"%passed)
         return analysisResultAsJson(resultXml)
     elif conn.getcode() == 202:
         return None
