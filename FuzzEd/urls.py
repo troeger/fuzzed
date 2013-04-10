@@ -21,29 +21,33 @@ urlpatterns = patterns('',
 
     # API
     # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API
+
+    # graph
     url(r'^api/graphs$','FuzzEd.api.graphs', name='graphs'),
     url(r'^api/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.graph', name='graph'),
+    url(r'^api/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.graph_download', name='graph_download'),
 
-    url(r'^api/graphs/(?P<graph_id>\d+)/download$', 'FuzzEd.api.download', name='download'),
-
+    # node
     url(r'^api/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.nodes', name='nodes'),
     url(r'^api/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$', 'FuzzEd.api.node', name='node'),
 
+    # properties
     url(r'^api/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties$',
         'FuzzEd.api.properties', name='properties'),
     url(r'^api/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties/(?P<key>)$',
         'FuzzEd.api.property', name='property'),
 
+    # edges
     url(r'^api/graphs/(?P<graph_id>\d+)/edges$','FuzzEd.api.edges', name='edges'),
     url(r'^api/graphs/(?P<graph_id>\d+)/edges/(?P<edge_id>\d+)$','FuzzEd.api.edge', name='edge'),
 
+    # undo/redo
     url(r'^api/graphs/(?P<graph_id>\d+)/redos$','FuzzEd.api.redos', name='redos'),
     url(r'^api/graphs/(?P<graph_id>\d+)/undos$','FuzzEd.api.undos', name='undos'),
 
+    # analysis
     url(r'^api/graphs/(?P<graph_id>\d+)/cutsets$', 'FuzzEd.api.cutsets', name='cutsets'),
-
     url(r'^api/graphs/(?P<graph_id>\d+)/calc/topevent$', 'FuzzEd.api.calc_topevent'),
-    
     url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.job_status', name='job_status'),
 )
 

@@ -28,18 +28,6 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
                 .off(Config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY);
         },
 
-        /*
-         Function: graphEdgeAdded
-            Adds a new edge from a given source node to a given target node.
-
-         Parameters:
-             edgeId       - ID of the edge.
-             sourceNodeId - Source node of the new edge.
-             targetNodeId - Target node of the new edge.
-             success      - [optional] Will be called when the request was successful. Provides e.g. the ID of the new edge.
-             error        - [optional] Callback that gets called in case of an ajax-error.
-             complete     - [optional] Callback that is invoked in both cases - a successful or an erroneous ajax request
-         */
         graphEdgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
             var data = {
                 id:          edgeId,
@@ -58,17 +46,29 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
                 complete: complete || jQuery.noop
             });
         },
+        /*
+         Function: graphEdgeAdded
+         Adds a new edge from a given source node to a given target node.
+
+         Parameters:
+         edgeId       - ID of the edge.
+         sourceNodeId - Source node of the new edge.
+         targetNodeId - Target node of the new edge.
+         success      - [optional] Function that is invoked when the ajax request was successful.
+         error        - [optional] Callback that gets called in case of an ajax-error.
+         complete     - [optional] Callback that gets invoked in both cases - a successful and an erroneous ajax-call.
+         */
 
         /*
-             Function: graphNodeAdded
-                 Adds a new node to the backend of this graph.
+         Function: graphNodeAdded
+             Adds a new node to the backend of this graph.
 
-             Parameters:
-                 nodeId   - The node ID.
-                 kind     - The node kind.
-                 success  - [optional] Will be called on successful node creation transmission to server.
-                 error    - [optional] Callback that gets called in case of an ajax-error.
-                 complete - [optional] Callback that is invoked when the ajax request completes successful or erroneous.
+         Parameters:
+             nodeId   - The node ID.
+             kind     - The node kind.
+             success  - [optional] Function that is invoked when the ajax request was successful.
+             error    - [optional] Callback that gets called in case of an ajax-error.
+             complete - [optional] Callback that gets invoked in both cases - a successful and an erroneous ajax-call.
          */
         graphNodeAdded: function(event, nodeId, kind, x, y, success, error, complete) {
             var data = {
@@ -96,9 +96,9 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
 
          Parameters:
              edgeId   - The ID of the edge that should be deleted.
-             success  - [optional] Function that is invoked when the ajax request was successful
+             success  - [optional] Function that is invoked when the ajax request was successful.
              error    - [optional] Callback that gets called in case of an ajax-error.
-             complete - [optional] Callback that gets invoked in both cases - a successful and an errornous ajax-call.
+             complete - [optional] Callback that gets invoked in both cases - a successful and an erroneous ajax-call.
          */
         graphEdgeDeleted: function(event, edgeId, success, error, complete) {
             jQuery.ajax({
@@ -118,9 +118,9 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
 
          Parameters:
              nodeId   - The ID of the node that should be deleted.
-             succes   - [optional] Callback that is being called on successful deletion on backend.
+             success  - [optional] Function that is invoked when the ajax request was successful.
              error    - [optional] Callback that gets called in case of an ajax-error.
-             complete - [optional] Callback that is invoked in both cases either in an successful or errornous ajax call.
+             complete - [optional] Callback that gets invoked in both cases - a successful and an erroneous ajax-call.
          */
         graphNodeDeleted: function(event, nodeId, success, error, complete) {
             jQuery.ajax({
@@ -139,11 +139,11 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
              Changes the properties of a given node.
 
          Parameters:
-             nodeId     - The node that shall be moved
-             properties - The node's properties that should be changed
-             success    - [optional] Function that is invoked when the node's move was successfully transmitted.
+             nodeId     - The node that shall be moved.
+             properties - The node's properties that should be changed.
+             success    - [optional] Function that is invoked when the ajax request was successful.
              error      - [optional] Callback that gets called in case of an ajax-error.
-             complete   - [optional] Callback that is always invoked no matter if ajax request was successful or erroneous.
+             complete   - [optional] Callback that gets invoked in both cases - a successful and an erroneous ajax-call.
          */
         nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
             jQuery.ajax({
@@ -162,13 +162,12 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
 
         /*
          Function: getGraph
-             Fetch a Graph object from the backend.
+             Fetch a graph object from the backend as json.
 
          Parameters:
-             success  - [optional] Callback function for a successful asynchronous request for json representing a graph with given id.
-             error    - [optional] Callback that gets called in case of an unsuccessful retrieval of the graph from
-                        the database. Will create a new graph in the backend anyway.
-             complete - [optional] Callback that gets invoked in either a successful or erroneous graph request.
+             success  - [optional] Function that is invoked when the ajax request was successful.
+             error    - [optional] Callback that gets called in case of an ajax-error.
+             complete - [optional] Callback that gets invoked in both cases - a successful and an erroneous ajax-call.
          */
         getGraph: function(success, error, complete) {
             jQuery.ajax({
@@ -182,15 +181,14 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
         },
 
         /*
-             Function: calculateCutsets
-                 Tells the server to calculate the minimal cutsets for the given graph and passes
-                 the results to the provided callback.
+         Function: calculateCutsets
+             Tells the server to calculate the minimal cutsets for the given graph and passes the results to the
+             provided callback.
 
-             Parameters:
-                 success  - [optional] Callback function for asynchronous requests.
-                            Will be called when the request returns with the cutsets.
-                 error    - [optional] Callback that gets called in case of an error.
-                 complete - [optional] Callback that gets invoked in either a successful or erroneous request.
+         Parameters:
+             success  - [optional] Function that is invoked when the ajax request was successful.
+             error    - [optional] Callback that gets called in case of an ajax-error.
+             complete - [optional] Callback that gets invoked in both cases - a successful and an erroneous ajax-call.
          */
         calculateCutsets: function(event, success, error, complete) {
             jQuery.ajax({

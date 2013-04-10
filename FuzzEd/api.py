@@ -178,12 +178,12 @@ def graph(request, graph_id):
 @login_required
 @csrf_exempt
 @require_GET
-def download(request, graph_id):
+def graph_download(request, graph_id):
     """
-    Function: download
+    Function: graph_download
         Downloads the graph represented in the specified format
 
-    Request:            GET - /api/graphs/<GRAPH_ID>/download
+    Request:            GET - /api/graphs/<GRAPH_ID>/graph_download
     Request Parameters: [optional] format - Specifies the download format. Default is 'xml'.
     Response:           TODO
 
@@ -199,12 +199,14 @@ def download(request, graph_id):
 
     response = HttpResponse()
 
-    if format == 'xml':
+    if export_format == 'xml':
         response.content = graph.to_xml()
         response['Content-Type'] = 'application/xml'
-    elif format == 'json':
+
+    elif export_format == 'json':
         response.content = graph.to_json()
         response['Content-Type'] = 'application/javascript'
+
     else:
         raise HttpResponseNotFoundAnswer()
 
@@ -297,7 +299,7 @@ def node(request, graph_id, node_id):
             # Interpret all parameters as json. This will ensure correct parsing of numerical values like e.g. ids
             parameters = json.loads(request.POST.get('properties', {}))
 
-            logger.debug('Changing node %d in graph %d to %s' % (node_id, graph_id, parameters))
+            logger.debug('Changing node %s in graph %s to %s' % (node_id, graph_id, parameters))
             command = commands.ChangeNode.create_from(graph_id, node_id, parameters)
             command.do()
 

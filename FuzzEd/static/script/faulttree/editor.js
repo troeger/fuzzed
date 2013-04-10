@@ -1,4 +1,5 @@
-define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery.ui/jquery.ui.resizable', 'slickgrid'],
+define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery.ui/jquery.ui.resizable',
+        'slickgrid'],
 function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
     /**
      *  Package: Faulttree
@@ -6,8 +7,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
     /**
      *  Class: CutsetsMenu
-     *    A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to
-     *    a cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
+     *    A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
+     *    cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
      *
      *  Extends: <Base::Menus::Menu>
      */
@@ -246,7 +247,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             } else {
                 var chartData = {};
                 var tableData = [];
-                var configID = "";
+                var configID = '';
 
                 _.each(data['configurations'], function(config, index) {
                     //TODO: better naming?
@@ -578,7 +579,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         _displayNetworkError: function() {
             //TODO: This is a temporary solution. Should be replaced by error messages later.
-            this._chartContainer.text("Not found");
+            this._chartContainer.text('Not found');
         }
 
 
@@ -596,8 +597,10 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Members
          *
          *  Properties:
-         *    {<CutsetsMenu>}     cutsetsMenu     - The <CutsetsMenu> instance used to display the calculated minimal cutsets.
-         *    {<ProbabilityMenu>} probabilityMenu - The <ProbabilityMenu> instance used to display the probability of the top event.
+         *    {<CutsetsMenu>}     cutsetsMenu     - The <CutsetsMenu> instance used to display the calculated minimal
+         *                                          cutsets.
+         *    {<ProbabilityMenu>} probabilityMenu - The <ProbabilityMenu> instance used to display the probability of
+         *                                          the top event.
          */
         cutsetsMenu: undefined,
         probabilityMenu: undefined,
@@ -684,9 +687,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
         /**
          *  Method: _setupTobEventProbabilityActionEntry
-         *    Adds an entry to the actions navbar group for calculating the probability of the top event.
-         *    Clicking will issue an asynchronous backend call which returns a <Job> object that can be queried for
-         *    the final result. The job object will be used to initialize the probability menu.
+         *    Adds an entry to the actions navbar group for calculating the probability of the top event. Clicking will
+         *    issue an asynchronous backend call which returns a <Job> object that can be queried for the final result.
+         *    The job object will be used to initialize the probability menu.
          *
          *  Returns:
          *    This editor instance for chaining.
