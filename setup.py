@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 
-import os, pprint, sys, shutil
-try:
-    import json
-except ImportError:
-    import simplejson as json
+import os, json, pprint, sys, shutil
 
 from setuptools import setup
 from distutils.command.build import build as _build
