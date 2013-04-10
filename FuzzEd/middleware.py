@@ -1,16 +1,18 @@
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponseNotModified, HttpResponseBadRequest, HttpResponseNotFound, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseGone, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponseNotModified, \
+    HttpResponseBadRequest, HttpResponseNotFound, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseGone, \
+    HttpResponseServerError
 
 class HttpResponseRedirectAnswer(Exception):
     def __init__(self, target):
         self.target = target
     def result(self):
-        return HttpResponseRedirect(target)
+        return HttpResponseRedirect(self.target)
 
 class HttpResponsePermanentRedirectAnswer(Exception):
     def __init__(self, target):
         self.target = target
     def result(self):
-        return HttpResponsePermanentRedirect(target)
+        return HttpResponsePermanentRedirect(self.target)
 
 class HttpResponseNotModifiedAnswer(Exception):
     def result(self):
@@ -32,7 +34,7 @@ class HttpResponseNotAllowedAnswer(Exception):
     def __init__(self, allowedMethods):
         self.allowedMethods = allowedMethods
     def result(self):
-        return HttpResponseNotAllowed(allowedMethods) 
+        return HttpResponseNotAllowed(self.allowedMethods)
 
 class HttpResponseGoneAnswer(Exception):
     def result(self):
