@@ -157,7 +157,8 @@ def graph(request, graph_id):
     """
     Function: graph
     
-    The function provides the JSON serialized version of the graph with the provided id given that the graph is owned by the requesting user and it is not marked as deleted.
+    The function provides the JSON serialized version of the graph with the provided id given that the graph is owned
+    by the requesting user and it is not marked as deleted.
     
     Request:            GET - /api/graphs/<GRAPH_ID>
     Request Parameters: None
@@ -194,7 +195,7 @@ def download(request, graph_id):
      {HTTPResponse} a django response object
     """
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    format = request.GET.get('format', 'xml')
+    export_format = request.GET.get('format', 'xml')
 
     response = HttpResponse()
 
@@ -207,7 +208,7 @@ def download(request, graph_id):
     else:
         raise HttpResponseNotFoundAnswer()
 
-    response['Content-Disposition'] = 'attachment; filename=' + graph.name + '.' + format
+    response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
 
     return response
 
@@ -242,8 +243,8 @@ def nodes(request, graph_id):
         kind = POST['kind']
         assert(kind in notations.by_kind[graph.kind]['nodes'])
 
-        command = commands.AddNode.create_from(graph_id=graph_id, node_id=POST['id'], \
-                                             kind=kind, x=POST['x'], y=POST['y'])
+        command = commands.AddNode.create_from(graph_id=graph_id, node_id=POST['id'],
+                                               kind=kind, x=POST['x'], y=POST['y'])
         command.do()
         node = command.node
 
@@ -293,12 +294,13 @@ def node(request, graph_id, node_id):
     try:
         node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id, deleted=False)
         if request.method == 'POST':
-            # Interpret all parameters as json-formatted. This will also correctly parse
-            # numerical values like 'x' and 'y'.
+            # Interpret all parameters as json. This will ensure correct parsing of numerical values like e.g. ids
             parameters = json.loads(request.POST.get('properties', {}))
-            logger.debug("Changing node %s in graph %s to %s"%(str(node_id),str(graph_id),parameters))
+
+            logger.debug('Changing node %d in graph %d to %s' % (node_id, graph_id, parameters))
             command = commands.ChangeNode.create_from(graph_id, node_id, parameters)
             command.do()
+
             # return the updated node object
             return HttpResponse(node.to_json(), 'application/javascript', status=204)
 
@@ -306,8 +308,9 @@ def node(request, graph_id, node_id):
             command = commands.DeleteNode.create_from(graph_id, node_id)
             command.do()
             return HttpResponse(status=204)
-    except Exception, e:
-        logger.error("Exception: "+str(e))
+
+    except Exception as exception:
+        logger.error('Exception: ' + str(exception))
 
 
 @login_required
@@ -319,7 +322,10 @@ def edges(request, graph_id):
     """
     Function: edges
     
-    This API handler creates a new edge in the graph with the given id. The edge links the two nodes 'source' and 'destination' with each other that are provided in the POST body. Additionally, a request to this URL MUST provide an id for this edge that was assigned by the client (no wait for round-trip). The response contains the JSON serialized representation of the new edge and it location URI.
+    This API handler creates a new edge in the graph with the given id. The edge links the two nodes 'source' and
+    'destination' with each other that are provided in the POST body. Additionally, a request to this URL MUST provide
+    an id for this edge that was assigned by the client (no wait for round-trip). The response contains the JSON
+    serialized representation of the new edge and it location URI.
     
     Request:            POST - /api/graphs/<GRAPH_ID>/edges
     Request Parameters: client_id = <INT>, source = <INT>, destination = <INT>
@@ -334,7 +340,7 @@ def edges(request, graph_id):
     """
     POST = request.POST
     try:
-        command = commands.AddEdge.create_from(graph_id=graph_id, client_id=POST['id'], \
+        command = commands.AddEdge.create_from(graph_id=graph_id, client_id=POST['id'],
                                                from_id=POST['source'], to_id=POST['destination'])
         command.do()
 
@@ -365,7 +371,7 @@ def edge(request, graph_id, edge_id):
     """
     Function: edge
     
-    This API handler deletes the edge from the graph using the both provided ids. The id of the edge hereby referes to
+    This API handler deletes the edge from the graph using the both provided ids. The id of the edge hereby refers to
     the previously assigned client side id and NOT the database id. The response to this request does not contain any
     body.
     
@@ -405,7 +411,7 @@ def property(**kwargs):
 @login_required
 @csrf_exempt
 @require_ajax
-@require_http_methods(["GET", "POST"])
+@require_http_methods(['GET', 'POST'])
 @transaction.commit_on_success
 def undos(request, graph_id):
     #
@@ -432,7 +438,7 @@ def undos(request, graph_id):
 @login_required
 @csrf_exempt
 @require_ajax
-@require_http_methods(["GET", "POST"])
+@require_http_methods(['GET', 'POST'])
 @transaction.commit_on_success
 def redos(request, graph_id):
     #
