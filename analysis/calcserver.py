@@ -3,7 +3,7 @@
 from FuzzEd import settings
 from FuzzEd.models import xml_analysis, Node
 
-import json, urllib, logging
+import json, urllib, logging, time, xml.sax
 
 logger = logging.getLogger('FuzzEd')
 
@@ -21,10 +21,51 @@ class JobNotFoundError(Exception):
     '''
     pass
 
+class AnalysisResultContentHandler(xml.sax.ContentHandler):
+    result = {}
+
+    def __init__(self):
+        xml.sax.ContentHandler.__init__(self)
+
+    def startElement(self, name, attrs):
+        if "AnalysisResult" in name:
+            self.resultAttrs={}
+            for k,v in attrs.items():
+                if k in ['decompositionNumber','timestamp','validResult']:
+                    self.resultAttrs[k]=v
+            logger.debug('Analysis result attributes: '+str(self.resultAttrs))
+        elif name == "configurations":
+            logger.debug('Diving into configuration')
+            self.inConfiguration = True
+            self.configAttrs = {'costs': attrs.value('costs')}
+        elif name == "choices" and self.inConfiguration:
+            logger.debug("Diving into configuration choice setting")
+            self.inChoice = True
+            self.choiceAttrs = {'key': attrs.value('key')}
+        elif name == 'value' and self.inChoice:
+            for k,v in attrs.items():
+                self.choiceAttrs[k] = v
+
+    def endElement(self, name):
+        if 
+ 
+    def characters(self, content):
+        pass
+  
+def analysisResultAsJson2(xmltext):
+    start = time.clock()
+    xml.sax.parseString(xmltext, AnalysisResultContentHandler())
+    passed = time.clock()-start
+    logger.info("Analysis XML parsing with SAX took %s"%passed)
+
 def analysisResultAsJson(xmltext):
+    analysisResultAsJson2(xmltext)
     # load generating binding class with XML text
+    start = time.clock()
     try:
         xml = xml_analysis.CreateFromDocument(xmltext)
+        passed = time.clock()-start
+        logger.info("Analysis XML parsing took %s"%passed)
     except Exception as e:
         logger.debug("Exception while parsing analysis XML: "+str(e))
     # Create result dictionary to be converted to JSON
@@ -87,6 +128,8 @@ def analysisResultAsJson(xmltext):
         configs.append(config)
     result['configurations']=configs
     jsontext = json.dumps(result)
+    passed = time.clock()-start
+    logger.info("Analysis XML to JSON generation took %s"%passed)
     return jsontext
 
 def createJob(xml, decompositionNumber, verifyOnly=False):
@@ -116,8 +159,11 @@ def getJobResult(jobid):
     '''
     conn=urllib.urlopen('%s/fuzztree/analysis/getJobResult?jobId=%u'%(baseUrl, int(jobid))) 
     if conn.getcode() == 200:
+        start = time.clock()
         resultXml = conn.read()
         logger.debug("Server result: "+str(resultXml))      
+        passed = time.clock()-start
+        logger.info("Reading analysis server results took %s"%passed)
         return analysisResultAsJson(resultXml)
     elif conn.getcode() == 202:
         return None
