@@ -5,12 +5,12 @@ class Job(models.Model):
     class Meta:
         app_label = 'FuzzEd'
 
-    CUTSETS_JOB = 'C'                       
-    TOPEVENT_JOB = 'T' 
+    CUTSETS_JOB   = 'C'
+    TOP_EVENT_JOB = 'T'
 
     JOB_TYPES = (
-        (CUTSETS_JOB, 'Cutset computation'),    
-        (TOPEVENT_JOB, 'Top event calculation')
+        (CUTSETS_JOB,   'Cutset computation'),
+        (TOP_EVENT_JOB, 'Top event calculation')
     )    
 
     graph = models.ForeignKey(Graph, null=False, related_name='jobs')

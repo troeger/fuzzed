@@ -116,14 +116,13 @@ class Node(models.Model):
         elif self.kind == 'andGate':
             return '(%s)' % (' and '.join(children))
 
-        elif self.kind in ['basicEvent']:
+        elif self.kind in {'basicEvent'}:
             return str(self.client_id)
 
         elif self.kind == 'topEvent':
             return str(children[0])
 
-        else:
-            raise ValueError('Node %s has unsupported kind' % self)
+        raise ValueError('Node %s has unsupported kind' % self)
 
     def to_xml(self):
         """
@@ -195,10 +194,10 @@ class Node(models.Model):
             return self.properties.get(key=key).value
         except ObjectDoesNotExist:
             try:
-                logger.debug('Node has no property "%s", trying to use default from notation' % key)
+                logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
                 return notations.by_kind[self.graph.kind]['nodes'][self.kind][key]
             except KeyError:
-                logger.debug('No default given in notation, assuming "%s" instead' % default)
+                logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
                 return default
 
     def get_attr(self, key):

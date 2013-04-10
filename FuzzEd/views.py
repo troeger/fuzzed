@@ -317,8 +317,7 @@ def login(request):
             # both, username and e-mail were not given, use a timestamp as username
             elif not user_name and not email:
                 now = datetime.datetime.now()
-                user_name = 'Anonymous %u%u%u%u' % (now.hour, now.minute,\
-                                                    now.second, now.microsecond)
+                user_name = 'Anonymous %d%d%d%d' % (now.hour, now.minute, now.second, now.microsecond)
                 new_user = User(username=user_name)
 
             # username and e-mail were given; great - register as is

@@ -17,9 +17,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Members
          *
          *  Properties:
-         *    {Graph} _graph - <Base::Graph> instance for which the cutsets are calculated.
+         *    {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
          */
-        _graph: undefined,
+        _editor: undefined,
 
         /**
          *  Group: Initialization
@@ -30,11 +30,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Sets up the menu.
          *
          *  Parameters:
-         *    {Graph} graph - The <Base::Graph> instance for which the cutsets are calculated.
+         *    {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
          */
-        init: function(graph) {
+        init: function(editor) {
             this._super();
-            this._graph = graph;
+            this._editor = editor;
         },
 
         /**
@@ -62,7 +62,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             _.each(cutsets, function(cutset) {
                 var nodeIDs = cutset['nodes'];
                 var nodes = _.map(nodeIDs, function(id) {
-                    return this._graph.getNodeById(id);
+                    return this._editor.graph.getNodeById(id);
                 }.bind(this));
                 var nodeNames = _.map(nodes, function(node) {
                     return node.name;
@@ -75,15 +75,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 entry.hover(
                     // in
                     function() {
-                        var allNodes = this._graph.getNodes();
-                        _.invoke(allNodes, 'disable');
+                        var disable = _.difference(this._editor.graph.getNodes(), nodes);
+                        _.invoke(disable, 'disable');
                         _.invoke(nodes, 'highlight');
                     }.bind(this),
 
                     // out
                     function() {
-                        var allNodes = this._graph.getNodes();
-                        _.invoke(allNodes, 'enable');
+                        var enable = _.difference(this._editor.graph.getNodes(), nodes);
+                        _.invoke(enable, 'enable');
                         _.invoke(nodes, 'unhighlight');
                     }.bind(this)
                 );
@@ -619,7 +619,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         init: function(graphId) {
             this._super(graphId);
 
-            this.cutsetsMenu = new CutsetsMenu();
+            this.cutsetsMenu = new CutsetsMenu(this);
             this.probabilityMenu = new ProbabilityMenu(this);
 
             this._setupCutsetsActionEntry()
@@ -704,7 +704,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
                 jQuery(document).trigger(
-                    this.config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY,
+                    this.config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY,
                     this.probabilityMenu.show.bind(this.probabilityMenu)
                 );
             }.bind(this));

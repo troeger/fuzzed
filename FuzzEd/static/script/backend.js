@@ -14,7 +14,7 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
                 .on(Config.Events.GRAPH_EDGE_ADDED,         this.graphEdgeAdded.bind(this))
                 .on(Config.Events.GRAPH_EDGE_DELETED,       this.graphEdgeDeleted.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_CUTSETS, this.calculateCutsets.bind(this))
-                .on(Config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY, this.calculateTopeventProbability.bind(this));
+                .on(Config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY, this.calculateTopEventProbability.bind(this));
         },
 
         deactivate: function() {
@@ -25,7 +25,7 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
                 .off(Config.Events.GRAPH_EDGE_ADDED)
                 .off(Config.Events.GRAPH_EDGE_DELETED)
                 .off(Config.Events.EDITOR_CALCULATE_CUTSETS)
-                .off(Config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY);
+                .off(Config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY);
         },
 
         graphEdgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
@@ -212,9 +212,9 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
          *    {Function} error    - [optional] Callback that gets called in case of an error.
          *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
-        calculateTopeventProbability: function(event, success, error, complete) {
+        calculateTopEventProbability: function(event, success, error, complete) {
             jQuery.ajax({
-                url:      this._fullUrlForTopeventProbability(),
+                url:      this._fullUrlForTopEventProbability(),
                 dataType: 'json',
 
                 statusCode: {
@@ -234,6 +234,10 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
         /* Section: Internal */
 
         /* Section: Helper */
+
+        _fullUrlForAnalysis: function() {
+            return this._fullUrlForGraph() + Config.Backend.ANALYSIS_URL;
+        },
 
         _fullUrlForGraph: function() {
             return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + this._graphId;
@@ -256,11 +260,11 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
         },
 
         _fullUrlForCutsets: function() {
-            return this._fullUrlForGraph() + Config.Backend.CUTSETS_URL;
+            return this._fullUrlForAnalysis() + Config.Backend.CUTSETS_URL;
         },
 
-        _fullUrlForTopeventProbability: function() {
-            return this._fullUrlForGraph() + Config.Backend.TOPEVENT_PROBABILITY_URL;
+        _fullUrlForTopEventProbability: function() {
+            return this._fullUrlForAnalysis() + Config.Backend.TOP_EVENT_PROBABILITY_URL;
         }
     });
 });

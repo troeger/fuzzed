@@ -89,8 +89,8 @@ class Graph(models.Model):
         fuzz_tree = XmlFuzzTree(name = self.name, id = self.pk)
 
         # Find root node and start from there
-        topEventNode = self.nodes.get(kind='topEvent')
-        fuzz_tree.topEvent = topEventNode.to_xml()
+        top_event = self.nodes.get(kind='topEvent')
+        fuzz_tree.topEvent = top_event.to_xml()
         pyxb.utils.domutils.BindingDOMSupport.DeclareNamespace(XmlNamespace, 'ft')
 
         return fuzz_tree.toxml('utf-8')

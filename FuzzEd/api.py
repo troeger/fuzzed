@@ -11,7 +11,7 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 # NOTE: it is important to use our custom exceptions!
 # 
 # REASON: django.http responses are regular returns, transaction.commit_on_success will therefore  
-# REASON: always commit changes even if we return errornous responses (400, 404, ...). We can
+# REASON: always commit changes even if we return erroneous responses (400, 404, ...). We can
 # REASON: bypass this behaviour by throwing exception that send correct HTTP status to the user 
 # REASON: but abort the transaction. The custom exceptions can be found in middleware.py
 
@@ -19,80 +19,10 @@ from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, \
                               HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands, Job
-from FuzzEd import backend
-from analysis import calcserver
+from analysis import cutsets, top_event_probability
+
 import logging, json
-
 logger = logging.getLogger('FuzzEd')
-
-@login_required
-@csrf_exempt
-@require_http_methods(['GET'])
-def calc_topevent(request, graph_id):
-    """
-    Function: calc_topevent
-    
-    This API handler is responsible for starting an analysis run in the analysis engine.
-    It is intended to return immediately with job information for the frontend.
-    If the analysis engine cannot start the job (most likely due to broken XML data generated here),
-    the view returns HttpResponseServerErrorAnswer to the front-end.
-    """
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-
-    try:
-        post_data = graph.to_xml()
-        logger.debug('Sending XML to calcserver:\n' + post_data)
-        job_id, configuration_count, node_count = calcserver.createJob(post_data,10)
-
-        # store job information for this graph
-        job = Job(name=job_id, configurations=configuration_count, nodes=node_count, graph=graph, kind=Job.TOPEVENT_JOB)
-        job.save()
-
-        # return URL for job status information
-        logger.debug('Got new job \'%s\' with ID %u for graph %u' % (job.name, job.pk, graph.pk))
-        response = HttpResponse(status=201) 
-        response['Location'] = reverse('job_status', args=[job.pk])
-
-        return response
-
-    except calcserver.InternalError as exception:
-        logger.error('Exception while using calcserver: ' + str(exception))
-        #TODO: Perform some smarter error handling here
-        raise HttpResponseServerErrorAnswer()        
-
-@login_required
-@csrf_exempt
-@require_http_methods(['GET'])
-def job_status(request, job_id):
-    try:
-        job = Job.objects.get(pk=job_id)
-        # Prevent cross-checking of jobs by different users
-        assert(job.graph.owner == request.user)
-
-    except:
-        # Inform the frontend that the job no longer exists
-        # TODO: Add reason for cancellation to body as plain text 
-        raise HttpResponseNotFoundAnswer()
-
-    if job.kind != Job.TOPEVENT_JOB:
-        raise HttpResponseBadRequestAnswer()
-
-    # query status from analysis engine, based on job type
-    try:
-        result = calcserver.getJobResult(job.name)
-
-        if result is None:
-            return HttpResponse(status=202)
-
-        else:
-            logger.debug('Analysis result:\n' + result)
-            return HttpResponse(result)
-
-    except Exception as exception:
-        # Analysis engine does not know this job, or something else went wrong
-        # for the frontend, this is basically an unspecified backend error
-        logger.error('Error while fetch calc server job status: ' + str(exception))
-        raise HttpResponseServerErrorAnswer()
 
 @login_required
 @csrf_exempt
@@ -468,7 +398,7 @@ def redos(request, graph_id):
 @require_ajax
 @require_GET
 @transaction.commit_on_success
-def cutsets(request, graph_id):
+def analyze_cutsets(request, graph_id):
     """
     The function provides all cut sets of the given graph.
     It currently performs the computation (of unknown duration) synchronously,
@@ -484,6 +414,76 @@ def cutsets(request, graph_id):
     if node_count >= 10:
         raise HttpResponseServerErrorAnswer()
 
-    result = backend.getcutsets(graph.to_bool_term())
+    result = cutsets.get(graph.to_bool_term())
     #TODO: check the command stack if meanwhile the graph was modified
     return HttpResponse(json.dumps(result), 'application/javascript')
+
+@login_required
+@csrf_exempt
+@require_http_methods(['GET'])
+def analyze_top_event_probability(request, graph_id):
+    """
+    Function: analyze_top_event_probability
+
+    This API handler is responsible for starting an analysis run in the analysis engine.
+    It is intended to return immediately with job information for the frontend.
+    If the analysis engine cannot start the job (most likely due to broken XML data generated here),
+    the view returns HttpResponseServerErrorAnswer to the front-end.
+    """
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+
+    try:
+        post_data = graph.to_xml()
+        logger.debug('Sending XML to analysis server:\n' + post_data)
+        job_id, configuration_count, node_count = top_event_probability.create_job(post_data,10)
+
+        # store job information for this graph
+        job = Job(name=job_id, configurations=configuration_count,
+                  nodes=node_count, graph=graph, kind=Job.TOP_EVENT_JOB)
+        job.save()
+
+        # return URL for job status information
+        logger.debug('Got new job \'%s\' with ID %d for graph %d' % (job.name, job.pk, graph.pk))
+        response = HttpResponse(status=201)
+        response['Location'] = reverse('job_status', args=[job.pk])
+
+        return response
+
+    except top_event_probability.InternalError as exception:
+        logger.error('Exception while using analysis server: %s' % exception)
+        #TODO: Perform some smarter error handling here
+        raise HttpResponseServerErrorAnswer()
+
+@login_required
+@csrf_exempt
+@require_http_methods(['GET'])
+def job_status(request, job_id):
+    try:
+        job = Job.objects.get(pk=job_id)
+        # Prevent cross-checking of jobs by different users
+        assert(job.graph.owner == request.user)
+
+    except:
+        # Inform the frontend that the job no longer exists
+        # TODO: Add reason for cancellation to body as plain text
+        raise HttpResponseNotFoundAnswer()
+
+    if job.kind != Job.TOP_EVENT_JOB:
+        raise HttpResponseBadRequestAnswer()
+
+    # query status from analysis engine, based on job type
+    try:
+        result = top_event_probability.get_job_result(job.name)
+
+        if result is None:
+            return HttpResponse(status=202)
+
+        else:
+            logger.debug('Analysis result:\n%s' % result)
+            return HttpResponse(result)
+
+    except Exception as exception:
+        # Analysis engine does not know this job, or something else went wrong
+        # for the frontend, this is basically an unspecified backend error
+        logger.error('Error while fetching analysis server job status: %s' % exception)
+        raise HttpResponseServerErrorAnswer()

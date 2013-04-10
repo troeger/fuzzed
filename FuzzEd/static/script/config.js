@@ -41,21 +41,24 @@ define(function() {
          *    Backend-specific constants.
          *
          *  Constants:
-         *    {String} BASE_URL    - Part of the sub-URL that is common for all API calls.
-         *    {String} GRAPHS_URL  - Part of the sub-URL used to perform graph-specific API calls.
-         *    {String} NODES_URL   - Part of the sub-URL used to perform node-specific API calls.
-         *    {String} EDGES_URL   - Part of the sub-URL used to perform edge-specific API calls.
-         *    {String} CUTSETS_URL - Part of the sub-URL used to perform cutset-specific API calls.
-         *    {String} TOPEVENT_PROBABILITY_URL - Part of the sub-URL used to topevent calculation API calls.
+         *    {String} ANALYSIS_URL              - Part of the sub-URL that is common for all analysis calls.
+         *    {String} BASE_URL                  - Part of the sub-URL that is common for all API calls.
+         *    {String} EDITOR_URL                - Part of the sub-URL that refers to the editor.
+         *    {String} GRAPHS_URL                - Part of the sub-URL used to perform graph-specific API calls.
+         *    {String} NODES_URL                 - Part of the sub-URL used to perform node-specific API calls.
+         *    {String} EDGES_URL                 - Part of the sub-URL used to perform edge-specific API calls.
+         *    {String} CUTSETS_URL               - Part of the sub-URL used to perform cutset-specific API calls.
+         *    {String} TOP_EVENT_PROBABILITY_URL - Part of the sub-URL used to top event calculation API calls.
          */
         Backend: {
-            EDITOR_URL:               '/editor',
-            BASE_URL:                 '/api',
-            GRAPHS_URL:               '/graphs',
-            NODES_URL:                '/nodes',
-            EDGES_URL:                '/edges',
-            CUTSETS_URL:              '/cutsets',
-            TOPEVENT_PROBABILITY_URL: '/calc/topevent'
+            ANALYSIS_URL:              '/analysis',
+            BASE_URL:                  '/api',
+            EDITOR_URL:                '/editor',
+            GRAPHS_URL:                '/graphs',
+            NODES_URL:                 '/nodes',
+            EDGES_URL:                 '/edges',
+            CUTSETS_URL:               '/cutsets',
+            TOP_EVENT_PROBABILITY_URL: '/topEventProbability'
         },
 
         /**
