@@ -471,14 +471,13 @@ def redos(request, graph_id):
 def cutsets(request, graph_id):
     """
     The function provides all cut sets of the given graph.
-    It currently performs the computation (of unknown duration) synchronousely,
+    It currently performs the computation (of unknown duration) synchronously,
     so the client is expected to perform an asynchronous REST call on its own
 
     API Request:  GET /api/graphs/[graphID]/cutsets, no body
     API Response: JSON body with list of dicts, one dict per cut set, 'nodes' key has list of client_id's value
     """
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    #tree='(b or c or a) and (c or a and b) and (d) or (e)'
     # minbool is NP-complete, so more than 10 basic events are not feasible for computation
     node_count = graph.nodes.all().filter(kind__exact='basicEvent', deleted__exact=False).count()
 
