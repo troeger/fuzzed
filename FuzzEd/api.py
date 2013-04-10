@@ -3,6 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import reverse
 
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from django.views.decorators.csrf import csrf_exempt
@@ -143,6 +144,34 @@ def graph_download(request, graph_id):
     response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
 
     return response
+
+@login_required
+@csrf_exempt
+@require_ajax
+@require_GET
+def graph_transfers(request, graph_id):
+    """
+    Function: graph_transfers
+
+    Request:            GET - /api/graphs/<GRAPH_ID>/transfers
+    Request Parameters: graph_id = <INT>
+    Response:           200 - <TRANSFERS_AS_JSON>
+
+    Parameters:
+     {HTTPRequest} request  - the django request object
+     {int}         graph_id - the id of the graph to get the transfers for
+
+    Returns:
+     {HTTPResponse} a django response object
+    """
+    transfers = []
+    graph     = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+
+    if graph.kind in ['faulttree', 'fuzztree']:
+        for transfer in Graph.objects.filter(~Q(pk=graph_id), owner=request.user, kind=graph.kind, deleted=False):
+            transfers.append({'id': transfer.pk, 'name': transfer.name})
+
+    return HttpResponse(json.dumps({'transfers': transfers}), 'application/javascript', status=200)
 
 @login_required
 @csrf_exempt

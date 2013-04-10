@@ -43,10 +43,11 @@ define(function() {
          *  Constants:
          *    {String} ANALYSIS_URL              - Part of the sub-URL that is common for all analysis calls.
          *    {String} BASE_URL                  - Part of the sub-URL that is common for all API calls.
-         *    {String} EDITOR_URL                - Part of the sub-URL that refers to the editor.
+         *    {String} EDITOR_URL                - Part of the sub-URL that is common for all editor API calls.
          *    {String} GRAPHS_URL                - Part of the sub-URL used to perform graph-specific API calls.
          *    {String} NODES_URL                 - Part of the sub-URL used to perform node-specific API calls.
          *    {String} EDGES_URL                 - Part of the sub-URL used to perform edge-specific API calls.
+         *    {String} TRANSFERS_URL             - Part of the sub-URL used to perform transferable specific API calls.
          *    {String} CUTSETS_URL               - Part of the sub-URL used to perform cutset-specific API calls.
          *    {String} TOP_EVENT_PROBABILITY_URL - Part of the sub-URL used to top event calculation API calls.
          */
@@ -57,6 +58,7 @@ define(function() {
             GRAPHS_URL:                '/graphs',
             NODES_URL:                 '/nodes',
             EDGES_URL:                 '/edges',
+            TRANSFERS_URL:             '/transfers',
             CUTSETS_URL:               '/cutsets',
             TOP_EVENT_PROBABILITY_URL: '/topEventProbability'
         },

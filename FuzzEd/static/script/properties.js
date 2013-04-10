@@ -717,6 +717,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
     var Transfer = Property.extend({
         UNLINK_VALUE: -1,
         UNLINK_TEXT:  'unlinked',
+        GRAPHS_URL:   Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/',
 
         _graphId:       undefined,
         _inverseValues: undefined,
@@ -763,7 +764,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
             this._setupSelect();
 
             jQuery.ajax({
-                url:      Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL,
+                url:      this.GRAPHS_URL + this._graphId + Config.Backend.TRANSFERS_URL,
                 type:     'GET',
                 dataType: 'json',
 
@@ -793,9 +794,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         },
 
         _setupGraphOptions: function(all) {
-            _.each(all.graphs, function(graph) {
-                if (graph.id === this._graphId) return;
-
+            _.each(all.transfers, function(graph) {
                 this._select.append(jQuery('<option>')
                     .html(graph.name)
                     .attr('value', graph.id)
