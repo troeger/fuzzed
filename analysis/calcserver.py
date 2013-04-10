@@ -39,21 +39,26 @@ class AnalysisResultContentHandler(xml.sax.ContentHandler):
             for k,v in attrs.items():
                 if k in ['decompositionNumber','timestamp','validResult']:
                     self.result[k]=v
-            logger.debug('Analysis result attributes: '+str(self.resultAttrs))
         elif name == "configurations":
-            logger.debug('Diving into configuration')
             self.inConfiguration = True
             self.choices = {}
-            self.config = {'costs': attrs.getValue('costs')}
+            self.config = {'costs': int(attrs.getValue('costs'))}
         elif name == "choices" and self.inConfiguration:
-            logger.debug("Diving into configuration choice setting")
             self.inChoice = True
             # The choice key is a node ID that must be translated
-            self.choiceKey = Node.objects.get(pk=attrs.getValue('key')).client_id
+            self.choiceKey = int(Node.objects.get(pk=int(attrs.getValue('key'))).client_id)
         elif name == 'value' and self.inChoice and not self.inAlphaCut:
             self.choiceAttributes={}
             for k,v in attrs.items():
-                self.choiceAttributes[k] = v
+                if k=='xsi:type':
+                    # strip XML namespace prefix from type identifier string
+                    self.choiceAttributes['type']=v[v.find(':')+1:]
+                elif k=='featureId':
+                    # translate to client node ID
+                    self.choiceAttributes[k]=int(Node.objects.get(pk=int(v)).client_id)
+                else:
+                    # its the type-specific value setting
+                    self.choiceAttributes[k] = v
         elif name == 'probability' and self.inConfiguration:
             self.inProbability = True
             self.alphaCuts = {}
@@ -63,10 +68,10 @@ class AnalysisResultContentHandler(xml.sax.ContentHandler):
         elif name == 'value' and not self.inChoice and self.inAlphaCut:
             self.alphaCutValues = [float(attrs.getValue('lowerBound')), float(attrs.getValue('upperBound'))]
         elif name == 'errors':
-            nodeid = Node.objects.get(pk=attrs.getValue('elementId')).client_id
+            nodeid = int(Node.objects.get(pk=int(attrs.getValue('elementId'))).client_id)
             self.errors[nodeid] = attrs.getValue('message')
         elif name == 'warnings':
-            nodeid = Node.objects.get(pk=attrs.getValue('elementId')).client_id
+            nodeid = int(Node.objects.get(pk=int(attrs.getValue('elementId'))).client_id)
             self.warnings[nodeid] = attrs.getValue('message')
 
     def endElement(self, name):
@@ -100,7 +105,6 @@ def analysisResultAsJson(xmltext):
     json = parsedContent.as_json()
     passed = time.clock()-start
     logger.info("Analysis XML parsing with SAX took %s"%passed)
-    logger.debug("Analysis result from SAX parsing as JSON: "+json)
     return json
 
 def analysisResultAsJsonValidating(xmltext):

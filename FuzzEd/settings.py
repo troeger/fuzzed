@@ -224,7 +224,7 @@ LOGGING = {
         },
         'FuzzEd': {
             'handlers':  ['console'],
-            'level':     'INFO',
+            'level':     'DEBUG',
             'propagate': True,
         }
     }
