@@ -14,13 +14,13 @@ from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
 from FuzzEd.models import Graph, notations, commands
 
 GREETINGS = [
-    "Loading the FuzzEd User Experience",
-    "Trying to find your Data... it was here somewhere",
-    "Fiddeling with your Graph... Stand by!",
-    "Loading good Karma into your Browser",
-    "Calculating the Answer to Life...",
-    "Man, this takes like for ever to load...",
-    "Time to grab some Coffee!"
+    'Loading the FuzzEd User Experience',
+    'Trying to find your Data... it was here somewhere',
+    'Fiddeling with your Graph... Stand by!',
+    'Loading good Karma into your Browser',
+    'Calculating the Answer to Life...',
+    'Man, this takes like for ever to load...',
+    'Time to grab some Coffee!'
 ]
 
 def index(request):
@@ -96,8 +96,7 @@ def dashboard_new(request):
 
     # save the graph
     if POST.get('save') and POST.get('kind') and POST.get('name'):
-        commands.AddGraph.create_from(kind=POST['kind'], name=POST['name'], \
-                                      owner=request.user).do()
+        commands.AddGraph.create_from(kind=POST['kind'], name=POST['name'], owner=request.user).do()
         return redirect('dashboard')
 
     # render the create diagram if fuzztree

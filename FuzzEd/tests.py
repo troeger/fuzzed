@@ -1,9 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
-from django.contrib.auth.models import User
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
-from FuzzEd.models.edge import Edge
 
 class ApiTestCase(TestCase):
     fixtures = ['test_data.json']

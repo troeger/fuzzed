@@ -1,4 +1,4 @@
-import ast, minbool
+import minbool
 
 def getcutsets(structformula):
     result=[]
