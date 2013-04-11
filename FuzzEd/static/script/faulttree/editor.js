@@ -6,8 +6,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
     /**
      *  Class: CutsetsMenu
-     *    A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to
-     *    a cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
+     *
+     *  A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
+     *  cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
      *
      *  Extends: <Base::Menus::Menu>
      */
@@ -34,6 +35,25 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         init: function(graph) {
             this._super();
             this._graph = graph;
+        },
+
+        /**
+         *  Method: _setupContainer
+         *    Sets up the DOM container element for this menu and appends it to the DOM.
+         *
+         *  Returns:
+         *    A jQuery object of the container.
+         */
+        _setupContainer: function() {
+            return jQuery(
+                '<div id="' + FaulttreeConfig.IDs.CUTSETS_MENU + '" class="menu" header="Cutsets">\
+                    <div class="menu-controls">\
+                        <span class="menu-minimize"></span>\
+                        <span class="menu-close"></span>\
+                    </div>\
+                    <ul class="nav-list unstyled"></ul>\
+                </div>'
+            ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
         },
 
         /**
@@ -92,36 +112,14 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             this._super();
             return this;
-        },
-
-        /**
-         *  Group: Setup
-         */
-
-        /**
-         *  Method: _setupContainer
-         *    Sets up the DOM container element for this menu and appends it to the DOM.
-         *
-         *  Returns:
-         *    A jQuery object of the container.
-         */
-        _setupContainer: function() {
-            return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.CUTSETS_MENU + '" class="menu" header="Cutsets">\
-                    <div class="menu-controls">\
-                        <span class="menu-minimize"></span>\
-                        <span class="menu-close"></span>\
-                    </div>\
-                    <ul class="nav-list unstyled"></ul>\
-                </div>'
-            ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
         }
     });
 
     /**
-     *  Class: FaultTreeEditor
-     *    Faulttree-specific <Base::Editor> class. The fault tree editor distinguishes from the 'normal' editor by
-     *    their ability to calculate minimal cutsets for the displayed graph.
+     *  Class: FaulttreeEditor
+     *
+     *  Faulttree-specific <Base::Editor> class. The fault tree editor distinguishes from the 'normal' editor by their
+     *  ability to calculate minimal cutsets for the displayed graph.
      *
      *  Extends: <Base::Editor>
      */
@@ -153,6 +151,28 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         },
 
         /**
+         *  Method: _setupCutsetsActionEntry
+         *    Adds an entry to the actions navbar group for calculating the minimal cutsets for the edited graph.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
+        _setupCutsetsActionEntry: function() {
+            var navbarActionsEntry = jQuery(
+                '<li>' +
+                    '<a id="' + this.config.IDs.NAVBAR_ACTION_CUTSETS + '" href="#">Calculate cutsets</a>' +
+                    '</li>');
+            this._navbarActionsGroup.append(navbarActionsEntry);
+
+            // register for clicks on the corresponding nav action
+            navbarActionsEntry.click(function() {
+                jQuery(document).trigger(this.config.Events.EDITOR_CALCULATE_CUTSETS, this.cutsets.show.bind(this.cutsets));
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
          *  Group: Accessors
          */
 
@@ -180,32 +200,6 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         getGraphClass: function() {
             return FaulttreeGraph;
-        },
-
-        /**
-         *  Group: Setup
-         */
-
-        /**
-         *  Method: _setupCutsetsActionEntry
-         *    Adds an entry to the actions navbar group for calculating the minimal cutsets for the edited graph.
-         *
-         *  Returns:
-         *    This editor instance for chaining.
-         */
-        _setupCutsetsActionEntry: function() {
-            var navbarActionsEntry = jQuery(
-                '<li>' +
-                    '<a id="' + this.config.IDs.NAVBAR_ACTION_CUTSETS + '" href="#">Calculate cutsets</a>' +
-                '</li>');
-            this._navbarActionsGroup.append(navbarActionsEntry);
-
-            // register for clicks on the corresponding nav action
-            navbarActionsEntry.click(function() {
-                jQuery(document).trigger(this.config.Events.EDITOR_CALCULATE_CUTSETS, this.cutsets.show.bind(this.cutsets));
-            }.bind(this));
-
-            return this;
         }
     });
 });
