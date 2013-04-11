@@ -194,7 +194,7 @@ function(Class, Menus, Canvas, Backend) {
 
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
-                jQuery('#' + this.config.IDs.CANVAS).children('svg').toggle();
+                Canvas.toggleGrid();
             }.bind(this));
 
             return this;

@@ -21,6 +21,10 @@ function(Class, Config) {
                 ._setupCanvas();
         },
 
+        toggleGrid: function() {
+            jQuery(this._background.root()).toggle();
+        },
+
         /* Section: Coordinate conversion */
 
         toGrid: function(first, second) {
