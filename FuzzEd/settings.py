@@ -3,7 +3,7 @@ import os.path, logging
 is_production = False
 cwd = os.path.dirname(__file__)
 
-if cwd.startswith('/var/www/fuzztrees.net'):
+if cwd.startswith('/var/www'):
     is_production = True
 
 ADMINS = (
@@ -19,8 +19,9 @@ if is_production:
     TEMPLATE_DEBUG          = DEBUG
     SEND_BROKEN_LINK_EMAILS = False     
     EMAIL_BACKEND           = 'django.core.mail.backends.smtp.EmailBackend'
-    SERVER_EMAIL            = 'noreply@citemaster.net'
+    SERVER_EMAIL            = 'webmaster@fuzztrees.net'
     EMAIL_HOST              = 'localhost'
+    OPENID_RETURN           = 'http://www.fuzztrees.net/login/?openidreturn'
 
     DATABASES = {
         'default': {
@@ -45,6 +46,7 @@ else:
     DEBUG          = True
     TEMPLATE_DEBUG = True
     EMAIL_BACKEND  = 'django.core.mail.backends.console.EmailBackend'
+    OPENID_RETURN  = 'http://localhost:8080/login/?openidreturn'
 
     DATABASES = {
         'default': {
