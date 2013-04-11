@@ -39,6 +39,8 @@ FuzzEd/models/node.py
 FuzzEd/models/notations.py
 FuzzEd/models/properties.py
 FuzzEd/models/user.py
+FuzzEd/models/xml_analysis.py
+FuzzEd/models/xml_fuzztree.py
 FuzzEd/templates/403.html
 FuzzEd/templates/404.html
 FuzzEd/templates/500.html
