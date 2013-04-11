@@ -56,6 +56,10 @@ class AnalysisResultContentHandler(xml.sax.ContentHandler):
                 elif k=='featureId':
                     # translate to client node ID
                     self.choiceAttributes[k]=int(Node.objects.get(pk=int(v)).client_id)
+                elif k=='included':
+                    self.choiceAttributes[k]=bool(v)
+                elif k=='n':
+                    self.choiceAttributes[k]=int(v)
                 else:
                     # its the type-specific value setting
                     self.choiceAttributes[k] = v

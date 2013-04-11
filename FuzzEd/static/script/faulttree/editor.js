@@ -389,8 +389,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 switch (choice['type']) {
                     case 'InclusionChoice':
                         // if this node is not included (optional) ignore it and its children
-                        //TODO: this should be of boolean type, not string
-                        if (choice['included'] == 'false') {
+                        if (!choice['included']) {
                             children = [];
                             nodes = [];
                             edges = [];
@@ -404,8 +403,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
                     case 'RedundancyChoice':
                         // do not highlight this node and its children if no child was chosen
-                        //TODO: this should be of number type, not string
-                        if (choice['n'] == '0') {
+                        if (choice['n'] == 0) {
                             nodes = [];
                             children = [];
                             edges = [];
