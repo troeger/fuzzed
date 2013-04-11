@@ -82,7 +82,7 @@ class Graph(models.Model):
         Returns:
             {string} The XML representation of the graph
         """
-        if self.kind != 'fuzztree':
+        if self.kind not in {'fuzztree', 'faulttree'}:
             raise ValueError('No XML support for this graph type.')
 
         #TODO: Add UI and model attribute for the decomposition number

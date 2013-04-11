@@ -155,7 +155,7 @@ class Node(models.Model):
                     properties['probability'] = TriangularFuzzyInterval(a=point - alpha, b1=point,
                                                                         b2=point, c=point + alpha)
 
-            elif isinstance(probability, long):
+            elif isinstance(probability, (long, int, float)):
                 properties['probability'] = CrispProbability(value_=probability)
 
             else:
