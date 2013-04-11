@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fta:AnalysisResult xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fta="net.fuzztree.analysis" modelId="20130403" validResult="true" decompositionNumber="1">
+  <configurations costs="20">
+    <choices key="110">
+      <value xsi:type="fta:InclusionChoice" included="true"/>
+    </choices>
+    <choices key="11">
+      <value xsi:type="fta:FeatureChoice" featureId="110"/>
+    </choices>
+    <choices key="10">
+      <value xsi:type="fta:FeatureChoice" featureId="11"/>
+    </choices>
+    <probability>
+      <alphaCuts key="0.0">
+        <value lowerBound="0.1" upperBound="0.1"/>
+      </alphaCuts>
+      <alphaCuts key="1.0">
+        <value lowerBound="0.1" upperBound="0.1"/>
+      </alphaCuts>
+    </probability>
+  </configurations>
+  <configurations costs="0">
+    <choices key="110">
+      <value xsi:type="fta:InclusionChoice" included="false"/>
+    </choices>
+    <choices key="11">
+      <value xsi:type="fta:FeatureChoice" featureId="110"/>
+    </choices>
+    <choices key="10">
+      <value xsi:type="fta:FeatureChoice" featureId="11"/>
+    </choices>
+    <probability>
+      <alphaCuts key="0.0">
+        <value lowerBound="0.0" upperBound="0.0"/>
+      </alphaCuts>
+      <alphaCuts key="1.0">
+        <value lowerBound="0.0" upperBound="0.0"/>
+      </alphaCuts>
+    </probability>
+  </configurations>
+  <configurations costs="5">
+    <choices key="11">
+      <value xsi:type="fta:FeatureChoice" featureId="111"/>
+    </choices>
+    <choices key="10">
+      <value xsi:type="fta:FeatureChoice" featureId="11"/>
+    </choices>
+    <probability>
+      <alphaCuts key="0.0">
+        <value lowerBound="0.2" upperBound="0.2"/>
+      </alphaCuts>
+      <alphaCuts key="1.0">
+        <value lowerBound="0.2" upperBound="0.2"/>
+      </alphaCuts>
+    </probability>
+  </configurations>
+  <configurations costs="2">
+    <choices key="12">
+      <value xsi:type="fta:RedundancyChoice" n="4"/>
+    </choices>
+    <choices key="10">
+      <value xsi:type="fta:FeatureChoice" featureId="12"/>
+    </choices>
+    <probability>
+      <alphaCuts key="0.0">
+        <value lowerBound="0.6875" upperBound="0.6875"/>
+      </alphaCuts>
+      <alphaCuts key="1.0">
+        <value lowerBound="0.6875" upperBound="0.6875"/>
+      </alphaCuts>
+    </probability>
+  </configurations>
+  <configurations costs="3">
+    <choices key="12">
+      <value xsi:type="fta:RedundancyChoice" n="5"/>
+    </choices>
+    <choices key="10">
+      <value xsi:type="fta:FeatureChoice" featureId="12"/>
+    </choices>
+    <probability>
+      <alphaCuts key="0.0">
+        <value lowerBound="0.5" upperBound="0.5"/>
+      </alphaCuts>
+      <alphaCuts key="1.0">
+        <value lowerBound="0.5" upperBound="0.5"/>
+      </alphaCuts>
+    </probability>
+  </configurations>
+</fta:AnalysisResult>

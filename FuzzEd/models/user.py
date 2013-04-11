@@ -10,7 +10,8 @@ class UserProfile(models.Model):
     
     Extends: models.Model
     
-    A user profile that enriches the standard django user with additional information, such as e.g. if he or she wants to receive newsletters.
+    A user profile that enriches the standard django user with additional information, such as e.g. if he or she wants
+    to receive newsletters.
     
     Fields:
      {User} - the wrapped django user

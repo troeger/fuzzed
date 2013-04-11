@@ -7,13 +7,16 @@ class Property(models.Model):
     """
     Class: Property
 
-    This class models generic properties (i.e. attributes) of the nodes of any diagram notation.They are basically key-values tuples that allow the dynamic addition or deletion of whole sets of new property names without having to alter the schema of nodes.
+    This class models generic properties (i.e. attributes) of the nodes of any diagram notation. They are basically
+    key-value tuple that allow the dynamic addition or deletion of whole sets of new property names without having to
+    alter the schema of nodes.
 
     Fields:
      {str}    key      - the name of the property
      {json}   value    - the value of the property
      {<Node>} node     - link to the node that owns the property
-     {bool}   deleted  - flag indicating whether this property is deleted or not. Simplifies the restoration of this property by just having to toggle this flag (default: False)
+     {bool}   deleted  - flag indicating whether this property is deleted or not. Simplifies the restoration of this
+                        property by just having to toggle this flag (default: False)
     """
     class Meta:
         app_label = 'FuzzEd'

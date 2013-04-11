@@ -6,7 +6,10 @@ function(Graph, FaulttreeNode, FaulttreeConfig, FaulttreeNotation) {
 
     /**
      *  Class: Graph
-     *    Faulttree-specific graph. Extends <Base::Graph>.
+     *
+     *  Faulttree-specific graph.
+     *
+     *  Extends <Base::Graph>.
      */
     return Graph.extend({
         /**

@@ -194,7 +194,7 @@ function(Class, Menus, Canvas, Backend) {
 
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
-                jQuery('#' + this.config.IDs.CANVAS).children('svg').toggle();
+                Canvas.toggleGrid();
             }.bind(this));
 
             return this;
@@ -246,8 +246,10 @@ function(Class, Menus, Canvas, Backend) {
          *    This editor instance for chaining.
          */
         _setupKeyBindings: function() {
-            jQuery(document).keydown(function(event) {
+            var selectedNodes = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
 
+            jQuery(document).keydown(function(event) {
                 if (event.which == jQuery.ui.keyCode.ESCAPE) {
                     event.preventDefault();
                     //XXX: deselect everything
@@ -259,14 +261,14 @@ function(Class, Menus, Canvas, Backend) {
                     event.preventDefault();
 
                     // delete selected nodes
-                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE).each(function(index, element) {
+                    jQuery(selectedNodes).each(function(index, element) {
                         this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
                     }.bind(this));
 
                     this.properties.hide();
 
                     // delete selected edges
-                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR).each(function(index, element) {
+                    jQuery(selectedEdges).each(function(index, element) {
                         var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
                         jsPlumb.detach(edge);
                         this.graph.deleteEdge(edge);
@@ -310,6 +312,11 @@ function(Class, Menus, Canvas, Backend) {
         /**
          *  Method: _setupEventCallbacks
          *    Registers all event listeners of the editor.
+         *
+         *  On:
+         *    <Config::Events::NODE_DRAG_STOPPED>
+         *    <Config::Events::GRAPH_NODE_ADDED>
+         *    <Config::Events::GRAPH_NODE_DELETED>
          *
          *  Returns:
          *    This Editor instance for chaining.

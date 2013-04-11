@@ -28,8 +28,8 @@ define(['canvas', 'class'], function(Canvas, Class) {
         edges:        {},
         nodes:        {},
         name:         undefined,
-        _nodeClasses: {},
 
+        _nodeClasses: {},
 
         /**
          *  Group: Initialization
@@ -89,6 +89,11 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *    This should be done _after_ the initial graph loading from the backend to avoid the creation
          *    of duplicate nodes/edges.
          *
+         *  On:
+         *    <Config::Events::CANVAS_SHAPE_DROPPED>
+         *    <Config::Events::CANVAS_EDGE_SELECTED>
+         *    <Config::Events::CANVAS_EDGE_UNSELECTED>
+         *
          *  Returns:
          *    This <Graph> instance for chaining.
          */
@@ -113,7 +118,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *  Group: Graph manipulation
          */
 
-        /*
+        /**
          *  Method: addEdge
          *    Adds a given edge to this graph. It will also assign a unique _fuzzedId to it and store it by this
          *    ID in the <edges> member.
@@ -152,7 +157,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
             return this;
         },
 
-        /*
+        /**
          *  Method: deleteEdge
          *    Deletes the given edges from the graph if present.
          *
@@ -179,7 +184,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
             return this;
         },
 
-        /*
+        /**
          *  Method: addNode
          *    Adds a given node to this graph.
          *
@@ -201,7 +206,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
             return node;
         },
 
-        /*
+        /**
          *  Method: deleteNode
          *    Deletes the given node from the graph if present.
          *
@@ -235,7 +240,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *  Group: Accessors
          */
 
-        /*
+        /**
          *  Method: nodeClassFor
          *    Returns the <Node> class for the given kind. If the class does not yet exist it is created from the
          *    notation definition. It is an error if the given node kind does not exist in the notation.
@@ -292,7 +297,18 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *
          */
         getNodes: function() {
-            return _.values(this._nodes);
+            return _.values(this.nodes);
+        },
+
+        /**
+         *  Method: getEdges
+         *
+         *  Returns:
+         *    An Array containing all <Edges> of the graph.
+         *
+         */
+        getEdges: function() {
+            return _.values(this.edges);
         },
 
         /**

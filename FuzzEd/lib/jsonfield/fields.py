@@ -1,14 +1,17 @@
 from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils import simplejson as json
 from django.utils.translation import ugettext_lazy as _
+try:
+    import json
+except:
+    import simplejson as json
 
 from django.forms.fields import Field
 from django.forms.util import ValidationError as FormValidationError
 
 # Tell South hwo to serialize this stuff
 from south.modelsinspector import add_introspection_rules
-add_introspection_rules([], ["^FuzzEd.lib.jsonfield\.fields\.(JSONField|JSONCharField)"])
+add_introspection_rules([], ['^FuzzEd.lib.jsonfield\.fields\.(JSONField|JSONCharField)'])
 
 class JSONFormField(Field):
     def clean(self, value):
@@ -22,12 +25,11 @@ class JSONFormField(Field):
             try:
                 json.loads(value)
             except ValueError:
-                raise FormValidationError(_("Enter valid JSON"))
+                raise FormValidationError(_('Enter valid JSON'))
         return value
 
 
 class JSONFieldBase(object):
-
     # Used so to_python() is called
     __metaclass__ = models.SubfieldBase
 
@@ -62,20 +64,18 @@ class JSONFieldBase(object):
 
     def formfield(self, **kwargs):
 
-        if "form_class" not in kwargs:
-            kwargs["form_class"] = JSONFormField
+        if 'form_class' not in kwargs:
+            kwargs['form_class'] = JSONFormField
 
         field = super(JSONFieldBase, self).formfield(**kwargs)
 
         if not field.help_text:
-            field.help_text = "Enter valid JSON"
+            field.help_text = 'Enter valid JSON'
 
         return field
 
-
 class JSONField(JSONFieldBase, models.TextField):
     """JSONField is a generic textfield that serializes/unserializes JSON objects"""
-
 
 class JSONCharField(JSONFieldBase, models.CharField):
     """JSONCharField is a generic textfield that serializes/unserializes JSON objects,

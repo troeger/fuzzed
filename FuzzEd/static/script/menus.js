@@ -1,5 +1,4 @@
-define(['config', 'class'],
-        function(Config, Class) {
+define(['config', 'class'], function(Config, Class) {
 
     /**
      * Class: Menu

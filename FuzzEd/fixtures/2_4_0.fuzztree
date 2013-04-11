@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ASCII"?>
+<ft:FuzzTree xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="de.hpi.dcl.fuzztree" xmlns:fta="de.hpi.dcl.fuzztree.analysis" id="-1" name="EWDC 2013" decompositionNumber="2">
+  <annotations xsi:type="fta:ConfigurationInstance" ancestorModelId="1337">
+    <configuration>
+      <choices key="5">
+        <value xsi:type="fta:OptionalElementChoice" elementConsidered="true"/>
+      </choices>
+      <choices key="6">
+        <value xsi:type="fta:RedundancyGateChoice" chosenNumber="4"/>
+      </choices>
+      <choices key="8">
+        <value xsi:type="fta:ChoiceEventChoice" chosenElementId="9"/>
+      </choices>
+    </configuration>
+  </annotations>
+  <topEvent id="1" name="Server Failure">
+    <children xsi:type="ft:Or" id="2">
+      <children xsi:type="ft:And" id="3">
+        <children xsi:type="ft:BasicEvent" id="4" name="Primary CPU Failure" optional="false">
+          <probability xsi:type="ft:TriangularFuzzyInterval" a="0.072" b1="0.08" b2="0.08" c="0.088"/>
+        </children>
+        <children xsi:type="ft:BasicEvent" id="5" name="Secondary CPU Failure" optional="true">
+          <probability xsi:type="ft:TriangularFuzzyInterval" a="0.072" b1="0.08" b2="0.08" c="0.088"/>
+        </children>
+      </children>
+      <children xsi:type="ft:VotingOr" id="-1" name="Power Failure" k="2">
+        <children xsi:type="ft:BasicEvent" id="-1" name="Power Unit Failure" optional="false">
+          <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.15" b2="0.15" c="0.2"/>
+        </children>
+        <children xsi:type="ft:BasicEvent" id="-1" name="Power Unit Failure" optional="false">
+          <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.15" b2="0.15" c="0.2"/>
+        </children>
+        <children xsi:type="ft:BasicEvent" id="-1" name="Power Unit Failure" optional="false">
+          <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.15" b2="0.15" c="0.2"/>
+        </children>
+        <children xsi:type="ft:BasicEvent" id="-1" name="Power Unit Failure" optional="false">
+          <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.15" b2="0.15" c="0.2"/>
+        </children>
+      </children>
+      <children xsi:type="ft:IntermediateEvent" id="9" name="RAID 0">
+        <children xsi:type="ft:Or" id="10">
+          <children xsi:type="ft:BasicEvent" id="-1" name="Disc Failure" optional="false">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.11" b1="0.12" b2="0.12" c="0.13"/>
+          </children>
+          <children xsi:type="ft:BasicEvent" id="-1" name="Disc Failure" optional="false">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.11" b1="0.12" b2="0.12" c="0.13"/>
+          </children>
+        </children>
+      </children>
+    </children>
+  </topEvent>
+</ft:FuzzTree>
