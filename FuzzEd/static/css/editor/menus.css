@@ -125,6 +125,16 @@
     margin-left: 18px;
 }
 
+#FuzzEdProperties div.progress {
+    width: 160px;
+    margin: 6px 0 0 0;
+}
+
+#FuzzEdProperties button.fuzzed-property-open {
+    display: block;
+    margin-top: 5px;
+}
+
 #FuzzEdCutsetsMenu {
     display: none;
     top: 20px;

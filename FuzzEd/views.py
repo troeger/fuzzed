@@ -6,29 +6,29 @@ from django.contrib.auth.models import User
 
 from django.core.mail import mail_managers
 
-from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
-from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, getOpenIDs
-
-from FuzzEd.models import Graph, Edge, notations, commands
+from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
+from FuzzEd.models import Graph, notations, commands
 
 GREETINGS = [
-    "Loading the FuzzEd User Experience",
-    "Trying to find your Data... it was here somewhere",
-    "Fiddeling with your Graph... Stand by!",
-    "Loading good Karma into your Browser",
-    "Calculating the Answer to Life...",
-    "Man, this takes like for ever to load...",
-    "Time to grab some Coffee!"
+    'Loading the FuzzEd User Experience',
+    'Trying to find your Data... it was here somewhere',
+    'Fiddeling with your Graph... Stand by!',
+    'Loading good Karma into your Browser',
+    'Calculating the Answer to Life...',
+    'Man, this takes like for ever to load...',
+    'Time to grab some Coffee!'
 ]
 
 def index(request):
     """
     Function: index
     
-    This is the view handler for loading the landing page of the editor. The index.html is rendered unless the user is already signed in and being redirected to his or her dashboard.
+    This is the view handler for loading the landing page of the editor. The index.html is rendered unless the user is
+    already signed in and being redirected to his or her dashboard.
     
     Parameters:
      {HttpRequest} request - a django request object
@@ -63,7 +63,9 @@ def dashboard(request):
     """
     Function: dashboard
     
-    This view handler renders the dashboard of the user. It lists all the graphs of the user that are not marked as deleted ordered descending by its creation date. Also, a user is able to create new graphs and edit or delete existing graphs from here.
+    This view handler renders the dashboard of the user. It lists all the graphs of the user that are not marked as
+    deleted ordered descending by its creation date. Also, a user is able to create new graphs and edit or delete
+    existing graphs from here.
     
     Parameters:
      {HttpRequest} request - a django request object
@@ -81,7 +83,8 @@ def dashboard_new(request):
     """
     Function: dashboard_new
     
-    This handler is responsible for rendering a dialog to the user to create a new diagram. It is also responsible for processing a save request of such a 'new diagram' request and forwards the user to the dashboard after doing so.
+    This handler is responsible for rendering a dialog to the user to create a new diagram. It is also responsible for
+    processing a save request of such a 'new diagram' request and forwards the user to the dashboard after doing so.
     
     Parameters:
      {HttpRequest} request - a django http request object
@@ -93,8 +96,7 @@ def dashboard_new(request):
 
     # save the graph
     if POST.get('save') and POST.get('kind') and POST.get('name'):
-        commands.AddGraph.create_from(kind=POST['kind'], name=POST['name'], \
-                                      owner=request.user).do()
+        commands.AddGraph.create_from(kind=POST['kind'], name=POST['name'], owner=request.user).do()
         return redirect('dashboard')
 
     # render the create diagram if fuzztree
@@ -114,7 +116,9 @@ def dashboard_edit(request, graph_id):
     """
     Function: dashboard_edit
     
-    This handler function is responsible for allowing the user to edit the properties of an already existing graph. Therefore the system renders a edit dialog to the user where changes can be made and saved or the graph can be deleted.
+    This handler function is responsible for allowing the user to edit the properties of an already existing graph.
+    Therefore the system renders a edit dialog to the user where changes can be made and saved or the graph can be
+    deleted.
     
     Parameters:
      {HttpResponse} request  - a django request object
@@ -140,35 +144,39 @@ def dashboard_edit(request, graph_id):
     # duplication requested
     if POST.get('duplicate'):
         # add new graph object
-        oldgraph=Graph.objects.get(pk=graph_id)
-        cmd = commands.AddGraph.create_from(kind=oldgraph.kind, 
-                                            name=oldgraph.name+" (copy)", 
-                                            owner=request.user,
-                                            add_default_nodes=False)
-        cmd.do()    
-        newgraph=cmd.graph
+        old_graph=Graph.objects.get(pk=graph_id)
+        duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
+                                                          owner=request.user,  add_default_nodes=False)
+        duplicate_command.do()
+        new_graph = duplicate_command.graph
+
         # copy all nodes and their properties
-        nodemapping={}
-        for node in oldgraph.nodes.all():
+        node_cache = {}
+
+        for node in old_graph.nodes.all():
             # first cache the old node's properties
-            props = node.properties.all()
+            properties = node.properties.all()
+
             # create node copy by overwriting the ID field
-            oldid=node.pk
-            node.pk=None
-            node.graph=newgraph
+            old_id = node.pk
+            node.pk = None
+            node.graph = new_graph
             node.save()
-            nodemapping[oldid]=node
-            # now save the propery objects for the new node
-            for prop in props:
-                prop.pk=None
-                prop.node=node
+            node_cache[old_id] = node
+
+            # now save the property objects for the new node
+            for prop in properties:
+                prop.pk = None
+                prop.node = node
                 prop.save()
-        for edge in oldgraph.edges.all():
-            edge.pk=None
-            edge.source=nodemapping[edge.source.pk]
-            edge.target=nodemapping[edge.target.pk]
-            edge.graph=newgraph
-            edge.save()    
+
+        for edge in old_graph.edges.all():
+            edge.pk = None
+            edge.source = node_cache[edge.source.pk]
+            edge.target = node_cache[edge.target.pk]
+            edge.graph = new_graph
+            edge.save()
+
         return redirect('dashboard')
 
     # please show the edit page to the user on get requests
@@ -187,7 +195,8 @@ def settings(request):
     """
     Function: settings
     
-    This view handler shows user its settings page. However, if the user is doing some changes to its profile and posts the changes to this handler, it will change the underlying user object and redirect afterwards to the dashboard.
+    This view handler shows user its settings page. However, if the user is doing some changes to its profile and posts
+    the changes to this handler, it will change the underlying user object and redirect afterwards to the dashboard.
     
     Parameters:
      {HttpRequest} request - a django request object
@@ -219,7 +228,8 @@ def editor(request, graph_id):
     """
     Function: editor
     
-    View handler for loading the editor. It just tries to locate the graph to be opened in the editor and passes it to its according view.
+    View handler for loading the editor. It just tries to locate the graph to be opened in the editor and passes it to
+    its according view.
     
     Parameters:
      {HttpRequest} request  - a django request object
@@ -246,7 +256,8 @@ def login(request):
     """
     Function: login
     
-    View handler for loging in a user using OpenID. If the user is not yet know to the system a new profile is created for him using his or her personal information as provided by the OpenID provider.
+    View handler for loging in a user using OpenID. If the user is not yet know to the system a new profile is created
+    for him using his or her personal information as provided by the OpenID provider.
     
     Parameters:
      {HttpRequest} request - a django request object
@@ -306,8 +317,7 @@ def login(request):
             # both, username and e-mail were not given, use a timestamp as username
             elif not user_name and not email:
                 now = datetime.datetime.now()
-                user_name = 'Anonymous %u%u%u%u' % (now.hour, now.minute,\
-                                                    now.second, now.microsecond)
+                user_name = 'Anonymous %d%d%d%d' % (now.hour, now.minute, now.second, now.microsecond)
                 new_user = User(username=user_name)
 
             # username and e-mail were given; great - register as is

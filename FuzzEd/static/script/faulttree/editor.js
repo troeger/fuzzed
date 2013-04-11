@@ -1,4 +1,5 @@
-define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery.ui/jquery.ui.resizable', 'slickgrid'],
+define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery.ui/jquery.ui.resizable',
+        'slickgrid'],
 function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
     /**
      *  Package: Faulttree
@@ -6,8 +7,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
     /**
      *  Class: CutsetsMenu
-     *    A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to
-     *    a cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
+     *    A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
+     *    cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
      *
      *  Extends: <Base::Menus::Menu>
      */
@@ -16,9 +17,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Members
          *
          *  Properties:
-         *    {Graph} _graph - <Base::Graph> instance for which the cutsets are calculated.
+         *    {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
          */
-        _graph: undefined,
+        _editor: undefined,
 
         /**
          *  Group: Initialization
@@ -29,11 +30,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Sets up the menu.
          *
          *  Parameters:
-         *    {Graph} graph - The <Base::Graph> instance for which the cutsets are calculated.
+         *    {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
          */
-        init: function(graph) {
+        init: function(editor) {
             this._super();
-            this._graph = graph;
+            this._editor = editor;
         },
 
         /**
@@ -61,7 +62,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             _.each(cutsets, function(cutset) {
                 var nodeIDs = cutset['nodes'];
                 var nodes = _.map(nodeIDs, function(id) {
-                    return this._graph.getNodeById(id);
+                    return this._editor.graph.getNodeById(id);
                 }.bind(this));
                 var nodeNames = _.map(nodes, function(node) {
                     return node.name;
@@ -74,15 +75,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 entry.hover(
                     // in
                     function() {
-                        var allNodes = this._graph.getNodes();
-                        _.invoke(allNodes, 'disable');
+                        var disable = _.difference(this._editor.graph.getNodes(), nodes);
+                        _.invoke(disable, 'disable');
                         _.invoke(nodes, 'highlight');
                     }.bind(this),
 
                     // out
                     function() {
-                        var allNodes = this._graph.getNodes();
-                        _.invoke(allNodes, 'enable');
+                        var enable = _.difference(this._editor.graph.getNodes(), nodes);
+                        _.invoke(enable, 'enable');
                         _.invoke(nodes, 'unhighlight');
                     }.bind(this)
                 );
@@ -287,7 +288,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             } else {
                 var chartData = {};
                 var tableData = [];
-                var configID = "";
+                var configID = '';
 
                 _.each(data['configurations'], function(config, index) {
                     //TODO: better naming?
@@ -683,7 +684,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         _displayNetworkError: function() {
             //TODO: This is a temporary solution. Should be replaced by error messages later.
-            this._chartContainer.text("Network error");
+            this._chartContainer.text('Network error');
         },
 
         /**
@@ -692,10 +693,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         _displayNotFoundError: function() {
             //TODO: This is a temporary solution. Should be replaced by error messages later.
-            this._chartContainer.text("Not found");
+            this._chartContainer.text('Not found');
         }
-
-
     });
 
     /**
@@ -710,8 +709,10 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Members
          *
          *  Properties:
-         *    {<CutsetsMenu>}     cutsetsMenu     - The <CutsetsMenu> instance used to display the calculated minimal cutsets.
-         *    {<ProbabilityMenu>} probabilityMenu - The <ProbabilityMenu> instance used to display the probability of the top event.
+         *    {<CutsetsMenu>}     cutsetsMenu     - The <CutsetsMenu> instance used to display the calculated minimal
+         *                                          cutsets.
+         *    {<ProbabilityMenu>} probabilityMenu - The <ProbabilityMenu> instance used to display the probability of
+         *                                          the top event.
          */
         cutsetsMenu: undefined,
         probabilityMenu: undefined,
@@ -730,7 +731,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         init: function(graphId) {
             this._super(graphId);
 
-            this.cutsetsMenu = new CutsetsMenu();
+            this.cutsetsMenu = new CutsetsMenu(this);
             this.probabilityMenu = new ProbabilityMenu(this);
 
             this._setupCutsetsActionEntry()
@@ -798,9 +799,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
         /**
          *  Method: _setupTobEventProbabilityActionEntry
-         *    Adds an entry to the actions navbar group for calculating the probability of the top event.
-         *    Clicking will issue an asynchronous backend call which returns a <Job> object that can be queried for
-         *    the final result. The job object will be used to initialize the probability menu.
+         *    Adds an entry to the actions navbar group for calculating the probability of the top event. Clicking will
+         *    issue an asynchronous backend call which returns a <Job> object that can be queried for the final result.
+         *    The job object will be used to initialize the probability menu.
          *
          *  Returns:
          *    This editor instance for chaining.
@@ -815,7 +816,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             // register for clicks on the corresponding nav action
             navbarActionsEntry.click(function() {
                 jQuery(document).trigger(
-                    this.config.Events.EDITOR_CALCULATE_TOPEVENT_PROBABILITY,
+                    this.config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY,
                     this.probabilityMenu.show.bind(this.probabilityMenu)
                     //TODO: display errors
                 );

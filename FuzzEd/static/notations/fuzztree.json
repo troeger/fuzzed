@@ -278,7 +278,7 @@
             "inherits": "variationPoint",
 
             "name": "Feature Variation",
-            "allowConnectionTo": ["event", "variationPoint"],
+            "allowConnectionTo": ["event", "variationPoint", "transferIn"],
             "image": "feature_variation.svg",
             "help": "Placeholder for one of the input events",
 
@@ -300,7 +300,7 @@
             "image": "redundancy_variation.svg",
             "help": "Placeholder for a voting OR gate over a chosen number of the input events",
 
-            "kFormula": "N-2",
+            "kFormula": "N-1",
             "nRange": [1, 2],
 
             "propertyMenuEntries": {
@@ -346,6 +346,45 @@
             "help": "An event that is expected to occur and typically does not denote a failure"
         },
 
+        "transferIn": {
+            "inherits": "node",
+            "name": "Transfer In",
+            "image": "transfer_in.svg",
+            "help": "Connects the output of a related FuzzTree, e.g. a subsystem, to this one",
+
+            "numberOfIncomingConnections": 1,
+            "numberOfOutgoingConnections": 0,
+
+            "transfer": -1,
+            "transferMaxCost": 1,
+
+            "propertyMenuEntries": {
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer"
+                },
+                "transferMaxCost": {
+                    "kind": "number",
+                    "displayName": "Max Cost",
+                    "min": 0,
+                    "step": 1
+                }
+            },
+
+            "propertyMirrors": {
+                "transfer": {
+                    "position": "bottom",
+                    "style": ["bold", "large"],
+                    "prefix": "◄ "
+                },
+                "transferMaxCost": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "max(c)="
+                }
+            }
+        },
+
         "topEvent": {
             "inherits": "event",
             "name": "Top Event",
@@ -384,7 +423,9 @@
         "k",
         "kFormula",
         "nRange",
-        "decompositions"
+        "decompositions",
+        "transfer",
+        "transferMaxCost"
     ],
 
     "shapeMenuNodeDisplayOrder": [
@@ -400,6 +441,7 @@
         "redundancyVariation",
         "houseEvent",
         "undevelopedEvent",
+        "transferIn",
         "topEvent"
     ],
 

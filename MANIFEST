@@ -4,7 +4,6 @@ setup.py
 FuzzEd/__init__.py
 FuzzEd/admin.py
 FuzzEd/api.py
-FuzzEd/backend.py
 FuzzEd/contextprocessors.py
 FuzzEd/decorators.py
 FuzzEd/middleware.py
@@ -60,7 +59,9 @@ FuzzEd/models/properties.py
 FuzzEd/models/properties.pyc
 FuzzEd/models/user.py
 FuzzEd/models/user.pyc
+FuzzEd/models/xml_analysis.py
 FuzzEd/models/xml_analysis.pyc
+FuzzEd/models/xml_fuzztree.py
 FuzzEd/models/xml_fuzztree.pyc
 FuzzEd/static-release/admin/css/base.css
 FuzzEd/static-release/admin/css/changelists.css
@@ -135,6 +136,8 @@ FuzzEd/static-release/admin/js/admin/RelatedObjectLookups.js
 FuzzEd/static-release/admin/js/admin/ordering.js
 FuzzEd/static-release/css/jquery.ui.custom.css
 FuzzEd/static-release/css/print.css
+FuzzEd/static-release/css/slick.grid.css
+FuzzEd/static-release/css/slick.grid.theme.css
 FuzzEd/static-release/css/util.css
 FuzzEd/static-release/css/editor/editor.css
 FuzzEd/static-release/css/editor/menus.css
@@ -175,6 +178,12 @@ FuzzEd/static-release/img/rbd/block.svg
 FuzzEd/static-release/img/rbd/end.svg
 FuzzEd/static-release/img/rbd/out_of.svg
 FuzzEd/static-release/img/rbd/start.svg
+FuzzEd/static-release/img/slickgrid/collapse.gif
+FuzzEd/static-release/img/slickgrid/expand.gif
+FuzzEd/static-release/img/slickgrid/header-columns-bg.gif
+FuzzEd/static-release/img/slickgrid/header-columns-over-bg.gif
+FuzzEd/static-release/img/slickgrid/sort-asc.gif
+FuzzEd/static-release/img/slickgrid/sort-desc.gif
 FuzzEd/static-release/lib/bignumber/LICENCE
 FuzzEd/static-release/lib/bignumber/README.md
 FuzzEd/static-release/lib/bignumber/bignumber.js
@@ -321,6 +330,10 @@ FuzzEd/static-release/lib/requirejs/require-jquery.js
 FuzzEd/static-release/lib/requirejs/require_build_profile.js
 FuzzEd/static-release/lib/requirejs/plugins/json.js
 FuzzEd/static-release/lib/requirejs/plugins/text.js
+FuzzEd/static-release/lib/slickgrid/jquery.event.drag-2.2.js
+FuzzEd/static-release/lib/slickgrid/slick.core.js
+FuzzEd/static-release/lib/slickgrid/slick.grid.js
+FuzzEd/static-release/lib/slickgrid/slick.rowselectionmodel.js
 FuzzEd/static-release/lib/underscore/underscore-1.4.3.js
 FuzzEd/static-release/lib/underscore/underscore-1.4.3.min.js
 FuzzEd/static-release/notations/faulttree.json

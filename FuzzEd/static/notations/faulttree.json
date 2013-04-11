@@ -199,6 +199,33 @@
             "help": "An event that is expected to occur and typically does not denote a failure"
         },
 
+        "transferIn": {
+            "inherits": "node",
+            "name": "Transfer In",
+            "image": "transfer_in.svg",
+            "help": "Connects the output of a related FaultTree, e.g. a subsystem, to this one",
+
+            "numberOfIncomingConnections": 1,
+            "numberOfOutgoingConnections": 0,
+
+            "transfer": -1,
+
+            "propertyMenuEntries": {
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer"
+                }
+            },
+
+            "propertyMirrors": {
+                "transfer": {
+                    "position": "bottom",
+                    "style": ["bold", "large"],
+                    "prefix": "◄ "
+                }
+            }
+        },
+
         "topEvent": {
             "inherits": "event",
             "name": "Top Event",
@@ -215,7 +242,8 @@
         "name",
         "probability",
         "cardinality",
-        "k"
+        "k",
+        "transfer"
     ],
 
     "shapeMenuNodeDisplayOrder": [
@@ -229,6 +257,7 @@
         "votingOrGate",
         "undevelopedEvent",
         "houseEvent",
+        "transferIn",
         "topEvent"
     ],
 

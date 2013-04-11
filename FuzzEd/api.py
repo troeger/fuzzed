@@ -3,6 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import reverse
 
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from django.views.decorators.csrf import csrf_exempt
@@ -11,83 +12,18 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 # NOTE: it is important to use our custom exceptions!
 # 
 # REASON: django.http responses are regular returns, transaction.commit_on_success will therefore  
-# REASON: always commit changes even if we return errornous responses (400, 404, ...). We can
+# REASON: always commit changes even if we return erroneous responses (400, 404, ...). We can
 # REASON: bypass this behaviour by throwing exception that send correct HTTP status to the user 
 # REASON: but abort the transaction. The custom exceptions can be found in middleware.py
 
 from FuzzEd.decorators import require_ajax
-from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
+from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, \
+                              HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands, Job
-from FuzzEd import backend, settings
-from analysis import calcserver
+from analysis import cutsets, top_event_probability
 
-import logging, json, urllib, urllib2
+import logging, json
 logger = logging.getLogger('FuzzEd')
-
-try:
-    import json
-# backwards compatibility with older python versions
-except ImportError:
-    import simplejson as json
-
-@login_required
-@csrf_exempt
-#@require_ajax
-@require_http_methods(['GET'])
-def calc_topevent(request, graph_id):
-    """
-    Function: calc_topevent
-    
-    This API handler is responsible for starting an analysis run in the analysis engine.
-    It is intended to return immediately with job information for the frontend.
-    If the analysis engine cannot start the job (most likely due to broken XML data generated here),
-    the view returns HttpResponseServerErrorAnswer to the front-end.
-    """
-    g = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    try:
-        postdata=g.to_xml()
-        logger.debug("Sending XML to calcserver:\n"+postdata)
-        jobid, num_configurations, num_nodes = calcserver.createJob(postdata,10)
-        # store job information for this graph
-        j = Job(name=jobid, configurations=num_configurations, nodes=num_nodes, graph=g, kind=Job.TOPEVENT_JOB)
-        j.save()
-        # return URL for job status information
-        logger.debug("Got new job '%s' with ID %u for graph %u"%(j.name, j.pk, g.pk))
-        response = HttpResponse(status=201) 
-        response['Location'] = reverse('jobstatus', args=[j.pk])
-        return response
-    except calcserver.InternalError as e:
-        logger.error("Exception while using calcserver: "+str(e))
-        #TODO: Perform some smarter error handling here
-        raise HttpResponseServerErrorAnswer()        
-
-@login_required
-@csrf_exempt
-#@require_ajax
-@require_http_methods(['GET'])
-def jobstatus(request, job_id):
-    try:
-        j = Job.objects.get(pk=job_id)
-        # Prevent cross-checking of jobs by different users
-        assert(j.graph.owner == request.user)
-    except:
-        # Inform the frontend that the job no longer exists
-        # TODO: Add reason for cancellation to body as plain text 
-        raise HttpResponseNotFoundAnswer()
-    # query status from analysis engine, based on job type
-    if j.kind == Job.TOPEVENT_JOB:
-        try:
-            result = calcserver.getJobResult(j.name)
-            if result == None:
-                return HttpResponse(status=202)
-            else:
-                logger.debug("Analysis result:\n"+result)
-                return HttpResponse(result)
-        except Exception as e:
-            # Analysis engine does not know this job, or something else went wrong
-            # for the frontend, this is basically an unspecified backend error
-            logger.error("Error while fetch calc server job status: "+str(e))
-            raise HttpResponseServerErrorAnswer()
 
 @login_required
 @csrf_exempt
@@ -98,7 +34,9 @@ def graphs(request):
     """
     Function: graphs
     
-    This API handler is responsible for all graphes of the user. It operates in two modes: receiving a GET request will return a JSON encoded list of all the graphs of the user. A POST request instead, will create a new graph (requires the below stated parameters) and returns its ID and URI.
+    This API handler is responsible for all graphes of the user. It operates in two modes: receiving a GET request will
+    return a JSON encoded list of all the graphs of the user. A POST request instead, will create a new graph (requires
+    the below stated parameters) and returns its ID and URI.
     
     Request:            GET - /api/graphs
     Request Parameters: None
@@ -142,9 +80,6 @@ def graphs(request):
     except (ValueError, KeyError):
         raise HttpResponseBadRequestAnswer()
 
-    # Should not be reachable, just for error tracing reasons here
-    raise HttpResponseServerErrorAnswer()
-
 @login_required
 @csrf_exempt
 @require_ajax
@@ -153,7 +88,8 @@ def graph(request, graph_id):
     """
     Function: graph
     
-    The function provides the JSON serialized version of the graph with the provided id given that the graph is owned by the requesting user and it is not marked as deleted.
+    The function provides the JSON serialized version of the graph with the provided id given that the graph is owned
+    by the requesting user and it is not marked as deleted.
     
     Request:            GET - /api/graphs/<GRAPH_ID>
     Request Parameters: None
@@ -173,12 +109,12 @@ def graph(request, graph_id):
 @login_required
 @csrf_exempt
 @require_GET
-def download(request, graph_id):
+def graph_download(request, graph_id):
     """
-    Function: download
+    Function: graph_download
         Downloads the graph represented in the specified format
 
-    Request:            GET - /api/graphs/<GRAPH_ID>/download
+    Request:            GET - /api/graphs/<GRAPH_ID>/graph_download
     Request Parameters: [optional] format - Specifies the download format. Default is 'xml'.
     Response:           TODO
 
@@ -190,22 +126,52 @@ def download(request, graph_id):
      {HTTPResponse} a django response object
     """
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    format = request.GET.get('format', 'xml')
+    export_format = request.GET.get('format', 'xml')
 
     response = HttpResponse()
 
-    if format == 'xml':
+    if export_format == 'xml':
         response.content = graph.to_xml()
         response['Content-Type'] = 'application/xml'
-    elif format == 'json':
+
+    elif export_format == 'json':
         response.content = graph.to_json()
         response['Content-Type'] = 'application/javascript'
+
     else:
         raise HttpResponseNotFoundAnswer()
 
-    response['Content-Disposition'] = 'attachment; filename=' + graph.name + '.' + format
+    response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
 
     return response
+
+@login_required
+@csrf_exempt
+@require_ajax
+@require_GET
+def graph_transfers(request, graph_id):
+    """
+    Function: graph_transfers
+
+    Request:            GET - /api/graphs/<GRAPH_ID>/transfers
+    Request Parameters: graph_id = <INT>
+    Response:           200 - <TRANSFERS_AS_JSON>
+
+    Parameters:
+     {HTTPRequest} request  - the django request object
+     {int}         graph_id - the id of the graph to get the transfers for
+
+    Returns:
+     {HTTPResponse} a django response object
+    """
+    transfers = []
+    graph     = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+
+    if graph.kind in ['faulttree', 'fuzztree']:
+        for transfer in Graph.objects.filter(~Q(pk=graph_id), owner=request.user, kind=graph.kind, deleted=False):
+            transfers.append({'id': transfer.pk, 'name': transfer.name})
+
+    return HttpResponse(json.dumps({'transfers': transfers}), 'application/javascript', status=200)
 
 @login_required
 @csrf_exempt
@@ -216,7 +182,10 @@ def nodes(request, graph_id):
     """
     Function: nodes
     
-    This function creates a new node in the graph with the provided it. In order to be able to create the node four data items about the node are needed: its kind, its position (x and y coordinate) and an id as assigned by the client (calculated by the client to prevent waiting for round-trip). The response contains the JSON serialized representation of the newly created node and its new location URI.
+    This function creates a new node in the graph with the provided it. In order to be able to create the node four data
+    items about the node are needed: its kind, its position (x and y coordinate) and an id as assigned by the client
+    (calculated by the client to prevent waiting for round-trip). The response contains the JSON serialized
+    representation of the newly created node and its new location URI.
     
     Request:            POST - /api/graphs/<GRAPH_ID>/nodes
     Request Parameters: client_id = <INT>, kind = <NODE_TYPE>, x = <INT>, y = <INT>
@@ -235,8 +204,8 @@ def nodes(request, graph_id):
         kind = POST['kind']
         assert(kind in notations.by_kind[graph.kind]['nodes'])
 
-        command = commands.AddNode.create_from(graph_id=graph_id, node_id=POST['id'], \
-                                             kind=kind, x=POST['x'], y=POST['y'])
+        command = commands.AddNode.create_from(graph_id=graph_id, node_id=POST['id'],
+                                               kind=kind, x=POST['x'], y=POST['y'])
         command.do()
         node = command.node
 
@@ -286,12 +255,13 @@ def node(request, graph_id, node_id):
     try:
         node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id, deleted=False)
         if request.method == 'POST':
-            # Interpret all parameters as json-formatted. This will also correctly parse
-            # numerical values like 'x' and 'y'.
+            # Interpret all parameters as json. This will ensure correct parsing of numerical values like e.g. ids
             parameters = json.loads(request.POST.get('properties', {}))
-            logger.debug("Changing node %s in graph %s to %s"%(str(node_id),str(graph_id),parameters))
+
+            logger.debug('Changing node %s in graph %s to %s' % (node_id, graph_id, parameters))
             command = commands.ChangeNode.create_from(graph_id, node_id, parameters)
             command.do()
+
             # return the updated node object
             return HttpResponse(node.to_json(), 'application/javascript', status=204)
 
@@ -299,8 +269,9 @@ def node(request, graph_id, node_id):
             command = commands.DeleteNode.create_from(graph_id, node_id)
             command.do()
             return HttpResponse(status=204)
-    except Exception, e:
-        logger.error("Exception: "+str(e))
+
+    except Exception as exception:
+        logger.error('Exception: ' + str(exception))
 
 
 @login_required
@@ -312,7 +283,10 @@ def edges(request, graph_id):
     """
     Function: edges
     
-    This API handler creates a new edge in the graph with the given id. The edge links the two nodes 'source' and 'destination' with each other that are provided in the POST body. Additionally, a request to this URL MUST provide an id for this edge that was assigned by the client (no wait for round-trip). The response contains the JSON serialized representation of the new edge and it location URI.
+    This API handler creates a new edge in the graph with the given id. The edge links the two nodes 'source' and
+    'destination' with each other that are provided in the POST body. Additionally, a request to this URL MUST provide
+    an id for this edge that was assigned by the client (no wait for round-trip). The response contains the JSON
+    serialized representation of the new edge and it location URI.
     
     Request:            POST - /api/graphs/<GRAPH_ID>/edges
     Request Parameters: client_id = <INT>, source = <INT>, destination = <INT>
@@ -327,7 +301,7 @@ def edges(request, graph_id):
     """
     POST = request.POST
     try:
-        command = commands.AddEdge.create_from(graph_id=graph_id, client_id=POST['id'], \
+        command = commands.AddEdge.create_from(graph_id=graph_id, client_id=POST['id'],
                                                from_id=POST['source'], to_id=POST['destination'])
         command.do()
 
@@ -358,7 +332,9 @@ def edge(request, graph_id, edge_id):
     """
     Function: edge
     
-    This API handler deletes the edge from the graph using the both provided ids. The id of the edge hereby referes to the previously assigned client side id and NOT the database id. The response to this request does not contain any body.
+    This API handler deletes the edge from the graph using the both provided ids. The id of the edge hereby refers to
+    the previously assigned client side id and NOT the database id. The response to this request does not contain any
+    body.
     
     Request:            DELETE - /api/graphs/<GRAPH_ID>/edge/<EDGE_ID>
     Request Parameters: None
@@ -396,7 +372,7 @@ def property(**kwargs):
 @login_required
 @csrf_exempt
 @require_ajax
-@require_http_methods(["GET", "POST"])
+@require_http_methods(['GET', 'POST'])
 @transaction.commit_on_success
 def undos(request, graph_id):
     #
@@ -423,7 +399,7 @@ def undos(request, graph_id):
 @login_required
 @csrf_exempt
 @require_ajax
-@require_http_methods(["GET", "POST"])
+@require_http_methods(['GET', 'POST'])
 @transaction.commit_on_success
 def redos(request, graph_id):
     #
@@ -451,21 +427,92 @@ def redos(request, graph_id):
 @require_ajax
 @require_GET
 @transaction.commit_on_success
-def cutsets(request, graph_id):
+def analyze_cutsets(request, graph_id):
     """
     The function provides all cut sets of the given graph.
-    It currently performs the computation (of unknown duration) synchronousely,
+    It currently performs the computation (of unknown duration) synchronously,
     so the client is expected to perform an asynchronous REST call on its own
 
     API Request:  GET /api/graphs/[graphID]/cutsets, no body
     API Response: JSON body with list of dicts, one dict per cut set, 'nodes' key has list of client_id's value
     """
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    #tree='(b or c or a) and (c or a and b) and (d) or (e)'
     # minbool is NP-complete, so more than 10 basic events are not feasible for computation
-    nodecount = graph.nodes.all().filter(kind__exact="basicEvent", deleted__exact=False).count()
-    if nodecount >= 10:
+    node_count = graph.nodes.all().filter(kind__exact='basicEvent', deleted__exact=False).count()
+
+    if node_count >= 10:
         raise HttpResponseServerErrorAnswer()
-    result=backend.getcutsets(graph.to_bool_term())
+
+    result = cutsets.get(graph.to_bool_term())
     #TODO: check the command stack if meanwhile the graph was modified
     return HttpResponse(json.dumps(result), 'application/javascript')
+
+@login_required
+@csrf_exempt
+@require_http_methods(['GET'])
+def analyze_top_event_probability(request, graph_id):
+    """
+    Function: analyze_top_event_probability
+
+    This API handler is responsible for starting an analysis run in the analysis engine.
+    It is intended to return immediately with job information for the frontend.
+    If the analysis engine cannot start the job (most likely due to broken XML data generated here),
+    the view returns HttpResponseServerErrorAnswer to the front-end.
+    """
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+
+    try:
+        post_data = graph.to_xml()
+        logger.debug('Sending XML to analysis server:\n' + post_data)
+        job_id, configuration_count, node_count = top_event_probability.create_job(post_data,10)
+
+        # store job information for this graph
+        job = Job(name=job_id, configurations=configuration_count,
+                  nodes=node_count, graph=graph, kind=Job.TOP_EVENT_JOB)
+        job.save()
+
+        # return URL for job status information
+        logger.debug('Got new job \'%s\' with ID %d for graph %d' % (job.name, job.pk, graph.pk))
+        response = HttpResponse(status=201)
+        response['Location'] = reverse('job_status', args=[job.pk])
+
+        return response
+
+    except top_event_probability.InternalError as exception:
+        logger.error('Exception while using analysis server: %s' % exception)
+        #TODO: Perform some smarter error handling here
+        raise HttpResponseServerErrorAnswer()
+
+@login_required
+@csrf_exempt
+@require_http_methods(['GET'])
+def job_status(request, job_id):
+    try:
+        job = Job.objects.get(pk=job_id)
+        # Prevent cross-checking of jobs by different users
+        assert(job.graph.owner == request.user)
+
+    except:
+        # Inform the frontend that the job no longer exists
+        # TODO: Add reason for cancellation to body as plain text
+        raise HttpResponseNotFoundAnswer()
+
+    if job.kind != Job.TOP_EVENT_JOB:
+        raise HttpResponseBadRequestAnswer()
+
+    # query status from analysis engine, based on job type
+    try:
+        result = top_event_probability.get_job_result(job.name)
+
+        if result is None:
+            return HttpResponse(status=202)
+
+        else:
+            logger.debug('Analysis result:\n%s' % result)
+            return HttpResponse(result)
+
+    except Exception as exception:
+        # Analysis engine does not know this job, or something else went wrong
+        # for the frontend, this is basically an unspecified backend error
+        logger.error('Error while fetching analysis server job status: %s' % exception)
+        raise HttpResponseServerErrorAnswer()

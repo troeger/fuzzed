@@ -10,17 +10,17 @@ ADMINS = (
     ('Peter Troeger', 'peter.troeger@hpi.uni-potsdam.de'),
 )
 MANAGERS = ADMINS
-EMAIL_SUBJECT_PREFIX = '[FuzzTrees] '
+EMAIL_SUBJECT_PREFIX = '[FuzzEd] '
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 if is_production:
-    DEBUG =                   True
-    TEMPLATE_DEBUG =          DEBUG
+    DEBUG                   = True
+    TEMPLATE_DEBUG          = DEBUG
     SEND_BROKEN_LINK_EMAILS = False     
-    EMAIL_BACKEND =           'django.core.mail.backends.smtp.EmailBackend'
-    SERVER_EMAIL =            'noreply@citemaster.net'
-    EMAIL_HOST =              'localhost'
+    EMAIL_BACKEND           = 'django.core.mail.backends.smtp.EmailBackend'
+    SERVER_EMAIL            = 'noreply@citemaster.net'
+    EMAIL_HOST              = 'localhost'
 
     DATABASES = {
         'default': {
@@ -42,9 +42,9 @@ if is_production:
     )
 
 else:
-    DEBUG =          True
+    DEBUG          = True
     TEMPLATE_DEBUG = True
-    EMAIL_BACKEND =  'django.core.mail.backends.console.EmailBackend'    
+    EMAIL_BACKEND  = 'django.core.mail.backends.console.EmailBackend'
 
     DATABASES = {
         'default': {
@@ -236,5 +236,4 @@ AUTHENTICATION_BACKENDS = (
 )
 
 AUTH_PROFILE_MODULE = 'FuzzEd.UserProfile'
-
-CALC_TOPEVENT_SERVER = "http://localhost:8080"
+ANALYZE_TOP_EVENT_PROBABILITY_SERVER = 'http://localhost:8080'

@@ -4,7 +4,6 @@ from FuzzEd.lib.jsonfield import JSONField
 from edge import Edge
 from graph import Graph
 from node import Node
-from properties import Property
 
 import notations
 
@@ -12,7 +11,8 @@ class Command(models.Model):
     """
     Class [abstract]: Command
 
-    Abstract base class for any command in the system. Required for type correctness and contains meta data needed in every subtype.
+    Abstract base class for any command in the system. Required for type correctness and contains meta data needed in
+    every subtype.
 
     Fields:
      {bool}           undoable     - indicates if command can be undone (default: False)
@@ -65,7 +65,8 @@ class AddEdge(Command):
         """
         Method [static]: create_from
 
-        Convience factory method for issueing an add edge command from parameters as received from API calls. NOTE: the edge object that is required for this command is created and saved when invoking this method.
+        Convenience factory method for issuing an add edge command from parameters as received from API calls.
+        NOTE: the edge object that is required for this command is created and saved when invoking this method.
 
         Parameters:
          {str} graph_id  - the id of the graph that will contain this edge
@@ -88,7 +89,8 @@ class AddEdge(Command):
         """
         Method: do
 
-        Adds the edge to the graph by removing the deleted flag from the instance. As the edge is by default marked as not deleted the invokation of this method is only mandatory when redoing this command.
+        Adds the edge to the graph by removing the deleted flag from the instance. As the edge is by default marked as
+        not deleted the invocation of this method is only mandatory when redoing this command.
 
         Returns:
          {None}
@@ -128,7 +130,8 @@ class AddGraph(Command):
         """
         Method [static]: create_from
         
-        Convenience factory method for issuing an add graph command from parameters as received from API calls. NOTE: the graph object that is required for this command is created and saved when invoking this method.
+        Convenience factory method for issuing an add graph command from parameters as received from API calls.
+        NOTE: the graph object that is required for this command is created and saved when invoking this method.
         
         Parameters:
          {str}  kind     - type identifier for the graph's notation
@@ -141,7 +144,7 @@ class AddGraph(Command):
         graph = Graph(kind=kind, name=name, owner=owner, deleted=True)
         graph.save()
         if add_default_nodes:
-            # preinitialize the graph with default nodes
+            # pre-initialize the graph with default nodes
             notation = notations.by_kind[kind]
             if 'defaults' in notation:
                 for index, node in enumerate(notation['defaults']['nodes']):
@@ -180,7 +183,8 @@ class AddNode(Command):
         """
         Method [static]: create_from
 
-        Convenience factory method for issuing an add node command from parameters as received from API calls. NOTE: the node object that is required for this command is created and saved when invoking this method.
+        Convenience factory method for issuing an add node command from parameters as received from API calls.
+        NOTE: the node object that is required for this command is created and saved when invoking this method.
 
         Arguments:
          {str} graph_id  - the id of the graph the node is added to
@@ -202,7 +206,8 @@ class AddNode(Command):
         """
         Method: do
         
-        Adds the node to the graph by removing the deleted flag from the instance. As the node is by default marked as not deleted the invokation of this method is only mandatory when redoing this command.
+        Adds the node to the graph by removing the deleted flag from the instance. As the node is by default marked as
+        not deleted the invocation of this method is only mandatory when redoing this command.
         
         Returns:
          {None}
@@ -239,11 +244,12 @@ class ChangeNode(Command):
         """
         Method [static]: create_from
         
-        Convience factory method for issueing a property changed command from parameters as received from API calls. NOTE: if the property does not yet exist it being created and saved.
+        Convenience factory method for issuing a property changed command from parameters as received from API calls.
+        NOTE: if the property does not yet exist it being created and saved.
 
         Parameters:
-         {str} graph_id   - the id of the graph that contains the node thats property changed
-         {str] node_id    - the client id(!) of the node thats property changed
+         {str} graph_id   - the id of the graph that contains the node's property changed
+         {str] node_id    - the client id(!) of the node's property changed
          {str} key        - the name of the property that changed
          {str} new_value  - the value the property has been changed to
 
@@ -262,8 +268,7 @@ class ChangeNode(Command):
             except ValueError:
                 pass
 
-            property_change = PropertyChange(command=command, key=key, \
-                                             old_value=old_value, new_value=value)
+            property_change = PropertyChange(command=command, key=key, old_value=old_value, new_value=value)
             property_change.save()
 
         return command
@@ -335,7 +340,7 @@ class DeleteEdge(Command):
         """
         Method [static]: create_from
         
-        Convience factory method for issueing a delete node command from parameters as received from API calls. 
+        Convenience factory method for issuing a delete node command from parameters as received from API calls.
 
         Arguments:
          {str} graph_id  - the id of the graph that contains the edge to be deleted
@@ -390,7 +395,7 @@ class DeleteGraph(Command):
         """
         Method [static]: create_from
         
-        Convience factory method for issueing a delete graph command from parameters as received from API calls.
+        Convenience factory method for issuing a delete graph command from parameters as received from API calls.
 
         Parameters:
          {str} graph_id  - the id of the graph to be deleted
@@ -443,7 +448,7 @@ class DeleteNode(Command):
         """
         Method [static]: create_from
         
-        Convience factory method for issueing an add node command from parameters as received from API calls.
+        Convenience factory method for issuing an add node command from parameters as received from API calls.
 
         Parameters:
          {str} graph_id  - the id of the graph that contains the node to be deleted
@@ -499,7 +504,7 @@ class RenameGraph(Command):
         """
         Method [static]: create_from
         
-        Convience factory method for issueing an add node command from parameters as received from API calls.
+        Convenience factory method for issuing an add node command from parameters as received from API calls.
 
         Parameters:
          {str} graph_id  - the id of the graph to be renamed
