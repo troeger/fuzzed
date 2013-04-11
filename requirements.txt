@@ -4,3 +4,5 @@ openid2rp
 django-require
 minbool
 pyxb
+psycopg2
+
