@@ -28,14 +28,10 @@ define(['faulttree/config'], function(FaulttreeConfig) {
          *    Configuration of node (visual) properties.
          *
          *  Constants:
-         *    {String} OPTIONAL_INDICATOR_FILL   - Fill color of optional indicators.
-         *    {Number} OPTIONAL_INDICATOR_RADIUS - Circle radius of optional indicators.
-         *    {Number} OPTIONAL_INDICATOR_STROKE - Stroke width of optional indicators.
+         *    {String} OPTIONAL_STROKE-STYLE - SVG dash-array value that optional nodes receive
          */
         Node: {
-            OPTIONAL_INDICATOR_FILL:   '#FFF',
-            OPTIONAL_INDICATOR_RADIUS: Math.round(FaulttreeConfig.Grid.SIZE / 10),
-            OPTIONAL_INDICATOR_STROKE: 2
+            OPTIONAL_STROKE_STYLE: '4.8 2' // svg dash-array value
         }
     });
 });

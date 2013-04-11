@@ -33,6 +33,8 @@ function(Properties, Mirror, Canvas, Class) {
          *    {bool}       _highlighted        - Boolean flag that is true when the node needs to be highlighted on hover.
          *    {bool}       _selected           - Boolean flag that is true when the node is selected - i.e. clicked.
          *    {DOMElement} _nodeImage          - DOM element that contains the actual image/svg of the node.
+         *    {DOMElement} _badge              - DOM element that contains the badge that can be used to display additional
+         *                                       information on a node.
          *    {DOMElement} _nodeImageContainer - A wrapper for the node image which is necessary to get position
          *                                       calculation working in Firefox.
          *    {DOMElement} _connectionHandle   - DOM element containing the visual representation of the handle where one
@@ -48,6 +50,7 @@ function(Properties, Mirror, Canvas, Class) {
         _highlighted:        false,
         _selected:           false,
         _nodeImage:          undefined,
+        _badge:              undefined,
         _nodeImageContainer: undefined,
         _connectionHandle:   undefined,
 
@@ -128,8 +131,16 @@ function(Properties, Mirror, Canvas, Class) {
                 // add new classes for the actual node
                 .addClass(this.config.Classes.NODE_IMAGE);
 
+            // links to primitive shapes and groups of the SVG for later manipulation (highlighting, ...)
+            this._nodeImage.primitives = this._nodeImage.find('rect, circle, path');
+            this._nodeImage.groups     = this._nodeImage.find('g');
+
+            this._badge = jQuery('<span class="badge"></span>')
+                .hide();
+
             this._nodeImageContainer = jQuery('<div>')
-                .append(this._nodeImage);
+                .append(this._nodeImage)
+                .append(this._badge);
 
             this.container = jQuery('<div>')
                 .attr('id', this.kind + this.id)
@@ -156,10 +167,6 @@ function(Properties, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         _setupNodeImage: function() {
-            // links to primitive shapes and groups of the SVG for later manipulation (highlighting, ...)
-            this._nodeImage.primitives = this._nodeImage.find('rect, circle, path');
-            this._nodeImage.groups     = this._nodeImage.find('g');
-
             // calculate the scale factor
             var marginOffset = this._nodeImage.outerWidth(true) - this._nodeImage.width();
             var scaleFactor  = (Canvas.gridSize - marginOffset) / this._nodeImage.height();
@@ -618,6 +625,10 @@ function(Properties, Mirror, Canvas, Class) {
         },
 
         /**
+         * Group: Accessors
+         */
+
+        /**
          * Method: getConfig
          *
          * This method is abstract. All non abstract subclasses MUST override this method. It is an error to call this
@@ -644,6 +655,20 @@ function(Properties, Mirror, Canvas, Class) {
          */
         getConfig: function() {
             throw '[ABSTRACT] Subclass Responsibility';
+        },
+
+        /**
+         * Method: getChildren
+         *
+         * Returns:
+         *   All direct children of this node.
+         */
+        getChildren: function() {
+            var children = [];
+            _.each(this.outgoingEdges, function(edge) {
+                children.push(edge.target.data(this.config.Keys.NODE));
+            }.bind(this));
+            return children;
         },
 
         /**
@@ -827,6 +852,45 @@ function(Properties, Mirror, Canvas, Class) {
             if (this._selected || this._disabled) return this;
 
             return this._visualReset();
+        },
+
+        /**
+         * Method: showBadge
+         *   Display a badge on the node.
+         *
+         * Parameters:
+         *   {String} text  - The text that should be displayed in the badge.
+         *   {String} style - [optional] The style (color) of the badge.
+         *                    See http://twitter.github.io/bootstrap/components.html#labels-badges.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        showBadge: function(text, style) {
+            this._badge
+                .text(text)
+                .addClass('badge')
+                .show();
+            if (typeof style !== 'undefined')
+                this._badge.addClass('badge-' + style);
+
+            return this;
+        },
+
+        /**
+         * Method: hideBadge
+         *   Hides the badge displayed on the node.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        hideBadge: function() {
+            this._badge
+                .text('')
+                .removeClass()
+                .hide();
+
+            return this;
         },
 
         /**

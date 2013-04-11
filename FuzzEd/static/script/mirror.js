@@ -83,7 +83,7 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
          *   This {Mirror} instance for chaining.
          */
         show: function(text) {
-            if (!text) {
+            if (typeof text === 'undefined' || text === null) {
                 this.container.css('display', 'none');
             } else {
                 // remove 'display: none' from element to show it again

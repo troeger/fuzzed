@@ -1,32 +1,28 @@
 from django.contrib.auth.models import User
-
-from django.core.exceptions import ObjectDoesNotExist
-
 from django.db import models
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
-try:
-    import json
-# backwards compatibility with older versions of Python
-except ImportError:
-    import simplejson as json
-import sys
+import pyxb.utils.domutils
+from xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlNamespace
 
-import notations
+import json, notations
 
 class Graph(models.Model):
     """
     Class: Graph
 
-    This class models a generic graph that is suitable for any diagram notation. It basically serves a container for its contained nodes and edges. Additionally, it provides functionality for serializing it.
+    This class models a generic graph that is suitable for any diagram notation. It basically serves a container for
+    its contained nodes and edges. Additionally, it provides functionality for serializing it.
 
     Fields:
-     {str}            kind     - unique identifier that indicates the graph's notation (e.g. fuzztree). Must be an element of the set of available notations (See also: <notations>)
+     {str}            kind     - unique identifier that indicates the graph's notation (e.g. fuzztree). Must be an
+                                 element of the set of available notations (See also: <notations>)
      {str}            name     - the name of the graph
      {User}           owner    - a link to the owner of the graph
      {const datetime} created  - timestamp of the moment of graph creation (default: now)
-     {bool}           deleted  - flag indicating whether this graph was deleted or not. Simplifies restoration of the graph if needed by toggling this member (default: False)
+     {bool}           deleted  - flag indicating whether this graph was deleted or not. Simplifies restoration of the
+                                 graph if needed by toggling this member (default: False)
     """
     class Meta:
         app_label = 'FuzzEd'
@@ -55,7 +51,8 @@ class Graph(models.Model):
         """
         Method: to_dict
         
-        Encodes the whole graph as dictionary having five top level items: its id, name, type and two lists containing all edges and nodes in the graph
+        Encodes the whole graph as dictionary having five top level items: its id, name, type and two lists containing
+        all edges and nodes in the graph
         
         Returns:
          {dict} the graph as dictionary
@@ -76,6 +73,27 @@ class Graph(models.Model):
     def to_bool_term(self):
         root = self.nodes.get(kind__exact = 'topEvent')
         return root.to_bool_term()
+
+    def to_xml(self):
+        """
+        Method: to_xml
+            Serializes the graph into its XML representation.
+
+        Returns:
+            {string} The XML representation of the graph
+        """
+        if self.kind != 'fuzztree':
+            raise ValueError('No XML support for this graph type.')
+
+        #TODO: Add UI and model attribute for the decomposition number
+        fuzz_tree = XmlFuzzTree(name = self.name, id = self.pk)
+
+        # Find root node and start from there
+        top_event = self.nodes.get(kind='topEvent')
+        fuzz_tree.topEvent = top_event.to_xml()
+        pyxb.utils.domutils.BindingDOMSupport.DeclareNamespace(XmlNamespace, 'ft')
+
+        return fuzz_tree.toxml('utf-8')
 
 # validation handler that ensures that the graph kind is known
 @receiver(pre_save, sender=Graph)

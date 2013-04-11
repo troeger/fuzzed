@@ -19,19 +19,10 @@
         "event": {
             "inherits": "node",
 
-            "allowConnectionTo": ["gate"],
-
-            "probability": 0,
-
             "propertyMenuEntries": {
                 "name": {
                     "kind": "text",
                     "displayName": "Name"
-                },
-                "probability": {
-                    "kind": "text",
-                    "displayName": "Probability",
-                    "disabled": true
                 }
             },
 
@@ -60,7 +51,7 @@
             "propertyMenuEntries": {
                 "probability": {
                     "kind": "number",
-                    "disabled": false,
+                    "displayName": "Probability",
                     "min": 0,
                     "max": 1,
                     "step": 0.01
@@ -82,6 +73,7 @@
             "name": "Basic Event Set",
             "image": "basic_event_set.svg",
             "help": "Set of basic events with identical properties",
+
             "cardinality": 1,
 
             "propertyMenuEntries": {
@@ -172,21 +164,22 @@
             "name": "Voting OR Gate",
             "image": "voting_or_gate.svg",
             "help": "Output event occurs if the given number of input events occur",
-            "kN": [1, 2],
+
+            "k": 1,
 
             "propertyMenuEntries": {
-                "kN": {
-                    "kind": "range",
-                    "displayName": "k-out-of-N",
+                "k": {
+                    "kind": "number",
+                    "displayName": "k",
                     "min": 1,
                     "step": 1
                 }
             },
             "propertyMirrors": {
-                "kN": {
+                "k": {
                     "position": "bottom",
                     "style": ["italic"],
-                    "prefix": "k/N: "
+                    "prefix": "k="
                 }
             }
         },
@@ -200,34 +193,57 @@
         },
 
         "houseEvent": {
-            "inherits": "event",
+            "inherits": "basicEvent",
             "name": "House Event",
-            "numberOfOutgoingConnections": 0,
             "image": "house_event.svg",
             "help": "An event that is expected to occur and typically does not denote a failure"
+        },
+
+        "transferIn": {
+            "inherits": "node",
+            "name": "Transfer In",
+            "image": "transfer_in.svg",
+            "help": "Connects the output of a related FaultTree, e.g. a subsystem, to this one",
+
+            "numberOfIncomingConnections": 1,
+            "numberOfOutgoingConnections": 0,
+
+            "transfer": -1,
+
+            "propertyMenuEntries": {
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer"
+                }
+            },
+
+            "propertyMirrors": {
+                "transfer": {
+                    "position": "bottom",
+                    "style": ["bold", "large"],
+                    "prefix": "◄ "
+                }
+            }
         },
 
         "topEvent": {
             "inherits": "event",
             "name": "Top Event",
             "image": "top_event.svg",
+
             "excludeFromShapesMenu": true,
             "numberOfIncomingConnections": 0,
             "numberOfOutgoingConnections": 1,
-            "optional": null,
-            "deletable": false,
-
-            "propertyMenuEntries": {
-                "optional": null
-            }
+            "deletable": false
         }
     },
 
     "propertiesDisplayOrder": [
         "name",
         "probability",
-        "kN",
-        "cardinality"
+        "cardinality",
+        "k",
+        "transfer"
     ],
 
     "shapeMenuNodeDisplayOrder": [
@@ -241,6 +257,7 @@
         "votingOrGate",
         "undevelopedEvent",
         "houseEvent",
+        "transferIn",
         "topEvent"
     ],
 

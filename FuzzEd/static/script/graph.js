@@ -297,7 +297,18 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *
          */
         getNodes: function() {
-            return _.values(this._nodes);
+            return _.values(this.nodes);
+        },
+
+        /**
+         *  Method: getEdges
+         *
+         *  Returns:
+         *    An Array containing all <Edges> of the graph.
+         *
+         */
+        getEdges: function() {
+            return _.values(this.edges);
         },
 
         /**

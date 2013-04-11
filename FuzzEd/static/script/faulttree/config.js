@@ -15,10 +15,14 @@ define(['config'], function(Config) {
          *    Name of global events triggered on the document with jQuery.trigger().
          *
          *  Constants:
-         *    {String} EDITOR_CALCULATE_CUTSETS - Event triggered when he 'calculate cutsets' action has been chosen.
+         *    {String} EDITOR_CALCULATE_CUTSETS               - Event triggered when he 'calculate cutsets' action
+         *                                                      has been chosen.
+         *    {String} EDITOR_CALCULATE_TOP_EVENT_PROBABILITY - Event triggered when the 'calculate top event
+         *                                                      probability' action has been chosen.
          */
         Events: {
-            EDITOR_CALCULATE_CUTSETS: 'editor-calculate-cutsets'
+            EDITOR_CALCULATE_CUTSETS:               'editor-calculate-cutsets',
+            EDITOR_CALCULATE_TOP_EVENT_PROBABILITY: 'editor-calculate-topevent-probability'
         },
 
         /**
@@ -27,11 +31,24 @@ define(['config'], function(Config) {
          *
          *  Constants:
          *    {String} CUTSETS_MENU          - The container element of the cutsets menu.
+         *    {String} PROBABILITY_MENU      - The container element of the probability menu.
          *    {String} NAVBAR_ACTION_CUTSETS - The navbar actions button for cutsets calculation.
          */
         IDs: {
-            CUTSETS_MENU:          'FuzzEdCutsets',
+            CUTSETS_MENU:          'FuzzEdCutsetsMenu',
+            PROBABILITY_MENU:      'FuzzEdProbabilityMenu',
             NAVBAR_ACTION_CUTSETS: 'FuzzEdNavbarActionCutsets'
+        },
+
+        /**
+         *  Group: Menus
+         *    Menu configurations.
+         *
+         *  Constants:
+         *    {Number} PROBABILITY_MENU_MAX_GRID_HEIGHT - Max. height of the grid that displays the configurations.
+         */
+        Menus: {
+            PROBABILITY_MENU_MAX_GRID_HEIGHT: 500
         }
     });
 });

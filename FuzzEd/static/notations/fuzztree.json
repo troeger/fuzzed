@@ -20,27 +20,13 @@
 
         "event": {
             "inherits": "node",
-            "allowConnectionTo": ["gate"],
 
             "optional": false,
-            "cost": 1,
-            "probability": 0,
 
             "propertyMenuEntries": {
                 "name": {
                     "kind": "text",
                     "displayName": "Name"
-                },
-                "cost": {
-                    "kind": "number",
-                    "displayName": "Cost",
-                    "min": 0,
-                    "step": 1
-                },
-                "probability": {
-                    "kind": "text",
-                    "displayName": "Probability",
-                    "disabled": true
                 },
                 "optional": {
                     "kind": "checkbox",
@@ -49,7 +35,6 @@
             },
 
             "propertyMirrors": {
-
                 "name": {
                     "position": "bottom",
                     "style": ["bold", "large"]
@@ -59,6 +44,24 @@
 
         "gate": {
             "inherits": "node"
+        },
+
+        "variationPoint": {
+            "inherits": "node",
+
+            "propertyMenuEntries": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name"
+                }
+            },
+
+            "propertyMirrors": {
+                "name": {
+                    "position": "bottom",
+                    "style": ["bold", "large"]
+                }
+            }
         },
 
         "basicEvent": {
@@ -71,11 +74,12 @@
 
             "probability": [0.5, 0],
             "probabilitySelected": "Exact",
+            "cost": 1,
 
             "propertyMenuEntries": {
                 "probability": {
                     "kind": "compound",
-                    "disabled": false,
+                    "displayName": "Probability",
 
                     "choices": {
                         "Fuzzy": {
@@ -114,6 +118,12 @@
                         "Fuzzy": [0.5, 0.3],
                         "Exact": [0.5, 0]
                     }
+                },
+                "cost": {
+                    "kind": "number",
+                    "displayName": "Cost",
+                    "min": 0,
+                    "step": 1
                 }
             },
 
@@ -122,6 +132,10 @@
                     "position": "bottom",
                     "style": ["italic"],
                     "prefix": "p="
+                },
+                "cost": {
+                    "position": "bottom",
+                    "prefix": "c="
                 }
             }
         },
@@ -157,15 +171,7 @@
 
             "name": "Intermediate Event",
             "image": "intermediate_event.svg",
-            "help": "Failure resulting from a combination of previous events",
-
-            "cost": null,
-            "propertyMenuEntries": {
-                "cost": null
-            },
-            "propertyMirrors": {
-                "cost": null
-            }
+            "help": "Failure resulting from a combination of previous events"
         },
 
         "intermediateEventSet": {
@@ -182,8 +188,7 @@
                     "displayName": "Cardinality",
                     "min": 1,
                     "step": 1
-                },
-                "cost": null
+                }
             },
 
             "propertyMirrors": {
@@ -191,8 +196,7 @@
                     "position": "bottom",
                     "style": ["italic"],
                     "prefix": "#"
-                },
-                "cost": null
+                }
             }
         },
 
@@ -232,21 +236,21 @@
             "name": "Voting OR Gate",
             "image": "voting_or_gate.svg",
             "help": "Output event occurs if the given number of input events occur",
-            "kN": [1, 2],
+            "k": 1,
 
             "propertyMenuEntries": {
-                "kN": {
-                    "kind": "range",
-                    "displayName": "k-out-of-N",
+                "k": {
+                    "kind": "number",
+                    "displayName": "k",
                     "min": 1,
                     "step": 1
                 }
             },
             "propertyMirrors": {
-                "kN": {
+                "k": {
                     "position": "bottom",
                     "style": ["italic"],
-                    "prefix": "k/N: "
+                    "prefix": "k="
                 }
             }
         },
@@ -257,15 +261,25 @@
             "name": "Undeveloped Event",
             "numberOfOutgoingConnections": 0,
             "image": "undeveloped_event.svg",
-            "help": "Event with no information available or insignificant impact"
+            "help": "Event with no information available or insignificant impact",
+
+            "optional": null,
+
+            "propertyMenuEntries": {
+                "optional": null
+            },
+
+            "propertyMirrors": {
+                "optional": null
+            }
         },
 
-        "choiceEvent": {
-            "inherits": "event",
+        "featureVariation": {
+            "inherits": "variationPoint",
 
-            "name": "Choice Event",
-            "allowConnectionTo": ["event"],
-            "image": "choice_event.svg",
+            "name": "Feature Variation",
+            "allowConnectionTo": ["event", "variationPoint", "transferIn"],
+            "image": "feature_variation.svg",
             "help": "Placeholder for one of the input events",
 
             "connector": {
@@ -277,16 +291,16 @@
             }
         },
 
-        "redundancyEvent": {
-            "inherits": "event",
+        "redundancyVariation": {
+            "inherits": "variationPoint",
 
-            "name": "Redundancy Event",
-            "allowConnectionTo": ["basicEventSet"],
+            "name": "Redundancy Variation",
+            "allowConnectionTo": ["intermediateEventSet", "basicEventSet"],
             "numberOfOutgoingConnections": 1,
-            "image": "redundancy_event.svg",
+            "image": "redundancy_variation.svg",
             "help": "Placeholder for a voting OR gate over a chosen number of the input events",
 
-            "kFormula": "N-2",
+            "kFormula": "N-1",
             "nRange": [1, 2],
 
             "propertyMenuEntries": {
@@ -325,11 +339,50 @@
         },
 
         "houseEvent": {
-            "inherits": "event",
+            "inherits": "basicEvent",
             "name": "House Event",
             "numberOfOutgoingConnections": 0,
             "image": "house_event.svg",
             "help": "An event that is expected to occur and typically does not denote a failure"
+        },
+
+        "transferIn": {
+            "inherits": "node",
+            "name": "Transfer In",
+            "image": "transfer_in.svg",
+            "help": "Connects the output of a related FuzzTree, e.g. a subsystem, to this one",
+
+            "numberOfIncomingConnections": 1,
+            "numberOfOutgoingConnections": 0,
+
+            "transfer": -1,
+            "transferMaxCost": 1,
+
+            "propertyMenuEntries": {
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer"
+                },
+                "transferMaxCost": {
+                    "kind": "number",
+                    "displayName": "Max Cost",
+                    "min": 0,
+                    "step": 1
+                }
+            },
+
+            "propertyMirrors": {
+                "transfer": {
+                    "position": "bottom",
+                    "style": ["bold", "large"],
+                    "prefix": "◄ "
+                },
+                "transferMaxCost": {
+                    "position": "bottom",
+                    "style": ["italic"],
+                    "prefix": "max(c)="
+                }
+            }
         },
 
         "topEvent": {
@@ -339,8 +392,9 @@
             "excludeFromShapesMenu": true,
             "numberOfIncomingConnections": 0,
             "numberOfOutgoingConnections": 1,
-            "optional": null,
             "deletable": false,
+
+            "optional": null,
             "decompositions": 1,
 
             "propertyMenuEntries": {
@@ -352,6 +406,10 @@
                     "min": 1,
                     "step": 1
                 }
+            },
+
+            "propertyMirrors": {
+                "optional": null
             }
         }
     },
@@ -361,11 +419,13 @@
         "cost",
         "probability",
         "optional",
-        "kN",
         "cardinality",
+        "k",
         "kFormula",
         "nRange",
-        "decompositions"
+        "decompositions",
+        "transfer",
+        "transferMaxCost"
     ],
 
     "shapeMenuNodeDisplayOrder": [
@@ -377,10 +437,11 @@
         "orGate",
         "xorGate",
         "votingOrGate",
-        "undevelopedEvent",
-        "choiceEvent",
-        "redundancyEvent",
+        "featureVariation",
+        "redundancyVariation",
         "houseEvent",
+        "undevelopedEvent",
+        "transferIn",
         "topEvent"
     ],
 
