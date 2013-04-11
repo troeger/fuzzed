@@ -555,9 +555,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             var columns = [
                 { id: 'id',    name: 'ID',      field: 'id',    sortable: true, minWidth: 110 },
-                { id: 'min',   name: 'Minimum', field: 'min',   sortable: true, formatter: shorten, defaultSortAsc: false },
-                { id: 'peak',  name: 'Peak',    field: 'peak',  sortable: true, formatter: shorten, defaultSortAsc: false },
-                { id: 'max',   name: 'Maximum', field: 'max',   sortable: true, formatter: shorten, defaultSortAsc: false },
+                { id: 'min',   name: 'Minimum', field: 'min',   sortable: true, formatter: shorten },
+                { id: 'peak',  name: 'Peak',    field: 'peak',  sortable: true, formatter: shorten },
+                { id: 'max',   name: 'Maximum', field: 'max',   sortable: true, formatter: shorten },
                 { id: 'costs', name: 'Costs',   field: 'costs', sortable: true }
             ];
 
