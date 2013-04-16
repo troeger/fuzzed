@@ -76,7 +76,6 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
     });
 
     var Numeric = Property.extend({
-        default: 0,
         min:    -Decimal.MAX_VALUE,
         max:     Decimal.MAX_VALUE,
         step:    undefined,
@@ -105,7 +104,35 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         }
     });
 
-    var Text = Class.extend({
+    var Range = Property.extend({
+        min: -Decimal.MAX_VALUE,
+        max:  Decimal.MAX_VALUE,
+        step: undefined,
+
+        validate: function(value, validationResult) {
+            if (typeof this.value !== 'array' || this.value.length != 2) {
+                validationResult.message = '[TYPE ERROR] value must be a tuple';
+                return false;
+            }
+
+            var lower = value[0];
+            var upper = value[1];
+            if (typeof lower !== 'number' || typeof upper !== 'number' || window.isNaN(lower) || window.isNaN(upper)) {
+                validationResult.message = '[VALUE ERROR] lower and upper bound must be numbers';
+                return false;
+            } else if (lower > upper) {
+                validationResult.message = '[VALUE ERROR] lower bound must be less or equal upper bound';
+                return false;
+            } else if (typeof this.step !== 'undefined' && !this.default[0].minus(lower).mod(this.step).eq(0) ||
+                                                           !this.default[1].minus(upper).mod(this.step).eq(0)) {
+                validationResult.message('[VALUE ERROR] value not in value range (step)');
+                return false;
+            }
+            return true;
+        }
+    });
+
+    var Text = Property.extend({
         notEmpty: false,
 
         validate: function(value, validationResult) {
@@ -124,6 +151,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         switch (definition.kind) {
             case 'choice':  return new Choice(node, definition);
             case 'numeric': return new Numeric(node, definition);
+            case 'range':   return new Range(node, definition);
             case 'text':    return new Text(node, definition);
 
             default: throw '[VALUE ERROR] unknown property kind ' + definition.kind;
