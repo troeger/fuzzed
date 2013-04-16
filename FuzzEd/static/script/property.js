@@ -1,4 +1,4 @@
-define(['class', 'decimal'], function(Class, Decimal) {
+define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
 
     var Property = Class.extend({
         node:  undefined,
@@ -32,6 +32,45 @@ define(['class', 'decimal'], function(Class, Decimal) {
                 throw validationResult.message;
             }
 
+            return this;
+        }
+    });
+
+    var Choice = Property.extend({
+        choices: undefined,
+        values:  undefined,
+
+        init: function(node, definition) {
+            definition.values = typeof definition.values === 'undefined' ? definition.choices : definition.values;
+            this._super(node, definition);
+        },
+
+        validate: function(value, validationResult) {
+            if (_.indexOf(this.values, value) < 0) {
+                validationResult.message = '[TYPE ERROR] no such value ' + value;
+                return false;
+            }
+            return true;
+        },
+
+        setChoice: function(choice) {
+            var choiceIndex = _.indexOf(this.choices, choice);
+            if (choiceIndex < 0) {
+                throw '[VALUE ERROR] invalid choice ' + choice;
+            }
+            return this.setValue(this.values[choiceIndex]);
+        },
+
+        _sanityCheck: function() {
+            this._super();
+
+            if (typeof this.choices !== 'undefined' || this.choices.length === 0) {
+                throw '[VALUE ERROR] there must be at least one choice';
+            } else if (this.choices.length != this.values.length) {
+                throw '[VALUE ERROR] there must be a value for each choice';
+            } else if (_.indexOf(this.values, this.value) < 0) {
+                throw '[VALUE ERROR] unknown value ' + this.value;
+            }
             return this;
         }
     });
@@ -81,16 +120,18 @@ define(['class', 'decimal'], function(Class, Decimal) {
         }
     });
 
-    function from(node, definition) {
-        if (definition.kind === 'numeric') {
-            return new Numeric(node, definition);
-        } else if (definition.kind === 'text') {
-            return new Text(node, definition);
+    var from = function(node, definition) {
+        switch (definition.kind) {
+            case 'choice':  return new Choice(node, definition);
+            case 'numeric': return new Numeric(node, definition);
+            case 'text':    return new Text(node, definition);
+
+            default: throw '[VALUE ERROR] unknown property kind ' + definition.kind;
         }
-        throw '[VALUE ERROR] unknown property kind ' + definition.kind;
-    }
+    };
 
     return {
+        Choice:   Choice,
         Numeric:  Numeric,
         Property: Property,
 
