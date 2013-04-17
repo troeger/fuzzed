@@ -143,6 +143,9 @@ class Node(models.Model):
         if self.kind in {'basicEvent', 'basicEventSet', 'intermediateEvent', 'intermediateEventSet', 'houseEvent'}:
             properties['optional'] = self.get_property('optional', False)
 
+        if self.kind in {'basicEventSet', 'intermediateEventSet'}:
+            properties['quantity'] = self.get_property('cardinality')
+
         if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
             probability = self.get_property('probability', None)
             if isinstance(probability, list):
@@ -154,7 +157,6 @@ class Node(models.Model):
                 else:
                     properties['probability'] = TriangularFuzzyInterval(a=point - alpha, b1=point,
                                                                         b2=point, c=point + alpha)
-
             elif isinstance(probability, (long, int, float)):
                 properties['probability'] = CrispProbability(value_=probability)
 
