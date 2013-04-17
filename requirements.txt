@@ -1,0 +1,8 @@
+django>=1.5
+south
+openid2rp
+django-require
+minbool
+pyxb
+psycopg2
+

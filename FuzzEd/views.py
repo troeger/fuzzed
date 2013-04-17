@@ -12,6 +12,7 @@ from django.views.decorators.http import require_http_methods
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
 from FuzzEd.models import Graph, notations, commands
+import FuzzEd.settings
 
 GREETINGS = [
     'Loading the FuzzEd User Experience',
@@ -280,7 +281,7 @@ def login(request):
         open_id = GET['openid_identifier']
         request.session['openid_identifier'] = open_id
 
-        return preAuthenticate(open_id, 'http://%s/login/?openidreturn' % request.get_host())
+        return preAuthenticate(open_id, FuzzEd.settings.OPENID_RETURN)
 
     elif 'openidreturn' in GET:
         user = auth.authenticate(openidrequest=request)
