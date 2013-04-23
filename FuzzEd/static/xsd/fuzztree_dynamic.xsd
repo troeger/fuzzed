@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns:ft="net.fuzztree" xmlns:ftd="net.fuzztree.dynamic" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztree.dynamic">
+  <xsd:import namespace="net.fuzztree" schemaLocation="fuzztree.xsd"/>
+  
+  <xsd:complexType abstract="true" name="DynamicGate">
+    <xsd:complexContent>
+      <xsd:extension base="ft:Gate"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:simpleType name="idlist">
+    <xsd:list itemType="xsd:int"/>
+  </xsd:simpleType>
+
+  <xsd:complexType name="SpareGate">
+    <xsd:complexContent>
+      <xsd:extension base="ftd:DynamicGate">
+        <xsd:attribute name="spareIds" type="ftd:idlist" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="SpareGate" type="ftd:SpareGate"/>
+
+  <xsd:complexType name="PANDGate">
+    <xsd:complexContent>
+      <xsd:extension base="ftd:DynamicGate">
+        <xsd:attribute name="priorityEvent" type="xsd:int" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="PANDGate" type="ftd:PANDGate"/>
+
+  <xsd:complexType name="SEQGate">
+    <xsd:complexContent>
+      <xsd:extension base="ftd:DynamicGate">
+        <xsd:attribute name="eventSequence" type="ftd:idlist" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="SEQGate" type="ftd:SEQGate"/>
+
+  <xsd:complexType name="FDEPGate">
+    <xsd:complexContent>
+      <xsd:extension base="ftd:DynamicGate">
+        <xsd:attribute name="triggeredEvent" type="xsd:int" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="FDEPGate" type="ftd:FDEPGate"/>
+
+</xsd:schema>
