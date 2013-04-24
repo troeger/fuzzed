@@ -93,7 +93,7 @@ class Graph(models.Model):
         fuzz_tree.topEvent = top_event.to_xml()
         pyxb.utils.domutils.BindingDOMSupport.DeclareNamespace(XmlNamespace, 'ft')
 
-        return fuzz_tree.toxml('utf-8')
+        return unicode(fuzz_tree.toxml('utf-8'),'utf-8')
 
 # validation handler that ensures that the graph kind is known
 @receiver(pre_save, sender=Graph)
