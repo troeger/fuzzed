@@ -2,7 +2,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
 
     var isNumber = function(num) {
         return typeof num === 'number' && !window.isNaN(num);
-    }
+    };
 
     var Property = Class.extend({
         node:  undefined,
@@ -19,13 +19,18 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
             throw '[ABSTRACT] subclass responsibility';
         },
 
-        setValue: function(newValue) {
+        setValue: function(newValue, propagate) {
+            if (typeof propagate === 'undefined') propagate = true;
+
             var validationResult = {};
             if (!this.validate(newValue, validationResult)) {
                 throw '[VALUE ERROR] ' + validationResult;
             }
             this.value = newValue;
-            // TODO: backend
+
+            if (propagate) {
+                // TODO: backend
+            }
 
             return this;
         },
@@ -89,6 +94,69 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         }
     });
 
+        var Compound = Property.extend({
+        parts:     undefined,
+
+        setValue: function(newValue, propagate) {
+            if (typeof propagate === 'undefined') propagate = true;
+
+            var validationResult = {};
+            if (!this.validate(newValue, validationResult)) {
+                throw '[VALUE ERROR] ' + validationResult;
+            }
+            this.parts[newValue[0]].setValue(newValue[1], false);
+
+            this.value = newValue;
+
+            if (propagate) {
+                // TODO: backend
+            }
+
+            return this;
+        },
+
+        validate: function(value, validationResult) {
+            if (typeof this.value !== 'array' || this.value.length != 2) {
+                validationResult.message = '[TYPE ERROR] value must be a tuple';
+                return false;
+            }
+
+            var selection = value[0];
+            var partValue = value[1];
+            if (!isNumber(selection)) {
+                validationResult.message = '[VALUE ERROR] selection must be a number';
+                return false;
+            }
+            if (selection >= 0 || selection < this.parts.length) {
+                validationResult.message = '[VALUE ERROR] selection must point to a part';
+                return false;
+            }
+
+            return this.parts[selection].validate(partValue, validationResult);
+        },
+
+        _sanitize: function() {
+            if (typeof this.parts !== 'array' || this.parts.length < 1) {
+                throw '[VALUE ERROR] there must be at least one part';
+            }
+            if (isNumber(this.default[0]) && this.default[0] >= 0 && this.default[0] < this.parts.length) {
+                throw '[VALUE ERROR] selection must point to a part';
+            }
+
+            return this._setupParts()._super();
+        },
+
+        _setupParts: function() {
+            var newParts = [];
+            _.each(this.parts, function(part) {
+                newParts.push(from(this.node, part));
+            }.bind(this));
+            this.parts = newParts;
+
+            return this;
+        }
+    });
+
     var Epsilon = Property.extend({
         min:        -Decimal.MAX_VALUE,
         max:         Decimal.MAX_VALUE,
@@ -128,7 +196,6 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         _sanitize: function() {
             if (typeof this.default !== 'array' || this.default.length != 2) {
                 throw '[TYPE ERROR] default must be a tuple';
-                return false;
             }
 
             if (!this.default[0] instanceof Decimal && isNumber(this.default[0])) {
@@ -248,7 +315,6 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         _sanitize: function() {
             if (typeof this.default !== 'array' || this.default.length != 2) {
                 throw '[TYPE ERROR] default must be a tuple';
-                return false;
             }
 
             if (!this.default[0] instanceof Decimal && isNumber(this.default[0])) {
@@ -303,11 +369,13 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
 
     var from = function(node, definition) {
         switch (definition.kind) {
-            case 'bool':    return new Bool(node, definition);
-            case 'choice':  return new Choice(node, definition);
-            case 'numeric': return new Numeric(node, definition);
-            case 'range':   return new Range(node, definition);
-            case 'text':    return new Text(node, definition);
+            case 'bool':     return new Bool(node, definition);
+            case 'choice':   return new Choice(node, definition);
+            case 'compound': return new Compound(node, definition);
+            case 'epsilon':  return new Epsilon(node, definition);
+            case 'numeric':  return new Numeric(node, definition);
+            case 'range':    return new Range(node, definition);
+            case 'text':     return new Text(node, definition);
 
             default: throw '[VALUE ERROR] unknown property kind ' + definition.kind;
         }
@@ -316,10 +384,12 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
     return {
         Bool:     Bool,
         Choice:   Choice,
+        Compound: Compound,
         Epsilon:  Epsilon,
         Numeric:  Numeric,
         Property: Property,
         Range:    Range,
+        Text:     Text,
 
         from: from
     };
