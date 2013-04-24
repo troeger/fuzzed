@@ -294,7 +294,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
                 _.each(data['configurations'], function(config, index) {
                     //TODO: better naming?
-                    configID = 'Configuration ' + (index + 1);
+                    configID = '#' + (index + 1);
                     var displayData = this._convertToDisplayFormat(config);
 
                     // remember the nodes and edges involved in this config for later highlighting
@@ -361,6 +361,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                     min:   min,
                     max:   max,
                     peak:  peak,
+                    ineffectiveness: peak / configuration['costs'],
                     costs: configuration['costs']
                 }
             };
@@ -557,11 +558,12 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             }
 
             var columns = [
-                { id: 'id',    name: 'ID',      field: 'id',    sortable: true, minWidth: 110 },
+                { id: 'id',    name: 'Configuration',      field: 'id',    sortable: true },
                 { id: 'min',   name: 'Minimum', field: 'min',   sortable: true, formatter: shorten },
                 { id: 'peak',  name: 'Peak',    field: 'peak',  sortable: true, formatter: shorten },
                 { id: 'max',   name: 'Maximum', field: 'max',   sortable: true, formatter: shorten },
-                { id: 'costs', name: 'Costs',   field: 'costs', sortable: true }
+                { id: 'costs', name: 'Costs',   field: 'costs', sortable: true },
+                { id: 'ineffectiveness', name: 'Risk (Peak/Costs)', field: 'ineffectiveness', sortable: true, minWidth: 150}
             ];
 
             var options = {
