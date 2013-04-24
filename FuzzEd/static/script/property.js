@@ -86,16 +86,39 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
     });
 
     var Epsilon = Property.extend({
-        min: -Decimal.MAX_VALUE,
-        max:  Decimal.MAX_VALUE,
-        step: undefined,
-
-        epsilonMin:  0,
-        epsilonMax:  Decimal.MAX_VALUE / 2,
+        min:        -Decimal.MAX_VALUE,
+        max:         Decimal.MAX_VALUE,
+        step:        undefined,
         epsilonStep: undefined,
 
         validate: function(value, validationResult) {
+            if (typeof value !== 'array' || value.length != 2) {
+                validationResult.message('[TYPE ERROR] value must be a tuple');
+                return false;
+            }
 
+            var center  = value[0];
+            var epsilon = value[1];
+
+            if (typeof center  !== 'number' || window.isNaN(center) ||
+                typeof epsilon !== 'number' || window.isNaN(epsilon)) {
+                validationResult.message('[TYPE ERROR] center and epsilon must be numbers');
+                return false;
+            } else if (epsilon < 0) {
+                validationResult.message('[VALUE ERROR] epsilon must not be negative');
+                return false;
+            } else if (this.min.gt(center - epsilon) || this.max.lt(center + epsilon)) {
+                validationResult.message('[VALUE ERROR] value out of bounds');
+                return false;
+            } else if (typeof this.step !== 'undefined' && !this.default[0].minus(center).mod(this.step).eq(0)) {
+                validationResult.message('[VALUE ERROR] center not in value range (step)');
+                return false;
+            } else if (typeof this.epsilonStep !== 'undefined' &&
+                       !this.default[1].minus(epsilon).mod(this.epsilonStep).eq(0)) {
+                validationResult.message('[VALUE ERROR] epsilon not in value range (step)');
+                return false;
+            }
+            return true;
         }
     });
 
