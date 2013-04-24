@@ -7,6 +7,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
     var Property = Class.extend({
         node:  undefined,
         value: undefined,
+        displayName: '',
 
         init: function(node, definition) {
             jQuery.extend(this, definition);
@@ -94,7 +95,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         }
     });
 
-        var Compound = Property.extend({
+    var Compound = Property.extend({
         parts:     undefined,
 
         setValue: function(newValue, propagate) {
@@ -236,6 +237,10 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         }
     });
 
+    var Link = Property.extend({
+        //TODO
+    });
+
     var Numeric = Property.extend({
         min:    -Decimal.MAX_VALUE,
         max:     Decimal.MAX_VALUE,
@@ -373,6 +378,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
             case 'choice':   return new Choice(node, definition);
             case 'compound': return new Compound(node, definition);
             case 'epsilon':  return new Epsilon(node, definition);
+            case 'link':     return new Link(node, definition);
             case 'numeric':  return new Numeric(node, definition);
             case 'range':    return new Range(node, definition);
             case 'text':     return new Text(node, definition);
@@ -386,6 +392,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         Choice:   Choice,
         Compound: Compound,
         Epsilon:  Epsilon,
+        Link:     Link,
         Numeric:  Numeric,
         Property: Property,
         Range:    Range,
