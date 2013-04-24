@@ -36,6 +36,16 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         }
     });
 
+    var Bool = Property.extend({
+        validate: function(value, validationResult) {
+            if (typeof value === 'boolean') {
+                validationResult.message = '[TYPE ERROR] value must be boolean';
+                return false;
+            }
+            return true;
+        }
+    });
+
     var Choice = Property.extend({
         choices: undefined,
         values:  undefined,
@@ -72,6 +82,20 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
                 throw '[VALUE ERROR] unknown value ' + this.value;
             }
             return this;
+        }
+    });
+
+    var Epsilon = Property.extend({
+        min: -Decimal.MAX_VALUE,
+        max:  Decimal.MAX_VALUE,
+        step: undefined,
+
+        epsilonMin:  0,
+        epsilonMax:  Decimal.MAX_VALUE / 2,
+        epsilonStep: undefined,
+
+        validate: function(value, validationResult) {
+
         }
     });
 
@@ -149,6 +173,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
 
     var from = function(node, definition) {
         switch (definition.kind) {
+            case 'bool':    return new Bool(node, definition);
             case 'choice':  return new Choice(node, definition);
             case 'numeric': return new Numeric(node, definition);
             case 'range':   return new Range(node, definition);
@@ -159,9 +184,12 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
     };
 
     return {
+        Bool:     Bool,
         Choice:   Choice,
+        Epsilon:  Epsilon,
         Numeric:  Numeric,
         Property: Property,
+        Range:    Range,
 
         from: from
     };
