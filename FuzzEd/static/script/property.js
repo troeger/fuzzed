@@ -1,5 +1,9 @@
 define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
 
+    var isNumber = function(num) {
+        return typeof num === 'number' && !window.isNaN(num);
+    }
+
     var Property = Class.extend({
         node:  undefined,
         value: undefined,
@@ -8,7 +12,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
             jQuery.extend(this, definition);
             this.node  = node;
             this.value = typeof this.value === 'undefined' ? this.default: this.value;
-            this._sanityCheck();
+            this._sanitize();
         },
 
         validate: function(value, validationResult) {
@@ -26,7 +30,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
             return this;
         },
 
-        _sanityCheck: function() {
+        _sanitize: function() {
             var validationResult = {};
             if (!this.validate(this.value, validationResult)) {
                 throw validationResult.message;
@@ -71,7 +75,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
             return this.setValue(this.values[choiceIndex]);
         },
 
-        _sanityCheck: function() {
+        _sanitize: function() {
             this._super();
 
             if (typeof this.choices !== 'undefined' || this.choices.length === 0) {
@@ -119,6 +123,49 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
                 return false;
             }
             return true;
+        },
+
+        _sanitize: function() {
+            if (typeof this.default !== 'array' || this.default.length != 2) {
+                throw '[TYPE ERROR] default must be a tuple';
+                return false;
+            }
+
+            if (!this.default[0] instanceof Decimal && isNumber(this.default[0])) {
+                this.default[0] = new Decimal(this.default[0]);
+            } else {
+                throw '[VALUE ERROR] default lower bound must be Decimal or number';
+            }
+            if (!this.default[1] instanceof Decimal && isNumber(this.default[1])) {
+                this.default[1] = new Decimal(this.default[1]);
+            } else {
+                throw '[VALUE ERROR] default upper bound must be Decimal or number';
+            }
+
+            if (!this.min instanceof Decimal && isNumber(this.min)) {
+                this.min = new Decimal(this.min);
+            } else {
+                throw '[VALUE ERROR] min must be Decimal or number';
+            }
+            if (!this.max instanceof Decimal && isNumber(this.max)) {
+                this.max = new Decimal(this.max);
+            } else {
+                throw '[VALUE ERROR] max must be Decimal or number';
+            }
+            if (typeof this.step !== 'undefined' && !isNumber(this.step)) {
+                throw '[VALUE ERROR] step must be a number';
+            }
+            if (typeof this.epsilonStep !== 'undefined' && !isNumber(this.epsilonStep)) {
+                throw '[VALUE ERROR] epsilon step must be a number';
+            }
+
+            if (this.min.gt(this.max)) {
+                throw '[VALUE ERROR] bounds violation min/max: ' + this.min + '/' + this.max;
+            } else if (typeof this.step !== 'undefined' && this.step < 0) {
+                throw '[VALUE ERROR] step must be positive: ' + this.step;
+            }
+
+            return this._super();
         }
     });
 
@@ -128,7 +175,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         step:    undefined,
 
         validate: function(value, validationResult) {
-            if (typeof value !== 'number' || window.isNaN(value)) {
+            if (!isNumber(value)) {
                 validationResult.message('[TYPE ERROR] value is not a number');
                 return false;
             } else if (this.min.gt(value) || this.max.lt(value)) {
@@ -141,13 +188,33 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
             return true;
         },
 
-        _sanityCheck: function() {
+        _sanitize: function() {
+            if (!this.default instanceof Decimal && isNumber(this.default)) {
+                this.default = new Decimal(this.default);
+            } else {
+                throw '[VALUE ERROR] default must be Decimal or number';
+            }
+            if (!this.min instanceof Decimal && isNumber(this.min)) {
+                this.min = new Decimal(this.min);
+            } else {
+                throw '[VALUE ERROR] min must be Decimal or number';
+            }
+            if (!this.max instanceof Decimal && isNumber(this.max)) {
+                this.max = new Decimal(this.max);
+            } else {
+                throw '[VALUE ERROR] max must be Decimal or number';
+            }
+            if (typeof this.step !== 'undefined' && !isNumber(this.step)) {
+                throw '[VALUE ERROR] step must be a number';
+            }
+
             if (this.min.gt(this.max)) {
                 throw '[VALUE ERROR] bounds violation min/max: ' + this.min + '/' + this.max;
-            } else if (this.step && this.step < 0) {
+            } else if (typeof this.step !== 'undefined'  && this.step < 0) {
                 throw '[VALUE ERROR] step must be positive: ' + this.step;
             }
-            return this;
+
+            return this._super();
         }
     });
 
@@ -164,7 +231,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
 
             var lower = value[0];
             var upper = value[1];
-            if (typeof lower !== 'number' || typeof upper !== 'number' || window.isNaN(lower) || window.isNaN(upper)) {
+            if (!isNumber(lower) || !isNumber(upper)) {
                 validationResult.message = '[VALUE ERROR] lower and upper bound must be numbers';
                 return false;
             } else if (lower > upper) {
@@ -176,6 +243,46 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
                 return false;
             }
             return true;
+        },
+
+        _sanitize: function() {
+            if (typeof this.default !== 'array' || this.default.length != 2) {
+                throw '[TYPE ERROR] default must be a tuple';
+                return false;
+            }
+
+            if (!this.default[0] instanceof Decimal && isNumber(this.default[0])) {
+                this.default[0] = new Decimal(this.default[0]);
+            } else {
+                throw '[VALUE ERROR] default lower bound must be Decimal or number';
+            }
+            if (!this.default[1] instanceof Decimal && isNumber(this.default[1])) {
+                this.default[1] = new Decimal(this.default[1]);
+            } else {
+                throw '[VALUE ERROR] default upper bound must be Decimal or number';
+            }
+
+            if (!this.min instanceof Decimal && isNumber(this.min)) {
+                this.min = new Decimal(this.min);
+            } else {
+                throw '[VALUE ERROR] min must be Decimal or number';
+            }
+            if (!this.max instanceof Decimal && isNumber(this.max)) {
+                this.max = new Decimal(this.max);
+            } else {
+                throw '[VALUE ERROR] max must be Decimal or number';
+            }
+            if (typeof this.step !== 'undefined' && !isNumber(this.step)) {
+                throw '[VALUE ERROR] step must be a number';
+            }
+
+            if (this.min.gt(this.max)) {
+                throw '[VALUE ERROR] bounds violation min/max: ' + this.min + '/' + this.max;
+            } else if (typeof this.step !== 'undefined' && this.step < 0) {
+                throw '[VALUE ERROR] step must be positive: ' + this.step;
+            }
+
+            return this._super();
         }
     });
 
