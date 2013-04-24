@@ -355,13 +355,18 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 return point[0];
             });
 
+            if (configuration['costs']) 
+                ie = peak / configuration['costs'];
+            else
+                ie = '-';
+
             return {
                 series: series,
                 statistics: {
                     min:   min,
                     max:   max,
                     peak:  peak,
-                    ineffectiveness: peak / configuration['costs'],
+                    ineffectiveness: ie,
                     costs: configuration['costs']
                 }
             };
