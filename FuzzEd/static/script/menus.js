@@ -191,7 +191,7 @@ define(['config', 'class'], function(Config, Class) {
 
             // display the properties menu only if there is exactly one node selected
             // and the menu is not minimized; otherwise hide the menu
-            if (selected.length == 1 && !this._isMinimized()) {
+            if (selected.length === 1 && !this._isMinimized()) {
                 return this._show(selected);
             }
 
@@ -201,8 +201,8 @@ define(['config', 'class'], function(Config, Class) {
         _removeEntries: function() {
             if (!this._node) return this;
 
-            _.each(this._node.propertyMenuEntries, function(menuEntry) {
-                menuEntry.hide();
+            _.each(this._node.properties, function(property) {
+                property.menuEntry.hide();
             }.bind(this));
 
             return this;
@@ -222,16 +222,15 @@ define(['config', 'class'], function(Config, Class) {
             this._node = selected.data(Config.Keys.NODE);
 
             // this node does not have any properties to display, go home!
-            if (_.isEmpty(this._node.propertyMenuEntries)) {
+            if (_.isEmpty(this._node.properties)) {
                 this.hide();
                 return this;
             }
 
-            _.each(this._displayOrder, function(property) {
-                var menuEntry = this._node.propertyMenuEntries[property];
-
+            _.each(this._displayOrder, function(propertyName) {
+                var property = this._node.properties[propertyName];
                 // has the node such a property? display it!
-                if (typeof menuEntry !== 'undefined') menuEntry.show(this._form);
+                if (typeof property !== 'undefined') property.menuEntry.show(this._form);
             }.bind(this));
 
             // fix the left offset (jQueryUI bug with draggable menus and CSS right property)

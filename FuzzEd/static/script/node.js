@@ -106,9 +106,6 @@ function(Property, Mirror, Canvas, Class) {
                 ._setupDragging()
                 ._setupMouse()
                 ._setupSelection()
-                // Property displays
-                //TODO
-//                ._setupMirrors(this.propertyMirrors, propertiesDisplayOrder)
                 ._setupProperties(propertiesDisplayOrder);
         },
 
@@ -471,36 +468,6 @@ function(Property, Mirror, Canvas, Class) {
         },
 
         /**
-         * Method: _setupMirrors
-         *
-         * This helper method is called in the constructor and creates <Mirrors> for the node. Mirrors are create if
-         * and only if they appear in the propertyDisplayOrder collection.
-         *
-         * Parameters:
-         *   {Object}     propertyMirrors      - The mirror definition objects as found in notations file
-         *                                       (e.g. notations/faulttree.json)
-         *   {Array[str]} propertyDisplayOrder - An array of property name string in the order descending order of their
-         *                                       appearance as mirrors.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-            //TODO
-        _setupMirrors: function(propertyMirrors, propertiesDisplayOrder) {
-            this.propertyMirrors = {};
-            if (typeof propertyMirrors === 'undefined') return this;
-
-            _.each(propertiesDisplayOrder, function(property) {
-                var mirrorDefinition = propertyMirrors[property];
-
-                if (typeof mirrorDefinition === 'undefined' || mirrorDefinition === null) return;
-                this.propertyMirrors[property] = new Mirror(this.container, mirrorDefinition);
-            }.bind(this));
-
-            return this;
-        },
-
-        /**
          * Method: _setupProperties
          *
          * Parameters:
@@ -513,10 +480,9 @@ function(Property, Mirror, Canvas, Class) {
             _.each(propertiesDisplayOrder, function(propertyName) {
                 var property = this.properties[propertyName];
                 if (!property) return;
-                this[propertyName] = Property.from(this, property);
+                this.properties[propertyName] = Property.from(this, property);
             }.bind(this));
 
-            delete this.properties;
             return this;
         },
 

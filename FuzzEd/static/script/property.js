@@ -1,4 +1,4 @@
-define(['class', 'decimal', 'mirror', 'underscore'], function(Class, Decimal, Mirror) {
+define(['class', 'decimal', 'propertyMenuEntry', 'mirror', 'underscore'], function(Class, Decimal, PropertyMenuEntry, Mirror) {
 
     var isNumber = function(num) {
         return typeof num === 'number' && !window.isNaN(num);
@@ -8,12 +8,19 @@ define(['class', 'decimal', 'mirror', 'underscore'], function(Class, Decimal, Mi
         node:  undefined,
         value: undefined,
         displayName: '',
+        mirror: undefined,
+        menuEntry: undefined,
 
         init: function(node, definition) {
             jQuery.extend(this, definition);
             this.node  = node;
             this._sanitize()
-                ._setupMirror();
+                ._setupMirror()
+                ._setupMenuEntry();
+        },
+
+        menuEntryClass: function() {
+            throw '[ABSTRACT] subclass responsibility';
         },
 
         validate: function(value, validationResult) {
@@ -52,6 +59,12 @@ define(['class', 'decimal', 'mirror', 'underscore'], function(Class, Decimal, Mi
             this.mirror.show(this.value);
 
             return this;
+        },
+
+        _setupMenuEntry: function() {
+            //TODO
+//            this.menuEntry = new (this.menuEntryClass())(this);
+            this.menuEntry = new PropertyMenuEntry.TextEntry(this);
         }
     });
 
@@ -382,6 +395,10 @@ define(['class', 'decimal', 'mirror', 'underscore'], function(Class, Decimal, Mi
 
     var Text = Property.extend({
         notEmpty: false,
+
+        menuEntryClass: function() {
+            return PropertyMenuEntry.TextEntry;
+        },
 
         validate: function(value, validationResult) {
             if (typeof value !== 'string') {
