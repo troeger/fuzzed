@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FuzzTree xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="de.hpi.dcl.fuzztree" name="EWDC 2013" decompositionNumber="2">
+  <topEvent id="1" name="Server Failure">
+    <children xsi:type="ft:And" id="1">
+      <children xsi:type="ft:Or" id="2">
+      	<children xsi:type="ft:BasicEventSet" id="3" name="Component Failure" quantity="3">
+          <probability xsi:type="ft:CrispProbability" value="0.001"/>
+        </children>
+      </children>
+      <children xsi:type="ft:Or" id="4">
+      	<children xsi:type="ft:BasicEventSet" id="5" name="Component Failure" quantity="3">
+          <probability xsi:type="ft:CrispProbability" value="0.001"/>
+        </children>
+      </children>
+    </children>
+  </topEvent>
+</ft:FuzzTree>
