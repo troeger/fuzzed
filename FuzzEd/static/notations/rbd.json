@@ -89,7 +89,7 @@
 
             "properties": {
                 "probability": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "default": 0,
                     "min": 0,
                     "max": 1,
