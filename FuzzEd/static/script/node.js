@@ -1,5 +1,5 @@
-define(['properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
-function(Properties, Mirror, Canvas, Class) {
+define(['property', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
+function(Property, Mirror, Canvas, Class) {
     /**
      *  Class: {Abstract} Node
      *
@@ -61,12 +61,12 @@ function(Properties, Mirror, Canvas, Class) {
         /**
          * Constructor: init
          *
-         * The constructor of the abstract node class. It will merge the state of the properties, assign a client-side
+         * The constructor of the abstract node class. It will merge the state of the definition, assign a client-side
          * id, setup the visual representation and enable interaction via mouse and keyboard. Calling the constructor
          * as-is, will result in an exception.
          *
          * Parameters:
-         *   {Object}     properties             - An object containing default values for the node's properties. E.g.:
+         *   {Object}     definition             - An object containing default values for the node's definition. E.g.:
          *                                         {x: 1, y: 20, name: 'foo'}. The values will be merged into the node
          *                                         recursively, creating deep copies of complex structures like arrays
          *                                         or other objects. Mainly required for restoring the state of a node
@@ -78,9 +78,9 @@ function(Properties, Mirror, Canvas, Class) {
          * Returns:
          *   This {<Node>} instance.
          */
-        init: function(properties, propertiesDisplayOrder) {
+        init: function(definition, propertiesDisplayOrder) {
             // merge all presets of the configuration and data from the backend into this object
-            jQuery.extend(true, this, properties);
+            jQuery.extend(true, this, definition);
 
             // logic
             if (typeof this.id === 'undefined') {
@@ -107,8 +107,9 @@ function(Properties, Mirror, Canvas, Class) {
                 ._setupMouse()
                 ._setupSelection()
                 // Property displays
-                ._setupMirrors(this.propertyMirrors, propertiesDisplayOrder)
-                ._setupPropertyMenuEntries(this.propertyMenuEntries, propertiesDisplayOrder);
+                //TODO
+//                ._setupMirrors(this.propertyMirrors, propertiesDisplayOrder)
+                ._setupProperties(propertiesDisplayOrder);
         },
 
         /**
@@ -484,6 +485,7 @@ function(Properties, Mirror, Canvas, Class) {
          * Returns:
          *   This {<Node>} instance for chaining.
          */
+            //TODO
         _setupMirrors: function(propertyMirrors, propertiesDisplayOrder) {
             this.propertyMirrors = {};
             if (typeof propertyMirrors === 'undefined') return this;
@@ -499,29 +501,22 @@ function(Properties, Mirror, Canvas, Class) {
         },
 
         /**
-         * Method: _setuPropertyMenuEntries
+         * Method: _setupProperties
          *
          * Parameters:
-         *   {Object}     propertyMenuEntries    - An object containing
          *   {Array[str]} propertiesDisplayOrder - bar.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
-        _setupPropertyMenuEntries: function(propertyMenuEntries, propertiesDisplayOrder) {
-            this.propertyMenuEntries = {};
-            if (typeof propertyMenuEntries === 'undefined') return this.propertyMenuEntries;
-
-            _.each(propertiesDisplayOrder, function(property) {
-                var menuEntry = propertyMenuEntries[property];
-                if (typeof menuEntry === 'undefined' || menuEntry === null) return;
-
-                var mirror = this.propertyMirrors[property];
-
-                menuEntry.property = property;
-                this.propertyMenuEntries[property] = Properties.newFrom(this, mirror, menuEntry);
+        _setupProperties: function(propertiesDisplayOrder) {
+            _.each(propertiesDisplayOrder, function(propertyName) {
+                var property = this.properties[propertyName];
+                if (!property) return;
+                this[propertyName] = Property.from(this, property);
             }.bind(this));
 
+            delete this.properties;
             return this;
         },
 
