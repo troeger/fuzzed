@@ -107,8 +107,9 @@ def generate_node_choices(notations):
         node_category_choices = ()
 
         for node_kind, node in nodes.items():
-            if not 'name' in node: continue
-            node_category_choices += ((node_kind, node['name']),)
+            name_property = node['properties'].get('name')
+            if name_property is None: continue
+            node_category_choices += ((node_kind, name_property['default']),)
 
         node_category += (node_category_choices,)
         node_choices.append(node_category)
