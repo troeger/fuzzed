@@ -4,7 +4,7 @@
 #endif
 #include <pugixml.hpp>
 #include <boost/filesystem/path.hpp>
-#include <future>
+#include <thread>
 #if IS_WINDOWS 
 #pragma warning(pop) 
 #endif

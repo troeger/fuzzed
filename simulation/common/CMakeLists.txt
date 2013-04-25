@@ -16,11 +16,6 @@ set(HEADERS
 	Types.h
 	Constants.h
 	Condition.h
-	
-	#third party
-	ExpressionParser.h
-	ReaderWriterQueue.h
-	atomicops.h
 )
 
 include_directories(${Boost_INCLUDE_DIRS})

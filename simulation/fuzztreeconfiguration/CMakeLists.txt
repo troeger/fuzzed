@@ -3,12 +3,12 @@ project(ftconfiguration CXX)
 set(SOURCES
    ${SOURCE}
    FuzzTreeImport.cpp
-   FaultTreeWriter.cpp
+   FuzzTreeTransform.cpp
 )
 set(HEADERS
    ${HEADERS}
    FuzzTreeImport.h
-   FaultTreeWriter.h
+   FuzzTreeTransform.h
 )
 
 include_directories(${Boost_INCLUDE_DIRS})
