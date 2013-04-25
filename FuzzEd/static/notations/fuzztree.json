@@ -15,6 +15,19 @@
                     "top":    0,
                     "bottom": 0
                 }
+            },
+
+            "properties": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name",
+                    "default": "Node",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"]
+                    }
+                }
             }
         },
 
@@ -23,14 +36,7 @@
 
             "properties": {
                 "name": {
-                    "kind": "text",
-                    "displayName": "Name",
-                    "default": "Event",
-
-                    "mirror": {
-                        "position": "bottom",
-                        "style": ["bold", "large"]
-                    }
+                    "default": "Event"
                 },
                 "optional": {
                     "kind": "bool",
@@ -41,7 +47,13 @@
         },
 
         "gate": {
-            "inherits": "node"
+            "inherits": "node",
+
+            "properties": {
+                "name": {
+                    "default": "Gate"
+                }
+            }
         },
 
         "variationPoint": {
@@ -49,14 +61,7 @@
 
             "properties": {
                 "name": {
-                    "kind": "text",
-                    "displayName": "Name",
-                    "default": "Variation Point",
-
-                    "mirror": {
-                        "position": "bottom",
-                        "style": ["bold", "large"]
-                    }
+                    "default": "Variation Point"
                 }
             }
         },
@@ -116,7 +121,7 @@
                 },
 
                 "cost": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "Cost",
                     "default": 1,
                     "min": 0,
@@ -141,7 +146,7 @@
                 },
 
                 "cardinality": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "Cardinality",
                     "default": 1,
                     "min": 1,
@@ -181,7 +186,7 @@
                 },
 
                 "cardinality": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "Cardinality",
                     "default": 1,
                     "min": 1,
@@ -252,7 +257,7 @@
                     "default": "Voting OR Gate"
                 },
                 "k": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "k",
                     "min": 1,
                     "step": 1,
@@ -391,7 +396,7 @@
                     }
                 },
                 "transferMaxCost": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "Max Cost",
                     "min": 0,
                     "step": 1,
@@ -422,7 +427,7 @@
                     "default": null
                 },
                 "decompositions": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "Decompose",
                     "min": 1,
                     "step": 1,

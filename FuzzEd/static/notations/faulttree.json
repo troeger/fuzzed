@@ -13,16 +13,12 @@
                     "top":    0,
                     "bottom": 0
                 }
-            }
-        },
-
-        "event": {
-            "inherits": "node",
+            },
 
             "properties": {
                 "name": {
                     "kind": "text",
-                    "default": "Event",
+                    "default": "Node",
                     "displayName": "Name",
 
                     "mirror": {
@@ -33,8 +29,24 @@
             }
         },
 
+        "event": {
+            "inherits": "node",
+
+            "properties": {
+                "name": {
+                    "default": "Event"
+                }
+            }
+        },
+
         "gate": {
-            "inherits": "node"
+            "inherits": "node",
+
+            "properties": {
+                "name": {
+                    "default": "Gate"
+                }
+            }
         },
 
         "basicEvent": {
@@ -49,7 +61,7 @@
                     "default": "Basic Event"
                 },
                 "probability": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "Probability",
                     "min": 0,
                     "max": 1,
@@ -75,7 +87,7 @@
                     "default": "Basic Event Set"
                 },
                 "cardinality": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "Cardinality",
                     "min": 1,
                     "step": 1,
@@ -113,7 +125,7 @@
                     "default": "Intermediate Event Set"
                 },
                 "cardinality": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "Cardinality",
                     "min": 1,
                     "step": 1,
@@ -184,7 +196,7 @@
                     "default": "Voting OR Gate"
                 },
                 "k": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "k",
                     "min": 1,
                     "step": 1,
