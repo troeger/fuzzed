@@ -3,6 +3,7 @@
     "name": "Reliability Block Diagram",
     "nodes": {
         "node": {
+            "nodeDisplayName": "Node",
             "numberOfIncomingConnections": -1,
             "numberOfOutgoingConnections": -1,
 
@@ -30,6 +31,7 @@
         },
 
         "start": {
+            "nodeDisplayName": "Start",
             "inherits": "node",
             "image": "start.svg",
 
@@ -54,6 +56,7 @@
         },
 
         "end": {
+            "nodeDisplayName": "End",
             "inherits": "node",
             "image": "end.svg",
 
@@ -76,6 +79,7 @@
         },
 
         "block": {
+            "nodeDisplayName": "Block",
             "inherits": "node",
             "image": "block.svg",
 
@@ -101,6 +105,7 @@
         },
 
         "out_of": {
+            "nodeDisplayName": "Out of",
             "inherits": "node",
             "image": "out_of.svg",
 

@@ -3,6 +3,7 @@
     "name": "Fault Tree",
     "nodes": {
         "node": {
+            "nodeDisplayName": "Node",
             "numberOfIncomingConnections":  1,
             "numberOfOutgoingConnections": -1,
             "allowConnectionTo": ["node"],
@@ -30,6 +31,7 @@
         },
 
         "event": {
+            "nodeDisplayName": "Event",
             "inherits": "node",
 
             "properties": {
@@ -40,6 +42,7 @@
         },
 
         "gate": {
+            "nodeDisplayName": "Gate",
             "inherits": "node",
 
             "properties": {
@@ -50,6 +53,7 @@
         },
 
         "basicEvent": {
+            "nodeDisplayName": "Basic Event",
             "inherits": "event",
 
             "numberOfOutgoingConnections": 0,
@@ -77,6 +81,7 @@
         },
 
         "basicEventSet": {
+            "nodeDisplayName": "Basic Event Set",
             "inherits": "basicEvent",
 
             "image": "basic_event_set.svg",
@@ -102,6 +107,7 @@
         },
 
         "intermediateEvent": {
+            "nodeDisplayName": "Intermediate Event",
             "inherits": "event",
 
             "image": "intermediate_event.svg",
@@ -115,6 +121,7 @@
         },
 
         "intermediateEventSet": {
+            "nodeDisplayName": "Intermediate Event Set",
             "inherits": "intermediateEvent",
 
             "image": "intermediate_event_set.svg",
@@ -140,6 +147,7 @@
         },
 
         "andGate": {
+            "nodeDisplayName": "AND Gate",
             "inherits": "gate",
 
             "image": "and_gate.svg",
@@ -153,6 +161,7 @@
         },
 
         "orGate": {
+            "nodeDisplayName": "OR Gate",
             "inherits": "gate",
 
             "image": "or_gate.svg",
@@ -172,6 +181,7 @@
         },
 
         "xorGate": {
+            "nodeDisplayName": "XOR Gate",
             "inherits": "gate",
 
             "name": "XOR Gate",
@@ -186,6 +196,7 @@
         },
 
         "votingOrGate": {
+            "nodeDisplayName": "Voting OR Gate",
             "inherits": "gate",
 
             "image": "voting_or_gate.svg",
@@ -211,6 +222,7 @@
         },
 
         "undevelopedEvent": {
+            "nodeDisplayName": "Undeveloped Event",
             "inherits": "event",
 
             "numberOfOutgoingConnections": 0,
@@ -225,6 +237,7 @@
         },
 
         "houseEvent": {
+            "nodeDisplayName": "House Event",
             "inherits": "basicEvent",
 
             "image": "house_event.svg",
@@ -238,6 +251,7 @@
         },
 
         "transferIn": {
+            "nodeDisplayName": "Transfer In",
             "inherits": "node",
 
             "image": "transfer_in.svg",
@@ -263,6 +277,7 @@
         },
 
         "topEvent": {
+            "nodeDisplayName": "Top Event",
             "inherits": "event",
 
             "image": "top_event.svg",
