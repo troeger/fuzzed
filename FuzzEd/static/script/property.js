@@ -1,4 +1,4 @@
-define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
+define(['class', 'decimal', 'mirror', 'underscore'], function(Class, Decimal, Mirror) {
 
     var isNumber = function(num) {
         return typeof num === 'number' && !window.isNaN(num);
@@ -12,7 +12,8 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         init: function(node, definition) {
             jQuery.extend(this, definition);
             this.node  = node;
-            this._sanitize();
+            this._sanitize()
+                ._setupMirror();
         },
 
         validate: function(value, validationResult) {
@@ -27,6 +28,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
                 throw '[VALUE ERROR] ' + validationResult;
             }
             this.value = newValue;
+            this.mirror.show(newValue);
 
             if (propagate) {
                 // TODO: backend
@@ -40,6 +42,14 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
             if (!this.validate(this.value, validationResult)) {
                 throw validationResult.message;
             }
+
+            return this;
+        },
+
+        _setupMirror: function() {
+            if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
+            this.mirror = new Mirror(this.node.container, this.mirror);
+            this.mirror.show(this.value);
 
             return this;
         }
