@@ -12,7 +12,6 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         init: function(node, definition) {
             jQuery.extend(this, definition);
             this.node  = node;
-            this.value = typeof this.value === 'undefined' ? this.default: this.value;
             this._sanitize();
         },
 
@@ -53,6 +52,11 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
                 return false;
             }
             return true;
+        },
+
+        _sanitize: function() {
+            this.value = typeof this.value === 'undefined' ? this.default : this.value;
+            return this._super();
         }
     });
 
@@ -82,7 +86,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         },
 
         _sanitize: function() {
-            this._super();
+            this.value = typeof this.value === 'undefined' ? this.default : this.value;
 
             if (typeof this.choices !== 'undefined' || this.choices.length === 0) {
                 throw '[VALUE ERROR] there must be at least one choice';
@@ -91,7 +95,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
             } else if (_.indexOf(this.values, this.value) < 0) {
                 throw '[VALUE ERROR] unknown value ' + this.value;
             }
-            return this;
+            return this._super();
         }
     });
 
@@ -137,6 +141,8 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         },
 
         _sanitize: function() {
+            this.value = typeof this.value === 'undefined' ? this.default.slice(0) : this.value;
+
             if (!_.isArray(this.parts) || this.parts.length < 1) {
                 throw '[VALUE ERROR] there must be at least one part';
             }
@@ -198,6 +204,8 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
             if (!_.isArray(this.default) || this.default.length != 2) {
                 throw '[TYPE ERROR] default must be a tuple';
             }
+
+            this.value = typeof this.value === 'undefined' ? this.default.slice(0) : this.value;
 
             if (!(this.default[0] instanceof Decimal) && isNumber(this.default[0])) {
                 this.default[0] = new Decimal(this.default[0]);
@@ -261,17 +269,19 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         },
 
         _sanitize: function() {
-            if (!(this.default instanceof Decimal) && isNumber(this.default)) {
+            this.value = typeof this.value === 'undefined' ? this.default : this.value;
+
+            if (isNumber(this.default)) {
                 this.default = new Decimal(this.default);
             } else {
                 throw '[VALUE ERROR] default must be Decimal or number';
             }
-            if (!(this.min instanceof Decimal) && isNumber(this.min)) {
+            if (isNumber(this.min)) {
                 this.min = new Decimal(this.min);
             } else {
                 throw '[VALUE ERROR] min must be Decimal or number';
             }
-            if (!(this.max instanceof Decimal) && isNumber(this.max)) {
+            if (isNumber(this.max)) {
                 this.max = new Decimal(this.max);
             } else {
                 throw '[VALUE ERROR] max must be Decimal or number';
@@ -318,9 +328,12 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         },
 
         _sanitize: function() {
+
             if (!_.isArray(this.default) || this.default.length != 2) {
                 throw '[TYPE ERROR] default must be a tuple';
             }
+
+            this.value = typeof this.value === 'undefined' ? this.default.slice(0) : this.value;
 
             if (!(this.default[0] instanceof Decimal) && isNumber(this.default[0])) {
                 this.default[0] = new Decimal(this.default[0]);
@@ -369,6 +382,11 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
                 return false;
             }
             return true;
+        },
+
+        _sanitize: function() {
+            this.value = typeof this.value === 'undefined' ? this.default : this.value;
+            return this._super();
         }
     });
 
