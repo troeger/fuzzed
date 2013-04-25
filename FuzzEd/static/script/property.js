@@ -96,7 +96,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
     });
 
     var Compound = Property.extend({
-        parts:     undefined,
+        parts: undefined,
 
         setValue: function(newValue, propagate) {
             if (typeof propagate === 'undefined') propagate = true;
@@ -117,7 +117,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         },
 
         validate: function(value, validationResult) {
-            if (typeof this.value !== 'array' || this.value.length != 2) {
+            if (!_.isArray(this.value) || this.value.length != 2) {
                 validationResult.message = '[TYPE ERROR] value must be a tuple';
                 return false;
             }
@@ -137,10 +137,10 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         },
 
         _sanitize: function() {
-            if (typeof this.parts !== 'array' || this.parts.length < 1) {
+            if (!_.isArray(this.parts) || this.parts.length < 1) {
                 throw '[VALUE ERROR] there must be at least one part';
             }
-            if (isNumber(this.default[0]) && this.default[0] >= 0 && this.default[0] < this.parts.length) {
+            if (isNumber(this.default[0]) && this.default[0] < 0 && this.default[0] >= this.parts.length) {
                 throw '[VALUE ERROR] selection must point to a part';
             }
 
@@ -165,8 +165,8 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         epsilonStep: undefined,
 
         validate: function(value, validationResult) {
-            if (typeof value !== 'array' || value.length != 2) {
-                validationResult.message('[TYPE ERROR] value must be a tuple');
+            if (!_.isArray(value) || value.length != 2) {
+                validationResult.message = '[TYPE ERROR] value must be a tuple';
                 return false;
             }
 
@@ -175,47 +175,47 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
 
             if (typeof center  !== 'number' || window.isNaN(center) ||
                 typeof epsilon !== 'number' || window.isNaN(epsilon)) {
-                validationResult.message('[TYPE ERROR] center and epsilon must be numbers');
+                validationResult.message = '[TYPE ERROR] center and epsilon must be numbers';
                 return false;
             } else if (epsilon < 0) {
-                validationResult.message('[VALUE ERROR] epsilon must not be negative');
+                validationResult.message = '[VALUE ERROR] epsilon must not be negative';
                 return false;
             } else if (this.min.gt(center - epsilon) || this.max.lt(center + epsilon)) {
-                validationResult.message('[VALUE ERROR] value out of bounds');
+                validationResult.message = '[VALUE ERROR] value out of bounds';
                 return false;
             } else if (typeof this.step !== 'undefined' && !this.default[0].minus(center).mod(this.step).eq(0)) {
-                validationResult.message('[VALUE ERROR] center not in value range (step)');
+                validationResult.message = '[VALUE ERROR] center not in value range (step)';
                 return false;
             } else if (typeof this.epsilonStep !== 'undefined' &&
                        !this.default[1].minus(epsilon).mod(this.epsilonStep).eq(0)) {
-                validationResult.message('[VALUE ERROR] epsilon not in value range (step)');
+                validationResult.message = '[VALUE ERROR] epsilon not in value range (step)';
                 return false;
             }
             return true;
         },
 
         _sanitize: function() {
-            if (typeof this.default !== 'array' || this.default.length != 2) {
+            if (!_.isArray(this.default) || this.default.length != 2) {
                 throw '[TYPE ERROR] default must be a tuple';
             }
 
-            if (!this.default[0] instanceof Decimal && isNumber(this.default[0])) {
+            if (!(this.default[0] instanceof Decimal) && isNumber(this.default[0])) {
                 this.default[0] = new Decimal(this.default[0]);
             } else {
                 throw '[VALUE ERROR] default lower bound must be Decimal or number';
             }
-            if (!this.default[1] instanceof Decimal && isNumber(this.default[1])) {
+            if (!(this.default[1] instanceof Decimal) && isNumber(this.default[1])) {
                 this.default[1] = new Decimal(this.default[1]);
             } else {
                 throw '[VALUE ERROR] default upper bound must be Decimal or number';
             }
 
-            if (!this.min instanceof Decimal && isNumber(this.min)) {
+            if (!(this.min instanceof Decimal) && isNumber(this.min)) {
                 this.min = new Decimal(this.min);
             } else {
                 throw '[VALUE ERROR] min must be Decimal or number';
             }
-            if (!this.max instanceof Decimal && isNumber(this.max)) {
+            if (!(this.max instanceof Decimal) && isNumber(this.max)) {
                 this.max = new Decimal(this.max);
             } else {
                 throw '[VALUE ERROR] max must be Decimal or number';
@@ -248,30 +248,30 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
 
         validate: function(value, validationResult) {
             if (!isNumber(value)) {
-                validationResult.message('[TYPE ERROR] value is not a number');
+                validationResult.message = '[TYPE ERROR] value is not a number';
                 return false;
             } else if (this.min.gt(value) || this.max.lt(value)) {
-                validationResult.message('[VALUE ERROR] value out of bounds');
+                validationResult.message = '[VALUE ERROR] value out of bounds';
                 return false;
             } else if (typeof this.step !== 'undefined' && !this.default.minus(value).mod(this.step).eq(0)) {
-                validationResult.message('[VALUE ERROR] value not in value range (step)');
+                validationResult.message = '[VALUE ERROR] value not in value range (step)';
                 return false;
             }
             return true;
         },
 
         _sanitize: function() {
-            if (!this.default instanceof Decimal && isNumber(this.default)) {
+            if (!(this.default instanceof Decimal) && isNumber(this.default)) {
                 this.default = new Decimal(this.default);
             } else {
                 throw '[VALUE ERROR] default must be Decimal or number';
             }
-            if (!this.min instanceof Decimal && isNumber(this.min)) {
+            if (!(this.min instanceof Decimal) && isNumber(this.min)) {
                 this.min = new Decimal(this.min);
             } else {
                 throw '[VALUE ERROR] min must be Decimal or number';
             }
-            if (!this.max instanceof Decimal && isNumber(this.max)) {
+            if (!(this.max instanceof Decimal) && isNumber(this.max)) {
                 this.max = new Decimal(this.max);
             } else {
                 throw '[VALUE ERROR] max must be Decimal or number';
@@ -296,7 +296,7 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
         step: undefined,
 
         validate: function(value, validationResult) {
-            if (typeof this.value !== 'array' || this.value.length != 2) {
+            if (!_.isArray(this.value) || this.value.length != 2) {
                 validationResult.message = '[TYPE ERROR] value must be a tuple';
                 return false;
             }
@@ -311,34 +311,34 @@ define(['class', 'decimal', 'underscore'], function(Class, Decimal) {
                 return false;
             } else if (typeof this.step !== 'undefined' && !this.default[0].minus(lower).mod(this.step).eq(0) ||
                                                            !this.default[1].minus(upper).mod(this.step).eq(0)) {
-                validationResult.message('[VALUE ERROR] value not in value range (step)');
+                validationResult.message = '[VALUE ERROR] value not in value range (step)';
                 return false;
             }
             return true;
         },
 
         _sanitize: function() {
-            if (typeof this.default !== 'array' || this.default.length != 2) {
+            if (!_.isArray(this.default) || this.default.length != 2) {
                 throw '[TYPE ERROR] default must be a tuple';
             }
 
-            if (!this.default[0] instanceof Decimal && isNumber(this.default[0])) {
+            if (!(this.default[0] instanceof Decimal) && isNumber(this.default[0])) {
                 this.default[0] = new Decimal(this.default[0]);
             } else {
                 throw '[VALUE ERROR] default lower bound must be Decimal or number';
             }
-            if (!this.default[1] instanceof Decimal && isNumber(this.default[1])) {
+            if (!(this.default[1] instanceof Decimal) && isNumber(this.default[1])) {
                 this.default[1] = new Decimal(this.default[1]);
             } else {
                 throw '[VALUE ERROR] default upper bound must be Decimal or number';
             }
 
-            if (!this.min instanceof Decimal && isNumber(this.min)) {
+            if (!(this.min instanceof Decimal) && isNumber(this.min)) {
                 this.min = new Decimal(this.min);
             } else {
                 throw '[VALUE ERROR] min must be Decimal or number';
             }
-            if (!this.max instanceof Decimal && isNumber(this.max)) {
+            if (!(this.max instanceof Decimal) && isNumber(this.max)) {
                 this.max = new Decimal(this.max);
             } else {
                 throw '[VALUE ERROR] max must be Decimal or number';
