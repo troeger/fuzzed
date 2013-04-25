@@ -17,9 +17,8 @@ int SpareGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	vector<int> regularIds;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
 	{
-		//boost::shared_ptr<BasicEvent> basicEvent = boost::dynamic_pointer_cast<BasicEvent,FaultTreeNode>(*it);
 		BasicEvent* basicEvent = dynamic_cast<BasicEvent*>(*it);
-		if (CONTAINS(m_spareIndices, basicEvent->getId()))
+		if (CONTAINS(m_spareIndices, basicEvent->getId())) // TODO
 			spares.push_back(basicEvent->serializeAsColdSpare(doc));
 		else
 			regularIds.push_back(basicEvent->serialize(doc));

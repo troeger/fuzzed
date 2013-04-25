@@ -3,7 +3,7 @@
 #include "implementation/PetriNetSimulation.h"
 
 #include "serialization/PNMLDocument.h"
-#include "import/FaultTreeImport.h"
+#include "FuzzTreeImport.h"
 
 #include "util.h"
 #include "Config.h"
@@ -220,10 +220,10 @@ void SimulationProxy::simulateFile(const boost::filesystem::path& p, bool simula
 
 	else if (p.extension() == ".fuzztree" && !simulatePetriNet)
 	{
-		pair<FaultTreeImport*, FTResults*> results;
+		pair<FuzzTreeImport*, FTResults*> results;
 		try
 		{
-			results = FaultTreeImport::loadFaultTreeAsync(p.generic_string());
+			results = FuzzTreeImport::loadFaultTreeAsync(p.generic_string());
 		}
 		catch (std::exception& e)
 		{
@@ -235,7 +235,7 @@ void SimulationProxy::simulateFile(const boost::filesystem::path& p, bool simula
 		}
 
 		FTResults* const resultQueue = results.second;
-		const FaultTreeImport* const importer = results.first;
+		const FuzzTreeImport* const importer = results.first;
 
 		assert(resultQueue && importer);
 

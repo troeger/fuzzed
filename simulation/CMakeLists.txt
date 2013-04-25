@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8) 
+cmake_minimum_required(VERSION 2.8.8) 
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
@@ -13,8 +13,15 @@ set(BOOST_INCLUDEDIR ${BOOST_ROOT}/Include)
 set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
        
 set(FT_LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
-set(FT_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/modeltransform" "${PROJECT_SOURCE_DIR}/common")
+set(FT_INCLUDE_DIR 
+	"${PROJECT_SOURCE_DIR}/modeltransform" 
+	"${PROJECT_SOURCE_DIR}/common"
+	"${PROJECT_SOURCE_DIR}/fuzztreeconfiguration")
+
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
+
+# so the shared libs can see symbols from static libs
+set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 
 if(MSVC)
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -34,7 +41,6 @@ find_package(pugixml REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
-#add_definitions(${Boost_LIB_DIAGNOSTIC_DEFINITIONS})
 
 option(BUILD_TESTS OFF)
 if (${BUILD_TESTS})
@@ -45,5 +51,6 @@ endif()
 
 add_subdirectory(common)
 add_subdirectory(modeltransform)
-option(BUILD_SIMULATION_EXECUTABLE ON) #otherwise, a static lib
+option(BUILD_SIMULATION_EXECUTABLE ON)
+add_subdirectory(fuzztreeconfiguration)
 add_subdirectory(simulation)

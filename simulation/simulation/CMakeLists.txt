@@ -1,4 +1,4 @@
-project(fttransform CXX)
+project(ftsimulation CXX)
                                                                                                                                                                                                                         
 set(SOURCES
    ${SOURCE}
@@ -41,6 +41,8 @@ add_executable(ftsimulation ${SOURCES} ${HEADERS})
 if (WIN32)
 	target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/Release/ftmodeltransform.lib)
 	target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/Debug/ftmodeltransform.lib)
+   target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/Release/ftconfiguration.lib)
+   target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/Debug/ftconfiguration.lib)
 	target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/Release/ftcommon.lib)
 	target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/Debug/ftcommon.lib)
 endif (WIN32)
@@ -48,6 +50,8 @@ endif (WIN32)
 if (UNIX)
 	target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/libftmodeltransform.a)
 	target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/libftmodeltransform.a)
+   target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/libftconfiguration.a)
+   target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/libftconfiguration.a)
 	target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/libftcommon.a)
 	target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/libftcommon.a)
 	message("Linking against static libs")

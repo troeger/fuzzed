@@ -6,7 +6,6 @@
 
 #include "pugixml.hpp"
 
-
 class PNDocument;
 
 class FaultTreeNode

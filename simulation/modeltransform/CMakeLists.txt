@@ -23,9 +23,8 @@ set(SOURCES
    serialization/PNDocument.cpp
    serialization/PNMLDocument.cpp
    serialization/TimeNETDocument.cpp
-
-   import/FaultTreeImport.cpp
 )
+
 set(HEADERS
    ${HEADERS}
    FaultTreeNode.h
@@ -50,9 +49,6 @@ set(HEADERS
    serialization/PNDocument.h
    serialization/PNMLDocument.h
    serialization/TimeNETDocument.h
-   
-   import/FaultTreeImport.h
-   import/FuzzTreeConfiguration.h
 )
 
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})

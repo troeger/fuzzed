@@ -1,12 +1,12 @@
 #pragma once
 #if IS_WINDOWS 
-	#pragma warning(push, 3) 
+#pragma warning(push, 3) 
 #endif
 #include <pugixml.hpp>
 #include <boost/filesystem/path.hpp>
 #include <future>
 #if IS_WINDOWS 
-	#pragma warning(pop) 
+#pragma warning(pop) 
 #endif
 
 #include "FaultTreeNode.h"
@@ -18,17 +18,16 @@ using namespace pugi;
 
 typedef moodycamel::ReaderWriterQueue<FaultTreeNode*> FTResults;
 
-class FaultTreeImport : public XMLImport
+class FuzzTreeImport : public XMLImport
 {
 public:
-	// blocks until one fault tree has been loaded
 	static FaultTreeNode* loadFaultTree(const string& fileName);
 
 	// returns a vector of futures on the fault tree configurations
-	// the caller should tidy up the FaultTreeImport pointer
-	static pair<FaultTreeImport*,FTResults*> loadFaultTreeAsync(const string& fileName);
+	// the caller should tidy up the FuzzTreeImport pointer
+	static pair<FuzzTreeImport*,FTResults*> loadFaultTreeAsync(const string& fileName);
 
-	virtual ~FaultTreeImport();
+	virtual ~FuzzTreeImport();
 
 	bool isBusy() const { return m_busy; };
 
@@ -43,8 +42,8 @@ protected:
 	static double parseFailureRate(const xml_node &child);
 
 private:
-	FaultTreeImport(const string& fileName);
-	
+	FuzzTreeImport(const string& fileName);
+
 	virtual bool loadRootNode() override;
 
 	void loadTree(FTResults* queue);

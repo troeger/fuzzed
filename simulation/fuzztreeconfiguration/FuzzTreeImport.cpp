@@ -1,24 +1,24 @@
 #if IS_WINDOWS 
-	#pragma warning(push, 3) 
+#pragma warning(push, 3) 
 #endif
 #include <algorithm>
 #include <iostream>
 #include <boost/range/counting_range.hpp>
 #if IS_WINDOWS 
-	#pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 
-#include "FaultTreeImport.h"
+#include "FuzzTreeImport.h"
 #include "FaultTreeIncludes.h"
 #include "Constants.h"
 #include "util.h"
 
 using namespace fuzzTree;
 
-FaultTreeNode* FaultTreeImport::loadFaultTree(const string& fileName)
+FaultTreeNode* FuzzTreeImport::loadFaultTree(const string& fileName)
 {
-	FaultTreeImport import(fileName);
+	FuzzTreeImport import(fileName);
 	FTResults* results = new FTResults();
 
 	try
@@ -40,9 +40,9 @@ FaultTreeNode* FaultTreeImport::loadFaultTree(const string& fileName)
 	return res;
 }	
 
-std::pair<FaultTreeImport*,FTResults*> FaultTreeImport::loadFaultTreeAsync(const string& fileName)
+std::pair<FuzzTreeImport*,FTResults*> FuzzTreeImport::loadFaultTreeAsync(const string& fileName)
 {
-	FaultTreeImport* import = new FaultTreeImport(fileName);
+	FuzzTreeImport* import = new FuzzTreeImport(fileName);
 	FTResults* results = new FTResults();
 
 	try
@@ -61,11 +61,11 @@ std::pair<FaultTreeImport*,FTResults*> FaultTreeImport::loadFaultTreeAsync(const
 	return make_pair(import, results);
 }
 
-FaultTreeImport::FaultTreeImport(const string& fileName)
+FuzzTreeImport::FuzzTreeImport(const string& fileName)
 	: XMLImport(fileName), m_busy(true)
 {}
 
-bool FaultTreeImport::loadRootNode()
+bool FuzzTreeImport::loadRootNode()
 {
 	m_rootNode = m_document.child(FUZZ_TREE);
 	if (!m_rootNode)
@@ -76,7 +76,7 @@ bool FaultTreeImport::loadRootNode()
 	return true;
 }
 
-void FaultTreeImport::loadTree(FTResults* queue)
+void FuzzTreeImport::loadTree(FTResults* queue)
 {
 	m_running.emplace_back( std::thread([this, queue]() -> void
 	{
@@ -101,26 +101,26 @@ void FaultTreeImport::loadTree(FTResults* queue)
 		{
 			cout << "Unknown error during asynchronous import" << endl;
 		}
-	
+
 		m_busy = false;
 	}));
 }
 
-void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree, FTResults* results)
+void FuzzTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree, FTResults* results)
 {
 	assert(tree != nullptr);
-	
+
 	for (xml_node& child : node.children("children"))
 	{
 		const string typeDescriptor = child.attribute("xsi:type").as_string();
-		
+
 		const int id		= child.attribute("id").as_int(-1);
 		const char* name	= child.attribute("name").as_string();
 		const bool opt		= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
 
 		if (id < 0)
 			throw runtime_error("Invalid ID");
-		
+
 		/************************************************************************/
 		/* Basic Events/ Leaf Nodes                                             */
 		/************************************************************************/
@@ -134,7 +134,7 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree, FTResu
 			tree->addChild(new UndevelopedEvent(id, parseFailureRate(child), name));
 			continue;
 		}
-		
+
 		/************************************************************************/
 		/* Configuration Points                                                 */
 		/************************************************************************/
@@ -192,15 +192,15 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree, FTResu
 			const string prioIds = child.attribute(PRIO_ID_ATTRIBUTE).as_string("");
 			vector<int> prioIndices;
 			util::tokenizeIntegerString(prioIds, prioIndices);
-			
+
 			gate = new PANDGate(id, set<int>(prioIndices.begin(), prioIndices.end()), name);
 		}
 		else
 		{
 			cout << "Unrecognized type descriptor: " << typeDescriptor
-				 << "...ignoring this node.";
+				<< "...ignoring this node.";
 			continue;
-			
+
 		}
 		if (gate != nullptr)
 			tree->addChild(gate);
@@ -210,7 +210,7 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree, FTResu
 	}
 }
 
-double FaultTreeImport::parseFailureRate(const xml_node &child)
+double FuzzTreeImport::parseFailureRate(const xml_node &child)
 {
 	for (auto& probabilityNode : child.children("probability"))
 	{
@@ -227,7 +227,7 @@ double FaultTreeImport::parseFailureRate(const xml_node &child)
 	return -1.0;
 }
 
-void FaultTreeImport::handleBasicEventSet(
+void FuzzTreeImport::handleBasicEventSet(
 	xml_node &child, 
 	const int id, 
 	const char* name, 
@@ -248,7 +248,7 @@ void FaultTreeImport::handleBasicEventSet(
 	}
 }
 
-void FaultTreeImport::handleFeatureVP(
+void FuzzTreeImport::handleFeatureVP(
 	xml_node &node, 
 	const int id,
 	const char* name, 
@@ -258,7 +258,7 @@ void FaultTreeImport::handleFeatureVP(
 	// find the top level node and clone it
 	const FaultTreeNode* const top = tree->getRoot();
 	const int parentID = tree->getId();
-	
+
 	for (xml_node& child : node.children("children"))
 	{
 		FaultTreeNode* newTree = top->clone();
@@ -268,7 +268,7 @@ void FaultTreeImport::handleFeatureVP(
 	}
 }
 
-void FaultTreeImport::handleRedundancyVP(
+void FuzzTreeImport::handleRedundancyVP(
 	xml_node &child, 
 	const int id, 
 	const char* name, 
@@ -304,7 +304,7 @@ void FaultTreeImport::handleRedundancyVP(
 	}
 }
 
-FaultTreeImport::~FaultTreeImport()
+FuzzTreeImport::~FuzzTreeImport()
 {
 	for (auto& thread : m_running)
 		thread.join();
