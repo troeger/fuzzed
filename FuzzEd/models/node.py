@@ -30,7 +30,8 @@ xml_classes = {
     'xorGate':              Xor,
     'votingOrGate':         VotingOr,
     'featureVariation':     FeatureVariationPoint,
-    'redundancyVariation':  RedundancyVariationPoint
+    'redundancyVariation':  RedundancyVariationPoint,
+    'transferIn':           TransferIn
 }
 
 class Node(models.Model):
@@ -177,6 +178,9 @@ class Node(models.Model):
             properties['start']   = nRange[0]
             properties['end']     = nRange[1]
             properties['formula'] = self.get_property('kFormula')
+
+        elif self.kind == 'transferIn':
+            properties['fromModelId'] = self.get_property('transfer')
 
         try:
             xml_node = xml_classes[self.kind](**properties)
