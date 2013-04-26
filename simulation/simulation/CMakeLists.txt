@@ -52,9 +52,6 @@ else (BUILD_SIMULATION_EXECUTABLE) # shared library
       ftcommon
    )
    add_definitions(-DSIMULATION_DLL)
-   if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-      set_target_properties(ftsimulation PROPERTIES COMPILE_FLAGS "-fPIC")
-   endif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
    message("Building shared simulation library")
 endif (BUILD_SIMULATION_EXECUTABLE)
 
