@@ -54,7 +54,7 @@
       </alphaCuts>
     </probability>
   </configurations>
-  <configurations costs="2">
+  <configurations costs="200">
     <choices key="12">
       <value xsi:type="fta:RedundancyChoice" n="4"/>
     </choices>
@@ -70,7 +70,7 @@
       </alphaCuts>
     </probability>
   </configurations>
-  <configurations costs="3">
+  <configurations costs="250">
     <choices key="12">
       <value xsi:type="fta:RedundancyChoice" n="5"/>
     </choices>
