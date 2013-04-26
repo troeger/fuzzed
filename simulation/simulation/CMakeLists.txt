@@ -44,7 +44,7 @@ if (BUILD_SIMULATION_EXECUTABLE)
       ftcommon
    )
    message("Building simulation executable")
-else (BUILD_SIMULATION_EXECUTABLE)
+else (BUILD_SIMULATION_EXECUTABLE) # shared library
    add_library(ftsimulation SHARED ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation
       ftmodeltransform
@@ -52,10 +52,13 @@ else (BUILD_SIMULATION_EXECUTABLE)
       ftcommon
    )
    add_definitions(-DSIMULATION_DLL)
+   if (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+      set_target_properties(ftsimulation PROPERTIES COMPILE_FLAGS "-fPIC")
+   endif (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
    message("Building shared simulation library")
 endif (BUILD_SIMULATION_EXECUTABLE)
 
-option(profileOMP "Profile OpenMP" ON)
+option(profileOMP "Profile OpenMP" OFF)
 find_package(OpenMP)
 if (OPENMP_FOUND)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
