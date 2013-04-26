@@ -36,28 +36,23 @@ set(HEADERS
    petrinet/PetriNet.h
 )
 
-add_executable(ftsimulation ${SOURCES} ${HEADERS})
-
-if (WIN32)
-	target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/Release/ftmodeltransform.lib)
-	target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/Debug/ftmodeltransform.lib)
-   target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/Release/ftconfiguration.lib)
-   target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/Debug/ftconfiguration.lib)
-	target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/Release/ftcommon.lib)
-	target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/Debug/ftcommon.lib)
-endif (WIN32)
-
-if (UNIX)
-	target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/libftmodeltransform.a)
-	target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/libftmodeltransform.a)
-   target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/libftconfiguration.a)
-   target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/libftconfiguration.a)
-	target_link_libraries(ftsimulation optimized ${FT_LIB_DIR}/libftcommon.a)
-	target_link_libraries(ftsimulation debug ${FT_LIB_DIR}/libftcommon.a)
-	message("Linking against static libs")
-endif (UNIX)
-
-message("Building Simulation Executable")
+if (BUILD_SIMULATION_EXECUTABLE)
+   add_executable(ftsimulation ${SOURCES} ${HEADERS})
+   target_link_libraries(ftsimulation
+      ftmodeltransform
+      ftconfiguration
+      ftcommon
+   )
+   message("Building simulation executable")
+else (BUILD_SIMULATION_EXECUTABLE)
+   add_library(ftsimulation SHARED ${SOURCES} ${HEADERS})
+   target_link_libraries(ftsimulation
+      ftmodeltransform
+      ftconfiguration
+      ftcommon
+   )
+   message("Building shared simulation library")
+endif (BUILD_SIMULATION_EXECUTABLE)
 
 option(profileOMP "Profile OpenMP" ON)
 find_package(OpenMP)

@@ -1,5 +1,8 @@
 project(common)
 
+set(LIBNAME ftcommon)
+set(FTCOMMON_LIB ${LIBNAME} PARENT_SCOPE)
+
 set(SOURCES
 	${SOURCES}
 	

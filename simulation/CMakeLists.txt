@@ -30,6 +30,7 @@ if(MSVC)
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
+  ADD_DEFINITIONS(/D_CRT_SECURE_NO_WARNINGS /DNOMINMAX /DWIN32_LEAN_AND_MEAN)
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -std=c++0x")
 endif()
@@ -51,6 +52,9 @@ if (${BUILD_TESTS})
 endif()
 
 add_subdirectory(common)
+
+message("Test: ${FTCOMMON_LIB}")
+
 add_subdirectory(modeltransform)
 option(BUILD_SIMULATION_EXECUTABLE ON)
 add_subdirectory(fuzztreeconfiguration)
