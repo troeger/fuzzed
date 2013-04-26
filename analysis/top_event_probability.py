@@ -3,6 +3,7 @@
 from FuzzEd import settings
 from FuzzEd.models import xml_analysis, Node
 import json, urllib, logging, time, xml.sax
+import errors
 
 logger   = logging.getLogger('FuzzEd')
 BASE_URL = settings.ANALYZE_TOP_EVENT_PROBABILITY_SERVER
@@ -83,11 +84,11 @@ class AnalysisResultContentHandler(xml.sax.ContentHandler):
 
         elif name == 'errors':
             node_id = int(Node.objects.get(pk=int(attrs.getValue('elementId'))).client_id)
-            self.errors[node_id] = attrs.getValue('message')
+            self.errors[node_id] = errors.text[int(attrs.getValue('issueId'))]
 
         elif name == 'warnings':
             node_id = int(Node.objects.get(pk=int(attrs.getValue('elementId'))).client_id)
-            self.warnings[node_id] = attrs.getValue('message')
+            self.warnings[node_id] = errors.text[int(attrs.getValue('issueId'))]
 
     def endElement(self, name):
         if name == 'choices':
