@@ -22,7 +22,7 @@ set(FT_INCLUDE_DIR
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
 
 # so the shared libs can see symbols from static libs
-set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
+#set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
 
 if(MSVC)
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -52,8 +52,6 @@ if (${BUILD_TESTS})
 endif()
 
 add_subdirectory(common)
-
-message("Test: ${FTCOMMON_LIB}")
 
 add_subdirectory(modeltransform)
 option(BUILD_SIMULATION_EXECUTABLE ON)
