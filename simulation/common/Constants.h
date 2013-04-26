@@ -56,6 +56,7 @@ const std::string g_alphabet = "abcdefghijklmnopqrstuvwxyz";
 namespace fuzzTree 
 {
 	const char* const FUZZ_TREE = "ft:FuzzTree";
+	const char* const TOP_EVENT = "topEvent";
 
 	const char* const INTERMEDIATE_EVENT = "ft:IntermediateEvent";
 	const char* const BASIC_EVENT = "ft:BasicEvent";
