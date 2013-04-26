@@ -51,6 +51,7 @@ else (BUILD_SIMULATION_EXECUTABLE)
       ftconfiguration
       ftcommon
    )
+   add_definitions(-DSIMULATION_DLL)
    message("Building shared simulation library")
 endif (BUILD_SIMULATION_EXECUTABLE)
 

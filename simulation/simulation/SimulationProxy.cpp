@@ -23,6 +23,7 @@
 #if IS_WINDOWS 
 	#pragma warning(pop)
 #endif
+#include "FuzzTreeTransform.h"
 
 
 namespace po = boost::program_options;
@@ -221,6 +222,9 @@ void SimulationProxy::simulateFile(const boost::filesystem::path& p, bool simula
 	else if (p.extension() == ".fuzztree" && !simulatePetriNet)
 	{
 		pair<FuzzTreeImport*, FTResults*> results;
+
+// 		FuzzTreeTransform::transformFuzzTree(p.generic_string(), "");
+// 		return; // NOCOMMIT
 		try
 		{
 			results = FuzzTreeImport::loadFaultTreeAsync(p.generic_string());
@@ -268,4 +272,46 @@ void SimulationProxy::simulateFile(const boost::filesystem::path& p, bool simula
 		delete importer;
 		delete resultQueue;
 	}
+}
+
+void runSimulation(
+	char* filePath, /* path to fault tree file */ 
+	int missionTime, 
+	int numRounds, /* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/ 
+	double convergenceThreshold, /* stop after reliability changes no more than this threshold */
+	int maxTime /* maximum duration of simulation in milliseconds */)
+{
+	string newFileName(filePath);
+	FaultTreeNode* ft = FuzzTreeImport::loadFaultTree(newFileName);
+	if (!ft || !ft->isValid())
+	{
+		cout << "Invalid Fault Tree! " << endl;
+		return;
+	}
+	
+	util::replaceFileExtensionInPlace(newFileName, ".pnml");
+	boost::shared_ptr<PNMLDocument> doc = 
+		boost::shared_ptr<PNMLDocument>(new PNMLDocument());
+
+	ft->serialize(doc);
+	ft->print(cout);
+	delete ft;
+
+	doc->save(newFileName); // save PNML file
+	
+	std::string logFileName = newFileName;
+	util::replaceFileExtensionInPlace(logFileName, ".log");
+
+	PetriNetSimulation* sim = new PetriNetSimulation(
+		newFileName, 
+		logFileName, 
+		maxTime, 
+		missionTime, 
+		numRounds,
+		convergenceThreshold,
+		true, /* simulate until failure for MTTF */
+		0 /* not yet implemented */);
+
+	sim->run(false);
+	delete sim;
 }

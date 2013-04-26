@@ -10,6 +10,8 @@
 	#pragma warning(pop)
 #endif
 
+#include "Config.h"
+
 using namespace std;
 
 enum SimulationImpl
@@ -18,7 +20,23 @@ enum SimulationImpl
 	DEFAULT
 };
 
+
 /************************************************************************/
+/* SIMULATION LIBRARY                                                   */
+/************************************************************************/
+extern "C"
+{
+	void __declspec(dllexport) runSimulation(
+		char* filePath, /* path to fault tree file */
+		int missionTime,
+		int numRounds,	/* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/
+		double convergenceThreshold, /* stop after reliability changes no more than this threshold */
+		int maxTime		/* maximum duration of simulation in milliseconds */
+		);
+};
+
+/************************************************************************/
+/* SIMLATION EXECUTABLE													*/
 /* determines the simulation configuration from command line arguments, */
 /* and runs the simulation												*/
 /************************************************************************/
