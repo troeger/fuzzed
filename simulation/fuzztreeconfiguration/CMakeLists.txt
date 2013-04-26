@@ -23,3 +23,7 @@ if (WIN32)
    target_link_libraries(ftconfiguration optimized ${PUGIXML_LIB_RELEASE})
    target_link_libraries(ftconfiguration debug ${PUGIXML_LIB_DEBUG})
 endif(WIN32)
+
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+   set_target_properties(ftcommon PROPERTIES COMPILE_FLAGS "-fPIC")
+endif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
