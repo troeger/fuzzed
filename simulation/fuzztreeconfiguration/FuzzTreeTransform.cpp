@@ -44,8 +44,11 @@ void FuzzTreeTransform::transformFuzzTree(const string& fileName, const string& 
 
 void FuzzTreeTransform::loadNode(const xml_node& node, xml_node& previous, xml_document& newDoc)
 {
-	for (xml_node& child : node.children("children"))
+	auto childRange = node.children("children");
+	for (auto it = childRange.begin(); it != childRange.end(); ++it)
 	{
+		const xml_node child = *it;
+		
 		const string typeDescriptor = child.attribute("xsi:type").as_string();
 
 		const int id		= child.attribute("id").as_int(-1);
@@ -54,6 +57,27 @@ void FuzzTreeTransform::loadNode(const xml_node& node, xml_node& previous, xml_d
 
 		if (id < 0)
 			continue;
+		
+		if (opt)
+		{ // branch and create a new tree
+			xml_document copiedDoc;
+			copiedDoc.reset(newDoc);
+
+			// TODO this cannot be the easiest way
+			auto nextIt = childRange.begin();
+			while (nextIt != it)
+			{
+				++nextIt;
+			}
+			++nextIt;
+			xml_node nextChild = *nextIt;
+
+			boost::function<void()> branchedTask = 
+				boost::bind(&FuzzTreeTransform::loadNodeInBranch, this, nextChild, previous, boost::ref(copiedDoc));
+			
+			m_threadPool.schedule(branchedTask);
+		}
+
 				
 		/************************************************************************/
 		/* Basic Events/ Leaf Nodes                                             */
@@ -90,17 +114,6 @@ void FuzzTreeTransform::loadNode(const xml_node& node, xml_node& previous, xml_d
 		else if (typeDescriptor == TRANSFER_GATE)
 		{
 			continue;
-		}
-
-		if (opt)
-		{ // branch and create a new tree
-			xml_document copiedDoc;
-			copiedDoc.reset(newDoc);
-			
-			boost::function<void()> branchedTask = 
-				boost::bind(&FuzzTreeTransform::loadNode, this, child, previous, boost::ref(copiedDoc));
-
-			m_threadPool.schedule(branchedTask);
 		}
 
 		/************************************************************************/
@@ -143,11 +156,12 @@ void FuzzTreeTransform::handleBasicEventSet(
 
 void FuzzTreeTransform::handleFeatureVP(const xml_node &child, xml_node& previous, xml_document& newDoc)
 {
+	// TODO
 }
 
 void FuzzTreeTransform::handleRedundancyVP(const xml_node &child, xml_node& previous, xml_document& newDoc)
 {
-
+	// TODO
 }
 
 FuzzTreeTransform::FuzzTreeTransform(const string& fileName, const string& targetDir)
@@ -175,7 +189,9 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fileName, const string& targe
 
 FuzzTreeTransform::~FuzzTreeTransform()
 {
+	// TODO this threadpool never finishes.
 	m_threadPool.clear();
+	// m_threadPool.wait();
 }
 
 bool FuzzTreeTransform::loadRootNode()
@@ -225,4 +241,16 @@ bool FuzzTreeTransform::isFaultTreeGate(const string& typeDescriptor)
 		typeDescriptor == AND_GATE ||
 		typeDescriptor == OR_GATE ||
 		typeDescriptor == VOTING_OR_GATE;// TODO dynamic gates
+}
+
+void FuzzTreeTransform::loadNodeInBranch(const xml_node& node, xml_node& previous, xml_document& newDoc)
+{
+	loadNode(node, previous, newDoc);
+
+	const string fileName = 
+		m_targetDir.generic_string() + "\\" +
+		m_file.filename().generic_string() + 
+		util::toString(m_count++) + ".fuzztree";
+
+	newDoc.save_file(fileName.c_str());
 }

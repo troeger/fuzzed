@@ -22,6 +22,8 @@ protected:
 	void loadTree();
 	void loadNode(const xml_node& node, xml_node& previous, xml_document& newDoc);
 
+	void loadNodeInBranch(const xml_node& node, xml_node& previous, xml_document& newDoc);
+
 	void handleBasicEventSet(const xml_node& child, xml_node& previous, xml_document& newDoc);
 	void handleFeatureVP(const xml_node& child, xml_node& previous, xml_document& newDoc);
 	void handleRedundancyVP(const xml_node& child, xml_node& previous, xml_document& newDoc);
