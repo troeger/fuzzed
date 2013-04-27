@@ -25,10 +25,21 @@ protected:
 	void scheduleFTGeneration(boost::function<void()>& task);
 
 	void generateFaultTree(const FuzzTreeConfiguration& configuration);
-	void generateFaultTreeRecursive(const xml_node& templateNode, xml_node& node, const FuzzTreeConfiguration& configuration);
+	void generateFaultTreeRecursive(
+		const xml_node& templateNode, 
+		xml_node& node, 
+		const FuzzTreeConfiguration& configuration) const;
 
-	void generateConfigurations(vector<FuzzTreeConfiguration>& configurations);
-	void generateConfigurationsRecursive(const xml_node& node, vector<FuzzTreeConfiguration>& configurations);
+	// returns the configured VotingOR gate
+	xml_node handleRedundancyVP(
+		const xml_node& templateNode, 
+		xml_node& node, 
+		const int configuredN) const;
+
+	void generateConfigurations(vector<FuzzTreeConfiguration>& configurations) const;
+	void generateConfigurationsRecursive(
+		const xml_node& node, 
+		vector<FuzzTreeConfiguration>& configurations) const;
 
 	static void shallowCopy(const xml_node& proto, xml_node& copiedNode);
 	static bool isFaultTreeGate(const string& typeDescriptor);

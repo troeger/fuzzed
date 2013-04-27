@@ -87,4 +87,6 @@ namespace fuzzTree
 	const char* const CHILDREN = "children";
 	const char* const NODE_TYPE = "xsi:type";
 	const char* const NAME_ATTRIBUTE = "name";
+	const char* const VOTING_OR_K = "k";
+	const char* const BASIC_EVENT_SET_QUANTITY = "quantity";
 }

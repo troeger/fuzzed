@@ -173,7 +173,7 @@ void FuzzTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree, FTResul
 		}
 		else if (typeDescriptor == VOTING_OR_GATE)
 		{
-			const int k = child.attribute("k").as_int(-1);
+			const int k = child.attribute(VOTING_OR_K).as_int(-1);
 			if (k < 0)
 				throw runtime_error("Invalid k for VotingORGate");
 
@@ -234,7 +234,7 @@ void FuzzTreeImport::handleBasicEventSet(
 	FaultTreeNode* tree,
 	FTResults* results)
 {
-	const int numEvents = child.attribute("quantity").as_int(1);
+	const int numEvents = child.attribute(BASIC_EVENT_SET_QUANTITY).as_int(1);
 	if (numEvents <= 0)
 	{
 		throw runtime_error("Invalid quantity in Basic Event Set!");

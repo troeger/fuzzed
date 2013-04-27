@@ -114,11 +114,7 @@ bool FuzzTreeTransform::isFaultTreeGate(const string& typeDescriptor)
 		typeDescriptor == VOTING_OR_GATE;// TODO dynamic gates
 }
 
-/************************************************************************/
-/* Traverse the FuzzTree and generate Configurations from it            */
-/************************************************************************/
-
-void FuzzTreeTransform::generateConfigurations(vector<FuzzTreeConfiguration>& configs)
+void FuzzTreeTransform::generateConfigurations(vector<FuzzTreeConfiguration>& configs) const
 {
 	xml_node topEventNode = m_rootNode.child(TOP_EVENT);
 	assert(!topEventNode.empty());
@@ -129,7 +125,7 @@ void FuzzTreeTransform::generateConfigurations(vector<FuzzTreeConfiguration>& co
 
 void FuzzTreeTransform::generateConfigurationsRecursive(
 	const xml_node& fuzzTreeNode, 
-	vector<FuzzTreeConfiguration>& configurations)
+	vector<FuzzTreeConfiguration>& configurations) const
 {
 	for (auto child : fuzzTreeNode.children("children"))
 	{
@@ -224,7 +220,7 @@ void FuzzTreeTransform::scheduleFTGeneration(boost::function<void()>& task)
 void FuzzTreeTransform::generateFaultTreeRecursive(
 	const xml_node& templateNode,
 	xml_node& faultTreeNode, 
-	const FuzzTreeConfiguration& configuration)
+	const FuzzTreeConfiguration& configuration) const
 {
 	const std::string templateType = templateNode.attribute(NODE_TYPE).as_string();
 	const std::string ftType = faultTreeNode.attribute(NODE_TYPE).as_string();
@@ -246,7 +242,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		if (typeDescriptor == REDUNDANCY_VP)
 		{
 			const int configuredN = configuration.getRedundancyCount(id);
-			// TODO handle basic event set below
+			newNode = handleRedundancyVP(child, faultTreeNode, configuredN); // returns a VotingOR Gate
 		}
 		else if (typeDescriptor == FEATURE_VP)
 		{
@@ -271,6 +267,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		if (isLeaf(typeDescriptor)) 
 			continue;
 
+		newNode.print(cout);
 		generateFaultTreeRecursive(child, newNode, configuration);
 	}
 }
@@ -286,4 +283,47 @@ const std::string FuzzTreeTransform::uniqueFileName()
 		m_targetDir.generic_string() + "\\" +
 		m_file.filename().generic_string() + 
 		util::toString(m_count++) + ".fuzztree_";
+}
+
+xml_node FuzzTreeTransform::handleRedundancyVP(
+	const xml_node& templateNode, 
+	xml_node& node, 
+	const int configuredN) const
+{
+	xml_node votingOR = node.append_child("children");
+	votingOR.append_attribute(NODE_TYPE).set_value(VOTING_OR_GATE);
+
+	const xml_node child = templateNode.child("children"); // allow only one child below RedundancyVP
+	
+	if (child.empty())
+	{
+		assert(false);
+		return votingOR;
+	}
+
+	if (string(child.attribute(NODE_TYPE).as_string()) == BASIC_EVENT_SET)
+	{
+		// TODO is there a default quantity?
+		const int numChildren = child.attribute(BASIC_EVENT_SET_QUANTITY).as_int(-1);
+		xml_node probabilityNode = child.child("probability");
+		if (numChildren < configuredN || probabilityNode.empty())
+			return votingOR; // invalid configuration
+		
+		votingOR.append_attribute(VOTING_OR_K).set_value(configuredN);
+		
+		// expanding basic event set
+		int i = 0;
+		while (i < numChildren)
+		{
+			xml_node basicEvent = votingOR.append_child(BASIC_EVENT);
+			basicEvent.append_copy(probabilityNode);
+			i++;
+		}
+	}
+	else
+	{
+		// TODO handle IntermediateEventSet
+	}
+
+	return votingOR;
 }
