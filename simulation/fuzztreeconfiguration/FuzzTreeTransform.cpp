@@ -205,7 +205,6 @@ void FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configura
 	xml_document* newDoc = new xml_document();
 	xml_node newTopEvent = newDoc->append_child(TOP_EVENT);
 	shallowCopy(topEvent, newTopEvent);
-	newDoc->print(cout);
 	
 	generateFaultTreeRecursive(topEvent, newTopEvent, configuration);
 
@@ -248,6 +247,11 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		{
 			// TODO
 		}
+		else if (typeDescriptor == BASIC_EVENT_SET)
+		{
+			expandBasicEventSet(child, faultTreeNode);
+			continue;
+		}
 		else
 		{
 			if (isFaultTreeGate(typeDescriptor))
@@ -259,7 +263,6 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 			{ // copy everything including probability child node
 				newNode = faultTreeNode.append_copy(child);
 			}
-			
 			newNode.remove_attribute(OPTIONAL_ATTRIBUTE);
 		}
 
@@ -274,7 +277,9 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 
 bool FuzzTreeTransform::isLeaf(const string& typeDescriptor)
 {
-	return typeDescriptor == BASIC_EVENT || typeDescriptor == UNDEVELOPED_EVENT;
+	return 
+		typeDescriptor == BASIC_EVENT || 
+		typeDescriptor == UNDEVELOPED_EVENT;
 }
 
 const std::string FuzzTreeTransform::uniqueFileName()
@@ -303,22 +308,8 @@ xml_node FuzzTreeTransform::handleRedundancyVP(
 
 	if (string(child.attribute(NODE_TYPE).as_string()) == BASIC_EVENT_SET)
 	{
-		// TODO is there a default quantity?
-		const int numChildren = child.attribute(BASIC_EVENT_SET_QUANTITY).as_int(-1);
-		xml_node probabilityNode = child.child("probability");
-		if (numChildren < configuredN || probabilityNode.empty())
-			return votingOR; // invalid configuration
-		
 		votingOR.append_attribute(VOTING_OR_K).set_value(configuredN);
-		
-		// expanding basic event set
-		int i = 0;
-		while (i < numChildren)
-		{
-			xml_node basicEvent = votingOR.append_child(BASIC_EVENT);
-			basicEvent.append_copy(probabilityNode);
-			i++;
-		}
+		expandBasicEventSet(child, votingOR); // TODO check if numChildren >= configuredN
 	}
 	else
 	{
@@ -326,4 +317,26 @@ xml_node FuzzTreeTransform::handleRedundancyVP(
 	}
 
 	return votingOR;
+}
+
+void FuzzTreeTransform::expandBasicEventSet(const xml_node& templateNode, xml_node& parent) const
+{
+	// TODO is there a default quantity?
+	const int numChildren = templateNode.attribute(BASIC_EVENT_SET_QUANTITY).as_int(-1);
+	
+	xml_node probabilityNode = templateNode.child("probability");
+	if (probabilityNode.empty())
+	{
+		assert(false);
+		return;
+	}
+
+	int i = 0;
+	while (i < numChildren)
+	{
+		xml_node basicEvent = parent.append_child("children");
+		basicEvent.append_attribute(NODE_TYPE).set_value(BASIC_EVENT);
+		basicEvent.append_copy(probabilityNode);
+		i++;
+	}
 }

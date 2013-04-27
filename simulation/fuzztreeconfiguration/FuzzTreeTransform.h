@@ -36,6 +36,8 @@ protected:
 		xml_node& node, 
 		const int configuredN) const;
 
+	void expandBasicEventSet(const xml_node& templateNode, xml_node& parent) const;
+
 	void generateConfigurations(vector<FuzzTreeConfiguration>& configurations) const;
 	void generateConfigurationsRecursive(
 		const xml_node& node, 
