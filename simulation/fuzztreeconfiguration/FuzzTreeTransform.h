@@ -25,7 +25,7 @@ protected:
 	void scheduleFTGeneration(boost::function<void()>& task);
 
 	void generateFaultTree(const FuzzTreeConfiguration& configuration);
-	void generateFaultTreeRecursive(xml_node& node, const FuzzTreeConfiguration& configuration);
+	void generateFaultTreeRecursive(const xml_node& templateNode, xml_node& node, const FuzzTreeConfiguration& configuration);
 
 	void generateConfigurations(vector<FuzzTreeConfiguration>& configurations);
 	void generateConfigurationsRecursive(const xml_node& node, vector<FuzzTreeConfiguration>& configurations);

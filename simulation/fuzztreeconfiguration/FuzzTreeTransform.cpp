@@ -171,7 +171,7 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 				return parser.eval(fomulaStringTmp);
 			};
 
-			vector<FuzzTreeConfiguration> additional;
+			vector<FuzzTreeConfiguration> newConfigs;
 			for (int i : boost::counting_range(from, to+1))
 			{
 				int numVotes = formula(i);
@@ -182,10 +182,11 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 				{
 					FuzzTreeConfiguration copied = config;
 					copied.setRedundancyNumber(id, numVotes);
-					additional.emplace_back(copied);
+					newConfigs.emplace_back(copied);
 				}
 			}
-			configurations.insert(configurations.begin(), additional.begin(), additional.end());
+			// N * M configurations
+			configurations.assign(newConfigs.begin(), newConfigs.end());
 		}
 		else if (typeDescriptor == FEATURE_VP)
 		{
@@ -202,14 +203,15 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 
 void FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configuration)
 {
-	xml_node topEventNode = m_rootNode.child(TOP_EVENT);
-	assert(!topEventNode.empty());
+	xml_node topEvent = m_rootNode.child(TOP_EVENT);
+	assert(!topEvent.empty());
 
 	xml_document* newDoc = new xml_document();
 	xml_node newTopEvent = newDoc->append_child(TOP_EVENT);
-	shallowCopy(topEventNode, newTopEvent);
+	shallowCopy(topEvent, newTopEvent);
+	newDoc->print(cout);
 	
-	generateFaultTreeRecursive(newTopEvent, configuration);
+	generateFaultTreeRecursive(topEvent, newTopEvent, configuration);
 
 	newDoc->save_file(uniqueFileName().c_str());
 }
@@ -220,27 +222,27 @@ void FuzzTreeTransform::scheduleFTGeneration(boost::function<void()>& task)
 }
 
 void FuzzTreeTransform::generateFaultTreeRecursive(
-	xml_node& fuzzTreeNode, 
+	const xml_node& templateNode,
+	xml_node& faultTreeNode, 
 	const FuzzTreeConfiguration& configuration)
 {
-	for (auto child : fuzzTreeNode.children("children"))
+	const std::string templateType = templateNode.attribute(NODE_TYPE).as_string();
+	const std::string ftType = faultTreeNode.attribute(NODE_TYPE).as_string();
+	
+	for (auto child : templateNode.children("children"))
 	{
 		const string typeDescriptor = child.attribute("xsi:type").as_string();
 
-		const int id		= child.attribute("id").as_int(-1);
-		const bool opt		= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
+		const int id	= child.attribute("id").as_int(-1);
+		const bool opt	= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
 
 		if (id < 0)
 			continue;
 
-		if (opt && configuration.isOptionalEnabled(id))
-		{
-			if (configuration.isOptionalEnabled(id))
-				child.remove_attribute("optional");
-			else
-				continue; // do not add this node
-		}
+		if (opt && !configuration.isOptionalEnabled(id))
+			continue; // do not add this node
 
+		xml_node newNode;
 		if (typeDescriptor == REDUNDANCY_VP)
 		{
 			const int configuredN = configuration.getRedundancyCount(id);
@@ -248,19 +250,28 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		}
 		else if (typeDescriptor == FEATURE_VP)
 		{
-
+			// TODO
 		}
-		else if (isFaultTreeGate(typeDescriptor))
+		else
 		{
-			fuzzTreeNode.append_copy(child);
-		}
-		else if (isLeaf(typeDescriptor))
-		{
-			fuzzTreeNode.append_copy(child);
-			continue; // break recursion
+			if (isFaultTreeGate(typeDescriptor))
+			{ // don't copy children yet
+				newNode = faultTreeNode.append_child("children");
+				shallowCopy(child, newNode);
+			}
+			else if (isLeaf(typeDescriptor))
+			{ // copy everything including probability child node
+				newNode = faultTreeNode.append_copy(child);
+			}
+			
+			newNode.remove_attribute(OPTIONAL_ATTRIBUTE);
 		}
 
-		generateFaultTreeRecursive(child, configuration);
+		// break recursion
+		if (isLeaf(typeDescriptor)) 
+			continue;
+
+		generateFaultTreeRecursive(child, newNode, configuration);
 	}
 }
 
