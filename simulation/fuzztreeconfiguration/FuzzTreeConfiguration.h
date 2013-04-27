@@ -13,6 +13,7 @@ public:
 	void setRedundancyNumber(int ID, int configuredNumber);
 	void setFeatureNumber(int ID, int configuredChild);
 
+	// TODO this throws...
 	bool isOptionalEnabled(int ID) const { return m_optionalNodes.at(ID); }
 	int	getRedundancyCount(int ID) const { return m_redundancyNodes.at(ID); }
 	int getFeaturedChild(int ID) const { return m_featureNodes.at(ID); }

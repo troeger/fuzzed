@@ -106,12 +106,14 @@ void FuzzTreeTransform::shallowCopy(const xml_node& proto, xml_node& copiedNode)
 	}
 }
 
-bool FuzzTreeTransform::isFaultTreeGate(const string& typeDescriptor)
-{
+bool FuzzTreeTransform::isGate(const string& typeDescriptor)
+{ // all gates which do not lead to additional configuration branching
 	return
 		typeDescriptor == AND_GATE ||
 		typeDescriptor == OR_GATE ||
-		typeDescriptor == VOTING_OR_GATE;// TODO dynamic gates
+		typeDescriptor == VOTING_OR_GATE ||
+		typeDescriptor == PAND_GATE ||
+		typeDescriptor == COLD_SPARE_GATE;
 }
 
 void FuzzTreeTransform::generateConfigurations(vector<FuzzTreeConfiguration>& configs) const
@@ -127,7 +129,7 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 	const xml_node& fuzzTreeNode, 
 	vector<FuzzTreeConfiguration>& configurations) const
 {
-	for (auto child : fuzzTreeNode.children("children"))
+	for (const auto& child : fuzzTreeNode.children("children"))
 	{
 		const string typeDescriptor = child.attribute("xsi:type").as_string();
 
@@ -170,7 +172,7 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 			vector<FuzzTreeConfiguration> newConfigs;
 			for (int i : boost::counting_range(from, to+1))
 			{
-				int numVotes = formula(i);
+				const int numVotes = formula(i);
 				if (numVotes < from || numVotes > to)
 					continue;
 
@@ -199,10 +201,10 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 
 void FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configuration)
 {
-	xml_node topEvent = m_rootNode.child(TOP_EVENT);
+	const xml_node topEvent = m_rootNode.child(TOP_EVENT);
 	assert(!topEvent.empty());
 
-	xml_document* newDoc = new xml_document();
+	xml_document* const newDoc = new xml_document();
 	xml_node newTopEvent = newDoc->append_child(TOP_EVENT);
 	shallowCopy(topEvent, newTopEvent);
 	
@@ -212,7 +214,7 @@ void FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configura
 }
 
 void FuzzTreeTransform::scheduleFTGeneration(boost::function<void()>& task)
-{
+{ // does this even make sense??
 	m_threadPool.schedule(task);
 }
 
@@ -224,7 +226,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 	const std::string templateType = templateNode.attribute(NODE_TYPE).as_string();
 	const std::string ftType = faultTreeNode.attribute(NODE_TYPE).as_string();
 	
-	for (auto child : templateNode.children("children"))
+	for (const auto& child : templateNode.children("children"))
 	{
 		const string typeDescriptor = child.attribute("xsi:type").as_string();
 
@@ -241,7 +243,10 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		if (typeDescriptor == REDUNDANCY_VP)
 		{
 			const int configuredN = configuration.getRedundancyCount(id);
-			newNode = handleRedundancyVP(child, faultTreeNode, configuredN); // returns a VotingOR Gate
+			auto result = handleRedundancyVP(child, faultTreeNode, configuredN); // returns a VotingOR Gate
+			newNode = result.first;
+			if (result.second)
+				continue; // stop recursion
 		}
 		else if (typeDescriptor == FEATURE_VP)
 		{
@@ -254,7 +259,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		}
 		else
 		{
-			if (isFaultTreeGate(typeDescriptor))
+			if (isGate(typeDescriptor))
 			{ // don't copy children yet
 				newNode = faultTreeNode.append_child("children");
 				shallowCopy(child, newNode);
@@ -290,7 +295,10 @@ const std::string FuzzTreeTransform::uniqueFileName()
 		util::toString(m_count++) + ".fuzztree_";
 }
 
-xml_node FuzzTreeTransform::handleRedundancyVP(
+// the second return value is true if the recursion should terminate below the gate
+// (i.e. there was a basic event set)
+
+pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 	const xml_node& templateNode, 
 	xml_node& node, 
 	const int configuredN) const
@@ -303,20 +311,21 @@ xml_node FuzzTreeTransform::handleRedundancyVP(
 	if (child.empty())
 	{
 		assert(false);
-		return votingOR;
+		return make_pair(votingOR, true);
 	}
 
 	if (string(child.attribute(NODE_TYPE).as_string()) == BASIC_EVENT_SET)
 	{
 		votingOR.append_attribute(VOTING_OR_K).set_value(configuredN);
 		expandBasicEventSet(child, votingOR); // TODO check if numChildren >= configuredN
+		return make_pair(votingOR, true);
 	}
 	else
 	{
 		// TODO handle IntermediateEventSet
 	}
 
-	return votingOR;
+	return make_pair(votingOR, false);
 }
 
 void FuzzTreeTransform::expandBasicEventSet(const xml_node& templateNode, xml_node& parent) const

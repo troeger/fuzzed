@@ -31,7 +31,7 @@ protected:
 		const FuzzTreeConfiguration& configuration) const;
 
 	// returns the configured VotingOR gate
-	xml_node handleRedundancyVP(
+	pair<xml_node, bool /*isLeaf*/> handleRedundancyVP(
 		const xml_node& templateNode, 
 		xml_node& node, 
 		const int configuredN) const;
@@ -44,7 +44,7 @@ protected:
 		vector<FuzzTreeConfiguration>& configurations) const;
 
 	static void shallowCopy(const xml_node& proto, xml_node& copiedNode);
-	static bool isFaultTreeGate(const string& typeDescriptor);
+	static bool isGate(const string& typeDescriptor);
 	static bool isLeaf(const string& typeDescriptor);
 
 	const std::string uniqueFileName();

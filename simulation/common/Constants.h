@@ -71,7 +71,6 @@ namespace fuzzTree
 	const char* const XOR_GATE = "ft:Xor";
 	const char* const VOTING_OR_GATE = "ft:VotingOr";
 
-	// not yet part of the XSD...
 	const char* const COLD_SPARE_GATE = "ft:ColdSpareGate";
 	const char* const PAND_GATE = "ft:PriorityAnd";
 

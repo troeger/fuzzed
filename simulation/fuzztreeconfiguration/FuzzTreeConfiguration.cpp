@@ -6,9 +6,7 @@ FuzzTreeConfiguration::FuzzTreeConfiguration()
 }
 
 FuzzTreeConfiguration::~FuzzTreeConfiguration()
-{
-
-}
+{} // nothing
 
 void FuzzTreeConfiguration::setNodeOptional(int ID, bool optional)
 {
