@@ -19,6 +19,8 @@ bool XMLImport::validateAndLoad()
 			cout << "Loaded XML: " << endl;
 			m_document.print(std::cout);
 #endif
+			m_bLoaded = loadRootNode();
+			return m_bLoaded;
 		}
 	}
 	catch (exception& e)
@@ -26,8 +28,6 @@ bool XMLImport::validateAndLoad()
 		cout << e.what();
 		return false;
 	}
-	m_bLoaded = loadRootNode();
-	return m_bLoaded;
 }
 
 XMLImport::XMLImport(const string& fileName)

@@ -42,13 +42,13 @@ void FuzzTreeTransform::transformFuzzTree(const string& fileName, const string& 
 	}
 }
 
-void FuzzTreeTransform::loadNode(const xml_node& node, xml_node& previous, xml_document& newDoc)
+void FuzzTreeTransform::loadNode(const xml_node& node, xml_node& previous, xml_document* doc, std::set<int> includedIds)
 {
-	auto childRange = node.children("children");
-	for (auto it = childRange.begin(); it != childRange.end(); ++it)
+	const int previousId = previous.attribute("id").as_int(-1);
+	assert(previousId >= 0);
+	
+	for (auto child : node.children("children"))
 	{
-		const xml_node child = *it;
-		
 		const string typeDescriptor = child.attribute("xsi:type").as_string();
 
 		const int id		= child.attribute("id").as_int(-1);
@@ -59,26 +59,49 @@ void FuzzTreeTransform::loadNode(const xml_node& node, xml_node& previous, xml_d
 			continue;
 		
 		if (opt)
-		{ // branch and create a new tree
-			xml_document copiedDoc;
-			copiedDoc.reset(newDoc);
-
-			// TODO this cannot be the easiest way
-			auto nextIt = childRange.begin();
-			while (nextIt != it)
+		{ // branch and create a new tree - WITH the optional node	
+			auto itID = includedIds.find(id);
+			if (itID == includedIds.end())
 			{
-				++nextIt;
+				xml_document* copiedDoc = new xml_document();
+				copiedDoc->reset(*doc);
+				copiedDoc->print(cout);
+								
+				xml_node node = copiedDoc->child(TOP_EVENT);
+				assert(!node.empty());
+
+				xml_node copiedPrevious;
+				for (xml_node c : node.children("children"))
+				{
+					if (c.attribute("id").as_int(-1) == previousId)
+					{
+						copiedPrevious = c;
+						break;
+					}
+				}
+				assert(!copiedPrevious.empty());
+
+				xml_node optionalNode = copiedPrevious.append_copy(child);
+				optionalNode.print(cout);
+				optionalNode.remove_attribute("optional");
+
+				std::set<int> newOptIds(includedIds);
+				newOptIds.emplace(id);
+
+				// restart at the same level
+				boost::function<void()> branchedTask = boost::bind(
+					&FuzzTreeTransform::loadNodeInBranch, this, node, copiedPrevious, copiedDoc, newOptIds);
+
+				m_threadPool.schedule(branchedTask);
+				continue;
 			}
-			++nextIt;
-			xml_node nextChild = *nextIt;
-
-			boost::function<void()> branchedTask = 
-				boost::bind(&FuzzTreeTransform::loadNodeInBranch, this, nextChild, previous, boost::ref(copiedDoc));
-			
-			m_threadPool.schedule(branchedTask);
+			else
+			{
+				includedIds.erase(itID);
+				continue;
+			}
 		}
-
-				
+		
 		/************************************************************************/
 		/* Basic Events/ Leaf Nodes                                             */
 		/************************************************************************/
@@ -96,19 +119,19 @@ void FuzzTreeTransform::loadNode(const xml_node& node, xml_node& previous, xml_d
 		/************************************************************************/
 		/* Configuration Points                                                 */
 		/************************************************************************/
-		if (typeDescriptor == FEATURE_VP)
+		else if (typeDescriptor == FEATURE_VP)
 		{
-			handleFeatureVP(child, previous, newDoc);
+			handleFeatureVP(child, previous, doc);
 			continue;
 		}
 		else if (typeDescriptor == REDUNDANCY_VP)
 		{
-			handleRedundancyVP(child, previous, newDoc);
+			handleRedundancyVP(child, previous, doc);
 			continue;
 		}
 		else if (typeDescriptor == BASIC_EVENT_SET)
 		{
-			handleBasicEventSet(child, previous, newDoc);
+			handleBasicEventSet(child, previous, doc);
 			continue;
 		}
 		else if (typeDescriptor == TRANSFER_GATE)
@@ -120,22 +143,25 @@ void FuzzTreeTransform::loadNode(const xml_node& node, xml_node& previous, xml_d
 		/* Gates                                                                */
 		/************************************************************************/
 
-		xml_node lastNode;
-		if (isFaultTreeGate(typeDescriptor))
-		{
-			lastNode = previous.append_child("children");
+		else if (isFaultTreeGate(typeDescriptor))
+		{ // basic gates can just be copied
+			xml_node lastNode = previous.append_child("children");
 			shallowCopy(child, lastNode);
+
+			// recurse!
+			loadNode(child, lastNode, doc, includedIds);
 		}
-		
-		// recurse!
-		loadNode(child, lastNode, newDoc);
+		else
+		{
+			assert(false);
+		}
 	}
 }
 
 void FuzzTreeTransform::handleBasicEventSet(
 	const xml_node& child, 
 	xml_node& previouslyAdded,
-	xml_document& newDoc)
+	xml_document* doc)
 {
 	const int numEvents = child.attribute("quantity").as_int(1);
 	if (numEvents <= 0)
@@ -154,12 +180,12 @@ void FuzzTreeTransform::handleBasicEventSet(
 	}
 }
 
-void FuzzTreeTransform::handleFeatureVP(const xml_node &child, xml_node& previous, xml_document& newDoc)
+void FuzzTreeTransform::handleFeatureVP(const xml_node &child, xml_node& previous, xml_document* doc)
 {
 	// TODO
 }
 
-void FuzzTreeTransform::handleRedundancyVP(const xml_node &child, xml_node& previous, xml_document& newDoc)
+void FuzzTreeTransform::handleRedundancyVP(const xml_node &child, xml_node& previous, xml_document* doc)
 {
 	// TODO
 }
@@ -167,8 +193,7 @@ void FuzzTreeTransform::handleRedundancyVP(const xml_node &child, xml_node& prev
 FuzzTreeTransform::FuzzTreeTransform(const string& fileName, const string& targetDir)
 	: XMLImport(fileName), 
 	m_targetDir(targetDir), 
-	m_count(0),
-	m_threadPool(omp_get_num_threads() - 1)
+	m_count(0)
 {
 	if (!filesystem::is_directory(targetDir))
 	{
@@ -185,13 +210,14 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fileName, const string& targe
 	{
 		throw runtime_error("File not found " + fileName);
 	}
+
+	m_threadPool = threadpool::fifo_pool(omp_get_max_threads()-1);
 }
 
 FuzzTreeTransform::~FuzzTreeTransform()
 {
-	// TODO this threadpool never finishes.
+	m_threadPool.wait();
 	m_threadPool.clear();
-	// m_threadPool.wait();
 }
 
 bool FuzzTreeTransform::loadRootNode()
@@ -206,22 +232,19 @@ bool FuzzTreeTransform::loadRootNode()
 
 void FuzzTreeTransform::loadTree()
 {
-	xml_document newDoc;
-	
-	for (auto node: m_rootNode.children(TOP_EVENT))
-	{
-		xml_node newTop = newDoc.append_child(TOP_EVENT);
-		shallowCopy(node, newTop);
-		loadNode(node, newTop, newDoc);
-		break; // just one topEvent
-	}
+	xml_document* newDoc = new xml_document();
+	xml_node newTop = newDoc->append_child(TOP_EVENT);
+	shallowCopy(m_rootNode.child(TOP_EVENT), newTop);
 
+	loadNode(m_rootNode.child(TOP_EVENT), newTop, newDoc, std::set<int>());
+	
 	const string fileName = 
 		m_targetDir.generic_string() + "\\" +
 		m_file.filename().generic_string() + 
-		util::toString(m_count++) + ".fuzztree";
+		util::toString(m_count++) + ".fuzztree_";
 
-	newDoc.save_file(fileName.c_str());
+	newDoc->save_file(fileName.c_str());
+	delete newDoc;
 }
 
 void FuzzTreeTransform::shallowCopy(const xml_node& proto, xml_node& copiedNode)
@@ -243,14 +266,15 @@ bool FuzzTreeTransform::isFaultTreeGate(const string& typeDescriptor)
 		typeDescriptor == VOTING_OR_GATE;// TODO dynamic gates
 }
 
-void FuzzTreeTransform::loadNodeInBranch(const xml_node& node, xml_node& previous, xml_document& newDoc)
+void FuzzTreeTransform::loadNodeInBranch(const xml_node& node, xml_node& previous, xml_document* newDoc, std::set<int> optIds)
 {
-	loadNode(node, previous, newDoc);
+	loadNode(node, previous, newDoc, optIds);
 
 	const string fileName = 
 		m_targetDir.generic_string() + "\\" +
 		m_file.filename().generic_string() + 
-		util::toString(m_count++) + ".fuzztree";
+		util::toString(m_count++) + ".fuzztree_";
 
-	newDoc.save_file(fileName.c_str());
+	newDoc->save_file(fileName.c_str());
+	delete newDoc;
 }
