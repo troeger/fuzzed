@@ -1,5 +1,6 @@
 #include "FuzzTreeTransform.h"
 #include "Constants.h"
+#include "FuzzTreeConfiguration.h"
 
 #pragma once
 #if IS_WINDOWS 
@@ -9,10 +10,12 @@
 #include <boost/range/counting_range.hpp>
 #include <exception>
 #include <iostream>
+#include "ExpressionParser.h"
 #if IS_WINDOWS 
 #pragma warning(pop) 
 #endif
 #include "util.h"
+
 #include <omp.h>
 
 using namespace pugi;
@@ -24,13 +27,23 @@ void FuzzTreeTransform::transformFuzzTree(const string& fileName, const string& 
 {
 	try
 	{
-		FuzzTreeTransform tranform(fileName, targetDir);
-		if (!tranform.validateAndLoad())
+		FuzzTreeTransform transform(fileName, targetDir);
+		if (!transform.validateAndLoad())
 		{
 			cout << "Could not load FuzzTree" << endl;
 			return;
 		}
-		tranform.loadTree();
+		
+		vector<FuzzTreeConfiguration> configs;
+		transform.generateConfigurations(configs);
+		
+		for (const auto& instanceConfiguration : configs)
+		{
+			boost::function<void()> generationTask = boost::bind(
+				&FuzzTreeTransform::generateFaultTree, &transform, instanceConfiguration);
+			
+			transform.scheduleFTGeneration(generationTask);
+		}
 	}
 	catch (std::exception& e)
 	{
@@ -40,154 +53,6 @@ void FuzzTreeTransform::transformFuzzTree(const string& fileName, const string& 
 	{
 		cout << "Unknown Error during FuzzTree Transformation" << endl;
 	}
-}
-
-void FuzzTreeTransform::loadNode(const xml_node& node, xml_node& previous, xml_document* doc, std::set<int> includedIds)
-{
-	const int previousId = previous.attribute("id").as_int(-1);
-	assert(previousId >= 0);
-	
-	for (auto child : node.children("children"))
-	{
-		const string typeDescriptor = child.attribute("xsi:type").as_string();
-
-		const int id		= child.attribute("id").as_int(-1);
-		const char* name	= child.attribute("name").as_string();
-		const bool opt		= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
-
-		if (id < 0)
-			continue;
-		
-		if (opt)
-		{ // branch and create a new tree - WITH the optional node	
-			auto itID = includedIds.find(id);
-			if (itID == includedIds.end())
-			{
-				xml_document* copiedDoc = new xml_document();
-				copiedDoc->reset(*doc);
-				copiedDoc->print(cout);
-								
-				xml_node node = copiedDoc->child(TOP_EVENT);
-				assert(!node.empty());
-
-				xml_node copiedPrevious;
-				for (xml_node c : node.children("children"))
-				{
-					if (c.attribute("id").as_int(-1) == previousId)
-					{
-						copiedPrevious = c;
-						break;
-					}
-				}
-				assert(!copiedPrevious.empty());
-
-				xml_node optionalNode = copiedPrevious.append_copy(child);
-				optionalNode.print(cout);
-				optionalNode.remove_attribute("optional");
-
-				std::set<int> newOptIds(includedIds);
-				newOptIds.emplace(id);
-
-				// restart at the same level
-				boost::function<void()> branchedTask = boost::bind(
-					&FuzzTreeTransform::loadNodeInBranch, this, node, copiedPrevious, copiedDoc, newOptIds);
-
-				m_threadPool.schedule(branchedTask);
-				continue;
-			}
-			else
-			{
-				includedIds.erase(itID);
-				continue;
-			}
-		}
-		
-		/************************************************************************/
-		/* Basic Events/ Leaf Nodes                                             */
-		/************************************************************************/
-		if (typeDescriptor == BASIC_EVENT)
-		{
-			previous.append_copy(child);
-			continue;
-		}
-		else if (typeDescriptor == UNDEVELOPED_EVENT)
-		{
-			previous.append_copy(child);
-			continue;
-		}
-
-		/************************************************************************/
-		/* Configuration Points                                                 */
-		/************************************************************************/
-		else if (typeDescriptor == FEATURE_VP)
-		{
-			handleFeatureVP(child, previous, doc);
-			continue;
-		}
-		else if (typeDescriptor == REDUNDANCY_VP)
-		{
-			handleRedundancyVP(child, previous, doc);
-			continue;
-		}
-		else if (typeDescriptor == BASIC_EVENT_SET)
-		{
-			handleBasicEventSet(child, previous, doc);
-			continue;
-		}
-		else if (typeDescriptor == TRANSFER_GATE)
-		{
-			continue;
-		}
-
-		/************************************************************************/
-		/* Gates                                                                */
-		/************************************************************************/
-
-		else if (isFaultTreeGate(typeDescriptor))
-		{ // basic gates can just be copied
-			xml_node lastNode = previous.append_child("children");
-			shallowCopy(child, lastNode);
-
-			// recurse!
-			loadNode(child, lastNode, doc, includedIds);
-		}
-		else
-		{
-			assert(false);
-		}
-	}
-}
-
-void FuzzTreeTransform::handleBasicEventSet(
-	const xml_node& child, 
-	xml_node& previouslyAdded,
-	xml_document* doc)
-{
-	const int numEvents = child.attribute("quantity").as_int(1);
-	if (numEvents <= 0)
-	{
-		throw runtime_error("Invalid quantity in Basic Event Set!");
-	}
-
-	for (auto i : boost::counting_range(0, numEvents))
-	{
-		xml_node basicEvent = previouslyAdded.append_child("children");
-		shallowCopy(child, basicEvent);
-		basicEvent.remove_attribute(NODE_TYPE);
-		basicEvent.append_attribute(NODE_TYPE).set_value(BASIC_EVENT);
-		
-		// TODO event probability
-	}
-}
-
-void FuzzTreeTransform::handleFeatureVP(const xml_node &child, xml_node& previous, xml_document* doc)
-{
-	// TODO
-}
-
-void FuzzTreeTransform::handleRedundancyVP(const xml_node &child, xml_node& previous, xml_document* doc)
-{
-	// TODO
 }
 
 FuzzTreeTransform::FuzzTreeTransform(const string& fileName, const string& targetDir)
@@ -230,23 +95,6 @@ bool FuzzTreeTransform::loadRootNode()
 	return true;
 }
 
-void FuzzTreeTransform::loadTree()
-{
-	xml_document* newDoc = new xml_document();
-	xml_node newTop = newDoc->append_child(TOP_EVENT);
-	shallowCopy(m_rootNode.child(TOP_EVENT), newTop);
-
-	loadNode(m_rootNode.child(TOP_EVENT), newTop, newDoc, std::set<int>());
-	
-	const string fileName = 
-		m_targetDir.generic_string() + "\\" +
-		m_file.filename().generic_string() + 
-		util::toString(m_count++) + ".fuzztree_";
-
-	newDoc->save_file(fileName.c_str());
-	delete newDoc;
-}
-
 void FuzzTreeTransform::shallowCopy(const xml_node& proto, xml_node& copiedNode)
 {
 	copiedNode.set_name(proto.name());
@@ -266,15 +114,165 @@ bool FuzzTreeTransform::isFaultTreeGate(const string& typeDescriptor)
 		typeDescriptor == VOTING_OR_GATE;// TODO dynamic gates
 }
 
-void FuzzTreeTransform::loadNodeInBranch(const xml_node& node, xml_node& previous, xml_document* newDoc, std::set<int> optIds)
-{
-	loadNode(node, previous, newDoc, optIds);
+/************************************************************************/
+/* Traverse the FuzzTree and generate Configurations from it            */
+/************************************************************************/
 
-	const string fileName = 
+void FuzzTreeTransform::generateConfigurations(vector<FuzzTreeConfiguration>& configs)
+{
+	xml_node topEventNode = m_rootNode.child(TOP_EVENT);
+	assert(!topEventNode.empty());
+
+	configs.emplace_back(FuzzTreeConfiguration()); // default
+	generateConfigurationsRecursive(topEventNode, configs);
+}
+
+void FuzzTreeTransform::generateConfigurationsRecursive(
+	const xml_node& fuzzTreeNode, 
+	vector<FuzzTreeConfiguration>& configurations)
+{
+	for (auto child : fuzzTreeNode.children("children"))
+	{
+		const string typeDescriptor = child.attribute("xsi:type").as_string();
+
+		const int id		= child.attribute("id").as_int(-1);
+		const bool opt		= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
+
+		if (id < 0)
+			continue;
+
+		if (opt)
+		{
+			vector<FuzzTreeConfiguration> additional;
+			for (FuzzTreeConfiguration& config : configurations)
+			{
+				FuzzTreeConfiguration copied = config;
+				copied.setNodeOptional(id, true);
+				config.setNodeOptional(id, false);
+
+				additional.emplace_back(copied);
+			}
+			configurations.insert(configurations.begin(), additional.begin(), additional.end());
+		}
+
+		if (typeDescriptor == REDUNDANCY_VP)
+		{
+			const int from = child.attribute("start").as_int(-1);
+			const int to = child.attribute("end").as_int(-1);
+			if (from < 0 || to < 0 || from > to)
+				throw runtime_error("Invalid boundaries for RedundancyGate");
+
+			const std::string formulaString = child.attribute("formula").as_string();
+			ExpressionParser<int> parser;
+			const std::function<int(int)> formula = [&](int n) -> int
+			{
+				std::string fomulaStringTmp = formulaString;
+				util::replaceStringInPlace(fomulaStringTmp, "N", util::toString(n));
+				return parser.eval(fomulaStringTmp);
+			};
+
+			vector<FuzzTreeConfiguration> additional;
+			for (int i : boost::counting_range(from, to+1))
+			{
+				int numVotes = formula(i);
+				if (numVotes < from || numVotes > to)
+					continue;
+
+				for (FuzzTreeConfiguration& config : configurations)
+				{
+					FuzzTreeConfiguration copied = config;
+					copied.setRedundancyNumber(id, numVotes);
+					additional.emplace_back(copied);
+				}
+			}
+			configurations.insert(configurations.begin(), additional.begin(), additional.end());
+		}
+		else if (typeDescriptor == FEATURE_VP)
+		{
+			// TODO
+		}
+		else if (isLeaf(typeDescriptor))
+		{
+			// end recursion
+			continue;
+		}
+		generateConfigurationsRecursive(child, configurations);
+	}
+}
+
+void FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configuration)
+{
+	xml_node topEventNode = m_rootNode.child(TOP_EVENT);
+	assert(!topEventNode.empty());
+
+	xml_document* newDoc = new xml_document();
+	xml_node newTopEvent = newDoc->append_child(TOP_EVENT);
+	shallowCopy(topEventNode, newTopEvent);
+	
+	generateFaultTreeRecursive(newTopEvent, configuration);
+
+	newDoc->save_file(uniqueFileName().c_str());
+}
+
+void FuzzTreeTransform::scheduleFTGeneration(boost::function<void()>& task)
+{
+	m_threadPool.schedule(task);
+}
+
+void FuzzTreeTransform::generateFaultTreeRecursive(
+	xml_node& fuzzTreeNode, 
+	const FuzzTreeConfiguration& configuration)
+{
+	for (auto child : fuzzTreeNode.children("children"))
+	{
+		const string typeDescriptor = child.attribute("xsi:type").as_string();
+
+		const int id		= child.attribute("id").as_int(-1);
+		const bool opt		= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
+
+		if (id < 0)
+			continue;
+
+		if (opt && configuration.isOptionalEnabled(id))
+		{
+			if (configuration.isOptionalEnabled(id))
+				child.remove_attribute("optional");
+			else
+				continue; // do not add this node
+		}
+
+		if (typeDescriptor == REDUNDANCY_VP)
+		{
+			const int configuredN = configuration.getRedundancyCount(id);
+			// TODO handle basic event set below
+		}
+		else if (typeDescriptor == FEATURE_VP)
+		{
+
+		}
+		else if (isFaultTreeGate(typeDescriptor))
+		{
+			fuzzTreeNode.append_copy(child);
+		}
+		else if (isLeaf(typeDescriptor))
+		{
+			fuzzTreeNode.append_copy(child);
+			continue; // break recursion
+		}
+
+		generateFaultTreeRecursive(child, configuration);
+	}
+}
+
+bool FuzzTreeTransform::isLeaf(const string& typeDescriptor)
+{
+	return typeDescriptor == BASIC_EVENT || typeDescriptor == UNDEVELOPED_EVENT;
+}
+
+const std::string FuzzTreeTransform::uniqueFileName()
+{
+	return 
 		m_targetDir.generic_string() + "\\" +
 		m_file.filename().generic_string() + 
 		util::toString(m_count++) + ".fuzztree_";
-
-	newDoc->save_file(fileName.c_str());
-	delete newDoc;
 }

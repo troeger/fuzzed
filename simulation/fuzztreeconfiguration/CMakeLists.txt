@@ -4,11 +4,13 @@ set(SOURCES
    ${SOURCE}
    FuzzTreeImport.cpp
    FuzzTreeTransform.cpp
+   FuzzTreeConfiguration.cpp
 )
 set(HEADERS
    ${HEADERS}
    FuzzTreeImport.h
    FuzzTreeTransform.h
+   FuzzTreeConfiguration.h
 )
 
 include_directories(${Boost_INCLUDE_DIRS})

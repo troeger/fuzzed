@@ -13,6 +13,8 @@
 
 #include "XMLImport.h"
 
+class FuzzTreeConfiguration;
+
 class FuzzTreeTransform : public XMLImport
 {
 public:
@@ -20,18 +22,19 @@ public:
 	static void transformFuzzTree(const std::string& fileName, const std::string& targetDir);
 
 protected:
-	void loadTree();
+	void scheduleFTGeneration(boost::function<void()>& task);
 
-	void loadNode(const xml_node& node, xml_node& previous, xml_document* doc, std::set<int> optIds);
+	void generateFaultTree(const FuzzTreeConfiguration& configuration);
+	void generateFaultTreeRecursive(xml_node& node, const FuzzTreeConfiguration& configuration);
 
-	void loadNodeInBranch(const xml_node& node, xml_node& previous, xml_document* doc, std::set<int> optIds);
-
-	void handleBasicEventSet(const xml_node& child, xml_node& previous, xml_document* doc);
-	void handleFeatureVP(const xml_node& child, xml_node& previous, xml_document* doc);
-	void handleRedundancyVP(const xml_node& child, xml_node& previous, xml_document* doc);
+	void generateConfigurations(vector<FuzzTreeConfiguration>& configurations);
+	void generateConfigurationsRecursive(const xml_node& node, vector<FuzzTreeConfiguration>& configurations);
 
 	static void shallowCopy(const xml_node& proto, xml_node& copiedNode);
 	static bool isFaultTreeGate(const string& typeDescriptor);
+	static bool isLeaf(const string& typeDescriptor);
+
+	const std::string uniqueFileName();
 
 private:
 	FuzzTreeTransform(const string& fileName, const string& targetDir);

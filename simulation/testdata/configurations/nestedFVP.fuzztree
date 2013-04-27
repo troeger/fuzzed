@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FuzzTree xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="net.fuzztree" name="Nested FVP" id="20130403">
+  <topEvent id="1" name="Nested FVP Test">
+      <children xsi:type="ft:BasicEvent" id="110" name="BE 1" costs="20" optional="true">
+        <probability xsi:type="ft:CrispProbability" value="0.1"/>
+      </children>
+      <children xsi:type="ft:RedundancyVariationPoint" id="12" name="Power Failure" start="1" end="5" formula="N-2" costFormula="N/2">
+        <children xsi:type="ft:BasicEventSet" id="120" name="Power Unit Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.5"/>
+        </children>
+      </children>
+  </topEvent>
+</ft:FuzzTree>
