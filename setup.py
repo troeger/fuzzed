@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os, json, pprint, sys, shutil, subprocess
+from lxml import etree
 
 from setuptools import setup
 from distutils.command.build import build as _build
@@ -23,6 +24,15 @@ def check_java_version():
     output = subprocess.check_output('java -version', stderr=subprocess.STDOUT, shell=True)
     if (not 'version' in output) or (not '1.7' in output):
         raise Exception('We need at least Java 1.7 to build the analysis server. We found ' + output)
+
+def build_faulttree_schema():
+    print "Generating faulttree XML schema from fuzztree XML schema ..."
+    xml_input = etree.parse("FuzzEd/static/xsd/fuzztree.xsd")
+    xslt_root = etree.parse("FuzzEd/static/xsd/fuzztofault.xsl")
+    transform = etree.XSLT(xslt_root)
+    out = open("FuzzEd/static/xsd/faulttree.xsd","w")
+    out.write(str(transform(xml_input)))
+    out.close()    
 
 def build_xmlschema_wrapper():
     print 'Building XML schema wrappers ...'
@@ -142,9 +152,10 @@ def inherit(node_name, node, nodes, node_cache):
 class build(_build):
     def run(self):
         _build.run(self)
-        build_xmlschema_wrapper()
         build_analysis_server()
         build_notations()
+        build_faulttree_schema()
+        build_xmlschema_wrapper()
 
 def clean_docs():
     os.system('rm -rf docs')
@@ -175,14 +186,6 @@ class sdist(_sdist):
 setup(
     name = 'FuzzEd',
     version = __version__,
-    install_requires=[
-        'django',
-        'south',
-        'openid2rp',
-        'django-require',
-        'minbool',
-        'pyxb'
-    ],
     packages = ['FuzzEd'],
     include_package_data = True,
     cmdclass={
