@@ -212,13 +212,13 @@ void FuzzTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree, FTResul
 
 double FuzzTreeImport::parseFailureRate(const xml_node &child)
 {
-	for (auto& probabilityNode : child.children("probability"))
+	for (const auto& probabilityNode : child.children("probability"))
 	{
 		if (!probabilityNode)
 			throw runtime_error("Could not find Probability Node for Basic event");
 
 		// TODO find an adequate crisp number in this case
-		if (string(probabilityNode.attribute("xsi:type").as_string()) != CRISP_NUM)
+		if (string(probabilityNode.attribute(NODE_TYPE).as_string()) != CRISP_NUM)
 			throw runtime_error("Fuzzy Probabilites are not supported yet");
 
 		return probabilityNode.attribute("value").as_double(-1.0);
@@ -241,7 +241,7 @@ void FuzzTreeImport::handleBasicEventSet(
 	}
 
 	unsigned int count = 0;
-	for (auto i : boost::counting_range(0, numEvents))
+	while (count < numEvents)
 	{
 		// TODO unique ids
 		tree->addChild(new BasicEvent(id*100+(++count), parseFailureRate(child), name));

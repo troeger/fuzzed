@@ -28,6 +28,7 @@ bool XMLImport::validateAndLoad()
 		cout << e.what();
 		return false;
 	}
+	return false;
 }
 
 XMLImport::XMLImport(const string& fileName)

@@ -3,7 +3,7 @@
 #include <map>
 
 // No tree, just a flat data structure for configuring which nodes are enabled
-class FuzzTreeConfiguration
+struct FuzzTreeConfiguration
 {
 public:
 	FuzzTreeConfiguration();

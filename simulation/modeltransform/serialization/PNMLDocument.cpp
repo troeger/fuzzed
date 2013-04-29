@@ -31,13 +31,17 @@ int PNMLDocument::addImmediateTransition(long double weight /*= 1.0*/, const Con
 	return addTransition(weight, cond, false);
 }
 
-int PNMLDocument::addPlace(int initialMarking, int capacity /*= 1*/, const string& label /*= ""*/, bool isBasicEvent /*= false*/)
+int PNMLDocument::addPlace(
+	int initialMarking, 
+	int capacity /*= 1*/, 
+	const string& label /*= ""*/, 
+	bool isBasicEvent /*= false*/)
 {	
 	assert(capacity >= 0 && initialMarking >= 0 && capacity >= initialMarking);
 
 	xml_node node;
 	node = m_root.append_child(PLACE_TAG);
-	const string idString = PLACE_IDENTIFIER+util::toString(++m_placeCount);
+	const string idString = PLACE_IDENTIFIER + util::toString(++m_placeCount);
 	node.append_attribute(ID_TAG).set_value(idString.c_str());
 	
 	setName(node, label);
@@ -79,7 +83,7 @@ int PNMLDocument::addTransition(long double rate, const Condition& cond, bool is
 {
 	xml_node transitionNode = m_root.append_child(TRANSITION_TAG);
 
-	const string name = TRANSITION_IDENTIFIER+util::toString(++m_transitionCount);
+	const string name = TRANSITION_IDENTIFIER + util::toString(++m_transitionCount);
 	transitionNode.append_attribute(ID_TAG).set_value(name.c_str());
 	setName(transitionNode, name);
 
