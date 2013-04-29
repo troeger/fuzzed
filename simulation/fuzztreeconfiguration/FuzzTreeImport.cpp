@@ -62,7 +62,7 @@ std::pair<FuzzTreeImport*,FTResults*> FuzzTreeImport::loadFaultTreeAsync(const s
 }
 
 FuzzTreeImport::FuzzTreeImport(const string& fileName)
-	: XMLImport(fileName), m_busy(true)
+	: XMLImport(fileName), m_busy(false)
 {}
 
 bool FuzzTreeImport::loadRootNode()
@@ -84,6 +84,7 @@ void FuzzTreeImport::loadTree(FTResults* queue)
 
 		try
 		{
+			m_busy = true;
 			const xml_node topEvent = m_rootNode.child("topEvent");
 			if (!topEvent)
 				throw runtime_error("Missing TopEvent");
