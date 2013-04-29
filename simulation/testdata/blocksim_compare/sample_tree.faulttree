@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FaultTree xmlns:ft="net.faulttree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="20130403">
+  <topEvent id="1" name="Server Failure">
+  	<children xsi:type="ft:Or" id="10">
+        <children xsi:type="ft:BasicEvent" id="20" name="Bus Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+        </children>
+        
+        <children xsi:type="ft:BasicEvent" id="30" name="Hard Disk Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+        </children>
+	    
+	    <children xsi:type="ft:ColdSpare" id="40" spareIds="6">
+	      	<children id="50" xsi:type="ft:BasicEvent" name="Secondary CPU Failure">
+	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    	</children>
+			<children id="60" xsi:type="ft:BasicEvent" name="Primary CPU Failure">
+	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    	</children>
+	    </children>
+
+	    <children xsi:type="ft:VotingOr" id="70" name="Power Failure" k="2">
+	      	<children id="71" xsi:type="ft:BasicEvent" name="Secondary CPU Failure">
+	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    	</children>
+			<children id="72" xsi:type="ft:BasicEvent" name="Primary CPU Failure">
+	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    	</children>
+	    	<children id="73" xsi:type="ft:BasicEvent" name="Secondary CPU Failure">
+	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    	</children>
+	    </children>
+	</children>
+
+    <children xsi:type="ft:PriorityAnd" id="74" priorityIds="3">
+      	<children id="3" xsi:type="ft:BasicEvent" name="First Failure">
+	      	<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    </children>
+		<children id="4"  xsi:type="ft:BasicEvent" name="Second Failure">
+	    	<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    </children>
+    </children>
+
+    <children xsi:type="ft:Sequence" id="75" eventSequence="5 6 7">
+      	<children id="5"  xsi:type="ft:BasicEvent">
+	      	<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    </children>
+		<children id="6"  xsi:type="ft:BasicEvent">
+	    	<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    </children>
+	    <children id="7"  xsi:type="ft:BasicEvent">
+	    	<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    </children>
+    </children>
+
+    <children xsi:type="ft:FDEP" id="76" triggeredEvents="5 6">
+      	<children id="5"  xsi:type="ft:BasicEvent">
+	      	<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    </children>
+    </children>
+  </topEvent>
+</ft:FaultTree>
