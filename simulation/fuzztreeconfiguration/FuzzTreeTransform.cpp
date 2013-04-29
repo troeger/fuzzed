@@ -125,6 +125,7 @@ void FuzzTreeTransform::generateConfigurations(vector<FuzzTreeConfiguration>& co
 	generateConfigurationsRecursive(topEventNode, configs);
 }
 
+// TODO refactor?
 void FuzzTreeTransform::generateConfigurationsRecursive(
 	const xml_node& fuzzTreeNode, 
 	vector<FuzzTreeConfiguration>& configurations) const
@@ -133,14 +134,14 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 	{
 		const string typeDescriptor = child.attribute("xsi:type").as_string();
 
-		const int id		= child.attribute("id").as_int(-1);
+		const int id		= parseID(child);
 		const bool opt		= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
 
 		if (id < 0)
 			continue;
 
 		if (opt)
-		{
+		{ // inclusion variation point. Generate n + n configurations.
 			vector<FuzzTreeConfiguration> additional;
 			for (FuzzTreeConfiguration& config : configurations)
 			{
@@ -154,11 +155,13 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 		}
 
 		if (typeDescriptor == REDUNDANCY_VP)
-		{
+		{ // any VotingOR with k in [from, to] and k=n-2. Generate n * #validVotingOrs configurations.
 			const int from = child.attribute("start").as_int(-1);
 			const int to = child.attribute("end").as_int(-1);
 			if (from < 0 || to < 0 || from > to)
 				throw runtime_error("Invalid boundaries for RedundancyGate");
+
+			if (from == to) continue;
 
 			const std::string formulaString = child.attribute("formula").as_string();
 			ExpressionParser<int> parser;
@@ -183,12 +186,38 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 					newConfigs.emplace_back(copied);
 				}
 			}
-			// N * M configurations
-			configurations.assign(newConfigs.begin(), newConfigs.end());
+			if (!newConfigs.empty())
+			{
+				assert(newConfigs.size() > configurations.size());
+				configurations.assign(newConfigs.begin(), newConfigs.end());
+			}
 		}
 		else if (typeDescriptor == FEATURE_VP)
-		{
-			// TODO
+		{ // exactly one subtree. Generate N * #Features configurations.
+			vector<int> childIds;
+			for (const auto& featuredChild : child.children("children"))
+				childIds.emplace_back(featuredChild.attribute("id").as_int(-1));
+
+			if (childIds.empty())
+			{
+				throw runtime_error("Feature Variation Points need child nodes");
+				continue;
+			}
+			vector<FuzzTreeConfiguration> newConfigs;
+			for (const int& i : childIds)
+			{
+				for (FuzzTreeConfiguration& config : configurations)
+				{
+					FuzzTreeConfiguration copied = config;
+					copied.setFeatureNumber(id, i);
+					newConfigs.emplace_back(copied);
+				}
+			}
+			if (!newConfigs.empty())
+			{
+				assert(newConfigs.size() > configurations.size());
+				configurations.assign(newConfigs.begin(), newConfigs.end());
+			}
 		}
 		else if (isLeaf(typeDescriptor))
 		{
@@ -223,14 +252,11 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 	xml_node& faultTreeNode, 
 	const FuzzTreeConfiguration& configuration) const
 {
-	const std::string templateType = templateNode.attribute(NODE_TYPE).as_string();
-	const std::string ftType = faultTreeNode.attribute(NODE_TYPE).as_string();
-	
 	for (const auto& child : templateNode.children("children"))
 	{
 		const string typeDescriptor = child.attribute("xsi:type").as_string();
 
-		const int id	= child.attribute("id").as_int(-1);
+		const int id	= parseID(child);
 		const bool opt	= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
 
 		if (id < 0)
@@ -250,7 +276,11 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		}
 		else if (typeDescriptor == FEATURE_VP)
 		{
-			// TODO
+			const int configuredChildID = configuration.getFeaturedChild(id);
+			auto result = handleFeatureVP(child, faultTreeNode, configuredChildID);
+			newNode = result.first;
+			if (result.second)
+				continue; // stop recursion
 		}
 		else if (typeDescriptor == BASIC_EVENT_SET)
 		{
@@ -306,8 +336,7 @@ pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 	xml_node votingOR = node.append_child("children");
 	votingOR.append_attribute(NODE_TYPE).set_value(VOTING_OR_GATE);
 
-	const xml_node child = templateNode.child("children"); // allow only one child below RedundancyVP
-	
+	const xml_node child = templateNode.child("children"); // allow only one child below RedundancyVP	
 	if (child.empty())
 	{
 		assert(false);
@@ -317,7 +346,7 @@ pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 	if (string(child.attribute(NODE_TYPE).as_string()) == BASIC_EVENT_SET)
 	{
 		votingOR.append_attribute(VOTING_OR_K).set_value(configuredN);
-		expandBasicEventSet(child, votingOR); // TODO check if numChildren >= configuredN
+		expandBasicEventSet(child, votingOR); // TODO: default quantity?
 		return make_pair(votingOR, true);
 	}
 	else
@@ -328,14 +357,16 @@ pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 	return make_pair(votingOR, false);
 }
 
-void FuzzTreeTransform::expandBasicEventSet(const xml_node& templateNode, xml_node& parent) const
+void FuzzTreeTransform::expandBasicEventSet(
+	const xml_node& templateNode, 
+	xml_node& parent, 
+	const int& defaultQuantity) const
 {
-	// TODO is there a default quantity?
-	const int numChildren = templateNode.attribute(BASIC_EVENT_SET_QUANTITY).as_int(-1);
-	
+	const int numChildren = templateNode.attribute(BASIC_EVENT_SET_QUANTITY).as_int(defaultQuantity);
 	xml_node probabilityNode = templateNode.child("probability");
 	if (probabilityNode.empty())
 	{
+		templateNode.print(cout);
 		assert(false);
 		return;
 	}
@@ -348,4 +379,41 @@ void FuzzTreeTransform::expandBasicEventSet(const xml_node& templateNode, xml_no
 		basicEvent.append_copy(probabilityNode);
 		i++;
 	}
+}
+
+pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
+	const xml_node& templateNode, 
+	xml_node& node, 
+	const int configuredChildId) const
+{
+	// find the configured child
+	xml_node configuredChild = node.append_child("children");
+	for (auto& child : templateNode.children("children"))
+	{
+		if (parseID(child) == configuredChildId)
+		{
+			shallowCopy(child, configuredChild);
+			break;
+		}
+	}
+	assert(!configuredChild.empty());
+
+	// if the we arrived at a leaf, return true
+	const string configuredChildType = configuredChild.attribute(NODE_TYPE).as_string();
+	if (configuredChildType == BASIC_EVENT_SET)
+	{
+		expandBasicEventSet(configuredChild, node);
+		return make_pair(configuredChild, true);
+	}
+	else if (configuredChildType == BASIC_EVENT)
+	{
+		return make_pair(configuredChild, true);
+	}
+
+	return make_pair(configuredChild, false);
+}
+
+int FuzzTreeTransform::parseID(const xml_node& node)
+{
+	return node.attribute("id").as_int(-1);
 }

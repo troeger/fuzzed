@@ -13,7 +13,7 @@
 
 #include "XMLImport.h"
 
-class FuzzTreeConfiguration;
+struct FuzzTreeConfiguration;
 
 class FuzzTreeTransform : public XMLImport
 {
@@ -36,7 +36,13 @@ protected:
 		xml_node& node, 
 		const int configuredN) const;
 
-	void expandBasicEventSet(const xml_node& templateNode, xml_node& parent) const;
+	// returns the configured child gate
+	pair<xml_node, bool /*isLeaf*/> handleFeatureVP(
+		const xml_node& templateNode, 
+		xml_node& node, 
+		const int configuredChildId) const;
+
+	void expandBasicEventSet(const xml_node& templateNode, xml_node& parent, const int& defaultQuantity = -1) const;
 
 	void generateConfigurations(vector<FuzzTreeConfiguration>& configurations) const;
 	void generateConfigurationsRecursive(
@@ -46,6 +52,8 @@ protected:
 	static void shallowCopy(const xml_node& proto, xml_node& copiedNode);
 	static bool isGate(const string& typeDescriptor);
 	static bool isLeaf(const string& typeDescriptor);
+
+	static int parseID(const xml_node& node);
 
 	const std::string uniqueFileName();
 
