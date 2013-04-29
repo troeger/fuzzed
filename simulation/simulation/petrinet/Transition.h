@@ -6,15 +6,15 @@
 
 class Place;
 
-typedef std::map<Place*, int> Places;
+typedef std::map<Place*, int /* number of tokens consumed */> PlaceTokenMap;
 
 class Transition
 {
 public:
 	void setLogFile(std::ofstream* file);
 
-	void setInPlaces(const Places inPlaces)		{ m_inPlaces = inPlaces; };
-	void setOutPlaces(const Places outPlaces)	{ m_outPlaces = outPlaces; };
+	void setInPlaces(const PlaceTokenMap inPlaces)		{ m_inPlaces = inPlaces; };
+	void setOutPlaces(const PlaceTokenMap outPlaces)	{ m_outPlaces = outPlaces; };
 
 	bool wantsToFire(int tick);
 
@@ -27,15 +27,24 @@ public:
 protected:
 	Transition(const std::string& id);
 	
-	virtual bool stochasticallyEnabled(int tick) = 0;
+	virtual bool stochasticallyEnabled(int tick) const = 0;
 
-	Places m_inPlaces;
-	Places m_outPlaces;
+	PlaceTokenMap m_inPlaces;
+	PlaceTokenMap m_outPlaces;
 
 	std::string m_ID;
 
 	bool m_active;
 	bool m_bLoggingActive;
+
+	// true if the in-places hold enough tokens.
+	// this is important because the stochastic distribution starts only at the time the transition is enabled.
+	// TODO: can this be modeled with m_active? 
+	// -> maybe not, because inactive transitions are never considered during simulation
+	bool m_enabled;
+
+	// the first time all in-places hold enough tokens.
+	int m_startupTime;
 
 	std::ofstream* m_log;
 };

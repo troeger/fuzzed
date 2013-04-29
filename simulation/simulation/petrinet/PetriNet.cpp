@@ -38,7 +38,7 @@ void PetriNet::setupConnections()
 	auto setPlaces = [&](Transition& t) -> void
 	{
 		string ID = t.getID();
-		Places inPlaces, outPlaces;
+		PlaceTokenMap inPlaces, outPlaces;
 		for (auto& tup : m_arcDict)
 		{
 			const int weight = get<2>(tup);
@@ -54,9 +54,7 @@ void PetriNet::setupConnections()
 	};
 	
 	for (ImmediateTransition& t : m_immediateTransitions)
-	{
 		setPlaces(t);
-	}
 
 	int sumFiringTimes = 0;
 	for (auto& p : m_timedTransitions)
@@ -73,12 +71,11 @@ void PetriNet::setupConnections()
 			m_topLevelPlace = &it->second;
 		++it;
 	}
-	assert(m_topLevelPlace && "Must have a top level place, or the simulation won't terminate");
+	assert(m_topLevelPlace && "the petri net must have a top level place, or the simulation won't terminate");
 
-	m_avgFiringTime = (double)sumFiringTimes/(double)m_timedTransitions.size();
-	m_previousFiringTime = m_timedTransitions.cbegin();
-	
-	m_finalFiringTime = (--m_timedTransitions.end())->first;
+	m_avgFiringTime			= (double)sumFiringTimes/(double)m_timedTransitions.size();
+	m_previousFiringTime	= m_timedTransitions.cbegin();
+	m_finalFiringTime		= (--m_timedTransitions.end())->first;
 }
 
 PetriNet::~PetriNet()

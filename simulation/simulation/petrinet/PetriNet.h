@@ -14,7 +14,7 @@ typedef multimap<int, TimedTransition> TransitionTimeMapping;
 
 class PetriNet
 {
-	friend class PetriNetSimulation;
+	friend class PetriNetSimulation; // ugh.
 
 public:
 	typedef boost::shared_ptr<PetriNet> Ptr;
@@ -31,13 +31,14 @@ public:
 
 	virtual ~PetriNet();
 
-	// returns the next time a timed transition fires
+	// returns the next time a timed transition fires and increases internal time counter
 	int nextFiringTime(int currentTime);
-	int finalFiringTime() const { return m_finalFiringTime; }
+	
+	int finalFiringTime()		const { return m_finalFiringTime; }
+	int numTimedTransitions()	const { return m_timedTransitions.size(); }
+	double averageFiringTime()	const { return m_avgFiringTime; }
 
-	int numTimedTransitions() const { return m_timedTransitions.size(); }
-	double averageFiringTime() const { return m_avgFiringTime; }
-
+	// check if simulation can be terminated
 	bool failed() const { return m_topLevelPlace->getCurrentMarking() > 0; }
 
 protected:
@@ -48,7 +49,7 @@ protected:
 	TransitionTimeMapping m_timedTransitions;
 
 	map<string, Place> m_placeDict;
-	Place* m_topLevelPlace;
+	Place* m_topLevelPlace; // just a pointer into m_placeDict. shouldn't leak.
 
 	ArcList m_arcDict;
 

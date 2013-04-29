@@ -14,13 +14,12 @@ public:
 	TimedTransition(const TimedTransition& other);
 	TimedTransition& operator= (const TimedTransition &other);
 
-	// TODO floats sufficient here?
 	double getRate() const { return m_rate; };
 	int getFiringTime() const { return m_r; };
 	void setFiringTime(int t) { m_r = t; };
 
 protected:
-	virtual bool stochasticallyEnabled(int tick) override;
+	virtual bool stochasticallyEnabled(int tick) const override;
 
 	double m_rate;
 	int m_r;

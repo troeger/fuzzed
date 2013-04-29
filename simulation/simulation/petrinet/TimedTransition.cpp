@@ -7,11 +7,13 @@ TimedTransition::TimedTransition(const std::string& id, double rate, int r)
 
 TimedTransition::TimedTransition(const TimedTransition& other)
 	: Transition(other.m_ID), m_rate(other.m_rate), m_r(other.m_r)
-{}
-
-bool TimedTransition::stochasticallyEnabled(int tick) 
 {
-	return m_r <= tick;
+	m_startupTime = 0;
+}
+
+bool TimedTransition::stochasticallyEnabled(int tick) const
+{
+	return (m_r + m_startupTime) <= tick;
 }
 
 TimedTransition& TimedTransition::operator=(const TimedTransition &other)
@@ -21,5 +23,7 @@ TimedTransition& TimedTransition::operator=(const TimedTransition &other)
 	m_active = true;
 	m_bLoggingActive = other.m_bLoggingActive;
 	m_r = other.m_r;
+	m_startupTime = other.m_startupTime;
+	m_startupTime = 0;
 	return *this;
 }

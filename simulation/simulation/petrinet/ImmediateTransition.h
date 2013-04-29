@@ -15,7 +15,7 @@ public:
 	double getPriority() const { return m_priority; };
 
 protected:
-	virtual bool stochasticallyEnabled(int tick) override;
+	virtual bool stochasticallyEnabled(int tick) const override;
 
 	double m_rate;
 	double m_priority;

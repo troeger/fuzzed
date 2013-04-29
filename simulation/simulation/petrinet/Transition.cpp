@@ -29,7 +29,6 @@ void Transition::fire(int tick)
 		if (m_bLoggingActive)
 			(*m_log) << "++" << place->getID().c_str() << endl;
 	}
-	
 }
 
 bool Transition::wantsToFire(int tick)
@@ -37,11 +36,7 @@ bool Transition::wantsToFire(int tick)
 	if (!m_active)
 		return false;
 
-	bool result = stochasticallyEnabled(tick);
-	if (!result)
-		return false;
-
-	for (auto& p : m_inPlaces)
+	for (const auto& p : m_inPlaces)
 	{
 		const int currentMarking = p.first->getCurrentMarking();
 		assert(currentMarking >= 0);
@@ -49,13 +44,25 @@ bool Transition::wantsToFire(int tick)
 			return false;
 	}
 
+	if (!m_enabled)
+	{ 
+		// the transition only just got enabled.
+		// save the time, so it can be used to offset probability distribution.
+		m_startupTime = tick;
+	}
+
+	bool result = stochasticallyEnabled(tick);
+	if (!result)
+		return false;
+
 	return true;
 }
 
 Transition::Transition(const string& id)
 	: m_ID(id),
 	m_bLoggingActive(false),
-	m_active(true)
+	m_active(true),
+	m_startupTime(0)
 {}
 
 void Transition::tryToFire()
