@@ -13,9 +13,9 @@ void FuzzTreeConfiguration::setNodeOptional(int ID, bool optional)
 	m_optionalNodes[ID] = optional;
 }
 
-void FuzzTreeConfiguration::setRedundancyNumber(int ID, int configuredNumber)
+void FuzzTreeConfiguration::setRedundancyNumber(int ID, int n, int outOfM)
 {
-	m_redundancyNodes[ID] = configuredNumber;
+	m_redundancyNodes[ID] = std::make_tuple(n, outOfM);
 }
 
 void FuzzTreeConfiguration::setFeatureNumber(int ID, int configuredChild)

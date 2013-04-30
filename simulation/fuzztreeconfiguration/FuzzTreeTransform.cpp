@@ -145,6 +145,9 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 			vector<FuzzTreeConfiguration> additional;
 			for (FuzzTreeConfiguration& config : configurations)
 			{
+				if (!config.isIncluded(id) || !config.isIncluded(parseID(fuzzTreeNode)))
+					continue;
+
 				FuzzTreeConfiguration copied = config;
 				copied.setNodeOptional(id, true);
 				config.setNodeOptional(id, false);
@@ -174,22 +177,24 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 			};
 
 			vector<FuzzTreeConfiguration> newConfigs;
-			for (int i : boost::counting_range(from, to+1))
+			for (FuzzTreeConfiguration& config : configurations)
 			{
-				const int numVotes = formula(i);
-				if (numVotes <= 0)
-					continue;
-
-				for (FuzzTreeConfiguration& config : configurations)
+				if (config.isIncluded(id))
 				{
-					FuzzTreeConfiguration copied = config;
-					if (config.isIncluded(id))
+					for (int i : boost::counting_range(from, to+1))
 					{
-						copied.setRedundancyNumber(id, numVotes);
+						FuzzTreeConfiguration copied = config;
+						const int numVotes = formula(i);
+						if (numVotes <= 0)
+							continue;
+						copied.setRedundancyNumber(id, numVotes, i);
 						newConfigs.emplace_back(copied);
 					}
 				}
+				else
+					newConfigs.emplace_back(config); // keep config as it is
 			}
+			
 			if (!newConfigs.empty())
 			{
 				assert(newConfigs.size() >= configurations.size());
@@ -208,23 +213,26 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 				continue;
 			}
 			vector<FuzzTreeConfiguration> newConfigs;
-			for (const int& i : childIds)
+			for (FuzzTreeConfiguration& config : configurations)
 			{
-				for (FuzzTreeConfiguration& config : configurations)
+				if (config.isIncluded(id))
 				{
-					FuzzTreeConfiguration copied = config;
-					if (config.isIncluded(id))
+					for (const int& i : childIds)
 					{
+						FuzzTreeConfiguration copied = config;
 						copied.setFeatureNumber(id, i);
 						for (const int& other : childIds)
 						{
 							if (other != i)
 								copied.setNotIncluded(other);
 						}
+						newConfigs.emplace_back(copied);
 					}
-					newConfigs.emplace_back(copied);
 				}
+				else
+					newConfigs.emplace_back(config); // keep config as it is
 			}
+			
 			if (!newConfigs.empty())
 			{
 				assert(newConfigs.size() >= configurations.size());
@@ -280,9 +288,10 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		xml_node newNode;
 		if (typeDescriptor == REDUNDANCY_VP)
 		{
-			const int configuredN = configuration.getRedundancyCount(id);
+			const tuple<int,int> configuredN = configuration.getRedundancyCount(id);
 			auto result = handleRedundancyVP(child, faultTreeNode, configuredN); // returns a VotingOR Gate
 			newNode = result.first;
+
 			if (result.second)
 				continue; // stop recursion
 		}
@@ -291,6 +300,9 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 			const int configuredChildID = configuration.getFeaturedChild(id);
 			auto result = handleFeatureVP(child, faultTreeNode, configuredChildID);
 			newNode = result.first;
+
+			result.first.print(cout);
+
 			if (result.second)
 				continue; // stop recursion
 		}
@@ -317,7 +329,6 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		if (isLeaf(typeDescriptor)) 
 			continue;
 
-		newNode.print(cout);
 		generateFaultTreeRecursive(child, newNode, configuration);
 	}
 }
@@ -343,7 +354,7 @@ const std::string FuzzTreeTransform::uniqueFileName()
 pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 	const xml_node& templateNode, 
 	xml_node& node, 
-	const int configuredN) const
+	const tuple<int,int> kOutOfN) const
 {
 	xml_node votingOR = node.append_child("children");
 	votingOR.append_attribute(NODE_TYPE).set_value(VOTING_OR_GATE);
@@ -357,8 +368,8 @@ pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 
 	if (string(child.attribute(NODE_TYPE).as_string()) == BASIC_EVENT_SET)
 	{
-		votingOR.append_attribute(VOTING_OR_K).set_value(configuredN);
-		expandBasicEventSet(child, votingOR); // TODO: default quantity?
+		votingOR.append_attribute(VOTING_OR_K).set_value(get<0>(kOutOfN));
+		expandBasicEventSet(child, votingOR, get<1>(kOutOfN)); // TODO: default quantity?
 		return make_pair(votingOR, true);
 	}
 	else
@@ -424,8 +435,11 @@ pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
 		newFeatured = node.append_copy(featuredTemplate);
 		return make_pair(newFeatured, true);
 	}
-
-	shallowCopy(featuredTemplate, newFeatured);
+	else if (isGate(configuredChildType))
+	{
+		shallowCopy(featuredTemplate, newFeatured);
+		return make_pair(newFeatured, false);
+	}
 	return make_pair(newFeatured, false);
 }
 

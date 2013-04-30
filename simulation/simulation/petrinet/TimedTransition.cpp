@@ -21,6 +21,7 @@ TimedTransition& TimedTransition::operator=(const TimedTransition &other)
 	m_hasNotFired = true;
 	m_bLoggingActive = other.m_bLoggingActive;
 	m_r = other.m_r;
+	m_wasNotEnabled = true;
 	return *this;
 }
 

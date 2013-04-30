@@ -34,7 +34,7 @@ protected:
 	pair<xml_node, bool /*isLeaf*/> handleRedundancyVP(
 		const xml_node& templateNode, 
 		xml_node& node, 
-		const int configuredN) const;
+		const tuple<int,int> configuredN) const;
 
 	// returns the configured child gate
 	pair<xml_node, bool /*isLeaf*/> handleFeatureVP(
