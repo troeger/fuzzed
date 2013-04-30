@@ -176,7 +176,7 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 			for (int i : boost::counting_range(from, to+1))
 			{
 				const int numVotes = formula(i);
-				if (numVotes < from || numVotes > to)
+				if (numVotes <= 0)
 					continue;
 
 				for (FuzzTreeConfiguration& config : configurations)
