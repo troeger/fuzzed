@@ -272,24 +272,23 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 	xml_node& faultTreeNode, 
 	const FuzzTreeConfiguration& configuration) const
 {
-	for (const auto& child : templateNode.children("children"))
+	vector<xml_node> emptyNodes;
+	for (const auto& currentChild : templateNode.children("children"))
 	{
-		const string typeDescriptor = child.attribute("xsi:type").as_string();
+		const int id	= parseID(currentChild);
+		const bool opt	= currentChild.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
 
-		const int id	= parseID(child);
-		const bool opt	= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
-
-		if (id < 0 || !configuration.isIncluded(id))
-			continue;
-
-		if (opt && !configuration.isOptionalEnabled(id))
+		if (id < 0 || !configuration.isIncluded(id) || (opt && !configuration.isOptionalEnabled(id)))
 			continue; // do not add this node
+		
+		const string typeDescriptor = currentChild.attribute("xsi:type").as_string();
+		const bool bLeaf = isLeaf(typeDescriptor);
 
 		xml_node newNode;
 		if (typeDescriptor == REDUNDANCY_VP)
 		{
 			const tuple<int,int> configuredN = configuration.getRedundancyCount(id);
-			auto result = handleRedundancyVP(child, faultTreeNode, configuredN); // returns a VotingOR Gate
+			auto result = handleRedundancyVP(currentChild, faultTreeNode, configuredN); // returns a VotingOR Gate
 			newNode = result.first;
 
 			if (result.second)
@@ -298,38 +297,48 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		else if (typeDescriptor == FEATURE_VP)
 		{
 			const int configuredChildID = configuration.getFeaturedChild(id);
-			auto result = handleFeatureVP(child, faultTreeNode, configuredChildID);
+			auto result = handleFeatureVP(currentChild, faultTreeNode, configuredChildID);
 			newNode = result.first;
-
-			result.first.print(cout);
 
 			if (result.second)
 				continue; // stop recursion
 		}
 		else if (typeDescriptor == BASIC_EVENT_SET)
 		{
-			expandBasicEventSet(child, faultTreeNode);
+			expandBasicEventSet(currentChild, faultTreeNode);
 			continue;
+		}
+		else if (typeDescriptor == INTERMEDIATE_EVENT_SET)
+		{
+			continue; // TODO
 		}
 		else
 		{
 			if (isGate(typeDescriptor))
 			{ // don't copy children yet
 				newNode = faultTreeNode.append_child("children");
-				shallowCopy(child, newNode);
+				shallowCopy(currentChild, newNode);
 			}
-			else if (isLeaf(typeDescriptor))
+			else if (bLeaf)
 			{ // copy everything including probability child node
-				newNode = faultTreeNode.append_copy(child);
+				newNode = faultTreeNode.append_copy(currentChild);
 			}
 			newNode.remove_attribute(OPTIONAL_ATTRIBUTE);
 		}
 
 		// break recursion
-		if (isLeaf(typeDescriptor)) 
+		if (bLeaf) 
 			continue;
-
-		generateFaultTreeRecursive(child, newNode, configuration);
+		else if (currentChild.child("children").empty())
+		{
+			emptyNodes.push_back(currentChild);
+			break;
+		}
+		generateFaultTreeRecursive(currentChild, newNode, configuration);
+	}
+	for (auto& node : emptyNodes)
+	{
+		faultTreeNode.remove_child(node);
 	}
 }
 
