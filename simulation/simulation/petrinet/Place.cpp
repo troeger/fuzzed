@@ -71,13 +71,13 @@ void Place::resolveConflictsTimed(int tick)
 	// P(2) = 0.5/1.0 --> subinterval [0.4, 0.9]
 	// P(3) = 0.1/1.0 --> subinterval [0.9, 1.0]
 	
-	double lower = 0.0;
-	double upper = 0.0;
 	for (Transition* t : m_transitionQueue)
 	{
 		TimedTransition* tt = dynamic_cast<TimedTransition*>(t);
-		upper = lower + tt->getRate();
+		assert(tt != nullptr);
 
+		double lower = 0.0;
+		double upper = lower + tt->getRate();
 		if (r >= lower && r < upper)
 		{
 			tt->fire(tick);

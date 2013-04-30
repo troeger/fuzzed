@@ -20,6 +20,8 @@ public:
 		int simulationSteps, // the number of logical simulation steps performed in each round
 		int numRounds) : // the number of simulation rounds for the entire net
 		m_netFile(p),
+		m_topProbability(0.0),
+		m_failureTime(0),
 		m_simulationTimeSeconds(simulationTime),
 		m_numSimulationSteps(simulationSteps),
 		m_numRounds(numRounds),

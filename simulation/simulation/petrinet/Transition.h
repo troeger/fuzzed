@@ -13,8 +13,8 @@ class Transition
 public:
 	void setLogFile(std::ofstream* file);
 
-	void setInPlaces(const PlaceTokenMap inPlaces)		{ m_inPlaces = inPlaces; };
-	void setOutPlaces(const PlaceTokenMap outPlaces)	{ m_outPlaces = outPlaces; };
+	void setInPlaces(const PlaceTokenMap& inPlaces)		{ m_inPlaces = inPlaces; };
+	void setOutPlaces(const PlaceTokenMap& outPlaces)	{ m_outPlaces = outPlaces; };
 
 	bool wantsToFire(int tick);
 

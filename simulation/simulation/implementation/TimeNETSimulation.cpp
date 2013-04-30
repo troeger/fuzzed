@@ -86,6 +86,8 @@ bool TimeNETSimulation::run(bool withLogging /*= true*/)
 	outJS << outStr.c_str();
 	outJS.close();
 
+	delete buf;
+
 	string serverCall = str(format("java -Xms32m -Xmx512m -cp %1% -DTNETHOME=\"%6%\" -Dlog4j.configuration=\"%2%\" gpsc.Host -i \"%3%\" -s -m \"%4%\" \"%5%\"") 
 		% m_simulationServerPath 
 		% m_logPropsPath % m_integrationPropsPath

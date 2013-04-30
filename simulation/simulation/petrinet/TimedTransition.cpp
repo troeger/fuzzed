@@ -2,11 +2,11 @@
 #include "implementation/Simulation.h"
 
 TimedTransition::TimedTransition(const std::string& id, double rate, int r)
-	: Transition(id), m_rate(rate), m_r(r)
+	: Transition(id), m_rate(rate), m_r(r), m_wasNotEnabled(true)
 {}
 
 TimedTransition::TimedTransition(const TimedTransition& other)
-	: Transition(other.m_ID), m_rate(other.m_rate), m_r(other.m_r)
+	: Transition(other.m_ID), m_rate(other.m_rate), m_r(other.m_r), m_wasNotEnabled(true)
 {}
 
 bool TimedTransition::stochasticallyEnabled(int tick) const

@@ -173,13 +173,13 @@ void TimeNETDocument::setHeaderTimeNET()
 	m_root.append_attribute("xsi:schemaLocation").set_value("http://pdv.cs.tu-berlin.de/TimeNET/schema/SCPN etc/schemas/SCPN.xsd");
 }
 
-void TimeNETDocument::setType(xml_node& node, const string type /*="node"*/)
+void TimeNETDocument::setType(xml_node& node, const string& type /*="node"*/)
 {
 	xml_attribute typeAttr = node.append_attribute("type");
 	typeAttr.set_value(type.c_str());
 }
 
-void TimeNETDocument::setLabel(xml_node& node, const string label)
+void TimeNETDocument::setLabel(xml_node& node, const string& label)
 {
 	xml_node labelNode = node.append_child("label");
 	labelNode.append_attribute("id").set_value(label.c_str());

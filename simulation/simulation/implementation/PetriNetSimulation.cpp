@@ -179,7 +179,6 @@ SimulationResult PetriNetSimulation::runOneRound(PetriNet* net, bool withLogging
 			i.setLogFile(file);
 	}
 
-	int nextStep = 0;//= net->nextFiringTime(0);
 	const int maxTime = m_simulationTimeSeconds*1000;
 	const auto start = high_resolution_clock::now();
 
@@ -191,6 +190,7 @@ SimulationResult PetriNetSimulation::runOneRound(PetriNet* net, bool withLogging
 	auto elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();
 	try
 	{
+		int nextStep = 0;//= net->nextFiringTime(0);
 		while ((nextStep <= m_numSimulationSteps || m_simulateUntilFailure)  && elapsedTime < maxTime)
 		{
 			elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();

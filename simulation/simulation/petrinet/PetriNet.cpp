@@ -111,7 +111,7 @@ int PetriNet::nextFiringTime(int currentTime)
 		return m_finalFiringTime;
 
 	while (m_previousFiringTime->first <= currentTime)
-		m_previousFiringTime++;
+		++m_previousFiringTime;
 
 	return m_previousFiringTime->first;
 }

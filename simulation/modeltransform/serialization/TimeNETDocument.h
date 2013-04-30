@@ -23,8 +23,8 @@ protected:
 
 	// helpers
 	static void setID(xml_node& node, const int id, const NodeType type);
-	static void setType(xml_node& node, const string type="node");
-	static void setLabel(xml_node& node, const string label);
+	static void setType(xml_node& node, const string& type="node");
+	static void setLabel(xml_node& node, const string& label);
 	static void setPosition(xml_node& node, const int x, const int y);
 
 	void setTransitionProperties(xml_node &node, const string& str);
