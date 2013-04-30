@@ -18,9 +18,12 @@ public:
 	int getFiringTime() const { return m_r; };
 	void setFiringTime(int t) { m_r = t; };
 
+	bool tryUpdateStartupTime(int tick);
+
 protected:
 	virtual bool stochasticallyEnabled(int tick) const override;
 
 	double m_rate;
 	int m_r;
+	bool m_wasNotEnabled;
 };

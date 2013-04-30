@@ -154,9 +154,14 @@ void PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	// propagate all failures upwards in the correct time step
 	bool immediateCanFire = true;
 	while (immediateCanFire)
-	{
 		tryImmediateTransitions(pn, tick, immediateCanFire);
-	}
+
+	// TODO make this work
+// 	for (auto& t : pn->m_inactiveTimedTransitions)
+// 	{
+// 		if (t->tryUpdateStartupTime(tick))
+// 			pn->updateFiringTime(t, tick);
+// 	}
 }
 
 SimulationResult PetriNetSimulation::runOneRound(PetriNet* net, bool withLogging /*= true*/)

@@ -30,13 +30,13 @@ int SpareGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	// this place is shared between all primary gates and used to trigger spare activation
 	const int primaryGateFailed	= doc->addPlace(0, regularIds.size(), "PrimaryGateFailure");
 	
-	for (pair<int,int> spare : spares)
+	for (const pair<int,int>& spare : spares)
 	{
 		doc->placeToTransition(primaryGateFailed, spare.second);
 		doc->placeToTransition(spare.first, failGate);
 	}
 
-	for (int primary : regularIds)
+	for (const int& primary : regularIds)
 	{
 		// if a regular child fails, generate a token for spare activation
 		int fail = doc->addImmediateTransition();

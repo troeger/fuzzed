@@ -6,7 +6,7 @@
 void Transition::fire(int tick)
 {
 	// cout << "Firing: " << m_ID << endl;
-	m_active = false;
+	m_hasNotFired = false;
 
 	if (m_bLoggingActive)
 	{
@@ -33,36 +33,17 @@ void Transition::fire(int tick)
 
 bool Transition::wantsToFire(int tick)
 {
-	if (!m_active)
-		return false;
-
-	for (const auto& p : m_inPlaces)
-	{
-		const int currentMarking = p.first->getCurrentMarking();
-		assert(currentMarking >= 0);
-		if (currentMarking < p.second)
-			return false;
-	}
-
-	if (!m_enabled)
-	{ 
-		// the transition only just got enabled.
-		// save the time, so it can be used to offset probability distribution.
-		m_startupTime = tick;
-	}
-
-	bool result = stochasticallyEnabled(tick);
-	if (!result)
-		return false;
-
-	return true;
+	return 
+		m_hasNotFired &&
+		enoughTokens() &&
+		stochasticallyEnabled(tick);
 }
 
 Transition::Transition(const string& id)
 	: m_ID(id),
 	m_bLoggingActive(false),
-	m_active(true),
-	m_startupTime(0)
+	m_hasNotFired(true),
+	m_log(nullptr)
 {}
 
 void Transition::tryToFire()
@@ -82,4 +63,27 @@ void Transition::setLogFile(std::ofstream* file)
 {
 	m_log = file;
 	m_bLoggingActive = true;
+}
+
+bool Transition::enoughTokens() const
+{
+	for (const auto& p : m_inPlaces)
+	{
+		const int currentMarking = p.first->getCurrentMarking();
+		assert(currentMarking >= 0);
+		if (currentMarking < p.second)
+			return false;
+	}
+	return true;
+}
+
+bool Transition::operator==(Transition const& lhs)
+{
+	return this->m_ID == lhs.m_ID;
+}
+
+Transition::~Transition()
+{
+	if (m_log)
+		delete m_log;
 }

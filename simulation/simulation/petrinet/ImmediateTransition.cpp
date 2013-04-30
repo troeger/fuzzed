@@ -13,7 +13,7 @@ ImmediateTransition& ImmediateTransition::operator=(const ImmediateTransition &o
 {
 	m_ID = other.m_ID;
 	m_rate = other.m_rate;
-	m_active = true;
+	m_hasNotFired = true;
 	m_bLoggingActive = other.m_bLoggingActive;
 
 	return *this;

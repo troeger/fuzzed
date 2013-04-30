@@ -55,14 +55,7 @@ void PetriNet::setupConnections()
 	
 	for (ImmediateTransition& t : m_immediateTransitions)
 		setPlaces(t);
-
-	int sumFiringTimes = 0;
-	for (auto& p : m_timedTransitions)
-	{
-		setPlaces(p.second);
-		sumFiringTimes += p.first;
-	}
-
+ 
 	m_topLevelPlace = nullptr;
 	map<string, Place>::iterator it = m_placeDict.begin();
 	while (!m_topLevelPlace && it != m_placeDict.end())
@@ -72,6 +65,16 @@ void PetriNet::setupConnections()
 		++it;
 	}
 	assert(m_topLevelPlace && "the petri net must have a top level place, or the simulation won't terminate");
+
+	int sumFiringTimes = 0;
+	for (auto& p : m_timedTransitions)
+	{
+		setPlaces(p.second);
+		if (!p.second.enoughTokens())
+			m_inactiveTimedTransitions.emplace(&p.second);
+
+		sumFiringTimes += p.first;
+	}
 
 	m_avgFiringTime			= (double)sumFiringTimes/(double)m_timedTransitions.size();
 	m_previousFiringTime	= m_timedTransitions.cbegin();
@@ -111,4 +114,9 @@ int PetriNet::nextFiringTime(int currentTime)
 		m_previousFiringTime++;
 
 	return m_previousFiringTime->first;
+}
+
+void PetriNet::updateFiringTime(TimedTransition* tt, const int& updatedTime)
+{
+	// TODO: update the list of firing times as well as the pointer to the next time
 }

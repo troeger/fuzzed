@@ -33,6 +33,8 @@ public:
 
 	// returns the next time a timed transition fires and increases internal time counter
 	int nextFiringTime(int currentTime);
+
+	void updateFiringTime(TimedTransition* tt, const int& updatedTime);
 	
 	int finalFiringTime()		const { return m_finalFiringTime; }
 	int numTimedTransitions()	const { return m_timedTransitions.size(); }
@@ -47,6 +49,7 @@ protected:
 
 	vector<ImmediateTransition> m_immediateTransitions; 
 	TransitionTimeMapping m_timedTransitions;
+	set<TimedTransition*> m_inactiveTimedTransitions;
 
 	map<string, Place> m_placeDict;
 	Place* m_topLevelPlace; // just a pointer into m_placeDict. shouldn't leak.
