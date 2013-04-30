@@ -148,6 +148,7 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 				FuzzTreeConfiguration copied = config;
 				copied.setNodeOptional(id, true);
 				config.setNodeOptional(id, false);
+				config.setNotIncluded(id);
 
 				additional.emplace_back(copied);
 			}
@@ -182,13 +183,16 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 				for (FuzzTreeConfiguration& config : configurations)
 				{
 					FuzzTreeConfiguration copied = config;
-					copied.setRedundancyNumber(id, numVotes);
-					newConfigs.emplace_back(copied);
+					if (config.isIncluded(id))
+					{
+						copied.setRedundancyNumber(id, numVotes);
+						newConfigs.emplace_back(copied);
+					}
 				}
 			}
 			if (!newConfigs.empty())
 			{
-				assert(newConfigs.size() > configurations.size());
+				assert(newConfigs.size() >= configurations.size());
 				configurations.assign(newConfigs.begin(), newConfigs.end());
 			}
 		}
@@ -209,13 +213,21 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 				for (FuzzTreeConfiguration& config : configurations)
 				{
 					FuzzTreeConfiguration copied = config;
-					copied.setFeatureNumber(id, i);
+					if (config.isIncluded(id))
+					{
+						copied.setFeatureNumber(id, i);
+						for (const int& other : childIds)
+						{
+							if (other != i)
+								copied.setNotIncluded(other);
+						}
+					}
 					newConfigs.emplace_back(copied);
 				}
 			}
 			if (!newConfigs.empty())
 			{
-				assert(newConfigs.size() > configurations.size());
+				assert(newConfigs.size() >= configurations.size());
 				configurations.assign(newConfigs.begin(), newConfigs.end());
 			}
 		}
@@ -259,7 +271,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		const int id	= parseID(child);
 		const bool opt	= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
 
-		if (id < 0)
+		if (id < 0 || !configuration.isIncluded(id))
 			continue;
 
 		if (opt && !configuration.isOptionalEnabled(id))
@@ -387,30 +399,34 @@ pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
 	const int configuredChildId) const
 {
 	// find the configured child
-	xml_node configuredChild = node.append_child("children");
+	xml_node featuredTemplate;
 	for (auto& child : templateNode.children("children"))
 	{
 		if (parseID(child) == configuredChildId)
 		{
-			shallowCopy(child, configuredChild);
+			featuredTemplate = child;
 			break;
 		}
 	}
-	assert(!configuredChild.empty());
+	assert(!featuredTemplate.empty());
 
 	// if the we arrived at a leaf, return true
-	const string configuredChildType = configuredChild.attribute(NODE_TYPE).as_string();
+	const string configuredChildType = featuredTemplate.attribute(NODE_TYPE).as_string();
+
+	xml_node newFeatured = node.append_child("children");
 	if (configuredChildType == BASIC_EVENT_SET)
 	{
-		expandBasicEventSet(configuredChild, node);
-		return make_pair(configuredChild, true);
+		expandBasicEventSet(featuredTemplate, node);
+		return make_pair(node, true);
 	}
 	else if (configuredChildType == BASIC_EVENT)
 	{
-		return make_pair(configuredChild, true);
+		newFeatured = node.append_copy(featuredTemplate);
+		return make_pair(newFeatured, true);
 	}
 
-	return make_pair(configuredChild, false);
+	shallowCopy(featuredTemplate, newFeatured);
+	return make_pair(newFeatured, false);
 }
 
 int FuzzTreeTransform::parseID(const xml_node& node)

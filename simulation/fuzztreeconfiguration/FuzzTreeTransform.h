@@ -43,7 +43,7 @@ protected:
 		const int configuredChildId) const;
 
 	void expandBasicEventSet(const xml_node& templateNode, xml_node& parent, const int& defaultQuantity = -1) const;
-
+	
 	void generateConfigurations(vector<FuzzTreeConfiguration>& configurations) const;
 	void generateConfigurationsRecursive(
 		const xml_node& node, 

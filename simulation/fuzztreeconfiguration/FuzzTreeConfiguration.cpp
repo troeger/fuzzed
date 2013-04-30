@@ -22,3 +22,8 @@ void FuzzTreeConfiguration::setFeatureNumber(int ID, int configuredChild)
 {
 	m_featureNodes[ID] = configuredChild;
 }
+
+void FuzzTreeConfiguration::setNotIncluded(int ID)
+{
+	m_notIncluded.emplace(ID);
+}
