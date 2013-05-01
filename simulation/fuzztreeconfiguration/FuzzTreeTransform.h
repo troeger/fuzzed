@@ -11,6 +11,9 @@
 #pragma warning(pop) 
 #endif
 
+#define HAS_CHILDREN(node) (!node.child("children").empty())
+#define SET_OPTIONAL_FALSE(node) (node.remove_attribute(OPTIONAL_ATTRIBUTE))
+
 #include "XMLImport.h"
 
 struct FuzzTreeConfiguration;
@@ -27,7 +30,7 @@ protected:
 	void generateFaultTree(const FuzzTreeConfiguration& configuration);
 	void generateFaultTreeRecursive(
 		const xml_node& templateNode, 
-		xml_node& node, 
+		xml_node& node,
 		const FuzzTreeConfiguration& configuration) const;
 
 	// returns the configured VotingOR gate

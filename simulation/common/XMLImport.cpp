@@ -14,7 +14,6 @@ bool XMLImport::validateAndLoad()
 		{
 			if (!m_document.load_file(m_file.generic_string().c_str()))
 				return false;
-
 #ifdef DEBUG
 			cout << "Loaded XML: " << endl;
 			m_document.print(std::cout);
