@@ -24,6 +24,17 @@ define(function() {
      */
     return {
         /**
+         *  Group: Alerts
+         *    Configs related to alert messages.
+         *
+         *  Constants:
+         *    {Number} TIMEOUT - Default timeout for alert messages (in ms).
+         */
+        Alerts: {
+            TIMEOUT: 5000 //ms
+        },
+
+        /**
          *  Group: Attributes
          *    Names of certain DOM-element attributes.
          *

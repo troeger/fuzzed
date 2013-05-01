@@ -1,4 +1,4 @@
-define(['class', 'config', 'job'], function (Class, Config, Job) {
+define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alerts) {
 
     /**
      * Class: Backend
@@ -125,7 +125,11 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
 
                 data:     data,
                 success:  success  || jQuery.noop,
-                error:    error    || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Edge could not be saved:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
                 complete: complete || jQuery.noop
             });
 
@@ -163,7 +167,11 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
 
                 data:     data,
                 success:  success  || jQuery.noop,
-                error:    error    || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Node could not be created:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
                 complete: complete || jQuery.noop
             });
 
@@ -189,7 +197,11 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
                 dataType: 'json',
 
                 success:  success  || jQuery.noop,
-                error:    error    || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Edge could not be deleted:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
                 complete: complete || jQuery.noop
             });
 
@@ -215,7 +227,11 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
                 dataType: 'json',
 
                 success:  success  || jQuery.noop,
-                error:    error    || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Node could not be deleted:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
                 complete: complete || jQuery.noop
             });
 
@@ -247,7 +263,11 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
                 dataType: 'json',
 
                 success:  success  || jQuery.noop,
-                error:    error    || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Node could not be changed:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
                 complete: complete || jQuery.noop
             });
 
@@ -296,7 +316,11 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
                 dataType: 'json',
 
                 success:  success  || jQuery.noop,
-                error:    error    || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Failed to calculate cutsets:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
                 complete: complete || jQuery.noop
             });
 
@@ -328,7 +352,11 @@ define(['class', 'config', 'job'], function (Class, Config, Job) {
                     }
                 },
 
-                error:    error    || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Failed to calculate Top Event probability:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
                 complete: complete || jQuery.noop
             });
         },
