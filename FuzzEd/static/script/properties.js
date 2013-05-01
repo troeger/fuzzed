@@ -1,4 +1,4 @@
-define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, Class) {
+define(['config', 'decimal', 'class', 'alerts', 'underscore'], function(Config, Decimal, Class, Alerts) {
     var get = function(object, key, defaultValue) {
         var value = object[key];
         return (typeof value !== 'undefined' ? value : defaultValue);
@@ -863,7 +863,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         },
 
         _throwError: function(xhr, textStatus, errorThrown) {
-            throw '[AJAX ERROR] Could not fetch graph for transfer, reason: ' + errorThrown;
+            Alerts.showWarningAlert('Could not fetch graph for transfer:', errorThrown, Config.Alerts.TIMEOUT);
         }
     });
 
