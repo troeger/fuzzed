@@ -25,8 +25,8 @@ define(["class"], function(Class) {
         errorCallback:    jQuery.noop(),
         queryInterval:    1000,
 
-        _url:            undefined,
-        _timeout:        undefined,
+        _url:             undefined,
+        _timeout:         undefined,
 
         /**
          *  Group: Initialization
@@ -37,10 +37,10 @@ define(["class"], function(Class) {
          *    Constructor for this Job instance.
          *
          *  Parameters:
-         *    {String}      url                - The query URL of this job.
+         *    {String} url - The query URL of this job.
          */
         init: function(url) {
-            this._url             = url;
+            this._url = url;
         },
 
         /**
