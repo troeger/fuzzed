@@ -13,7 +13,6 @@
 using namespace chrono;
 using boost::format;
 
-// #define profile_OMP true
 bool PetriNetSimulation::run(bool withLogging /*= true*/)
 {	
 	unsigned long numFailures = 0;
@@ -21,18 +20,13 @@ bool PetriNetSimulation::run(bool withLogging /*= true*/)
 	unsigned long sumFailureTime_fail = 0;
 	unsigned long count = 0;
 
-	const PetriNet* pn = PNMLImport::loadPNML(m_netFile.generic_string());
+	const PetriNet* const pn = PNMLImport::loadPNML(m_netFile.generic_string());
 	if (!pn)
 	{
 		throw runtime_error("Import was not successful.");
 	}
 
 	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads...";
-	
-#ifdef profile_OMP
-	#pragma pomp inst init
-	#pragma pomp inst begin(foo)
-#endif // profile_OMP
 
 	const double startTime = omp_get_wtime();
 
@@ -51,14 +45,13 @@ bool PetriNetSimulation::run(bool withLogging /*= true*/)
 		if (privateBreak)
 			continue;
 		
-		PetriNet* currentNet = new PetriNet(*pn);
-		SimulationResult res = runOneRound(currentNet, withLogging);
-		delete currentNet;
-
+		PetriNet currentNet(std::move(*pn));
+		SimulationResult res = runOneRound(&currentNet, withLogging);
+		
 		if (res.valid)
 		{
 			++count;
-			sumFailureTime_all += res.failureTime; // TODO what about the cases when the failureTime is MAX_INT?
+			sumFailureTime_all += res.failureTime;
 			
 			if (res.failed && res.failureTime <= m_numSimulationSteps)
 			{ // the failure occurred before the end of mission time -> add up to compute R(mission time)
@@ -81,10 +74,6 @@ bool PetriNetSimulation::run(bool withLogging /*= true*/)
 			privateLast = current;
 		}
 	}
-
-#ifdef profile_OMP
-	#pragma pomp inst end(foo)
-#endif // profile_OMP
 
 	const double endTime = omp_get_wtime();
 
@@ -166,19 +155,6 @@ void PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 
 SimulationResult PetriNetSimulation::runOneRound(PetriNet* net, bool withLogging /*= true*/)
 {
-	ofstream* file = nullptr;
-	if (withLogging)
-	{ // caution: this logs for each transition. lots of output.
-		file = new ofstream;
-		file->open(m_directoryPrefix + "events/" + util::timeStamp() + ".txt");
-
-		for (auto& t : net->m_timedTransitions)
-			t.second.setLogFile(file);
-
-		for (ImmediateTransition& i: net->m_immediateTransitions)
-			i.setLogFile(file);
-	}
-
 	const int maxTime = m_simulationTimeSeconds*1000;
 	const auto start = high_resolution_clock::now();
 
@@ -202,8 +178,8 @@ SimulationResult PetriNetSimulation::runOneRound(PetriNet* net, bool withLogging
 				break;
 			}
 			else if (nextStep == net->finalFiringTime())
-			{
-				result.failureTime = MAX_INT; // there are configurations where the tree can no longer fail!
+			{ // there are configurations where the tree can no longer fail!
+				result.failureTime = m_numSimulationSteps; 
 				result.failed = false;
 				break;
 			}
@@ -220,10 +196,6 @@ SimulationResult PetriNetSimulation::runOneRound(PetriNet* net, bool withLogging
 		(m_outStream ? *m_outStream : cout) << "Unknown Exception during Simulation" << endl;
 		result.valid = false;
 	}
-
-	if (file)
-		file->close();
-
 	return result;
 }
 
