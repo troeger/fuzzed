@@ -95,7 +95,7 @@ bool SimulationProxy::runSimulation(boost::filesystem::path p, SimulationImpl im
 			success &= sim->run(false);
 		}
 #else
-		success = sim->run(false /*no logging*/);
+		success = sim->run();
 #endif
 	}
 	catch (exception& e)
@@ -135,8 +135,8 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 		return;
 	}
 
-	const bool bDir = optionsMap.count("dir");
-	const bool bFile = optionsMap.count("file");
+	const bool bDir = optionsMap.count("dir") > 0;
+	const bool bFile = optionsMap.count("file") > 0;
 	if (!bDir && !bFile)
 	{
 		cout << "Please specify either a directory or a file" << endl;
@@ -312,6 +312,6 @@ void runSimulation(
 		true, /* simulate until failure for MTTF */
 		0 /* not yet implemented */);
 
-	sim->run(false);
+	sim->run();
 	delete sim;
 }

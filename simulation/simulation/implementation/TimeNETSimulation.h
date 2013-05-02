@@ -28,7 +28,7 @@ public:
 		void* additionalArgmuments);
 	virtual ~TimeNETSimulation() {}; // TODO
 
-	virtual bool run(bool withLogging = true) override;
+	virtual bool run() override;
 
 protected:
 	static const char* templatePath;

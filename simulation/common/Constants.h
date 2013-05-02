@@ -59,6 +59,7 @@ namespace fuzzTree
 	const char* const TOP_EVENT = "topEvent";
 
 	const char* const INTERMEDIATE_EVENT = "ft:IntermediateEvent";
+	const char* const INTERMEDIATE_EVENT_SET = "ft:IntermediateEventSet";
 	const char* const BASIC_EVENT = "ft:BasicEvent";
 	const char* const BASIC_EVENT_SET = "ft:BasicEventSet";
 	const char* const UNDEVELOPED_EVENT = "ft:UndevelopedEvent";
@@ -77,10 +78,9 @@ namespace fuzzTree
 	const char* const TRIANGULAR_FUZZY_NUM = "ft:TriangularFuzzyInterval";
 	const char* const CRISP_NUM = "ft:CrispProbability";
 
+	// attributes
 	const char* const SPARE_ID_ATTRIBUTE = "spareIds";
 	const char* const PRIO_ID_ATTRIBUTE = "priorityIds";
-
-	// attributes
 	const char* const OPTIONAL_ATTRIBUTE = "optional";
 	const char* const COST_ATTRIBUTE = "cost";
 	const char* const CHILDREN = "children";

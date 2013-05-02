@@ -29,7 +29,7 @@ public:
 
 	virtual ~Simulation() { assert(!m_bRunning); };
 
-	virtual bool run(bool withLogging = true) = 0;
+	virtual bool run() = 0;
 
 protected:
 	boost::filesystem::path m_netFile;

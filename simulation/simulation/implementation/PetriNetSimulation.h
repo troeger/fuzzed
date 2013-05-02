@@ -18,13 +18,13 @@ public:
 		bool simulateUntilFailure = true,	// if true, the simulation stops only with a SimulationException. necessary for MTTF computations
 		int numAdaptiveRounds = 0);			// number of rounds performed to adapt OpenMP parallelization
 
-	virtual bool run(bool withLogging = true) override;
+	virtual bool run() override;
 
 	virtual ~PetriNetSimulation();
 
 protected:
 	// performs one round of m_numSimulationSteps discrete time steps
-	SimulationResult runOneRound(PetriNet* net, bool withLogging = true);
+	SimulationResult runOneRound(PetriNet* net);
 
 	// performs one single simulation step
 	void simulationStep(PetriNet* pn, int tick);

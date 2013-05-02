@@ -13,7 +13,7 @@
 using namespace chrono;
 using boost::format;
 
-bool PetriNetSimulation::run(bool withLogging /*= true*/)
+bool PetriNetSimulation::run()
 {	
 	unsigned long numFailures = 0;
 	unsigned long sumFailureTime_all = 0;
@@ -46,7 +46,7 @@ bool PetriNetSimulation::run(bool withLogging /*= true*/)
 			continue;
 		
 		PetriNet currentNet(std::move(*pn));
-		SimulationResult res = runOneRound(&currentNet, withLogging);
+		SimulationResult res = runOneRound(&currentNet);
 		
 		if (res.valid)
 		{
@@ -145,15 +145,14 @@ void PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	while (immediateCanFire)
 		tryImmediateTransitions(pn, tick, immediateCanFire);
 
-	// TODO make this work
-// 	for (auto& t : pn->m_inactiveTimedTransitions)
-// 	{
-// 		if (t->tryUpdateStartupTime(tick))
-// 			pn->updateFiringTime(t, tick);
-// 	}
+	for (auto& t : pn->m_inactiveTimedTransitions)
+	{
+		if (t->tryUpdateStartupTime(tick))
+			pn->updateFiringTime(t, tick);
+	}
 }
 
-SimulationResult PetriNetSimulation::runOneRound(PetriNet* net, bool withLogging /*= true*/)
+SimulationResult PetriNetSimulation::runOneRound(PetriNet* net)
 {
 	const int maxTime = m_simulationTimeSeconds*1000;
 	const auto start = high_resolution_clock::now();
@@ -223,10 +222,10 @@ void PetriNetSimulation::tryImmediateTransitions(PetriNet* pn, int tick, bool& i
 
 void PetriNetSimulation::tryTimedTransitions(PetriNet* pn, int tick)
 {
-	for (auto& t : pn->m_timedTransitions)
+	for (auto& t : pn->m_activeTimedTransitions)
 	{
-		if (t.second.wantsToFire(tick))
-			t.second.tryToFire();
+		if (t.second->wantsToFire(tick))
+			t.second->tryToFire();
 	}
 
 	for (auto& p : pn->m_placeDict)

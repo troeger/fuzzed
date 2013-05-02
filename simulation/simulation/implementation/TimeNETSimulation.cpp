@@ -49,7 +49,7 @@ TimeNETSimulation::TimeNETSimulation(const boost::filesystem::path &p,
 	m_timenetHome = boost::filesystem::path(timenetDir);
 }
 
-bool TimeNETSimulation::run(bool withLogging /*= true*/)
+bool TimeNETSimulation::run()
 {
 	const string jsPath = "./simulate.js";
 	const string netFilePath = boost::filesystem::path(
