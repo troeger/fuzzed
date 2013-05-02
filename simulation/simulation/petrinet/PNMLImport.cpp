@@ -59,12 +59,12 @@ bool PNMLImport::loadRootNode()
 		return false;
 	m_rootNode = m_rootNode.child(ROOT_TAG);
 
-	return m_rootNode;
+	return !m_rootNode.empty();
 }
 
 void PNMLImport::loadPlaces(map<string, Place>& places)
 {
-	for (xml_node& child : m_rootNode.children(PLACE_TAG))
+	for (const xml_node& child : m_rootNode.children(PLACE_TAG))
 	{
 		const int initialMarking = parseIntegerValue(child, INITIALMARKING_TAG, 0);
 		const string ID = child.attribute(ID_TAG).as_string();
@@ -90,14 +90,14 @@ int PNMLImport::parseIntegerValue(const xml_node& node, const string& type, cons
 
 void PNMLImport::loadArcs(ArcList& arcs)
 {
-	for (xml_node& childNode : m_rootNode.children(ARC_TAG))
+	for (const xml_node& childNode : m_rootNode.children(ARC_TAG))
 	{
 		const string src = childNode.attribute(SOURCE_TAG).as_string();
 		const string dst = childNode.attribute(TARGET_TAG).as_string();
 		
 		int weight = 1;
-		xml_node valNode = childNode.child(INSCRIPTION_TAG);
-		if (valNode)
+		const xml_node valNode = childNode.child(INSCRIPTION_TAG);
+		if (valNode.empty())
 		{ // in the inscription node, the number of tokens is written comma-separated from the token type
 			xml_node c = valNode.child(VALUE_TAG);
 			if (!valNode)
@@ -107,7 +107,7 @@ void PNMLImport::loadArcs(ArcList& arcs)
 			util::tokenizeIntegerString(c.text().as_string(""), results);
 			weight = results.back();
 		}
-		arcs.push_back(make_tuple(src, dst, weight));
+		arcs.emplace_back(src, dst, weight);
 	}
 }
 
@@ -115,7 +115,7 @@ void PNMLImport::loadTransitions(
 	vector<ImmediateTransition>& immediateTransitions, 
 	TransitionTimeMapping& timedTransitions)
 {
-	for (xml_node& child : m_rootNode.children(TRANSITION_TAG))
+	for (const xml_node& child : m_rootNode.children(TRANSITION_TAG))
 	{
 		const string ID = child.attribute(ID_TAG).as_string();
 		if (parseBooleanValue(child, TIMED_TAG, false))
@@ -138,7 +138,7 @@ void PNMLImport::loadTransitions(
 
 void PNMLImport::loadUserDescription(string& description)
 {
-	for (xml_node& child : m_rootNode.children(USER_DESCRIPTION_LABEL))
+	for (const xml_node& child : m_rootNode.children(USER_DESCRIPTION_LABEL))
 	{
 		description = child.text().as_string("");
 		return;
@@ -147,12 +147,12 @@ void PNMLImport::loadUserDescription(string& description)
 
 bool PNMLImport::parseBooleanValue(const xml_node& node, const string& type, const bool defaultValue)
 {
-	xml_node valNode = node.child(type.c_str());
-	if (!valNode)
+	const xml_node valNode = node.child(type.c_str());
+	if (valNode.empty())
 		return defaultValue;
 
-	xml_node child = valNode.child(VALUE_TAG);
-	if (!valNode)
+	const xml_node child = valNode.child(VALUE_TAG);
+	if (child.empty())
 		throw runtime_error("Value node not found");
 
 	return child.text().as_bool(defaultValue);
@@ -160,12 +160,12 @@ bool PNMLImport::parseBooleanValue(const xml_node& node, const string& type, con
 
 double PNMLImport::parseDoubleValue(const xml_node& node, const string& type, const double defaultValue)
 {
-	xml_node valNode = node.child(type.c_str());
-	if (!valNode)
+	const xml_node valNode = node.child(type.c_str());
+	if (valNode.empty())
 		return defaultValue;
 
-	xml_node child = valNode.child(VALUE_TAG);
-	if (!valNode)
+	const xml_node child = valNode.child(VALUE_TAG);
+	if (child.empty())
 		throw runtime_error("Value node not found");
 
 	return child.text().as_double(defaultValue);

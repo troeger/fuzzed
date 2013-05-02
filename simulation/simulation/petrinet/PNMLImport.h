@@ -2,15 +2,13 @@
 #include <pugixml.hpp>
 #include <boost/filesystem/path.hpp>
 
+#include "XMLImport.h"
 #include "ImmediateTransition.h"
 #include "TimedTransition.h"
 #include "Place.h"
 
 #include <set>
 #include <map>
-#include <unordered_map>
-
-#include "XMLImport.h"
 
 class PetriNet;
 
@@ -41,9 +39,9 @@ private:
 
 	void loadUserDescription(string& description);
 
-	static int parseIntegerValue(const xml_node& node, const string& type, const int defaultValue);
-	static double parseDoubleValue(const xml_node& node, const string& type, const double defaultValue);
-	static bool parseBooleanValue(const xml_node& node, const string& type, const bool defaultValue);
+	static int		parseIntegerValue(const xml_node& node, const string& type, const int defaultValue);
+	static double	parseDoubleValue(const xml_node& node, const string& type, const double defaultValue);
+	static bool		parseBooleanValue(const xml_node& node, const string& type, const bool defaultValue);
 
 	virtual bool loadRootNode() override;
 
