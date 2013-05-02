@@ -158,9 +158,9 @@ def dashboard_edit(request, graph_id):
         messages.add_message(request, messages.SUCCESS, 'Graph duplicated.')
         return redirect('dashboard')
 
-    elif POST.get('copy-read-only'):
+    elif POST.get('snapshot'):
         old_graph = Graph.objects.get(pk=graph_id)
-        duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
+        duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
                                                           owner=request.user, add_default_nodes=False)
         duplicate_command.do()
         new_graph = duplicate_command.graph
@@ -169,7 +169,7 @@ def dashboard_edit(request, graph_id):
         new_graph.read_only = True
         new_graph.save()
 
-        messages.add_message(request, messages.SUCCESS, 'Graph duplicated.')
+        messages.add_message(request, messages.SUCCESS, 'Created snapshot.')
         return redirect('dashboard')
 
 

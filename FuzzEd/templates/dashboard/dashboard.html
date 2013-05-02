@@ -82,8 +82,8 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Graph</th>
                 <th></th>
+                <th>Graph</th>
                 <th>Kind</th>
                 <th>Created</th>
                 <th></th>
@@ -95,15 +95,12 @@
                 <tr onclick="document.location = '/editor/{{ graph.pk }}';">
                     <td>{{ forloop.counter }}</td>
                     <td>
-                        <strong class="graph_name">{{ graph }}</strong>
+                        {% if graph.read_only %}
+                            <i class="icon-lock"></i>
+                        {% endif %}
                     </td>
                     <td>
-                        {% if graph.read_only %}
-                            <span class="label label-info">
-                                <i class="icon-lock icon-white"></i>
-                                read-only
-                            </span>
-                        {% endif %}
+                        <strong class="graph_name">{{ graph }}</strong>
                     </td>
                     <td><span class="label">{{ name }}</span></td>
                     <td>{{ graph.created }}</td>
@@ -119,9 +116,9 @@
                                 <i class="icon-plus-sign"></i>
                                 Copy
                             </button>
-                            <button type="submit" name="copy-read-only" value="copy-read-only" class="btn">
-                                <i class="icon-lock"></i>
-                                Copy read-only
+                            <button type="submit" name="snapshot" value="snapshot" class="btn">
+                                <i class="icon-camera"></i>
+                                Snapshot
                             </button>
                             <button type="button" class="btn btn-danger require-dialog">
                                 <i class="icon-white icon-trash"></i>
