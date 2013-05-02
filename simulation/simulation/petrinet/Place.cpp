@@ -20,7 +20,7 @@ void Place::consumeTokens(Transition* const t, int numTokens)
 		m_transitionQueue.clear();
 }
 
-void Place::requestTokens(Transition* const t, int numTokens)
+void Place::requestTokens(Transition* const t)
 {
 	m_transitionQueue.insert(t);
 }

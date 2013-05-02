@@ -98,14 +98,7 @@ struct toInt
 {
 	int operator()(string const &str) 
 	{ 
-		try
-		{
-			return atoi(str.c_str());
-		}
-		catch (boost::bad_lexical_cast&)
-		{
-			return 0;
-		}
+		return atoi(str.c_str());
 	}
 };
 

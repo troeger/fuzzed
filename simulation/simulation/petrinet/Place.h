@@ -21,6 +21,8 @@ public:
 
 	Place(const string& id, int initialMarking, int capacity, bool isTopLevel);
 
+	Place(){}; // satisfy the compiler
+
 	// copying
 	Place(const Place& other);
 	Place& operator= (const Place& other);
@@ -35,8 +37,7 @@ public:
 
 	void produceTokens(int numTokens);
 	void consumeTokens(Transition* const t, int numTokens);
-	
-	void requestTokens(Transition* const t, int numTokens);
+	void requestTokens(Transition* const t);
 
 	// this will make the simulation stop
 	void markAsTopLevel() { m_bTopLevelPlace = true; };
