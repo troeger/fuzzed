@@ -27,11 +27,12 @@ class Graph(models.Model):
     class Meta:
         app_label = 'FuzzEd'
 
-    kind    = models.CharField(max_length=127, choices=notations.choices)
-    name    = models.CharField(max_length=255)
-    owner   = models.ForeignKey(User, related_name='graphs')
-    created = models.DateTimeField(auto_now_add=True, editable=False)
-    deleted = models.BooleanField(default=False)
+    kind      = models.CharField(max_length=127, choices=notations.choices)
+    name      = models.CharField(max_length=255)
+    owner     = models.ForeignKey(User, related_name='graphs')
+    created   = models.DateTimeField(auto_now_add=True, editable=False)
+    deleted   = models.BooleanField(default=False)
+    read_only = models.BooleanField(default=False)
 
     def __unicode__(self):
         return unicode('%s%s' % ('[DELETED] ' if self.deleted else '', self.name))
@@ -59,15 +60,16 @@ class Graph(models.Model):
         """
         node_set = self.nodes.filter(deleted=False)
         edge_set = self.edges.filter(deleted=False)
-        nodes   = [node.to_dict() for node in node_set]
-        edges   = [edge.to_dict() for edge in edge_set]
+        nodes    = [node.to_dict() for node in node_set]
+        edges    = [edge.to_dict() for edge in edge_set]
 
         return {
-            'id':    self.pk,
-            'name':  self.name,
-            'type':  self.kind,
-            'nodes': nodes,
-            'edges': edges
+            'id':       self.pk,
+            'name':     self.name,
+            'type':     self.kind,
+            'readOnly': self.read_only,
+            'nodes':    nodes,
+            'edges':    edges
         }
 
     def to_bool_term(self):
@@ -94,6 +96,37 @@ class Graph(models.Model):
         pyxb.utils.domutils.BindingDOMSupport.DeclareNamespace(XmlNamespace, 'ft')
 
         return unicode(fuzz_tree.toxml('utf-8'),'utf-8')
+
+    def copy_values(self, other):
+        # copy all nodes and their properties
+        node_cache = {}
+
+        for node in other.nodes.all():
+            # first cache the old node's properties
+            properties = node.properties.all()
+
+            # create node copy by overwriting the ID field
+            old_id = node.pk
+            node.pk = None
+            node.graph = self
+            node.save()
+            node_cache[old_id] = node
+
+            # now save the property objects for the new node
+            for prop in properties:
+                prop.pk = None
+                prop.node = node
+                prop.save()
+
+        for edge in other.edges.all():
+            edge.pk = None
+            edge.source = node_cache[edge.source.pk]
+            edge.target = node_cache[edge.target.pk]
+            edge.graph = self
+            edge.save()
+
+        self.read_only = other.read_only
+        self.save()
 
 # validation handler that ensures that the graph kind is known
 @receiver(pre_save, sender=Graph)
