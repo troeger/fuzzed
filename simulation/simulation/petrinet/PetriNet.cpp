@@ -35,22 +35,17 @@ PetriNet::PetriNet(const PetriNet& otherNet) :
 
 void PetriNet::setupConnections()
 {
-	auto setPlaces = [&](Transition& t) -> void
+	const auto setPlaces = [&](Transition& t) -> void
 	{
-		string ID = t.getID();
-		PlaceTokenMap inPlaces, outPlaces;
-		for (auto& tup : m_arcDict)
+		const string ID = t.getID();
+		for (const auto& tup : m_arcDict)
 		{
-			const int weight = get<2>(tup);
 			if (get<0>(tup) == ID) // transition-to-place
-				outPlaces.insert(make_pair(&m_placeDict.at(get<1>(tup)), weight));
+				t.addOutPlace(&m_placeDict[get<1>(tup)], get<2>(tup));
 
 			else if (get<1>(tup) == ID) // place-to-transition
-				inPlaces.insert(make_pair(&m_placeDict.at(get<0>(tup)), weight));
+				t.addInPlace(&m_placeDict[get<0>(tup)], get<2>(tup));
 		}
-
-		t.setInPlaces(inPlaces);
-		t.setOutPlaces(outPlaces);
 	};
 	
 	for (ImmediateTransition& t : m_immediateTransitions)

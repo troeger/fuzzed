@@ -1,5 +1,6 @@
 #pragma once
 #include <set>
+#include <unordered_map>
 #include <boost/shared_ptr.hpp>
 #include <fstream>
 #include "implementation/Random.h"
@@ -12,6 +13,9 @@ class Transition
 {
 public:
 	void setLogFile(std::ofstream* file);
+
+	void addInPlace(Place* p, const int& numTokens);
+	void addOutPlace(Place* p, const int& numTokens);
 
 	void setInPlaces(const PlaceTokenMap& inPlaces)		{ m_inPlaces = inPlaces; };
 	void setOutPlaces(const PlaceTokenMap& outPlaces)	{ m_outPlaces = outPlaces; };
@@ -30,7 +34,6 @@ public:
 
 protected:
 	Transition(const std::string& id);
-	virtual ~Transition();
 	
 	virtual bool stochasticallyEnabled(int tick) const = 0;
 
@@ -42,5 +45,6 @@ protected:
 	bool m_hasNotFired;
 	bool m_bLoggingActive;
 
+	// obsolete
 	std::ofstream* m_log;
 };

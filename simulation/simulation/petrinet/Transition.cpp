@@ -48,14 +48,13 @@ Transition::Transition(const string& id)
 
 void Transition::tryToFire()
 {
-	// cout << "Transition " << m_ID << " trying to fire" << endl;
 	for (auto& p : m_inPlaces)
 	{
 		Place* const place = p.first;
 		const int numTokens = p.second;
 
 		assert(place->getCurrentMarking() >= numTokens);
-		place->requestTokens(this, numTokens);
+		place->requestTokens(this);
 	}
 }
 
@@ -82,8 +81,12 @@ bool Transition::operator==(Transition const& lhs)
 	return this->m_ID == lhs.m_ID;
 }
 
-Transition::~Transition()
+void Transition::addInPlace(Place* p, const int& numTokens)
 {
-	if (m_log)
-		delete m_log;
+	m_inPlaces[p] = numTokens;
+}
+
+void Transition::addOutPlace(Place* p, const int& numTokens)
+{
+	m_outPlaces[p] = numTokens;
 }
