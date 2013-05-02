@@ -139,52 +139,42 @@ def dashboard_edit(request, graph_id):
         return redirect('dashboard')
 
     # deletion requested? do it and go back to dashboard
-    if POST.get('delete'):
+    elif POST.get('delete'):
         commands.DeleteGraph.create_from(graph_id).do()
         messages.add_message(request, messages.SUCCESS, 'Graph deleted.')
         return redirect('dashboard')
 
-    # duplication requested
-    if POST.get('duplicate'):
-        # add new graph object
+    # copy requested
+    elif POST.get('copy'):
         old_graph = Graph.objects.get(pk=graph_id)
         duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
                                                           owner=request.user,  add_default_nodes=False)
         duplicate_command.do()
         new_graph = duplicate_command.graph
 
-        # copy all nodes and their properties
-        node_cache = {}
-
-        for node in old_graph.nodes.all():
-            # first cache the old node's properties
-            properties = node.properties.all()
-
-            # create node copy by overwriting the ID field
-            old_id = node.pk
-            node.pk = None
-            node.graph = new_graph
-            node.save()
-            node_cache[old_id] = node
-
-            # now save the property objects for the new node
-            for prop in properties:
-                prop.pk = None
-                prop.node = node
-                prop.save()
-
-        for edge in old_graph.edges.all():
-            edge.pk = None
-            edge.source = node_cache[edge.source.pk]
-            edge.target = node_cache[edge.target.pk]
-            edge.graph = new_graph
-            edge.save()
+        new_graph.copy_values(old_graph)
+        new_graph.save()
 
         messages.add_message(request, messages.SUCCESS, 'Graph duplicated.')
         return redirect('dashboard')
 
+    elif POST.get('snapshot'):
+        old_graph = Graph.objects.get(pk=graph_id)
+        duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
+                                                          owner=request.user, add_default_nodes=False)
+        duplicate_command.do()
+        new_graph = duplicate_command.graph
+
+        new_graph.copy_values(old_graph)
+        new_graph.read_only = True
+        new_graph.save()
+
+        messages.add_message(request, messages.SUCCESS, 'Created snapshot.')
+        return redirect('dashboard')
+
+
     # please show the edit page to the user on get requests
-    if POST.get('edit') or request.method == 'GET':
+    elif POST.get('edit') or request.method == 'GET':
         parameters = {
             'graph': graph,
             'kind':  notations.by_kind[graph.kind]['name']

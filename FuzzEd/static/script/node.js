@@ -211,6 +211,8 @@ function(Properties, Mirror, Canvas, Class) {
                         'left': this._nodeImage.xCenter
                     })
                     .appendTo(this.container);
+
+                if (this.readOnly) this._connectionHandle.hide();
             }
 
             return this;
@@ -350,8 +352,9 @@ function(Properties, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         _setupDragging: function() {
-            var initialPositions = {};
+            if (this.readOnly) return this;
 
+            var initialPositions = {};
             // using jsPlumb draggable and not jQueryUI to allow that edges move together with nodes
             jsPlumb.draggable(this.container, {
                 // stay in the canvas
@@ -438,6 +441,7 @@ function(Properties, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         _setupMouse: function() {
+            if (this.readOnly) return this;
             // hovering over a node
             this.container.hover(
                 // mouse in
@@ -458,6 +462,8 @@ function(Properties, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         _setupSelection: function() {
+            if (this.readOnly) return this;
+
             //XXX: select a node on click
             // This uses the jQuery.ui.selectable internal functions.
             // We need to trigger them manually because only jQuery.ui.draggable gets the mouseDown events on nodes.

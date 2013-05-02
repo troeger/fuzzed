@@ -5,19 +5,31 @@ define(['config', 'class'], function(Config, Class) {
      */
     var Menu = Class.extend({
         container:    undefined,
+
         _controls:     undefined,
+        _disabled:     undefined,
         _navbar:       undefined,
         _navbarButton: undefined,
 
         init: function() {
             this.container = this._setupContainer();
-            this._controls  = this._setupControls();
-            this._navbar    = this._setupNavbar();
+            this._controls = this._setupControls();
+            this._disabled = false;
+            this._navbar   = this._setupNavbar();
 
             this._setupDragging();
         },
 
         /* Section: Visibility */
+        disable: function() {
+            this._disabled = true;
+            this.hide();
+        },
+
+        enable: function() {
+            this._disabled = false;
+        },
+
         hide: function() {
             this.container.hide();
             return this;
@@ -80,7 +92,7 @@ define(['config', 'class'], function(Config, Class) {
 
         show: function() {
             // prevent that the menu is shown again as long it is minimized
-            if (this._isMinimized()) return this;
+            if (this._isMinimized() || this._disabled) return this;
 
             this.container.show();
             return this;
@@ -191,7 +203,7 @@ define(['config', 'class'], function(Config, Class) {
 
             // display the properties menu only if there is exactly one node selected
             // and the menu is not minimized; otherwise hide the menu
-            if (selected.length == 1 && !this._isMinimized()) {
+            if (selected.length == 1 && !this._isMinimized() && !this._disabled) {
                 return this._show(selected);
             }
 
