@@ -5,30 +5,13 @@
 
 void Transition::fire(int tick)
 {
-	// cout << "Firing: " << m_ID << endl;
-	m_hasNotFired = false;
-
-	if (m_bLoggingActive)
-	{
-		(*m_log) << 
-			"FIRING at time " << util::toString(tick) << 
-			" : " << typeid(*this).name() << " " <<  m_ID.c_str() << endl;
-	}
-
 	for (auto& p : m_inPlaces)
-	{
-		Place* const place = p.first;
-		place->consumeTokens(this, p.second);
-		if (m_bLoggingActive)
-			(*m_log) << "--" << place->getID().c_str() << endl;
-	}
+		p.first->consumeTokens(this, p.second);
+
 	for (auto& p : m_outPlaces)
-	{
-		Place* const place = p.first;
-		place->produceTokens(p.second);
-		if (m_bLoggingActive)
-			(*m_log) << "++" << place->getID().c_str() << endl;
-	}
+		p.first->produceTokens(p.second);
+
+	m_hasNotFired = false;
 }
 
 bool Transition::wantsToFire(int tick)
@@ -41,9 +24,7 @@ bool Transition::wantsToFire(int tick)
 
 Transition::Transition(const string& id)
 	: m_ID(id),
-	m_bLoggingActive(false),
-	m_hasNotFired(true),
-	m_log(nullptr)
+	m_hasNotFired(true)
 {}
 
 void Transition::tryToFire()
@@ -56,12 +37,6 @@ void Transition::tryToFire()
 		assert(place->getCurrentMarking() >= numTokens);
 		place->requestTokens(this);
 	}
-}
-
-void Transition::setLogFile(std::ofstream* file)
-{
-	m_log = file;
-	m_bLoggingActive = true;
 }
 
 bool Transition::enoughTokens() const

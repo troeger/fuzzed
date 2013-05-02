@@ -16,8 +16,6 @@ using namespace PNML;
 PetriNet* PNMLImport::loadPNML(const string& fileName)
 {
 	PNMLImport import(fileName);
-	cout << "Importing " << fileName << "...";
-	
 	try
 	{
 		if (!import.validateAndLoad())
@@ -30,10 +28,8 @@ PetriNet* PNMLImport::loadPNML(const string& fileName)
 		import.loadArcs(arcList);
 
 		vector<ImmediateTransition> immediateTransitions; 
-		TransitionTimeMapping timedTransitions;
+		vector<TimedTransition>		timedTransitions;
 		import.loadTransitions(immediateTransitions, timedTransitions);
-
-		cout << "...done." << endl;
 
 		string userDescription;
 		import.loadUserDescription(userDescription);
@@ -113,7 +109,7 @@ void PNMLImport::loadArcs(ArcList& arcs)
 
 void PNMLImport::loadTransitions(
 	vector<ImmediateTransition>& immediateTransitions, 
-	TransitionTimeMapping& timedTransitions)
+	vector<TimedTransition>& timedTransitions)
 {
 	for (const xml_node& child : m_rootNode.children(TRANSITION_TAG))
 	{
@@ -124,8 +120,7 @@ void PNMLImport::loadTransitions(
 			if (rate < 0.0)
 				throw runtime_error("Invalid rate for transition detected");
 
-			const int occurrenceTime = m_gen.randomFiringTime(rate);
-			timedTransitions.insert(make_pair(occurrenceTime, TimedTransition(ID, rate, occurrenceTime)));
+			timedTransitions.emplace_back(ID, rate);
 		}
 		else
 		{ // immediateTransition

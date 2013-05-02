@@ -10,7 +10,7 @@
 
 typedef tuple<string, string, int> ArcSpec;
 typedef vector<ArcSpec> ArcList;
-typedef multimap<int, TimedTransition> TransitionTimeMapping;
+typedef multimap<int, TimedTransition*> TransitionTimeMapping;
 
 class PetriNet
 {
@@ -22,7 +22,7 @@ public:
 	// explicit constructor, from file import
 	PetriNet(
 		const vector<ImmediateTransition>& immediateTransitions, 
-		const TransitionTimeMapping& timedTransitions, 
+		const vector<TimedTransition>& timedTransitions, 
 		const map<string, Place>& places,
 		const ArcList& arcDict);
 
@@ -37,7 +37,7 @@ public:
 	void updateFiringTime(TimedTransition* tt, const int& updatedTime);
 	
 	int finalFiringTime()		const { return m_finalFiringTime; }
-	int numTimedTransitions()	const { return m_timedTransitions.size(); }
+	int numTimedTransitions()	const { return m_activeTimedTransitions.size(); }
 	double averageFiringTime()	const { return m_avgFiringTime; }
 
 	// check if simulation can be terminated
@@ -45,16 +45,18 @@ public:
 
 protected:
 	// uses the information in m_arcDict to tell each transition about its in- and out-places
-	void setupConnections();
+	void setup();
 
 	vector<ImmediateTransition> m_immediateTransitions; 
-	TransitionTimeMapping m_timedTransitions;
+	vector<TimedTransition> m_timedTransitions;
+	
 	set<TimedTransition*> m_inactiveTimedTransitions;
+	TransitionTimeMapping m_activeTimedTransitions;
 
 	map<string, Place> m_placeDict;
 	Place* m_topLevelPlace; // just a pointer into m_placeDict. shouldn't leak.
 
-	ArcList m_arcDict;
+	ArcList m_arcs;
 
 	double m_avgFiringTime;
 

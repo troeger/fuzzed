@@ -34,7 +34,8 @@ private:
 	void loadPlaces(map<string, Place>& placeDict);
 	void loadTransitions(
 		vector<ImmediateTransition>& immediateTransitions, 
-		multimap<int, TimedTransition>& timedTransitions);
+		vector<TimedTransition>& timedTransitions);
+
 	void loadArcs(vector<tuple<string,string,int>>& arcDict);
 
 	void loadUserDescription(string& description);

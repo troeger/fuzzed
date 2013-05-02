@@ -12,19 +12,13 @@ typedef std::map<Place*, int /* number of tokens consumed */> PlaceTokenMap;
 class Transition
 {
 public:
-	void setLogFile(std::ofstream* file);
-
 	void addInPlace(Place* p, const int& numTokens);
 	void addOutPlace(Place* p, const int& numTokens);
-
-	void setInPlaces(const PlaceTokenMap& inPlaces)		{ m_inPlaces = inPlaces; };
-	void setOutPlaces(const PlaceTokenMap& outPlaces)	{ m_outPlaces = outPlaces; };
-
-	bool wantsToFire(int tick);
 
 	bool isActive() const		{ return m_hasNotFired; };
 	std::string getID() const	{ return m_ID; };
 	
+	bool wantsToFire(int tick);
 	void tryToFire();
 	void fire(int tick);
 
@@ -43,8 +37,4 @@ protected:
 	std::string m_ID;
 
 	bool m_hasNotFired;
-	bool m_bLoggingActive;
-
-	// obsolete
-	std::ofstream* m_log;
 };
