@@ -329,10 +329,6 @@
                 }
             },
 
-            "connector": {
-                "dashstyle": "4 2"
-            },
-
             "changedChildProperties": {
                 "optional": null
             }
