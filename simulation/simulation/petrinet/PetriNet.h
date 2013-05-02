@@ -34,7 +34,7 @@ public:
 	// returns the next time a timed transition fires and increases internal time counter
 	int nextFiringTime(int currentTime);
 
-	void updateFiringTime(TimedTransition* tt, const int& updatedTime);
+	void updateFiringTime(TimedTransition* tt);
 	
 	int finalFiringTime()		const { return m_finalFiringTime; }
 	int numTimedTransitions()	const { return m_activeTimedTransitions.size(); }
@@ -42,6 +42,8 @@ public:
 
 	// check if simulation can be terminated
 	bool failed() const { return m_topLevelPlace->getCurrentMarking() > 0; }
+
+	bool hasInactiveTransitions() const { return m_inactiveTimedTransitions.size() > 0; }
 
 protected:
 	// uses the information in m_arcDict to tell each transition about its in- and out-places

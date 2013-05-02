@@ -145,11 +145,17 @@ void PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	while (immediateCanFire)
 		tryImmediateTransitions(pn, tick, immediateCanFire);
 
-	for (auto& t : pn->m_inactiveTimedTransitions)
+	vector<TimedTransition*> toRemove;
+	for (TimedTransition* tt : pn->m_inactiveTimedTransitions)
 	{
-		if (t->tryUpdateStartupTime(tick))
-			pn->updateFiringTime(t, tick);
+		if (tt->tryUpdateStartupTime(tick))
+		{
+			toRemove.emplace_back(tt);
+			pn->updateFiringTime(tt);
+		}
 	}
+	for (TimedTransition* tt : toRemove)
+		pn->m_inactiveTimedTransitions.erase(tt);
 }
 
 SimulationResult PetriNetSimulation::runOneRound(PetriNet* net)
@@ -176,7 +182,7 @@ SimulationResult PetriNetSimulation::runOneRound(PetriNet* net)
 				result.failed = true;
 				break;
 			}
-			else if (nextStep == net->finalFiringTime())
+			else if (nextStep == net->finalFiringTime() && !net->hasInactiveTransitions())
 			{ // there are configurations where the tree can no longer fail!
 				result.failureTime = m_numSimulationSteps; 
 				result.failed = false;

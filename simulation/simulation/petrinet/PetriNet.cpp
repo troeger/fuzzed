@@ -104,11 +104,11 @@ int PetriNet::nextFiringTime(int currentTime)
 	return m_previousFiringTime->first;
 }
 
-void PetriNet::updateFiringTime(TimedTransition* tt, const int& updatedTime)
+void PetriNet::updateFiringTime(TimedTransition* tt)
 {
+	const int updatedTime = tt->getFiringTime();
 	m_activeTimedTransitions.insert(make_pair(updatedTime, tt));
-	m_inactiveTimedTransitions.erase(tt);
-
+	
 	if (updatedTime > m_finalFiringTime)
 		m_finalFiringTime = updatedTime;
 
