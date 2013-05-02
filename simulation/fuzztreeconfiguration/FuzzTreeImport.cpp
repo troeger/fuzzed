@@ -78,13 +78,12 @@ bool FuzzTreeImport::loadRootNode()
 
 void FuzzTreeImport::loadTree(FTResults* queue)
 {
+	m_busy = true;
 	m_running.emplace_back( std::thread([this, queue]() -> void
 	{
 		assert(m_rootNode);
-
 		try
 		{
-			m_busy = true;
 			const xml_node topEvent = m_rootNode.child("topEvent");
 			if (!topEvent)
 				throw runtime_error("Missing TopEvent");
