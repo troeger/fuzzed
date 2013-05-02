@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Gate.h"
+
 class FDEPGate : public Gate
 {
 public:
@@ -10,4 +12,5 @@ public:
 
 protected:
 	int m_triggerID;
+	std::vector<int> m_dependentEvents;
 };

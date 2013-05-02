@@ -2,8 +2,7 @@
 
 Gate::Gate(int ID, const std::string& name)
 	: FaultTreeNode(ID, name), m_bDynamic(false)
-{
-}
+{}
 
 long double Gate::computeUnreliability() const
 {
