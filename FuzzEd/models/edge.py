@@ -40,7 +40,7 @@ class Edge(models.Model):
         Returns:
          {dict} the edge as dictionary
         """
-        json.dumps(self.to_dict())
+        return json.dumps(self.to_dict())
 
     def to_dict(self):
         """
