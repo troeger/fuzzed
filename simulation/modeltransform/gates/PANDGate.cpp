@@ -16,11 +16,11 @@ int PANDGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	vector<int> regularIds;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
 	{
-		BasicEvent* basicEvent = dynamic_cast<BasicEvent*>(*it);
-		if (CONTAINS(m_prioIDs, basicEvent->getId()))
-			priorityIds.push_back(basicEvent->serialize(doc));
+		FaultTreeNode* node = dynamic_cast<FaultTreeNode*>(*it);
+		if (CONTAINS(m_prioIDs, node->getId()))
+			priorityIds.push_back(node->serialize(doc));
 		else
-			regularIds.push_back(basicEvent->serialize(doc));
+			regularIds.push_back(node->serialize(doc));
 	}
 
 	int transitionID = doc->addImmediateTransition(2.0);
