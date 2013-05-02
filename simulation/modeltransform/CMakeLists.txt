@@ -56,7 +56,7 @@ add_library(ftmodeltransform STATIC ${SOURCES} ${HEADERS})
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${FT_INCLUDE_DIR})
-target_link_libraries(ftmodeltransform ${Boost_LIBRARIES})
+target_link_libraries(ftmodeltransform ${Boost_LIBRARIES} ftcommon)
 
 include_directories(${PUGIXML_INCLUDE_DIR})
 

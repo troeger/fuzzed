@@ -37,7 +37,7 @@ endif()
 
 set(Boost_DIR ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
 
-find_package(Boost COMPONENTS filesystem program_options REQUIRED)
+find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
 find_package(pugixml REQUIRED)
 
