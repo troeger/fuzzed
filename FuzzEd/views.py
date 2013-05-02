@@ -135,17 +135,19 @@ def dashboard_edit(request, graph_id):
     if POST.get('save'):
         graph.name = POST.get('name', '')
         graph.save()
+        messages.add_message(request, messages.SUCCESS, 'Graph saved.')
         return redirect('dashboard')
 
     # deletion requested? do it and go back to dashboard
     if POST.get('delete'):
         commands.DeleteGraph.create_from(graph_id).do()
+        messages.add_message(request, messages.SUCCESS, 'Graph deleted.')
         return redirect('dashboard')
 
     # duplication requested
     if POST.get('duplicate'):
         # add new graph object
-        old_graph=Graph.objects.get(pk=graph_id)
+        old_graph = Graph.objects.get(pk=graph_id)
         duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
                                                           owner=request.user,  add_default_nodes=False)
         duplicate_command.do()
@@ -178,6 +180,7 @@ def dashboard_edit(request, graph_id):
             edge.graph = new_graph
             edge.save()
 
+        messages.add_message(request, messages.SUCCESS, 'Graph duplicated.')
         return redirect('dashboard')
 
     # please show the edit page to the user on get requests

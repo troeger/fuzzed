@@ -24,6 +24,17 @@ define(function() {
      */
     return {
         /**
+         *  Group: Alerts
+         *    Configs related to alert messages.
+         *
+         *  Constants:
+         *    {Number} TIMEOUT - Default timeout for alert messages (in ms).
+         */
+        Alerts: {
+            TIMEOUT: 5000 //ms
+        },
+
+        /**
          *  Group: Attributes
          *    Names of certain DOM-element attributes.
          *
@@ -196,6 +207,7 @@ define(function() {
          *    IDs of certain DOM-elements.
          *
          *  Constants:
+         *    {String} ALERT_CONTAINER           - The DOM element containing the alerts messages.
          *    {String} CANVAS                    - The DOM element containing the canvas.
          *    {String} CONTENT                   - The container element for the content (without navbar).
          *    {String} PROPERTIES_MENU           - The container for the properties menu.
@@ -205,6 +217,7 @@ define(function() {
          *    {String} NAVBAR_ACTION_GRID_TOGGLE - The list element that contains the grid toggle item.
          */
         IDs: {
+            ALERT_CONTAINER:           'FuzzEdAlertContainer',
             CANVAS:                    'FuzzEdCanvas',
             CONTENT:                   'FuzzEdContent',
             PROPERTIES_MENU:           'FuzzEdProperties',

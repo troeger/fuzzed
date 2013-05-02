@@ -2,6 +2,14 @@ section {
     padding-top: 40px;
 }
 
+#FuzzEdAlertContainer {
+    position: absolute;
+    top: 50px;
+    width: 30%;
+    left: 35%;
+    z-index: 9999; /*above all*/
+}
+
 .brand {
     color: white !important;
 }
