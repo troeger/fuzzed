@@ -86,6 +86,7 @@ namespace fuzzTree
 	const char* const OPTIONAL_ATTRIBUTE = "optional";
 	const char* const COST_ATTRIBUTE = "cost";
 	const char* const CHILDREN = "children";
+	const char* const NODE_ID = "id";
 	const char* const NODE_TYPE = "xsi:type";
 	const char* const NAME_ATTRIBUTE = "name";
 	const char* const VOTING_OR_K = "k";

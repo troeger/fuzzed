@@ -2,6 +2,7 @@
 #include "Constants.h"
 
 #include <cstdlib>
+#include <stdarg.h> 
 #include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/binomial.hpp>
 #include <boost/range/counting_range.hpp>
@@ -122,4 +123,24 @@ void util::replaceFileExtensionInPlace(string& subject, const string& newExtensi
 {
 	size_t pos = subject.find_last_of(".");
 	subject.replace(pos, subject.length()-pos, newExtension);
+}
+
+string util::nestedIDString(int n, ...)
+{
+	stringstream result;
+
+	va_list args;
+	va_start(args, n);
+
+	int id = va_arg(args, int);
+	result <<  id;
+	for (int i = 1; i < n; ++i)
+	{
+		id = va_arg(args, int);
+		result <<  ".";
+		result << id;
+	}
+	va_end(args);
+
+	return result.str();
 }

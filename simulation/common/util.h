@@ -23,12 +23,13 @@ namespace util
 	/* Strings                                                              */
 	/************************************************************************/
 
-	// Thank you Stackoverflow!
 #if IS_WINDOWS
 	static const std::string slash="\\";
 #else
 	static const std::string slash="/";
 #endif
+
+	string nestedIDString(int n, ...);
 
 	string toString(int i);
 	string toString(double d, int prec = 9);

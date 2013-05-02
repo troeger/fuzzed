@@ -240,7 +240,7 @@ void FuzzTreeImport::handleBasicEventSet(
 		throw runtime_error("Invalid quantity in Basic Event Set!");
 	}
 
-	unsigned int count = 0;
+	int count = 0;
 	while (count < numEvents)
 	{
 		// TODO unique ids

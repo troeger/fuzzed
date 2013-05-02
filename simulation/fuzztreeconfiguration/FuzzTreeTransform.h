@@ -37,7 +37,7 @@ protected:
 	pair<xml_node, bool /*isLeaf*/> handleRedundancyVP(
 		const xml_node& templateNode, 
 		xml_node& node, 
-		const tuple<int,int> configuredN) const;
+		const tuple<int,int> configuredN, const int& id) const;
 
 	// returns the configured child gate
 	pair<xml_node, bool /*isLeaf*/> handleFeatureVP(
@@ -45,7 +45,7 @@ protected:
 		xml_node& node, 
 		const int configuredChildId) const;
 
-	void expandBasicEventSet(const xml_node& templateNode, xml_node& parent, const int& defaultQuantity = -1) const;
+	void expandBasicEventSet(const xml_node& templateNode, xml_node& parent, const int& id, const int& defaultQuantity) const;
 	
 	void generateConfigurations(vector<FuzzTreeConfiguration>& configurations) const;
 	void generateConfigurationsRecursive(

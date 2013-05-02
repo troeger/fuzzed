@@ -1,4 +1,4 @@
-#include "FuzzTreeTransform.h"
+﻿#include "FuzzTreeTransform.h"
 #include "Constants.h"
 #include "FuzzTreeConfiguration.h"
 
@@ -287,7 +287,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		if (typeDescriptor == REDUNDANCY_VP)
 		{
 			const tuple<int,int> configuredN = configuration.getRedundancyCount(id);
-			auto result = handleRedundancyVP(currentChild, faultTreeNode, configuredN); // returns a VotingOR Gate
+			auto result = handleRedundancyVP(currentChild, faultTreeNode, configuredN, id); // returns a VotingOR Gate
 			newNode = result.first;
 
 			if (result.second)
@@ -304,7 +304,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		}
 		else if (typeDescriptor == BASIC_EVENT_SET)
 		{
-			expandBasicEventSet(currentChild, faultTreeNode);
+			expandBasicEventSet(currentChild, faultTreeNode, id, 0);
 			continue;
 		}
 		else if (typeDescriptor == INTERMEDIATE_EVENT_SET)
@@ -359,10 +359,14 @@ const std::string FuzzTreeTransform::uniqueFileName()
 pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 	const xml_node& templateNode, 
 	xml_node& node, 
-	const tuple<int,int> kOutOfN) const
+	const tuple<int,int> kOutOfN, const int& id) const
 {
+	if (string(node.name()) == "dummy")
+		node.set_name("children");
+	
 	xml_node votingOR = node.append_child("children");
 	votingOR.append_attribute(NODE_TYPE).set_value(VOTING_OR_GATE);
+	votingOR.append_attribute(NODE_ID).set_value(id);
 
 	const xml_node child = templateNode.child("children"); // allow only one child below RedundancyVP	
 	if (child.empty())
@@ -375,7 +379,7 @@ pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 	if (typeDescriptor == BASIC_EVENT_SET)
 	{
 		votingOR.append_attribute(VOTING_OR_K).set_value(get<0>(kOutOfN));
-		expandBasicEventSet(child, votingOR, get<1>(kOutOfN)); // TODO: default quantity?
+		expandBasicEventSet(child, votingOR, id, get<1>(kOutOfN));
 		return make_pair(votingOR, true);
 	}
 	else if (typeDescriptor == INTERMEDIATE_EVENT_SET)
@@ -392,10 +396,15 @@ pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 
 void FuzzTreeTransform::expandBasicEventSet(
 	const xml_node& templateNode, 
-	xml_node& parent, 
+	xml_node& parent,
+	const int& id,
 	const int& defaultQuantity) const
 {
 	const int numChildren = templateNode.attribute(BASIC_EVENT_SET_QUANTITY).as_int(defaultQuantity);
+	if (numChildren <= 0)
+	{
+		throw runtime_error("Invalid Quantity in Basic Event Set");
+	}
 	xml_node probabilityNode = templateNode.child("probability");
 	if (probabilityNode.empty())
 	{
@@ -409,6 +418,7 @@ void FuzzTreeTransform::expandBasicEventSet(
 	{
 		xml_node basicEvent = parent.append_child("children");
 		basicEvent.append_attribute(NODE_TYPE).set_value(BASIC_EVENT);
+		basicEvent.append_attribute(NODE_ID).set_value(util::nestedIDString(2, id, i).c_str());
 		basicEvent.append_copy(probabilityNode);
 		i++;
 	}
@@ -416,7 +426,7 @@ void FuzzTreeTransform::expandBasicEventSet(
 
 pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
 	const xml_node& templateNode, 
-	xml_node& node, 
+	xml_node& node,
 	const int configuredChildId) const
 {
 	// find the configured child
@@ -434,10 +444,10 @@ pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
 	// if the we arrived at a leaf, return true
 	const string configuredChildType = featuredTemplate.attribute(NODE_TYPE).as_string();
 
-	xml_node newFeatured = node.append_child("children");
+	xml_node newFeatured = node.append_child("dummy");
 	if (configuredChildType == BASIC_EVENT_SET)
 	{
-		expandBasicEventSet(featuredTemplate, node);
+		expandBasicEventSet(featuredTemplate, node, configuredChildId, 0);
 		return make_pair(node, true);
 	}
 	else if (configuredChildType == BASIC_EVENT)
@@ -448,6 +458,7 @@ pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
 	}
 	else if (isGate(configuredChildType))
 	{
+		newFeatured = node.append_child("children");
 		shallowCopy(featuredTemplate, newFeatured);
 		return make_pair(newFeatured, false);
 	}
@@ -455,7 +466,10 @@ pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
 	{
 		return make_pair(node, false);
 	}
-	
+	else
+	{
+		//???
+	}
 	return make_pair(newFeatured, false);
 }
 
