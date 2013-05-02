@@ -28,6 +28,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
         edges:        {},
         nodes:        {},
         name:         undefined,
+        readOnly:     undefined,
 
         _nodeClasses: {},
 
@@ -62,6 +63,8 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *    This <Graph> instance for chaining.
          */
         _loadFromJson: function(json) {
+            this.readOnly = json.readOnly;
+
             // parse the json nodes and convert them to node objects
             _.each(json.nodes, function(jsonNode) {
                 this.addNode(jsonNode.kind, jsonNode);
@@ -199,6 +202,8 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *    This <Graph> instance for chaining.
          */
         addNode: function(kind, properties) {
+            properties.readOnly = this.readOnly;
+
             var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
             jQuery(document).trigger(this.config.Events.GRAPH_NODE_ADDED, [node.id, kind, node.x, node.y]);
             this.nodes[node.id] = node;

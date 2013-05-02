@@ -761,13 +761,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
 
         _loadGraphCompleted: function(readOnly) {
-            if (!readOnly) {
-                this.cutsetsMenu     = new CutsetsMenu(this);
-                this.probabilityMenu = new ProbabilityMenu(this);
+            this.cutsetsMenu     = new CutsetsMenu(this);
+            this.probabilityMenu = new ProbabilityMenu(this);
 
-                this._setupCutsetsActionEntry()
-                    ._setupTobEventProbabilityActionEntry();
-            }
+            this._setupCutsetsActionEntry()
+                ._setupTopEventProbabilityActionEntry();
 
             return this._super(readOnly);
         },
@@ -798,7 +796,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         },
 
         /**
-         *  Method: _setupTobEventProbabilityActionEntry
+         *  Method: _setupTopEventProbabilityActionEntry
          *    Adds an entry to the actions navbar group for calculating the probability of the top event. Clicking will
          *    issue an asynchronous backend call which returns a <Job> object that can be queried for the final result.
          *    The job object will be used to initialize the probability menu.
@@ -806,7 +804,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Returns:
          *    This editor instance for chaining.
          */
-        _setupTobEventProbabilityActionEntry: function() {
+        _setupTopEventProbabilityActionEntry: function() {
             var navbarActionsEntry = jQuery(
                 '<li>' +
                     '<a href="#">Calculate top event probability</a>' +

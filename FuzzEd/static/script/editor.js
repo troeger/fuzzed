@@ -1,5 +1,4 @@
-define(['class', 'menus', 'canvas', 'backend', 'canvas'],
-function(Class, Menus, Canvas, Backend) {
+define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus, Canvas, Backend, Alerts) {
     /**
      *  Package: Base
      */
@@ -137,10 +136,11 @@ function(Class, Menus, Canvas, Backend) {
             this._backend.activate();
 
             if (readOnly) {
+                Alerts.showInfoAlert('Remember:', 'this diagram is read-only');
                 this.shapes.disable();
                 this.properties.disable();
+                Canvas.disableInteraction();
             }
-
 
             this._setupKeyBindings(readOnly);
             // fade out the splash screen

@@ -42,8 +42,22 @@ function(Class, Config) {
                 ._setupCanvas();
         },
 
+        /**
+         * Section: Visuals
+         */
         toggleGrid: function() {
             jQuery(this._background.root()).toggle();
+        },
+
+        /**
+         * Section: Interaction
+         */
+        disableInteraction: function() {
+            this.container
+                .droppable('disable')
+                .selectable('disable');
+
+            return this;
         },
 
         /**
