@@ -10,7 +10,7 @@
           <probability xsi:type="ft:CrispProbability" value="0.0001"/>
         </children>
 	    
-	    <children xsi:type="ft:ColdSpareGate" id="4" spareIds="5">
+	    <children xsi:type="ft:ColdSpare" id="4" spareIds="5">
 	      	<children costs="1" id="5" name="" xsi:type="ft:BasicEvent" name="Secondary CPU Failure">
 	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
 	    	</children>

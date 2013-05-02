@@ -72,8 +72,10 @@ namespace fuzzTree
 	const char* const XOR_GATE = "ft:Xor";
 	const char* const VOTING_OR_GATE = "ft:VotingOr";
 
-	const char* const COLD_SPARE_GATE = "ft:ColdSpareGate";
+	const char* const COLD_SPARE_GATE = "ft:ColdSpare";
 	const char* const PAND_GATE = "ft:PriorityAnd";
+	const char* const SEQ_GATE = "ft:Sequence";
+	const char* const FDEP_GATE = "ft:FDEP";
 
 	const char* const TRIANGULAR_FUZZY_NUM = "ft:TriangularFuzzyInterval";
 	const char* const CRISP_NUM = "ft:CrispProbability";
