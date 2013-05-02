@@ -64,7 +64,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
          */
         _loadFromJson: function(json) {
             this.readOnly = json.readOnly;
-            
+
             var maxX = 0;
             var maxY = 0;
 
