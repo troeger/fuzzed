@@ -107,6 +107,8 @@ define(function() {
          *    {String} PROPERTY_WARNING        - Class for property input fields if they are erroneous.
          */
         Classes: {
+            GRID_HIDDEN:             'fuzzed-grid-hidden',
+
             JQUERY_UI_SELECTED:      'ui-selected',
 
             JSPLUMB_ENDPOINT:        'jsplumb-endpoint',

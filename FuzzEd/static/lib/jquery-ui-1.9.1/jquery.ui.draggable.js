@@ -167,6 +167,10 @@ $.widget("ui.draggable", $.ui.mouse, {
 	},
 
 	_mouseDrag: function(event, noPropagation) {
+        var o = this.options;
+        if (o.containment) {
+            this._setContainment();
+        }
 
 		//Compute the helpers position
 		this.position = this._generatePosition(event);
