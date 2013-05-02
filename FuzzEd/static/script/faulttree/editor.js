@@ -7,14 +7,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
     /**
      *  Class: CutsetsMenu
-<<<<<<< mine
      *
      *  A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
      *  cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
-=======
-     *    A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
-     *    cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
->>>>>>> theirs
      *
      *  Extends: <Base::Menus::Menu>
      */
@@ -563,11 +558,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             }
 
             var columns = [
-                { id: 'id',    name: 'Configuration',      field: 'id',    sortable: true },
-                { id: 'min',   name: 'Minimum', field: 'min',   sortable: true, formatter: shorten },
-                { id: 'peak',  name: 'Peak',    field: 'peak',  sortable: true, formatter: shorten },
-                { id: 'max',   name: 'Maximum', field: 'max',   sortable: true, formatter: shorten },
-                { id: 'costs', name: 'Costs',   field: 'costs', sortable: true },
+                { id: 'id',              name: 'Configuration',     field: 'id',              sortable: true },
+                { id: 'min',             name: 'Minimum',           field: 'min',             sortable: true, formatter: shorten },
+                { id: 'peak',            name: 'Peak',              field: 'peak',            sortable: true, formatter: shorten },
+                { id: 'max',             name: 'Maximum',           field: 'max',             sortable: true, formatter: shorten },
+                { id: 'costs',           name: 'Costs',             field: 'costs',           sortable: true },
                 { id: 'ineffectiveness', name: 'Risk (Peak/Costs)', field: 'ineffectiveness', sortable: true, minWidth: 150}
             ];
 
@@ -577,7 +572,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 multiColumnSort:            true,
                 autoHeight:                 true,
                 forceFitColumns:            true
-            }
+            };
 
             // little workaround for constraining the height of the grid
             var maxHeight = this._editor.getConfig().Menus.PROBABILITY_MENU_MAX_GRID_HEIGHT;
@@ -724,29 +719,12 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {<ProbabilityMenu>} probabilityMenu - The <ProbabilityMenu> instance used to display the probability of
          *                                          the top event.
          */
-        cutsetsMenu: undefined,
+        cutsetsMenu:     undefined,
         probabilityMenu: undefined,
 
         /**
          *  Group: Initialization
          */
-
-        /**
-         *  Constructor: init
-         *    Sets up the cutset and probability menus in addition to <Base::Editor::init>.
-         *
-         *  Parameters:
-         *    {int} graphId - The ID of the graph that is going to be edited by this editor.
-         */
-        init: function(graphId) {
-            this._super(graphId);
-
-            this.cutsetsMenu = new CutsetsMenu(this);
-            this.probabilityMenu = new ProbabilityMenu(this);
-
-            this._setupCutsetsActionEntry()
-                ._setupTobEventProbabilityActionEntry();
-        },
 
         /**
          *  Group: Accessors
@@ -781,6 +759,18 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         /**
          *  Group: Setup
          */
+
+        _loadGraphCompleted: function(readOnly) {
+            if (!readOnly) {
+                this.cutsetsMenu     = new CutsetsMenu(this);
+                this.probabilityMenu = new ProbabilityMenu(this);
+
+                this._setupCutsetsActionEntry()
+                    ._setupTobEventProbabilityActionEntry();
+            }
+
+            return this._super(readOnly);
+        },
 
         /**
          *  Method: _setupCutsetsActionEntry
