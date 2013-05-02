@@ -198,7 +198,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
-                    var message = errorThrown || 'Could not connect to backend.';
+                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
                     Alerts.showErrorAlert('Edge could not be deleted:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
@@ -228,7 +228,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
-                    var message = errorThrown || 'Could not connect to backend.';
+                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
                     Alerts.showErrorAlert('Node could not be deleted:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
@@ -264,7 +264,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
-                    var message = errorThrown || 'Could not connect to backend.';
+                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
                     Alerts.showErrorAlert('Node could not be changed:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
@@ -317,7 +317,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
-                    var message = errorThrown || 'Could not connect to backend.';
+                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
                     Alerts.showErrorAlert('Failed to calculate cutsets:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
@@ -353,7 +353,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
                 },
 
                 error:    function(jqXHR, errorStatus, errorThrown) {
-                    var message = errorThrown || 'Could not connect to backend.';
+                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
                     Alerts.showErrorAlert('Failed to calculate Top Event probability:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },

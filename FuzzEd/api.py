@@ -19,7 +19,8 @@ from django.views.decorators.cache import never_cache
 
 from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, \
-                              HttpResponseCreated, HttpResponseNotFoundAnswer, HttpResponseServerErrorAnswer
+                              HttpResponseForbiddenAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, \
+                              HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands, Job
 from analysis import cutsets, top_event_probability
 
@@ -205,6 +206,9 @@ def nodes(request, graph_id):
     POST = request.POST
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)    
     try:
+        if graph.read_only:
+            raise HttpResponseForbiddenAnswer('Trying to create a node in a read-only graph')
+
         kind = POST['kind']
         assert(kind in notations.by_kind[graph.kind]['nodes'])
 
@@ -259,6 +263,10 @@ def node(request, graph_id, node_id):
     """
     try:
         node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id, deleted=False)
+
+        if node.graph.read_only:
+            raise HttpResponseForbiddenAnswer('Trying to modify a node in a read-only graph')
+
         if request.method == 'POST':
             # Interpret all parameters as json. This will ensure correct parsing of numerical values like e.g. ids
             parameters = json.loads(request.POST.get('properties', {}))
@@ -277,7 +285,7 @@ def node(request, graph_id, node_id):
 
     except Exception as exception:
         logger.error('Exception: ' + str(exception))
-
+        raise exception
 
 @login_required
 @csrf_exempt
@@ -307,6 +315,10 @@ def edges(request, graph_id):
     """
     POST = request.POST
     try:
+        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+        if graph.read_only:
+            raise HttpResponseForbiddenAnswer('Trying to create an edge in a read-only graph')
+
         command = commands.AddEdge.create_from(graph_id=graph_id, client_id=POST['id'],
                                                from_id=POST['source'], to_id=POST['destination'])
         command.do()
@@ -356,6 +368,10 @@ def edge(request, graph_id, edge_id):
      {HTTPResponse} a django response object
     """
     try:
+        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+        if graph.read_only:
+            raise HttpResponseForbiddenAnswer('Trying to delete an edge in a read-only graph')
+
         commands.DeleteEdge.create_from(graph_id=graph_id, edge_id=edge_id).do()
         return HttpResponse(status=204)
 
