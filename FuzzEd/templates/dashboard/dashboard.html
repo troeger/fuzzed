@@ -83,6 +83,7 @@
             <tr>
                 <th>#</th>
                 <th>Graph</th>
+                <th></th>
                 <th>Kind</th>
                 <th>Created</th>
                 <th></th>
@@ -93,7 +94,17 @@
             {% for name, graph in graphs %} 
                 <tr onclick="document.location = '/editor/{{ graph.pk }}';">
                     <td>{{ forloop.counter }}</td>
-                    <td><strong class="graph_name">{{ graph }}</strong></td>
+                    <td>
+                        <strong class="graph_name">{{ graph }}</strong>
+                    </td>
+                    <td>
+                        {% if graph.read_only %}
+                            <span class="label label-info">
+                                <i class="icon-lock icon-white"></i>
+                                read-only
+                            </span>
+                        {% endif %}
+                    </td>
                     <td><span class="label">{{ name }}</span></td>
                     <td>{{ graph.created }}</td>
                     <td style="text-align: right;">
