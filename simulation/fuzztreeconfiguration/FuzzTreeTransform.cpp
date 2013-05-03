@@ -2,7 +2,6 @@
 #include "Constants.h"
 #include "FuzzTreeConfiguration.h"
 
-#pragma once
 #if IS_WINDOWS 
 #pragma warning(push, 3) 
 #endif

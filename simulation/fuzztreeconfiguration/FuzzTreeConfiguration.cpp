@@ -25,5 +25,5 @@ void FuzzTreeConfiguration::setFeatureNumber(int ID, int configuredChild)
 
 void FuzzTreeConfiguration::setNotIncluded(int ID)
 {
-	m_notIncluded.emplace(ID);
+	m_notIncluded.insert(ID);
 }

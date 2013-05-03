@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.8)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
-set(Boost_USE_STATIC_LIBS       OFF)
+set(Boost_USE_STATIC_LIBS       ON)
 set(Boost_USE_MULTITHREADED     ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 #add_definitions(-DBOOST_ALL_NO_LIB)
@@ -36,7 +36,6 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 set(Boost_DIR ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
-
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
 find_package(pugixml REQUIRED)
