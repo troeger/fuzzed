@@ -33,15 +33,20 @@ int SEQGate::serialize(boost::shared_ptr<PNDocument> doc) const
 			throw runtime_error("ID in sequence list was not among the children" + i); // TODO check this earlier
 
 		int childFailed = childNode->serialize(doc);
-		int propagateChildFailure = doc->addImmediateTransition();
+		int propagateChildFailure = doc->addImmediateTransition(2.0);
 
 		if (previousEvent > 0) // depend on the previous event happening
+		{
 			doc->placeToTransition(previousEvent, propagateChildFailure);
-
+			// if the required previous event didn't happen before, trash the token
+			int garbage = doc->addPlace(0, 0, "Discarded Sequence");
+			int discard = doc->addImmediateTransition(1.0);
+			doc->transitionToPlace(discard, garbage, 0);
+			doc->placeToTransition(childFailed, discard);
+		}
 		previousEvent = doc->addPlace(0);
 		doc->placeToTransition(childFailed, propagateChildFailure);
 		doc->transitionToPlace(propagateChildFailure, previousEvent);
 	}
 	return previousEvent;
 }
-
