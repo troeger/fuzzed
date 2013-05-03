@@ -16,19 +16,19 @@ class HttpResponsePermanentRedirectAnswer(Exception):
 
 class HttpResponseNotModifiedAnswer(Exception):
     def result(self):
-        return HttpResponseNotModified()
+        return HttpResponseNotModified(self.message)
 
 class HttpResponseBadRequestAnswer(Exception):
     def result(self):
-        return HttpResponseBadRequest()
+        return HttpResponseBadRequest(self.message)
 
 class HttpResponseNotFoundAnswer(Exception):
     def result(self):
-        return HttpResponseNotFound()
+        return HttpResponseNotFound(self.message)
 
 class HttpResponseForbiddenAnswer(Exception):
     def result(self):
-        return HttpResponseForbidden()
+        return HttpResponseForbidden(self.message)
 
 class HttpResponseNotAllowedAnswer(Exception):
     def __init__(self, allowedMethods):
@@ -38,11 +38,11 @@ class HttpResponseNotAllowedAnswer(Exception):
 
 class HttpResponseGoneAnswer(Exception):
     def result(self):
-        return HttpResponseGone()
+        return HttpResponseGone(self.message)
 
 class HttpResponseServerErrorAnswer(Exception):
     def result(self):
-        return HttpResponseServerError()
+        return HttpResponseServerError(self.message)
 
 class HttpResponseCreated(HttpResponse):
     status_code = 201
@@ -59,7 +59,7 @@ class HttpResponseAccepted(HttpResponse):
 
 class HttpResponseNoResponseAnswer(Exception):
     def result(self):
-        return HttpResponseNoResponse()
+        return HttpResponseNoResponse(self.message)
 
 class HttpErrorMiddleware(object):
     def process_exception(self, request, exception):

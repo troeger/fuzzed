@@ -46,7 +46,7 @@ else:
     DEBUG          = True
     TEMPLATE_DEBUG = True
     EMAIL_BACKEND  = 'django.core.mail.backends.console.EmailBackend'
-    OPENID_RETURN  = 'http://localhost:8080/login/?openidreturn'
+    OPENID_RETURN  = 'http://localhost:8000/login/?openidreturn'
 
     DATABASES = {
         'default': {

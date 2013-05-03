@@ -30,7 +30,8 @@ xml_classes = {
     'xorGate':              Xor,
     'votingOrGate':         VotingOr,
     'featureVariation':     FeatureVariationPoint,
-    'redundancyVariation':  RedundancyVariationPoint
+    'redundancyVariation':  RedundancyVariationPoint,
+    'transferIn':           TransferIn
 }
 
 class Node(models.Model):
@@ -143,6 +144,9 @@ class Node(models.Model):
         if self.kind in {'basicEvent', 'basicEventSet', 'intermediateEvent', 'intermediateEventSet', 'houseEvent'}:
             properties['optional'] = self.get_property('optional', False)
 
+        if self.kind in {'basicEventSet', 'intermediateEventSet'}:
+            properties['quantity'] = self.get_property('cardinality')
+
         if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
             probability = self.get_property('probability', None)
             if isinstance(probability, list):
@@ -154,7 +158,6 @@ class Node(models.Model):
                 else:
                     properties['probability'] = TriangularFuzzyInterval(a=point - alpha, b1=point,
                                                                         b2=point, c=point + alpha)
-
             elif isinstance(probability, (long, int, float)):
                 properties['probability'] = CrispProbability(value_=probability)
 
@@ -175,6 +178,9 @@ class Node(models.Model):
             properties['start']   = nRange[0]
             properties['end']     = nRange[1]
             properties['formula'] = self.get_property('kFormula')
+
+        elif self.kind == 'transferIn':
+            properties['fromModelId'] = self.get_property('transfer')
 
         try:
             xml_node = xml_classes[self.kind](**properties)
