@@ -105,7 +105,8 @@ struct toInt
 
 void util::tokenizeIntegerString(const string& input, vector<int>& results /*out*/)
 {
-	boost::tokenizer<> tok(input);
+	boost::char_separator<char> sep(" ,;");
+	boost::tokenizer<boost::char_separator<char>> tok(input, sep);
 	transform(tok.begin(), tok.end(), std::back_inserter(results), toInt());
 }
 

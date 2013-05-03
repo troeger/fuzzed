@@ -22,12 +22,15 @@ int SEQGate::serialize(boost::shared_ptr<PNDocument> doc) const
 		FaultTreeNode* childNode = nullptr;
 		for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
 		{
-			if (childNode->getId() != i)
-				continue;
+			if ((*it)->getId() == i)
+			{
+				childNode = *it;
+				break;
+			}
 		}
 		
 		if (!childNode)
-			throw runtime_error("ID in sequence list was not among the children"); // TODO check this earlier
+			throw runtime_error("ID in sequence list was not among the children" + i); // TODO check this earlier
 
 		int childFailed = childNode->serialize(doc);
 		int propagateChildFailure = doc->addImmediateTransition();
@@ -39,5 +42,6 @@ int SEQGate::serialize(boost::shared_ptr<PNDocument> doc) const
 		doc->placeToTransition(childFailed, propagateChildFailure);
 		doc->transitionToPlace(propagateChildFailure, previousEvent);
 	}
+	return previousEvent;
 }
 

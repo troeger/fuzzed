@@ -84,6 +84,7 @@ namespace fuzzTree
 	const char* const SPARE_ID_ATTRIBUTE = "spareIds";
 	const char* const PRIO_ID_ATTRIBUTE = "priorityIds";
 	const char* const OPTIONAL_ATTRIBUTE = "optional";
+	const char* const SEQUENCE_ATTRIBUTE = "eventSequence";
 	const char* const COST_ATTRIBUTE = "cost";
 	const char* const CHILDREN = "children";
 	const char* const NODE_ID = "id";

@@ -134,7 +134,7 @@ int PNMLDocument::addTopLevelPlace(const string& label)
 	node.append_attribute(ID_TAG).set_value(idString.c_str());
 	node.append_attribute(TOPLEVEL_TAG).set_value(true);
 
-	setName(node, label+"hello");
+	setName(node, label);
 
 	xml_node initialMarkingNode = node.append_child(INITIALMARKING_TAG);
 	setNodeValue(initialMarkingNode, util::toString(0));

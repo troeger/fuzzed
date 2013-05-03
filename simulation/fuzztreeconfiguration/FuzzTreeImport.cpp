@@ -195,6 +195,14 @@ void FuzzTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree, FTResul
 
 			gate = new PANDGate(id, set<int>(prioIndices.begin(), prioIndices.end()), name);
 		}
+		else if (typeDescriptor == SEQ_GATE)
+		{
+			const string sequence = child.attribute(SEQUENCE_ATTRIBUTE).as_string("");
+			vector<int> idSequence;
+			util::tokenizeIntegerString(sequence, idSequence);
+
+			gate = new SEQGate(id, idSequence, name);
+		}
 		else
 		{
 			cout << "Unrecognized type descriptor: " << typeDescriptor
