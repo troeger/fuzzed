@@ -93,7 +93,7 @@ void PNMLImport::loadArcs(ArcList& arcs)
 		
 		int weight = 1;
 		const xml_node valNode = childNode.child(INSCRIPTION_TAG);
-		if (valNode.empty())
+		if (!valNode.empty())
 		{ // in the inscription node, the number of tokens is written comma-separated from the token type
 			xml_node c = valNode.child(VALUE_TAG);
 			if (!valNode)
