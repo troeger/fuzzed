@@ -25,10 +25,15 @@ bool PetriNetSimulation::run()
 	{
 		throw runtime_error("Import was not successful.");
 	}
+	
+	const double startTime = omp_get_wtime();
+	if (pn->m_activeTimedTransitions.size() == 0)
+	{ // perfectly reliable
+		writeResults(0, 0, 0.0, -1.0, startTime, startTime, 1.0);
+		return true;
+	}
 
 	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads...";
-
-	const double startTime = omp_get_wtime();
 
 	// for checking local convergence, thread-local
 	long double privateLast = 10000.0L;
@@ -85,26 +90,7 @@ bool PetriNetSimulation::run()
 	
 	cout << "...done." << endl;
 
-	string results = str(
-		format("----- File %1%, %2% simulations with %3% simulated time steps \n \
-			   #Failures: %4% out of %5% \n \
-			   Reliability: %6% \n \
-			   Mean Availability (failing runs): %9% \n \
-			   MTTF: %7% \n \
-			   Simulation Duration %8% seconds") 
-		% m_netFile.generic_string()
-		% m_numRounds
-		% m_numSimulationSteps
-		% numFailures % count
-		% (1.0-unreliability)
-		% (m_simulateUntilFailure ? util::toString(avgFailureTime_all) : "N/A")
-		% (endTime-startTime)
-		% meanAvailability);
-
-	(*m_outStream) << results << endl;
-	m_outStream->close();
-
-	cout << results << endl << endl;
+	writeResults(numFailures, count, unreliability, avgFailureTime_all, endTime, startTime, meanAvailability);
 
 	return true;
 }
@@ -239,4 +225,35 @@ void PetriNetSimulation::tryTimedTransitions(PetriNet* pn, int tick)
 		if (p.second.hasRequests())
 			p.second.resolveConflictsTimed(tick);
 	}
+}
+
+void PetriNetSimulation::writeResults(
+	const unsigned long& numFailures, 
+	const unsigned long& count, 
+	const long double& unreliability, 
+	const long double& avgFailureTime_all, 
+	const double& endTime, 
+	const double& startTime, 
+	const long double& meanAvailability)
+{
+	string results = str(
+		format("----- File %1%, %2% simulations with %3% simulated time steps \n \
+			   #Failures: %4% out of %5% \n \
+			   Reliability: %6% \n \
+			   Mean Availability (failing runs): %9% \n \
+			   MTTF: %7% \n \
+			   Simulation Duration %8% seconds") 
+			   % m_netFile.generic_string()
+			   % m_numRounds
+			   % m_numSimulationSteps
+			   % numFailures % count
+			   % (1.0-unreliability)
+			   % (m_simulateUntilFailure ? util::toString(avgFailureTime_all) : "N/A")
+			   % (endTime-startTime)
+			   % meanAvailability);
+
+	(*m_outStream) << results << endl;
+	m_outStream->close();
+
+	cout << results << endl << endl;
 }

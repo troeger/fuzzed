@@ -20,6 +20,15 @@ public:
 
 	virtual bool run() override;
 
+	void writeResults(
+		const unsigned long& numFailures, 
+		const unsigned long& count, 
+		const long double& unreliability, 
+		const long double& avgFailureTime_all, 
+		const double& endTime, 
+		const double& startTime, 
+		const long double& meanAvailability);
+
 	virtual ~PetriNetSimulation();
 
 protected:
