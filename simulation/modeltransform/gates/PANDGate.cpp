@@ -24,28 +24,28 @@ int PANDGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	}
 
 	int transitionID = doc->addImmediateTransition(2.0);
-	for (int id : regularIds)
+	for (int regularChildFailed : regularIds)
 	{
-		if (id < 0)
+		if (regularChildFailed < 0)
 		{
-			cout << "Invalid child found, ID: " << id << endl;
+			cout << "Invalid child found, ID: " << regularChildFailed << endl;
 			continue;
 		}
-		doc->placeToTransition(id, transitionID);
+		doc->placeToTransition(regularChildFailed, transitionID);
 	}
 
-	for (int id : priorityIds)
+	for (int priorityChildFailed : priorityIds)
 	{
-		if (id < 0)
+		if (priorityChildFailed < 0)
 		{
-			cout << "Invalid child found, ID: " << id << endl;
+			cout << "Invalid child found, ID: " << priorityChildFailed << endl;
 			continue;
 		}
-		doc->placeToTransition(id, transitionID);
+		doc->placeToTransition(priorityChildFailed, transitionID);
 
 		int garbageTransition = doc->addImmediateTransition(1.0);
 		int garbagePlace = doc->addPlace(0, 0, "PAND_Disabled", false);
-		doc->placeToTransition(id, garbageTransition);
+		doc->placeToTransition(priorityChildFailed, garbageTransition);
 		doc->transitionToPlace(garbageTransition, garbagePlace, 0);
 	}
 

@@ -39,7 +39,8 @@ public:
 
 	// returns ID of the "top level" place
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const = 0;
-	virtual int serialize(PNDocument* doc);
+	
+	std::pair<int /*placeID*/,int /*spareActivationTransition*/> serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const;
 	
 	// uses RTTI
 	virtual void print(std::ostream& stream, int indentLevel=0) const;

@@ -24,25 +24,25 @@ int VotingORGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	if (getNumChildren() == 0)
 		return -1;
 
-	cout << "Value of VotingOR: " << getValue() << endl;
+	// cout << "Value of VotingOR: " << getValue() << endl;
 
 	vector<int> childIDs;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
 		childIDs.push_back((*it)->serialize(doc));
 
 	int somethingFailed = doc->addPlace(0, childIDs.size(), "VotingOR_somethingFailed");
-	for (int id : childIDs)
+	for (int childFailed : childIDs)
 	{
-		int transitionID = doc->addImmediateTransition();
-		doc->placeToTransition(id, transitionID, 1, "i");
-		doc->transitionToPlace(transitionID, somethingFailed, 1, "i");
+		int propagateChildFailure = doc->addImmediateTransition();
+		doc->placeToTransition(childFailed, propagateChildFailure, 1, "i");
+		doc->transitionToPlace(propagateChildFailure, somethingFailed, 1, "i");
 	}
 
-	int finalTransitionID = doc->addImmediateTransition(2.0);
-	doc->placeToTransition(somethingFailed, finalTransitionID, m_numVotes, "x");
+	int triggerGate = doc->addImmediateTransition();
+	doc->placeToTransition(somethingFailed, triggerGate, m_numVotes, "x");
 
 	int gateFailed = doc->addPlace(0, 1, "VotingOR");
-	doc->transitionToPlace(finalTransitionID, gateFailed);
+	doc->transitionToPlace(triggerGate, gateFailed);
 
 	return gateFailed;
 }

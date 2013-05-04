@@ -29,7 +29,7 @@ int ORGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
 		childIDs.push_back((*it)->serialize(doc));
 
-	int placeID = doc->addPlace(0, 100, "OR_Failed");
+	int oneChildFailed = doc->addPlace(0, 100, "OR_Failed");
 	for (int id : childIDs)
 	{
 		if (id < 0)
@@ -37,15 +37,15 @@ int ORGate::serialize(boost::shared_ptr<PNDocument> doc) const
 			cout << "Invalid child found, ID: " << id << endl;
 			continue;
 		}
-		int transitionID = doc->addImmediateTransition();
+		int propagateChildFailure = doc->addImmediateTransition();
 		
-		doc->placeToTransition(id, transitionID);
-		doc->transitionToPlace(transitionID, placeID);
+		doc->placeToTransition(id, propagateChildFailure);
+		doc->transitionToPlace(propagateChildFailure, oneChildFailed);
 	}
 
 	cout << "Value of OR: " << getValue() << endl;
 
-	return placeID;
+	return oneChildFailed;
 }
 
 FaultTreeNode* ORGate::clone() const

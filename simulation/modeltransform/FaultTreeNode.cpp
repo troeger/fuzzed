@@ -52,11 +52,6 @@ FaultTreeNode* FaultTreeNode::getChildById(int id)
 	return nullptr;
 }
 
-int FaultTreeNode::serialize(PNDocument* doc)
-{
-	return serialize(boost::shared_ptr<PNDocument>(doc));
-}
-
 string FaultTreeNode::description() const
 {
 	return 

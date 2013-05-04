@@ -26,7 +26,7 @@ int ANDGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
 		childIDs.push_back((*it)->serialize(doc));
 	
-	int transitionID = doc->addImmediateTransition();
+	int triggerGate = doc->addImmediateTransition();
 	for (int id : childIDs)
 	{
 		if (id < 0)
@@ -34,15 +34,15 @@ int ANDGate::serialize(boost::shared_ptr<PNDocument> doc) const
 			cout << "Invalid child found, ID: " << id << endl;
 			continue;
 		}
-		doc->placeToTransition(id, transitionID);
+		doc->placeToTransition(id, triggerGate);
 	}
 	
-	int placeID = doc->addPlace(0, 1, "AND_Failed");
-	doc->transitionToPlace(transitionID, placeID);
+	int allChildrenFailed = doc->addPlace(0, 1, "AND_Failed");
+	doc->transitionToPlace(triggerGate, allChildrenFailed);
 	
-	cout << "Value of AND: " << getValue() << endl;
+	// cout << "Value of AND: " << getValue() << endl;
 
-	return placeID;
+	return allChildrenFailed;
 }
 
 ANDGate::~ANDGate(void)

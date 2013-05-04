@@ -13,34 +13,18 @@ BasicEvent::~BasicEvent()
 
 int BasicEvent::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
-	int placeID = doc->addPlace(1, 1, "BasicEvent" + util::toString(m_id), true);
-	int transitionID = doc->addTimedTransition(m_failureRate);
-	doc->placeToTransition(placeID, transitionID);
-	placeID = doc->addPlace(0, 100, "BasicEvent" + util::toString(m_id) + "_occured");
-	doc->transitionToPlace(transitionID, placeID);
-
-	return placeID;
+	int notFailed = doc->addPlace(1, 1, "BasicEvent" + util::toString(m_id), true);
+	int failComponent = doc->addTimedTransition(m_failureRate);
+	doc->placeToTransition(notFailed, failComponent);
+	
+	int failed = doc->addPlace(0, 100, "BasicEvent" + util::toString(m_id) + "_occured");
+	doc->transitionToPlace(failComponent, failed);
+	return failed;
 }
 
 void BasicEvent::addChild(FaultTreeNode* child)
 {
 	assert(false && "This is a leaf node!");
-}
-
-std::pair<int,int> BasicEvent::serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const
-{
-	int spare = doc->addPlace(1, 1, "ColdSpare" + util::toString(m_id), true);
-	int activateTransition = doc->addImmediateTransition();
-	doc->placeToTransition(spare, activateTransition);
-	
-	int activePlaceID = doc->addPlace(0, 1, "ColdSpare" + util::toString(m_id) + "_active");
-	int failedPlaceID = doc->addPlace(0, 1, "ColdSpare" + util::toString(m_id) + "_failed");
-	int failTransition = doc->addTimedTransition(m_failureRate);
-	doc->transitionToPlace(activateTransition, activePlaceID);
-	doc->placeToTransition(activePlaceID, failTransition);
-	doc->transitionToPlace(failTransition, failedPlaceID);
-	
-	return make_pair(failedPlaceID, activateTransition);
 }
 
 FaultTreeNode* BasicEvent::clone() const
@@ -52,4 +36,20 @@ std::string BasicEvent::description() const
 {
 	return FaultTreeNode::description() 
 		+ " Rate: " + util::toString(m_failureRate);
+}
+
+std::pair<int /*placeID*/,int /*spareActivationTransition*/> BasicEvent::serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const
+{
+	int sparePassive = doc->addPlace(1, 1, "ColdSpare" + util::toString(m_id), true);
+	int activateTransition = doc->addImmediateTransition();
+	doc->placeToTransition(sparePassive, activateTransition);
+
+	int activePlaceID = doc->addPlace(0, 1, "ColdSpare" + util::toString(m_id) + "_active");
+	int failedPlaceID = doc->addPlace(0, 1, "ColdSpare" + util::toString(m_id) + "_failed");
+	int failTransition = doc->addTimedTransition(m_failureRate);
+	doc->transitionToPlace(activateTransition, activePlaceID);
+	doc->placeToTransition(activePlaceID, failTransition);
+	doc->transitionToPlace(failTransition, failedPlaceID);
+
+	return make_pair(failedPlaceID, activateTransition);
 }
