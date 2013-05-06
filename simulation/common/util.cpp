@@ -47,9 +47,12 @@ bool util::copyFile(const string& src, const string& dst)
 	return outStream.good();
 }
 
-string util::fileNameFromPath(const string& path)
+string util::fileNameFromPath(const string& path, bool withExtension)
 {
-	return path.substr(std::min(path.find_last_of("/"), path.find_last_of("\\"))+1);
+	return path.substr(
+		std::min(path.find_last_of("/"), path.find_last_of("\\")) + 1, 
+		withExtension ? string::npos : (path.length() - path.find_last_of("."))
+		);
 }
 
 int util::fileSize(const char* filename)
@@ -123,6 +126,7 @@ void util::replaceStringInPlace(string& subject, const string& search, const std
 void util::replaceFileExtensionInPlace(string& subject, const string& newExtension)
 {
 	size_t pos = subject.find_last_of(".");
+	if (pos == string::npos) return;
 	subject.replace(pos, subject.length()-pos, newExtension);
 }
 

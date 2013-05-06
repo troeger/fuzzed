@@ -6,9 +6,6 @@
 #endif
 #include <boost/filesystem/path.hpp>
 
-using namespace std;
-using namespace pugi;
-
 /************************************************************************/
 /* Abstract XML File importer.											*/
 /* Subclassed by FuzzTreeImport and PNMLImport							*/
@@ -19,15 +16,15 @@ public:
 	bool isLoaded() const { return m_bLoaded; };
 
 protected:
-	XMLImport(const string& fileName);
+	XMLImport(const std::string& fileName);
 	
 	bool validateAndLoad();
 	virtual bool loadRootNode() = 0;
 	
 	boost::filesystem::path m_file;
 
-	xml_document m_document;
-	xml_node m_rootNode;
+	pugi::xml_document m_document;
+	pugi::xml_node m_rootNode;
 
 	bool m_bLoaded;
 };

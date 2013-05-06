@@ -54,7 +54,7 @@ namespace util
 	/************************************************************************/
 	int fileSize(const char* fileName);
 	bool copyFile(const string& src, const string& dst);
-	string fileNameFromPath(const string& path);
+	string fileNameFromPath(const string& path, bool withExtension);
 
 	/************************************************************************/
 	/* Maths                                                                */

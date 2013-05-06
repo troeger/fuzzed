@@ -17,13 +17,15 @@
 
 #include "XMLImport.h"
 
+using namespace pugi;
+using namespace std;
 struct FuzzTreeConfiguration;
 
 class FuzzTreeTransform : public XMLImport
 {
 public:
 	// produces Fault Tree Files in targetDir
-	static void transformFuzzTree(const std::string& fileName, const std::string& targetDir);
+	static void transformFuzzTree(const string& fileName, const string& targetDir);
 
 protected:
 	void scheduleFTGeneration(boost::function<void()>& task);
@@ -37,7 +39,7 @@ protected:
 	static void removeEmptyNodes(xml_node& node);
 
 	// returns the configured VotingOR gate
-	pair<xml_node, bool /*isLeaf*/> handleRedundancyVP(
+	std::pair<xml_node, bool /*isLeaf*/> handleRedundancyVP(
 		const xml_node& templateNode, 
 		xml_node& node, 
 		const tuple<int,int> configuredN, const int& id) const;

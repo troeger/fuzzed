@@ -5,6 +5,9 @@
 
 namespace fs = boost::filesystem;
 
+using namespace std;
+using namespace pugi;
+
 bool XMLImport::validateAndLoad()
 {
 	cout << "loading " << m_file.generic_string() << endl;

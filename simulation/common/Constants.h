@@ -62,6 +62,7 @@ namespace faultTree
 	const char* const TOP_EVENT = "topEvent";
 
 	const char* const BASIC_EVENT = "ft:BasicEvent";
+	const char* const UNDEVELOPED_EVENT = "ft:UndevelopedEvent";
 
 	const char* const AND_GATE = "ft:And";
 	const char* const OR_GATE = "ft:Or";
@@ -93,7 +94,6 @@ namespace fuzzTree
 	const char* const INTERMEDIATE_EVENT = "ft:IntermediateEvent";
 	const char* const INTERMEDIATE_EVENT_SET = "ft:IntermediateEventSet";
 	const char* const BASIC_EVENT_SET = "ft:BasicEventSet";
-	const char* const UNDEVELOPED_EVENT = "ft:UndevelopedEvent";
 	const char* const TRANSFER_GATE = "ft:TransferIn";
 	const char* const FEATURE_VP = "ft:FeatureVariationPoint";
 	const char* const REDUNDANCY_VP = "ft:RedundancyVariationPoint";

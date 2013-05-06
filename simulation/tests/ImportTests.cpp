@@ -1,5 +1,5 @@
 #include "FaultTreeIncludes.h"
-#include "import/FaultTreeImport.h"
+#include "fuzztreeconfiguration//FaultTreeImport.h"
 #include "serialization/PNMLDocument.h"
 #include "util.h"
 
