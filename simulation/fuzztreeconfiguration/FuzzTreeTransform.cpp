@@ -10,7 +10,7 @@
 #include <exception>
 #include <iostream>
 #include "ExpressionParser.h"
-#if IS_WINDOWS 
+#if IS_WINDOWS
 #pragma warning(pop) 
 #endif
 #include "util.h"
@@ -23,7 +23,7 @@ using namespace fuzzTree;
 using namespace faultTree;
 using namespace boost;
 
-void FuzzTreeTransform::transformFuzzTree(const string& fileName, const string& targetDir)
+void FuzzTreeTransform::transformFuzzTree(const string& fileName, const string& targetDir) noexcept
 {
 	try
 	{
@@ -89,9 +89,8 @@ bool FuzzTreeTransform::loadRootNode()
 {
 	m_rootNode = m_document.child(FUZZ_TREE);
 	if (!m_rootNode)
-	{
 		throw runtime_error("Missing FuzzTree Root Node");
-	}
+
 	return true;
 }
 

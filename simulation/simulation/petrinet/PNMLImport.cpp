@@ -13,11 +13,12 @@
 
 using namespace PNML;
 
-PetriNet* PNMLImport::loadPNML(const string& fileName)
+PetriNet* PNMLImport::loadPNML(const string& fileName) noexcept
 {
-	PNMLImport import(fileName);
 	try
 	{
+		PNMLImport import(fileName);
+		
 		if (!import.validateAndLoad())
 			throw runtime_error(string("Could not load ") + fileName);
 

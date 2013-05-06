@@ -6,6 +6,7 @@
 #include "ImmediateTransition.h"
 #include "TimedTransition.h"
 #include "Place.h"
+#include "platform.h"
 
 #include <set>
 #include <map>

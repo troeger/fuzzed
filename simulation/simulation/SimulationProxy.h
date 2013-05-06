@@ -73,5 +73,4 @@ protected:
 	boost::program_options::options_description m_standardOptions;
 
 	static bool acceptFileExtension(const boost::filesystem::path& p);
-
 };

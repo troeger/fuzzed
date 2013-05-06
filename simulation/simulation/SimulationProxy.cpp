@@ -291,39 +291,54 @@ void runSimulation(
 	int missionTime, 
 	int numRounds, /* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/ 
 	double convergenceThreshold, /* stop after reliability changes no more than this threshold */
-	int maxTime /* maximum duration of simulation in milliseconds */)
+	int maxTime /* maximum duration of simulation in milliseconds */) noexcept
 {
-	string newFileName(filePath);
-	FaultTreeNode* ft = FuzzTreeImport::loadFaultTree(newFileName);
-	if (!ft || !ft->isValid())
+	PetriNetSimulation* sim = nullptr;
+	FaultTreeNode* ft = nullptr;
+	
+	try
 	{
-		cout << "Invalid Fault Tree! " << endl;
-		return;
+		string newFileName(filePath);
+		ft = FuzzTreeImport::loadFaultTree(newFileName);
+		if (!ft || !ft->isValid())
+		{
+			cout << "Invalid Fault Tree! " << endl;
+			return;
+		}
+
+		util::replaceFileExtensionInPlace(newFileName, ".pnml");
+		boost::shared_ptr<PNMLDocument> doc = 
+			boost::shared_ptr<PNMLDocument>(new PNMLDocument());
+
+		ft->serialize(doc);
+		ft->print(cout);
+		
+		doc->save(newFileName); // save PNML file
+
+		std::string logFileName = newFileName;
+		util::replaceFileExtensionInPlace(logFileName, ".log");
+
+		sim = new PetriNetSimulation(
+			newFileName, 
+			logFileName, 
+			maxTime, 
+			missionTime, 
+			numRounds,
+			convergenceThreshold,
+			true, /* simulate until failure for MTTF */
+			0 /* not yet implemented */);
+
+		sim->run();
+	}
+	catch (const exception& e)
+	{
+		cout << "Unhandled Exception during Simulation: " << e.what() << endl;
+	}
+	catch (...)
+	{
+		cout << "Unknown Exception during Simulation" << endl;
 	}
 	
-	util::replaceFileExtensionInPlace(newFileName, ".pnml");
-	boost::shared_ptr<PNMLDocument> doc = 
-		boost::shared_ptr<PNMLDocument>(new PNMLDocument());
-
-	ft->serialize(doc);
-	ft->print(cout);
 	delete ft;
-
-	doc->save(newFileName); // save PNML file
-	
-	std::string logFileName = newFileName;
-	util::replaceFileExtensionInPlace(logFileName, ".log");
-
-	PetriNetSimulation* sim = new PetriNetSimulation(
-		newFileName, 
-		logFileName, 
-		maxTime, 
-		missionTime, 
-		numRounds,
-		convergenceThreshold,
-		true, /* simulate until failure for MTTF */
-		0 /* not yet implemented */);
-
-	sim->run();
 	delete sim;
 }
