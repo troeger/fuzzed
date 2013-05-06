@@ -3,12 +3,12 @@
 #include <map>
 #include "FaultTreeNode.h"
 
-typedef std::map<int/*ID*/, long double/*value*/> NodeValueMap;
+typedef std::map<const std::string/*ID*/, long double/*value*/> NodeValueMap;
 
 class Gate : public FaultTreeNode
 {
 public:
-	Gate(int ID, const std::string& name);
+	Gate(const std::string& ID, const std::string& name);
 	virtual ~Gate() {};
 
 	virtual long double computeUnreliability() const;

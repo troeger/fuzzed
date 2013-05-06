@@ -73,7 +73,7 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 
 	for (xml_node& child : node.children("children"))
 	{
-		const int id = child.attribute("id").as_int(-1);
+		const int id = parseId(child);
 		if (id < 0) throw runtime_error("Invalid ID");
 
 		const char* name	= child.attribute(NAME_ATTRIBUTE).as_string();
@@ -169,3 +169,10 @@ double FaultTreeImport::parseFailureRate(const xml_node &child)
 
 FaultTreeImport::~FaultTreeImport()
 {}
+
+int FaultTreeImport::parseId(const pugi::xml_node& child)
+{
+	const string idString = child.attribute("id").as_string("");
+	// TODO use string ids in general...
+
+}

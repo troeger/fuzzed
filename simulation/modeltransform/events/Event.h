@@ -6,8 +6,8 @@ typedef float FuzzyNumber;
 class Event : public FaultTreeNode
 {
 public:
-	Event(int ID, long double failureRate, const std::string& name = "");
-	Event(int ID, FuzzyNumber fuzzyFailureRate);
+	Event(const std::string& ID, long double failureRate, const std::string& name = "");
+	Event(const std::string& ID, FuzzyNumber fuzzyFailureRate);
 	
 	virtual ~Event() {};
 

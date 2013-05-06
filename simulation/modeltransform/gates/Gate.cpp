@@ -1,6 +1,6 @@
 #include "Gate.h"
 
-Gate::Gate(int ID, const std::string& name)
+Gate::Gate(const std::string& ID, const std::string& name)
 	: FaultTreeNode(ID, name), m_bDynamic(false)
 {}
 

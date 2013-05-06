@@ -13,7 +13,7 @@ class FaultTreeNode
 public:
 	typedef std::vector<FaultTreeNode*> NodeList;
 
-	FaultTreeNode(int ID, const std::string& name = "");
+	FaultTreeNode(const std::string& ID, const std::string& name = "");
 	virtual FaultTreeNode* clone() const = 0; // virtual deep copying
 
 	virtual ~FaultTreeNode();
@@ -21,19 +21,19 @@ public:
 	// override to enforce assertions
 	virtual void addChild(FaultTreeNode* child);
 	
-	virtual bool addChildBelow(int id, FaultTreeNode* child);
+	virtual bool addChildBelow(const std::string& ID, FaultTreeNode* child);
 
 	NodeList::const_iterator getChildrenBegin() const	{ return m_children.begin(); };
 	NodeList::const_iterator getChildrenEnd()	const	{ return m_children.end(); };
 
-	FaultTreeNode* getChildById(int id);
+	FaultTreeNode* getChildById(const std::string& ID);
 
 	int getNumChildren() const { return m_children.size(); };
 
 	virtual bool isValid() const { return m_children.size() > 0; };
 
 	virtual long double getValue() const = 0;
-	int getId() const { return m_id; };
+	const std::string getId() const { return m_id; };
 	
 	virtual int getCost() const;
 
@@ -55,7 +55,7 @@ protected:
 	NodeList m_children;
 	FaultTreeNode* m_parent;
 
-	int m_id;
+	std::string m_id;
 	int m_cost;
 
 	std::string m_name;

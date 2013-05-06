@@ -20,7 +20,9 @@ public:
 
 protected:
 	static void loadNode(const pugi::xml_node& node, FaultTreeNode* ft);
-	static double parseFailureRate(const pugi::xml_node &child);
+
+	static double	parseFailureRate(const pugi::xml_node& child);
+	static int		parseId(const pugi::xml_node& child);
 
 private:
 	FaultTreeImport(const std::string& fileName);

@@ -3,7 +3,7 @@
 #include "FaultTreeNode.h"
 #include "util.h"
 
-VotingORGate::VotingORGate(int id, int numVotes, const string& name) 
+VotingORGate::VotingORGate(const std::string& id, int numVotes, const string& name) 
 	: Gate(id, name), m_numVotes(numVotes)
 {
 	m_bDynamic = false;

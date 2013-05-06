@@ -5,7 +5,7 @@
 
 int UndevelopedEvent::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
-	int placeID = doc->addPlace(1, 1, "UndevelopedEvent" + util::toString(m_id), true);
+	int placeID = doc->addPlace(1, 1, "UndevelopedEvent" + m_id, true);
 	int transitionID = doc->addTimedTransition(m_failureRate);
 	doc->placeToTransition(placeID, transitionID);
 	placeID = doc->addPlace(0);
@@ -14,7 +14,7 @@ int UndevelopedEvent::serialize(boost::shared_ptr<PNDocument> doc) const
 	return placeID;
 }
 
-UndevelopedEvent::UndevelopedEvent(int ID, long double failureRate, const string& name /*= ""*/) 
+UndevelopedEvent::UndevelopedEvent(const std::string& ID, long double failureRate, const string& name /*= ""*/) 
 	: Event(ID, failureRate, name)
 {}
 

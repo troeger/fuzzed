@@ -4,10 +4,9 @@
 #include <typeinfo>
 #include "util.h"
 
-FaultTreeNode::FaultTreeNode(int ID, const std::string& name)
+FaultTreeNode::FaultTreeNode(const std::string& ID, const std::string& name)
 	: m_id(ID), m_name(name), m_parent(nullptr), m_cost(0)
-{
-}
+{}
 
 void FaultTreeNode::addChild(FaultTreeNode* child)
 {
@@ -32,7 +31,7 @@ void FaultTreeNode::print(std::ostream& stream, int indentLevel) const
 	}
 }
 
-FaultTreeNode* FaultTreeNode::getChildById(int id) 
+FaultTreeNode* FaultTreeNode::getChildById(const std::string& id) 
 {
 	if (m_id == id)
 		return this;
@@ -56,11 +55,11 @@ string FaultTreeNode::description() const
 {
 	return 
 		string(typeid(*this).name()) 
-		+ " ID: " + util::toString(m_id)
+		+ " ID: " + m_id
 		+ " NAME: " + m_name;
 }
 
-bool FaultTreeNode::addChildBelow(int id, FaultTreeNode* insertedChild)
+bool FaultTreeNode::addChildBelow(const std::string& id, FaultTreeNode* insertedChild)
 {
 	for (auto& child : m_children)
 	{

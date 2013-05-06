@@ -4,7 +4,7 @@
 class VotingORGate : public Gate
 {
 public:
-	VotingORGate(int id, int numVotes, const std::string& name = "");
+	VotingORGate(const std::string& id, int numVotes, const std::string& name = "");
 	virtual ~VotingORGate(void) {};
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
