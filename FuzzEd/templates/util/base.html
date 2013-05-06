@@ -101,7 +101,7 @@
     <div class="navbar navbar-fixed-top no-print">
         <div class="navbar-inner">
             <div class="container">
-                <a class="brand" anchor="#">FuzzEd</a>
+                <a class="brand" anchor="#">FuzzEd - {{ graph }}</a>
                 <ul class="nav pull-right">
                     {%  if user.is_authenticated %}
                     <li class="{% block navigation_home %}{% endblock %}">
