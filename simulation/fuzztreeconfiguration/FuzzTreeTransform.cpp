@@ -255,11 +255,12 @@ void FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configura
 	xml_document* const newDoc = new xml_document();
 	xml_node faultTree = newDoc->append_child(FAULT_TREE);
 	// TODO attributes
-	xml_node newTopEvent = faultTree->append_child(TOP_EVENT);
+	xml_node newTopEvent = faultTree.append_child(TOP_EVENT);
 	shallowCopy(topEvent, newTopEvent);
 	
 	generateFaultTreeRecursive(topEvent, newTopEvent, configuration);
-	
+	removeEmptyNodes(newTopEvent);
+
 	newDoc->save_file(uniqueFileName().c_str());
 }
 
@@ -275,14 +276,16 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 {
 	for (const auto& currentChild : templateNode.children("children"))
 	{
-		const int id	= parseID(currentChild);
-		const bool opt	= currentChild.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
-
-		if (id < 0 || !configuration.isIncluded(id) || (opt && !configuration.isOptionalEnabled(id)))
-			continue; // do not add this node
+		const int		id	= parseID(currentChild);
+		const bool		opt	= currentChild.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
 		
-		const string typeDescriptor = currentChild.attribute("xsi:type").as_string();
-		const bool bLeaf = isLeaf(typeDescriptor);
+		if (id < 0 || !configuration.isIncluded(id) || (opt && !configuration.isOptionalEnabled(id)))
+		{
+			continue; // do not add this node
+		}
+
+		const string	typeDescriptor = currentChild.attribute("xsi:type").as_string();		
+		const bool		bLeaf = isLeaf(typeDescriptor);
 
 		xml_node newNode;
 		if (typeDescriptor == REDUNDANCY_VP)
@@ -327,14 +330,11 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		}
 
 		// break recursion
-		if (bLeaf) 
-			continue;
+		if (bLeaf)	continue;
 
-		if (!HAS_CHILDREN(currentChild))
-		{
+		else if (!HAS_CHILDREN(currentChild))
 			faultTreeNode.remove_child(newNode);
-		}
-
+		
 		generateFaultTreeRecursive(currentChild, newNode, configuration);
 	}
 }
@@ -348,10 +348,13 @@ bool FuzzTreeTransform::isLeaf(const string& typeDescriptor)
 
 const std::string FuzzTreeTransform::uniqueFileName()
 {
-	return 
+	string fn = 
 		m_targetDir.generic_string() + "\\" +
-		m_file.filename().generic_string() + 
-		util::toString(m_count++) + ".fuzztree_";
+		m_file.filename().generic_string();
+	
+	util::replaceFileExtensionInPlace(fn, "");
+	
+	return fn + util::toString(m_count++) + ".faulttree";
 }
 
 // the second return value is true if the recursion should terminate below the gate
@@ -409,7 +412,6 @@ void FuzzTreeTransform::expandBasicEventSet(
 	xml_node probabilityNode = templateNode.child("probability");
 	if (probabilityNode.empty())
 	{
-		templateNode.print(cout);
 		assert(false);
 		return;
 	}
@@ -445,7 +447,7 @@ pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
 	// if the we arrived at a leaf, return true
 	const string configuredChildType = featuredTemplate.attribute(NODE_TYPE).as_string();
 
-	xml_node newFeatured = node.append_child("dummy");
+	xml_node newFeatured = node.append_child(DUMMY);
 	if (configuredChildType == BASIC_EVENT_SET)
 	{
 		expandBasicEventSet(featuredTemplate, node, configuredChildId, 0);
@@ -477,4 +479,17 @@ pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
 int FuzzTreeTransform::parseID(const xml_node& node)
 {
 	return node.attribute("id").as_int(-1);
+}
+
+void FuzzTreeTransform::removeEmptyNodes(xml_node& node)
+{
+	for (auto& child : node.children())
+	{
+		if (string(child.name()) == DUMMY)
+		{
+			// TODO: assert that node doesn't have children
+			node.remove_child(child);
+		}
+		removeEmptyNodes(child);
+	}
 }

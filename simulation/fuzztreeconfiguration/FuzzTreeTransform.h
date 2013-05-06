@@ -13,6 +13,7 @@
 
 #define HAS_CHILDREN(node) (!node.child("children").empty())
 #define SET_OPTIONAL_FALSE(node) (node.remove_attribute(OPTIONAL_ATTRIBUTE))
+#define DUMMY "dummy"
 
 #include "XMLImport.h"
 
@@ -32,6 +33,8 @@ protected:
 		const xml_node& templateNode, 
 		xml_node& node,
 		const FuzzTreeConfiguration& configuration) const;
+
+	static void removeEmptyNodes(xml_node& node);
 
 	// returns the configured VotingOR gate
 	pair<xml_node, bool /*isLeaf*/> handleRedundancyVP(
