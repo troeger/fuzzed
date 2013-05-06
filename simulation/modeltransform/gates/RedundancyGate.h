@@ -6,7 +6,7 @@ using std::string;
 class RedundancyGate : public VotingORGate
 {
 public:
-	RedundancyGate(int id, int from, int to, int configuredN, const string& formula, const string& name);
+	RedundancyGate(const string& id, int from, int to, int configuredN, const string& formula, const string& name);
 	virtual ~RedundancyGate(void) {};
 
 	bool isValidConfiguration() const;

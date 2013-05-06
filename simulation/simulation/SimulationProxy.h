@@ -11,6 +11,7 @@
 #endif
 
 #include "Config.h"
+#include "platform.h"
 
 using namespace std;
 
@@ -26,7 +27,7 @@ enum SimulationImpl
 /************************************************************************/
 extern "C"
 {
-	void __declspec(dllexport) runSimulation(
+	void FT_DLL_API runSimulation(
 		char* filePath, /* path to fault tree file */
 		int missionTime,
 		int numRounds,	/* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-ANDGate::ANDGate(int id, const string& name /*= ""*/)
+ANDGate::ANDGate(const string& id, const string& name /*= ""*/)
 	: Gate(id, name)
 {
 	m_bDynamic = false;

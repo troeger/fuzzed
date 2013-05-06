@@ -1,13 +1,11 @@
 #include "Gate.h"
 #include <set>
 
-using namespace std;
-
 // cold spare
 class SpareGate : public Gate
 {
 public:
-	SpareGate(int id, const set<int>& spareIndices, const string& name);
+	SpareGate(const std::string& id, const std::set<const std::string>& spareIndices, const std::string& name);
 	virtual ~SpareGate(void) {};
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
@@ -15,5 +13,5 @@ public:
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
 
 protected:
-	set<int> m_spareIndices;
+	std::set<const std::string> m_spareIndices;
 };

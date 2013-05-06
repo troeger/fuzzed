@@ -4,7 +4,7 @@
 class ORGate : public Gate
 {
 public:
-	ORGate(int id, const std::string& name = "");
+	ORGate(const std::string& id, const std::string& name = "");
 	virtual ~ORGate(void);
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying

@@ -1,7 +1,7 @@
 #include "SEQGate.h"
 #include "serialization/PNDocument.h"
 
-SEQGate::SEQGate(int id, const std::vector<int>& ordering, const std::string& name /*= ""*/)
+SEQGate::SEQGate(const std::string& id, const std::vector<const string>& ordering, const std::string& name /*= ""*/)
 	: Gate(id, name), m_ordering(ordering)
 {}
 
@@ -17,7 +17,7 @@ FaultTreeNode* SEQGate::clone() const
 int SEQGate::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
 	int previousEvent = -1;
-	for (const int& i : m_ordering)
+	for (const string& i : m_ordering)
 	{
 		FaultTreeNode* childNode = nullptr;
 		for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)

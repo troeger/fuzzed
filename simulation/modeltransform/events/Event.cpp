@@ -1,13 +1,13 @@
 #include "Event.h"
 
-Event::Event(int ID, long double failureRate, const std::string& name/* = ""*/)
+Event::Event(const std::string& ID, long double failureRate, const std::string& name/* = ""*/)
 	: FaultTreeNode(ID, name), m_failureRate(failureRate)
 {
 }
 
 
 // big fat TODO
-Event::Event(int ID, FuzzyNumber fuzzyFailureRate)
+Event::Event(const std::string& ID, FuzzyNumber fuzzyFailureRate)
 	: FaultTreeNode(ID), m_failureRate(fuzzyFailureRate)
 {
 }

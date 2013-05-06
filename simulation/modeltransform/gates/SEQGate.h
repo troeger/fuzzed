@@ -6,7 +6,7 @@
 class SEQGate : public Gate
 {
 public:
-	SEQGate(int id, const std::vector<int>& ordering, const std::string& name = "");
+	SEQGate(const std::string& id, const std::vector<const std::string>& ordering, const std::string& name = "");
 	virtual ~SEQGate(void) {};
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
@@ -14,5 +14,5 @@ public:
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
 
 protected:
-	std::vector<int> m_ordering;
+	std::vector<const std::string> m_ordering;
 };

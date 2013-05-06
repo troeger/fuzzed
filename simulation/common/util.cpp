@@ -113,6 +113,17 @@ void util::tokenizeIntegerString(const string& input, vector<int>& results /*out
 	transform(tok.begin(), tok.end(), std::back_inserter(results), toInt());
 }
 
+
+
+void util::tokenizeString(const string& input, vector<const string>& results /*out*/)
+{
+	boost::char_separator<char> sep(" ,;");
+	boost::tokenizer<boost::char_separator<char>> tok(input, sep);
+	for (const auto& t : tok)
+		results.emplace_back(t);
+}
+
+
 void util::replaceStringInPlace(string& subject, const string& search, const std::string& replacement)
 {	
 	size_t pos = 0;

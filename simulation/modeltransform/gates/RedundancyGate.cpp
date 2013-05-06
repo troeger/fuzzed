@@ -10,7 +10,7 @@
 #include "RedundancyGate.h"
 #include "util.h"
 
-RedundancyGate::RedundancyGate(int id, int from, int to, int configuredN, const string& formula, const string& name)
+RedundancyGate::RedundancyGate(const std::string& id, int from, int to, int configuredN, const string& formula, const string& name)
 	: VotingORGate(id, 0, name), 
 	m_formulaString(formula), 
 	m_from(from), m_to(to)

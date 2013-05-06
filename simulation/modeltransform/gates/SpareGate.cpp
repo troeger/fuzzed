@@ -5,7 +5,7 @@
 
 #include <set>
 
-SpareGate::SpareGate(int id, const set<int>& spareIndices, const string& name)
+SpareGate::SpareGate(const std::string& id, const set<const string>& spareIndices, const string& name)
 	: Gate(id, name), m_spareIndices(spareIndices)
 {
 	m_bDynamic = true;

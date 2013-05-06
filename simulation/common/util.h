@@ -39,6 +39,7 @@ namespace util
 	string conditionString(const string& placeIdentifier, ConditionType cond, const int argument);
 
 	void tokenizeIntegerString(const string& input, vector<int>& results /*out*/);
+	void tokenizeString(const string& input, vector<const string>& results /*out*/);
 	
 	void replaceStringInPlace(string& subject, const string& search, const std::string& replacement);
 	void replaceFileExtensionInPlace(string& subject, const string& newExtension);

@@ -96,7 +96,7 @@ void FuzzTreeImport::loadTree(FTResults* queue)
 			if (!topEvent)
 				throw runtime_error("Missing TopEvent");
 
-			auto tree = new TopLevelEvent(topEvent.attribute("id").as_int());
+			auto tree = new TopLevelEvent(topEvent.attribute("id").as_string());
 
 			loadNode(topEvent, tree, queue);
 			queue->enqueue(tree);
@@ -122,12 +122,11 @@ void FuzzTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree, FTResul
 	{
 		const string typeDescriptor = child.attribute("xsi:type").as_string();
 
-		const int id		= child.attribute("id").as_int(-1);
+		const string id		= child.attribute("id").as_string();
 		const char* name	= child.attribute("name").as_string();
 		const bool opt		= child.attribute(OPTIONAL_ATTRIBUTE).as_bool(false);
 
-		if (id < 0)
-			throw runtime_error("Invalid ID");
+		if (id.empty()) throw runtime_error("Invalid ID");
 
 		/************************************************************************/
 		/* Basic Events/ Leaf Nodes                                             */
@@ -190,24 +189,24 @@ void FuzzTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree, FTResul
 		else if (typeDescriptor == COLD_SPARE_GATE)
 		{
 			const string spareIds = child.attribute(SPARE_ID_ATTRIBUTE).as_string("");
-			vector<int> spareIndices;
-			util::tokenizeIntegerString(spareIds, spareIndices);
+			vector<const string> spareIndices;
+			util::tokenizeString(spareIds, spareIndices);
 
-			gate = new SpareGate(id, set<int>(spareIndices.begin(), spareIndices.end()), name);
+			gate = new SpareGate(id, set<const string>(spareIndices.begin(), spareIndices.end()), name);
 		}
 		else if (typeDescriptor == PAND_GATE)
 		{
 			const string prioIds = child.attribute(PRIO_ID_ATTRIBUTE).as_string("");
-			vector<int> prioIndices;
-			util::tokenizeIntegerString(prioIds, prioIndices);
+			vector<const string> prioIndices;
+			util::tokenizeString(prioIds, prioIndices);
 
-			gate = new PANDGate(id, set<int>(prioIndices.begin(), prioIndices.end()), name);
+			gate = new PANDGate(id, set<const string>(prioIndices.begin(), prioIndices.end()), name);
 		}
 		else if (typeDescriptor == SEQ_GATE)
 		{
 			const string sequence = child.attribute(SEQUENCE_ATTRIBUTE).as_string("");
-			vector<int> idSequence;
-			util::tokenizeIntegerString(sequence, idSequence);
+			vector<const string> idSequence;
+			util::tokenizeString(sequence, idSequence);
 
 			gate = new SEQGate(id, idSequence, name);
 		}
@@ -245,7 +244,7 @@ double FuzzTreeImport::parseFailureRate(const xml_node &child)
 
 void FuzzTreeImport::handleBasicEventSet(
 	xml_node &child, 
-	const int id, 
+	const string& id, 
 	const char* name, 
 	FaultTreeNode* tree,
 	FTResults* results)
@@ -260,20 +259,20 @@ void FuzzTreeImport::handleBasicEventSet(
 	while (count < numEvents)
 	{
 		// TODO unique ids
-		tree->addChild(new BasicEvent(id*100+(++count), parseFailureRate(child), name));
+		tree->addChild(new BasicEvent(id, parseFailureRate(child), name));
 	}
 }
 
 void FuzzTreeImport::handleFeatureVP(
 	xml_node &node, 
-	const int id,
+	const string& id,
 	const char* name, 
 	FaultTreeNode* tree,
 	FTResults* results)
 {
 	// find the top level node and clone it
 	const FaultTreeNode* const top = tree->getRoot();
-	const int parentID = tree->getId();
+	const std::string& parentID = tree->getId();
 
 	for (xml_node& child : node.children("children"))
 	{
@@ -286,7 +285,7 @@ void FuzzTreeImport::handleFeatureVP(
 
 void FuzzTreeImport::handleRedundancyVP(
 	xml_node &child, 
-	const int id, 
+	const string& id, 
 	const char* name, 
 	FaultTreeNode* tree,
 	FTResults* results)
@@ -297,7 +296,7 @@ void FuzzTreeImport::handleRedundancyVP(
 		throw runtime_error("Invalid boundaries for RedundancyGate");
 
 	const char* const formula = child.attribute("formula").as_string();
-	const int parentID = tree->getId();
+	const std::string& parentID = tree->getId();
 
 	// find the top level node and clone it
 	const FaultTreeNode* const top = tree->getRoot();

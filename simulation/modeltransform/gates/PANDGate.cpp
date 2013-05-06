@@ -3,7 +3,7 @@
 #include "events/BasicEvent.h"
 #include "util.h"
 
-PANDGate::PANDGate(int id, const std::set<int>& prioIds, const string& name/* = ""*/)
+PANDGate::PANDGate(const string& id, const std::set<const string>& prioIds, const string& name/* = ""*/)
 	: Gate(id, name), m_prioIDs(prioIds)
 {
 	m_bDynamic = true;

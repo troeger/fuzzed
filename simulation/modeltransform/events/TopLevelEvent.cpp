@@ -3,7 +3,7 @@
 #include "util.h"
 #include "gates/Gate.h"
 
-TopLevelEvent::TopLevelEvent(int ID /*= 0*/)
+TopLevelEvent::TopLevelEvent(const std::string& ID /*= 0*/)
 	: Event(ID, 0.0L)
 {}
 

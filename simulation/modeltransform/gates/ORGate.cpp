@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-ORGate::ORGate(int id, const string& name /*= ""*/) 
+ORGate::ORGate(const string& id, const string& name /*= ""*/) 
 	: Gate(id, name)
 {
 	m_bDynamic = false;

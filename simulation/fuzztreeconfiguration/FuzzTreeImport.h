@@ -35,9 +35,9 @@ protected:
 
 	static void loadNode(const xml_node& node, FaultTreeNode* ft, FTResults* queue);
 
-	static void handleBasicEventSet(xml_node &child, const int id, const char* name, FaultTreeNode* tree, FTResults* queue);
-	static void handleFeatureVP(xml_node &child, const int id, const char* name, FaultTreeNode* tree, FTResults* queue);
-	static void handleRedundancyVP(xml_node &child, const int id, const char* name, FaultTreeNode* tree, FTResults* queue);
+	static void handleBasicEventSet(xml_node &child, const string& id, const char* name, FaultTreeNode* tree, FTResults* queue);
+	static void handleFeatureVP(xml_node &child, const string& id, const char* name, FaultTreeNode* tree, FTResults* queue);
+	static void handleRedundancyVP(xml_node &child, const string& id, const char* name, FaultTreeNode* tree, FTResults* queue);
 
 	static double parseFailureRate(const xml_node &child);
 

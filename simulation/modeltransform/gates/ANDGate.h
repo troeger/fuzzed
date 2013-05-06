@@ -4,7 +4,7 @@
 class ANDGate : public Gate
 {
 public:
-	ANDGate(int id, const std::string& name = "");
+	ANDGate(const std::string& id, const std::string& name = "");
 	virtual ~ANDGate(void);
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying

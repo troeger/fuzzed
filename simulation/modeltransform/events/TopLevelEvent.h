@@ -4,7 +4,7 @@
 class TopLevelEvent : public Event
 {
 public:
-	TopLevelEvent(int ID);
+	TopLevelEvent(const std::string& ID);
 	virtual ~TopLevelEvent() {};
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying

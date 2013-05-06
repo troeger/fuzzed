@@ -4,6 +4,6 @@
 class XORGate : public Gate
 {
 public:
-	XORGate(int ID, const std::string& name);
+	XORGate(const std::string& ID, const std::string& name);
 	virtual ~XORGate();
 };

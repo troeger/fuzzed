@@ -2,7 +2,7 @@
 #include "serialization/PNDocument.h"
 #include "util.h"
 
-BasicEvent::BasicEvent(int ID, long double failureRate, const std::string& name/* = ""*/, int cost /*=1*/)
+BasicEvent::BasicEvent(const std::string& ID, long double failureRate, const std::string& name/* = ""*/, int cost /*=1*/)
 	: Event(ID, failureRate, name)
 {
 	m_cost = cost;
