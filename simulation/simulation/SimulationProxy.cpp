@@ -32,19 +32,24 @@ namespace fs = boost::filesystem;
 
 SimulationProxy::SimulationProxy(int argc, char** arguments)
 {
-	bool useTimeNET = false;
-	for (int i : boost::counting_range(1, argc))
+	try
 	{
-		if (string(arguments[i]) == "TimeNET")
-			useTimeNET = true;
+		bool useTimeNET = false;
+		for (int i : boost::counting_range(1, argc))
+		{
+			if (string(arguments[i]) == "TimeNET")
+				useTimeNET = true;
+		}
+		
+		useTimeNET ? parseTimeNET(argc, arguments) : parseStandard(argc, arguments);
 	}
-	if (useTimeNET)
-	{ // TimeNETSimulation.h
-		parseTimeNET(argc, arguments);
+	catch (const exception& e)
+	{
+		cout << "Exception when invoking simulation: " << e.what();
 	}
-	else
-	{ // PetriNetSimulation.h
-		parseStandard(argc, arguments);
+	catch (...)
+	{
+		cout << "Unknown exception when invoking simulation";
 	}
 }
 
