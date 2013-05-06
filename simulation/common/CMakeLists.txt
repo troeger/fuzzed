@@ -13,7 +13,8 @@ set(SOURCES
 
 set(HEADERS
 	${HEADERS}
-	
+
+	platform.h
 	util.h
 	XMLImport.h
 	Types.h

@@ -2,16 +2,6 @@
 
 #define WINDOWS defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 
-#if WINDOWS
-	#ifdef SIMULATION_DLL
-		#define FT_DLL_API __declspec(dllexport)
-	#else
-		#define FT_DLL_API __declspec(dllimport)
-	#endif
-#else
-#define FT_DLL_API
-#endif
-
 const char* const RAND_FILE = "C:/dev/masterarbeit/simulation/implementation/randomnumbers/rand_.txt";
 
 #if WINDOWS

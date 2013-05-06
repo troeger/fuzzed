@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include "Types.h"
+#include "platform.h"
 
 using namespace std;
 
@@ -14,8 +15,6 @@ using namespace std;
 #define MAX_DOUBLE std::numeric_limits<double>::max()
 #define MAX_LONG_DOUBLE std::numeric_limits<long double>::max()
 #define MAX_FLOAT std::numeric_limits<float>::max()
-
-#define IS_WINDOWS defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 
 namespace util
 {
