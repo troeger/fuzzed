@@ -358,7 +358,7 @@ function(Properties, Mirror, Canvas, Class) {
             // using jsPlumb draggable and not jQueryUI to allow that edges move together with nodes
             jsPlumb.draggable(this.container, {
                 // stay in the canvas
-                containment: 'parent',
+                containment: Canvas.container,
                 // become a little bit opaque when dragged
                 opacity:     this.config.Dragging.OPACITY,
                 // show a cursor with four arrows
@@ -386,6 +386,9 @@ function(Properties, Mirror, Canvas, Class) {
                 }.bind(this),
 
                 drag: function(event, ui) {
+                    // enlarge canvas
+                    Canvas.enlarge({x: ui.offset.left, y: ui.offset.top});
+
                     // determine by how many pixels we moved from our original position (see: start callback)
                     var xOffset = ui.position.left - initialPositions[this.id].left;
                     var yOffset = ui.position.top  - initialPositions[this.id].top;
@@ -743,6 +746,7 @@ function(Properties, Mirror, Canvas, Class) {
                 left: position.x - this._nodeImage.xCenter,
                 top:  position.y - this._nodeImage.yCenter
             });
+            Canvas.enlarge(position);
 
             return this;
         },
