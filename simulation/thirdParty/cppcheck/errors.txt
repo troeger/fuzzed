@@ -1,0 +1,16 @@
+[..\..\common\Condition.cpp:8]: (warning) Member variable 'Condition::m_placeID' is not initialized in the constructor.
+[..\..\common\Condition.cpp:8]: (warning) Member variable 'Condition::m_value' is not initialized in the constructor.
+[..\..\common\Condition.cpp:8]: (warning) Member variable 'Condition::m_type' is not initialized in the constructor.
+[..\..\fuzztreeconfiguration\FuzzTreeImport.cpp:127]: (style) Variable 'opt' is assigned a value that is never used.
+[..\..\fuzztreeconfiguration\FuzzTreeTransform.cpp:212]: (style) Consecutive return, break, continue, goto or throw statements are unnecessary.
+[..\..\simulation\SimulationProxy.cpp:181]: (style) Variable 'directoryName' is assigned a value that is never used.
+[..\..\simulation\SimulationProxy.cpp:33]: (warning) Member variable 'SimulationProxy::m_simulationSteps' is not initialized in the constructor.
+[..\..\simulation\SimulationProxy.cpp:33]: (warning) Member variable 'SimulationProxy::m_simulationTime' is not initialized in the constructor.
+[..\..\simulation\SimulationProxy.cpp:33]: (warning) Member variable 'SimulationProxy::m_numRounds' is not initialized in the constructor.
+[..\..\simulation\SimulationProxy.cpp:33]: (warning) Member variable 'SimulationProxy::m_numAdaptiveRounds' is not initialized in the constructor.
+[..\..\simulation\SimulationProxy.cpp:33]: (warning) Member variable 'SimulationProxy::m_convergenceThresh' is not initialized in the constructor.
+[..\..\simulation\SimulationProxy.cpp:33]: (warning) Member variable 'SimulationProxy::m_bSimulateUntilFailure' is not initialized in the constructor.
+[..\..\simulation\implementation\TimeNETSimulation.cpp:31]: (style) C-style pointer casting
+[..\..\simulation\implementation\TimeNETSimulation.cpp:89]: (error) Mismatching allocation and deallocation: buf
+[..\..\simulation\implementation\TimeNETSimulation.cpp:72]: (error) Memory leak: buf
+[..\..\simulation\petrinet\PetriNet.h:46]: (performance) Possible inefficient checking for 'm_inactiveTimedTransitions' emptiness.
