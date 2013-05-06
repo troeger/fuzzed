@@ -15,6 +15,7 @@
 #include "util.h"
 
 using namespace fuzzTree;
+using namespace faultTree;
 
 FaultTreeNode* FuzzTreeImport::loadFaultTree(const string& fileName)
 {
@@ -42,11 +43,13 @@ FaultTreeNode* FuzzTreeImport::loadFaultTree(const string& fileName)
 
 std::pair<FuzzTreeImport*,FTResults*> FuzzTreeImport::loadFaultTreeAsync(const string& fileName)
 {
-	FuzzTreeImport* import = new FuzzTreeImport(fileName);
-	FTResults* results = new FTResults();
-
+	FuzzTreeImport* import = nullptr;
+	FTResults* results = nullptr;
 	try
 	{
+		import = new FuzzTreeImport(fileName);
+		results = new FTResults();
+
 		if (!import->validateAndLoad())
 			return make_pair(import, results);
 
@@ -55,6 +58,11 @@ std::pair<FuzzTreeImport*,FTResults*> FuzzTreeImport::loadFaultTreeAsync(const s
 	catch (std::exception& e)
 	{
 		cout << "Error during import " << e.what() << endl;
+		return make_pair(import, results);
+	}
+	catch (...)
+	{
+		cout << "Unknown error during import" << endl;
 		return make_pair(import, results);
 	}
 

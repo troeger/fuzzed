@@ -57,7 +57,7 @@ protected:
 	// simulates all configurations from one file
 	void simulateFile(const boost::filesystem::path& p, bool simulatePetriNet);
 	bool runSimulation(
-		boost::filesystem::path p, 
+		const boost::filesystem::path& p, 
 		SimulationImpl implementationType,
 		void* additionalArguments = NULL);
 	
@@ -71,4 +71,7 @@ protected:
 
 	boost::program_options::options_description m_timeNetOptions;
 	boost::program_options::options_description m_standardOptions;
+
+	static bool acceptFileExtension(const boost::filesystem::path& p);
+
 };

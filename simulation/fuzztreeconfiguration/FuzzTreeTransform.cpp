@@ -20,6 +20,7 @@
 using namespace pugi;
 using namespace std;
 using namespace fuzzTree;
+using namespace faultTree;
 using namespace boost;
 
 void FuzzTreeTransform::transformFuzzTree(const string& fileName, const string& targetDir)

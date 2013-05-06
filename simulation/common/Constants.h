@@ -19,6 +19,7 @@ namespace timeNET
 
 namespace PNML
 {
+	const char* const PNML_EXT = ".pnml";
 	const char* const TRANSITION_TAG = "transition";
 	const char* const PLACE_TAG = "place";
 	const char* const ARC_TAG = "arc";
@@ -53,20 +54,14 @@ const std::string g_alphabet = "abcdefghijklmnopqrstuvwxyz";
 /************************************************************************/
 /* FuzzTree-Format                                                      */
 /************************************************************************/
-namespace fuzzTree 
+
+namespace faultTree
 {
-	const char* const FUZZ_TREE = "ft:FuzzTree";
 	const char* const FAULT_TREE = "ft:FaultTree";
+	const char* const FAULT_TREE_EXT = ".faulttree";
 	const char* const TOP_EVENT = "topEvent";
 
-	const char* const INTERMEDIATE_EVENT = "ft:IntermediateEvent";
-	const char* const INTERMEDIATE_EVENT_SET = "ft:IntermediateEventSet";
 	const char* const BASIC_EVENT = "ft:BasicEvent";
-	const char* const BASIC_EVENT_SET = "ft:BasicEventSet";
-	const char* const UNDEVELOPED_EVENT = "ft:UndevelopedEvent";
-	const char* const TRANSFER_GATE = "ft:TransferIn";
-	const char* const FEATURE_VP = "ft:FeatureVariationPoint";
-	const char* const REDUNDANCY_VP = "ft:RedundancyVariationPoint";
 
 	const char* const AND_GATE = "ft:And";
 	const char* const OR_GATE = "ft:Or";
@@ -78,19 +73,34 @@ namespace fuzzTree
 	const char* const SEQ_GATE = "ft:Sequence";
 	const char* const FDEP_GATE = "ft:FDEP";
 
-	const char* const TRIANGULAR_FUZZY_NUM = "ft:TriangularFuzzyInterval";
 	const char* const CRISP_NUM = "ft:CrispProbability";
-
-	// attributes
 	const char* const SPARE_ID_ATTRIBUTE = "spareIds";
 	const char* const PRIO_ID_ATTRIBUTE = "priorityIds";
-	const char* const OPTIONAL_ATTRIBUTE = "optional";
-	const char* const SEQUENCE_ATTRIBUTE = "eventSequence";
-	const char* const COST_ATTRIBUTE = "cost";
+
 	const char* const CHILDREN = "children";
 	const char* const NODE_ID = "id";
 	const char* const NODE_TYPE = "xsi:type";
 	const char* const NAME_ATTRIBUTE = "name";
 	const char* const VOTING_OR_K = "k";
+	const char* const SEQUENCE_ATTRIBUTE = "eventSequence";
+}
+
+namespace fuzzTree
+{
+	const char* const FUZZ_TREE = "ft:FuzzTree";
+	const char* const FUZZ_TREE_EXT = ".fuzztree"; 
+
+	const char* const INTERMEDIATE_EVENT = "ft:IntermediateEvent";
+	const char* const INTERMEDIATE_EVENT_SET = "ft:IntermediateEventSet";
+	const char* const BASIC_EVENT_SET = "ft:BasicEventSet";
+	const char* const UNDEVELOPED_EVENT = "ft:UndevelopedEvent";
+	const char* const TRANSFER_GATE = "ft:TransferIn";
+	const char* const FEATURE_VP = "ft:FeatureVariationPoint";
+	const char* const REDUNDANCY_VP = "ft:RedundancyVariationPoint";
+
+	const char* const TRIANGULAR_FUZZY_NUM = "ft:TriangularFuzzyInterval";
+
+	const char* const OPTIONAL_ATTRIBUTE = "optional";
+	const char* const COST_ATTRIBUTE = "cost";
 	const char* const BASIC_EVENT_SET_QUANTITY = "quantity";
 }

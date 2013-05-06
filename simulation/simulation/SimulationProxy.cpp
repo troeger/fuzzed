@@ -7,6 +7,7 @@
 
 #include "util.h"
 #include "Config.h"
+#include "Constants.h"
 #include <omp.h>
 
 #if IS_WINDOWS 
@@ -27,6 +28,7 @@
 
 
 namespace po = boost::program_options;
+namespace fs = boost::filesystem;
 
 SimulationProxy::SimulationProxy(int argc, char** arguments)
 {
@@ -46,7 +48,7 @@ SimulationProxy::SimulationProxy(int argc, char** arguments)
 	}
 }
 
-bool SimulationProxy::runSimulation(boost::filesystem::path p, SimulationImpl implementationType, void* additionalArguments) 
+bool SimulationProxy::runSimulation(const fs::path& p, SimulationImpl implementationType, void* additionalArguments) 
 {
 	Simulation* sim;
 	switch (implementationType)
@@ -146,21 +148,21 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 
 	if (bDir)
 	{
-		const auto dirPath = boost::filesystem::path(directoryName.c_str());
+		const auto dirPath = fs::path(directoryName.c_str());
 		if (!is_directory(dirPath))
 			throw runtime_error("Not a directory: " + directoryName);
 
 		cout << "Simulating all files in directory " << dirPath.generic_string() << endl;
-		boost::filesystem::directory_iterator it(dirPath), eod;
-		BOOST_FOREACH(boost::filesystem::path const &p, std::make_pair(it, eod))   
-		{ 
-			if (is_regular_file(p) && (p.extension() == ".pnml" || p.extension() == ".fuzztree"))
+		fs::directory_iterator it(dirPath), eod;
+		BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))   
+		{
+			if (is_regular_file(p) && acceptFileExtension(p))
 				simulateFile(p, simulatePetriNet);
 		}
 	}
 	else if (bFile)
 	{
-		const auto fPath = boost::filesystem::path(filePath.c_str());
+		const auto fPath = fs::path(filePath.c_str());
 		if (!is_regular_file(fPath))
 			throw runtime_error("Not a file: " + filePath);
 
@@ -208,41 +210,43 @@ void SimulationProxy::parseTimeNET(int numArguments, char** arguments)
 
 	assert(!fileName.empty());
 
-	runSimulation(boost::filesystem::path(fileName), TIMENET, (void*)props);
+	runSimulation(fs::path(fileName), TIMENET, (void*)props);
 	delete props;
 }
 
-void SimulationProxy::simulateFile(const boost::filesystem::path& p, bool simulatePetriNet)
+void SimulationProxy::simulateFile(const fs::path& p, bool simulatePetriNet)
 {	
-	assert(is_regular_file(p));
+	assert(is_regular_file(p) && acceptFileExtension(p));
 
-	if (p.extension() == ".pnml" && simulatePetriNet)
+	if (p.extension() == PNML::PNML_EXT && simulatePetriNet)
 		runSimulation(p, DEFAULT); // run simulation directly
 
-	else if (p.extension() == ".fuzztree" && !simulatePetriNet)
-	{
-		pair<FuzzTreeImport*, FTResults*> results;
+	else if (p.extension() == fuzzTree::FUZZ_TREE_EXT)
+	{ // transform into fault trees first
+		fs::path targetDir = p;
+		targetDir.remove_filename();
+		targetDir /= "faultTrees_" + util::fileNameFromPath(p.generic_string());
 
-		FuzzTreeTransform::transformFuzzTree(p.generic_string(), "");
-		return; // NOCOMMIT
-		try
+		if (!fs::create_directory(targetDir))
+			throw runtime_error("Could not create directory: " + targetDir.generic_string());
+
+		FuzzTreeTransform::transformFuzzTree(p.generic_string(), targetDir.generic_string());
+		fs::directory_iterator it(targetDir), eod;
+		BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
 		{
-			results = FuzzTreeImport::loadFaultTreeAsync(p.generic_string());
+			if (!fs::is_regular_file(p) || p.extension() != faultTree::FAULT_TREE_EXT)
+				simulateFile(p, false);
 		}
-		catch (std::exception& e)
-		{
-			cout << "Error during fault tree import: " << e.what() << endl;
-		}
-		catch (...)
-		{
-			cout << "Unknown error during import" << endl;
-		}
+	}
+
+	else if (p.extension() == faultTree::FAULT_TREE_EXT)
+	{ // already a fault tree
+		const auto results = FuzzTreeImport::loadFaultTreeAsync(p.generic_string());
 
 		FTResults* const resultQueue = results.second;
 		const FuzzTreeImport* const importer = results.first;
 
 		assert(resultQueue && importer);
-
 		while (importer->isBusy())
 		{
 			FaultTreeNode* ft = nullptr;
@@ -257,7 +261,7 @@ void SimulationProxy::simulateFile(const boost::filesystem::path& p, bool simula
 				ft->print(cout);
 
 				string newFileName = p.generic_string();
-				util::replaceFileExtensionInPlace(newFileName, "_" + util::toString(i++) + ".pnml");
+				util::replaceFileExtensionInPlace(newFileName, "_" + util::toString(i++) + PNML::PNML_EXT);
 
 				boost::shared_ptr<PNMLDocument> doc = 
 					boost::shared_ptr<PNMLDocument>(new PNMLDocument());
@@ -271,7 +275,15 @@ void SimulationProxy::simulateFile(const boost::filesystem::path& p, bool simula
 
 		delete importer;
 		delete resultQueue;
-	}
+	}		
+}
+
+bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
+{
+	return
+		p.extension() == PNML::PNML_EXT ||
+		p.extension() == fuzzTree::FUZZ_TREE_EXT ||
+		p.extension() == faultTree::FAULT_TREE_EXT;
 }
 
 void runSimulation(
