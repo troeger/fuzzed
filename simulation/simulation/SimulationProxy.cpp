@@ -223,8 +223,8 @@ void SimulationProxy::simulateFile(const boost::filesystem::path& p, bool simula
 	{
 		pair<FuzzTreeImport*, FTResults*> results;
 
-// 		FuzzTreeTransform::transformFuzzTree(p.generic_string(), "");
-// 		return; // NOCOMMIT
+		FuzzTreeTransform::transformFuzzTree(p.generic_string(), "");
+		return; // NOCOMMIT
 		try
 		{
 			results = FuzzTreeImport::loadFaultTreeAsync(p.generic_string());

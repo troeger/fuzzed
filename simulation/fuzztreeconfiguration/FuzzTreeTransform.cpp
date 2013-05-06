@@ -253,7 +253,9 @@ void FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configura
 	assert(!topEvent.empty());
 
 	xml_document* const newDoc = new xml_document();
-	xml_node newTopEvent = newDoc->append_child(TOP_EVENT);
+	xml_node faultTree = newDoc->append_child(FAULT_TREE);
+	// TODO attributes
+	xml_node newTopEvent = faultTree->append_child(TOP_EVENT);
 	shallowCopy(topEvent, newTopEvent);
 	
 	generateFaultTreeRecursive(topEvent, newTopEvent, configuration);
