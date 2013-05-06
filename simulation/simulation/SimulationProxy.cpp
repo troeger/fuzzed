@@ -3,7 +3,9 @@
 #include "implementation/PetriNetSimulation.h"
 
 #include "serialization/PNMLDocument.h"
-#include "FuzzTreeImport.h"
+#include "FaultTreeNode.h"
+#include "FaultTreeImport.h"
+#include "FuzzTreeTransform.h"
 
 #include "util.h"
 #include "Config.h"
@@ -24,8 +26,6 @@
 #if IS_WINDOWS 
 	#pragma warning(pop)
 #endif
-#include "FuzzTreeTransform.h"
-
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -224,57 +224,40 @@ void SimulationProxy::simulateFile(const fs::path& p, bool simulatePetriNet)
 	else if (p.extension() == fuzzTree::FUZZ_TREE_EXT)
 	{ // transform into fault trees first
 		fs::path targetDir = p;
+		string name = util::fileNameFromPath(p.generic_string(), false);
+		util::replaceFileExtensionInPlace(name, "");
 		targetDir.remove_filename();
-		targetDir /= "faultTrees_" + util::fileNameFromPath(p.generic_string());
+		targetDir /= "faultTrees_" + name;
 
-		if (!fs::create_directory(targetDir))
+		if (!fs::create_directory(targetDir) && !fs::is_directory(targetDir))
 			throw runtime_error("Could not create directory: " + targetDir.generic_string());
 
 		FuzzTreeTransform::transformFuzzTree(p.generic_string(), targetDir.generic_string());
 		fs::directory_iterator it(targetDir), eod;
 		BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
 		{
-			if (!fs::is_regular_file(p) || p.extension() != faultTree::FAULT_TREE_EXT)
+			if (fs::is_regular_file(p) && p.extension() == faultTree::FAULT_TREE_EXT)
 				simulateFile(p, false);
 		}
 	}
 
 	else if (p.extension() == faultTree::FAULT_TREE_EXT)
 	{ // already a fault tree
-		const auto results = FuzzTreeImport::loadFaultTreeAsync(p.generic_string());
+		FaultTreeNode* ft = FaultTreeImport::loadFaultTree(p.generic_string());
+		if (!ft || !ft->isValid()) throw("Invalid Fault Tree");
+		
+		ft->print(cout);
 
-		FTResults* const resultQueue = results.second;
-		const FuzzTreeImport* const importer = results.first;
+		string newFileName = p.generic_string();
+		util::replaceFileExtensionInPlace(newFileName, PNML::PNML_EXT);
 
-		assert(resultQueue && importer);
-		while (importer->isBusy())
-		{
-			FaultTreeNode* ft = nullptr;
-			int i = 0;
-			while (resultQueue->try_dequeue(ft))
-			{
-				if (!ft || !ft->isValid())
-				{
-					cout << "Invalid Fault Tree" << endl;
-					continue;
-				}
-				ft->print(cout);
+		boost::shared_ptr<PNMLDocument> doc = 
+			boost::shared_ptr<PNMLDocument>(new PNMLDocument());
+		ft->serialize(doc);
+		delete ft;
 
-				string newFileName = p.generic_string();
-				util::replaceFileExtensionInPlace(newFileName, "_" + util::toString(i++) + PNML::PNML_EXT);
-
-				boost::shared_ptr<PNMLDocument> doc = 
-					boost::shared_ptr<PNMLDocument>(new PNMLDocument());
-				ft->serialize(doc);
-				delete ft;
-
-				doc->save(newFileName);
-				runSimulation(newFileName, DEFAULT);
-			}			
-		}
-
-		delete importer;
-		delete resultQueue;
+		doc->save(newFileName);
+		runSimulation(newFileName, DEFAULT);
 	}		
 }
 
@@ -299,7 +282,7 @@ void runSimulation(
 	try
 	{
 		string newFileName(filePath);
-		ft = FuzzTreeImport::loadFaultTree(newFileName);
+		ft = FaultTreeImport::loadFaultTree(newFileName);
 		if (!ft || !ft->isValid())
 		{
 			cout << "Invalid Fault Tree! " << endl;

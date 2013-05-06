@@ -3,12 +3,14 @@ project(ftconfiguration CXX)
 set(SOURCES
    ${SOURCE}
    FuzzTreeImport.cpp
+   FaultTreeImport.cpp
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
 )
 set(HEADERS
    ${HEADERS}
    FuzzTreeImport.h
+   FaultTreeImport.h
    FuzzTreeTransform.h
    FuzzTreeConfiguration.h
 )
