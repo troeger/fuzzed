@@ -761,11 +761,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
 
         _loadGraphCompleted: function(readOnly) {
-            this.cutsetsMenu     = new CutsetsMenu(this);
+//          this.cutsetsMenu     = new CutsetsMenu(this);
             this.probabilityMenu = new ProbabilityMenu(this);
 
-            this._setupCutsetsActionEntry()
-                ._setupTopEventProbabilityActionEntry();
+//          this._setupCutsetsActionEntry()
+            this._setupTopEventProbabilityActionEntry();
 
             return this._super(readOnly);
         },
