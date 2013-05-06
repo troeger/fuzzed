@@ -233,6 +233,9 @@ def editor(request, graph_id):
      {HttpResponse} a django response object
     """
     graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user)
+    if graph.read_only:
+        return HttpResponseBadRequest()
+
     notation = notations.by_kind[graph.kind]
     nodes    = notation['nodes']
 
@@ -244,6 +247,39 @@ def editor(request, graph_id):
     }
 
     return render(request, 'editor/editor.html', parameters)
+
+@login_required
+def snapshot(request, graph_id):
+    """
+    Function: snapshot
+    
+    View handler for loading the snapshot viewer. It just tries to locate the graph to be opened 
+    and passes it to its according view. For the moment, this is the editor itself, were the JavaScript
+    code handles the read-only mode from UI perspective.
+    
+    Parameters:
+     {HttpRequest} request  - a django request object
+     {int}         graph_id - the id of the graph to be opened in the snapshot viewer
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
+    if not graph.read_only:
+        return HttpResponseBadRequest()
+
+    notation = notations.by_kind[graph.kind]
+    nodes    = notation['nodes']
+
+    parameters = {
+        'graph':          graph,
+        'graph_notation': notation,
+        'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
+        'greetings':      GREETINGS
+    }
+
+    return render(request, 'editor/editor.html', parameters)
+
 
 @require_http_methods(['GET', 'POST'])
 def login(request):

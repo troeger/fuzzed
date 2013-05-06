@@ -65,6 +65,9 @@ define(['canvas', 'class'], function(Canvas, Class) {
         _loadFromJson: function(json) {
             this.readOnly = json.readOnly;
 
+            var maxX = 0;
+            var maxY = 0;
+
             // parse the json nodes and convert them to node objects
             _.each(json.nodes, function(jsonNode) {
                 this.addNode(jsonNode.kind, jsonNode);

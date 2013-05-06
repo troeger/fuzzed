@@ -7,21 +7,25 @@
 }
 
 #FuzzEdCanvas {
-    position:         relative;
-    width:            100%;
-    height:           100%;
-    overflow:         auto;
-    background-color: white;
-    z-index:          0;
+    background-image:      url(../../img/background.svg);
+    background-attachment: local;
+    position:              absolute;
+    width:                 100%;
+    height:                100%;
+    z-index:               0;
+}
+
+#FuzzEdCanvas.fuzzed-grid-hidden {
+    background-image: none;
 }
 
 .fuzzed-mirror {
     background-color: white;
-    display: block;
-    font-size: 11px;
-    word-wrap: break-word;
-    margin-bottom: -3px;
-    z-index: 110; /* above connection */
+    display:          block;
+    font-size:        11px;
+    word-wrap:        break-word;
+    margin-bottom:    -3px;
+    z-index:          110; /* above connection */
 }
 
 .fuzzed-mirror-italic {
@@ -42,10 +46,10 @@
 }
 
 .fuzzed-node .badge {
-    position:   absolute;
-    top:        0;
-    right:      0;
-    margin:     -7px -7px 0 0;
+    position: absolute;
+    top:      0;
+    right:    0;
+    margin:   -7px -7px 0 0;
 }
 
 .fuzzed-node .badge-info {
@@ -101,5 +105,5 @@
 
 .ui-selectable-helper {
     position: absolute;
-    border: 1px gray dashed;
+    border:   1px gray dashed;
 }

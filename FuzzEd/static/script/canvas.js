@@ -23,10 +23,10 @@ function(Class, Config) {
          *
          * {DOMElement} _background - SVG DOM element where the dashed grid lines are drawn on.
          */
-        container:   undefined,
-        gridSize:    Config.Grid.SIZE,
+        container:        undefined,
+        gridSize:         Config.Grid.SIZE,
 
-        _background: undefined,
+        _backgroundImage: undefined,
 
         /**
          * Constructor: init
@@ -37,16 +37,36 @@ function(Class, Config) {
         init: function() {
             // locate predefined DOM elements and bind Editor instance to canvas
             this.container = jQuery('#' + Config.IDs.CANVAS);
+            this._backgroundImage = this.container.css('background-image');
+            this._setupCanvas();
+        },
 
-            this._setupBackground()
-                ._setupCanvas();
+        /**
+         * Section: Visual
+         */
+        enlarge: function(to) {
+            var canvasWidth  = this.container.width();
+            var canvasHeight = this.container.height();
+            var doubleGrid   = this.gridSize << 1;
+
+            while (to.x > canvasWidth - doubleGrid) {
+                canvasWidth *= 2;
+            }
+            while (to.y > canvasHeight - doubleGrid) {
+                canvasHeight *= 2;
+            }
+
+            this.container.width(canvasWidth);
+            this.container.height(canvasHeight);
+
+            return this;
         },
 
         /**
          * Section: Visuals
          */
         toggleGrid: function() {
-            jQuery(this._background.root()).toggle();
+            this.container.toggleClass(Config.Classes.GRID_HIDDEN);
         },
 
         /**
@@ -138,68 +158,6 @@ function(Class, Config) {
         /**
          *  Section: Initialization
          */
-
-        /**
-         * Methid: _drawGrid
-         *
-         * Draws the dashed grid line on the <Canvas::_background> DOM element. Clears any previous lines from the
-         * background first (needed in case of window resizing). The lines are drawn from top to bottom and left to
-         * right, using SVG lines.
-         *
-         * Returns:
-         *   This {<Canvas>} instance for chaining.
-         */
-        _drawGrid: function() {
-            var height = this.container.height();
-            var width  = this.container.width();
-
-            // clear old background and resize svg container to current canvas size
-            // important when window was resized in the mean time
-            this._background.clear();
-            this._background.configure({
-                height: height,
-                width:  width,
-                class:  Config.Classes.NO_PRINT
-            });
-
-            // horizontal lines
-            for (var y = this.gridSize; y < height; y += this.gridSize) {
-                this._background.line(0, y, width, y, {
-                    stroke:          Config.Grid.STROKE,
-                    strokeWidth:     Config.Grid.STROKE_WIDTH,
-                    strokeDashArray: Config.Grid.STROKE_STYLE
-                });
-            }
-
-            // vertical lines
-            for (var x = this.gridSize; x < width; x += this.gridSize) {
-                this._background.line(x, 0, x, height, {
-                    stroke:          Config.Grid.STROKE,
-                    strokeWidth:     Config.Grid.STROKE_WIDTH,
-                    strokeDashArray: Config.Grid.STROKE_STYLE
-                });
-            }
-
-            return this;
-        },
-
-        /**
-         * Method: _setupBackground
-         *
-         * Creates the _background SVG DOM element, draws the grid initially for the first time and ensures that the
-         * grid is refreshed on window resizing.
-         *
-         * Returns:
-         *   This {<Canvas>} instance for chaining.
-         */
-        _setupBackground: function() {
-            this._background = this.container.svg().svg('get');
-            this._drawGrid();
-            // on window resize, redraw grid
-            jQuery(window).resize(this._drawGrid.bind(this));
-
-            return this;
-        },
 
         /**
          * Method: _setupCanvas

@@ -92,7 +92,11 @@
 
         <tbody>
             {% for name, graph in graphs %} 
-                <tr onclick="document.location = '/editor/{{ graph.pk }}';">
+                    {% if graph.read_only %}
+                        <tr onclick="document.location = '/snapshot/{{ graph.pk }}';">
+                    {% else %}
+                        <tr onclick="document.location = '/editor/{{ graph.pk }}';">
+                    {% endif %}                
                     <td>{{ forloop.counter }}</td>
                     <td>
                         {% if graph.read_only %}
