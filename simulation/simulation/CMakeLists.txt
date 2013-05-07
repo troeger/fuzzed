@@ -4,6 +4,7 @@ set(SOURCES
    ${SOURCE}
    main.cpp
    SimulationProxy.cpp
+   ResultDocument.cpp
 
    implementation/PetriNetSimulation.cpp
    implementation/TimeNETSimulation.cpp
@@ -20,6 +21,7 @@ set(SOURCES
 set(HEADERS
    ${HEADERS}
    SimulationProxy.h
+   ResultDocument.h
    Config.h
    
    implementation/PetriNetSimulation.h
