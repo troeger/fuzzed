@@ -4,12 +4,9 @@
 #pragma warning(push, 3) 
 #endif
 #include "pugixml.hpp"
-#include <vector>
 #if IS_WINDOWS 
 #pragma warning(pop)
 #endif
-
-class SimulationResult;
 
 class ResultDocument : public pugi::xml_document
 {
@@ -26,8 +23,9 @@ public:
 		const long double& reliability, 
 		const long double& meanAvailability, 
 		const long double& mttf,
-		const int& nRounds,
-		const int& nFailures);
+		const unsigned long& nRounds,
+		const unsigned long& nFailures,
+		const long& duration);
 
 	bool save(const std::string& fileName);
 

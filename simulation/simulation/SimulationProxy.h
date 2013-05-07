@@ -45,24 +45,33 @@ extern "C"
 class SimulationProxy
 {
 public:
+	// constructor for command line tool
 	SimulationProxy(int numArguments, char** arguments);
+
+	// constructor for library calls
+	SimulationProxy(
+		int missionTime,
+		int numRounds,
+		double convergenceThreshold,
+		int maxTime);
 
 	virtual ~SimulationProxy() {};
 
 	void run();
 
+	// simulates all configurations from one file
+	void simulateFile(const boost::filesystem::path& p, bool simulatePetriNet);
+
 protected:
 	void parseTimeNET(int numArguments, char** arguments);
 	void parseStandard(int numArguments, char** arguments);
 
-	// simulates all configurations from one file
-	void simulateFile(const boost::filesystem::path& p, bool simulatePetriNet);
 	bool runSimulation(
 		const boost::filesystem::path& p, 
 		SimulationImpl implementationType,
 		void* additionalArguments = NULL);
 	
-	int m_simulationSteps;
+	int m_missionTime;
 	int m_simulationTime;
 	int m_numRounds;
 	int m_numAdaptiveRounds;

@@ -1,6 +1,7 @@
 #include "PetriNetSimulation.h"
 #include "util.h"
 #include "Config.h"
+#include "ResultDocument.h"
 #include "petrinet/PNMLImport.h"
 #include "petrinet/PetriNet.h"
 
@@ -29,7 +30,7 @@ bool PetriNetSimulation::run()
 	const double startTime = omp_get_wtime();
 	if (pn->m_activeTimedTransitions.size() == 0)
 	{ // perfectly reliable
-		writeResults(0, 0, 0.0, -1.0, startTime, startTime, 1.0);
+		printResults(0, 0, 0.0, -1.0, startTime, startTime, 1.0);
 		return true;
 	}
 
@@ -90,14 +91,15 @@ bool PetriNetSimulation::run()
 	
 	cout << "...done." << endl;
 
-	writeResults(numFailures, count, unreliability, avgFailureTime_all, endTime, startTime, meanAvailability);
+	printResults(numFailures, count, unreliability, avgFailureTime_all, endTime, startTime, meanAvailability);
+	writeResultXML(numFailures, count, unreliability, avgFailureTime_all, endTime, startTime, meanAvailability);
 
 	return true;
 }
 
 PetriNetSimulation::PetriNetSimulation(
 	const boost::filesystem::path& path,
-	const string& logFile, 
+	const string& outputFileName, 
 	int simulationTime,		// the maximum duration of one simulation in seconds
 	int simulationSteps,	// the number of logical simulation steps performed in each round
 	int numRounds,
@@ -106,20 +108,20 @@ PetriNetSimulation::PetriNetSimulation(
 	int numAdaptiveRounds		/*= 0*/)
 	: Simulation(path, simulationTime, simulationSteps, numRounds), 
 	m_outStream(nullptr),
-	m_directoryPrefix(DEFAULT_SIMULATION_OUTPUT_PREFIX),
+	m_outputFileName(outputFileName),
 	m_simulateUntilFailure(simulateUntilFailure),
 	m_numAdaptiveRounds(numAdaptiveRounds),
 	m_convergenceThresh(convergenceThresh)
 {
 	assert(!m_netFile.empty());
 	
-	if (!logFile.empty())
+	if (!outputFileName.empty())
 	{
-		m_outStream = new ofstream(logFile);
-		m_debugOutStream = new ofstream(logFile+".debug");
+		m_outStream = new ofstream(outputFileName+ ".log");
+		m_debugOutStream = new ofstream(outputFileName+".debug");
 	}
 
-	cout << "Results will be written to " << logFile << endl;
+	cout << "Results will be written to " << outputFileName << endl;
 }
 
 void PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
@@ -227,7 +229,7 @@ void PetriNetSimulation::tryTimedTransitions(PetriNet* pn, int tick)
 	}
 }
 
-void PetriNetSimulation::writeResults(
+void PetriNetSimulation::printResults(
 	const unsigned long& numFailures, 
 	const unsigned long& count, 
 	const long double& unreliability, 
@@ -256,4 +258,18 @@ void PetriNetSimulation::writeResults(
 	m_outStream->close();
 
 	cout << results << endl << endl;
+}
+
+void PetriNetSimulation::writeResultXML(
+	const unsigned long& numFailures, 
+	const unsigned long& count, 
+	const long double& unreliability, 
+	const long double& avgFailureTime_all, 
+	const double& endTime, 
+	const double& startTime, 
+	const long double& meanAvailability)
+{
+	ResultDocument doc;
+	doc.setResults(1.0-unreliability, meanAvailability, avgFailureTime_all, count, numFailures, endTime-startTime);
+	doc.save(m_outputFileName + ".xml");
 }

@@ -14,6 +14,7 @@
     <xsd:attribute name="nFailures" type="xsd:int" use="required"/>
     <xsd:attribute name="nSimulatedRounds" type="xsd:int" use="required"/>
     <xsd:attribute name="availability" type="xsd:double"/>
+    <xsd:attribute name="duration" type="xsd:double"/>
     <xsd:attribute name="mttf" type="xsd:double"/>
   </xsd:complexType>
   <xsd:element name="SimulationResult" type="fts:SimulationResult"/>

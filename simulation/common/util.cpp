@@ -48,12 +48,9 @@ bool util::copyFile(const string& src, const string& dst)
 	return outStream.good();
 }
 
-string util::fileNameFromPath(const string& path, bool withExtension)
+string util::fileNameFromPath(const string& path)
 {
-	return path.substr(
-		std::min(path.find_last_of("/"), path.find_last_of("\\")) + 1, 
-		withExtension ? string::npos : (path.length() - path.find_last_of("."))
-		);
+	return path.substr(std::min(path.find_last_of("/"), path.find_last_of("\\")) + 1);
 }
 
 int util::fileSize(const char* filename)

@@ -10,7 +10,7 @@ class PetriNetSimulation : public Simulation
 public:
 	PetriNetSimulation(
 		const boost::filesystem::path& p,
-		const std::string& logFile,
+		const std::string& outputFileName,
 		int simulationTime,					// the maximum duration of one simulation in seconds
 		int simulationSteps,				// the number of logical simulation steps performed in each round
 		int numRounds,						// the number of simulation rounds performed in parallel
@@ -20,7 +20,16 @@ public:
 
 	virtual bool run() override;
 
-	void writeResults(
+	void writeResultXML(
+		const unsigned long& numFailures, 
+		const unsigned long& count, 
+		const long double& unreliability, 
+		const long double& avgFailureTime_all, 
+		const double& endTime, 
+		const double& startTime, 
+		const long double& meanAvailability);
+
+	void printResults(
 		const unsigned long& numFailures, 
 		const unsigned long& count, 
 		const long double& unreliability, 
@@ -41,7 +50,7 @@ protected:
 	void tryTimedTransitions(PetriNet* pn, int tick);
 	void tryImmediateTransitions(PetriNet* pn, int tick, bool& immediateOnly);
 
-	std::string m_directoryPrefix;
+	std::string m_outputFileName;
 	std::ofstream* m_outStream;
 	std::ofstream* m_debugOutStream;
 

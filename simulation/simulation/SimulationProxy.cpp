@@ -53,6 +53,15 @@ SimulationProxy::SimulationProxy(int argc, char** arguments)
 	}
 }
 
+SimulationProxy::SimulationProxy(int missionTime, int numRounds, double convergenceThreshold, int maxTime)
+	: m_missionTime(missionTime),
+	m_numRounds(numRounds),
+	m_convergenceThresh(convergenceThreshold),
+	m_simulationTime(maxTime),
+	m_bSimulateUntilFailure(true),
+	m_numAdaptiveRounds(0)
+{}
+
 bool SimulationProxy::runSimulation(const fs::path& p, SimulationImpl implementationType, void* additionalArguments) 
 {
 	Simulation* sim;
@@ -61,20 +70,20 @@ bool SimulationProxy::runSimulation(const fs::path& p, SimulationImpl implementa
 	case TIMENET:
 		{
 			assert(additionalArguments != nullptr);
-			sim = new TimeNETSimulation(p, m_simulationTime, m_simulationSteps, m_numRounds, additionalArguments);
+			sim = new TimeNETSimulation(p, m_simulationTime, m_missionTime, m_numRounds, additionalArguments);
 			break;
 		}
 	case DEFAULT:
 		{
 			std::string fileName = p.generic_string();
 			std::string logFileName = fileName;
-			util::replaceFileExtensionInPlace(logFileName, ".log");
+			util::replaceFileExtensionInPlace(logFileName, "");
 
 			sim = new PetriNetSimulation(
 				fileName, 
 				logFileName, 
 				m_simulationTime, 
-				m_simulationSteps, 
+				m_missionTime, 
 				m_numRounds,
 				m_convergenceThresh,
 				m_bSimulateUntilFailure,
@@ -126,7 +135,7 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 		("file,f",		po::value<string>(&filePath),												"Path to FuzzTree or PNML file")
 		("dir,d",		po::value<string>(&directoryName),											"Directory containing FuzzTree or PNML files")
 		("time,t",		po::value<int>(&m_simulationTime)->default_value(DEFAULT_SIMULATION_TIME),	"Maximum Simulation Time in milliseconds")
-		("steps,s",		po::value<int>(&m_simulationSteps)->default_value(DEFAULT_SIMULATION_STEPS),"Number of Simulation Steps")
+		("steps,s",		po::value<int>(&m_missionTime)->default_value(DEFAULT_SIMULATION_STEPS),"Number of Simulation Steps")
 		("rounds,r",	po::value<int>(&m_numRounds)->default_value(DEFAULT_SIMULATION_ROUNDS),		"Number of Simulation Rounds")
 		("MTTF",		po::value<bool>(&m_bSimulateUntilFailure)->default_value(true),				"Simulate each Round until System Failure, necessary for MTTF")
 		("converge,c",	po::value<double>(&m_convergenceThresh)->default_value((double)0.0001),		"Cancel simulation after the resulting reliability differs in less than this threshold")
@@ -221,6 +230,8 @@ void SimulationProxy::parseTimeNET(int numArguments, char** arguments)
 
 void SimulationProxy::simulateFile(const fs::path& p, bool simulatePetriNet)
 {	
+	cout << "Simulating..." << endl;
+	
 	assert(is_regular_file(p) && acceptFileExtension(p));
 
 	if (p.extension() == PNML::PNML_EXT && simulatePetriNet)
@@ -229,10 +240,10 @@ void SimulationProxy::simulateFile(const fs::path& p, bool simulatePetriNet)
 	else if (p.extension() == fuzzTree::FUZZ_TREE_EXT)
 	{ // transform into fault trees first
 		fs::path targetDir = p;
-		string name = util::fileNameFromPath(p.generic_string(), false);
+		string name = util::fileNameFromPath(p.generic_string());
 		util::replaceFileExtensionInPlace(name, "");
 		targetDir.remove_filename();
-		targetDir /= "faultTrees_" + name;
+		targetDir /= name;
 
 		if (!fs::create_directory(targetDir) && !fs::is_directory(targetDir))
 			throw runtime_error("Could not create directory: " + targetDir.generic_string());
@@ -262,7 +273,14 @@ void SimulationProxy::simulateFile(const fs::path& p, bool simulatePetriNet)
 		delete ft;
 
 		doc->save(newFileName);
-		runSimulation(newFileName, DEFAULT);
+		try
+		{
+			runSimulation(newFileName, DEFAULT);
+		}
+		catch (...)
+		{
+			;
+		}
 	}		
 }
 
@@ -280,43 +298,13 @@ void runSimulation(
 	int numRounds, /* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/ 
 	double convergenceThreshold, /* stop after reliability changes no more than this threshold */
 	int maxTime /* maximum duration of simulation in milliseconds */) noexcept
-{
-	PetriNetSimulation* sim = nullptr;
-	FaultTreeNode* ft = nullptr;
-	
+{	
 	try
 	{
-		string newFileName(filePath);
-		ft = FaultTreeImport::loadFaultTree(newFileName);
-		if (!ft || !ft->isValid())
-		{
-			cout << "Invalid Fault Tree! " << endl;
-			return;
-		}
+		cout << "Hello";
+		SimulationProxy p = SimulationProxy(missionTime, numRounds, convergenceThreshold, maxTime);
+		p.simulateFile(filePath, false);
 
-		util::replaceFileExtensionInPlace(newFileName, ".pnml");
-		boost::shared_ptr<PNMLDocument> doc = 
-			boost::shared_ptr<PNMLDocument>(new PNMLDocument());
-
-		ft->serialize(doc);
-		ft->print(cout);
-		
-		doc->save(newFileName); // save PNML file
-
-		std::string logFileName = newFileName;
-		util::replaceFileExtensionInPlace(logFileName, ".log");
-
-		sim = new PetriNetSimulation(
-			newFileName, 
-			logFileName, 
-			maxTime, 
-			missionTime, 
-			numRounds,
-			convergenceThreshold,
-			true, /* simulate until failure for MTTF */
-			0 /* not yet implemented */);
-
-		sim->run();
 	}
 	catch (const exception& e)
 	{
@@ -326,7 +314,4 @@ void runSimulation(
 	{
 		cout << "Unknown Exception during Simulation" << endl;
 	}
-	
-	delete ft;
-	delete sim;
 }

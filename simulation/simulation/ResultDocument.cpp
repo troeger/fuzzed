@@ -39,14 +39,16 @@ void ResultDocument::setResults(
 	const long double& reliability, 
 	const long double& meanAvailability, 
 	const long double& mttf, 
-	const int& nRounds, 
-	const int& nFailures)
+	const unsigned long& nRounds, 
+	const unsigned long& nFailures,
+	const long& duration)
 {
 	m_root.append_attribute(RELIABILITY).set_value((double)reliability);
 	m_root.append_attribute(AVAILABILTIY).set_value((double)meanAvailability);
 	m_root.append_attribute(MTTF).set_value((double)mttf);
-	m_root.append_attribute(NROUNDS).set_value(nRounds);
-	m_root.append_attribute(NFAILURES).set_value(nFailures);
+	m_root.append_attribute(NROUNDS).set_value((long)nRounds);
+	m_root.append_attribute(NFAILURES).set_value((long)nFailures);
+	m_root.append_attribute(DURATION).set_value(duration);
 }
 
 bool ResultDocument::save(const string& fileName)
