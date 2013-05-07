@@ -1,9 +1,8 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-import http.server
-import socketserver
+from socketserver import TCPServer
 import logging
-
-from ctypes import *
+import ctypes
+#import os
 
 HOST = "localhost"
 PORT = 8000
@@ -18,7 +17,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
     cThresh = 0.00001
     maxTime = 10000
 
-    resultFile = None
+    resultFile = "result.xml"
     
     def do_GET(self):
         #logging.error(self.headers)
@@ -27,9 +26,9 @@ class ServerHandler(SimpleHTTPRequestHandler):
     def do_POST(self):
         #logging.error(self.headers)
         print("received POST")
-        if not self.headers["content-type"] == "application/xml":
+        if not self.headers["Content-type"] == "application/xml":
             self.send_response(404)
-        data = self.rfile.read(int(self.headers["content-length"]))
+        data = self.rfile.read(int(self.headers["Content-length"]))
         file = open("tree.xml", "wb")
         try:
             file.write(data)
@@ -57,7 +56,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
 def main():
     try:
         Handler = ServerHandler
-        httpd = socketserver.TCPServer((HOST, PORT), Handler)
+        httpd = TCPServer((HOST, PORT), Handler)
         print("hello from simulation server, serving at port", PORT)
         httpd.serve_forever()
     except Exception as e:

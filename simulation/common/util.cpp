@@ -6,17 +6,18 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/binomial.hpp>
 #include <boost/range/counting_range.hpp>
+#include <boost/tokenizer.hpp>
 #include <fstream>
 #include <cmath>
 #include <chrono>
 #include <exception>
-#include <boost/tokenizer.hpp>
 
 using namespace chrono;
+using namespace boost;
 
 std::string util::toString(int i)
 {
-	return boost::lexical_cast<string>(i);
+	return lexical_cast<string>(i);
 }
 
 std::string util::toString(double d, int prec /*= 5*/)
@@ -89,9 +90,9 @@ long double util::kOutOfN(long double rate, int k, int N)
 		return rate;
 	
 	long double sum = 0.0L;
-	for (int i : boost::counting_range(k, N))
+	for (int i : counting_range(k, N))
 	{
-		double binom = boost::math::binomial_coefficient<double>(N, i);
+		double binom = math::binomial_coefficient<double>(N, i);
 		sum += binom * std::pow(rate, i) * std::pow(1.0L - rate, N-i);
 	}
 	return sum;
@@ -108,8 +109,8 @@ struct toInt
 
 void util::tokenizeIntegerString(const string& input, vector<int>& results /*out*/)
 {
-	boost::char_separator<char> sep(" ,;");
-	boost::tokenizer<boost::char_separator<char>> tok(input, sep);
+	char_separator<char> sep(" ,;");
+	tokenizer<char_separator<char>> tok(input, sep);
 	transform(tok.begin(), tok.end(), std::back_inserter(results), toInt());
 }
 
@@ -117,10 +118,10 @@ void util::tokenizeIntegerString(const string& input, vector<int>& results /*out
 
 void util::tokenizeString(const string& input, vector<const string>& results /*out*/)
 {
-	boost::char_separator<char> sep(" ,;");
-	boost::tokenizer<boost::char_separator<char>> tok(input, sep);
-	for (const auto& t : tok)
-		results.emplace_back(t);
+	char_separator<char> sep(" ,;");
+	tokenizer<char_separator<char>> tok(input, sep);
+	for (tokenizer<char_separator<char>>::iterator it = tok.begin(); it != tok.end(); ++it)
+		results.emplace_back(*it);
 }
 
 

@@ -211,6 +211,7 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 				throw runtime_error("Feature Variation Points need child nodes");
 				continue;
 			}
+
 			vector<FuzzTreeConfiguration> newConfigs;
 			for (FuzzTreeConfiguration& config : configurations)
 			{

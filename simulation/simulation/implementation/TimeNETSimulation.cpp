@@ -69,7 +69,10 @@ bool TimeNETSimulation::run()
 
 	ofstream outJS(jsPath);
 	if (!outJS.is_open())
+	{
+		free(buf);
 		throw runtime_error("Could not open JavaScript file.");
+	}
 
 	// javascript generation
 	// parameters:
@@ -86,7 +89,7 @@ bool TimeNETSimulation::run()
 	outJS << outStr.c_str();
 	outJS.close();
 
-	delete buf;
+	free(buf);
 
 	string serverCall = str(format("java -Xms32m -Xmx512m -cp %1% -DTNETHOME=\"%6%\" -Dlog4j.configuration=\"%2%\" gpsc.Host -i \"%3%\" -s -m \"%4%\" \"%5%\"") 
 		% m_simulationServerPath 
