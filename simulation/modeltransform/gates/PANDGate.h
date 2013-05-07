@@ -10,7 +10,7 @@
 class PANDGate : public Gate
 {
 public:
-	PANDGate(const std::string& id, const std::set<const std::string>& priorityIDs, const std::string& name = "");
+	PANDGate(const std::string& id, const std::set<std::string>& priorityIDs, const std::string& name = "");
 	virtual ~PANDGate(void) {};
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
@@ -18,6 +18,6 @@ public:
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
 
 protected:
-	std::set<const std::string> m_prioIDs;
+	std::set<std::string> m_prioIDs;
 };
 

@@ -116,7 +116,7 @@ void util::tokenizeIntegerString(const string& input, vector<int>& results /*out
 
 
 
-void util::tokenizeString(const string& input, vector<const string>& results /*out*/)
+void util::tokenizeString(const string& input, vector<string>& results /*out*/)
 {
 	char_separator<char> sep(" ,;");
 	tokenizer<char_separator<char>> tok(input, sep);

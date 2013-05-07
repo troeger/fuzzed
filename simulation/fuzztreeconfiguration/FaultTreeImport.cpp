@@ -116,23 +116,23 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 		else if (typeDescriptor == COLD_SPARE_GATE)
 		{
 			const string spareIds = child.attribute(SPARE_ID_ATTRIBUTE).as_string("");
-			vector<const string> spareIndices;
+			vector<string> spareIndices;
 			util::tokenizeString(spareIds, spareIndices);
 
-			gate = new SpareGate(id, set<const string>(spareIndices.begin(), spareIndices.end()), name);
+			gate = new SpareGate(id, set<string>(spareIndices.begin(), spareIndices.end()), name);
 		}
 		else if (typeDescriptor == PAND_GATE)
 		{
 			const string prioIds = child.attribute(PRIO_ID_ATTRIBUTE).as_string("");
-			vector<const string> prioIndices;
+			vector<string> prioIndices;
 			util::tokenizeString(prioIds, prioIndices);
 
-			gate = new PANDGate(id, set<const string>(prioIndices.begin(), prioIndices.end()), name);
+			gate = new PANDGate(id, set<string>(prioIndices.begin(), prioIndices.end()), name);
 		}
 		else if (typeDescriptor == SEQ_GATE)
 		{
 			const string sequence = child.attribute(SEQUENCE_ATTRIBUTE).as_string("");
-			vector<const string> idSequence;
+			vector<string> idSequence;
 			util::tokenizeString(sequence, idSequence);
 
 			gate = new SEQGate(id, idSequence, name);
@@ -163,8 +163,6 @@ double FaultTreeImport::parseFailureRate(const xml_node &child)
 
 		return probabilityNode.attribute("value").as_double(-1.0);
 	}
-	throw runtime_error("Unable to parse failure rate");
-	return -1.0;
 }
 
 FaultTreeImport::~FaultTreeImport()

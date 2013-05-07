@@ -5,7 +5,7 @@
 class SpareGate : public Gate
 {
 public:
-	SpareGate(const std::string& id, const std::set<const std::string>& spareIndices, const std::string& name);
+	SpareGate(const std::string& id, const std::set<std::string>& spareIndices, const std::string& name);
 	virtual ~SpareGate(void) {};
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
@@ -13,5 +13,5 @@ public:
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
 
 protected:
-	std::set<const std::string> m_spareIndices;
+	std::set<std::string> m_spareIndices;
 };

@@ -1,7 +1,7 @@
 #include "SEQGate.h"
 #include "serialization/PNDocument.h"
 
-SEQGate::SEQGate(const std::string& id, const std::vector<const string>& ordering, const std::string& name /*= ""*/)
+SEQGate::SEQGate(const string& id, const vector<string>& ordering, const string& name /*= ""*/)
 	: Gate(id, name), m_ordering(ordering)
 {}
 
