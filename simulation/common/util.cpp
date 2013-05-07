@@ -118,7 +118,7 @@ void util::tokenizeString(const string& input, vector<string>& results /*out*/)
 	char_separator<char> sep(" ,;");
 	tokenizer<char_separator<char>> tok(input, sep);
 	for (tokenizer<char_separator<char>>::iterator it = tok.begin(); it != tok.end(); ++it)
-		results.emplace_back(*it);
+		results.push_back(string(*it));
 }
 
 

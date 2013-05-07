@@ -67,7 +67,7 @@ void PetriNet::setup()
 		if (tt.enoughTokens())
 			m_activeTimedTransitions.insert(make_pair(time, &tt));
 		else
-			m_inactiveTimedTransitions.emplace(&tt);
+			m_inactiveTimedTransitions.insert(&tt);
 	}
 
 	if (m_activeTimedTransitions.empty())

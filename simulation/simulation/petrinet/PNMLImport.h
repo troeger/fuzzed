@@ -24,7 +24,7 @@ using namespace pugi;
 class PNMLImport : public XMLImport
 {
 public:
-	static PetriNet* loadPNML(const string& fileName);
+	static PetriNet* loadPNML(const string& fileName) noexcept;
 
 	virtual ~PNMLImport();
 

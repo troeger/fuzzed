@@ -33,8 +33,8 @@ extern "C"
 		int numRounds,	/* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/
 		double convergenceThreshold, /* stop after reliability changes no more than this threshold */
 		int maxTime		/* maximum duration of simulation in milliseconds */
-		);
-};
+		) noexcept;
+}
 
 /************************************************************************/
 /* SIMLATION EXECUTABLE													*/
@@ -56,8 +56,6 @@ public:
 		int maxTime);
 
 	virtual ~SimulationProxy() {};
-
-	void run();
 
 	// simulates all configurations from one file
 	void simulateFile(const boost::filesystem::path& p, bool simulatePetriNet);
@@ -81,6 +79,6 @@ protected:
 
 	boost::program_options::options_description m_timeNetOptions;
 	boost::program_options::options_description m_standardOptions;
-
+	
 	static bool acceptFileExtension(const boost::filesystem::path& p);
 };

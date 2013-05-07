@@ -25,7 +25,7 @@ class FuzzTreeTransform : public XMLImport
 {
 public:
 	// produces Fault Tree Files in targetDir
-	static void transformFuzzTree(const string& fileName, const string& targetDir);
+	static void transformFuzzTree(const string& fileName, const string& targetDir) noexcept;
 
 protected:
 	void scheduleFTGeneration(boost::function<void()>& task);

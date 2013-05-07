@@ -46,9 +46,9 @@ void ResultDocument::setResults(
 	m_root.append_attribute(RELIABILITY).set_value((double)reliability);
 	m_root.append_attribute(AVAILABILTIY).set_value((double)meanAvailability);
 	m_root.append_attribute(MTTF).set_value((double)mttf);
-	m_root.append_attribute(NROUNDS).set_value((long)nRounds);
-	m_root.append_attribute(NFAILURES).set_value((long)nFailures);
-	m_root.append_attribute(DURATION).set_value(duration);
+	m_root.append_attribute(NROUNDS).set_value((int)nRounds);
+	m_root.append_attribute(NFAILURES).set_value((int)nFailures);
+	m_root.append_attribute(DURATION).set_value((int)duration);
 }
 
 bool ResultDocument::save(const string& fileName)

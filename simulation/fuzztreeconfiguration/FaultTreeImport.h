@@ -15,7 +15,7 @@ class FaultTreeNode;
 class FaultTreeImport : public XMLImport
 {
 public:
-	static FaultTreeNode* loadFaultTree(const std::string& fileName);
+	static FaultTreeNode* loadFaultTree(const std::string& fileName) noexcept;
 	virtual ~FaultTreeImport();
 
 protected:
