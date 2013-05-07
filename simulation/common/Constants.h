@@ -119,4 +119,5 @@ namespace simulation
 	const char* const NFAILURES = "nFailures";
 	const char* const MODELID = "modelId";
 	const char* const TIMESTAMP = "timestamp";
+	const char* const DURATION = "duration";
 }
