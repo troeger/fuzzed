@@ -104,3 +104,19 @@ namespace fuzzTree
 	const char* const COST_ATTRIBUTE = "cost";
 	const char* const BASIC_EVENT_SET_QUANTITY = "quantity";
 }
+
+namespace simulation
+{
+	const char* const SIMULATION_RESULT = "fts:SimulationResult";
+	const char* const SIMULATION_ERROR = "fts:SimulationError";
+	const char* const SIMULATION_WARNING = "fts:SimulationWarning";
+
+	// attributes
+	const char* const RELIABILITY = "reliability";
+	const char* const AVAILABILTIY = "availability";
+	const char* const NROUNDS = "nSimulatedRounds";
+	const char* const MTTF = "mttf";
+	const char* const NFAILURES = "nFailures";
+	const char* const MODELID = "modelId";
+	const char* const TIMESTAMP = "timestamp";
+}
