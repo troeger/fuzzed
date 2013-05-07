@@ -3,7 +3,7 @@
 #include "Place.h"
 #include "util.h"
 
-void Transition::fire(int tick)
+void Transition::fire()
 {
 	for (auto& p : m_inPlaces)
 		p.first->consumeTokens(this, p.second);

@@ -80,7 +80,7 @@ void Place::resolveConflictsTimed(int tick)
 		double upper = lower + tt->getRate();
 		if (r >= lower && r < upper)
 		{
-			tt->fire(tick);
+			tt->fire();
 			m_transitionQueue.erase(tt);
 			return;
 		}
@@ -116,7 +116,7 @@ void Place::resolveConflictsImmediate(int tick)
 	if (!maxPrioIT)
 		return;
 
-	maxPrioIT->fire(tick);
+	maxPrioIT->fire();
 	m_transitionQueue.erase(maxPrioIT);
 }
 

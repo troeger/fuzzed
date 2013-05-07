@@ -20,7 +20,7 @@ public:
 	
 	bool wantsToFire(int tick);
 	void tryToFire();
-	void fire(int tick);
+	void fire();
 
 	bool enoughTokens() const;
 
