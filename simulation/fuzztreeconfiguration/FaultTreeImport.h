@@ -9,6 +9,7 @@
 #endif
 
 #include "XMLImport.h"
+#include "platform.h"
 
 class FaultTreeNode;
 

@@ -16,6 +16,7 @@
 #define DUMMY "dummy"
 
 #include "XMLImport.h"
+#include "platform.h"
 
 using namespace pugi;
 using namespace std;
