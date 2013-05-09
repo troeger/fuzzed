@@ -45,9 +45,14 @@ public:
 
 	bool hasInactiveTransitions() const { return !m_inactiveTimedTransitions.empty(); }
 
+	// reduce number of places and immediate transitions which are not essential for the net semantics
+	void simplify();
+
 protected:
 	// uses the information in m_arcDict to tell each transition about its in- and out-places
 	void setup();
+
+	void applyToAllTransitions(std::function<void (Transition& t)> func);
 
 	vector<ImmediateTransition> m_immediateTransitions; 
 	vector<TimedTransition> m_timedTransitions;

@@ -13,6 +13,7 @@ PetriNet::PetriNet(
 	m_finalFiringTime(MAX_INT)
 {
 	setup();
+	simplify();
 }
 
 PetriNet::PetriNet(const PetriNet& otherNet) :
@@ -47,7 +48,8 @@ void PetriNet::setup()
  
 	m_topLevelPlace = nullptr;
 	map<string, Place>::iterator it = m_placeDict.begin();
-	while (!m_topLevelPlace && it != m_placeDict.end())
+	const auto itEnd = m_placeDict.end();
+	while (!m_topLevelPlace && it != itEnd)
 	{
 		if (it->second.isTopLevelPlace())
 			m_topLevelPlace = &it->second;
@@ -65,7 +67,7 @@ void PetriNet::setup()
 
 		// save the activated transitions separately
 		if (tt.enoughTokens())
-			m_activeTimedTransitions.insert(make_pair(time, &tt));
+			m_activeTimedTransitions.emplace(time, &tt);
 		else
 			m_inactiveTimedTransitions.insert(&tt);
 	}
@@ -114,4 +116,48 @@ void PetriNet::updateFiringTime(TimedTransition* tt)
 	
 	if (updatedTime > m_finalFiringTime)
 		m_finalFiringTime = updatedTime;
+}
+
+void PetriNet::simplify()
+{
+	vector<ImmediateTransition> toErase;
+
+	//   O->|->O  ==>  O
+	for (ImmediateTransition& t : m_immediateTransitions)
+	{
+		if (t.nInPlaces() == 1 && t.nOutPlaces() == 1)
+		{ // remove transition and connect all arcs to the inplace with the outplace
+			Place* ip = t.inPlacesBegin()->first;
+			Place* op = t.outPlacesBegin()->first;
+			const int produceCount = t.outPlacesBegin()->second;
+			const int consumeCount = t.inPlacesBegin()->second;
+			assert(ip && op);
+
+			if (produceCount != consumeCount) continue; // TODO: handle this case
+
+			toErase.emplace_back(t);
+			std::function<void(Transition&)> reconnect = [&](Transition& t) -> void
+			{
+				if (t.producesInto(ip))
+				{
+					t.addOutPlace(op, produceCount);
+					t.removeInPlace(ip);
+				}
+			};
+
+			applyToAllTransitions(reconnect);
+		}
+	}
+
+	for (auto& t : toErase)
+		util::removeValue(m_immediateTransitions, t);
+}
+
+void PetriNet::applyToAllTransitions(std::function<void (Transition& t)> func)
+{
+	for (ImmediateTransition& it : m_immediateTransitions)
+		func(it);
+
+	for (TimedTransition& tt : m_timedTransitions)
+		func(tt);
 }

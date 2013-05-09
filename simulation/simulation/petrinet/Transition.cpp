@@ -65,3 +65,13 @@ void Transition::addOutPlace(Place* p, const int& numTokens)
 {
 	m_outPlaces[p] = numTokens;
 }
+
+void Transition::removeInPlace(Place* p)
+{
+	m_inPlaces.erase(p);
+}
+
+void Transition::removeOutPlace(Place* p)
+{
+	m_outPlaces.erase(p);
+}
