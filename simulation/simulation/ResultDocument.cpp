@@ -17,12 +17,16 @@ void ResultDocument::initXML()
 
 void ResultDocument::addError(const string& msg)
 {
-	// TODO
+	auto errorNode = m_root.append_child(SIMULATION_ERROR);
+	errorNode.append_attribute(SIMULATION_MESSAGE).set_value(msg.c_str());
+	errorNode.append_attribute(ID_ATTRIBUTE).set_value(++m_errors);
 }
 
-void ResultDocument::addWarning(const std::string& message)
+void ResultDocument::addWarning(const string& message)
 {
-	// TODO
+	auto warningNode = m_root.append_child(SIMULATION_WARNING);
+	warningNode.append_attribute(SIMULATION_MESSAGE).set_value(msg.c_str());
+	warningNode.append_attribute(ID_ATTRIBUTE).set_value(++m_warnings);
 }
 
 void ResultDocument::setModelId(const int& modelID)

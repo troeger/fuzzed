@@ -4,8 +4,8 @@
  -->
   <xsd:complexType name="SimulationResult">
     <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="errors" type="fts:SimulationError"/>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="warnings" type="fts:SimulationWarning"/>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="error" type="fts:SimulationError"/>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="warning" type="fts:SimulationWarning"/>
     </xsd:sequence>
     <xsd:attribute name="id" type="xsd:int"/>
     <xsd:attribute name="modelId" type="xsd:int" use="required"/>
