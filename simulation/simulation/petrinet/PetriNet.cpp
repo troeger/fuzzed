@@ -81,9 +81,7 @@ void PetriNet::setup()
 }
 
 PetriNet::~PetriNet()
-{
-	// TODO
-}
+{}
 
 PetriNet& PetriNet::operator=(const PetriNet& otherNet)
 {

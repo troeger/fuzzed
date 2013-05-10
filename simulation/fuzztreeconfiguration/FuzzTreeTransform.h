@@ -13,7 +13,6 @@
 
 #define HAS_CHILDREN(node) (!node.child("children").empty())
 #define SET_OPTIONAL_FALSE(node) (node.remove_attribute(OPTIONAL_ATTRIBUTE))
-#define DUMMY "dummy"
 
 #include "XMLImport.h"
 #include "platform.h"
@@ -64,7 +63,8 @@ protected:
 
 	static int parseID(const xml_node& node);
 
-	const std::string uniqueFileName();
+	std::string generateUniqueId(const char* oldId);
+	const std::string uniqueFileName() const;
 
 private:
 	FuzzTreeTransform(const string& fileName, const string& targetDir);

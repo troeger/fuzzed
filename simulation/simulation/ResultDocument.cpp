@@ -22,7 +22,7 @@ void ResultDocument::addError(const string& msg)
 	errorNode.append_attribute(ID_ATTRIBUTE).set_value(++m_errors);
 }
 
-void ResultDocument::addWarning(const string& message)
+void ResultDocument::addWarning(const string& msg)
 {
 	auto warningNode = m_root.append_child(SIMULATION_WARNING);
 	warningNode.append_attribute(SIMULATION_MESSAGE).set_value(msg.c_str());

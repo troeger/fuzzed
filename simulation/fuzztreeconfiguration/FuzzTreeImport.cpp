@@ -254,11 +254,8 @@ void FuzzTreeImport::handleBasicEventSet(
 	}
 
 	int count = 0;
-	while (count < numEvents)
-	{
-		// TODO unique ids
+	while (++count <= numEvents)
 		tree->addChild(new BasicEvent(id, parseFailureRate(child), name));
-	}
 }
 
 void FuzzTreeImport::handleFeatureVP(

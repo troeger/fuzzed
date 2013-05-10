@@ -17,7 +17,6 @@ public:
 
 	void setNotIncluded(int ID);
 
-	// TODO this throws...
 	bool isOptionalEnabled(int ID)	const { return m_optionalNodes.at(ID); }
 	bool isIncluded(int ID)			const { return m_notIncluded.find(ID) == m_notIncluded.end(); }
 	

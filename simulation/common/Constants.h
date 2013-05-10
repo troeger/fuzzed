@@ -35,7 +35,6 @@ namespace PNML
 	const char* const INITIALMARKING_TAG = "initialMarking";
 	const char* const TOPLEVEL_TAG = "isTopLevelEvent";
 	const char* const CAPACITY_TAG = "capacity";
-	const char* const ID_TAG = "id";
 	const char* const SOURCE_TAG = "source";
 	const char* const TARGET_TAG = "target";
 }
@@ -49,6 +48,8 @@ const char* const PLACE_IDENTIFIER = "p";
 const char* const ARC_IDENTIFIER = "a";
 
 const std::string g_alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+const char* const ID_ATTRIBUTE = "id";
 
 
 /************************************************************************/
@@ -79,7 +80,6 @@ namespace faultTree
 	const char* const PRIO_ID_ATTRIBUTE = "priorityIds";
 
 	const char* const CHILDREN = "children";
-	const char* const NODE_ID = "id";
 	const char* const NODE_TYPE = "xsi:type";
 	const char* const NAME_ATTRIBUTE = "name";
 	const char* const VOTING_OR_K = "k";
@@ -103,14 +103,16 @@ namespace fuzzTree
 	const char* const OPTIONAL_ATTRIBUTE = "optional";
 	const char* const COST_ATTRIBUTE = "cost";
 	const char* const BASIC_EVENT_SET_QUANTITY = "quantity";
+	const char* const REDUNDANCY_FORMULA = "formula";
 }
 
 namespace simulation
 {
 	const char* const SIMULATION_RESULT = "fts:SimulationResult";
-	const char* const SIMULATION_ERROR = "fts:SimulationError";
-	const char* const SIMULATION_WARNING = "fts:SimulationWarning";
-
+	const char* const SIMULATION_ERROR = "error";
+	const char* const SIMULATION_WARNING = "warning";
+	const char* const SIMULATION_MESSAGE = "message";
+	
 	// attributes
 	const char* const RELIABILITY = "reliability";
 	const char* const AVAILABILTIY = "availability";

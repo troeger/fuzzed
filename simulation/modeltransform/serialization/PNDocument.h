@@ -33,7 +33,7 @@ public:
 	
 	// wrappers around addArc
 	virtual void placeToTransition(int placeID, int transitionID, int consumeCount = 1, const string& inscription = "x");
-	virtual void transitionToPlace(int transitionID, int placeID, int procudeCount = 1, const string& inscription = "x"); // TODO support producing multiple tokens
+	virtual void transitionToPlace(int transitionID, int placeID, int procudeCount = 1, const string& inscription = "x");
 	
 	// add a measure which defines the time until the TopLevelEvent is triggered
 	virtual void addFailureMeasure() = 0;

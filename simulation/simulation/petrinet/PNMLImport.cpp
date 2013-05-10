@@ -64,7 +64,7 @@ void PNMLImport::loadPlaces(map<string, Place>& places)
 	for (const xml_node& child : m_rootNode.children(PLACE_TAG))
 	{
 		const int initialMarking = parseIntegerValue(child, INITIALMARKING_TAG, 0);
-		const string ID = child.attribute(ID_TAG).as_string();
+		const string ID = child.attribute(ID_ATTRIBUTE).as_string();
 		const bool isTopLevel = child.attribute(TOPLEVEL_TAG).as_bool(false);
 
 		const int capacity = parseIntegerValue(child, CAPACITY_TAG, 0);
@@ -114,7 +114,7 @@ void PNMLImport::loadTransitions(
 {
 	for (const xml_node& child : m_rootNode.children(TRANSITION_TAG))
 	{
-		const string ID = child.attribute(ID_TAG).as_string();
+		const string ID = child.attribute(ID_ATTRIBUTE).as_string();
 		if (parseBooleanValue(child, TIMED_TAG, false))
 		{ // timedTransition
 			const double rate = parseDoubleValue(child, RATE_TAG, -1.0);

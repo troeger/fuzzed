@@ -42,7 +42,7 @@ int PNMLDocument::addPlace(
 	xml_node node;
 	node = m_root.append_child(PLACE_TAG);
 	const string idString = PLACE_IDENTIFIER + util::toString(++m_placeCount);
-	node.append_attribute(ID_TAG).set_value(idString.c_str());
+	node.append_attribute(ID_ATTRIBUTE).set_value(idString.c_str());
 	
 	setName(node, label);
 
@@ -78,13 +78,12 @@ void PNMLDocument::setName(xml_node &node, const string& label)
 	setNodeValue(name, label);
 }
 
-// TODO implement net-global conditions
 int PNMLDocument::addTransition(long double rate, const Condition& cond, bool isTimed)
 {
 	xml_node transitionNode = m_root.append_child(TRANSITION_TAG);
 
 	const string name = TRANSITION_IDENTIFIER + util::toString(++m_transitionCount);
-	transitionNode.append_attribute(ID_TAG).set_value(name.c_str());
+	transitionNode.append_attribute(ID_ATTRIBUTE).set_value(name.c_str());
 	setName(transitionNode, name);
 
 	xml_node rateNode = transitionNode.append_child(RATE_TAG);
@@ -102,10 +101,11 @@ void PNMLDocument::addArc(
 	const string& inscription /*= "x"*/)
 {
 	xml_node arcNode = m_root.append_child(ARC_TAG);
-	auto arcChild = arcNode.append_child(ID_TAG);
-	setNodeValue(arcChild, ARC_IDENTIFIER+util::toString(++m_arcCount));
-	const string p = PLACE_IDENTIFIER+util::toString(placeID);
-	const string t = TRANSITION_IDENTIFIER+util::toString(transitionID);
+	auto arcChild = arcNode.append_child(ID_ATTRIBUTE);
+	setNodeValue(arcChild, ARC_IDENTIFIER + util::toString(++m_arcCount));
+
+	const string p = PLACE_IDENTIFIER + util::toString(placeID);
+	const string t = TRANSITION_IDENTIFIER + util::toString(transitionID);
 
 	switch (direction)
 	{
@@ -131,7 +131,7 @@ int PNMLDocument::addTopLevelPlace(const string& label)
 	node = m_root.append_child(PLACE_TAG);
 	const string idString = PLACE_IDENTIFIER+util::toString(++m_placeCount);
 
-	node.append_attribute(ID_TAG).set_value(idString.c_str());
+	node.append_attribute(ID_ATTRIBUTE).set_value(idString.c_str());
 	node.append_attribute(TOPLEVEL_TAG).set_value(true);
 
 	setName(node, label);
