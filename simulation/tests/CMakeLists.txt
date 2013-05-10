@@ -26,7 +26,8 @@ include_directories(${PUGIXML_INCLUDE_DIR})
 target_link_libraries(Tests optimized ${PUGIXML_LIB_RELEASE})
 target_link_libraries(Tests debug ${PUGIXML_LIB_DEBUG})
 
-target_link_libraries(Tests optimized ${FT_LIB_DIR}/Release/ftmodeltransform.lib)
-target_link_libraries(Tests debug ${FT_LIB_DIR}/Debug/ftmodeltransform.lib)
-target_link_libraries(Tests optimized ${FT_LIB_DIR}/Release/ftcommon.lib)
-target_link_libraries(Tests debug ${FT_LIB_DIR}/Debug/ftcommon.lib)
+target_link_libraries(Tests 
+	ftcommon
+	ftsimulation_static
+	ftconfiguration
+	ftmodeltransform)

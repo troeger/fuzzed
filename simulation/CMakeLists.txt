@@ -22,11 +22,6 @@ set(FT_INCLUDE_DIR
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/lib")
 
-set(THIRD_PARTY_DLL "${PROJECT_SOURCE_DIR}/thirdParty/dll")
-
-# so the shared libs can see symbols from static libs
-#set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--export-all-symbols")
-
 if (MSVC)
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")

@@ -83,4 +83,13 @@ target_link_libraries(ftsimulation ${Boost_LIBRARIES})
 if (WIN32)
    target_link_libraries(ftsimulation optimized ${PUGIXML_LIB_RELEASE})
    target_link_libraries(ftsimulation debug ${PUGIXML_LIB_DEBUG})
-endif(WIN32)
+endif (WIN32)
+
+if (BUILD_TESTS)
+   add_library(ftsimulation_static STATIC ${SOURCES} ${HEADERS})
+   target_link_libraries(ftsimulation_static
+      ftmodeltransform
+      ftconfiguration
+      ftcommon
+   )
+endif (BUILD_TESTS)
