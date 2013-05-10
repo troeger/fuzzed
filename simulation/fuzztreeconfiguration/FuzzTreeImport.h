@@ -12,6 +12,7 @@
 #include "FaultTreeNode.h"
 #include "XMLImport.h"
 #include "ReaderWriterQueue.h"
+#include "platform.h"
 
 using namespace std;
 using namespace pugi;
@@ -21,11 +22,11 @@ typedef moodycamel::ReaderWriterQueue<FaultTreeNode*> FTResults;
 class FuzzTreeImport : public XMLImport
 {
 public:
-	static FaultTreeNode* loadFaultTree(const string& fileName);
+	DEPRECATED static FaultTreeNode* loadFaultTree(const string& fileName);
 
 	// returns a vector of futures on the fault tree configurations
 	// the caller should tidy up the FuzzTreeImport pointer
-	static pair<FuzzTreeImport*,FTResults*> loadFaultTreeAsync(const string& fileName);
+	DEPRECATED static pair<FuzzTreeImport*,FTResults*> loadFaultTreeAsync(const string& fileName);
 
 	virtual ~FuzzTreeImport();
 

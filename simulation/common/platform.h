@@ -13,5 +13,11 @@
 	#define FT_DLL_API __declspec(dllimport)
 #endif
 #else
-#define FT_DLL_API
+	#define FT_DLL_API
+#endif
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+	#define DEPRECATED __declspec(deprecated)
+#else
+	#define DEPRECATED __attribute__((deprecated))
 #endif
