@@ -7,10 +7,13 @@
 #include <boost/math/special_functions/binomial.hpp>
 #include <boost/range/counting_range.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <fstream>
 #include <cmath>
 #include <chrono>
 #include <exception>
+#include <algorithm>
 
 using namespace chrono;
 using namespace boost;
@@ -157,4 +160,12 @@ string util::nestedIDString(int n, ...)
 	va_end(args);
 
 	return result.str();
+}
+
+int util::countFiles(const string& path, const string& ext /*= ""*/)
+{
+	return std::count_if(
+		filesystem::directory_iterator(path),
+		filesystem::directory_iterator(),
+		[&](filesystem::path p) { return is_regular_file(p) && p.extension() == ext; } );
 }

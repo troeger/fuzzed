@@ -66,6 +66,8 @@ namespace util
 	bool copyFile(const string& src, const string& dst);
 	string fileNameFromPath(const string& path);
 
+	int countFiles(const string& path, const string& extension = "");
+
 	/************************************************************************/
 	/* Maths                                                                */
 	/************************************************************************/
