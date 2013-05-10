@@ -10,6 +10,7 @@ PetriNet::PetriNet(
 	m_timedTransitions(timedTransitions),
 	m_placeDict(places),
 	m_arcs(arcDict),
+	m_topLevelPlace(nullptr),
 	m_finalFiringTime(MAX_INT)
 {
 	setup();
@@ -55,8 +56,7 @@ void PetriNet::setup()
 			m_topLevelPlace = &it->second;
 		++it;
 	}
-	assert(m_topLevelPlace && "the petri net must have a top level place, or the simulation won't terminate");
-
+	
 	int sumFiringTimes = 0;
 	for (TimedTransition& tt : m_timedTransitions)
 	{
@@ -158,4 +158,9 @@ void PetriNet::applyToAllTransitions(std::function<void (Transition& t)> func)
 
 	for (TimedTransition& tt : m_timedTransitions)
 		func(tt);
+}
+
+bool PetriNet::valid() const
+{
+	return m_topLevelPlace != nullptr;
 }

@@ -22,10 +22,10 @@ bool PetriNetSimulation::run()
 	unsigned long count = 0;
 
 	const PetriNet* const pn = PNMLImport::loadPNML(m_netFile.generic_string());
-	if (!pn)
-	{
+	if (!pn) 
 		throw runtime_error("Import was not successful.");
-	}
+	else if (!pn->valid()) 
+		throw runtime_error("Invalid Petri Net.");
 	
 	const double startTime = omp_get_wtime();
 	if (pn->m_activeTimedTransitions.size() == 0)

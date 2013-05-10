@@ -35,7 +35,7 @@ SimulationProxy::SimulationProxy(int argc, char** arguments)
 	try
 	{
 		bool useTimeNET = false;
-		for (int i : boost::counting_range(1, argc))
+		for (const int& i : boost::counting_range(1, argc))
 		{
 			if (string(arguments[i]) == "TimeNET")
 				useTimeNET = true;
@@ -117,6 +117,10 @@ bool SimulationProxy::runSimulation(const fs::path& p, SimulationImpl implementa
 	catch (exception& e)
 	{
 		cout << "Exception during simulation: " << e.what(); 
+	}
+	catch (...)
+	{
+		cout << "Unknown Exception during simulation";
 	}
 
 	delete sim;

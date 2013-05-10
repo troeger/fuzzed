@@ -51,6 +51,8 @@ public:
 	// reduce number of places and immediate transitions which are not essential for the net semantics
 	void simplify();
 
+	bool valid() const;
+
 protected:
 	// uses the information in m_arcDict to tell each transition about its in- and out-places
 	void setup();
