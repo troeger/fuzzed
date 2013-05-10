@@ -37,7 +37,10 @@ public:
 	void updateFiringTime(TimedTransition* tt);
 	
 	int finalFiringTime()		const { return m_finalFiringTime; }
+	
 	int numTimedTransitions()	const { return m_activeTimedTransitions.size(); }
+	int numPlaces()				const { return m_placeDict.size(); }
+	
 	double averageFiringTime()	const { return m_avgFiringTime; }
 
 	// check if simulation can be terminated

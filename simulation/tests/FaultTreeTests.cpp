@@ -6,7 +6,7 @@
 
 TEST(Tree, BasicTest)
 {
-	TopLevelEvent faultTree(0);
+	TopLevelEvent faultTree("0");
 	FaultTreeNode* ag = new ANDGate("1");
 	faultTree.addChild(ag);
 	ag->addChild(new BasicEvent("2", 0.0001));
@@ -39,7 +39,7 @@ TEST(Tree, UniqueID)
 
 TEST(Tree, CloneTest)
 {
-	TopLevelEvent faultTree(0);
+	TopLevelEvent faultTree("0");
 	FaultTreeNode* ag = new ANDGate("1");
 	faultTree.addChild(ag);
 
@@ -61,7 +61,6 @@ TEST(Tree, CloneTest)
 		EXPECT_TRUE(dynamic_cast<BasicEvent*>(tmp) != nullptr);
 	}
 }
-
 
 TEST(Tree, Parents)
 {

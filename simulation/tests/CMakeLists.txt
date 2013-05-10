@@ -6,7 +6,7 @@ set(SOURCES
 	
 	SerializationTests.cpp
 	FaultTreeTests.cpp
-	ImportTests.cpp
+	SimulationTests.cpp
 )
 
 if(MSVC) # VS2012 doesn't support correctly the tuples yet
