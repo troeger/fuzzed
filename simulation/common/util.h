@@ -39,9 +39,9 @@ namespace util
 
 	string nestedIDString(int n, ...);
 
-	string toString(int i);
-	string toString(double d, int prec = 9);
-	string toString(long double d, int prec = 9);
+	string toString(const int& i);
+	string toString(const double& d, const int& prec = 9);
+	string toString(const long double& d, const int& prec = 9);
 
 	// returns something like #p[placeID] [cond] [argument]
 	string conditionString(const int placeID, ConditionType cond, const int argument);

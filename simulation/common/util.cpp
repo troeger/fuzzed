@@ -15,12 +15,12 @@
 using namespace chrono;
 using namespace boost;
 
-std::string util::toString(int i)
+std::string util::toString(const int& i)
 {
 	return lexical_cast<string>(i);
 }
 
-std::string util::toString(double d, int prec /*= 5*/)
+std::string util::toString(const double& d, const int& prec /*= 5*/)
 {
 	std::ostringstream oss;
 	oss << std::fixed << std::setprecision(prec);
@@ -28,7 +28,7 @@ std::string util::toString(double d, int prec /*= 5*/)
 	return oss.str();
 }
 
-std::string util::toString(long double d, int prec /*= 5*/)
+std::string util::toString(const long double& d, const int& prec /*= 5*/)
 {
 	std::ostringstream oss;
 	oss << std::fixed << std::setprecision(prec);
