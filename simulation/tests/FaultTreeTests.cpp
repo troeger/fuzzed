@@ -7,9 +7,9 @@
 TEST(Tree, BasicTest)
 {
 	TopLevelEvent faultTree(0);
-	FaultTreeNode* ag = new ANDGate(1);
+	FaultTreeNode* ag = new ANDGate("1");
 	faultTree.addChild(ag);
-	ag->addChild(new BasicEvent(2, 0.0001));
+	ag->addChild(new BasicEvent("2", 0.0001));
 
 	EXPECT_EQ(faultTree.getNumChildren(), 1);
 	EXPECT_EQ(ag->getNumChildren(), 1);
@@ -17,18 +17,18 @@ TEST(Tree, BasicTest)
 
 TEST(Tree, UniqueID)
 {
-	TopLevelEvent faultTree(0);
-	FaultTreeNode* ag = new ANDGate(1);
+	TopLevelEvent faultTree("0");
+	FaultTreeNode* ag = new ANDGate("2");
 	faultTree.addChild(ag);
 
 	auto range = boost::counting_range(1, 5);
 	for (int i: range)
 	{
-		ag->addChild(new BasicEvent(i, 0.0001));
+		ag->addChild(new BasicEvent(util::toString(i), 0.0001));
 	}
 
 	auto it = faultTree.getChildrenBegin();
-	std::set<int> ids;
+	std::set<string> ids;
 	while (it != faultTree.getChildrenEnd())
 	{
 		EXPECT_FALSE(CONTAINS(ids, (*it)->getId()));
@@ -40,19 +40,18 @@ TEST(Tree, UniqueID)
 TEST(Tree, CloneTest)
 {
 	TopLevelEvent faultTree(0);
-	FaultTreeNode* ag = new ANDGate(1);
+	FaultTreeNode* ag = new ANDGate("1");
 	faultTree.addChild(ag);
 
-	auto range = boost::counting_range(1, 5);
-	for (int i: range)
+	for (int i: boost::counting_range(1, 5))
 	{
-		ag->addChild(new BasicEvent(i, 0.0001));
+		ag->addChild(new BasicEvent(util::toString(i), 0.0001));
 	}
 
 	FaultTreeNode* clone = faultTree.clone();
 
 	EXPECT_EQ(clone->getNumChildren(), 1);
-	FaultTreeNode* andGate = clone->getChildById(1);
+	FaultTreeNode* andGate = clone->getChildById("1");
 	EXPECT_TRUE(dynamic_cast<ANDGate*>(andGate) != nullptr);
 
 	EXPECT_EQ(andGate->getNumChildren(), 4);
@@ -66,15 +65,15 @@ TEST(Tree, CloneTest)
 
 TEST(Tree, Parents)
 {
-	TopLevelEvent faultTree(0);
-	FaultTreeNode* ag = new ANDGate(1);
+	TopLevelEvent faultTree("0");
+	FaultTreeNode* ag = new ANDGate("1");
 	faultTree.addChild(ag);
 
 	EXPECT_TRUE(ag->getParent() != nullptr);
 	EXPECT_EQ(ag->getParent(), &faultTree);
 
-	FaultTreeNode* child = new BasicEvent(2,0.0001);
+	FaultTreeNode* child = new BasicEvent("2" ,0.0001);
 	ag->addChild(child);
 
-	EXPECT_EQ(child->getParent()->getId(), 1);
+	EXPECT_EQ(child->getParent()->getId(), "1");
 }
