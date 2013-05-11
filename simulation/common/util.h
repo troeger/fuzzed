@@ -68,6 +68,8 @@ namespace util
 
 	int countFiles(const string& path, const string& extension = "");
 
+	void clearDirectory(const string& dir); // remove all files from dir
+
 	/************************************************************************/
 	/* Maths                                                                */
 	/************************************************************************/

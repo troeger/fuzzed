@@ -273,7 +273,8 @@ void FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configura
 
 void FuzzTreeTransform::scheduleFTGeneration(boost::function<void()>& task)
 { // does this even make sense??
-	m_threadPool.schedule(task);
+	//m_threadPool.schedule(task);
+	task();
 }
 
 void FuzzTreeTransform::generateFaultTreeRecursive(
@@ -307,7 +308,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		else if (typeDescriptor == FEATURE_VP)
 		{
 			const int configuredChildID = configuration.getFeaturedChild(id);
-			auto result = handleFeatureVP(currentChild, faultTreeNode, configuredChildID);
+			auto result = handleFeatureVP(currentChild, faultTreeNode, configuration, configuredChildID);
 			newNode = result.first;
 			
 			if (result.second)
@@ -369,17 +370,16 @@ const std::string FuzzTreeTransform::uniqueFileName() const
 
 pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 	const xml_node& templateNode, 
-	xml_node& node, 
+	xml_node& node,
 	const tuple<int,int> kOutOfN, const int& id) const
 {
 	if (string(node.name()) == DUMMY)
 		node.set_name(CHILDREN);
-	
+
 	xml_node votingOR = node.append_child(CHILDREN);
 	votingOR.append_attribute(NODE_TYPE).set_value(VOTING_OR_GATE);
-	votingOR.append_attribute(ID_ATTRIBUTE).set_value(id);
-
-	const xml_node child = templateNode.child(CHILDREN); // allow only one child below RedundancyVP	
+	
+	const xml_node child = templateNode.child(CHILDREN); // TODO: allow only one child below RedundancyVP	
 	if (child.empty())
 	{
 		assert(false);
@@ -387,8 +387,10 @@ pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 	}
 
 	const string typeDescriptor = child.attribute(NODE_TYPE).as_string();
+
 	if (typeDescriptor == BASIC_EVENT_SET)
 	{
+		votingOR.append_attribute(ID_ATTRIBUTE).set_value(id);
 		votingOR.append_attribute(VOTING_OR_K).set_value(get<0>(kOutOfN));
 		expandBasicEventSet(child, votingOR, id, get<1>(kOutOfN));
 		return make_pair(votingOR, true);
@@ -437,6 +439,7 @@ void FuzzTreeTransform::expandBasicEventSet(
 pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
 	const xml_node& templateNode, 
 	xml_node& node,
+	const FuzzTreeConfiguration& configuration,
 	const int configuredChildId) const
 {
 	// find the configured child
@@ -451,12 +454,15 @@ pair<xml_node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
 	}
 	assert(!featuredTemplate.empty());
 
-	// if the we arrived at a leaf, return true
-	const string configuredChildType = featuredTemplate.attribute(NODE_TYPE).as_string();
-
 	xml_node newFeatured = node.append_child(DUMMY);
-	if (configuredChildType == BASIC_EVENT_SET)
+	const string configuredChildType = featuredTemplate.attribute(NODE_TYPE).as_string();
+	const bool opt = featuredTemplate.attribute(OPTIONAL_ATTRIBUTE).as_bool();
+	if (opt && !configuration.isIncluded(configuredChildId))
 	{
+		return make_pair(newFeatured, true);
+	}
+	if (configuredChildType == BASIC_EVENT_SET)
+	{ 
 		expandBasicEventSet(featuredTemplate, node, configuredChildId, 0);
 		return make_pair(node, true);
 	}

@@ -56,17 +56,26 @@ TEST(Serialization, FuzzTreeTransform)
 	static const string redundancyFileName	= "redundancy.fuzztree";
 	static const string featureFileName		= "feature.fuzztree";
 	
+	if (filesystem::is_directory(targetDir)) filesystem::remove_all(targetDir);
 	ASSERT_TRUE(filesystem::create_directory(targetDir));
 
 	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(dir + optFileName, targetDir));
 	EXPECT_EQ(util::countFiles(targetDir, faultTree::FAULT_TREE_EXT), 2);
 
-	filesystem::directory_iterator end;
-	for(filesystem::directory_iterator iter(targetDir) ; iter != end ; ++iter)
-		filesystem::remove_all(*iter);
+	util::clearDirectory(targetDir);
 	
 	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(dir + featureFileName, targetDir));
 	EXPECT_EQ(util::countFiles(targetDir, faultTree::FAULT_TREE_EXT), 6);
+
+	util::clearDirectory(targetDir);
+
+	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(dir + redundancyFileName, targetDir));
+	EXPECT_EQ(util::countFiles(targetDir, faultTree::FAULT_TREE_EXT), 9); // 3*3 configs (two RedundancyVPs)
+
+	util::clearDirectory(targetDir);
+
+	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(dir + nestedFVPFileName, targetDir));
+	EXPECT_EQ(util::countFiles(targetDir, faultTree::FAULT_TREE_EXT), 8);
 
 	filesystem::remove_all(targetDir);
 }

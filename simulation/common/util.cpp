@@ -169,3 +169,10 @@ int util::countFiles(const string& path, const string& ext /*= ""*/)
 		filesystem::directory_iterator(),
 		[&](filesystem::path p) { return is_regular_file(p) && p.extension() == ext; } );
 }
+
+void util::clearDirectory(const string& dir)
+{
+	filesystem::directory_iterator end;
+	for(filesystem::directory_iterator iter(dir) ; iter != end ; ++iter)
+		filesystem::remove_all(*iter);
+}
