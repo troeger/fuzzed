@@ -8,6 +8,7 @@ from distutils.command.clean import clean as _clean
 from distutils.command.sdist import sdist as _sdist
 # check FuzzEd/__init__.py for the project version number
 from FuzzEd import __version__, util
+from setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 
 def check_python_version():
     version_message = 'This Django project requires Python 2.7+'
@@ -25,14 +26,10 @@ def check_java_version():
     if (not 'version' in output) or (not '1.7' in output):
         raise Exception('We need at least Java 1.7 to build the analysis server. We found ' + output)
 
-def build_faulttree_schema():
-    print "Generating faulttree XML schema from fuzztree XML schema ..."
-    xml_input = etree.parse("FuzzEd/static/xsd/fuzztree.xsd")
-    xslt_root = etree.parse("FuzzEd/static/xsd/fuzztofault.xsl")
-    transform = etree.XSLT(xslt_root)
-    out = open("FuzzEd/static/xsd/faulttree.xsd","w")
-    out.write(str(transform(xml_input)))
-    out.close()    
+def build_schema_files():
+    print "Generating XML schema files ..."
+    createFaultTreeSchema("FuzzEd/static/xsd/faulttree.xsd")
+    createFuzzTreeSchema("FuzzEd/static/xsd/fuzztree.xsd")
 
 def build_xmlschema_wrapper():
     print 'Building XML schema wrappers ...'
@@ -151,11 +148,11 @@ def inherit(node_name, node, nodes, node_cache):
 # Our overloaded 'setup.py build' command
 class build(_build):
     def run(self):
-        _build.run(self)
-        build_analysis_server()
-        build_notations()
-        build_faulttree_schema()
-        build_xmlschema_wrapper()
+#        _build.run(self)
+ #       build_analysis_server()
+  #      build_notations()
+        build_schema_files()
+   #     build_xmlschema_wrapper()
 
 def clean_docs():
     os.system('rm -rf docs')
