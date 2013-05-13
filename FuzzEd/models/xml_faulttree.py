@@ -1,7 +1,7 @@
 # FuzzEd/models/xml_faulttree.py
 # -*- coding: utf-8 -*-
 # PyXB bindings for NM:0c3643272b4de760c38b0556be1c2c4346c7368c
-# Generated 2013-05-13 19:04:04.094870 by PyXB version 1.2.1
+# Generated 2013-05-13 19:43:02.052267 by PyXB version 1.2.1
 # Namespace net.faulttree
 
 import pyxb
@@ -13,7 +13,7 @@ import pyxb.utils.domutils
 import sys
 
 # Unique identifier for bindings created at the same time
-_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:1d5bb6e6-bbef-11e2-aa0f-58b035ff3a58')
+_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:8ee26dd1-bbf4-11e2-b95e-58b035ff3a58')
 
 # Import bindings for namespaces imported into schema
 import pyxb.binding.datatypes
@@ -66,7 +66,7 @@ class idlist (pyxb.binding.basis.STD_list):
     """Simple type that is a list of pyxb.binding.datatypes.int."""
 
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'idlist')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 148, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 149, 2)
     _Documentation = None
 
     _ItemType = pyxb.binding.datatypes.int
@@ -699,7 +699,7 @@ class DynamicGate (Gate):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = True
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'DynamicGate')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 142, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 143, 2)
     # Base type is Gate
     
     # Element annotations (annotations) inherited from {net.faulttree}AnnotatedElement
@@ -732,7 +732,7 @@ class ColdSpare_ (DynamicGate):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'ColdSpare')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 152, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 153, 2)
     # Base type is DynamicGate
     
     # Element annotations (annotations) inherited from {net.faulttree}AnnotatedElement
@@ -749,8 +749,8 @@ class ColdSpare_ (DynamicGate):
     
     # Attribute spareIds uses Python identifier spareIds
     __spareIds = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'spareIds'), 'spareIds', '__net_faulttree_ColdSpare__spareIds', idlist, required=True)
-    __spareIds._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 155, 8)
-    __spareIds._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 155, 8)
+    __spareIds._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 156, 8)
+    __spareIds._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 156, 8)
     
     spareIds = property(__spareIds.value, __spareIds.set, None, None)
 
@@ -773,7 +773,7 @@ class PriorityAnd_ (DynamicGate):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'PriorityAnd')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 161, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 162, 2)
     # Base type is DynamicGate
     
     # Element annotations (annotations) inherited from {net.faulttree}AnnotatedElement
@@ -790,8 +790,8 @@ class PriorityAnd_ (DynamicGate):
     
     # Attribute priorityIds uses Python identifier priorityIds
     __priorityIds = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'priorityIds'), 'priorityIds', '__net_faulttree_PriorityAnd__priorityIds', idlist, required=True)
-    __priorityIds._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 164, 8)
-    __priorityIds._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 164, 8)
+    __priorityIds._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 165, 8)
+    __priorityIds._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 165, 8)
     
     priorityIds = property(__priorityIds.value, __priorityIds.set, None, None)
 
@@ -814,7 +814,7 @@ class Sequence_ (DynamicGate):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'Sequence')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 170, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 171, 2)
     # Base type is DynamicGate
     
     # Element annotations (annotations) inherited from {net.faulttree}AnnotatedElement
@@ -831,8 +831,8 @@ class Sequence_ (DynamicGate):
     
     # Attribute eventSequence uses Python identifier eventSequence
     __eventSequence = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'eventSequence'), 'eventSequence', '__net_faulttree_Sequence__eventSequence', idlist, required=True)
-    __eventSequence._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 173, 8)
-    __eventSequence._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 173, 8)
+    __eventSequence._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 174, 8)
+    __eventSequence._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 174, 8)
     
     eventSequence = property(__eventSequence.value, __eventSequence.set, None, None)
 
@@ -855,7 +855,7 @@ class FDEP_ (DynamicGate):
     _ContentTypeTag = pyxb.binding.basis.complexTypeDefinition._CT_ELEMENT_ONLY
     _Abstract = False
     _ExpandedName = pyxb.namespace.ExpandedName(Namespace, u'FDEP')
-    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 179, 2)
+    _XSDLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 180, 2)
     # Base type is DynamicGate
     
     # Element annotations (annotations) inherited from {net.faulttree}AnnotatedElement
@@ -872,8 +872,8 @@ class FDEP_ (DynamicGate):
     
     # Attribute triggeredEvents uses Python identifier triggeredEvents
     __triggeredEvents = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, u'triggeredEvents'), 'triggeredEvents', '__net_faulttree_FDEP__triggeredEvents', idlist, required=True)
-    __triggeredEvents._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 182, 8)
-    __triggeredEvents._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 182, 8)
+    __triggeredEvents._DeclarationLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 183, 8)
+    __triggeredEvents._UseLocation = pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 183, 8)
     
     triggeredEvents = property(__triggeredEvents.value, __triggeredEvents.set, None, None)
 
@@ -901,7 +901,7 @@ Namespace.addCategoryObject('elementBinding', TransferIn.name().localName(), Tra
 UndevelopedEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'UndevelopedEvent'), UndevelopedEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 121, 2))
 Namespace.addCategoryObject('elementBinding', UndevelopedEvent.name().localName(), UndevelopedEvent)
 
-BasicEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'BasicEvent'), BasicEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 139, 2))
+BasicEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'BasicEvent'), BasicEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 140, 2))
 Namespace.addCategoryObject('elementBinding', BasicEvent.name().localName(), BasicEvent)
 
 And = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'And'), And_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 80, 2))
@@ -919,16 +919,16 @@ Namespace.addCategoryObject('elementBinding', VotingOr.name().localName(), Votin
 HouseEvent = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'HouseEvent'), HouseEvent_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 128, 2))
 Namespace.addCategoryObject('elementBinding', HouseEvent.name().localName(), HouseEvent)
 
-ColdSpare = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'ColdSpare'), ColdSpare_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 159, 2))
+ColdSpare = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'ColdSpare'), ColdSpare_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 160, 2))
 Namespace.addCategoryObject('elementBinding', ColdSpare.name().localName(), ColdSpare)
 
-PriorityAnd = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'PriorityAnd'), PriorityAnd_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 168, 2))
+PriorityAnd = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'PriorityAnd'), PriorityAnd_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 169, 2))
 Namespace.addCategoryObject('elementBinding', PriorityAnd.name().localName(), PriorityAnd)
 
-Sequence = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'Sequence'), Sequence_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 177, 2))
+Sequence = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'Sequence'), Sequence_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 178, 2))
 Namespace.addCategoryObject('elementBinding', Sequence.name().localName(), Sequence)
 
-FDEP = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'FDEP'), FDEP_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 186, 2))
+FDEP = pyxb.binding.basis.element(pyxb.namespace.ExpandedName(Namespace, u'FDEP'), FDEP_, location=pyxb.utils.utility.Location('/Users/troeger/svn/fuzztrees/FuzzEd/static/xsd/faulttree.xsd', 187, 2))
 Namespace.addCategoryObject('elementBinding', FDEP.name().localName(), FDEP)
 
 

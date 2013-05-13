@@ -129,10 +129,11 @@ commonXsd='''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
   <xsd:complexType name="BasicEvent">
     <xsd:complexContent>
-      <xsd:extension base="{2}">
+      <xsd:extension base="{3}">
         <xsd:sequence>
           <xsd:element maxOccurs="1" minOccurs="1" name="probability" type="ft:Probability"/>
         </xsd:sequence>
+        {4}
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -295,14 +296,22 @@ fuzzTreeXsd = '''
 '''
 
 def createFaultTreeSchema(fname):
-	xsd = commonXsd.format('net.faulttree', 'FaultTree', 'ft:ChildNode') + faultTreeXsd + '</xsd:schema>'
+	xsd = commonXsd.format( 'net.faulttree', 
+                          'FaultTree', 
+                          'ft:ChildNode',
+                          'ft:ChildNode',
+                          '') + faultTreeXsd + '</xsd:schema>'
 	print "Writing new XSD file to "+fname
 	f=open(fname,'w')
 	f.write(xsd)
 	f.close()
 
 def createFuzzTreeSchema(fname):
-	xsd = commonXsd.format('net.fuzztree', 'FuzzTree', 'ft:VariationPoint') + fuzzTreeXsd + '</xsd:schema>'
+	xsd = commonXsd.format( 'net.fuzztree', 
+                          'FuzzTree', 
+                          'ft:VariationPoint',
+                          'ft:InclusionVariationPoint',
+                          '<xsd:attribute name="costs" type="xsd:int"/>') + fuzzTreeXsd + '</xsd:schema>'
 	print "Writing new XSD file to "+fname
 	f=open(fname,'w')
 	f.write(xsd)
