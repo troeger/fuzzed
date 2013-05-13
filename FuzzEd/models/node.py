@@ -7,7 +7,8 @@ from django.dispatch import receiver
 import logging
 logger = logging.getLogger('FuzzEd')
 
-from xml_fuzztree import *
+import xml_fuzztree
+import xml_faulttree
 from graph import Graph
 
 import json, notations, sys, time
@@ -15,23 +16,33 @@ import json, notations, sys, time
 def new_client_id():
     return str(int(time.mktime(time.gmtime())))
 
-# TODO: CREATE ALL THE PROPERTIES OF THIS NODE ON CREATION (OR FACTORY METHOD?)
+fuzztree_classes = {
+    'topEvent':             xml_fuzztree.TopEvent,
+    'basicEvent':           xml_fuzztree.BasicEvent,
+    'basicEventSet':        xml_fuzztree.BasicEventSet,
+    'intermediateEvent':    xml_fuzztree.IntermediateEvent,
+    'intermediateEventSet': xml_fuzztree.IntermediateEventSet,
+    'houseEvent':           xml_fuzztree.HouseEvent,
+    'undevelopedEvent':     xml_fuzztree.UndevelopedEvent,
+    'andGate':              xml_fuzztree.And,
+    'orGate':               xml_fuzztree.Or,
+    'xorGate':              xml_fuzztree.Xor,
+    'votingOrGate':         xml_fuzztree.VotingOr,
+    'featureVariation':     xml_fuzztree.FeatureVariationPoint,
+    'redundancyVariation':  xml_fuzztree.RedundancyVariationPoint,
+    'transferIn':           xml_fuzztree.TransferIn
+}
 
-xml_classes = {
-    'topEvent':             TopEvent,
-    'basicEvent':           BasicEvent,
-    'basicEventSet':        BasicEventSet,
-    'intermediateEvent':    IntermediateEvent,
-    'intermediateEventSet': IntermediateEventSet,
-    'houseEvent':           HouseEvent,
-    'undevelopedEvent':     UndevelopedEvent,
-    'andGate':              And,
-    'orGate':               Or,
-    'xorGate':              Xor,
-    'votingOrGate':         VotingOr,
-    'featureVariation':     FeatureVariationPoint,
-    'redundancyVariation':  RedundancyVariationPoint,
-    'transferIn':           TransferIn
+faulttree_classes = {
+    'topEvent':             xml_faulttree.TopEvent,
+    'basicEvent':           xml_faulttree.BasicEvent,
+    'houseEvent':           xml_faulttree.HouseEvent,
+    'undevelopedEvent':     xml_faulttree.UndevelopedEvent,
+    'andGate':              xml_faulttree.And,
+    'orGate':               xml_faulttree.Or,
+    'xorGate':              xml_faulttree.Xor,
+    'votingOrGate':         xml_faulttree.VotingOr,
+    'transferIn':           xml_faulttree.TransferIn
 }
 
 class Node(models.Model):
@@ -134,64 +145,72 @@ class Node(models.Model):
         long for some XML processors.
         
         Returns:
-         This node instance
+         The XML node instance for this graph node and its children
         """
         properties = {
             'id':   self.id,
             'name': self.get_property('name', '-')
         }
 
-        if self.kind in {'basicEvent', 'basicEventSet', 'intermediateEvent', 'intermediateEventSet', 'houseEvent'}:
-            properties['optional'] = self.get_property('optional', False)
-
-        if self.kind in {'basicEventSet', 'intermediateEventSet'}:
-            properties['quantity'] = self.get_property('cardinality')
-
-        if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
-            probability = self.get_property('probability', None)
-            if isinstance(probability, list):
-                point = probability[0]
-                alpha = probability[1]
-
-                if alpha == 0:
-                    properties['probability'] = CrispProbability(value_=point)
-                else:
-                    properties['probability'] = TriangularFuzzyInterval(a=point - alpha, b1=point,
-                                                                        b2=point, c=point + alpha)
-            elif isinstance(probability, (long, int, float)):
-                properties['probability'] = CrispProbability(value_=probability)
-
-            else:
-                raise ValueError('Cannot handle probability value: "%s"' % probability)
-
-            properties['costs'] = self.get_property('cost', 0)
-
-        elif self.kind == 'votingOrGate':
-            if self.graph.kind == 'fuzztree':
-                properties['k'] = self.get_property('k')
-            else:
-                properties['k'] = self.get_property('kN')[0]
-
-        elif self.kind == 'redundancyVariation':
-            nRange = self.get_property('nRange')
-
-            properties['start']   = nRange[0]
-            properties['end']     = nRange[1]
-            properties['formula'] = self.get_property('kFormula')
-
-        elif self.kind == 'transferIn':
+        if self.kind == 'transferIn':
             properties['fromModelId'] = self.get_property('transfer')
 
-        try:
-            xml_node = xml_classes[self.kind](**properties)
-            logger.debug('[XML] Adding node "%s" with properties %s' % (self.kind, properties))
+        # Special treatment for some of the FuzzTree node types
+        if self.graph.kind == 'fuzztree':
+            # for any node that may be optional, set the according property
+            if self.kind in {'basicEvent', 'basicEventSet', 'intermediateEvent', 'intermediateEventSet', 'houseEvent'}:
+                properties['optional'] = self.get_property('optional', False)
 
-            # serialize children
-            for edge in self.outgoing.filter(deleted=False):
-                xml_node.children.append(edge.target.to_xml())
+            # for any node that may have a quantity, set the according property
+            if self.kind in {'basicEventSet', 'intermediateEventSet'}:
+                properties['quantity'] = self.get_property('cardinality')
 
-        except KeyError:
-            raise ValueError('Unsupported node %s' % self.kind)
+            # determine fuzzy or crisp probability, set it accordingly
+            if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
+                probability = self.get_property('probability', None)
+                if isinstance(probability, list):
+                    point = probability[0]
+                    alpha = probability[1]
+                    if alpha == 0:
+                        properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
+                    else:
+                        properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(   a=point - alpha, b1=point,
+                                                                                           b2=point, c=point + alpha)
+                elif isinstance(probability, (long, int, float)):
+                    properties['probability'] = xml_fuzztree.CrispProbability(value_=probability)
+                else:
+                    raise ValueError('Cannot handle probability value: "%s"' % probability)
+                # nodes that have a probability also have costs in FuzzTrees
+                properties['costs'] = self.get_property('cost', 0)
+
+            # Voting OR in FuzzTrees has different parameter name than in fault trees
+            elif self.kind == 'votingOrGate':
+                properties['k'] = self.get_property('k')
+
+            # add range attribute for redundancy variation
+            elif self.kind == 'redundancyVariation':
+                nRange = self.get_property('nRange')
+                properties['start']   = nRange[0]
+                properties['end']     = nRange[1]
+                properties['formula'] = self.get_property('kFormula')
+
+            xml_node = fuzztree_classes[self.kind](**properties)
+
+        # Special treatment for some of the FaultTree node types
+        elif self.graph.kind == 'faulttree':
+            if self.kind == 'votingOrGate':
+                properties['k'] = self.get_property('kN')[0]
+
+            # determine fuzzy or crisp probability, set it accordingly
+            if self.kind in {'basicEvent', 'houseEvent'}:
+                properties['probability'] = xml_faulttree.CrispProbability(value_=self.get_property('probability', None))
+
+            xml_node = faulttree_classes[self.kind](**properties)
+
+        # serialize children
+        logger.debug('[XML] Added node "%s" with properties %s' % (self.kind, properties))
+        for edge in self.outgoing.filter(deleted=False):
+            xml_node.children.append(edge.target.to_xml())
 
         return xml_node
 
