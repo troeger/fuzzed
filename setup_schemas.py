@@ -1,5 +1,4 @@
-commonXsd='''
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+commonXsd='''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xsd:schema xmlns:ft="{0}" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="{0}">
   
   <!--Abstract Types-->

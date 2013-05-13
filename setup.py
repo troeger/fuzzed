@@ -33,18 +33,15 @@ def build_schema_files():
 
 def build_xmlschema_wrapper():
     print 'Building XML schema wrappers ...'
-    # Copy most recent schema files from calc server
-    shutil.copyfile('analysis/code/net.fuzztree.model.analysis/model/AnalysisXML.xsd', 'FuzzEd/static/xsd/analysis.xsd')
-    shutil.copyfile('analysis/code/net.fuzztree.model.fuzztree/model/FuzzTreeXML.xsd', 'FuzzEd/static/xsd/fuzztree.xsd')
 
     # Remove old binding files and generate new ones
-    for file_name in ['xml_fuzztree.py', 'xml_analysis.py']:
+    for file_name in ['xml_faulttree.py', 'xml_fuzztree.py', 'xml_analysis.py']:
         path_name = 'FuzzEd/models/%s' % file_name
 
         if os.path.exists(path_name):
             os.remove(path_name)
     if os.system('pyxbgen --binding-root=FuzzEd/models/ -u FuzzEd/static/xsd/analysis.xsd '
-                 '-m xml_analysis -u FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree') != 0:
+                 '-m xml_analysis -u FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree -u FuzzEd/static/xsd/faulttree.xsd -m xml_faulttree') != 0:
         raise Exception('Execution of pyxbgen failed.\nTry "sudo setup.py test" for installing all dependencies.')
 
 def build_naturaldocs():
@@ -152,7 +149,7 @@ class build(_build):
  #       build_analysis_server()
   #      build_notations()
         build_schema_files()
-   #     build_xmlschema_wrapper()
+        build_xmlschema_wrapper()
 
 def clean_docs():
     os.system('rm -rf docs')
