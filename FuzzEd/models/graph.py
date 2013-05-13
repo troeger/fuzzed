@@ -75,7 +75,7 @@ class Graph(models.Model):
         root = self.nodes.get(kind__exact = 'topEvent')
         return root.to_bool_term()
 
-    def to_xml(self):
+    def to_xml(self, xmltype=None):
         """
         Method: to_xml
             Serializes the graph into its XML representation.
@@ -83,10 +83,14 @@ class Graph(models.Model):
         Returns:
             {string} The XML representation of the graph
         """
-        if self.kind == "fuzztree":
+        if xmltype:
+            kind=xmltype
+        else:
+            kind=self.kind
+        if kind == "fuzztree":
             tree = XmlFuzzTree(name = self.name, id = self.pk)
             pyxb.utils.domutils.BindingDOMSupport.DeclareNamespace(XmlFuzzTreeNamespace, 'fuzzTree')
-        elif self.kind == "faulttree":
+        elif kind == "faulttree":
             tree = XmlFaultTree(name = self.name, id = self.pk)
             pyxb.utils.domutils.BindingDOMSupport.DeclareNamespace(XmlFaultTreeNamespace, 'faultTree')
         else:
@@ -94,7 +98,7 @@ class Graph(models.Model):
 
         # Find root node and start from there
         top_event = self.nodes.get(kind='topEvent')
-        tree.topEvent = top_event.to_xml()
+        tree.topEvent = top_event.to_xml(kind)
 
         return unicode(tree.toxml('utf-8'),'utf-8')
 

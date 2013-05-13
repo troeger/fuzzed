@@ -139,7 +139,7 @@ class Node(models.Model):
 
         raise ValueError('Node %s has unsupported kind' % self)
 
-    def to_xml(self):
+    def to_xml(self, xmltype=None):
         """
         Method: to_xml
         
@@ -150,6 +150,11 @@ class Node(models.Model):
         Returns:
          The XML node instance for this graph node and its children
         """
+
+        # If the target XML type is not given, we take the graph type
+        if not xmltype:
+            xmltype = self.graph.kind
+
         properties = {
             'id':   self.id,
             'name': self.get_property('name', '-')
@@ -163,7 +168,7 @@ class Node(models.Model):
             properties['quantity'] = self.get_property('cardinality')
 
         # Special treatment for some of the FuzzTree node types
-        if self.graph.kind == 'fuzztree':
+        if xmltype == 'fuzztree':
             # for any node that may be optional, set the according property
             if self.kind in {'basicEvent', 'basicEventSet', 'intermediateEvent', 'intermediateEventSet', 'houseEvent'}:
                 properties['optional'] = self.get_property('optional', False)
@@ -200,7 +205,7 @@ class Node(models.Model):
             xml_node = fuzztree_classes[self.kind](**properties)
 
         # Special treatment for some of the FaultTree node types
-        elif self.graph.kind == 'faulttree':
+        elif xmltype == 'faulttree':
             if self.kind == 'votingOrGate':
                 properties['k'] = self.get_property('k')
 
@@ -213,7 +218,7 @@ class Node(models.Model):
         # serialize children
         logger.debug('[XML] Added node "%s" with properties %s' % (self.kind, properties))
         for edge in self.outgoing.filter(deleted=False):
-            xml_node.children.append(edge.target.to_xml())
+            xml_node.children.append(edge.target.to_xml(xmltype))
 
         return xml_node
 
