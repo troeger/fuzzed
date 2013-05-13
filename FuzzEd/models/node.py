@@ -36,6 +36,9 @@ fuzztree_classes = {
 faulttree_classes = {
     'topEvent':             xml_faulttree.TopEvent,
     'basicEvent':           xml_faulttree.BasicEvent,
+    'basicEventSet':        xml_faulttree.BasicEventSet,
+    'intermediateEvent':    xml_faulttree.IntermediateEvent,
+    'intermediateEventSet': xml_faulttree.IntermediateEventSet,    
     'houseEvent':           xml_faulttree.HouseEvent,
     'undevelopedEvent':     xml_faulttree.UndevelopedEvent,
     'andGate':              xml_faulttree.And,
@@ -155,15 +158,15 @@ class Node(models.Model):
         if self.kind == 'transferIn':
             properties['fromModelId'] = self.get_property('transfer')
 
+        # for any node that may have a quantity, set the according property
+        if self.kind in {'basicEventSet', 'intermediateEventSet'}:
+            properties['quantity'] = self.get_property('cardinality')
+
         # Special treatment for some of the FuzzTree node types
         if self.graph.kind == 'fuzztree':
             # for any node that may be optional, set the according property
             if self.kind in {'basicEvent', 'basicEventSet', 'intermediateEvent', 'intermediateEventSet', 'houseEvent'}:
                 properties['optional'] = self.get_property('optional', False)
-
-            # for any node that may have a quantity, set the according property
-            if self.kind in {'basicEventSet', 'intermediateEventSet'}:
-                properties['quantity'] = self.get_property('cardinality')
 
             # determine fuzzy or crisp probability, set it accordingly
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
@@ -199,10 +202,10 @@ class Node(models.Model):
         # Special treatment for some of the FaultTree node types
         elif self.graph.kind == 'faulttree':
             if self.kind == 'votingOrGate':
-                properties['k'] = self.get_property('kN')[0]
+                properties['k'] = self.get_property('k')
 
             # determine fuzzy or crisp probability, set it accordingly
-            if self.kind in {'basicEvent', 'houseEvent'}:
+            if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
                 properties['probability'] = xml_faulttree.CrispProbability(value_=self.get_property('probability', None))
 
             xml_node = faulttree_classes[self.kind](**properties)

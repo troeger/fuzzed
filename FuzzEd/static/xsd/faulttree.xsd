@@ -139,6 +139,31 @@
   </xsd:complexType>
   <xsd:element name="BasicEvent" type="ft:BasicEvent"/>
 
+  <xsd:complexType name="IntermediateEvent">
+    <xsd:complexContent>
+      <xsd:extension base="ft:ChildNode"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="IntermediateEvent" type="ft:IntermediateEvent"/>
+
+  <xsd:complexType name="BasicEventSet">
+    <xsd:complexContent>
+      <xsd:extension base="ft:BasicEvent">
+        <xsd:attribute name="quantity" type="xsd:int"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="BasicEventSet" type="ft:BasicEventSet"/>
+
+  <xsd:complexType name="IntermediateEventSet">
+    <xsd:complexContent>
+      <xsd:extension base="ft:IntermediateEvent">
+        <xsd:attribute name="quantity" type="xsd:int"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="IntermediateEventSet" type="ft:IntermediateEventSet"/>  
+
   <!--Dynamic Fault Tree Gates-->
   <xsd:complexType abstract="true" name="DynamicGate">
     <xsd:complexContent>

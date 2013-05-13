@@ -138,6 +138,31 @@ commonXsd='''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:element name="BasicEvent" type="ft:BasicEvent"/>
+
+  <xsd:complexType name="IntermediateEvent">
+    <xsd:complexContent>
+      <xsd:extension base="{3}"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="IntermediateEvent" type="ft:IntermediateEvent"/>
+
+  <xsd:complexType name="BasicEventSet">
+    <xsd:complexContent>
+      <xsd:extension base="ft:BasicEvent">
+        <xsd:attribute name="quantity" type="xsd:int"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="BasicEventSet" type="ft:BasicEventSet"/>
+
+  <xsd:complexType name="IntermediateEventSet">
+    <xsd:complexContent>
+      <xsd:extension base="ft:IntermediateEvent">
+        <xsd:attribute name="quantity" type="xsd:int"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="IntermediateEventSet" type="ft:IntermediateEventSet"/>  
 '''
 
 faultTreeXsd = '''
@@ -227,39 +252,6 @@ fuzzTreeXsd = '''
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:element name="TriangularFuzzyInterval" type="ft:TriangularFuzzyInterval"/>
-
-  <xsd:complexType name="IntermediateEvent">
-    <xsd:complexContent>
-      <xsd:extension base="ft:InclusionVariationPoint"/>
-    </xsd:complexContent>
-  </xsd:complexType>
-  <xsd:element name="IntermediateEvent" type="ft:IntermediateEvent"/>
-
-  <xsd:complexType name="BasicEventSet">
-    <xsd:complexContent>
-      <xsd:extension base="ft:BasicEvent">
-        <xsd:attribute name="quantity" type="xsd:int"/>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-  <xsd:element name="BasicEventSet" type="ft:BasicEventSet"/>
-
-  <xsd:complexType name="IntermediateEventSet">
-    <xsd:complexContent>
-      <xsd:extension base="ft:IntermediateEvent">
-        <xsd:attribute name="quantity" type="xsd:int"/>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-  <xsd:element name="IntermediateEventSet" type="ft:IntermediateEventSet"/>
-
-  <xsd:complexType abstract="true" name="EventSet">
-    <xsd:complexContent>
-      <xsd:extension base="ft:InclusionVariationPoint">
-        <xsd:attribute name="quantity" type="xsd:int"/>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
 
   <xsd:complexType abstract="true" name="InclusionVariationPoint">
     <xsd:complexContent>
