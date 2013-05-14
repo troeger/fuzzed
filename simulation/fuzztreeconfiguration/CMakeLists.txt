@@ -20,7 +20,7 @@ include_directories(${FT_INCLUDE_DIR})
 include_directories(${PUGIXML_INCLUDE_DIR})
 
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
-add_library(ftconfiguration STATIC ${SOURCES} ${HEADERS})
+add_library(ftconfiguration SHARED ${SOURCES} ${HEADERS})
 
 target_link_libraries(ftconfiguration ${Boost_LIBRARIES})
 if (WIN32)

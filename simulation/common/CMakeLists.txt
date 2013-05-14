@@ -27,7 +27,7 @@ include_directories(${FT_INCLUDE_DIR})
 include_directories(${PUGIXML_INCLUDE_DIR})
 
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
-add_library(ftcommon STATIC ${SOURCES} ${HEADERS})
+add_library(${LIBNAME} STATIC ${SOURCES} ${HEADERS})
 
 if (WIN32)
 	target_link_libraries(ftcommon optimized ${PUGIXML_LIB_RELEASE})

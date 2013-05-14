@@ -52,7 +52,7 @@ set(HEADERS
 )
 
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
-add_library(ftmodeltransform STATIC ${SOURCES} ${HEADERS})
+add_library(ftmodeltransform SHARED ${SOURCES} ${HEADERS})
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${FT_INCLUDE_DIR})
@@ -66,5 +66,5 @@ if (WIN32)
 endif(WIN32)
 
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-   set_target_properties(ftcommon PROPERTIES COMPILE_FLAGS "-fPIC")
+   set_target_properties(ftcommon PROPERTIES COMPILE_FLAGS "-fPIC -rdynamic")
 endif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
