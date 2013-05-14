@@ -48,9 +48,9 @@ if (BUILD_SIMULATION_EXECUTABLE)
    message("Building simulation executable")
 else (BUILD_SIMULATION_EXECUTABLE) # shared library
    add_library(ftsimulation SHARED ${SOURCES} ${HEADERS})
-   target_link_libraries(ftsimulation
-      ftmodeltransform
-      ftconfiguration
+   target_link_libraries(ftsimulation 
+      ftmodeltransform      
+ftconfiguration
       ftcommon
    )
    add_definitions(-DSIMULATION_DLL)
