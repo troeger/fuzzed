@@ -21,3 +21,5 @@ simulation/tests/output
 *.log
 *.pnml
 *.log.debug
+simulation/profiling
+*.debug
