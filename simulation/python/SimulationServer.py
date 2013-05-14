@@ -1,5 +1,5 @@
-from http.server import HTTPServer, SimpleHTTPRequestHandler
-from socketserver import TCPServer
+from SimpleHTTPServer import SimpleHTTPRequestHandler
+from SocketServer import TCPServer
 from ctypes import *
 import logging
 import os
