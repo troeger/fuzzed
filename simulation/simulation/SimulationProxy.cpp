@@ -305,7 +305,6 @@ void runSimulation(
 {	
 	try
 	{
-		cout << "Hello";
 		SimulationProxy p = SimulationProxy(missionTime, numRounds, convergenceThreshold, maxTime);
 		p.simulateFile(filePath, false);
 
