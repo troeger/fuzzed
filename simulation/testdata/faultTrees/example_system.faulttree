@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FaultTree name = "ExampleSystem">
+  <topEvent id="1" name="Server Failure">
+  	<children xsi:type="ft:Or" id="11">
+        
+        <children xsi:type="ft:BasicEvent" id="2" name="Bus Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+        </children>
+
+        <children xsi:type="ft:BasicEvent" id="3" name="Hard Disk Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+        </children>
+	    
+	    <children xsi:type="ft:ColdSpare" id="4" spareIds="5">
+	      	<children costs="1" id="5" name="" xsi:type="ft:BasicEvent" name="Secondary CPU Failure">
+	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    	</children>
+			<children costs="1" id="6" name="" xsi:type="ft:BasicEvent" name="Primary CPU Failure">
+	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    	</children>
+	    </children>
+
+	    <children xsi:type="ft:VotingOr" id="7" name="Power Failure" k="2">
+	      	<children xsi:type="ft:BasicEvent" id="7.1" name="Power Unit Failure">
+          		<probability xsi:type="ft:CrispProbability" value="0.0001"/>
+        	</children>
+
+        	<children xsi:type="ft:BasicEvent" id="7.2" name="Power Unit Failure">
+          		<probability xsi:type="ft:CrispProbability" value="0.0001"/>
+        	</children>
+
+        	<children xsi:type="ft:BasicEvent" id="7.3" name="Power Unit Failure">
+          		<probability xsi:type="ft:CrispProbability" value="0.0001"/>
+        	</children>
+
+        	<children xsi:type="ft:BasicEvent" id="7.4" name="Power Unit Failure">
+          		<probability xsi:type="ft:CrispProbability" value="0.0001"/>
+        	</children>
+	    </children>
+
+	</children>
+  </topEvent>
+</ft:FuzzTree>

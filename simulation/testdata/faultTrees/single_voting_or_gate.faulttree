@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FaultTree name="VotingOr_Test">
+  <topEvent id="1" name="Server Failure">
+    <children xsi:type="ft:VotingOr" id="2" k="2">
+      <children xsi:type="ft:BasicEvent" id="3.1" name="Component Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.001"/>
+       </children>
+       <children xsi:type="ft:BasicEvent" id="3.2" name="Component Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.001"/>
+       </children>
+       <children xsi:type="ft:BasicEvent" id="3.3" name="Component Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.001"/>
+       </children>
+       <children xsi:type="ft:BasicEvent" id="3.4" name="Component Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.001"/>
+       </children>
+    </children>
+  </topEvent>
+</ft:FaultTree>

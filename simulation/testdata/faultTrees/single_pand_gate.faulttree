@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FaultTree name="Pand_Test">
+  <topEvent id="1" name="Server Failure">
+    <children xsi:type="ft:PriorityAnd" id="2" priorityIds="3">
+      	<children id="3" xsi:type="ft:BasicEvent" name="First Failure">
+	      	<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    </children>
+		<children id="4"  xsi:type="ft:BasicEvent" name="Second Failure">
+	    	<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	    </children>
+    </children>
+</ft:FaultTree>

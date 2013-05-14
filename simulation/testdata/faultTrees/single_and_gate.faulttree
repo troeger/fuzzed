@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FaultTree name="Test_And">
+  <topEvent id="1" name="Server Failure">
+    <children xsi:type="ft:And" id="2">
+      <children xsi:type="ft:BasicEvent" id="2.1" name="Component Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.001"/>
+        </children>
+        <children xsi:type="ft:BasicEvent" id="2.2" name="Component Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.001"/>
+        </children>
+    </children>
+  </topEvent>
+</ft:FaultTree>
