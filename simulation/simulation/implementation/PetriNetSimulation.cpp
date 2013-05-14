@@ -16,10 +16,10 @@ using boost::format;
 
 bool PetriNetSimulation::run()
 {	
-	unsigned long numFailures = 0;
+	unsigned int numFailures = 0;
 	unsigned long sumFailureTime_all = 0;
 	unsigned long sumFailureTime_fail = 0;
-	unsigned long count = 0;
+	unsigned int count = 0;
 
 	const PetriNet* const pn = PNMLImport::loadPNML(m_netFile.generic_string());
 	if (!pn) 
@@ -27,10 +27,11 @@ bool PetriNetSimulation::run()
 	else if (!pn->valid()) 
 		throw runtime_error("Invalid Petri Net.");
 	
-	const double startTime = omp_get_wtime();
+	SimulationResult res;
 	if (pn->m_activeTimedTransitions.size() == 0)
 	{ // perfectly reliable
-		printResults(0, 0, 0.0, -1.0, startTime, startTime, 1.0);
+		printResults(res);
+		writeResultXML(res);
 		return true;
 	}
 
@@ -43,16 +44,18 @@ bool PetriNetSimulation::run()
 
 	// for checking global convergence, shared variable
 	bool globalConvergence = true;
+	
+	const double startTime = omp_get_wtime();
 
 	// sum up all the failures from all simulation rounds in parallel, counting how many rounds were successful
-#pragma omp parallel for reduction(+:numFailures, count, sumFailureTime_all, sumFailureTime_fail) reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak) schedule(static) if (m_numRounds > PAR_THRESH)
+#pragma omp parallel for reduction(+:numFailures, count, sumFailureTime_all, sumFailureTime_fail) reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak) schedule(dynamic) if (m_numRounds > PAR_THRESH)
 	for (int i = 0; i < m_numRounds; ++i)
 	{
 		if (privateBreak)
 			continue;
 		
 		PetriNet currentNet(std::move(*pn));
-		SimulationResult res = runOneRound(&currentNet);
+		SimulationRoundResult res = runOneRound(&currentNet);
 		
 		if (res.valid)
 		{
@@ -83,16 +86,22 @@ bool PetriNetSimulation::run()
 
 	const double endTime = omp_get_wtime();
 
-	long double unreliability = (long double)numFailures/(long double)count;
-	long double avgFailureTime_all = (long double)sumFailureTime_all/(long double)count;
-	long double avgFailureTime_fail = (long double)sumFailureTime_fail/(long double)numFailures;
-
-	long double meanAvailability = avgFailureTime_fail /(long double)m_numSimulationSteps;
+	long double unreliability		= (long double)numFailures			/(long double)count;
+	long double avgFailureTime_all	= (long double)sumFailureTime_all	/(long double)count;
+	long double avgFailureTime_fail = (long double)sumFailureTime_fail	/(long double)numFailures;
+	long double meanAvailability	= avgFailureTime_fail				/(long double)m_numSimulationSteps;
 	
 	cout << "...done." << endl;
 
-	printResults(numFailures, count, unreliability, avgFailureTime_all, endTime, startTime, meanAvailability);
-	writeResultXML(numFailures, count, unreliability, avgFailureTime_all, endTime, startTime, meanAvailability);
+	res.reliability			= 1.0 - unreliability;
+	res.meanAvailability	= meanAvailability;
+	res.nFailures			= numFailures;
+	res.nRounds				= count;
+	res.mttf				= avgFailureTime_all;
+	res.duration			= endTime - startTime;
+
+	printResults(res);
+	writeResultXML(res);
 
 	return true;
 }
@@ -146,12 +155,12 @@ void PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 		pn->m_inactiveTimedTransitions.erase(tt);
 }
 
-SimulationResult PetriNetSimulation::runOneRound(PetriNet* net)
+SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 {
 	const int maxTime = m_simulationTimeSeconds*1000;
 	const auto start = high_resolution_clock::now();
 
-	SimulationResult result;
+	SimulationRoundResult result;
 	result.failed = false;
 	result.failureTime = m_numSimulationSteps;
 	result.valid = true;
@@ -229,14 +238,7 @@ void PetriNetSimulation::tryTimedTransitions(PetriNet* pn, int tick)
 	}
 }
 
-void PetriNetSimulation::printResults(
-	const unsigned long& numFailures, 
-	const unsigned long& count, 
-	const long double& unreliability, 
-	const long double& avgFailureTime_all, 
-	const double& endTime, 
-	const double& startTime, 
-	const long double& meanAvailability)
+void PetriNetSimulation::printResults(const SimulationResult& res)
 {
 	string results = str(
 		format("----- File %1%, %2% simulations with %3% simulated time steps \n \
@@ -248,11 +250,11 @@ void PetriNetSimulation::printResults(
 			   % m_netFile.generic_string()
 			   % m_numRounds
 			   % m_numSimulationSteps
-			   % numFailures % count
-			   % (1.0-unreliability)
-			   % (m_simulateUntilFailure ? util::toString(avgFailureTime_all) : "N/A")
-			   % (endTime-startTime)
-			   % meanAvailability);
+			   % res.nFailures % res.nRounds
+			   % res.reliability
+			   % (m_simulateUntilFailure ? util::toString(res.mttf) : "N/A")
+			   % res.duration
+			   % res.meanAvailability);
 
 	(*m_outStream) << results << endl;
 	m_outStream->close();
@@ -260,16 +262,9 @@ void PetriNetSimulation::printResults(
 	cout << results << endl << endl;
 }
 
-void PetriNetSimulation::writeResultXML(
-	const unsigned long& numFailures, 
-	const unsigned long& count, 
-	const long double& unreliability, 
-	const long double& avgFailureTime_all, 
-	const double& endTime, 
-	const double& startTime, 
-	const long double& meanAvailability)
+void PetriNetSimulation::writeResultXML(const SimulationResult& res)
 {
 	ResultDocument doc;
-	doc.setResults(1.0-unreliability, meanAvailability, avgFailureTime_all, count, numFailures, endTime-startTime);
+	doc.setResult(res);
 	doc.save(m_outputFileName + ".xml");
 }

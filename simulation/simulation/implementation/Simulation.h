@@ -3,7 +3,7 @@
 #include <boost/filesystem/path.hpp>
 #include <iostream>
 
-struct SimulationResult
+struct SimulationRoundResult
 {
 	bool failed; // did the top level event occur?
 	bool valid;

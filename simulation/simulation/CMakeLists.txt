@@ -22,6 +22,7 @@ set(HEADERS
    ${HEADERS}
    SimulationProxy.h
    ResultDocument.h
+   ResultStruct.h
    Config.h
    
    implementation/PetriNetSimulation.h

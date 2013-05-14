@@ -1,5 +1,6 @@
 #pragma once
 #include "Simulation.h"
+#include "ResultStruct.h"
 
 #include <fstream>
 
@@ -20,29 +21,14 @@ public:
 
 	virtual bool run() override;
 
-	void writeResultXML(
-		const unsigned long& numFailures, 
-		const unsigned long& count, 
-		const long double& unreliability, 
-		const long double& avgFailureTime_all, 
-		const double& endTime, 
-		const double& startTime, 
-		const long double& meanAvailability);
-
-	void printResults(
-		const unsigned long& numFailures, 
-		const unsigned long& count, 
-		const long double& unreliability, 
-		const long double& avgFailureTime_all, 
-		const double& endTime, 
-		const double& startTime, 
-		const long double& meanAvailability);
+	void writeResultXML(const SimulationResult& res);
+	void printResults(const SimulationResult& res);
 
 	virtual ~PetriNetSimulation();
 
 protected:
 	// performs one round of m_numSimulationSteps discrete time steps
-	SimulationResult runOneRound(PetriNet* net);
+	SimulationRoundResult runOneRound(PetriNet* net);
 
 	// performs one single simulation step
 	void simulationStep(PetriNet* pn, int tick);

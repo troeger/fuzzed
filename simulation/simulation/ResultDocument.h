@@ -8,6 +8,8 @@
 #pragma warning(pop)
 #endif
 
+#include "ResultStruct.h"
+
 class ResultDocument : public pugi::xml_document
 {
 public:
@@ -19,13 +21,8 @@ public:
 
 	void setModelId(const int& modelID);
 	void setTimeStamp(const int& timeStamp);
-	void setResults(
-		const long double& reliability, 
-		const long double& meanAvailability, 
-		const long double& mttf,
-		const unsigned long& nRounds,
-		const unsigned long& nFailures,
-		const long& duration);
+
+	void setResult(const SimulationResult& result);
 
 	bool save(const std::string& fileName);
 

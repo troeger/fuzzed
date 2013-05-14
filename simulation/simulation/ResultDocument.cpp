@@ -39,24 +39,18 @@ void ResultDocument::setTimeStamp(const int& timeStamp)
 	m_root.append_attribute(TIMESTAMP).set_value(timeStamp);
 }
 
-void ResultDocument::setResults(
-	const long double& reliability, 
-	const long double& meanAvailability, 
-	const long double& mttf, 
-	const unsigned long& nRounds, 
-	const unsigned long& nFailures,
-	const long& duration)
-{
-	m_root.append_attribute(RELIABILITY).set_value((double)reliability);
-	m_root.append_attribute(AVAILABILTIY).set_value((double)meanAvailability);
-	m_root.append_attribute(MTTF).set_value((double)mttf);
-	m_root.append_attribute(NROUNDS).set_value((int)nRounds);
-	m_root.append_attribute(NFAILURES).set_value((int)nFailures);
-	m_root.append_attribute(DURATION).set_value((int)duration);
-}
-
 bool ResultDocument::save(const string& fileName)
 {
 	m_bSaved = xml_document::save_file(fileName.c_str());
 	return m_bSaved;
+}
+
+void ResultDocument::setResult(const SimulationResult& result)
+{
+	m_root.append_attribute(RELIABILITY).set_value((double)result.reliability);
+	m_root.append_attribute(AVAILABILTIY).set_value((double)result.meanAvailability);
+	m_root.append_attribute(MTTF).set_value((double)result.mttf);
+	m_root.append_attribute(NROUNDS).set_value(result.nRounds);
+	m_root.append_attribute(NFAILURES).set_value(result.nFailures);
+	m_root.append_attribute(DURATION).set_value(result.duration);
 }
