@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ft:FaultTree xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="de.hpi.dcl.fuzztree" name="EWDC 2013" decompositionNumber="2">
+<ft:FaultTree name="Or_Test" blocksimReliability="0.02">
   <topEvent id="1" name="Server Failure">
     <children xsi:type="ft:Or" id="2">
       <children xsi:type="ft:BasicEvent" id="2.1" name="Component Failure">
