@@ -29,6 +29,7 @@ namespace PNML
 	const char* const TIMED_TAG = "timed";
 	const char* const VALUE_TAG = "value";
 	const char* const NAME_TAG = "name";
+	const char* const LABEL_TAG = "label";
 	const char* const ROOT_TAG = "net";
 	const char* const PNML_TAG = "pnml";
 	const char* const INSCRIPTION_TAG = "inscription";

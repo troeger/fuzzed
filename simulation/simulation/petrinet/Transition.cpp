@@ -22,8 +22,9 @@ bool Transition::wantsToFire(int tick)
 		stochasticallyEnabled(tick);
 }
 
-Transition::Transition(const string& id)
+Transition::Transition(const string& id, const string& label /*= ""*/)
 	: m_ID(id),
+	m_label(label),
 	m_hasNotFired(true)
 {}
 

@@ -39,7 +39,7 @@ public:
 	bool operator==(Transition const& lhs);
 
 protected:
-	Transition(const std::string& id);
+	Transition(const std::string& id, const std::string& label = "");
 	
 	virtual bool stochasticallyEnabled(int tick) const = 0;
 
@@ -47,6 +47,7 @@ protected:
 	PlaceTokenMap m_outPlaces;
 
 	std::string m_ID;
+	std::string m_label;
 
 	bool m_hasNotFired;
 };

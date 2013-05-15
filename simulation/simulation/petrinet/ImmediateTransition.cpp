@@ -5,8 +5,8 @@ bool ImmediateTransition::stochasticallyEnabled(int tick) const
 	return true;
 }
 
-ImmediateTransition::ImmediateTransition(const std::string& id, double rate, double priority)
-	: Transition(id), m_rate(rate), m_priority(priority)
+ImmediateTransition::ImmediateTransition(const std::string& id, double rate, double priority, const std::string& label /*= ""*/)
+	: Transition(id, label), m_rate(rate), m_priority(priority)
 {}
 
 ImmediateTransition& ImmediateTransition::operator=(const ImmediateTransition &other)

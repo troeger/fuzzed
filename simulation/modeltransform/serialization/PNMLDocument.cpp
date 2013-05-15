@@ -21,14 +21,14 @@ PNMLDocument::PNMLDocument(const string& fileName)
 PNMLDocument::~PNMLDocument() // nothing yet
 {}
 
-int PNMLDocument::addTimedTransition(long double rate, const Condition& cond /*= Condition()*/)
+int PNMLDocument::addTimedTransition(long double rate, const Condition& cond /*= Condition()*/, const string& label /*= ""*/)
 {
-	return addTransition(rate, cond, true);
+	return addTransition(rate, cond, true, label);
 }
 
-int PNMLDocument::addImmediateTransition(long double weight /*= 1.0*/, const Condition& cond /*= Condition()*/)
+int PNMLDocument::addImmediateTransition(long double weight /*= 1.0*/, const Condition& cond /*= Condition()*/, const string& label /*= ""*/)
 {
-	return addTransition(weight, cond, false);
+	return addTransition(weight, cond, false, label);
 }
 
 int PNMLDocument::addPlace(
@@ -78,7 +78,7 @@ void PNMLDocument::setName(xml_node &node, const string& label)
 	setNodeValue(name, label);
 }
 
-int PNMLDocument::addTransition(long double rate, const Condition& cond, bool isTimed)
+int PNMLDocument::addTransition(long double rate, const Condition& cond, bool isTimed, const string& label /*=""*/)
 {
 	xml_node transitionNode = m_root.append_child(TRANSITION_TAG);
 
@@ -86,11 +86,10 @@ int PNMLDocument::addTransition(long double rate, const Condition& cond, bool is
 	transitionNode.append_attribute(ID_ATTRIBUTE).set_value(name.c_str());
 	setName(transitionNode, name);
 
-	xml_node rateNode = transitionNode.append_child(RATE_TAG);
-	setNodeValue(rateNode, util::toString(rate));
-
-	xml_node timedNode = transitionNode.append_child(TIMED_TAG);
-	setNodeValue(timedNode, isTimed ? "true":"false");
+	setNodeValue(transitionNode.append_child(RATE_TAG), util::toString(rate));
+	setNodeValue(transitionNode.append_child(TIMED_TAG), isTimed ? "true":"false");
+	if (!label.empty())
+		setNodeValue(transitionNode.append_child(LABEL_TAG), label);
 
 	return m_transitionCount;
 }

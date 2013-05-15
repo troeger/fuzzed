@@ -6,7 +6,7 @@ class ImmediateTransition : public Transition
 public:
 	typedef boost::shared_ptr<ImmediateTransition> Ptr;
 
-	ImmediateTransition(const std::string& id, double rate, double priority);
+	ImmediateTransition(const std::string& id, double rate, double priority, const std::string& label = "");
 
 	// copying
 	ImmediateTransition(const ImmediateTransition& other);

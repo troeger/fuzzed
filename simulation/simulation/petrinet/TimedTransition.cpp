@@ -1,8 +1,8 @@
 #include "TimedTransition.h"
 #include "implementation/Simulation.h"
 
-TimedTransition::TimedTransition(const std::string& id, double rate)
-	: Transition(id), 
+TimedTransition::TimedTransition(const std::string& id, double rate, const std::string& label /*=""*/)
+	: Transition(id, label), 
 	m_rate(rate), 
 	m_r(-1), 
 	m_wasNotEnabled(true)
