@@ -1,4 +1,4 @@
-project(fttransform CXX)
+project(ftmodeltransform CXX)
                                                                                                                                                                                                                         
 set(SOURCES
    ${SOURCE}
@@ -52,19 +52,22 @@ set(HEADERS
 )
 
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
-add_library(ftmodeltransform SHARED ${SOURCES} ${HEADERS})
+
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${FT_INCLUDE_DIR})
-target_link_libraries(ftmodeltransform ${Boost_LIBRARIES} ftcommon)
 
 include_directories(${PUGIXML_INCLUDE_DIR})
 
 if (WIN32)
+   add_library(ftmodeltransform STATIC ${SOURCES} ${HEADERS})
    target_link_libraries(ftmodeltransform optimized ${PUGIXML_LIB_RELEASE})
    target_link_libraries(ftmodeltransform debug ${PUGIXML_LIB_DEBUG})
 endif(WIN32)
 
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-   set_target_properties(ftcommon PROPERTIES COMPILE_FLAGS "-fPIC -rdynamic")
+   add_library(ftmodeltransform SHARED ${SOURCES} ${HEADERS})
+   set_target_properties(ftmodeltransform PROPERTIES COMPILE_FLAGS "-fPIC -rdynamic")
 endif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
+
+target_link_libraries(ftmodeltransform ${Boost_LIBRARIES} ftcommon)
