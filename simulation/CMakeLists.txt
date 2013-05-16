@@ -14,7 +14,8 @@ set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
        
 set(FT_LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
 set(FT_INCLUDE_DIR 
-	"${PROJECT_SOURCE_DIR}/modeltransform" 
+	"${PROJECT_SOURCE_DIR}/modeltransform"
+	"${PROJECT_SOURCE_DIR}/simulation" 
 	"${PROJECT_SOURCE_DIR}/common"
 	"${PROJECT_SOURCE_DIR}/fuzztreeconfiguration"
 	"${PROJECT_SOURCE_DIR}/thirdParty")

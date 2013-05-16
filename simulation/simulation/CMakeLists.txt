@@ -93,4 +93,5 @@ if (BUILD_TESTS)
       ftconfiguration
       ftcommon
    )
+   set_target_properties(ftsimulation_static PROPERTIES COMPILE_DEFINITIONS "SIMULATION_STATIC")
 endif (BUILD_TESTS)
