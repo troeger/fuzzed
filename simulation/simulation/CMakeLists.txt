@@ -17,6 +17,7 @@ set(SOURCES
    petrinet/TransitionCondition.cpp
    petrinet/PNMLImport.cpp
    petrinet/PetriNet.cpp
+   petrinet/SequentialConstraint.cpp
 )
 set(HEADERS
    ${HEADERS}
@@ -37,6 +38,8 @@ set(HEADERS
    petrinet/TransitionCondition.h
    petrinet/PNMLImport.h
    petrinet/PetriNet.h
+   petrinet/SequentialConstraint.h
+   petrinet/PetriNetConstraint.h
 )
 
 if (BUILD_SIMULATION_EXECUTABLE)

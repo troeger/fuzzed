@@ -17,6 +17,9 @@ FaultTreeNode* SEQGate::clone() const
 int SEQGate::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
 	int previousEvent = -1;
+
+	// #define PETRINET_ONLY_MAPPING
+#ifdef PETRINET_ONLY_MAPPING
 	for (const string& i : m_ordering)
 	{
 		FaultTreeNode* childNode = nullptr;
@@ -49,4 +52,36 @@ int SEQGate::serialize(boost::shared_ptr<PNDocument> doc) const
 		doc->transitionToPlace(propagateChildFailure, previousEvent);
 	}
 	return previousEvent;
+#else
+	
+	vector<int> childIds;
+	for (const string& i : m_ordering)
+	{
+		FaultTreeNode* childNode = nullptr;
+		for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
+		{
+			if ((*it)->getId() == i)
+			{
+				childNode = *it;
+				break;
+			}
+		}
+
+		if (!childNode)
+			throw runtime_error("ID in sequence list was not among the children" + i); // TODO check this earlier
+
+		childIds.emplace_back(childNode->serialize(doc));
+	}
+
+	int triggerGate = doc->addImmediateTransition();
+	for (int id : childIds)
+		doc->placeToTransition(id, triggerGate);
+
+	int allChildrenFailed = doc->addPlace(0, 1, "AND_Failed");
+	doc->transitionToPlace(triggerGate, allChildrenFailed);
+
+	doc->addSequenceConstraint(childIds);
+
+	return allChildrenFailed;
+#endif
 }
