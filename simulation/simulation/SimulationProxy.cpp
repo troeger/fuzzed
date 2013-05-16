@@ -264,7 +264,7 @@ void SimulationProxy::simulateFile(const fs::path& p, bool simulatePetriNet)
 	else if (p.extension() == faultTree::FAULT_TREE_EXT)
 	{ // already a fault tree
 		FaultTreeNode* ft = FaultTreeImport::loadFaultTree(p.generic_string());
-		if (!ft || !ft->isValid()) throw("Invalid Fault Tree");
+		if (!ft || !ft->isValid()) throw runtime_error("Invalid Fault Tree");
 		
 		ft->print(cout);
 
