@@ -52,8 +52,7 @@ FaultTreeNode* ORGate::clone() const
 {
 	FaultTreeNode* newNode = new ORGate(m_id, m_name);
 	for (auto& child : m_children)
-	{
 		newNode->addChild(child->clone());
-	}
+	
 	return newNode;
 }

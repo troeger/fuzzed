@@ -32,3 +32,12 @@ int XORGate::serialize(boost::shared_ptr<PNDocument> doc) const
 
 	return oneChildFailed;
 }
+
+FaultTreeNode* XORGate::clone() const 
+{
+	FaultTreeNode* newNode = new XORGate(m_id, m_name);
+	for (auto& child : m_children)
+		newNode->addChild(child->clone());
+
+	return newNode;
+}

@@ -105,6 +105,10 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 		{
 			gate = new ORGate(id, name);
 		}
+		else if (typeDescriptor == XOR_GATE)
+		{
+			gate = new XORGate(id, name);
+		}
 		else if (typeDescriptor == VOTING_OR_GATE)
 		{
 			const int k = child.attribute(VOTING_OR_K).as_int(-1);

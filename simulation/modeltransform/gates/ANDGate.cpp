@@ -52,8 +52,7 @@ FaultTreeNode* ANDGate::clone() const
 {
 	FaultTreeNode* newNode = new ANDGate(m_id, m_name);
 	for (auto& child : m_children)
-	{
 		newNode->addChild(child->clone());
-	}
+
 	return newNode;
 }

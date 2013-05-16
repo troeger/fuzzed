@@ -110,6 +110,7 @@ bool FuzzTreeTransform::isGate(const string& typeDescriptor)
 	return
 		typeDescriptor == AND_GATE ||
 		typeDescriptor == OR_GATE ||
+		typeDescriptor == XOR_GATE ||
 		typeDescriptor == VOTING_OR_GATE ||
 		typeDescriptor == PAND_GATE ||
 		typeDescriptor == COLD_SPARE_GATE;
