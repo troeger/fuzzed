@@ -12,7 +12,7 @@ class PetriNetConstraint
 {
 public:
 	PetriNetConstraint() : m_consequence(REJECT_PETRINET) {}
-	virtual bool isSatisfied(const PetriNet* const pn) const = 0;
+	virtual bool isSatisfied(const PetriNet* const pn) const { return false; };
 
 protected:
 	ViolationConsequence m_consequence;

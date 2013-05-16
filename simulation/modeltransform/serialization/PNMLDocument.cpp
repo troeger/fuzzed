@@ -55,11 +55,6 @@ int PNMLDocument::addPlace(
 	return m_placeCount;
 }
 
-void PNMLDocument::addFailureMeasure()
-{
-	// throw runtime_error("not yet implemented");
-}
-
 void PNMLDocument::setNodeValue(xml_node& name, const string& val)
 {
 	xml_node nameVal = name.append_child(VALUE_TAG);
@@ -126,8 +121,7 @@ void PNMLDocument::addArc(
 
 int PNMLDocument::addTopLevelPlace(const string& label)
 {
-	xml_node node;
-	node = m_root.append_child(PLACE_TAG);
+	xml_node node = m_root.append_child(PLACE_TAG);
 	const string idString = PLACE_IDENTIFIER+util::toString(++m_placeCount);
 
 	node.append_attribute(ID_ATTRIBUTE).set_value(idString.c_str());
@@ -142,4 +136,15 @@ int PNMLDocument::addTopLevelPlace(const string& label)
 	setNodeValue(capacityNode, util::toString(1));
 
 	return m_placeCount;
+}
+
+void PNMLDocument::addSequenceConstraint(const vector<int>& sequence)
+{
+	xml_node node = m_root.append_child(TOOL_SPECIFIC_TAG);
+	xml_node constraintNode = node.append_child(SEQUENCE_CONSTRAINT);
+
+	string sequenceString = "";
+	for (const int& id : sequence)
+		sequenceString += TRANSITION_IDENTIFIER+util::toString(id) + " ";
+	constraintNode.append_attribute(SEQUENCE_LIST).set_value(sequenceString.c_str());
 }

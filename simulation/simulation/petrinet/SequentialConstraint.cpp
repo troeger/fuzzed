@@ -3,7 +3,7 @@
 
 using namespace std;
 
-SequentialConstraint::SequentialConstraint(vector<string>& sequence)
+SequentialConstraint::SequentialConstraint(const vector<string>& sequence)
 	: m_timedTransitionSequence(sequence)
 {}
 

@@ -5,11 +5,13 @@ PetriNet::PetriNet(
 	const vector<ImmediateTransition>& immediateTransitions, 
 	const vector<TimedTransition>& timedTransitions, 
 	const map<string, Place>& places,
-	const ArcList& arcDict) :
+	const ArcList& arcDict,
+	const vector<SequentialConstraint>& constraints) :
 	m_immediateTransitions(immediateTransitions),
 	m_timedTransitions(timedTransitions),
 	m_placeDict(places),
 	m_arcs(arcDict),
+	m_constraints(constraints),
 	m_topLevelPlace(nullptr),
 	m_finalFiringTime(MAX_INT)
 {
@@ -24,6 +26,7 @@ PetriNet::PetriNet(const PetriNet& otherNet) :
 	m_timedTransitions(otherNet.m_timedTransitions),
 	m_placeDict(otherNet.m_placeDict),
 	m_arcs(otherNet.m_arcs),
+	m_constraints(otherNet.m_constraints),
 	m_finalFiringTime(MAX_INT)
 {
 	setup();
@@ -89,6 +92,7 @@ PetriNet& PetriNet::operator=(const PetriNet& otherNet)
 	m_timedTransitions		= otherNet.m_timedTransitions;
 	m_placeDict				= otherNet.m_placeDict;
 	m_arcs					= otherNet.m_arcs;
+	m_constraints			= otherNet.m_constraints;
 
 	setup();
 
@@ -163,4 +167,12 @@ void PetriNet::applyToAllTransitions(std::function<void (Transition& t)> func)
 bool PetriNet::valid() const
 {
 	return m_topLevelPlace != nullptr;
+}
+
+bool PetriNet::constraintViolated() const
+{
+	for (const SequentialConstraint& c : m_constraints)
+		if (!c.isSatisfied(this))
+			return true;
+	return false;
 }

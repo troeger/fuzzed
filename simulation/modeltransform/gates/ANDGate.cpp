@@ -24,7 +24,7 @@ int ANDGate::serialize(boost::shared_ptr<PNDocument> doc) const
 {
 	vector<int> childIDs;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
-		childIDs.push_back((*it)->serialize(doc));
+		childIDs.emplace_back((*it)->serialize(doc));
 	
 	int triggerGate = doc->addImmediateTransition();
 	for (int id : childIDs)

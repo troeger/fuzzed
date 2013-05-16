@@ -38,6 +38,9 @@ namespace PNML
 	const char* const CAPACITY_TAG = "capacity";
 	const char* const SOURCE_TAG = "source";
 	const char* const TARGET_TAG = "target";
+	const char* const TOOL_SPECIFIC_TAG = "toolSpecific";
+	const char* const SEQUENCE_CONSTRAINT = "sequenceConstraint";
+	const char* const SEQUENCE_LIST = "sequence";
 }
 
 const char* const USER_DESCRIPTION_LABEL = "userDescription";

@@ -14,8 +14,8 @@ public:
 
 	virtual int addPlace(int initialMarking, int capacity = 1,  const string& label = "", bool isBasicEvent = false) override;
 	virtual int addTopLevelPlace(const string& label) override;
-
-	virtual void addFailureMeasure() override;
+	
+	virtual void addSequenceConstraint(const vector<int>& sequence) override;
 
 protected:
 	virtual void addArc(int placeID, int transitionID, int tokenCount, ArcDirection direction, const string& inscription = "x") override;

@@ -36,8 +36,8 @@ public:
 	virtual void transitionToPlace(int transitionID, int placeID, int procudeCount = 1, const string& inscription = "x");
 	
 	// add a measure which defines the time until the TopLevelEvent is triggered
-	virtual void addFailureMeasure() = 0;
-
+	virtual void addFailureMeasure() {}; // TimeNET
+	virtual void addSequenceConstraint(const vector<int>& sequence) {}; // SEQGate
 	virtual void addUserDescription(const string& description);
 	
 	bool save(const string& fileName);

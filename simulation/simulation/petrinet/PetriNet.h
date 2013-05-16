@@ -3,6 +3,7 @@
 #include "ImmediateTransition.h"
 #include "TimedTransition.h"
 #include "Place.h"
+#include "SequentialConstraint.h"
 
 #include <set>
 #include <map>
@@ -15,6 +16,7 @@ typedef multimap<int, TimedTransition*> TransitionTimeMapping;
 class PetriNet
 {
 	friend class PetriNetSimulation; // ugh.
+	friend class SequentialConstraint; // yikes.
 
 public:
 	typedef boost::shared_ptr<PetriNet> Ptr;
@@ -24,7 +26,8 @@ public:
 		const vector<ImmediateTransition>& immediateTransitions, 
 		const vector<TimedTransition>& timedTransitions, 
 		const map<string, Place>& places,
-		const ArcList& arcDict);
+		const ArcList& arcDict,
+		const vector<SequentialConstraint>& constraints);
 
 	PetriNet(const PetriNet& otherNet);
 	PetriNet& operator=(const PetriNet& rhs);
@@ -53,11 +56,15 @@ public:
 
 	bool valid() const;
 
+	bool constraintViolated() const;
+
 protected:
 	// uses the information in m_arcDict to tell each transition about its in- and out-places
 	void setup();
 
 	void applyToAllTransitions(std::function<void (Transition& t)> func);
+
+	vector<SequentialConstraint> m_constraints;
 
 	vector<ImmediateTransition> m_immediateTransitions; 
 	vector<TimedTransition> m_timedTransitions;

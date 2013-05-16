@@ -27,11 +27,12 @@ namespace
 	const string dir = "C:/dev/fuzztrees/simulation/testdata/faultTrees/";
 	const string targetDir = "C:/dev/fuzztrees/simulation/tests/output/";
 
-	const string AndOrTest = "and_or.faulttree";
-	const string ExampleSystemTest = "example_system.faulttree";
-	const string OrTest = "single_or_gate.faulttree";
-	const string AndTest = "single_and_gate.faulttree";
-	const string XorTest = "single_xor_gate.faulttree";
+	const string AndOrTest			= "and_or.faulttree";
+	const string ExampleSystemTest	= "example_system.faulttree";
+	const string OrTest				= "single_or_gate.faulttree";
+	const string AndTest			= "single_and_gate.faulttree";
+	const string XorTest			= "single_xor_gate.faulttree";
+	const string SEQTest			= "single_seq_gate.faulttree";
 
 	const int MISSION_TIME			= 1000;
 	const int NUM_ROUNDS			= 10000;
@@ -85,6 +86,11 @@ TEST(Simulation, Or)
 TEST(Simulation, XOR)
 {
 	TEST_SIMULATION(dir + XorTest, 0.0);
+}
+
+TEST(Simulation, Sequence)
+{
+	TEST_SIMULATION(dir + SEQTest, 0.5);
 }
 
 TEST(Simulation, Convergence)

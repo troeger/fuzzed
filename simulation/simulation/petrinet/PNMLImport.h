@@ -5,6 +5,7 @@
 #include "XMLImport.h"
 #include "ImmediateTransition.h"
 #include "TimedTransition.h"
+#include "SequentialConstraint.h"
 #include "Place.h"
 #include "platform.h"
 
@@ -40,6 +41,8 @@ private:
 	void loadArcs(vector<tuple<string,string,int>>& arcDict);
 
 	void loadUserDescription(string& description);
+
+	void loadConstraints(vector<SequentialConstraint>& constraints);
 
 	static int		parseIntegerValue(const xml_node& node, const string& type, const int defaultValue);
 	static double	parseDoubleValue(const xml_node& node, const string& type, const double defaultValue);

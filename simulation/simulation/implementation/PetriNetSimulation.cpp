@@ -161,6 +161,11 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 	const auto start = high_resolution_clock::now();
 
 	SimulationRoundResult result;
+	if (net->constraintViolated())
+	{
+		result.valid = false;
+		return result;
+	}
 	result.failed = false;
 	result.failureTime = m_numSimulationSteps;
 	result.valid = true;
