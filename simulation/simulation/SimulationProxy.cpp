@@ -30,7 +30,13 @@
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
-SimulationProxy::SimulationProxy(int argc, char** arguments)
+SimulationProxy::SimulationProxy(int argc, char** arguments) :
+	m_missionTime(0),
+	m_numRounds(0),
+	m_convergenceThresh(0.0),
+	m_simulationTime(0),
+	m_bSimulateUntilFailure(true),
+	m_numAdaptiveRounds(0)
 {
 	try
 	{
@@ -53,8 +59,8 @@ SimulationProxy::SimulationProxy(int argc, char** arguments)
 	}
 }
 
-SimulationProxy::SimulationProxy(int missionTime, int numRounds, double convergenceThreshold, int maxTime)
-	: m_missionTime(missionTime),
+SimulationProxy::SimulationProxy(unsigned int missionTime, unsigned int numRounds, double convergenceThreshold, unsigned int maxTime) : 
+	m_missionTime(missionTime),
 	m_numRounds(numRounds),
 	m_convergenceThresh(convergenceThreshold),
 	m_simulationTime(maxTime),
@@ -131,19 +137,19 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 {
 	string directoryName, filePath;
 	bool simulatePetriNet;
-	int numAdaptiveRounds; // not yet implemented
+	unsigned int numAdaptiveRounds; // not yet implemented
 	
 	m_standardOptions.add_options()
 		("help,h", "produce help message")
 		("PN",			po::value<bool>(&simulatePetriNet)->default_value(false),					"Simulate Petri Net directly")
 		("file,f",		po::value<string>(&filePath),												"Path to FuzzTree or PNML file")
 		("dir,d",		po::value<string>(&directoryName),											"Directory containing FuzzTree or PNML files")
-		("time,t",		po::value<int>(&m_simulationTime)->default_value(DEFAULT_SIMULATION_TIME),	"Maximum Simulation Time in milliseconds")
-		("steps,s",		po::value<int>(&m_missionTime)->default_value(DEFAULT_SIMULATION_STEPS),"Number of Simulation Steps")
-		("rounds,r",	po::value<int>(&m_numRounds)->default_value(DEFAULT_SIMULATION_ROUNDS),		"Number of Simulation Rounds")
+		("time,t",		po::value<unsigned int>(&m_simulationTime)->default_value(DEFAULT_SIMULATION_TIME),	"Maximum Simulation Time in milliseconds")
+		("steps,s",		po::value<unsigned int>(&m_missionTime)->default_value(DEFAULT_SIMULATION_STEPS),"Number of Simulation Steps")
+		("rounds,r",	po::value<unsigned int>(&m_numRounds)->default_value(DEFAULT_SIMULATION_ROUNDS),		"Number of Simulation Rounds")
 		("MTTF",		po::value<bool>(&m_bSimulateUntilFailure)->default_value(true),				"Simulate each Round until System Failure, necessary for MTTF")
 		("converge,c",	po::value<double>(&m_convergenceThresh)->default_value((double)0.0001),		"Cancel simulation after the resulting reliability differs in less than this threshold")
-		("adaptive,a",	po::value<int>(&numAdaptiveRounds)->default_value(0),						"Adaptively adjust the number of Simulation Rounds, NOT YET IMPLEMENTED");
+		("adaptive,a",	po::value<unsigned int>(&numAdaptiveRounds)->default_value(0),						"Adaptively adjust the number of Simulation Rounds, NOT YET IMPLEMENTED");
 
 	po::variables_map optionsMap;
 	po::store(po::parse_command_line(numArguments, arguments, m_standardOptions), optionsMap);
@@ -191,7 +197,6 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 void SimulationProxy::parseTimeNET(int numArguments, char** arguments)
 {
 	string fileName			= DEFAULT_FILE_PATH;
-	string directoryName	= DEFAULT_FILE_PATH;
 	string integrationPath	= DEFAULT_INTEGRATION_PROPS_PATH;
 	string logsPath			= DEFAULT_LOG_PROPS_PATH;
 	string timeNetPath		= DEFAULT_TIMENET_PATH;

@@ -5,7 +5,7 @@
 
 class Place;
 
-typedef std::map<Place*, int /* number of tokens consumed */> PlaceTokenMap;
+typedef std::map<Place*, unsigned int /* number of tokens consumed */> PlaceTokenMap;
 
 class Transition
 {
@@ -13,8 +13,8 @@ public:
 	int nInPlaces()		const { return m_inPlaces.size(); }
 	int nOutPlaces()	const { return m_outPlaces.size(); }
 
-	void addInPlace(Place* p, const int& numTokens);
-	void addOutPlace(Place* p, const int& numTokens);
+	void addInPlace(Place* p, const unsigned int& numTokens);
+	void addOutPlace(Place* p, const unsigned int& numTokens);
 
 	void removeInPlace(Place* p);
 	void removeOutPlace(Place* p);
@@ -41,7 +41,7 @@ public:
 protected:
 	Transition(const std::string& id, const std::string& label = "");
 	
-	virtual bool stochasticallyEnabled(int tick) const = 0;
+	virtual bool stochasticallyEnabled(unsigned int tick) const = 0;
 
 	PlaceTokenMap m_inPlaces;
 	PlaceTokenMap m_outPlaces;

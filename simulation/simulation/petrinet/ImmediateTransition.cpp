@@ -1,6 +1,6 @@
 #include "ImmediateTransition.h"
 
-bool ImmediateTransition::stochasticallyEnabled(int tick) const 
+bool ImmediateTransition::stochasticallyEnabled(unsigned int tick) const 
 {
 	return true;
 }

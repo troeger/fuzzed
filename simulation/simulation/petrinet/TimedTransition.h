@@ -15,16 +15,16 @@ public:
 	TimedTransition& operator= (const TimedTransition &other);
 
 	double getRate()	const { return m_rate; };
-	int getFiringTime() const { return m_r; };
+	unsigned int getFiringTime() const { return m_r; };
 
-	void setFiringTime(int t) { m_r = t; };
+	void setFiringTime(unsigned int t) { m_r = t; };
 
-	bool tryUpdateStartupTime(int tick);
+	bool tryUpdateStartupTime(unsigned int tick);
 
 protected:
-	virtual bool stochasticallyEnabled(int tick) const override;
+	virtual bool stochasticallyEnabled(unsigned int tick) const override;
 
 	double m_rate;
-	int m_r;
+	unsigned int m_r;
 	bool m_wasNotEnabled;
 };

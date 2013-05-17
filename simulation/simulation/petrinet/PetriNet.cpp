@@ -99,7 +99,7 @@ PetriNet& PetriNet::operator=(const PetriNet& otherNet)
 	return *this;
 }
 
-int PetriNet::nextFiringTime(int currentTime)
+unsigned int PetriNet::nextFiringTime(const unsigned int& currentTime)
 {
 	if (m_previousFiringTime == m_activeTimedTransitions.cend() 
 	 || m_previousFiringTime->first == m_finalFiringTime)
@@ -113,7 +113,7 @@ int PetriNet::nextFiringTime(int currentTime)
 
 void PetriNet::updateFiringTime(TimedTransition* tt)
 {
-	const int updatedTime = tt->getFiringTime();
+	const unsigned int updatedTime = tt->getFiringTime();
 	m_activeTimedTransitions.insert(make_pair(updatedTime, tt));
 	
 	if (updatedTime > m_finalFiringTime)

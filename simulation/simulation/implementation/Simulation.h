@@ -7,7 +7,7 @@ struct SimulationRoundResult
 {
 	bool failed; // did the top level event occur?
 	bool valid;
-	int failureTime; // number of logical time steps until the failure event
+	unsigned int failureTime; // number of logical time steps until the failure event
 };
 
 
@@ -16,12 +16,10 @@ class Simulation
 public:
 	Simulation(
 		const boost::filesystem::path& p, 
-		int simulationTime, // the maximum duration of one simulation in seconds
-		int simulationSteps, // the number of logical simulation steps performed in each round
-		int numRounds) : // the number of simulation rounds for the entire net
+		unsigned int simulationTime, // the maximum duration of one simulation in seconds
+		unsigned int simulationSteps, // the number of logical simulation steps performed in each round
+		unsigned int numRounds) : // the number of simulation rounds for the entire net
 		m_netFile(p),
-		m_topProbability(0.0),
-		m_failureTime(0),
 		m_simulationTimeSeconds(simulationTime),
 		m_numSimulationSteps(simulationSteps),
 		m_numRounds(numRounds),
@@ -36,10 +34,7 @@ protected:
 	
 	bool m_bRunning;
 
-	int m_simulationTimeSeconds;
-	int m_numSimulationSteps;
-	int m_numRounds;
-
-	double m_topProbability;
-	int m_failureTime; // the simulation step at which the top event was activated
+	unsigned int m_simulationTimeSeconds;
+	unsigned int m_numSimulationSteps;
+	unsigned int m_numRounds;
 };

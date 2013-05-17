@@ -57,12 +57,12 @@ bool Transition::operator==(Transition const& lhs)
 	return this->m_ID == lhs.m_ID;
 }
 
-void Transition::addInPlace(Place* p, const int& numTokens)
+void Transition::addInPlace(Place* p, const unsigned int& numTokens)
 {
 	m_inPlaces[p] = numTokens;
 }
 
-void Transition::addOutPlace(Place* p, const int& numTokens)
+void Transition::addOutPlace(Place* p, const unsigned int& numTokens)
 {
 	m_outPlaces[p] = numTokens;
 }

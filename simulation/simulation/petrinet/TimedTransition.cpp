@@ -15,7 +15,7 @@ TimedTransition::TimedTransition(const TimedTransition& other)
 	m_wasNotEnabled(true)
 {}
 
-bool TimedTransition::stochasticallyEnabled(int tick) const
+bool TimedTransition::stochasticallyEnabled(unsigned int tick) const
 {
 	return m_r <= tick;
 }
@@ -30,7 +30,7 @@ TimedTransition& TimedTransition::operator=(const TimedTransition &other)
 	return *this;
 }
 
-bool TimedTransition::tryUpdateStartupTime(int tick)
+bool TimedTransition::tryUpdateStartupTime(unsigned int tick)
 {
 	if (m_hasNotFired && m_wasNotEnabled && enoughTokens())
 	{

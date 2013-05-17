@@ -51,8 +51,7 @@ bool PetriNetSimulation::run()
 #pragma omp parallel for reduction(+:numFailures, count, sumFailureTime_all, sumFailureTime_fail) reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak) schedule(dynamic) if (m_numRounds > PAR_THRESH)
 	for (int i = 0; i < m_numRounds; ++i)
 	{
-		if (privateBreak)
-			continue;
+		if (privateBreak) continue;
 		
 		PetriNet currentNet(std::move(*pn));
 		SimulationRoundResult res = runOneRound(&currentNet);
@@ -109,12 +108,12 @@ bool PetriNetSimulation::run()
 PetriNetSimulation::PetriNetSimulation(
 	const boost::filesystem::path& path,
 	const string& outputFileName, 
-	int simulationTime,		// the maximum duration of one simulation in seconds
-	int simulationSteps,	// the number of logical simulation steps performed in each round
-	int numRounds,
+	unsigned int simulationTime,	// the maximum duration of one simulation in seconds
+	unsigned int simulationSteps,	// the number of logical simulation steps performed in each round
+	unsigned int numRounds,
 	double convergenceThresh,
-	bool simulateUntilFailure	/*= false*/,
-	int numAdaptiveRounds		/*= 0*/)
+	bool simulateUntilFailure,
+	unsigned int numAdaptiveRounds /*= 0*/)
 	: Simulation(path, simulationTime, simulationSteps, numRounds), 
 	m_outStream(nullptr),
 	m_outputFileName(outputFileName),
@@ -177,7 +176,7 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 	auto elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();
 	try
 	{
-		int nextStep = 0;//= net->nextFiringTime(0);
+		unsigned int nextStep = net->nextFiringTime(0);
 		while ((nextStep <= m_numSimulationSteps || m_simulateUntilFailure)  && elapsedTime < maxTime)
 		{
 			elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();

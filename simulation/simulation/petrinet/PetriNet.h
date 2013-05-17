@@ -11,7 +11,7 @@
 
 typedef tuple<string, string, int> ArcSpec;
 typedef vector<ArcSpec> ArcList;
-typedef multimap<int, TimedTransition*> TransitionTimeMapping;
+typedef multimap<unsigned int, TimedTransition*> TransitionTimeMapping;
 
 class PetriNet
 {
@@ -35,14 +35,14 @@ public:
 	virtual ~PetriNet();
 
 	// returns the next time a timed transition fires and increases internal time counter
-	int nextFiringTime(int currentTime);
+	unsigned int nextFiringTime(const unsigned int& currentTime);
 
 	void updateFiringTime(TimedTransition* tt);
 	
-	int finalFiringTime()		const { return m_finalFiringTime; }
+	unsigned int finalFiringTime() const { return m_finalFiringTime; }
 	
-	int numTimedTransitions()	const { return m_activeTimedTransitions.size(); }
-	int numPlaces()				const { return m_placeDict.size(); }
+	unsigned int numTimedTransitions()	const { return m_activeTimedTransitions.size(); }
+	unsigned int numPlaces()			const { return m_placeDict.size(); }
 	
 	double averageFiringTime()	const { return m_avgFiringTime; }
 
@@ -80,7 +80,7 @@ protected:
 	double m_avgFiringTime;
 
 	TransitionTimeMapping::const_iterator m_previousFiringTime;
-	int m_finalFiringTime;
+	unsigned int m_finalFiringTime;
 
 	RandomNumberGenerator m_generator;
 };

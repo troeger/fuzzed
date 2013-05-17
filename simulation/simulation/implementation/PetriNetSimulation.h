@@ -12,12 +12,12 @@ public:
 	PetriNetSimulation(
 		const boost::filesystem::path& p,
 		const std::string& outputFileName,
-		int simulationTime,					// the maximum duration of one simulation in seconds
-		int simulationSteps,				// the number of logical simulation steps performed in each round
-		int numRounds,						// the number of simulation rounds performed in parallel
+		unsigned int simulationTime,		// the maximum duration of one simulation in seconds
+		unsigned int simulationSteps,		// the number of logical simulation steps performed in each round
+		unsigned int numRounds,				// the number of simulation rounds performed in parallel
 		double convergenceThresh,			// simulation stops after 
 		bool simulateUntilFailure = true,	// if true, the simulation stops only with a SimulationException. necessary for MTTF computations
-		int numAdaptiveRounds = 0);			// number of rounds performed to adapt OpenMP parallelization
+		unsigned int numAdaptiveRounds = 0);			// number of rounds performed to adapt OpenMP parallelization
 
 	virtual bool run() override;
 

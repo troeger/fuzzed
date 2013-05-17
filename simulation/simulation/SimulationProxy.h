@@ -50,10 +50,10 @@ public:
 
 	// constructor for library calls
 	SimulationProxy(
-		int missionTime,
-		int numRounds,
+		unsigned int missionTime,
+		unsigned int numRounds,
 		double convergenceThreshold,
-		int maxTime);
+		unsigned int maxTime);
 
 	virtual ~SimulationProxy() {};
 
@@ -69,10 +69,10 @@ protected:
 		SimulationImpl implementationType,
 		void* additionalArguments = NULL);
 	
-	int m_missionTime;
-	int m_simulationTime;
-	int m_numRounds;
-	int m_numAdaptiveRounds;
+	unsigned int m_missionTime;
+	unsigned int m_simulationTime;
+	unsigned int m_numRounds;
+	unsigned int m_numAdaptiveRounds;
 	double m_convergenceThresh;
 
 	bool m_bSimulateUntilFailure;
