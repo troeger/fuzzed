@@ -16,8 +16,6 @@ FaultTreeNode* SEQGate::clone() const
 
 int SEQGate::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
-	int previousEvent = -1;
-
 	// #define PETRINET_ONLY_MAPPING
 #ifdef PETRINET_ONLY_MAPPING
 	for (const string& i : m_ordering)

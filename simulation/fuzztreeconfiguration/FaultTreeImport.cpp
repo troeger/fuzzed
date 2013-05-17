@@ -167,6 +167,7 @@ double FaultTreeImport::parseFailureRate(const xml_node &child)
 
 		return probabilityNode.attribute("value").as_double(-1.0);
 	}
+	return -1.0;
 }
 
 FaultTreeImport::~FaultTreeImport()

@@ -8,7 +8,6 @@
 
 /************************************************************************/
 /* Abstract XML File importer.											*/
-/* Subclassed by FuzzTreeImport and PNMLImport							*/
 /************************************************************************/
 class XMLImport
 {
