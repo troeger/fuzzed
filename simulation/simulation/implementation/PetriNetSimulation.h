@@ -21,6 +21,8 @@ public:
 
 	virtual bool run() override;
 
+	void simulateRounds(const PetriNet* const pn, unsigned int& numRounds, unsigned int &count, unsigned long &sumFailureTime_all, unsigned int &numFailures, unsigned long &sumFailureTime_fail);
+
 	void writeResultXML(const SimulationResult& res);
 	void printResults(const SimulationResult& res);
 
