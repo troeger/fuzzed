@@ -5,13 +5,10 @@
 #include <boost/interprocess/managed_mapped_file.hpp>
 
 using namespace std;
-// using boost::interprocess;
 
 class RandomNumberGenerator
 {
 public:
-	// static RandomNumberGenerator& instance();
-	virtual ~RandomNumberGenerator();
 	RandomNumberGenerator();
 
 	// uniform distribution
@@ -20,7 +17,7 @@ public:
 	// exponential distribution
 	double randomNumberExponential(double rate);
 
-	int randomFiringTime(double rate);
+	unsigned int randomFiringTime(double rate);
 
 	// weibull distribution
 	double randomNumberWeibull(double rate, double k);

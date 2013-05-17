@@ -9,7 +9,7 @@ RandomNumberGenerator::RandomNumberGenerator()
 	: m_fileCount(0)
 {
 	static int count = 0;
-	m_generator.seed(++count);
+	m_generator.seed(time(NULL)*++count);
 }
 
 double RandomNumberGenerator::randomNumberInInterval(double L, double H)
@@ -67,10 +67,7 @@ double RandomNumberGenerator::randomNumberDebug(double rate)
 	return dist(m_generator);
 }
 
-RandomNumberGenerator::~RandomNumberGenerator()
-{}
-
-int RandomNumberGenerator::randomFiringTime(double rate)
+unsigned int RandomNumberGenerator::randomFiringTime(double rate)
 {
 	return std::ceil(randomNumberExponential(rate));
 }

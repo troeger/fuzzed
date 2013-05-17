@@ -53,6 +53,7 @@ bool PetriNetSimulation::run()
 	{
 		if (privateBreak) continue;
 		
+		// TODO: check remaining stack size. or make sure it's big enough.
 		PetriNet currentNet(std::move(*pn));
 		SimulationRoundResult res = runOneRound(&currentNet);
 		

@@ -38,7 +38,7 @@
         	</children>
 	    </children>
 
-<children xsi:type="ft:VotingOr" id="11" name="Power Failure" k="2">
+      <children xsi:type="ft:VotingOr" id="11" name="Power Failure" k="2">
           <children xsi:type="ft:BasicEvent" id="11.1" name="Power Unit Failure">
               <probability xsi:type="ft:CrispProbability" value="0.0001"/>
           </children>
@@ -112,4 +112,4 @@
 
 	 </children>
   </topEvent>
-</ft:FuzzTree>
+</ft:FaultTree>

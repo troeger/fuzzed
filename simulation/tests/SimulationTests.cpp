@@ -34,10 +34,11 @@ namespace
 	const string XorTest			= "single_xor_gate.faulttree";
 	const string SEQTest			= "single_seq_gate.faulttree";
 	const string BigTreeTest		= "big_tree.faulttree";
+	const string SpareTest			= "single_spare_gate.faulttree";
 
 	const int MISSION_TIME			= 1000;
 	const int NUM_ROUNDS			= 10000;
-	const double CONVERGE_THRESH	= 0.00001;
+	const double CONVERGE_THRESH	= 0.0;
 	const int MAX_TIME				= 1000;
 	const double MAX_DEVIATION		= 0.02; // TODO how much precision is needed here?
 }
@@ -113,4 +114,9 @@ TEST(Simulation, Convergence)
 TEST(Simulation, BigTree)
 {
 	TEST_SIMULATION(dir + BigTreeTest, 0.5);
+}
+
+TEST(Simulation, Spare)
+{
+	TEST_SIMULATION(dir + SpareTest, 0.5);
 }
