@@ -39,8 +39,7 @@ int PNMLDocument::addPlace(
 {	
 	assert(capacity >= 0 && initialMarking >= 0 && capacity >= initialMarking);
 
-	xml_node node;
-	node = m_root.append_child(PLACE_TAG);
+	xml_node node = m_root.append_child(PLACE_TAG);
 	const string idString = PLACE_IDENTIFIER + util::toString(++m_placeCount);
 	node.append_attribute(ID_ATTRIBUTE).set_value(idString.c_str());
 	
@@ -145,6 +144,9 @@ void PNMLDocument::addSequenceConstraint(const vector<int>& sequence)
 
 	string sequenceString = "";
 	for (const int& id : sequence)
-		sequenceString += TRANSITION_IDENTIFIER+util::toString(id) + " ";
+	{
+		assert(m_placeCount >= id);
+		sequenceString += PLACE_IDENTIFIER + util::toString(id) + " ";
+	}
 	constraintNode.append_attribute(SEQUENCE_LIST).set_value(sequenceString.c_str());
 }

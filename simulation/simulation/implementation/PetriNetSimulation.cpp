@@ -133,15 +133,17 @@ PetriNetSimulation::PetriNetSimulation(
 	cout << "Results will be written to " << outputFileName << endl;
 }
 
-void PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
+bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 {
 	tryTimedTransitions(pn, tick);
 	
 	// propagate all failures upwards in the correct time step
 	bool immediateCanFire = true;
 	while (immediateCanFire)
+	{
+		if (pn->constraintViolated()) return false;
 		tryImmediateTransitions(pn, tick, immediateCanFire);
-
+	}
 	vector<TimedTransition*> toRemove;
 	for (TimedTransition* tt : pn->m_inactiveTimedTransitions)
 	{
@@ -153,6 +155,8 @@ void PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	}
 	for (TimedTransition* tt : toRemove)
 		pn->m_inactiveTimedTransitions.erase(tt);
+
+	return true;
 }
 
 SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
@@ -177,8 +181,12 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 		while ((nextStep <= m_numSimulationSteps || m_simulateUntilFailure)  && elapsedTime < maxTime)
 		{
 			elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();
-			simulationStep(net, nextStep);
-			if (net->failed())
+			if (!simulationStep(net, nextStep))
+			{
+				result.valid = false;
+				return result;
+			}
+			else if (net->failed())
 			{
 				result.failureTime = nextStep;
 				result.failed = true;

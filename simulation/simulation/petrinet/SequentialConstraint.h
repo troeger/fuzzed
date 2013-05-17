@@ -6,8 +6,11 @@ class SequentialConstraint
 {
 public:
 	SequentialConstraint(const std::vector<std::string>& sequence);
-	bool isSatisfied(const PetriNet* const pn) const;
+	bool isSatisfied(const PetriNet* const pn);
 
 private:
-	std::vector<std::string> m_timedTransitionSequence;
+	std::vector<std::string> m_requiredSequence;
+	int m_sequencePos;
+
+	bool m_satisfied;
 };

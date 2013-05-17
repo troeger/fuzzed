@@ -56,7 +56,7 @@ public:
 
 	bool valid() const;
 
-	bool constraintViolated() const;
+	bool constraintViolated();
 
 protected:
 	// uses the information in m_arcDict to tell each transition about its in- and out-places

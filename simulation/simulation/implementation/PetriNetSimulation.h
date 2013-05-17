@@ -30,8 +30,8 @@ protected:
 	// performs one round of m_numSimulationSteps discrete time steps
 	SimulationRoundResult runOneRound(PetriNet* net);
 
-	// performs one single simulation step
-	void simulationStep(PetriNet* pn, int tick);
+	// performs one single simulation step, returns whether the net is still valid
+	bool simulationStep(PetriNet* pn, int tick);
 
 	void tryTimedTransitions(PetriNet* pn, int tick);
 	void tryImmediateTransitions(PetriNet* pn, int tick, bool& immediateOnly);

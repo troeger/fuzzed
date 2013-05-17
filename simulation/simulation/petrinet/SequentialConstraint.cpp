@@ -4,20 +4,30 @@
 using namespace std;
 
 SequentialConstraint::SequentialConstraint(const vector<string>& sequence)
-	: m_timedTransitionSequence(sequence)
+	: m_requiredSequence(sequence), 
+	m_satisfied(true), 
+	m_sequencePos(0)
 {}
 
-bool SequentialConstraint::isSatisfied(const PetriNet* const pn) const
+bool SequentialConstraint::isSatisfied(const PetriNet* const pn)
 {
-	vector<string>::const_iterator sequencePtr = m_timedTransitionSequence.begin();
-	for (const auto& timeTransitionPair : pn->m_activeTimedTransitions)
+	assert(m_satisfied);
+	for (const auto& placeMarking : pn->m_placeDict)
 	{
-		const string transitionID = timeTransitionPair.second->getID();
-		for (auto it = m_timedTransitionSequence.begin(); it != sequencePtr; ++it)
-			if (transitionID == *it) return false;
+		if (placeMarking.second.getCurrentMarking() > 0)
+		{
+			const string placeID = placeMarking.second.getID();
+			for (int i = 0; i != m_sequencePos; ++i)
+				if (m_requiredSequence.at(i) == placeID)
+				{
+					m_satisfied = false;
+					return false;
+				}
 
-		for (auto it = sequencePtr; it != m_timedTransitionSequence.end(); ++it)
-			if (*it == transitionID) sequencePtr = it;
+			for (int i = m_sequencePos; i != m_requiredSequence.size(); ++i)
+				if (m_requiredSequence.at(i) == placeID)
+					m_sequencePos = i;
+		}
 	}
 	return true;
 }

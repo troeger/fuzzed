@@ -169,9 +169,9 @@ bool PetriNet::valid() const
 	return m_topLevelPlace != nullptr;
 }
 
-bool PetriNet::constraintViolated() const
+bool PetriNet::constraintViolated()
 {
-	for (const SequentialConstraint& c : m_constraints)
+	for (SequentialConstraint& c : m_constraints)
 		if (!c.isSatisfied(this))
 			return true;
 	return false;
