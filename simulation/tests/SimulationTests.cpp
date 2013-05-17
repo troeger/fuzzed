@@ -33,6 +33,7 @@ namespace
 	const string AndTest			= "single_and_gate.faulttree";
 	const string XorTest			= "single_xor_gate.faulttree";
 	const string SEQTest			= "single_seq_gate.faulttree";
+	const string BigTreeTest		= "big_tree.faulttree";
 
 	const int MISSION_TIME			= 1000;
 	const int NUM_ROUNDS			= 10000;
@@ -107,4 +108,9 @@ TEST(Simulation, Convergence)
 
 	EXPECT_SIMILAR(res1.reliability, res2.reliability, MAX_DEVIATION);
 	EXPECT_LE(res1.duration, res2.duration, MAX_DEVIATION);
+}
+
+TEST(Simulation, BigTree)
+{
+	TEST_SIMULATION(dir + BigTreeTest, 0.5);
 }

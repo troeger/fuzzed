@@ -158,10 +158,8 @@ double FaultTreeImport::parseFailureRate(const xml_node &child)
 {
 	for (const auto& probabilityNode : child.children("probability"))
 	{
-		if (!probabilityNode)
-			throw runtime_error("Could not find Probability Node for Basic event");
+		if (!probabilityNode) throw runtime_error("Could not find Probability Node for Basic event");
 
-		// TODO find an adequate crisp number in this case
 		if (string(probabilityNode.attribute(NODE_TYPE).as_string()) != CRISP_NUM)
 			throw runtime_error("Fuzzy Probabilites are not supported yet");
 

@@ -38,7 +38,77 @@
         	</children>
 	    </children>
 
-      
+<children xsi:type="ft:VotingOr" id="11" name="Power Failure" k="2">
+          <children xsi:type="ft:BasicEvent" id="11.1" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="11.2" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="11.3" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="11.4" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+      </children>
+
+      <children xsi:type="ft:VotingOr" id="10" name="Power Failure" k="2">
+          <children xsi:type="ft:BasicEvent" id="10.1" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="10.2" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="10.3" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="10.4" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+      </children>
+
+      <children xsi:type="ft:VotingOr" id="9" name="Power Failure" k="2">
+          <children xsi:type="ft:BasicEvent" id="9.1" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="9.2" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="9.3" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="9.4" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+      </children>
+
+      <children xsi:type="ft:VotingOr" id="8" name="Power Failure" k="2">
+          <children xsi:type="ft:BasicEvent" id="8.1" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="8.2" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="8.3" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+
+          <children xsi:type="ft:BasicEvent" id="8.4" name="Power Unit Failure">
+              <probability xsi:type="ft:CrispProbability" value="0.0001"/>
+          </children>
+      </children>      
 
 	 </children>
   </topEvent>
