@@ -53,6 +53,4 @@ protected:
 	int m_capacity;
 
 	bool m_bTopLevelPlace;
-
-	RandomNumberGenerator m_gen;
 };

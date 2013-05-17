@@ -9,8 +9,8 @@
 #include <map>
 #include <unordered_map>
 
-typedef tuple<string, string, int> ArcSpec;
-typedef vector<ArcSpec> ArcList;
+typedef tuple<string, string, int>	ArcSpec;
+typedef vector<ArcSpec>				ArcList;
 typedef multimap<unsigned int, TimedTransition*> TransitionTimeMapping;
 
 class PetriNet
@@ -81,6 +81,4 @@ protected:
 
 	TransitionTimeMapping::const_iterator m_previousFiringTime;
 	unsigned int m_finalFiringTime;
-
-	RandomNumberGenerator m_generator;
 };

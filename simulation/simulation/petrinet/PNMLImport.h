@@ -49,6 +49,4 @@ private:
 	static bool		parseBooleanValue(const xml_node& node, const string& type, const bool defaultValue);
 
 	virtual bool loadRootNode() override;
-
-	RandomNumberGenerator m_gen;
 };

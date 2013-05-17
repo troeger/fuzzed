@@ -61,10 +61,11 @@ void PetriNet::setup()
 	}
 	
 	int sumFiringTimes = 0;
+	RandomNumberGenerator* const gen = RandomNumberGenerator::instanceForCurrentThread();
 	for (TimedTransition& tt : m_timedTransitions)
 	{
 		// compute random firing times for all transitions
-		const int time = m_generator.randomFiringTime(tt.getRate());
+		const unsigned int time = gen->randomFiringTime(tt.getRate());
 		tt.setFiringTime(time);
 		setPlaces(tt);
 

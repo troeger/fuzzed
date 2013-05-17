@@ -1,5 +1,6 @@
 #pragma once
 #include "Transition.h"
+#include <boost/shared_ptr.hpp>
 
 class ImmediateTransition : public Transition
 {

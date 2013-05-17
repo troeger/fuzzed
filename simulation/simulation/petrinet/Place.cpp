@@ -61,7 +61,7 @@ void Place::resolveConflictsTimed(int tick)
 		sumLambda += tt->getRate();
 	}
 
-	double r = m_gen.randomNumberInInterval(0.0, sumLambda);
+	double r = RandomNumberGenerator::instanceForCurrentThread()->randomNumberInInterval(0.0, sumLambda);
 
 	// for exponential distributions: P(i) = lambda_i/sumLambda
 	// divide [0, sumLambda] into intervals corresponding to the transition probabilities
