@@ -16,10 +16,16 @@ using boost::format;
 
 bool PetriNetSimulation::run()
 {	
+	unsigned int numFailures = 0;
+	unsigned long sumFailureTime_all = 0;
+	unsigned long sumFailureTime_fail = 0;
+	unsigned int count = 0;
+
 	const PetriNet* const pn = PNMLImport::loadPNML(m_netFile.generic_string());
-	
-	if (!pn)				throw runtime_error("Import was not successful.");
-	else if (!pn->valid())  throw runtime_error("Invalid Petri Net.");
+	if (!pn) 
+		throw runtime_error("Import was not successful.");
+	else if (!pn->valid()) 
+		throw runtime_error("Invalid Petri Net.");
 	
 	SimulationResult res;
 	if (pn->m_activeTimedTransitions.size() == 0)
@@ -31,15 +37,51 @@ bool PetriNetSimulation::run()
 
 	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads...";
 
-	const double startTime = omp_get_wtime();
-	
-	unsigned int numFailures = 0;
-	unsigned long sumFailureTime_all = 0;
-	unsigned long sumFailureTime_fail = 0;
-	unsigned int count = 0;
+	// for checking local convergence, thread-local
+	long double privateLast = 10000.0L;
+	bool privateConvergence = false;
+	bool privateBreak = false;
 
-	while (count < m_numRounds/2) // TODO: magic number
-		simulateRounds(pn, m_numRounds, count, sumFailureTime_all, numFailures, sumFailureTime_fail);
+	// for checking global convergence, shared variable
+	bool globalConvergence = true;
+	
+	const double startTime = omp_get_wtime();
+
+	// sum up all the failures from all simulation rounds in parallel, counting how many rounds were successful
+#pragma omp parallel for reduction(+:numFailures, count, sumFailureTime_all, sumFailureTime_fail) reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak) schedule(dynamic) if (m_numRounds > PAR_THRESH)
+	for (int i = 0; i < m_numRounds; ++i)
+	{
+		if (privateBreak) continue;
+		
+		PetriNet currentNet(std::move(*pn));
+		SimulationRoundResult res = runOneRound(&currentNet);
+		
+		if (res.valid)
+		{
+			++count;
+			sumFailureTime_all += res.failureTime;
+			
+			if (res.failed && res.failureTime <= m_numSimulationSteps)
+			{ // the failure occurred before the end of mission time -> add up to compute R(mission time)
+				++numFailures;
+				sumFailureTime_fail += res.failureTime;
+			}
+
+			const long double current = (count == 0) ? 0 : ((long double)numFailures/(long double)count);
+			const long double diff = std::abs(privateLast - current);
+
+			if ((current > 0.0L) && (current < 1.0L) && (diff < m_convergenceThresh))
+			{
+				privateConvergence = true;
+				globalConvergence &= privateConvergence;
+				
+				#pragma omp flush(globalConvergence)
+				if (globalConvergence)
+					privateBreak = true;
+			}
+			privateLast = current;
+		}
+	}
 
 	const double endTime = omp_get_wtime();
 
@@ -237,75 +279,4 @@ void PetriNetSimulation::writeResultXML(const SimulationResult& res)
 	ResultDocument doc;
 	doc.setResult(res);
 	doc.save(m_outputFileName + ".xml");
-}
-
-
-// runs numRounds simulations concurrently, accumulating results in the reference variables
-void PetriNetSimulation::simulateRounds(
-	const PetriNet* const pn, 
-	unsigned int& numRounds, 
-	unsigned int &count, 
-	unsigned long &sumFailureTime_all, 
-	unsigned int &numFailures, 
-	unsigned long &sumFailureTime_fail)
-{
-	// for checking local convergence, thread-local
-	long double privateLast = 10000.0L;
-	bool privateConvergence = false;
-	bool privateBreak = false;
-
-	// for checking global convergence, shared variable
-	bool globalConvergence = true;
-
-	// OMP variables cannot have reference type -.-
-	unsigned int ompCount				= count;
-	unsigned int ompNumFailures			= numFailures;
-	unsigned long ompSumFailureTime_all = sumFailureTime_all;
-	unsigned long ompSumFailureTime_fail= sumFailureTime_fail;
-
-	// sum up all the failures from all simulation rounds in parallel, counting how many rounds were successful
-#pragma omp parallel for\
-		reduction(+:ompNumFailures, ompCount, ompSumFailureTime_all, ompSumFailureTime_fail)\
-		reduction(&: globalConvergence)\
-		firstprivate(privateLast, privateConvergence, privateBreak)\
-		schedule(dynamic) if (numRounds > PAR_THRESH)
-	for (int i = 0; i < numRounds; ++i)
-	{
-		if (privateBreak) continue;
-
-		PetriNet currentNet(std::move(*pn));
-		SimulationRoundResult res = runOneRound(&currentNet);
-
-		if (res.valid)
-		{
-			++ompCount;
-			ompSumFailureTime_all += res.failureTime;
-
-			if (res.failed && res.failureTime <= m_numSimulationSteps)
-			{ // the failure occurred before the end of mission time -> add up to compute R(mission time)
-				++ompNumFailures;
-				ompSumFailureTime_fail += res.failureTime;
-			}
-
-			const long double current = (ompCount == 0) ? 0 : ((long double)ompNumFailures/(long double)ompCount);
-			const long double diff = std::abs(privateLast - current);
-
-			if ((current > 0.0L) && (current < 1.0L) && (diff < m_convergenceThresh))
-			{
-				privateConvergence = true;
-				globalConvergence &= privateConvergence;
-
-				#pragma omp flush(globalConvergence)
-				if (globalConvergence)
-					privateBreak = true;
-			}
-			privateLast = current;
-		}
-	}
-
-	//...copy back results...
-	count				= ompCount;
-	numFailures			= ompNumFailures;
-	sumFailureTime_all	= ompSumFailureTime_all;
-	sumFailureTime_fail = ompSumFailureTime_fail;
 }
