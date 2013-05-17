@@ -38,7 +38,7 @@ namespace
 
 	const int MISSION_TIME			= 1000;
 	const int NUM_ROUNDS			= 10000;
-	const double CONVERGE_THRESH	= 0.0;
+	const double CONVERGE_THRESH	= 0.00001;
 	const int MAX_TIME				= 1000;
 	const double MAX_DEVIATION		= 0.02; // TODO how much precision is needed here?
 }
@@ -72,7 +72,7 @@ TEST(Simulation, AndOr)
 
 TEST(Simulation, ExampleSystem)
 {
-	TEST_SIMULATION(dir + ExampleSystemTest, 0.5);
+	TEST_SIMULATION(dir + ExampleSystemTest, 0.587);
 }
 
 TEST(Simulation, And)
@@ -87,12 +87,12 @@ TEST(Simulation, Or)
 
 TEST(Simulation, XOR)
 {
-	TEST_SIMULATION(dir + XorTest, 0.0);
+	TEST_SIMULATION(dir + XorTest, 0.0); // TODO
 }
 
 TEST(Simulation, Sequence)
 {
-	TEST_SIMULATION(dir + SEQTest, 0.5);
+	TEST_SIMULATION(dir + SEQTest, 0.5); // TODO
 }
 
 TEST(Simulation, Convergence)
@@ -113,10 +113,10 @@ TEST(Simulation, Convergence)
 
 TEST(Simulation, BigTree)
 {
-	TEST_SIMULATION(dir + BigTreeTest, 0.5);
+	TEST_SIMULATION(dir + BigTreeTest, 0.488);
 }
 
 TEST(Simulation, Spare)
 {
-	TEST_SIMULATION(dir + SpareTest, 0.5);
+	TEST_SIMULATION(dir + SpareTest, 0.914);
 }

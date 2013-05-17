@@ -3,10 +3,10 @@
   <topEvent id="1" name="Server Failure">
   	<children xsi:type="ft:ColdSpare" id="4" spareIds="6">
 	      	<children id="5" xsi:type="ft:BasicEvent" name="Secondary CPU Failure">
-	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	      		<probability value="0.0001" xsi:type="ft:CrispProbability"/>
 	    	</children>
 			<children id="6" xsi:type="ft:BasicEvent" name="Primary CPU Failure">
-	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
+	      		<probability value="0.01" xsi:type="ft:CrispProbability"/>
 	    	</children>
 	    </children>
   </topEvent>
