@@ -3,6 +3,10 @@
 #include <vector>
 #include "Gate.h"
 
+// TODO: think about the semantics.
+// currently, simulations where the children do not occur in the right sequence are aborted.
+// since the probability of the specific sequence can be low, this results in very few completed simulation rounds.
+
 class SEQGate : public Gate
 {
 public:

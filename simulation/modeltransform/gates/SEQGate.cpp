@@ -77,9 +77,8 @@ int SEQGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	for (int id : childIds)
 		doc->placeToTransition(id, triggerGate);
 
-	int allChildrenFailed = doc->addPlace(0, 1, "AND_Failed");
+	int allChildrenFailed = doc->addPlace(0, 1, "SEQ_Failed");
 	doc->transitionToPlace(triggerGate, allChildrenFailed);
-
 	doc->addSequenceConstraint(childIds);
 
 	return allChildrenFailed;
