@@ -1,7 +1,7 @@
 # FuzzEd/models/xml_faulttree.py
 # -*- coding: utf-8 -*-
 # PyXB bindings for NM:0c3643272b4de760c38b0556be1c2c4346c7368c
-# Generated 2013-05-13 20:55:56.312129 by PyXB version 1.2.1
+# Generated 2013-05-19 22:34:54.138280 by PyXB version 1.2.1
 # Namespace net.faulttree
 
 import pyxb
@@ -13,7 +13,7 @@ import pyxb.utils.domutils
 import sys
 
 # Unique identifier for bindings created at the same time
-_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:be24c6bd-bbfe-11e2-b66d-58b035ff3a58')
+_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:8fd8a297-c0c3-11e2-983e-58b035ff3a58')
 
 # Import bindings for namespaces imported into schema
 import pyxb.binding.datatypes
