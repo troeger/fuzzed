@@ -3,6 +3,7 @@ south
 openid2rp
 django-require
 minbool
+lxml
 pyxb
 psycopg2
 

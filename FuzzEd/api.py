@@ -488,7 +488,8 @@ def analyze_top_event_probability(request, graph_id):
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
     try:
-        post_data = graph.to_xml()
+        # The Java analysis server currently only likes FuzzTree XML
+        post_data = graph.to_xml('fuzztree')
         logger.debug('Sending XML to analysis server:\n' + post_data)
         job_id, configuration_count, node_count = top_event_probability.create_job(post_data,10)
 
