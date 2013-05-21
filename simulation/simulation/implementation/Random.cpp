@@ -2,6 +2,7 @@
 #include <time.h>
 #include <iostream>
 #include <omp.h>
+#include <stdexcept>
 #include "util.h"
 
 RandomNumberGenerator::RandomNumberGenerator()

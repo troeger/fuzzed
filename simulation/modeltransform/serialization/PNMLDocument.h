@@ -22,9 +22,9 @@ protected:
 	int addTransition(long double rate, const Condition& cond, bool isTimed, const string& label = "");
 	
 	// helpers
-	static void setName(xml_node& node, const string& label);
+	static void setName(xml_node node, const string& label);
 	// adds a child node: <value>val</value>
-	static void setNodeValue(xml_node& name, const string& val);
+	static void setNodeValue(xml_node name, const string& val);
 
 	virtual void initXML() override;
 };

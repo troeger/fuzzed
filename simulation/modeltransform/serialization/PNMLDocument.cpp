@@ -54,7 +54,7 @@ int PNMLDocument::addPlace(
 	return m_placeCount;
 }
 
-void PNMLDocument::setNodeValue(xml_node& name, const string& val)
+void PNMLDocument::setNodeValue(xml_node name, const string& val)
 {
 	xml_node nameVal = name.append_child(VALUE_TAG);
 	nameVal.append_child(node_pcdata).set_value(val.c_str());
@@ -66,7 +66,7 @@ void PNMLDocument::initXML()
 	m_root = pnmlNode.append_child(ROOT_TAG);
 }
 
-void PNMLDocument::setName(xml_node &node, const string& label)
+void PNMLDocument::setName(xml_node node, const string& label)
 {
 	xml_node name = node.append_child(NAME_TAG);
 	setNodeValue(name, label);

@@ -1,6 +1,7 @@
 #pragma once
 #include "PetriNetConstraint.h"
 #include <vector>
+#include <string>
 
 class SequentialConstraint
 {
