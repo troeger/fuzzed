@@ -23,3 +23,5 @@ simulation/tests/output
 *.log.debug
 simulation/profiling
 *.debug
+simulation/testdata/faultTrees/*.xml
+*.ilk
