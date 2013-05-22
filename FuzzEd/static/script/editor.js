@@ -265,8 +265,12 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
                     Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
                     Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
                 } else if (event.which == jQuery.ui.keyCode.DELETE) {
-                    event.preventDefault();
+                    // prevent that node is being deleted when we edit an input field
+                    if (jQuery(event.srcElement).is('input')) {
+                        return;
+                    }
 
+                    event.preventDefault();
                     // delete selected nodes
                     jQuery(selectedNodes).each(function(index, element) {
                         this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
