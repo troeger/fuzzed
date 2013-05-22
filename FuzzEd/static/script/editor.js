@@ -356,8 +356,7 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _showProgressIndicator: function() {
-            //TODO
-            console.log('show progress');
+            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).css('visibility', 'visible');
 
             return this;
         },
@@ -370,8 +369,7 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _hideProgressIndicator: function() {
-            //TODO
-            console.log('hide progress');
+            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).css('visibility', 'hidden');
 
             return this;
         },

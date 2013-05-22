@@ -10,6 +10,11 @@ section {
     z-index:  9999; /*above all*/
 }
 
+#FuzzEdProgressIndicator {
+    padding-top: 9px;
+    visibility: hidden;
+}
+
 .brand {
     color: white !important;
 }
