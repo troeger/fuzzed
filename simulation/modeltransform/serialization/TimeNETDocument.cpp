@@ -235,7 +235,7 @@ void TimeNETDocument::addFailureMeasure()
 	importanceGraphicsNode.append_attribute("y").set_value(rand()%100);
 }
 
-int TimeNETDocument::addTimedTransition(long double rate, const Condition& cond /*= Condition()*/, const string& label)
+int TimeNETDocument::addTimedTransition(long double rate, const string& label)
 {
 	assert(rate > 0.0 && "non-negative weight required");
 
@@ -253,15 +253,13 @@ int TimeNETDocument::addTimedTransition(long double rate, const Condition& cond 
 	if (!label.empty())
 		node.append_child("label").set_value(label.c_str());
 
-	setTransitionProperties(node, cond.asString());
-
 	const string timeFunc = "EXP(" + util::toString(rate) + ")";
 	node.append_attribute("timeFunction").set_value(timeFunc.c_str());
 
 	return m_transitionCount;
 }
 
-int TimeNETDocument::addImmediateTransition(long double weight /*=1.0*/, const Condition& cond /*= Condition()*/, const string& label)
+int TimeNETDocument::addImmediateTransition(long double weight /*=1.0*/, const string& label)
 {
 	assert(weight > 0.0 && "non-negative weight required");
 
@@ -278,8 +276,6 @@ int TimeNETDocument::addImmediateTransition(long double weight /*=1.0*/, const C
 	{
 		node = m_root.insert_child_before(IMMEDIATE_TRANSITION_TAG, m_firstImmediateTransition);
 	}
-
-	setTransitionProperties(node, cond.asString());
 	node.append_attribute("weight").set_value((double)weight);
 	node.append_attribute("priority").set_value((double)weight);
 
