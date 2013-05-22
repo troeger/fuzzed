@@ -106,7 +106,10 @@ def graph(request, graph_id):
     Returns:
      {HTTPResponse} a django response object
     """
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    if request.user.is_staff:
+        graph = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
     return HttpResponse(graph.to_json(), 'application/javascript')
 
@@ -129,7 +132,10 @@ def graph_download(request, graph_id):
     Returns:
      {HTTPResponse} a django response object
     """
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    if request.user.is_staff:
+        graph = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)        
     export_format = request.GET.get('format', 'xml')
 
     response = HttpResponse()
@@ -157,6 +163,8 @@ def graph_transfers(request, graph_id):
     """
     Function: graph_transfers
 
+    Returns a list of transfers for the given graph
+
     Request:            GET - /api/graphs/<GRAPH_ID>/transfers
     Request Parameters: graph_id = <INT>
     Response:           200 - <TRANSFERS_AS_JSON>
@@ -169,7 +177,10 @@ def graph_transfers(request, graph_id):
      {HTTPResponse} a django response object
     """
     transfers = []
-    graph     = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    if request.user.is_staff:
+        graph     = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph     = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)        
 
     if graph.kind in ['faulttree', 'fuzztree']:
         for transfer in Graph.objects.filter(~Q(pk=graph_id), owner=request.user, kind=graph.kind, deleted=False):
@@ -204,7 +215,10 @@ def nodes(request, graph_id):
      {HTTPResponse} a django response object
     """
     POST = request.POST
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    if request.user.is_staff:
+        graph = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     try:
         if graph.read_only:
             raise HttpResponseForbiddenAnswer('Trying to create a node in a read-only graph')
@@ -315,7 +329,10 @@ def edges(request, graph_id):
     """
     POST = request.POST
     try:
-        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+        if request.user.is_staff:
+            graph = get_object_or_404(Graph, pk=graph_id)
+        else:
+            graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
         if graph.read_only:
             raise HttpResponseForbiddenAnswer('Trying to create an edge in a read-only graph')
 
@@ -368,7 +385,10 @@ def edge(request, graph_id, edge_id):
      {HTTPResponse} a django response object
     """
     try:
-        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+        if request.user.is_staff:
+            graph = get_object_or_404(Graph, pk=graph_id)
+        else:
+            graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)            
         if graph.read_only:
             raise HttpResponseForbiddenAnswer('Trying to delete an edge in a read-only graph')
 
@@ -462,7 +482,10 @@ def analyze_cutsets(request, graph_id):
     API Request:  GET /api/graphs/[graphID]/cutsets, no body
     API Response: JSON body with list of dicts, one dict per cut set, 'nodes' key has list of client_id's value
     """
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    if request.user.is_staff:
+        graph = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     # minbool is NP-complete, so more than 10 basic events are not feasible for computation
     node_count = graph.nodes.all().filter(kind__exact='basicEvent', deleted__exact=False).count()
 
@@ -485,7 +508,10 @@ def analyze_top_event_probability(request, graph_id):
     If the analysis engine cannot start the job (most likely due to broken XML data generated here),
     the view returns HttpResponseServerErrorAnswer to the front-end.
     """
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    if request.user.is_staff:
+        graph = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
     try:
         # The Java analysis server currently only likes FuzzTree XML
@@ -517,7 +543,7 @@ def job_status(request, job_id):
     try:
         job = Job.objects.get(pk=job_id)
         # Prevent cross-checking of jobs by different users
-        assert(job.graph.owner == request.user)
+        assert(job.graph.owner == request.user or request.user.is_staff)
 
     except:
         # Inform the frontend that the job no longer exists
