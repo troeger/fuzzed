@@ -54,7 +54,7 @@
                     "displayName": "Probability",
                     "min": 0,
                     "max": 1,
-                    "step": 0.01
+                    "step": 0.0000000001
                 }
             },
 
@@ -100,32 +100,6 @@
             "name": "Intermediate Event",
             "image": "intermediate_event.svg",
             "help": "Failure resulting from a combination of previous events"
-        },
-
-        "intermediateEventSet": {
-            "inherits": "intermediateEvent",
-
-            "name": "Intermediate Event Set",
-            "image": "intermediate_event_set.svg",
-            "help": "Set of intermediate events",
-            "cardinality": 1,
-
-            "propertyMenuEntries": {
-                "cardinality": {
-                    "kind": "number",
-                    "displayName": "Cardinality",
-                    "min": 1,
-                    "step": 1
-                }
-            },
-
-            "propertyMirrors": {
-                "cardinality": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "#"
-                }
-            }
         },
 
         "andGate": {
@@ -250,7 +224,6 @@
         "basicEvent",
         "basicEventSet",
         "intermediateEvent",
-        "intermediateEventSet",
         "andGate",
         "orGate",
         "xorGate",
