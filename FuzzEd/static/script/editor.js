@@ -266,7 +266,7 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
                     Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
                 } else if (event.which == jQuery.ui.keyCode.DELETE) {
                     // prevent that node is being deleted when we edit an input field
-                    if (jQuery(event.srcElement).is('input')) {
+                    if (jQuery(event.target).is('input')) {
                         return;
                     }
 
