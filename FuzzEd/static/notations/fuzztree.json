@@ -181,7 +181,6 @@
             "image": "intermediate_event_set.svg",
             "help": "Set of intermediate events",
             "cardinality": 1,
-            "excludeFromShapesMenu": true,
 
             "propertyMenuEntries": {
                 "cardinality": {
