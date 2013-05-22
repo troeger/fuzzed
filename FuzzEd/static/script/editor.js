@@ -340,6 +340,8 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
 
             jQuery(document).ajaxStart(this._showProgressIndicator.bind(this));
             jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
+            jQuery(document).ajaxSuccess(this._flashSaveIndicator.bind(this));
+            jQuery(document).ajaxError(this._flashErrorIndicator.bind(this));
 
             return this;
         },
@@ -356,7 +358,7 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _showProgressIndicator: function() {
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).css('visibility', 'visible');
+            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
 
             return this;
         },
@@ -369,7 +371,33 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _hideProgressIndicator: function() {
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).css('visibility', 'hidden');
+            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
+
+            return this;
+        },
+
+        /**
+         *  Method: _flashSaveIndicator
+         *    Flash the save indicator to show that the current graph is saved in the backend.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _flashSaveIndicator: function() {
+            jQuery('#' + this.config.IDs.SAVE_INDICATOR).fadeIn(200).delay(600).fadeOut(200);
+
+            return this;
+        },
+
+        /**
+         *  Method _flashErrorIndicator
+         *    Flash the error indicator to show that the current graph has not been saved to the backend.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _flashErrorIndicator: function() {
+            jQuery('#' + this.config.IDs.ERROR_INDICATOR).fadeIn(200).delay(5000).fadeOut(200);
 
             return this;
         },

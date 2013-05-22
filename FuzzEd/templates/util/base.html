@@ -104,7 +104,17 @@
                 <a class="brand" anchor="#">FuzzEd - {{ graph }}</a>
                 <ul class="nav">
                     <li>
-                        <img id="FuzzEdProgressIndicator" src="{{ STATIC_URL }}img/ajax-loader.gif" style="padding-top: 9px;">
+                        <a>
+                            <img id="FuzzEdProgressIndicator" src="{{ STATIC_URL }}img/ajax-loader.gif">
+                            <span id="FuzzEdSaveIndicator">
+                                <i class="icon-ok icon-white"></i>
+                                Saved
+                            </span>
+                            <span id="FuzzEdErrorIndicator">
+                                <i class="icon-warning-sign icon-white"></i>
+                                Not saved!
+                            </span>
+                        </a>
                     </li>
                 </ul>
                 <ul class="nav pull-right">
