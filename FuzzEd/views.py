@@ -232,7 +232,10 @@ def editor(request, graph_id):
     Returns:
      {HttpResponse} a django response object
     """
-    graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user)
+    if request.user.is_staff:
+        graph    = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     if graph.read_only:
         return HttpResponseBadRequest()
 
@@ -264,7 +267,10 @@ def snapshot(request, graph_id):
     Returns:
      {HttpResponse} a django response object
     """
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
+    if request.user.is_staff:
+        graph    = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     if not graph.read_only:
         return HttpResponseBadRequest()
 
