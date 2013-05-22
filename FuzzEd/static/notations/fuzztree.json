@@ -107,10 +107,10 @@
                             "kind": "neighborhood",
                             "min": 0,
                             "max": 1,
-                            "step": 0.0001,
+                            "step": 0.0000000001,
                             "epsilonMin": 0,
                             "epsilonMax": 1,
-                            "epsilonStep": 0.0001
+                            "epsilonStep": 0.0000000001
                         }
                     },
 
