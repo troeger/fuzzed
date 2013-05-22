@@ -48,7 +48,11 @@ bool PetriNetSimulation::run()
 	const double startTime = omp_get_wtime();
 
 	// sum up all the failures from all simulation rounds in parallel, counting how many rounds were successful
-#pragma omp parallel for reduction(+:numFailures, count, sumFailureTime_all, sumFailureTime_fail) reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak) schedule(dynamic) if (m_numRounds > PAR_THRESH)
+#pragma omp parallel for\
+	reduction(+:numFailures, count, sumFailureTime_all, sumFailureTime_fail)\
+	reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak)\
+	schedule(dynamic) if (m_numRounds > PAR_THRESH)
+
 	for (int i = 0; i < m_numRounds; ++i)
 	{
 		if (privateBreak) continue;
