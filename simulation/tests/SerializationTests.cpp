@@ -83,7 +83,7 @@ TEST(Serialization, RedundancyVP)
 
 TEST(Serialization, Optional_Redundancy)
 {
-	TEST_NUM_CONFIGURATIONS(dir + optRedundancyFileName, 16); // TODO
+	TEST_NUM_CONFIGURATIONS(dir + optRedundancyFileName, 9); // 2*2 + 2 + 2 + 1 (no optional child)
 }
 
 TEST(Serialization, Other)

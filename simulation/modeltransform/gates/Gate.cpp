@@ -16,7 +16,6 @@ long double Gate::computeUnreliability() const
 
 long double Gate::getValue() const
 {
-	if (m_bDynamic)
-		return 1.0L;
+	if (m_bDynamic) return 1.0L;
 	return computeUnreliability();
 }
