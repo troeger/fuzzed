@@ -204,7 +204,7 @@ def nodes(request, graph_id):
      {HTTPResponse} a django response object
     """
     POST = request.POST
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)    
+    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     try:
         if graph.read_only:
             raise HttpResponseForbiddenAnswer('Trying to create a node in a read-only graph')
@@ -262,7 +262,7 @@ def node(request, graph_id, node_id):
         {HTTPResponse} a django response object
     """
     try:
-        node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id, deleted=False)
+        node = get_object_or_404(Node, client_id=node_id, graph__pk=graph_id)
 
         if node.graph.read_only:
             raise HttpResponseForbiddenAnswer('Trying to modify a node in a read-only graph')

@@ -179,7 +179,7 @@ define(['config', 'class'], function(Config, Class) {
         init: function(displayOrder) {
             this._super();
             this._displayOrder = displayOrder;
-            this._form = this.container.find('form');
+            this._form = this.container.find('.form-horizontal');
 
             this._setupSelection();
         },

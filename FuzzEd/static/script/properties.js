@@ -176,11 +176,17 @@ define(['config', 'decimal', 'class', 'alerts', 'underscore'], function(Config, 
             var register = this.registerOn();
 
             _.each(this.blurEvents(), function(event) {
-                register.on(event, this.blurred.bind(this));
+                register.on(event, function(event) {
+                    // defere call so that paste and cut change the value before the event is triggered
+                    _.defer(this.blurred.bind(this), event);
+                }.bind(this));
             }.bind(this));
 
             _.each(this.changeEvents(), function(event) {
-                register.on(event, this.changed.bind(this));
+                register.on(event, function(event) {
+                    // defere call so that paste and cut change the value before the event is triggered
+                    _.defer(this.changed.bind(this), event);
+                }.bind(this));
             }.bind(this));
 
             return this;
@@ -346,7 +352,7 @@ define(['config', 'decimal', 'class', 'alerts', 'underscore'], function(Config, 
 
         _initialValue: undefined,
 
-        changeEvents: function() { return ['keyup', 'change']; },
+        changeEvents: function() { return ['keyup', 'change', 'paste', 'cut']; },
 
         fix: function(event) {
             if (event.type !== 'change' && event.type !== 'blur') return this;
@@ -467,7 +473,7 @@ define(['config', 'decimal', 'class', 'alerts', 'underscore'], function(Config, 
 
         _initialValue: undefined,
 
-        changeEvents: function() { return ['keyup', 'change']; },
+        changeEvents: function() { return ['keyup', 'change', 'paste', 'cut']; },
 
         inputValue: function(newValue) {
             if (typeof newValue === 'undefined') return window.parseFloat(this.input.val());
@@ -520,7 +526,7 @@ define(['config', 'decimal', 'class', 'alerts', 'underscore'], function(Config, 
         _register:     undefined,
         _initialValue: undefined,
 
-        changeEvents: function() { return ['keyup', 'change']; },
+        changeEvents: function() { return ['keyup', 'change', 'paste', 'cut']; },
 
         fix: function(event) {
             if (event.type !== 'change' && event.type !== 'blur') return this;
@@ -697,7 +703,7 @@ define(['config', 'decimal', 'class', 'alerts', 'underscore'], function(Config, 
     });
 
     var Text = Property.extend({
-        changeEvents: function() { return ['keyup', 'change']; },
+        changeEvents: function() { return ['keyup', 'change', 'paste', 'cut']; },
 
         inputValue: function(newValue) {
             if (typeof newValue === 'undefined') return this.input.val();
