@@ -338,6 +338,41 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
             jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,   this._updatePrintOffsets.bind(this));
             jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED, this._updatePrintOffsets.bind(this));
 
+            jQuery(document).ajaxStart(this._showProgressIndicator.bind(this));
+            jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Group: Progress Indication
+         */
+
+        /**
+         *  Method _showProgressIndicator
+         *    Display the progress indicator.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _showProgressIndicator: function() {
+            //TODO
+            console.log('show progress');
+
+            return this;
+        },
+
+        /**
+         *  Method _hideProgressIndicator
+         *    Hides the progress indicator.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _hideProgressIndicator: function() {
+            //TODO
+            console.log('hide progress');
+
             return this;
         },
 
