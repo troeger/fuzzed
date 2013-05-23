@@ -41,6 +41,7 @@ if is_production:
         # Don't forget to use absolute paths, not relative paths.
         PROJECT_ROOT+'/static-release/img',
     )
+    ANALYZE_TOP_EVENT_PROBABILITY_SERVER = 'http://t420.asg-platform.org:8080'
 
 else:
     DEBUG          = True
@@ -66,6 +67,8 @@ else:
         'FuzzEd/templates',
         'FuzzEd/static/img'
     )
+    ANALYZE_TOP_EVENT_PROBABILITY_SERVER = 'http://localhost:8080'
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -241,4 +244,3 @@ AUTH_PROFILE_MODULE = 'FuzzEd.UserProfile'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/'
 
-ANALYZE_TOP_EVENT_PROBABILITY_SERVER = 'http://localhost:8080'
