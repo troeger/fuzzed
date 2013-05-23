@@ -773,6 +773,8 @@ define(['config', 'decimal', 'class', 'alerts', 'underscore'], function(Config, 
                 url:      this.GRAPHS_URL + this._graphId + Config.Backend.TRANSFERS_URL,
                 type:     'GET',
                 dataType: 'json',
+                // don't show progress
+                global:   false,
 
                 success:  this._setupGraphOptions.bind(this),
                 error:    this._throwError.bind(this)

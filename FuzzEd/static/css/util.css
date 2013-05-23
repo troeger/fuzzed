@@ -10,6 +10,18 @@ section {
     z-index:  9999; /*above all*/
 }
 
+#FuzzEdProgressIndicator {
+    display: none;
+    float: left;
+}
+
+#FuzzEdSaveIndicator {
+    display: none;
+}
+#FuzzEdErrorIndicator {
+    display: none;
+}
+
 .brand {
     color: white !important;
 }

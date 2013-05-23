@@ -397,10 +397,13 @@ function(Properties, Mirror, Canvas, Class) {
                     jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
 
+                        var x = initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter;
+                        var y = initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter;
+
                         // move the other selectee by the dragging offset, do NOT report to the backend yet
                         nodeInstance._moveContainerToPixel({
-                            'x': initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
-                            'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
+                            'x': Math.max(x, Canvas.gridSize),
+                            'y': Math.max(y, Canvas.gridSize)
                         });
 
                         // ask jsPlumb to repaint the selectee in order to redraw its connections
@@ -417,10 +420,13 @@ function(Properties, Mirror, Canvas, Class) {
                     jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
 
+                        var x = initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter;
+                        var y = initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter;
+
                         // ... and report to the backend this time because dragging ended
                         nodeInstance.moveTo({
-                            'x': initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
-                            'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
+                            'x': Math.max(x, Canvas.gridSize),
+                            'y': Math.max(y, Canvas.gridSize)
                         });
                     }.bind(this));
 
