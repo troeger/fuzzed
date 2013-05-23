@@ -102,6 +102,21 @@
         <div class="navbar-inner">
             <div class="container">
                 <a class="brand" anchor="#">FuzzEd - {{ graph }}</a>
+                <ul class="nav">
+                    <li>
+                        <a>
+                            <img id="FuzzEdProgressIndicator" src="{{ STATIC_URL }}img/ajax-loader.gif">
+                            <span id="FuzzEdSaveIndicator">
+                                <i class="icon-ok icon-white"></i>
+                                Saved
+                            </span>
+                            <span id="FuzzEdErrorIndicator">
+                                <i class="icon-warning-sign icon-white"></i>
+                                Not saved!
+                            </span>
+                        </a>
+                    </li>
+                </ul>
                 <ul class="nav pull-right">
                     {%  if user.is_authenticated %}
                     <li class="{% block navigation_home %}{% endblock %}">

@@ -290,6 +290,8 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
             jQuery.ajax({
                 url:      this._fullUrlForGraph(),
                 dataType: 'json',
+                // don't show progress
+                global:   false,
 
                 success:  success  || jQuery.noop,
                 error:    error    || jQuery.noop,
@@ -314,6 +316,8 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
             jQuery.ajax({
                 url:      this._fullUrlForCutsets(),
                 dataType: 'json',
+                // don't show progress
+                global:   false,
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -342,6 +346,8 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
             jQuery.ajax({
                 url:      this._fullUrlForTopEventProbability(),
                 dataType: 'json',
+                // don't show progress
+                global:   false,
 
                 statusCode: {
                     201: function(data, status, req) {

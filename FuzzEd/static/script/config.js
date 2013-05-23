@@ -217,6 +217,9 @@ define(function() {
          *    {String} SPLASH                    - The splash screen element.
          *    {String} NAVBAR_ACTIONS            - The list element that contains the action buttons in the navbar.
          *    {String} NAVBAR_ACTION_GRID_TOGGLE - The list element that contains the grid toggle item.
+         *    {String} PROGRESS_INDICATOR        - The animated progress indicator gif.
+         *    {String} SAVE_INDICATOR            - The navbar entry indicating the save state.
+         *    {String} ERROR_INDICATOR           - The navbar entry indicating the error state.
          */
         IDs: {
             ALERT_CONTAINER:           'FuzzEdAlertContainer',
@@ -226,7 +229,10 @@ define(function() {
             SHAPES_MENU:               'FuzzEdShapes',
             SPLASH:                    'FuzzEdSplash',
             NAVBAR_ACTIONS:            'FuzzEdNavbarActions',
-            NAVBAR_ACTION_GRID_TOGGLE: 'FuzzEdNavbarActionGridToggle'
+            NAVBAR_ACTION_GRID_TOGGLE: 'FuzzEdNavbarActionGridToggle',
+            PROGRESS_INDICATOR:        'FuzzEdProgressIndicator',
+            SAVE_INDICATOR:            'FuzzEdSaveIndicator',
+            ERROR_INDICATOR:           'FuzzEdErrorIndicator'
         },
 
         /**
