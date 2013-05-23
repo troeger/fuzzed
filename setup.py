@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os, json, pprint, sys, shutil, subprocess
-from lxml import etree
 
 from setuptools import setup
 from distutils.command.build import build as _build
