@@ -19,9 +19,8 @@ const char* const RAND_FILE = "C:/dev/masterarbeit/simulation/implementation/ran
 
 #define DEFAULT_SIMULATION_OUTPUT_PREFIX "../simulationoutput/"
 
-
 /************************************************************************/
 /* Performance stuff                                                    */
 /************************************************************************/
 #define PAR_THRESH 10 // if less rounds are executed, don't even parallelize
-#define SCHEDULE static //dynamic
+// #define CONSTRAIN_DYNAMIC 1
