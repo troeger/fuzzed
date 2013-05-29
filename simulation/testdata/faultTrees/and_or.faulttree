@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ft:FaultTree name="AndOr_Test">
+<ft:FaultTree name="AndOr_Test" blocksimReliability="0.094">
   <topEvent id="1" name="Server Failure">
     <children xsi:type="ft:And" id="1">
 
