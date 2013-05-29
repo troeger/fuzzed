@@ -362,8 +362,7 @@ const std::string FuzzTreeTransform::uniqueFileName() const
 		m_targetDir.generic_string() + slash.make_preferred().native() +
 		m_file.filename().generic_string();
 	
-	util::replaceFileExtensionInPlace(fn, "");
-	cout << fn << endl;	
+	util::replaceFileExtensionInPlace(fn, "");	
 	return fn + util::toString(m_count) + FAULT_TREE_EXT;
 }
 
