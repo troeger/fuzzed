@@ -28,6 +28,16 @@ Transition::Transition(const string& id, const string& label /*= ""*/)
 	m_hasNotFired(true)
 {}
 
+Transition::Transition(const Transition& other)
+	: m_inPlaces(PlaceTokenMap()),
+	m_outPlaces(PlaceTokenMap()),
+	m_ID(other.m_ID),
+	m_label(other.m_label),
+	m_hasNotFired(true)
+{
+
+}
+
 void Transition::tryToFire()
 {
 	for (auto& p : m_inPlaces)

@@ -37,6 +37,7 @@ public:
 	bool enoughTokens() const;
 
 	bool operator==(Transition const& lhs);
+	Transition(const Transition& other);
 
 protected:
 	Transition(const std::string& id, const std::string& label = "");
