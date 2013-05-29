@@ -8,8 +8,8 @@ public:
 	TimeNETDocument();
 	TimeNETDocument(const string& fileName);
 
-	virtual int addTimedTransition(long double rate, const Condition& cond = Condition(), const string& label = "") override;
-	virtual int addImmediateTransition(long double weight = 1.0, const Condition& cond = Condition(), const string& label = "") override;
+	virtual int addTimedTransition(long double rate, const string& label = "") override;
+	virtual int addImmediateTransition(long double weight = 1.0, const string& label = "") override;
 	virtual int addTopLevelPlace(const string& label) override;
 
 	virtual int addPlace(int initialMarking, int capacity = 1,  const string& label = "", bool isBasicEvent = false) override;

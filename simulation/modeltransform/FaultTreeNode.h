@@ -46,7 +46,7 @@ public:
 	virtual void print(std::ostream& stream, int indentLevel=0) const;
 
 	const FaultTreeNode* getRoot() const;
-	FaultTreeNode* getParent() const { return m_parent; };
+	const FaultTreeNode* getParent() const { return m_parent; };
 	virtual void setParent(FaultTreeNode* parent) { m_parent = parent; };
 
 protected:

@@ -19,15 +19,23 @@
 using namespace std;
 using namespace boost;
 
+#define TEST_NUM_CONFIGURATIONS(fileName, num)\
+	if (filesystem::is_directory(targetDir))\
+		filesystem::remove_all(targetDir);\
+	ASSERT_TRUE(filesystem::create_directory(targetDir));\
+	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(fileName, targetDir));\
+	EXPECT_EQ(util::countFiles(targetDir, faultTree::FAULT_TREE_EXT), num);\
+	filesystem::remove_all(targetDir);
 
 namespace
 {
 	const string dir = "C:/dev/fuzztrees/simulation/testdata/configurations/";
-	const string targetDir = "C:/dev/fuzztrees/simulation/tests/output/";
+	const string targetDir = "C:/dev/fuzztrees/simulation/testdata/configurations/output/";
 
 	const string optFileName			= "optional.fuzztree";
-	const string nestedFVPFileName	= "nestedFVP.fuzztree";
-	const string redundancyFileName	= "redundancy.fuzztree";
+	const string optRedundancyFileName	= "optional_redundancy.fuzztree";
+	const string otherName				= "other.fuzztree";
+	const string redundancyFileName		= "redundancy.fuzztree";
 	const string featureFileName		= "feature.fuzztree";
 }
 
@@ -60,47 +68,25 @@ TEST(Serialization, PNML)
 
 TEST(Serialization, Optional)
 {
-	if (filesystem::is_directory(targetDir)) 
-		filesystem::remove_all(targetDir);
-	ASSERT_TRUE(filesystem::create_directory(targetDir));
-
-	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(dir + optFileName, targetDir));
-	EXPECT_EQ(util::countFiles(targetDir, faultTree::FAULT_TREE_EXT), 2);
-
+	TEST_NUM_CONFIGURATIONS(dir + optFileName, 2);
 }
 
 TEST(Serialization, FeatureVP)
 {
-	if (filesystem::is_directory(targetDir)) 
-		filesystem::remove_all(targetDir);
-	ASSERT_TRUE(filesystem::create_directory(targetDir));
-	
-	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(dir + featureFileName, targetDir));
-	EXPECT_EQ(util::countFiles(targetDir, faultTree::FAULT_TREE_EXT), 6);
-
-	filesystem::remove_all(targetDir);
+	TEST_NUM_CONFIGURATIONS(dir + featureFileName, 6);
 }
 
 TEST(Serialization, RedundancyVP)
 {
-	if (filesystem::is_directory(targetDir)) 
-		filesystem::remove_all(targetDir);
-	ASSERT_TRUE(filesystem::create_directory(targetDir));
-	
-	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(dir + redundancyFileName, targetDir));
-	EXPECT_EQ(util::countFiles(targetDir, faultTree::FAULT_TREE_EXT), 9); // 3*3 configs (two RedundancyVPs)
+	TEST_NUM_CONFIGURATIONS(dir + redundancyFileName, 9); // 3*3 configs (two RedundancyVPs)
+}
 
-	filesystem::remove_all(targetDir);
+TEST(Serialization, Optional_Redundancy)
+{
+	TEST_NUM_CONFIGURATIONS(dir + optRedundancyFileName, 9); // 2*2 + 2 + 2 + 1 (no optional child)
 }
 
 TEST(Serialization, Other)
 {
-	if (filesystem::is_directory(targetDir)) 
-		filesystem::remove_all(targetDir);
-	ASSERT_TRUE(filesystem::create_directory(targetDir));
-	
-	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(dir + nestedFVPFileName, targetDir));
-	EXPECT_EQ(util::countFiles(targetDir, faultTree::FAULT_TREE_EXT), 8);
-
-	filesystem::remove_all(targetDir);
+	TEST_NUM_CONFIGURATIONS(dir + redundancyFileName, 8);
 }

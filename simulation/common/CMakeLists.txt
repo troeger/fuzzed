@@ -8,7 +8,6 @@ set(SOURCES
 	
 	util.cpp
 	XMLImport.cpp
-	Condition.cpp
 )
 
 set(HEADERS
@@ -19,7 +18,6 @@ set(HEADERS
 	XMLImport.h
 	Types.h
 	Constants.h
-	Condition.h
 )
 
 include_directories(${Boost_INCLUDE_DIRS})

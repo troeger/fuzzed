@@ -33,19 +33,16 @@ void FaultTreeNode::print(std::ostream& stream, int indentLevel) const
 
 FaultTreeNode* FaultTreeNode::getChildById(const std::string& id) 
 {
-	if (m_id == id)
-		return this;
+	if (m_id == id) return this;
 
 	for (auto& child : m_children)
 	{
-		if (child->getId() == id)
-			return child;
+		if (child->getId() == id) return child;
 		
 		else 
 		{
 			FaultTreeNode* c = child->getChildById(id);
-			if (c !=  nullptr)
-				return c;
+			if (c !=  nullptr) return c;
 		}
 	}
 	return nullptr;
@@ -80,9 +77,7 @@ bool FaultTreeNode::addChildBelow(const std::string& id, FaultTreeNode* inserted
 FaultTreeNode::~FaultTreeNode()
 {
 	for (auto child : m_children)
-	{
 		delete child;
-	}
 }
 
 const FaultTreeNode* FaultTreeNode::getRoot() const
@@ -98,8 +93,6 @@ int FaultTreeNode::getCost() const
 {
 	int result = 0;
 	for (auto& child : m_children)
-	{
 		result += child->getCost();
-	}
 	return result;
 }

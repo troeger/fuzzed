@@ -21,14 +21,14 @@ PNMLDocument::PNMLDocument(const string& fileName)
 PNMLDocument::~PNMLDocument() // nothing yet
 {}
 
-int PNMLDocument::addTimedTransition(long double rate, const Condition& cond /*= Condition()*/, const string& label /*= ""*/)
+int PNMLDocument::addTimedTransition(long double rate, const string& label /*= ""*/)
 {
-	return addTransition(rate, cond, true, label);
+	return addTransition(rate, true, label);
 }
 
-int PNMLDocument::addImmediateTransition(long double weight /*= 1.0*/, const Condition& cond /*= Condition()*/, const string& label /*= ""*/)
+int PNMLDocument::addImmediateTransition(long double weight /*= 1.0*/, const string& label /*= ""*/)
 {
-	return addTransition(weight, cond, false, label);
+	return addTransition(weight, false, label);
 }
 
 int PNMLDocument::addPlace(
@@ -72,7 +72,7 @@ void PNMLDocument::setName(xml_node node, const string& label)
 	setNodeValue(name, label);
 }
 
-int PNMLDocument::addTransition(long double rate, const Condition& cond, bool isTimed, const string& label /*=""*/)
+int PNMLDocument::addTransition(long double rate, bool isTimed, const string& label /*=""*/)
 {
 	xml_node transitionNode = m_root.append_child(TRANSITION_TAG);
 
