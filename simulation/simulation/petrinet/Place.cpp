@@ -71,6 +71,7 @@ void Place::resolveConflictsTimed(int tick)
 	// P(2) = 0.5/1.0 --> subinterval [0.4, 0.9]
 	// P(3) = 0.1/1.0 --> subinterval [0.9, 1.0]
 	
+	set<Transition*> toErase;
 	for (Transition* t : m_transitionQueue)
 	{
 		TimedTransition* tt = dynamic_cast<TimedTransition*>(t);
@@ -81,11 +82,14 @@ void Place::resolveConflictsTimed(int tick)
 		if (r >= lower && r < upper)
 		{
 			tt->fire();
-			m_transitionQueue.erase(tt);
+			toErase.emplace(tt);// m_transitionQueue.erase(tt);
 			return;
 		}
 		lower = upper;
 	}
+	for (Transition* t : toErase)
+		m_transitionQueue.erase(t);
+
 	assert(false && "One interval should have been chosen");
 }
 
