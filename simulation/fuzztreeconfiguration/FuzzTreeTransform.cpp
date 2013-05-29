@@ -283,7 +283,6 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 	xml_node& faultTreeNode,
 	const FuzzTreeConfiguration& configuration) const
 {
-	cout << "generating";
 	for (const auto& currentChild : templateNode.children(CHILDREN))
 	{
 		const int		id	= parseID(currentChild);
