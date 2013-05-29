@@ -253,6 +253,7 @@ void SimulationProxy::simulateFile(const fs::path& p, bool simulatePetriNet)
 		util::replaceFileExtensionInPlace(name, "");
 		targetDir.remove_filename();
 		targetDir /= name;
+		targetDir.make_preferred();
 
 		if (!fs::create_directory(targetDir) && !fs::is_directory(targetDir))
 			throw runtime_error("Could not create directory: " + targetDir.generic_string());

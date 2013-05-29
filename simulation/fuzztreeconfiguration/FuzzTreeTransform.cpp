@@ -283,6 +283,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 	xml_node& faultTreeNode,
 	const FuzzTreeConfiguration& configuration) const
 {
+	cout << "generating";
 	for (const auto& currentChild : templateNode.children(CHILDREN))
 	{
 		const int		id	= parseID(currentChild);
@@ -357,12 +358,13 @@ bool FuzzTreeTransform::isLeaf(const string& typeDescriptor)
 
 const std::string FuzzTreeTransform::uniqueFileName() const
 {
+	boost::filesystem::path slash("/");
 	string fn = 
-		m_targetDir.generic_string() + "\\" +
+		m_targetDir.generic_string() + slash.make_preferred().native() +
 		m_file.filename().generic_string();
 	
 	util::replaceFileExtensionInPlace(fn, "");
-	
+	cout << fn << endl;	
 	return fn + util::toString(m_count) + FAULT_TREE_EXT;
 }
 
