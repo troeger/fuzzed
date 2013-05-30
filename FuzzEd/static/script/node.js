@@ -381,6 +381,9 @@ function(Properties, Mirror, Canvas, Class) {
                     // capture the original positions of all (multi) selected nodes and save them
                     jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
+                        // if this DOM element does not have an associated node object, do nothing
+                        if (typeof nodeInstance === 'undefined') return;
+
                         initialPositions[nodeInstance.id] = nodeInstance.container.position();
                     }.bind(this));
                 }.bind(this),
@@ -396,6 +399,8 @@ function(Properties, Mirror, Canvas, Class) {
                     // tell all selected nodes to move as well, except this node; the user already dragged it
                     jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
+                        // if this DOM element does not have an associated node object, do nothing
+                        if (typeof nodeInstance === 'undefined') return;
 
                         var x = initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter;
                         var y = initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter;
@@ -419,6 +424,8 @@ function(Properties, Mirror, Canvas, Class) {
 
                     jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
+                        // if this DOM element does not have an associated node object, do nothing
+                        if (typeof nodeInstance === 'undefined') return;
 
                         var x = initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter;
                         var y = initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter;
