@@ -31,7 +31,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
         },
 
         setValue: function(newValue, issuer, propagate) {
-            if (this.value === newValue) return;
+            if (this.value === newValue) return this;
 
             if (typeof propagate === 'undefined') propagate = true;
 
@@ -74,8 +74,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
     });
 
     var Bool = Property.extend({
+        menuEntryClass: function() {
+            return PropertyMenuEntry.BoolEntry;
+        },
+
         validate: function(value, validationResult) {
-            if (typeof value === 'boolean') {
+            if (typeof value !== 'boolean') {
                 validationResult.message = '[TYPE ERROR] value must be boolean';
                 return false;
             }

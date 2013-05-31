@@ -161,6 +161,24 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    var BoolEntry = Entry.extend({
+        blurEvents:   function() { return []; },
+        changeEvents: function() { return ['change']; },
+
+        _setupInput: function() {
+            this.inputs = jQuery('<input type="checkbox">').attr('id', this.id);
+
+            return this;
+        },
+
+        _value: function(newValue) {
+            if (typeof newValue === 'undefined') return this.inputs.attr('checked') === 'checked';
+            this.inputs.attr('checked', newValue ? 'checked' : null);
+
+            return this;
+        }
+    });
+
     var NumericEntry = Entry.extend({
         _setupInput: function() {
             this.inputs = jQuery('<input type="number" class="input-medium">')
@@ -207,7 +225,8 @@ define(['class', 'config'], function(Class, Config) {
     });
 
     return {
+        'BoolEntry':    BoolEntry,
         'NumericEntry': NumericEntry,
-        'TextEntry': TextEntry
+        'TextEntry':    TextEntry
     }
 });

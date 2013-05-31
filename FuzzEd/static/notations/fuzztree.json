@@ -293,11 +293,10 @@
             "help": "Event with no information available or insignificant impact",
 
             "properties": {
+                "optional": null,
+
                 "name": {
                     "default": "Undeveloped Event"
-                },
-                "optional": {
-                    "default": null
                 }
             }
         },
@@ -438,11 +437,10 @@
             "deletable": false,
 
             "properties": {
+                "optional": null,
+
                 "name": {
                     "default": "Top Event"
-                },
-                "optional": {
-                    "default": null
                 },
                 "decompositions": {
                     "kind": "numeric",

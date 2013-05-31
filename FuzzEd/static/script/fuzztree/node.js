@@ -3,11 +3,7 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
      *  Concrete fuzztree node implementation
      */
     return FaulttreeNode.extend({
-        optionalIndicator: undefined,
-
         setOptional: function(optional) {
-            this.optional = optional;
-
             // mark node optional (or remove mark)
             if (optional) {
                 this.container.addClass(this.config.Classes.NODE_OPTIONAL);
@@ -24,20 +20,18 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
             return Config;
         },
 
-        _setupVisualRepresentation: function() {
-            this._super();
-            this.setOptional(this.optional);
-
-            return this;
-        },
-
         _setupProperties: function(propertyMenuEntries, propertiesDisplayOrder) {
-            if (propertyMenuEntries && propertyMenuEntries.optional) {
-                propertyMenuEntries.optional.change = function() {
-                    this.setOptional(this.optional);
-                }.bind(this);
+            var returned = this._super(propertyMenuEntries, propertiesDisplayOrder);
+            var optionalProperty = this.properties.optional;
+
+            if (optionalProperty) {
+                this.setOptional(optionalProperty.value);
+                jQuery(optionalProperty).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue) {
+                    this.setOptional(newValue);
+                }.bind(this));
             }
-            return this._super(propertyMenuEntries, propertiesDisplayOrder);
+
+            return returned;
         }
     });
 });
