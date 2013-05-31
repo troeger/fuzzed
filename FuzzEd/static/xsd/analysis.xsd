@@ -16,12 +16,12 @@
   </xsd:complexType>
   <xsd:element name="AnalysisResult" type="fta:AnalysisResult"/>
   <xsd:complexType name="AnalysisError">
-    <xsd:attribute name="message" type="xsd:string" use="required"/>
+    <xsd:attribute name="issueId" type="xsd:int" use="required"/>
     <xsd:attribute name="elementId" type="xsd:int" use="required"/>
   </xsd:complexType>
   <xsd:element name="AnalysisError" type="fta:AnalysisError"/>
   <xsd:complexType name="AnalysisWarning">
-    <xsd:attribute name="message" type="xsd:string" use="required"/>
+    <xsd:attribute name="issueId" type="xsd:int" use="required"/>
     <xsd:attribute name="elementId" type="xsd:int" use="required"/>
   </xsd:complexType>
   <xsd:element name="AnalysisWarning" type="fta:AnalysisWarning"/>

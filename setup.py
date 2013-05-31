@@ -7,6 +7,7 @@ from distutils.command.clean import clean as _clean
 from distutils.command.sdist import sdist as _sdist
 # check FuzzEd/__init__.py for the project version number
 from FuzzEd import __version__, util
+from setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 
 def check_python_version():
     version_message = 'This Django project requires Python 2.7+'
@@ -24,20 +25,22 @@ def check_java_version():
     if (not 'version' in output) or (not '1.7' in output):
         raise Exception('We need at least Java 1.7 to build the analysis server. We found ' + output)
 
+def build_schema_files():
+    print "Generating XML schema files ..."
+    createFaultTreeSchema("FuzzEd/static/xsd/faulttree.xsd")
+    createFuzzTreeSchema("FuzzEd/static/xsd/fuzztree.xsd")
+
 def build_xmlschema_wrapper():
     print 'Building XML schema wrappers ...'
-    # Copy most recent schema files from calc server
-    shutil.copyfile('analysis/code/net.fuzztree.model.analysis/model/AnalysisXML.xsd', 'FuzzEd/static/xsd/analysis.xsd')
-    shutil.copyfile('analysis/code/net.fuzztree.model.fuzztree/model/FuzzTreeXML.xsd', 'FuzzEd/static/xsd/fuzztree.xsd')
 
     # Remove old binding files and generate new ones
-    for file_name in ['xml_fuzztree.py', 'xml_analysis.py']:
+    for file_name in ['xml_faulttree.py', 'xml_fuzztree.py', 'xml_analysis.py']:
         path_name = 'FuzzEd/models/%s' % file_name
 
         if os.path.exists(path_name):
             os.remove(path_name)
     if os.system('pyxbgen --binding-root=FuzzEd/models/ -u FuzzEd/static/xsd/analysis.xsd '
-                 '-m xml_analysis -u FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree') != 0:
+                 '-m xml_analysis -u FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree -u FuzzEd/static/xsd/faulttree.xsd -m xml_faulttree') != 0:
         raise Exception('Execution of pyxbgen failed.\nTry "sudo setup.py test" for installing all dependencies.')
 
 def build_naturaldocs():
@@ -141,9 +144,10 @@ def inherit(node_name, node, nodes, node_cache):
 class build(_build):
     def run(self):
         _build.run(self)
-        build_xmlschema_wrapper()
         build_analysis_server()
         build_notations()
+        build_schema_files()
+        build_xmlschema_wrapper()
 
 def clean_docs():
     os.system('rm -rf docs')
@@ -167,21 +171,13 @@ class clean(_clean):
 # Our overloaded 'setup.py sdist' command
 class sdist(_sdist):
     def run(self):
-        _sdist.run(self)
         build_naturaldocs()
         build_django_require()
+        _sdist.run(self)
 
 setup(
     name = 'FuzzEd',
     version = __version__,
-    install_requires=[
-        'django',
-        'south',
-        'openid2rp',
-        'django-require',
-        'minbool',
-        'pyxb'
-    ],
     packages = ['FuzzEd'],
     include_package_data = True,
     cmdclass={

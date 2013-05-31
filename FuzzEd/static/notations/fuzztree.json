@@ -93,8 +93,8 @@
                         "default": [0.5, 0],
                         "min": 0,
                         "max": 1,
-                        "step": 0.01,
-                        "epsilonStep": 0.01
+                        "step": 0.0000000001,
+                        "epsilonStep": 0.0000000001
                     }, {
                         "kind": "choice",
                         "default": [0.5, 0.3],

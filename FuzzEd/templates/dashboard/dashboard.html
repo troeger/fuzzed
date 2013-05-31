@@ -82,6 +82,7 @@
         <thead>
             <tr>
                 <th>#</th>
+                <th></th>
                 <th>Graph</th>
                 <th>Kind</th>
                 <th>Created</th>
@@ -91,9 +92,20 @@
 
         <tbody>
             {% for name, graph in graphs %} 
-                <tr onclick="document.location = '/editor/{{ graph.pk }}';">
+                    {% if graph.read_only %}
+                        <tr onclick="document.location = '/snapshot/{{ graph.pk }}';">
+                    {% else %}
+                        <tr onclick="document.location = '/editor/{{ graph.pk }}';">
+                    {% endif %}                
                     <td>{{ forloop.counter }}</td>
-                    <td><strong class="graph_name">{{ graph }}</strong></td>
+                    <td>
+                        {% if graph.read_only %}
+                            <i class="icon-lock"></i>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong class="graph_name">{{ graph }}</strong>
+                    </td>
                     <td><span class="label">{{ name }}</span></td>
                     <td>{{ graph.created }}</td>
                     <td style="text-align: right;">
@@ -104,9 +116,13 @@
                                 <i class="icon-wrench"></i>
                                 Settings
                             </button>
-                            <button type="submit" name="duplicate" value="duplicate" class="btn">
-                                <i class="icon-tags"></i>
-                                Duplicate
+                            <button type="submit" name="copy" value="copy" class="btn">
+                                <i class="icon-plus-sign"></i>
+                                Copy
+                            </button>
+                            <button type="submit" name="snapshot" value="snapshot" class="btn">
+                                <i class="icon-camera"></i>
+                                Snapshot
                             </button>
                             <button type="button" class="btn btn-danger require-dialog">
                                 <i class="icon-white icon-trash"></i>

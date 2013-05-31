@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     url(r'^dashboard/new/$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
     url(r'^dashboard/(?P<graph_id>\d+)/$', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
     url(r'^editor/(?P<graph_id>\d+)$', 'FuzzEd.views.editor', name='editor'),
+    url(r'^snapshot/(?P<graph_id>\d+)$', 'FuzzEd.views.snapshot', name='snapshot'),
 
     # API
     # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API

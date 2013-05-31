@@ -1,6 +1,8 @@
 include distribute_setup.py
 include manage.py
 include setup.py
+include analysis/*.py
+include analysis/jar/fuzzTreeAnalysis.jar
 recursive-include FuzzEd *.py
 graft FuzzEd/lib
 graft FuzzEd/management

@@ -4,11 +4,11 @@
 	<topEvent id="1" name="Ausfall Server">
 		<children id="2" name="-" xsi:type="ft:Or">
 			<children id="3" name="-" xsi:type="ft:And">
-				<children id="10" name="Ausfall Netzteil 1" optional="false"
+				<children id="10" costs="50" name="Ausfall Netzteil 1" optional="false"
 					xsi:type="ft:BasicEvent">
 					<probability value="0.01" xsi:type="ft:CrispProbability" />
 				</children>
-				<children costs="100" id="20" name="Ausfall Netzteil 2"
+				<children costs="50" id="20" name="Ausfall Netzteil 2"
 					optional="true" xsi:type="ft:BasicEvent">
 					<probability value="0.01" xsi:type="ft:CrispProbability" />
 				</children>

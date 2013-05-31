@@ -209,6 +209,8 @@ function(Property, Mirror, Canvas, Class) {
                         'left': this._nodeImage.xCenter
                     })
                     .appendTo(this.container);
+
+                if (this.readOnly) this._connectionHandle.hide();
             }
 
             return this;
@@ -348,12 +350,13 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         _setupDragging: function() {
-            var initialPositions = {};
+            if (this.readOnly) return this;
 
+            var initialPositions = {};
             // using jsPlumb draggable and not jQueryUI to allow that edges move together with nodes
             jsPlumb.draggable(this.container, {
                 // stay in the canvas
-                containment: 'parent',
+                containment: Canvas.container,
                 // become a little bit opaque when dragged
                 opacity:     this.config.Dragging.OPACITY,
                 // show a cursor with four arrows
@@ -381,6 +384,9 @@ function(Property, Mirror, Canvas, Class) {
                 }.bind(this),
 
                 drag: function(event, ui) {
+                    // enlarge canvas
+                    Canvas.enlarge({x: ui.offset.left, y: ui.offset.top});
+
                     // determine by how many pixels we moved from our original position (see: start callback)
                     var xOffset = ui.position.left - initialPositions[this.id].left;
                     var yOffset = ui.position.top  - initialPositions[this.id].top;
@@ -389,10 +395,13 @@ function(Property, Mirror, Canvas, Class) {
                     jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
 
+                        var x = initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter;
+                        var y = initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter;
+
                         // move the other selectee by the dragging offset, do NOT report to the backend yet
                         nodeInstance._moveContainerToPixel({
-                            'x': initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
-                            'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
+                            'x': Math.max(x, Canvas.gridSize),
+                            'y': Math.max(y, Canvas.gridSize)
                         });
 
                         // ask jsPlumb to repaint the selectee in order to redraw its connections
@@ -409,10 +418,13 @@ function(Property, Mirror, Canvas, Class) {
                     jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
 
+                        var x = initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter;
+                        var y = initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter;
+
                         // ... and report to the backend this time because dragging ended
                         nodeInstance.moveTo({
-                            'x': initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
-                            'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
+                            'x': Math.max(x, Canvas.gridSize),
+                            'y': Math.max(y, Canvas.gridSize)
                         });
                     }.bind(this));
 
@@ -436,6 +448,7 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         _setupMouse: function() {
+            if (this.readOnly) return this;
             // hovering over a node
             this.container.hover(
                 // mouse in
@@ -456,6 +469,8 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         _setupSelection: function() {
+            if (this.readOnly) return this;
+
             //XXX: select a node on click
             // This uses the jQuery.ui.selectable internal functions.
             // We need to trigger them manually because only jQuery.ui.draggable gets the mouseDown events on nodes.
@@ -699,6 +714,7 @@ function(Property, Mirror, Canvas, Class) {
                 left: position.x - this._nodeImage.xCenter,
                 top:  position.y - this._nodeImage.yCenter
             });
+            Canvas.enlarge(position);
 
             return this;
         },
