@@ -70,7 +70,7 @@ class Node(models.Model):
             return unicode('%s%s' % (prefix, name))
 
         except ObjectDoesNotExist:
-            return unicode('%s%s_%s' % (prefix, self.pk, notations.by_kind[self.graph.kind]['nodes'][self.kind]['name']))
+            return unicode('%s%s_%s' % (prefix, self.pk, notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']['name']['default']))
 
     def to_json(self):
         """
@@ -92,16 +92,15 @@ class Node(models.Model):
         Returns:
          {dict} the node as dictionary
         """
-        serialized = dict([prop.to_tuple() for prop in self.properties.filter(deleted=False)])
-
-        serialized['id']       = self.client_id
-        serialized['kind']     = self.kind
-        serialized['x']        = self.x
-        serialized['y']        = self.y
-        serialized['outgoing'] = [edge.client_id for edge in self.outgoing.filter(deleted=False)]
-        serialized['incoming'] = [edge.client_id for edge in self.incoming.filter(deleted=False)]
-
-        return serialized
+        return {
+            'properties': {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)},
+            'id':         self.client_id,
+            'kind':       self.kind,
+            'x':          self.x,
+            'y':          self.y,
+            'outgoing':   [edge.client_id for edge in self.outgoing.filter(deleted=False)],
+            'incoming':   [edge.client_id for edge in self.incoming.filter(deleted=False)]
+        }
 
     def to_bool_term(self):
         edges = self.outgoing.filter(deleted=False).all()
@@ -195,7 +194,7 @@ class Node(models.Model):
         except ObjectDoesNotExist:
             try:
                 logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
-                return notations.by_kind[self.graph.kind]['nodes'][self.kind][key]
+                return notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
             except KeyError:
                 logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
                 return default

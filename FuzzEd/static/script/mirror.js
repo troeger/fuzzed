@@ -15,12 +15,14 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
          * Group: Members
          *
          * Properties:
+         *   {Property}   property     - The mirrored property object
          *   {DOMElement} container    - This is the mirror's container element that holds the actual content.
          *   {String}     prefix       - A constant string that is always prepended to the show content (default: '').
          *   {String}     suffix       - A constant string that is always appended to the show content (default: '').
          *
          *   {DOMElement} _containment - The DOM element that the mirror is attached to - i.e. <Node::container>.
          */
+        property:     undefined,
         container:    undefined,
         prefix:       undefined,
         suffix:       undefined,
@@ -36,10 +38,12 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
          * {Array[String]} style (possible values in array: 'bold', 'italic', 'large').
          *
          * Parameters:
+         *   {Property}   property    - The mirrored property object
          *   {DOMElement} containment - The DOM element that will contain the mirror's DOM elements.
          *   {Objects}    properties  - Object with mirror configuration options. See description above for details.
          */
-        init: function(containment, properties) {
+        init: function(property, containment, properties) {
+            this.property     = property;
             this._containment = containment;
             this.container    = jQuery('<span>').addClass(Config.Classes.MIRROR)
                 // The label is double the grid/node's width to allow for large textual content. Since the mirror is
@@ -66,6 +70,8 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
                 this._containment.prepend(this.container);
             else
                 throw '[VALUE ERROR] unknown mirror position: ' + properties.position;
+
+            this._setupEvents();
         },
 
         /**
@@ -93,6 +99,12 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
             }
 
             return this;
+        },
+
+        _setupEvents: function() {
+            jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, issuer) {
+                this.show(newValue);
+            }.bind(this));
         }
     });
 });

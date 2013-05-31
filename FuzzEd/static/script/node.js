@@ -480,6 +480,7 @@ function(Property, Mirror, Canvas, Class) {
             _.each(propertiesDisplayOrder, function(propertyName) {
                 var property = this.properties[propertyName];
                 if (!property) return;
+                property.name = propertyName;
                 this.properties[propertyName] = Property.from(this, property);
             }.bind(this));
 

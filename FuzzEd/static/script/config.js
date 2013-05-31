@@ -266,12 +266,14 @@ define(function() {
          *    Menu configurations.
          *
          *  Constants:
-         *    {Number} ANIMATION_DURATION     - Duration of the minimize animation (in ms).
-         *    {Number} PROPERTIES_MENU_OFFSET - Offset of the properties menu from the borders.
+         *    {Number} ANIMATION_DURATION      - Duration of the minimize animation (in ms).
+         *    {Number} PROPERTIES_MENU_OFFSET  - Offset of the properties menu from the borders.
+         *    {Number} PROPERTIES_MENU_TIMEOUT - Number of milliseconds after which a change is propagated.
          */
         Menus: {
-            ANIMATION_DURATION:     200,
-            PROPERTIES_MENU_OFFSET: 20
+            ANIMATION_DURATION:      200,
+            PROPERTIES_MENU_OFFSET:  20,
+            PROPERTIES_MENU_TIMEOUT: 500
         },
 
         /**

@@ -1,22 +1,25 @@
-define(['class', 'decimal', 'propertyMenuEntry', 'mirror', 'underscore'], function(Class, Decimal, PropertyMenuEntry, Mirror) {
+define(['class', 'config', 'decimal', 'propertyMenuEntry', 'mirror', 'underscore'],
+function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
 
     var isNumber = function(num) {
         return typeof num === 'number' && !window.isNaN(num);
     };
 
     var Property = Class.extend({
-        node:  undefined,
-        value: undefined,
+        node:        undefined,
+        value:       undefined,
         displayName: '',
-        mirror: undefined,
-        menuEntry: undefined,
+        mirror:      undefined,
+        menuEntry:   undefined,
 
         init: function(node, definition) {
             jQuery.extend(this, definition);
-            this.node  = node;
+            this.node = node;
             this._sanitize()
                 ._setupMirror()
                 ._setupMenuEntry();
+
+            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.value, this]);
         },
 
         menuEntryClass: function() {
@@ -27,18 +30,21 @@ define(['class', 'decimal', 'propertyMenuEntry', 'mirror', 'underscore'], functi
             throw '[ABSTRACT] subclass responsibility';
         },
 
-        setValue: function(newValue, propagate) {
+        setValue: function(newValue, issuer, propagate) {
             if (typeof propagate === 'undefined') propagate = true;
 
             var validationResult = {};
             if (!this.validate(newValue, validationResult)) {
                 throw '[VALUE ERROR] ' + validationResult;
             }
+
             this.value = newValue;
-            this.mirror.show(newValue);
+            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [newValue, issuer]);
 
             if (propagate) {
-                // TODO: backend
+                var properties = {};
+                properties[this.name] = newValue;
+                jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.node.id, properties]);
             }
 
             return this;
@@ -55,16 +61,13 @@ define(['class', 'decimal', 'propertyMenuEntry', 'mirror', 'underscore'], functi
 
         _setupMirror: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
-            this.mirror = new Mirror(this.node.container, this.mirror);
-            this.mirror.show(this.value);
+            this.mirror = new Mirror(this, this.node.container, this.mirror);
 
             return this;
         },
 
         _setupMenuEntry: function() {
-            //TODO
-//            this.menuEntry = new (this.menuEntryClass())(this);
-            this.menuEntry = new PropertyMenuEntry.TextEntry(this);
+            this.menuEntry = new (this.menuEntryClass())(this);
         }
     });
 
