@@ -317,13 +317,9 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 				continue; // stop recursion
 		}
 		else if (typeDescriptor == BASIC_EVENT_SET)
-		{
+		{ // TODO forbid quantity parameter in basic event sets below Redundancy VP
 			expandBasicEventSet(currentChild, faultTreeNode, id, 0);
 			continue;
-		}
-		else if (typeDescriptor == INTERMEDIATE_EVENT_SET)
-		{
-			continue; // TODO
 		}
 		else
 		{
@@ -359,8 +355,10 @@ bool FuzzTreeTransform::isLeaf(const string& typeDescriptor)
 const std::string FuzzTreeTransform::uniqueFileName() const
 {
 	boost::filesystem::path slash("/");
+	const string sSlash = slash.make_preferred().string();
+	
 	string fn = 
-		m_targetDir.generic_string() + slash.make_preferred().native() +
+		m_targetDir.generic_string() + sSlash +
 		m_file.filename().generic_string();
 	
 	util::replaceFileExtensionInPlace(fn, "");
@@ -396,10 +394,6 @@ pair<xml_node,bool> FuzzTreeTransform::handleRedundancyVP(
 		votingOR.append_attribute(VOTING_OR_K).set_value(get<0>(kOutOfN));
 		expandBasicEventSet(child, votingOR, id, get<1>(kOutOfN));
 		return make_pair(votingOR, true);
-	}
-	else if (typeDescriptor == INTERMEDIATE_EVENT_SET)
-	{
-		// TODO handle IntermediateEventSet
 	}
 	else
 	{
