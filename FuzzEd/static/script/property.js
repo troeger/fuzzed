@@ -31,11 +31,13 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
         },
 
         setValue: function(newValue, issuer, propagate) {
+            if (this.value === newValue) return;
+
             if (typeof propagate === 'undefined') propagate = true;
 
             var validationResult = {};
             if (!this.validate(newValue, validationResult)) {
-                throw '[VALUE ERROR] ' + validationResult;
+                throw '[VALUE ERROR] ' + validationResult.message;
             }
 
             this.value = newValue;
@@ -279,6 +281,10 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
         min:    -Decimal.MAX_VALUE,
         max:     Decimal.MAX_VALUE,
         step:    undefined,
+
+        menuEntryClass: function() {
+            return PropertyMenuEntry.NumericEntry;
+        },
 
         validate: function(value, validationResult) {
             if (!isNumber(value)) {

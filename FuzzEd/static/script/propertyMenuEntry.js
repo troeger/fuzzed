@@ -20,7 +20,7 @@ define(['class', 'config'], function(Class, Config) {
         },
 
         blurEvents: function() {
-            return ['blur'];
+            return ['blur', 'remove'];
         },
 
         blurred: function(event, ui) {
@@ -28,9 +28,10 @@ define(['class', 'config'], function(Class, Config) {
 
             this._abortChange().unwarn();
 
-            if (this.property.validate(this._value())) {
+            if (this.property.validate(this._value(), {})) {
                 this.property.setValue(this._value(), this);
             } else {
+                this._value(this._preEditValue);
                 this.property.setValue(this._preEditValue, this, false);
             }
 
@@ -59,7 +60,7 @@ define(['class', 'config'], function(Class, Config) {
             if (this.property.validate(this._value(), validationResult)) {
                 this._sendChange().unwarn();
             } else {
-                this._abortChange().warn(validationResult);
+                this._abortChange().warn(validationResult.message);
             }
 
             return this;
@@ -98,20 +99,16 @@ define(['class', 'config'], function(Class, Config) {
         },
 
         warn: function(text) {
-            this.inputs.addClass(Config.Classes.PROPERTY_WARNING);
             this.container
-                .tooltip({
-                    trigger: 'manual',
-                    title:   text
-                })
+                .addClass(Config.Classes.PROPERTY_WARNING)
+                .attr('data-original-title', text)
                 .tooltip('show');
 
             return this;
         },
 
         unwarn: function() {
-            this.inputs.removeClass(Config.Classes.PROPERTY_WARNING);
-            this.container.tooltip('hide');
+            this.container.removeClass(Config.Classes.PROPERTY_WARNING).tooltip('hide');
 
             return this;
         },
@@ -126,7 +123,7 @@ define(['class', 'config'], function(Class, Config) {
 
         _setupContainer: function() {
             this.container = jQuery(
-                '<div class="control-group">\
+                '<div class="control-group" data-toggle="tooltip" data-trigger="manual" data-placement="left">\
                     <label class="control-label" for="' + this.id + '">' + (this.property.displayName || '') + '</label>\
                     <div class="controls"></div>\
                 </div>'
@@ -164,6 +161,29 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    var NumericEntry = Entry.extend({
+        _setupInput: function() {
+            this.inputs = jQuery('<input type="number" class="input-medium">')
+                .attr('id',       this.id)
+                .attr('min',      this.property.min)
+                .attr('max',      this.property.max)
+                .attr('step',     this.property.step);
+
+            return this;
+        },
+
+        _value: function(newValue) {
+            if (typeof newValue === 'undefined') return window.parseFloat(this.inputs.val());
+            this.inputs.val(newValue);
+
+            return this;
+        },
+
+        changeEvents: function() {
+            return ['change', 'keyup', 'cut', 'paste'];
+        }
+    });
+
     var TextEntry = Entry.extend({
         _setupInput: function() {
             this.inputs = jQuery('<input type="text" class="input-medium">').attr('id', this.id);
@@ -177,6 +197,8 @@ define(['class', 'config'], function(Class, Config) {
         _value: function(newValue) {
             if (typeof newValue === 'undefined') return this.inputs.val();
             this.inputs.val(newValue);
+
+            return this;
         },
 
         changeEvents: function() {
@@ -185,6 +207,7 @@ define(['class', 'config'], function(Class, Config) {
     });
 
     return {
+        'NumericEntry': NumericEntry,
         'TextEntry': TextEntry
     }
 });
