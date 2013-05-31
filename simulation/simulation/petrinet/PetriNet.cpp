@@ -125,6 +125,16 @@ void PetriNet::simplify()
 {
 	vector<ImmediateTransition> toErase;
 
+	std::function<void(Transition&, Place*, Place*, int)> reconnect = 
+		[](Transition& t, Place* ip, Place* op, int produceCount) -> void
+	{
+		if (t.producesInto(ip))
+		{
+			t.addOutPlace(op, produceCount);
+			t.removeInPlace(ip);
+		}
+	};
+
 	//   O->|->O  ==>  O
 	for (ImmediateTransition& t : m_immediateTransitions)
 	{
@@ -137,18 +147,12 @@ void PetriNet::simplify()
 			assert(ip && op);
 
 			if (produceCount != consumeCount) continue; // TODO: handle this case
+			// TODO: check priority!
 
 			toErase.emplace_back(t);
-			std::function<void(Transition&)> reconnect = [&](Transition& t) -> void
-			{
-				if (t.producesInto(ip))
-				{
-					t.addOutPlace(op, produceCount);
-					t.removeInPlace(ip);
-				}
-			};
+			applyToAllTransitions(std::bind(reconnect, std::placeholders::_1, ip, op, produceCount));
 
-			applyToAllTransitions(reconnect);
+			m_placeDict.erase(ip->getID());
 		}
 	}
 
