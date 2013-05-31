@@ -93,7 +93,7 @@ define(['class', 'decimal', 'propertyMenuEntry', 'mirror', 'underscore'], functi
         },
 
         validate: function(value, validationResult) {
-            if (_.indexOf(this.values, value) < 0) {
+            if (!_.find(this.values, function(val){ return _.isEqual(val, value); }, this)) {
                 validationResult.message = '[TYPE ERROR] no such value ' + value;
                 return false;
             }
@@ -111,11 +111,11 @@ define(['class', 'decimal', 'propertyMenuEntry', 'mirror', 'underscore'], functi
         _sanitize: function() {
             this.value = typeof this.value === 'undefined' ? this.default : this.value;
 
-            if (typeof this.choices !== 'undefined' || this.choices.length === 0) {
+            if (typeof this.choices === 'undefined' || this.choices.length === 0) {
                 throw '[VALUE ERROR] there must be at least one choice';
             } else if (this.choices.length != this.values.length) {
                 throw '[VALUE ERROR] there must be a value for each choice';
-            } else if (_.indexOf(this.values, this.value) < 0) {
+            } else if (!_.find(this.values, function(value){ return _.isEqual(value, this.value); }, this)) {
                 throw '[VALUE ERROR] unknown value ' + this.value;
             }
             return this._super();
