@@ -409,7 +409,9 @@ void FuzzTreeTransform::expandBasicEventSet(
 	const int& id,
 	const int& defaultQuantity) const
 {
-	const int numChildren = templateNode.attribute(BASIC_EVENT_SET_QUANTITY).as_int(defaultQuantity);
+	const int numChildren = defaultQuantity == 0 ? 
+		templateNode.attribute(BASIC_EVENT_SET_QUANTITY).as_int(defaultQuantity) : defaultQuantity;
+
 	if (numChildren <= 0)
 	{
 		throw runtime_error("Invalid Quantity in Basic Event Set");
