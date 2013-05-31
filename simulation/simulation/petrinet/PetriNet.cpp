@@ -16,7 +16,7 @@ PetriNet::PetriNet(
 	m_finalFiringTime(MAX_INT)
 {
 	setup();
-	simplify();
+	// simplify();
 }
 
 PetriNet::PetriNet(const PetriNet& otherNet) :
@@ -131,7 +131,7 @@ void PetriNet::simplify()
 		if (t.producesInto(ip))
 		{
 			t.addOutPlace(op, produceCount);
-			t.removeInPlace(ip);
+			t.removeOutPlace(ip);
 		}
 	};
 
@@ -152,7 +152,7 @@ void PetriNet::simplify()
 			toErase.emplace_back(t);
 			applyToAllTransitions(std::bind(reconnect, std::placeholders::_1, ip, op, produceCount));
 
-			m_placeDict.erase(ip->getID());
+			//m_placeDict.erase(ip->getID());
 		}
 	}
 
