@@ -94,5 +94,5 @@ TEST(Serialization, Other)
 
 TEST(Serialization, ExampleSystem)
 {
-	TEST_NUM_CONFIGURATIONS("C:/dev/fuzztrees/simulation/testdata/blocksimCompare/" + exampleSystemFileName, 3);
+	TEST_NUM_CONFIGURATIONS("C:/dev/fuzztrees/simulation/testdata/blocksim_compare/" + exampleSystemFileName, 3);
 }
