@@ -53,3 +53,15 @@ std::pair<int /*placeID*/,int /*spareActivationTransition*/> BasicEvent::seriali
 
 	return make_pair(failedPlaceID, activateTransition);
 }
+
+std::pair<int /*placeID*/, int /*timedTransitionID*/> 
+	BasicEvent::serializeSequential(boost::shared_ptr<PNDocument> doc) const
+{
+	int notFailed = doc->addPlace(1, 1, "BasicEvent" + m_id, true);
+	int failComponent = doc->addTimedTransition(m_failureRate);
+	doc->placeToTransition(notFailed, failComponent);
+
+	int failed = doc->addPlace(0, 100, "BasicEvent" + m_id + "_occured");
+	doc->transitionToPlace(failComponent, failed);
+	return make_pair(failed, failComponent);
+}

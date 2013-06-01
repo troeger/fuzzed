@@ -7,6 +7,8 @@
 // currently, simulations where the children do not occur in the right sequence are aborted.
 // since the probability of the specific sequence can be low, this results in very few completed simulation rounds.
 
+#define STATIC_SEQUENCE 1
+
 class SEQGate : public Gate
 {
 public:
