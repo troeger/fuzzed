@@ -11,7 +11,7 @@ enum SequenceType
 	DYNAMIC_PLACE_SEQ
 };
 
-class SequentialConstraint
+class SequentialConstraint : public PetriNetConstraint
 {
 public:
 	SequentialConstraint(const std::vector<std::string>& sequence, SequenceType type);

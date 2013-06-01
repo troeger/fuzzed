@@ -4,6 +4,7 @@
 using namespace std;
 
 SequentialConstraint::SequentialConstraint(const vector<string>& sequence, SequenceType type) :
+	PetriNetConstraint(),
 	m_requiredSequence(sequence),
 	m_type(type),
 	m_satisfied(true), 
@@ -52,17 +53,17 @@ bool SequentialConstraint::checkPlaceSequence(const PetriNet* const pn)
 bool SequentialConstraint::checkTransitionSequence(const PetriNet* const pn)
 {
 	auto sequencePos = m_requiredSequence.begin();
-	for (const auto& p : pn->m_activeTimedTransitions)
+	for (auto it = m_requiredSequence.begin(); it != m_requiredSequence.end(); ++it)
 	{
-		const string transitionID = p.second->getID();
-		for (auto it = m_requiredSequence.begin(); it != m_requiredSequence.end(); ++it)
-		{ // find this transition
-			if (it->getID() == transitionID)
+		for (const auto& p : pn->m_activeTimedTransitions)
+		{
+			const string transitionID = p.second->getID();
+			if (*it == transitionID)
 			{
 				if (sequencePos > it) return false;
 				sequencePos = it;
 			}
 		}
-	
 	}
+	return true;
 }
