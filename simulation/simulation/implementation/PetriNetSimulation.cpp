@@ -59,6 +59,9 @@ bool PetriNetSimulation::run()
 		
 		// TODO: check remaining stack size. or make sure it's big enough.
 		PetriNet currentNet(std::move(*pn));
+		while (currentNet.constraintViolated())
+			currentNet = PetriNet(std::move(*pn));
+
 		SimulationRoundResult res = runOneRound(&currentNet);
 		
 		if (res.valid)
@@ -145,7 +148,9 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	bool immediateCanFire = true;
 	while (immediateCanFire)
 	{
+#ifndef STATIC_SEQUENCE
 		if (pn->constraintViolated()) return false;
+#endif
 		tryImmediateTransitions(pn, tick, immediateCanFire);
 	}
 	vector<TimedTransition*> toRemove;
@@ -169,11 +174,13 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 	const auto start = high_resolution_clock::now();
 
 	SimulationRoundResult result;
+#ifndef STATIC_SEQUENCE
 	if (net->constraintViolated())
 	{
 		result.valid = false;
 		return result;
 	}
+#endif
 	result.failed = false;
 	result.failureTime = m_numSimulationSteps;
 	result.valid = true;

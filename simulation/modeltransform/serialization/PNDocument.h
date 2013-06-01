@@ -10,6 +10,7 @@
 #endif
 
 #include "Condition.h"
+#include "petrinet\SequentialConstraint.h"
 
 using namespace pugi;
 using namespace std;
@@ -37,7 +38,7 @@ public:
 	
 	// add a measure which defines the time until the TopLevelEvent is triggered
 	virtual void addFailureMeasure() {}; // TimeNET
-	virtual void addSequenceConstraint(const vector<int>& sequence) {}; // SEQGate
+	virtual void addSequenceConstraint(const vector<int>& sequence, SequenceType type) {}; // SEQGate
 	virtual void addUserDescription(const string& description);
 	
 	bool save(const string& fileName);

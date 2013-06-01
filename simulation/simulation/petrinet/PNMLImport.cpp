@@ -10,6 +10,7 @@
 #include "Constants.h"
 #include "PetriNet.h"
 #include "util.h"
+#include "gates/SEQGate.h"
 
 using namespace PNML;
 
@@ -180,7 +181,11 @@ void PNMLImport::loadConstraints(vector<SequentialConstraint>& constraints)
 			vector<string> sequence;
 			const string seqString = constraintChild.attribute(SEQUENCE_LIST).as_string();
 			util::tokenizeString(seqString, sequence);
-			constraints.emplace_back(SequentialConstraint(sequence));
+#ifdef STATIC_SEQUENCE
+			constraints.emplace_back(SequentialConstraint(sequence, STATIC_TRANSITIION_SEQ));
+#else
+			constraints.emplace_back(SequentialConstraint(sequence, DYNAMIC_PLACE_SEQ));
+#endif
 		}
 	}
 }

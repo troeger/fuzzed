@@ -137,7 +137,7 @@ int PNMLDocument::addTopLevelPlace(const string& label)
 	return m_placeCount;
 }
 
-void PNMLDocument::addSequenceConstraint(const vector<int>& sequence)
+void PNMLDocument::addSequenceConstraint(const vector<int>& sequence, SequenceType type)
 {
 	xml_node node = m_root.append_child(TOOL_SPECIFIC_TAG);
 	xml_node constraintNode = node.append_child(SEQUENCE_CONSTRAINT);
@@ -146,7 +146,7 @@ void PNMLDocument::addSequenceConstraint(const vector<int>& sequence)
 	for (const int& id : sequence)
 	{
 		assert(m_placeCount >= id);
-		sequenceString += PLACE_IDENTIFIER + util::toString(id) + " ";
+		sequenceString += ((type == DYNAMIC_PLACE_SEQ) ? PLACE_IDENTIFIER : TRANSITION_IDENTIFIER) + util::toString(id) + " ";
 	}
 	constraintNode.append_attribute(SEQUENCE_LIST).set_value(sequenceString.c_str());
 }
