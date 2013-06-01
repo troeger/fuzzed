@@ -52,6 +52,14 @@ void Place::resolveConflictsTimed(int tick)
 	assert(m_marking >= 0);
 	assert(hasRequests());
 
+	if (m_transitionQueue.size() == 1)
+	{
+		TimedTransition* tt = dynamic_cast<TimedTransition*>(*m_transitionQueue.begin());
+		tt->fire();
+		m_transitionQueue.clear();
+		return;
+	}
+
 	double sumLambda = 0.0;
 	for (Transition* t : m_transitionQueue)
 	{
@@ -83,14 +91,12 @@ void Place::resolveConflictsTimed(int tick)
 		{
 			tt->fire();
 			toErase.emplace(tt);// m_transitionQueue.erase(tt);
-			return;
+			break;
 		}
 		lower = upper;
 	}
 	for (Transition* t : toErase)
 		m_transitionQueue.erase(t);
-
-	assert(false && "One interval should have been chosen");
 }
 
 void Place::resolveConflictsImmediate(int tick)
