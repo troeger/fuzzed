@@ -416,9 +416,9 @@
         "probability",
         "optional",
         "cardinality",
+        "nRange",
         "k",
         "kFormula",
-        "nRange",
         "decompositions",
         "transfer",
         "transferMaxCost"
