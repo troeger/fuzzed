@@ -1,5 +1,6 @@
 #include "PetriNet.h"
 #include "util.h"
+#include "Constants.h"
 
 PetriNet::PetriNet(
 	const vector<ImmediateTransition>& immediateTransitions, 
@@ -15,7 +16,9 @@ PetriNet::PetriNet(
 	m_topLevelPlace(nullptr),
 	m_finalFiringTime(MAX_INT)
 {
-	setup();
+	// this is just the first petri net created from PNML import.
+	// setup necessary only for its copies.
+	// setup();
 	// simplify();
 }
 
@@ -95,6 +98,10 @@ PetriNet& PetriNet::operator=(const PetriNet& otherNet)
 	m_arcs					= otherNet.m_arcs;
 	m_constraints			= otherNet.m_constraints;
 
+	m_activeTimedTransitions = TransitionTimeMapping();
+	m_inactiveTimedTransitions = set<TimedTransition*>();
+	m_finalFiringTime = MAX_INT;
+
 	setup();
 
 	return *this;
@@ -122,43 +129,53 @@ void PetriNet::updateFiringTime(TimedTransition* tt)
 }
 
 void PetriNet::simplify()
-{
-	vector<ImmediateTransition> toErase;
+{ // fragments towards simplifying on the arc list??
+	enum ArcEnd { BEGIN, END };
 
-	std::function<void(Transition&, Place*, Place*, int)> reconnect = 
-		[](Transition& t, Place* ip, Place* op, int produceCount) -> void
+	for (ArcSpec& spec : m_arcs)
 	{
-		if (t.producesInto(ip))
+		const string input = get<0>(spec);
+		const string output = get<1>(spec);
+		const int tokenNum = get<2>(spec);
+
+		string transitionName, placeName;
+		ArcEnd endType;
+		if (util::beginsWith(input, TRANSITION_IDENTIFIER))
 		{
-			t.addOutPlace(op, produceCount);
-			t.removeOutPlace(ip);
+			transitionName = input;
+			placeName = output;
+			endType = BEGIN;
 		}
-	};
+		else if (util::beginsWith(output, TRANSITION_IDENTIFIER))
+		{
+			transitionName = output;
+			placeName = input;
+			endType = END;
+		}
+		else continue;
 
-	//   O->|->O  ==>  O
-	for (ImmediateTransition& t : m_immediateTransitions)
-	{
-		if (t.nInPlaces() == 1 && t.nOutPlaces() == 1)
-		{ // remove transition and connect all arcs to the inplace with the outplace
-			Place* ip = t.inPlacesBegin()->first;
-			Place* op = t.outPlacesBegin()->first;
-			const int produceCount = t.outPlacesBegin()->second;
-			const int consumeCount = t.inPlacesBegin()->second;
-			assert(ip && op);
+		for (const ArcSpec& spec1 : m_arcs)
+		{
+			if (get<2>(spec1) != tokenNum) continue;
 
-			if (produceCount != consumeCount) continue; // TODO: handle this case
-			// TODO: check priority!
-
-			toErase.emplace_back(t);
-			applyToAllTransitions(std::bind(reconnect, std::placeholders::_1, ip, op, produceCount));
-
-			//m_placeDict.erase(ip->getID());
+			string outputID, inputID;
+			if (get<0>(spec1) == transitionName && endType == END)
+			{ // place-to-transition
+				outputID = get<1>(spec1);
+				inputID = placeName;
+			}
+			else if (get<1>(spec1) == transitionName && endType == BEGIN)
+			{
+				outputID = placeName;
+				inputID = get<0>(spec1);
+			}
+			else continue;
+			
+			assert(util::beginsWith(outputID, PLACE_IDENTIFIER) && util::beginsWith(inputID, PLACE_IDENTIFIER));
 		}
 	}
-
-	for (auto& t : toErase)
-		util::removeValue(m_immediateTransitions, t);
 }
+
 
 void PetriNet::applyToAllTransitions(std::function<void (Transition& t)> func)
 {
