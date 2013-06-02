@@ -48,12 +48,13 @@ namespace util
 	string conditionString(const int placeID, ConditionType cond, const int argument);
 	string conditionString(const string& placeIdentifier, ConditionType cond, const int argument);
 
+	bool beginsWith(const string& subject, const string& prefix);
+
 	void tokenizeIntegerString(const string& input, vector<int>& results /*out*/);
 	void tokenizeString(const string& input, vector<string>& results /*out*/);
 	
 	void replaceStringInPlace(string& subject, const string& search, const std::string& replacement);
 	void replaceFileExtensionInPlace(string& subject, const string& newExtension);
-
 
 	/************************************************************************/
 	/* Timing                                                               */

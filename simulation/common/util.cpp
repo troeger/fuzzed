@@ -176,3 +176,8 @@ void util::clearDirectory(const string& dir)
 	for(filesystem::directory_iterator iter(dir) ; iter != end ; ++iter)
 		filesystem::remove_all(*iter);
 }
+
+bool util::beginsWith(const string& subject, const string& prefix)
+{
+	return subject.substr(0, prefix.length()) == prefix;
+}
