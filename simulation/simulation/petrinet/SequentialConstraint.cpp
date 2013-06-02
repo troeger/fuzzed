@@ -52,16 +52,23 @@ bool SequentialConstraint::checkPlaceSequence(const PetriNet* const pn)
 
 bool SequentialConstraint::checkTransitionSequence(const PetriNet* const pn)
 {
-	auto sequencePos = m_requiredSequence.begin();
-	for (auto it = m_requiredSequence.begin(); it != m_requiredSequence.end(); ++it)
-	{
-		for (const auto& p : pn->m_activeTimedTransitions)
+	unsigned int sequencePos = 0;
+
+	auto current = m_requiredSequence.begin();
+	for (auto tt = pn->m_activeTimedTransitions.begin(); tt != pn->m_activeTimedTransitions.end(); ++tt)
+	{ // find the currently required transition
+		const string transitionID = tt->second->getID();
+		for (auto itFront = m_requiredSequence.begin(); itFront != current; ++itFront)
 		{
-			const string transitionID = p.second->getID();
-			if (*it == transitionID)
+			if (*itFront == transitionID)
+				return false;
+		}
+		for (auto itBack = current; itBack != m_requiredSequence.end(); ++itBack)
+		{
+			if (*itBack == transitionID)
 			{
-				if (sequencePos > it) return false;
-				sequencePos = it;
+				current = itBack;
+				break;
 			}
 		}
 	}
