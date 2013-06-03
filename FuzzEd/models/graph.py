@@ -77,6 +77,32 @@ class Graph(models.Model):
         root = self.nodes.get(kind__exact = 'topEvent')
         return root.to_bool_term()
 
+    def to_tikz(self):
+        """
+        Method: to_tikz
+            Translates the graph into a LaTex TIKZ representation.
+
+        Returns:
+            {string} The TIKZ representation of the graph
+        """
+        # Latex preambel
+        result = """
+\\documentclass{article}
+\\usepackage{tikz}
+\\begin{document}
+\\begin{figure}
+\\begin{tikzpicture}[auto]
+"""
+        # Find root node and start from there
+        top_event = self.nodes.get(kind='topEvent')
+        result += top_event.to_tikz()
+        result += """
+\\end{tikzpicture}
+\\end{figure}
+\\end{document}
+"""
+        return result
+
     def to_xml(self, xmltype=None):
         """
         Method: to_xml

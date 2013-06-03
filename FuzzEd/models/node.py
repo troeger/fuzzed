@@ -139,6 +139,14 @@ class Node(models.Model):
 
         raise ValueError('Node %s has unsupported kind' % self)
 
+    def to_tikz(self):
+        name = self.get_property('name', '-')
+        result = "\\node (%u) at (%u, -%u) {%s};"%(self.pk, self.x, self.y, name)
+        for edge in self.outgoing.filter(deleted=False):
+            result += edge.target.to_tikz()
+            result += "\draw (%u.south) -| (%u);"%(self.pk, edge.target.pk)
+        return result
+
     def to_xml(self, xmltype=None):
         """
         Method: to_xml
