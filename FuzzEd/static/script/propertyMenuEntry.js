@@ -162,8 +162,8 @@ define(['class', 'config'], function(Class, Config) {
     });
 
     var BoolEntry = Entry.extend({
-        blurEvents:   function() { return []; },
-        changeEvents: function() { return ['change']; },
+        blurEvents:   function() { return ['change']; },
+        changeEvents: function() { return []; },
 
         _setupInput: function() {
             this.inputs = jQuery('<input type="checkbox">').attr('id', this.id);
