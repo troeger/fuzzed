@@ -28,7 +28,7 @@ public:
 	PlaceTokenMap::iterator outPlacesEnd()		{ return m_outPlaces.end(); }
 
 	bool isActive() const		{ return m_hasNotFired; }
-	std::string getID() const	{ return m_ID; }
+	const std::string& getID() const	{ return m_ID; }
 	
 	bool wantsToFire(int tick);
 	void tryToFire();

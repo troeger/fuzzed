@@ -21,14 +21,12 @@ bool PetriNetSimulation::run()
 	unsigned long sumFailureTime_fail = 0;
 	unsigned int count = 0;
 
-	const PetriNet* const pn = PNMLImport::loadPNML(m_netFile.generic_string());
-	if (!pn) 
-		throw runtime_error("Import was not successful.");
-	else if (!pn->valid()) 
+	PetriNet pn = *PNMLImport::loadPNML(m_netFile.generic_string());
+	if (!pn.valid()) 
 		throw runtime_error("Invalid Petri Net.");
 	
 	SimulationResult res;
-	if (pn->m_activeTimedTransitions.size() == 0)
+	if (pn.m_activeTimedTransitions.size() == 0)
 	{ // perfectly reliable
 		printResults(res);
 		writeResultXML(res);
@@ -51,18 +49,18 @@ bool PetriNetSimulation::run()
 #pragma omp parallel for\
 	reduction(+:numFailures, count, sumFailureTime_all, sumFailureTime_fail)\
 	reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak)\
-	schedule(dynamic) if (m_numRounds > PAR_THRESH)
+	schedule(dynamic) if (m_numRounds > PAR_THRESH)\
+	default(none) firstprivate(pn) // rely on OpenMP magical copying
 
 	for (int i = 0; i < m_numRounds; ++i)
 	{
 		if (privateBreak) continue;
 		
-		// TODO: check remaining stack size. or make sure it's big enough.
-		PetriNet currentNet(std::move(*pn));
-		while (currentNet.constraintViolated())
-			currentNet = PetriNet(std::move(*pn));
+		// TODO
+// 		while (currentNet.constraintViolated())
+// 			currentNet = PetriNet(std::move(currentNet));
 
-		SimulationRoundResult res = runOneRound(&currentNet);
+		SimulationRoundResult res = runOneRound(&pn);
 		
 		if (res.valid)
 		{
@@ -154,6 +152,7 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 		tryImmediateTransitions(pn, tick, immediateCanFire);
 	}
 	vector<TimedTransition*> toRemove;
+
 	for (TimedTransition* tt : pn->m_inactiveTimedTransitions)
 	{
 		if (tt->tryUpdateStartupTime(tick))

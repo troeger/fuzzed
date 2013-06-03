@@ -16,8 +16,6 @@ PetriNet::PetriNet(
 	m_topLevelPlace(nullptr),
 	m_finalFiringTime(MAX_INT)
 {
-	// this is just the first petri net created from PNML import.
-	// setup necessary only for its copies.
 	// setup();
 	// simplify();
 }
@@ -39,7 +37,7 @@ void PetriNet::setup()
 {
 	const auto setPlaces = [&](Transition& t) -> void
 	{
-		const string ID = t.getID();
+		const string& ID = t.getID();
 		for (const auto& tup : m_arcs)
 		{
 			if (get<0>(tup) == ID) // transition-to-place
@@ -188,7 +186,7 @@ void PetriNet::applyToAllTransitions(std::function<void (Transition& t)> func)
 
 bool PetriNet::valid() const
 {
-	return m_topLevelPlace != nullptr;
+	return true;//m_topLevelPlace;
 }
 
 bool PetriNet::constraintViolated()
