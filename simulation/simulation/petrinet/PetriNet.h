@@ -58,6 +58,9 @@ public:
 
 	bool constraintViolated();
 
+	void generateRandomFiringTimes();
+	void restoreInitialMarking();
+
 protected:
 	// uses the information in m_arcDict to tell each transition about its in- and out-places
 	void setup();

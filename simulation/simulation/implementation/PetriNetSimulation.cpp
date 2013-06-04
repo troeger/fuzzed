@@ -26,13 +26,6 @@ bool PetriNetSimulation::run()
 		throw runtime_error("Invalid Petri Net.");
 	
 	SimulationResult res;
-	if (pn.m_activeTimedTransitions.size() == 0)
-	{ // perfectly reliable
-		printResults(res);
-		writeResultXML(res);
-		return true;
-	}
-
 	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads...";
 
 	// for checking local convergence, thread-local
@@ -60,6 +53,8 @@ bool PetriNetSimulation::run()
 // 		while (currentNet.constraintViolated())
 // 			currentNet = PetriNet(std::move(currentNet));
 
+		pn.restoreInitialMarking();
+		pn.generateRandomFiringTimes();
 		SimulationRoundResult res = runOneRound(&pn);
 		
 		if (res.valid)
@@ -173,6 +168,9 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 	const auto start = high_resolution_clock::now();
 
 	SimulationRoundResult result;
+	if (net->m_activeTimedTransitions.size() == 0)
+		return result; // TODO check this earlier
+
 #ifndef STATIC_SEQUENCE
 	if (net->constraintViolated())
 	{
@@ -180,9 +178,6 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 		return result;
 	}
 #endif
-	result.failed = false;
-	result.failureTime = m_numSimulationSteps;
-	result.valid = true;
 
 	auto elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();
 	try
@@ -200,12 +195,14 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 			{
 				result.failureTime = nextStep;
 				result.failed = true;
+				result.valid = true;
 				break;
 			}
 			else if (nextStep == net->finalFiringTime() && !net->hasInactiveTransitions())
 			{ // there are configurations where the tree can no longer fail!
 				result.failureTime = m_numSimulationSteps; 
 				result.failed = false;
+				result.valid = true;
 				break;
 			}
 			nextStep = net->nextFiringTime(nextStep);

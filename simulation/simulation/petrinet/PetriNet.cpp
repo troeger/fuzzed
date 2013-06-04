@@ -48,8 +48,7 @@ void PetriNet::setup()
 		}
 	};
 	
-	for (ImmediateTransition& t : m_immediateTransitions)
-		setPlaces(t);
+	applyToAllTransitions(setPlaces);
  
 	m_topLevelPlace = nullptr;
 	map<string, Place>::iterator it = m_placeDict.begin();
@@ -60,33 +59,12 @@ void PetriNet::setup()
 			m_topLevelPlace = &it->second;
 		++it;
 	}
-	
-	int sumFiringTimes = 0;
-	RandomNumberGenerator* const gen = RandomNumberGenerator::instanceForCurrentThread();
-	for (TimedTransition& tt : m_timedTransitions)
-	{
-		// compute random firing times for all transitions
-		const unsigned int time = gen->randomFiringTime(tt.getRate());
-		tt.setFiringTime(time);
-		setPlaces(tt);
-
-		// save the activated transitions separately
-		if (tt.enoughTokens())
-			m_activeTimedTransitions.insert(make_pair(time, &tt));
-		else
-			m_inactiveTimedTransitions.insert(&tt);
-	}
-
-	if (m_activeTimedTransitions.empty())
-		return;
-
-	m_avgFiringTime			= (double)sumFiringTimes/(double)m_activeTimedTransitions.size();
-	m_previousFiringTime	= m_activeTimedTransitions.cbegin();
-	m_finalFiringTime		= (--m_activeTimedTransitions.end())->first;
 }
 
 PetriNet::~PetriNet()
-{}
+{
+
+}
 
 PetriNet& PetriNet::operator=(const PetriNet& otherNet)
 {
@@ -195,4 +173,45 @@ bool PetriNet::constraintViolated()
 		if (!c.isSatisfied(this))
 			return true;
 	return false;
+}
+
+void PetriNet::generateRandomFiringTimes()
+{ // TODO factor out the things that can happen earlier
+	m_activeTimedTransitions.clear();
+	m_inactiveTimedTransitions.clear();
+
+	int sumFiringTimes = 0;
+	RandomNumberGenerator* const gen = RandomNumberGenerator::instanceForCurrentThread();
+	for (TimedTransition& tt : m_timedTransitions)
+	{
+		// compute random firing times for all transitions
+		const unsigned int time = gen->randomFiringTime(tt.getRate());
+		tt.setFiringTime(time);
+
+		// save the activated transitions separately
+		if (tt.enoughTokens())
+		{
+			m_activeTimedTransitions.insert(make_pair(time, &tt));
+			sumFiringTimes += time;
+		}
+		else
+			m_inactiveTimedTransitions.insert(&tt);
+	}
+
+	if (m_activeTimedTransitions.empty())
+		return;
+
+	m_avgFiringTime			= (double)sumFiringTimes/(double)m_activeTimedTransitions.size();
+	m_previousFiringTime	= m_activeTimedTransitions.cbegin();
+	m_finalFiringTime		= (--m_activeTimedTransitions.end())->first;
+
+	assert(m_activeTimedTransitions.size() + m_inactiveTimedTransitions.size() == m_timedTransitions.size());
+}
+
+void PetriNet::restoreInitialMarking()
+{
+	for (auto& p : m_placeDict)
+		p.second.reset();
+
+	applyToAllTransitions(std::mem_fn(&Transition::reset));
 }

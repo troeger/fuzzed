@@ -86,3 +86,8 @@ void Transition::removeOutPlace(Place* p)
 {
 	m_outPlaces.erase(p);
 }
+
+void Transition::reset()
+{
+	m_hasNotFired = true;
+}

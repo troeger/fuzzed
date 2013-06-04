@@ -36,6 +36,8 @@ public:
 
 	bool enoughTokens() const;
 
+	void reset();
+
 	bool operator==(Transition const& lhs);
 	Transition(const Transition& other);
 
