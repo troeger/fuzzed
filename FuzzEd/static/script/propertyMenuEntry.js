@@ -103,6 +103,10 @@ define(['class', 'config'], function(Class, Config) {
         },
 
         warn: function(text) {
+            if (this.container.hasClass(Config.Classes.PROPERTY_WARNING) &&
+                this.container.attr('data-original-title') === text)
+                return this;
+
             this.container
                 .addClass(Config.Classes.PROPERTY_WARNING)
                 .attr('data-original-title', text)
