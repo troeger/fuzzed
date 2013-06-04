@@ -1,5 +1,7 @@
 define(['class', 'config'], function(Class, Config) {
 
+    var NUMBER_REGEX = /^[+\-]?(?:0|[1-9]\d*)(?:[.,]\d*)?(?:[eE][+\-]?\d+)?$/;
+
     var Entry = Class.extend({
         id:            undefined,
         property:      undefined,
@@ -190,7 +192,11 @@ define(['class', 'config'], function(Class, Config) {
         },
 
         _value: function(newValue) {
-            if (typeof newValue === 'undefined') return window.parseFloat(this.inputs.val());
+            if (typeof newValue === 'undefined') {
+                var val = this.inputs.val();
+                if (this.inputs.is(':invalid') || !NUMBER_REGEX.test(val)) return window.NaN;
+                return window.parseFloat(val);
+            }
             this.inputs.val(newValue);
 
             return this;
@@ -210,28 +216,48 @@ define(['class', 'config'], function(Class, Config) {
             var a = 1;
         },
 
+        _setupVisualRepresentation: function() {
+            this._setupContainer()
+                ._setupInput();
+
+            jQuery('<form class="form-inline">')
+                .append(this.inputs)
+                .appendTo(this.container.find('.controls'));
+
+            return this;
+        },
+
         _setupInput: function() {
             var value = this.property.value;
 
-            this.inputs = jQuery('<form class="form-inline">')
-                .append(this._setupMiniNumeric(value[0]))
-                .append(this._setupMiniNumeric(value[1]));
+            this.inputs = this._setupMiniNumeric(value[0])
+                .attr('id', this.id) // clicking the label should focus the first input
+                .add(this._setupMiniNumeric(value[1]));
+
+            return this;
         },
 
         _setupMiniNumeric: function(value) {
             return jQuery('<input type="number" class="input-mini">')
                 .attr('min',  this.property.min.toFloat())
                 .attr('max',  this.property.max.toFloat())
-                .attr('step', this.property.step.toFloat())
+                .attr('step', this.property.step)
                 .val(value)
         },
 
         _value: function(newValue) {
+            var lower = this.inputs.eq(0);
+            var upper = this.inputs.eq(1);
+
             if (typeof newValue === 'undefined') {
-                return [window.parseFloat(this.inputs.eq(0).val()), window.parseFloat(this.inputs.eq(1).val())]
+                var lowerVal = (lower.is(':invalid') || !NUMBER_REGEX.test(lower.val()))
+                    ? window.NaN : window.parseFloat(lower.val());
+                var upperVal = (upper.is(':invalid') || !NUMBER_REGEX.test(upper.val()))
+                    ? window.NaN : window.parseFloat(upper.val());
+                return [lowerVal, upperVal];
             }
-            this.inputs.eq(0).val(newValue[0]);
-            this.inputs.eq(1).val(newValue[1]);
+            lower.val(newValue[0]);
+            upper.val(newValue[1]);
 
             return this;
         }
