@@ -162,8 +162,7 @@ define(['class', 'config'], function(Class, Config) {
     });
 
     var BoolEntry = Entry.extend({
-        blurEvents:   function() { return ['change']; },
-        changeEvents: function() { return []; },
+        blurEvents: function() { return ['change']; },
 
         _setupInput: function() {
             this.inputs = jQuery('<input type="checkbox">').attr('id', this.id);
@@ -182,10 +181,10 @@ define(['class', 'config'], function(Class, Config) {
     var NumericEntry = Entry.extend({
         _setupInput: function() {
             this.inputs = jQuery('<input type="number" class="input-medium">')
-                .attr('id',       this.id)
-                .attr('min',      this.property.min)
-                .attr('max',      this.property.max)
-                .attr('step',     this.property.step);
+                .attr('id',   this.id)
+                .attr('min',  this.property.min)
+                .attr('max',  this.property.max)
+                .attr('step', this.property.step);
 
             return this;
         },
@@ -202,7 +201,47 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    var RangeEntry = Entry.extend({
+        changeEvents: function() {
+            return ['keyup', 'cut', 'paste'];
+        },
+
+        _fix: function(event, ui) {
+            var a = 1;
+        },
+
+        _setupInput: function() {
+            var value = this.property.value;
+
+            this.inputs = jQuery('<form class="form-inline">')
+                .append(this._setupMiniNumeric(value[0]))
+                .append(this._setupMiniNumeric(value[1]));
+        },
+
+        _setupMiniNumeric: function(value) {
+            return jQuery('<input type="number" class="input-mini">')
+                .attr('min',  this.property.min.toFloat())
+                .attr('max',  this.property.max.toFloat())
+                .attr('step', this.property.step.toFloat())
+                .val(value)
+        },
+
+        _value: function(newValue) {
+            if (typeof newValue === 'undefined') {
+                return [window.parseFloat(this.inputs.eq(0).val()), window.parseFloat(this.inputs.eq(1).val())]
+            }
+            this.inputs.eq(0).val(newValue[0]);
+            this.inputs.eq(1).val(newValue[1]);
+
+            return this;
+        }
+    });
+
     var TextEntry = Entry.extend({
+        changeEvents: function() {
+            return ['keyup', 'cut', 'paste'];
+        },
+
         _setupInput: function() {
             this.inputs = jQuery('<input type="text" class="input-medium">').attr('id', this.id);
 
@@ -217,16 +256,13 @@ define(['class', 'config'], function(Class, Config) {
             this.inputs.val(newValue);
 
             return this;
-        },
-
-        changeEvents: function() {
-            return ['keyup', 'cut', 'paste'];
         }
     });
 
     return {
         'BoolEntry':    BoolEntry,
         'NumericEntry': NumericEntry,
+        'RangeEntry':   RangeEntry,
         'TextEntry':    TextEntry
     }
 });

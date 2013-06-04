@@ -341,6 +341,10 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
         max:  Decimal.MAX_VALUE,
         step: undefined,
 
+        menuEntryClass: function() {
+            return PropertyMenuEntry.RangeEntry;
+        },
+
         validate: function(value, validationResult) {
             if (!_.isArray(this.value) || this.value.length != 2) {
                 validationResult.message = '[TYPE ERROR] value must be a tuple';
