@@ -30,7 +30,7 @@ int XORGate::serialize(boost::shared_ptr<PNDocument> doc) const
 
 	// doc->placeToTransition(oneChildFailed, discardMultipleFailures, 2); 
 	// TODO: this should be ">=2". Or add transitions for every i < numChildren.
-	for (int i = 2; i <= childIDs.size(); ++i)
+	for (unsigned int i = 2; i <= childIDs.size(); ++i)
 	{
 		int discardMultipleFailures = doc->addImmediateTransition(2.0, "more than one child failed");
 		doc->placeToTransition(failedChildren, discardMultipleFailures, i);

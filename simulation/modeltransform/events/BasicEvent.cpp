@@ -22,7 +22,7 @@ int BasicEvent::serialize(boost::shared_ptr<PNDocument> doc) const
 	return failed;
 }
 
-void BasicEvent::addChild(FaultTreeNode* child)
+void BasicEvent::addChild(FaultTreeNode*)
 {
 	assert(false && "This is a leaf node!");
 }

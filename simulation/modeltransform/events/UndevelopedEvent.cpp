@@ -18,7 +18,7 @@ UndevelopedEvent::UndevelopedEvent(const std::string& ID, long double failureRat
 	: Event(ID, failureRate, name)
 {}
 
-void UndevelopedEvent::addChild(FaultTreeNode* child)
+void UndevelopedEvent::addChild(FaultTreeNode*)
 {
 	assert(false && "This is a leaf node!");
 }

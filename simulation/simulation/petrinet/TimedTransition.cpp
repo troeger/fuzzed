@@ -4,20 +4,20 @@
 TimedTransition::TimedTransition(const std::string& id, double rate, const std::string& label /*=""*/)
 	: Transition(id, label), 
 	m_rate(rate), 
-	m_r(-1), 
+	m_r(MAX_INT), 
 	m_wasNotEnabled(true)
 {}
 
 TimedTransition::TimedTransition(const TimedTransition& other)
 	: Transition(other.m_ID), 
 	m_rate(other.m_rate), 
-	m_r(-1), 
+	m_r(MAX_INT), 
 	m_wasNotEnabled(true)
 {}
 
 bool TimedTransition::stochasticallyEnabled(unsigned int tick) const
 {
-	return m_r <= tick;
+	return m_r <= tick; // TODO <= or <??
 }
 
 TimedTransition& TimedTransition::operator=(const TimedTransition &other)
