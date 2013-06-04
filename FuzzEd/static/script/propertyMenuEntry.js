@@ -183,8 +183,12 @@ define(['class', 'config'], function(Class, Config) {
     });
 
     var NumericEntry = Entry.extend({
+        blurEvents: function() {
+            return ['blur', 'change', 'remove'];
+        },
+
         changeEvents: function() {
-            return ['change', 'keyup', 'cut', 'paste'];
+            return ['keyup', 'cut', 'paste'];
         },
 
         _setupInput: function() {
