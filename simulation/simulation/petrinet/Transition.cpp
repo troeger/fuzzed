@@ -54,7 +54,7 @@ bool Transition::enoughTokens() const
 {
 	for (const auto& p : m_inPlaces)
 	{
-		const int currentMarking = p.first->getCurrentMarking();
+		const unsigned int currentMarking = p.first->getCurrentMarking();
 		assert(currentMarking >= 0);
 		if (currentMarking < p.second)
 			return false;

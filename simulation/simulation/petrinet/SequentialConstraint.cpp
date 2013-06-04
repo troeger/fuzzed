@@ -34,15 +34,15 @@ bool SequentialConstraint::checkPlaceSequence(const PetriNet* const pn)
 	{
 		if (placeMarking.second.getCurrentMarking() > 0)
 		{
-			const string placeID = placeMarking.second.getID();
-			for (int i = 0; i != m_sequencePos; ++i)
+			const string& placeID = placeMarking.second.getID();
+			for (unsigned int i = 0; i != m_sequencePos; ++i)
 				if (m_requiredSequence.at(i) == placeID)
 				{
 					m_satisfied = false;
 					return false;
 				}
 
-				for (int i = m_sequencePos; i != m_requiredSequence.size(); ++i)
+				for (unsigned int i = m_sequencePos; i != m_requiredSequence.size(); ++i)
 					if (m_requiredSequence.at(i) == placeID)
 						m_sequencePos = i;
 		}
@@ -52,12 +52,10 @@ bool SequentialConstraint::checkPlaceSequence(const PetriNet* const pn)
 
 bool SequentialConstraint::checkTransitionSequence(const PetriNet* const pn)
 {
-	unsigned int sequencePos = 0;
-
 	string current = m_requiredSequence.front();
 	for (auto tt : pn->m_activeTimedTransitions)
 	{ // find the currently required transition
-		const string transitionID = tt.second->getID();
+		const string& transitionID = tt.second->getID();
 		for (auto itFront : m_requiredSequence)
 		{
 			if (itFront == transitionID)

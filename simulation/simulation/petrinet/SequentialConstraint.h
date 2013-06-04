@@ -23,7 +23,7 @@ private:
 
 	SequenceType m_type;
 	std::vector<std::string> m_requiredSequence;
-	int m_sequencePos;
+	unsigned int m_sequencePos;
 
 	bool m_satisfied;
 };

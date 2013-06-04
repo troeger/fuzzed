@@ -25,7 +25,7 @@ TimedTransition& TimedTransition::operator=(const TimedTransition &other)
 	m_ID = other.m_ID;
 	m_rate = other.m_rate;
 	m_hasNotFired = true;
-	m_r = -1;
+	m_r = MAX_INT;
 	m_wasNotEnabled = true;
 	return *this;
 }
