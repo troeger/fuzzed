@@ -1,8 +1,8 @@
 define(['class', 'config', 'decimal', 'propertyMenuEntry', 'mirror', 'underscore'],
 function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
 
-    var isNumber = function(num) {
-        return typeof num === 'number' && !window.isNaN(num);
+    var isNumber = function(number) {
+        return _.isNumber(number) && !_.isNaN(number);
     };
 
     var Property = Class.extend({
@@ -31,8 +31,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
         },
 
         setValue: function(newValue, issuer, propagate) {
-            if (this.value === newValue) return this;
-
+            if (_.isEqual(this.value, newValue)) return this;
             if (typeof propagate === 'undefined') propagate = true;
 
             var validationResult = {};
