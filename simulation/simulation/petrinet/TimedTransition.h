@@ -25,6 +25,6 @@ protected:
 	virtual bool stochasticallyEnabled(unsigned int tick) const override;
 
 	double m_rate;
+
 	unsigned int m_r;
-	bool m_wasNotEnabled;
 };

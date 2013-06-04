@@ -25,7 +25,8 @@ bool Transition::wantsToFire(int tick)
 Transition::Transition(const string& id, const string& label /*= ""*/)
 	: m_ID(id),
 	m_label(label),
-	m_hasNotFired(true)
+	m_hasNotFired(true),
+	m_wasNotEnabled(true)
 {}
 
 Transition::Transition(const Transition& other)
@@ -33,10 +34,9 @@ Transition::Transition(const Transition& other)
 	m_outPlaces(PlaceTokenMap()),
 	m_ID(other.m_ID),
 	m_label(other.m_label),
-	m_hasNotFired(true)
-{
-
-}
+	m_hasNotFired(true),
+	m_wasNotEnabled(true)
+{}
 
 void Transition::tryToFire()
 {
@@ -90,4 +90,5 @@ void Transition::removeOutPlace(Place* p)
 void Transition::reset()
 {
 	m_hasNotFired = true;
+	m_wasNotEnabled = true;
 }

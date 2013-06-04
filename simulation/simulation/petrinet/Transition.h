@@ -53,4 +53,5 @@ protected:
 	std::string m_label;
 
 	bool m_hasNotFired;
+	bool m_wasNotEnabled;
 };
