@@ -1,6 +1,7 @@
 define(['class', 'config'], function(Class, Config) {
 
-    var NUMBER_REGEX = /^[+\-]?(?:0|[1-9]\d*)(?:[.,]\d*)?(?:[eE][+\-]?\d+)?$/;
+    var NUMBER_REGEX     = /^[+\-]?(?:0|[1-9]\d*)(?:[.,]\d*)?(?:[eE][+\-]?\d+)?$/;
+    var ERROR_TYPE_REGEX = /^\[.+\]\s*(.+)/;
 
     var Entry = Class.extend({
         id:            undefined,
@@ -103,6 +104,8 @@ define(['class', 'config'], function(Class, Config) {
         },
 
         warn: function(text) {
+            text = ERROR_TYPE_REGEX.exec(text)[1];
+
             if (this.container.hasClass(Config.Classes.PROPERTY_WARNING) &&
                 this.container.attr('data-original-title') === text)
                 return this;
