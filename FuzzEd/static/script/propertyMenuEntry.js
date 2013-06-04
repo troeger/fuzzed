@@ -85,7 +85,9 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
-        fix: function(event, ui) {},
+        fix: function(event, ui) {
+            return this;
+        },
 
         show: function(on) {
             on.append(this.container);
@@ -181,6 +183,10 @@ define(['class', 'config'], function(Class, Config) {
     });
 
     var NumericEntry = Entry.extend({
+        changeEvents: function() {
+            return ['change', 'keyup', 'cut', 'paste'];
+        },
+
         _setupInput: function() {
             this.inputs = jQuery('<input type="number" class="input-medium">')
                 .attr('id',   this.id)
@@ -200,20 +206,33 @@ define(['class', 'config'], function(Class, Config) {
             this.inputs.val(newValue);
 
             return this;
-        },
-
-        changeEvents: function() {
-            return ['change', 'keyup', 'cut', 'paste'];
         }
     });
 
     var RangeEntry = Entry.extend({
+        blurEvents: function() {
+            return ['blur', 'change', 'remove'];
+        },
+
         changeEvents: function() {
             return ['keyup', 'cut', 'paste'];
         },
 
-        _fix: function(event, ui) {
-            var a = 1;
+        fix: function(event, ui) {
+            var val = this._value();
+            var lower = val[0];
+            var upper = val[1];
+
+            if (_.isNaN(lower) || _.isNaN(upper)) return this;
+
+            var target = jQuery(event.target);
+            if (target.is(this.inputs.eq(0)) && lower > upper) {
+                this._value([lower, lower]);
+            } else if (target.is(this.inputs.eq(1)) && upper < lower) {
+                this._value([upper, upper]);
+            }
+
+            return this;
         },
 
         _setupVisualRepresentation: function() {
