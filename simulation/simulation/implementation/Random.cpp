@@ -8,7 +8,7 @@
 RandomNumberGenerator::RandomNumberGenerator()
 {
 	static int count = 0;
-	m_generator.seed(time(NULL) * ++count);
+	m_generator.seed(time(NULL) * rand());
 	// cout << "Creating Random Number Generator " << count << " in thread " << omp_get_thread_num() << endl;
 }
 
@@ -20,16 +20,8 @@ double RandomNumberGenerator::randomNumberInInterval(double L, double H)
 
 double RandomNumberGenerator::randomNumberExponential(double rate)
 {
-	auto res = m_exponentialDistributions.find(rate);
-	if (res != m_exponentialDistributions.end())
-		return res->second(m_generator);
-
-	else
-	{
-		exponential_distribution<double> dist(rate);
-		m_exponentialDistributions.insert(make_pair(rate, dist));
-		return dist(m_generator);
-	}
+	exponential_distribution<double> dist(rate);
+	return dist(m_generator);
 }
 
 double RandomNumberGenerator::randomNumberWeibull(double rate, double k)
@@ -56,7 +48,8 @@ void RandomNumberGenerator::generateExponentialRandomNumbers(const string& fileN
 
 unsigned int RandomNumberGenerator::randomFiringTime(double rate)
 {
-	return std::ceil(randomNumberExponential(rate));
+	unsigned int t = std::ceil(randomNumberExponential(rate));
+	return t;
 }
 
 boost::once_flag RandomNumberGenerator::s_flag  = BOOST_ONCE_INIT;
@@ -64,10 +57,10 @@ unordered_map<int, RandomNumberGenerator*> RandomNumberGenerator::s_generators =
 
 RandomNumberGenerator* RandomNumberGenerator::instanceForCurrentThread()
 {
-	if (s_generators.empty())
+	if (/*s_generators.empty()*/s_generators.size() !=  omp_get_max_threads())
 		boost::call_once(s_flag, initGenerators);
 	
-	assert(s_generators.size() > omp_get_thread_num());
+	// assert(s_generators.size() >= omp_get_num_threads());
 	return s_generators.at(omp_get_thread_num());
 }
 
