@@ -26,6 +26,7 @@ void Place::requestTokens(Transition* const t)
 }
 
 Place::Place(const string& id, int initialMarking, int capacity, bool isTopLevel) :
+	m_initialMarking(initialMarking),
 	m_marking(initialMarking), 
 	m_ID(id), 
 	m_capacity(capacity), 
@@ -37,7 +38,8 @@ Place::Place(const string& id, int initialMarking, int capacity, bool isTopLevel
 }
 
 Place::Place(const Place& other) :
-	m_marking(other.m_marking),
+	m_initialMarking(other.m_initialMarking),
+	m_marking(other.m_initialMarking),
 	m_capacity(other.m_capacity),
 	m_ID(other.m_ID),
 	m_bTopLevelPlace(other.m_bTopLevelPlace),
@@ -47,7 +49,12 @@ Place::Place(const Place& other) :
 		throw runtime_error("Invalid Place configuration: the initial marking must not be larger than capacity.");
 }
 
-void Place::resolveConflictsTimed(int tick)
+Place::Place() : m_initialMarking(0)
+{
+	assert(false);
+}
+
+void Place::resolveConflictsTimed(int)
 {
 	assert(m_marking >= 0);
 	assert(hasRequests());
@@ -138,11 +145,17 @@ void Place::produceTokens(int numTokens)
 
 Place& Place::operator=(const Place& other)
 {
-	m_marking = other.m_marking;
+	m_marking = other.m_initialMarking;
 	m_capacity = other.m_capacity;
 	m_ID = other.m_ID;
 	m_bTopLevelPlace = other.m_bTopLevelPlace;
 	m_transitionQueue = set<Transition*>();
 
 	return *this;
+}
+
+void Place::reset()
+{
+	m_marking = m_initialMarking;
+	m_transitionQueue.clear();
 }
