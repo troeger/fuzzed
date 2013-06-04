@@ -1,7 +1,17 @@
-define(function() {
+define(['underscore'], function() {
     /**
      *  Package: Base
      */
+
+    /**
+     *  Underscore template configuration:
+     *    Configure underscores template language to match Django's style.
+     */
+    _.templateSettings = {
+        interpolate: /\{\{(.+?)\}\}/g,
+        evaluate:    /\{%(.+?)%\}/g,
+        escape:      /\{-(.+?)-\}/g
+    }
 
     /**
      *  Constants:

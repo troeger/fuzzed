@@ -74,7 +74,7 @@
                     "mirror": {
                         "position": "bottom",
                         "style": ["italic"],
-                        "prefix": "p="
+                        "format": "p={{$0}}"
                     }
                 }
             }
@@ -100,7 +100,7 @@
                     "mirror": {
                         "position": "bottom",
                         "style": ["italic"],
-                        "prefix": "#"
+                        "format": "#{{$0}}"
                     }
                 }
             }
@@ -141,7 +141,7 @@
                     "mirror": {
                         "position": "bottom",
                         "style": ["italic"],
-                        "prefix": "#"
+                        "format": "#{{$0}}"
                     }
                 }
             }
@@ -216,7 +216,7 @@
                     "mirror": {
                         "position": "bottom",
                         "style": ["italic"],
-                        "prefix": "k="
+                        "format": "k={{$0}}"
                     }
                 }
             }
@@ -271,7 +271,7 @@
                     "mirror": {
                         "position": "bottom",
                         "style": ["bold", "large"],
-                        "prefix": "◄ "
+                        "format": "◄ {{$0}}"
                     }
                 }
             }

@@ -1,4 +1,4 @@
-define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
+define(['config', 'canvas', 'class', 'underscore'], function(Config, Canvas, Class) {
     /**
      * Package: Base
      */
@@ -17,15 +17,14 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
          * Properties:
          *   {Property}   property     - The mirrored property object
          *   {DOMElement} container    - This is the mirror's container element that holds the actual content.
-         *   {String}     prefix       - A constant string that is always prepended to the show content (default: '').
-         *   {String}     suffix       - A constant string that is always appended to the show content (default: '').
+         *   {String}     format       - A template string used to format the mirror value. Django template language
+         *                               syntax (default: {{0}}).
          *
          *   {DOMElement} _containment - The DOM element that the mirror is attached to - i.e. <Node::container>.
          */
         property:     undefined,
         container:    undefined,
-        prefix:       undefined,
-        suffix:       undefined,
+        format:       undefined,
 
         _containment: undefined,
 
@@ -53,8 +52,7 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
                 .css('width', Canvas.gridSize * 2 - Config.Grid.STROKE_WIDTH * 4)
                 .css('margin-left', -(Canvas.gridSize / 2) + Config.Grid.STROKE_WIDTH);
 
-            this.prefix = properties.prefix || '';
-            this.suffix = properties.suffix || '';
+            this.format = properties.format || '{{$0}}';
 
             // style the mirror's visualization - i.e. bold, italic or larger text
             _.each(properties.style, function(style) {
@@ -88,14 +86,19 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
          * Returns:
          *   This {Mirror} instance for chaining.
          */
-        show: function(text) {
-            if (typeof text === 'undefined' || text === null) {
+        show: function(value) {
+            if (typeof value === 'undefined' || value === null) {
                 this.container.css('display', 'none');
             } else {
+                if (!_.isArray(value)) value = [value];
+                // convert the array into an object, where the keys are the index of the array
+                // and the value are the values of the array at the corresponding index
+                var enumerated = _.object(_.map(_.range(value.length), function(num){return '$' + num;}), value);
+
                 // remove 'display: none' from element to show it again
                 // '.show()' won't work because this sets display to 'inline', but we need 'block'
                 this.container.css('display', '');
-                this.container.html(this.prefix + text + this.suffix);
+                this.container.text(_.template(this.format, enumerated));
             }
 
             return this;

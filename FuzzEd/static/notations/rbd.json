@@ -98,7 +98,7 @@
                     "mirror": {
                         "position": "bottom",
                         "style": ["italic"],
-                        "prefix": "p="
+                        "format": "p={{$0}}"
                     }
                 }
             }
