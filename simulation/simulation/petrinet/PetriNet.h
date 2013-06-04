@@ -41,7 +41,7 @@ public:
 	
 	unsigned int finalFiringTime() const { return m_finalFiringTime; }
 	
-	unsigned int numTimedTransitions()	const { return m_activeTimedTransitions.size(); }
+	unsigned int numTimedTransitions()	const { return m_timedTransitions.size(); }
 	unsigned int numPlaces()			const { return m_placeDict.size(); }
 	
 	double averageFiringTime()	const { return m_avgFiringTime; }

@@ -146,7 +146,7 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 #endif
 		tryImmediateTransitions(pn, tick, immediateCanFire);
 	}
-	vector<TimedTransition*> toRemove;
+	vector<TimedTransition*> toRemove; // TODO: this appears to be a hotspot
 
 	for (TimedTransition* tt : pn->m_inactiveTimedTransitions)
 	{
