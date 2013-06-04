@@ -3,6 +3,10 @@ define(['class', 'config'], function(Class, Config) {
     var NUMBER_REGEX     = /^[+\-]?(?:0|[1-9]\d*)(?:[.,]\d*)?(?:[eE][+\-]?\d+)?$/;
     var ERROR_TYPE_REGEX = /^\[.+\]\s*(.+)/;
 
+    var capitalize = function(aString) {
+        return aString.charAt(0).toUpperCase() + aString.slice(1);
+    };
+
     var Entry = Class.extend({
         id:            undefined,
         property:      undefined,
@@ -27,8 +31,11 @@ define(['class', 'config'], function(Class, Config) {
         },
 
         blurred: function(event, ui) {
-            this.fix(event, ui);
+            if (!this._editing) {
+                this._preEditValue = this.property.value;
+            }
 
+            this.fix(event, ui);
             this._abortChange().unwarn();
 
             if (this.property.validate(this._value(), {})) {
@@ -104,7 +111,7 @@ define(['class', 'config'], function(Class, Config) {
         },
 
         warn: function(text) {
-            text = ERROR_TYPE_REGEX.exec(text)[1];
+            text = capitalize(ERROR_TYPE_REGEX.exec(text)[1]);
 
             if (this.container.hasClass(Config.Classes.PROPERTY_WARNING) &&
                 this.container.attr('data-original-title') === text)
