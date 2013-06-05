@@ -1,0 +1,9 @@
+\definecolor{cffffff}{RGB}{255,255,255}
+
+
+\begin{tikzpicture}[y=0.80pt,x=0.80pt,yscale=-1, inner sep=0pt, outer sep=0pt]
+  \path[draw=black,fill=cffffff,line width=1.120pt] (17.5000,0.7000) --
+    (34.3000,15.0000) -- (34.3000,34.3000) -- (0.7000,34.3000) -- (0.7000,15.0000)
+    -- cycle;
+
+\end{tikzpicture}

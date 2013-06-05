@@ -1,0 +1,12 @@
+\definecolor{cffffff}{RGB}{255,255,255}
+
+
+\begin{tikzpicture}[y=0.80pt,x=0.80pt,yscale=-1, inner sep=0pt, outer sep=0pt]
+  \path[draw=black,fill=cffffff,line width=1.120pt,rounded corners=0.0000cm]
+    (7.7000,7.7000) rectangle (34.3000,34.3000);
+  \path[draw=black,fill=cffffff,line width=1.120pt,rounded corners=0.0000cm]
+    (4.2000,4.2000) rectangle (30.8000,30.8000);
+  \path[draw=black,fill=cffffff,line width=1.120pt,rounded corners=0.0000cm]
+    (0.7000,0.7000) rectangle (27.3000,27.3000);
+
+\end{tikzpicture}

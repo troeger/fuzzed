@@ -1,0 +1,8 @@
+\definecolor{cffffff}{RGB}{255,255,255}
+
+
+\begin{tikzpicture}[y=0.80pt,x=0.80pt,yscale=-1, inner sep=0pt, outer sep=0pt]
+  \path[draw=black,fill=cffffff,line width=2.240pt] (17.5000,17.5000) circle
+    (0.2540cm);
+
+\end{tikzpicture}
