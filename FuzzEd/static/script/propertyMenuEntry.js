@@ -266,20 +266,23 @@ define(['class', 'config'], function(Class, Config) {
 
         _setupInput: function() {
             var value = this.property.value;
+            var min   = this.property.min;
+            var max   = this.property.max;
+            var step  = this.property.step;
 
-            this.inputs = this._setupMiniNumeric(value[0])
+            this.inputs = this._setupMiniNumeric(min, max, step, value[0])
                 .attr('id', this.id) // clicking the label should focus the first input
-                .add(this._setupMiniNumeric(value[1]));
+                .add(this._setupMiniNumeric(min, max, step, value[1]));
 
             return this;
         },
 
-        _setupMiniNumeric: function(value) {
+        _setupMiniNumeric: function(min, max, step, value) {
             return jQuery('<input type="number" class="input-mini">')
-                .attr('min',  this.property.min.toFloat())
-                .attr('max',  this.property.max.toFloat())
+                .attr('min',  this.property.min)
+                .attr('max',  this.property.max)
                 .attr('step', this.property.step)
-                .val(value)
+                .val(value);
         },
 
         _value: function(newValue) {
@@ -295,6 +298,48 @@ define(['class', 'config'], function(Class, Config) {
             }
             lower.val(newValue[0]);
             upper.val(newValue[1]);
+
+            return this;
+        }
+    });
+
+    var EpsilonEntry = RangeEntry.extend({
+
+        fix: function(event, ui) {
+            var val     = this._value();
+            var center  = val[0];
+            var epsilon = val[1];
+
+            // early out, if one of the numbers is NaN we cannot fix anything, leave it to the property
+            if (_.isNaN(center) || _.isNaN(epsilon)) return this;
+
+            var pMin   = this.property.min;
+            var pMax   = this.property.max;
+            var target = jQuery(event.target);
+
+            // early out, nothing to fix here
+            if (pMin.gt(center) || pMax.lt(center) || pMax.lt(epsilon) || epsilon < 0) return this;
+
+            if (target.is(this.inputs.eq(0))) {
+                var epsBounded = Math.min(Math.abs(pMin.toFloat() - center), epsilon, pMax.toFloat() - center);
+                this._value([center, epsBounded]);
+
+            } else if (target.is(this.inputs.eq(1))) {
+                var cenBounded = Math.max(pMin.plus(epsilon), Math.min(center, pMax.minus(epsilon).toFloat()));
+                this._value([cenBounded, epsilon]);
+            }
+
+            return this;
+        },
+
+        _setupInput: function() {
+            var value = this.property.value;
+            var min   = this.property.min;
+            var max   = this.property.max;
+
+            this.inputs = this._setupMiniNumeric(min, max, this.property.step, value[0])
+                .attr('id', this.id) // clicking the label should focus the first input
+                .add(this._setupMiniNumeric(0, max, this.property.epsilonStep, value[1]));
 
             return this;
         }
@@ -324,6 +369,7 @@ define(['class', 'config'], function(Class, Config) {
 
     return {
         'BoolEntry':    BoolEntry,
+        'EpsilonEntry': EpsilonEntry,
         'NumericEntry': NumericEntry,
         'RangeEntry':   RangeEntry,
         'TextEntry':    TextEntry

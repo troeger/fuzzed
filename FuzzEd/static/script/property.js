@@ -201,6 +201,10 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
         step:        undefined,
         epsilonStep: undefined,
 
+        menuEntryClass: function() {
+            return PropertyMenuEntry.EpsilonEntry;
+        },
+
         validate: function(value, validationResult) {
             if (!_.isArray(value) || value.length != 2) {
                 validationResult.message = '[TYPE ERROR] value must be a tuple';
