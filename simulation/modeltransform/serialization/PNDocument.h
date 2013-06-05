@@ -29,7 +29,7 @@ public:
 	// add PetriNet component to the XML document, returning IDs
 	virtual int addTimedTransition(long double rate, const string& label = "") = 0;
 	virtual int addImmediateTransition(long double weight = 1.0, const string& label = "") = 0;
-	virtual int addPlace(int initialMarking, int capacity = 100 /*a big number*/,  const string& label = "", bool isBasicEvent = false) = 0;
+	virtual int addPlace(int initialMarking, int capacity,  const string& label = "", bool isBasicEvent = false) = 0;
 	virtual int addTopLevelPlace(const string& label) = 0;
 	
 	// wrappers around addArc

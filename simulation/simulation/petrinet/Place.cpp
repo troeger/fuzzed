@@ -139,8 +139,9 @@ void Place::resolveConflictsImmediate(int tick)
 
 void Place::produceTokens(int numTokens)
 {
-	assert(m_marking + numTokens <= m_capacity);
 	m_marking += numTokens;
+	if (m_marking > m_capacity)
+		m_marking = m_capacity;
 }
 
 Place& Place::operator=(const Place& other)

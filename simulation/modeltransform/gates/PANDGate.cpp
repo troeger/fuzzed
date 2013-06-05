@@ -49,7 +49,7 @@ int PANDGate::serialize(boost::shared_ptr<PNDocument> doc) const
 		doc->transitionToPlace(garbageTransition, garbagePlace, 0);
 	}
 
-	int placeID = doc->addPlace(0, 100, "PAND_Failed");
+	int placeID = doc->addPlace(0, 1, "PAND_Failed");
 	doc->transitionToPlace(transitionID, placeID);
 
 	cout << "Value of AND: " << getValue() << endl;

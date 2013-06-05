@@ -29,7 +29,7 @@ int ORGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
 		childIDs.push_back((*it)->serialize(doc));
 
-	int oneChildFailed = doc->addPlace(0, 100, "OR_Failed");
+	int oneChildFailed = doc->addPlace(0, 1, "OR_Failed");
 	for (int id : childIDs)
 	{
 		if (id < 0)
