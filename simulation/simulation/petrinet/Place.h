@@ -8,6 +8,12 @@
 	#pragma warning(pop)
 #endif
 
+/************************************************************************/
+/* Conflict resolution based on:										*/ 
+/* http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.110.2081		*/ 
+/* "race with age memory" + atomic firing								*/
+/************************************************************************/
+
 #include "implementation/Random.h"
 
 using namespace std;
@@ -24,7 +30,6 @@ public:
 
 	// copying
 	Place(const Place& other);
-	Place& operator= (const Place& other);
 	
 	const string& getID() const { return m_ID; }
 	int getCurrentMarking() const { return m_marking; }
@@ -51,8 +56,8 @@ protected:
 	int m_marking;
 	const int m_initialMarking;
 	
-	string m_ID;
-	int m_capacity;
+	const string m_ID;
+	const int m_capacity;
 
 	bool m_bTopLevelPlace;
 };

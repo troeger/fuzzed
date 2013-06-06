@@ -49,7 +49,7 @@ Place::Place(const Place& other) :
 		throw runtime_error("Invalid Place configuration: the initial marking must not be larger than capacity.");
 }
 
-Place::Place() : m_initialMarking(0)
+Place::Place() : m_initialMarking(0), m_capacity(0)
 {
 	assert(false);
 }
@@ -76,6 +76,9 @@ void Place::resolveConflictsTimed(int)
 		sumLambda += tt->getRate();
 	}
 
+
+	return;
+	// TODO: 
 	double r = RandomNumberGenerator::instanceForCurrentThread()->randomNumberInInterval(0.0, sumLambda);
 
 	// for exponential distributions: P(i) = lambda_i/sumLambda
@@ -142,17 +145,6 @@ void Place::produceTokens(int numTokens)
 	m_marking += numTokens;
 	if (m_marking > m_capacity)
 		m_marking = m_capacity;
-}
-
-Place& Place::operator=(const Place& other)
-{
-	m_marking = other.m_initialMarking;
-	m_capacity = other.m_capacity;
-	m_ID = other.m_ID;
-	m_bTopLevelPlace = other.m_bTopLevelPlace;
-	m_transitionQueue = set<Transition*>();
-
-	return *this;
 }
 
 void Place::reset()

@@ -129,9 +129,9 @@ void PNMLImport::loadTransitions(
 		}
 		else
 		{ // immediateTransition
-			const double weight = parseDoubleValue(child, RATE_TAG, 1.0);
-			const double prio = parseDoubleValue(child, PRIORITY_TAG, 1.0);
-			immediateTransitions.emplace_back(ID, weight, prio);
+			const double rate = parseDoubleValue(child, RATE_TAG, 1.0);
+			const int prio = parseIntegerValue(child, PRIORITY_TAG, 1.0);
+			immediateTransitions.emplace_back(ID, rate, prio);
 		}
 	}
 }
