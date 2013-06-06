@@ -100,7 +100,7 @@ void Place::resolveConflictsTimed(int)
 		if (r >= lower && r < upper)
 		{
 			tt->fire();
-			toErase.emplace(tt);// m_transitionQueue.erase(tt);
+			toErase.insert(tt);// m_transitionQueue.erase(tt);
 			break;
 		}
 		lower = upper;
