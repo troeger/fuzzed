@@ -10,7 +10,7 @@
 #endif
 
 #include "Condition.h"
-#include "petrinet\SequentialConstraint.h"
+#include "petrinet/SequentialConstraint.h"
 
 using namespace pugi;
 using namespace std;
