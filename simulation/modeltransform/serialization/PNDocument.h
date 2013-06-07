@@ -12,45 +12,42 @@
 #include "Condition.h"
 #include "petrinet/SequentialConstraint.h"
 
-using namespace pugi;
-using namespace std;
-
 /************************************************************************/
 /* Abstract Class for XML documents representing Petri Nets             */
 /************************************************************************/
-class PNDocument : public xml_document
+class PNDocument : public pugi::xml_document
 {
 public:
 	PNDocument(int id = 0);
-	PNDocument(const string& fileName, int id = 0);
+	PNDocument(const std::string& fileName, int id = 0);
 
 	virtual ~PNDocument();
 
 	// add PetriNet component to the XML document, returning IDs
-	virtual int addTimedTransition(long double rate, const string& label = "") = 0;
-	virtual int addImmediateTransition(long double weight = 1.0, const string& label = "") = 0;
-	virtual int addPlace(int initialMarking, int capacity,  const string& label = "", bool isBasicEvent = false) = 0;
-	virtual int addTopLevelPlace(const string& label) = 0;
+	virtual int addTimedTransition(long double rate, const std::string& label = "") = 0;
+	virtual int addImmediateTransition(long double weight = 1.0, const std::string& label = "") = 0;
+	virtual int addPlace(int initialMarking, int capacity,  const std::string& label = "", bool isBasicEvent = false) = 0;
+	virtual int addTopLevelPlace(const std::string& label) = 0;
 	
 	// wrappers around addArc
-	virtual void placeToTransition(int placeID, int transitionID, int consumeCount = 1, const string& inscription = "x");
-	virtual void transitionToPlace(int transitionID, int placeID, int procudeCount = 1, const string& inscription = "x");
+	virtual void placeToTransition(int placeID, int transitionID, int consumeCount = 1, const std::string& inscription = "x");
+	virtual void transitionToPlace(int transitionID, int placeID, int procudeCount = 1, const std::string& inscription = "x");
 	
 	// add a measure which defines the time until the TopLevelEvent is triggered
 	virtual void addFailureMeasure() {}; // TimeNET
-	virtual void addSequenceConstraint(const vector<int>&, SequenceType) {}; // SEQGate
-	virtual void addUserDescription(const string& description);
+	virtual void addSequenceConstraint(const std::vector<int>&, SequenceType) {}; // SEQGate
+	virtual void addUserDescription(const std::string& description);
 	
-	bool save(const string& fileName);
+	bool save(const std::string& fileName);
 
-	bool valid() const { return !xml_document::empty(); }; // TODO
-	bool saved() const { return m_bSaved; };
+	bool valid() const { return !pugi::xml_document::empty(); } // TODO
+	const bool& saved() const { return m_bSaved; }
 
 protected:
-	virtual void addArc(int placeID, int transitionID, int tokenCount, ArcDirection direction, const string& inscription = "x") = 0;
+	virtual void addArc(int placeID, int transitionID, int tokenCount, ArcDirection direction, const std::string& inscription = "x") = 0;
 	virtual void initXML() = 0;
 
-	xml_node m_root;
+	pugi::xml_node m_root;
 
 	int m_transitionCount;
 	int m_placeCount;

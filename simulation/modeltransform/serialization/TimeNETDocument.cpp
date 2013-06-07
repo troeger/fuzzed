@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 
+using namespace std;
+using namespace pugi;
 using namespace timeNET;
 
 int TimeNETDocument::addPlace(

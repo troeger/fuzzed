@@ -2,6 +2,8 @@
 #include "serialization/TimeNETDocument.h"
 #include <iostream>
 
+using namespace std;
+
 XORGate::XORGate(const std::string& ID, const std::string& name)
 	: Gate(ID, name)
 {}

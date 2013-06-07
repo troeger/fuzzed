@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 using namespace PNML;
+using namespace pugi;
 
 PNMLDocument::PNMLDocument()
 	: PNDocument()

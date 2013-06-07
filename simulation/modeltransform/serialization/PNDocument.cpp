@@ -10,6 +10,9 @@
 	#pragma warning(pop) 
 #endif
 
+using namespace std;
+using namespace pugi;
+
 PNDocument::PNDocument(int id /*= 0*/)
 	: xml_document(),
 	m_placeCount(0), 

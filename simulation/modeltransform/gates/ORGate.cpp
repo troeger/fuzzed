@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+using namespace std;
+
 ORGate::ORGate(const string& id, const string& name /*= ""*/) 
 	: Gate(id, name)
 {
