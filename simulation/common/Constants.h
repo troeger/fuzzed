@@ -35,6 +35,7 @@ namespace PNML
 	const char* const INSCRIPTION_TAG = "inscription";
 	const char* const INITIALMARKING_TAG = "initialMarking";
 	const char* const TOPLEVEL_TAG = "isTopLevelEvent";
+	const char* const CONSTRAINT_TAG = "isConstraintPlace";
 	const char* const CAPACITY_TAG = "capacity";
 	const char* const SOURCE_TAG = "source";
 	const char* const TARGET_TAG = "target";

@@ -63,18 +63,10 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fileName, const string& targe
 	m_count(0)
 {
 	if (!filesystem::is_directory(targetDir))
-	{
-		m_targetDir = filesystem::path(fileName);
-		m_targetDir.remove_filename();
-
-		cout << "Directory " << targetDir << " not found, defaulting to " << m_targetDir.generic_string() << endl;
-
-		if (!filesystem::is_directory(m_targetDir))
-			throw runtime_error("Could not find target directory");
-	}
+		EXIT_ERROR(string("Directory ") + targetDir + " not found.");
 	
-	if (!filesystem::is_regular_file(fileName))
-		throw runtime_error("File not found " + fileName);
+	else if (!filesystem::is_regular_file(fileName))
+		EXIT_ERROR(string("File ") + fileName + " not found.");
 
 	m_threadPool = threadpool::fifo_pool(omp_get_max_threads()-1); // TODO
 }
@@ -88,9 +80,7 @@ FuzzTreeTransform::~FuzzTreeTransform()
 bool FuzzTreeTransform::loadRootNode()
 {
 	m_rootNode = m_document.child(FUZZ_TREE);
-	if (!m_rootNode)
-		throw runtime_error("Missing FuzzTree Root Node");
-
+	EXIT_ERROR("Missing Fuzztree Root Node");
 	return true;
 }
 
@@ -283,7 +273,6 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 	xml_node& faultTreeNode,
 	const FuzzTreeConfiguration& configuration) const
 {
-	cout << "generating";
 	for (const auto& currentChild : templateNode.children(CHILDREN))
 	{
 		const int		id	= parseID(currentChild);

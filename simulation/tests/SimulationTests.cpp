@@ -108,7 +108,7 @@ TEST(Simulation, Convergence)
 	SimulationResult res2 = readResultFile(fn);
 
 	EXPECT_SIMILAR(res1.reliability, res2.reliability, MAX_DEVIATION);
-	EXPECT_LE(res1.duration, res2.duration, MAX_DEVIATION);
+	EXPECT_SIMILAR(res1.duration, res2.duration, MAX_DEVIATION);
 }
 
 TEST(Simulation, BigTree)

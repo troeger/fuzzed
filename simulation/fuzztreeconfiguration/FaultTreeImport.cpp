@@ -60,8 +60,8 @@ FaultTreeNode* FaultTreeImport::loadTree()
 	assert(m_rootNode);
 	const xml_node topEvent = m_rootNode.child(TOP_EVENT);
 	if (!topEvent)
-		throw runtime_error("Missing TopEvent");
-	
+		EXIT_ERROR("Missing Top Event");
+
 	FaultTreeNode* tree = new TopLevelEvent(topEvent.attribute("id").as_string());
 	loadNode(topEvent, tree);
 	return tree;
@@ -143,6 +143,7 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 		}
 		else
 		{
+			// TODO: throw, exit or ignore?
 			throw runtime_error("Unrecognized node type: " + typeDescriptor);
 		}
 

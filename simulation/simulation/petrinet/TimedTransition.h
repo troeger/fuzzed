@@ -14,10 +14,11 @@ public:
 	TimedTransition(const TimedTransition& other);
 	TimedTransition& operator= (const TimedTransition &other);
 
-	double getRate()	const { return m_rate; };
-	unsigned int getFiringTime() const { return m_r; };
+	double getRate() const { return m_rate; }
+	unsigned int getFiringTime() const { return m_r; }
 
-	void setFiringTime(unsigned int t) { m_r = t; };
+	// TODO: find out if float would increase precision
+	void setFiringTime(unsigned int t) { m_r = t; }
 
 	bool tryUpdateStartupTime(unsigned int tick);
 

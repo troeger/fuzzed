@@ -17,6 +17,14 @@ using namespace std;
 #define MAX_LONG_DOUBLE std::numeric_limits<long double>::max()
 #define MAX_FLOAT std::numeric_limits<float>::max()
 
+#define EXIT_ERROR(s) ( exit_error(s) )
+
+inline void exit_error(std::string s)
+{
+	std::cout << s << std::endl; 
+	exit(-1);
+}
+
 namespace util
 {
 	/************************************************************************/
