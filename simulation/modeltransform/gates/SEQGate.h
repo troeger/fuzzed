@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "Gate.h"
+#include "PANDGate.h"
 
 // TODO: think about the semantics.
 // currently, simulations where the children do not occur in the right sequence are aborted.
@@ -9,7 +9,7 @@
 
 #define STATIC_SEQUENCE 1
 
-class SEQGate : public Gate
+class SEQGate : public PANDGate
 {
 public:
 	SEQGate(const std::string& id, const std::vector<std::string>& ordering, const std::string& name = "");
@@ -17,8 +17,8 @@ public:
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
-	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
-
 protected:
+	virtual int addSequenceViolatedPlace(boost::shared_ptr<PNDocument> doc) const override;
+
 	std::vector<std::string> m_ordering;
 };

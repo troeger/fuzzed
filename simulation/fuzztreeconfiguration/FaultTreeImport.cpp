@@ -131,7 +131,7 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 			vector<string> prioIndices;
 			util::tokenizeString(prioIds, prioIndices);
 
-			gate = new PANDGate(id, set<string>(prioIndices.begin(), prioIndices.end()), name);
+			gate = new PANDGate(id, prioIndices, name);
 		}
 		else if (typeDescriptor == SEQ_GATE)
 		{
