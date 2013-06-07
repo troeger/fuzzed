@@ -15,8 +15,7 @@
 /************************************************************************/
 
 #include "implementation/Random.h"
-
-using namespace std;
+#include "Types.h"
 
 class Transition;
 
@@ -25,7 +24,7 @@ class Place
 public:
 	typedef boost::shared_ptr<Place> Ptr;
 
-	Place(const string& id, int initialMarking, int capacity, bool isTopLevel);
+	Place(const string& id, int initialMarking, int capacity, PlaceSemantics semantics);
 	Place(); // satisfy the compiler
 
 	// copying
@@ -43,9 +42,7 @@ public:
 	void consumeTokens(Transition* const t, int numTokens);
 	void requestTokens(Transition* const t);
 
-	// this will make the simulation stop
-	void markAsTopLevel() { m_bTopLevelPlace = true; }
-	bool isTopLevelPlace() const { return m_bTopLevelPlace; }
+	const bool& isTopLevelPlace() const { return m_semantics == TOP_LEVEL_PLACE; }
 
 	void reset();
 
@@ -59,5 +56,5 @@ protected:
 	const string m_ID;
 	const int m_capacity;
 
-	bool m_bTopLevelPlace;
+	PlaceSemantics m_semantics;
 };

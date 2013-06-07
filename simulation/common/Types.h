@@ -20,6 +20,13 @@ enum ArcDirection
 	TRANSITION_TO_PLACE
 };
 
+enum PlaceSemantics
+{
+	DEFAULT_PLACE,
+	TOP_LEVEL_PLACE,
+	CONSTRAINT_VIOLATED_PLACE
+};
+
 enum ConditionType
 {
 	MORE,

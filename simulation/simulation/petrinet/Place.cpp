@@ -25,12 +25,12 @@ void Place::requestTokens(Transition* const t)
 	m_transitionQueue.insert(t);
 }
 
-Place::Place(const string& id, int initialMarking, int capacity, bool isTopLevel) :
+Place::Place(const string& id, int initialMarking, int capacity, PlaceSemantics semantics) :
 	m_initialMarking(initialMarking),
 	m_marking(initialMarking), 
 	m_ID(id), 
 	m_capacity(capacity), 
-	m_bTopLevelPlace(isTopLevel), 
+	m_semantics(semantics), 
 	m_transitionQueue(set<Transition*>())
 {
 	if (m_capacity > 0 && m_capacity < m_marking)
@@ -42,7 +42,7 @@ Place::Place(const Place& other) :
 	m_marking(other.m_initialMarking),
 	m_capacity(other.m_capacity),
 	m_ID(other.m_ID),
-	m_bTopLevelPlace(other.m_bTopLevelPlace),
+	m_semantics(other.m_semantics),
 	m_transitionQueue(set<Transition*>())
 {
 	if (m_capacity > 0 && m_capacity < m_marking)

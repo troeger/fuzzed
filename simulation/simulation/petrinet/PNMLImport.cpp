@@ -70,9 +70,13 @@ void PNMLImport::loadPlaces(map<string, Place>& places)
 		const int initialMarking = parseIntegerValue(child, INITIALMARKING_TAG, 0);
 		const string ID = child.attribute(ID_ATTRIBUTE).as_string();
 		const bool isTopLevel = child.attribute(TOPLEVEL_TAG).as_bool(false);
+		const bool isConstraint = child.attribute(CONSTRAINT_TAG).as_bool(false);
 
 		const int capacity = parseIntegerValue(child, CAPACITY_TAG, 0);
-		places.insert(make_pair(ID, Place(ID, initialMarking, capacity, isTopLevel)));
+		places.insert(make_pair(ID, 
+			Place(
+			ID, initialMarking, capacity, 
+			isTopLevel ? TOP_LEVEL_PLACE : isConstraint ? CONSTRAINT_VIOLATED_PLACE : DEFAULT_PLACE)));
 	}
 }
 
@@ -83,7 +87,7 @@ int PNMLImport::parseIntegerValue(const xml_node& node, const string& type, cons
 		return defaultValue;
 
 	xml_node child = valNode.child(VALUE_TAG);
-	if (!valNode)
+	if (!child)
 		throw runtime_error("Value node not found");
 
 	return child.text().as_int(defaultValue);
