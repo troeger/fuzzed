@@ -57,10 +57,9 @@ unordered_map<int, RandomNumberGenerator*> RandomNumberGenerator::s_generators =
 
 RandomNumberGenerator* RandomNumberGenerator::instanceForCurrentThread()
 {
-	if (/*s_generators.empty()*/s_generators.size() !=  omp_get_max_threads())
+	if (s_generators.size() !=  omp_get_max_threads()) // TODO is this safe??
 		boost::call_once(s_flag, initGenerators);
 	
-	// assert(s_generators.size() >= omp_get_num_threads());
 	return s_generators.at(omp_get_thread_num());
 }
 

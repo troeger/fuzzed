@@ -59,60 +59,19 @@ void Place::resolveConflictsTimed(int)
 	assert(m_marking >= 0);
 	assert(hasRequests());
 
-	if (m_transitionQueue.size() == 1)
-	{
-		TimedTransition* tt = dynamic_cast<TimedTransition*>(*m_transitionQueue.begin());
-		tt->fire();
-		m_transitionQueue.clear();
-		return;
-	}
-
-	double sumLambda = 0.0;
-	for (Transition* t : m_transitionQueue)
-	{
-		TimedTransition* tt = dynamic_cast<TimedTransition*>(t);
-		assert(tt && "At this stage only timed transitions should request a token");
-
-		sumLambda += tt->getRate();
-	}
-
-
-	return;
-	// TODO: 
-	double r = RandomNumberGenerator::instanceForCurrentThread()->randomNumberInInterval(0.0, sumLambda);
-
-	// for exponential distributions: P(i) = lambda_i/sumLambda
-	// divide [0, sumLambda] into intervals corresponding to the transition probabilities
-	// EXAMPLE: rates are (0.4, 0.5, 0.1)
-	// sumLambda = 1.0
-	// P(1) = 0.4/1.0 --> subinterval [0, 0.4]
-	// P(2) = 0.5/1.0 --> subinterval [0.4, 0.9]
-	// P(3) = 0.1/1.0 --> subinterval [0.9, 1.0]
-	
-	set<Transition*> toErase;
-	for (Transition* t : m_transitionQueue)
-	{
-		TimedTransition* tt = dynamic_cast<TimedTransition*>(t);
-		assert(tt != nullptr);
-
-		double lower = 0.0;
-		double upper = lower + tt->getRate();
-		if (r >= lower && r < upper)
-		{
-			tt->fire();
-			toErase.insert(tt);// m_transitionQueue.erase(tt);
-			break;
-		}
-		lower = upper;
-	}
-	for (Transition* t : toErase)
-		m_transitionQueue.erase(t);
+	// always take the first transition.
+	// this is not strictly correct. TODO implement arbitrary precision random numbers or something
+	TimedTransition* tt = dynamic_cast<TimedTransition*>(*m_transitionQueue.begin());
+	tt->fire();
+	m_transitionQueue.clear();
 }
 
 void Place::resolveConflictsImmediate(int tick)
 {
 	assert(m_marking >= 0);
 	assert(hasRequests());
+
+	// TODO handle weights?
 
 	ImmediateTransition* maxPrioIT = nullptr;
 	for (auto i = m_transitionQueue.begin(); i != m_transitionQueue.end(); )
@@ -151,4 +110,45 @@ void Place::reset()
 {
 	m_marking = m_initialMarking;
 	m_transitionQueue.clear();
+}
+
+DEPRECATED void Place::resolveExponential()
+{
+	double sumLambda = 0.0;
+	for (Transition* t : m_transitionQueue)
+	{
+		TimedTransition* tt = dynamic_cast<TimedTransition*>(t);
+		assert(tt && "At this stage only timed transitions should request a token");
+
+		sumLambda += tt->getRate();
+	}
+
+	double r = RandomNumberGenerator::instanceForCurrentThread()->randomNumberInInterval(0.0, sumLambda);
+
+	// for exponential distributions: P(i) = lambda_i/sumLambda
+	// divide [0, sumLambda] into intervals corresponding to the transition probabilities
+	// EXAMPLE: rates are (0.4, 0.5, 0.1)
+	// sumLambda = 1.0
+	// P(1) = 0.4/1.0 --> subinterval [0, 0.4]
+	// P(2) = 0.5/1.0 --> subinterval [0.4, 0.9]
+	// P(3) = 0.1/1.0 --> subinterval [0.9, 1.0]
+
+	set<Transition*> toErase;
+	for (Transition* t : m_transitionQueue)
+	{
+		TimedTransition* tt = dynamic_cast<TimedTransition*>(t);
+		assert(tt != nullptr);
+
+		double lower = 0.0;
+		double upper = lower + tt->getRate();
+		if (r >= lower && r < upper)
+		{
+			tt->fire();
+			toErase.insert(tt);// m_transitionQueue.erase(tt);
+			break;
+		}
+		lower = upper;
+	}
+	for (Transition* t : toErase)
+		m_transitionQueue.erase(t);
 }

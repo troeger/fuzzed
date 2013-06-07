@@ -38,11 +38,14 @@ public:
 	void resolveConflictsImmediate(int tick);
 	void resolveConflictsTimed(int tick);
 
+	void resolveExponential();
+
 	void produceTokens(int numTokens);
 	void consumeTokens(Transition* const t, int numTokens);
 	void requestTokens(Transition* const t);
 
-	const bool& isTopLevelPlace() const { return m_semantics == TOP_LEVEL_PLACE; }
+	const bool isTopLevelPlace() const { return m_semantics == TOP_LEVEL_PLACE; }
+	const bool isConstraintPlace() const { return m_semantics ==  CONSTRAINT_VIOLATED_PLACE; }
 
 	void reset();
 

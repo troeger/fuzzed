@@ -169,15 +169,11 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 
 	SimulationRoundResult result;
 	if (net->m_activeTimedTransitions.size() == 0)
-		return result; // TODO check this earlier
-
-#ifndef STATIC_SEQUENCE
-	if (net->constraintViolated())
 	{
-		result.valid = false;
-		return result;
+		result.valid = true;
+		result.failed = false;
+		return result; // TODO check this earlier
 	}
-#endif
 
 	auto elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();
 	try

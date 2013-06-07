@@ -60,7 +60,7 @@ int TimeNETDocument::addPlace(
 	return m_placeCount;
 }
 
-void TimeNETDocument::addArc(int placeID, int transitionID, int tokenCount, ArcDirection dir, const string& inscription /*=""*/)
+void TimeNETDocument::addArc(int placeID, int transitionID, int, ArcDirection dir, const string& inscription /*=""*/)
 {
 	assert(placeID <= m_placeCount && transitionID <= m_transitionCount);
 
