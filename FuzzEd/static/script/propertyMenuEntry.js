@@ -1,13 +1,45 @@
 define(['class', 'config'], function(Class, Config) {
 
+    /**
+     *  Package: Base
+     */
+
+    /**
+     *  Constants:
+     *      {RegEx} NUMBER_REGEX     - RegEx for matching all kind of number representations with strings.
+     *      {RegEx} ERROR_TYPE_REGEX - RegEx for filtering out the '[...ERROR]' part of a warning message.
+     */
     var NUMBER_REGEX     = /^[+\-]?(?:0|[1-9]\d*)(?:[.,]\d*)?(?:[eE][+\-]?\d+)?$/;
     var ERROR_TYPE_REGEX = /^\[.+\]\s*(.+)/;
 
+    /**
+     *  Function: capitalize
+     *      Helper function for capitalizing the first letter of a string.
+     */
     var capitalize = function(aString) {
         return aString.charAt(0).toUpperCase() + aString.slice(1);
     };
 
+    /**
+     *  Class: Entry
+     *      Abstract base class for an entry in the property menu of a node. It's associated with a <Property> object
+     *      and handles the synchronization with it.
+     */
     var Entry = Class.extend({
+
+        /**
+         *  Group: Members
+         *
+         *  Properties:
+         *      {String} id                   - Form element ID for value retrieval.
+         *      {<Property>} property         - The associated <Property> object.
+         *      {jQuery Selector} container   - The container element in the property dialog.
+         *      {jQuery Selector} inputs      - A selector containing all relevant form elements.
+         *      {boolean} _editing            - A flag that marks this entry as currently beeing edited.
+         *      {Object} _preEditValue        - The last valid value stored before editing this entry.
+         *      {jQuery Selector} _editTarget - A selector containing the one form element that is currently being edited.
+         *      {Timeout} _timer              - The Timeout object used to prevent updates from firing immediately.
+         */
         id:            undefined,
         property:      undefined,
         container:     undefined,
@@ -18,6 +50,13 @@ define(['class', 'config'], function(Class, Config) {
         _editTarget:   undefined,
         _timer:        undefined,
 
+        /**
+         *  Constructor: init
+         *      Entry initialization.
+         *
+         *  Parameters:
+         *      {<Property>} property - The associated <Property> object.
+         */
         init: function(property) {
             this.id = _.uniqueId('property');
             this.property = property;
@@ -26,10 +65,33 @@ define(['class', 'config'], function(Class, Config) {
                 ._setupEvents();
         },
 
+        /**
+         *  Section: Event Handling
+         */
+
+        /**
+         *  Method: blurEvents
+         *      Return the blur ('stop editing') events this Entry should react on.
+         *
+         *  Returns:
+         *      An array of event names.
+         */
         blurEvents: function() {
             return ['blur', 'remove'];
         },
 
+        /**
+         *  Method: blurred
+         *      Callback method that gets fired when one of the blur events specified in <blurEvents> was fired.
+         *      Cares about validation and propagating the new value of the Entry to the associated <Property>.
+         *      If the new value is not valid it will restore the old (valid) value.
+         *
+         *  Parameters:
+         *      See jQuery event handling.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         blurred: function(event, ui) {
             if (!this._editing) {
                 this._preEditValue = this.property.value;
@@ -52,10 +114,31 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+        /**
+         *  Method: changeEvents
+         *      Return the change ('currently editing') events this Entry should react on.
+         *
+         *  Returns:
+         *      An array of event names.
+         */
         changeEvents: function() {
             return [];
         },
 
+        /**
+         *  Method: changed
+         *      Callback method that gets fired when one of the change events specified in <changeEvents> was fired.
+         *      Cares about validation and propagating the new value of the Entry to the associated <Property>.
+         *      If the new value is not valid it will display an appropriate error message.
+         *      Valid values will be propagated to the <Property> after a short timeout to prevent propagation
+         *      while changing the value too often.
+         *
+         *  Parameters:
+         *      See jQuery event handling.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         changed: function(event, ui) {
             if (!this._editing) {
                 this._preEditValue = this.property.value;
@@ -76,12 +159,29 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+        /**
+         *  Method: _abortChange
+         *      Abort the currently running value propagation timeout to prevent the propagation of the value to
+         *      the <Property>.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         _abortChange: function() {
             window.clearTimeout(this._timer);
 
             return this;
         },
 
+        /**
+         *  Method: _sendChange
+         *      Propagate the currently set value to the <Property> object after a short timeout
+         *      (to prevent over-propagation). If there is already a timeout running it will cancel that timeout
+         *      and start a new one.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         _sendChange: function() {
             // discard old timeout
             window.clearTimeout(this._timer);
@@ -93,10 +193,34 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+
+        /**
+         *  Section: Validation
+         */
+
+        /**
+         *  Method: fix
+         *      Fix the currently set value to a value that is allowed for this Entry.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         fix: function(event, ui) {
             return this;
         },
 
+
+        /**
+         *  Section: Visuals
+         */
+
+        /**
+         *  Method: show
+         *      Adds this Entry to the container in the properties menu.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         show: function(on) {
             on.append(this.container);
             this._setupCallbacks();
@@ -104,12 +228,26 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+        /**
+         *  Method: hide
+         *      Removes this Entry to the container in the properties menu.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         hide: function() {
             this.container.remove();
 
             return this;
         },
 
+        /**
+         *  Method: warn
+         *      Highlight the corresponding form elements (error state) and show a popup containing an error message.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         warn: function(text) {
             text = capitalize(ERROR_TYPE_REGEX.exec(text)[1]);
 
@@ -125,12 +263,31 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+        /**
+         *  Method: unwarn
+         *      Restores normal state of all form elements and hides warning popups.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         unwarn: function() {
             this.container.removeClass(Config.Classes.PROPERTY_WARNING).tooltip('hide');
 
             return this;
         },
 
+
+        /**
+         *  Section: Setup
+         */
+
+        /**
+         *  Method: _setupVisualRepresentation
+         *      Setup all visuals (container and inputs).
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         _setupVisualRepresentation: function() {
             this._setupContainer()
                 ._setupInput();
@@ -139,6 +296,13 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+        /**
+         *  Method: _setupContainer
+         *      Setup the container element.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         _setupContainer: function() {
             this.container = jQuery(
                 '<div class="control-group" data-toggle="tooltip" data-trigger="manual" data-placement="left">\
@@ -150,10 +314,24 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+        /**
+         *  Method: _setupInput
+         *      Setup all needed input (form) elements.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         _setupInput: function() {
             throw '[ABSTRACT] subclass responsibility';
         },
 
+        /**
+         *  Method: _setupCallbacks
+         *      Setup the callbacks for change and blur events on input elements.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         _setupCallbacks: function() {
             _.each(this.blurEvents(), function(event) {
                 this.inputs.on(event, this.blurred.bind(this));
@@ -166,14 +344,34 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+        /**
+         *  Method: _setupEvents
+         *      Register for changes of the associated <Property> object.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
         _setupEvents: function() {
             jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 // ignore changes issued by us in order to prevent race conditions with the user
                 if (issuer === this) return;
                 this._value(newValue);
             }.bind(this));
+
+            return this;
         },
 
+        /**
+         *  Section: Accessors
+         */
+
+        /**
+         *  Method: _value
+         *      Method used for retrieving the current property value from the inputs.
+         *
+         *  Returns:
+         *      The currently set value.
+         */
         _value: function(newValue) {
             throw '[ABSTRACT] subclass responsibility';
         }
