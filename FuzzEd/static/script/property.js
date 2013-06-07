@@ -19,7 +19,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
                 ._setupMirror()
                 ._setupMenuEntry();
 
-            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.value, this]);
+            this._triggerChange(this.value, this);
         },
 
         menuEntryClass: function() {
@@ -40,7 +40,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
             }
 
             this.value = newValue;
-            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [newValue, issuer]);
+            this._triggerChange(newValue, issuer);
 
             if (propagate) {
                 var properties = {};
@@ -69,6 +69,10 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
 
         _setupMenuEntry: function() {
             this.menuEntry = new (this.menuEntryClass())(this);
+        },
+
+        _triggerChange: function(value, issuer) {
+            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
         }
     });
 
@@ -95,6 +99,10 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
         choices: undefined,
         values:  undefined,
 
+        menuEntryClass: function(){
+            return PropertyMenuEntry.ChoiceEntry;
+        },
+
         init: function(node, definition) {
             definition.values = typeof definition.values === 'undefined' ? definition.choices : definition.values;
             this._super(node, definition);
@@ -108,14 +116,6 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
             return true;
         },
 
-        setChoice: function(choice) {
-            var choiceIndex = _.indexOf(this.choices, choice);
-            if (choiceIndex < 0) {
-                throw '[VALUE ERROR] invalid choice ' + choice;
-            }
-            return this.setValue(this.values[choiceIndex]);
-        },
-
         _sanitize: function() {
             this.value = typeof this.value === 'undefined' ? this.default : this.value;
 
@@ -127,6 +127,18 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
                 throw '[VALUE ERROR] unknown value ' + this.value;
             }
             return this._super();
+        },
+
+        _triggerChange: function(value, issuer) {
+            var index = -1;
+            for (var i = this.values.length - 1; i >=0; i--) {
+                if (_.isEqual(this.values[i], value)) {
+                    index = i;
+                    break;
+                }
+            }
+
+            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, this.choices[i], issuer]);
         }
     });
 

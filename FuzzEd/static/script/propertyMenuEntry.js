@@ -167,7 +167,7 @@ define(['class', 'config'], function(Class, Config) {
         },
 
         _setupEvents: function() {
-            jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, issuer) {
+            jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 // ignore changes issued by us in order to prevent race conditions with the user
                 if (issuer === this) return;
                 this._value(newValue);
@@ -191,6 +191,46 @@ define(['class', 'config'], function(Class, Config) {
         _value: function(newValue) {
             if (typeof newValue === 'undefined') return this.inputs.attr('checked') === 'checked';
             this.inputs.attr('checked', newValue ? 'checked' : null);
+
+            return this;
+        }
+    });
+
+    var ChoiceEntry = Entry.extend({
+        blurEvents: function() {
+            return ['blur', 'change', 'remove'];
+        },
+
+        _setupInput: function() {
+            var value    = this.property.value;
+            this.inputs  = jQuery('<select class="input-medium">').attr('id', this.id);
+
+            var selected = this.property.choices[this._indexForValue(value)];
+
+            _.each(this.property.choices, function(choice, index) {
+                this.inputs.append(jQuery('<option>')
+                    .text(choice)
+                    .val(index)
+                    .attr('selected', choice === selected ? 'selected' : null)
+                )
+            }.bind(this));
+        },
+
+        _indexForValue: function(value) {
+            for (var i = this.property.values.length -1; i >= 0; i--) {
+                if (_.isEqual(this.property.values[i], value)) {
+                    return i;
+                }
+            }
+
+            return -1;
+        },
+
+        _value: function(newValue) {
+            if (typeof newValue === 'undefined') {
+                return this.property.values[this.inputs.val()];
+            }
+            this.inputs.val(this._indexForValue(newValue));
 
             return this;
         }
@@ -369,6 +409,7 @@ define(['class', 'config'], function(Class, Config) {
 
     return {
         'BoolEntry':    BoolEntry,
+        'ChoiceEntry':  ChoiceEntry,
         'EpsilonEntry': EpsilonEntry,
         'NumericEntry': NumericEntry,
         'RangeEntry':   RangeEntry,

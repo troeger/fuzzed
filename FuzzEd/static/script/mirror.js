@@ -105,8 +105,8 @@ define(['config', 'canvas', 'class', 'underscore'], function(Config, Canvas, Cla
         },
 
         _setupEvents: function() {
-            jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, issuer) {
-                this.show(newValue);
+            jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+                this.show(text);
             }.bind(this));
         }
     });
