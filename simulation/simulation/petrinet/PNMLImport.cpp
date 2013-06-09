@@ -82,19 +82,6 @@ void PNMLImport::loadPlaces(map<string, Place>& places)
 	}
 }
 
-int PNMLImport::parseIntegerValue(const xml_node& node, const string& type, const int defaultValue)
-{
-	xml_node valNode = node.child(type.c_str());
-	if (!valNode)
-		return defaultValue;
-
-	xml_node child = valNode.child(VALUE_TAG);
-	if (!child)
-		throw runtime_error("Value node not found");
-
-	return child.text().as_int(defaultValue);
-}
-
 void PNMLImport::loadArcs(ArcList& arcs)
 {
 	for (const xml_node& childNode : m_rootNode.children(ARC_TAG))
@@ -149,31 +136,7 @@ void PNMLImport::loadUserDescription(string& description)
 		description = child.text().as_string("");
 }
 
-bool PNMLImport::parseBooleanValue(const xml_node& node, const string& type, const bool defaultValue)
-{
-	const xml_node valNode = node.child(type.c_str());
-	if (valNode.empty())
-		return defaultValue;
 
-	const xml_node child = valNode.child(VALUE_TAG);
-	if (child.empty())
-		throw runtime_error("Value node not found");
-
-	return child.text().as_bool(defaultValue);
-}
-
-double PNMLImport::parseDoubleValue(const xml_node& node, const string& type, const double defaultValue)
-{
-	const xml_node valNode = node.child(type.c_str());
-	if (valNode.empty())
-		return defaultValue;
-
-	const xml_node child = valNode.child(VALUE_TAG);
-	if (child.empty())
-		throw runtime_error("Value node not found");
-
-	return child.text().as_double(defaultValue);
-}
 
 PNMLImport::~PNMLImport()
 {}

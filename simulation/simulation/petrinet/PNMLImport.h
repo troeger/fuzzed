@@ -41,9 +41,5 @@ private:
 
 	void loadConstraints(std::vector<SequentialConstraint>& constraints);
 
-	static int		parseIntegerValue(const pugi::xml_node& node, const std::string& type, const int defaultValue);
-	static double	parseDoubleValue(const pugi::xml_node& node, const std::string& type, const double defaultValue);
-	static bool		parseBooleanValue(const pugi::xml_node& node, const std::string& type, const bool defaultValue);
-
 	virtual bool loadRootNode() override;
 };

@@ -17,6 +17,7 @@
 
 using namespace chrono;
 using namespace boost;
+using namespace pugi;
 
 std::string util::toString(const int& i)
 {
@@ -180,4 +181,44 @@ void util::clearDirectory(const string& dir)
 bool util::beginsWith(const string& subject, const string& prefix)
 {
 	return subject.substr(0, prefix.length()) == prefix;
+}
+
+
+bool util::parseBooleanValue(const xml_node& node, const string& type, const bool defaultValue)
+{
+	const xml_node valNode = node.child(type.c_str());
+	if (valNode.empty())
+		return defaultValue;
+
+	const xml_node child = valNode.child("value");
+	if (child.empty())
+		throw runtime_error("Value node not found");
+
+	return child.text().as_bool(defaultValue);
+}
+
+double util::parseDoubleValue(const xml_node& node, const string& type, const double defaultValue)
+{
+	const xml_node valNode = node.child(type.c_str());
+	if (valNode.empty())
+		return defaultValue;
+
+	const xml_node child = valNode.child("value");
+	if (child.empty())
+		throw runtime_error("Value node not found");
+
+	return child.text().as_double(defaultValue);
+}
+
+int util::parseIntegerValue(const xml_node& node, const string& type, const int defaultValue)
+{
+	xml_node valNode = node.child(type.c_str());
+	if (!valNode)
+		return defaultValue;
+
+	xml_node child = valNode.child("value");
+	if (!child)
+		throw runtime_error("Value node not found");
+
+	return child.text().as_int(defaultValue);
 }
