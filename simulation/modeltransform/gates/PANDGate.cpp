@@ -13,7 +13,7 @@ PANDGate::PANDGate(const string& id, const std::vector<std::string>& ordering, c
 int PANDGate::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
 	// TODO
-	return -1;
+	return 1;
 }
 
 FaultTreeNode* PANDGate::clone() const
@@ -28,5 +28,5 @@ FaultTreeNode* PANDGate::clone() const
 
 int PANDGate::addSequenceViolatedPlace(boost::shared_ptr<PNDocument> doc) const
 {
-	return doc->addPlace(0, 0, "SequenceViolated", false);
+	return doc->addPlace(0, 0, "SequenceViolated");
 }

@@ -13,7 +13,7 @@ BasicEvent::~BasicEvent()
 
 int BasicEvent::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
-	int notFailed = doc->addPlace(1, 1, "BasicEvent" + m_id, true);
+	int notFailed = doc->addPlace(1, 1, "BasicEvent" + m_id);
 	int failComponent = doc->addTimedTransition(m_failureRate);
 	doc->placeToTransition(notFailed, failComponent);
 	
@@ -40,7 +40,7 @@ std::string BasicEvent::description() const
 
 std::pair<int /*placeID*/,int /*spareActivationTransition*/> BasicEvent::serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const
 {
-	int sparePassive = doc->addPlace(1, 1, "ColdSpare" + m_id, true);
+	int sparePassive = doc->addPlace(1, 1, "ColdSpare" + m_id);
 	int activateTransition = doc->addImmediateTransition();
 	doc->placeToTransition(sparePassive, activateTransition);
 
@@ -57,7 +57,7 @@ std::pair<int /*placeID*/,int /*spareActivationTransition*/> BasicEvent::seriali
 std::pair<int /*placeID*/, int /*timedTransitionID*/> 
 	BasicEvent::serializeSequential(boost::shared_ptr<PNDocument> doc) const
 {
-	int notFailed = doc->addPlace(1, 1, "BasicEvent" + m_id, true);
+	int notFailed = doc->addPlace(1, 1, "BasicEvent" + m_id);
 	int failComponent = doc->addTimedTransition(m_failureRate);
 	doc->placeToTransition(notFailed, failComponent);
 

@@ -13,7 +13,7 @@ int TimeNETDocument::addPlace(
 	int initialMarking, 
 	int capacity /*=1*/, 
 	const string& label/* = ""*/, 
-	bool isBasicEvent /*=false*/)
+	PlaceSemantics semantics /*= DEFAULT_PLACE*/)
 {
 	assert(capacity > 0 && initialMarking >= 0);
 	if (capacity < initialMarking)
@@ -50,12 +50,7 @@ int TimeNETDocument::addPlace(
 
 	setType(node);
 	const string l = label.empty() ? PLACE_IDENTIFIER+util::toString(m_placeCount) : label;
-	setLabel(node,l);
-
-	// we need these IDs for tracking which components have failed (only at the bottom level)
-	// in the importance function
-	if (isBasicEvent)
-		m_basicEventLabels.push_back(l);
+	setLabel(node, l);
 
 	return m_placeCount;
 }
@@ -304,5 +299,5 @@ void TimeNETDocument::setTransitionProperties(xml_node &node, const string& cond
 
 int TimeNETDocument::addTopLevelPlace(const string& label)
 {
-	return addPlace(0, 1, label, false);
+	return addPlace(0, 1, label, TOP_LEVEL_PLACE);
 }

@@ -26,7 +26,7 @@ public:
 	// add PetriNet component to the XML document, returning IDs
 	virtual int addTimedTransition(long double rate, const std::string& label = "") = 0;
 	virtual int addImmediateTransition(long double weight = 1.0, const std::string& label = "") = 0;
-	virtual int addPlace(int initialMarking, int capacity,  const std::string& label = "", bool isBasicEvent = false) = 0;
+	virtual int addPlace(int initialMarking, int capacity,  const std::string& label = "", PlaceSemantics semantics = DEFAULT_PLACE) = 0;
 	virtual int addTopLevelPlace(const std::string& label) = 0;
 	
 	// wrappers around addArc

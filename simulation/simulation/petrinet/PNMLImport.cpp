@@ -13,6 +13,8 @@
 #include "gates/SEQGate.h"
 
 using namespace PNML;
+using namespace std;
+using namespace pugi;
 
 PetriNet* PNMLImport::loadPNML(const string& fileName) noexcept
 {

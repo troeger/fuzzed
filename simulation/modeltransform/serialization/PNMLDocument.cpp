@@ -36,7 +36,7 @@ int PNMLDocument::addPlace(
 	int initialMarking, 
 	int capacity /*= 1*/, 
 	const string& label /*= ""*/, 
-	bool isBasicEvent /*= false*/)
+	PlaceSemantics semantics /*= DEFAULT_PLACE*/)
 {	
 	assert(capacity >= 0 && initialMarking >= 0 && capacity >= initialMarking);
 
@@ -51,6 +51,9 @@ int PNMLDocument::addPlace(
 
 	xml_node capacityNode = node.append_child(CAPACITY_TAG);
 	setNodeValue(capacityNode, util::toString(capacity));
+
+	if (semantics == CONSTRAINT_VIOLATED_PLACE)
+		node.append_attribute(CONSTRAINT_TAG).set_value(true);
 
 	return m_placeCount;
 }

@@ -12,7 +12,7 @@ public:
 	virtual int addImmediateTransition(long double weight = 1.0, const std::string& label = "") override;
 	virtual int addTopLevelPlace(const std::string& label) override;
 
-	virtual int addPlace(int initialMarking, int capacity = 1,  const std::string& label = "", bool isBasicEvent = false) override;
+	virtual int addPlace(int initialMarking, int capacity = 1,  const std::string& label = "", PlaceSemantics semantics = DEFAULT_PLACE) override;
 	
 	virtual void addFailureMeasure() override;
 	
