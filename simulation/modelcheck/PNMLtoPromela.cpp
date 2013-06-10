@@ -1,6 +1,5 @@
 #include "PNMLtoPromela.h"
-#include "petrinet/PNMLImport.h"
-#include "petrinet/PetriNet.h"
+#include "PTNet.h"
 
 #include <boost/format.hpp>
 
@@ -32,23 +31,39 @@ const string arcTemplate1to1 = ":: d_step{ inp1(M[%1%]) -> T[%2%]++; out1(M[%3%]
 const string markingTemplate = "M[%1%] = %2% \n";
 
 PNMLtoPromela::PNMLtoPromela(const boost::filesystem::path& pnmlPath, const boost::filesystem::path& outPath)
-	: m_net(PNMLImport::loadPNML(pnmlPath.generic_string())),
+	: m_net(PTNet::loadNet(pnmlPath)),
 	m_outPath(outPath)
 {}
 
 void PNMLtoPromela::convertFile(const boost::filesystem::path& pnmlPath, const boost::filesystem::path& outPath)
 {
 	PNMLtoPromela converter(pnmlPath, outPath);
-	converter.checkPetriNet();
 	converter.convertToPromela();
 }
 
 void PNMLtoPromela::convertToPromela()
 {
-	boost::format(promelaTemplate);
-}
+	string initBehaviour;
+	string netBehaviour;
 
-bool PNMLtoPromela::checkPetriNet()
-{
-	return m_net && m_net->valid();
+	for (const auto& place : m_net->m_places)
+	{
+		netBehaviour += str(boost::format(markingTemplate) % place._id % place._initialMarking);
+	}
+
+	for (const auto& transition : m_net->m_transitions)
+	{
+
+	}
+
+	for (const auto& arc : m_net->m_arcs)
+	{
+
+	}
+
+	boost::format(promelaTemplate) 
+		% m_net->m_places.size() 
+		% m_net->m_transitions.size()
+		% initBehaviour
+		% netBehaviour;
 }

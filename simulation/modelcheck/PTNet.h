@@ -7,30 +7,38 @@ typedef std::tuple<std::string, std::string, int> ArcSpec;
 
 struct Place
 {
-	std::string id;
-	unsigned int initialMarking;
-	unsigned int capacity;
+	Place(const std::string& ID, const unsigned int& initialMarking, const unsigned int& capacity) :
+		_id(ID), _initialMarking(initialMarking), _capacity(capacity) {}
+
+	std::string _id;
+	unsigned int _initialMarking;
+	unsigned int _capacity;
 };
 
 struct Transition
 {
-	std::string id;
-	unsigned int priority;
+	Transition(const std::string& ID, const unsigned int& prio) :
+		_id(ID), _priority(prio) {}
+	
+	std::string _id;
+	unsigned int _priority;
 };
 
 struct Arc
 {
-	std::string to;
-	std::string from;
-	unsigned int count;
+	Arc(const std::string& from, const std::string& to, const unsigned int& count) :
+		_from(from), _to(to), _count(count) {}
+	
+	std::string _from;
+	std::string _to;
+	unsigned int _count;
 };
 
 class PTNet
 {
 public:
-	const PTNet* loadNet(const boost::filesystem::path& path);
+	static const PTNet* loadNet(const boost::filesystem::path& path);
 
-private:
 	PTNet();
 
 	std::vector<Transition>	m_transitions;
