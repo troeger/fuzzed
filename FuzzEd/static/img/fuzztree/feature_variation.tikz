@@ -1,11 +1,6 @@
-\definecolor{cffffff}{RGB}{255,255,255}
-
-
-\begin{tikzpicture}[y=0.80pt,x=0.80pt,yscale=-1, inner sep=0pt, outer sep=0pt]
-  \path[draw=black,fill=cffffff,dash pattern=on 3.36pt off 1.12pt,line
+\path[draw=black,fill=cffffff,dash pattern=on 3.36pt off 1.12pt,line
     join=miter,line cap=butt,miter limit=2.80,line width=1.040pt] (0.7000,24.0000)
     .. controls (0.7000,24.0000) and (3.5000,34.0000) .. (17.5000,34.3000) ..
     controls (31.5000,34.3000) and (34.3000,24.0000) .. (34.3000,24.0000) --
     (21.0000,0.7000) -- (14.0000,0.7000) -- cycle;
 
-\end{tikzpicture}

@@ -11,6 +11,8 @@ import xml_fuzztree
 import xml_faulttree
 from graph import Graph
 
+from node_renderings import tikz
+
 import json, notations, sys, time
 
 def new_client_id():
