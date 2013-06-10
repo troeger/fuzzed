@@ -69,12 +69,12 @@ void PNMLImport::loadPlaces(map<string, Place>& places)
 {
 	for (const xml_node& child : m_rootNode.children(PLACE_TAG))
 	{
-		const int initialMarking = parseIntegerValue(child, INITIALMARKING_TAG, 0);
+		const int initialMarking = util::parseIntegerValue(child, INITIALMARKING_TAG, 0);
 		const string ID = child.attribute(ID_ATTRIBUTE).as_string();
 		const bool isTopLevel = child.attribute(TOPLEVEL_TAG).as_bool(false);
 		const bool isConstraint = child.attribute(CONSTRAINT_TAG).as_bool(false);
 
-		const int capacity = parseIntegerValue(child, CAPACITY_TAG, 0);
+		const int capacity = util::parseIntegerValue(child, CAPACITY_TAG, 0);
 		places.insert(make_pair(ID, 
 			Place(
 			ID, initialMarking, capacity, 
@@ -112,9 +112,9 @@ void PNMLImport::loadTransitions(
 	for (const xml_node& child : m_rootNode.children(TRANSITION_TAG))
 	{
 		const string ID = child.attribute(ID_ATTRIBUTE).as_string();
-		if (parseBooleanValue(child, TIMED_TAG, false))
+		if (util::parseBooleanValue(child, TIMED_TAG, false))
 		{ // timedTransition
-			const double rate = parseDoubleValue(child, RATE_TAG, -1.0);
+			const double rate = util::parseDoubleValue(child, RATE_TAG, -1.0);
 			if (rate < 0.0)
 				throw runtime_error("Invalid rate for transition detected");
 
@@ -122,8 +122,8 @@ void PNMLImport::loadTransitions(
 		}
 		else
 		{ // immediateTransition
-			const double rate = parseDoubleValue(child, RATE_TAG, 1.0);
-			const int prio = parseIntegerValue(child, PRIORITY_TAG, 1.0);
+			const double rate = util::parseDoubleValue(child, RATE_TAG, 1.0);
+			const int prio = util::parseIntegerValue(child, PRIORITY_TAG, 1.0);
 			immediateTransitions.emplace_back(ID, rate, prio);
 		}
 	}
