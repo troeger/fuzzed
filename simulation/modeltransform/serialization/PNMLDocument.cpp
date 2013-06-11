@@ -149,7 +149,7 @@ int PNMLDocument::addTopLevelPlace(const string& label)
 	return m_placeCount;
 }
 
-void PNMLDocument::addSequenceConstraint(const vector<int>& sequence, SequenceType type)
+void DEPRECATED PNMLDocument::addSequenceConstraint(const vector<int>& sequence, SequenceType type)
 {
 	xml_node node = m_root.append_child(TOOL_SPECIFIC_TAG);
 	xml_node constraintNode = node.append_child(SEQUENCE_CONSTRAINT);
