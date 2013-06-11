@@ -80,7 +80,8 @@ FuzzTreeTransform::~FuzzTreeTransform()
 bool FuzzTreeTransform::loadRootNode()
 {
 	m_rootNode = m_document.child(FUZZ_TREE);
-	EXIT_ERROR("Missing Fuzztree Root Node");
+	if (!m_rootNode)
+		EXIT_ERROR("Missing Fuzztree Root Node");
 	return true;
 }
 
