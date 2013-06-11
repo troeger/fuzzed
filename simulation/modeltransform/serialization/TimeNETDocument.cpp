@@ -256,9 +256,9 @@ int TimeNETDocument::addTimedTransition(long double rate, const string& label)
 	return m_transitionCount;
 }
 
-int TimeNETDocument::addImmediateTransition(long double weight /*=1.0*/, const string& label)
+int TimeNETDocument::addImmediateTransition(const unsigned int priority /*=1*/, const string& label)
 {
-	assert(weight > 0.0 && "non-negative weight required");
+	assert(priority > 0.0 && "non-negative weight required");
 
 	xml_node node;
 	if (m_immediateTransitionCount++ == 0)
@@ -273,8 +273,8 @@ int TimeNETDocument::addImmediateTransition(long double weight /*=1.0*/, const s
 	{
 		node = m_root.insert_child_before(IMMEDIATE_TRANSITION_TAG, m_firstImmediateTransition);
 	}
-	node.append_attribute("weight").set_value((double)weight);
-	node.append_attribute("priority").set_value((double)weight);
+	// node.append_attribute("weight").set_value((double)weight);
+	node.append_attribute("priority").set_value(priority);
 
 	if (!label.empty())
 		node.append_child("label").set_value(label.c_str());

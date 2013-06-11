@@ -9,16 +9,16 @@ public:
 
 	virtual ~PNMLDocument();
 
-	virtual int addTimedTransition(const long double& rate, const std::string& label = "") override;
-	virtual int addImmediateTransition(const unsigned int& priority = 1, const std::string& label = "") override;
+	virtual int addTimedTransition(long double rate, const std::string& label = "") override;
+	virtual int addImmediateTransition(unsigned int priority = 1, const std::string& label = "") override;
 
-	virtual int addPlace(const int& initialMarking, const int& capacity = 1,  const std::string& label = "", PlaceSemantics semantics = DEFAULT_PLACE) override;
+	virtual int addPlace(int initialMarking, int capacity = 1,  const std::string& label = "", PlaceSemantics semantics = DEFAULT_PLACE) override;
 	virtual int addTopLevelPlace(const std::string& label) override;
 	
 	virtual void addSequenceConstraint(const std::vector<int>& sequence, SequenceType type) override;
 
 protected:
-	virtual void addArc(const int& placeID, const int& transitionID, const int& tokenCount, const ArcDirection& direction, const std::string& inscription = "x") override;
+	virtual void addArc(int placeID, int transitionID, int tokenCount, ArcDirection direction, const std::string& inscription = "x") override;
 	
 	// helpers
 	static void setName(pugi::xml_node node, const std::string& label);

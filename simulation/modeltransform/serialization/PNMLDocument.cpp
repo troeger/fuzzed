@@ -39,7 +39,7 @@ int PNMLDocument::addTimedTransition(long double rate, const string& label /*= "
 	return m_transitionCount;
 }
 
-int PNMLDocument::addImmediateTransition(const unsigned int& priority, const string& label /*= ""*/)
+int PNMLDocument::addImmediateTransition(unsigned int priority, const string& label /*= ""*/)
 {
 	xml_node transitionNode = m_root.append_child(TRANSITION_TAG);
 
@@ -101,8 +101,8 @@ void PNMLDocument::setName(xml_node node, const string& label)
 }
 
 void PNMLDocument::addArc(
-	const int& placeID, const int& transitionID, const int& tokenCount,
-	const ArcDirection& direction,
+	int placeID, int transitionID, int tokenCount,
+	ArcDirection direction,
 	const string& inscription /*= "x"*/)
 {
 	xml_node arcNode = m_root.append_child(ARC_TAG);
