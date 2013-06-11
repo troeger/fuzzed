@@ -401,7 +401,7 @@
                     "default": "Transfer In"
                 },
                 "transfer": {
-                    "kind": "link",
+                    "kind": "transfer",
                     "displayName": "Transfer",
                     "default": -1,
 

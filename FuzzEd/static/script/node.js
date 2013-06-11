@@ -19,6 +19,7 @@ function(Property, Mirror, Canvas, Class) {
          *                                       defaults to <Node::getConfig()>.
          *    {DOMElement} container           - The DOM element that contains all other visual DOM elements of the node
          *                                       such as its image, mirrors, ...
+         *    {<Graph>}    graph               - The Graph this node belongs to.
          *    {int}        id                  - A client-side generated id - i.e. UNIX-timestamp - to uniquely identify
          *                                       the node in the frontend. It does NOT correlate with database ids in the
          *                                       backend. Introduced to save round-trips and to later allow for an
@@ -42,6 +43,7 @@ function(Property, Mirror, Canvas, Class) {
          */
         config:        undefined,
         container:     undefined,
+        graph:         undefined,
         id:            undefined,
         incomingEdges: undefined,
         outgoingEdges: undefined,
@@ -665,7 +667,7 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          *
          * Triggers:
-         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::PROPERTY_CHANGED>
          */
         moveTo: function(position) {
             var gridPos = Canvas.toGrid(position);
@@ -674,7 +676,7 @@ function(Property, Mirror, Canvas, Class) {
 
             this._moveContainerToPixel(position);
             // call home
-            jQuery(document).trigger(this.config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+            jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },

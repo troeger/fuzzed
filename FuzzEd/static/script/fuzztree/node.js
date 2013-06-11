@@ -26,7 +26,7 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
 
             if (optionalProperty) {
                 this.setOptional(optionalProperty.value);
-                jQuery(optionalProperty).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue) {
+                jQuery(optionalProperty).on(Config.Events.PROPERTY_CHANGED, function(event, newValue) {
                     this.setOptional(newValue);
                 }.bind(this));
             }

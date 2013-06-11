@@ -42,7 +42,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
          * listed below.
          *
          * On:
-         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::PROPERTY_CHANGED>
          *   <Config::Events::GRAPH_NODE_ADDED>
          *   <Config::Events::GRAPH_NODE_DELETED>
          *   <Config::Events::GRAPH_EDGE_DELETED>
@@ -53,7 +53,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
          */
         activate: function() {
             jQuery(document)
-                .on(Config.Events.NODE_PROPERTY_CHANGED,    this.nodePropertyChanged.bind(this))
+                .on(Config.Events.PROPERTY_CHANGED,    this.nodePropertyChanged.bind(this))
                 .on(Config.Events.GRAPH_NODE_ADDED,         this.graphNodeAdded.bind(this))
                 .on(Config.Events.GRAPH_NODE_DELETED,       this.graphNodeDeleted.bind(this))
                 .on(Config.Events.GRAPH_EDGE_ADDED,         this.graphEdgeAdded.bind(this))
@@ -70,7 +70,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
          * all handlers for custom synchronization events.
          *
          * Off:
-         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::PROPERTY_CHANGED>
          *   <Config::Events::GRAPH_NODE_ADDED>
          *   <Config::Events::GRAPH_NODE_DELETED>
          *   <Config::Events::GRAPH_EDGE_DELETED>
@@ -81,7 +81,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
          */
         deactivate: function() {
             jQuery(document)
-                .off(Config.Events.NODE_PROPERTY_CHANGED)
+                .off(Config.Events.PROPERTY_CHANGED)
                 .off(Config.Events.GRAPH_NODE_ADDED)
                 .off(Config.Events.GRAPH_NODE_DELETED)
                 .off(Config.Events.GRAPH_EDGE_ADDED)

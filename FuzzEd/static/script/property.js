@@ -1,5 +1,5 @@
-define(['class', 'config', 'decimal', 'propertyMenuEntry', 'mirror', 'underscore'],
-function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
+define(['class', 'config', 'decimal', 'propertyMenuEntry', 'mirror', 'alerts', 'underscore'],
+function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
@@ -45,7 +45,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
             if (propagate) {
                 var properties = {};
                 properties[this.name] = newValue;
-                jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.node.id, properties]);
+                jQuery(document).trigger(Config.Events.PROPERTY_CHANGED, [this.node.id, properties]);
             }
 
             return this;
@@ -69,10 +69,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
 
         _setupMenuEntry: function() {
             this.menuEntry = new (this.menuEntryClass())(this);
+
+            return this;
         },
 
         _triggerChange: function(value, issuer) {
-            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
+            jQuery(this).trigger(Config.Events.PROPERTY_CHANGED, [value, value, issuer]);
         }
     });
 
@@ -138,7 +140,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
                 }
             }
 
-            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, this.choices[i], issuer]);
+            jQuery(this).trigger(Config.Events.PROPERTY_CHANGED, [value, this.choices[i], issuer]);
         }
     });
 
@@ -292,14 +294,10 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
         }
     });
 
-    var Link = Property.extend({
-        //TODO
-    });
-
     var Numeric = Property.extend({
-        min:    -Decimal.MAX_VALUE,
-        max:     Decimal.MAX_VALUE,
-        step:    undefined,
+        min: -Decimal.MAX_VALUE,
+        max:  Decimal.MAX_VALUE,
+        step: undefined,
 
         menuEntryClass: function() {
             return PropertyMenuEntry.NumericEntry;
@@ -449,16 +447,103 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
         }
     });
 
+    var Transfer = Property.extend({
+        UNLINK_VALUE: -1,
+        UNLINK_TEXT:  'unlinked',
+        GRAPHS_URL:   Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/',
+
+        transferGraphs: undefined,
+
+        init: function(node, definition) {
+            jQuery.extend(this, definition);
+            this.node = node;
+            this._sanitize()
+                ._setupMirror()
+                ._setupMenuEntry()
+                .fetchTransferGraphs();
+        },
+
+        menuEntryClass: function() {
+            return PropertyMenuEntry.TransferEntry;
+        },
+
+        validate: function(value, validationResult) {
+            if (value === this.UNLINK_VALUE) {
+                validationResult.message = '[WARNING] No link set';
+            } else if (!_.has(this.transferGraphs, value)) {
+                validationResult.message = '[VALUE ERROR] Specified graph unknown';
+                return false;
+            }
+
+            return true;
+        },
+
+        _sanitize: function() {
+            // do not validate
+            this.value = typeof this.value === 'undefined' ? this.default : this.value;
+            return this;
+        },
+
+        _triggerChange: function(value, issuer) {
+            var unlinked = value === this.UNLINK_VALUE;
+
+            if (!unlinked) this.node.hideBadge();
+
+            jQuery(this).trigger(Config.Events.PROPERTY_CHANGED, [
+                value,
+                unlinked ? this.UNLINK_TEXT : this.transferGraphs[value],
+                issuer]
+            );
+        },
+
+        fetchTransferGraphs: function() {
+            jQuery.ajax({
+                url:      this.GRAPHS_URL + this.node.graph.id + Config.Backend.TRANSFERS_URL,
+                type:     'GET',
+                dataType: 'json',
+                // don't show progress
+                global:   false,
+
+                success:  this._setTransferGraphs.bind(this),
+                error:    this._throwError
+            });
+        },
+
+        _setTransferGraphs: function(json) {
+            this.transferGraphs = _.reduce(json.transfers, function(all, current) {
+                all[current.id] = current.name;
+                return all;
+            }, {});
+
+            if (this.value === this.UNLINK_VALUE)
+                this.node.showBadge('!', 'important');
+
+            jQuery(this).trigger(Config.Events.PROPERTY_SYNCHRONIZED);
+            this._triggerChange(this.value, this);
+
+            return this;
+        },
+
+        _throwError: function(xhr, textStatus, errorThrown) {
+            Alerts.showWarningAlert('Could not fetch graph for transfer:', errorThrown, Config.Alerts.TIMEOUT);
+
+            this.value = this.UNLINK_VALUE;
+            this.transferGraphs = undefined;
+
+            jQuery(this).trigger(Config.Events.PROPERTY_SYNCHRONIZED);
+        }
+    });
+
     var from = function(node, definition) {
         switch (definition.kind) {
             case 'bool':     return new Bool(node, definition);
             case 'choice':   return new Choice(node, definition);
             case 'compound': return new Compound(node, definition);
             case 'epsilon':  return new Epsilon(node, definition);
-            case 'link':     return new Link(node, definition);
             case 'numeric':  return new Numeric(node, definition);
             case 'range':    return new Range(node, definition);
             case 'text':     return new Text(node, definition);
+            case 'transfer': return new Transfer(node, definition);
 
             default: throw '[VALUE ERROR] unknown property kind ' + definition.kind;
         }
@@ -469,11 +554,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror) {
         Choice:   Choice,
         Compound: Compound,
         Epsilon:  Epsilon,
-        Link:     Link,
         Numeric:  Numeric,
         Property: Property,
         Range:    Range,
         Text:     Text,
+        Transfer: Transfer,
 
         from: from
     };

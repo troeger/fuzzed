@@ -291,7 +291,7 @@ define(['class', 'config'], function(Class, Config) {
         _setupVisualRepresentation: function() {
             this._setupContainer()
                 ._setupInput();
-            this.container.find('.controls').append(this.inputs);
+            this.container.find('.controls').prepend(this.inputs);
 
             return this;
         },
@@ -352,7 +352,7 @@ define(['class', 'config'], function(Class, Config) {
          *      This Entry for chaining.
          */
         _setupEvents: function() {
-            jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+            jQuery(this.property).on(Config.Events.PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 // ignore changes issued by us in order to prevent race conditions with the user
                 if (issuer === this) return;
                 this._value(newValue);
@@ -605,12 +605,129 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    var TransferEntry = Entry.extend({
+        _progressIndicator: undefined,
+        _openButton: undefined,
+        _unlinked: undefined,
+
+        init: function(property) {
+            this._super(property);
+
+            jQuery(window).on('focus', this._refetchEntries.bind(this));
+            jQuery(this.property).on(Config.Events.PROPERTY_SYNCHRONIZED, this._refreshEntries.bind(this));
+        },
+
+        blurEvents: function() {
+            return ['blur', 'change', 'remove'];
+        },
+
+        fix: function(event, ui) {
+            if (this._value() !== this.property.UNLINK_VALUE) {
+                this._unlinked.remove();
+            }
+
+            return this;
+        },
+
+        _setupInput: function() {
+            this.inputs = jQuery('<select class="input-medium">')
+                .attr('id', this.id)
+                .css('display', 'none');
+
+            // add placeholder entry
+            this._unlinked = jQuery('<option>')
+                .text(this.property.UNLINK_TEXT)
+                .attr('selected', 'selected')
+                .attr('value', this.property.UNLINK_VALUE);
+
+            this._openButton = jQuery('<button type="button">')
+                .addClass('btn')
+                .addClass('input-medium')
+                .addClass(Config.Classes.PROPERTY_OPEN_BUTTON)
+                .text('Open in new tab')
+                .appendTo(this.container.children('.controls'))
+                .css('display', 'none');
+
+            return this._setupProgressIndicator();
+        },
+
+        _setupOptions: function() {
+            // remove old values
+            this.inputs.empty();
+
+            var found = false;
+
+            _.each(this.property.transferGraphs, function(graphName, graphID) {
+                var optionSelected = this.property.value == graphID;
+
+                this.inputs.append(jQuery('<option>')
+                    .text(graphName)
+                    .attr('value', graphID)
+                    .attr('selected', optionSelected ? 'selected': null)
+                );
+
+                found |= optionSelected;
+            }.bind(this));
+
+            // if the value was not found we need to reset to the default 'unlinked' value
+            if (!found) {
+                this.inputs.prepend(this._unlinked.attr('selected', 'selected'));
+                this.property.setValue(this.property.UNLINK_VALUE);
+            }
+        },
+
+        _setupCallbacks: function() {
+            this._openButton.click(function() {
+                var value = this._value();
+
+                if (value != this.property.UNLINK_VALUE) {
+                    window.open(Config.Backend.EDITOR_URL + '/' + value, '_blank');
+                }
+            }.bind(this));
+
+            return this._super();
+        },
+
+        _setupProgressIndicator: function() {
+            this._progressIndicator = jQuery('<div class="progress progress-striped active">\
+                <div class="bar" style="width: 100%;"></div>\
+            </div>').appendTo(this.container.children('.controls'));
+
+            return this;
+        },
+
+        _refetchEntries: function() {
+            this.property.fetchTransferGraphs();
+            this._progressIndicator.css('display', '');
+            this._openButton.css('display', 'none');
+            this.inputs.css('display', 'none');
+        },
+
+        _refreshEntries: function() {
+            this._setupOptions();
+            this._progressIndicator.css('display', 'none');
+            this._openButton.css('display', '');
+            this.inputs.css('display', '');
+        },
+
+        _value: function(newValue) {
+            if (typeof newValue === 'undefined') {
+                return window.parseInt(this.inputs.val());
+            }
+
+            this.inputs.val(newValue);
+
+            return this;
+        }
+    });
+
     return {
-        'BoolEntry':    BoolEntry,
-        'ChoiceEntry':  ChoiceEntry,
-        'EpsilonEntry': EpsilonEntry,
-        'NumericEntry': NumericEntry,
-        'RangeEntry':   RangeEntry,
-        'TextEntry':    TextEntry
+        'BoolEntry':     BoolEntry,
+        'ChoiceEntry':   ChoiceEntry,
+        'EpsilonEntry':  EpsilonEntry,
+        'NumericEntry':  NumericEntry,
+        'RangeEntry':    RangeEntry,
+        'TextEntry':     TextEntry,
+        'TransferEntry': TransferEntry
     }
 });

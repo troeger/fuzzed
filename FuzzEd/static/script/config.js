@@ -174,13 +174,15 @@ define(['underscore'], function() {
          *    {String} CANVAS_EDGE_SELECTED     - Event triggered when an edge got selected.
          *    {String} CANVAS_EDGE_UNSELECTED   - Event triggered when an edge got unselected.
          *
-         *    {String} NODE_PROPERTY_CHANGED    - Event triggered when a property of a node changed.
-         *    {String} NODE_DRAG_STOPPED        - Event triggered when a dragged node is dropped again.
-         *
          *    {String} GRAPH_NODE_ADDED         - Event triggered when a node was added to the graph.
          *    {String} GRAPH_NODE_DELETED       - Event triggered when a node was deleted from the graph.
          *    {String} GRAPH_EDGE_ADDED         - Event triggered when an edge was added to the graph.
          *    {String} GRAPH_EDGE_DELETED       - Event triggered when an edge was deleted from the graph.
+         *
+         *    {String} NODE_DRAG_STOPPED        - Event triggered when a dragged node is dropped again.
+         *
+         *    {String} PROPERTY_CHANGED         - Event triggered when a property of a node changed.
+         *    {String} PROPERTY_SYNCHRONIZED    - Event triggered when a property synced itself with the backend.
          */
         Events: {
             CANVAS_SELECTION_STOPPED: 'canvas-selection-stopped',
@@ -188,13 +190,15 @@ define(['underscore'], function() {
             CANVAS_EDGE_SELECTED:     'canvas-edge-selected',
             CANVAS_EDGE_UNSELECTED:   'canvas-edge-unselected',
 
-            NODE_PROPERTY_CHANGED:    'node-property-changed',
-            NODE_DRAG_STOPPED:        'node-drag-stopped',
-
             GRAPH_NODE_ADDED:         'graph-node-added',
             GRAPH_NODE_DELETED:       'graph-node-deleted',
             GRAPH_EDGE_ADDED:         'graph-edge-added',
-            GRAPH_EDGE_DELETED:       'graph-edge-deleted'
+            GRAPH_EDGE_DELETED:       'graph-edge-deleted',
+
+            NODE_DRAG_STOPPED:        'node-drag-stopped',
+
+            PROPERTY_CHANGED:         'property-changed',
+            PROPERTY_SYNCHRONIZED:    'property-synchronized'
         },
 
         /**

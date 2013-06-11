@@ -206,6 +206,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
          */
         addNode: function(kind, properties) {
             properties.readOnly = this.readOnly;
+            properties.graph    = this;
 
             var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
             jQuery(document).trigger(this.config.Events.GRAPH_NODE_ADDED, [node.id, kind, node.x, node.y]);

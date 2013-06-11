@@ -166,7 +166,7 @@ define(['config', 'decimal', 'class', 'alerts', 'underscore'], function(Config, 
                 properties[this.options.property] =  this.value();
 
                 // call home!
-                jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.node.id, properties]);
+                jQuery(document).trigger(Config.Events.PROPERTY_CHANGED, [this.node.id, properties]);
             }.bind(this), 1000);
 
             return this;
