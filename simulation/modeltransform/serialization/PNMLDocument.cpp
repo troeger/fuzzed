@@ -24,12 +24,36 @@ PNMLDocument::~PNMLDocument() // nothing yet
 
 int PNMLDocument::addTimedTransition(long double rate, const string& label /*= ""*/)
 {
-	return addTransition(rate, true, label);
+	xml_node transitionNode = m_root.append_child(TRANSITION_TAG);
+
+	const string name = TRANSITION_IDENTIFIER + util::toString(++m_transitionCount);
+	transitionNode.append_attribute(ID_ATTRIBUTE).set_value(name.c_str());
+	setName(transitionNode, name);
+
+	setNodeValue(transitionNode.append_child(RATE_TAG), util::toString(rate));
+	setNodeValue(transitionNode.append_child(TIMED_TAG), "true");
+	
+	if (!label.empty())
+		setNodeValue(transitionNode.append_child(LABEL_TAG), label);
+
+	return m_transitionCount;
 }
 
-int PNMLDocument::addImmediateTransition(long double weight /*= 1.0*/, const string& label /*= ""*/)
+int PNMLDocument::addImmediateTransition(const unsigned int& priority, const string& label /*= ""*/)
 {
-	return addTransition(weight, false, label);
+	xml_node transitionNode = m_root.append_child(TRANSITION_TAG);
+
+	const string name = TRANSITION_IDENTIFIER + util::toString(++m_transitionCount);
+	transitionNode.append_attribute(ID_ATTRIBUTE).set_value(name.c_str());
+	setName(transitionNode, name);
+
+	setNodeValue(transitionNode.append_child(PRIORITY_TAG), util::toString((int)priority));
+	setNodeValue(transitionNode.append_child(TIMED_TAG), "false");
+
+	if (!label.empty())
+		setNodeValue(transitionNode.append_child(LABEL_TAG), label);
+
+	return m_transitionCount;
 }
 
 int PNMLDocument::addPlace(
@@ -76,25 +100,9 @@ void PNMLDocument::setName(xml_node node, const string& label)
 	setNodeValue(name, label);
 }
 
-int PNMLDocument::addTransition(long double rate, bool isTimed, const string& label /*=""*/)
-{
-	xml_node transitionNode = m_root.append_child(TRANSITION_TAG);
-
-	const string name = TRANSITION_IDENTIFIER + util::toString(++m_transitionCount);
-	transitionNode.append_attribute(ID_ATTRIBUTE).set_value(name.c_str());
-	setName(transitionNode, name);
-
-	setNodeValue(transitionNode.append_child(RATE_TAG), util::toString(rate));
-	setNodeValue(transitionNode.append_child(TIMED_TAG), isTimed ? "true":"false");
-	if (!label.empty())
-		setNodeValue(transitionNode.append_child(LABEL_TAG), label);
-
-	return m_transitionCount;
-}
-
 void PNMLDocument::addArc(
-	int placeID, int transitionID, int tokenCount,
-	ArcDirection direction,
+	const int& placeID, const int& transitionID, const int& tokenCount,
+	const ArcDirection& direction,
 	const string& inscription /*= "x"*/)
 {
 	xml_node arcNode = m_root.append_child(ARC_TAG);
