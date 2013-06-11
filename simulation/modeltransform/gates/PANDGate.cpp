@@ -12,8 +12,31 @@ PANDGate::PANDGate(const string& id, const std::vector<std::string>& ordering, c
 
 int PANDGate::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
-	// TODO
-	return 1;
+	int previousChildFailed = -1;
+	int garbage = addSequenceViolatedPlace(doc);
+	for (auto& child : m_children)
+	{
+		int childFailed = child->serialize(doc);
+		if (previousChildFailed > 0)
+		{
+			int discard		= doc->addImmediateTransition(1, "discard");
+			int propagate	= doc->addImmediateTransition(2, "propagate");
+
+			doc->placeToTransition(previousChildFailed, propagate);
+			doc->placeToTransition(childFailed, discard);
+			doc->transitionToPlace(discard, garbage);
+
+			int currentSequence = doc->addPlace(0, 1);
+			doc->transitionToPlace(propagate, currentSequence);
+
+			previousChildFailed = currentSequence;
+		}
+		else
+		{
+			previousChildFailed = childFailed;
+		}
+	}
+	return previousChildFailed;
 }
 
 FaultTreeNode* PANDGate::clone() const
