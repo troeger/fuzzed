@@ -47,9 +47,13 @@ public:
 	double averageFiringTime()	const { return m_avgFiringTime; }
 
 	// check if simulation can be terminated
-	bool failed() const { return m_topLevelPlace->getCurrentMarking() > 0; }
+	bool failed() const;
 
-	bool hasInactiveTransitions() const { return !m_inactiveTimedTransitions.empty(); }
+	// check if an invalid marking (due to a wrong sequence of events) was reached
+	bool markingInvalid() const;
+
+	// check if cold spares could yet become activated
+	bool hasInactiveTransitions() const;
 
 	// reduce number of places and immediate transitions which are not essential for the net semantics
 	void simplify();
@@ -76,7 +80,9 @@ protected:
 	TransitionTimeMapping m_activeTimedTransitions;
 
 	map<string, Place> m_placeDict;
+
 	Place* m_topLevelPlace; // just a pointer into m_placeDict. shouldn't leak.
+	vector<Place*> m_constraintPlaces;
 
 	ArcList m_arcs;
 

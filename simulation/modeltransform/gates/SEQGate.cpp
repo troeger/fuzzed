@@ -19,5 +19,5 @@ FaultTreeNode* SEQGate::clone() const
 
 int SEQGate::addSequenceViolatedPlace(boost::shared_ptr<PNDocument> doc) const 
 {
-	return doc->addPlace(0, 0, "SequenceViolated", CONSTRAINT_VIOLATED_PLACE);
+	return doc->addPlace(0, 1, "SequenceViolated", CONSTRAINT_VIOLATED_PLACE);
 }

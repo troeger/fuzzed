@@ -48,10 +48,6 @@ bool PetriNetSimulation::run()
 	for (int i = 0; i < m_numRounds; ++i)
 	{
 		if (privateBreak) continue;
-		
-		// TODO
-// 		while (currentNet.constraintViolated())
-// 			currentNet = PetriNet(std::move(currentNet));
 
 		pn.restoreInitialMarking();
 		pn.generateRandomFiringTimes();
@@ -133,6 +129,7 @@ PetriNetSimulation::PetriNetSimulation(
 	cout << "Results will be written to " << outputFileName << endl;
 }
 
+// returns false, if a sequence constraint was violated
 bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 {
 	tryTimedTransitions(pn, tick);
@@ -141,9 +138,6 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	bool immediateCanFire = true;
 	while (immediateCanFire)
 	{
-#ifndef STATIC_SEQUENCE
-		if (pn->constraintViolated()) return false;
-#endif
 		tryImmediateTransitions(pn, tick, immediateCanFire);
 	}
 	vector<TimedTransition*> toRemove; // TODO: this appears to be a hotspot
@@ -159,12 +153,12 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	for (TimedTransition* tt : toRemove)
 		pn->m_inactiveTimedTransitions.erase(tt);
 
-	return true;
+	return !pn->markingInvalid();
 }
 
 SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 {
-	const int maxTime = m_simulationTimeSeconds*1000;
+	const int maxTime = m_simulationTimeSeconds * 1000;
 	const auto start = high_resolution_clock::now();
 
 	SimulationRoundResult result;

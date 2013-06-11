@@ -56,7 +56,14 @@ void PetriNet::setup()
 	while (!m_topLevelPlace && it != itEnd)
 	{
 		if (it->second.isTopLevelPlace())
+		{
+			assert(m_topLevelPlace == nullptr);
 			m_topLevelPlace = &it->second;
+		}
+		else if (it->second.isConstraintPlace())
+		{
+			m_constraintPlaces.emplace_back(&it->second);
+		}
 		++it;
 	}
 }
@@ -167,7 +174,7 @@ bool PetriNet::valid() const
 	return true;//m_topLevelPlace;
 }
 
-bool PetriNet::constraintViolated()
+bool DEPRECATED PetriNet::constraintViolated()
 {
 	for (SequentialConstraint& c : m_constraints)
 		if (!c.isSatisfied(this))
@@ -214,4 +221,22 @@ void PetriNet::restoreInitialMarking()
 		p.second.reset();
 
 	applyToAllTransitions(std::mem_fn(&Transition::reset));
+}
+
+bool PetriNet::failed() const
+{
+	return m_topLevelPlace->getCurrentMarking() > 0;
+}
+
+bool PetriNet::hasInactiveTransitions() const
+{
+	return !m_inactiveTimedTransitions.empty();
+}
+
+bool PetriNet::markingInvalid() const
+{
+	for (const auto& place : m_constraintPlaces)
+		if (place->getCurrentMarking() > 0) return true;
+
+	return false;
 }
