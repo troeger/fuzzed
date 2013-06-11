@@ -16,7 +16,7 @@ int XORGate::serialize(boost::shared_ptr<PNDocument> doc) const
 
 	int oneChildFailed			= doc->addPlace(0, 1, "XOR_Failed");
 	int failedChildren			= doc->addPlace(0, childIDs.size(), "Failed_Children");
-	int moreThanOneChildFailed	= doc->addPlace(0, 0, "XOR_moreThanOne");
+	
 	for (int id : childIDs)
 	{
 		if (id < 0)
@@ -36,7 +36,6 @@ int XORGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	{
 		int discardMultipleFailures = doc->addImmediateTransition(2, "more than one child failed");
 		doc->placeToTransition(failedChildren, discardMultipleFailures, i);
-		doc->transitionToPlace(discardMultipleFailures, moreThanOneChildFailed, 0);
 	}
 
 	int finalTransition = doc->addImmediateTransition(1, "Trigger_XOR");
