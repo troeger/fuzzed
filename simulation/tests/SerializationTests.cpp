@@ -38,6 +38,7 @@ namespace
 	const string redundancyFileName		= "redundancy.fuzztree";
 	const string featureFileName		= "feature.fuzztree";
 	const string exampleSystemFileName	= "example_system.fuzztree";
+	const string config1				= "config1.fuzztree";
 }
 
 TEST(Serialization, PNML)
@@ -95,4 +96,9 @@ TEST(Serialization, Other)
 TEST(Serialization, ExampleSystem)
 {
 	TEST_NUM_CONFIGURATIONS("C:/dev/fuzztrees/simulation/testdata/blocksim_compare/" + exampleSystemFileName, 3);
+}
+
+TEST(Serialization, Config1)
+{
+	TEST_NUM_CONFIGURATIONS(dir + config1, 10);
 }
