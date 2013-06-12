@@ -19,7 +19,7 @@
 	string fn = fileName; \
 	EXPECT_NO_THROW(runSimulation(_strdup(fn.c_str()), MISSION_TIME, NUM_ROUNDS, CONVERGE_THRESH, MAX_TIME)); \
 	util::replaceFileExtensionInPlace(fn, ".xml"); \
-	SimulationResult res = readResultFile(fn); \
+	SimulationResult res = util::readResultFile(fn); \
 	EXPECT_SIMILAR(res.reliability, expectedReliability, MAX_DEVIATION);
 
 namespace
@@ -45,25 +45,6 @@ namespace
 
 using namespace simulation;
 using namespace pugi;
-
-SimulationResult readResultFile(const string& fileName)
-{
-	SimulationResult res;
-	xml_document resultDoc;
-	if (!resultDoc.load_file(fileName.c_str()))
-		return res;
-	xml_node topNode = resultDoc.child(SIMULATION_RESULT);
-	if (topNode.empty())
-		return res;
-	
-	res.reliability			= topNode.attribute(RELIABILITY).as_double(-1.0);
-	res.meanAvailability	= topNode.attribute(AVAILABILTIY).as_double(-1.0);
-	res.mttf				= topNode.attribute(MTTF).as_double(-1.0);
-	res.nRounds				= topNode.attribute(NROUNDS).as_uint(0);
-	res.nFailures			= topNode.attribute(NFAILURES).as_uint(0);
-
-	return res;
-}
 
 TEST(Simulation, AndOr)
 {
@@ -100,12 +81,12 @@ TEST(Simulation, Convergence)
 	string fn = dir + ExampleSystemTest;
 	EXPECT_NO_THROW(runSimulation(_strdup(fn.c_str()), MISSION_TIME, NUM_ROUNDS, CONVERGE_THRESH * 100, MAX_TIME)); 
 	util::replaceFileExtensionInPlace(fn, ".xml");
-	SimulationResult res1 = readResultFile(fn);
+	SimulationResult res1 = util::readResultFile(fn);
 	
 	util::replaceFileExtensionInPlace(fn, ".faulttree");
 	EXPECT_NO_THROW(runSimulation(_strdup(fn.c_str()), MISSION_TIME, NUM_ROUNDS, CONVERGE_THRESH, MAX_TIME)); 
 	util::replaceFileExtensionInPlace(fn, ".xml");
-	SimulationResult res2 = readResultFile(fn);
+	SimulationResult res2 = util::readResultFile(fn);
 
 	EXPECT_SIMILAR(res1.reliability, res2.reliability, MAX_DEVIATION);
 	EXPECT_SIMILAR(res1.duration, res2.duration, MAX_DEVIATION);
