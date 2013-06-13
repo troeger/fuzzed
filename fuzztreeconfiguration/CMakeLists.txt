@@ -12,6 +12,10 @@ set(BOOST_ROOT $ENV{BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to poi
 set(BOOST_INCLUDEDIR ${BOOST_ROOT}/Include)
 set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
 
+find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
+message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
+find_package(pugixml REQUIRED)
+
 include(common)
 find_package(XercesC REQUIRED) # XSD DEPENDS ON ${XERCESC_FOUND}
 if(XERCESC_FOUND)
@@ -23,6 +27,7 @@ else(XERCESC_FOUND)
 endif(XERCESC_FOUND)
 
 include_directories(${XERCESC_INCLUDE_DIR})
+include_directories(${PUGIXML_INCLUDE_DIR})
 
 find_package(pugixml REQUIRED)
 find_package(Xsd REQUIRED) # CODESYNTHESIS
@@ -34,23 +39,20 @@ endif(XSD_FOUND)
 include_directories(${XSD_INCLUDE_DIR})
                                                                                                                                                                                                                         
 set(SOURCES
-   ${SOURCE}
-   FaultTreeImport.cpp
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
 )
 set(HEADERS
-   ${HEADERS}
-   FaultTreeImport.h
    FuzzTreeTransform.h
    FuzzTreeConfiguration.h
 )
 
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdParty)
 
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
 
-set(FAULTTREE_XSD faulttree.xsd)
+set(FAULTTREE_XSD xml/faultTree.xsd)
 set(FAULTTREE_OUT ${CMAKE_CURRENT_SOURCE_DIR})
 XSD_SCHEMA(FAULTTREE_XSD FAULTTREE_OUT)
 

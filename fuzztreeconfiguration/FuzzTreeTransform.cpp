@@ -1,21 +1,13 @@
 ﻿#include "FuzzTreeTransform.h"
 #include "Constants.h"
 #include "FuzzTreeConfiguration.h"
+#include "util.h"
 
-#if IS_WINDOWS 
-#pragma warning(push, 3) 
-#endif
 #include <boost/filesystem/operations.hpp>
 #include <boost/range/counting_range.hpp>
 #include <exception>
 #include <iostream>
-#include "ExpressionParser.h"
-#if IS_WINDOWS
-#pragma warning(pop) 
-#endif
-#include "util.h"
-
-#include <omp.h>
+#include <ExpressionParser.h>
 
 using namespace pugi;
 using namespace std;
@@ -25,12 +17,12 @@ using namespace boost;
 
 const char* const DUMMY = "dummy";
 
-void FuzzTreeTransform::transformFuzzTree(const string& fileName, const string& targetDir) noexcept
+void FuzzTreeTransform::transformFuzzTree(const string& fuzzTreeXML) noexcept
 {
 	try
 	{
-		FuzzTreeTransform transform(fileName, targetDir);
-		if (!transform.validateAndLoad())
+		FuzzTreeTransform transform(fuzzTreeXML);
+		if (!transform.loadRootNode())
 		{
 			cout << "Could not load FuzzTree" << endl;
 			return;
@@ -41,10 +33,7 @@ void FuzzTreeTransform::transformFuzzTree(const string& fileName, const string& 
 		
 		for (const auto& instanceConfiguration : configs)
 		{
-			boost::function<void()> generationTask = boost::bind(
-				&FuzzTreeTransform::generateFaultTree, &transform, instanceConfiguration);
-			
-			transform.scheduleFTGeneration(generationTask);
+			transform.generateFaultTree(instanceConfiguration);
 		}
 	}
 	catch (std::exception& e)
@@ -57,25 +46,14 @@ void FuzzTreeTransform::transformFuzzTree(const string& fileName, const string& 
 	}
 }
 
-FuzzTreeTransform::FuzzTreeTransform(const string& fileName, const string& targetDir)
-	: XMLImport(fileName), 
-	m_targetDir(targetDir), 
+FuzzTreeTransform::FuzzTreeTransform(const std::string& fuzzTreeXML) :
 	m_count(0)
 {
-	if (!filesystem::is_directory(targetDir))
-		EXIT_ERROR(string("Directory ") + targetDir + " not found.");
-	
-	else if (!filesystem::is_regular_file(fileName))
-		EXIT_ERROR(string("File ") + fileName + " not found.");
-
-	m_threadPool = threadpool::fifo_pool(omp_get_max_threads()-1); // TODO
+	m_document.load(fuzzTreeXML.c_str());
 }
 
 FuzzTreeTransform::~FuzzTreeTransform()
-{
-	m_threadPool.wait();
-	m_threadPool.clear();
-}
+{}
 
 bool FuzzTreeTransform::loadRootNode()
 {
@@ -260,13 +238,7 @@ void FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configura
 	generateFaultTreeRecursive(topEvent, newTopEvent, configuration);
 	removeEmptyNodes(newTopEvent);
 
-	newDoc->save_file(uniqueFileName().c_str());
-}
-
-void FuzzTreeTransform::scheduleFTGeneration(boost::function<void()>& task)
-{ // does this even make sense??
-	//m_threadPool.schedule(task);
-	task();
+	//newDoc->save_file(uniqueFileName().c_str());
 }
 
 void FuzzTreeTransform::generateFaultTreeRecursive(
@@ -340,19 +312,6 @@ bool FuzzTreeTransform::isLeaf(const string& typeDescriptor)
 	return 
 		typeDescriptor == BASIC_EVENT || 
 		typeDescriptor == UNDEVELOPED_EVENT;
-}
-
-const std::string FuzzTreeTransform::uniqueFileName() const
-{
-	boost::filesystem::path slash("/");
-	const string sSlash = slash.make_preferred().string();
-	
-	string fn = 
-		m_targetDir.generic_string() + sSlash +
-		m_file.filename().generic_string();
-	
-	util::replaceFileExtensionInPlace(fn, "");
-	return fn + util::toString(m_count) + FAULT_TREE_EXT;
 }
 
 // the second return value is true if the recursion should terminate below the gate
