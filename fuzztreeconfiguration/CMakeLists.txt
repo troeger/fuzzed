@@ -53,17 +53,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdParty)
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
 
 set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faultTree.xsd")
-set(FAULTTREE_OUT_SRC "${CMAKE_CURRENT_SOURCE_DIR}/FaultTree.cpp")
-set(FAULTTREE_OUT_H "${CMAKE_CURRENT_SOURCE_DIR}/FaultTree.h")
-
-add_custom_command(
-  OUTPUT ${FAULTTREE_OUT_SRC}
-  OUTPUT ${FAULTTREE_OUT_H}
-  DEPENDS ${FAULTTREE_XSD}
-  COMMAND ${XSD_EXECUTABLE}
-  ARGS cxx-tree --namespace-map net.faultTree=ft --generate-serialization --hxx-suffix .h --cxx-suffix .cpp --generate-polymorphic --output-dir ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMENT "Generating C++ / XML mapping files"
-  VERBATIM)
 
 if (WIN32)
    add_library(ftconfiguration STATIC ${SOURCES} ${HEADERS})
@@ -76,3 +65,33 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
    set_target_properties(ftcommon PROPERTIES COMPILE_FLAGS "-fPIC")
 endif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(ftconfiguration ${Boost_LIBRARIES})
+
+# TODO: in order not to re-generate all the time we actually want something like this (not working -.-):
+# set(FAULTTREE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/FaultTree.cpp")
+# set(FAULTTREE_H "${CMAKE_CURRENT_SOURCE_DIR}/FaultTree.h")
+# add_custom_command(
+#   OUTPUT ${FAULTTREE_SRC} ${FAULTTREE_H}
+#   DEPENDS ${FAULTTREE_XSD}
+#   COMMAND ${XSD_EXECUTABLE}
+#   ARGS cxx-tree --namespace-map net.faulttree=ft --hxx-suffix .h --cxx-suffix .cpp --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FAULTTREE_XSD}
+#   COMMENT "Generating C++ / XML mapping files"
+#   VERBATIM)
+
+set(XSD_ARGS
+  --include-with-brackets #include with <> instead of ""
+  --generate-polymorphic #needed for xsi:type
+  --root-element "FuzzTree"
+  --type-naming ucc --function-naming lcc
+  #--suppress-parsing 
+  --generate-serialization --namespace-map net.faulttree=ft 
+  --hxx-suffix .h --cxx-suffix .cpp
+
+)
+
+add_custom_command(
+  TARGET ftconfiguration
+  DEPENDS ${FAULTTREE_XSD}
+  COMMAND ${XSD_EXECUTABLE}
+  ARGS cxx-tree ${XSD_ARGS} --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FAULTTREE_XSD}
+  COMMENT "Generating C++ / XML mapping files"
+  VERBATIM)
