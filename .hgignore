@@ -25,3 +25,4 @@ simulation/profiling
 *.debug
 simulation/testdata/faultTrees/*.xml
 *.ilk
+fuzztreeconfiguration/build/*
