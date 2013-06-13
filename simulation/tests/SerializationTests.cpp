@@ -100,5 +100,5 @@ TEST(Serialization, ExampleSystem)
 
 TEST(Serialization, Config1)
 {
-	TEST_NUM_CONFIGURATIONS(dir + config1, 10);
+	TEST_NUM_CONFIGURATIONS(dir + config1, 5);
 }

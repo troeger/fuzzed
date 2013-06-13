@@ -51,8 +51,8 @@ namespace util
 	string nestedIDString(int n, ...);
 
 	string toString(const int& i);
-	string toString(const double& d, const int& prec = 9);
-	string toString(const long double& d, const int& prec = 9);
+	string toString(const double& d, const int& prec = 10);
+	string toString(const long double& d, const int& prec = 10);
 
 	// returns something like #p[placeID] [cond] [argument]
 	string conditionString(const int placeID, ConditionType cond, const int argument);
@@ -94,7 +94,6 @@ namespace util
 	int		parseIntegerValue(const pugi::xml_node& node, const std::string& type, const int defaultValue);
 	double	parseDoubleValue(const pugi::xml_node& node, const std::string& type, const double defaultValue);
 	bool	parseBooleanValue(const pugi::xml_node& node, const std::string& type, const bool defaultValue);
-
 
 	SimulationResult readResultFile(const std::string& fileName);
 }

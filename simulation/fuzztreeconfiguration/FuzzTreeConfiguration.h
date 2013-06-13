@@ -17,11 +17,11 @@ public:
 
 	void setNotIncluded(int ID);
 
-	bool isOptionalEnabled(int ID)	const { return m_optionalNodes.at(ID); }
-	bool isIncluded(int ID)			const { return m_notIncluded.find(ID) == m_notIncluded.end(); }
+	const bool& isOptionalEnabled(int ID)	const { return m_optionalNodes.at(ID); }
+	const bool isIncluded(int ID)			const { return m_notIncluded.find(ID) == m_notIncluded.end(); }
 	
-	std::tuple<int,int> getRedundancyCount(int ID) const { return m_redundancyNodes.at(ID); }
-	int getFeaturedChild(int ID)	const { return m_featureNodes.at(ID); }
+	const std::tuple<int,int>& getRedundancyCount(int ID) const { return m_redundancyNodes.at(ID); }
+	const int& getFeaturedChild(int ID)	const { return m_featureNodes.at(ID); }
 
 protected:
 	std::set<int> m_notIncluded;
