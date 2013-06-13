@@ -52,9 +52,18 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdParty)
 
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
 
-set(FAULTTREE_XSD xml/faultTree.xsd)
-set(FAULTTREE_OUT ${CMAKE_CURRENT_SOURCE_DIR})
-XSD_SCHEMA(FAULTTREE_XSD FAULTTREE_OUT)
+set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faultTree.xsd")
+set(FAULTTREE_OUT_SRC "${CMAKE_CURRENT_SOURCE_DIR}/FaultTree.cpp")
+set(FAULTTREE_OUT_H "${CMAKE_CURRENT_SOURCE_DIR}/FaultTree.h")
+
+add_custom_command(
+  OUTPUT ${FAULTTREE_OUT_SRC}
+  OUTPUT ${FAULTTREE_OUT_H}
+  DEPENDS ${FAULTTREE_XSD}
+  COMMAND ${XSD_EXECUTABLE}
+  ARGS cxx-tree --namespace-map net.faultTree=ft --generate-serialization --hxx-suffix .h --cxx-suffix .cpp --generate-polymorphic --output-dir ${CMAKE_CURRENT_SOURCE_DIR}
+  COMMENT "Generating C++ / XML mapping files"
+  VERBATIM)
 
 if (WIN32)
    add_library(ftconfiguration STATIC ${SOURCES} ${HEADERS})

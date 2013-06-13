@@ -1,38 +1,41 @@
-MACRO( XSD_SCHEMA NAME FILE )
+FUNCTION(XSD_EXTRACT_OPTIONS _xsd_files _xsd_options)
+  foreach(current_arg ${ARGN})
+    IF(${current_arg} STREQUAL "OPTIONS")
+      SET(_XSD_DOING_OPTIONS TRUE)
+    else(${current_arg} STREQUAL "OPTIONS")
+      if(_XSD_DOING_OPTIONS)
+        SET(_xsd_options_p ${_xsd_options_p} ${current_arg})
+      else(_XSD_DOING_OPTIONS)
+        SET(_xsd_files_p ${_xsd_files_p} ${current_arg})
+      endif(_XSD_DOING_OPTIONS)
+    endif(${current_arg} STREQUAL "OPTIONS")
+  endforeach(current_arg)
+  SET(${_xsd_files} ${_xsd_files_p} PARENT_SCOPE)
+  SET(${_xsd_options} ${_xsd_options_p} PARENT_SCOPE)
+ENDFUNCTION(XSD_EXTRACT_OPTIONS)
 
-  #
-  # Make a full path from the source directory
-  #
-  SET( xs_SRC "${FILE}" )
-
-  # 
-  # XSD will generate two or three C++ files (*.cxx,*.hxx). Get the
-  # destination file path sans any extension and then build paths to the
-  # generated files.
-  #
-  GET_FILENAME_COMPONENT( xs_FILE "${FILE}" NAME_WE )
-  SET( xs_CXX "${CMAKE_CURRENT_BINARY_DIR}/${xs_FILE}.cxx" )
-  SET( xs_HXX "${CMAKE_CURRENT_BINARY_DIR}/${xs_FILE}.hxx" )
-
-  #
-  # Add the source files to the NAME variable, which presumably will be used to
-  # define the source of another target.
-  #
-  LIST( APPEND ${NAME} ${xs_CXX} )
-
-  #
-  # Set up a generator for the output files from the given schema file using
-  # the XSD cxx-tree command.
-  #
-  ADD_CUSTOM_COMMAND( OUTPUT "${xs_CXX}" "${xs_HXX}"
-  					COMMAND ${XSD_EXECUTABLE}
-					  ARGS "cxx-tree" ${ARGN} ${CMAKE_CURRENT_SOURCE_DIR}/${xs_SRC}
-					  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${xs_SRC})
-
-  #
-  # Don't fail if a generated file does not exist.
-  #
-  SET_SOURCE_FILES_PROPERTIES( "${xs_CXX}" "${xs_HXX}"
-  							   PROPERTIES GENERATED TRUE )
-
-ENDMACRO( XSD_SCHEMA )
+FUNCTION(WRAP_XSD XSD_SRCS XSD_INCLUDES OUT_PATH)
+  SET(OUTPUT_DIR  ${CMAKE_CURRENT_BINARY_DIR}/src/xsd)
+  FILE(MAKE_DIRECTORY ${OUTPUT_DIR})
+  SET(${XSD_INCLUDES} ${OUTPUT_DIR} PARENT_SCOPE)
+  XSD_EXTRACT_OPTIONS(xsd_files xsd_options ${ARGN})
+  FOREACH(it ${xsd_files})
+    STRING(REGEX REPLACE ".*/" "" BARE_XSD "${it}" )
+    STRING(REGEX REPLACE ".xsd" ".cpp" SOURCE "${BARE_XSD}" )
+    STRING(REGEX REPLACE ".xsd" ".h" HEADER "${BARE_XSD}" )
+    CONFIGURE_FILE(${it} ${OUT_PATH}/${BARE_XSD} COPY_ONLY)
+    SET(SOURCE ${OUTPUT_DIR}/${SOURCE})
+    SET(HEADER ${OUTPUT_DIR}/${HEADER})
+    message("${SOURCE}")
+    message("${OUT_PATH}/${BARE_XSD}")
+    ADD_CUSTOM_COMMAND(OUTPUT ${SOURCE} ${HEADER}
+        COMMAND ${XSD_EXECUTABLE} ${xsd_options} "--output-dir" ${OUTPUT_DIR} ${OUT_PATH}/${BARE_XSD}
+        DEPENDS ${it}
+        VERBATIM
+    )
+    set_source_files_properties(${HEADER} PROPERTIES GENERATED TRUE)
+    set_source_files_properties(${SOURCE} PROPERTIES GENERATED TRUE)
+    SET(_XSD_SRCS ${_XSD_SRCS} ${SOURCE} ${HEADER})
+  ENDFOREACH(it)
+  SET(${XSD_SRCS} ${_XSD_SRCS} PARENT_SCOPE)
+ENDFUNCTION(WRAP_XSD)
