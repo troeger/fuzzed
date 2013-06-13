@@ -11,8 +11,6 @@ import xml_fuzztree
 import xml_faulttree
 from graph import Graph
 
-from node_renderings import tikz
-
 import json, notations, sys, time
 
 def new_client_id():
@@ -142,11 +140,12 @@ class Node(models.Model):
         raise ValueError('Node %s has unsupported kind' % self)
 
     def to_tikz(self):
+        nodekind = self.kind.lower()
         name = self.get_property('name', '-')
-        result = "\\node (%u) at (%u, -%u) {%s};"%(self.pk, self.x, self.y, name)
+        result = "\\node [align=center] at (%u, -%u) (%u) {\includegraphics{%s}\\\\%s};\n"%(self.x, self.y, self.pk, "voting_or_gate.eps", name)
         for edge in self.outgoing.filter(deleted=False):
             result += edge.target.to_tikz()
-            result += "\draw (%u.south) -| (%u);"%(self.pk, edge.target.pk)
+            result += "\draw (%u.south) -| (%u);\n"%(self.pk, edge.target.pk)
         return result
 
     def to_xml(self, xmltype=None):
