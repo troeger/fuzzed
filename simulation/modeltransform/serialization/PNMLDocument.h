@@ -5,8 +5,7 @@ class PNMLDocument : public PNDocument
 {
 public:
 	PNMLDocument();
-	PNMLDocument(const std::string& fileName);
-
+	
 	virtual ~PNMLDocument();
 
 	virtual int addTimedTransition(long double rate, const std::string& label = "") override;

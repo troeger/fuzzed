@@ -13,12 +13,6 @@ PNMLDocument::PNMLDocument()
 	initXML();
 }
 
-PNMLDocument::PNMLDocument(const string& fileName)
-	: PNDocument(fileName)
-{
-	initXML();
-}
-
 PNMLDocument::~PNMLDocument() // nothing yet
 {}
 

@@ -22,21 +22,6 @@ PNDocument::PNDocument(int id /*= 0*/)
 	m_bSaved(false)
 {}
 
-PNDocument::PNDocument(const string& fileName, int id /*= 0*/)
-	: xml_document(),
-	m_placeCount(0), 
-	m_transitionCount(0), 
-	m_arcCount(0),
-	m_id(id),
-	m_bSaved(false)
-{
-	auto result = xml_document::load_file(fileName.c_str());
-	if (!result)
-	{
-		cout << result.description() << endl;
-	}
-}
-
 PNDocument::~PNDocument()
 {
 	if (!m_bSaved)

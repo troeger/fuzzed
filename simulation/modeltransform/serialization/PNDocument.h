@@ -19,8 +19,7 @@ class PNDocument : public pugi::xml_document
 {
 public:
 	PNDocument(int id = 0);
-	PNDocument(const std::string& fileName, int id = 0);
-
+	
 	virtual ~PNDocument();
 
 	// add PetriNet component to the XML document, returning IDs
@@ -36,7 +35,7 @@ public:
 	virtual void addSequenceConstraint(const std::vector<int>&, SequenceType) {}; // SEQGate
 	virtual void addUserDescription(const std::string& description);
 	
-	bool save(const std::string& fileName);
+	virtual bool save(const std::string& fileName);
 
 	bool valid() const { return !pugi::xml_document::empty(); } // TODO
 	const bool& saved() const { return m_bSaved; }
