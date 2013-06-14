@@ -9,6 +9,7 @@
 #endif
 
 #include "serialization/PNMLDocument.h"
+#include "serialization/TNDocument.h"
 #include "FuzzTreeTransform.h"
 #include "petrinet/PNMLImport.h"
 #include "petrinet/PetriNet.h"
@@ -67,6 +68,23 @@ TEST(Serialization, PNML)
 	EXPECT_FALSE(net->hasInactiveTransitions());
 }
 
+TEST(Serialization, TN)
+{
+	static const string fileName = "test.TN";	
+
+	TNDocument doc;
+	int tt = doc.addTimedTransition(0.001);
+
+	int inPlace = doc.addPlace(1, 1, "Input");
+	int outPlace = doc.addPlace(0, 1, "Output");
+
+	doc.placeToTransition(inPlace, tt);
+	doc.transitionToPlace(tt, outPlace);
+
+	EXPECT_TRUE(doc.save(fileName));
+	EXPECT_TRUE(doc.saved());
+	EXPECT_TRUE(doc.valid());
+}
 
 TEST(Serialization, Optional)
 {
