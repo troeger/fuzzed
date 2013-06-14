@@ -2,10 +2,14 @@
 #
 # fuzzTreeAnalysis 
 #
+# Make sure that you link this script in /etc/init.d and enable it's startup:
+# chkconfig --level 345 fuzzTreeAnalysis on
+#
 ### BEGIN INIT INFO
 # Provides: fuzzTreeAnalysis 
 # Required-Start: $local_fs $remote_fs $network
 # Required-Stop: $local_fs $remote_fs $network
+# chkconfig: 345 99 01
 ### END INIT INFO
 
 # Source function library.
