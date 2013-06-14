@@ -33,8 +33,6 @@ public:
 	virtual void placeToTransition(int placeID, int transitionID, int consumeCount = 1, const std::string& inscription = "x");
 	virtual void transitionToPlace(int transitionID, int placeID, int procudeCount = 1, const std::string& inscription = "x");
 	
-	// add a measure which defines the time until the TopLevelEvent is triggered
-	virtual void addFailureMeasure() {}; // TimeNET
 	virtual void addSequenceConstraint(const std::vector<int>&, SequenceType) {}; // SEQGate
 	virtual void addUserDescription(const std::string& description);
 	

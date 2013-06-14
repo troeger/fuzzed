@@ -22,7 +22,7 @@ set(SOURCES
    
    serialization/PNDocument.cpp
    serialization/PNMLDocument.cpp
-   serialization/TimeNETDocument.cpp
+   serialization/TNDocument.cpp
 )
 
 set(HEADERS
@@ -48,7 +48,7 @@ set(HEADERS
    
    serialization/PNDocument.h
    serialization/PNMLDocument.h
-   serialization/TimeNETDocument.h
+   serialization/TNDocument.h
 )
 
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
