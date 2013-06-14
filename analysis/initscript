@@ -1,32 +1,91 @@
-#! /bin/sh
-
+#!/bin/bash
+#
+# fuzzTreeAnalysis 
+#
 ### BEGIN INIT INFO
-# Provides:          fuzzed-analysis 
-# Required-Start:    $local_fs $remote_fs
-# Required-Stop:
-# X-Start-Before:    
-# Default-Start:     2 3 4 5
-# Default-Stop:
-# Short-Description: Java Tomcat server for FuzzEd analysis backend
+# Provides: fuzzTreeAnalysis 
+# Required-Start: $local_fs $remote_fs $network
+# Required-Stop: $local_fs $remote_fs $network
 ### END INIT INFO
 
-THIS=/etc/init.d/fuzzed-analysis
-SCRIPTDIR=/root/fuzztrees/
+# Source function library.
+. /etc/rc.d/init.d/functions
 
-set -e
+prog="FuzzTrees Analysis Server"
+exec=/home/fuzztrees/fuzzed/analysis/jar/fuzzTreeAnalysis.sh
+pidfile=/var/run/fuzzTreeAnalysis.pid
+lockfile=/var/lock/subsys/fuzzTreeAnalysis
+
+start() {
+    echo -n $"Starting $prog ..."
+    daemon --pidfile=${pidfile} $exec 
+    retval=$?
+    echo
+    if [ $retval -eq 0 ]; then
+        touch $lockfile || retval=4
+    fi
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $prog ..."
+    killproc -p ${pidfile} $exec
+    retval=$?
+    echo
+    [ $retval -eq 0 ] && rm -f $lockfile
+    return $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+reload() {
+    restart
+}
+
+force_reload() {
+    restart
+}
+
+rh_status() {
+    # run checks to determine if the service is running or use generic status
+    status -p ${pidfile} -l ${lockfile} $exec
+}
+
+rh_status_q() {
+    rh_status >/dev/null 2>&1
+}
 
 case "$1" in
-  start)
-        start-stop-daemon --start --background --name fuzzed-analysis --exec /usr/bin/java --chdir $SCRIPTDIR --  -Djava.util.logging.config.file=analysis/jar/logging.properties -jar analysis/jar/fuzzTreeAnalysis.jar -runServer
+    start)
+        rh_status_q && exit 0
+        $1
         ;;
-  stop)
-        start-stop-daemon --stop --name fuzzed-analysis
+    stop)
+        rh_status_q || exit 0
+        $1
         ;;
-  *)
-        echo "Usage: $THIS {start|stop}" >&2
-        exit 1
+    restart)
+        $1
         ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+        restart
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+        exit 2
 esac
-
-exit 0
-
+exit $?
