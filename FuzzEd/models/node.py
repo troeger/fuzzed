@@ -141,8 +141,11 @@ class Node(models.Model):
 
     def to_tikz(self):
         nodekind = self.kind.lower()
+        # TODO: Determine mirror text by checking for the properties to be shown in notations.py
         name = self.get_property('name', '-')
+        # Create Tikz snippet for tree node
         result = "\\node [align=center] at (%u, -%u) (%u) {\includegraphics{%s}\\\\%s};\n"%(self.x, self.y, self.pk, "voting_or_gate.eps", name)
+        # Create also linked nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             result += edge.target.to_tikz()
             result += "\draw (%u.south) -| (%u);\n"%(self.pk, edge.target.pk)

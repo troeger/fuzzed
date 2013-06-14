@@ -89,6 +89,7 @@ class Graph(models.Model):
         result = """
 \\documentclass{article}
 \\usepackage{tikz}
+\\usetikzlibrary{positioning} 
 \\begin{document}
 \\begin{figure}
 \\begin{tikzpicture}[auto]
