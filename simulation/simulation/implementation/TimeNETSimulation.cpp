@@ -51,48 +51,16 @@ TimeNETSimulation::TimeNETSimulation(const boost::filesystem::path &p,
 
 bool TimeNETSimulation::run()
 {
-	const string jsPath = "./simulate.js";
-	const string netFilePath = boost::filesystem::path(
-		m_timenetHome.string() + "/" + m_filePath.filename().generic_string()).generic_string();
 
-	util::copyFile(m_filePath.generic_string(), netFilePath);
+// "Usage : SIM_TRAN_win model -{D|S} -{Pon|Poff} -{Gon|Goff} <transient_time> <no_sampling_points> <conf.level> <epsilon> <seed> <max.real time>"
+// D: distributed, S: sequential
+// Pon/Poff: percentage-rule
+// Gon/Goff: result monitor
 
-	const char* templatePath = JS_TEMPLATE_PATH;
-	ifstream inJS(templatePath, ios::in|ios::ate);
-	if (!inJS.good())
-		throw runtime_error("Could not load JavaScript template.");
 
-	const int templateSize = (int)inJS.tellg();
-	inJS.seekg(0, ios::beg);
-	char* buf = (char*) malloc (templateSize*sizeof(char));
-	memset(buf, 0, templateSize*sizeof(char));
 
-	ofstream outJS(jsPath);
-	if (!outJS.is_open())
-	{
-		free(buf);
-		throw runtime_error("Could not open JavaScript file.");
-	}
-
-	// javascript generation
-	// parameters:
-	// 	 count = %1%;
-	// 	 simulationTime = %2%;
-	// 	 netName = \"%3%\"
-	// 	 sometimes: fileName = \"%4%\"
-
-	inJS.read(buf, templateSize);
-	const string outStr = str(format(buf) 
-		% m_numRounds 
-		% m_simulationTimeSeconds 
-		% netFilePath);
-	outJS << outStr.c_str();
-	outJS.close();
-
-	free(buf);
-
-	string serverCall = str(format("java -Xms32m -Xmx512m -cp %1% -DTNETHOME=\"%6%\" -Dlog4j.configuration=\"%2%\" gpsc.Host -i \"%3%\" -s -m \"%4%\" \"%5%\"") 
-		% m_simulationServerPath 
+	string serverCall = str(format("%1% %2% -D -Poff -Goff %3% %4% %5% 0.95 ) 
+		% SIMULATION_SCRIPT 
 		% m_logPropsPath % m_integrationPropsPath
 		% m_timenetHome.generic_string() % jsPath
 		% m_timenetHome);

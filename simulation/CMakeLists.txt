@@ -56,5 +56,6 @@ add_subdirectory(common)
 
 add_subdirectory(modeltransform)
 option(BUILD_SIMULATION_EXECUTABLE ON)
+option(USE_TIMENET ON)
 add_subdirectory(fuzztreeconfiguration)
 add_subdirectory(simulation)

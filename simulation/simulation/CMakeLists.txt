@@ -42,6 +42,10 @@ set(HEADERS
    petrinet/PetriNetConstraint.h
 )
 
+if (USE_TIMENET)
+	find_package(TimeNET required)
+endif (USE_TIMENET)
+
 if (BUILD_SIMULATION_EXECUTABLE)
    add_executable(ftsimulation ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation
