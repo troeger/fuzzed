@@ -42,7 +42,7 @@ public:
 
 protected:
 	virtual void addArc(int placeID, int transitionID, int tokenCount, ArcDirection direction, const std::string& inscription = "x") = 0;
-	virtual void initXML() = 0;
+	virtual void initXML() {};
 
 	pugi::xml_node m_root;
 

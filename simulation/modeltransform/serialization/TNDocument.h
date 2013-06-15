@@ -3,7 +3,25 @@
 #include "Types.h"
 
 #include <map>
+#include <tuple>
 #include <fstream>
+
+namespace
+{
+	struct TN_TransitionSpec 
+	{
+		TN_TransitionSpec() {}
+		TN_TransitionSpec(const std::string& description) : transitionDescription(description) {}
+		
+		std::string transitionDescription;
+
+		std::vector<std::string> inputArcs;
+		std::vector<std::string> outputArcs;
+		std::vector<std::string> inhibitArcs;
+	};
+}
+
+
 
 class TNDocument : public PNDocument
 {
@@ -23,7 +41,11 @@ protected:
 
 	void writeHeader();
 
-	std::map<std::string, std::string> m_transitions;
+	static inline const std::string transitionString(const TN_TransitionSpec& spec);
+	static inline const std::string transitionIdentifier(const int& id);
+	static inline const std::string placeIdentifier(const int& id);
+
+	std::map<std::string, TN_TransitionSpec> m_transitions;
 	std::map<std::string, std::string> m_places;
 	std::vector<std::string> m_measures; // TODO
 };

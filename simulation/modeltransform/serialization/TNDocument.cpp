@@ -14,14 +14,15 @@ namespace
 		"TRANSITIONS: %2% \n"
 		"DELAY_PARAMETERS: 0 \n"
 		"MARKING_PARAMETERS: 0 \n"
-		"REWARD_MEASURES: %3%";
+		"REWARD_MEASURES: %3% \n \n";
 
 	// 1: PLACES
 	// 2: TRANSITIONS
 	// 3: MEASURES
-	const string CONTENTTEMLPATE = "-- LIST OF PLACES: %1% \n"
-		"-- TRANSITIONS %2% \n"
-		"-- MEASURES %2%";
+	const string CONTENTTEMLPATE = ""
+		"-- LIST OF PLACES: \n %1% \n \n"
+		"-- LIST OF TRANSITIONS: \n %2% \n \n"
+		"-- LIST OF MEASURES: \n %3% \n \n";
 
 	// NAME, MARKING, (X,Y)-POSITION (PLACE & TAG)
 	// 1: NAME
@@ -34,13 +35,13 @@ namespace
 	// 3: PRIORITY
 	// 4: #INPARCS
 	// 6: #OUTARCS
-	const string EXPTRANSITIONTEMPLATE = "TRANSITION %1% %2% IS EXP RE %3% 0 1 0 1.000000"
-		"INPARCS %4% \n %5%"
-		"OUTPARCS %6% \n %7%";
+	const string EXPTRANSITIONTEMPLATE = "TRANSITION %1% %2% IS EXP RE %3% 0 1 0 1.000000 \n";
+	//	"INPARCS %4% \n %5%"
+	//	"OUTPARCS %6% \n %7%";
 
-	const string IMMEDIATETRANSITIONTEMPLATE = "TRANSITION %1% %2% IS IM RE %3% 0 1 0 1.000000"
-		"INPARCS %4% \n %5%"
-		"OUTPARCS %6% \n %7%";
+	const string IMMEDIATETRANSITIONTEMPLATE = "TRANSITION %1% %2% IS IM RE %3% 0 1 0 1.000000 \n";
+	//	"INPARCS %4% \n %5%"
+	//	"OUTPARCS %6% \n %7%";
 }
 
 TNDocument::TNDocument()
@@ -50,17 +51,17 @@ TNDocument::TNDocument()
 int TNDocument::addTimedTransition(long double rate, const std::string& label /*= ""*/)
 {
 	const string id = label.empty() ? TRANSITION_IDENTIFIER + util::toString((int)m_transitions.size()) : label;
-	m_transitions[id] = (boost::format(EXPTRANSITIONTEMPLATE) % id % (1/rate) % 1).str();
+	m_transitions[id] = TN_TransitionSpec((boost::format(EXPTRANSITIONTEMPLATE) % id % (1/rate) % 1).str());
 
-	return m_transitions.size();
+	return m_transitions.size()-1;
 }
 
 int TNDocument::addImmediateTransition(const unsigned int priority /*= 1*/, const std::string& label /*= ""*/)
 {
 	const string id = label.empty() ? TRANSITION_IDENTIFIER + util::toString((int)m_transitions.size()) : label;
-	m_transitions[id] = (boost::format(IMMEDIATETRANSITIONTEMPLATE) % id % 0 % priority).str();
+	m_transitions[id] = TN_TransitionSpec((boost::format(IMMEDIATETRANSITIONTEMPLATE) % id % 0 % priority).str());
 
-	return m_transitions.size();
+	return m_transitions.size()-1;
 }
 
 
@@ -71,14 +72,14 @@ int TNDocument::addPlace(
 	PlaceSemantics semantics /*= DEFAULT_PLACE*/)
 {
 	const string id = label.empty() ? PLACE_IDENTIFIER + util::toString((int)m_places.size()) : label;
-	m_places[label] = (boost::format(PLACETEMPLATE) % id % initialMarking).str();
+	m_places[id] = (boost::format(PLACETEMPLATE) % id % initialMarking).str();
 
-	return m_places.size();
+	return m_places.size()-1;
 }
 
 bool TNDocument::save(const string& fileName)
 {
-	std::fstream file(fileName);
+	std::ofstream file(fileName);
 	if (!file)
 		return false;
 
@@ -90,7 +91,7 @@ bool TNDocument::save(const string& fileName)
 
 	string transitions;
 	for (const auto& t : m_transitions)
-		transitions += t.second;
+		transitions += transitionString(t.second);
 
 	string measures;
 	for (const auto& m : m_measures)
@@ -98,13 +99,25 @@ bool TNDocument::save(const string& fileName)
 
 	file << boost::format(CONTENTTEMLPATE) % places % transitions % measures;
 	file.close();
+
+	return true;
 }
 
-void TNDocument::addArc(
+void TNDocument::addArc (
 	int placeID, int transitionID, int tokenCount, 
 	ArcDirection direction, const std::string& inscription /*= "x"*/)
 {
-	// TODO
+	const string trans = transitionIdentifier(transitionID);
+	
+	auto it = m_transitions.find(trans);
+	if (it == m_transitions.end()) return; // TODO throw?
+
+	const string arc = util::toString(tokenCount) + " " + placeIdentifier(placeID) + " " + util::toString(0) + "\n";
+	if (direction == TRANSITION_TO_PLACE)
+		it->second.outputArcs.emplace_back(arc);
+	else if (direction == PLACE_TO_TRANSITION)
+		it->second.inputArcs.emplace_back(arc);
+
 }
 
 int TNDocument::addTopLevelPlace(const std::string& label)
@@ -121,4 +134,33 @@ TNDocument::~TNDocument()
 {
 	if (!m_bSaved)
 		cout << "File was not saved" << endl;
+}
+
+const string TNDocument::transitionString(const TN_TransitionSpec& spec)
+{
+	string result = spec.transitionDescription;
+
+	result += "INPARCS " + util::toString((int)spec.inputArcs.size()) + " \n";
+	for (const auto& s : spec.inputArcs)
+		result += s;
+
+	result += "OUTPARCS " + util::toString((int)spec.outputArcs.size()) + "\n";
+	for (const auto& s : spec.outputArcs)
+		result += s;
+	 
+	result += "INHARCS " + util::toString((int)spec.inhibitArcs.size()) + " \n";
+	for (const auto& s : spec.inhibitArcs)
+		result += s;
+
+	return result + "\n";
+}
+
+const std::string TNDocument::transitionIdentifier(const int& id)
+{
+	return TRANSITION_IDENTIFIER + util::toString(id);
+}
+
+const std::string TNDocument::placeIdentifier(const int& id)
+{
+	return PLACE_IDENTIFIER + util::toString(id);
 }
