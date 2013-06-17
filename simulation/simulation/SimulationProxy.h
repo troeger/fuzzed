@@ -36,11 +36,7 @@ extern "C"
 		) noexcept;
 }
 
-/************************************************************************/
-/* SIMLATION EXECUTABLE													*/
-/* determines the simulation configuration from command line arguments, */
-/* and runs the simulation												*/
-/************************************************************************/
+class TimeNETProperties;
 
 class SimulationProxy
 {
@@ -55,13 +51,12 @@ public:
 		double convergenceThreshold,
 		unsigned int maxTime);
 
-	virtual ~SimulationProxy() {};
+	virtual ~SimulationProxy();;
 
 	// simulates all configurations from one file
-	void simulateFile(const boost::filesystem::path& p, bool simulatePetriNet);
-
+	void simulateFile(const boost::filesystem::path& p, SimulationImpl impl, bool simulatePetriNet);
+	
 protected:
-	void parseTimeNET(int numArguments, char** arguments);
 	void parseStandard(int numArguments, char** arguments);
 
 	bool runSimulation(
@@ -77,8 +72,9 @@ protected:
 
 	bool m_bSimulateUntilFailure;
 
-	boost::program_options::options_description m_timeNetOptions;
-	boost::program_options::options_description m_standardOptions;
+	boost::program_options::options_description m_options;
 	
 	static bool acceptFileExtension(const boost::filesystem::path& p);
+
+	TimeNETProperties* m_timeNetProperties;
 };

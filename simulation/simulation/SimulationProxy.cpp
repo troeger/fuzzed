@@ -3,6 +3,7 @@
 #include "implementation/PetriNetSimulation.h"
 
 #include "serialization/PNMLDocument.h"
+#include "serialization/TNDocument.h"
 #include "FaultTreeNode.h"
 #include "FaultTreeImport.h"
 #include "FuzzTreeTransform.h"
@@ -40,14 +41,7 @@ SimulationProxy::SimulationProxy(int argc, char** arguments) :
 {
 	try
 	{
-		bool useTimeNET = false;
-		for (const int& i : boost::counting_range(1, argc))
-		{
-			if (string(arguments[i]) == "TimeNET")
-				useTimeNET = true;
-		}
-		
-		useTimeNET ? parseTimeNET(argc, arguments) : parseStandard(argc, arguments);
+		parseStandard(argc, arguments);
 	}
 	catch (const exception& e)
 	{
@@ -65,7 +59,8 @@ SimulationProxy::SimulationProxy(unsigned int missionTime, unsigned int numRound
 	m_convergenceThresh(convergenceThreshold),
 	m_simulationTime(maxTime),
 	m_bSimulateUntilFailure(true),
-	m_numAdaptiveRounds(0)
+	m_numAdaptiveRounds(0),
+	m_timeNetProperties(nullptr)
 {}
 
 bool SimulationProxy::runSimulation(const fs::path& p, SimulationImpl implementationType, void* additionalArguments) 
@@ -137,28 +132,45 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 {
 	string directoryName, filePath;
 	bool simulatePetriNet;
+	bool useTimeNET;
 	unsigned int numAdaptiveRounds; // not yet implemented
-	
-	m_standardOptions.add_options()
+	int confidence;
+	float epsilon;
+
+	m_options.add_options()
 		("help,h", "produce help message")
-		("PN",			po::value<bool>(&simulatePetriNet)->default_value(false),					"Simulate Petri Net directly")
-		("file,f",		po::value<string>(&filePath),												"Path to FuzzTree or PNML file")
-		("dir,d",		po::value<string>(&directoryName),											"Directory containing FuzzTree or PNML files")
+		("TimeNET",	po::value<bool>(&useTimeNET)->default_value(false),									"Use TimeNET simulation")
+		("PN",			po::value<bool>(&simulatePetriNet)->default_value(false),							"Simulate Petri Net directly")
+		("file,f",		po::value<string>(&filePath),														"Path to FuzzTree or PNML file")
+		("dir,d",		po::value<string>(&directoryName),													"Directory containing FuzzTree or PNML files")
 		("time,t",		po::value<unsigned int>(&m_simulationTime)->default_value(DEFAULT_SIMULATION_TIME),	"Maximum Simulation Time in milliseconds")
-		("steps,s",		po::value<unsigned int>(&m_missionTime)->default_value(DEFAULT_SIMULATION_STEPS),"Number of Simulation Steps")
-		("rounds,r",	po::value<unsigned int>(&m_numRounds)->default_value(DEFAULT_SIMULATION_ROUNDS),		"Number of Simulation Rounds")
-		("MTTF",		po::value<bool>(&m_bSimulateUntilFailure)->default_value(true),				"Simulate each Round until System Failure, necessary for MTTF")
-		("converge,c",	po::value<double>(&m_convergenceThresh)->default_value((double)0.0001),		"Cancel simulation after the resulting reliability differs in less than this threshold")
+		("steps,s",		po::value<unsigned int>(&m_missionTime)->default_value(DEFAULT_SIMULATION_STEPS),	"Number of Simulation Steps")
+		("rounds,r",	po::value<unsigned int>(&m_numRounds)->default_value(DEFAULT_SIMULATION_ROUNDS),	"Number of Simulation Rounds")
+		("conf",		po::value<int>(&confidence)->default_value(DEFAULT_CONFIDENCE),						"Confidence level (TimeNET only)")
+		("epsilon,e",	po::value<float>(&epsilon)->default_value(DEFAULT_EPSILON),							"Epsilon (TimeNET only)")
+		("MTTF",		po::value<bool>(&m_bSimulateUntilFailure)->default_value(true),						"Simulate each Round until System Failure, necessary for MTTF")
+		("converge,c",	po::value<double>(&m_convergenceThresh)->default_value((double)0.0001),				"Cancel simulation after the resulting reliability differs in less than this threshold")
 		("adaptive,a",	po::value<unsigned int>(&numAdaptiveRounds)->default_value(0),						"Adaptively adjust the number of Simulation Rounds, NOT YET IMPLEMENTED");
 
 	po::variables_map optionsMap;
-	po::store(po::parse_command_line(numArguments, arguments, m_standardOptions), optionsMap);
+	po::store(po::parse_command_line(numArguments, arguments, m_options), optionsMap);
 	po::notify(optionsMap);
 
 	if (optionsMap.count("help")) 
 	{
-		cout << m_standardOptions << endl;
+		cout << m_options << endl;
 		return;
+	}
+
+	if (useTimeNET)
+	{
+		m_timeNetProperties = new TimeNETProperties();
+		m_timeNetProperties->filePath = filePath;
+		m_timeNetProperties->seed = rand();
+		m_timeNetProperties->confLevel = confidence;
+		m_timeNetProperties->epsilon = epsilon;
+		m_timeNetProperties->maxExecutionTime = m_simulationTime;
+		m_timeNetProperties->transientSimTime = m_missionTime;
 	}
 
 	const bool bDir = optionsMap.count("dir") > 0;
@@ -166,7 +178,7 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 	if (!bDir && !bFile)
 	{
 		cout << "Please specify either a directory or a file" << endl;
-		cout << m_standardOptions << endl;
+		cout << m_options << endl;
 		return;
 	}
 
@@ -181,7 +193,7 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 		BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))   
 		{
 			if (is_regular_file(p) && acceptFileExtension(p))
-				simulateFile(p, simulatePetriNet);
+				simulateFile(p, useTimeNET ? TIMENET : DEFAULT, simulatePetriNet);
 		}
 	}
 	else if (bFile)
@@ -190,59 +202,22 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 		if (!is_regular_file(fPath))
 			throw runtime_error("Not a file: " + filePath);
 
-		simulateFile(fPath, simulatePetriNet);
+		simulateFile(fPath, useTimeNET ? TIMENET : DEFAULT, simulatePetriNet);
 	}
 }
 
-void SimulationProxy::parseTimeNET(int numArguments, char** arguments)
-{
-	string fileName			= "";
-	int confidence			= DEFAULT_CONFIDENCE;
-	float epsilon			= DEFAULT_EPSILON;
-	int simulationTime		= DEFAULT_SIMULATION_TIME;
-
-	m_timeNetOptions.add_options()
-		("help", "produce help message")
-		("TimeNET", "Simulate with TimeNET")
-		("file,f",		po::value<string>(&fileName),			"Name of Petri Net File in TimeNET XML format")
-		("time,t",		po::value<int>(&simulationTime),		"Simulation mission end time")
-		("conf,c",		po::value<int>(&confidence),			"Confidence level")
-		("epsilon,e",	po::value<float>(&epsilon),				"Epsilon");
-
-	po::variables_map timeNETMap;
-	po::store(po::parse_command_line(numArguments, arguments, m_timeNetOptions), timeNETMap);
-	po::notify(timeNETMap);
-
-	assert(!fileName.empty());
-
-	if (timeNETMap.count("help")) 
-	{
-		cout << m_timeNetOptions << "\n";
-		return;
-	}
-
-	TimeNETProperties* props = new TimeNETProperties;
-	props->filePath = fileName;
-	props->seed = rand();
-	props->confLevel = confidence;
-	props->epsilon = epsilon;
-	props->maxExecutionTime = 300;
-	props->transientSimTime = simulationTime;
-
-	runSimulation(fs::path(fileName), TIMENET, (void*)props);
-	delete props;
-}
-
-void SimulationProxy::simulateFile(const fs::path& p, bool simulatePetriNet)
+void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool simulatePetriNet)
 {	
 	cout << "Simulating..." << endl;
 	
 	assert(is_regular_file(p) && acceptFileExtension(p));
 
-	if (p.extension() == PNML::PNML_EXT && simulatePetriNet)
-		runSimulation(p, DEFAULT); // run simulation directly
+	const auto ext = p.extension();
 
-	else if (p.extension() == fuzzTree::FUZZ_TREE_EXT)
+	if (((ext == PNML::PNML_EXT && impl==DEFAULT) || (ext == timeNET::TN_EXT)) && simulatePetriNet)
+		runSimulation(p, impl); // run simulation directly
+
+	else if (ext == fuzzTree::FUZZ_TREE_EXT)
 	{ // transform into fault trees first
 		fs::path targetDir = p;
 		string name = util::fileNameFromPath(p.generic_string());
@@ -256,14 +231,14 @@ void SimulationProxy::simulateFile(const fs::path& p, bool simulatePetriNet)
 
 		FuzzTreeTransform::transformFuzzTree(p.generic_string(), targetDir.generic_string());
 		fs::directory_iterator it(targetDir), eod;
-		BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))
+		BOOST_FOREACH(fs::path const &pNew, std::make_pair(it, eod))
 		{
-			if (fs::is_regular_file(p) && p.extension() == faultTree::FAULT_TREE_EXT)
-				simulateFile(p, false);
+			if (fs::is_regular_file(pNew) && pNew.extension() == faultTree::FAULT_TREE_EXT)
+				simulateFile(pNew, impl, false);
 		}
 	}
 
-	else if (p.extension() == faultTree::FAULT_TREE_EXT)
+	else if (ext == faultTree::FAULT_TREE_EXT)
 	{ // already a fault tree
 		FaultTreeNode* ft = FaultTreeImport::loadFaultTree(p.generic_string());
 		if (!ft || !ft->isValid()) throw runtime_error("Invalid Fault Tree");
@@ -273,15 +248,24 @@ void SimulationProxy::simulateFile(const fs::path& p, bool simulatePetriNet)
 		string newFileName = p.generic_string();
 		util::replaceFileExtensionInPlace(newFileName, PNML::PNML_EXT);
 
-		boost::shared_ptr<PNMLDocument> doc = 
-			boost::shared_ptr<PNMLDocument>(new PNMLDocument());
+		boost::shared_ptr<PNDocument> doc;
+		switch (impl)
+		{
+		case DEFAULT:
+			doc = boost::shared_ptr<PNMLDocument>(new PNMLDocument());
+			break;
+		case TIMENET:
+			doc = boost::shared_ptr<TNDocument>(new TNDocument());
+			break;
+		}
+
 		ft->serialize(doc);
 		delete ft;
-
 		doc->save(newFileName);
+		
 		try
 		{
-			runSimulation(newFileName, DEFAULT);
+			runSimulation(newFileName, impl, m_timeNetProperties);
 		}
 		catch (...)
 		{
@@ -295,7 +279,14 @@ bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
 	return
 		p.extension() == PNML::PNML_EXT ||
 		p.extension() == fuzzTree::FUZZ_TREE_EXT ||
-		p.extension() == faultTree::FAULT_TREE_EXT;
+		p.extension() == faultTree::FAULT_TREE_EXT ||
+		p.extension() == timeNET::TN_EXT;
+}
+
+SimulationProxy::~SimulationProxy()
+{
+	if (m_timeNetProperties)
+		delete m_timeNetProperties;
 }
 
 void runSimulation(
@@ -308,7 +299,7 @@ void runSimulation(
 	try
 	{
 		SimulationProxy p = SimulationProxy(missionTime, numRounds, convergenceThreshold, maxTime);
-		p.simulateFile(filePath, false);
+		p.simulateFile(filePath, DEFAULT, false); // TODO make configurable
 
 	}
 	catch (const exception& e)
