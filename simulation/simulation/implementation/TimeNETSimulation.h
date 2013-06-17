@@ -5,16 +5,14 @@ using namespace std;
 
 struct TimeNETProperties
 {
-	string serverIP;
-	int serverPort;
-	string resultIP;
-	int resultPort;
-	
 	string filePath; // the petri net file
-
-	string integrationPropsPath;
-	string logPropsPath;
-	string simulationServerPath;
+	
+	int transientSimTime;
+	int confLevel;
+	
+	float epsilon;
+	int seed;
+	int maxExecutionTime;
 };
 
 class TimeNETSimulation : public Simulation
@@ -31,18 +29,6 @@ public:
 	virtual bool run() override;
 
 protected:
-	static const char* templatePath;
 
-	int m_serverPort;
-	int m_resultPort;
-
-	std::string m_serverIP;
-	std::string m_resultIP;
-
-	boost::filesystem::path m_filePath;
-	boost::filesystem::path m_simulationServerPath;
-	boost::filesystem::path m_timenetHome;
-
-	boost::filesystem::path m_integrationPropsPath;
-	boost::filesystem::path m_logPropsPath;
+	TimeNETProperties* m_properties;
 };

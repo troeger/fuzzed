@@ -43,7 +43,7 @@ set(HEADERS
 )
 
 if (USE_TIMENET)
-	find_package(TimeNET required)
+	find_package(TimeNET REQUIRED)
 endif (USE_TIMENET)
 
 if (BUILD_SIMULATION_EXECUTABLE)

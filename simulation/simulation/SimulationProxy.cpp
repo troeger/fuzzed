@@ -196,24 +196,24 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 
 void SimulationProxy::parseTimeNET(int numArguments, char** arguments)
 {
-	string fileName			= DEFAULT_FILE_PATH;
-	string integrationPath	= DEFAULT_INTEGRATION_PROPS_PATH;
-	string logsPath			= DEFAULT_LOG_PROPS_PATH;
-	string timeNetPath		= DEFAULT_TIMENET_PATH;
+	string fileName			= "";
+	int confidence			= DEFAULT_CONFIDENCE;
+	float epsilon			= DEFAULT_EPSILON;
 	int simulationTime		= DEFAULT_SIMULATION_TIME;
 
 	m_timeNetOptions.add_options()
 		("help", "produce help message")
 		("TimeNET", "Simulate with TimeNET")
 		("file,f",		po::value<string>(&fileName),			"Name of Petri Net File in TimeNET XML format")
-		("time,t",		po::value<int>(&simulationTime),		"Simulation Time in milliseconds")
-		("iProps,i",	po::value<string>(&integrationPath),	"Path to integration.props")
-		("lProps,l",	po::value<string>(&logsPath),			"Path to log4j.props")
-		("TNjar",		po::value<string>(&timeNetPath),		"Path to TimeNET.jar");
+		("time,t",		po::value<int>(&simulationTime),		"Simulation mission end time")
+		("conf,c",		po::value<int>(&confidence),			"Confidence level")
+		("epsilon,e",	po::value<float>(&epsilon),				"Epsilon");
 
 	po::variables_map timeNETMap;
 	po::store(po::parse_command_line(numArguments, arguments, m_timeNetOptions), timeNETMap);
 	po::notify(timeNETMap);
+
+	assert(!fileName.empty());
 
 	if (timeNETMap.count("help")) 
 	{
@@ -222,16 +222,12 @@ void SimulationProxy::parseTimeNET(int numArguments, char** arguments)
 	}
 
 	TimeNETProperties* props = new TimeNETProperties;
-	props->integrationPropsPath = integrationPath;
-	props->logPropsPath = logsPath;
-	props->simulationServerPath = timeNetPath;
-
-	props->serverIP = "localhost";
-	props->resultIP = "localhost";
-	props->resultPort = 4455;
-	props->serverPort = 4455;
-
-	assert(!fileName.empty());
+	props->filePath = fileName;
+	props->seed = rand();
+	props->confLevel = confidence;
+	props->epsilon = epsilon;
+	props->maxExecutionTime = 300;
+	props->transientSimTime = simulationTime;
 
 	runSimulation(fs::path(fileName), TIMENET, (void*)props);
 	delete props;
