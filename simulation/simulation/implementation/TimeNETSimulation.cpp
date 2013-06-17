@@ -37,8 +37,11 @@ TimeNETSimulation::TimeNETSimulation(const boost::filesystem::path &p,
 bool TimeNETSimulation::run()
 {
 	string serverCall = 
-		string("python ") + TNETSCRIPT + " " + m_properties->filePath + " " + TNETDIR
+		string("python ") + TNETSCRIPT 
+		+ " " + m_properties->filePath
+		+ " " + TNETDIR
 		+ " " + util::toString(m_properties->transientSimTime)
+		+ " " + util::toString(m_properties->confLevel)
 		+ " " + util::toString(m_properties->epsilon)
 		+ " " + util::toString(m_properties->seed)
 		+ " " + util::toString(m_properties->maxExecutionTime);
