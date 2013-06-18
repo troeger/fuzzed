@@ -42,23 +42,25 @@ namespace
 	const string IMMEDIATETRANSITIONTEMPLATE = "TRANSITION %1% %2% IS IM RE %3% 0 1 0 1.000000 \n";
 	//	"INPARCS %4% \n %5%"
 	//	"OUTPARCS %6% \n %7%";
+
+	const string MEASURETEMPLATE = "MEASURE %1% \n";
 }
 
 TNDocument::TNDocument()
 	: PNDocument()
 {}
 
-int TNDocument::addTimedTransition(long double rate, const std::string& label /*= ""*/)
+int TNDocument::addTimedTransition(long double rate, const std::string& /*= ""*/)
 {
-	const string id = label.empty() ? TRANSITION_IDENTIFIER + util::toString((int)m_transitions.size()) : label;
+	const string id = TRANSITION_IDENTIFIER + util::toString((int)m_transitions.size());
 	m_transitions[id] = TN_TransitionSpec((boost::format(EXPTRANSITIONTEMPLATE) % id % (1/rate) % 1).str());
 
 	return m_transitions.size()-1;
 }
 
-int TNDocument::addImmediateTransition(const unsigned int priority /*= 1*/, const std::string& label /*= ""*/)
+int TNDocument::addImmediateTransition(const unsigned int priority /*= 1*/, const std::string& /*= ""*/)
 {
-	const string id = label.empty() ? TRANSITION_IDENTIFIER + util::toString((int)m_transitions.size()) : label;
+	const string id = TRANSITION_IDENTIFIER + util::toString((int)m_transitions.size());
 	m_transitions[id] = TN_TransitionSpec((boost::format(IMMEDIATETRANSITIONTEMPLATE) % id % 0 % priority).str());
 
 	return m_transitions.size()-1;
@@ -68,10 +70,10 @@ int TNDocument::addImmediateTransition(const unsigned int priority /*= 1*/, cons
 int TNDocument::addPlace(
 	int initialMarking,
 	int capacity /*= 1*/,
-	const std::string& label /*= ""*/,
+	const std::string& /*= ""*/,
 	PlaceSemantics semantics /*= DEFAULT_PLACE*/)
 {
-	const string id = label.empty() ? PLACE_IDENTIFIER + util::toString((int)m_places.size()) : label;
+	const string id = PLACE_IDENTIFIER + util::toString((int)m_places.size());
 	m_places[id] = (boost::format(PLACETEMPLATE) % id % initialMarking).str();
 
 	return m_places.size()-1;
@@ -103,9 +105,9 @@ bool TNDocument::save(const string& fileName)
 	return true;
 }
 
-void TNDocument::addArc (
+void TNDocument::addArc(
 	int placeID, int transitionID, int tokenCount, 
-	ArcDirection direction, const std::string& inscription /*= "x"*/)
+	ArcDirection direction, const std::string&)
 {
 	const string trans = transitionIdentifier(transitionID);
 	
@@ -120,12 +122,13 @@ void TNDocument::addArc (
 
 }
 
-int TNDocument::addTopLevelPlace(const std::string& label)
+int TNDocument::addTopLevelPlace(const std::string&)
 {
-	const string id = label.empty() ? PLACE_IDENTIFIER + util::toString((int)m_places.size()) : label;
-	m_places[label] = (boost::format(PLACETEMPLATE) % id % 0).str();
+	const string id = PLACE_IDENTIFIER + util::toString((int)m_places.size());
+	m_places[id] = (boost::format(PLACETEMPLATE) % id % 0).str();
 
-	m_measures.emplace_back("P{#" + id + ">0};");
+	const string measure = (boost::format(MEASURETEMPLATE) % (string("P{ #") + id + " > 0};")).str();
+	m_measures.emplace_back(measure);
 
 	return m_places.size();
 }

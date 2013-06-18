@@ -31,7 +31,9 @@ public:
 
 	virtual int addTimedTransition(long double rate, const std::string& label = "") override;
 	virtual int addImmediateTransition(unsigned int priority = 1, const std::string& label = "") override;
-	virtual int addTopLevelPlace(const std::string& label) override;
+	// virtual int addGuardedTransition(const TransitionCondition& guard, unsigned int priority = 1, const std::string& label);
+
+	virtual int addTopLevelPlace(const std::string&) override;
 	virtual int addPlace(int initialMarking, int capacity = 1,  const std::string& label = "", PlaceSemantics semantics = DEFAULT_PLACE) override;
 	
 	virtual bool save(const std::string& fileName) override;
