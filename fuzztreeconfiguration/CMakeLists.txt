@@ -41,10 +41,15 @@ include_directories(${XSD_INCLUDE_DIR})
 set(SOURCES
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
+   FaultTree.cpp
+   util.cpp
 )
 set(HEADERS
    FuzzTreeTransform.h
    FuzzTreeConfiguration.h
+   FaultTree.h
+   platform.h
+   util.h
 )
 
 include_directories(${Boost_INCLUDE_DIRS})
@@ -78,8 +83,9 @@ target_link_libraries(ftconfiguration ${Boost_LIBRARIES})
 #   VERBATIM)
 
 set(XSD_ARGS
-  --include-with-brackets #include with <> instead of ""
-  --generate-polymorphic #needed for xsi:type
+  --include-with-brackets	#include with <> instead of ""
+  --generate-polymorphic	#needed for xsi:type
+  --generate-inline			#simple functions are inlined
   --root-element "FuzzTree"
   --type-naming ucc --function-naming lcc
   #--suppress-parsing 

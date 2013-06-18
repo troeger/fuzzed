@@ -65,20 +65,6 @@ int util::fileSize(const char* filename)
 	return (int)in.tellg(); 
 }
 
-string util::conditionString(const int placeID, ConditionType cond, const int argument)
-{
-	return 
-		"#" + string(PLACE_IDENTIFIER) + util::toString(placeID) 
-		+ conditionTypeString(cond) + util::toString(argument);
-}
-
-string util::conditionString(const string& placeIdentifier, ConditionType cond, const int argument)
-{
-	return 
-		"#" + placeIdentifier
-		+ conditionTypeString(cond) + util::toString(argument);
-}
-
 string util::timeStamp()
 {
 	const int time = (int)duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();

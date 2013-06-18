@@ -4,16 +4,17 @@
 # the 'bin' directory in the path given in the XSD_ROOT environment variable.
 #
 FIND_PROGRAM( XSD_EXECUTABLE xsd
-          HINTS ${RWSL_DEPS}/xsd/bin $ENV{XSD_ROOT}/bin
-        PATHS /usr/local/xsd-3.2.0-i686-macosx/bin
-            /usr/local/xsd-3.2.0-x86_64-linux-gnu/bin
-            /usr/local/bin
-          /opt/xsd-3.2.0-i686-macosx/bin
-            /opt/xsd-3.2.0-x86_64-linux-gnu/bin
-            /usr/bin
-          ENV PATH )
+  HINTS $ENV{XSD_ROOT}/bin
+  paths
+    /usr/local/xsd-3.2.0-i686-macosx/bin
+    /usr/local/xsd-3.2.0-x86_64-linux-gnu/bin
+    /usr/local/bin
+    /opt/xsd-3.2.0-i686-macosx/bin
+    /opt/xsd-3.2.0-x86_64-linux-gnu/bin
+    /usr/bin
+    ENV PATH)
 
-IF( XSD_EXECUTABLE )
+IF(XSD_EXECUTABLE)
 
   # 
   # Obtain the include directory that one can use with INCLUDE_DIRECTORIES() to
