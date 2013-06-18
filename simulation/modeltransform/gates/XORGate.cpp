@@ -1,5 +1,5 @@
 #include "XORGate.h"
-#include "serialization/TimeNETDocument.h"
+#include "serialization/PNDocument.h"
 #include <iostream>
 
 using namespace std;
