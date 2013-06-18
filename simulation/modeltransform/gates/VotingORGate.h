@@ -1,7 +1,7 @@
 #pragma once
-#include "Gate.h"
+#include "StaticGate.h"
 
-class VotingORGate : public Gate
+class VotingORGate : public StaticGate
 {
 public:
 	VotingORGate(const std::string& id, int numVotes, const std::string& name = "");
@@ -10,6 +10,7 @@ public:
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
+	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const override;
 
 	int getNumVotes() const { return m_numVotes; };
 

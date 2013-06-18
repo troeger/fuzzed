@@ -1,5 +1,5 @@
 #pragma once
-#include "Gate.h"
+#include "DynamicGate.h"
 #include <set>
 
 /************************************************************************/
@@ -7,7 +7,7 @@
 /* the order being defined by the insertion order in the child list		*/
 /************************************************************************/
 
-class PANDGate : public Gate
+class PANDGate : public DynamicGate
 {
 public:
 	PANDGate(const std::string& id, const std::vector<std::string>& ordering, const std::string& name = "");

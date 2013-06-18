@@ -9,7 +9,7 @@ set(SOURCES
    events/TopLevelEvent.cpp
    events/UndevelopedEvent.cpp
    
-   gates/Gate.cpp
+   gates/StaticGate.cpp
    gates/ANDGate.cpp
    gates/ORGate.cpp
    gates/PANDGate.cpp
@@ -36,6 +36,8 @@ set(HEADERS
    events/UndevelopedEvent.h
    
    gates/Gate.h
+   gates/StaticGate.h
+   gates/DynamicGate.h
    gates/ANDGate.h
    gates/ORGate.h
    gates/PANDGate.h

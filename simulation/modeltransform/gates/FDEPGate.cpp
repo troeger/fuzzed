@@ -2,10 +2,8 @@
 #include "serialization/PNDocument.h"
 
 FDEPGate::FDEPGate(const std::string& id, int trigger, std::vector<std::string>& dependentEvents, const std::string& name /*= ""*/)
-	: Gate(id, name), m_triggerID(trigger), m_dependentEvents(dependentEvents)
-{
-	m_bDynamic = true;
-}
+	: DynamicGate(id, name), m_triggerID(trigger), m_dependentEvents(dependentEvents)
+{}
 
 int FDEPGate::serialize(boost::shared_ptr<PNDocument> doc) const 
 {

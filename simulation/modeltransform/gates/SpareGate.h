@@ -1,8 +1,8 @@
-#include "Gate.h"
+#include "DynamicGate.h"
 #include <set>
 
 // cold spare
-class SpareGate : public Gate
+class SpareGate : public DynamicGate
 {
 public:
 	SpareGate(const std::string& id, const std::set<std::string>& spareIndices, const std::string& name);

@@ -1,16 +1,12 @@
 #include "ORGate.h"
 #include "serialization/PNDocument.h"
-#include "FaultTreeNode.h"
-
 #include <iostream>
 
 using namespace std;
 
 ORGate::ORGate(const string& id, const string& name /*= ""*/) 
-	: Gate(id, name)
+	: StaticGate(id, name)
 {
-	m_bDynamic = false;
-
 	m_activationFunc = [](NodeValueMap childValues) -> long double 
 	{
 		long double result = 1.0;
@@ -45,7 +41,7 @@ int ORGate::serialize(boost::shared_ptr<PNDocument> doc) const
 		doc->transitionToPlace(propagateChildFailure, oneChildFailed);
 	}
 
-	cout << "Value of OR: " << getValue() << endl;
+	// cout << "Value of OR: " << computeUnreliability() << endl;
 
 	return oneChildFailed;
 }
@@ -57,4 +53,10 @@ FaultTreeNode* ORGate::clone() const
 		newNode->addChild(child->clone());
 	
 	return newNode;
+}
+
+std::string ORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
+{
+	assert(false && "implement");
+	return "";
 }

@@ -4,10 +4,8 @@
 #include "util.h"
 
 VotingORGate::VotingORGate(const std::string& id, int numVotes, const string& name) 
-	: Gate(id, name), m_numVotes(numVotes)
+	: StaticGate(id, name), m_numVotes(numVotes)
 {
-	m_bDynamic = false;
-
 	m_activationFunc = [=](NodeValueMap childValues) -> long double 
 	{
 		assert(childValues.size() > 0);
@@ -60,4 +58,10 @@ FaultTreeNode* VotingORGate::clone() const
 std::string VotingORGate::description() const 
 {
 	return util::toString(m_numVotes) + " out of " + util::toString(getNumChildren());
+}
+
+std::string VotingORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
+{
+	assert(false && "implement");
+	return "";
 }

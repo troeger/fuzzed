@@ -6,10 +6,8 @@
 #include <set>
 
 SpareGate::SpareGate(const std::string& id, const set<string>& spareIndices, const string& name)
-	: Gate(id, name), m_spareIndices(spareIndices)
-{
-	m_bDynamic = true;
-}
+	: DynamicGate(id, name), m_spareIndices(spareIndices)
+{}
 
 int SpareGate::serialize(boost::shared_ptr<PNDocument> doc) const 
 {

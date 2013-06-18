@@ -4,10 +4,8 @@
 #include "util.h"
 
 PANDGate::PANDGate(const string& id, const std::vector<std::string>& ordering, const string& name/* = ""*/)
-	: Gate(id, name), m_prioIDs(ordering)
-{
-	m_bDynamic = true;
-}
+	: DynamicGate(id, name), m_prioIDs(ordering)
+{}
 
 
 int PANDGate::serialize(boost::shared_ptr<PNDocument> doc) const 

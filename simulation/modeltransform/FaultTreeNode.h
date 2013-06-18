@@ -31,14 +31,13 @@ public:
 	int getNumChildren() const { return m_children.size(); };
 
 	virtual bool isValid() const { return m_children.size() > 0; };
-
-	virtual long double getValue() const = 0;
 	const std::string getId() const { return m_id; };
 	
 	virtual int getCost() const;
 
 	// returns ID of the "top level" place
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const = 0;
+	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const = 0;
 	
 	std::pair<int /*placeID*/,int /*spareActivationTransition*/> serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const;
 	

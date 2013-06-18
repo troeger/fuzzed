@@ -5,7 +5,7 @@
 using namespace std;
 
 XORGate::XORGate(const std::string& ID, const std::string& name)
-	: Gate(ID, name)
+	: StaticGate(ID, name)
 {}
 
 int XORGate::serialize(boost::shared_ptr<PNDocument> doc) const 
@@ -49,4 +49,10 @@ FaultTreeNode* XORGate::clone() const
 		newNode->addChild(child->clone());
 
 	return newNode;
+}
+
+std::string XORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const
+{
+	assert(false && "implement");
+	return "";
 }

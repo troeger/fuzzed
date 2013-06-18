@@ -11,7 +11,7 @@ public:
 	
 	virtual ~Event() {};
 
-	virtual long double getValue() const override;
+	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const override;
 
 protected:
 	long double m_failureRate;

@@ -1,4 +1,5 @@
 #include "Event.h"
+#include "Constants.h"
 
 Event::Event(const std::string& ID, long double failureRate, const std::string& name/* = ""*/)
 	: FaultTreeNode(ID, name), m_failureRate(failureRate)
@@ -12,7 +13,7 @@ Event::Event(const std::string& ID, FuzzyNumber fuzzyFailureRate)
 {
 }
 
-long double Event::getValue() const 
+std::string Event::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
 {
-	return m_failureRate;
+	return PLACE_IDENTIFIER + serialize(doc);
 }

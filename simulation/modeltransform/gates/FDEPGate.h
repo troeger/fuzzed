@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Gate.h"
+#include "DynamicGate.h"
 
-class FDEPGate : public Gate
+class FDEPGate : public DynamicGate
 {
 public:
 	FDEPGate(const std::string& id, int trigger, std::vector<std::string>& dependentEvents, const std::string& name = "");

@@ -6,10 +6,8 @@
 using namespace std;
 
 ANDGate::ANDGate(const string& id, const string& name /*= ""*/)
-	: Gate(id, name)
+	: StaticGate(id, name)
 {
-	m_bDynamic = false;
-
 	m_activationFunc = [](NodeValueMap childValues) -> long double 
 	{
 		long double result = 1.0;
@@ -55,4 +53,10 @@ FaultTreeNode* ANDGate::clone() const
 		newNode->addChild(child->clone());
 
 	return newNode;
+}
+
+std::string ANDGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
+{
+	assert(false && "implement");
+	return "";
 }

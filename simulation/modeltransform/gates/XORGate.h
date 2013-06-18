@@ -1,7 +1,7 @@
 #pragma once
-#include "Gate.h"
+#include "StaticGate.h"
 
-class XORGate : public Gate
+class XORGate : public StaticGate
 {
 public:
 	XORGate(const std::string& ID, const std::string& name);
@@ -10,4 +10,5 @@ public:
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
+	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const;
 };

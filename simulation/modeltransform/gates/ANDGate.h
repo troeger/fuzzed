@@ -1,7 +1,7 @@
 #pragma once
-#include "Gate.h"
+#include "StaticGate.h"
 
-class ANDGate : public Gate
+class ANDGate : public StaticGate
 {
 public:
 	ANDGate(const std::string& id, const std::string& name = "");
@@ -10,5 +10,5 @@ public:
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
+	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const override;
 };
-
