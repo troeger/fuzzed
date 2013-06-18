@@ -32,6 +32,7 @@ TimeNETSimulation::TimeNETSimulation(const boost::filesystem::path &p,
 	assert(props);
 
 	m_properties = props;
+	m_properties->filePath = p.generic_string();
 }
 
 bool TimeNETSimulation::run()

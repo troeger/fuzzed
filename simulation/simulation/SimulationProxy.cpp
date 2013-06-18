@@ -37,7 +37,8 @@ SimulationProxy::SimulationProxy(int argc, char** arguments) :
 	m_convergenceThresh(0.0),
 	m_simulationTime(0),
 	m_bSimulateUntilFailure(true),
-	m_numAdaptiveRounds(0)
+	m_numAdaptiveRounds(0),
+	m_timeNetProperties(nullptr)
 {
 	try
 	{
@@ -139,7 +140,7 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 
 	m_options.add_options()
 		("help,h", "produce help message")
-		("TimeNET",	po::value<bool>(&useTimeNET)->default_value(false),									"Use TimeNET simulation")
+		("TimeNET",		po::value<bool>(&useTimeNET)->default_value(false),									"Use TimeNET simulation")
 		("PN",			po::value<bool>(&simulatePetriNet)->default_value(false),							"Simulate Petri Net directly")
 		("file,f",		po::value<string>(&filePath),														"Path to FuzzTree or PNML file")
 		("dir,d",		po::value<string>(&directoryName),													"Directory containing FuzzTree or PNML files")
@@ -246,7 +247,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 		ft->print(cout);
 
 		string newFileName = p.generic_string();
-		util::replaceFileExtensionInPlace(newFileName, PNML::PNML_EXT);
+		util::replaceFileExtensionInPlace(newFileName, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
 
 		boost::shared_ptr<PNDocument> doc;
 		switch (impl)
