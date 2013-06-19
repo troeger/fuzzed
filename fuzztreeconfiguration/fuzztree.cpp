@@ -862,13 +862,30 @@ namespace fuzztree
 
       // annotations
       //
-      if (n.name () == "annotations" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< AnnotationsType > r (
-          AnnotationsTraits::create (i, f, this));
+        ::xsd::cxx::tree::type_factory_map< char >& tfm (
+          ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
 
-        this->annotations_.push_back (r);
-        continue;
+        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+          tfm.create (
+            "annotations",
+            "",
+            &::xsd::cxx::tree::factory_impl< AnnotationsType >,
+            false, false, i, n, f, this));
+
+        if (tmp.get () != 0)
+        {
+          ::std::auto_ptr< AnnotationsType > r (
+            dynamic_cast< AnnotationsType* > (tmp.get ()));
+
+          if (r.get ())
+            tmp.release ();
+          else
+            throw ::xsd::cxx::tree::not_derived< char > ();
+
+          this->annotations_.push_back (r);
+          continue;
+        }
       }
 
       break;
@@ -916,6 +933,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, AnnotatedElement >
+  _xsd_AnnotatedElement_type_factory_init (
+    "AnnotatedElement",
+    "net.fuzztree");
+
   // Model
   //
 
@@ -952,6 +975,12 @@ namespace fuzztree
   ~Model ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Model >
+  _xsd_Model_type_factory_init (
+    "Model",
+    "net.fuzztree");
 
   // FuzzTree
   //
@@ -1009,15 +1038,32 @@ namespace fuzztree
 
       // topEvent
       //
-      if (n.name () == "topEvent" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< TopEventType > r (
-          TopEventTraits::create (i, f, this));
+        ::xsd::cxx::tree::type_factory_map< char >& tfm (
+          ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
 
-        if (!topEvent_.present ())
+        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+          tfm.create (
+            "topEvent",
+            "",
+            &::xsd::cxx::tree::factory_impl< TopEventType >,
+            false, false, i, n, f, this));
+
+        if (tmp.get () != 0)
         {
-          this->topEvent_.set (r);
-          continue;
+          if (!topEvent_.present ())
+          {
+            ::std::auto_ptr< TopEventType > r (
+              dynamic_cast< TopEventType* > (tmp.get ()));
+
+            if (r.get ())
+              tmp.release ();
+            else
+              throw ::xsd::cxx::tree::not_derived< char > ();
+
+            this->topEvent_.set (r);
+            continue;
+          }
         }
       }
 
@@ -1043,6 +1089,12 @@ namespace fuzztree
   ~FuzzTree ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, FuzzTree >
+  _xsd_FuzzTree_type_factory_init (
+    "FuzzTree",
+    "net.fuzztree");
 
   // Node
   //
@@ -1097,13 +1149,30 @@ namespace fuzztree
 
       // children
       //
-      if (n.name () == "children" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< ChildrenType > r (
-          ChildrenTraits::create (i, f, this));
+        ::xsd::cxx::tree::type_factory_map< char >& tfm (
+          ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
 
-        this->children_.push_back (r);
-        continue;
+        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+          tfm.create (
+            "children",
+            "",
+            &::xsd::cxx::tree::factory_impl< ChildrenType >,
+            false, false, i, n, f, this));
+
+        if (tmp.get () != 0)
+        {
+          ::std::auto_ptr< ChildrenType > r (
+            dynamic_cast< ChildrenType* > (tmp.get ()));
+
+          if (r.get ())
+            tmp.release ();
+          else
+            throw ::xsd::cxx::tree::not_derived< char > ();
+
+          this->children_.push_back (r);
+          continue;
+        }
       }
 
       break;
@@ -1143,6 +1212,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Node >
+  _xsd_Node_type_factory_init (
+    "Node",
+    "net.fuzztree");
+
   // ChildNode
   //
 
@@ -1179,6 +1254,12 @@ namespace fuzztree
   ~ChildNode ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, ChildNode >
+  _xsd_ChildNode_type_factory_init (
+    "ChildNode",
+    "net.fuzztree");
 
   // Gate
   //
@@ -1217,6 +1298,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Gate >
+  _xsd_Gate_type_factory_init (
+    "Gate",
+    "net.fuzztree");
+
   // VariationPoint
   //
 
@@ -1253,6 +1340,12 @@ namespace fuzztree
   ~VariationPoint ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, VariationPoint >
+  _xsd_VariationPoint_type_factory_init (
+    "VariationPoint",
+    "net.fuzztree");
 
   // InclusionVariationPoint
   //
@@ -1335,12 +1428,26 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, InclusionVariationPoint >
+  _xsd_InclusionVariationPoint_type_factory_init (
+    "InclusionVariationPoint",
+    "net.fuzztree");
+
   // BasicEvent
   //
 
   BasicEvent::
   BasicEvent (const IdType& id,
               const ProbabilityType& probability)
+  : ::fuzztree::InclusionVariationPoint (id),
+    probability_ (probability, ::xml_schema::Flags (), this)
+  {
+  }
+
+  BasicEvent::
+  BasicEvent (const IdType& id,
+              ::std::auto_ptr< ProbabilityType >& probability)
   : ::fuzztree::InclusionVariationPoint (id),
     probability_ (probability, ::xml_schema::Flags (), this)
   {
@@ -1383,15 +1490,32 @@ namespace fuzztree
 
       // probability
       //
-      if (n.name () == "probability" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< ProbabilityType > r (
-          ProbabilityTraits::create (i, f, this));
+        ::xsd::cxx::tree::type_factory_map< char >& tfm (
+          ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
 
-        if (!probability_.present ())
+        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+          tfm.create (
+            "probability",
+            "",
+            &::xsd::cxx::tree::factory_impl< ProbabilityType >,
+            false, false, i, n, f, this));
+
+        if (tmp.get () != 0)
         {
-          this->probability_.set (r);
-          continue;
+          if (!probability_.present ())
+          {
+            ::std::auto_ptr< ProbabilityType > r (
+              dynamic_cast< ProbabilityType* > (tmp.get ()));
+
+            if (r.get ())
+              tmp.release ();
+            else
+              throw ::xsd::cxx::tree::not_derived< char > ();
+
+            this->probability_.set (r);
+            continue;
+          }
         }
       }
 
@@ -1417,6 +1541,12 @@ namespace fuzztree
   ~BasicEvent ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, BasicEvent >
+  _xsd_BasicEvent_type_factory_init (
+    "BasicEvent",
+    "net.fuzztree");
 
   // TopEvent
   //
@@ -1455,6 +1585,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, TopEvent >
+  _xsd_TopEvent_type_factory_init (
+    "TopEvent",
+    "net.fuzztree");
+
   // And
   //
 
@@ -1491,6 +1627,12 @@ namespace fuzztree
   ~And ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, And >
+  _xsd_And_type_factory_init (
+    "And",
+    "net.fuzztree");
 
   // Or
   //
@@ -1529,6 +1671,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Or >
+  _xsd_Or_type_factory_init (
+    "Or",
+    "net.fuzztree");
+
   // Xor
   //
 
@@ -1565,6 +1713,12 @@ namespace fuzztree
   ~Xor ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Xor >
+  _xsd_Xor_type_factory_init (
+    "Xor",
+    "net.fuzztree");
 
   // VotingOr
   //
@@ -1641,6 +1795,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, VotingOr >
+  _xsd_VotingOr_type_factory_init (
+    "VotingOr",
+    "net.fuzztree");
+
   // FeatureVariationPoint
   //
 
@@ -1677,6 +1837,12 @@ namespace fuzztree
   ~FeatureVariationPoint ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, FeatureVariationPoint >
+  _xsd_FeatureVariationPoint_type_factory_init (
+    "FeatureVariationPoint",
+    "net.fuzztree");
 
   // RedundancyVariationPoint
   //
@@ -1802,6 +1968,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, RedundancyVariationPoint >
+  _xsd_RedundancyVariationPoint_type_factory_init (
+    "RedundancyVariationPoint",
+    "net.fuzztree");
+
   // TransferIn
   //
 
@@ -1891,6 +2063,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, TransferIn >
+  _xsd_TransferIn_type_factory_init (
+    "TransferIn",
+    "net.fuzztree");
+
   // Annotation
   //
 
@@ -1945,6 +2123,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Annotation >
+  _xsd_Annotation_type_factory_init (
+    "Annotation",
+    "net.fuzztree");
+
   // Probability
   //
 
@@ -1998,6 +2182,12 @@ namespace fuzztree
   ~Probability ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Probability >
+  _xsd_Probability_type_factory_init (
+    "Probability",
+    "net.fuzztree");
 
   // CrispProbability
   //
@@ -2068,6 +2258,12 @@ namespace fuzztree
   ~CrispProbability ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, CrispProbability >
+  _xsd_CrispProbability_type_factory_init (
+    "CrispProbability",
+    "net.fuzztree");
 
   // TriangularFuzzyInterval
   //
@@ -2190,6 +2386,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, TriangularFuzzyInterval >
+  _xsd_TriangularFuzzyInterval_type_factory_init (
+    "TriangularFuzzyInterval",
+    "net.fuzztree");
+
   // UndevelopedEvent
   //
 
@@ -2226,6 +2428,12 @@ namespace fuzztree
   ~UndevelopedEvent ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, UndevelopedEvent >
+  _xsd_UndevelopedEvent_type_factory_init (
+    "UndevelopedEvent",
+    "net.fuzztree");
 
   // IntermediateEvent
   //
@@ -2264,12 +2472,27 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, IntermediateEvent >
+  _xsd_IntermediateEvent_type_factory_init (
+    "IntermediateEvent",
+    "net.fuzztree");
+
   // BasicEventSet
   //
 
   BasicEventSet::
   BasicEventSet (const IdType& id,
                  const ProbabilityType& probability)
+  : ::fuzztree::BasicEvent (id,
+                            probability),
+    quantity_ (::xml_schema::Flags (), this)
+  {
+  }
+
+  BasicEventSet::
+  BasicEventSet (const IdType& id,
+                 ::std::auto_ptr< ProbabilityType >& probability)
   : ::fuzztree::BasicEvent (id,
                             probability),
     quantity_ (::xml_schema::Flags (), this)
@@ -2333,12 +2556,26 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, BasicEventSet >
+  _xsd_BasicEventSet_type_factory_init (
+    "BasicEventSet",
+    "net.fuzztree");
+
   // HouseEvent
   //
 
   HouseEvent::
   HouseEvent (const IdType& id,
               const ProbabilityType& probability)
+  : ::fuzztree::BasicEvent (id,
+                            probability)
+  {
+  }
+
+  HouseEvent::
+  HouseEvent (const IdType& id,
+              ::std::auto_ptr< ProbabilityType >& probability)
   : ::fuzztree::BasicEvent (id,
                             probability)
   {
@@ -2371,6 +2608,12 @@ namespace fuzztree
   ~HouseEvent ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, HouseEvent >
+  _xsd_HouseEvent_type_factory_init (
+    "HouseEvent",
+    "net.fuzztree");
 
   // IntermediateEventSet
   //
@@ -2439,6 +2682,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, IntermediateEventSet >
+  _xsd_IntermediateEventSet_type_factory_init (
+    "IntermediateEventSet",
+    "net.fuzztree");
+
   // EventSet
   //
 
@@ -2506,6 +2755,12 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, EventSet >
+  _xsd_EventSet_type_factory_init (
+    "EventSet",
+    "net.fuzztree");
+
   // DecomposedFuzzyProbability
   //
 
@@ -2551,13 +2806,30 @@ namespace fuzztree
 
       // alphaCuts
       //
-      if (n.name () == "alphaCuts" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< AlphaCutsType > r (
-          AlphaCutsTraits::create (i, f, this));
+        ::xsd::cxx::tree::type_factory_map< char >& tfm (
+          ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
 
-        this->alphaCuts_.push_back (r);
-        continue;
+        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+          tfm.create (
+            "alphaCuts",
+            "",
+            &::xsd::cxx::tree::factory_impl< AlphaCutsType >,
+            false, false, i, n, f, this));
+
+        if (tmp.get () != 0)
+        {
+          ::std::auto_ptr< AlphaCutsType > r (
+            dynamic_cast< AlphaCutsType* > (tmp.get ()));
+
+          if (r.get ())
+            tmp.release ();
+          else
+            throw ::xsd::cxx::tree::not_derived< char > ();
+
+          this->alphaCuts_.push_back (r);
+          continue;
+        }
       }
 
       break;
@@ -2575,6 +2847,12 @@ namespace fuzztree
   ~DecomposedFuzzyProbability ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, DecomposedFuzzyProbability >
+  _xsd_DecomposedFuzzyProbability_type_factory_init (
+    "DecomposedFuzzyProbability",
+    "net.fuzztree");
 
   // DoubleToIntervalMap
   //
@@ -2634,15 +2912,32 @@ namespace fuzztree
 
       // value
       //
-      if (n.name () == "value" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< ValueType > r (
-          ValueTraits::create (i, f, this));
+        ::xsd::cxx::tree::type_factory_map< char >& tfm (
+          ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
 
-        if (!value_.present ())
+        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+          tfm.create (
+            "value",
+            "",
+            &::xsd::cxx::tree::factory_impl< ValueType >,
+            false, false, i, n, f, this));
+
+        if (tmp.get () != 0)
         {
-          this->value_.set (r);
-          continue;
+          if (!value_.present ())
+          {
+            ::std::auto_ptr< ValueType > r (
+              dynamic_cast< ValueType* > (tmp.get ()));
+
+            if (r.get ())
+              tmp.release ();
+            else
+              throw ::xsd::cxx::tree::not_derived< char > ();
+
+            this->value_.set (r);
+            continue;
+          }
         }
       }
 
@@ -2688,6 +2983,12 @@ namespace fuzztree
   ~DoubleToIntervalMap ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, DoubleToIntervalMap >
+  _xsd_DoubleToIntervalMap_type_factory_init (
+    "DoubleToIntervalMap",
+    "net.fuzztree");
 
   // Interval
   //
@@ -2775,6 +3076,12 @@ namespace fuzztree
   ~Interval ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Interval >
+  _xsd_Interval_type_factory_init (
+    "Interval",
+    "net.fuzztree");
 }
 
 #include <istream>
@@ -3009,12 +3316,26 @@ namespace fuzztree
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (e));
 
-    if (n.name () == "FuzzTree" &&
-        n.namespace_ () == "net.fuzztree")
+    ::xsd::cxx::tree::type_factory_map< char >& tfm (
+      ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
+
+    ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+      tfm.create (
+        "FuzzTree",
+        "net.fuzztree",
+        &::xsd::cxx::tree::factory_impl< ::fuzztree::FuzzTree >,
+        true, true, e, n, f, 0));
+
+    if (tmp.get () != 0)
     {
       ::std::auto_ptr< ::fuzztree::FuzzTree > r (
-        ::xsd::cxx::tree::traits< ::fuzztree::FuzzTree, char >::create (
-          e, f, 0));
+        dynamic_cast< ::fuzztree::FuzzTree* > (tmp.get ()));
+
+      if (r.get ())
+        tmp.release ();
+      else
+        throw ::xsd::cxx::tree::not_derived< char > ();
+
       return r;
     }
 
@@ -3047,12 +3368,27 @@ namespace fuzztree
                        (c.get () ? &c : &d),
                        0);
 
-    if (n.name () == "FuzzTree" &&
-        n.namespace_ () == "net.fuzztree")
+    ::xsd::cxx::tree::type_factory_map< char >& tfm (
+      ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
+
+    ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+      tfm.create (
+        "FuzzTree",
+        "net.fuzztree",
+        &::xsd::cxx::tree::factory_impl< ::fuzztree::FuzzTree >,
+        true, true, e, n, f, 0));
+
+    if (tmp.get () != 0)
     {
+
       ::std::auto_ptr< ::fuzztree::FuzzTree > r (
-        ::xsd::cxx::tree::traits< ::fuzztree::FuzzTree, char >::create (
-          e, f, 0));
+        dynamic_cast< ::fuzztree::FuzzTree* > (tmp.get ()));
+
+      if (r.get ())
+        tmp.release ();
+      else
+        throw ::xsd::cxx::tree::not_derived< char > ();
+
       return r;
     }
 
@@ -3086,16 +3422,29 @@ namespace fuzztree
 
     // annotations
     //
-    for (AnnotatedElement::AnnotationsConstIterator
-         b (i.annotations ().begin ()), n (i.annotations ().end ());
-         b != n; ++b)
     {
-      ::xercesc::DOMElement& s (
-        ::xsd::cxx::xml::dom::create_element (
-          "annotations",
-          e));
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      s << *b;
+      for (AnnotatedElement::AnnotationsConstIterator
+           b (i.annotations ().begin ()), n (i.annotations ().end ());
+           b != n; ++b)
+      {
+        if (typeid (AnnotatedElement::AnnotationsType) == typeid (*b))
+        {
+          ::xercesc::DOMElement& s (
+            ::xsd::cxx::xml::dom::create_element (
+              "annotations",
+              e));
+
+          s << *b;
+        }
+        else
+          tsm.serialize (
+            "annotations",
+            "",
+            false, false, e, *b);
+      }
     }
 
     // id
@@ -3122,11 +3471,25 @@ namespace fuzztree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, AnnotatedElement >
+  _xsd_AnnotatedElement_type_serializer_init (
+    "AnnotatedElement",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const Model& i)
   {
     e << static_cast< const ::fuzztree::AnnotatedElement& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Model >
+  _xsd_Model_type_serializer_init (
+    "Model",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const FuzzTree& i)
@@ -3136,14 +3499,33 @@ namespace fuzztree
     // topEvent
     //
     {
-      ::xercesc::DOMElement& s (
-        ::xsd::cxx::xml::dom::create_element (
-          "topEvent",
-          e));
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      s << i.topEvent ();
+      const FuzzTree::TopEventType& x (i.topEvent ());
+      if (typeid (FuzzTree::TopEventType) == typeid (x))
+      {
+        ::xercesc::DOMElement& s (
+          ::xsd::cxx::xml::dom::create_element (
+            "topEvent",
+            e));
+
+        s << x;
+      }
+      else
+        tsm.serialize (
+          "topEvent",
+          "",
+          false, false, e, x);
     }
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, FuzzTree >
+  _xsd_FuzzTree_type_serializer_init (
+    "FuzzTree",
+    "net.fuzztree");
+
 
   void
   fuzzTree (::std::ostream& o,
@@ -3263,18 +3645,31 @@ namespace fuzztree
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (e));
 
-    if (n.name () == "FuzzTree" &&
-        n.namespace_ () == "net.fuzztree")
+    if (typeid (::fuzztree::FuzzTree) == typeid (s))
     {
-      e << s;
+      if (n.name () == "FuzzTree" &&
+          n.namespace_ () == "net.fuzztree")
+      {
+        e << s;
+      }
+      else
+      {
+        throw ::xsd::cxx::tree::unexpected_element < char > (
+          n.name (),
+          n.namespace_ (),
+          "FuzzTree",
+          "net.fuzztree");
+      }
     }
     else
     {
-      throw ::xsd::cxx::tree::unexpected_element < char > (
-        n.name (),
-        n.namespace_ (),
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
+
+      tsm.serialize (
         "FuzzTree",
-        "net.fuzztree");
+        "net.fuzztree",
+        e, n, s);
     }
   }
 
@@ -3283,11 +3678,29 @@ namespace fuzztree
             const ::xml_schema::NamespaceInfomap& m,
             ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
-      ::xsd::cxx::xml::dom::serialize< char > (
-        "FuzzTree",
-        "net.fuzztree",
-        m, f));
+    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d;
+
+    if (typeid (::fuzztree::FuzzTree) == typeid (s))
+    {
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > r (
+        ::xsd::cxx::xml::dom::serialize< char > (
+          "FuzzTree",
+          "net.fuzztree",
+          m, f));
+      d = r;
+    }
+    else
+    {
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
+
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > r (
+        tsm.serialize (
+          "FuzzTree",
+          "net.fuzztree",
+          m, s, f));
+      d = r;
+    }
 
     ::fuzztree::fuzzTree (*d, s, f);
     return d;
@@ -3300,16 +3713,29 @@ namespace fuzztree
 
     // children
     //
-    for (Node::ChildrenConstIterator
-         b (i.children ().begin ()), n (i.children ().end ());
-         b != n; ++b)
     {
-      ::xercesc::DOMElement& s (
-        ::xsd::cxx::xml::dom::create_element (
-          "children",
-          e));
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      s << *b;
+      for (Node::ChildrenConstIterator
+           b (i.children ().begin ()), n (i.children ().end ());
+           b != n; ++b)
+      {
+        if (typeid (Node::ChildrenType) == typeid (*b))
+        {
+          ::xercesc::DOMElement& s (
+            ::xsd::cxx::xml::dom::create_element (
+              "children",
+              e));
+
+          s << *b;
+        }
+        else
+          tsm.serialize (
+            "children",
+            "",
+            false, false, e, *b);
+      }
     }
 
     // x
@@ -3337,11 +3763,25 @@ namespace fuzztree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Node >
+  _xsd_Node_type_serializer_init (
+    "Node",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const ChildNode& i)
   {
     e << static_cast< const ::fuzztree::Node& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, ChildNode >
+  _xsd_ChildNode_type_serializer_init (
+    "ChildNode",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const Gate& i)
@@ -3349,11 +3789,25 @@ namespace fuzztree
     e << static_cast< const ::fuzztree::ChildNode& > (i);
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Gate >
+  _xsd_Gate_type_serializer_init (
+    "Gate",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const VariationPoint& i)
   {
     e << static_cast< const ::fuzztree::ChildNode& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, VariationPoint >
+  _xsd_VariationPoint_type_serializer_init (
+    "VariationPoint",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const InclusionVariationPoint& i)
@@ -3384,6 +3838,13 @@ namespace fuzztree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, InclusionVariationPoint >
+  _xsd_InclusionVariationPoint_type_serializer_init (
+    "InclusionVariationPoint",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const BasicEvent& i)
   {
@@ -3392,14 +3853,33 @@ namespace fuzztree
     // probability
     //
     {
-      ::xercesc::DOMElement& s (
-        ::xsd::cxx::xml::dom::create_element (
-          "probability",
-          e));
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      s << i.probability ();
+      const BasicEvent::ProbabilityType& x (i.probability ());
+      if (typeid (BasicEvent::ProbabilityType) == typeid (x))
+      {
+        ::xercesc::DOMElement& s (
+          ::xsd::cxx::xml::dom::create_element (
+            "probability",
+            e));
+
+        s << x;
+      }
+      else
+        tsm.serialize (
+          "probability",
+          "",
+          false, false, e, x);
     }
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, BasicEvent >
+  _xsd_BasicEvent_type_serializer_init (
+    "BasicEvent",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const TopEvent& i)
@@ -3407,11 +3887,25 @@ namespace fuzztree
     e << static_cast< const ::fuzztree::Node& > (i);
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, TopEvent >
+  _xsd_TopEvent_type_serializer_init (
+    "TopEvent",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const And& i)
   {
     e << static_cast< const ::fuzztree::Gate& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, And >
+  _xsd_And_type_serializer_init (
+    "And",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const Or& i)
@@ -3419,11 +3913,25 @@ namespace fuzztree
     e << static_cast< const ::fuzztree::Gate& > (i);
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Or >
+  _xsd_Or_type_serializer_init (
+    "Or",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const Xor& i)
   {
     e << static_cast< const ::fuzztree::Gate& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Xor >
+  _xsd_Xor_type_serializer_init (
+    "Xor",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const VotingOr& i)
@@ -3442,11 +3950,25 @@ namespace fuzztree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, VotingOr >
+  _xsd_VotingOr_type_serializer_init (
+    "VotingOr",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const FeatureVariationPoint& i)
   {
     e << static_cast< const ::fuzztree::VariationPoint& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, FeatureVariationPoint >
+  _xsd_FeatureVariationPoint_type_serializer_init (
+    "FeatureVariationPoint",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const RedundancyVariationPoint& i)
@@ -3499,6 +4021,13 @@ namespace fuzztree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, RedundancyVariationPoint >
+  _xsd_RedundancyVariationPoint_type_serializer_init (
+    "RedundancyVariationPoint",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const TransferIn& i)
   {
@@ -3527,6 +4056,13 @@ namespace fuzztree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, TransferIn >
+  _xsd_TransferIn_type_serializer_init (
+    "TransferIn",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const Annotation& i)
   {
@@ -3543,6 +4079,13 @@ namespace fuzztree
               const Annotation&)
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Annotation >
+  _xsd_Annotation_type_serializer_init (
+    "Annotation",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const Probability& i)
@@ -3561,6 +4104,13 @@ namespace fuzztree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Probability >
+  _xsd_Probability_type_serializer_init (
+    "Probability",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const CrispProbability& i)
   {
@@ -3577,6 +4127,13 @@ namespace fuzztree
       a << ::xml_schema::AsDouble(i.value ());
     }
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, CrispProbability >
+  _xsd_CrispProbability_type_serializer_init (
+    "CrispProbability",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const TriangularFuzzyInterval& i)
@@ -3628,17 +4185,38 @@ namespace fuzztree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, TriangularFuzzyInterval >
+  _xsd_TriangularFuzzyInterval_type_serializer_init (
+    "TriangularFuzzyInterval",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const UndevelopedEvent& i)
   {
     e << static_cast< const ::fuzztree::ChildNode& > (i);
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, UndevelopedEvent >
+  _xsd_UndevelopedEvent_type_serializer_init (
+    "UndevelopedEvent",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const IntermediateEvent& i)
   {
     e << static_cast< const ::fuzztree::InclusionVariationPoint& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, IntermediateEvent >
+  _xsd_IntermediateEvent_type_serializer_init (
+    "IntermediateEvent",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const BasicEventSet& i)
@@ -3658,11 +4236,25 @@ namespace fuzztree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, BasicEventSet >
+  _xsd_BasicEventSet_type_serializer_init (
+    "BasicEventSet",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const HouseEvent& i)
   {
     e << static_cast< const ::fuzztree::BasicEvent& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, HouseEvent >
+  _xsd_HouseEvent_type_serializer_init (
+    "HouseEvent",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const IntermediateEventSet& i)
@@ -3682,6 +4274,13 @@ namespace fuzztree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, IntermediateEventSet >
+  _xsd_IntermediateEventSet_type_serializer_init (
+    "IntermediateEventSet",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const EventSet& i)
   {
@@ -3700,6 +4299,13 @@ namespace fuzztree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, EventSet >
+  _xsd_EventSet_type_serializer_init (
+    "EventSet",
+    "net.fuzztree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const DecomposedFuzzyProbability& i)
   {
@@ -3707,18 +4313,38 @@ namespace fuzztree
 
     // alphaCuts
     //
-    for (DecomposedFuzzyProbability::AlphaCutsConstIterator
-         b (i.alphaCuts ().begin ()), n (i.alphaCuts ().end ());
-         b != n; ++b)
     {
-      ::xercesc::DOMElement& s (
-        ::xsd::cxx::xml::dom::create_element (
-          "alphaCuts",
-          e));
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      s << *b;
+      for (DecomposedFuzzyProbability::AlphaCutsConstIterator
+           b (i.alphaCuts ().begin ()), n (i.alphaCuts ().end ());
+           b != n; ++b)
+      {
+        if (typeid (DecomposedFuzzyProbability::AlphaCutsType) == typeid (*b))
+        {
+          ::xercesc::DOMElement& s (
+            ::xsd::cxx::xml::dom::create_element (
+              "alphaCuts",
+              e));
+
+          s << *b;
+        }
+        else
+          tsm.serialize (
+            "alphaCuts",
+            "",
+            false, false, e, *b);
+      }
     }
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, DecomposedFuzzyProbability >
+  _xsd_DecomposedFuzzyProbability_type_serializer_init (
+    "DecomposedFuzzyProbability",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const DoubleToIntervalMap& i)
@@ -3728,12 +4354,24 @@ namespace fuzztree
     // value
     //
     {
-      ::xercesc::DOMElement& s (
-        ::xsd::cxx::xml::dom::create_element (
-          "value",
-          e));
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      s << i.value ();
+      const DoubleToIntervalMap::ValueType& x (i.value ());
+      if (typeid (DoubleToIntervalMap::ValueType) == typeid (x))
+      {
+        ::xercesc::DOMElement& s (
+          ::xsd::cxx::xml::dom::create_element (
+            "value",
+            e));
+
+        s << x;
+      }
+      else
+        tsm.serialize (
+          "value",
+          "",
+          false, false, e, x);
     }
 
     // key
@@ -3747,6 +4385,13 @@ namespace fuzztree
       a << ::xml_schema::AsDouble(i.key ());
     }
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, DoubleToIntervalMap >
+  _xsd_DoubleToIntervalMap_type_serializer_init (
+    "DoubleToIntervalMap",
+    "net.fuzztree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const Interval& i)
@@ -3775,6 +4420,12 @@ namespace fuzztree
       a << ::xml_schema::AsDouble(i.upperBound ());
     }
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Interval >
+  _xsd_Interval_type_serializer_init (
+    "Interval",
+    "net.fuzztree");
 }
 
 #include <xsd/cxx/post.hxx>

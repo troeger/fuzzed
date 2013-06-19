@@ -4,6 +4,7 @@
 #endif
 #include <boost/filesystem/path.hpp>
 #include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
 #include <string>
 #include <set>
 #if IS_WINDOWS 
@@ -17,6 +18,8 @@
 #include "fuzzTree.h"
 
 struct FuzzTreeConfiguration;
+
+namespace fuzztree = ft;
 
 class FuzzTreeTransform
 {
@@ -60,7 +63,7 @@ protected:
 	std::string generateUniqueId(const char* oldId);
 
 private:
-	FuzzTreeTransform(const std::string& fuzzTreeXML, const std::string& fuzzTreeSchemaPath);
+	FuzzTreeTransform(const std::string& fuzzTreeXML);
 	~FuzzTreeTransform();
 
 	bool loadRootNode();

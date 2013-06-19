@@ -579,6 +579,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Annotation >
+  _xsd_Annotation_type_factory_init (
+    "Annotation",
+    "net.faulttree");
+
   // Probability
   //
 
@@ -633,6 +639,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Probability >
+  _xsd_Probability_type_factory_init (
+    "Probability",
+    "net.faulttree");
+
   // AnnotatedElement
   //
 
@@ -684,13 +696,30 @@ namespace faulttree
 
       // annotations
       //
-      if (n.name () == "annotations" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< AnnotationsType > r (
-          AnnotationsTraits::create (i, f, this));
+        ::xsd::cxx::tree::type_factory_map< char >& tfm (
+          ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
 
-        this->annotations_.push_back (r);
-        continue;
+        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+          tfm.create (
+            "annotations",
+            "",
+            &::xsd::cxx::tree::factory_impl< AnnotationsType >,
+            false, false, i, n, f, this));
+
+        if (tmp.get () != 0)
+        {
+          ::std::auto_ptr< AnnotationsType > r (
+            dynamic_cast< AnnotationsType* > (tmp.get ()));
+
+          if (r.get ())
+            tmp.release ();
+          else
+            throw ::xsd::cxx::tree::not_derived< char > ();
+
+          this->annotations_.push_back (r);
+          continue;
+        }
       }
 
       break;
@@ -738,6 +767,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, AnnotatedElement >
+  _xsd_AnnotatedElement_type_factory_init (
+    "AnnotatedElement",
+    "net.faulttree");
+
   // Model
   //
 
@@ -774,6 +809,12 @@ namespace faulttree
   ~Model ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Model >
+  _xsd_Model_type_factory_init (
+    "Model",
+    "net.faulttree");
 
   // Node
   //
@@ -828,13 +869,30 @@ namespace faulttree
 
       // children
       //
-      if (n.name () == "children" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< ChildrenType > r (
-          ChildrenTraits::create (i, f, this));
+        ::xsd::cxx::tree::type_factory_map< char >& tfm (
+          ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
 
-        this->children_.push_back (r);
-        continue;
+        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+          tfm.create (
+            "children",
+            "",
+            &::xsd::cxx::tree::factory_impl< ChildrenType >,
+            false, false, i, n, f, this));
+
+        if (tmp.get () != 0)
+        {
+          ::std::auto_ptr< ChildrenType > r (
+            dynamic_cast< ChildrenType* > (tmp.get ()));
+
+          if (r.get ())
+            tmp.release ();
+          else
+            throw ::xsd::cxx::tree::not_derived< char > ();
+
+          this->children_.push_back (r);
+          continue;
+        }
       }
 
       break;
@@ -874,6 +932,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Node >
+  _xsd_Node_type_factory_init (
+    "Node",
+    "net.faulttree");
+
   // ChildNode
   //
 
@@ -910,6 +974,12 @@ namespace faulttree
   ~ChildNode ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, ChildNode >
+  _xsd_ChildNode_type_factory_init (
+    "ChildNode",
+    "net.faulttree");
 
   // FaultTree
   //
@@ -967,15 +1037,32 @@ namespace faulttree
 
       // topEvent
       //
-      if (n.name () == "topEvent" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< TopEventType > r (
-          TopEventTraits::create (i, f, this));
+        ::xsd::cxx::tree::type_factory_map< char >& tfm (
+          ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
 
-        if (!topEvent_.present ())
+        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+          tfm.create (
+            "topEvent",
+            "",
+            &::xsd::cxx::tree::factory_impl< TopEventType >,
+            false, false, i, n, f, this));
+
+        if (tmp.get () != 0)
         {
-          this->topEvent_.set (r);
-          continue;
+          if (!topEvent_.present ())
+          {
+            ::std::auto_ptr< TopEventType > r (
+              dynamic_cast< TopEventType* > (tmp.get ()));
+
+            if (r.get ())
+              tmp.release ();
+            else
+              throw ::xsd::cxx::tree::not_derived< char > ();
+
+            this->topEvent_.set (r);
+            continue;
+          }
         }
       }
 
@@ -1001,6 +1088,12 @@ namespace faulttree
   ~FaultTree ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, FaultTree >
+  _xsd_FaultTree_type_factory_init (
+    "FaultTree",
+    "net.faulttree");
 
   // TopEvent
   //
@@ -1038,6 +1131,12 @@ namespace faulttree
   ~TopEvent ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, TopEvent >
+  _xsd_TopEvent_type_factory_init (
+    "TopEvent",
+    "net.faulttree");
 
   // CrispProbability
   //
@@ -1109,6 +1208,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, CrispProbability >
+  _xsd_CrispProbability_type_factory_init (
+    "CrispProbability",
+    "net.faulttree");
+
   // Gate
   //
 
@@ -1145,6 +1250,12 @@ namespace faulttree
   ~Gate ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Gate >
+  _xsd_Gate_type_factory_init (
+    "Gate",
+    "net.faulttree");
 
   // And
   //
@@ -1183,6 +1294,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, And >
+  _xsd_And_type_factory_init (
+    "And",
+    "net.faulttree");
+
   // Or
   //
 
@@ -1220,6 +1337,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Or >
+  _xsd_Or_type_factory_init (
+    "Or",
+    "net.faulttree");
+
   // Xor
   //
 
@@ -1256,6 +1379,12 @@ namespace faulttree
   ~Xor ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Xor >
+  _xsd_Xor_type_factory_init (
+    "Xor",
+    "net.faulttree");
 
   // VotingOr
   //
@@ -1332,6 +1461,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, VotingOr >
+  _xsd_VotingOr_type_factory_init (
+    "VotingOr",
+    "net.faulttree");
+
   // DynamicGate
   //
 
@@ -1368,6 +1503,12 @@ namespace faulttree
   ~DynamicGate ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, DynamicGate >
+  _xsd_DynamicGate_type_factory_init (
+    "DynamicGate",
+    "net.faulttree");
 
   // Idlist
   //
@@ -1411,6 +1552,12 @@ namespace faulttree
   ~Idlist ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Idlist >
+  _xsd_Idlist_type_factory_init (
+    "idlist",
+    "net.faulttree");
 
   // ColdSpare
   //
@@ -1490,6 +1637,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, ColdSpare >
+  _xsd_ColdSpare_type_factory_init (
+    "ColdSpare",
+    "net.faulttree");
+
   // PriorityAnd
   //
 
@@ -1567,6 +1720,12 @@ namespace faulttree
   ~PriorityAnd ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, PriorityAnd >
+  _xsd_PriorityAnd_type_factory_init (
+    "PriorityAnd",
+    "net.faulttree");
 
   // Sequence
   //
@@ -1646,6 +1805,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Sequence >
+  _xsd_Sequence_type_factory_init (
+    "Sequence",
+    "net.faulttree");
+
   // FDEP
   //
 
@@ -1723,6 +1888,12 @@ namespace faulttree
   ~FDEP ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, FDEP >
+  _xsd_FDEP_type_factory_init (
+    "FDEP",
+    "net.faulttree");
 
   // TransferIn
   //
@@ -1813,6 +1984,12 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, TransferIn >
+  _xsd_TransferIn_type_factory_init (
+    "TransferIn",
+    "net.faulttree");
+
   // UndevelopedEvent
   //
 
@@ -1850,12 +2027,26 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, UndevelopedEvent >
+  _xsd_UndevelopedEvent_type_factory_init (
+    "UndevelopedEvent",
+    "net.faulttree");
+
   // BasicEvent
   //
 
   BasicEvent::
   BasicEvent (const IdType& id,
               const ProbabilityType& probability)
+  : ::faulttree::ChildNode (id),
+    probability_ (probability, ::xml_schema::Flags (), this)
+  {
+  }
+
+  BasicEvent::
+  BasicEvent (const IdType& id,
+              ::std::auto_ptr< ProbabilityType >& probability)
   : ::faulttree::ChildNode (id),
     probability_ (probability, ::xml_schema::Flags (), this)
   {
@@ -1898,15 +2089,32 @@ namespace faulttree
 
       // probability
       //
-      if (n.name () == "probability" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< ProbabilityType > r (
-          ProbabilityTraits::create (i, f, this));
+        ::xsd::cxx::tree::type_factory_map< char >& tfm (
+          ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
 
-        if (!probability_.present ())
+        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+          tfm.create (
+            "probability",
+            "",
+            &::xsd::cxx::tree::factory_impl< ProbabilityType >,
+            false, false, i, n, f, this));
+
+        if (tmp.get () != 0)
         {
-          this->probability_.set (r);
-          continue;
+          if (!probability_.present ())
+          {
+            ::std::auto_ptr< ProbabilityType > r (
+              dynamic_cast< ProbabilityType* > (tmp.get ()));
+
+            if (r.get ())
+              tmp.release ();
+            else
+              throw ::xsd::cxx::tree::not_derived< char > ();
+
+            this->probability_.set (r);
+            continue;
+          }
         }
       }
 
@@ -1933,12 +2141,26 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, BasicEvent >
+  _xsd_BasicEvent_type_factory_init (
+    "BasicEvent",
+    "net.faulttree");
+
   // HouseEvent
   //
 
   HouseEvent::
   HouseEvent (const IdType& id,
               const ProbabilityType& probability)
+  : ::faulttree::BasicEvent (id,
+                             probability)
+  {
+  }
+
+  HouseEvent::
+  HouseEvent (const IdType& id,
+              ::std::auto_ptr< ProbabilityType >& probability)
   : ::faulttree::BasicEvent (id,
                              probability)
   {
@@ -1971,6 +2193,12 @@ namespace faulttree
   ~HouseEvent ()
   {
   }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, HouseEvent >
+  _xsd_HouseEvent_type_factory_init (
+    "HouseEvent",
+    "net.faulttree");
 }
 
 #include <istream>
@@ -2205,12 +2433,26 @@ namespace faulttree
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (e));
 
-    if (n.name () == "FaultTree" &&
-        n.namespace_ () == "net.faulttree")
+    ::xsd::cxx::tree::type_factory_map< char >& tfm (
+      ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
+
+    ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+      tfm.create (
+        "FaultTree",
+        "net.faulttree",
+        &::xsd::cxx::tree::factory_impl< ::faulttree::FaultTree >,
+        true, true, e, n, f, 0));
+
+    if (tmp.get () != 0)
     {
       ::std::auto_ptr< ::faulttree::FaultTree > r (
-        ::xsd::cxx::tree::traits< ::faulttree::FaultTree, char >::create (
-          e, f, 0));
+        dynamic_cast< ::faulttree::FaultTree* > (tmp.get ()));
+
+      if (r.get ())
+        tmp.release ();
+      else
+        throw ::xsd::cxx::tree::not_derived< char > ();
+
       return r;
     }
 
@@ -2243,12 +2485,27 @@ namespace faulttree
                        (c.get () ? &c : &d),
                        0);
 
-    if (n.name () == "FaultTree" &&
-        n.namespace_ () == "net.faulttree")
+    ::xsd::cxx::tree::type_factory_map< char >& tfm (
+      ::xsd::cxx::tree::type_factory_map_instance< 0, char > ());
+
+    ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+      tfm.create (
+        "FaultTree",
+        "net.faulttree",
+        &::xsd::cxx::tree::factory_impl< ::faulttree::FaultTree >,
+        true, true, e, n, f, 0));
+
+    if (tmp.get () != 0)
     {
+
       ::std::auto_ptr< ::faulttree::FaultTree > r (
-        ::xsd::cxx::tree::traits< ::faulttree::FaultTree, char >::create (
-          e, f, 0));
+        dynamic_cast< ::faulttree::FaultTree* > (tmp.get ()));
+
+      if (r.get ())
+        tmp.release ();
+      else
+        throw ::xsd::cxx::tree::not_derived< char > ();
+
       return r;
     }
 
@@ -2292,6 +2549,13 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Annotation >
+  _xsd_Annotation_type_serializer_init (
+    "Annotation",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const Probability& i)
   {
@@ -2309,6 +2573,13 @@ namespace faulttree
   {
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Probability >
+  _xsd_Probability_type_serializer_init (
+    "Probability",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const AnnotatedElement& i)
   {
@@ -2316,16 +2587,29 @@ namespace faulttree
 
     // annotations
     //
-    for (AnnotatedElement::AnnotationsConstIterator
-         b (i.annotations ().begin ()), n (i.annotations ().end ());
-         b != n; ++b)
     {
-      ::xercesc::DOMElement& s (
-        ::xsd::cxx::xml::dom::create_element (
-          "annotations",
-          e));
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      s << *b;
+      for (AnnotatedElement::AnnotationsConstIterator
+           b (i.annotations ().begin ()), n (i.annotations ().end ());
+           b != n; ++b)
+      {
+        if (typeid (AnnotatedElement::AnnotationsType) == typeid (*b))
+        {
+          ::xercesc::DOMElement& s (
+            ::xsd::cxx::xml::dom::create_element (
+              "annotations",
+              e));
+
+          s << *b;
+        }
+        else
+          tsm.serialize (
+            "annotations",
+            "",
+            false, false, e, *b);
+      }
     }
 
     // id
@@ -2352,11 +2636,25 @@ namespace faulttree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, AnnotatedElement >
+  _xsd_AnnotatedElement_type_serializer_init (
+    "AnnotatedElement",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const Model& i)
   {
     e << static_cast< const ::faulttree::AnnotatedElement& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Model >
+  _xsd_Model_type_serializer_init (
+    "Model",
+    "net.faulttree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const Node& i)
@@ -2365,16 +2663,29 @@ namespace faulttree
 
     // children
     //
-    for (Node::ChildrenConstIterator
-         b (i.children ().begin ()), n (i.children ().end ());
-         b != n; ++b)
     {
-      ::xercesc::DOMElement& s (
-        ::xsd::cxx::xml::dom::create_element (
-          "children",
-          e));
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      s << *b;
+      for (Node::ChildrenConstIterator
+           b (i.children ().begin ()), n (i.children ().end ());
+           b != n; ++b)
+      {
+        if (typeid (Node::ChildrenType) == typeid (*b))
+        {
+          ::xercesc::DOMElement& s (
+            ::xsd::cxx::xml::dom::create_element (
+              "children",
+              e));
+
+          s << *b;
+        }
+        else
+          tsm.serialize (
+            "children",
+            "",
+            false, false, e, *b);
+      }
     }
 
     // x
@@ -2402,11 +2713,25 @@ namespace faulttree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Node >
+  _xsd_Node_type_serializer_init (
+    "Node",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const ChildNode& i)
   {
     e << static_cast< const ::faulttree::Node& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, ChildNode >
+  _xsd_ChildNode_type_serializer_init (
+    "ChildNode",
+    "net.faulttree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const FaultTree& i)
@@ -2416,14 +2741,33 @@ namespace faulttree
     // topEvent
     //
     {
-      ::xercesc::DOMElement& s (
-        ::xsd::cxx::xml::dom::create_element (
-          "topEvent",
-          e));
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      s << i.topEvent ();
+      const FaultTree::TopEventType& x (i.topEvent ());
+      if (typeid (FaultTree::TopEventType) == typeid (x))
+      {
+        ::xercesc::DOMElement& s (
+          ::xsd::cxx::xml::dom::create_element (
+            "topEvent",
+            e));
+
+        s << x;
+      }
+      else
+        tsm.serialize (
+          "topEvent",
+          "",
+          false, false, e, x);
     }
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, FaultTree >
+  _xsd_FaultTree_type_serializer_init (
+    "FaultTree",
+    "net.faulttree");
+
 
   void
   faultTree (::std::ostream& o,
@@ -2543,18 +2887,31 @@ namespace faulttree
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (e));
 
-    if (n.name () == "FaultTree" &&
-        n.namespace_ () == "net.faulttree")
+    if (typeid (::faulttree::FaultTree) == typeid (s))
     {
-      e << s;
+      if (n.name () == "FaultTree" &&
+          n.namespace_ () == "net.faulttree")
+      {
+        e << s;
+      }
+      else
+      {
+        throw ::xsd::cxx::tree::unexpected_element < char > (
+          n.name (),
+          n.namespace_ (),
+          "FaultTree",
+          "net.faulttree");
+      }
     }
     else
     {
-      throw ::xsd::cxx::tree::unexpected_element < char > (
-        n.name (),
-        n.namespace_ (),
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
+
+      tsm.serialize (
         "FaultTree",
-        "net.faulttree");
+        "net.faulttree",
+        e, n, s);
     }
   }
 
@@ -2563,11 +2920,29 @@ namespace faulttree
              const ::xml_schema::NamespaceInfomap& m,
              ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
-      ::xsd::cxx::xml::dom::serialize< char > (
-        "FaultTree",
-        "net.faulttree",
-        m, f));
+    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d;
+
+    if (typeid (::faulttree::FaultTree) == typeid (s))
+    {
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > r (
+        ::xsd::cxx::xml::dom::serialize< char > (
+          "FaultTree",
+          "net.faulttree",
+          m, f));
+      d = r;
+    }
+    else
+    {
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
+
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > r (
+        tsm.serialize (
+          "FaultTree",
+          "net.faulttree",
+          m, s, f));
+      d = r;
+    }
 
     ::faulttree::faultTree (*d, s, f);
     return d;
@@ -2578,6 +2953,13 @@ namespace faulttree
   {
     e << static_cast< const ::faulttree::Node& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, TopEvent >
+  _xsd_TopEvent_type_serializer_init (
+    "TopEvent",
+    "net.faulttree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const CrispProbability& i)
@@ -2596,11 +2978,25 @@ namespace faulttree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, CrispProbability >
+  _xsd_CrispProbability_type_serializer_init (
+    "CrispProbability",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const Gate& i)
   {
     e << static_cast< const ::faulttree::ChildNode& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Gate >
+  _xsd_Gate_type_serializer_init (
+    "Gate",
+    "net.faulttree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const And& i)
@@ -2608,17 +3004,38 @@ namespace faulttree
     e << static_cast< const ::faulttree::Gate& > (i);
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, And >
+  _xsd_And_type_serializer_init (
+    "And",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const Or& i)
   {
     e << static_cast< const ::faulttree::Gate& > (i);
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Or >
+  _xsd_Or_type_serializer_init (
+    "Or",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const Xor& i)
   {
     e << static_cast< const ::faulttree::Gate& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Xor >
+  _xsd_Xor_type_serializer_init (
+    "Xor",
+    "net.faulttree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const VotingOr& i)
@@ -2637,11 +3054,25 @@ namespace faulttree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, VotingOr >
+  _xsd_VotingOr_type_serializer_init (
+    "VotingOr",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const DynamicGate& i)
   {
     e << static_cast< const ::faulttree::Gate& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, DynamicGate >
+  _xsd_DynamicGate_type_serializer_init (
+    "DynamicGate",
+    "net.faulttree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const Idlist& i)
@@ -2662,6 +3093,13 @@ namespace faulttree
     l << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::Int, char >& > (i);
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Idlist >
+  _xsd_Idlist_type_serializer_init (
+    "idlist",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const ColdSpare& i)
   {
@@ -2678,6 +3116,13 @@ namespace faulttree
       a << i.spareIds ();
     }
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, ColdSpare >
+  _xsd_ColdSpare_type_serializer_init (
+    "ColdSpare",
+    "net.faulttree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const PriorityAnd& i)
@@ -2696,6 +3141,13 @@ namespace faulttree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, PriorityAnd >
+  _xsd_PriorityAnd_type_serializer_init (
+    "PriorityAnd",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const Sequence& i)
   {
@@ -2713,6 +3165,13 @@ namespace faulttree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Sequence >
+  _xsd_Sequence_type_serializer_init (
+    "Sequence",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const FDEP& i)
   {
@@ -2729,6 +3188,13 @@ namespace faulttree
       a << i.triggeredEvents ();
     }
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, FDEP >
+  _xsd_FDEP_type_serializer_init (
+    "FDEP",
+    "net.faulttree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const TransferIn& i)
@@ -2758,11 +3224,25 @@ namespace faulttree
     }
   }
 
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, TransferIn >
+  _xsd_TransferIn_type_serializer_init (
+    "TransferIn",
+    "net.faulttree");
+
+
   void
   operator<< (::xercesc::DOMElement& e, const UndevelopedEvent& i)
   {
     e << static_cast< const ::faulttree::ChildNode& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, UndevelopedEvent >
+  _xsd_UndevelopedEvent_type_serializer_init (
+    "UndevelopedEvent",
+    "net.faulttree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const BasicEvent& i)
@@ -2772,20 +3252,45 @@ namespace faulttree
     // probability
     //
     {
-      ::xercesc::DOMElement& s (
-        ::xsd::cxx::xml::dom::create_element (
-          "probability",
-          e));
+      ::xsd::cxx::tree::type_serializer_map< char >& tsm (
+        ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      s << i.probability ();
+      const BasicEvent::ProbabilityType& x (i.probability ());
+      if (typeid (BasicEvent::ProbabilityType) == typeid (x))
+      {
+        ::xercesc::DOMElement& s (
+          ::xsd::cxx::xml::dom::create_element (
+            "probability",
+            e));
+
+        s << x;
+      }
+      else
+        tsm.serialize (
+          "probability",
+          "",
+          false, false, e, x);
     }
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, BasicEvent >
+  _xsd_BasicEvent_type_serializer_init (
+    "BasicEvent",
+    "net.faulttree");
+
 
   void
   operator<< (::xercesc::DOMElement& e, const HouseEvent& i)
   {
     e << static_cast< const ::faulttree::BasicEvent& > (i);
   }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, HouseEvent >
+  _xsd_HouseEvent_type_serializer_init (
+    "HouseEvent",
+    "net.faulttree");
 }
 
 #include <xsd/cxx/post.hxx>

@@ -1222,6 +1222,9 @@ namespace faulttree
     BasicEvent (const IdType&,
                 const ProbabilityType&);
 
+    BasicEvent (const IdType&,
+                ::std::auto_ptr< ProbabilityType >&);
+
     BasicEvent (const ::xercesc::DOMElement& e,
                 ::xml_schema::Flags f = 0,
                 ::xml_schema::Container* c = 0);
@@ -1255,6 +1258,9 @@ namespace faulttree
     //
     HouseEvent (const IdType&,
                 const ProbabilityType&);
+
+    HouseEvent (const IdType&,
+                ::std::auto_ptr< ProbabilityType >&);
 
     HouseEvent (const ::xercesc::DOMElement& e,
                 ::xml_schema::Flags f = 0,

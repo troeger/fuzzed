@@ -1,5 +1,4 @@
-﻿#include <xercesc/parsers/XercesDOMParser.hpp>
-#include "FuzzTreeTransform.h"
+﻿#include "FuzzTreeTransform.h"
 #include "FuzzTreeConfiguration.h"
 #include "Constants.h"
 #include "util.h"
@@ -16,9 +15,7 @@ std::vector<faulttree::FaultTree> FuzzTreeTransform::transformFuzzTree(const std
 	
 	try
 	{
-		FuzzTreeTransform transform(fuzzTreeXML, FUZZTREEXSD);
-		if (!transform.loadRootNode()) 
-			EXIT_ERROR("Could not load root node of fuzztree XML.");
+		FuzzTreeTransform transform(fuzzTreeXML);
 		
 		vector<FuzzTreeConfiguration> configs;
 		transform.generateConfigurations(configs);
@@ -27,6 +24,10 @@ std::vector<faulttree::FaultTree> FuzzTreeTransform::transformFuzzTree(const std
 		{
 			transform.generateFaultTree(instanceConfiguration);
 		}
+	}
+	catch (xsd::cxx::exception& e)
+	{
+		cout << "Parse Error: " << e.what() << endl;
 	}
 	catch (std::exception& e)
 	{
@@ -40,7 +41,7 @@ std::vector<faulttree::FaultTree> FuzzTreeTransform::transformFuzzTree(const std
 	return results;
 }
 
-FuzzTreeTransform::FuzzTreeTransform(const std::string& fuzzTreeXML, const std::string& schemaPath) :
+FuzzTreeTransform::FuzzTreeTransform(const std::string& fuzzTreeXML) :
 	m_count(0),
 	m_fuzzTree(fuzztree::fuzzTree(fuzzTreeXML.c_str()))
 {
