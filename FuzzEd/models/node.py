@@ -33,6 +33,23 @@ fuzztree_classes = {
     'transferIn':           xml_fuzztree.TransferIn
 }
 
+tree_node_image = {
+    'topEvent':             'top_event',
+    'basicEvent':           'basic_event',
+    'basicEventSet':        'basic_event_set',
+    'intermediateEvent':    'intermediate_event',
+    'intermediateEventSet': 'intermediate_event_set',
+    'houseEvent':           'house_event',
+    'undevelopedEvent':     'undeveloped_event',
+    'andGate':              'and_gate',
+    'orGate':               'or_gate',
+    'xorGate':              'xor_gate',
+    'votingOrGate':         'voting_or_gate',
+    'featureVariation':     'feature_variation',
+    'redundancyVariation':  'redundancy_variation',
+    'transferIn':           'transfer_in'
+}
+
 faulttree_classes = {
     'topEvent':             xml_faulttree.TopEvent,
     'basicEvent':           xml_faulttree.BasicEvent,
@@ -139,15 +156,25 @@ class Node(models.Model):
 
         raise ValueError('Node %s has unsupported kind' % self)
 
-    def to_tikz(self):
+
+    def to_tikz(self, x_offset=0, y_offset=0):
+        """
+        Serializes this node into a TiKZ representation.
+        A positive x offset shifts the resulting tree accordingly to the right.
+        Negative offsets are allowed.
+
+        Returns:
+         {str} the node in JSON representation
+        """
+        #TODO: Separate img node and mirror text node, so that the images in one line get aligned
         nodekind = self.kind.lower()
         # TODO: Determine mirror text by checking for the properties to be shown in notations.py
         name = self.get_property('name', '-')
         # Create Tikz snippet for tree node
-        result = "\\node [align=center] at (%u, -%u) (%u) {\includegraphics{%s}\\\\%s};\n"%(self.x, self.y, self.pk, "voting_or_gate.eps", name)
+        result = "\\node [align=center, text width=5em, inner sep=0em, outer sep=0em] at (%u, -%u) (%u) {\includegraphics{%s}\\\\%s};\n"%(self.x+x_offset, self.y+y_offset, self.pk, tree_node_image[self.kind]+".eps", name)
         # Create also linked nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
-            result += edge.target.to_tikz()
+            result += edge.target.to_tikz(x_offset, y_offset)
             result += "\draw (%u.south) -| (%u);\n"%(self.pk, edge.target.pk)
         return result
 

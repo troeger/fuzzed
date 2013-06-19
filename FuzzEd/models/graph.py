@@ -88,16 +88,23 @@ class Graph(models.Model):
         # Latex preambel
         result = """
 \\documentclass{article}
+\\usepackage[landscape, top=1in, bottom=1in, left=1in, right=1in]{geometry}
 \\usepackage{tikz}
 \\usetikzlibrary{positioning} 
 \\begin{document}
 \\begin{figure}
-\\begin{tikzpicture}[auto]
+\\begin{tikzpicture}[auto, trim left]
 """
+        # Find most left node and takes it's x coordinate as start offset
+        # This basically shifts the whole tree to the left border
+        minx = self.nodes.aggregate(min_x = models.Min('x'))['min_x']
         # Find root node and start from there
+        # Use the TOP node Y coordinate as starting point at the upper border
+        # Note: (0,0) is the upper left corder in TiKZ, but the lower left in the DB
         top_event = self.nodes.get(kind='topEvent')
-        result += top_event.to_tikz()
+        result += top_event.to_tikz(x_offset = -minx, y_offset = top_event.y)
         result += """
+\\path[draw=black] (current bounding box.north west) rectangle (current bounding box.south east);
 \\end{tikzpicture}
 \\end{figure}
 \\end{document}

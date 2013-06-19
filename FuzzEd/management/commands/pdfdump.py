@@ -19,7 +19,7 @@ class Command(BaseCommand):
         f.close()
         # Copy the neccessary image files for Latex compilation
         #TODO: This should be smarter
-        for root, dirs, files in os.walk('FuzzEd/static/img/faulttree'):
+        for root, dirs, files in os.walk('FuzzEd/static/img/fuzztree'):
             for f in files:
                 if f.endswith('.eps'):
                     print "Copying "+f
