@@ -215,13 +215,16 @@ define(['class', 'config'], function(Class, Config) {
          */
 
         /**
-         *  Method: show
+         *  Method: appendTo
          *      Adds this Entry to the container in the properties menu.
+         *
+         *  Parameters:
+         *      {jQuery Selector} on - The element this Entry should be appended to.
          *
          *  Returns:
          *      This Entry for chaining.
          */
-        show: function(on) {
+        appendTo: function(on) {
             on.append(this.container);
             this._setupCallbacks();
 
@@ -229,22 +232,51 @@ define(['class', 'config'], function(Class, Config) {
         },
 
         /**
-         *  Method: hide
+         *  Method: remove
          *      Removes this Entry to the container in the properties menu.
          *
          *  Returns:
          *      This Entry for chaining.
          */
-        hide: function() {
+        remove: function() {
             this.container.remove();
 
             return this;
         },
 
+        /**
+         *  Method: setReadonly
+         *      Set the readonly state of this menu entry. Readonly entries can not be edited but (in case of text
+         *      fields) be marked and copied from.
+         *
+         *  Parameters:
+         *      {boolean} readonly - The new readonly state to set for this entry.
+         *
+         *  Returns:
+         *      This Entry instance for chaining.
+         */
         setReadonly: function(readonly) {
             this.inputs
                 .attr('readonly', readonly ? 'readonly' : null)
                 .toggleClass('disabled', readonly);
+
+            return this;
+        },
+
+        /**
+         *  Method: setHidden
+         *      Set the hidden state of this menu entry. Hidden entries do not appear in the menu.
+         *
+         *  Parameters:
+         *      {boolean} hidden - The new hidden state to set for this entry.
+         *
+         *  Returns:
+         *      This Entry instance for chaining.
+         */
+        setHidden: function(hidden) {
+            this.container.toggle(!hidden);
+
+            return this;
         },
 
         /**
@@ -300,6 +332,7 @@ define(['class', 'config'], function(Class, Config) {
             this.container.find('.controls').prepend(this.inputs);
 
             this.setReadonly(this.property.readonly);
+            this.setHidden(this.property.hidden);
 
             return this;
         },
@@ -368,6 +401,10 @@ define(['class', 'config'], function(Class, Config) {
 
             jQuery(this.property).on(Config.Events.PROPERTY_READONLY_CHANGED, function(event, newReadonly) {
                 this.setReadonly(newReadonly);
+            }.bind(this));
+
+            jQuery(this.property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, newHidden) {
+                this.setHidden(newHidden);
             }.bind(this));
 
             return this;
@@ -523,6 +560,9 @@ define(['class', 'config'], function(Class, Config) {
             jQuery('<form class="form-inline">')
                 .append(this.inputs)
                 .appendTo(this.container.find('.controls'));
+
+            this.setReadonly(this.property.readonly);
+            this.setHidden(this.property.hidden);
 
             return this;
         },

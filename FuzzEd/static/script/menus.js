@@ -172,9 +172,10 @@ define(['config', 'class'], function(Config, Class) {
      * Class: PropertiesMenu
      */
     var PropertiesMenu = Menu.extend({
-        _displayOrder: undefined,
-        _form:         undefined,
-        _node:         undefined,
+        _displayedEntries: 0,
+        _displayOrder:     undefined,
+        _form:             undefined,
+        _node:             undefined,
 
         init: function(displayOrder) {
             this._super();
@@ -214,7 +215,7 @@ define(['config', 'class'], function(Config, Class) {
             if (!this._node) return this;
 
             _.each(this._node.properties, function(property) {
-                property.menuEntry.hide();
+                property.menuEntry.remove();
             }.bind(this));
 
             return this;
@@ -239,10 +240,19 @@ define(['config', 'class'], function(Config, Class) {
                 return this;
             }
 
+            this._displayedEntries = 0;
             _.each(this._displayOrder, function(propertyName) {
                 var property = this._node.properties[propertyName];
                 // has the node such a property? display it!
-                if (typeof property !== 'undefined') property.menuEntry.show(this._form);
+                if (typeof property !== 'undefined') {
+                    property.menuEntry.appendTo(this._form);
+                    this._displayedEntries += (property.hidden ? 0 : 1);
+
+                    jQuery(property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
+                        this._displayedEntries += hidden ? -1 : 1;
+                        this.container.toggle(this._displayedEntries > 0);
+                    }.bind(this));
+                }
             }.bind(this));
 
             // fix the left offset (jQueryUI bug with draggable menus and CSS right property)
@@ -250,7 +260,7 @@ define(['config', 'class'], function(Config, Class) {
                 var offset =  - this.container.outerWidth(true) - Config.Menus.PROPERTIES_MENU_OFFSET;
                 this.container.css('left', jQuery('body').outerWidth(true) + offset);
             }
-            this.container.show();
+            this.container.toggle(this._displayedEntries > 0);
 
             return this;
         }

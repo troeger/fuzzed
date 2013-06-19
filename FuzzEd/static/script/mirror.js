@@ -87,19 +87,13 @@ define(['config', 'canvas', 'class', 'underscore'], function(Config, Canvas, Cla
          *   This {Mirror} instance for chaining.
          */
         show: function(value) {
-            if (typeof value === 'undefined' || value === null) {
-                this.container.css('display', 'none');
-            } else {
-                if (!_.isArray(value)) value = [value];
-                // convert the array into an object, where the keys are the index of the array
-                // and the value are the values of the array at the corresponding index
-                var enumerated = _.object(_.map(_.range(value.length), function(num){return '$' + num;}), value);
+            if (!_.isArray(value)) value = [value];
+            // convert the array into an object, where the keys are the index of the array
+            // and the value are the values of the array at the corresponding index
+            var enumerated = _.object(_.map(_.range(value.length), function(num){return '$' + num;}), value);
+            this.container.text(_.template(this.format, enumerated));
 
-                // remove 'display: none' from element to show it again
-                // '.show()' won't work because this sets display to 'inline', but we need 'block'
-                this.container.css('display', '');
-                this.container.text(_.template(this.format, enumerated));
-            }
+            this.container.toggle(!(this.property.hidden || typeof value === 'undefined' || value === null));
 
             return this;
         },
@@ -107,6 +101,10 @@ define(['config', 'canvas', 'class', 'underscore'], function(Config, Canvas, Cla
         _setupEvents: function() {
             jQuery(this.property).on(Config.Events.PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 this.show(text);
+            }.bind(this));
+
+            jQuery(this.property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
+                this.container.toggle(!hidden);
             }.bind(this));
         }
     });
