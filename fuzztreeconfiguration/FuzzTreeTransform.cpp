@@ -26,7 +26,7 @@ std::vector<faulttree::FaultTree> FuzzTreeTransform::transformFuzzTree(const std
 
 		for (const auto& instanceConfiguration : configs)
 		{
-			transform.generateFaultTree(instanceConfiguration);
+			results.emplace_back(transform.generateFaultTree(instanceConfiguration));
 		}
 	}
 	catch (xsd::cxx::exception& e)
@@ -62,18 +62,28 @@ FuzzTreeTransform::~FuzzTreeTransform()
 bool FuzzTreeTransform::isGate(const fuzztree::Node& node)
 {
 	return
-		false; // TODO
+		dynamic_cast<const fuzztree::And*>(&node) ||
+		dynamic_cast<const fuzztree::Or*>(&node)  ||
+		dynamic_cast<const fuzztree::Xor*>(&node) ||
+		dynamic_cast<const fuzztree::VotingOr*>(&node);
 }
 
 bool FuzzTreeTransform::isLeaf(const fuzztree::Node& node)
 {
-	return 
-		false; // TODO
+	return
+		dynamic_cast<const fuzztree::BasicEvent*>(&node) ||
+		dynamic_cast<const fuzztree::HouseEvent*>(&node)  ||
+		dynamic_cast<const fuzztree::UndevelopedEvent*>(&node);
 }
 
 std::string FuzzTreeTransform::generateUniqueId(const char* oldId)
 {
 	return std::string(oldId) + "." + util::toString(++m_count);
+}
+
+int FuzzTreeTransform::generateUniqueId(int oldId)
+{
+	return oldId * 100 + (++m_count);
 }
 
 /************************************************************************/
@@ -205,7 +215,7 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 				}
 			}
 			else if (isLeaf(child))
-			{
+			{ // TODO find out if this is necessary, and about the performance of dynamic_cast
 				continue; // end recursion
 			}
 		}
@@ -217,9 +227,25 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 /* Generating fault trees from configurations                           */
 /************************************************************************/
 
-void FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configuration)
+faulttree::FaultTree FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configuration)
 {
+	const fuzztree::TopEvent topEvent = m_fuzzTree->topEvent();
+	const std::string name = "foo";// TODO topEvent.name();
+	const int id = topEvent.id();
 
+	faulttree::FaultTree faultTree();
+	faultTree.name() = name;
+	faultTree.id() = generateUniqueId(id);
+// 	faultTree.topEvent() = topEvent;
+// 
+// 	// TODO attributes
+// 	xml_node newTopEvent = faultTree.append_child(TOP_EVENT);
+// 	shallowCopy(topEvent, newTopEvent);
+// 
+// 	generateFaultTreeRecursive(topEvent, newTopEvent, configuration);
+// 	removeEmptyNodes(newTopEvent);
+
+	return faultTree;
 }
 
 void FuzzTreeTransform::generateFaultTreeRecursive(

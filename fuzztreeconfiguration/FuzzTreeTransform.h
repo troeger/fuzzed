@@ -28,7 +28,7 @@ public:
 	static std::vector<faulttree::FaultTree> transformFuzzTree(const std::string& fuzzTreeXML) noexcept;
 
 protected:
-	void generateFaultTree(const FuzzTreeConfiguration& configuration);
+	faulttree::FaultTree generateFaultTree(const FuzzTreeConfiguration& configuration);
 	void generateFaultTreeRecursive(
 		const fuzztree::Node* templateNode, /*Xerces*/
 		faulttree::Node* node, /*generated internal fault tree model*/
@@ -61,6 +61,7 @@ protected:
 	static inline bool isLeaf(const fuzztree::Node& typeDescriptor);
 
 	std::string generateUniqueId(const char* oldId);
+	int generateUniqueId(int oldId);
 
 private:
 	FuzzTreeTransform(const std::string& fuzzTreeXML);
