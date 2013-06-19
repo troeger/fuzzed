@@ -73,20 +73,18 @@ target_link_libraries(ftconfiguration ${Boost_LIBRARIES})
 set(XSD_TO_FAULTTREE_ARGS
   --include-with-brackets	#include with <> instead of ""
   --generate-polymorphic	#needed for xsi:type
-  --generate-inline       #simple functions are inlined
   --root-element "FaultTree"
   --type-naming ucc --function-naming lcc
-  --generate-serialization --namespace-map net.faulttree=ft 
+  --generate-serialization --namespace-map net.faulttree=faulttree
   --hxx-suffix .h --cxx-suffix .cpp
 )
 
 set(XSD_TO_FUZZTREE_ARGS
   --include-with-brackets	#include with <> instead of ""
   --generate-polymorphic	#needed for xsi:type
-  --generate-inline	      #simple functions are inlined
   --root-element "FuzzTree"
   --type-naming ucc --function-naming lcc
-  --generate-serialization --namespace-map net.fuzztree=ft 
+  --generate-serialization --namespace-map net.fuzztree=fuzztree 
   --hxx-suffix .h --cxx-suffix .cpp
 )
 
@@ -98,6 +96,9 @@ add_custom_target(generateFaultTreeModel
 
 add_custom_target(generateFuzzTreeModel
   DEPENDS ${FUZZTREE_XSD}
-  COMMAND ${XSD_EXECUTABLE} cxx-tree ${XSD_TO_FAULTTREE_ARGS} --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FUZZTREE_XSD}
+  COMMAND ${XSD_EXECUTABLE} cxx-tree ${XSD_TO_FUZZTREE_ARGS} --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FUZZTREE_XSD}
   COMMENT "Generating C++ / XML mapping files for FuzzTrees"
   VERBATIM)
+
+add_definitions(-DFUZZTREEXSD="${FUZZTREE_XSD}")
+add_definitions(-DFAULTTREEXSD="${FAULTTREE_XSD}")

@@ -17,7 +17,6 @@
 
 using namespace chrono;
 using namespace boost;
-using namespace pugi;
 
 std::string util::toString(const int& i)
 {
@@ -167,65 +166,4 @@ void util::clearDirectory(const string& dir)
 bool util::beginsWith(const string& subject, const string& prefix)
 {
 	return subject.substr(0, prefix.length()) == prefix;
-}
-
-
-bool util::parseBooleanValue(const xml_node& node, const string& type, const bool defaultValue)
-{
-	const xml_node valNode = node.child(type.c_str());
-	if (valNode.empty())
-		return defaultValue;
-
-	const xml_node child = valNode.child("value");
-	if (child.empty())
-		throw runtime_error("Value node not found");
-
-	return child.text().as_bool(defaultValue);
-}
-
-double util::parseDoubleValue(const xml_node& node, const string& type, const double defaultValue)
-{
-	const xml_node valNode = node.child(type.c_str());
-	if (valNode.empty())
-		return defaultValue;
-
-	const xml_node child = valNode.child("value");
-	if (child.empty())
-		throw runtime_error("Value node not found");
-
-	return child.text().as_double(defaultValue);
-}
-
-int util::parseIntegerValue(const xml_node& node, const string& type, const int defaultValue)
-{
-	xml_node valNode = node.child(type.c_str());
-	if (!valNode)
-		return defaultValue;
-
-	xml_node child = valNode.child("value");
-	if (!child)
-		throw runtime_error("Value node not found");
-
-	return child.text().as_int(defaultValue);
-}
-
-SimulationResult util::readResultFile(const std::string& fileName)
-{
-	using namespace simulation;
-	
-	SimulationResult res;
-	pugi::xml_document resultDoc;
-	if (!resultDoc.load_file(fileName.c_str()))
-		return res;
-	pugi::xml_node topNode = resultDoc.child(SIMULATION_RESULT);
-	if (topNode.empty())
-		return res;
-
-	res.reliability			= topNode.attribute(RELIABILITY).as_double(-1.0);
-	res.meanAvailability	= topNode.attribute(AVAILABILTIY).as_double(-1.0);
-	res.mttf				= topNode.attribute(MTTF).as_double(-1.0);
-	res.nRounds				= topNode.attribute(NROUNDS).as_uint(0);
-	res.nFailures			= topNode.attribute(NFAILURES).as_uint(0);
-
-	return res;
 }
