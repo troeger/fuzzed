@@ -39,6 +39,7 @@ include_directories(${XSD_INCLUDE_DIR})
 set(SOURCES
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
+   TreeHelpers.cpp
    util.cpp
    main.cpp
    faulttree.cpp
@@ -47,6 +48,7 @@ set(SOURCES
 set(HEADERS
    FuzzTreeTransform.h
    FuzzTreeConfiguration.h
+   TreeHelpers.h
    platform.h
    util.h
    faulttree.h
