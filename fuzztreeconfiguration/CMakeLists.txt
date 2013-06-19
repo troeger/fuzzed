@@ -41,13 +41,11 @@ include_directories(${XSD_INCLUDE_DIR})
 set(SOURCES
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
-   FaultTree.cpp
    util.cpp
 )
 set(HEADERS
    FuzzTreeTransform.h
    FuzzTreeConfiguration.h
-   FaultTree.h
    platform.h
    util.h
 )
@@ -57,7 +55,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdParty)
 
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
 
-set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faultTree.xsd")
+set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faulttree.xsd")
+set(FUZZTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/fuzztree.xsd")
 
 if (WIN32)
    add_library(ftconfiguration STATIC ${SOURCES} ${HEADERS})
@@ -71,33 +70,34 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(ftconfiguration ${Boost_LIBRARIES})
 
-# TODO: in order not to re-generate all the time we actually want something like this (not working -.-):
-# set(FAULTTREE_SRC "${CMAKE_CURRENT_SOURCE_DIR}/FaultTree.cpp")
-# set(FAULTTREE_H "${CMAKE_CURRENT_SOURCE_DIR}/FaultTree.h")
-# add_custom_command(
-#   OUTPUT ${FAULTTREE_SRC} ${FAULTTREE_H}
-#   DEPENDS ${FAULTTREE_XSD}
-#   COMMAND ${XSD_EXECUTABLE}
-#   ARGS cxx-tree --namespace-map net.faulttree=ft --hxx-suffix .h --cxx-suffix .cpp --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FAULTTREE_XSD}
-#   COMMENT "Generating C++ / XML mapping files"
-#   VERBATIM)
-
-set(XSD_ARGS
+set(XSD_TO_FAULTTREE_ARGS
   --include-with-brackets	#include with <> instead of ""
   --generate-polymorphic	#needed for xsi:type
-  --generate-inline			#simple functions are inlined
-  --root-element "FuzzTree"
+  --generate-inline       #simple functions are inlined
+  --root-element "FaultTree"
   --type-naming ucc --function-naming lcc
-  #--suppress-parsing 
   --generate-serialization --namespace-map net.faulttree=ft 
   --hxx-suffix .h --cxx-suffix .cpp
-
 )
 
-add_custom_command(
-  TARGET ftconfiguration
+set(XSD_TO_FUZZTREE_ARGS
+  --include-with-brackets	#include with <> instead of ""
+  --generate-polymorphic	#needed for xsi:type
+  --generate-inline	      #simple functions are inlined
+  --root-element "FuzzTree"
+  --type-naming ucc --function-naming lcc
+  --generate-serialization --namespace-map net.fuzztree=ft 
+  --hxx-suffix .h --cxx-suffix .cpp
+)
+
+add_custom_target(generateFaultTreeModel
   DEPENDS ${FAULTTREE_XSD}
-  COMMAND ${XSD_EXECUTABLE}
-  ARGS cxx-tree ${XSD_ARGS} --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FAULTTREE_XSD}
-  COMMENT "Generating C++ / XML mapping files"
+  COMMAND ${XSD_EXECUTABLE} cxx-tree ${XSD_TO_FAULTTREE_ARGS} --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FAULTTREE_XSD}
+  COMMENT "Generating C++ / XML mapping files for FaultTrees"
+  VERBATIM)
+
+add_custom_target(generateFuzzTreeModel
+  DEPENDS ${FUZZTREE_XSD}
+  COMMAND ${XSD_EXECUTABLE} cxx-tree ${XSD_TO_FAULTTREE_ARGS} --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FUZZTREE_XSD}
+  COMMENT "Generating C++ / XML mapping files for FuzzTrees"
   VERBATIM)
