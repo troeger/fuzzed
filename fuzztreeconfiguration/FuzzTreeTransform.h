@@ -19,7 +19,7 @@
 
 struct FuzzTreeConfiguration;
 
-namespace fuzztree = ft;
+//namespace fuzztree = ft;
 
 class FuzzTreeTransform
 {
@@ -69,9 +69,7 @@ private:
 	bool loadRootNode();
 
 	xercesc::DOMDocument* m_document;
-	std::unique_ptr<fuzztree::FuzzTree> m_fuzzTree;
-
-	xercesc::XercesDOMParser m_parser;
+	std::auto_ptr<fuzztree::FuzzTree> m_fuzzTree;
 
 	int m_count;
 };

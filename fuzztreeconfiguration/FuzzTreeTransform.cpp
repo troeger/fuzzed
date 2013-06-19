@@ -3,6 +3,8 @@
 #include "Constants.h"
 #include "util.h"
 
+#include <xsd/cxx/tree/elements.hxx>
+
 using namespace fuzzTree;
 using namespace faultTree;
 
@@ -42,9 +44,9 @@ std::vector<faulttree::FaultTree> FuzzTreeTransform::transformFuzzTree(const std
 }
 
 FuzzTreeTransform::FuzzTreeTransform(const std::string& fuzzTreeXML) :
-	m_count(0),
-	m_fuzzTree(fuzztree::fuzzTree(fuzzTreeXML.c_str()))
+	m_count(0)
 {
+	m_fuzzTree = fuzztree::fuzzTree(fuzzTreeXML.c_str(), xsd::cxx::tree::flags::dont_validate);
 	assert(m_fuzzTree.get());
 }
 
