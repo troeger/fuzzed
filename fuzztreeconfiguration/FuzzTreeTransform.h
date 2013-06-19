@@ -57,8 +57,8 @@ protected:
 		const fuzztree::Node* node, 
 		std::vector<FuzzTreeConfiguration>& configurations) const;
 
-	static inline bool isGate(const std::string& typeDescriptor);
-	static inline bool isLeaf(const std::string& typeDescriptor);
+	static inline bool isGate(const fuzztree::Node& node);
+	static inline bool isLeaf(const fuzztree::Node& typeDescriptor);
 
 	std::string generateUniqueId(const char* oldId);
 
@@ -66,9 +66,6 @@ private:
 	FuzzTreeTransform(const std::string& fuzzTreeXML);
 	~FuzzTreeTransform();
 
-	bool loadRootNode();
-
-	xercesc::DOMDocument* m_document;
 	std::auto_ptr<fuzztree::FuzzTree> m_fuzzTree;
 
 	int m_count;
