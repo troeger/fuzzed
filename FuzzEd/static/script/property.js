@@ -11,6 +11,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         displayName: '',
         mirror:      undefined,
         menuEntry:   undefined,
+        hidden:      false,
+        readonly:    false,
 
         init: function(node, definition) {
             jQuery.extend(this, definition);
@@ -31,7 +33,10 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         },
 
         setValue: function(newValue, issuer, propagate) {
-            if (_.isEqual(this.value, newValue)) return this;
+            if (_.isEqual(this.value, newValue) || this.readonly) {
+                return this;
+            }
+
             if (typeof propagate === 'undefined') propagate = true;
 
             var validationResult = {};
@@ -47,6 +52,22 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
                 properties[this.name] = newValue;
                 jQuery(document).trigger(Config.Events.PROPERTY_CHANGED, [this.node.id, properties]);
             }
+
+            return this;
+        },
+
+        setHidden: function(newHidden) {
+            this.hidden = newHidden;
+
+             jQuery(this).trigger(Config.Events.PROPERTY_HIDDEN_CHANGED, [newHidden]);
+
+            return this;
+        },
+
+        setReadonly: function(newReadonly) {
+            this.readonly = newReadonly;
+
+             jQuery(this).trigger(Config.Events.PROPERTY_READONLY_CHANGED, [newReadonly]);
 
             return this;
         },

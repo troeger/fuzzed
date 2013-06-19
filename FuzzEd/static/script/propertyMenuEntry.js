@@ -241,6 +241,12 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+        setReadonly: function(readonly) {
+            this.inputs
+                .attr('readonly', readonly ? 'readonly' : null)
+                .toggleClass('disabled', readonly);
+        },
+
         /**
          *  Method: warn
          *      Highlight the corresponding form elements (error state) and show a popup containing an error message.
@@ -292,6 +298,8 @@ define(['class', 'config'], function(Class, Config) {
             this._setupContainer()
                 ._setupInput();
             this.container.find('.controls').prepend(this.inputs);
+
+            this.setReadonly(this.property.readonly);
 
             return this;
         },
@@ -358,6 +366,10 @@ define(['class', 'config'], function(Class, Config) {
                 this._value(newValue);
             }.bind(this));
 
+            jQuery(this.property).on(Config.Events.PROPERTY_READONLY_CHANGED, function(event, newReadonly) {
+                this.setReadonly(newReadonly);
+            }.bind(this));
+
             return this;
         },
 
@@ -380,8 +392,15 @@ define(['class', 'config'], function(Class, Config) {
     var BoolEntry = Entry.extend({
         blurEvents: function() { return ['change']; },
 
+        setReadonly: function(readonly) {
+            this.inputs.attr('disabled', readonly ? 'disabled' : null);
+
+            return this._super(readonly);
+        },
+
         _setupInput: function() {
-            this.inputs = jQuery('<input type="checkbox">').attr('id', this.id);
+            this.inputs = jQuery('<input type="checkbox">')
+                .attr('id', this.id);
 
             return this;
         },
@@ -397,6 +416,12 @@ define(['class', 'config'], function(Class, Config) {
     var ChoiceEntry = Entry.extend({
         blurEvents: function() {
             return ['blur', 'change', 'remove'];
+        },
+
+        setReadonly: function(readonly) {
+            this.inputs.attr('disabled', readonly ? 'disabled' : null);
+
+            return this._super(readonly);
         },
 
         _setupInput: function() {
@@ -627,6 +652,12 @@ define(['class', 'config'], function(Class, Config) {
             }
 
             return this;
+        },
+
+        setReadonly: function(readonly) {
+            this.inputs.attr('disabled', readonly ? 'disabled' : null);
+
+            return this._super(readonly);
         },
 
         _setupInput: function() {
