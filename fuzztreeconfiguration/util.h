@@ -4,7 +4,6 @@
 #include <vector>
 #include <set>
 #include <algorithm>
-#include <pugixml.hpp>
 
 using namespace std;
 
@@ -79,12 +78,4 @@ namespace util
 	/* Maths                                                                */
 	/************************************************************************/
 	long double kOutOfN(long double rate, int k, int N);
-
-	/************************************************************************/
-	/* XML                                                                  */
-	/************************************************************************/
-
-	int		parseIntegerValue(const pugi::xml_node& node, const std::string& type, const int defaultValue);
-	double	parseDoubleValue(const pugi::xml_node& node, const std::string& type, const double defaultValue);
-	bool	parseBooleanValue(const pugi::xml_node& node, const std::string& type, const bool defaultValue);
 }
