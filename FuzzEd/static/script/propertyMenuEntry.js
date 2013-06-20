@@ -426,6 +426,10 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    /**
+     *  Class: BoolEntry
+     *      Simple checkbox entry that reflects a <Bool> <Property>.
+     */
     var BoolEntry = Entry.extend({
         blurEvents: function() { return ['change']; },
 
@@ -450,6 +454,10 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    /**
+     *  Class: ChoiceEntry
+     *      An Entry allowing to select a value from a list of values defined by a <Choice> <Property>.
+     */
     var ChoiceEntry = Entry.extend({
         blurEvents: function() {
             return ['blur', 'change', 'remove'];
@@ -476,6 +484,16 @@ define(['class', 'config'], function(Class, Config) {
             }.bind(this));
         },
 
+        /**
+         *  Method: _indexForValue
+         *      Reverse search of a index belonging to a given value.
+         *
+         *  Parameters:
+         *      {Object} value - The value of an entry.
+         *
+         *   Returns:
+         *      The index of the given value. Returns -1 in case it was not found.
+         */
         _indexForValue: function(value) {
             for (var i = this.property.values.length -1; i >= 0; i--) {
                 if (_.isEqual(this.property.values[i], value)) {
@@ -496,6 +514,12 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    /**
+     *  Class: CompoundEntry
+     *      A container entry containing multiple other Entries. This is the graphical equivalent to a <Compound>
+     *      <Property>. The active child Property can be chosen with radio buttons. The CompoundEntry ensures
+     *      the consistency of updates with the backend.
+     */
     var CompoundEntry = Entry.extend({
         blurEvents: function() {
             return ['click', 'remove'];
@@ -505,11 +529,9 @@ define(['class', 'config'], function(Class, Config) {
             this._super(on);
             _.each(this.property.parts, function(part, index) {
                 part.menuEntry.appendTo(this.container);
-
                 // child entries should not update on remove because only visible entries should be allowed
                 // to propagate their value which is ensured by the parent compound (on remove)
                 part.menuEntry.inputs.off('remove');
-
                 part.menuEntry.setHidden(this.property.value !== index);
             }.bind(this));
 
@@ -548,13 +570,30 @@ define(['class', 'config'], function(Class, Config) {
             jQuery(event.target).button('toggle');
         },
 
+        /**
+         *  Method: _showPartAtIndex
+         *      Make the child Entry with the given index visible and hide all others.
+         *
+         *  Parameters:
+         *      {Integer} index - The index of the child Entry that should be displayed.
+         *
+         *  Returns:
+         *      This Entry instance for chaining.
+         */
         _showPartAtIndex: function(index) {
             _.each(this.property.parts, function(part, iterIndex) {
                 part.setHidden(iterIndex !== index);
             });
+
+            return this;
         }
     });
 
+    /**
+     *  Class: NumericEntry
+     *      Input field for a <Numeric> <Property>. It ensures that only number-typed values are allowed and
+     *      provides convenience functions like stepping with spinners.
+     */
     var NumericEntry = Entry.extend({
         blurEvents: function() {
             return ['blur', 'change', 'remove'];
@@ -586,6 +625,10 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    /**
+     *  Class: RangeEntry
+     *      Entry for modifying values of a <Range> <Property> consisting of two numbers.
+     */
     var RangeEntry = Entry.extend({
         blurEvents: function() {
             return ['blur', 'change', 'remove'];
@@ -639,6 +682,19 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+        /**
+         *  Method: _setupMiniNumeric
+         *      Constructs and returns a number field with the given attributes.
+         *
+         *  Parameters:
+         *      {Number} min   - The minimum number that should be allowed.
+         *      {Number} max   - The maximum number that should be allowed.
+         *      {Number} step  - The step width the value should fit in.
+         *      {Number} value - The currently set value.
+         *
+         *  Returns:
+         *      A jQuery object containing the newly constructed number input.
+         */
         _setupMiniNumeric: function(min, max, step, value) {
             return jQuery('<input type="number" class="input-mini">')
                 .attr('min',  this.property.min)
@@ -665,6 +721,11 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    /**
+     *  Class: EpsilonEntry
+     *      Similar to <RangeEntry>, but the with different semantic: The second number specifies an epsilon range
+     *      around the first number.
+     */
     var EpsilonEntry = RangeEntry.extend({
 
         fix: function(event, ui) {
@@ -707,6 +768,10 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    /**
+     *  Class: TextEntry
+     *      Simple input field for a <Text> <Property>.
+     */
     var TextEntry = Entry.extend({
         changeEvents: function() {
             return ['keyup', 'cut', 'paste'];
@@ -729,6 +794,11 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    /**
+     *  TransferEntry
+     *      Allows to link to other entities in the database. Looks like a normal <ChoiceEntry>,
+     *      but actually fetches the available values from the backend using Ajax.
+     */
     var TransferEntry = Entry.extend({
         _progressIndicator: undefined,
         _openButton: undefined,
@@ -781,6 +851,14 @@ define(['class', 'config'], function(Class, Config) {
             return this._setupProgressIndicator();
         },
 
+        /**
+         *  Method: _setupOptions
+         *      Reconstructs the HTML option elements from the list of transfer graphs. It will also select
+         *      the currently active value or reset to default if the current value is no longer available.
+         *
+         *  Returns:
+         *      This Entry instance for chaining.
+         */
         _setupOptions: function() {
             // remove old values
             this.inputs.empty();
@@ -804,6 +882,8 @@ define(['class', 'config'], function(Class, Config) {
                 this.inputs.prepend(this._unlinked.attr('selected', 'selected'));
                 this.property.setValue(this.property.UNLINK_VALUE);
             }
+
+            return this;
         },
 
         _setupCallbacks: function() {
@@ -818,6 +898,13 @@ define(['class', 'config'], function(Class, Config) {
             return this._super();
         },
 
+        /**
+         *  Method: _setupProgressIndicator
+         *      Constructs the progress indicator that is displayed as long as the list is fetched with Ajax.
+         *
+         *  Returns:
+         *      This Entry instance for chaining.
+         */
         _setupProgressIndicator: function() {
             this._progressIndicator = jQuery('<div class="progress progress-striped active">\
                 <div class="bar" style="width: 100%;"></div>\
@@ -826,18 +913,36 @@ define(['class', 'config'], function(Class, Config) {
             return this;
         },
 
+        /**
+         *  Method: _refetchEntries
+         *      Triggers a refetch of the available list values from the backend and displays the progress indicator.
+         *
+         *  Returns:
+         *      This Entry instance for chaining.
+         */
         _refetchEntries: function() {
             this.property.fetchTransferGraphs();
             this._progressIndicator.css('display', '');
             this._openButton.css('display', 'none');
             this.inputs.css('display', 'none');
+
+            return this;
         },
 
+        /**
+         *  Method: _refreshEntries
+         *      Reconstructs the select list and hides the progress indicator.
+         *
+         *  Returns:
+         *      This Entry instance for chaining.
+         */
         _refreshEntries: function() {
             this._setupOptions();
             this._progressIndicator.css('display', 'none');
             this._openButton.css('display', '');
             this.inputs.css('display', '');
+
+            return this;
         },
 
         _value: function(newValue) {
