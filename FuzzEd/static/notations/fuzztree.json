@@ -95,7 +95,13 @@
                         "min": 0,
                         "max": 1,
                         "step": 0.0000000001,
-                        "epsilonStep": 0.0000000001
+                        "epsilonStep": 0.0000000001,
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}±{{$1}}"
+                        }
                     }, {
                         "kind": "choice",
                         "partName": "Fuzzy",
@@ -117,14 +123,14 @@
                             [0.66, 0.2],
                             [0.8,  0.1],
                             [1,    0]
-                        ]
-                    }],
+                        ],
 
-                    "mirror": {
-                        "position": "bottom",
-                        "style": ["italic"],
-                        "format": "p={{$0}}"
-                    }
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }]
                 },
 
                 "cost": {
