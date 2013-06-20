@@ -2,6 +2,7 @@
 #include "FuzzTreeConfiguration.h"
 #include "Constants.h"
 #include "ExpressionParser.h"
+#include "TreeHelpers.h"
 #include "util.h"
 
 #include <xsd/cxx/tree/elements.hxx>
@@ -230,22 +231,10 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 faulttree::FaultTree FuzzTreeTransform::generateFaultTree(const FuzzTreeConfiguration& configuration)
 {
 	const fuzztree::TopEvent topEvent = m_fuzzTree->topEvent();
-	const std::string name = "foo";// TODO topEvent.name();
-	const int id = topEvent.id();
+	auto newTopEvent = treeHelpers::copyTopEvent(topEvent);
 
-	faulttree::FaultTree faultTree();
-	faultTree.name() = name;
-	faultTree.id() = generateUniqueId(id);
-// 	faultTree.topEvent() = topEvent;
-// 
-// 	// TODO attributes
-// 	xml_node newTopEvent = faultTree.append_child(TOP_EVENT);
-// 	shallowCopy(topEvent, newTopEvent);
-// 
-// 	generateFaultTreeRecursive(topEvent, newTopEvent, configuration);
-// 	removeEmptyNodes(newTopEvent);
-
-	return faultTree;
+	generateFaultTreeRecursive(&topEvent, &newTopEvent, configuration);
+	return faulttree::FaultTree(generateUniqueId(topEvent.id()), newTopEvent);
 }
 
 void FuzzTreeTransform::generateFaultTreeRecursive(

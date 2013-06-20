@@ -3,8 +3,6 @@
 #pragma warning(push, 3) 
 #endif
 #include <boost/filesystem/path.hpp>
-#include <xercesc/dom/DOMDocument.hpp>
-#include <xercesc/parsers/XercesDOMParser.hpp>
 #include <string>
 #include <set>
 #if IS_WINDOWS 
@@ -18,8 +16,6 @@
 #include "fuzzTree.h"
 
 struct FuzzTreeConfiguration;
-
-//namespace fuzztree = ft;
 
 class FuzzTreeTransform
 {

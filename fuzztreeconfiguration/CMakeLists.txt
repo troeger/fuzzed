@@ -44,6 +44,7 @@ set(SOURCES
    main.cpp
    faulttree.cpp
    fuzztree.cpp
+   #fuzztree_custom.cpp # custom methods. not generated.
 )
 set(HEADERS
    FuzzTreeTransform.h
@@ -53,6 +54,7 @@ set(HEADERS
    util.h
    faulttree.h
    fuzztree.h
+   #fuzztree_custom.h # custom methods. not generated.
 )
 
 include_directories(${Boost_INCLUDE_DIRS})
@@ -80,8 +82,10 @@ set(XSD_TO_FAULTTREE_ARGS
   --generate-polymorphic	#needed for xsi:type
   --polymorphic-type-all
   --root-element "FaultTree"
-  --type-naming ucc --function-naming lcc
-  --generate-serialization --namespace-map net.faulttree=faulttree
+  --type-naming ucc
+  --function-naming lcc
+  --generate-serialization
+  --namespace-map net.faulttree=faulttree
   --hxx-suffix .h --cxx-suffix .cpp
 )
 
@@ -90,9 +94,17 @@ set(XSD_TO_FUZZTREE_ARGS
   --generate-polymorphic	#needed for xsi:type
   --polymorphic-type-all
   --root-element "FuzzTree"
-  --type-naming ucc --function-naming lcc
-  --generate-serialization --namespace-map net.fuzztree=fuzztree 
+  --type-naming ucc 
+  --function-naming lcc
+  --generate-serialization
+  --namespace-map net.fuzztree=fuzztree 
   --hxx-suffix .h --cxx-suffix .cpp
+  # the following options enable custom class implementations, but it seems easier to write helpers by hand
+  #--custom-type "Node=Node_impl<Node_base>/Node_base"
+  #--custom-type "VotingOr=VotingOr_impl<VotingOr_base>/VotingOr_base"
+  #--custom-type "BasicEvent=BasicEvent_impl<BasicEvent_base>/BasicEvent_base"
+  #--custom-type "BasicEventSet=BasicEventSet_impl<BasicEventSet_base>/BasicEventSet_base"
+  #--hxx-epilogue #include "fuzztree_custom.h"
 )
 
 add_custom_target(generateFaultTreeModel
