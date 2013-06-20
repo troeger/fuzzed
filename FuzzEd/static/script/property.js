@@ -6,13 +6,14 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
     };
 
     var Property = Class.extend({
-        node:        undefined,
-        value:       undefined,
-        displayName: '',
-        mirror:      undefined,
-        menuEntry:   undefined,
-        hidden:      false,
-        readonly:    false,
+        node:           undefined,
+        value:          undefined,
+        displayName:    '',
+        mirror:         undefined,
+        menuEntry:      undefined,
+        hidden:         false,
+        readonly:       false,
+        partInCompound: undefined,
 
         init: function(node, definition) {
             jQuery.extend(this, definition);
@@ -33,7 +34,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         },
 
         setValue: function(newValue, issuer, propagate) {
-            if (_.isEqual(this.value, newValue) || this.readonly) {
+            // we can't optimize for compound parts because their value does not always reflect the
+            // value stored in the backend
+            if ((typeof this.partInCompound === 'undefined' && _.isEqual(this.value, newValue)) || this.readonly) {
                 return this;
             }
 
@@ -49,7 +52,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
             if (propagate) {
                 var properties = {};
-                properties[this.name] = newValue;
+                // compound parts need another format for backend propagation
+                var value = typeof this.partInCompound === 'undefined' ? newValue : [this.partInCompound, newValue];
+                properties[this.name] = value;
                 jQuery(document).trigger(Config.Events.PROPERTY_CHANGED, [this.node.id, properties]);
             }
 
@@ -168,6 +173,24 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
     var Compound = Property.extend({
         parts: undefined,
 
+        menuEntryClass: function(){
+            return PropertyMenuEntry.CompoundEntry;
+        },
+
+        setHidden: function(newHidden) {
+            this._super();
+            this.parts[this.value].setHidden(newHidden);
+
+            return this;
+        },
+
+        setReadonly: function(newReadonly) {
+            this._super();
+            _.invoke(this.parts, 'setReadonly', newReadonly);
+
+            return this;
+        },
+
         setValue: function(newValue, propagate) {
             if (typeof propagate === 'undefined') propagate = true;
 
@@ -175,56 +198,59 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             if (!this.validate(newValue, validationResult)) {
                 throw '[VALUE ERROR] ' + validationResult;
             }
-            this.parts[newValue[0]].setValue(newValue[1], false);
-
+            // trigger a change in the newly selected part to propagate the new index (stored in the part)
+            // to the backend
+            this.parts[newValue].setValue(this.parts[newValue].value, propagate);
             this.value = newValue;
 
-            if (propagate) {
-                // TODO: backend
-            }
+            // also trigger change on this property (index changed)
+            this._triggerChange(newValue, this);
 
             return this;
         },
 
         validate: function(value, validationResult) {
-            if (!_.isArray(this.value) || this.value.length != 2) {
-                validationResult.message = '[TYPE ERROR] value must be a tuple';
+            if (!isNumber(value) || value % 1 !== 0) {
+                validationResult.message = '[VALUE ERROR] value must be an integer';
+                return false;
+            }
+            if (value < 0 || value > this.parts.length) {
+                validationResult.message = '[VALUE ERROR] value out of bounds';
                 return false;
             }
 
-            var selection = value[0];
-            var partValue = value[1];
-            if (!isNumber(selection)) {
-                validationResult.message = '[VALUE ERROR] selection must be a number';
-                return false;
-            }
-            if (selection >= 0 || selection < this.parts.length) {
-                validationResult.message = '[VALUE ERROR] selection must point to a part';
-                return false;
-            }
-
-            return this.parts[selection].validate(partValue, validationResult);
+            return true;
         },
 
         _sanitize: function() {
-            this.value = typeof this.value === 'undefined' ? this.default.slice(0) : this.value;
+            var value = typeof this.value === 'undefined' ? this.default : this.value;
+
+            if (!_.isArray(value) && value.length === 2) {
+                throw '[VALUE ERROR] value from backend must be a tuple';
+            }
+            this.value = value[0];
 
             if (!_.isArray(this.parts) || this.parts.length < 1) {
                 throw '[VALUE ERROR] there must be at least one part';
             }
-            if (isNumber(this.default[0]) && this.default[0] < 0 && this.default[0] >= this.parts.length) {
-                throw '[VALUE ERROR] selection must point to a part';
-            }
+            this._super();
 
-            return this._setupParts()._super();
+            return this._setupParts(value[1]);
         },
 
-        _setupParts: function() {
-            var newParts = [];
-            _.each(this.parts, function(part) {
-                newParts.push(from(this.node, part));
+        _setupParts: function(value) {
+            var parsedParts = new Array(this.parts.length);
+
+            this.parts = _.each(this.parts, function(part, index) {
+                var partDef = jQuery.extend({}, part, {
+                    name: this.name,
+                    partInCompound: index,
+                    value: index === this.value ? value : undefined
+                });
+                parsedParts[index] = from(this.node, partDef);
             }.bind(this));
-            this.parts = newParts;
+
+            this.parts = parsedParts;
 
             return this;
         }

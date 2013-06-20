@@ -496,6 +496,60 @@ define(['class', 'config'], function(Class, Config) {
         }
     });
 
+    var CompoundEntry = Entry.extend({
+        blurEvents: function() {
+            return ['click', 'remove'];
+        },
+
+        appendTo: function(on) {
+            this._super(on);
+            _.each(this.property.parts, function(part, index) {
+                part.menuEntry.appendTo(this.container);
+                part.menuEntry.setHidden(this.property.value !== index);
+            }.bind(this));
+
+            return this;
+        },
+
+        setReadonly: function(readonly) {
+            this.inputs.attr('disabled', readonly ? 'disabled' : null);
+
+            return this._super(readonly);
+        },
+
+        _setupInput: function() {
+            this.inputs = jQuery('<div class="btn-group" data-toggle="buttons-radio">');
+
+            _.each(this.property.parts, function(part, index) {
+                var button = jQuery('<button type="button" class="btn">');
+                button.text(part.partName);
+                button.toggleClass('active', index === this.property.value);
+                this.inputs.append(button);
+            }.bind(this));
+        },
+
+        _value: function(newValue) {
+            if (typeof newValue === 'undefined') {
+                return this.inputs.find('.active').index();
+            }
+
+            this.inputs.find('.btn:nth-child(' + (newValue + 1) + ')').button('toggle');
+            this._showPartAtIndex(newValue);
+        },
+
+        fix: function(event, ui) {
+            // we try to read the button state before bootstraps event handling is finished, so we
+            // force bootstrap to manually toggle the button state before we read it
+            jQuery(event.target).button('toggle');
+        },
+
+        _showPartAtIndex: function(index) {
+            _.each(this.property.parts, function(part, iterIndex) {
+                part.setHidden(iterIndex !== index);
+            });
+        }
+    });
+
     var NumericEntry = Entry.extend({
         blurEvents: function() {
             return ['blur', 'change', 'remove'];
@@ -795,6 +849,7 @@ define(['class', 'config'], function(Class, Config) {
     return {
         'BoolEntry':     BoolEntry,
         'ChoiceEntry':   ChoiceEntry,
+        'CompoundEntry': CompoundEntry,
         'EpsilonEntry':  EpsilonEntry,
         'NumericEntry':  NumericEntry,
         'RangeEntry':    RangeEntry,

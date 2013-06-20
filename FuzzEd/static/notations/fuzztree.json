@@ -90,6 +90,7 @@
 
                     "parts": [{
                         "kind": "epsilon",
+                        "partName": "Exact",
                         "default": [0.5, 0],
                         "min": 0,
                         "max": 1,
@@ -97,6 +98,7 @@
                         "epsilonStep": 0.0000000001
                     }, {
                         "kind": "choice",
+                        "partName": "Fuzzy",
                         "default": [0.5, 0.3],
                         "choices": [
                             "never",
