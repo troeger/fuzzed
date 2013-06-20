@@ -171,12 +171,13 @@ class Node(models.Model):
         # TODO: Determine mirror text by checking for the properties to be shown in notations.py
         name = self.get_property('name', '-')
         # Create Tikz snippet for tree node
+        result = "\\node [inner sep=0em, outer sep=0em] at (%u, -%u) (%u) {\includegraphics{%s}};\n"%(self.x+x_offset, self.y+y_offset, self.pk, tree_node_image[self.kind]+".eps")
         # Text width is exactly the double width of the icons
-        result = "\\node [align=center, text width=56.210pt, inner sep=0em, outer sep=0em] at (%u, -%u) (%u) {\includegraphics{%s}\\\\%s};\n"%(self.x+x_offset, self.y+y_offset, self.pk, tree_node_image[self.kind]+".eps", name)
+        result += "\\node [text width=56.210pt, below, align=center] at (%u.south) (text%u) {\\footnotesize %s};\n"%(self.pk, self.pk, name)
         # Create also linked nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             result += edge.target.to_tikz(x_offset, y_offset)
-            result += "\draw (%u.south) -| (%u);\n"%(self.pk, edge.target.pk)
+            result += "\draw (text%u.south) -| (%u.north);\n"%(self.pk, edge.target.pk)
         return result
 
     def to_xml(self, xmltype=None):

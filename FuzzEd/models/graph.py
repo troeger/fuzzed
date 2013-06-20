@@ -104,7 +104,6 @@ class Graph(models.Model):
         top_event = self.nodes.get(kind='topEvent')
         result += top_event.to_tikz(x_offset = -minx, y_offset = top_event.y)
         result += """
-\\path[draw=black] (current bounding box.north west) rectangle (current bounding box.south east);
 \\end{tikzpicture}
 \\end{figure}
 \\end{document}
