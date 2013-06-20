@@ -505,6 +505,11 @@ define(['class', 'config'], function(Class, Config) {
             this._super(on);
             _.each(this.property.parts, function(part, index) {
                 part.menuEntry.appendTo(this.container);
+
+                // child entries should not update on remove because only visible entries should be allowed
+                // to propagate their value which is ensured by the parent compound (on remove)
+                part.menuEntry.inputs.off('remove');
+
                 part.menuEntry.setHidden(this.property.value !== index);
             }.bind(this));
 
