@@ -244,7 +244,7 @@ define(['config', 'class'], function(Config, Class) {
             _.each(this._displayOrder, function(propertyName) {
                 var property = this._node.properties[propertyName];
                 // has the node such a property? display it!
-                if (typeof property !== 'undefined') {
+                if (typeof property !== 'undefined' && property !== null) {
                     property.menuEntry.appendTo(this._form);
                     this._displayedEntries += (property.hidden ? 0 : 1);
 
