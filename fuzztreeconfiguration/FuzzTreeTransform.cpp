@@ -261,8 +261,8 @@ faulttree::FaultTree FuzzTreeTransform::generateFaultTree(const FuzzTreeConfigur
 }
 
 void FuzzTreeTransform::generateFaultTreeRecursive(
-	const fuzztree::Node* templateNode, /*Xerces*/ 
-	faulttree::Node* node, /*generated internal fault tree model*/ 
+	const fuzztree::Node* templateNode,
+	faulttree::Node* node,
 	const FuzzTreeConfiguration& configuration) const
 {
 	for (const auto& currentChild : templateNode->children())
@@ -280,13 +280,13 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		
 		const bool bLeaf = isLeaf(currentChild);
 
-		faulttree::ChildNode newNode(0);
+		faulttree::ChildNode newNode = faulttree::ChildNode(0);
 
 		const fuzztree::RedundancyVariationPoint* redundancyNode = 
 			dynamic_cast<const fuzztree::RedundancyVariationPoint*>(&currentChild);
 		if (redundancyNode)
 		{
-			auto result = handleRedundancyVP(
+			const auto result = handleRedundancyVP(
 				redundancyNode, 
 				dynamic_cast<faulttree::ChildNode*>(node), 
 				configuration.getRedundancyCount(id), 
@@ -304,7 +304,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 				dynamic_cast<const fuzztree::FeatureVariationPoint*>(&currentChild);
 			if (featureNode)
 			{
-				auto result = handleFeatureVP(
+				const auto result = handleFeatureVP(
 					featureNode, 
 					dynamic_cast<faulttree::ChildNode*>(node),
 					configuration, 
@@ -347,7 +347,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		if (bLeaf)
 			continue;
 
-		generateFaultTreeRecursive(&currentChild, &newNode, configuration);
+		generateFaultTreeRecursive(&currentChild, &node->children().back(), configuration);
 	}
 }
 
@@ -428,7 +428,8 @@ std::pair<faulttree::ChildNode, bool /*isLeaf*/> FuzzTreeTransform::handleRedund
 	faulttree::ChildNode* node,
 	const tuple<int,int> kOutOfN, const int& id) const
 {
-	if (isDummy(*node));// TODO
+	if (isDummy(*node))
+		;// TODO
 	
 	const fuzztree::BasicEventSet* basicEventSet = 
 		dynamic_cast<const fuzztree::BasicEventSet*>(&templateNode->children().front());
