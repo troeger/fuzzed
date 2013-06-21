@@ -89,6 +89,12 @@ namespace faulttree
     this->id_.set (x);
   }
 
+  void AnnotatedElement::
+  id (::std::auto_ptr< IdType > x)
+  {
+    this->id_.set (x);
+  }
+
   const AnnotatedElement::NameOptional& AnnotatedElement::
   name () const
   {
@@ -733,7 +739,10 @@ namespace faulttree
 
       if (n.name () == "id" && n.namespace_ ().empty ())
       {
-        this->id_.set (IdTraits::create (i, f, this));
+        ::std::auto_ptr< IdType > r (
+          IdTraits::create (i, f, this));
+
+        this->id_.set (r);
         continue;
       }
 

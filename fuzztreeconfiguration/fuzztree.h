@@ -321,7 +321,7 @@ namespace fuzztree
 
     // id
     // 
-    typedef ::xml_schema::Int IdType;
+    typedef ::xml_schema::String IdType;
     typedef ::xsd::cxx::tree::traits< IdType, char > IdTraits;
 
     const IdType&
@@ -332,6 +332,9 @@ namespace fuzztree
 
     void
     id (const IdType& x);
+
+    void
+    id (::std::auto_ptr< IdType > p);
 
     // name
     // 
