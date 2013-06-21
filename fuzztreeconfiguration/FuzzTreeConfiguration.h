@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <map>
 #include <set>
 #include <tuple>
@@ -8,24 +9,26 @@
 struct FuzzTreeConfiguration
 {
 public:
+	typedef std::string id_type;
+
 	FuzzTreeConfiguration();
 	virtual ~FuzzTreeConfiguration();
 
-	void setNodeOptional(int ID, bool optional);
-	void setRedundancyNumber(int ID, int n, int outOfM);
-	void setFeatureNumber(int ID, int configuredChild);
+	void setNodeOptional(const id_type& ID, bool optional);
+	void setRedundancyNumber(const id_type& ID, int k, int outOfN);
+	void setFeatureNumber(const id_type& ID, const id_type& configuredChild);
 
-	void setNotIncluded(int ID);
+	void setNotIncluded(const id_type& ID);
 
-	const bool& isOptionalEnabled(int ID)	const { return m_optionalNodes.at(ID); }
-	const bool isIncluded(int ID)			const { return m_notIncluded.find(ID) == m_notIncluded.end(); }
+	const bool& isOptionalEnabled(const id_type& ID)	const { return m_optionalNodes.at(ID); }
+	const bool isIncluded(const id_type& ID)			const { return m_notIncluded.find(ID) == m_notIncluded.end(); }
 	
-	const std::tuple<int,int>& getRedundancyCount(int ID) const { return m_redundancyNodes.at(ID); }
-	const int& getFeaturedChild(int ID)	const { return m_featureNodes.at(ID); }
+	const std::tuple<int,int>& getRedundancyCount(const id_type& ID)const { return m_redundancyNodes.at(ID); }
+	const id_type& getFeaturedChild(const id_type& ID)				const { return m_featureNodes.at(ID); }
 
 protected:
-	std::set<int> m_notIncluded;
-	std::map<int /*ID*/, bool /*enabled*/>						m_optionalNodes;
-	std::map<int /*ID*/, std::tuple<int,int> /*n out of m*/>	m_redundancyNodes;
-	std::map<int /*ID*/, int /*ID of enabled child*/>			m_featureNodes;
+	std::set<id_type>										m_notIncluded;
+	std::map<id_type, bool /*enabled*/>						m_optionalNodes;
+	std::map<id_type, std::tuple<int,int> /*n out of m*/>	m_redundancyNodes;
+	std::map<id_type, id_type>								m_featureNodes;
 };

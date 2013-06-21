@@ -8,22 +8,22 @@ FuzzTreeConfiguration::FuzzTreeConfiguration()
 FuzzTreeConfiguration::~FuzzTreeConfiguration()
 {} // nothing
 
-void FuzzTreeConfiguration::setNodeOptional(int ID, bool optional)
+void FuzzTreeConfiguration::setNodeOptional(const id_type& ID, bool optional)
 {
 	m_optionalNodes[ID] = optional;
 }
 
-void FuzzTreeConfiguration::setRedundancyNumber(int ID, int n, int outOfM)
+void FuzzTreeConfiguration::setRedundancyNumber(const id_type& ID, int k, int outOfN)
 {
-	m_redundancyNodes[ID] = std::make_tuple(n, outOfM);
+	m_redundancyNodes[ID] = std::make_tuple(k, outOfN);
 }
 
-void FuzzTreeConfiguration::setFeatureNumber(int ID, int configuredChild)
+void FuzzTreeConfiguration::setFeatureNumber(const id_type& ID, const id_type& configuredChild)
 {
 	m_featureNodes[ID] = configuredChild;
 }
 
-void FuzzTreeConfiguration::setNotIncluded(int ID)
+void FuzzTreeConfiguration::setNotIncluded(const id_type& ID)
 {
 	m_notIncluded.insert(ID);
 }

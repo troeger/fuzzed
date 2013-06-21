@@ -109,11 +109,6 @@ std::string FuzzTreeTransform::generateUniqueId(const std::string& oldId)
 	return oldId + "." + util::toString(++m_count);
 }
 
-int FuzzTreeTransform::generateUniqueId(int oldId)
-{
-	return (oldId * 100 + (++m_count));
-}
-
 /************************************************************************/
 /* Generating all possible configurations initially                     */
 /************************************************************************/
@@ -130,9 +125,8 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 	using namespace fuzztree;
 	for (const auto& child : node->children())
 	{
-		const int id = child.id();
-		if (id < 0) continue;
-
+		const std::string id = child.id();
+		
 		if (isOptional(child))
 		{ // inclusion variation point. Generate n + n configurations.
 			vector<FuzzTreeConfiguration> additional;
@@ -199,9 +193,8 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 		{
 			const FeatureVariationPoint* featureNode = dynamic_cast<const FeatureVariationPoint*>(&child);
 			if (featureNode)
-			{
-				// exactly one subtree. Generate N * #Features configurations.
-				vector<int> childIds;
+			{ // exactly one subtree. Generate N * #Features configurations.
+				vector<FuzzTreeConfiguration::id_type> childIds;
 				for (const auto& featuredChild : featureNode->children())
 					childIds.emplace_back(featuredChild.id());
 
@@ -216,15 +209,14 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 				{
 					if (config.isIncluded(id))
 					{
-						for (const int& i : childIds)
+						for (const auto& i : childIds)
 						{
 							FuzzTreeConfiguration copied = config;
 							copied.setFeatureNumber(id, i);
-							for (const int& other : childIds)
-							{
-								if (other != i)
+							for (const auto& other : childIds)
+								if (other != i) 
 									copied.setNotIncluded(other);
-							}
+							
 							newConfigs.emplace_back(copied);
 						}
 					}
@@ -267,17 +259,15 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 {
 	for (const auto& currentChild : templateNode->children())
 	{
-		const int id = currentChild.id();
+		const auto id = currentChild.id();
 		
 		const fuzztree::InclusionVariationPoint* inclusionNode = 
 			dynamic_cast<const fuzztree::InclusionVariationPoint*>(&currentChild);
 		const bool opt = (inclusionNode != nullptr) && inclusionNode->optional();
 
-		if (id < 0 || !configuration.isIncluded(id) || (opt && !configuration.isOptionalEnabled(id)))
-		{
+		if (!configuration.isIncluded(id) || (opt && !configuration.isOptionalEnabled(id)))
 			continue; // do not add this node
-		}
-		
+
 		const bool bLeaf = isLeaf(currentChild);
 		bool bChanged = false;
 
@@ -334,8 +324,7 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		}		
 
 		// break recursion
-		if (bLeaf)
-			continue;
+		if (bLeaf) continue;
 
 		generateFaultTreeRecursive(&currentChild, bChanged ? &node->children().back() : node, configuration);
 	}
@@ -344,7 +333,8 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 void FuzzTreeTransform::expandBasicEventSet(
 	const fuzztree::Node* templateNode,
 	faulttree::Node* parentNode, 
-	const int& id, const int& defaultQuantity /*= 0*/) const
+	const FuzzTreeConfiguration::id_type& id,
+	const int& defaultQuantity /*= 0*/) const
 {
 	assert(parentNode && templateNode);
 
@@ -366,8 +356,8 @@ void FuzzTreeTransform::expandBasicEventSet(
 	int i = 0;
 	while (i < numChildren)
 	{
-		const int id = eventSet->id(); // TODO get a unique id here
-		faulttree::BasicEvent basicEvent(id, probability);
+		const auto id = eventSet->id();
+		faulttree::BasicEvent basicEvent(id + util::toString(i), probability);
 		parentNode->children().push_back(basicEvent);
 		i++;
 	}
@@ -376,7 +366,8 @@ void FuzzTreeTransform::expandBasicEventSet(
 bool FuzzTreeTransform::handleFeatureVP(
 	const fuzztree::ChildNode* templateNode,
 	faulttree::Node* node,
-	const FuzzTreeConfiguration& configuration, const int configuredChildId) const
+	const FuzzTreeConfiguration& configuration,
+	const FuzzTreeConfiguration::id_type& configuredChildId) const
 {
 	assert(node && templateNode);
 	// find the configured child
@@ -418,11 +409,11 @@ bool FuzzTreeTransform::handleFeatureVP(
 	return false;
 }
 
-
 bool FuzzTreeTransform::handleRedundancyVP(
 	const fuzztree::ChildNode* templateNode,
 	faulttree::Node* node,
-	const tuple<int,int> kOutOfN, const int& id) const
+	const tuple<int,int> kOutOfN,
+	const FuzzTreeConfiguration::id_type& id) const
 {
 	assert(node && templateNode);
 

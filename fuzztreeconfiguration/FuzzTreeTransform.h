@@ -10,14 +10,11 @@
 #endif
 
 #include "platform.h"
-#include "TreeHelpers.h"
+#include "FuzzTreeConfiguration.h"
 
 // generated model files
 #include "faultTree.h"
 #include "fuzzTree.h"
-
-struct FuzzTreeConfiguration;
-
 
 class FuzzTreeTransform
 {
@@ -28,27 +25,29 @@ public:
 protected:
 	faulttree::FaultTree generateFaultTree(const FuzzTreeConfiguration& configuration);
 	void generateFaultTreeRecursive(
-		const fuzztree::Node* templateNode, /*Xerces*/
-		faulttree::Node* node, /*generated internal fault tree model*/
+		const fuzztree::Node* templateNode,
+		faulttree::Node* node,
 		const FuzzTreeConfiguration& configuration) const;
 
 	// add the configured VotingOR gate, return true if leaf was reached
 	bool handleRedundancyVP(
 		const fuzztree::ChildNode* templateNode,
 		faulttree::Node* node,
-		const std::tuple<int,int> configuredN, const int& id) const;
+		const std::tuple<int,int> configuredN,
+		const FuzzTreeConfiguration::id_type& id) const;
 
 	// add the configured child gate, return true if leaf was reached
 	bool handleFeatureVP(
 		const fuzztree::ChildNode* templateNode,
 		faulttree::Node* node,
 		const FuzzTreeConfiguration& configuration,
-		const int configuredChildId) const;
+		const FuzzTreeConfiguration::id_type& configuredChildId) const;
 
 	void expandBasicEventSet(
 		const fuzztree::Node* templateNode, /*Xerces*/
 		faulttree::Node* parentNode, /*generated internal fault tree model*/ 
-		const int& id, const int& defaultQuantity = 0) const;
+		const FuzzTreeConfiguration::id_type& id,
+		const int& defaultQuantity = 0) const;
 	
 	void generateConfigurations(std::vector<FuzzTreeConfiguration>& configurations) const;
 	void generateConfigurationsRecursive(
@@ -62,8 +61,7 @@ protected:
 	static bool isDummy(const faulttree::Node& node);
 
 	std::string generateUniqueId(const std::string& oldId);
-	int generateUniqueId(int oldId);
-
+	
 private:
 	FuzzTreeTransform(const std::string& fuzzTreeXML);
 	~FuzzTreeTransform();
