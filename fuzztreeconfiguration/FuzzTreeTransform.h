@@ -10,12 +10,14 @@
 #endif
 
 #include "platform.h"
+#include "TreeHelpers.h"
 
 // generated model files
 #include "faultTree.h"
 #include "fuzzTree.h"
 
 struct FuzzTreeConfiguration;
+
 
 class FuzzTreeTransform
 {
@@ -30,16 +32,16 @@ protected:
 		faulttree::Node* node, /*generated internal fault tree model*/
 		const FuzzTreeConfiguration& configuration) const;
 
-	// returns the configured VotingOR gate
-	std::pair<faulttree::ChildNode, bool /*isLeaf*/> handleRedundancyVP(
+	// add the configured VotingOR gate, return true if leaf was reached
+	bool handleRedundancyVP(
 		const fuzztree::ChildNode* templateNode,
-		faulttree::ChildNode* node,
+		faulttree::Node* node,
 		const std::tuple<int,int> configuredN, const int& id) const;
 
-	// returns the configured child gate
-	 std::pair<faulttree::ChildNode, bool /*isLeaf*/> handleFeatureVP(
+	// add the configured child gate, return true if leaf was reached
+	bool handleFeatureVP(
 		const fuzztree::ChildNode* templateNode,
-		faulttree::ChildNode* node,
+		faulttree::Node* node,
 		const FuzzTreeConfiguration& configuration,
 		const int configuredChildId) const;
 
