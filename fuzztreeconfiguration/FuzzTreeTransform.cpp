@@ -14,9 +14,10 @@ using namespace faultTree;
 using xercesc::DOMNode;
 using xercesc::DOMDocument;
 
-class Dummy : public faulttree::Node
+class Dummy : public faulttree::ChildNode
 {
-	//
+public:
+	Dummy() : faulttree::ChildNode(0) {}
 };
 
 std::vector<faulttree::FaultTree> FuzzTreeTransform::transformFuzzTree(const std::string& fuzzTreeXML)
@@ -30,9 +31,17 @@ std::vector<faulttree::FaultTree> FuzzTreeTransform::transformFuzzTree(const std
 		vector<FuzzTreeConfiguration> configs;
 		transform.generateConfigurations(configs);
 
+		int indent = 0;
+		treeHelpers::printTree(transform.m_fuzzTree->topEvent(), indent);
+		cout << endl << " ...... configurations: ...... " << endl;
+
 		for (const auto& instanceConfiguration : configs)
 		{
-			results.emplace_back(transform.generateFaultTree(instanceConfiguration));
+			auto faultTree = transform.generateFaultTree(instanceConfiguration);	
+			indent = 0;
+			treeHelpers::printTree(faultTree.topEvent(), indent);
+			cout << endl;
+			results.emplace_back(faultTree);
 		}
 	}
 	catch (xsd::cxx::exception& e)
@@ -65,6 +74,11 @@ FuzzTreeTransform::~FuzzTreeTransform()
 /* Utility methods                                                      */
 /************************************************************************/
 
+bool FuzzTreeTransform::isDummy(const faulttree::Node& node)
+{
+	return dynamic_cast<const faulttree::Node*>(&node);
+}
+
 bool FuzzTreeTransform::isGate(const fuzztree::Node& node)
 {
 	return
@@ -82,14 +96,22 @@ bool FuzzTreeTransform::isLeaf(const fuzztree::Node& node)
 		dynamic_cast<const fuzztree::UndevelopedEvent*>(&node);
 }
 
-std::string FuzzTreeTransform::generateUniqueId(const char* oldId)
+bool FuzzTreeTransform::isOptional(const fuzztree::Node& node)
 {
-	return std::string(oldId) + "." + util::toString(++m_count);
+	const fuzztree::InclusionVariationPoint* inclusionNode =
+		dynamic_cast<const fuzztree::InclusionVariationPoint*>(&node);
+	return inclusionNode && inclusionNode->optional();
+}
+
+
+std::string FuzzTreeTransform::generateUniqueId(const std::string& oldId)
+{
+	return oldId + "." + util::toString(++m_count);
 }
 
 int FuzzTreeTransform::generateUniqueId(int oldId)
 {
-	return oldId * 100 + (++m_count);
+	return (oldId * 100 + (++m_count));
 }
 
 /************************************************************************/
@@ -111,10 +133,7 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 		const int id = child.id();
 		if (id < 0) continue;
 
-		const InclusionVariationPoint* inclusionNode = dynamic_cast<const InclusionVariationPoint*>(&child);
-		const bool opt = (inclusionNode != nullptr) && inclusionNode->optional();
-
-		if (opt)
+		if (isOptional(child))
 		{ // inclusion variation point. Generate n + n configurations.
 			vector<FuzzTreeConfiguration> additional;
 			for (FuzzTreeConfiguration& config : configurations)
@@ -261,14 +280,20 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		
 		const bool bLeaf = isLeaf(currentChild);
 
-		faulttree::Node newNode(0);
+		faulttree::ChildNode newNode(0);
 
 		const fuzztree::RedundancyVariationPoint* redundancyNode = 
 			dynamic_cast<const fuzztree::RedundancyVariationPoint*>(&currentChild);
 		if (redundancyNode)
 		{
-			auto result = handleRedundancyVP(redundancyNode, node, configuration.getRedundancyCount(id), id); // returns a VotingOR Gate
+			auto result = handleRedundancyVP(
+				redundancyNode, 
+				dynamic_cast<faulttree::ChildNode*>(node), 
+				configuration.getRedundancyCount(id), 
+				id); // returns a VotingOR Gate
+
 			newNode = result.first;
+			node->children().push_back(newNode);
 
 			if (result.second)
 				continue; // stop recursion
@@ -279,8 +304,14 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 				dynamic_cast<const fuzztree::FeatureVariationPoint*>(&currentChild);
 			if (featureNode)
 			{
-				auto result = handleFeatureVP(featureNode, node, configuration, configuration.getFeaturedChild(id));
+				auto result = handleFeatureVP(
+					featureNode, 
+					dynamic_cast<faulttree::ChildNode*>(node),
+					configuration, 
+					configuration.getFeaturedChild(id));
+
 				newNode = result.first;
+				node->children().push_back(newNode);
 
 				if (result.second)
 					continue; // stop recursion
@@ -296,22 +327,25 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 				{ // copy everything including probability child node
 					newNode = treeHelpers::copyBasicEvent(dynamic_cast<const fuzztree::BasicEvent&>(currentChild));
 				}
-				else if (false)
+				else
 				{
-					// 		else if (typeDescriptor == BASIC_EVENT_SET)
-					// 		{ // TODO forbid quantity parameter in basic event sets below Redundancy VP
-					// 			expandBasicEventSet(currentChild, faultTreeNode, id, 0);
-					// 			continue;
-					// 		}
+					const fuzztree::BasicEventSet* basicEventSet = 
+						dynamic_cast<const fuzztree::BasicEventSet*>(&currentChild);
+
+					if (basicEventSet)
+					{
+						expandBasicEventSet(basicEventSet, node, id, 0);
+						continue;
+					}
 				}
 			}	
 		}		
 
-		// break recursion
-		if (bLeaf)	continue;
+		node->children().push_back(newNode);
 
-// 		else if (!HAS_CHILDREN(currentChild))
-// 			faultTreeNode.remove_child(newNode);
+		// break recursion
+		if (bLeaf)
+			continue;
 
 		generateFaultTreeRecursive(&currentChild, &newNode, configuration);
 	}
@@ -322,24 +356,88 @@ void FuzzTreeTransform::expandBasicEventSet(
 	faulttree::Node* parentNode, 
 	const int& id, const int& defaultQuantity /*= 0*/) const
 {
+	const fuzztree::BasicEventSet* eventSet = dynamic_cast<const fuzztree::BasicEventSet*>(templateNode);
+	assert(eventSet);
 
+	// barharhar
+	const int numChildren = 
+		defaultQuantity == 0 ? eventSet->quantity().present() ? eventSet->quantity().get() : defaultQuantity : defaultQuantity;
+
+	if (numChildren <= 0)
+	{
+		throw runtime_error("Invalid Quantity in Basic Event Set");
+	}
+	
+	const faulttree::Probability probability = 
+		treeHelpers::copyProbability(eventSet->probability());
+
+	int i = 0;
+	while (i < numChildren)
+	{
+		const int id = eventSet->id(); // TODO get a unique id here
+		faulttree::BasicEvent basicEvent(id, probability);
+		parentNode->children().push_back(basicEvent);
+		i++;
+	}
 }
 
-std::pair<faulttree::Node, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
-	const fuzztree::Node* templateNode,
-	faulttree::Node* node,
+std::pair<faulttree::ChildNode, bool /*isLeaf*/> FuzzTreeTransform::handleFeatureVP(
+	const fuzztree::ChildNode* templateNode,
+	faulttree::ChildNode* node,
 	const FuzzTreeConfiguration& configuration, const int configuredChildId) const
 {
-	assert(false && "implement");
-	return make_pair(faulttree::Node(0), false);
+	// find the configured child
+	auto it = templateNode->children().begin();
+	while (it != templateNode->children().end())
+	{
+		if (it->id() == configuredChildId)
+			break;
+		++it;
+	}
+	
+	const fuzztree::ChildNode featuredTemplate = *it;
+	if (isOptional(featuredTemplate) && !configuration.isIncluded(configuredChildId))
+	{
+		return make_pair(Dummy(), true);
+	}
+	else if (isLeaf(featuredTemplate))
+	{
+		return make_pair(treeHelpers::copyBasicEvent(dynamic_cast<const fuzztree::BasicEvent&>(featuredTemplate)), true);
+	}
+	else if (dynamic_cast<const fuzztree::BasicEventSet*>(&featuredTemplate))
+	{ 
+		expandBasicEventSet(&featuredTemplate, node, configuredChildId, 0);
+		return make_pair(*node, true);
+	}
+	else if (isGate(featuredTemplate))
+	{
+		return make_pair(treeHelpers::copyGate(featuredTemplate), false);
+	}
+	else
+	{
+		if (dynamic_cast<const fuzztree::FeatureVariationPoint*>(node) ||
+			dynamic_cast<const fuzztree::RedundancyVariationPoint*>(node))
+			return make_pair(*node, false);
+	}
+	return make_pair(Dummy(), false);
 }
 
 
-std::pair<faulttree::Node, bool /*isLeaf*/> FuzzTreeTransform::handleRedundancyVP(
-	const fuzztree::Node* templateNode,
-	faulttree::Node* node,
+std::pair<faulttree::ChildNode, bool /*isLeaf*/> FuzzTreeTransform::handleRedundancyVP(
+	const fuzztree::ChildNode* templateNode,
+	faulttree::ChildNode* node,
 	const tuple<int,int> kOutOfN, const int& id) const
 {
-	assert(false && "implement");
-	return make_pair(faulttree::Node(0), false);
+	if (isDummy(*node));// TODO
+	
+	const fuzztree::BasicEventSet* basicEventSet = 
+		dynamic_cast<const fuzztree::BasicEventSet*>(&templateNode->children().front());
+	
+	if (basicEventSet)
+	{
+		faulttree::VotingOr votingOrGate(id, get<0>(kOutOfN));
+		expandBasicEventSet(basicEventSet, &votingOrGate, id, get<1>(kOutOfN));
+		return make_pair(votingOrGate, true);
+	}
+	else throw runtime_error("Child of Redundancy VP must be an event set");
 }

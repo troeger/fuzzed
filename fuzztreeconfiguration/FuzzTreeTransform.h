@@ -31,15 +31,15 @@ protected:
 		const FuzzTreeConfiguration& configuration) const;
 
 	// returns the configured VotingOR gate
-	std::pair<faulttree::Node, bool /*isLeaf*/> handleRedundancyVP(
-		const fuzztree::Node* templateNode,
-		faulttree::Node* node,
+	std::pair<faulttree::ChildNode, bool /*isLeaf*/> handleRedundancyVP(
+		const fuzztree::ChildNode* templateNode,
+		faulttree::ChildNode* node,
 		const std::tuple<int,int> configuredN, const int& id) const;
 
 	// returns the configured child gate
-	 std::pair<faulttree::Node, bool /*isLeaf*/> handleFeatureVP(
-		const fuzztree::Node* templateNode,
-		faulttree::Node* node,
+	 std::pair<faulttree::ChildNode, bool /*isLeaf*/> handleFeatureVP(
+		const fuzztree::ChildNode* templateNode,
+		faulttree::ChildNode* node,
 		const FuzzTreeConfiguration& configuration,
 		const int configuredChildId) const;
 
@@ -53,10 +53,13 @@ protected:
 		const fuzztree::Node* node, 
 		std::vector<FuzzTreeConfiguration>& configurations) const;
 
-	static inline bool isGate(const fuzztree::Node& node);
-	static inline bool isLeaf(const fuzztree::Node& typeDescriptor);
+	static bool isOptional(const fuzztree::Node& node);
+	static bool isGate(const fuzztree::Node& node);
+	static bool isLeaf(const fuzztree::Node& node);
+	
+	static bool isDummy(const faulttree::Node& node);
 
-	std::string generateUniqueId(const char* oldId);
+	std::string generateUniqueId(const std::string& oldId);
 	int generateUniqueId(int oldId);
 
 private:
