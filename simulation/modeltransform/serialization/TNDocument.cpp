@@ -8,6 +8,11 @@ using std::string;
 
 namespace
 {
+	// Some TN-WTFs
+	//	- 0 transitions are not allowed (for trees with just topEvent, add a dummy transition)
+	//	- the position values are NOT optional
+	//	- the "comment" -- DEFINITION OF PARAMETERS: is strictly necessary and will lead to "parse error" if omitted
+
 	const string HEADERTEMPLATE = "NET_TYPE: eDSPN\n"
 		"DESCRIPTION: generated TN for fault tree simulation\n" 
 		"PLACES: %1%\n"
@@ -20,14 +25,14 @@ namespace
 	// 2: TRANSITIONS
 	// 3: MEASURES
 	const string CONTENTTEMLPATE = ""
-		"-- LIST OF PLACES:\n%1%\n\n"
-		"-- LIST OF TRANSITIONS:\n%2%\n\n"
-		"-- LIST OF MEASURES:\n%3%\n\n";
+		"\n%1%\n\n"
+		"\n%2%\n\n"
+		"\n%3%\n\n";
 
 	// NAME, MARKING, (X,Y)-POSITION (PLACE & TAG)
 	// 1: NAME
 	// 2: MARKING
-	const string PLACETEMPLATE = "PLACE %1% %2% 0 0 0 0\n";
+	const string PLACETEMPLATE = "PLACE %1% %2% 0.0 0.0 0.0 0.0\n";
 
 	//NAME, DELAY, ENABLING DEPENDENCE, KIND, FIRING POLICY, PRIORITY,ORIENTATION, PHASE, GROUP, GROUP_WEIGHT, (X,Y)-POSITION (TRANSITION, TAG & DELAY), ARCS
 	// 1: NAME
@@ -35,15 +40,15 @@ namespace
 	// 3: PRIORITY
 	// 4: #INPARCS
 	// 6: #OUTARCS
-	const string EXPTRANSITIONTEMPLATE = "TRANSITION %1% %2% IS EXP RE %3% 0 1 0 1.000000 0 0 0 0 0 0\n";
+	const string EXPTRANSITIONTEMPLATE = "TRANSITION %1% %2% IS EXP RE %3% 0 1 0 1.000000 0.0 0.0 0.0 0.0 0.0 0.0\n";
 	//	"INPARCS %4% \n %5%"
 	//	"OUTPARCS %6% \n %7%";
 
-	const string IMMEDIATETRANSITIONTEMPLATE = "TRANSITION %1% %2% IS IM RE %3% 0 1 0 1.000000 0 0 0 0 0 0\n";
+	const string IMMEDIATETRANSITIONTEMPLATE = "TRANSITION %1% %2% IS IM RE %3% 0 1 0 1.000000 0.0 0.0 0.0 0.0 0.0 0.0\n";
 	//	"INPARCS %4% \n %5%"
 	//	"OUTPARCS %6% \n %7%";
 
-	const string MEASURETEMPLATE = "MEASURE %1%\n %2%\n";
+	const string MEASURETEMPLATE = "MEASURE %1%\n%2%";
 }
 
 TNDocument::TNDocument()
@@ -95,11 +100,12 @@ bool TNDocument::save(const string& fileName)
 	for (const auto& t : m_transitions)
 		transitions += transitionString(t.second);
 
- 	string measures;
-	for (const auto& m : m_measures)
-		measures += m;
+ 	string measures = "-- DEFINITION OF PARAMETERS:\n-- REWARD MEASURES:\n\n"; // more than a comment...
+// 	for (const auto& m : m_measures)
+// 		measures += m;
 
 	file << boost::format(CONTENTTEMLPATE) % places % transitions % measures << std::endl;
+	file << "-- END OF SPECIFICATION FILE" << std::endl;
 	file.close();
 
 	return true;
@@ -127,7 +133,7 @@ int TNDocument::addTopLevelPlace(const std::string&)
 	const string id = PLACE_IDENTIFIER + util::toString((int)m_places.size());
 	m_places[id] = (boost::format(PLACETEMPLATE) % id % 0).str();
 
-	const string measure = (boost::format(MEASURETEMPLATE) % "SystemFailure" % (string("P{#") + id + " > 0};")).str();
+	const string measure = (boost::format(MEASURETEMPLATE) % "SystemFailure" % (string("P{#") + id + " > 0}")).str();
 	m_measures.emplace_back(measure);
 
 	return m_places.size()-1;
