@@ -242,7 +242,8 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 	else if (ext == faultTree::FAULT_TREE_EXT)
 	{ // already a fault tree
 		FaultTreeNode* ft = FaultTreeImport::loadFaultTree(p.generic_string());
-		if (!ft || !ft->isValid()) throw runtime_error("Invalid Fault Tree");
+		if (!ft) 
+			throw runtime_error("Could not load Fault Tree");
 		
 		ft->print(cout);
 

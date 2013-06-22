@@ -31,7 +31,7 @@ public:
 	int getNumChildren() const { return m_children.size(); };
 
 	virtual bool isValid() const { return m_children.size() > 0; };
-	const std::string getId() const { return m_id; };
+	const std::string& getId() const { return m_id; };
 	
 	virtual int getCost() const;
 

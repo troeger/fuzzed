@@ -9,19 +9,21 @@ TopLevelEvent::TopLevelEvent(const std::string& ID /*= 0*/)
 
 int TopLevelEvent::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
-	assert(m_children.size() == 1 && "Top Level Event cannot have multiple children");
+	assert(m_children.size() <= 1 && "Top Level Event cannot have multiple children");
 	
-	FaultTreeNode* gate = m_children.front();
-	int finalPlaceID = -1;
+	int finalPlaceID = finalPlaceID = doc->addTopLevelPlace("SystemFailure");
+
 	try
 	{
-		int gatePlaceID = gate->serialize(doc);
-		int transitionID = doc->addImmediateTransition();
-		
-		finalPlaceID = doc->addTopLevelPlace("SystemFailure");
+		if (!m_children.empty())
+		{
+			FaultTreeNode* gate = m_children.front();
+			int gatePlaceID = gate->serialize(doc);
+			int transitionID = doc->addImmediateTransition();
 
-		doc->placeToTransition(gatePlaceID, transitionID);
-		doc->transitionToPlace(transitionID, finalPlaceID);
+			doc->placeToTransition(gatePlaceID, transitionID);
+			doc->transitionToPlace(transitionID, finalPlaceID);
+		}
 	}
 	catch (exception& e)
 	{
