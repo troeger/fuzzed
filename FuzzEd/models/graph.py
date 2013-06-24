@@ -92,6 +92,7 @@ class Graph(models.Model):
 \\usepackage{tikz}
 \\usetikzlibrary{positioning} 
 \\begin{document}
+\\pagestyle{empty}
 \\begin{figure}
 \\begin{tikzpicture}[auto, trim left]
 """
