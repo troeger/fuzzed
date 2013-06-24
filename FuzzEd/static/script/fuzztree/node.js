@@ -21,7 +21,7 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
         },
 
         _setupProperties: function(propertyMenuEntries, propertiesDisplayOrder) {
-            var returned = this._super(propertyMenuEntries, propertiesDisplayOrder);
+            this._super(propertyMenuEntries, propertiesDisplayOrder);
             var optionalProperty = this.properties.optional;
 
             if (optionalProperty) {
@@ -31,7 +31,7 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
                 }.bind(this));
             }
 
-            return returned;
+            return this;
         }
     });
 });
