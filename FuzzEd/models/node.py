@@ -7,7 +7,8 @@ from django.dispatch import receiver
 import logging
 logger = logging.getLogger('FuzzEd')
 
-from xml_fuzztree import *
+import xml_fuzztree
+import xml_faulttree
 from graph import Graph
 
 import json, notations, sys, time
@@ -15,22 +16,36 @@ import json, notations, sys, time
 def new_client_id():
     return str(int(time.mktime(time.gmtime())))
 
-# TODO: CREATE ALL THE PROPERTIES OF THIS NODE ON CREATION (OR FACTORY METHOD?)
+fuzztree_classes = {
+    'topEvent':             xml_fuzztree.TopEvent,
+    'basicEvent':           xml_fuzztree.BasicEvent,
+    'basicEventSet':        xml_fuzztree.BasicEventSet,
+    'intermediateEvent':    xml_fuzztree.IntermediateEvent,
+    'intermediateEventSet': xml_fuzztree.IntermediateEventSet,
+    'houseEvent':           xml_fuzztree.HouseEvent,
+    'undevelopedEvent':     xml_fuzztree.UndevelopedEvent,
+    'andGate':              xml_fuzztree.And,
+    'orGate':               xml_fuzztree.Or,
+    'xorGate':              xml_fuzztree.Xor,
+    'votingOrGate':         xml_fuzztree.VotingOr,
+    'featureVariation':     xml_fuzztree.FeatureVariationPoint,
+    'redundancyVariation':  xml_fuzztree.RedundancyVariationPoint,
+    'transferIn':           xml_fuzztree.TransferIn
+}
 
-xml_classes = {
-    'topEvent':             TopEvent,
-    'basicEvent':           BasicEvent,
-    'basicEventSet':        BasicEventSet,
-    'intermediateEvent':    IntermediateEvent,
-    'intermediateEventSet': IntermediateEventSet,
-    'houseEvent':           HouseEvent,
-    'undevelopedEvent':     UndevelopedEvent,
-    'andGate':              And,
-    'orGate':               Or,
-    'xorGate':              Xor,
-    'votingOrGate':         VotingOr,
-    'featureVariation':     FeatureVariationPoint,
-    'redundancyVariation':  RedundancyVariationPoint
+faulttree_classes = {
+    'topEvent':             xml_faulttree.TopEvent,
+    'basicEvent':           xml_faulttree.BasicEvent,
+    'basicEventSet':        xml_faulttree.BasicEventSet,
+    'intermediateEvent':    xml_faulttree.IntermediateEvent,
+    'intermediateEventSet': xml_faulttree.IntermediateEventSet,    
+    'houseEvent':           xml_faulttree.HouseEvent,
+    'undevelopedEvent':     xml_faulttree.UndevelopedEvent,
+    'andGate':              xml_faulttree.And,
+    'orGate':               xml_faulttree.Or,
+    'xorGate':              xml_faulttree.Xor,
+    'votingOrGate':         xml_faulttree.VotingOr,
+    'transferIn':           xml_faulttree.TransferIn
 }
 
 class Node(models.Model):
@@ -70,7 +85,7 @@ class Node(models.Model):
             return unicode('%s%s' % (prefix, name))
 
         except ObjectDoesNotExist:
-            return unicode('%s%s_%s' % (prefix, self.pk, notations.by_kind[self.graph.kind]['nodes'][self.kind]['name']))
+            return unicode('%s%s_%s' % (prefix, self.pk, notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']['name']['default']))
 
     def to_json(self):
         """
@@ -92,16 +107,15 @@ class Node(models.Model):
         Returns:
          {dict} the node as dictionary
         """
-        serialized = dict([prop.to_tuple() for prop in self.properties.filter(deleted=False)])
-
-        serialized['id']       = self.client_id
-        serialized['kind']     = self.kind
-        serialized['x']        = self.x
-        serialized['y']        = self.y
-        serialized['outgoing'] = [edge.client_id for edge in self.outgoing.filter(deleted=False)]
-        serialized['incoming'] = [edge.client_id for edge in self.incoming.filter(deleted=False)]
-
-        return serialized
+        return {
+            'properties': {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)},
+            'id':         self.client_id,
+            'kind':       self.kind,
+            'x':          self.x,
+            'y':          self.y,
+            'outgoing':   [edge.client_id for edge in self.outgoing.filter(deleted=False)],
+            'incoming':   [edge.client_id for edge in self.incoming.filter(deleted=False)]
+        }
 
     def to_bool_term(self):
         edges = self.outgoing.filter(deleted=False).all()
@@ -124,7 +138,7 @@ class Node(models.Model):
 
         raise ValueError('Node %s has unsupported kind' % self)
 
-    def to_xml(self):
+    def to_xml(self, xmltype=None):
         """
         Method: to_xml
         
@@ -133,59 +147,77 @@ class Node(models.Model):
         long for some XML processors.
         
         Returns:
-         This node instance
+         The XML node instance for this graph node and its children
         """
+
+        # If the target XML type is not given, we take the graph type
+        if not xmltype:
+            xmltype = self.graph.kind
+
         properties = {
             'id':   self.id,
             'name': self.get_property('name', '-')
         }
 
-        if self.kind in {'basicEvent', 'basicEventSet', 'intermediateEvent', 'intermediateEventSet', 'houseEvent'}:
-            properties['optional'] = self.get_property('optional', False)
+        if self.kind == 'transferIn':
+            properties['fromModelId'] = self.get_property('transfer')
 
-        if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
-            probability = self.get_property('probability', None)
-            if isinstance(probability, list):
-                point = probability[0]
-                alpha = probability[1]
+        # for any node that may have a quantity, set the according property
+        if self.kind in {'basicEventSet', 'intermediateEventSet'}:
+            properties['quantity'] = self.get_property('cardinality')
 
-                if alpha == 0:
-                    properties['probability'] = CrispProbability(value_=point)
+        # Special treatment for some of the FuzzTree node types
+        if xmltype == 'fuzztree':
+            # for any node that may be optional, set the according property
+            if self.kind in {'basicEvent', 'basicEventSet', 'intermediateEvent', 'intermediateEventSet', 'houseEvent'}:
+                properties['optional'] = self.get_property('optional', False)
+
+            # determine fuzzy or crisp probability, set it accordingly
+            if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
+                probability = self.get_property('probability', None)
+                if isinstance(probability, list):
+                    point = probability[0]
+                    alpha = probability[1]
+                    if alpha == 0:
+                        properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
+                    else:
+                        properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(   a=point - alpha, b1=point,
+                                                                                           b2=point, c=point + alpha)
+                elif isinstance(probability, (long, int, float)):
+                    properties['probability'] = xml_fuzztree.CrispProbability(value_=probability)
                 else:
-                    properties['probability'] = TriangularFuzzyInterval(a=point - alpha, b1=point,
-                                                                        b2=point, c=point + alpha)
+                    raise ValueError('Cannot handle probability value: "%s"' % probability)
+                # nodes that have a probability also have costs in FuzzTrees
+                properties['costs'] = self.get_property('cost', 0)
 
-            elif isinstance(probability, (long, int, float)):
-                properties['probability'] = CrispProbability(value_=probability)
-
-            else:
-                raise ValueError('Cannot handle probability value: "%s"' % probability)
-
-            properties['costs'] = self.get_property('cost', 0)
-
-        elif self.kind == 'votingOrGate':
-            if self.graph.kind == 'fuzztree':
+            # Voting OR in FuzzTrees has different parameter name than in fault trees
+            elif self.kind == 'votingOrGate':
                 properties['k'] = self.get_property('k')
-            else:
-                properties['k'] = self.get_property('kN')[0]
 
-        elif self.kind == 'redundancyVariation':
-            nRange = self.get_property('nRange')
+            # add range attribute for redundancy variation
+            elif self.kind == 'redundancyVariation':
+                nRange = self.get_property('nRange')
+                properties['start']   = nRange[0]
+                properties['end']     = nRange[1]
+                properties['formula'] = self.get_property('kFormula')
 
-            properties['start']   = nRange[0]
-            properties['end']     = nRange[1]
-            properties['formula'] = self.get_property('kFormula')
+            xml_node = fuzztree_classes[self.kind](**properties)
 
-        try:
-            xml_node = xml_classes[self.kind](**properties)
-            logger.debug('[XML] Adding node "%s" with properties %s' % (self.kind, properties))
+        # Special treatment for some of the FaultTree node types
+        elif xmltype == 'faulttree':
+            if self.kind == 'votingOrGate':
+                properties['k'] = self.get_property('k')
 
-            # serialize children
-            for edge in self.outgoing.filter(deleted=False):
-                xml_node.children.append(edge.target.to_xml())
+            # determine fuzzy or crisp probability, set it accordingly
+            if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
+                properties['probability'] = xml_faulttree.CrispProbability(value_=self.get_property('probability', None))
 
-        except KeyError:
-            raise ValueError('Unsupported node %s' % self.kind)
+            xml_node = faulttree_classes[self.kind](**properties)
+
+        # serialize children
+        logger.debug('[XML] Added node "%s" with properties %s' % (self.kind, properties))
+        for edge in self.outgoing.filter(deleted=False):
+            xml_node.children.append(edge.target.to_xml(xmltype))
 
         return xml_node
 
@@ -195,7 +227,7 @@ class Node(models.Model):
         except ObjectDoesNotExist:
             try:
                 logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
-                return notations.by_kind[self.graph.kind]['nodes'][self.kind][key]
+                return notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
             except KeyError:
                 logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
                 return default

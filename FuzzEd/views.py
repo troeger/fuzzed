@@ -12,6 +12,7 @@ from django.views.decorators.http import require_http_methods
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
 from FuzzEd.models import Graph, notations, commands
+import FuzzEd.settings
 
 GREETINGS = [
     'Loading the FuzzEd User Experience',
@@ -134,53 +135,46 @@ def dashboard_edit(request, graph_id):
     if POST.get('save'):
         graph.name = POST.get('name', '')
         graph.save()
+        messages.add_message(request, messages.SUCCESS, 'Graph saved.')
         return redirect('dashboard')
 
     # deletion requested? do it and go back to dashboard
-    if POST.get('delete'):
+    elif POST.get('delete'):
         commands.DeleteGraph.create_from(graph_id).do()
+        messages.add_message(request, messages.SUCCESS, 'Graph deleted.')
         return redirect('dashboard')
 
-    # duplication requested
-    if POST.get('duplicate'):
-        # add new graph object
-        old_graph=Graph.objects.get(pk=graph_id)
+    # copy requested
+    elif POST.get('copy'):
+        old_graph = Graph.objects.get(pk=graph_id)
         duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
                                                           owner=request.user,  add_default_nodes=False)
         duplicate_command.do()
         new_graph = duplicate_command.graph
 
-        # copy all nodes and their properties
-        node_cache = {}
+        new_graph.copy_values(old_graph)
+        new_graph.save()
 
-        for node in old_graph.nodes.all():
-            # first cache the old node's properties
-            properties = node.properties.all()
-
-            # create node copy by overwriting the ID field
-            old_id = node.pk
-            node.pk = None
-            node.graph = new_graph
-            node.save()
-            node_cache[old_id] = node
-
-            # now save the property objects for the new node
-            for prop in properties:
-                prop.pk = None
-                prop.node = node
-                prop.save()
-
-        for edge in old_graph.edges.all():
-            edge.pk = None
-            edge.source = node_cache[edge.source.pk]
-            edge.target = node_cache[edge.target.pk]
-            edge.graph = new_graph
-            edge.save()
-
+        messages.add_message(request, messages.SUCCESS, 'Graph duplicated.')
         return redirect('dashboard')
 
+    elif POST.get('snapshot'):
+        old_graph = Graph.objects.get(pk=graph_id)
+        duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
+                                                          owner=request.user, add_default_nodes=False)
+        duplicate_command.do()
+        new_graph = duplicate_command.graph
+
+        new_graph.copy_values(old_graph)
+        new_graph.read_only = True
+        new_graph.save()
+
+        messages.add_message(request, messages.SUCCESS, 'Created snapshot.')
+        return redirect('dashboard')
+
+
     # please show the edit page to the user on get requests
-    if POST.get('edit') or request.method == 'GET':
+    elif POST.get('edit') or request.method == 'GET':
         parameters = {
             'graph': graph,
             'kind':  notations.by_kind[graph.kind]['name']
@@ -238,7 +232,13 @@ def editor(request, graph_id):
     Returns:
      {HttpResponse} a django response object
     """
-    graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user)
+    if request.user.is_staff:
+        graph    = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    if graph.read_only:
+        return HttpResponseBadRequest()
+
     notation = notations.by_kind[graph.kind]
     nodes    = notation['nodes']
 
@@ -250,6 +250,42 @@ def editor(request, graph_id):
     }
 
     return render(request, 'editor/editor.html', parameters)
+
+@login_required
+def snapshot(request, graph_id):
+    """
+    Function: snapshot
+    
+    View handler for loading the snapshot viewer. It just tries to locate the graph to be opened 
+    and passes it to its according view. For the moment, this is the editor itself, were the JavaScript
+    code handles the read-only mode from UI perspective.
+    
+    Parameters:
+     {HttpRequest} request  - a django request object
+     {int}         graph_id - the id of the graph to be opened in the snapshot viewer
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    if request.user.is_staff:
+        graph    = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    if not graph.read_only:
+        return HttpResponseBadRequest()
+
+    notation = notations.by_kind[graph.kind]
+    nodes    = notation['nodes']
+
+    parameters = {
+        'graph':          graph,
+        'graph_notation': notation,
+        'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
+        'greetings':      GREETINGS
+    }
+
+    return render(request, 'editor/editor.html', parameters)
+
 
 @require_http_methods(['GET', 'POST'])
 def login(request):
@@ -280,7 +316,7 @@ def login(request):
         open_id = GET['openid_identifier']
         request.session['openid_identifier'] = open_id
 
-        return preAuthenticate(open_id, 'http://%s/login/?openidreturn' % request.get_host())
+        return preAuthenticate(open_id, FuzzEd.settings.OPENID_RETURN)
 
     elif 'openidreturn' in GET:
         user = auth.authenticate(openidrequest=request)

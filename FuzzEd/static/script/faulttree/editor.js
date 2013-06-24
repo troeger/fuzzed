@@ -7,14 +7,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
     /**
      *  Class: CutsetsMenu
-<<<<<<< mine
      *
      *  A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
      *  cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
-=======
-     *    A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
-     *    cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
->>>>>>> theirs
      *
      *  Extends: <Base::Menus::Menu>
      */
@@ -294,7 +289,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
                 _.each(data['configurations'], function(config, index) {
                     //TODO: better naming?
-                    configID = 'Configuration ' + (index + 1);
+                    configID = '#' + (index + 1);
                     var displayData = this._convertToDisplayFormat(config);
 
                     // remember the nodes and edges involved in this config for later highlighting
@@ -358,10 +353,11 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             return {
                 series: series,
                 statistics: {
-                    min:   min,
-                    max:   max,
-                    peak:  peak,
-                    costs: configuration['costs']
+                    min:             min,
+                    max:             max,
+                    peak:            peak,
+                    ineffectiveness: configuration['costs'] ? peak / configuration['costs'] : '-',
+                    costs:           configuration['costs']
                 }
             };
         },
@@ -557,11 +553,12 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             }
 
             var columns = [
-                { id: 'id',    name: 'ID',      field: 'id',    sortable: true, minWidth: 110 },
-                { id: 'min',   name: 'Minimum', field: 'min',   sortable: true, formatter: shorten },
-                { id: 'peak',  name: 'Peak',    field: 'peak',  sortable: true, formatter: shorten },
-                { id: 'max',   name: 'Maximum', field: 'max',   sortable: true, formatter: shorten },
-                { id: 'costs', name: 'Costs',   field: 'costs', sortable: true }
+                { id: 'id',              name: 'Configuration',     field: 'id',              sortable: true },
+                { id: 'min',             name: 'Minimum',           field: 'min',             sortable: true, formatter: shorten },
+                { id: 'peak',            name: 'Peak',              field: 'peak',            sortable: true, formatter: shorten },
+                { id: 'max',             name: 'Maximum',           field: 'max',             sortable: true, formatter: shorten },
+                { id: 'costs',           name: 'Costs',             field: 'costs',           sortable: true },
+                { id: 'ineffectiveness', name: 'Risk (Peak/Costs)', field: 'ineffectiveness', sortable: true, minWidth: 150}
             ];
 
             var options = {
@@ -570,7 +567,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 multiColumnSort:            true,
                 autoHeight:                 true,
                 forceFitColumns:            true
-            }
+            };
 
             // little workaround for constraining the height of the grid
             var maxHeight = this._editor.getConfig().Menus.PROBABILITY_MENU_MAX_GRID_HEIGHT;
@@ -717,29 +714,12 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {<ProbabilityMenu>} probabilityMenu - The <ProbabilityMenu> instance used to display the probability of
          *                                          the top event.
          */
-        cutsetsMenu: undefined,
+        cutsetsMenu:     undefined,
         probabilityMenu: undefined,
 
         /**
          *  Group: Initialization
          */
-
-        /**
-         *  Constructor: init
-         *    Sets up the cutset and probability menus in addition to <Base::Editor::init>.
-         *
-         *  Parameters:
-         *    {int} graphId - The ID of the graph that is going to be edited by this editor.
-         */
-        init: function(graphId) {
-            this._super(graphId);
-
-            this.cutsetsMenu = new CutsetsMenu(this);
-            this.probabilityMenu = new ProbabilityMenu(this);
-
-            this._setupCutsetsActionEntry()
-                ._setupTobEventProbabilityActionEntry();
-        },
 
         /**
          *  Group: Accessors
@@ -775,6 +755,16 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Group: Setup
          */
 
+        _loadGraphCompleted: function(readOnly) {
+//          this.cutsetsMenu     = new CutsetsMenu(this);
+            this.probabilityMenu = new ProbabilityMenu(this);
+
+//          this._setupCutsetsActionEntry()
+            this._setupTopEventProbabilityActionEntry();
+
+            return this._super(readOnly);
+        },
+
         /**
          *  Method: _setupCutsetsActionEntry
          *    Adds an entry to the actions navbar group for calculating the minimal cutsets for the edited graph.
@@ -801,7 +791,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         },
 
         /**
-         *  Method: _setupTobEventProbabilityActionEntry
+         *  Method: _setupTopEventProbabilityActionEntry
          *    Adds an entry to the actions navbar group for calculating the probability of the top event. Clicking will
          *    issue an asynchronous backend call which returns a <Job> object that can be queried for the final result.
          *    The job object will be used to initialize the probability menu.
@@ -809,7 +799,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Returns:
          *    This editor instance for chaining.
          */
-        _setupTobEventProbabilityActionEntry: function() {
+        _setupTopEventProbabilityActionEntry: function() {
             var navbarActionsEntry = jQuery(
                 '<li>' +
                     '<a href="#">Calculate top event probability</a>' +

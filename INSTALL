@@ -1,0 +1,19 @@
+Install dependencies for compiling / running the app
+----------------------------------------------------
+sudo easy_install pip
+sudo pip install -r requirements.txt
+- Oracle Java 7 installation for the analysis server
+- ANT
+- PostgreSQL database
+
+Compile install packages to ./dist
+----------------------------------
+./setup.py build
+./setup.py sdist
+
+Install in web directory
+------------------------
+- Untar file
+./manage.py syncdb
+./manage.py migrate
+

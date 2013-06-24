@@ -3,7 +3,7 @@ import os.path, logging
 is_production = False
 cwd = os.path.dirname(__file__)
 
-if cwd.startswith('/var/www/fuzztrees.net'):
+if cwd.startswith('/var/www'):
     is_production = True
 
 ADMINS = (
@@ -19,8 +19,9 @@ if is_production:
     TEMPLATE_DEBUG          = DEBUG
     SEND_BROKEN_LINK_EMAILS = False     
     EMAIL_BACKEND           = 'django.core.mail.backends.smtp.EmailBackend'
-    SERVER_EMAIL            = 'noreply@citemaster.net'
+    SERVER_EMAIL            = 'webmaster@fuzztrees.net'
     EMAIL_HOST              = 'localhost'
+    OPENID_RETURN           = 'http://www.fuzztrees.net/login/?openidreturn'
 
     DATABASES = {
         'default': {
@@ -40,11 +41,13 @@ if is_production:
         # Don't forget to use absolute paths, not relative paths.
         PROJECT_ROOT+'/static-release/img',
     )
+    ANALYZE_TOP_EVENT_PROBABILITY_SERVER = 'http://t420.asg-platform.org:8080'
 
 else:
     DEBUG          = True
     TEMPLATE_DEBUG = True
     EMAIL_BACKEND  = 'django.core.mail.backends.console.EmailBackend'
+    OPENID_RETURN  = 'http://localhost:8000/login/?openidreturn'
 
     DATABASES = {
         'default': {
@@ -64,6 +67,8 @@ else:
         'FuzzEd/templates',
         'FuzzEd/static/img'
     )
+    ANALYZE_TOP_EVENT_PROBABILITY_SERVER = 'http://localhost:8080'
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -168,7 +173,6 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
@@ -240,4 +244,3 @@ AUTH_PROFILE_MODULE = 'FuzzEd.UserProfile'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/'
 
-ANALYZE_TOP_EVENT_PROBABILITY_SERVER = 'http://localhost:8080'

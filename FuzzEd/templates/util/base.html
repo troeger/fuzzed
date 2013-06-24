@@ -18,12 +18,82 @@
     {% block script %}
     {{ block.super }}
     <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
-    <script type="text/javascript">
-        jQuery(document).ready( function(){
-            // TODO: make this well
-            jQuery(".alert").fadeIn().delay(1500).fadeOut();
+
+    <script type="text/javascript" language="javascript">
+        require.config({
+            baseUrl: '{{ STATIC_URL }}script/',
+            waitSeconds: 5,
+            paths: {
+                // require plugins
+                'text' :      '../lib/requirejs/plugins/text', // required by json plugin
+                'json' :      '../lib/requirejs/plugins/json',
+                // jquery and plugins
+                'jquery':        'require-jquery',
+                'jquery.ui':     '../lib/jquery-ui-1.9.1',
+                'jquery.svg':    '../lib/jquery-svg/jquery-svg-1.4.5',
+                'jquery.svgdom': '../lib/jquery-svg/jquery-svgdom-1.4.5',
+                // other libs
+                'bootstrap':  '../lib/bootstrap/js/bootstrap-2.0.4.min',
+                'underscore': '../lib/underscore/underscore-1.4.3.min',
+                'jsplumb':    '../lib/jsplumb/jsplumb-1.3.16',
+                'highcharts': '../lib/highcharts-2.3.5/highcharts',
+                'slickgrid':  '../lib/slickgrid/slick.grid',
+                'bignumber':  '../lib/bignumber/bignumber.min',
+
+                'notations':  '../notations'
+
+            },
+            // define dependencies for libs that are not AMD compatible
+            shim: {
+                'jquery.ui/jquery.ui.core':       ['jquery'],
+                'jquery.ui/jquery.ui.widget':     ['jquery'],
+                'jquery.ui/jquery.ui.mouse':      ['jquery.ui/jquery.ui.core', 'jquery.ui/jquery.ui.widget'],
+                'jquery.ui/jquery.ui.draggable':  ['jquery.ui/jquery.ui.mouse'],
+                'jquery.ui/jquery.ui.droppable':  ['jquery.ui/jquery.ui.mouse'],
+                'jquery.ui/jquery.ui.selectable': ['jquery.ui/jquery.ui.mouse'],
+                'jquery.ui/jquery.ui.resizable':  ['jquery.ui/jquery.ui.mouse'],
+
+                'jquery.svg':    ['jquery'],
+                'jquery.svgdom': ['jquery.svg'],
+
+                'underscore': {
+                    exports: '_'
+                },
+
+                'jsplumb': {
+                    deps: ['jquery', 'jquery.ui/jquery.ui.draggable', 'jquery.ui/jquery.ui.droppable'],
+                    exports: 'jsPlumb'
+                },
+
+                'highcharts': {
+                    deps: ['jquery'],
+                    exports: 'Highcharts'
+                },
+
+                'slickgrid': {
+                    deps: [
+                        'jquery',
+                        '../lib/slickgrid/jquery.event.drag-2.2',
+                        '../lib/slickgrid/slick.core',
+                        '../lib/slickgrid/slick.rowselectionmodel'
+                    ],
+                    exports: 'Slick'
+                }
+            }
         });
     </script>
+
+    {% if messages %}
+        <script type="text/javascript">
+            require(['alerts'], function(Alerts) {
+                jQuery(document).ready( function(){
+                    {% for message in messages %}
+                        Alerts.showAlert('{{ message.tags }}', '{{ message.tags.capitalize }}', '{{ message }}', 5000);
+                    {% endfor %}
+                });
+            });
+        </script>
+    {% endif %}
     {% endblock %}
 </head>
 
@@ -31,7 +101,22 @@
     <div class="navbar navbar-fixed-top no-print">
         <div class="navbar-inner">
             <div class="container">
-                <a class="brand" anchor="#">FuzzEd</a>
+                <a class="brand" anchor="#">FuzzEd - {{ graph }}</a>
+                <ul class="nav">
+                    <li>
+                        <a>
+                            <img id="FuzzEdProgressIndicator" src="{{ STATIC_URL }}img/ajax-loader.gif">
+                            <span id="FuzzEdSaveIndicator">
+                                <i class="icon-ok icon-white"></i>
+                                Saved
+                            </span>
+                            <span id="FuzzEdErrorIndicator">
+                                <i class="icon-warning-sign icon-white"></i>
+                                Not saved!
+                            </span>
+                        </a>
+                    </li>
+                </ul>
                 <ul class="nav pull-right">
                     {%  if user.is_authenticated %}
                     <li class="{% block navigation_home %}{% endblock %}">
@@ -58,30 +143,10 @@
             </div>
         </div>
     </div>
-    
+
     {% block body %}
     <div class="container space-top">
-        {% if messages %}
-            <div class="no-print" style="position: relative; margin-top: -40px; top: 0; width: 100%">
-            {% for message in messages %}
-                {% if message.tags == "success" %}
-                    <div class="alert alert-success hide">
-                    <i class="icon-ok-sign"></i>
-                {% elif message.tags == "info"%}
-                    <div class="alert alert-info hide">
-                    <i class="icon-info-sign"></i>                
-                {% elif message.tags == "warning"%}
-                    <div class="alert hide">
-                    <i class="icon-warning-sign"></i>                
-                {% elif message.tags == "error"%}
-                    <div class="alert alert-error hide">
-                    <i class="icon-warning-sign"></i>                
-                {% endif %}
-                {{ message }}
-                </div>
-            {% endfor %}
-            </div>
-        {% endif %}
+        <div id="FuzzEdAlertContainer" class="no-print"></div>
 
         {% block content %}{% endblock %}
 

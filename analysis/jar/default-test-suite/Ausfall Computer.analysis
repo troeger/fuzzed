@@ -78,7 +78,7 @@
       </alphaCuts>
     </probability>
   </configurations>
-  <configurations costs="100">
+  <configurations costs="150">
     <choices key="35">
       <value xsi:type="fta:TransferInChoice">
         <chosenConfiguration costs="100">
@@ -117,7 +117,7 @@
       </alphaCuts>
     </probability>
   </configurations>
-  <configurations costs="100">
+  <configurations costs="150">
     <choices key="35">
       <value xsi:type="fta:TransferInChoice">
         <chosenConfiguration costs="100">

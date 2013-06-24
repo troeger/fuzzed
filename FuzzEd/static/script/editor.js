@@ -1,5 +1,4 @@
-define(['class', 'menus', 'canvas', 'backend', 'canvas'],
-function(Class, Menus, Canvas, Backend) {
+define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus, Canvas, Backend, Alerts) {
     /**
      *  Package: Base
      */
@@ -56,13 +55,12 @@ function(Class, Menus, Canvas, Backend) {
         init: function(graphId) {
             if (typeof graphId !== 'number') throw 'You need a graph ID to initialize the editor.';
 
-            this.config = this.getConfig();
-            this._backend = new Backend(graphId);
+            this.config              = this.getConfig();
+            this._backend            = new Backend(graphId);
             this._navbarActionsGroup = jQuery('#' + this.config.IDs.NAVBAR_ACTIONS);
 
             // run a few sub initializer
             this._setupJsPlumb()
-                ._setupKeyBindings()
                 ._setupNodeOffsetPrintStylesheet()
                 ._setupEventCallbacks()
                 ._setupGridToggleAction();
@@ -131,17 +129,24 @@ function(Class, Menus, Canvas, Backend) {
          *  Returns:
          *    This editor instance for chaining.
          */
-        _loadGraphCompleted: function() {
+        _loadGraphCompleted: function(readOnly) {
             // create manager objects for the bars
             this.properties = new Menus.PropertiesMenu(this.graph.getNotation().propertiesDisplayOrder);
             this.shapes     = new Menus.ShapeMenu();
+            this._backend.activate();
 
+            if (readOnly) {
+                Alerts.showInfoAlert('Remember:', 'this diagram is read-only');
+                this.shapes.disable();
+                this.properties.disable();
+                Canvas.disableInteraction();
+            }
+
+            this._setupKeyBindings(readOnly);
             // fade out the splash screen
             jQuery('#' + this.config.IDs.SPLASH).fadeOut(this.config.Splash.FADE_TIME, function() {
                 jQuery(this).remove();
             });
-            // activate the backend AFTER the graph is fully loaded to prevent backend calls during graph construction
-            this._backend.activate();
 
             return this;
         },
@@ -168,7 +173,7 @@ function(Class, Menus, Canvas, Backend) {
          */
         _loadGraphFromJson: function(json) {
             this.graph = new (this.getGraphClass())(json);
-            this._loadGraphCompleted();
+            this._loadGraphCompleted(json.readOnly);
 
             return this;
         },
@@ -245,7 +250,9 @@ function(Class, Menus, Canvas, Backend) {
          *  Returns:
          *    This editor instance for chaining.
          */
-        _setupKeyBindings: function() {
+        _setupKeyBindings: function(readOnly) {
+            if (readOnly) return this;
+
             var selectedNodes = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE;
             var selectedEdges = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
 
@@ -258,14 +265,16 @@ function(Class, Menus, Canvas, Backend) {
                     Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
                     Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
                 } else if (event.which == jQuery.ui.keyCode.DELETE) {
-                    event.preventDefault();
+                    // prevent that node is being deleted when we edit an input field
+                    if (jQuery(event.target).is('input')) {
+                        return;
+                    }
 
+                    event.preventDefault();
                     // delete selected nodes
                     jQuery(selectedNodes).each(function(index, element) {
                         this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
                     }.bind(this));
-
-                    this.properties.hide();
 
                     // delete selected edges
                     jQuery(selectedEdges).each(function(index, element) {
@@ -273,6 +282,8 @@ function(Class, Menus, Canvas, Backend) {
                         jsPlumb.detach(edge);
                         this.graph.deleteEdge(edge);
                     }.bind(this));
+
+                    this.properties.hide();
                 }
             }.bind(this));
 
@@ -323,9 +334,70 @@ function(Class, Menus, Canvas, Backend) {
          */
         _setupEventCallbacks: function() {
             // events that trigger a re-calculation of the print offsets
-            jQuery(document).on(this.config.Events.NODE_DRAG_STOPPED,    this._updatePrintOffsets.bind(this));
-            jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED, this._updatePrintOffsets.bind(this));
-            jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED,   this._updatePrintOffsets.bind(this));
+            jQuery(document).on(this.config.Events.NODE_DRAG_STOPPED,  this._updatePrintOffsets.bind(this));
+            jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,   this._updatePrintOffsets.bind(this));
+            jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED, this._updatePrintOffsets.bind(this));
+
+            jQuery(document).ajaxStart(this._showProgressIndicator.bind(this));
+            jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
+            jQuery(document).ajaxSuccess(this._flashSaveIndicator.bind(this));
+            jQuery(document).ajaxError(this._flashErrorIndicator.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Group: Progress Indication
+         */
+
+        /**
+         *  Method _showProgressIndicator
+         *    Display the progress indicator.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _showProgressIndicator: function() {
+            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+
+            return this;
+        },
+
+        /**
+         *  Method _hideProgressIndicator
+         *    Hides the progress indicator.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _hideProgressIndicator: function() {
+            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
+
+            return this;
+        },
+
+        /**
+         *  Method: _flashSaveIndicator
+         *    Flash the save indicator to show that the current graph is saved in the backend.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _flashSaveIndicator: function() {
+            jQuery('#' + this.config.IDs.SAVE_INDICATOR).fadeIn(200).delay(600).fadeOut(200);
+
+            return this;
+        },
+
+        /**
+         *  Method _flashErrorIndicator
+         *    Flash the error indicator to show that the current graph has not been saved to the backend.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _flashErrorIndicator: function() {
+            jQuery('#' + this.config.IDs.ERROR_INDICATOR).fadeIn(200).delay(5000).fadeOut(200);
 
             return this;
         },
@@ -342,8 +414,8 @@ function(Class, Menus, Canvas, Backend) {
          *    An object containing the minimal top ('top') and minimal left ('left') offset to the browser borders.
          */
         _calculateContentOffsets: function() {
-            var minLeftOffset = Infinity;
-            var minTopOffset  = Infinity;
+            var minLeftOffset = window.Infinity;
+            var minTopOffset  = window.Infinity;
 
             jQuery('.' + this.config.Classes.NODE + ', .' + this.config.Classes.MIRROR).each(function(index, element) {
                 var offset = jQuery(element).offset();

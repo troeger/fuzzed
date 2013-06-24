@@ -5,19 +5,31 @@ define(['config', 'class'], function(Config, Class) {
      */
     var Menu = Class.extend({
         container:    undefined,
+
         _controls:     undefined,
+        _disabled:     undefined,
         _navbar:       undefined,
         _navbarButton: undefined,
 
         init: function() {
             this.container = this._setupContainer();
-            this._controls  = this._setupControls();
-            this._navbar    = this._setupNavbar();
+            this._controls = this._setupControls();
+            this._disabled = false;
+            this._navbar   = this._setupNavbar();
 
             this._setupDragging();
         },
 
         /* Section: Visibility */
+        disable: function() {
+            this._disabled = true;
+            this.hide();
+        },
+
+        enable: function() {
+            this._disabled = false;
+        },
+
         hide: function() {
             this.container.hide();
             return this;
@@ -80,7 +92,7 @@ define(['config', 'class'], function(Config, Class) {
 
         show: function() {
             // prevent that the menu is shown again as long it is minimized
-            if (this._isMinimized()) return this;
+            if (this._isMinimized() || this._disabled) return this;
 
             this.container.show();
             return this;
@@ -122,7 +134,7 @@ define(['config', 'class'], function(Config, Class) {
         },
 
         _setupNavbar: function() {
-            return jQuery('ul.nav');
+            return jQuery('ul.nav.pull-right');
         }
     });
 
@@ -167,7 +179,7 @@ define(['config', 'class'], function(Config, Class) {
         init: function(displayOrder) {
             this._super();
             this._displayOrder = displayOrder;
-            this._form = this.container.find('form');
+            this._form = this.container.find('.form-horizontal');
 
             this._setupSelection();
         },
@@ -176,7 +188,7 @@ define(['config', 'class'], function(Config, Class) {
             this._navbarButton.remove();
             this._navbarButton = undefined;
 
-            this.show(this._nodes);
+            this.show();
             this.container.animate(eventObject.data, {
                 duration: Config.Menus.ANIMATION_DURATION
             });
@@ -184,6 +196,10 @@ define(['config', 'class'], function(Config, Class) {
         },
 
         /* Section: Visibility */
+        hide: function() {
+            this._node = undefined;
+            return this._super();
+        },
 
         show: function() {
             var selected = jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + '.' + Config.Classes.NODE);
@@ -191,7 +207,7 @@ define(['config', 'class'], function(Config, Class) {
 
             // display the properties menu only if there is exactly one node selected
             // and the menu is not minimized; otherwise hide the menu
-            if (selected.length == 1 && !this._isMinimized()) {
+            if (selected.length === 1 && !this._isMinimized() && !this._disabled) {
                 return this._show(selected);
             }
 
@@ -201,8 +217,8 @@ define(['config', 'class'], function(Config, Class) {
         _removeEntries: function() {
             if (!this._node) return this;
 
-            _.each(this._node.propertyMenuEntries, function(menuEntry) {
-                menuEntry.hide();
+            _.each(this._node.properties, function(property) {
+                property.menuEntry.remove();
             }.bind(this));
 
             return this;
@@ -222,16 +238,21 @@ define(['config', 'class'], function(Config, Class) {
             this._node = selected.data(Config.Keys.NODE);
 
             // this node does not have any properties to display, go home!
-            if (_.isEmpty(this._node.propertyMenuEntries)) {
+            if (_.isEmpty(this._node.properties)) {
                 this.hide();
                 return this;
             }
 
-            _.each(this._displayOrder, function(property) {
-                var menuEntry = this._node.propertyMenuEntries[property];
-
+            _.each(this._displayOrder, function(propertyName) {
+                var property = this._node.properties[propertyName];
                 // has the node such a property? display it!
-                if (typeof menuEntry !== 'undefined') menuEntry.show(this._form);
+                if (typeof property !== 'undefined' && property !== null) {
+                    property.menuEntry.appendTo(this._form);
+
+                    jQuery(property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
+                        this.container.toggle(!this._allHidden());
+                    }.bind(this));
+                }
             }.bind(this));
 
             // fix the left offset (jQueryUI bug with draggable menus and CSS right property)
@@ -239,9 +260,13 @@ define(['config', 'class'], function(Config, Class) {
                 var offset =  - this.container.outerWidth(true) - Config.Menus.PROPERTIES_MENU_OFFSET;
                 this.container.css('left', jQuery('body').outerWidth(true) + offset);
             }
-            this.container.show();
+            this.container.toggle(!_.all(this._node.properties, function(property) { return property.hidden; }));
 
             return this;
+        },
+
+        _allHidden: function() {
+            return !this._node || _.all(this._node.properties, function(property) { return property.hidden; });
         }
     });
 

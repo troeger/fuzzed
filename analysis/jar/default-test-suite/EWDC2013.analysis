@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fta:AnalysisResult xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fta="net.fuzztree.analysis" validResult="true" modelId="123" decompositionNumber="2">
-  <warnings message="Attribute 'costs' is not set." elementId="5"/>
-  <warnings message="Attribute 'costFormula' is not set." elementId="6"/>
-  <warnings message="Attribute 'costs' is not set and element is child of an FeatureVariationPoint." elementId="9"/>
-  <warnings message="Attribute 'costs' is not set and element is child of an FeatureVariationPoint." elementId="12"/>
   <configurations costs="0">
     <choices key="8">
       <value xsi:type="fta:FeatureChoice" featureId="9"/>

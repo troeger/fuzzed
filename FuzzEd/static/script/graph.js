@@ -28,6 +28,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
         edges:        {},
         nodes:        {},
         name:         undefined,
+        readOnly:     undefined,
 
         _nodeClasses: {},
 
@@ -62,6 +63,11 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *    This <Graph> instance for chaining.
          */
         _loadFromJson: function(json) {
+            this.readOnly = json.readOnly;
+
+            var maxX = 0;
+            var maxY = 0;
+
             // parse the json nodes and convert them to node objects
             _.each(json.nodes, function(jsonNode) {
                 this.addNode(jsonNode.kind, jsonNode);
@@ -76,7 +82,6 @@ define(['canvas', 'class'], function(Canvas, Class) {
                 edge._fuzzedId = jsonEdge.id;
 
                 this.addEdge(edge);
-
             }.bind(this));
 
             return this;
@@ -143,6 +148,8 @@ define(['canvas', 'class'], function(Canvas, Class) {
             var sourceNode = edge.source.data(this.config.Keys.NODE);
             var targetNode = edge.target.data(this.config.Keys.NODE);
 
+            sourceNode.setChildProperties(targetNode);
+
             jQuery(document).trigger(
                 this.config.Events.GRAPH_EDGE_ADDED,
                 [edge._fuzzedId,
@@ -175,6 +182,8 @@ define(['canvas', 'class'], function(Canvas, Class) {
             var sourceNode = edge.source.data(this.config.Keys.NODE);
             var targetNode = edge.target.data(this.config.Keys.NODE);
 
+            sourceNode.restoreChildProperties(targetNode);
+
             sourceNode.outgoingEdges = _.without(sourceNode.outgoingEdges, edge);
             targetNode.incomingEdges = _.without(targetNode.incomingEdges, edge);
 
@@ -199,6 +208,9 @@ define(['canvas', 'class'], function(Canvas, Class) {
          *    This <Graph> instance for chaining.
          */
         addNode: function(kind, properties) {
+            properties.readOnly = this.readOnly;
+            properties.graph    = this;
+
             var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
             jQuery(document).trigger(this.config.Events.GRAPH_NODE_ADDED, [node.id, kind, node.x, node.y]);
             this.nodes[node.id] = node;
