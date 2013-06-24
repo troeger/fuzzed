@@ -779,10 +779,6 @@ define(['class', 'config'], function(Class, Config) {
 
         _setupInput: function() {
             this.inputs = jQuery('<input type="text" class="input-medium">').attr('id', this.id);
-
-            //TODO: deactivate and/or disable
-            //.attr('disabled', this.options.disabled ? 'disabled' : null)
-
             return this;
         },
 
