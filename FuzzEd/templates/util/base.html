@@ -101,7 +101,9 @@
     <div class="navbar navbar-fixed-top no-print">
         <div class="navbar-inner">
             <div class="container">
-                <a class="brand" anchor="#">FuzzEd - {{ graph }}</a>
+                <a class="brand" anchor="#">
+                    FuzzEd{% if graph %} - {{ graph }}{% endif %}
+                </a>
                 <ul class="nav">
                     <li>
                         <a>
