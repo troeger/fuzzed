@@ -134,7 +134,7 @@ define(['config', 'class'], function(Config, Class) {
         },
 
         _setupNavbar: function() {
-            return jQuery('ul.nav');
+            return jQuery('ul.nav.pull-right');
         }
     });
 
