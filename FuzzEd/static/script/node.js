@@ -611,6 +611,61 @@ function(Property, Mirror, Canvas, Class) {
         },
 
         /**
+         * Method: setChildProperties
+         *
+         * This method will evaluate and set the properties of the passed child according to the value specified in the
+         * childProperties key of the notation file.
+         *
+         * Parameters:
+         *   {<Node>} other - the child of the current node.
+         *
+         * Returns:
+         *   {this} node instance for chaining.
+         */
+        setChildProperties: function(otherNode) {
+            _.each(this.childProperties, function(childValues, propertyName) {
+                var property = otherNode.properties[propertyName];
+                if (typeof property === 'undefined' || property === null) return;
+
+                _.each(childValues, function(value, key) {
+                    if (key === 'hidden') {
+                        property.setHidden(value);
+                    } else if (key === 'value') {
+                        property.setValue(value);
+                    }
+                });
+            });
+
+            return this;
+        },
+
+        /**
+         * Method: restoreChildProperties
+         *
+         * This method will reset the passed child's properties from their parent enforced ones to their previous state.
+         *
+         * Parameters:
+         *   {<Node>} other - the child of the current node.
+         *
+         * Returns:
+         *   {this} node instance for chaining.
+         */
+        restoreChildProperties: function(otherNode) {
+            _.each(this.childProperties, function(childValue, propertyName) {
+                var property = otherNode.properties[propertyName];
+                if (typeof property === 'undefined' || property === null) return;
+
+                _.each(childValue, function(value, key) {
+                    if (key === 'hidden') {
+                        property.setHidden(!value);
+                    }
+                });
+            });
+
+            return this;
+        },
+
+        /**
          * Group: Accessors
          */
 

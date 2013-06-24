@@ -149,6 +149,8 @@ define(['canvas', 'class'], function(Canvas, Class) {
             var sourceNode = edge.source.data(this.config.Keys.NODE);
             var targetNode = edge.target.data(this.config.Keys.NODE);
 
+            sourceNode.setChildProperties(targetNode);
+
             jQuery(document).trigger(
                 this.config.Events.GRAPH_EDGE_ADDED,
                 [edge._fuzzedId,
@@ -180,6 +182,8 @@ define(['canvas', 'class'], function(Canvas, Class) {
             var id         = edge._fuzzedId;
             var sourceNode = edge.source.data(this.config.Keys.NODE);
             var targetNode = edge.target.data(this.config.Keys.NODE);
+
+            sourceNode.restoreChildProperties(targetNode);
 
             sourceNode.outgoingEdges = _.without(sourceNode.outgoingEdges, edge);
             targetNode.incomingEdges = _.without(targetNode.incomingEdges, edge);
