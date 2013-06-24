@@ -82,7 +82,6 @@ define(['canvas', 'class'], function(Canvas, Class) {
                 edge._fuzzedId = jsonEdge.id;
 
                 this.addEdge(edge);
-
             }.bind(this));
 
             return this;

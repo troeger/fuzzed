@@ -276,14 +276,14 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
                         this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
                     }.bind(this));
 
-                    this.properties.hide();
-
                     // delete selected edges
                     jQuery(selectedEdges).each(function(index, element) {
                         var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
                         jsPlumb.detach(edge);
                         this.graph.deleteEdge(edge);
                     }.bind(this));
+
+                    this.properties.hide();
                 }
             }.bind(this));
 

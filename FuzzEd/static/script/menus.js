@@ -172,10 +172,9 @@ define(['config', 'class'], function(Config, Class) {
      * Class: PropertiesMenu
      */
     var PropertiesMenu = Menu.extend({
-        _displayedEntries: 0,
-        _displayOrder:     undefined,
-        _form:             undefined,
-        _node:             undefined,
+        _displayOrder: undefined,
+        _form:         undefined,
+        _node:         undefined,
 
         init: function(displayOrder) {
             this._super();
@@ -189,7 +188,7 @@ define(['config', 'class'], function(Config, Class) {
             this._navbarButton.remove();
             this._navbarButton = undefined;
 
-            this.show(this._nodes);
+            this.show();
             this.container.animate(eventObject.data, {
                 duration: Config.Menus.ANIMATION_DURATION
             });
@@ -197,6 +196,10 @@ define(['config', 'class'], function(Config, Class) {
         },
 
         /* Section: Visibility */
+        hide: function() {
+            this._node = undefined;
+            return this._super();
+        },
 
         show: function() {
             var selected = jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + '.' + Config.Classes.NODE);
@@ -240,17 +243,14 @@ define(['config', 'class'], function(Config, Class) {
                 return this;
             }
 
-            this._displayedEntries = 0;
             _.each(this._displayOrder, function(propertyName) {
                 var property = this._node.properties[propertyName];
                 // has the node such a property? display it!
                 if (typeof property !== 'undefined' && property !== null) {
                     property.menuEntry.appendTo(this._form);
-                    this._displayedEntries += (property.hidden ? 0 : 1);
 
                     jQuery(property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
-                        this._displayedEntries += hidden ? -1 : 1;
-                        this.container.toggle(this._displayedEntries > 0);
+                        this.container.toggle(!this._allHidden());
                     }.bind(this));
                 }
             }.bind(this));
@@ -260,9 +260,13 @@ define(['config', 'class'], function(Config, Class) {
                 var offset =  - this.container.outerWidth(true) - Config.Menus.PROPERTIES_MENU_OFFSET;
                 this.container.css('left', jQuery('body').outerWidth(true) + offset);
             }
-            this.container.toggle(this._displayedEntries > 0);
+            this.container.toggle(!_.all(this._node.properties, function(property) { return property.hidden; }));
 
             return this;
+        },
+
+        _allHidden: function() {
+            return !this._node || _.all(this._node.properties, function(property) { return property.hidden; });
         }
     });
 
