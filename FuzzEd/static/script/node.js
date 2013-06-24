@@ -496,7 +496,7 @@ function(Property, Mirror, Canvas, Class) {
         _setupProperties: function(propertiesDisplayOrder) {
             _.each(propertiesDisplayOrder, function(propertyName) {
                 var property = this.properties[propertyName];
-                if (!property) return;
+                if (typeof property === 'undefined' || property === null) return;
                 property.name = propertyName;
                 this.properties[propertyName] = Property.from(this, property);
             }.bind(this));
