@@ -90,6 +90,7 @@
             "properties": {
                 "probability": {
                     "kind": "numeric",
+                    "displayName": "Probability",
                     "default": 0,
                     "min": 0,
                     "max": 1,
@@ -124,13 +125,15 @@
 
                 "out_of": {
                     "kind": "range",
+                    "displayName": "Out-of",
                     "default": [1, 1],
                     "min": 1,
                     "step": 1,
 
                     "mirror": {
                         "position": "bottom",
-                        "style": ["italic"]
+                        "style": ["italic"],
+                        "format": "{{$0}}/{{$1}}"
                     }
                 }
             }
