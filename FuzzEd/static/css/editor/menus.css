@@ -72,6 +72,9 @@
     z-index: 1;
 }
 
+/*
+ *  Shapes Menu
+ */
 #FuzzEdShapes {
     top: 60px;
     left: 20px;
@@ -93,6 +96,9 @@
     text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
 }
 
+/*
+ *  Properties Menu
+ */
 #FuzzEdProperties {
     display: none;
     top: 60px;
@@ -135,6 +141,14 @@
     margin-top: 5px;
 }
 
+#FuzzEdProperties .control-group .control-group {
+    margin-top: 18px;
+    margin-bottom: 0;
+}
+
+/*
+ *  Cutsets Menu
+ */
 #FuzzEdCutsetsMenu {
     display: none;
     top: 60px;
@@ -142,6 +156,9 @@
     min-width: 200px;
 }
 
+/*
+ *  Probability Menu
+ */
 #FuzzEdProbabilityMenu {
     display:    none;
     top:        60px;

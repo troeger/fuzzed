@@ -1,5 +1,5 @@
-define(['properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
-function(Properties, Mirror, Canvas, Class) {
+define(['property', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
+function(Property, Mirror, Canvas, Class) {
     /**
      *  Class: {Abstract} Node
      *
@@ -19,6 +19,7 @@ function(Properties, Mirror, Canvas, Class) {
          *                                       defaults to <Node::getConfig()>.
          *    {DOMElement} container           - The DOM element that contains all other visual DOM elements of the node
          *                                       such as its image, mirrors, ...
+         *    {<Graph>}    graph               - The Graph this node belongs to.
          *    {int}        id                  - A client-side generated id - i.e. UNIX-timestamp - to uniquely identify
          *                                       the node in the frontend. It does NOT correlate with database ids in the
          *                                       backend. Introduced to save round-trips and to later allow for an
@@ -42,6 +43,7 @@ function(Properties, Mirror, Canvas, Class) {
          */
         config:        undefined,
         container:     undefined,
+        graph:         undefined,
         id:            undefined,
         incomingEdges: undefined,
         outgoingEdges: undefined,
@@ -61,12 +63,12 @@ function(Properties, Mirror, Canvas, Class) {
         /**
          * Constructor: init
          *
-         * The constructor of the abstract node class. It will merge the state of the properties, assign a client-side
+         * The constructor of the abstract node class. It will merge the state of the definition, assign a client-side
          * id, setup the visual representation and enable interaction via mouse and keyboard. Calling the constructor
          * as-is, will result in an exception.
          *
          * Parameters:
-         *   {Object}     properties             - An object containing default values for the node's properties. E.g.:
+         *   {Object}     definition             - An object containing default values for the node's definition. E.g.:
          *                                         {x: 1, y: 20, name: 'foo'}. The values will be merged into the node
          *                                         recursively, creating deep copies of complex structures like arrays
          *                                         or other objects. Mainly required for restoring the state of a node
@@ -78,9 +80,9 @@ function(Properties, Mirror, Canvas, Class) {
          * Returns:
          *   This {<Node>} instance.
          */
-        init: function(properties, propertiesDisplayOrder) {
+        init: function(definition, propertiesDisplayOrder) {
             // merge all presets of the configuration and data from the backend into this object
-            jQuery.extend(true, this, properties);
+            jQuery.extend(true, this, definition);
 
             // logic
             if (typeof this.id === 'undefined') {
@@ -106,9 +108,7 @@ function(Properties, Mirror, Canvas, Class) {
                 ._setupDragging()
                 ._setupMouse()
                 ._setupSelection()
-                // Property displays
-                ._setupMirrors(this.propertyMirrors, propertiesDisplayOrder)
-                ._setupPropertyMenuEntries(this.propertyMenuEntries, propertiesDisplayOrder);
+                ._setupProperties(propertiesDisplayOrder);
         },
 
         /**
@@ -492,56 +492,27 @@ function(Properties, Mirror, Canvas, Class) {
         },
 
         /**
-         * Method: _setupMirrors
-         *
-         * This helper method is called in the constructor and creates <Mirrors> for the node. Mirrors are create if
-         * and only if they appear in the propertyDisplayOrder collection.
+         * Method: _setupProperties
          *
          * Parameters:
-         *   {Object}     propertyMirrors      - The mirror definition objects as found in notations file
-         *                                       (e.g. notations/faulttree.json)
-         *   {Array[str]} propertyDisplayOrder - An array of property name string in the order descending order of their
-         *                                       appearance as mirrors.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-        _setupMirrors: function(propertyMirrors, propertiesDisplayOrder) {
-            this.propertyMirrors = {};
-            if (typeof propertyMirrors === 'undefined') return this;
-
-            _.each(propertiesDisplayOrder, function(property) {
-                var mirrorDefinition = propertyMirrors[property];
-
-                if (typeof mirrorDefinition === 'undefined' || mirrorDefinition === null) return;
-                this.propertyMirrors[property] = new Mirror(this.container, mirrorDefinition);
-            }.bind(this));
-
-            return this;
-        },
-
-        /**
-         * Method: _setuPropertyMenuEntries
-         *
-         * Parameters:
-         *   {Object}     propertyMenuEntries    - An object containing
          *   {Array[str]} propertiesDisplayOrder - bar.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
-        _setupPropertyMenuEntries: function(propertyMenuEntries, propertiesDisplayOrder) {
-            this.propertyMenuEntries = {};
-            if (typeof propertyMenuEntries === 'undefined') return this.propertyMenuEntries;
+        _setupProperties: function(propertiesDisplayOrder) {
+            _.each(propertiesDisplayOrder, function(propertyName) {
+                var property = this.properties[propertyName];
 
-            _.each(propertiesDisplayOrder, function(property) {
-                var menuEntry = propertyMenuEntries[property];
-                if (typeof menuEntry === 'undefined' || menuEntry === null) return;
+                if (typeof property === 'undefined') {
+                    return;
+                } else if (property === null) {
+                    delete this.properties[propertyName];
+                    return;
+                }
 
-                var mirror = this.propertyMirrors[property];
-
-                menuEntry.property = property;
-                this.propertyMenuEntries[property] = Properties.newFrom(this, mirror, menuEntry);
+                property.name = propertyName;
+                this.properties[propertyName] = Property.from(this, property);
             }.bind(this));
 
             return this;
@@ -647,6 +618,61 @@ function(Properties, Mirror, Canvas, Class) {
         },
 
         /**
+         * Method: setChildProperties
+         *
+         * This method will evaluate and set the properties of the passed child according to the value specified in the
+         * childProperties key of the notation file.
+         *
+         * Parameters:
+         *   {<Node>} other - the child of the current node.
+         *
+         * Returns:
+         *   {this} node instance for chaining.
+         */
+        setChildProperties: function(otherNode) {
+            _.each(this.childProperties, function(childValues, propertyName) {
+                var property = otherNode.properties[propertyName];
+                if (typeof property === 'undefined' || property === null) return;
+
+                _.each(childValues, function(value, key) {
+                    if (key === 'hidden') {
+                        property.setHidden(value);
+                    } else if (key === 'value') {
+                        property.setValue(value);
+                    }
+                });
+            });
+
+            return this;
+        },
+
+        /**
+         * Method: restoreChildProperties
+         *
+         * This method will reset the passed child's properties from their parent enforced ones to their previous state.
+         *
+         * Parameters:
+         *   {<Node>} other - the child of the current node.
+         *
+         * Returns:
+         *   {this} node instance for chaining.
+         */
+        restoreChildProperties: function(otherNode) {
+            _.each(this.childProperties, function(childValue, propertyName) {
+                var property = otherNode.properties[propertyName];
+                if (typeof property === 'undefined' || property === null) return;
+
+                _.each(childValue, function(value, key) {
+                    if (key === 'hidden') {
+                        property.setHidden(!value);
+                    }
+                });
+            });
+
+            return this;
+        },
+
+        /**
          * Group: Accessors
          */
 
@@ -710,7 +736,7 @@ function(Properties, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          *
          * Triggers:
-         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::PROPERTY_CHANGED>
          */
         moveTo: function(position) {
             var gridPos = Canvas.toGrid(position);
@@ -719,7 +745,7 @@ function(Properties, Mirror, Canvas, Class) {
 
             this._moveContainerToPixel(position);
             // call home
-            jQuery(document).trigger(this.config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+            jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },
