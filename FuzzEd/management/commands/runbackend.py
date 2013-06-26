@@ -1,7 +1,12 @@
 from django.core.management.base import BaseCommand, CommandError
 from analysis import top_event_probability
 from subprocess import Popen, PIPE
-import os, sys, beanstalkc
+import os, sys
+try:
+	import beanstalkc
+except:
+	print "ERROR: Please run 'sudo pip install -r requirements.txt' first to get the latest dependencies"
+	exit(-1)
 
 def printAnalysisServerStatus():
 	print 'Job\tStatus'
@@ -24,13 +29,13 @@ class Command(BaseCommand):
 			print "Error %u while starting beanstalkd"%beanstalk.returncode
 			exit(-1)
 		print "Starting Java analysis server ..."
-		analysis = Popen(["java","-jar","analysis/jar/fuzzTreeAnalysis.jar","-runServer"], stderr=PIPE, stdout=PIPE)
+		analysis = Popen(["java","-jar","analysis/jar/fuzzTreeAnalysis.jar","-runServer"])
 		if analysis.returncode != None:
 			print "Error %u while starting Java analysis server"%analysis.returncode
 			beanstalk.terminate()
 			exit(-1)
 		print "Starting rendering server ..."
-		rendering = Popen(["python","rendering/renderServer.py"], stderr=PIPE, stdout=PIPE)
+		rendering = Popen(["python","rendering/renderServer.py"])
 		if rendering.returncode != None:
 			print "Error %u while starting rendering server"%rendering.returncode
 			analysis.terminate()

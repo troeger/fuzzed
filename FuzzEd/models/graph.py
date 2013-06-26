@@ -4,8 +4,12 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 import pyxb.utils.domutils
-from xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlFuzzTreeNamespace
-from xml_faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace
+try:
+    from xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlFuzzTreeNamespace
+    from xml_faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace
+except:
+    print "ERROR: Run './setup.py build' to create the XML schema wrappers first"
+    exit(-1)
 
 import json, notations
 

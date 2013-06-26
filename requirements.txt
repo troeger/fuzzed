@@ -6,5 +6,6 @@ minbool
 lxml
 pyxb
 psycopg2
+pyyaml
 beanstalkc
 
