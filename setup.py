@@ -7,7 +7,7 @@ from distutils.command.clean import clean as _clean
 from distutils.command.sdist import sdist as _sdist
 # check FuzzEd/__init__.py for the project version number
 from FuzzEd import __version__, util
-from setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
+from FuzzEd.setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 
 def check_python_version():
     version_message = 'This Django project requires Python 2.7+'
