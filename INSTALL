@@ -6,11 +6,13 @@ Python dependencies can be installed via PIP:
 
 Additional software on the developer machine:
 - Oracle Java 7 JDK
-- ANT 
+- ANT
+- Beanstalkd 
 
 Additional software on the production machine:
 - Oracle Java 7 JRE
 - PostgreSQL database
+- Beanstalkd
 
 Compile install packages to ./dist on developer machine
 -------------------------------------------------------
