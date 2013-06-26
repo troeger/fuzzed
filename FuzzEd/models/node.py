@@ -165,7 +165,6 @@ class Node(models.Model):
         Returns:
          {str} the node in JSON representation
         """
-        #TODO: Separate img node and mirror text node, so that the images in one line get aligned
         nodekind = self.kind.lower()
         # TODO: Determine mirror text by checking for the properties to be shown in notations.py
         name = self.get_property('name', '-')
@@ -267,10 +266,10 @@ class Node(models.Model):
             return self.properties.get(key=key).value
         except ObjectDoesNotExist:
             try:
-                logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
-                return notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
+                logger.debug('Node has no property "%s", trying to use default from notation' % key)
+                return notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]['default']
             except KeyError:
-                logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
+                logger.debug('No default given in notation, using default "%s" instead' % default)
                 return default
 
     def get_attr(self, key):
