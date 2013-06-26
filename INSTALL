@@ -1,19 +1,25 @@
 Install dependencies for compiling / running the app
 ----------------------------------------------------
-sudo easy_install pip
-sudo pip install -r requirements.txt
-- Oracle Java 7 installation for the analysis server
-- ANT
+Python dependencies can be installed via PIP:
+- sudo easy_install pip
+- sudo pip install -r requirements.txt
+
+Additional software on the developer machine:
+- Oracle Java 7 JDK
+- ANT 
+
+Additional software on the production machine:
+- Oracle Java 7 JRE
 - PostgreSQL database
 
-Compile install packages to ./dist
-----------------------------------
+Compile install packages to ./dist on developer machine
+-------------------------------------------------------
 ./setup.py build
 ./setup.py sdist
 
-Install in web directory
-------------------------
-- Untar file
+Install new release on production machine
+------------------------------------------
+tar xvfz FuzzEdx.xx.tgz .
 ./manage.py syncdb
 ./manage.py migrate
 
