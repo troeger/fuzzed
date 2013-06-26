@@ -152,9 +152,14 @@ class build(_build):
 def clean_docs():
     os.system('rm -rf docs')
 
+def clean_build_garbage():
+    os.system('rm -rf FuzzEd.egg-info')
+    os.system('rm -rf build')
+    os.system('rm -rf dist')
+
 def clean_pycs():
     # Clean all pyc files recursively
-    for root, dirs, files in os.walk('FuzzEd'):
+    for root, dirs, files in os.walk('.'):
         for name in files:
             if name.endswith('.pyc'):
                 fullname = os.path.join(root, name)
@@ -167,6 +172,7 @@ class clean(_clean):
         _clean.run(self)
         clean_docs()
         clean_pycs()
+        clean_build_garbage()
 
 # Our overloaded 'setup.py sdist' command
 class sdist(_sdist):
