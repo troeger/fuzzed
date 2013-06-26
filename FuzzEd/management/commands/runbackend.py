@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from analysis import top_event_probability
 from subprocess import Popen, PIPE
-import os, sys
+import os, sys, beanstalkc
 
 def printAnalysisServerStatus():
 	print 'Job\tStatus'
@@ -9,6 +9,10 @@ def printAnalysisServerStatus():
 
 	for job_id, status in top_event_probability.list_jobs().iteritems():
 		print '%s\t%s' % (job_id, status)	
+
+def printBeanstalkStatus():
+	b = beanstalkc.Connection(parse_yaml=False)
+	print b.stats()
 
 class Command(BaseCommand):
 	help = 'Starts the backend services'
@@ -33,7 +37,14 @@ class Command(BaseCommand):
 				beanstalk.terminate()
 				exit(0)
 			else:
+				print 79*"="
+				print "Beanstalkd stats"
+				print 79*"="
+				printBeanstalkStatus()
+				print 79*"="
+				print "Java analysis server stats"
+				print 79*"="
 				printAnalysisServerStatus()
-				print 79*"-"
+				print 79*"="
 
 
