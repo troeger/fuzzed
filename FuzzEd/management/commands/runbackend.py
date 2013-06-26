@@ -19,7 +19,7 @@ class Command(BaseCommand):
 
 	def handle(self, *args, **options):
 		print "Starting beanstalkd messaging server ..."
-		beanstalk = Popen(["beanstalkd"], stdout=PIPE, stderr=PIPE)
+		beanstalk = Popen(["beanstalkd","-z 5000000"], stdout=PIPE, stderr=PIPE)
 		if beanstalk.returncode != None:
 			print "Error %u while starting beanstalkd"%beanstalk.returncode
 			exit(-1)
@@ -29,10 +29,18 @@ class Command(BaseCommand):
 			print "Error %u while starting Java analysis server"%analysis.returncode
 			beanstalk.terminate()
 			exit(-1)
+		print "Starting rendering server ..."
+		rendering = Popen(["python","rendering/renderServer.py"], stderr=PIPE, stdout=PIPE)
+		if rendering.returncode != None:
+			print "Error %u while starting rendering server"%rendering.returncode
+			analysis.terminate()
+			beanstalk.terminate()
+			exit(-1)
 		while 1:
 			print "Press any key for status information, or 'q' for quitting ..."
 			line = sys.stdin.readline()
 			if line.startswith('q'):
+				rendering.terminate()
 				analysis.terminate()
 				beanstalk.terminate()
 				exit(0)
