@@ -155,6 +155,22 @@ class Node(models.Model):
 
         raise ValueError('Node %s has unsupported kind' % self)
 
+    def get_all_properties(self):
+        """
+        Returns a sorted set of all node properties and their valus, according to the notation rendering rules.
+        """
+        result = []
+        displayOrder = notations.by_kind[self.graph.kind]['propertiesDisplayOrder']
+        for prop in displayOrder:
+            # determine value of the property, considerung also the possible default
+            val = self.get_property(prop, None)
+            if val != None:
+                if prop != "name":
+                    # Properties beside name have formatting rules for the mirror text
+                    format = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][prop]['mirror']['format']
+                    val = format.replace("{{$0}}",str(val))
+                result.append(val)
+        return result
 
     def to_tikz(self, x_offset=0, y_offset=0):
         """
@@ -165,14 +181,14 @@ class Node(models.Model):
         Returns:
          {str} the node in JSON representation
         """
-        #TODO: Separate img node and mirror text node, so that the images in one line get aligned
         nodekind = self.kind.lower()
-        # TODO: Determine mirror text by checking for the properties to be shown in notations.py
-        name = self.get_property('name', '-')
         # Create Tikz snippet for tree node
         result = "\\node [inner sep=0em, outer sep=0em] at (%u, -%u) (%u) {\includegraphics{%s}};\n"%(self.x+x_offset, self.y+y_offset, self.pk, tree_node_image[self.kind]+".eps")
         # Text width is exactly the double width of the icons
-        result += "\\node [text width=56.210pt, below, align=center] at (%u.south) (text%u) {\\footnotesize %s};\n"%(self.pk, self.pk, name)
+        mirrorText = ""
+        for propvalue in self.get_all_properties():
+            mirrorText += "%s\\\\"%propvalue
+        result += "\\node [text width=56.210pt, below, align=center] at (%u.south) (text%u) {\\footnotesize %s};\n"%(self.pk, self.pk, mirrorText)
         # Create also linked nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             result += edge.target.to_tikz(x_offset, y_offset)
@@ -266,11 +282,14 @@ class Node(models.Model):
         try:
             return self.properties.get(key=key).value
         except ObjectDoesNotExist:
-            try:
-                logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
-                return notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]['default']
-            except KeyError:
-                logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
+            logger.debug('Node instance has no property "%s", trying to use default from notation' % key)
+            props = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']
+            if props.has_key(key) and isinstance(props[key], dict):
+                # Ordinary property configuration dict, which also includes the default value
+                return props[key]['default']
+            else:
+                # Currently only possible for "optional: None", or if this node does node have this property
+                logger.debug('Node definition has no property "%s", using provided default' % key)
                 return default
 
     def get_attr(self, key):

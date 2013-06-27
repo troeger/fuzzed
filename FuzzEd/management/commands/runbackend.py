@@ -29,13 +29,13 @@ class Command(BaseCommand):
 			print "Error %u while starting beanstalkd"%beanstalk.returncode
 			exit(-1)
 		print "Starting Java analysis server ..."
-		analysis = Popen(["java","-jar","analysis/jar/fuzzTreeAnalysis.jar","-runServer"])
+		analysis = Popen(["java","-jar","analysis/jar/fuzzTreeAnalysis.jar","-runServer"], stdout=PIPE, stderr=PIPE)
 		if analysis.returncode != None:
 			print "Error %u while starting Java analysis server"%analysis.returncode
 			beanstalk.terminate()
 			exit(-1)
 		print "Starting rendering server ..."
-		rendering = Popen(["python","rendering/renderServer.py"])
+		rendering = Popen(["python","rendering/renderServer.py"], stdout=PIPE, stderr=PIPE)
 		if rendering.returncode != None:
 			print "Error %u while starting rendering server"%rendering.returncode
 			analysis.terminate()
