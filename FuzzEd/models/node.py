@@ -268,7 +268,7 @@ class Node(models.Model):
         except ObjectDoesNotExist:
             try:
                 logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
-                return notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
+                return notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]['default']
             except KeyError:
                 logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
                 return default

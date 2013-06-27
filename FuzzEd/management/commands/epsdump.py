@@ -10,7 +10,6 @@ class Command(BaseCommand):
         # Dump tikz Latex from graph and put it into the rendering tube
         graph_id = int(args[0])
         text = Graph.objects.get(pk=graph_id).to_tikz()
-        print text
         b=beanstalkc.Connection()
         b.use('rendering')
         b.watch('renderingResults')
