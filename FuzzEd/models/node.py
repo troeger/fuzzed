@@ -165,7 +165,7 @@ class Node(models.Model):
             # determine value of the property, considerung also the possible default
             val = self.get_property(prop, None)
             if val != None:
-                if prop != "name":
+                if prop not in ["name","decompositions"] and prop['kind'] != 'compound':
                     # Properties beside name have formatting rules for the mirror text
                     format = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][prop]['mirror']['format']
                     val = format.replace("{{$0}}",str(val))
