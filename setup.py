@@ -9,6 +9,10 @@ from distutils.command.sdist import sdist as _sdist
 from FuzzEd import __version__, util
 from FuzzEd.setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 
+IS_WINDOWS = os.name == 'nt'
+FILE_EXTENSION = '.py' if IS_WINDOWS else ''
+FILE_PREFIX = 'file:///' + os.getcwd() if IS_WINDOWS else '' 
+
 def check_python_version():
     version_message = 'This Django project requires Python 2.7+'
 
@@ -39,8 +43,9 @@ def build_xmlschema_wrapper():
 
         if os.path.exists(path_name):
             os.remove(path_name)
-    if os.system('pyxbgen --binding-root=FuzzEd/models/ -u FuzzEd/static/xsd/analysis.xsd '
-                 '-m xml_analysis -u FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree -u FuzzEd/static/xsd/faulttree.xsd -m xml_faulttree') != 0:
+    if os.system('pyxbgen%s --binding-root=FuzzEd/models/ -u %s/FuzzEd/static/xsd/analysis.xsd '
+                 '-m xml_analysis -u %s/FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree -u %s/FuzzEd/static/xsd/faulttree.xsd -m xml_faulttree'
+                 % (FILE_EXTENSION, FILE_PREFIX, FILE_PREFIX, FILE_PREFIX,)) != 0:
         raise Exception('Execution of pyxbgen failed.\nTry "sudo setup.py test" for installing all dependencies.')
 
 def build_naturaldocs():
@@ -94,14 +99,14 @@ def notation_json_to_py(kind):
                 if isinstance(node_config_data,unicode):
                     configs_as_attributes+="    %s = '%s'\n"%(node_config_name, node_config_data)
                 else:
-                    configs_as_attributes+="    %s = %s\n"%(node_config_name, node_config_data) 
+                    configs_as_attributes+="    %s = %s \n"%(node_config_name, node_config_data) 
         # Got the (maybe) base class and all the config options as class attributes, now adding them
         result += "\nclass %s_%s(%s):\n"%(kind, node_name, base_class)
         result += configs_as_attributes
         node_list.append(node_name)
     # Now comes the global information
     # The 'kind' attribute on root level of the JSON forms the class name
-    result+="\nclass %s():\n"%kind
+    result+="/nclass %s():/n"%kind
     # Add all attributes on the same root JSON level that are not node configurations
     for k,v in config.iteritems():
         if k != 'nodes':
@@ -135,10 +140,10 @@ def build_notations():
 class build(_build):
     def run(self):
         _build.run(self)
-#        build_analysis_server()
+        build_analysis_server()
         build_notations()
- #       build_schema_files()
-  #      build_xmlschema_wrapper()
+        build_schema_files()
+        build_xmlschema_wrapper()
 
 def clean_docs():
     os.system('rm -rf docs')
