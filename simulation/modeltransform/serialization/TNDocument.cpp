@@ -27,7 +27,7 @@ namespace
 	const string CONTENTTEMLPATE = ""
 		"\n%1%\n\n"
 		"\n%2%\n\n"
-		"\n%3%\n\n";
+		"\n%3%\n";
 
 	// NAME, MARKING, (X,Y)-POSITION (PLACE & TAG)
 	// 1: NAME
@@ -101,10 +101,10 @@ bool TNDocument::save(const string& fileName)
 		transitions += transitionString(t.second);
 
  	string measures = "-- DEFINITION OF PARAMETERS:\n-- REWARD MEASURES:\n\n"; // more than a comment...
-// 	for (const auto& m : m_measures)
-// 		measures += m;
+	for (const auto& m : m_measures)
+		measures += m;
 
-	file << boost::format(CONTENTTEMLPATE) % places % transitions % measures << std::endl;
+	file << boost::format(CONTENTTEMLPATE) % places % transitions % measures;
 	file << "-- END OF SPECIFICATION FILE" << std::endl;
 	file.close();
 
@@ -133,7 +133,7 @@ int TNDocument::addTopLevelPlace(const std::string&)
 	const string id = PLACE_IDENTIFIER + util::toString((int)m_places.size());
 	m_places[id] = (boost::format(PLACETEMPLATE) % id % 0).str();
 
-	const string measure = (boost::format(MEASURETEMPLATE) % "SystemFailure" % (string("P{#") + id + " > 0}")).str();
+	const string measure = (boost::format(MEASURETEMPLATE) % "S" % (string("P{#") + id + ">0};\n")).str();
 	m_measures.emplace_back(measure);
 
 	return m_places.size()-1;
