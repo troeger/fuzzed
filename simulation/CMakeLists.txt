@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.8)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
-set(Boost_USE_STATIC_LIBS       OFF)
+set(Boost_USE_STATIC_LIBS       ON)
 set(Boost_USE_MULTITHREADED     ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 #add_definitions(-DBOOST_ALL_NO_LIB)
@@ -12,8 +12,10 @@ set(BOOST_ROOT $ENV{BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to poi
 set(BOOST_INCLUDEDIR ${BOOST_ROOT}/Include)
 set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
        
+set(FT_CONFIG_DIR "${PROJECT_SOURCE_DIR}/../fuzztreeconfiguration")
 set(FT_LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
-set(FT_INCLUDE_DIR 
+set(FT_INCLUDE_DIR
+
 	"${PROJECT_SOURCE_DIR}/modeltransform"
 	"${PROJECT_SOURCE_DIR}/simulation" 
 	"${PROJECT_SOURCE_DIR}/common"
@@ -38,7 +40,7 @@ elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 set(Boost_DIR ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
-find_package(Boost COMPONENTS thread system filesystem program_options REQUIRED)
+find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
 find_package(pugixml REQUIRED)
 
@@ -59,3 +61,4 @@ option(BUILD_SIMULATION_EXECUTABLE ON)
 option(USE_TIMENET ON)
 add_subdirectory(fuzztreeconfiguration)
 add_subdirectory(simulation)
+add_subdirectory(modelcheck)
