@@ -11,7 +11,7 @@ from FuzzEd.setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 
 IS_WINDOWS = os.name == 'nt'
 FILE_EXTENSION = '.py' if IS_WINDOWS else ''
-FILE_PREFIX = 'file:///' + os.getcwd() if IS_WINDOWS else '' 
+FILE_PREFIX = 'file:///' + os.getcwd() + '/' if IS_WINDOWS else '' 
 
 def check_python_version():
     version_message = 'This Django project requires Python 2.7+'
@@ -43,8 +43,8 @@ def build_xmlschema_wrapper():
 
         if os.path.exists(path_name):
             os.remove(path_name)
-    if os.system('pyxbgen%s --binding-root=FuzzEd/models/ -u %s/FuzzEd/static/xsd/analysis.xsd '
-                 '-m xml_analysis -u %s/FuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree -u %s/FuzzEd/static/xsd/faulttree.xsd -m xml_faulttree'
+    if os.system('pyxbgen%s --binding-root=FuzzEd/models/ -u %sFuzzEd/static/xsd/analysis.xsd '
+                 '-m xml_analysis -u %sFuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree -u %sFuzzEd/static/xsd/faulttree.xsd -m xml_faulttree'
                  % (FILE_EXTENSION, FILE_PREFIX, FILE_PREFIX, FILE_PREFIX,)) != 0:
         raise Exception('Execution of pyxbgen failed.\nTry "sudo setup.py test" for installing all dependencies.')
 
