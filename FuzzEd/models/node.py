@@ -204,9 +204,15 @@ class Node(models.Model):
         Returns:
          {str} the node in JSON representation
         """
+        grid_size_pt = 56.210       # grid size in the front end, which is also the symbol width in EPS pictures
         nodekind = self.kind.lower()
         # Create Tikz snippet for tree node
-        result = "\\node [inner sep=0em, outer sep=0em] at (%u, -%u) (%u) {\includegraphics{%s}};\n"%(self.x+x_offset, self.y+y_offset, self.pk, tree_node_image[self.kind]+".eps")
+        # We are intentionally do not use the TiKZ tree rendering capabilities, since this
+        # would ignore all user formatting of the tree from the editor
+        # additional, freely floating nodes couldn't be considered any more
+        # we start with the TiKZ node for the graph icon
+        result = "\\node [inner sep=0em, outer sep=0em] at (%u, -%f) (%u) {\includegraphics{%s}};\n"%(self.x+x_offset, self.y+y_offset, self.pk, tree_node_image[self.kind]+".eps")
+        # Do the mirror text
         # Text width is exactly the double width of the icons
         mirrorText = ""
         for index,propvalue in enumerate(self.get_all_mirror_properties()):
@@ -217,11 +223,20 @@ class Node(models.Model):
             else:
                 propvalue = "{\\scriptsize %s}"%propvalue                                
             mirrorText += "%s\\\\"%propvalue
-        result += "\\node [text width=56.210pt, below, align=center] at (%u.south) (text%u) {%s};\n"%(self.pk, self.pk, mirrorText)
+        # If we do not have a mirror text (such as with gates), the connector should start directly at the node south
+        if mirrorText != "":
+            result += "\\node [text width=%fpt, below, align=center] at (%u.south) (text%u) {%s};\n"%(grid_size_pt, self.pk, self.pk, mirrorText)
+            connectorStart = "text%u"%self.pk
+        else:
+            connectorStart = str(self.pk)
         # Create also linked nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             result += edge.target.to_tikz(x_offset, y_offset)
-            result += "\draw [thick] (text%u.south) -| (%u.north);\n"%(self.pk, edge.target.pk)
+            # We tried several ways to get nice connector breaks without the trees package,
+            # but it finally always demands to much 'direction' logic to position some
+            # intermediate hidden nodes for the break
+            # therefore, we live with straight lines
+            result += "\draw [thick] (%s.south) -- (%u.north);\n"%(connectorStart, edge.target.pk)
         print result
         return result
 
