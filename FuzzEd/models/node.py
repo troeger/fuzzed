@@ -236,7 +236,7 @@ class Node(models.Model):
             # but it finally always demands to much 'direction' logic to position some
             # intermediate hidden nodes for the break
             # therefore, we live with straight lines
-            result += "\draw [thick] (%s.south) -- (%u.north);\n"%(connectorStart, edge.target.pk)
+            result += "\draw [thick] (%s.south) |-- (%u.north);\n"%(connectorStart, edge.target.pk)
         print result
         return result
 
