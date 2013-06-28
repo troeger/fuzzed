@@ -332,10 +332,6 @@
 
             "connector": {
                 "dashstyle": "4 2"
-            },
-
-            "changedChildProperties": {
-                "optional": null
             }
         },
 
@@ -382,8 +378,15 @@
                 "dashstyle": "4 2"
             },
 
-            "changedChildProperties": {
-                "optional": null
+            "childProperties": {
+                "optional": {
+                    "hidden": true,
+                    "value":  false
+                },
+                "cardinality": {
+                    "hidden": true,
+                    "value": 1
+                }
             }
         },
 
