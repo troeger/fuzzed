@@ -35,7 +35,7 @@ class Command(BaseCommand):
 			beanstalk.terminate()
 			exit(-1)
 		print "Starting rendering server ..."
-		rendering = Popen(["python","rendering/renderServer.py"], stdout=PIPE, stderr=PIPE)
+		rendering = Popen(["python","rendering/renderServer.py"])
 		if rendering.returncode != None:
 			print "Error %u while starting rendering server"%rendering.returncode
 			analysis.terminate()

@@ -13,7 +13,7 @@ class Command(BaseCommand):
         b=beanstalkc.Connection()
         b.use('rendering')
         b.watch('renderingResults')
-        jobid = b.put(str(text))
+        jobid = b.put(str(text.encode('utf-8')))
         # Wait for result ...
         result = b.reserve()
         f=open('graph.eps','w')

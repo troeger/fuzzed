@@ -157,19 +157,40 @@ class Node(models.Model):
 
     def get_all_properties(self):
         """
-        Returns a sorted set of all node properties and their valus, according to the notation rendering rules.
+        Returns a sorted set of all node properties and their values, according to the notation rendering rules.
         """
         result = []
         displayOrder = notations.by_kind[self.graph.kind]['propertiesDisplayOrder']
+        propdetails = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']
         for prop in displayOrder:
-            # determine value of the property, considerung also the possible default
-            val = self.get_property(prop, None)
-            if val != None:
-                if prop not in ["name","decompositions"] and prop['kind'] != 'compound':
-                    # Properties beside name have formatting rules for the mirror text
-                    format = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][prop]['mirror']['format']
-                    val = format.replace("{{$0}}",str(val))
-                result.append(val)
+            if propdetails.has_key(prop):           # the displayOrder list is static, the property does not have to be set
+                val = self.get_property(prop, None)
+                if isinstance(propdetails[prop],dict):          # Some properties do not have a config dict in notations, such as optional=None
+                    kind = propdetails[prop]['kind']
+                else:
+                    logger.debug("Property %s in %s has no config dictionary"%(prop, self.kind))
+                    kind="text"
+                if val != None:
+                    # In case, format the database value according to the notation configuration
+                    if kind == "range":
+                        format = propdetails[prop]['mirror']['format']
+                        val = format.replace("{{$0}}",str(val[0])).replace("{{$1}}",str(val[1]))
+                    elif kind == "compound":
+                        active_part = val[0]    # Compounds are unions, the first number tells us the active part defintion
+                        partkind = propdetails[prop]['parts'][active_part]['kind']
+                        format =   propdetails[prop]['parts'][active_part]['mirror']['format']
+                        if partkind == 'epsilon': 
+                            val = format.replace("{{$0}}",str(val[1][0])).replace("{{$1}}",str(val[1][1]))
+                        elif partkind == 'choice':
+                            val = format.replace("{{$0}}",str(val[1][0]))
+                    else:
+                        try:
+                            format = propdetails[prop]['mirror']['format']
+                            val = format.replace("{{$0}}",str(val))
+                        except:
+                            logger.debug("Property %s in %s has no mirror formatting instructions"%(prop, self.kind))
+                            val=str(val)
+                    result.append(val)
         return result
 
     def to_tikz(self, x_offset=0, y_offset=0):
@@ -187,8 +208,9 @@ class Node(models.Model):
         # Text width is exactly the double width of the icons
         mirrorText = ""
         for propvalue in self.get_all_properties():
+            propvalue = propvalue.replace("#","\\#")
             mirrorText += "%s\\\\"%propvalue
-        result += "\\node [text width=56.210pt, below, align=center] at (%u.south) (text%u) {\\footnotesize %s};\n"%(self.pk, self.pk, mirrorText)
+        result += "\\node [text width=56.210pt, below, align=center] at (%u.south) (text%u) {\\footnotesize {{%s}}};\n"%(self.pk, self.pk, mirrorText)
         # Create also linked nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             result += edge.target.to_tikz(x_offset, y_offset)
