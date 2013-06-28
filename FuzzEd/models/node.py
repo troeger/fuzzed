@@ -221,7 +221,7 @@ class Node(models.Model):
         # Create also linked nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             result += edge.target.to_tikz(x_offset, y_offset)
-            result += "\draw (text%u.south) -| (%u.north);\n"%(self.pk, edge.target.pk)
+            result += "\draw [thick] (text%u.south) -| (%u.north);\n"%(self.pk, edge.target.pk)
         print result
         return result
 
