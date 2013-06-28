@@ -93,6 +93,8 @@ class Graph(models.Model):
         result = """
 \\documentclass{article}
 \\usepackage[landscape, top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\\usepackage{helvet}
+\\renewcommand{\\familydefault}{\\sfdefault}
 \\usepackage{tikz}
 \\usetikzlibrary{positioning} 
 \\begin{document}

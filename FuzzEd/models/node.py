@@ -155,7 +155,7 @@ class Node(models.Model):
 
         raise ValueError('Node %s has unsupported kind' % self)
 
-    def get_all_properties(self):
+    def get_all_mirror_properties(self):
         """
         Returns a sorted set of all node properties and their values, according to the notation rendering rules.
         """
@@ -183,13 +183,15 @@ class Node(models.Model):
                             val = format.replace("{{$0}}",str(val[1][0])).replace("{{$1}}",str(val[1][1]))
                         elif partkind == 'choice':
                             val = format.replace("{{$0}}",str(val[1][0]))
+                    elif propdetails[prop].has_key('mirror'):
+                        if propdetails[prop]['mirror'].has_key('format'):
+                            val = propdetails[prop]['mirror']['format'].replace("{{$0}}",str(val))
+                        else:
+                            val = str(val)
                     else:
-                        try:
-                            format = propdetails[prop]['mirror']['format']
-                            val = format.replace("{{$0}}",str(val))
-                        except:
-                            logger.debug("Property %s in %s has no mirror formatting instructions"%(prop, self.kind))
-                            val=str(val)
+                        # Property has no special type and no mirror definition, so it shouldn't be shown
+                        # One example is the name of the top event
+                        continue
                     result.append(val)
         return result
 
@@ -207,14 +209,20 @@ class Node(models.Model):
         result = "\\node [inner sep=0em, outer sep=0em] at (%u, -%u) (%u) {\includegraphics{%s}};\n"%(self.x+x_offset, self.y+y_offset, self.pk, tree_node_image[self.kind]+".eps")
         # Text width is exactly the double width of the icons
         mirrorText = ""
-        for propvalue in self.get_all_properties():
+        for index,propvalue in enumerate(self.get_all_mirror_properties()):
             propvalue = propvalue.replace("#","\\#")
+            if index==0:
+                # Make the first property bigger, since it is supposed to be the name
+                propvalue = "\\textbf{{\\footnotesize %s}}"%propvalue  
+            else:
+                propvalue = "{\\scriptsize %s}"%propvalue                                
             mirrorText += "%s\\\\"%propvalue
-        result += "\\node [text width=56.210pt, below, align=center] at (%u.south) (text%u) {\\footnotesize {{%s}}};\n"%(self.pk, self.pk, mirrorText)
+        result += "\\node [text width=56.210pt, below, align=center] at (%u.south) (text%u) {%s};\n"%(self.pk, self.pk, mirrorText)
         # Create also linked nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             result += edge.target.to_tikz(x_offset, y_offset)
             result += "\draw (text%u.south) -| (%u.north);\n"%(self.pk, edge.target.pk)
+        print result
         return result
 
     def to_xml(self, xmltype=None):
