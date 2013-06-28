@@ -16,10 +16,17 @@
                 }
             },
 
+            "properties": {}
+        },
+
+        "event": {
+            "nodeDisplayName": "Event",
+            "inherits": "node",
+
             "properties": {
                 "name": {
                     "kind": "text",
-                    "default": "Node",
+                    "default": "Event",
                     "displayName": "Name",
 
                     "mirror": {
@@ -30,26 +37,9 @@
             }
         },
 
-        "event": {
-            "nodeDisplayName": "Event",
-            "inherits": "node",
-
-            "properties": {
-                "name": {
-                    "default": "Event"
-                }
-            }
-        },
-
         "gate": {
             "nodeDisplayName": "Gate",
-            "inherits": "node",
-
-            "properties": {
-                "name": {
-                    "default": "Gate"
-                }
-            }
+            "inherits": "node"
         },
 
         "basicEvent": {
@@ -152,13 +142,7 @@
             "inherits": "gate",
 
             "image": "and_gate.svg",
-            "help": "Output event occurs if all input events occur",
-
-            "properties": {
-                "name": {
-                    "default": "AND Gate"
-                }
-            }
+            "help": "Output event occurs if all input events occur"
         },
 
         "orGate": {
@@ -167,12 +151,6 @@
 
             "image": "or_gate.svg",
             "help": "Output event occurs if one or more input events occur",
-
-            "properties": {
-                "name": {
-                    "default": "OR Gate"
-                }
-            },
 
             "connector": {
                 "offset": {
@@ -187,13 +165,7 @@
 
             "name": "XOR Gate",
             "image": "xor_gate.svg",
-            "help": "Output event occurs if exactly one of the input events occur",
-
-            "properties": {
-                "name": {
-                    "default": "XOR Gate"
-                }
-            }
+            "help": "Output event occurs if exactly one of the input events occur"
         },
 
         "votingOrGate": {
@@ -204,9 +176,6 @@
             "help": "Output event occurs if the given number of input events occur",
 
             "properties": {
-                "name": {
-                    "default": "Voting OR Gate"
-                },
                 "k": {
                     "kind": "numeric",
                     "displayName": "k",
@@ -261,9 +230,6 @@
             "numberOfOutgoingConnections": 0,
 
             "properties": {
-                "name": {
-                    "default": "Transfer In"
-                },
                 "transfer": {
                     "kind": "transfer",
                     "displayName": "Transfer",

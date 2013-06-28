@@ -9,25 +9,14 @@
 
             "allowConnectionTo": ["node"],
 
+            "properties": {},
+
             "deletable": true,
 
             "connector": {
                 "offset": {
                     "top":    0,
                     "bottom": 0
-                }
-            },
-
-            "properties": {
-                "name": {
-                    "kind": "text",
-                    "displayName": "Name",
-                    "default": "Node",
-
-                    "mirror": {
-                        "position": "bottom",
-                        "style": ["bold", "large"]
-                    }
                 }
             }
         },
@@ -38,7 +27,14 @@
 
             "properties": {
                 "name": {
-                    "default": "Event"
+                    "kind": "text",
+                    "displayName": "Name",
+                    "default": "Event",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"]
+                    }
                 },
                 "optional": {
                     "kind": "bool",
@@ -50,13 +46,7 @@
 
         "gate": {
             "nodeDisplayName": "Gate",
-            "inherits": "node",
-
-            "properties": {
-                "name": {
-                    "default": "Gate"
-                }
-            }
+            "inherits": "node"
         },
 
         "variationPoint": {
@@ -65,7 +55,14 @@
 
             "properties": {
                 "name": {
-                    "default": "Variation Point"
+                    "kind": "text",
+                    "displayName": "Name",
+                    "default": "Variation Point",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"]
+                    }
                 }
             }
         },
@@ -222,13 +219,7 @@
             "inherits": "gate",
 
             "image": "and_gate.svg",
-            "help": "Output event occurs if all input events occur",
-
-            "properties": {
-                "name": {
-                    "default": "AND Gate"
-                }
-            }
+            "help": "Output event occurs if all input events occur"
         },
 
         "orGate": {
@@ -237,12 +228,6 @@
 
             "image": "or_gate.svg",
             "help": "Output event occurs if one or more input events occur",
-
-            "properties": {
-                "name": {
-                    "default": "OR Gate"
-                }
-            },
 
             "connector": {
                 "offset": {
@@ -256,13 +241,7 @@
             "inherits": "gate",
 
             "image": "xor_gate.svg",
-            "help": "Output event occurs if exactly one of the input events occur",
-
-            "properties": {
-                "name": {
-                    "default": "XOR Gate"
-                }
-            }
+            "help": "Output event occurs if exactly one of the input events occur"
         },
 
         "votingOrGate": {
@@ -273,9 +252,6 @@
             "help": "Output event occurs if the given number of input events occur",
 
             "properties": {
-                "name": {
-                    "default": "Voting OR Gate"
-                },
                 "k": {
                     "kind": "numeric",
                     "displayName": "k",
@@ -301,11 +277,10 @@
             "help": "Event with no information available or insignificant impact",
 
             "properties": {
-                "optional": null,
-
                 "name": {
                     "default": "Undeveloped Event"
-                }
+                },
+                "optional": null
             }
         },
 
@@ -415,9 +390,6 @@
             "numberOfOutgoingConnections": 0,
 
             "properties": {
-                "name": {
-                    "default": "Transfer In"
-                },
                 "transfer": {
                     "kind": "transfer",
                     "displayName": "Transfer",
