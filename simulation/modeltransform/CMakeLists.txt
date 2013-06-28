@@ -55,10 +55,26 @@ set(HEADERS
 
 set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
 
+find_package(XercesC REQUIRED) # XSD DEPENDS ON ${XERCESC_FOUND}
+if(XERCESC_FOUND)
+  message(STATUS "Found Xerces-C: ${XERCESC_LIBRARIES}")
+  message(STATUS "              : ${XERCESC_INCLUDE_DIR}")
+  message(STATUS "       Version: ${XERCESC_VERSION}")
+else(XERCESC_FOUND)
+  message(FATAL_ERROR "The package Apache Xerces-C++ has not been found")
+endif(XERCESC_FOUND)
+include_directories(${XERCESC_INCLUDE_DIR})
+
+find_package(Xsd REQUIRED) # CODESYNTHESIS
+if(XSD_FOUND)
+  message(STATUS "Package CodeSynthesis XSD found: ${XSD_INCLUDE_DIR}")
+else(XSD_FOUND)
+  message(FATAL_ERROR "The package CodeSynthesis XSD has not been found")
+endif(XSD_FOUND)  
+include_directories(${XSD_INCLUDE_DIR})
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${FT_INCLUDE_DIR})
-
 include_directories(${PUGIXML_INCLUDE_DIR})
 
 if (WIN32)
@@ -72,4 +88,4 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
    set_target_properties(ftmodeltransform PROPERTIES COMPILE_FLAGS "-fPIC -rdynamic")
 endif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 
-target_link_libraries(ftmodeltransform ${Boost_LIBRARIES} ftcommon)
+target_link_libraries(ftmodeltransform ${Boost_LIBRARIES} ftcommon ${FT_CONFIG_LIB})

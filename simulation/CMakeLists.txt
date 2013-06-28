@@ -13,9 +13,10 @@ set(BOOST_INCLUDEDIR ${BOOST_ROOT}/Include)
 set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
        
 set(FT_CONFIG_DIR "${PROJECT_SOURCE_DIR}/../fuzztreeconfiguration")
+find_package(ftconfiguration REQUIRED)
+
 set(FT_LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
 set(FT_INCLUDE_DIR
-
 	"${PROJECT_SOURCE_DIR}/modeltransform"
 	"${PROJECT_SOURCE_DIR}/simulation" 
 	"${PROJECT_SOURCE_DIR}/common"
@@ -33,7 +34,7 @@ if(MSVC)
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
-  ADD_DEFINITIONS(/D_CRT_SECURE_NO_WARNINGS /DNOMINMAX /DWIN32_LEAN_AND_MEAN)
+  add_definitions(/D_CRT_SECURE_NO_WARNINGS /DNOMINMAX /DWIN32_LEAN_AND_MEAN)
 elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -std=c++0x -fPIC")
   set(Boost_USE_STATIC_LIBS OFF)
@@ -45,7 +46,11 @@ message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
 find_package(pugixml REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${FT_CONFIG_INCLUDE})
 link_directories(${Boost_LIBRARY_DIRS})
+
+option(BUILD_SIMULATION_EXECUTABLE ON)
+option(USE_TIMENET ON)
 
 option(BUILD_TESTS OFF)
 if (${BUILD_TESTS})
@@ -55,10 +60,5 @@ if (${BUILD_TESTS})
 endif()
 
 add_subdirectory(common)
-
 add_subdirectory(modeltransform)
-option(BUILD_SIMULATION_EXECUTABLE ON)
-option(USE_TIMENET ON)
-add_subdirectory(fuzztreeconfiguration)
 add_subdirectory(simulation)
-add_subdirectory(modelcheck)

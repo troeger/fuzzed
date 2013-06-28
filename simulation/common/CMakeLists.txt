@@ -8,6 +8,7 @@ set(SOURCES
 	
 	util.cpp
 	XMLImport.cpp
+	FaultTreeImport.cpp
 )
 
 set(HEADERS
@@ -16,6 +17,7 @@ set(HEADERS
 	platform.h
 	util.h
 	XMLImport.h
+	FaultTreeImport.h
 	Types.h
 	Constants.h
 )
