@@ -220,23 +220,25 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 
 	else if (ext == fuzzTree::FUZZ_TREE_EXT)
 	{ // transform into fault trees first
-		fs::path targetDir = p;
-		string name = util::fileNameFromPath(p.generic_string());
-		util::replaceFileExtensionInPlace(name, "");
-		targetDir.remove_filename();
-		targetDir /= name;
-		targetDir.make_preferred();
 
-		if (!fs::create_directory(targetDir) && !fs::is_directory(targetDir))
-			throw runtime_error("Could not create directory: " + targetDir.generic_string());
-
-		FuzzTreeTransform::transformFuzzTree(p.generic_string(), targetDir.generic_string());
-		fs::directory_iterator it(targetDir), eod;
-		BOOST_FOREACH(fs::path const &pNew, std::make_pair(it, eod))
-		{
-			if (fs::is_regular_file(pNew) && pNew.extension() == faultTree::FAULT_TREE_EXT)
-				simulateFile(pNew, impl, false);
-		}
+		// TODO port
+// 		fs::path targetDir = p;
+// 		string name = util::fileNameFromPath(p.generic_string());
+// 		util::replaceFileExtensionInPlace(name, "");
+// 		targetDir.remove_filename();
+// 		targetDir /= name;
+// 		targetDir.make_preferred();
+// 
+// 		if (!fs::create_directory(targetDir) && !fs::is_directory(targetDir))
+// 			throw runtime_error("Could not create directory: " + targetDir.generic_string());
+// 
+// 		FuzzTreeTransform::transformFuzzTree(p.generic_string(), targetDir.generic_string());
+// 		fs::directory_iterator it(targetDir), eod;
+// 		BOOST_FOREACH(fs::path const &pNew, std::make_pair(it, eod))
+// 		{
+// 			if (fs::is_regular_file(pNew) && pNew.extension() == faultTree::FAULT_TREE_EXT)
+// 				simulateFile(pNew, impl, false);
+// 		}
 	}
 
 	else if (ext == faultTree::FAULT_TREE_EXT)
