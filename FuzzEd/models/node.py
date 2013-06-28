@@ -195,14 +195,34 @@ class Node(models.Model):
                     result.append(val)
         return result
 
+    def to_tikz_tree_child(self):
+        children=""
+        for edge in self.outgoing.filter(deleted=False):
+            children += edge.target.to_tikz_tree_child()
+        return "child { node {\includegraphics{%s}} %s }\n"%(tree_node_image[self.kind]+".eps", children)
+
+    def to_tikz_tree(self):
+        """
+        Serializes this node and all its children into a TiKZ representation.
+        In this version, TikZ is doing the tree node positioning
+        This has the advantage that fork connectors are possible
+
+        Returns:
+         {str} the node and its children in LaTex representation
+        """
+        children=""
+        for edge in self.outgoing.filter(deleted=False):
+            children += edge.target.to_tikz_tree_child()
+        return "\\node {\includegraphics{%s}}\n[edge from parent fork down]\n %s;"%(tree_node_image[self.kind]+".eps", children)
+
     def to_tikz(self, x_offset=0, y_offset=0):
         """
-        Serializes this node into a TiKZ representation.
+        Serializes this node and all its children into a TiKZ representation.
         A positive x offset shifts the resulting tree accordingly to the right.
         Negative offsets are allowed.
 
         Returns:
-         {str} the node in JSON representation
+         {str} the node and its children in LaTex representation
         """
         grid_size_pt = 56.210       # grid size in the front end, which is also the symbol width in EPS pictures
         nodekind = self.kind.lower()
@@ -235,9 +255,8 @@ class Node(models.Model):
             # We tried several ways to get nice connector breaks without the trees package,
             # but it finally always demands to much 'direction' logic to position some
             # intermediate hidden nodes for the break
-            # therefore, we live with straight lines
+            # therefore, we live with straight lines for the moment
             result += "\draw [thick] (%s.south) -- (%u.north);\n"%(connectorStart, edge.target.pk)
-        print result
         return result
 
     def to_xml(self, xmltype=None):

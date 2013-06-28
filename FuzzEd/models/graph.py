@@ -96,7 +96,7 @@ class Graph(models.Model):
 \\usepackage{helvet}
 \\renewcommand{\\familydefault}{\\sfdefault}
 \\usepackage{tikz}
-\\usetikzlibrary{positioning} 
+\\usetikzlibrary{positioning, trees} 
 \\begin{document}
 \\pagestyle{empty}
 \\begin{figure}
@@ -110,11 +110,13 @@ class Graph(models.Model):
         # Note: (0,0) is the upper left corder in TiKZ, but the lower left in the DB
         top_event = self.nodes.get(kind='topEvent')
         result += top_event.to_tikz(x_offset = -minx, y_offset = top_event.y)
+#        result += top_event.to_tikz_tree()
         result += """
 \\end{tikzpicture}
 \\end{figure}
 \\end{document}
 """
+        print result
         return result
 
     def to_xml(self, xmltype=None):
