@@ -761,31 +761,24 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
 
         _loadGraphCompleted: function(readOnly) {
-//          this.cutsetsMenu     = new CutsetsMenu(this);
+            //this.cutsetsMenu     = new CutsetsMenu(this);
             this.probabilityMenu = new ProbabilityMenu(this);
 
-//          this._setupCutsetsActionEntry()
-            this._setupTopEventProbabilityActionEntry();
+            this._setupCutsetsAction();
+            this._setupAnalyticalAction();
 
             return this._super(readOnly);
         },
 
         /**
-         *  Method: _setupCutsetsActionEntry
-         *    Adds an entry to the actions navbar group for calculating the minimal cutsets for the edited graph.
+         *  Method: _setupCutsetsAction
+         *    Registers the click handler for the 'cut set analysis' menu entry.
          *
          *  Returns:
          *    This editor instance for chaining.
          */
-        _setupCutsetsActionEntry: function() {
-            var navbarActionsEntry = jQuery(
-                '<li>' +
-                    '<a id="' + this.config.IDs.NAVBAR_ACTION_CUTSETS + '" href="#">Calculate cutsets</a>' +
-                '</li>');
-            this._navbarActionsGroup.append(navbarActionsEntry);
-
-            // register for clicks on the corresponding nav action
-            navbarActionsEntry.click(function() {
+        _setupCutsetsAction: function() {
+            jQuery("#"+this.config.IDs.ACTION_CUTSETS).click(function() {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_CALCULATE_CUTSETS,
                     this.cutsetsMenu.show.bind(this.cutsetsMenu)
@@ -796,28 +789,19 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         },
 
         /**
-         *  Method: _setupTopEventProbabilityActionEntry
-         *    Adds an entry to the actions navbar group for calculating the probability of the top event. Clicking will
+         *  Method: _setupAnalyticalAction
+         *    Registers the click handler for the 'analytical analysis' menu entry. Clicking will
          *    issue an asynchronous backend call which returns a <Job> object that can be queried for the final result.
          *    The job object will be used to initialize the probability menu.
          *
          *  Returns:
          *    This editor instance for chaining.
          */
-        _setupTopEventProbabilityActionEntry: function() {
-            var navbarActionsEntry = jQuery(
-                '<li>' +
-                    '<a href="#">Calculate top event probability</a>' +
-                '</li>');
-            this._navbarActionsGroup.append(navbarActionsEntry);
-
-            // register for clicks on the corresponding nav action
-            navbarActionsEntry.click(function() {
+        _setupAnalyticalAction: function() {
+            jQuery("#"+this.config.IDs.ACTION_ANALYTICAL).click(function() {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY,
-                    this.probabilityMenu.show.bind(this.probabilityMenu)
-                    //TODO: display errors
-                );
+                    this.probabilityMenu.show.bind(this.probabilityMenu));
             }.bind(this));
 
             return this;
