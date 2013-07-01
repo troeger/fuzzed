@@ -53,6 +53,7 @@ if (BUILD_SIMULATION_EXECUTABLE)
       ftmodeltransform
       ftcommon
 	  ${FT_CONFIG_LIB}
+	  ${XERCESC_LIBRARIES}
    )
    message("Building simulation executable")
 else (BUILD_SIMULATION_EXECUTABLE) # shared library
@@ -60,28 +61,12 @@ else (BUILD_SIMULATION_EXECUTABLE) # shared library
    target_link_libraries(ftsimulation 
       ftmodeltransform
 	  ${FT_CONFIG_LIB}
+	  ${XERCESC_LIBRARIES}
       ftcommon
    )
    add_definitions(-DSIMULATION_DLL)
    message("Building shared simulation library")
 endif (BUILD_SIMULATION_EXECUTABLE)
-
-option(profileOMP "Profile OpenMP" OFF)
-find_package(OpenMP)
-if (OPENMP_FOUND)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-	if (${profileOMP} AND UNIX)
-		find_package(ompP REQUIRED)
-		# compile with ompP compiler
-		# somehow this works only on the command line
-		#set(CMAKE_CXX_COMPILER "${OMPP_CXX} ${CMAKE_CXX_COMPILER}")
-		#set(CMAKE_C_COMPILER "${OMPP_CC} ${CMAKE_C_COMPILER}")
-		message("Profiling OpenMP")
-		include_directories(${OMPP_INCLUDE_DIR})
-		target_link_libraries(ftsimulation ${OMPP_LIB_DIR}/libompp.a)
-	endif()
-endif()
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

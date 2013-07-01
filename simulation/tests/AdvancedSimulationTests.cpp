@@ -17,7 +17,7 @@
 
 #define TEST_SIMULATION(fileName, missiontime, expectedReliability) \
 	string fn = fileName; \
-	EXPECT_NO_THROW(runSimulation(_strdup(fn.c_str()), missiontime, NUM_ROUNDS, CONVERGE_THRESH, MAX_TIME)); \
+	EXPECT_NO_THROW(runSimulationOnFile(_strdup(fn.c_str()), missiontime, NUM_ROUNDS, CONVERGE_THRESH, MAX_TIME)); \
 	util::replaceFileExtensionInPlace(fn, ".xml"); \
 	SimulationResult res = util::readResultFile(fn); \
 	EXPECT_SIMILAR(res.reliability, expectedReliability, MAX_DEVIATION);

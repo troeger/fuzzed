@@ -17,7 +17,6 @@ namespace timeNET
 	const char* const ROOT_TAG = "net";
 
 	const char* const TN_EXT = ".TN";
-
 }
 
 namespace PNML

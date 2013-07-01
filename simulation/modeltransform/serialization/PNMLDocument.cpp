@@ -4,6 +4,8 @@
 #include <assert.h>
 #include <stdexcept>
 
+#include "platform.h"
+
 using namespace PNML;
 using namespace pugi;
 

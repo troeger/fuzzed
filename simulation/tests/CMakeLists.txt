@@ -30,5 +30,6 @@ target_link_libraries(Tests debug ${PUGIXML_LIB_DEBUG})
 target_link_libraries(Tests 
 	ftcommon
 	ftsimulation_static
-	ftconfiguration
+	${FT_CONFIG_LIB}
+	${XERCESC_LIBRARIES}
 	ftmodeltransform)

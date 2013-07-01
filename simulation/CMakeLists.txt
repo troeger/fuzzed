@@ -49,6 +49,24 @@ include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${FT_CONFIG_INCLUDE})
 link_directories(${Boost_LIBRARY_DIRS})
 
+find_package(XercesC REQUIRED) # XSD DEPENDS ON ${XERCESC_FOUND}
+if(XERCESC_FOUND)
+  message(STATUS "Found Xerces-C: ${XERCESC_LIBRARIES}")
+  message(STATUS "              : ${XERCESC_INCLUDE_DIR}")
+  message(STATUS "       Version: ${XERCESC_VERSION}")
+else(XERCESC_FOUND)
+  message(FATAL_ERROR "The package Apache Xerces-C++ has not been found")
+endif(XERCESC_FOUND)
+include_directories(${XERCESC_INCLUDE_DIR})
+
+find_package(Xsd REQUIRED) # CODESYNTHESIS
+if(XSD_FOUND)
+  message(STATUS "Package CodeSynthesis XSD found: ${XSD_INCLUDE_DIR}")
+else(XSD_FOUND)
+  message(FATAL_ERROR "The package CodeSynthesis XSD has not been found")
+endif(XSD_FOUND)  
+include_directories(${XSD_INCLUDE_DIR})
+
 option(BUILD_SIMULATION_EXECUTABLE ON)
 option(USE_TIMENET ON)
 

@@ -5,7 +5,6 @@ set(FTCOMMON_LIB ${LIBNAME} PARENT_SCOPE)
 
 set(SOURCES
 	${SOURCES}
-	
 	util.cpp
 	XMLImport.cpp
 	FaultTreeImport.cpp
@@ -13,7 +12,6 @@ set(SOURCES
 
 set(HEADERS
 	${HEADERS}
-
 	platform.h
 	util.h
 	XMLImport.h
