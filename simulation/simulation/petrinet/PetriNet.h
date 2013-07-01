@@ -60,8 +60,6 @@ public:
 
 	bool valid() const;
 
-	bool constraintViolated();
-
 	void generateRandomFiringTimes();
 	void restoreInitialMarking();
 

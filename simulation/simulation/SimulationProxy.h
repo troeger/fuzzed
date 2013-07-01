@@ -12,8 +12,11 @@
 
 #include "Config.h"
 #include "platform.h"
-#include "faulttree.h"
-#include "fuzztree.h"
+
+namespace faulttree
+{
+	class FaultTree;
+}
 
 enum SimulationImpl
 {
@@ -27,7 +30,7 @@ enum SimulationImpl
 /************************************************************************/
 extern "C"
 {
-	void /*FT_DLL_API*/ runSimulation(
+	void /*FT_DLL_API*/ runSimulationOnFile(
 		char* filePath, /* path to fault tree file */
 		int missionTime,
 		int numRounds,	/* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/
@@ -35,21 +38,13 @@ extern "C"
 		int maxTime		/* maximum duration of simulation in milliseconds */
 		) noexcept;
 
-	void /*FT_DLL_API*/ runSimulation(
-		faulttree::FaultTree* faultTree, /* path to fault tree file */
-		int missionTime,
-		int numRounds,	/* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/
-		double convergenceThreshold, /* stop after reliability changes no more than this threshold */
-		int maxTime		/* maximum duration of simulation in milliseconds */
-		) noexcept;
-
-	void /*FT_DLL_API*/ runSimulation(
-		fuzztree::FuzzTree* faultTree, /* path to fuzztree file */
-		int missionTime,
-		int numRounds,	/* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/
-		double convergenceThreshold, /* stop after reliability changes no more than this threshold */
-		int maxTime		/* maximum duration of simulation in milliseconds */
-		) noexcept;
+// 	void /*FT_DLL_API*/ runSimulation(
+// 		faulttree::FaultTree* faultTree, /* path to fault tree file */
+// 		int missionTime,
+// 		int numRounds,	/* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/
+// 		double convergenceThreshold, /* stop after reliability changes no more than this threshold */
+// 		int maxTime		/* maximum duration of simulation in milliseconds */
+// 		) noexcept {}; // TODO
 }
 
 class TimeNETProperties;
@@ -75,7 +70,7 @@ public:
 protected:
 	void parseStandard(int numArguments, char** arguments);
 
-	bool runSimulation(
+	bool runSimulationInternal(
 		const boost::filesystem::path& p, 
 		SimulationImpl implementationType,
 		void* additionalArguments = NULL);

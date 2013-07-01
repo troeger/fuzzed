@@ -6,7 +6,7 @@ const char* const RAND_FILE = "C:/dev/masterarbeit/simulation/implementation/ran
 
 // TimeNET parameters
 #define DEFAULT_CONFIDENCE 95
-#define DEFAULT_EPSILON 0.2
+#define DEFAULT_EPSILON 0.2f
 
 // Simulation parameters
 #define DEFAULT_SIMULATION_TIME 100

@@ -17,7 +17,7 @@
 
 #define TEST_SIMULATION(fileName, expectedReliability) \
 	string fn = fileName; \
-	EXPECT_NO_THROW(runSimulation(_strdup(fn.c_str()), MISSION_TIME, NUM_ROUNDS, CONVERGE_THRESH, MAX_TIME)); \
+	EXPECT_NO_THROW(runSimulationOnFile(_strdup(fn.c_str()), MISSION_TIME, NUM_ROUNDS, CONVERGE_THRESH, MAX_TIME)); \
 	util::replaceFileExtensionInPlace(fn, ".xml"); \
 	SimulationResult res = util::readResultFile(fn); \
 	EXPECT_SIMILAR(res.reliability, expectedReliability, MAX_DEVIATION);
@@ -79,12 +79,12 @@ TEST(Simulation, Sequence)
 TEST(Simulation, Convergence)
 { // run with a lower threshold and expect similar values but faster execution time
 	string fn = dir + ExampleSystemTest;
-	EXPECT_NO_THROW(runSimulation(_strdup(fn.c_str()), MISSION_TIME, NUM_ROUNDS, CONVERGE_THRESH * 100, MAX_TIME)); 
+	EXPECT_NO_THROW(runSimulationOnFile(_strdup(fn.c_str()), MISSION_TIME, NUM_ROUNDS, CONVERGE_THRESH * 100, MAX_TIME)); 
 	util::replaceFileExtensionInPlace(fn, ".xml");
 	SimulationResult res1 = util::readResultFile(fn);
 	
 	util::replaceFileExtensionInPlace(fn, ".faulttree");
-	EXPECT_NO_THROW(runSimulation(_strdup(fn.c_str()), MISSION_TIME, NUM_ROUNDS, CONVERGE_THRESH, MAX_TIME)); 
+	EXPECT_NO_THROW(runSimulationOnFile(_strdup(fn.c_str()), MISSION_TIME, NUM_ROUNDS, CONVERGE_THRESH, MAX_TIME)); 
 	util::replaceFileExtensionInPlace(fn, ".xml");
 	SimulationResult res2 = util::readResultFile(fn);
 

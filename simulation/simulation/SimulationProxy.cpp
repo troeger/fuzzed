@@ -13,6 +13,9 @@
 #include "Constants.h"
 #include <omp.h>
 
+#include "faulttree.h"
+#include "fuzztree.h"
+
 #if IS_WINDOWS 
 	#pragma warning(push, 3) 
 #endif
@@ -64,7 +67,7 @@ SimulationProxy::SimulationProxy(unsigned int missionTime, unsigned int numRound
 	m_timeNetProperties(nullptr)
 {}
 
-bool SimulationProxy::runSimulation(const fs::path& p, SimulationImpl implementationType, void* additionalArguments) 
+bool SimulationProxy::runSimulationInternal(const fs::path& p, SimulationImpl implementationType, void* additionalArguments) 
 {
 	Simulation* sim;
 	switch (implementationType)
@@ -148,7 +151,7 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 		("steps,s",		po::value<unsigned int>(&m_missionTime)->default_value(DEFAULT_SIMULATION_STEPS),	"Number of Simulation Steps")
 		("rounds,r",	po::value<unsigned int>(&m_numRounds)->default_value(DEFAULT_SIMULATION_ROUNDS),	"Number of Simulation Rounds")
 		("conf",		po::value<int>(&confidence)->default_value(DEFAULT_CONFIDENCE),						"Confidence level (TimeNET only)")
-		("epsilon,e",	po::value<float>(&epsilon)->default_value(DEFAULT_EPSILON),							"Epsilon (TimeNET only)")
+		("epsilon,e",	po::value<float>(&epsilon)->default_value(DEFAULT_EPSILON),						"Epsilon (TimeNET only)")
 		("MTTF",		po::value<bool>(&m_bSimulateUntilFailure)->default_value(true),						"Simulate each Round until System Failure, necessary for MTTF")
 		("converge,c",	po::value<double>(&m_convergenceThresh)->default_value((double)0.0001),				"Cancel simulation after the resulting reliability differs in less than this threshold")
 		("adaptive,a",	po::value<unsigned int>(&numAdaptiveRounds)->default_value(0),						"Adaptively adjust the number of Simulation Rounds, NOT YET IMPLEMENTED");
@@ -216,29 +219,11 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 	const auto ext = p.extension();
 
 	if (((ext == PNML::PNML_EXT && impl==DEFAULT) || (ext == timeNET::TN_EXT)) && simulatePetriNet)
-		runSimulation(p, impl); // run simulation directly
+		runSimulationInternal(p, impl); // run simulation directly
 
 	else if (ext == fuzzTree::FUZZ_TREE_EXT)
 	{ // transform into fault trees first
 
-		// TODO port
-// 		fs::path targetDir = p;
-// 		string name = util::fileNameFromPath(p.generic_string());
-// 		util::replaceFileExtensionInPlace(name, "");
-// 		targetDir.remove_filename();
-// 		targetDir /= name;
-// 		targetDir.make_preferred();
-// 
-// 		if (!fs::create_directory(targetDir) && !fs::is_directory(targetDir))
-// 			throw runtime_error("Could not create directory: " + targetDir.generic_string());
-// 
-// 		FuzzTreeTransform::transformFuzzTree(p.generic_string(), targetDir.generic_string());
-// 		fs::directory_iterator it(targetDir), eod;
-// 		BOOST_FOREACH(fs::path const &pNew, std::make_pair(it, eod))
-// 		{
-// 			if (fs::is_regular_file(pNew) && pNew.extension() == faultTree::FAULT_TREE_EXT)
-// 				simulateFile(pNew, impl, false);
-// 		}
 	}
 
 	else if (ext == faultTree::FAULT_TREE_EXT)
@@ -269,7 +254,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 		
 		try
 		{
-			runSimulation(newFileName, impl, m_timeNetProperties);
+			runSimulationInternal(newFileName, impl, m_timeNetProperties);
 		}
 		catch (...)
 		{
@@ -293,7 +278,7 @@ SimulationProxy::~SimulationProxy()
 		delete m_timeNetProperties;
 }
 
-void runSimulation(
+void runSimulationOnFile(
 	char* filePath, /* path to fault tree file */ 
 	int missionTime, 
 	int numRounds, /* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/ 

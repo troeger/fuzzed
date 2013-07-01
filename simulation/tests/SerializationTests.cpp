@@ -13,7 +13,6 @@
 #include "FuzzTreeTransform.h"
 #include "petrinet/PNMLImport.h"
 #include "petrinet/PetriNet.h"
-#include "FaultTreeImport.h"
 #include "util.h"
 #include "Constants.h"
 
@@ -21,12 +20,7 @@ using namespace std;
 using namespace boost;
 
 #define TEST_NUM_CONFIGURATIONS(fileName, num)\
-	if (filesystem::is_directory(targetDir))\
-		filesystem::remove_all(targetDir);\
-	ASSERT_TRUE(filesystem::create_directory(targetDir));\
-	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(fileName, targetDir));\
-	EXPECT_EQ(util::countFiles(targetDir, faultTree::FAULT_TREE_EXT), num);\
-	filesystem::remove_all(targetDir);
+	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(fileName).size(), num);
 
 namespace
 {

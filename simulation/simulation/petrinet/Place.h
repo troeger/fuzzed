@@ -38,8 +38,6 @@ public:
 	void resolveConflictsImmediate(int tick);
 	void resolveConflictsTimed(int tick);
 
-	void resolveExponential();
-
 	void produceTokens(int numTokens);
 	void consumeTokens(Transition* const t, int numTokens);
 	void requestTokens(Transition* const t);

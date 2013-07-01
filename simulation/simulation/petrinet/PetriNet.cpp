@@ -174,14 +174,6 @@ bool PetriNet::valid() const
 	return true;//m_topLevelPlace;
 }
 
-bool DEPRECATED PetriNet::constraintViolated()
-{
-	for (SequentialConstraint& c : m_constraints)
-		if (!c.isSatisfied(this))
-			return true;
-	return false;
-}
-
 void PetriNet::generateRandomFiringTimes()
 { // TODO factor out the things that can happen earlier
 	m_activeTimedTransitions.clear();
