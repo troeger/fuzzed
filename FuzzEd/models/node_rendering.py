@@ -1,0 +1,267 @@
+tikz_shapes='''
+\\pgfdeclareshape{andGate}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfpathsvg{M 0.7,34.3 L 34.3,34.3 34.3,21 C 34.3,21 34.3,0.7 17.5,0.7 C 0.7,0.7 0.7,21 0.7,21 z}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{basicEvent}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{16.8}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{basicEventSet}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfcircle[stroke]{\pgfpoint{20}{20}}{14.3}
+        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{14.3}
+        \\pgfcircle[stroke]{\pgfpoint{15}{15}}{14.3}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{block}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{33.6}{33.6}}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{houseEvent}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfpathsvg{M 17.5,0.7 L 34.3,15 34.3,34.3 0.7,34.3 0.7,15 z}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{inhibitGate}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfpathsvg{M 17.5,0.7 L 34.3,11 34.3,24 17.5,34.3 0.7,24 0.7,11 z}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{intermediateEvent}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{33.6}{33.6}}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{intermediateEventSet}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{26.6}{26.6}}
+        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{26.6}{26.6}}
+        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{26.6}{26.6}}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{endNode}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{16.8}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{orGate}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{outOf}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{16.8}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{topEvent}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{33.6}{33.6}}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{transferIn}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfpathsvg{M 17.5,1 35,34.3 1,34.3 z}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{undevelopedEvent}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfpathsvg{M 17.5,0.7 34.3,17.5 17.5,34.3 0.7,17.5 z}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{votingOrGate}{
+    \\anchor{center}{\pgfpoint{17}{17}}
+    \\anchor{north}{\pgfpoint{17}{35}}
+    \\anchor{south}{\pgfpoint{17}{0}}
+    \\anchor{west}{\pgfpoint{0}{17}}
+    \\anchor{east}{\pgfpoint{35}{17}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-35}{-35}}
+        \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
+        \\pgfpathsvg{M 8.4,9.1 17.5,28.0 26.6,9.1}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{xorGate}{
+    \\anchor{center}{\pgfpoint{17}{17}}
+    \\anchor{north}{\pgfpoint{17}{35}}
+    \\anchor{south}{\pgfpoint{17}{0}}
+    \\anchor{west}{\pgfpoint{0}{17}}
+    \\anchor{east}{\pgfpoint{35}{17}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-35}{-35}}
+        \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
+        \\pgfpathsvg{M 0.7,34.3 L 17.5,1.4 34.3,34.3}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{featureVariation}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfpathsvg{M 0.7,24 C 0.7,24 3.5,34 17.5,34.3 31.5,34.3 34.3,24 34.3,24 L 21,0.7 14,0.7 z}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{redundancyVariation}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfpathsvg{M 0.7,24.5 C 0.7,38 34.3,38 34.3,24.5 L 28,21 C 26.6,10.5 22.4,3.5 17.5,0.7 C 12.6,3.5 8.4,10.5 7,21 z}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{end}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{9}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{start}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformrotate{180} 
+        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{9}
+        \\pgfusepath{stroke}
+}}'''

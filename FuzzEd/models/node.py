@@ -33,23 +33,6 @@ fuzztree_classes = {
     'transferIn':           xml_fuzztree.TransferIn
 }
 
-tree_node_image = {
-    'topEvent':             'top_event',
-    'basicEvent':           'basic_event',
-    'basicEventSet':        'basic_event_set',
-    'intermediateEvent':    'intermediate_event',
-    'intermediateEventSet': 'intermediate_event_set',
-    'houseEvent':           'house_event',
-    'undevelopedEvent':     'undeveloped_event',
-    'andGate':              'and_gate',
-    'orGate':               'or_gate',
-    'xorGate':              'xor_gate',
-    'votingOrGate':         'voting_or_gate',
-    'featureVariation':     'feature_variation',
-    'redundancyVariation':  'redundancy_variation',
-    'transferIn':           'transfer_in'
-}
-
 faulttree_classes = {
     'topEvent':             xml_faulttree.TopEvent,
     'basicEvent':           xml_faulttree.BasicEvent,
@@ -195,31 +178,34 @@ class Node(models.Model):
                     result.append(val)
         return result
 
-    def to_tikz_tree_child(self):
-        children=""
-        for edge in self.outgoing.filter(deleted=False):
-            children += edge.target.to_tikz_tree_child()
-        return "child { node {\includegraphics{%s}} %s }\n"%(tree_node_image[self.kind]+".eps", children)
+    # def to_tikz_tree_child(self):
+    #     children=""
+    #     for edge in self.outgoing.filter(deleted=False):
+    #         children += edge.target.to_tikz_tree_child()
+    #     return "child { node {\includegraphics{%s}} %s }\n"%(tree_node_image[self.kind]+".eps", children)
 
-    def to_tikz_tree(self):
-        """
-        Serializes this node and all its children into a TiKZ representation.
-        In this version, TikZ is doing the tree node positioning
-        This has the advantage that fork connectors are possible
+    # def to_tikz_tree(self):
+    #     """
+    #     Serializes this node and all its children into a TiKZ representation.
+    #     In this version, TikZ is doing the tree node positioning
+    #     This has the advantage that fork connectors are possible.
+    #     TODO: Consider original ordering of nodes in one line.
 
-        Returns:
-         {str} the node and its children in LaTex representation
-        """
-        children=""
-        for edge in self.outgoing.filter(deleted=False):
-            children += edge.target.to_tikz_tree_child()
-        return "\\node {\includegraphics{%s}}\n[edge from parent fork down]\n %s;"%(tree_node_image[self.kind]+".eps", children)
+    #     Returns:
+    #      {str} the node and its children in LaTex representation
+    #     """
+    #     children=""
+    #     for edge in self.outgoing.filter(deleted=False):
+    #         children += edge.target.to_tikz_tree_child()
+    #     return "\\node {\includegraphics{%s}}\n[edge from parent fork down]\n %s;"%(tree_node_image[self.kind]+".eps", children)
 
     def to_tikz(self, x_offset=0, y_offset=0):
         """
         Serializes this node and all its children into a TiKZ representation.
         A positive x offset shifts the resulting tree accordingly to the right.
         Negative offsets are allowed.
+
+        TODO: Mirror texts closer together, correct conversion of event set SVG's, lines behind mirrors
 
         Returns:
          {str} the node and its children in LaTex representation
@@ -231,7 +217,7 @@ class Node(models.Model):
         # would ignore all user formatting of the tree from the editor
         # additional, freely floating nodes couldn't be considered any more
         # we start with the TiKZ node for the graph icon
-        result = "\\node [inner sep=0em, outer sep=0em] at (%u, -%f) (%u) {\includegraphics{%s}};\n"%(self.x+x_offset, self.y+y_offset, self.pk, tree_node_image[self.kind]+".eps")
+        result = "\\node [shape=%s, inner sep=0em, outer sep=0em] at (%u, -%f) (%u) {};\n"%(self.kind, self.x+x_offset, self.y+y_offset, self.pk)
         # Do the mirror text
         # Text width is exactly the double width of the icons
         mirrorText = ""
@@ -245,7 +231,7 @@ class Node(models.Model):
             mirrorText += "%s\\\\"%propvalue
         # If we do not have a mirror text (such as with gates), the connector should start directly at the node south
         if mirrorText != "":
-            result += "\\node [text width=%fpt, below, align=center] at (%u.south) (text%u) {%s};\n"%(grid_size_pt, self.pk, self.pk, mirrorText)
+            result += "\\node [text width=%fpt, below, align=center, inner sep=0.5em] at (%u.south) (text%u) {%s};\n"%(grid_size_pt, self.pk, self.pk, mirrorText)
             connectorStart = "text%u"%self.pk
         else:
             connectorStart = str(self.pk)

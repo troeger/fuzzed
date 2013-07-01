@@ -11,6 +11,8 @@ except:
     print "ERROR: Run './setup.py build' to create the XML schema wrappers first"
     exit(-1)
 
+from node_rendering import tikz_shapes
+
 import json, notations
 
 class Graph(models.Model):
@@ -96,12 +98,11 @@ class Graph(models.Model):
 \\usepackage{helvet}
 \\renewcommand{\\familydefault}{\\sfdefault}
 \\usepackage{tikz}
-\\usetikzlibrary{positioning, trees} 
+\\usetikzlibrary{positioning, trees, svg.path} 
 \\begin{document}
 \\pagestyle{empty}
-\\begin{figure}
-\\begin{tikzpicture}[auto, trim left]
-"""
+        """
+        result += tikz_shapes + "\n\\begin{figure}\n\\begin{tikzpicture}[auto, trim left]"
         # Find most left node and takes it's x coordinate as start offset
         # This basically shifts the whole tree to the left border
         minx = self.nodes.aggregate(min_x = models.Min('x'))['min_x']
@@ -111,12 +112,7 @@ class Graph(models.Model):
         top_event = self.nodes.get(kind='topEvent')
         result += top_event.to_tikz(x_offset = -minx, y_offset = top_event.y)
 #        result += top_event.to_tikz_tree()
-        result += """
-\\end{tikzpicture}
-\\end{figure}
-\\end{document}
-"""
-        print result
+        result += "\\end{tikzpicture}\n\\end{figure}\n\\end{document}"
         return result
 
     def to_xml(self, xmltype=None):

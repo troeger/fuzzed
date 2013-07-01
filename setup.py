@@ -25,29 +25,51 @@ def check_python_version():
         exit(-1)
 check_python_version()
 
-def svg2pgf_shape(name, filename):
-    #TODO: Get size from DOM tree, use the values
-    #      Add rectangle and circle paths
-    #      Build a command for some test output
-    result = '''
-        \\pgfdeclareshape{%s}{
-            \\anchor{center}{\pgfpoint{18}{18}}
-            \\anchor{north}{\pgfpoint{18}{36}}
-            \\anchor{south}{\pgfpoint{18}{0}}
-            \\anchor{west}{\pgfpoint{0}{18}}
-            \\anchor{east}{\pgfpoint{36}{18}}
-            \\foregroundpath{
-                \\pgfsetlinewidth{1.4}
-'''%name
+def svg2pgf_shape(filename):
     xml = parseXml(filename)
-    # add all SVG paths
+    # determine size of the picture from SVG source
+    svg = xml.getElementsByTagName('svg')[0]
+    name = svg.attributes['id'].value
+    height = int(svg.attributes['height'].value)
+    width = int(svg.attributes['width'].value)
+    # Define shape anchors, based on image size
+    # We need double backslashes since the output is Python again
+    # The SVG coordinate system is mirrored on the horizon axis, so we add a rotation command amd a compensation
+    # for the coordinate shift resulting from this
+    result = '''
+\\\\pgfdeclareshape{%(name)s}{
+    \\\\anchor{center}{\pgfpoint{%(halfwidth)u}{%(halfheight)u}}
+    \\\\anchor{north}{\pgfpoint{%(halfwidth)u}{%(height)u}}
+    \\\\anchor{south}{\pgfpoint{%(halfwidth)u}{0}}
+    \\\\anchor{west}{\pgfpoint{0}{%(halfheight)u}}
+    \\\\anchor{east}{\pgfpoint{%(width)u}{%(halfheight)u}}
+    \\\\foregroundpath{
+        \\\\pgfsetlinewidth{1.4}
+        \\\\pgftransformrotate{180} 
+        \\\\pgftransformshift{\pgfpoint{-%(width)u}{-%(height)u}}
+'''%{'name':name, 'height':height, 'halfheight':height/2, 'width':width, 'halfwidth':width/2}
+    # add all SVG path
     pathCommands = xml.getElementsByTagName('path')
     for p in pathCommands:
-        result += "                \\pgfpathsvg{%s}\n"%p.attributes['d'].value
-    result += '                \\pgfusepath{stroke} } }'
+        result +="        \\\\pgfpathsvg{%s}\n"%p.attributes['d'].value
+    # add all SVG rectangle definitions
+    rectCommands = xml.getElementsByTagName('rect')
+    for r in rectCommands:
+        height = r.attributes['height'].value
+        width = r.attributes['width'].value
+        result += "        \\\\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{%s}{%s}}\n"%(width, height)
+    # add all SVG circle definitions
+    circleCommands = xml.getElementsByTagName('circle')
+    for c in circleCommands:
+        x = c.attributes['cx'].value
+        y = c.attributes['cy'].value
+        radius = c.attributes['r'].value
+        result += "        \\\\pgfcircle[stroke]{\pgfpoint{%s}{%s}}{%s}\n"%(x,y,radius)
+    # finalize TiKZ shape definition
+    result += '        \\\\pgfusepath{stroke}\n}}'
     return result
 
-def build_pgf_shape_lib(startdir='FuzzEd/static/img', covered=[]):
+def build_shape_lib_recursive(startdir='FuzzEd/static/img', covered=[]):
     ''' 
         Build static LaTex representation for our graphical symbols as TiKZ shapes.
         Some SVGs occur multiple times in subdirectories, so we track the already
@@ -56,12 +78,24 @@ def build_pgf_shape_lib(startdir='FuzzEd/static/img', covered=[]):
     result = ''
     for root, dirs, files in os.walk(startdir):
         for d in dirs:
-            result += build_pgf_shape_lib(root+d,covered)
+            result += build_shape_lib_recursive(root+d,covered)
         for f in files:
             if f.endswith('.svg') and f not in covered:
-                result += svg2pgf_shape(f, root+os.sep+f)
-                covered.append(f)
+                try:
+                    result += svg2pgf_shape(root+os.sep+f)
+                    covered.append(f)
+                    print "Converting %s to TiKZ shape ..."%f
+                except Exception, e:
+                    print "Error on parsing, ignoring %s ..."%f
     return result
+
+def build_shape_lib():
+    print "Generating TiKZ shape library ..."
+    f=open("FuzzEd/models/node_rendering.py","w")
+    f.write("tikz_shapes='''")
+    f.write(build_shape_lib_recursive())
+    f.write("'''")
+    f.close()
 
 def check_java_version():
     output = subprocess.check_output('java -version', stderr=subprocess.STDOUT, shell=True)
@@ -188,7 +222,7 @@ class build(_build):
 #        build_notations()
 #        build_schema_files()
 #        build_xmlschema_wrapper()
-        build_pgf_shape_lib()
+        build_shape_lib()
 
 def clean_docs():
     os.system('rm -rf docs')
