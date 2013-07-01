@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os, json, pprint, sys, shutil, subprocess
+from xml.dom.minidom import parse as parseXml
 
 from setuptools import setup
 from distutils.command.build import build as _build
@@ -23,6 +24,44 @@ def check_python_version():
         print(version_message)
         exit(-1)
 check_python_version()
+
+def svg2pgf_shape(name, filename):
+    #TODO: Get size from DOM tree, use the values
+    #      Add rectangle and circle paths
+    #      Build a command for some test output
+    result = '''
+        \\pgfdeclareshape{%s}{
+            \\anchor{center}{\pgfpoint{18}{18}}
+            \\anchor{north}{\pgfpoint{18}{36}}
+            \\anchor{south}{\pgfpoint{18}{0}}
+            \\anchor{west}{\pgfpoint{0}{18}}
+            \\anchor{east}{\pgfpoint{36}{18}}
+            \\foregroundpath{
+                \\pgfsetlinewidth{1.4}
+'''%name
+    xml = parseXml(filename)
+    # add all SVG paths
+    pathCommands = xml.getElementsByTagName('path')
+    for p in pathCommands:
+        result += "                \\pgfpathsvg{%s}\n"%p.attributes['d'].value
+    result += '                \\pgfusepath{stroke} } }'
+    return result
+
+def build_pgf_shape_lib(startdir='FuzzEd/static/img', covered=[]):
+    ''' 
+        Build static LaTex representation for our graphical symbols as TiKZ shapes.
+        Some SVGs occur multiple times in subdirectories, so we track the already
+        converted ones. 
+    '''
+    result = ''
+    for root, dirs, files in os.walk(startdir):
+        for d in dirs:
+            result += build_pgf_shape_lib(root+d,covered)
+        for f in files:
+            if f.endswith('.svg') and f not in covered:
+                result += svg2pgf_shape(f, root+os.sep+f)
+                covered.append(f)
+    return result
 
 def check_java_version():
     output = subprocess.check_output('java -version', stderr=subprocess.STDOUT, shell=True)
@@ -145,10 +184,11 @@ def inherit(node_name, node, nodes, node_cache):
 class build(_build):
     def run(self):
         _build.run(self)
-        build_analysis_server()
-        build_notations()
-        build_schema_files()
-        build_xmlschema_wrapper()
+#        build_analysis_server()
+#        build_notations()
+#        build_schema_files()
+#        build_xmlschema_wrapper()
+        build_pgf_shape_lib()
 
 def clean_docs():
     os.system('rm -rf docs')
