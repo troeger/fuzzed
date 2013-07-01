@@ -1,15 +1,11 @@
 ﻿#include "FuzzTreeTransform.h"
 #include "FuzzTreeConfiguration.h"
-#include "Constants.h"
 #include "ExpressionParser.h"
 #include "TreeHelpers.h"
-#include "util.h"
+#include "TransformUtil.h"
 
 #include <xsd/cxx/tree/elements.hxx>
 #include <boost/range/counting_range.hpp>
-
-using namespace fuzzTree;
-using namespace faultTree;
 
 using xercesc::DOMNode;
 using xercesc::DOMDocument;
