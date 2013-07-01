@@ -6,12 +6,12 @@
 
 {% block style %}
     {{ block.super }}
-    @import url("{{ STATIC_URL }}css/editor/editor.css");
-    @import url("{{ STATIC_URL }}css/editor/menus.css");
+    @import url("{{ STATIC_URL }}css/editor.css");
+    @import url("{{ STATIC_URL }}css/menus.css");
 
-    @import url("{{ STATIC_URL }}css/jquery.ui.custom.css");
-    @import url("{{ STATIC_URL }}css/slick.grid.css");
-    @import url("{{ STATIC_URL }}css/slick.grid.theme.css");
+    @import url("{{ STATIC_URL }}css/jquery-ui/jquery.ui-1.9.1.css");
+    @import url("{{ STATIC_URL }}css/slickgrid/slick.grid.css");
+    @import url("{{ STATIC_URL }}css/slickgrid/slick.grid.theme.css");
 {% endblock %}
 
 {% block script %}

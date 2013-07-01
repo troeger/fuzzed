@@ -6,41 +6,28 @@
 
 {% block script %}
 {{ block.super }}
-<script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
 <script type="text/javascript" language="javascript">
-    require.config({
-        baseUrl: '{{ STATIC_URL }}script/',
-        waitSeconds: 5,
-        paths: {
-            'jquery':    'require-jquery',
-            'bootstrap': '../lib/bootstrap/js/bootstrap-2.0.4.min'
-
-        }
-    });
-
     require(['bootstrap'], function() {
         var graph_to_delete = null;
 
-        function delete_clicked(event) {
+        var delete_clicked = function(event) {
             event.stopPropagation();
 
             graph_to_delete = jQuery(this).closest('form');
             var dialog      = jQuery('#delete_dialog')
             var name        = dialog.find('#delete_name');
 
-            name.html(graph_to_delete.closest('tr').find('strong.graph_name').html())
+            name.html(graph_to_delete.closest('tr').find('strong.graph_name').html());
             dialog.modal().show();
-        }
+        };
 
-        function delete_confirmed(event) {
-            console.log(graph_to_delete);
-            
+        var delete_confirmed = function(event) {
             graph_to_delete.find('input.delete_flag')
                            .attr('name',  'delete')
                            .attr('value', 'delete');
             graph_to_delete.submit();
             graph_to_delete = null;
-        }
+        };
 
         jQuery(document).ready(function() {
             jQuery('button.require-dialog').click(delete_clicked);

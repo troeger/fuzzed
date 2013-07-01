@@ -7,8 +7,8 @@
 
     <style type="text/css">
         {% block style %}
-        @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap.min.css");
-        @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap-responsive.min.css");
+        @import url("{{ STATIC_URL }}css/bootstrap/bootstrap-2.3.2.min.css");
+        @import url("{{ STATIC_URL }}css/bootstrap/bootstrap-responsive-2.3.2.min.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         @import url("{{ STATIC_URL }}css/util.css");
         @import url("{{ STATIC_URL }}css/print.css") print;
@@ -33,7 +33,7 @@
                 'jquery.svg':    '../lib/jquery-svg/jquery-svg-1.4.5',
                 'jquery.svgdom': '../lib/jquery-svg/jquery-svgdom-1.4.5',
                 // other libs
-                'bootstrap':  '../lib/bootstrap/js/bootstrap-2.0.4.min',
+                'bootstrap':  '../lib/bootstrap/bootstrap-2.3.2.min',
                 'underscore': '../lib/underscore/underscore-1.4.4.min',
                 'jsplumb':    '../lib/jsplumb/jsplumb-1.3.16',
                 'highcharts': '../lib/highcharts-2.3.5/highcharts',
@@ -98,7 +98,7 @@
 </head>
 
 <body>
-    <div class="navbar navbar-fixed-top no-print">
+    <div class="navbar navbar-inverse navbar-fixed-top no-print">
         <div class="navbar-inner">
             <div class="container">
                 <a class="brand" anchor="#">FuzzEd - {{ graph }}</a>
