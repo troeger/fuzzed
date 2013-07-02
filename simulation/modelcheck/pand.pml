@@ -27,25 +27,33 @@ bool propagated0 = 0;
 bool propagated1 = 0;
 bool propagated2 = 0;
 
-active proctype immediate() priority 2
-{
-    do
-    ::  d_step{ inp1Inhibited3(Mfailed0, M01, M012, propagated0)   -> propagated0++; out1(Mfailed0); out1(M0); skip }
-    ::  d_step{ inp1Inhibited2(Mfailed1, M012, propagated1)  -> propagated1++; out1(Mfailed1); out1(M01);skip }
-    ::  d_step{ inp1Inhibited(Mfailed2, propagated2)         -> propagated2++; out1(Mfailed2); out1(M012); skip }
-    ::  d_step{ inp1_3(M0, M01, M012) -> out1(fail);skip }
-    od
-}
 
-active proctype timed() priority 4
+inline timedTransitions()
 {
-    do
+	if
     ::  d_step{ inp1(Mactive0)->out1(Mfailed0);skip }
     ::  d_step{ inp1(Mactive1)->out1(Mfailed1);skip }
     ::  d_step{ inp1(Mactive2)->out1(Mfailed2);skip }
+	fi
+}
+
+inline immediateTransitions()
+{
+	if
+    ::  d_step{ inp1Inhibited3(Mfailed0, M01, M012, propagated0)   -> propagated0++; out1(Mfailed0); out1(M0); skip }
+    ::  d_step{ inp1Inhibited2(Mfailed1, M012, propagated1)  -> propagated1++; out1(Mfailed1); out1(M01);skip }
+    ::  d_step{ inp1Inhibited(Mfailed2, propagated2)         -> propagated2++; out1(Mfailed2); out1(M012); skip }
+    ::  d_step{ inp1_3(M0, M01, M012) -> out1(fail); assert(Mfailed0 && Mfailed1 && Mfailed2); skip }
+	fi
+}
+
+active proctype net()
+{
+ 	do
+	:: timedTransitions(); immediateTransitions(); skip
+	:: timeout -> break
     od
 }
 
-ltl {always(((Mfailed1 && !Mfailed0) -> !<>fail) && ((Mfailed2 && ! Mfailed1) -> !<>fail))}
-
-//ltl { always((eventually fail) <-> ((!Mfailed1 U Mfailed0) && (!Mfailed1 U Mfailed2))) }
+ltl {always((Mfailed1 && !Mfailed0) -> !<>fail)}
+ltl {always((Mfailed2 && !Mfailed1) -> !<>fail)}
