@@ -47,7 +47,7 @@ extern "C"
 		) noexcept; // TODO
 }
 
-class TimeNETProperties;
+struct TimeNETProperties;
 
 class SimulationProxy
 {
