@@ -5,6 +5,7 @@
 #include <boost/filesystem/path.hpp>
 #include <string>
 #include <set>
+#include <iostream>
 #if IS_WINDOWS 
 #pragma warning(pop) 
 #endif
@@ -21,6 +22,7 @@ class FuzzTreeTransform
 public:
 	// produces Fault Tree representations in memory. TODO return pointers?
 	static std::vector<faulttree::FaultTree> transformFuzzTree(const std::string& fuzzTreeXML) noexcept;
+	static std::vector<faulttree::FaultTree> transformFuzzTree(std::istream& fuzzTreeXML) noexcept;
 
 protected:
 	faulttree::FaultTree generateFaultTree(const FuzzTreeConfiguration& configuration);
@@ -64,7 +66,11 @@ protected:
 	
 private:
 	FuzzTreeTransform(const std::string& fuzzTreeXML);
+	FuzzTreeTransform(std::istream& fuzzTreeXML);
+
 	~FuzzTreeTransform();
+
+	std::vector<faulttree::FaultTree> transformInternal(FuzzTreeTransform &transform);
 
 	std::auto_ptr<fuzztree::FuzzTree> m_fuzzTree;
 

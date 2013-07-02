@@ -27,6 +27,7 @@
 #include <map>
 #include <set>
 #include <iostream>
+#include <fstream>
 #if IS_WINDOWS 
 	#pragma warning(pop)
 #endif
@@ -223,7 +224,14 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 
 	else if (ext == fuzzTree::FUZZ_TREE_EXT)
 	{ // transform into fault trees first
-
+		ifstream file(p.generic_string(), ios::in | ios::binary);
+		if (!file.is_open())
+			throw runtime_error("Could not open file");
+		
+		for (const auto& ft : FuzzTreeTransform::transformFuzzTree(file))
+		{
+			// TODO
+		}
 	}
 
 	else if (ext == faultTree::FAULT_TREE_EXT)
@@ -277,6 +285,28 @@ SimulationProxy::~SimulationProxy()
 	if (m_timeNetProperties)
 		delete m_timeNetProperties;
 }
+
+void runSimulation(
+	char* fuzztreeXML, /* path to fault tree file */ 
+	int missionTime, 
+	int numRounds, /* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/ 
+	double convergenceThreshold, /* stop after reliability changes no more than this threshold */
+	int maxTime /* maximum duration of simulation in milliseconds */) noexcept
+{	
+	try
+	{
+		// TODO
+	}
+	catch (const exception& e)
+	{
+		cout << "Unhandled Exception during Simulation: " << e.what() << endl;
+	}
+	catch (...)
+	{
+		cout << "Unknown Exception during Simulation" << endl;
+	}
+}
+
 
 void runSimulationOnFile(
 	char* filePath, /* path to fault tree file */ 
