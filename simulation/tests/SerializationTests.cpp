@@ -20,7 +20,8 @@ using namespace std;
 using namespace boost;
 
 #define TEST_NUM_CONFIGURATIONS(fileName, num)\
-	EXPECT_NO_THROW(FuzzTreeTransform::transformFuzzTree(fileName).size(), num);
+	auto ftTransform = FuzzTreeTransform(fileName);\
+	EXPECT_EQ(ftTransform.transform().size(), num);
 
 namespace
 {

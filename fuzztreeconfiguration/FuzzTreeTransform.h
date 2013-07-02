@@ -20,9 +20,12 @@
 class FuzzTreeTransform
 {
 public:
-	// produces Fault Tree representations in memory. TODO return pointers?
-	static std::vector<faulttree::FaultTree> transformFuzzTree(const std::string& fuzzTreeXML) noexcept;
-	static std::vector<faulttree::FaultTree> transformFuzzTree(std::istream& fuzzTreeXML) noexcept;
+	FuzzTreeTransform(const std::string& fuzzTreeXML);
+	FuzzTreeTransform(std::istream& fuzzTreeXML);
+
+	~FuzzTreeTransform();
+
+	std::vector<faulttree::FaultTree> transform();
 
 protected:
 	faulttree::FaultTree generateFaultTree(const FuzzTreeConfiguration& configuration);
@@ -65,13 +68,6 @@ protected:
 	std::string generateUniqueId(const std::string& oldId);
 	
 private:
-	FuzzTreeTransform(const std::string& fuzzTreeXML);
-	FuzzTreeTransform(std::istream& fuzzTreeXML);
-
-	~FuzzTreeTransform();
-
-	std::vector<faulttree::FaultTree> transformInternal(FuzzTreeTransform &transform);
-
 	std::auto_ptr<fuzztree::FuzzTree> m_fuzzTree;
 
 	int m_count;

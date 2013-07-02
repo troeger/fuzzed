@@ -227,8 +227,9 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 		ifstream file(p.generic_string(), ios::in | ios::binary);
 		if (!file.is_open())
 			throw runtime_error("Could not open file");
-		
-		for (const auto& ft : FuzzTreeTransform::transformFuzzTree(file))
+
+		auto ftTransform = FuzzTreeTransform(file);
+		for (const auto& ft : ftTransform.transform())
 		{
 			// TODO
 		}
