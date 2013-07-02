@@ -37,6 +37,7 @@ TimeNETSimulation::TimeNETSimulation(const boost::filesystem::path &p,
 
 bool TimeNETSimulation::run()
 {
+#ifdef TNETDIR
 	string serverCall = 
 		string("python ") + TNETSCRIPT 
 		+ " " + m_properties->filePath
@@ -51,4 +52,8 @@ bool TimeNETSimulation::run()
 
 	int ret = system(serverCall.c_str());
 	return (ret == 0);
+#endif
+
+	cout << "TimeNET not configured through CMake. Please check the USE_TIMENET option." << endl;
+	return -1;
 }
