@@ -60,11 +60,10 @@ protected:
 		std::vector<FuzzTreeConfiguration>& configurations) const;
 
 	static bool isOptional(const fuzztree::Node& node);
-	static bool isGate(const fuzztree::Node& node);
-	static bool isLeaf(const fuzztree::Node& node);
+	static bool isGate(const std::string& node);
+	static bool isLeaf(const std::string& node);
+	static bool isVariationPoint(const std::string& node);
 	
-	static bool isDummy(const faulttree::Node& node);
-
 	std::string generateUniqueId(const std::string& oldId);
 	
 private:

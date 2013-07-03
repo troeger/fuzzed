@@ -10,7 +10,7 @@ faulttree::BasicEvent treeHelpers::copyBasicEvent(const fuzztree::BasicEvent& be
 }
 
 faulttree::Gate treeHelpers::copyGate(const fuzztree::Node& gate)
-{
+{ // TODO typeids
 	faulttree::Gate res("0");
 	const fuzztree::And* andGate = dynamic_cast<const fuzztree::And*>(&gate);
 	if (andGate) 

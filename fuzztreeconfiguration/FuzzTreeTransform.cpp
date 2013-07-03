@@ -3,27 +3,25 @@
 #include "ExpressionParser.h"
 #include "TreeHelpers.h"
 #include "TransformUtil.h"
+#include "FuzzTreeTypes.h"
+#include "FaultTreeTypes.h"
 
 #include <xsd/cxx/tree/elements.hxx>
 #include <boost/range/counting_range.hpp>
 
 using xercesc::DOMNode;
 using xercesc::DOMDocument;
+using std::string;
 
-class Dummy : public faulttree::ChildNode
-{
-public:
-	Dummy() : faulttree::ChildNode(0) {}
-};
-
-FuzzTreeTransform::FuzzTreeTransform(const std::string& fuzzTreeXML) :
+FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 	m_count(0)
 {
-	static const std::string fuzztreeSchema = FUZZTREEXSD; // Path to schema from CMakeLists.txt
+	static const string fuzztreeSchema = FUZZTREEXSD; // Path to schema from CMakeLists.txt
 	assert(!fuzztreeSchema.empty());
 
 	xml_schema::Properties props;
 	props.schema_location("ft", fuzztreeSchema);
+	props.no_namespace_schema_location(fuzztreeSchema);
 
 	try
 	{
@@ -39,11 +37,12 @@ FuzzTreeTransform::FuzzTreeTransform(const std::string& fuzzTreeXML) :
 
 FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML)
 {
-	static const std::string fuzztreeSchema = FUZZTREEXSD; // Path to schema from CMakeLists.txt
+	static const string fuzztreeSchema = FUZZTREEXSD; // Path to schema from CMakeLists.txt
 	assert(!fuzztreeSchema.empty());
 
-// 	xml_schema::Properties props;
-// 	props.schema_location("ft", fuzztreeSchema);
+	xml_schema::Properties props;
+	props.schema_location("ft", fuzztreeSchema);
+	props.no_namespace_schema_location(fuzztreeSchema);
 
 	try
 	{
@@ -63,33 +62,45 @@ FuzzTreeTransform::~FuzzTreeTransform()
 /* Utility methods                                                      */
 /************************************************************************/
 
-bool FuzzTreeTransform::isDummy(const faulttree::Node& node)
+bool FuzzTreeTransform::isGate(const string& typeName)
 {
-	return dynamic_cast<const Dummy*>(&node) != nullptr;
+	using namespace fuzztreeType;
+	return
+		typeName == AND ||
+		typeName == OR ||
+		typeName == XOR ||
+		typeName == VOTINGOR;
 }
 
-bool FuzzTreeTransform::isGate(const fuzztree::Node& node)
+bool FuzzTreeTransform::isLeaf(const string& typeName)
 {
+	using namespace fuzztreeType;
 	return
-		dynamic_cast<const fuzztree::And*>(&node) ||
-		dynamic_cast<const fuzztree::Or*>(&node)  ||
-		dynamic_cast<const fuzztree::Xor*>(&node) ||
-		dynamic_cast<const fuzztree::VotingOr*>(&node);
+		typeName == BASICEVENT ||
+		typeName == HOUSEEVENT ||
+		typeName == UNDEVELOPEDEVENT ||
+		typeName == BASICEVENTSET;
 }
 
-bool FuzzTreeTransform::isLeaf(const fuzztree::Node& node)
+
+bool FuzzTreeTransform::isVariationPoint(const string& typeName)
 {
+	using namespace fuzztreeType;
 	return
-		dynamic_cast<const fuzztree::BasicEvent*>(&node) ||
-		dynamic_cast<const fuzztree::HouseEvent*>(&node)  ||
-		dynamic_cast<const fuzztree::UndevelopedEvent*>(&node);
+		typeName == FEATUREVP ||
+		typeName == REDUNDANCYVP;
 }
+
 
 bool FuzzTreeTransform::isOptional(const fuzztree::Node& node)
 {
+	const string typeName = typeid(node).name();
+	if (typeName != fuzztreeType::INTERMEDIATEEVENT && !isLeaf(typeName)) 
+		return false;
+	
 	const fuzztree::InclusionVariationPoint* inclusionNode =
-		dynamic_cast<const fuzztree::InclusionVariationPoint*>(&node);
-	return inclusionNode && inclusionNode->optional();
+		static_cast<const fuzztree::InclusionVariationPoint*>(&node);
+	return inclusionNode->optional();
 }
 
 
@@ -112,16 +123,19 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 	const fuzztree::Node* node, std::vector<FuzzTreeConfiguration>& configurations) const
 {
 	using namespace fuzztree;
+	using namespace fuzztreeType;
+
 	for (const auto& child : node->children())
 	{
-		const std::string id = child.id();
+		const string id = child.id();
+		const string typeName = typeid(child).name();
 		
 		if (isOptional(child))
 		{ // inclusion variation point. Generate n + n configurations.
 			vector<FuzzTreeConfiguration> additional;
 			for (FuzzTreeConfiguration& config : configurations)
 			{
-				if (!config.isIncluded(id) || !config.isIncluded(node->id()))
+				if (!config.isIncluded(id) || !config.isIncluded(node->id())) 
 					continue;
 
 				FuzzTreeConfiguration copied = config;
@@ -134,9 +148,9 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 			configurations.insert(configurations.begin(), additional.begin(), additional.end());
 		}
 
-		const RedundancyVariationPoint* redundancyNode = dynamic_cast<const RedundancyVariationPoint*>(&child);
-		if (redundancyNode)
+		if (typeName == REDUNDANCYVP)
 		{ // any VotingOR with k in [from, to] and k=n-2. Generate n * #validVotingOrs configurations.
+			const RedundancyVariationPoint* redundancyNode = static_cast<const RedundancyVariationPoint*>(&child);
 			const int from = redundancyNode->start();
 			const int to = redundancyNode->end();
 			if (from < 0 || to < 0 || from > to)
@@ -180,9 +194,9 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 		}
 		else
 		{
-			const FeatureVariationPoint* featureNode = dynamic_cast<const FeatureVariationPoint*>(&child);
-			if (featureNode)
+			if (typeName == FEATUREVP)
 			{ // exactly one subtree. Generate N * #Features configurations.
+				const FeatureVariationPoint* featureNode = static_cast<const FeatureVariationPoint*>(&child);
 				vector<FuzzTreeConfiguration::id_type> childIds;
 				for (const auto& featuredChild : featureNode->children())
 					childIds.emplace_back(featuredChild.id());
@@ -219,8 +233,8 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 					configurations.assign(newConfigs.begin(), newConfigs.end());
 				}
 			}
-			else if (isLeaf(child))
-			{ // TODO find out if this is necessary, and about the performance of dynamic_cast
+			else if (isLeaf(typeName))
+			{
 				continue; // end recursion
 			}
 		}
@@ -248,24 +262,21 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 {
 	for (const auto& currentChild : templateNode->children())
 	{
-		const auto id = currentChild.id();
+		const string id = currentChild.id();
+		const string typeName = typeid(currentChild).name();
 		
-		const fuzztree::InclusionVariationPoint* inclusionNode = 
-			dynamic_cast<const fuzztree::InclusionVariationPoint*>(&currentChild);
-		const bool opt = (inclusionNode != nullptr) && inclusionNode->optional();
+		const bool opt = isOptional(currentChild);
 
 		if (!configuration.isIncluded(id) || (opt && !configuration.isOptionalEnabled(id)))
 			continue; // do not add this node
 
-		const bool bLeaf = isLeaf(currentChild);
+		const bool bLeaf = isLeaf(typeName);
 		bool bChanged = false;
 
-		const fuzztree::RedundancyVariationPoint* redundancyNode = 
-			dynamic_cast<const fuzztree::RedundancyVariationPoint*>(&currentChild);
-		if (redundancyNode)
+		if (typeName == fuzztreeType::REDUNDANCYVP)
 		{ // TODO: probably this always ends up with a leaf node
 			handleRedundancyVP(
-				redundancyNode, 
+				&currentChild, 
 				node, 
 				configuration.getRedundancyCount(id), 
 				id); // returns a VotingOR Gate
@@ -274,12 +285,10 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 		}
 		else
 		{
-			const fuzztree::FeatureVariationPoint* featureNode = 
-				dynamic_cast<const fuzztree::FeatureVariationPoint*>(&currentChild);
-			if (featureNode)
+			if (typeName == fuzztreeType::FEATUREVP)
 			{
 				if (handleFeatureVP(
-					featureNode, 
+					&currentChild, 
 					node,
 					configuration, 
 					configuration.getFeaturedChild(id)))
@@ -288,9 +297,9 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 
 			else
 			{
-				if (isGate(currentChild))
+				if (isGate(typeName))
 				{ // don't copy children yet
-					node->children().push_back(treeHelpers::copyGate(dynamic_cast<const fuzztree::Gate&>(currentChild)));
+					node->children().push_back(treeHelpers::copyGate(static_cast<const fuzztree::Gate&>(currentChild)));
 					bChanged = true;
 				}
 				else if (bLeaf)
@@ -298,16 +307,10 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 					node->children().push_back(treeHelpers::copyBasicEvent(dynamic_cast<const fuzztree::BasicEvent&>(currentChild)));
 					bChanged = true;
 				}
-				else
+				else if (typeName == fuzztreeType::BASICEVENTSET)
 				{
-					const fuzztree::BasicEventSet* basicEventSet = 
-						dynamic_cast<const fuzztree::BasicEventSet*>(&currentChild);
-
-					if (basicEventSet)
-					{
-						expandBasicEventSet(basicEventSet, node, id, 0);
-						continue;
-					}
+					expandBasicEventSet(&currentChild, node, id, 0);
+					continue;
 				}
 			}	
 		}		
@@ -369,31 +372,29 @@ bool FuzzTreeTransform::handleFeatureVP(
 	}
 	
 	const fuzztree::ChildNode featuredTemplate = *it;
+	const string featuredTypeName = typeid(featuredTemplate).name();
 	if (isOptional(featuredTemplate) && !configuration.isIncluded(configuredChildId))
 	{
-		node->children().push_back(Dummy());
 		return true;
 	}
-	else if (isLeaf(featuredTemplate))
+	else if (featuredTypeName == fuzztreeType::BASICEVENTSET)
+	{
+		expandBasicEventSet(&featuredTemplate, node, configuredChildId, 0);
+		return true;
+	}
+	else if (isLeaf(featuredTypeName))
 	{
 		node->children().push_back(treeHelpers::copyBasicEvent(dynamic_cast<const fuzztree::BasicEvent&>(featuredTemplate)));
 		return true;
 	}
-	else if (dynamic_cast<const fuzztree::BasicEventSet*>(&featuredTemplate))
-	{ 
-		expandBasicEventSet(&featuredTemplate, node, configuredChildId, 0);
-		return true;
-	}
-	else if (isGate(featuredTemplate))
+	else if (isGate(featuredTypeName))
 	{
 		node->children().push_back(treeHelpers::copyGate(featuredTemplate));
 		return false;
 	}
-	else
+	else if (isVariationPoint(featuredTypeName))
 	{
-		if (dynamic_cast<const fuzztree::FeatureVariationPoint*>(node) ||
-			dynamic_cast<const fuzztree::RedundancyVariationPoint*>(node))
-			return false;
+		return false;
 	}
 	return false;
 }
@@ -406,9 +407,6 @@ bool FuzzTreeTransform::handleRedundancyVP(
 {
 	assert(node && templateNode);
 
-	if (isDummy(*node))
-		assert(false && "handle this!");// TODO
-	
 	const fuzztree::BasicEventSet* basicEventSet = 
 		dynamic_cast<const fuzztree::BasicEventSet*>(&templateNode->children().front());
 	
@@ -427,6 +425,12 @@ std::vector<faulttree::FaultTree> FuzzTreeTransform::transform()
 	try
 	{
 		vector<faulttree::FaultTree> results;
+		if (!m_fuzzTree.get())
+		{
+			cout << "Invalid Fuzztree." << endl;
+			return results;
+		}
+
 		vector<FuzzTreeConfiguration> configs;
 		generateConfigurations(configs);
 

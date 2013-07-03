@@ -59,6 +59,8 @@ set(HEADERS
    platform.h
    faulttree.h
    fuzztree.h
+   FaultTreeTypes.h
+   FuzzTreeTypes.h
    #fuzztree_custom.h # custom methods. not generated.
 )
 
