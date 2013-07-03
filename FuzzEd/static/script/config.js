@@ -11,7 +11,7 @@ define(['underscore'], function() {
         interpolate: /\{\{(.+?)\}\}/g,
         evaluate:    /\{%(.+?)%\}/g,
         escape:      /\{-(.+?)-\}/g
-    }
+    };
 
     /**
      *  Constants:
@@ -297,7 +297,7 @@ define(['underscore'], function() {
          */
         Keys: {
             NODE:       'node',
-            SELECTABLE: 'selectable'
+            SELECTABLE: 'ui-selectable'
         },
 
         /**

@@ -1,4 +1,4 @@
-define(['property', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
+define(['property', 'mirror', 'canvas', 'class', 'jquery', 'jsplumb'],
 function(Property, Mirror, Canvas, Class) {
     /**
      *  Class: {Abstract} Node

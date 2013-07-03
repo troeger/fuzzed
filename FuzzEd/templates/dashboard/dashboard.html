@@ -14,7 +14,7 @@
             event.stopPropagation();
 
             graph_to_delete = jQuery(this).closest('form');
-            var dialog      = jQuery('#delete_dialog')
+            var dialog      = jQuery('#delete_dialog');
             var name        = dialog.find('#delete_name');
 
             name.html(graph_to_delete.closest('tr').find('strong.graph_name').html());

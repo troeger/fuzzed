@@ -1,4 +1,5 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus, Canvas, Backend, Alerts) {
+define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery'],
+function(Class, Menus, Canvas, Backend, Alerts) {
     /**
      *  Package: Base
      */

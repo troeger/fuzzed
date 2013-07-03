@@ -1,4 +1,4 @@
-define(["class"], function(Class) {
+define(['class', 'jquery'], function(Class) {
 
     /**
      *  Class: Job

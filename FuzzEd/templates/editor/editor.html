@@ -6,12 +6,12 @@
 
 {% block style %}
     {{ block.super }}
-    @import url("{{ STATIC_URL }}css/editor.css");
-    @import url("{{ STATIC_URL }}css/menus.css");
-
-    @import url("{{ STATIC_URL }}css/jquery-ui/jquery.ui-1.9.1.css");
+    @import url("{{ STATIC_URL }}css/jquery-ui/jquery-ui-1.10.3.min.css");
     @import url("{{ STATIC_URL }}css/slickgrid/slick.grid.css");
     @import url("{{ STATIC_URL }}css/slickgrid/slick.grid.theme.css");
+
+    @import url("{{ STATIC_URL }}css/editor.css");
+    @import url("{{ STATIC_URL }}css/menus.css");
 {% endblock %}
 
 {% block script %}
@@ -33,11 +33,11 @@
             <i class="icon-cog icon-white"></i> Actions <b class="caret"></b>
         </a>
         <ul id="FuzzEdNavbarActions" class="dropdown-menu">
-                <li>
-                    <a href="{% url 'graph_download' graph.pk %}?format=xml">
-                        Save as XML <i class="icon-download"></i>
-                    </a>
-                </li>
+            <li>
+                <a href="{% url 'graph_download' graph.pk %}?format=xml">
+                    Save as XML <i class="icon-download"></i>
+                </a>
+            </li>
             <li>
                 <a href="{% url 'graph_download' graph.pk %}?format=json">
                     Save as JSON <i class="icon-download"></i>

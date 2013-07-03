@@ -1,4 +1,4 @@
-define(['canvas', 'class'], function(Canvas, Class) {
+define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
     /**
      *  Package: Base
      */

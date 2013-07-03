@@ -1,4 +1,4 @@
-define(['class', 'config'], function(Class, Config) {
+define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Package: Base

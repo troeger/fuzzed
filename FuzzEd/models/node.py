@@ -176,13 +176,17 @@ class Node(models.Model):
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
                 probability = self.get_property('probability', None)
                 if isinstance(probability, list):
-                    point = probability[0]
-                    alpha = probability[1]
+                    point = probability[-1][0]
+                    alpha = probability[-1][1]
+
+                    print probability, point, alpha
+
                     if alpha == 0:
                         properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
                     else:
-                        properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(   a=point - alpha, b1=point,
-                                                                                           b2=point, c=point + alpha)
+                        properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(
+                            a=point - alpha, b1=point, b2=point, c=point + alpha
+                        )
                 elif isinstance(probability, (long, int, float)):
                     properties['probability'] = xml_fuzztree.CrispProbability(value_=probability)
                 else:
@@ -227,7 +231,7 @@ class Node(models.Model):
         except ObjectDoesNotExist:
             try:
                 logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
-                return notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
+                return notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]['default']
             except KeyError:
                 logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
                 return default
