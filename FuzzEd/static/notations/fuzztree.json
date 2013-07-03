@@ -253,7 +253,7 @@
 
         "xorGate": {
             "nodeDisplayName": "XOR Gate",
-            "inherits": "gate",
+            "inherits": "orGate",
 
             "image": "xor_gate.svg",
             "help": "Output event occurs if exactly one of the input events occur",
@@ -267,7 +267,7 @@
 
         "votingOrGate": {
             "nodeDisplayName": "Voting OR Gate",
-            "inherits": "gate",
+            "inherits": "orGate",
 
             "image": "voting_or_gate.svg",
             "help": "Output event occurs if the given number of input events occur",
