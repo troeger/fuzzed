@@ -40,10 +40,10 @@ inline timedTransitions()
 inline immediateTransitions()
 {
 	if
-    ::  d_step{ inp1Inhibited3(Mfailed0, M01, M012, propagated0)   -> propagated0++; out1(Mfailed0); out1(M0); skip }
-    ::  d_step{ inp1Inhibited2(Mfailed1, M012, propagated1)  -> propagated1++; out1(Mfailed1); out1(M01);skip }
-    ::  d_step{ inp1Inhibited(Mfailed2, propagated2)         -> propagated2++; out1(Mfailed2); out1(M012); skip }
-    ::  d_step{ inp1_3(M0, M01, M012) -> out1(fail); assert(Mfailed0 && Mfailed1 && Mfailed2); skip }
+    ::  d_step{ inp1Inhibited3(Mfailed0, M01, M012, propagated0)   	-> propagated0++; out1(Mfailed0); out1(M0); skip }
+    ::  d_step{ inp1Inhibited2(Mfailed1, M012, propagated1)  		-> propagated1++; out1(Mfailed1); out1(M01);skip }
+    ::  d_step{ inp1Inhibited(Mfailed2, propagated2)         		-> propagated2++; out1(Mfailed2); out1(M012); skip }
+    ::  d_step{ inp1_3(M0, M01, M012) 								-> out1(fail); assert(Mfailed0 && Mfailed1 && Mfailed2); skip }
 	fi
 }
 
@@ -55,5 +55,4 @@ active proctype net()
     od
 }
 
-ltl {always((Mfailed1 && !Mfailed0) -> !<>fail)}
-ltl {always((Mfailed2 && !Mfailed1) -> !<>fail)}
+ltl {always((Mfailed1 && !Mfailed0) -> !<>fail) && always((Mfailed2 && !Mfailed1) -> !<>fail)}
