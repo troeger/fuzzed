@@ -8,14 +8,7 @@ using namespace std;
 ANDGate::ANDGate(const string& id, const string& name /*= ""*/)
 	: StaticGate(id, name)
 {
-	m_activationFunc = [](NodeValueMap childValues) -> long double 
-	{
-		long double result = 1.0;
-		for (const auto& p : childValues)
-			result *= p.second;
-
-		return result;
-	};
+	initActivationFunc();
 }
 
 int ANDGate::serialize(boost::shared_ptr<PNDocument> doc) const 
@@ -59,4 +52,16 @@ std::string ANDGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const
 {
 	assert(false && "implement");
 	return "";
+}
+
+void ANDGate::initActivationFunc()
+{
+	m_activationFunc = [](NodeValueMap childValues) -> long double 
+	{
+		long double result = 1.0;
+		for (const auto& p : childValues)
+			result *= p.second;
+
+		return result;
+	};
 }

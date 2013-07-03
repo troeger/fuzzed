@@ -15,6 +15,8 @@ public:
 	int getNumVotes() const { return m_numVotes; };
 
 protected:
+	virtual void initActivationFunc() override;
+
 	virtual std::string description() const override;
 
 	int m_numVotes;

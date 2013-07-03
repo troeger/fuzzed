@@ -1,28 +1,17 @@
 #include "VotingORGate.h"
 #include "serialization/PNDocument.h"
-#include "FaultTreeNode.h"
 #include "util.h"
 
 VotingORGate::VotingORGate(const std::string& id, int numVotes, const string& name) 
 	: StaticGate(id, name), m_numVotes(numVotes)
 {
-	m_activationFunc = [=](NodeValueMap childValues) -> long double 
-	{
-		assert(childValues.size() > 0);
-
-		// What to do if the children have different values?
-		const long double rate = childValues.begin()->second;
-		return util::kOutOfN(rate, numVotes, childValues.size());
-	};
+	initActivationFunc();
 }
-
 
 int VotingORGate::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
 	if (getNumChildren() == 0)
 		return -1;
-
-	// cout << "Value of VotingOR: " << getValue() << endl;
 
 	vector<int> childIDs;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
@@ -64,4 +53,16 @@ std::string VotingORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) 
 {
 	assert(false && "implement");
 	return "";
+}
+
+void VotingORGate::initActivationFunc()
+{
+	m_activationFunc = [=](NodeValueMap childValues) -> long double 
+	{
+		assert(childValues.size() > 0);
+
+		// What to do if the children have different values?
+		const long double rate = childValues.begin()->second;
+		return util::kOutOfN(rate, m_numVotes, childValues.size());
+	};
 }

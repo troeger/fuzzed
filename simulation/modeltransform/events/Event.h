@@ -13,6 +13,8 @@ public:
 
 	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const override;
 
+	const long double& getFailureRate() const { return m_failureRate; }
+
 protected:
 	long double m_failureRate;
 };

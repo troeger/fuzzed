@@ -15,6 +15,8 @@ public:
 	bool isDynamic() const { return false; }
 
 protected:
+	virtual void initActivationFunc() = 0;
+
 	// from all the input values, compute the value of the gate. only for static gates.
 	boost::function<long double (NodeValueMap)> m_activationFunc;
 };

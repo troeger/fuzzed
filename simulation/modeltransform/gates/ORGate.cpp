@@ -7,14 +7,7 @@ using namespace std;
 ORGate::ORGate(const string& id, const string& name /*= ""*/) 
 	: StaticGate(id, name)
 {
-	m_activationFunc = [](NodeValueMap childValues) -> long double 
-	{
-		long double result = 1.0;
-		for (const auto& p : childValues)
-			result *= 1.0 - p.second;
-
-		return 1.0L - result;
-	};
+	initActivationFunc();
 }
 
 ORGate::~ORGate(void)
@@ -59,4 +52,16 @@ std::string ORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const
 {
 	assert(false && "implement");
 	return "";
+}
+
+void ORGate::initActivationFunc()
+{
+	m_activationFunc = [](NodeValueMap childValues) -> long double 
+	{
+		long double result = 1.0;
+		for (const auto& p : childValues)
+			result *= 1.0 - p.second;
+
+		return 1.0L - result;
+	};
 }

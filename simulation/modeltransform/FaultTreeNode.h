@@ -13,19 +13,29 @@ class FaultTreeNode
 public:
 	typedef std::vector<FaultTreeNode*> NodeList;
 
-	FaultTreeNode(const std::string& ID, const std::string& name = "");
+	/************************************************************************/
+	/* object creation                                                      */
+	/************************************************************************/
 	virtual FaultTreeNode* clone() const = 0; // virtual deep copying
-
 	virtual ~FaultTreeNode();
-
-	// override to enforce assertions
-	virtual void addChild(FaultTreeNode* child);
 	
+	FaultTreeNode(const std::string& ID, const std::string& name = "");
+
+	/************************************************************************/
+	/* tree manipulation                                                    */
+	/************************************************************************/
+	virtual void addChild(FaultTreeNode* child);
 	virtual bool addChildBelow(const std::string& ID, FaultTreeNode* child);
 
-	NodeList::const_iterator getChildrenBegin() const	{ return m_children.begin(); };
-	NodeList::const_iterator getChildrenEnd()	const	{ return m_children.end(); };
+	virtual void setParent(FaultTreeNode* parent) { m_parent = parent; };
 
+	NodeList::const_iterator getChildrenBegin() const { return m_children.begin(); };
+	NodeList::const_iterator getChildrenEnd()	const { return m_children.end(); };
+
+
+	/************************************************************************/
+	/* data access                                                          */
+	/************************************************************************/
 	FaultTreeNode* getChildById(const std::string& ID);
 
 	int getNumChildren() const { return m_children.size(); };
@@ -35,18 +45,22 @@ public:
 	
 	virtual int getCost() const;
 
+	const FaultTreeNode* getRoot() const;
+	const FaultTreeNode* getParent() const { return m_parent; };
+	
+	/************************************************************************/
+	/* serialization                                                        */
+	/************************************************************************/
+
 	// returns ID of the "top level" place
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const = 0;
 	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const = 0;
-	
-	std::pair<int /*placeID*/,int /*spareActivationTransition*/> serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const;
-	
+
+	std::pair<int /*placeID*/,int /*spareActivationTransition*/> 
+		serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const;
+
 	// uses RTTI
 	virtual void print(std::ostream& stream, int indentLevel=0) const;
-
-	const FaultTreeNode* getRoot() const;
-	const FaultTreeNode* getParent() const { return m_parent; };
-	virtual void setParent(FaultTreeNode* parent) { m_parent = parent; };
 
 protected:
 	virtual std::string description() const;

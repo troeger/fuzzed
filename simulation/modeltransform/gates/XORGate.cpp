@@ -56,3 +56,8 @@ std::string XORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const
 	assert(false && "implement");
 	return "";
 }
+
+void XORGate::initActivationFunc()
+{
+	// ???
+}

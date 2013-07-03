@@ -8,9 +8,6 @@ BasicEvent::BasicEvent(const std::string& ID, long double failureRate, const std
 	m_cost = cost;
 }
 
-BasicEvent::~BasicEvent()
-{}
-
 int BasicEvent::serialize(boost::shared_ptr<PNDocument> doc) const 
 {
 	int notFailed = doc->addPlace(1, 1, "BasicEvent" + m_id);

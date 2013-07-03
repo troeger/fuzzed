@@ -11,4 +11,7 @@ public:
 
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
 	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const override;
+
+protected:
+	virtual void initActivationFunc() override;
 };
