@@ -193,28 +193,30 @@ function(Class, Config) {
                 filter: '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
                 selecting: function(event, ui) {
                     // highlight nodes...
-                    var selection = jQuery(ui.selecting);
-                    if (selection.hasClass(Config.Classes.NODE)) {
-                        selection.data(Config.Keys.NODE).select();
+                    var selection = ui.selecting;
+                    if (jQuery(selection).hasClass(Config.Classes.NODE)) {
+                        jQuery(selection).data(Config.Keys.NODE).select();
                     }
 
                     // ... and edges that are part of the new selection
-                    if (selection.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        var edgeId = selection.attr(Config.Attributes.CONNECTION_ID);
-                        jQuery(document).trigger(Config.Events.CANVAS_EDGE_SELECTED, edgeId);
+                    if (selection.classList && selection.classList.contains(Config.Classes.JSPLUMB_CONNECTOR)) {
+                        //XXX: jQuery selectable can't handle SVG elements yet, so we need to manually assign the
+                        //     corresponding class to it.
+                        selection.classList.add(Config.Classes.JQUERY_UI_SELECTED);
                     }
                 },
                 unselecting: function(event, ui) {
                     // unhighlight nodes...
-                    var unselection = jQuery(ui.unselecting);
-                    if (unselection.hasClass(Config.Classes.NODE)) {
-                        unselection.data(Config.Keys.NODE).deselect();
+                    var unselection = ui.unselecting;
+                    if (jQuery(unselection).hasClass(Config.Classes.NODE)) {
+                        jQuery(unselection).data(Config.Keys.NODE).deselect();
                     }
 
                     // ... and edges when the selection is cleared
-                    if (unselection.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        var edgeId = unselection.attr(Config.Attributes.CONNECTION_ID);
-                        jQuery(document).trigger(Config.Events.CANVAS_EDGE_UNSELECTED, edgeId);
+                    if (unselection.classList && unselection.classList.contains(Config.Classes.JSPLUMB_CONNECTOR)) {
+                        //XXX: jQuery selectable can't handle SVG elements yet, so we need to manually remove the
+                        //     corresponding class from it.
+                        unselection.classList.remove(Config.Classes.JQUERY_UI_SELECTED);
                     }
                 },
                 stop: function() {

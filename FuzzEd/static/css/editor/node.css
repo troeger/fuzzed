@@ -1,3 +1,8 @@
+.fuzzed-node {
+    text-align: center;
+    z-index: 100; /* above connection */
+}
+
 .fuzzed-node.highlighted path,
 .fuzzed-node.highlighted rect,
 .fuzzed-node.highlighted circle
@@ -31,4 +36,98 @@
 .fuzzed-node.disabled svg
 {
     opacity: 0.5;
+}
+
+.fuzzed-node .badge {
+    position: absolute;
+    top:      0;
+    right:    0;
+    margin:   -7px -7px 0 0;
+}
+
+.fuzzed-node .badge-info {
+    background-color: #409FFF;
+}
+
+.fuzzed-node-halo-connect {
+    /* XXX: this is a temporary solution */
+    background-color:       #409FFF;
+    position:               absolute;
+    visibility:             hidden;
+    z-index:                150; /* above image, TODO: let halo care about that */
+    cursor:                 move;
+    -webkit-border-radius:  7px;
+    -moz-border-radius:     7px;
+    border-radius:          7px;
+    /* fix for bootstrap icon looking strange in a circle */
+    width:                  15px;
+    height:                 15px;
+    margin:                 -8px 0 0 -7px;
+    background-position:    -407px -96px;
+}
+
+.fuzzed-node.selected .fuzzed-node-halo-connect {
+    background-color: #FF9640;
+}
+
+.fuzzed-node:hover .fuzzed-node-halo-connect {
+    visibility: visible;
+}
+
+.fuzzed-node-optional-indicator {
+    width:   12px;
+    height:  12px;
+    margin:  0 auto -1px auto; /* let it melt with the node image below */
+}
+
+.fuzzed-mirror {
+    background-color: white;
+    display:          block;
+    font-size:        11px;
+    word-wrap:        break-word;
+    margin-bottom:    -3px;
+    z-index:          110; /* above connection */
+}
+
+.fuzzed-mirror-italic {
+    font-style: italic;
+}
+
+.fuzzed-mirror-bold {
+    font-weight: bold;
+}
+
+.fuzzed-mirror-large {
+    font-size: 13px;
+}
+
+.jsplumb-endpoint
+{
+    opacity: 0;
+}
+
+.jsplumb-endpoint.highlighted
+{
+    opacity: 1;
+}
+
+.jsplumb-connector.highlighted
+{
+    z-index: 100; /* above selection, below mirror */
+}
+
+.jsplumb-connector.highlighted path
+{
+    stroke: #409FFF;
+}
+
+.jsplumb-connector.ui-selected,
+{
+    z-index: 50;
+}
+
+.jsplumb-connector.ui-selected path,
+.jsplumb-connector.ui-selected.highlighted path
+{
+    stroke: #FF9640;
 }

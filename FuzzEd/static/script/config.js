@@ -115,9 +115,7 @@ define(function() {
             JQUERY_UI_SELECTED:      'ui-selected',
 
             JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
-            JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover',
             JSPLUMB_CONNECTOR:       'jsplumb-connector',
-            JSPLUMB_CONNECTOR_HOVER: 'jsplumb-connector-hover',
 
             MENU_CONTROLS:           'menu-controls',
             MENU_CLOSE:              'menu-close',

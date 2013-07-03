@@ -90,15 +90,13 @@ define(['canvas', 'class'], function(Canvas, Class) {
 
         /**
          *  Method: _registerEventHandlers
-         *    Register on <Canvas> events in order to recognize shape drops and node/edge selection and register to
+         *    Register on <Canvas> events in order to recognize shape drops and register to
          *    jsPlumb events in order to recognize connection events.
          *    This should be done _after_ the initial graph loading from the backend to avoid the creation
          *    of duplicate nodes/edges.
          *
          *  On:
          *    <Config::Events::CANVAS_SHAPE_DROPPED>
-         *    <Config::Events::CANVAS_EDGE_SELECTED>
-         *    <Config::Events::CANVAS_EDGE_UNSELECTED>
          *
          *  Returns:
          *    This <Graph> instance for chaining.
@@ -113,8 +111,6 @@ define(['canvas', 'class'], function(Canvas, Class) {
             }.bind(this));
 
             jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED,   this._shapeDropped.bind(this));
-            jQuery(document).on(this.config.Events.CANVAS_EDGE_SELECTED,   this._edgeSelected.bind(this));
-            jQuery(document).on(this.config.Events.CANVAS_EDGE_UNSELECTED, this._edgeUnselected.bind(this));
 
             return this;
         },
@@ -423,52 +419,6 @@ define(['canvas', 'class'], function(Canvas, Class) {
         _shapeDropped: function(event, kind, position) {
             this.addNode(kind, Canvas.toGrid(position))
                 .container.click(); // emulate a click in order to select the new node
-        },
-
-        /**
-         *  Method: _edgeSelected
-         *    Callback that gets called when an edge is selected.
-         *    It will change the visual representation to the 'selected' style specified in the <Config>.
-         *
-         *  Parameters:
-         *    {jQuery::Event} event  - The event object passed by the jQuery event handling framework.
-         *    {int}           edgeId - The _fuzzedId of the edge that has been selected.
-         */
-        _edgeSelected: function(event, edgeId) {
-            var edge = this.getEdgeById(edgeId);
-            //XXX: Normally we could use jsPlumb's 'Connection Type' mechanism which allows the definition of
-            //     different styles and toggling between them. Unfortunately this causes the connector to get
-            //     completely redrawn (replace DOM element) which prevents us from associating it with the connection
-            //     object (via DOM attribute). So we need to toggle the styles manually for the moment.
-            edge.setPaintStyle({
-                strokeStyle: this.config.JSPlumb.STROKE_COLOR_SELECTED,
-                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
-            });
-            edge.setHoverPaintStyle({
-                strokeStyle: this.config.JSPlumb.STROKE_COLOR_SELECTED,
-                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
-            });
-        },
-
-        /**
-         *  Method: _edgeUnselected
-         *    Callback that gets called when an edge is unselected.
-         *    It will change the visual representation back to normal.
-         *
-         *  Parameters:
-         *    {jQuery::Event} event  - The event object passed by the jQuery event handling framework.
-         *    {int}           edgeId - The _fuzzedId of the edge that has been unselected.
-         */
-        _edgeUnselected: function(event, edgeId) {
-            var edge = this.getEdgeById(edgeId);
-            edge.setPaintStyle({
-                strokeStyle: this.config.JSPlumb.STROKE_COLOR,
-                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
-            });
-            edge.setHoverPaintStyle({
-                strokeStyle: this.config.JSPlumb.STROKE_COLOR_HIGHLIGHTED,
-                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
-            });
         }
     });
 });
