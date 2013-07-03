@@ -1,0 +1,175 @@
+.menu {
+    position: fixed;
+    min-height: 50px;
+    min-width: 100px;
+    padding: 42px 7px 7px 7px;
+
+    z-index: 0;
+
+    border: 1px solid #CCC;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+
+    background-color: whiteSmoke;
+    background-image: linear-gradient(top,#F6F6F6,#E6E6E6);
+    background-image: -ms-linear-gradient(top,#F6F6F6,#E6E6E6);
+    background-image: -moz-linear-gradient(top,#F6F6F6,#E6E6E6);
+    background-image: -webkit-gradient(linear,0 0,0 100%,from(#F6F6F6),to(#E6E6E6));
+    background-image: -webkit-linear-gradient(top,#F6F6F6,#E6E6E6);
+    background-image: -o-linear-gradient(top,#F6F6F6,#E6E6E6);
+    background-repeat: repeat-x;
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#f6f6f6',endColorstr='#e6e6e6',GradientType=0);
+    filter: progid:dximagetransform.microsoft.gradient(enabled=false);
+
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 10px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 10px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.1), 0 1px 10px rgba(0, 0, 0, 0.1);
+}
+
+.menu::after {
+    content: attr(header);
+
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    padding: 5px 15px;
+
+    color: #fff;
+    font-size: 14px;
+    font-weight: 200;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+
+    border: 1px solid #2C2C2C;
+    border-radius: 4px 4px 0px 0px;
+    -webkit-border-radius: 4px 4px 0px 0px;
+    -moz-border-radius: 4px 4px 0px 0px;
+    
+    background-color: #2C2C2C;
+    background-image: linear-gradient(to bottom, #333, #222);
+    background-image: -ms-linear-gradient(top,#333,#222);
+    background-image: -moz-linear-gradient(top, #333, #222);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#333), to(#222));
+    background-image: -webkit-linear-gradient(top, #333, #222);
+    background-image: -o-linear-gradient(top, #333, #222);
+    background-repeat: repeat-x;
+    filter: progid:dximagetransform.microsoft.gradient(startColorstr='#ff333333', endColorstr='#ff222222', GradientType=0);
+}
+
+.menu-controls {
+    position: absolute;
+    top: 6px;
+    right: 12px;
+    z-index: 1;
+}
+
+/*
+ *  Shapes Menu
+ */
+#FuzzEdShapes {
+    top: 60px;
+    left: 20px;
+}
+
+#FuzzEdShapes td {
+    text-align: center;
+    width: 90px;
+    vertical-align: top;
+}
+
+#FuzzEdShapes td span {
+    display: block;
+    margin-bottom: 10px;
+
+    font-size: 11px;
+    font-weight: bold;
+    color: #333;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+}
+
+/*
+ *  Properties Menu
+ */
+#FuzzEdProperties {
+    display: none;
+    top: 60px;
+}
+
+#FuzzEdProperties .form-horizontal .controls {
+    margin-left: 110px;
+}
+
+#FuzzEdProperties .form-horizontal .control-label {
+    width: 90px;
+
+    font-weight: bold;
+    color: #333;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+}
+
+#FuzzEdProperties input[type="checkbox"] {
+    margin: 9px 0 0 2px;
+}
+
+#FuzzEdProperties form.form-inline {
+    margin-bottom: 0;
+}
+
+#FuzzEdProperties form.form-inline input.input-mini:not(:first-child) {
+    margin-left: 18px;
+}
+
+#FuzzEdProperties div.progress {
+    width: 160px;
+    margin: 6px 0 0 0;
+}
+
+#FuzzEdProperties button.fuzzed-property-open {
+    display: block;
+    margin-top: 5px;
+}
+
+#FuzzEdProperties .control-group .control-group {
+    margin-top: 18px;
+    margin-bottom: 0;
+}
+
+/*
+ *  Cutsets Menu
+ */
+#FuzzEdCutsetsMenu {
+    display: none;
+    top: 60px;
+    left: 240px;
+    min-width: 200px;
+}
+
+/*
+ *  Probability Menu
+ */
+#FuzzEdProbabilityMenu {
+    display:    none;
+    top:        60px;
+    left:       240px;
+    min-width:  400px;
+    min-height: 100px;
+}
+
+#FuzzEdProbabilityMenu .content {
+    width:  100%;
+    height: 100%;
+    min-width:  400px;
+    min-height: 100px;
+}

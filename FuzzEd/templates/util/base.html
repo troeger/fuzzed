@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:svg="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<html lang="en" xmlns:svg="http://www.w3.org/2000/svg">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>{% block title %}FuzzEd{% endblock %}</title>
-
+    <title>
+        {% block title %}FuzzEd{% endblock %}
+    </title>
     <style type="text/css">
         {% block style %}
-        @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap.min.css");
-        @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap-responsive.min.css");
+        @import url("{{ STATIC_URL }}css/bootstrap/bootstrap-2.3.2.min.css");
+        @import url("{{ STATIC_URL }}css/bootstrap/bootstrap-responsive-2.3.2.min.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         @import url("{{ STATIC_URL }}css/util.css");
         @import url("{{ STATIC_URL }}css/print.css") print;
@@ -17,59 +17,47 @@
 
     {% block script %}
     {{ block.super }}
-    <script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
-
+    <script src="{{ STATIC_URL }}lib/requirejs/require-2.1.6.min.js" type="text/javascript" language="javascript"></script>
     <script type="text/javascript" language="javascript">
         require.config({
             baseUrl: '{{ STATIC_URL }}script/',
             waitSeconds: 5,
             paths: {
                 // require plugins
-                'text' :      '../lib/requirejs/plugins/text', // required by json plugin
-                'json' :      '../lib/requirejs/plugins/json',
+                'text' :      '../lib/requirejs/plugins/text-2.0.7', // required by json plugin
+                'json' :      '../lib/requirejs/plugins/json-0.3.1',
                 // jquery and plugins
-                'jquery':        'require-jquery',
-                'jquery.ui':     '../lib/jquery-ui-1.9.1',
-                'jquery.svg':    '../lib/jquery-svg/jquery-svg-1.4.5',
-                'jquery.svgdom': '../lib/jquery-svg/jquery-svgdom-1.4.5',
+                'jquery':     '../lib/jquery/jquery-2.0.2.min',
+                'jquery-ui':  '../lib/jquery-ui/jquery-ui-1.10.3.min',
                 // other libs
-                'bootstrap':  '../lib/bootstrap/js/bootstrap-2.0.4.min',
-                'underscore': '../lib/underscore/underscore-1.4.3.min',
-                'jsplumb':    '../lib/jsplumb/jsplumb-1.3.16',
+                'bignumber':  '../lib/bignumber/bignumber-1.0.1.min',
+                'bootstrap':  '../lib/bootstrap/bootstrap-2.3.2.min',
                 'highcharts': '../lib/highcharts-2.3.5/highcharts',
+                'jsplumb':    '../lib/jsplumb/jsplumb-1.3.16',
                 'slickgrid':  '../lib/slickgrid/slick.grid',
-                'bignumber':  '../lib/bignumber/bignumber.min',
-
+                'underscore': '../lib/underscore/underscore-1.4.4.min',
+                // notations directory
                 'notations':  '../notations'
-
             },
             // define dependencies for libs that are not AMD compatible
             shim: {
-                'jquery.ui/jquery.ui.core':       ['jquery'],
-                'jquery.ui/jquery.ui.widget':     ['jquery'],
-                'jquery.ui/jquery.ui.mouse':      ['jquery.ui/jquery.ui.core', 'jquery.ui/jquery.ui.widget'],
-                'jquery.ui/jquery.ui.draggable':  ['jquery.ui/jquery.ui.mouse'],
-                'jquery.ui/jquery.ui.droppable':  ['jquery.ui/jquery.ui.mouse'],
-                'jquery.ui/jquery.ui.selectable': ['jquery.ui/jquery.ui.mouse'],
-                'jquery.ui/jquery.ui.resizable':  ['jquery.ui/jquery.ui.mouse'],
-
-                'jquery.svg':    ['jquery'],
-                'jquery.svgdom': ['jquery.svg'],
-
-                'underscore': {
-                    exports: '_'
+                'bootstrap': {
+                    deps: ['jquery']
                 },
-
+                'jquery': {
+                    exports: 'jQuery'
+                },
+                'jquery-ui': {
+                    deps: ['jquery']
+                },
                 'jsplumb': {
-                    deps: ['jquery', 'jquery.ui/jquery.ui.draggable', 'jquery.ui/jquery.ui.droppable'],
+                    deps: ['jquery', 'jquery-ui'],
                     exports: 'jsPlumb'
                 },
-
                 'highcharts': {
                     deps: ['jquery'],
                     exports: 'Highcharts'
                 },
-
                 'slickgrid': {
                     deps: [
                         'jquery',
@@ -78,6 +66,9 @@
                         '../lib/slickgrid/slick.rowselectionmodel'
                     ],
                     exports: 'Slick'
+                },
+                'underscore': {
+                    exports: '_'
                 }
             }
         });
@@ -98,7 +89,7 @@
 </head>
 
 <body>
-    <div class="navbar navbar-fixed-top no-print">
+    <div class="navbar navbar-inverse navbar-fixed-top no-print">
         <div class="navbar-inner">
             <div class="container">
                 <a class="brand" anchor="#">

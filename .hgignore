@@ -18,7 +18,6 @@ FuzzEd/models/notations.py
 FuzzEd/models/xml_analysis.py
 FuzzEd/models/xml_faulttree.py
 FuzzEd/models/xml_fuzztree.py
-FuzzEd/models/xml_faulttree.py
 simulation/lib/
 simulation/tests/output
 *.log

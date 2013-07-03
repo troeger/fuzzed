@@ -1,5 +1,4 @@
-define(['class', 'config', 'jquery.ui/jquery.ui.droppable', 'jquery.ui/jquery.ui.selectable'],
-function(Class, Config) {
+define(['class', 'config', 'jquery-ui'], function(Class, Config) {
     /**
      * Package: Base
      */

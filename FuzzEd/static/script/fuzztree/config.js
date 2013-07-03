@@ -1,4 +1,4 @@
-define(['faulttree/config'], function(FaulttreeConfig) {
+define(['faulttree/config', 'jquery'], function(FaulttreeConfig) {
     /**
      *  Package Fuzztree
      */

@@ -3,40 +3,42 @@
     "name": "Reliability Block Diagram",
     "nodes": {
         "node": {
+            "nodeDisplayName": "Node",
             "numberOfIncomingConnections": -1,
             "numberOfOutgoingConnections": -1,
+
             "allowConnectionTo": [],
-
-            "name": "Node",
-
-            "propertyMenuEntries": {
-                "name": {
-                    "kind": "text",
-                    "displayName": "Name"
-                }
-            },
-
-            "propertyMirrors": {
-                "name": {
-                    "position": "bottom",
-                    "style": ["bold", "large"]
-                }
-            },
 
             "connector": {
                 "offset": {
                     "top":    0,
                     "bottom": 0
                 }
+            },
+
+            "properties": {
+                "name" : {
+                    "kind": "text",
+                    "default": "Node",
+                    "displayName": "Name",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"]
+                    }
+                }
             }
         },
 
         "start": {
+            "nodeDisplayName": "Start",
             "inherits": "node",
-            "name": "Start",
             "image": "start.svg",
+
             "numberOfIncomingConnections": 0,
+
             "allowConnectionTo": ["end", "block", "out_of"],
+
             "excludeFromShapesMenu": true,
             "deletable": false,
 
@@ -44,92 +46,111 @@
                 "offset": {
                     "right": -9.1
                 }
+            },
+
+            "properties": {
+                "name": {
+                    "default": "Start"
+                }
             }
         },
 
         "end": {
+            "nodeDisplayName": "End",
             "inherits": "node",
-            "name": "End",
             "image": "end.svg",
+
             "numberOfOutgoingConnections": 0,
+
             "excludeFromShapesMenu": true,
             "deletable": false,
 
             "connector": {
                 "offset": {
-                    "left":   8.1
+                    "left": 8.1
+                }
+            },
+
+            "properties": {
+                "name": {
+                    "default": "End"
                 }
             }
         },
 
         "block": {
+            "nodeDisplayName": "Block",
             "inherits": "node",
-            "name": "Block",
-            "excludeFromShapesMenu": false,
             "image": "block.svg",
+
             "allowConnectionTo": ["end", "block", "out_of"],
 
-            "probability": 0,
+            "excludeFromShapesMenu": false,
 
-            "propertyMenuEntries": {
+            "properties": {
                 "probability": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "Probability",
-                    "disabled": false,
+                    "default": 0,
                     "min": 0,
                     "max": 1,
-                    "step": 0.0000000001
-                }
-            },
+                    "step": 0.0000000001,
 
-            "propertyMirrors": {
-                "probability": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "p="
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "p={{$0}}"
+                    }
                 }
             }
         },
 
         "out_of": {
+            "nodeDisplayName": "Out of",
             "inherits": "node",
-            "name": "Out of",
-            "excludeFromShapesMenu": false,
             "image": "out_of.svg",
-            "allowConnectionTo": ["block", "end"],
+
             "numberOfOutgoingConnections": 1,
+
+            "allowConnectionTo": ["block", "end"],
+
+            "excludeFromShapesMenu": false,
 
             "out_of": [1, 1],
 
-            "propertyMenuEntries": {
+            "properties": {
+                "name": {
+                    "default": "Out of"
+                },
+
                 "out_of": {
                     "kind": "range",
-                    "displayName": "Out of",
+                    "displayName": "Out-of",
+                    "default": [1, 1],
                     "min": 1,
-                    "step": 1
-                }
-            },
+                    "step": 1,
 
-            "propertyMirrors": {
-                "out_of": {
-                    "position": "bottom",
-                    "style": ["italic"]
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "{{$0}}/{{$1}}"
+                    }
                 }
             }
         }
     },
+
+    "propertiesDisplayOrder": [
+        "name",
+        "probability",
+        "out_of"
+    ],
 
     "shapeMenuNodeDisplayOrder": [
         "block",
         "out_of",
         "start",
         "end"
-    ],
-
-    "propertiesDisplayOrder": [
-        "name",
-        "probability",
-        "out_of"
     ],
 
     "defaults": {

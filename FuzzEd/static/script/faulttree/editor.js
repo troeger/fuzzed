@@ -1,5 +1,4 @@
-define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery.ui/jquery.ui.resizable',
-        'slickgrid'],
+define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery-ui', 'slickgrid'],
 function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
     /**
      *  Package: Faulttree
@@ -350,19 +349,14 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 return point[0];
             });
 
-            if (configuration['costs']) 
-                ie = peak / configuration['costs'];
-            else
-                ie = '-';
-
             return {
                 series: series,
                 statistics: {
-                    min:   min,
-                    max:   max,
-                    peak:  peak,
-                    ineffectiveness: ie,
-                    costs: configuration['costs']
+                    min:             min,
+                    max:             max,
+                    peak:            peak,
+                    ineffectiveness: configuration['costs'] ? peak / configuration['costs'] : '-',
+                    costs:           configuration['costs']
                 }
             };
         },

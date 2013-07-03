@@ -6,13 +6,13 @@
 
 {% block style %}
     {{ block.super }}
-    @import url("{{ STATIC_URL }}css/editor/editor.css");
-    @import url("{{ STATIC_URL }}css/editor/node.css");
-    @import url("{{ STATIC_URL }}css/editor/menus.css");
+    @import url("{{ STATIC_URL }}css/jquery-ui/jquery-ui-1.10.3.min.css");
+    @import url("{{ STATIC_URL }}css/slickgrid/slick.grid.css");
+    @import url("{{ STATIC_URL }}css/slickgrid/slick.grid.theme.css");
 
-    @import url("{{ STATIC_URL }}css/jquery.ui.custom.css");
-    @import url("{{ STATIC_URL }}css/slick.grid.css");
-    @import url("{{ STATIC_URL }}css/slick.grid.theme.css");
+    @import url("{{ STATIC_URL }}css/editor.css");
+    @import url("{{ STATIC_URL }}css/node.css");
+    @import url("{{ STATIC_URL }}css/menus.css");
 {% endblock %}
 
 {% block script %}
@@ -41,6 +41,18 @@
                 Not saved!
             </span>
         </a>
+        <ul id="FuzzEdNavbarActions" class="dropdown-menu">
+            <li>
+                <a href="{% url 'graph_download' graph.pk %}?format=xml">
+                    Save as XML <i class="icon-download"></i>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'graph_download' graph.pk %}?format=json">
+                    Save as JSON <i class="icon-download"></i>
+                </a>
+            </li>
+        </ul>
     </li>
 </ul>
 {% endblock %}

@@ -1,4 +1,4 @@
-define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alerts) {
+define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, Job, Alerts) {
 
     /**
      * Class: Backend
@@ -42,7 +42,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
          * listed below.
          *
          * On:
-         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::PROPERTY_CHANGED>
          *   <Config::Events::GRAPH_NODE_ADDED>
          *   <Config::Events::GRAPH_NODE_DELETED>
          *   <Config::Events::GRAPH_EDGE_DELETED>
@@ -53,7 +53,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
          */
         activate: function() {
             jQuery(document)
-                .on(Config.Events.NODE_PROPERTY_CHANGED,    this.nodePropertyChanged.bind(this))
+                .on(Config.Events.PROPERTY_CHANGED,    this.nodePropertyChanged.bind(this))
                 .on(Config.Events.GRAPH_NODE_ADDED,         this.graphNodeAdded.bind(this))
                 .on(Config.Events.GRAPH_NODE_DELETED,       this.graphNodeDeleted.bind(this))
                 .on(Config.Events.GRAPH_EDGE_ADDED,         this.graphEdgeAdded.bind(this))
@@ -70,7 +70,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
          * all handlers for custom synchronization events.
          *
          * Off:
-         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::PROPERTY_CHANGED>
          *   <Config::Events::GRAPH_NODE_ADDED>
          *   <Config::Events::GRAPH_NODE_DELETED>
          *   <Config::Events::GRAPH_EDGE_DELETED>
@@ -81,7 +81,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
          */
         deactivate: function() {
             jQuery(document)
-                .off(Config.Events.NODE_PROPERTY_CHANGED)
+                .off(Config.Events.PROPERTY_CHANGED)
                 .off(Config.Events.GRAPH_NODE_ADDED)
                 .off(Config.Events.GRAPH_NODE_DELETED)
                 .off(Config.Events.GRAPH_EDGE_ADDED)
@@ -344,10 +344,9 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
          */
         calculateTopEventProbability: function(event, success, error, complete) {
             jQuery.ajax({
-                url:      this._fullUrlForTopEventProbability(),
-                dataType: 'json',
+                url:    this._fullUrlForTopEventProbability(),
                 // don't show progress
-                global:   false,
+                global: false,
 
                 statusCode: {
                     201: function(data, status, req) {
@@ -358,7 +357,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
                     }
                 },
 
-                error:    function(jqXHR, errorStatus, errorThrown) {
+                error: function(jqXHR, errorStatus, errorThrown) {
                     var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
                     Alerts.showErrorAlert('Failed to calculate Top Event probability:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
