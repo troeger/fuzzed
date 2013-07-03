@@ -1,4 +1,4 @@
-define(['properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
+define(['properties', 'mirror', 'canvas', 'class', 'jsplumb'],
 function(Properties, Mirror, Canvas, Class) {
     /**
      *  Class: {Abstract} Node
@@ -27,11 +27,6 @@ function(Properties, Mirror, Canvas, Class) {
          *                                       target of the edge).
          *    {Array[<Edge>]} outgoingEdges    - An enumeration of all edges linking FROM this node (this node is the
          *                                       source of the edge).
-         *    {bool}       _disabled           - Boolean flag indicating whether this node may be a target for a
-         *                                       currently drawn edge. True disables connection and therefore fades out
-         *                                       the node.
-         *    {bool}       _highlighted        - Boolean flag that is true when the node needs to be highlighted on hover.
-         *    {bool}       _selected           - Boolean flag that is true when the node is selected - i.e. clicked.
          *    {DOMElement} _nodeImage          - DOM element that contains the actual image/svg of the node.
          *    {DOMElement} _badge              - DOM element that contains the badge that can be used to display additional
          *                                       information on a node.
@@ -46,9 +41,6 @@ function(Properties, Mirror, Canvas, Class) {
         incomingEdges: undefined,
         outgoingEdges: undefined,
 
-        _disabled:           false,
-        _highlighted:        false,
-        _selected:           false,
         _nodeImage:          undefined,
         _badge:              undefined,
         _nodeImageContainer: undefined,
@@ -131,10 +123,6 @@ function(Properties, Mirror, Canvas, Class) {
                 // add new classes for the actual node
                 .addClass(this.config.Classes.NODE_IMAGE);
 
-            // links to primitive shapes and groups of the SVG for later manipulation (highlighting, ...)
-            this._nodeImage.primitives = this._nodeImage.find('rect, circle, path');
-            this._nodeImage.groups     = this._nodeImage.find('g');
-
             this._badge = jQuery('<span class="badge"></span>')
                 .hide();
 
@@ -176,10 +164,11 @@ function(Properties, Mirror, Canvas, Class) {
             this._nodeImage.attr('height', this._nodeImage.height() * scaleFactor);
 
             var newTransform = 'scale(' + scaleFactor + ')';
-            if (this._nodeImage.groups.attr('transform')) {
-                newTransform += ' ' + this._nodeImage.groups.attr('transform');
+            var groups = this._nodeImage.find('g');
+            if (groups.attr('transform')) {
+                newTransform += ' ' + groups.attr('transform');
             }
-            this._nodeImage.groups.attr('transform', newTransform);
+            groups.attr('transform', newTransform);
 
             // XXX: In Webkit browsers the container div does not resize properly. This should fix it.
             this.container.width(this._nodeImage.width());
@@ -770,99 +759,74 @@ function(Properties, Mirror, Canvas, Class) {
 
         /**
          * Method: disable
-         *
-         * Disables the node visually (fade out) to make it appear to be not interactive for the user. Sets the node's
-         * <Node::_disabled> flag to true.
+         *   Disables the node visually (fade out) to make it appear to be not interactive for the user.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         disable: function() {
-            this._disabled = true;
-            return this._visualDisable();
+            this.container.addClass(this.config.Classes.DISABLED);
+
+            return this;
         },
 
         /**
          * Method: enable
-         *
-         * This method node re-enables the node visually and makes appear interactive to the user. Should usually be
-         * called subsequently to <Node::disabled()>. Modifies the node's <Node::_disabled> flag to false. The method
-         * takes other visual states like highlighted and selected into account.
+         *   This method node re-enables the node visually and makes appear interactive to the user.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         enable: function() {
-            this._disabled = false;
+            this.container.removeClass(this.config.Classes.DISABLED);
 
-            if (this._selected) {
-                return this._visualSelect();
-            } else if (this._highlighted) {
-                return this._visualHighlight();
-            } else {
-                return this._visualReset();
-            }
+            return this;
         },
 
         /**
          * Method: select
-         *
-         * Marks the node as selected - meaning: it will set the <Node::_selected> member to true and change the node's
-         * visual appearance (<Node::_visualSelect()>). A node can only be selected if it is not already disabled.
+         *   Marks the node as selected by adding the corresponding CSS class.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         select: function() {
-            // don't allow selection of disabled nodes
-            if (this._disabled) return this;
+            this.container.addClass(this.config.Classes.SELECTED);
 
-            this._selected = true;
-            return this._visualSelect();
+            return this;
         },
 
         /**
          * Method: deselect
-         *
-         * This method deselects the node - meaning: sets the <Node::_selected> flag to false and reset it visual
-         * appearance as long is it not also selected.
+         *   This method deselects the node by removing the corresponding CSS class to it.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         deselect: function() {
-            this._selected = false;
+            this.container.removeClass(this.config.Classes.SELECTED);
 
-            if (this._highlighted) {
-                return this._visualHighlight();
-            } else {
-                return this._visualReset();
-            }
+            return this;
         },
 
         /**
          * Method: highlight
-         *
-         * This method highlights the node visually as long as the node is not already disabled or selected. It is for
-         * instance called when the user hovers over a node. Modifies the node's <Node::_highlighted> flag to true.
+         *   This method highlights the node visually as long as the node is not already disabled or selected. It is for
+         *   instance called when the user hovers over a node.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         highlight: function() {
-            this._highlighted = true;
-            // don't highlight selected or disabled nodes (visually)
-            if (this._selected || this._disabled) return this;
+            this.container.addClass(this.config.Classes.HIGHLIGHTED);
 
-            return this._visualHighlight();
+            return this;
         },
 
         /**
          * Method: unhighlight
-         *
-         * Unhighlights the node' visual appearance. The method is for instance calls when the user leaves a hovered
-         * node. Modifies the node's <Node::_highlighted> flag to false. Unhighlighting is only possible if the node is
-         * not also selected or disabled.
+         *   Unhighlights the node' visual appearance. The method is for instance calls when the user leaves a hovered
+         *   node.
          *
          * P.S.: The weird word unhighlighting is an adoption of the jQueryUI dev team speak, all credits to them :)!
          *
@@ -870,11 +834,9 @@ function(Properties, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         unhighlight: function() {
-            this._highlighted = false;
-            // don't highlight selected or disabled nodes (visually)
-            if (this._selected || this._disabled) return this;
+            this.container.removeClass(this.config.Classes.HIGHLIGHTED);
 
-            return this._visualReset();
+            return this;
         },
 
         /**
@@ -912,73 +874,6 @@ function(Properties, Mirror, Canvas, Class) {
                 .text('')
                 .removeClass()
                 .hide();
-
-            return this;
-        },
-
-        /**
-         * Method: _visualDisable
-         *
-         * Does the dirty work for visually disabling a node - changes the stroke of all SVG primitives (e.g. path,
-         * circle, ...) to the color specified in the <Config>.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-        _visualDisable: function() {
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_DISABLED);
-            this._nodeImage.css('opacity', this.config.Dragging.OPACITY);
-
-            return this;
-        },
-
-        /**
-         * Method: _visualHighlight
-         *
-         * Does the dirty work for visually changing the appearance of a highlighted node. Removes at first all already
-         * applied styles by calling <Node::_visualReset()> and then changes the stroke color of all SVG primitives of
-         * the node's image to the color specified in the <Config>.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-        _visualHighlight: function() {
-            this._visualReset();
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_HIGHLIGHTED);
-
-            return this;
-        },
-
-        /**
-         * Small helper method to reset all applied visual changes of the _visual*** method group. Therefore, removes
-         * added CSS classes and sets the node's stroke to its initial color.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-        _visualReset: function() {
-            this.container.removeClass(this.config.Classes.NODE_SELECTED);
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_NORMAL);
-            this._nodeImage.css('opacity', 1);
-
-            return this;
-        },
-
-        /**
-         * Method: _visualSelect
-         *
-         * Does the dirty work for visually selecting a node. At first it reset any previously assigned style by
-         * calling <Node::_visualReset()>. Then it paints all strokes of the SVG primitives of the node's image using
-         * the color specified in the <Config>.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-        _visualSelect: function() {
-            this._visualReset();
-
-            this.container.addClass(this.config.Classes.NODE_SELECTED);
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_SELECTED);
 
             return this;
         }

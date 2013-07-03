@@ -1,0 +1,34 @@
+.fuzzed-node.highlighted path,
+.fuzzed-node.highlighted rect,
+.fuzzed-node.highlighted circle
+{
+    stroke: #409FFF !important;
+}
+
+.fuzzed-node.selected path,
+.fuzzed-node.selected rect,
+.fuzzed-node.selected circle,
+.fuzzed-node.selected.highlighted path,
+.fuzzed-node.selected.highlighted rect,
+.fuzzed-node.selected.highlighted circle
+{
+    stroke: #FF9640 !important;
+}
+
+.fuzzed-node.disabled path,
+.fuzzed-node.disabled rect,
+.fuzzed-node.disabled circle,
+.fuzzed-node.disabled.selected path,
+.fuzzed-node.disabled.selected rect,
+.fuzzed-node.disabled.selected circle,
+.fuzzed-node.disabled.selected.highlighted path,
+.fuzzed-node.disabled.selected.highlighted rect,
+.fuzzed-node.disabled.selected.highlighted circle
+{
+    stroke: #CCCCCC !important;
+}
+
+.fuzzed-node.disabled svg
+{
+    opacity: 0.5;
+}

@@ -1,4 +1,4 @@
-define(['class', 'config', 'jquery.svgdom', 'jquery.ui/jquery.ui.droppable', 'jquery.ui/jquery.ui.selectable'],
+define(['class', 'config', 'jquery.ui/jquery.ui.droppable', 'jquery.ui/jquery.ui.selectable'],
 function(Class, Config) {
     /**
      * Package: Base

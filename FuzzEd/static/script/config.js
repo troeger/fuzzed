@@ -95,8 +95,7 @@ define(function() {
          *    {String} MIRROR_ITALIC           - Class of italic mirror labels.
          *    {String} MIRROR_LARGE            - Class of larger mirror labels.
          *
-         *    {String} NODE                    - Class of a node's container
-         *    {String} NODE_SELECTED           - Class assigned to a node's container when selected.
+         *    {String} NODE                    - Class of a node's container.
          *    {String} NODE_IMAGE              - Class of the node's image (the SVG).
          *    {String} NODE_DROP_ACTIVE        - Class assigned to nodes that are valid connection targets
          *                                       (when dragging a new connection).
@@ -107,6 +106,10 @@ define(function() {
          *    {String} PROPERTY_WARNING        - Class for property input fields if they are erroneous.
          */
         Classes: {
+            HIGHLIGHTED:             'highlighted',
+            SELECTED:                'selected',
+            DISABLED:                'disabled',
+
             GRID_HIDDEN:             'fuzzed-grid-hidden',
 
             JQUERY_UI_SELECTED:      'ui-selected',
@@ -126,7 +129,6 @@ define(function() {
             MIRROR_LARGE:            'fuzzed-mirror-large',
 
             NODE:                    'fuzzed-node',
-            NODE_SELECTED:           'fuzzed-node-selected',
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
             NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
