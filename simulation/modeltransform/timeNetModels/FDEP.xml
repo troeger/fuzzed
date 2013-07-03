@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<net id="0" netclass="eDSPN"
+  xmlns="http://pdv.cs.tu-berlin.de/TimeNET/schema/eDSPN"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pdv.cs.tu-berlin.de/TimeNET/schema/eDSPN etc/schemas/eDSPN.xsd">
+  <place id="0.0" initialMarking="0" type="node">
+    <graphics orientation="0" x="276" y="167"/>
+    <label id="0.0.0" text="Trigger" type="text">
+      <graphics x="-20" y="-39"/>
+    </label>
+  </place>
+  <place id="0.1" initialMarking="1" type="node">
+    <graphics orientation="0" x="274" y="351"/>
+    <label id="0.1.0" text="Dependent2" type="text">
+      <graphics x="-29" y="-40"/>
+    </label>
+  </place>
+  <place id="0.2" initialMarking="1" type="node">
+    <graphics orientation="0" x="270" y="279"/>
+    <label id="0.2.0" text="Dependent1" type="text">
+      <graphics x="-33" y="-40"/>
+    </label>
+  </place>
+  <place id="0.7" initialMarking="0" type="node">
+    <graphics orientation="0" x="431" y="280"/>
+    <label id="0.7.0" text="P0" type="text">
+      <graphics x="-10" y="-40"/>
+    </label>
+  </place>
+  <place id="0.8" initialMarking="0" type="node">
+    <graphics orientation="0" x="431" y="356"/>
+    <label id="0.8.0" text="P3" type="text">
+      <graphics x="-10" y="-40"/>
+    </label>
+  </place>
+  <place id="0.15" initialMarking="0" type="node">
+    <graphics orientation="0" x="144" y="165"/>
+    <label id="0.15.0" text="Event" type="text">
+      <graphics x="-16" y="-37"/>
+    </label>
+  </place>
+  <exponentialTransition DTSPNpriority="1" delay="1.0" id="0.3"
+    preemptionPolicy="PRD" serverType="ExclusiveServer" type="node">
+    <graphics orientation="0" x="343" y="280"/>
+    <label id="0.3.0" text="T0" type="text">
+      <graphics x="-10" y="-40"/>
+    </label>
+  </exponentialTransition>
+  <exponentialTransition DTSPNpriority="1" delay="1.0" id="0.4"
+    preemptionPolicy="PRD" serverType="ExclusiveServer" type="node">
+    <graphics orientation="0" x="343" y="353"/>
+    <label id="0.4.0" text="T1" type="text">
+      <graphics x="-10" y="-40"/>
+    </label>
+  </exponentialTransition>
+  <exponentialTransition DTSPNpriority="1" delay="1.0" id="0.16"
+    preemptionPolicy="PRD" serverType="ExclusiveServer" type="node">
+    <graphics orientation="0" x="220" y="166"/>
+    <label id="0.16.0" text="T3" type="text">
+      <graphics x="-10" y="-40"/>
+    </label>
+  </exponentialTransition>
+  <immediateTransition enablingFunction="" id="0.11" priority="1"
+    type="node" weight="1">
+    <graphics orientation="0" x="339" y="168"/>
+    <label id="0.11.0" text="T2" type="text">
+      <graphics x="-10" y="-40"/>
+    </label>
+  </immediateTransition>
+  <arc fromNode="0.2" id="0.5" toNode="0.3" type="connector">
+    <inscription id="0.5.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+  </arc>
+  <arc fromNode="0.1" id="0.6" toNode="0.4" type="connector">
+    <inscription id="0.6.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+  </arc>
+  <arc fromNode="0.3" id="0.9" toNode="0.7" type="connector">
+    <inscription id="0.9.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+  </arc>
+  <arc fromNode="0.4" id="0.10" toNode="0.8" type="connector">
+    <inscription id="0.10.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+  </arc>
+  <arc fromNode="0.0" id="0.12" toNode="0.11" type="connector">
+    <inscription id="0.12.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+    <handle id="0.12.1">
+      <graphics orientation="0" x="316" y="153"/>
+    </handle>
+  </arc>
+  <arc fromNode="0.11" id="0.13" toNode="0.7" type="connector">
+    <inscription id="0.13.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+    <handle id="0.13.2">
+      <graphics orientation="0" x="488" y="168"/>
+    </handle>
+    <handle id="0.13.1">
+      <graphics orientation="0" x="489" y="280"/>
+    </handle>
+  </arc>
+  <arc fromNode="0.11" id="0.14" toNode="0.8" type="connector">
+    <inscription id="0.14.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+    <handle id="0.14.3">
+      <graphics orientation="0" x="357" y="147"/>
+    </handle>
+    <handle id="0.14.1">
+      <graphics orientation="0" x="521" y="146"/>
+    </handle>
+    <handle id="0.14.2">
+      <graphics orientation="0" x="522" y="356"/>
+    </handle>
+  </arc>
+  <arc fromNode="0.15" id="0.17" toNode="0.16" type="connector">
+    <inscription id="0.17.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+  </arc>
+  <arc fromNode="0.16" id="0.18" toNode="0.0" type="connector">
+    <inscription id="0.18.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+  </arc>
+  <arc fromNode="0.11" id="0.19" toNode="0.0" type="connector">
+    <inscription id="0.19.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+    <handle id="0.19.1">
+      <graphics orientation="0" x="316" y="181"/>
+    </handle>
+  </arc>
+</net>
