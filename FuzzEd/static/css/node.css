@@ -44,6 +44,13 @@
     opacity: 0.5;
 }
 
+.fuzzed-node.optional path,
+.fuzzed-node.optional rect,
+.fuzzed-node.optional circle
+{
+    stroke-dasharray: 4.8 2;
+}
+
 .fuzzed-node .badge {
     position: absolute;
     top:      0;

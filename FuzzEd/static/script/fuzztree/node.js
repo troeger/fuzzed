@@ -6,11 +6,9 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
         setOptional: function(optional) {
             // mark node optional (or remove mark)
             if (optional) {
-                this.container.addClass(this.config.Classes.NODE_OPTIONAL);
-                this._nodeImage.primitives.attr('stroke-dasharray', this.config.Node.OPTIONAL_STROKE_STYLE);
+                this.container.addClass(this.config.Classes.OPTIONAL);
             } else {
-                this.container.removeClass(this.config.Classes.NODE_OPTIONAL);
-                this._nodeImage.primitives.removeAttr('stroke-dasharray');
+                this.container.removeClass(this.config.Classes.OPTIONAL);
             }
 
             return this;
