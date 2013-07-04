@@ -17,6 +17,7 @@ namespace faulttree
 {
 	class FaultTree;
 }
+class FaultTreeNode;
 
 enum SimulationImpl
 {
@@ -66,10 +67,11 @@ public:
 
 	// simulates all configurations from one file
 	void simulateFile(const boost::filesystem::path& p, SimulationImpl impl, bool simulatePetriNet);
-	
+
 protected:
 	void parseCommandline(int numArguments, char** arguments);
 
+	void simulateFaultTree(FaultTreeNode* ft, const std::string& newFileName, SimulationImpl impl);
 	bool runSimulationInternal(
 		const boost::filesystem::path& p, 
 		SimulationImpl implementationType,

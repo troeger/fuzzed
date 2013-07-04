@@ -220,7 +220,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 
 	const auto ext = p.extension();
 
-	if (((ext == PNML::PNML_EXT && impl==DEFAULT) || (ext == timeNET::TN_EXT)) && simulatePetriNet)
+	if (((ext == PNML::PNML_EXT && impl == DEFAULT) || (ext == timeNET::TN_EXT)) && simulatePetriNet)
 		runSimulationInternal(p, impl); // run simulation directly
 
 	else if (ext == fuzzTree::FUZZ_TREE_EXT)
@@ -230,11 +230,16 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 			throw runtime_error("Could not open file");
 
 		auto ftTransform = FuzzTreeTransform(file);
+		int i = 0;
 		for (const auto& ft : ftTransform.transform())
 		{
 			auto simTree = fromGeneratedFaultTree(ft.topEvent());
-			simTree->print(cout);
+			
+			std::string newFileName = p.generic_string();
+			util::replaceFileExtensionInPlace(newFileName, util::toString(++i) + ((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT));
+			simulateFaultTree(simTree.get(), newFileName, impl);
 		}
+		return;
 	}
 
 	else if (ext == faultTree::FAULT_TREE_EXT)
@@ -247,30 +252,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 
 		string newFileName = p.generic_string();
 		util::replaceFileExtensionInPlace(newFileName, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
-
-		boost::shared_ptr<PNDocument> doc;
-		switch (impl)
-		{
-		case DEFAULT:
-			doc = boost::shared_ptr<PNMLDocument>(new PNMLDocument());
-			break;
-		case TIMENET:
-			doc = boost::shared_ptr<TNDocument>(new TNDocument());
-			break;
-		}
-
-		ft->serialize(doc);
-		delete ft;
-		doc->save(newFileName);
-		
-		try
-		{
-			runSimulationInternal(newFileName, impl, m_timeNetProperties);
-		}
-		catch (...)
-		{
-			;
-		}
+		simulateFaultTree(ft, newFileName, impl);
 	}		
 }
 
@@ -287,6 +269,26 @@ SimulationProxy::~SimulationProxy()
 {
 	if (m_timeNetProperties)
 		delete m_timeNetProperties;
+}
+
+void SimulationProxy::simulateFaultTree(FaultTreeNode* ft, const std::string& newFileName, SimulationImpl impl)
+{
+	boost::shared_ptr<PNDocument> doc;
+	switch (impl)
+	{
+	case DEFAULT:
+		doc = boost::shared_ptr<PNMLDocument>(new PNMLDocument());
+		break;
+	case TIMENET:
+		doc = boost::shared_ptr<TNDocument>(new TNDocument());
+		break;
+	}
+
+	ft->serialize(doc);
+	delete ft;
+	doc->save(newFileName);
+
+	runSimulationInternal(newFileName, impl, m_timeNetProperties);
 }
 
 void runSimulation(
