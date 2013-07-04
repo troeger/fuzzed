@@ -10,12 +10,18 @@
     stroke: #409FFF !important;
 }
 
-.fuzzed-node.selected path,
-.fuzzed-node.selected rect,
-.fuzzed-node.selected circle,
-.fuzzed-node.selected.highlighted path,
-.fuzzed-node.selected.highlighted rect,
-.fuzzed-node.selected.highlighted circle
+.fuzzed-node.ui-selected path,
+.fuzzed-node.ui-selected rect,
+.fuzzed-node.ui-selected circle,
+.fuzzed-node.ui-selected.highlighted path,
+.fuzzed-node.ui-selected.highlighted rect,
+.fuzzed-node.ui-selected.highlighted circle,
+.fuzzed-node.ui-selecting path,
+.fuzzed-node.ui-selecting rect,
+.fuzzed-node.ui-selecting circle,
+.fuzzed-node.ui-selecting.highlighted path,
+.fuzzed-node.ui-selecting.highlighted rect,
+.fuzzed-node.ui-selecting.highlighted circle
 {
     stroke: #FF9640 !important;
 }
@@ -23,12 +29,12 @@
 .fuzzed-node.disabled path,
 .fuzzed-node.disabled rect,
 .fuzzed-node.disabled circle,
-.fuzzed-node.disabled.selected path,
-.fuzzed-node.disabled.selected rect,
-.fuzzed-node.disabled.selected circle,
-.fuzzed-node.disabled.selected.highlighted path,
-.fuzzed-node.disabled.selected.highlighted rect,
-.fuzzed-node.disabled.selected.highlighted circle
+.fuzzed-node.disabled.ui-selected path,
+.fuzzed-node.disabled.ui-selected rect,
+.fuzzed-node.disabled.ui-selected circle,
+.fuzzed-node.disabled.ui-selected.highlighted path,
+.fuzzed-node.disabled.ui-selected.highlighted rect,
+.fuzzed-node.disabled.ui-selected.highlighted circle
 {
     stroke: #CCCCCC !important;
 }
@@ -66,7 +72,7 @@
     background-position:    -407px -96px;
 }
 
-.fuzzed-node.selected .fuzzed-node-halo-connect {
+.fuzzed-node.ui-selected .fuzzed-node-halo-connect {
     background-color: #FF9640;
 }
 
@@ -127,7 +133,9 @@
 }
 
 .jsplumb-connector.ui-selected path,
-.jsplumb-connector.ui-selected.highlighted path
+.jsplumb-connector.ui-selecting path,
+.jsplumb-connector.ui-selected.highlighted path,
+.jsplumb-connector.ui-selecting.highlighted path
 {
     stroke: #FF9640;
 }

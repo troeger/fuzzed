@@ -21,7 +21,7 @@
     // start editor
     require(['{{ graph.kind }}/editor', 'bootstrap' /* needed for dropdown menu */], function(Editor) {
         jQuery(document).ready(function() {
-            editor = new Editor({{ graph.pk }});
+            var editor = new Editor({{ graph.pk }});
         });
     });
 </script>

@@ -362,13 +362,13 @@ function(Property, Mirror, Canvas, Class) {
                     // XXX: add dragged node to selection
                     // This uses the jQuery.ui.selectable internal functions.
                     // We need to trigger them manually because jQuery.ui.draggable doesn't propagate these events.
-                    if (!this.container.hasClass(this.config.Classes.JQUERY_UI_SELECTED)) {
+                    if (!this.container.hasClass(this.config.Classes.SELECTED)) {
                         Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
                         Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
                     }
 
                     // capture the original positions of all (multi) selected nodes and save them
-                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).each(function(index, node) {
+                    jQuery('.' + this.config.Classes.SELECTED).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
@@ -386,7 +386,7 @@ function(Property, Mirror, Canvas, Class) {
                     var yOffset = ui.position.top  - initialPositions[this.id].top;
 
                     // tell all selected nodes to move as well, except this node; the user already dragged it
-                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
+                    jQuery('.' + this.config.Classes.SELECTED).not(this.container).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
@@ -411,7 +411,7 @@ function(Property, Mirror, Canvas, Class) {
                     var xOffset = ui.position.left - initialPositions[this.id].left;
                     var yOffset = ui.position.top  - initialPositions[this.id].top;
 
-                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).each(function(index, node) {
+                    jQuery('.' + this.config.Classes.SELECTED).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;

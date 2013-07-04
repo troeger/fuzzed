@@ -241,8 +241,8 @@ function(Class, Menus, Canvas, Backend, Alerts) {
         _setupKeyBindings: function(readOnly) {
             if (readOnly) return this;
 
-            var selectedNodes = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE;
-            var selectedEdges = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
 
             jQuery(document).keydown(function(event) {
                 if (event.which == jQuery.ui.keyCode.ESCAPE) {

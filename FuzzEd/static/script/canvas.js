@@ -191,31 +191,19 @@ define(['class', 'config', 'jquery-ui'], function(Class, Config) {
             this.container.selectable({
                 filter: '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
                 selecting: function(event, ui) {
-                    // highlight nodes...
-                    var selection = ui.selecting;
-                    if (jQuery(selection).hasClass(Config.Classes.NODE)) {
-                        jQuery(selection).data(Config.Keys.NODE).select();
-                    }
-
-                    // ... and edges that are part of the new selection
-                    if (selection.classList && selection.classList.contains(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        //XXX: jQuery selectable can't handle SVG elements yet, so we need to manually assign the
-                        //     corresponding class to it.
-                        selection.classList.add(Config.Classes.JQUERY_UI_SELECTED);
+                    //XXX: jQuery selectable can't handle SVG elements yet, so we need to manually assign the
+                    //     corresponding selection class to the SVG elements of the jsPlumb connectors.
+                    var classList = ui.selecting.classList;
+                    if (classList && classList.contains(Config.Classes.JSPLUMB_CONNECTOR)) {
+                        classList.add(Config.Classes.SELECTED);
                     }
                 },
                 unselecting: function(event, ui) {
-                    // unhighlight nodes...
-                    var unselection = ui.unselecting;
-                    if (jQuery(unselection).hasClass(Config.Classes.NODE)) {
-                        jQuery(unselection).data(Config.Keys.NODE).deselect();
-                    }
-
-                    // ... and edges when the selection is cleared
-                    if (unselection.classList && unselection.classList.contains(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        //XXX: jQuery selectable can't handle SVG elements yet, so we need to manually remove the
-                        //     corresponding class from it.
-                        unselection.classList.remove(Config.Classes.JQUERY_UI_SELECTED);
+                    //XXX: jQuery selectable can't handle SVG elements yet, so we need to manually remove the
+                    //     corresponding selection class fron the SVG elements of the jsPlumb connectors.
+                    var classList = ui.unselecting.classList;
+                    if (classList && classList.contains(Config.Classes.JSPLUMB_CONNECTOR)) {
+                        classList.remove(Config.Classes.SELECTED);
                     }
                 },
                 stop: function() {
