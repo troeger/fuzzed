@@ -33,8 +33,8 @@
                 'bignumber':  '../lib/bignumber/bignumber-1.0.1.min',
                 'bootstrap':  '../lib/bootstrap/bootstrap-2.3.2.min',
                 'highcharts': '../lib/highcharts-2.3.5/highcharts',
-                'jsplumb':    '../lib/jsplumb/jsplumb-1.3.16',
-                'slickgrid':  '../lib/slickgrid/slick.grid',
+                'jsplumb':    '../lib/jsplumb/jsplumb-1.4.1.min',
+                'slickgrid':  '../lib/slickgrid/slick.grid-2.0.2',
                 'underscore': '../lib/underscore/underscore-1.4.4.min',
                 // notations directory
                 'notations':  '../notations'
@@ -43,9 +43,6 @@
             shim: {
                 'bootstrap': {
                     deps: ['jquery']
-                },
-                'jquery': {
-                    exports: 'jQuery'
                 },
                 'jquery-ui': {
                     deps: ['jquery']
@@ -61,9 +58,9 @@
                 'slickgrid': {
                     deps: [
                         'jquery',
-                        '../lib/slickgrid/jquery.event.drag-2.2',
-                        '../lib/slickgrid/slick.core',
-                        '../lib/slickgrid/slick.rowselectionmodel'
+                        '../lib/slickgrid/slick.core-2.0.2',
+                        '../lib/slickgrid/plugins/slick.rowselectionmodel-2.0.2',
+                        '../lib/slickgrid/lib/jquery.event.drag-2.0.min'
                     ],
                     exports: 'Slick'
                 },

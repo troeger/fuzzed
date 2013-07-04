@@ -183,7 +183,7 @@
 
         "xorGate": {
             "nodeDisplayName": "XOR Gate",
-            "inherits": "gate",
+            "inherits": "orGate",
 
             "name": "XOR Gate",
             "image": "xor_gate.svg",
@@ -198,7 +198,7 @@
 
         "votingOrGate": {
             "nodeDisplayName": "Voting OR Gate",
-            "inherits": "gate",
+            "inherits": "orGate",
 
             "image": "voting_or_gate.svg",
             "help": "Output event occurs if the given number of input events occur",
