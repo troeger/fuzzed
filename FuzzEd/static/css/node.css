@@ -65,18 +65,20 @@
 .fuzzed-node-halo-connect {
     /* XXX: this is a temporary solution */
     background-color:       #409FFF;
+    color:                  #FFFFFF;
     position:               absolute;
     visibility:             hidden;
     z-index:                150; /* above image, TODO: let halo care about that */
     cursor:                 move;
-    -webkit-border-radius:  7px;
-    -moz-border-radius:     7px;
-    border-radius:          7px;
-    /* fix for bootstrap icon looking strange in a circle */
-    width:                  15px;
-    height:                 15px;
-    margin:                 -8px 0 0 -7px;
-    background-position:    -407px -96px;
+    -webkit-border-radius:  8px;
+    -moz-border-radius:     8px;
+    -ms-border-radius:      8px;
+    -o-border-radius:       8px;
+    border-radius:          8px;
+    font-size:              13px;
+    line-height:            15px;
+    padding:                1px 3px 0 3px;
+    margin:                 -10px -8px 0 -8px;
 }
 
 .fuzzed-node.ui-selected .fuzzed-node-halo-connect {
