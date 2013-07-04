@@ -348,7 +348,10 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _showProgressIndicator: function() {
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+            // show indicator only if it takes longer then 500 ms
+            this._progressIndicatorTimeout = setTimeout(function() {
+                jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+            }.bind(this), 500);
 
             return this;
         },
@@ -361,6 +364,8 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _hideProgressIndicator: function() {
+            // prevent indicator from showing before 500 ms are passed
+            clearTimeout(this._progressIndicatorTimeout);
             jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
 
             return this;
