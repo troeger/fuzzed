@@ -396,7 +396,11 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _flashErrorIndicator: function() {
-            jQuery('#' + this.config.IDs.ERROR_INDICATOR).fadeIn(200).delay(5000).fadeOut(200);
+            var indicator = jQuery('#' + this.config.IDs.ERROR_INDICATOR);
+            // only flash if not already visible
+            if (indicator.is(':hidden')) {
+                indicator.fadeIn(200).delay(5000).fadeOut(200);
+            }
 
             return this;
         },
