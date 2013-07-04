@@ -68,7 +68,7 @@ public:
 	void simulateFile(const boost::filesystem::path& p, SimulationImpl impl, bool simulatePetriNet);
 	
 protected:
-	void parseStandard(int numArguments, char** arguments);
+	void parseCommandline(int numArguments, char** arguments);
 
 	bool runSimulationInternal(
 		const boost::filesystem::path& p, 

@@ -1,4 +1,6 @@
 #include "TimeNETSimulation.h"
+#include "FaultTreeNode.h"
+#include "serialization/TNDocument.h"
 
 #include "util.h"
 
@@ -33,6 +35,25 @@ TimeNETSimulation::TimeNETSimulation(const boost::filesystem::path &p,
 
 	m_properties = props;
 	m_properties->filePath = p.generic_string();
+}
+
+TimeNETSimulation::TimeNETSimulation(std::auto_ptr<FaultTreeNode> faultTree, 
+									 int simulationTime, /* the maximum duration of one simulation in seconds */ 
+									 int simulationSteps, /* the number of logical simulation steps performed in each round */ 
+									 int numRounds, 
+									 void* additionalArgmuments)
+	: Simulation(faultTree, simulationTime, simulationSteps, numRounds)
+{
+	TimeNETProperties* props = (TimeNETProperties*)(additionalArgmuments);
+	assert(props);
+
+	m_properties = props;
+	const string TNpath = "foo.TN";
+
+	boost::shared_ptr<TNDocument> doc(new TNDocument);
+	faultTree->serialize(doc);
+	doc->save(TNpath);
+	m_properties->filePath = TNpath;
 }
 
 bool TimeNETSimulation::run()

@@ -4,9 +4,10 @@
 
 #include "serialization/PNMLDocument.h"
 #include "serialization/TNDocument.h"
-#include "FaultTreeNode.h"
+#include "events/TopLevelEvent.h"
 #include "FaultTreeImport.h"
 #include "FuzzTreeTransform.h"
+#include "FaultTreeConversion.h"
 
 #include "util.h"
 #include "Config.h"
@@ -46,7 +47,7 @@ SimulationProxy::SimulationProxy(int argc, char** arguments) :
 {
 	try
 	{
-		parseStandard(argc, arguments);
+		parseCommandline(argc, arguments);
 	}
 	catch (const exception& e)
 	{
@@ -133,7 +134,7 @@ bool SimulationProxy::runSimulationInternal(const fs::path& p, SimulationImpl im
 	return success;
 }
 
-void SimulationProxy::parseStandard(int numArguments, char** arguments)
+void SimulationProxy::parseCommandline(int numArguments, char** arguments)
 {
 	string directoryName, filePath;
 	bool simulatePetriNet;
@@ -144,7 +145,7 @@ void SimulationProxy::parseStandard(int numArguments, char** arguments)
 
 	m_options.add_options()
 		("help,h", "produce help message")
-		("TimeNET",		po::value<bool>(&useTimeNET)->default_value(false),									"Use TimeNET simulation")
+		("TN",			po::value<bool>(&useTimeNET)->default_value(false),									"Use TimeNET simulation")
 		("PN",			po::value<bool>(&simulatePetriNet)->default_value(false),							"Simulate Petri Net directly")
 		("file,f",		po::value<string>(&filePath),														"Path to FuzzTree or PNML file")
 		("dir,d",		po::value<string>(&directoryName),													"Directory containing FuzzTree or PNML files")
@@ -231,7 +232,8 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 		auto ftTransform = FuzzTreeTransform(file);
 		for (const auto& ft : ftTransform.transform())
 		{
-			// TODO
+			auto simTree = fromGeneratedFaultTree(ft.topEvent());
+			simTree->print(cout);
 		}
 	}
 
@@ -296,7 +298,7 @@ void runSimulation(
 {	
 	try
 	{
-		// TODO
+		
 	}
 	catch (const exception& e)
 	{

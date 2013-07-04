@@ -24,6 +24,14 @@ public:
 		int simulationSteps, // the number of logical simulation steps performed in each round
 		int numRounds,
 		void* additionalArgmuments);
+
+	TimeNETSimulation(
+		std::auto_ptr<FaultTreeNode> faultTree, 
+		int simulationTime, // the maximum duration of one simulation in seconds
+		int simulationSteps, // the number of logical simulation steps performed in each round
+		int numRounds,
+		void* additionalArgmuments);
+
 	virtual ~TimeNETSimulation() {}; // TODO
 
 	virtual bool run() override;

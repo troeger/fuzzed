@@ -103,7 +103,7 @@ TEST(Serialization, Optional_Redundancy)
 
 TEST(Serialization, Other)
 {
-	TEST_NUM_CONFIGURATIONS(dir + redundancyFileName, 8);
+	TEST_NUM_CONFIGURATIONS(dir + otherName, 6);
 }
 
 TEST(Serialization, ExampleSystem)
