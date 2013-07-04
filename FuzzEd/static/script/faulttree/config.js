@@ -32,12 +32,10 @@ define(['config'], function(Config) {
          *  Constants:
          *    {String} CUTSETS_MENU          - The container element of the cutsets menu.
          *    {String} PROBABILITY_MENU      - The container element of the probability menu.
-         *    {String} NAVBAR_ACTION_CUTSETS - The navbar actions button for cutsets calculation.
          */
         IDs: {
             CUTSETS_MENU:          'FuzzEdCutsetsMenu',
-            PROBABILITY_MENU:      'FuzzEdProbabilityMenu',
-            NAVBAR_ACTION_CUTSETS: 'FuzzEdNavbarActionCutsets'
+            PROBABILITY_MENU:      'FuzzEdProbabilityMenu'
         },
 
         /**

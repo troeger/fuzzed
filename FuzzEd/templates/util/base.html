@@ -101,43 +101,14 @@
     <div class="navbar navbar-fixed-top no-print">
         <div class="navbar-inner">
             <div class="container">
-                <a class="brand" anchor="#">FuzzEd - {{ graph }}</a>
-                <ul class="nav">
-                    <li>
-                        <a>
-                            <img id="FuzzEdProgressIndicator" src="{{ STATIC_URL }}img/ajax-loader.gif">
-                            <span id="FuzzEdSaveIndicator">
-                                <i class="icon-ok icon-white"></i>
-                                Saved
-                            </span>
-                            <span id="FuzzEdErrorIndicator">
-                                <i class="icon-warning-sign icon-white"></i>
-                                Not saved!
-                            </span>
-                        </a>
-                    </li>
-                </ul>
+                <a class="brand" anchor="#">
+                    FuzzEd{% if graph %} - {{ graph }}{% endif %}
+                </a>
+                {% block nav_center %}{% endblock %}
                 <ul class="nav pull-right">
+                    {% block menu_right %}{% endblock %}
                     {%  if user.is_authenticated %}
-                    <li class="{% block navigation_home %}{% endblock %}">
-                        <a href="/">
-                            <i class="icon-home icon-white"></i>
-                            Dashboard
-                        </a>
-                    </li>
-                    {% block navigation_fields%}{%endblock%}
-                     <li class="{% block navigation_settings %}{% endblock %}">
-                        <a href="/settings">
-                            <i class="icon-wrench icon-white"></i>
-                            Account
-                        </a>
-                    </li>
-                    <li  class="{% block navigation_logout %}{% endblock %}">
-                        <a href="/?logout">
-                            <i class="icon-off icon-white"></i>
-                            Logout
-                        </a>
-                    </li>
+                    <li><a href="/?logout"><i class="icon-off icon-white"></i> Logout </a></li>
                     {% endif %}
                 </ul>
             </div>

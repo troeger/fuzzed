@@ -233,8 +233,9 @@ define(['underscore'], function() {
          *    {String} PROPERTIES_MENU           - The container for the properties menu.
          *    {String} SHAPES_MENU               - The container for the shapes menu.
          *    {String} SPLASH                    - The splash screen element.
-         *    {String} NAVBAR_ACTIONS            - The list element that contains the action buttons in the navbar.
-         *    {String} NAVBAR_ACTION_GRID_TOGGLE - The list element that contains the grid toggle item.
+         *    {String} ACTION_GRID_TOGGLE        - The list element that contains the grid toggle menu entry.
+         *    {String} ACTION_CUTSETS            - The list element that contains the cut set analysis menu entry.
+         *    {String} ACTION_ANALYTICAL        - The list element that contains the analytical analysis menu entry.                  
          *    {String} PROGRESS_INDICATOR        - The animated progress indicator gif.
          *    {String} SAVE_INDICATOR            - The navbar entry indicating the save state.
          *    {String} ERROR_INDICATOR           - The navbar entry indicating the error state.
@@ -246,10 +247,11 @@ define(['underscore'], function() {
             PROPERTIES_MENU:           'FuzzEdProperties',
             SHAPES_MENU:               'FuzzEdShapes',
             SPLASH:                    'FuzzEdSplash',
-            NAVBAR_ACTIONS:            'FuzzEdNavbarActions',
-            NAVBAR_ACTION_GRID_TOGGLE: 'FuzzEdNavbarActionGridToggle',
+            ACTION_GRID_TOGGLE:        'FuzzEdActionGridToggle',
+            ACTION_CUTSETS:            'FuzzEdActionCutsets',
+            ACTION_ANALYTICAL:         'FuzzEdActionAnalytical',            
             PROGRESS_INDICATOR:        'FuzzEdProgressIndicator',
-            SAVE_INDICATOR:            'FuzzEdSaveIndicator',
+            SAVE_INDICATOR:            'FuzzEdSaveIndicator',            
             ERROR_INDICATOR:           'FuzzEdErrorIndicator'
         },
 

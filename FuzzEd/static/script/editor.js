@@ -22,7 +22,6 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *                                                    the available shapes for the kind of the edited graph.
          *    {Backend}        _backend                     - The instance of the <Backend> that is used to communicate
          *                                                    graph changes to the server.
-         *    {jQuery Selector} _navbarActionsGroup         - Navbar dropdown menu that contains the available actions.
          *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
          *    {jQuery Selector} _nodeOffsetPrintStylesheet  - The dynamically generated and maintained stylesheet
          *                                                    used to fix the node offset when printing the page.
@@ -35,7 +34,6 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
         shapes:                        undefined,
 
         _backend:                      undefined,
-        _navbarActionsGroup:           undefined,
         _currentMinNodeOffsets:        {'top': 0, 'left': 0},
         _nodeOffsetPrintStylesheet:    undefined,
         _nodeOffsetStylesheetTemplate: undefined,
@@ -57,13 +55,12 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
 
             this.config              = this.getConfig();
             this._backend            = new Backend(graphId);
-            this._navbarActionsGroup = jQuery('#' + this.config.IDs.NAVBAR_ACTIONS);
 
             // run a few sub initializer
             this._setupJsPlumb()
                 ._setupNodeOffsetPrintStylesheet()
                 ._setupEventCallbacks()
-                ._setupGridToggleAction();
+                ._setupMenuActions();
 
             // fetch the content from the backend
             this._loadGraph(graphId);
@@ -183,22 +180,15 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          */
 
         /**
-         *  Method: _setupGridToggleAction
+         *  Method: _setupMenuActions
          *
-         *  Adds a button to the action group that allows to toggle the visibility of the background grid.
+         *  Registers the event handlers for graph type - independent menu entries that trigger JS calls
          *
          *  Returns:
          *    This {<Node>} instance for chaining.
          */
-        _setupGridToggleAction: function() {
-            var navbarActionsEntry = jQuery(
-                '<li>' +
-                    '<a id="' + this.config.IDs.NAVBAR_ACTION_GRID_TOGGLE + '" href="#">Toggle grid</a>' +
-                '</li>');
-            this._navbarActionsGroup.append(navbarActionsEntry);
-
-            // register for clicks on the corresponding nav action
-            navbarActionsEntry.click(function() {
+        _setupMenuActions: function() {
+            jQuery("#"+this.config.IDs.ACTION_GRID_TOGGLE).click(function() {
                 Canvas.toggleGrid();
             }.bind(this));
 
@@ -358,7 +348,10 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _showProgressIndicator: function() {
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+            // show indicator only if it takes longer then 500 ms
+            this._progressIndicatorTimeout = setTimeout(function() {
+                jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+            }.bind(this), 500);
 
             return this;
         },
@@ -371,6 +364,8 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _hideProgressIndicator: function() {
+            // prevent indicator from showing before 500 ms are passed
+            clearTimeout(this._progressIndicatorTimeout);
             jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
 
             return this;
@@ -384,7 +379,11 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _flashSaveIndicator: function() {
-            jQuery('#' + this.config.IDs.SAVE_INDICATOR).fadeIn(200).delay(600).fadeOut(200);
+            var indicator = jQuery('#' + this.config.IDs.SAVE_INDICATOR);
+            // only flash if not already visible
+            if (indicator.is(':hidden')) {
+                indicator.fadeIn(200).delay(600).fadeOut(200);
+            }
 
             return this;
         },
@@ -397,7 +396,11 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _flashErrorIndicator: function() {
-            jQuery('#' + this.config.IDs.ERROR_INDICATOR).fadeIn(200).delay(5000).fadeOut(200);
+            var indicator = jQuery('#' + this.config.IDs.ERROR_INDICATOR);
+            // only flash if not already visible
+            if (indicator.is(':hidden')) {
+                indicator.fadeIn(200).delay(5000).fadeOut(200);
+            }
 
             return this;
         },
