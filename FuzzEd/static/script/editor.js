@@ -253,37 +253,19 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
         _setupKeyBindings: function(readOnly) {
             if (readOnly) return this;
 
-            var selectedNodes = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE;
-            var selectedEdges = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
-
             jQuery(document).keydown(function(event) {
                 if (event.which == jQuery.ui.keyCode.ESCAPE) {
-                    event.preventDefault();
-                    //XXX: deselect everything
-                    // This uses the jQuery.ui.selectable internal functions.
-                    // We need to trigger them manually in order to simulate a click on the canvas.
-                    Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
-                    Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
+                    this._escapePressed(event);
                 } else if (event.which == jQuery.ui.keyCode.DELETE) {
-                    // prevent that node is being deleted when we edit an input field
-                    if (jQuery(event.target).is('input')) {
-                        return;
-                    }
-
-                    event.preventDefault();
-                    // delete selected nodes
-                    jQuery(selectedNodes).each(function(index, element) {
-                        this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
-                    }.bind(this));
-
-                    // delete selected edges
-                    jQuery(selectedEdges).each(function(index, element) {
-                        var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
-                        jsPlumb.detach(edge);
-                        this.graph.deleteEdge(edge);
-                    }.bind(this));
-
-                    this.properties.hide();
+                    this._deletePressed(event);
+                } else if (event.which == jQuery.ui.keyCode.UP) {
+                    this._arrowKeyPressed(event, 0, -1);
+                } else if (event.which == jQuery.ui.keyCode.RIGHT) {
+                    this._arrowKeyPressed(event, 1, 0);
+                } else if (event.which == jQuery.ui.keyCode.DOWN) {
+                    this._arrowKeyPressed(event, 0, 1);
+                } else if (event.which == jQuery.ui.keyCode.LEFT) {
+                    this._arrowKeyPressed(event, -1, 0);
                 }
             }.bind(this));
 
@@ -342,6 +324,99 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
             jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
             jQuery(document).ajaxSuccess(this._flashSaveIndicator.bind(this));
             jQuery(document).ajaxError(this._flashErrorIndicator.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Group: Keyboard Interaction
+         */
+
+        /**
+         *  Method: _arrowKeyPressed
+         *
+         *    Event callback for handling presses of arrow keys. Will move the selected nodes in the given direction by
+         *    and offset equal to the canvas' grid size. The movement is not done when an input field is currently in
+         *    focus.
+         *
+         *  Parameters:
+         *    {jQuery::Event} event      - the issued delete keypress event
+         *    {Number}        xDirection - signum of the arrow key's x direction movement (e.g. -1 for left)
+         *    {Number}        yDirection - signum of the arrow key's y direction movement (e.g.  1 for down)
+         *
+         *  Return:
+         *    This Editor instance for chaining
+         */
+        _arrowKeyPressed: function(event, xDirection, yDirection) {
+            if (jQuery(event.target).is('input')) return this;
+
+            var selectedNodes = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE;
+            jQuery(selectedNodes).each(function(index, element) {
+                var node = jQuery(element).data(this.config.Keys.NODE);
+                node.moveBy({
+                    x: xDirection * Canvas.gridSize,
+                    y: yDirection * Canvas.gridSize
+                });
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _deletePressed
+         *
+         *    Event callback for handling delete key presses. Will remove the selected nodes and edges as long as no
+         *    input field is currently focused (allows e.g. character removal in properties).
+         *
+         *  Parameters:
+         *    {jQuery::Event} event - the issued delete keypress event
+         *
+         *  Return:
+         *    This Editor instance for chaining
+         */
+        _deletePressed: function(event) {
+            // prevent that node is being deleted when we edit an input field
+            if (jQuery(event.target).is('input')) return this;
+
+            var selectedNodes = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+
+            event.preventDefault();
+            // delete selected nodes
+            jQuery(selectedNodes).each(function(index, element) {
+                this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
+            }.bind(this));
+
+            // delete selected edges
+            jQuery(selectedEdges).each(function(index, element) {
+                var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
+                jsPlumb.detach(edge);
+                this.graph.deleteEdge(edge);
+            }.bind(this));
+
+            this.properties.hide();
+
+            return this;
+        },
+
+        /**
+         *  Method: _escapePressed
+         *
+         *    Event callback for handling escape key presses. Will deselect any selected nodes and edges.
+         *
+         *  Parameters:
+         *    {jQuery::Event} event - the issued escape keypress event
+         *
+         *  Returns:
+         *    This Editor instance for chaining
+         */
+        _escapePressed: function(event) {
+            event.preventDefault();
+            //XXX: deselect everything
+            // This uses the jQuery.ui.selectable internal functions.
+            // We need to trigger them manually in order to simulate a click on the canvas.
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
 
             return this;
         },
