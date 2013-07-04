@@ -374,7 +374,11 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _flashSaveIndicator: function() {
-            jQuery('#' + this.config.IDs.SAVE_INDICATOR).fadeIn(200).delay(600).fadeOut(200);
+            var indicator = jQuery('#' + this.config.IDs.SAVE_INDICATOR);
+            // only flash if not already visible
+            if (indicator.is(':hidden')) {
+                indicator.fadeIn(200).delay(600).fadeOut(200);
+            }
 
             return this;
         },
