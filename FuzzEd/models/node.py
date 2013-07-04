@@ -178,26 +178,23 @@ class Node(models.Model):
                     result.append(val)
         return result
 
-    # def to_tikz_tree_child(self):
-    #     children=""
-    #     for edge in self.outgoing.filter(deleted=False):
-    #         children += edge.target.to_tikz_tree_child()
-    #     return "child { node {\includegraphics{%s}} %s }\n"%(tree_node_image[self.kind]+".eps", children)
+    def to_tikz_tree(self, recursionLevel=0, x_offset=0, y_offset=0):
+        """
+        Serializes this node and all its children into a TiKZ tree package representation.
+        This has the advantage that fork connectors are possible.
+        TODO: Consider original ordering of nodes in one line.
 
-    # def to_tikz_tree(self):
-    #     """
-    #     Serializes this node and all its children into a TiKZ representation.
-    #     In this version, TikZ is doing the tree node positioning
-    #     This has the advantage that fork connectors are possible.
-    #     TODO: Consider original ordering of nodes in one line.
+        Returns:
+         {str} the node and its children in LaTex representation
+        """
+        children = ""
+        for edge in self.outgoing.filter(deleted=False):
+            children += edge.target.to_tikz_tree(recursionLevel+1)
+        if recursionLevel==0:
+            return "\n\\node [shape=%s] {foo} \n %s;\n"%(self.kind, children)
+        else:
+            return recursionLevel*" "+"child { node [shape=%s]  at (%u, -%f) {bar} \n %s }\n"%(self.kind, self.x+x_offset, self.y+y_offset, children)
 
-    #     Returns:
-    #      {str} the node and its children in LaTex representation
-    #     """
-    #     children=""
-    #     for edge in self.outgoing.filter(deleted=False):
-    #         children += edge.target.to_tikz_tree_child()
-    #     return "\\node {\includegraphics{%s}}\n[edge from parent fork down]\n %s;"%(tree_node_image[self.kind]+".eps", children)
 
     def to_tikz(self, x_offset=0, y_offset=0):
         """
@@ -218,11 +215,11 @@ class Node(models.Model):
         # additional, freely floating nodes couldn't be considered any more
         # we start with the TiKZ node for the graph icon
         result = "\\node [shape=%s, inner sep=0em, outer sep=0em] at (%u, -%f) (%u) {};\n"%(self.kind, self.x+x_offset, self.y+y_offset, self.pk)
-        # Do the mirror text
+        # Do the mirror text based on all properties
         # Text width is exactly the double width of the icons
         mirrorText = ""
         for index,propvalue in enumerate(self.get_all_mirror_properties()):
-            propvalue = propvalue.replace("#","\\#")
+            propvalue = propvalue.replace("#","\\#")    # special LaTex character
             if index==0:
                 # Make the first property bigger, since it is supposed to be the name
                 propvalue = "\\textbf{{\\footnotesize %s}}"%propvalue  
@@ -231,17 +228,19 @@ class Node(models.Model):
             mirrorText += "%s\\\\"%propvalue
         # If we do not have a mirror text (such as with gates), the connector should start directly at the node south
         if mirrorText != "":
-            result += "\\node [text width=%fpt, below, align=center, inner sep=0.5em] at (%u.south) (text%u) {%s};\n"%(grid_size_pt, self.pk, self.pk, mirrorText)
+            result += "\\node [text width=%fpt, below, align=center, inner sep=0em] at (%u.south) (text%u) {%s};\n"%(grid_size_pt, self.pk, self.pk, mirrorText)
             connectorStart = "text%u"%self.pk
         else:
             connectorStart = str(self.pk)
-        # Create also linked nodes and their edges
+        # Create child nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             result += edge.target.to_tikz(x_offset, y_offset)
             # We tried several ways to get nice connector breaks without the trees package,
             # but it finally always demands to much 'direction' logic to position some
             # intermediate hidden nodes for the break
             # therefore, we live with straight lines for the moment
+            # compute intermediate direction change of the connector
+            # first, just go down until we half way to the next lower level
             result += "\draw [thick] (%s.south) -- (%u.north);\n"%(connectorStart, edge.target.pk)
         return result
 
