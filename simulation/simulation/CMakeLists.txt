@@ -54,15 +54,17 @@ if (BUILD_SIMULATION_EXECUTABLE)
       ftcommon
 	  ${FT_CONFIG_LIB}
 	  ${XERCESC_LIBRARIES}
+	  ${Boost_LIBRARIES}
    )
    message("Building simulation executable")
 else (BUILD_SIMULATION_EXECUTABLE) # shared library
    add_library(ftsimulation SHARED ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation 
       ftmodeltransform
+	  ftcommon
 	  ${FT_CONFIG_LIB}
 	  ${XERCESC_LIBRARIES}
-      ftcommon
+	  ${Boost_LIBRARIES}
    )
    add_definitions(-DSIMULATION_DLL)
    message("Building shared simulation library")

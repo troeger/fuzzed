@@ -3,6 +3,7 @@ project(ftmodeltransform CXX)
 set(SOURCES
    ${SOURCE}
    FaultTreeNode.cpp
+   FaultTreeConversion.cpp
    
    events/Event.cpp
    events/BasicEvent.cpp
@@ -29,6 +30,7 @@ set(HEADERS
    ${HEADERS}
    FaultTreeNode.h
    FaultTreeIncludes.h
+   FaultTreeConversion.h
    
    events/Event.h
    events/BasicEvent.h
