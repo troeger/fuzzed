@@ -17,4 +17,7 @@ namespace fuzztreeType
 	const std::string REDUNDANCYVP	= "class fuzztree::RedundancyVariationPoint";
 	const std::string INCLUSIONVP	= "class fuzztree::InclusionVariationPoint";
 	const std::string FEATUREVP		= "class fuzztree::FeatureVariationPoint";
+
+	const std::string CRISPPROB		= "class fuzztree::CrispProbability";
+	const std::string FUZZYPROB		= "class fuzztree::DecomposedFuzzyProbability";
 }

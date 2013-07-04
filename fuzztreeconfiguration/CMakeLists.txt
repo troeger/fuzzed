@@ -92,7 +92,6 @@ set(XSD_TO_FAULTTREE_ARGS
   --type-naming ucc
   --function-naming lcc
   --generate-serialization
-  --generate-from-base-ctor
   --namespace-map net.faulttree=faulttree
   --hxx-suffix .h --cxx-suffix .cpp
 )
@@ -105,7 +104,6 @@ set(XSD_TO_FUZZTREE_ARGS
   --type-naming ucc 
   --function-naming lcc
   --generate-serialization
-  --generate-from-base-ctor
   --namespace-map net.fuzztree=fuzztree 
   --hxx-suffix .h --cxx-suffix .cpp
   # the following options enable custom class implementations, but it seems easier to write helpers by hand

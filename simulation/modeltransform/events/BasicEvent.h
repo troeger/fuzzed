@@ -5,8 +5,7 @@ class BasicEvent : public Event
 {
 public:
 	BasicEvent(const std::string& ID, long double failureRate, const std::string& name = "", const int cost = 1);
-	virtual ~BasicEvent();
-
+	
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
 	virtual void addChild(FaultTreeNode* child) override;

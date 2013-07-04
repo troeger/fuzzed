@@ -260,6 +260,8 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 	faulttree::Node* node,
 	const FuzzTreeConfiguration& configuration) const
 {
+	using namespace fuzztreeType;
+	
 	for (const auto& currentChild : templateNode->children())
 	{
 		const string id = currentChild.id();
@@ -271,9 +273,9 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 			continue; // do not add this node
 
 		const bool bLeaf = isLeaf(typeName);
-		bool bChanged = false;
-
-		if (typeName == fuzztreeType::REDUNDANCYVP)
+		bool bChanged = true;
+		
+		if (typeName == REDUNDANCYVP)
 		{ // TODO: probably this always ends up with a leaf node
 			handleRedundancyVP(
 				&currentChild, 
@@ -283,37 +285,31 @@ void FuzzTreeTransform::generateFaultTreeRecursive(
 
 			continue; // stop recursion
 		}
-		else
+		else if (typeName == FEATUREVP)
 		{
-			if (typeName == fuzztreeType::FEATUREVP)
-			{
-				if (handleFeatureVP(
-					&currentChild, 
-					node,
-					configuration, 
-					configuration.getFeaturedChild(id)))
-					continue;
-			}
+			if (handleFeatureVP(
+				&currentChild, 
+				node,
+				configuration, 
+				configuration.getFeaturedChild(id))) continue;
 
-			else
-			{
-				if (isGate(typeName))
-				{ // don't copy children yet
-					node->children().push_back(treeHelpers::copyGate(static_cast<const fuzztree::Gate&>(currentChild)));
-					bChanged = true;
-				}
-				else if (bLeaf)
-				{ // copy everything including probability child node
-					node->children().push_back(treeHelpers::copyBasicEvent(dynamic_cast<const fuzztree::BasicEvent&>(currentChild)));
-					bChanged = true;
-				}
-				else if (typeName == fuzztreeType::BASICEVENTSET)
-				{
-					expandBasicEventSet(&currentChild, node, id, 0);
-					continue;
-				}
-			}	
-		}		
+			bChanged = false;
+		}
+		else if (typeName == BASICEVENTSET)
+		{
+			expandBasicEventSet(&currentChild, node, id, 0);
+			continue;
+		}
+		else if (typeName == AND)		node->children().push_back(faulttree::And(id));
+		else if (typeName == OR)		node->children().push_back(faulttree::Or(id));
+		else if (typeName == VOTINGOR)	node->children().push_back(faulttree::VotingOr(id, (static_cast<const fuzztree::VotingOr&>(currentChild)).k()));
+		else if (typeName == XOR)		node->children().push_back(faulttree::Xor(id));
+		else if (bLeaf)
+		{
+			if (typeName == BASICEVENT)
+				node->children().push_back(treeHelpers::copyBasicEvent(static_cast<const fuzztree::BasicEvent&>(currentChild)));
+			// TODO elses
+		}
 
 		// break recursion
 		if (bLeaf) continue;
@@ -373,25 +369,22 @@ bool FuzzTreeTransform::handleFeatureVP(
 	
 	const fuzztree::ChildNode featuredTemplate = *it;
 	const string featuredTypeName = typeid(featuredTemplate).name();
+	
+	using namespace fuzztreeType;
 	if (isOptional(featuredTemplate) && !configuration.isIncluded(configuredChildId))
 	{
 		return true;
 	}
-	else if (featuredTypeName == fuzztreeType::BASICEVENTSET)
+	else if (featuredTypeName == BASICEVENTSET)
 	{
 		expandBasicEventSet(&featuredTemplate, node, configuredChildId, 0);
 		return true;
 	}
-	else if (isLeaf(featuredTypeName))
-	{
-		node->children().push_back(treeHelpers::copyBasicEvent(dynamic_cast<const fuzztree::BasicEvent&>(featuredTemplate)));
-		return true;
-	}
-	else if (isGate(featuredTypeName))
-	{
-		node->children().push_back(treeHelpers::copyGate(featuredTemplate));
-		return false;
-	}
+	else if (featuredTypeName == AND)		node->children().push_back(faulttree::And(configuredChildId));
+	else if (featuredTypeName == OR)		node->children().push_back(faulttree::Or(configuredChildId));
+	else if (featuredTypeName == VOTINGOR)	node->children().push_back(faulttree::VotingOr(configuredChildId, (static_cast<const fuzztree::VotingOr&>(featuredTemplate)).k()));
+	else if (featuredTypeName == XOR)		node->children().push_back(faulttree::Xor(configuredChildId));
+	else if (isLeaf(featuredTypeName))		node->children().push_back(treeHelpers::copyBasicEvent(static_cast<const fuzztree::BasicEvent&>(featuredTemplate)));
 	else if (isVariationPoint(featuredTypeName))
 	{
 		return false;
@@ -440,11 +433,16 @@ std::vector<faulttree::FaultTree> FuzzTreeTransform::transform()
 
 		for (const auto& instanceConfiguration : configs)
 		{
-			auto faultTree = generateFaultTree(instanceConfiguration);	
+			auto ft = generateFaultTree(instanceConfiguration);
 			indent = 0;
-			treeHelpers::printTree(faultTree.topEvent(), indent);
+			treeHelpers::printTree(ft.topEvent(), indent);
 			cout << endl;
-			results.emplace_back(faultTree);
+
+// 			xml_schema::NamespaceInfomap map;
+// 			map[""].name = "";
+// 			faulttree::faultTree(cout, ft, map);
+
+			results.emplace_back(ft);
 		}
 
 		return results;

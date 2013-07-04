@@ -1,6 +1,9 @@
 #include "TreeHelpers.h"
+#include "FuzzTreeTypes.h"
 #include <typeinfo>
 #include <iostream>
+
+using std::string;
 
 faulttree::BasicEvent treeHelpers::copyBasicEvent(const fuzztree::BasicEvent& be)
 {
@@ -9,40 +12,14 @@ faulttree::BasicEvent treeHelpers::copyBasicEvent(const fuzztree::BasicEvent& be
 	return res;
 }
 
-faulttree::Gate treeHelpers::copyGate(const fuzztree::Node& gate)
-{ // TODO typeids
-	faulttree::Gate res("0");
-	const fuzztree::And* andGate = dynamic_cast<const fuzztree::And*>(&gate);
-	if (andGate) 
-		res = faulttree::And(andGate->id());
-
-	const fuzztree::Or* orGate = dynamic_cast<const fuzztree::Or*>(&gate);
-	if (orGate) 
-		res = faulttree::Or(orGate->id());
-
-	const fuzztree::VotingOr* votingOr = dynamic_cast<const fuzztree::VotingOr*>(&gate);
-	if (votingOr) 
-		res = faulttree::And(votingOr->id(), votingOr->k());
-
-	const fuzztree::Xor* xorGate = dynamic_cast<const fuzztree::Xor*>(&gate);
-	if (xorGate) 
-		res = faulttree::Xor(xorGate->id());
-
-	res.name() = gate.name();
-	return res;
-}
-
-faulttree::Probability treeHelpers::copyProbability(const fuzztree::Probability& prob)
+faulttree::CrispProbability treeHelpers::copyProbability(const fuzztree::Probability& prob)
 {
-	const fuzztree::CrispProbability* crisp = dynamic_cast<const fuzztree::CrispProbability*>(&prob);
-	if (crisp) return faulttree::CrispProbability(crisp->value());
+	using namespace fuzztreeType;
 
+	if (typeid(prob).name() == CRISPPROB)
+		return faulttree::CrispProbability(static_cast<const fuzztree::CrispProbability&>(prob).value());
 	else
-	{
-		const fuzztree::DecomposedFuzzyProbability* fuzzy = 
-			dynamic_cast<const fuzztree::DecomposedFuzzyProbability*>(&prob);
 		return faulttree::CrispProbability(0); // TODO
-	}
 }
 
 faulttree::TopEvent treeHelpers::copyTopEvent(const fuzztree::TopEvent& topEvent)
