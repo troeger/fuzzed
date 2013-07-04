@@ -348,7 +348,10 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _showProgressIndicator: function() {
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+            // show indicator only if it takes longer then 500 ms
+            this._progressIndicatorTimeout = setTimeout(function() {
+                jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+            }.bind(this), 500);
 
             return this;
         },
@@ -361,6 +364,8 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _hideProgressIndicator: function() {
+            // prevent indicator from showing before 500 ms are passed
+            clearTimeout(this._progressIndicatorTimeout);
             jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
 
             return this;
@@ -374,7 +379,11 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _flashSaveIndicator: function() {
-            jQuery('#' + this.config.IDs.SAVE_INDICATOR).fadeIn(200).delay(600).fadeOut(200);
+            var indicator = jQuery('#' + this.config.IDs.SAVE_INDICATOR);
+            // only flash if not already visible
+            if (indicator.is(':hidden')) {
+                indicator.fadeIn(200).delay(600).fadeOut(200);
+            }
 
             return this;
         },
@@ -387,7 +396,11 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _flashErrorIndicator: function() {
-            jQuery('#' + this.config.IDs.ERROR_INDICATOR).fadeIn(200).delay(5000).fadeOut(200);
+            var indicator = jQuery('#' + this.config.IDs.ERROR_INDICATOR);
+            // only flash if not already visible
+            if (indicator.is(':hidden')) {
+                indicator.fadeIn(200).delay(5000).fadeOut(200);
+            }
 
             return this;
         },
