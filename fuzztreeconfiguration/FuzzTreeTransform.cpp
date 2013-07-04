@@ -7,11 +7,12 @@
 #include "FaultTreeTypes.h"
 
 #include <xsd/cxx/tree/elements.hxx>
+#include <xsd/cxx/xml/dom/serialization-header.hxx>
 #include <boost/range/counting_range.hpp>
 
 using xercesc::DOMNode;
 using xercesc::DOMDocument;
-using std::string;
+using namespace std;
 
 FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 	m_count(0)
@@ -106,7 +107,7 @@ bool FuzzTreeTransform::isOptional(const fuzztree::Node& node)
 
 std::string FuzzTreeTransform::generateUniqueId(const std::string& oldId)
 {
-	return oldId + "." + util::toString(++m_count);
+	return oldId + "." + treeHelpers::toString(++m_count);
 }
 
 /************************************************************************/
@@ -163,7 +164,7 @@ void FuzzTreeTransform::generateConfigurationsRecursive(
 			const std::function<int(int)> formula = [&](int n) -> int
 			{
 				std::string fomulaStringTmp = formulaString;
-				util::replaceStringInPlace(fomulaStringTmp, "N", util::toString(n));
+				treeHelpers::replaceStringInPlace(fomulaStringTmp, "N", treeHelpers::toString(n));
 				return parser.eval(fomulaStringTmp);
 			};
 
@@ -337,16 +338,18 @@ void FuzzTreeTransform::expandBasicEventSet(
 	{
 		throw runtime_error("Invalid Quantity in Basic Event Set");
 	}
-	
-	const faulttree::Probability probability = 
-		treeHelpers::copyProbability(eventSet->probability());
+
+	const auto& prob = eventSet->probability();
+	const auto& copiedProb = (typeid(prob).name() == fuzztreeType::CRISPPROB) ? 
+		faulttree::CrispProbability(static_cast<const fuzztree::CrispProbability&>(prob).value()) :
+		faulttree::CrispProbability(0);
 
 	int i = 0;
 	while (i < numChildren)
 	{
 		const auto id = eventSet->id();
-		faulttree::BasicEvent basicEvent(id + util::toString(i), probability);
-		parentNode->children().push_back(basicEvent);
+		faulttree::BasicEvent be(id + "." + treeHelpers::toString(i), copiedProb);
+		parentNode->children().push_back(be);
 		i++;
 	}
 }
@@ -437,10 +440,6 @@ std::vector<faulttree::FaultTree> FuzzTreeTransform::transform()
 			indent = 0;
 			treeHelpers::printTree(ft.topEvent(), indent);
 			cout << endl;
-
-// 			xml_schema::NamespaceInfomap map;
-// 			map[""].name = "";
-// 			faulttree::faultTree(cout, ft, map);
 
 			results.emplace_back(ft);
 		}

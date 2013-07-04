@@ -45,7 +45,6 @@ set(SOURCES
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
    TreeHelpers.cpp
-   TransformUtil.cpp
    main.cpp
    faulttree.cpp
    fuzztree.cpp
@@ -55,7 +54,6 @@ set(HEADERS
    FuzzTreeTransform.h
    FuzzTreeConfiguration.h
    TreeHelpers.h
-   TransformUtil.h
    platform.h
    faulttree.h
    fuzztree.h

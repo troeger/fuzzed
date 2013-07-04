@@ -185,4 +185,11 @@
   </xsd:complexType>
   <xsd:element name="BasicEvent" type="ft:BasicEvent"/>
 
+
+  <xsd:complexType name="IntermediateEvent">
+    <xsd:complexContent>
+      <xsd:extension base="ft:ChildNode"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+
 </xsd:schema>

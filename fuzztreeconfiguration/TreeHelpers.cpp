@@ -2,24 +2,23 @@
 #include "FuzzTreeTypes.h"
 #include <typeinfo>
 #include <iostream>
+#include <iomanip>
+#include <stdarg.h>
 
 using std::string;
 
 faulttree::BasicEvent treeHelpers::copyBasicEvent(const fuzztree::BasicEvent& be)
 {
-	faulttree::BasicEvent res(be.id(), copyProbability(be.probability()));
+	const auto& prob = be.probability();
+	
+	faulttree::BasicEvent res(
+		be.id(),
+		typeid(prob).name() == fuzztreeType::CRISPPROB ? 
+			faulttree::CrispProbability(static_cast<const fuzztree::CrispProbability&>(prob).value()) :
+			faulttree::CrispProbability(0));
+
 	res.name() = be.name();
 	return res;
-}
-
-faulttree::CrispProbability treeHelpers::copyProbability(const fuzztree::Probability& prob)
-{
-	using namespace fuzztreeType;
-
-	if (typeid(prob).name() == CRISPPROB)
-		return faulttree::CrispProbability(static_cast<const fuzztree::CrispProbability&>(prob).value());
-	else
-		return faulttree::CrispProbability(0); // TODO
 }
 
 faulttree::TopEvent treeHelpers::copyTopEvent(const fuzztree::TopEvent& topEvent)
@@ -65,4 +64,37 @@ void treeHelpers::printTree(const fuzztree::Node& node, int indent)
 
 	for (const auto& child : node.children())
 		printTree(child, indent);
+}
+
+std::string treeHelpers::toString(const double& d, const int& prec /*= 5*/)
+{
+	std::ostringstream oss;
+	oss << std::fixed << std::setprecision(prec);
+	oss << d;
+	return oss.str();
+}
+
+std::string treeHelpers::toString(const long double& d, const int& prec /*= 5*/)
+{
+	std::ostringstream oss;
+	oss << std::fixed << std::setprecision(prec);
+	oss << d;
+	return oss.str();
+}
+
+std::string treeHelpers::toString(const int& d)
+{
+	std::ostringstream oss;
+	oss << d;
+	return oss.str();
+}
+
+void treeHelpers::replaceStringInPlace(string& subject, const string& search, const std::string& replacement)
+{
+	size_t pos = 0;
+	while ((pos = subject.find(search, pos)) != string::npos) 
+	{
+		subject.replace(pos, search.length(), replacement);
+		pos += replacement.length();
+	}
 }
