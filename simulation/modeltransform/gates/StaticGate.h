@@ -20,6 +20,9 @@ protected:
 	// from all the input values, compute the value of the gate. only for static gates.
 	boost::function<long double (NodeValueMap)> m_activationFunc;
 
-	static const std::string formulaBegin;
-	static const std::string formulaEnd;
+	static const std::string s_formulaBegin;
+	static const std::string s_formulaEnd;
+	static const std::string s_ORoperator;
+	static const std::string s_ANDoperator;
+	static const std::string s_NOToperator;
 };

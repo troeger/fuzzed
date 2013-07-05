@@ -1,5 +1,6 @@
 #include "XORGate.h"
 #include "serialization/PNDocument.h"
+#include "util.h"
 #include <iostream>
 
 using namespace std;
@@ -53,8 +54,37 @@ FaultTreeNode* XORGate::clone() const
 
 std::string XORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const
 {
-	assert(false && "implement");
-	return "";
+	vector<std::string> childFormulas;
+	for (const auto child : m_children)
+		childFormulas.emplace_back(child->serializeAsFormula(doc));
+
+	const int numChildren = childFormulas.size();
+	if (numChildren == 0) return "false";
+
+	string res = s_formulaBegin;
+	
+	// first: the OR part
+	res += s_formulaBegin + childFormulas[0];
+	for (int i = 1; i < numChildren; ++i)
+		res += s_ORoperator + childFormulas[i];
+	res += s_formulaEnd;
+
+	res += s_ANDoperator;
+
+	// second: disallow any 2-combination
+	do
+	{
+		res +=
+			s_NOToperator + s_formulaBegin +
+			childFormulas[0] + s_ANDoperator + childFormulas[1] +
+			s_formulaEnd;
+		
+		res += s_ANDoperator;
+
+	} while (util::next_combination(childFormulas.begin(), childFormulas.begin() + 2, childFormulas.end()));
+	res.erase(res.length() - s_ANDoperator.length(), s_ANDoperator.length()); // TODO remove last AND
+
+	return res + s_formulaEnd;
 }
 
 void XORGate::initActivationFunc()
