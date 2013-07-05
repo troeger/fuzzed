@@ -541,9 +541,9 @@ def analyze_top_event_probability(request, graph_id):
         return response
 
     except top_event_probability.InternalError as exception:
-        logger.error('Exception while using analysis server: %s' % exception)
+        logger.error('Exception while using analysis server: %s' % str(exception))
         #TODO: Perform some smarter error handling here
-        raise HttpResponseServerErrorAnswer()
+        raise HttpResponseServerErrorAnswer(str(exception))
 
 @login_required
 @csrf_exempt
