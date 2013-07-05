@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from FuzzEd.models import Graph
-import beanstalkc
+from rendering import renderClient
 
 class Command(BaseCommand):
     args = '<graph_id>'
@@ -10,16 +10,6 @@ class Command(BaseCommand):
         # Dump tikz Latex from graph and put it into the rendering tube
         graph_id = int(args[0])
         text = Graph.objects.get(pk=graph_id).to_tikz()
-        b=beanstalkc.Connection()
-        b.use('rendering')
-        b.watch('renderingResults')
-        jobid = b.put(str(text.encode('utf-8')))
-        # Wait for result ...
-        result = b.reserve()
         f=open('graph.eps','w')
-        f.write(result.body)
+        f.write(renderClient.latex2eps(text))
         f.close()
-        result.delete()
-        b.close()
-
-

@@ -52,9 +52,12 @@
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
         {% if graph.kind != 'rbd'%}
-            <li><a href="{% url 'graph_download' graph.pk %}?format=xml">Save as XML</a></li>
+            <li><a href="{% url 'graph_download' graph.pk %}?format=xml">as XML File</a></li>
         {% endif %}
-        <li><a href="{% url 'graph_download' graph.pk %}?format=json">Save as JSON</a></li>
+        <li><a href="{% url 'graph_download' graph.pk %}?format=json">as JSON File</a></li>
+        <li><a href="{% url 'graph_download' graph.pk %}?format=tex">as LaTex Document</a></li>
+        <li><a href="{% url 'graph_download' graph.pk %}?format=eps">as EPS Image</a></li>
+        <li><a href="{% url 'graph_download' graph.pk %}?format=pdf">as PDF Document</a></li>
     </ul>
 </li>
 {% if graph.kind != 'rbd'%}
