@@ -256,16 +256,18 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
             jQuery(document).keydown(function(event) {
                 if (event.which == jQuery.ui.keyCode.ESCAPE) {
                     this._escapePressed(event);
-                } else if (event.which == jQuery.ui.keyCode.DELETE) {
+                } else if (event.which === jQuery.ui.keyCode.DELETE) {
                     this._deletePressed(event);
-                } else if (event.which == jQuery.ui.keyCode.UP) {
+                } else if (event.which === jQuery.ui.keyCode.UP) {
                     this._arrowKeyPressed(event, 0, -1);
-                } else if (event.which == jQuery.ui.keyCode.RIGHT) {
+                } else if (event.which === jQuery.ui.keyCode.RIGHT) {
                     this._arrowKeyPressed(event, 1, 0);
-                } else if (event.which == jQuery.ui.keyCode.DOWN) {
+                } else if (event.which === jQuery.ui.keyCode.DOWN) {
                     this._arrowKeyPressed(event, 0, 1);
-                } else if (event.which == jQuery.ui.keyCode.LEFT) {
+                } else if (event.which === jQuery.ui.keyCode.LEFT) {
                     this._arrowKeyPressed(event, -1, 0);
+                } else if (event.which === 'A'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
+                    this._selectAllPressed(event);
                 }
             }.bind(this));
 
@@ -417,6 +419,43 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
             // We need to trigger them manually in order to simulate a click on the canvas.
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
+
+            return this;
+        },
+
+        /**
+         * Method: _selectAllPressed
+         *
+         *   Event callback for handling a select all (CTRL/CMD + A) key presses. Will select all nodes and edges.
+         *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _selectAllPressed: function(event) {
+            if (jQuery(event.target).is('input')) return this;
+
+            event.preventDefault();
+
+            var NODES           = '.' + this.config.Classes.NODE;
+            var NODES_AND_EDGES = NODES + ', .' + this.config.Classes.JSPLUMB_CONNECTOR;
+
+            jQuery(NODES_AND_EDGES).each(function(index, domElement) {
+                var element = jQuery(domElement);
+
+                element.addClass(this.config.Classes.JQUERY_UI_SELECTING)
+                       .addClass(this.config.Classes.JQUERY_UI_SELECTED);
+
+                if (element.is(NODES)) {
+                    element.data(this.config.Keys.NODE).select();
+                }
+            }.bind(this));
+
+            // XXX: trigger selection stop event manually here
+            // XXX:nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
 
             return this;
         },

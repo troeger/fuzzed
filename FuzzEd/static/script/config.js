@@ -120,6 +120,7 @@ define(['underscore'], function() {
             GRID_HIDDEN:             'fuzzed-grid-hidden',
 
             JQUERY_UI_SELECTED:      'ui-selected',
+            JQUERY_UI_SELECTING:     'ui-selecting',
 
             JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
             JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover',
