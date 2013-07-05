@@ -49,9 +49,21 @@ FaultTreeNode* ORGate::clone() const
 }
 
 std::string ORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
-{
-	assert(false && "implement");
-	return "";
+{	
+	const static string ORoperator = " || ";
+	
+	string result = formulaBegin;
+
+	auto it = getChildrenBegin();
+	result += (*it)->serializeAsFormula(doc);
+	++it;
+	while (it != getChildrenEnd())
+	{
+		result += ORoperator;
+		result += (*it)->serializeAsFormula(doc);
+		++it;
+	}
+	return result + formulaEnd;
 }
 
 void ORGate::initActivationFunc()

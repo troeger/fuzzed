@@ -50,8 +50,20 @@ FaultTreeNode* ANDGate::clone() const
 
 std::string ANDGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
 {
-	assert(false && "implement");
-	return "";
+	const static string ANDoperator = " && ";
+
+	string result = formulaBegin;
+
+	auto it = getChildrenBegin();
+	result += (*it)->serializeAsFormula(doc);
+	++it;
+	while (it != getChildrenEnd())
+	{
+		result += ANDoperator;
+		result += (*it)->serializeAsFormula(doc);
+		++it;
+	}
+	return result + formulaEnd;
 }
 
 void ANDGate::initActivationFunc()

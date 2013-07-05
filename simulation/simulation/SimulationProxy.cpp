@@ -233,8 +233,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 		int i = 0;
 		for (const auto& ft : ftTransform.transform())
 		{
-			auto simTree = fromGeneratedFaultTree(ft.topEvent());
-			
+			auto simTree = fromGeneratedFaultTree(ft.topEvent()); 
 			std::string newFileName = p.generic_string();
 			util::replaceFileExtensionInPlace(newFileName, util::toString(++i) + ((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT));
 			simulateFaultTree(simTree.get(), newFileName, impl);
@@ -253,6 +252,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 		string newFileName = p.generic_string();
 		util::replaceFileExtensionInPlace(newFileName, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
 		simulateFaultTree(ft, newFileName, impl);
+		delete ft;
 	}		
 }
 
@@ -285,8 +285,8 @@ void SimulationProxy::simulateFaultTree(FaultTreeNode* ft, const std::string& ne
 	}
 
 	ft->serialize(doc);
-	delete ft;
-	doc->save(newFileName);
+	std::cout << ft->serializeAsFormula(doc) << endl;
+	doc->save(newFileName);	
 
 	runSimulationInternal(newFileName, impl, m_timeNetProperties);
 }

@@ -62,3 +62,16 @@ void TopLevelEvent::print(std::ostream& stream, int indentLevel/*=0*/) const
 	stream << "Fault Tree with Cost: " << getCost() << endl;
 	FaultTreeNode::print(stream, indentLevel);
 }
+
+std::string TopLevelEvent::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
+{
+	assert(m_children.size() == 1);
+
+	const static std::string fomulaBegin = "P{ ";
+	const static std::string formulaEnd = "}";
+
+	return 
+		fomulaBegin + 
+		m_children.front()->serializeAsFormula(doc) +
+		formulaEnd;
+}

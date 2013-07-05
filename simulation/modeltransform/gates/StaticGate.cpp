@@ -24,3 +24,6 @@ long double StaticGate::computeUnreliability() const
 	}
 	return m_activationFunc(unreliabilities);
 }
+
+const std::string StaticGate::formulaBegin = "(";
+const std::string StaticGate::formulaEnd = ")";
