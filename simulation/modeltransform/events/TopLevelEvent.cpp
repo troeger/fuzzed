@@ -67,11 +67,11 @@ std::string TopLevelEvent::serializeAsFormula(boost::shared_ptr<PNDocument> doc)
 {
 	assert(m_children.size() == 1);
 
-	const static std::string fomulaBegin = "P{ ";
-	const static std::string formulaEnd = "}";
+	const static std::string topLevelFormulaBegin	= "P{ ";
+	const static std::string topLevelFormulaEnd		= " }";
 
 	return 
-		fomulaBegin + 
+		topLevelFormulaBegin + 
 		m_children.front()->serializeAsFormula(doc) +
-		formulaEnd;
+		topLevelFormulaEnd;
 }

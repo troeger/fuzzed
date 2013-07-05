@@ -51,8 +51,35 @@ std::string VotingORGate::description() const
 
 std::string VotingORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
 {
-	assert(false && "implement");
-	return "";
+	vector<std::string> childFormulas;
+	for (const auto child : m_children)
+		childFormulas.emplace_back(child->serializeAsFormula(doc));
+
+	const int numChildren = childFormulas.size();
+
+	static const string ANDoperator = " && ";
+	static const string ORoperator = " || ";
+	string res = formulaBegin;
+
+	// we need all n-combinations with n in [numVotes, numChildren]
+	for (int i = m_numVotes; i <= numChildren; ++i)
+	{
+		do
+		{
+			res += formulaBegin;
+			res += childFormulas[0];
+			for (int j = 1; j < i; ++ j)
+			{
+				res +=  ANDoperator;
+				res += childFormulas[j];
+			}
+			res += formulaEnd;
+			res += ORoperator;
+
+		} while (util::next_combination(childFormulas.begin(), childFormulas.begin() + i, childFormulas.end()));
+	}
+	res.erase(res.length() - ORoperator.length(), ORoperator.length()); // TODO remove last OR
+	return res + formulaEnd;
 }
 
 void VotingORGate::initActivationFunc()
@@ -66,3 +93,5 @@ void VotingORGate::initActivationFunc()
 		return util::kOutOfN(rate, m_numVotes, childValues.size());
 	};
 }
+
+
