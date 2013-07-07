@@ -207,14 +207,14 @@ class Node(models.Model):
         Returns:
          {str} the node and its children in LaTex representation
         """
-        grid_size_pt = 56.210       # grid size in the front end, which is also the symbol width in EPS pictures
+        grid_size_pt = 36       # grid size in the front end, which is also the symbol width in EPS pictures
         nodekind = self.kind.lower()
         # Create Tikz snippet for tree node
         # We are intentionally do not use the TiKZ tree rendering capabilities, since this
         # would ignore all user formatting of the tree from the editor
         # additional, freely floating nodes couldn't be considered any more
         # we start with the TiKZ node for the graph icon
-        result = "\\node [shape=%s, inner sep=0em, outer sep=0em] at (%u, -%f) (%u) {};\n"%(self.kind, self.x+x_offset, self.y+y_offset, self.pk)
+        result = "\\node [shape=%s, shapeStyle] at (%u, -%f) (%u) {};\n"%(self.kind, self.x+x_offset, (self.y+y_offset)*1.2, self.pk)
         # Do the mirror text based on all properties
         # Text width is exactly the double width of the icons
         mirrorText = ""
@@ -222,26 +222,17 @@ class Node(models.Model):
             propvalue = propvalue.replace("#","\\#")    # special LaTex character
             if index==0:
                 # Make the first property bigger, since it is supposed to be the name
-                propvalue = "\\textbf{{\\footnotesize %s}}"%propvalue  
+                propvalue = "\\baselineskip=0.8\\baselineskip\\textbf{{\\footnotesize %s}}"%propvalue  
             else:
-                propvalue = "{\\scriptsize %s}"%propvalue                                
+                propvalue = "{\\it\\scriptsize %s}"%propvalue                                
             mirrorText += "%s\\\\"%propvalue
-        # If we do not have a mirror text (such as with gates), the connector should start directly at the node south
-        if mirrorText != "":
-            result += "\\node [text width=%fpt, below, align=center, inner sep=0em] at (%u.south) (text%u) {%s};\n"%(grid_size_pt, self.pk, self.pk, mirrorText)
-            connectorStart = "text%u"%self.pk
-        else:
-            connectorStart = str(self.pk)
         # Create child nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             result += edge.target.to_tikz(x_offset, y_offset)
-            # We tried several ways to get nice connector breaks without the trees package,
-            # but it finally always demands to much 'direction' logic to position some
-            # intermediate hidden nodes for the break
-            # therefore, we live with straight lines for the moment
-            # compute intermediate direction change of the connector
-            # first, just go down until we half way to the next lower level
-            result += "\draw [thick] (%s.south) -- (%u.north);\n"%(connectorStart, edge.target.pk)
+            result += "\draw [thick] (%s.south) -- (%u.north);\n"%(self.pk, edge.target.pk)
+        # If we do not have a mirror text (such as with gates), the connector should start directly at the node south
+        if mirrorText != "":
+            result += "\\node [mirrorStyle] at (%u.south) (text%u) {%s};\n"%(self.pk, self.pk, mirrorText)
         return result
 
     def to_xml(self, xmltype=None):
