@@ -24,7 +24,7 @@ void convertFaultTreeRecursive(FaultTreeNode* node, const faulttree::Node& templ
 	{
 		const string id = child.id();
 		const string typeName = typeid(child).name();
-
+		
 		// Leaf nodes...
 		if (typeName == BASICEVENT) 
 		{
@@ -54,14 +54,47 @@ void convertFaultTreeRecursive(FaultTreeNode* node, const faulttree::Node& templ
 			// TODO
 		}
 
-		//  Gates...
+		// Static Gates...
 		else if (typeName == AND)				current = new ANDGate(id);
 		else if (typeName == OR)				current = new ORGate(id);
 		else if (typeName == XOR)				current = new XORGate(id);
 		else if (typeName == VOTINGOR)			current = new VotingORGate(id, static_cast<const faulttree::VotingOr&>(child).k());
 		
-		// TODO: dynamic gates...
-		// else if (typeName == FDEP) current = new FDEPGate();
+		// Dynamic gates...
+		else if (typeName == FDEP)
+		{
+			const faulttree::FDEP& fdep = static_cast<const faulttree::FDEP&>(child);
+			const string trigger = fdep.trigger();
+			std::vector<string> dependentEvents;
+			for (const string& e : fdep.triggeredEvents())
+				dependentEvents.emplace_back(e);
+			current = new FDEPGate(id, trigger, dependentEvents);
+		}
+		else if (typeName == PAND)
+		{
+			const faulttree::PriorityAnd& pand = static_cast<const faulttree::PriorityAnd&>(child);
+			std::vector<string> eventSequence;
+			for (const string& e : pand.eventSequence())
+				eventSequence.emplace_back(e);
+			current = new PANDGate(id, eventSequence); 
+		}
+		else if (typeName == SEQ)
+		{
+			const faulttree::Sequence& seq = static_cast<const faulttree::Sequence&>(child);
+			std::vector<string> eventSequence;
+			for (const string& e : seq.eventSequence())
+				eventSequence.emplace_back(e);
+			current = new SEQGate(id, eventSequence); 
+		}
+		else if (typeName == SPARE)
+		{
+			const faulttree::Spare& spareGate = static_cast<const faulttree::Spare&>(child);
+			const double dormancyFactor = spareGate.dormancyFactor();
+			std::set<string> spares;
+			for (const string& e : spareGate.spareIds())
+				spares.insert(e);
+			current = new SpareGate(id, spares, dormancyFactor); 
+		}
 
 		node->addChild(current);
 		convertFaultTreeRecursive(current, child);

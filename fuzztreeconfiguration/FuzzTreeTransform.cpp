@@ -2,7 +2,6 @@
 #include "FuzzTreeConfiguration.h"
 #include "ExpressionParser.h"
 #include "TreeHelpers.h"
-#include "TransformUtil.h"
 #include "FuzzTreeTypes.h"
 #include "FaultTreeTypes.h"
 

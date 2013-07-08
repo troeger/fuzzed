@@ -5,8 +5,10 @@
 
 #include <set>
 
-SpareGate::SpareGate(const std::string& id, const set<string>& spareIndices, const string& name)
-	: DynamicGate(id, name), m_spareIndices(spareIndices)
+SpareGate::SpareGate(const std::string& id, const set<string>& spareIndices, const double& dormancyFactor, const string& name)
+	: DynamicGate(id, name), 
+	m_spareIndices(spareIndices),
+	m_dormancyFactor(dormancyFactor)
 {}
 
 int SpareGate::serialize(boost::shared_ptr<PNDocument> doc) const 

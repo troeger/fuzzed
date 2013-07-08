@@ -1,7 +1,7 @@
 #include "FDEPGate.h"
 #include "serialization/PNDocument.h"
 
-FDEPGate::FDEPGate(const std::string& id, int trigger, std::vector<std::string>& dependentEvents, const std::string& name /*= ""*/)
+FDEPGate::FDEPGate(const std::string& id, const std::string& trigger, std::vector<std::string>& dependentEvents, const std::string& name /*= ""*/)
 	: DynamicGate(id, name), m_triggerID(trigger), m_dependentEvents(dependentEvents)
 {}
 
@@ -20,5 +20,14 @@ int FDEPGate::serialize(boost::shared_ptr<PNDocument> doc) const
 	// TODO: find the dependent events' output places and connect to them...
 
 	return gateTriggered;
+}
+
+FaultTreeNode* FDEPGate::clone() const 
+{
+	FaultTreeNode* newNode = new FDEPGate(m_id, m_triggerID, m_dependentEvents, m_name);
+	for (auto& child : m_children)
+		newNode->addChild(child->clone());
+
+	return newNode;
 }
 

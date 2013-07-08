@@ -1,11 +1,10 @@
 #include "DynamicGate.h"
 #include <set>
 
-// cold spare
 class SpareGate : public DynamicGate
 {
 public:
-	SpareGate(const std::string& id, const std::set<std::string>& spareIndices, const std::string& name);
+	SpareGate(const std::string& id, const std::set<std::string>& spareIndices, const double& dormancyFactor, const std::string& name ="");
 	virtual ~SpareGate(void) {};
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
@@ -14,4 +13,5 @@ public:
 
 protected:
 	std::set<std::string> m_spareIndices;
+	double m_dormancyFactor;
 };

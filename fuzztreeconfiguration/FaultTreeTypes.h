@@ -1,5 +1,7 @@
 #pragma once
 
+// TODO: generate this. otherwise it will break the build whenever the xsd changes
+
 namespace faultTreeType
 {
 	const std::string AND		= "class faulttree::And";
@@ -15,6 +17,7 @@ namespace faultTreeType
 	const std::string UNDEVELOPEDEVENT	= "class faulttree::UndevelopedEvent";
 
 	const std::string FDEP	= "class faulttree::FDEP";
-	const std::string SPARE = "class faulttree::ColdSpare";
+	const std::string SPARE = "class faulttree::Spare";
 	const std::string PAND	= "class faulttree::PAND";
+	const std::string SEQ	= "class faulttree::SEQ";
 }

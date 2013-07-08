@@ -113,14 +113,15 @@
     <xsd:list itemType="xsd:string"/>
   </xsd:simpleType>
 
-  <xsd:complexType name="ColdSpare">
+  <xsd:complexType name="Spare">
     <xsd:complexContent>
       <xsd:extension base="ft:DynamicGate">
         <xsd:attribute name="spareIds" type="ft:idlist" use="required"/>
+        <xsd:attribute name="dormancyFactor" type="xsd:double" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  <xsd:element name="ColdSpare" type="ft:ColdSpare"/>
+  <xsd:element name="Spare" type="ft:Spare"/>
 
   <xsd:complexType name="PriorityAnd">
     <xsd:complexContent>
