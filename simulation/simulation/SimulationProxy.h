@@ -22,7 +22,8 @@ class FaultTreeNode;
 enum SimulationImpl
 {
 	TIMENET,
-	DEFAULT
+	DEFAULT,
+	STRUCTUREFORMULA_ONLY
 };
 
 
@@ -63,15 +64,14 @@ public:
 		double convergenceThreshold,
 		unsigned int maxTime);
 
-	virtual ~SimulationProxy();;
+	virtual ~SimulationProxy();
 
 	// simulates all configurations from one file
 	void simulateFile(const boost::filesystem::path& p, SimulationImpl impl, bool simulatePetriNet);
+	void simulateFaultTree(FaultTreeNode* ft, const std::string& newFileName, SimulationImpl impl);
 
 protected:
 	void parseCommandline(int numArguments, char** arguments);
-
-	void simulateFaultTree(FaultTreeNode* ft, const std::string& newFileName, SimulationImpl impl);
 	bool runSimulationInternal(
 		const boost::filesystem::path& p, 
 		SimulationImpl implementationType,

@@ -65,9 +65,9 @@ std::string VotingORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) 
 		{
 			res += s_formulaBegin;
 			res += childFormulas[0];
-			for (int j = 1; j < i; ++ j)
+			for (int j = 1; j < i; ++j)
 			{
-				res +=  s_ANDoperator;
+				res += s_ANDoperator;
 				res += childFormulas[j];
 			}
 			res += s_formulaEnd;

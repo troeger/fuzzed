@@ -153,7 +153,7 @@ void SimulationProxy::parseCommandline(int numArguments, char** arguments)
 		("steps,s",		po::value<unsigned int>(&m_missionTime)->default_value(DEFAULT_SIMULATION_STEPS),	"Number of Simulation Steps")
 		("rounds,r",	po::value<unsigned int>(&m_numRounds)->default_value(DEFAULT_SIMULATION_ROUNDS),	"Number of Simulation Rounds")
 		("conf",		po::value<int>(&confidence)->default_value(DEFAULT_CONFIDENCE),						"Confidence level (TimeNET only)")
-		("epsilon,e",	po::value<float>(&epsilon)->default_value(DEFAULT_EPSILON),						"Epsilon (TimeNET only)")
+		("epsilon,e",	po::value<float>(&epsilon)->default_value(DEFAULT_EPSILON),							"Epsilon (TimeNET only)")
 		("MTTF",		po::value<bool>(&m_bSimulateUntilFailure)->default_value(true),						"Simulate each Round until System Failure, necessary for MTTF")
 		("converge,c",	po::value<double>(&m_convergenceThresh)->default_value((double)0.0001),				"Cancel simulation after the resulting reliability differs in less than this threshold")
 		("adaptive,a",	po::value<unsigned int>(&numAdaptiveRounds)->default_value(0),						"Adaptively adjust the number of Simulation Rounds, NOT YET IMPLEMENTED");
@@ -208,7 +208,7 @@ void SimulationProxy::parseCommandline(int numArguments, char** arguments)
 		if (!is_regular_file(fPath))
 			throw runtime_error("Not a file: " + filePath);
 
-		simulateFile(fPath, useTimeNET ? TIMENET : DEFAULT, simulatePetriNet);
+		simulateFile(fPath, /*useTimeNET ? TIMENET : DEFAULT*/STRUCTUREFORMULA_ONLY, simulatePetriNet);
 	}
 }
 
@@ -282,12 +282,17 @@ void SimulationProxy::simulateFaultTree(FaultTreeNode* ft, const std::string& ne
 	case TIMENET:
 		doc = boost::shared_ptr<TNDocument>(new TNDocument());
 		break;
+	case STRUCTUREFORMULA_ONLY:
+		doc = boost::shared_ptr<TNDocument>(new TNDocument());
+		break;
 	}
 
 	ft->serialize(doc);
 	std::cout << ft->serializeAsFormula(doc) << endl;
-	doc->save(newFileName);	
+	
+	if (STRUCTUREFORMULA_ONLY) return; // TODO some kind of output
 
+	doc->save(newFileName);	
 	runSimulationInternal(newFileName, impl, m_timeNetProperties);
 }
 
@@ -300,7 +305,15 @@ void runSimulation(
 {	
 	try
 	{
+		SimulationProxy p = SimulationProxy(missionTime, numRounds, convergenceThreshold, maxTime);
 		
+		auto ftTransform = FuzzTreeTransform(fuzztreeXML);
+		int i = 0;
+		for (const auto& ft : ftTransform.transform())
+		{
+			p.simulateFaultTree(fromGeneratedFaultTree(ft.topEvent()).get(), "foo" + util::toString(++i) + ".TN", TIMENET);
+		}
+
 	}
 	catch (const exception& e)
 	{

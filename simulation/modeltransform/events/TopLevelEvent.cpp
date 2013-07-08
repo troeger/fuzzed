@@ -66,12 +66,5 @@ void TopLevelEvent::print(std::ostream& stream, int indentLevel/*=0*/) const
 std::string TopLevelEvent::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
 {
 	assert(m_children.size() == 1);
-
-	const static std::string topLevelFormulaBegin	= "P{ ";
-	const static std::string topLevelFormulaEnd		= " }";
-
-	return 
-		topLevelFormulaBegin + 
-		m_children.front()->serializeAsFormula(doc) +
-		topLevelFormulaEnd;
+	return m_children.front()->serializeAsFormula(doc);
 }
