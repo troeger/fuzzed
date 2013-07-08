@@ -110,7 +110,7 @@
   </xsd:complexType>
 
   <xsd:simpleType name="idlist">
-    <xsd:list itemType="xsd:int"/>
+    <xsd:list itemType="xsd:string"/>
   </xsd:simpleType>
 
   <xsd:complexType name="ColdSpare">
@@ -125,7 +125,7 @@
   <xsd:complexType name="PriorityAnd">
     <xsd:complexContent>
       <xsd:extension base="ft:DynamicGate">
-        <xsd:attribute name="priorityIds" type="ft:idlist" use="required"/>
+        <xsd:attribute name="eventSequence" type="ft:idlist" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -143,6 +143,7 @@
   <xsd:complexType name="FDEP">
     <xsd:complexContent>
       <xsd:extension base="ft:DynamicGate">
+        <xsd:attribute name="trigger" type="xsd:string" use="required"/>
         <xsd:attribute name="triggeredEvents" type="ft:idlist" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
