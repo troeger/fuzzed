@@ -1,7 +1,7 @@
 #include "FDEPGate.h"
 #include "serialization/PNDocument.h"
 
-FDEPGate::FDEPGate(const std::string& id, const std::string& trigger, std::vector<std::string>& dependentEvents, const std::string& name /*= ""*/)
+FDEPGate::FDEPGate(const std::string& id, const std::string& trigger, std::vector<std::string> dependentEvents, const std::string& name /*= ""*/)
 	: DynamicGate(id, name), m_triggerID(trigger), m_dependentEvents(dependentEvents)
 {}
 

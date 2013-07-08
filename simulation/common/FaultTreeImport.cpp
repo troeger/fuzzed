@@ -123,7 +123,7 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 			vector<string> spareIndices;
 			util::tokenizeString(spareIds, spareIndices);
 
-			gate = new SpareGate(id, set<string>(spareIndices.begin(), spareIndices.end()), name);
+			gate = new SpareGate(id, set<string>(spareIndices.begin(), spareIndices.end()), 1.0, name);
 		}
 		else if (typeDescriptor == PAND_GATE)
 		{

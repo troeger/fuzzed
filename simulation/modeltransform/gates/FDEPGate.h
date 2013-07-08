@@ -5,7 +5,7 @@
 class FDEPGate : public DynamicGate
 {
 public:
-	FDEPGate(const std::string& id, const std::string& trigger, std::vector<std::string>& dependentEvents, const std::string& name = "");
+	FDEPGate(const std::string& id, const std::string& trigger, std::vector<std::string> dependentEvents, const std::string& name = "");
 	virtual ~FDEPGate(void) {};
 
 	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;

@@ -54,10 +54,9 @@ int SpareGate::serialize(boost::shared_ptr<PNDocument> doc) const
 
 FaultTreeNode* SpareGate::clone() const
 {
-	FaultTreeNode* newNode = new SpareGate(m_id, m_spareIndices, m_name);
+	FaultTreeNode* newNode = new SpareGate(m_id, m_spareIndices, m_dormancyFactor, m_name);
 	for (auto& child : m_children)
-	{
 		newNode->addChild(child->clone());
-	}
+
 	return newNode;
 }
