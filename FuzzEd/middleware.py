@@ -2,6 +2,20 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanen
     HttpResponseBadRequest, HttpResponseNotFound, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseGone, \
     HttpResponseServerError
 
+class FuzzEdException(Exception):
+    ''' 
+    As of Python 2.7, BaseException has no more default message attribute.
+    We therefore define our own base class for this.
+    '''
+    _message=""
+    def _get_message(self): 
+        return self._message
+    def _set_message(self, message): 
+        self._message = message
+    def __init__(self, message):
+        self.message = message
+    message = property(_get_message, _set_message)
+
 class HttpResponseRedirectAnswer(Exception):
     def __init__(self, target):
         self.target = target
@@ -14,19 +28,19 @@ class HttpResponsePermanentRedirectAnswer(Exception):
     def result(self):
         return HttpResponsePermanentRedirect(self.target)
 
-class HttpResponseNotModifiedAnswer(Exception):
+class HttpResponseNotModifiedAnswer(FuzzEdException):
     def result(self):
         return HttpResponseNotModified(self.message)
 
-class HttpResponseBadRequestAnswer(Exception):
+class HttpResponseBadRequestAnswer(FuzzEdException):
     def result(self):
         return HttpResponseBadRequest(self.message)
 
-class HttpResponseNotFoundAnswer(Exception):
+class HttpResponseNotFoundAnswer(FuzzEdException):
     def result(self):
         return HttpResponseNotFound(self.message)
 
-class HttpResponseForbiddenAnswer(Exception):
+class HttpResponseForbiddenAnswer(FuzzEdException):
     def result(self):
         return HttpResponseForbidden(self.message)
 
@@ -36,11 +50,11 @@ class HttpResponseNotAllowedAnswer(Exception):
     def result(self):
         return HttpResponseNotAllowed(self.allowedMethods)
 
-class HttpResponseGoneAnswer(Exception):
+class HttpResponseGoneAnswer(FuzzEdException):
     def result(self):
         return HttpResponseGone(self.message)
 
-class HttpResponseServerErrorAnswer(Exception):
+class HttpResponseServerErrorAnswer(FuzzEdException):
     def result(self):
         return HttpResponseServerError(self.message)
 
@@ -57,7 +71,7 @@ class HttpResponseNoResponse(HttpResponse):
 class HttpResponseAccepted(HttpResponse):
     status_code = 202
 
-class HttpResponseNoResponseAnswer(Exception):
+class HttpResponseNoResponseAnswer(FuzzEdException):
     def result(self):
         return HttpResponseNoResponse(self.message)
 
