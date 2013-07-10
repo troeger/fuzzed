@@ -100,6 +100,7 @@ class Graph(models.Model):
 \\usepackage{tikz}
 \\usetikzlibrary{positioning, trees, svg.path} 
 \\tikzset{shapeStyle/.style={inner sep=0em, outer sep=0em}}
+\\tikzset{shapeStyleDashed/.style={inner sep=0em, outer sep=0em, dashed}}
 \\tikzset{mirrorStyle/.style={fill=white,text width=%fpt, below, align=center, inner sep=0.2em, outer sep=0.3em}}
 \\begin{document}
 \\pagestyle{empty}

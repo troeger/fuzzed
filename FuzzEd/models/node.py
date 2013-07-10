@@ -143,6 +143,7 @@ class Node(models.Model):
         Returns a sorted set of all node properties and their values, according to the notation rendering rules.
         """
         result = []
+        # Only consider properties that have to be displayed in the mirror 
         displayOrder = notations.by_kind[self.graph.kind]['propertiesDisplayOrder']
         propdetails = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']
         for prop in displayOrder:
@@ -209,12 +210,17 @@ class Node(models.Model):
         """
         grid_size_pt = 36       # grid size in the front end, which is also the symbol width in EPS pictures
         nodekind = self.kind.lower()
+        optional = self.get_property("optional", False)
+        if optional:
+            nodeStyle = "shapeStyleDashed"
+        else:
+            nodeStyle = "shapeStyle"            
         # Create Tikz snippet for tree node
         # We are intentionally do not use the TiKZ tree rendering capabilities, since this
         # would ignore all user formatting of the tree from the editor
         # additional, freely floating nodes couldn't be considered any more
         # we start with the TiKZ node for the graph icon
-        result = "\\node [shape=%s, shapeStyle] at (%u, -%f) (%u) {};\n"%(self.kind, self.x+x_offset, (self.y+y_offset)*1.2, self.pk)
+        result = "\\node [shape=%s, %s] at (%u, -%f) (%u) {};\n"%(self.kind, nodeStyle, self.x+x_offset, (self.y+y_offset)*1.2, self.pk)
         # Do the mirror text based on all properties
         # Text width is exactly the double width of the icons
         mirrorText = ""
