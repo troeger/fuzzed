@@ -9,8 +9,9 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfsetfillcolor{gray}
         \\pgfpathsvg{M 0.7,34.3 L 34.3,34.3 34.3,21 C 34.3,21 34.3,0.7 17.5,0.7 C 0.7,0.7 0.7,21 0.7,21 z}
         \\pgfusepath{stroke}
 }}
@@ -22,9 +23,10 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{16.8}
+        \\pgfsetfillcolor{gray}
+        \\pgfcircle[fill]{\pgfpoint{17.500000}{17.500000}}{16.800000}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{basicEventSet}{
@@ -35,11 +37,12 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfcircle[stroke]{\pgfpoint{20}{20}}{14.3}
-        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{14.3}
-        \\pgfcircle[stroke]{\pgfpoint{15}{15}}{14.3}
+        \\pgfsetfillcolor{gray}
+        \\pgfcircle[fill]{\pgfpoint{20.000000}{20.000000}}{14.300000}
+        \\pgfcircle[fill]{\pgfpoint{17.500000}{17.500000}}{14.300000}
+        \\pgfcircle[fill]{\pgfpoint{15.000000}{15.000000}}{14.300000}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{block}{
@@ -50,9 +53,10 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{33.6}{33.6}}
+        \\pgfsetfillcolor{gray}
+        \\pgfrect[fill]{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{houseEvent}{
@@ -63,8 +67,9 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfsetfillcolor{gray}
         \\pgfpathsvg{M 17.5,0.7 L 34.3,15 34.3,34.3 0.7,34.3 0.7,15 z}
         \\pgfusepath{stroke}
 }}
@@ -76,8 +81,9 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfsetfillcolor{gray}
         \\pgfpathsvg{M 17.5,0.7 L 34.3,11 34.3,24 17.5,34.3 0.7,24 0.7,11 z}
         \\pgfusepath{stroke}
 }}
@@ -89,9 +95,10 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{33.6}{33.6}}
+        \\pgfsetfillcolor{gray}
+        \\pgfrect[fill]{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{intermediateEventSet}{
@@ -102,11 +109,12 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{26.6}{26.6}}
-        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{26.6}{26.6}}
-        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{26.6}{26.6}}
+        \\pgfsetfillcolor{gray}
+        \\pgfrect[fill]{\pgfpoint{7.700000}{7.700000}}{\pgfpoint{26.600000}{26.600000}}
+        \\pgfrect[fill]{\pgfpoint{4.200000}{4.200000}}{\pgfpoint{26.600000}{26.600000}}
+        \\pgfrect[fill]{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{26.600000}{26.600000}}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{endNode}{
@@ -117,9 +125,10 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{16.8}
+        \\pgfsetfillcolor{gray}
+        \\pgfcircle[fill]{\pgfpoint{17.500000}{17.500000}}{16.800000}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{orGate}{
@@ -130,8 +139,9 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfsetfillcolor{gray}
         \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
         \\pgfusepath{stroke}
 }}
@@ -143,9 +153,10 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{16.8}
+        \\pgfsetfillcolor{gray}
+        \\pgfcircle[fill]{\pgfpoint{17.500000}{17.500000}}{16.800000}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{topEvent}{
@@ -156,9 +167,10 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{33.6}{33.6}}
+        \\pgfsetfillcolor{gray}
+        \\pgfrect[fill]{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{transferIn}{
@@ -169,8 +181,9 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfsetfillcolor{gray}
         \\pgfpathsvg{M 17.5,1 35,34.3 1,34.3 z}
         \\pgfusepath{stroke}
 }}
@@ -182,8 +195,9 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
+        \\pgfsetfillcolor{gray}
         \\pgfpathsvg{M 17.5,0.7 34.3,17.5 17.5,34.3 0.7,17.5 z}
         \\pgfusepath{stroke}
 }}
@@ -195,8 +209,9 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{35}{17}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{35}{35}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-35}{-35}}
+        \\pgfsetfillcolor{gray}
         \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
         \\pgfpathsvg{M 8.4,9.1 17.5,28.0 26.6,9.1}
         \\pgfusepath{stroke}
@@ -209,8 +224,9 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{35}{17}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{35}{35}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-35}{-35}}
+        \\pgfsetfillcolor{gray}
         \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
         \\pgfpathsvg{M 0.7,34.3 L 17.5,1.4 34.3,34.3}
         \\pgfusepath{stroke}
@@ -223,9 +239,11 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfsetdash{{4.2}{1.4}}{0}        \\pgfpathsvg{M 0.7,24 C 0.7,24 3.5,34 17.5,34.3 31.5,34.3 34.3,24 34.3,24 L 21,0.7 14,0.7 z}
+        \\pgfsetfillcolor{gray}
+        \\pgfsetdash{{4.2}{1.4}}{0}
+        \\pgfpathsvg{M 0.7,24 C 0.7,24 3.5,34 17.5,34.3 31.5,34.3 34.3,24 34.3,24 L 21,0.7 14,0.7 z}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{redundancyVariation}{
@@ -236,9 +254,11 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfsetdash{{4.2}{1.4}}{0}        \\pgfpathsvg{M 0.7,24.5 C 0.7,38 34.3,38 34.3,24.5 L 28,21 C 26.6,10.5 22.4,3.5 17.5,0.7 C 12.6,3.5 8.4,10.5 7,21 z}
+        \\pgfsetfillcolor{gray}
+        \\pgfsetdash{{4.2}{1.4}}{0}
+        \\pgfpathsvg{M 0.7,24.5 C 0.7,38 34.3,38 34.3,24.5 L 28,21 C 26.6,10.5 22.4,3.5 17.5,0.7 C 12.6,3.5 8.4,10.5 7,21 z}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{end}{
@@ -249,9 +269,10 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{9}
+        \\pgfsetfillcolor{gray}
+        \\pgfcircle[fill]{\pgfpoint{17.500000}{17.500000}}{9.000000}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{start}{
@@ -262,9 +283,10 @@ tikz_shapes='''
     \\anchor{east}{\pgfpoint{36}{18}}
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
         \\pgftransformrotate{180} 
-        \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{9}
+        \\pgfsetfillcolor{gray}
+        \\pgfcircle[fill]{\pgfpoint{17.500000}{17.500000}}{9.000000}
         \\pgfusepath{stroke}
 }}
 %% End of shape library. This part below is unique for all graph exports.

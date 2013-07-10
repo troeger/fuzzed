@@ -37,8 +37,7 @@ def svg2pgf_shape(filename):
     width = int(svg.attributes['width'].value)
     # Define shape anchors, based on image size
     # We need double backslashes since the output is Python again
-    # The SVG coordinate system is mirrored on the horizon axis, so we add a rotation command amd a compensation
-    # for the coordinate shift resulting from this
+    # The SVG coordinate system is mirrored on the horizon axis, so we add a rotation command and a positional compensation
     result = '''
 \\\\pgfdeclareshape{%(name)s}{
     \\\\anchor{center}{\pgfpoint{%(halfwidth)u}{%(halfheight)u}}
@@ -48,8 +47,9 @@ def svg2pgf_shape(filename):
     \\\\anchor{east}{\pgfpoint{%(width)u}{%(halfheight)u}}
     \\\\foregroundpath{
         \\\\pgfsetlinewidth{1.4}
+        \\\\pgftransformshift{\pgfpoint{%(width)u}{%(height)u}}
         \\\\pgftransformrotate{180} 
-        \\\\pgftransformshift{\pgfpoint{-%(width)u}{-%(height)u}}
+        \\\\pgfsetfillcolor{gray}
 '''%{'name':name, 'height':height, 'halfheight':height/2, 'width':width, 'halfwidth':width/2}
     # add all SVG path
     pathCommands = xml.getElementsByTagName('path')
@@ -64,16 +64,18 @@ def svg2pgf_shape(filename):
     # add all SVG rectangle definitions
     rectCommands = xml.getElementsByTagName('rect')
     for r in rectCommands:
-        height = r.attributes['height'].value
-        width = r.attributes['width'].value
-        result += "        \\\\pgfrect[stroke]{\pgfpoint{0}{0}}{\pgfpoint{%s}{%s}}\n"%(width, height)
+        rheight = float(r.attributes['height'].value)
+        rwidth = float(r.attributes['width'].value)
+        x = float(r.attributes['x'].value)
+        y = float(r.attributes['y'].value)
+        result += "        \\\\pgfrect[fill]{\pgfpoint{%f}{%f}}{\pgfpoint{%f}{%f}}\n"%(x, y, rwidth, rheight)
     # add all SVG circle definitions
     circleCommands = xml.getElementsByTagName('circle')
     for c in circleCommands:
-        x = c.attributes['cx'].value
-        y = c.attributes['cy'].value
-        radius = c.attributes['r'].value
-        result += "        \\\\pgfcircle[stroke]{\pgfpoint{%s}{%s}}{%s}\n"%(x,y,radius)
+        x = float(c.attributes['cx'].value)
+        y = float(c.attributes['cy'].value)
+        radius = float(c.attributes['r'].value)
+        result += "        \\\\pgfcircle[fill]{\pgfpoint{%f}{%f}}{%f}\n"%(x,y,radius)
     # finalize TiKZ shape definition
     result += '        \\\\pgfusepath{stroke}\n}}'
     return result
