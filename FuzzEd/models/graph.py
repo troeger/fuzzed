@@ -101,10 +101,11 @@ class Graph(models.Model):
 \\usetikzlibrary{positioning, trees, svg.path} 
 \\tikzset{shapeStyle/.style={inner sep=0em, outer sep=0em}}
 \\tikzset{shapeStyleDashed/.style={inner sep=0em, outer sep=0em, dashed, dash pattern=on 4.2 off 1.4}}
-\\tikzset{mirrorStyle/.style={fill=white,text width=%fpt, below, align=center, inner sep=0.2em, outer sep=0.3em}}
+\\tikzset{mirrorStyle/.style={fill=white,text width=50pt, below, align=center, inner sep=0.2em, outer sep=0.3em}}
+\\tikzset{fork edge/.style={line width=1.4, to path={|- ([shift={(\\tikztotarget)}] +0pt,+18pt) -| (\\tikztotarget) }}}
 \\begin{document}
 \\pagestyle{empty}
-        """%50          # image shape size * 2
+        """     
         result += tikz_shapes + "\n\\begin{figure}\n\\begin{tikzpicture}[auto, trim left]"
         # Find most left node and takes it's x coordinate as start offset
         # This basically shifts the whole tree to the left border

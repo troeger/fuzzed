@@ -138,7 +138,7 @@ class Node(models.Model):
 
         raise ValueError('Node %s has unsupported kind' % self)
 
-    def get_all_mirror_properties(self):
+    def get_all_mirror_properties(self, hiddenProps=[]):
         """
         Returns a sorted set of all node properties and their values, according to the notation rendering rules.
         """
@@ -147,7 +147,7 @@ class Node(models.Model):
         displayOrder = notations.by_kind[self.graph.kind]['propertiesDisplayOrder']
         propdetails = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']
         for prop in displayOrder:
-            if propdetails.has_key(prop):           # the displayOrder list is static, the property does not have to be set
+            if propdetails.has_key(prop) and prop not in hiddenProps:   # the displayOrder list is static, the property does not have to be part of this node
                 val = self.get_property(prop, None)
                 if isinstance(propdetails[prop],dict):          # Some properties do not have a config dict in notations, such as optional=None
                     kind = propdetails[prop]['kind']
@@ -155,7 +155,6 @@ class Node(models.Model):
                     logger.debug("Property %s in %s has no config dictionary"%(prop, self.kind))
                     kind="text"
                 if val != None:
-                    # In case, format the database value according to the notation configuration
                     if kind == "range":
                         format = propdetails[prop]['mirror']['format']
                         format = format.replace(u"\xb1","$\\pm$")    # Special unicodes used in format strings, such as \xb1
@@ -181,54 +180,45 @@ class Node(models.Model):
                     result.append(val)
         return result
 
-    def to_tikz_tree(self, recursionLevel=0, x_offset=0, y_offset=0):
-        """
-        Serializes this node and all its children into a TiKZ tree package representation.
-        This has the advantage that fork connectors are possible.
-        TODO: Consider original ordering of nodes in one line.
 
-        Returns:
-         {str} the node and its children in LaTex representation
-        """
-        children = ""
-        for edge in self.outgoing.filter(deleted=False):
-            children += edge.target.to_tikz_tree(recursionLevel+1)
-        if recursionLevel==0:
-            return "\n\\node [shape=%s] {foo} \n %s;\n"%(self.kind, children)
-        else:
-            return recursionLevel*" "+"child { node [shape=%s]  at (%u, -%u) {bar} \n %s }\n"%(self.kind, self.x+x_offset, self.y+y_offset, children)
-
-
-    def to_tikz(self, x_offset=0, y_offset=0):
+    def to_tikz(self, x_offset=0, y_offset=0, parent_kind=None):
         """
         Serializes this node and all its children into a TiKZ representation.
         A positive x offset shifts the resulting tree accordingly to the right.
         Negative offsets are allowed.
 
-        TODO: Mirror texts closer together, correct conversion of event set SVG's, lines behind mirrors
+        We are intentionally do not use the TiKZ tree rendering capabilities, since this
+        would ignore all user formatting of the tree from the editor.
+
+        TikZ starts the coordinate system in the upper left corner, while we start in the lower left corner.
+        This demands some coordinate mangling on the Y axis.
 
         Returns:
          {str} the node and its children in LaTex representation
         """
-        grid_size_pt = 36       # grid size in the front end, which is also the symbol width in EPS pictures
         nodekind = self.kind.lower()
-        optional = self.get_property("optional", False)
-
-        if optional:
+        # Optional nodes are dashed
+        if self.get_property("optional", False):
             nodeStyle = "shapeStyleDashed"
         else:
-            nodeStyle = "shapeStyle"            
-        # Create Tikz snippet for tree node
-        # We are intentionally do not use the TiKZ tree rendering capabilities, since this
-        # would ignore all user formatting of the tree from the editor
-        # additional, freely floating nodes couldn't be considered any more
-        # we start with the TiKZ node for the graph icon
+            nodeStyle = "shapeStyle"     
+        # If this is a child node, we need to check if the parent wants to hide some child property
+        hiddenProps = []
+        if parent_kind:
+            nodeConfig = notations.by_kind[self.graph.kind]['nodes'][parent_kind]
+            if nodeConfig.has_key('childProperties'):
+                for childPropName in nodeConfig['childProperties']:
+                    for childPropSettingName, childPropSettingVal in nodeConfig['childProperties'][childPropName].iteritems():
+                        if childPropSettingName == "hidden" and childPropSettingVal == True:
+                            hiddenProps.append(childPropName)
+        # Create Tikz snippet for tree node, we start with the TiKZ node for the graph icon
+        # Y coordinates are stretched a little bit, for optics
         result = "\\node [shape=%s, %s] at (%u, -%f) (%u) {};\n"%(self.kind, nodeStyle, self.x+x_offset, (self.y+y_offset)*1.2, self.pk)
-        # Do the mirror text based on all properties
+        # Determine the mirror text based on all properties
         # Text width is exactly the double width of the icons
         mirrorText = ""
-        for index,propvalue in enumerate(self.get_all_mirror_properties()):
-            propvalue = propvalue.replace("#","\\#")    # special LaTex character
+        for index,propvalue in enumerate(self.get_all_mirror_properties(hiddenProps)):
+            propvalue = propvalue.replace("#","\\#")    # consider special LaTex character in mirror text
             if index==0:
                 # Make the first property bigger, since it is supposed to be the name
                 propvalue = "\\baselineskip=0.8\\baselineskip\\textbf{{\\footnotesize %s}}"%propvalue  
@@ -238,13 +228,13 @@ class Node(models.Model):
         # Create child nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             # Add child node rendering
-            result += edge.target.to_tikz(x_offset, y_offset)
+            result += edge.target.to_tikz(x_offset, y_offset, self.kind)
             # Add connector from this node to the added child, consider if dashed line is needed
             if notations.by_kind[self.graph.kind]['nodes'][self.kind]['connector'].has_key('dashstyle'):
-                result += "\draw [thick, dashed] (%s.south) -- (%u.north);\n"%(self.pk, edge.target.pk)
+                result += "\path[fork edge, dashed] (%s.south) edge (%u.north);\n"%(self.pk, edge.target.pk)
             else:
-                result += "\draw [thick] (%s.south) -- (%u.north);\n"%(self.pk, edge.target.pk)
-        # If we do not have a mirror text (such as with gates), the connector should start directly at the node south
+                result += "\path[fork edge] (%s.south) edge (%u.north);\n"%(self.pk, edge.target.pk)
+        # Add the mirror text as separate text node, which makes formatting more precise
         if mirrorText != "":
             result += "\\node [mirrorStyle] at (%u.south) (text%u) {%s};\n"%(self.pk, self.pk, mirrorText)
         return result
