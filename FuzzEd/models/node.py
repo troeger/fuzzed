@@ -213,6 +213,7 @@ class Node(models.Model):
         grid_size_pt = 36       # grid size in the front end, which is also the symbol width in EPS pictures
         nodekind = self.kind.lower()
         optional = self.get_property("optional", False)
+
         if optional:
             nodeStyle = "shapeStyleDashed"
         else:
@@ -236,8 +237,13 @@ class Node(models.Model):
             mirrorText += "%s\\\\"%propvalue
         # Create child nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
+            # Add child node rendering
             result += edge.target.to_tikz(x_offset, y_offset)
-            result += "\draw [thick] (%s.south) -- (%u.north);\n"%(self.pk, edge.target.pk)
+            # Add connector from this node to the added child, consider if dashed line is needed
+            if notations.by_kind[self.graph.kind]['nodes'][self.kind]['connector'].has_key('dashstyle'):
+                result += "\draw [thick, dashed] (%s.south) -- (%u.north);\n"%(self.pk, edge.target.pk)
+            else:
+                result += "\draw [thick] (%s.south) -- (%u.north);\n"%(self.pk, edge.target.pk)
         # If we do not have a mirror text (such as with gates), the connector should start directly at the node south
         if mirrorText != "":
             result += "\\node [mirrorStyle] at (%u.south) (text%u) {%s};\n"%(self.pk, self.pk, mirrorText)
