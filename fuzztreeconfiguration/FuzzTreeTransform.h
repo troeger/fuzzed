@@ -17,6 +17,15 @@
 #include "faultTree.h"
 #include "fuzzTree.h"
 
+enum ErrorType
+{
+	NO_ERROR,
+	WRONG_CHILD_TYPE,
+	WRONG_CHILD_NUM,
+	INVALID_NODE,
+	INVALID_ATTRIBUTE
+};
+
 class FuzzTreeTransform
 {
 public:
@@ -29,10 +38,16 @@ public:
 
 protected:
 	faulttree::FaultTree generateFaultTree(const FuzzTreeConfiguration& configuration);
-	void generateFaultTreeRecursive(
+	ErrorType generateFaultTreeRecursive(
 		const fuzztree::Node* templateNode,
 		faulttree::Node* node,
 		const FuzzTreeConfiguration& configuration) const;
+
+	static void copyNode(
+		const std::string typeName,
+		faulttree::Node* node,
+		const std::string id,
+		const fuzztree::ChildNode& currentChild);
 
 	// add the configured VotingOR gate, return true if leaf was reached
 	bool handleRedundancyVP(
@@ -48,14 +63,20 @@ protected:
 		const FuzzTreeConfiguration& configuration,
 		const FuzzTreeConfiguration::id_type& configuredChildId) const;
 
-	void expandBasicEventSet(
-		const fuzztree::Node* templateNode, /*Xerces*/
-		faulttree::Node* parentNode, /*generated internal fault tree model*/ 
+	ErrorType expandBasicEventSet(
+		const fuzztree::Node* templateNode,
+		faulttree::Node* parentNode, 
+		const FuzzTreeConfiguration::id_type& id,
+		const int& defaultQuantity = 0) const;
+
+	ErrorType expandIntermediateEventSet(
+		const fuzztree::Node* templateNode,
+		faulttree::Node* parentNode,
 		const FuzzTreeConfiguration::id_type& id,
 		const int& defaultQuantity = 0) const;
 	
 	void generateConfigurations(std::vector<FuzzTreeConfiguration>& configurations) const;
-	void generateConfigurationsRecursive(
+	ErrorType generateConfigurationsRecursive(
 		const fuzztree::Node* node, 
 		std::vector<FuzzTreeConfiguration>& configurations) const;
 
@@ -63,6 +84,9 @@ protected:
 	static bool isGate(const std::string& node);
 	static bool isLeaf(const std::string& node);
 	static bool isVariationPoint(const std::string& node);
+	static bool isEventSet(const std::string& node);
+
+	static bool connectionRuleViolated(const std::string& parentType, const std::string& childType);
 	
 	std::string generateUniqueId(const std::string& oldId);
 	

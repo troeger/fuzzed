@@ -11,7 +11,7 @@ int TopLevelEvent::serialize(boost::shared_ptr<PNDocument> doc) const
 {
 	assert(m_children.size() <= 1 && "Top Level Event cannot have multiple children");
 	
-	int finalPlaceID = finalPlaceID = doc->addTopLevelPlace("SystemFailure");
+	int finalPlaceID = doc->addTopLevelPlace("SystemFailure");
 
 	try
 	{

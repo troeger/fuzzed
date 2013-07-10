@@ -7,7 +7,8 @@ namespace fuzztreeType
 	const std::string XOR		= "class fuzztree::Xor";
 	const std::string VOTINGOR	= "class fuzztree::VotingOr";
 
-	const std::string BASICEVENTSET		= "class fuzztree::BasicEventSet";
+	const std::string BASICEVENTSET			= "class fuzztree::BasicEventSet";
+	const std::string INTERMEDIATEEVENTSET	= "class fuzztree::IntermediateEventSet";
 
 	const std::string BASICEVENT		= "class fuzztree::BasicEvent";
 	const std::string INTERMEDIATEEVENT	= "class fuzztree::IntermediateEvent";
