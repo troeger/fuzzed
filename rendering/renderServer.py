@@ -24,23 +24,35 @@ while 1:
     # so we simply got their for the time being
     olddir = os.getcwd()
     os.chdir(tmpdir)
+    latexError = False
     if tube == 'renderEps':
-        os.system("latex graph.tex")
-        os.system("dvips graph")
-        os.system("ps2eps -R + -f -a graph.ps")
-        # read resulting file content
-        result = open(tmpdir+os.sep+"graph.eps","r")
-        b.use('renderEpsResult')
+        os.system("latex -interaction nonstopmode graph.tex")
+        if os.path.exists('graph.ps'):
+            os.system("dvips graph")
+            os.system("ps2eps -R + -f -a graph.ps")
+            # read resulting file content
+            result = open(tmpdir+os.sep+"graph.eps","r")
+            b.use('renderEpsResult')
+        else:
+            print "Error during LaTex compilation"
+            latexError = True
     elif tube == 'renderPdf':
-        os.system("pdflatex graph.tex")
-        # read resulting file content
-        result = open(tmpdir+os.sep+"graph.pdf","r")
-        b.use('renderPdfResult')
-    # send back the result via messaging, provide original job ID as prefix
-    b.put("[%u]\n%s"%(job.stats()['id'], result.read()))
+        os.system("pdflatex -interaction nonstopmode graph.tex")
+        if os.path.exists('graph.pdf'):
+            # read resulting file content
+            result = open(tmpdir+os.sep+"graph.pdf","r")
+            b.use('renderPdfResult')
+        else:
+            print "Error during LaTex compilation"
+            latexError = True
+    if not latexError:
+        # send back the result via messaging, provide original job ID as prefix
+        b.put("[%u]\n%s"%(job.stats()['id'], result.read()))
+        result.close()
+        job.delete()
+    else:
+        job.bury()
     # clean up
-    job.delete()
-    result.close()
     os.chdir(olddir)
     shutil.rmtree(tmpdir, ignore_errors=True)
 

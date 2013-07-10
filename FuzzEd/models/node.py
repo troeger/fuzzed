@@ -158,11 +158,13 @@ class Node(models.Model):
                     # In case, format the database value according to the notation configuration
                     if kind == "range":
                         format = propdetails[prop]['mirror']['format']
+                        format = format.replace(u"\xb1","$\\pm$")    # Special unicodes used in format strings, such as \xb1
                         val = format.replace("{{$0}}",str(val[0])).replace("{{$1}}",str(val[1]))
                     elif kind == "compound":
                         active_part = val[0]    # Compounds are unions, the first number tells us the active part defintion
                         partkind = propdetails[prop]['parts'][active_part]['kind']
                         format =   propdetails[prop]['parts'][active_part]['mirror']['format']
+                        format = format.replace(u"\xb1","$\\pm$")    # Special unicodes used in format strings, such as \xb1
                         if partkind == 'epsilon': 
                             val = format.replace("{{$0}}",str(val[1][0])).replace("{{$1}}",str(val[1][1]))
                         elif partkind == 'choice':
