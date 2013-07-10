@@ -172,6 +172,14 @@
       <graphics x="0" y="0"/>
     </inscription>
   </inhibit>
+  <inhibit fromNode="0.21" id="0.27" toNode="0.19" type="connector">
+    <inscription id="0.27.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+    <handle id="0.27.1">
+      <graphics orientation="0" x="522" y="135"/>
+    </handle>
+  </inhibit>
   <definition defType="real" expression="0.5" id="0.26" name="dormancy" type="text">
     <graphics x="480" y="281"/>
   </definition>

@@ -164,4 +164,12 @@
       <graphics orientation="0" x="458" y="225"/>
     </handle>
   </inhibit>
+  <inhibit fromNode="0.22" id="0.26" toNode="0.19" type="connector">
+    <inscription id="0.26.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+    <handle id="0.26.1">
+      <graphics orientation="0" x="592" y="235"/>
+    </handle>
+  </inhibit>
 </net>
