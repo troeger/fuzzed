@@ -26,6 +26,9 @@ def check_python_version():
 check_python_version()
 
 def svg2pgf_shape(filename):
+    '''
+        Convert given SVG file to TiKZ code.
+    '''
     xml = parseXml(filename)
     # determine size of the picture from SVG source
     svg = xml.getElementsByTagName('svg')[0]
@@ -51,6 +54,12 @@ def svg2pgf_shape(filename):
     # add all SVG path
     pathCommands = xml.getElementsByTagName('path')
     for p in pathCommands:
+        # The path may have styling. We ignore everything but dashing.
+        if p.attributes.has_key('style'):
+            if 'stroke-dasharray' in p.attributes['style'].value:
+                # http://stuff.mit.edu/afs/athena/contrib/tex-contrib/beamer/pgf-1.01/doc/generic/pgf/version-for-tex4ht/en/pgfmanualse23.html
+                result += "        \\\\pgfsetdash{{4.2}{1.4}}{0}\n"
+        # Add the SVG path
         result +="        \\\\pgfpathsvg{%s}\n"%p.attributes['d'].value
     # add all SVG rectangle definitions
     rectCommands = xml.getElementsByTagName('rect')
@@ -87,6 +96,7 @@ def build_shape_lib_recursive(startdir='FuzzEd/static/img', covered=[]):
                     print "Converting %s to TiKZ shape ..."%f
                 except Exception, e:
                     print "Error on parsing, ignoring %s ..."%f
+                    print e
     return result
 
 def build_shape_lib():

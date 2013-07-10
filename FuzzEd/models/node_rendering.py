@@ -225,7 +225,7 @@ tikz_shapes='''
         \\pgfsetlinewidth{1.4}
         \\pgftransformrotate{180} 
         \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfpathsvg{M 0.7,24 C 0.7,24 3.5,34 17.5,34.3 31.5,34.3 34.3,24 34.3,24 L 21,0.7 14,0.7 z}
+        \\pgfsetdash{{4.2}{1.4}}{0}        \\pgfpathsvg{M 0.7,24 C 0.7,24 3.5,34 17.5,34.3 31.5,34.3 34.3,24 34.3,24 L 21,0.7 14,0.7 z}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{redundancyVariation}{
@@ -238,7 +238,7 @@ tikz_shapes='''
         \\pgfsetlinewidth{1.4}
         \\pgftransformrotate{180} 
         \\pgftransformshift{\pgfpoint{-36}{-36}}
-        \\pgfpathsvg{M 0.7,24.5 C 0.7,38 34.3,38 34.3,24.5 L 28,21 C 26.6,10.5 22.4,3.5 17.5,0.7 C 12.6,3.5 8.4,10.5 7,21 z}
+        \\pgfsetdash{{4.2}{1.4}}{0}        \\pgfpathsvg{M 0.7,24.5 C 0.7,38 34.3,38 34.3,24.5 L 28,21 C 26.6,10.5 22.4,3.5 17.5,0.7 C 12.6,3.5 8.4,10.5 7,21 z}
         \\pgfusepath{stroke}
 }}
 \\pgfdeclareshape{end}{
@@ -267,4 +267,5 @@ tikz_shapes='''
         \\pgfcircle[stroke]{\pgfpoint{17.5}{17.5}}{9}
         \\pgfusepath{stroke}
 }}
-%% End of shape library. This part remains the same for all graph exports.'''
+%% End of shape library. This part below is unique for all graph exports.
+'''

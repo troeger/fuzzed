@@ -196,7 +196,7 @@ class Node(models.Model):
         if recursionLevel==0:
             return "\n\\node [shape=%s] {foo} \n %s;\n"%(self.kind, children)
         else:
-            return recursionLevel*" "+"child { node [shape=%s]  at (%u, -%f) {bar} \n %s }\n"%(self.kind, self.x+x_offset, self.y+y_offset, children)
+            return recursionLevel*" "+"child { node [shape=%s]  at (%u, -%u) {bar} \n %s }\n"%(self.kind, self.x+x_offset, self.y+y_offset, children)
 
 
     def to_tikz(self, x_offset=0, y_offset=0):

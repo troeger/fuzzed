@@ -27,7 +27,7 @@ while 1:
     latexError = False
     if tube == 'renderEps':
         os.system("latex -interaction nonstopmode graph.tex")
-        if os.path.exists('graph.ps'):
+        if os.path.exists('graph.dvi'):
             os.system("dvips graph")
             os.system("ps2eps -R + -f -a graph.ps")
             # read resulting file content
