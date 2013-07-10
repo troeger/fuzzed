@@ -49,7 +49,7 @@ def svg2pgf_shape(filename):
         \\\\pgfsetlinewidth{1.4}
         \\\\pgftransformshift{\pgfpoint{%(width)u}{%(height)u}}
         \\\\pgftransformrotate{180} 
-        \\\\pgfsetfillcolor{gray}
+        \\\\pgfsetfillcolor{white}
 '''%{'name':name, 'height':height, 'halfheight':height/2, 'width':width, 'halfwidth':width/2}
     # add all SVG path
     pathCommands = xml.getElementsByTagName('path')
@@ -62,20 +62,21 @@ def svg2pgf_shape(filename):
         # Add the SVG path
         result +="        \\\\pgfpathsvg{%s}\n"%p.attributes['d'].value
     # add all SVG rectangle definitions
+    # Add usepath after each rectangle, in order to get overlayed filled rects correctly generated
     rectCommands = xml.getElementsByTagName('rect')
     for r in rectCommands:
         rheight = float(r.attributes['height'].value)
         rwidth = float(r.attributes['width'].value)
         x = float(r.attributes['x'].value)
         y = float(r.attributes['y'].value)
-        result += "        \\\\pgfrect[fill]{\pgfpoint{%f}{%f}}{\pgfpoint{%f}{%f}}\n"%(x, y, rwidth, rheight)
+        result += "        \\\\pgfrect{\pgfpoint{%f}{%f}}{\pgfpoint{%f}{%f}}\n\\\\pgfusepath{stroke, fill}\n"%(x, y, rwidth, rheight)
     # add all SVG circle definitions
     circleCommands = xml.getElementsByTagName('circle')
     for c in circleCommands:
         x = float(c.attributes['cx'].value)
         y = float(c.attributes['cy'].value)
         radius = float(c.attributes['r'].value)
-        result += "        \\\\pgfcircle[fill]{\pgfpoint{%f}{%f}}{%f}\n"%(x,y,radius)
+        result += "        \\\\pgfcircle{\pgfpoint{%f}{%f}}{%f}\n\\\\pgfusepath{stroke, fill}\n"%(x,y,radius)
     # finalize TiKZ shape definition
     result += '        \\\\pgfusepath{stroke}\n}}'
     return result
