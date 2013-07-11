@@ -85,7 +85,11 @@ class Node(models.Model):
             return unicode('%s%s' % (prefix, name))
 
         except ObjectDoesNotExist:
-            return unicode('%s%s_%s' % (prefix, self.pk, notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']['name']['default']))
+            try:
+                name = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']['name']['default']
+                return unicode('%s%s_%s' % (prefix, self.pk, name))
+            except KeyError:
+                return self.kind
 
     def to_json(self):
         """
