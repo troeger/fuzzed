@@ -210,16 +210,13 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
                 Endpoint:        [this.config.JSPlumb.ENDPOINT_STYLE, {
                     radius:      this.config.JSPlumb.ENDPOINT_RADIUS,
                     cssClass:    this.config.Classes.JSPLUMB_ENDPOINT,
-                    hoverClass:  this.config.Classes.JSPLUMB_ENDPOINT_HOVER
+                    hoverClass:  this.config.Classes.HIGHLIGHTED
                 }],
                 PaintStyle: {
                     strokeStyle: this.config.JSPlumb.STROKE_COLOR,
                     lineWidth:   this.config.JSPlumb.STROKE_WIDTH
                 },
-                HoverPaintStyle: {
-                    strokeStyle: this.config.JSPlumb.STROKE_COLOR_HIGHLIGHTED
-                },
-                HoverClass:      this.config.Classes.JSPLUMB_CONNECTOR_HOVER,
+                HoverClass:      this.config.Classes.HIGHLIGHTED,
                 Connector:       [this.config.JSPlumb.CONNECTOR_STYLE, this.config.JSPlumb.CONNECTOR_OPTIONS],
                 ConnectionsDetachable: false
             });
@@ -243,8 +240,8 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
         _setupKeyBindings: function(readOnly) {
             if (readOnly) return this;
 
-            var selectedNodes = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE;
-            var selectedEdges = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
 
             jQuery(document).keydown(function(event) {
                 if (event.which == jQuery.ui.keyCode.ESCAPE) {

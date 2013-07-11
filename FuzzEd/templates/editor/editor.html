@@ -9,6 +9,7 @@
     @import url("{{ STATIC_URL }}css/jquery-ui/jquery-ui-1.10.3.min.css");
     @import url("{{ STATIC_URL }}css/slickgrid/slick.grid-2.0.2.css");
     @import url("{{ STATIC_URL }}css/editor.css");
+    @import url("{{ STATIC_URL }}css/node.css");
     @import url("{{ STATIC_URL }}css/menus.css");
 {% endblock %}
 
@@ -18,7 +19,7 @@
     // start editor
     require(['{{ graph.kind }}/editor', 'bootstrap' /* needed for dropdown menu */], function(Editor) {
         jQuery(document).ready(function() {
-            editor = new Editor({{ graph.pk }});
+            var editor = new Editor({{ graph.pk }});
         });
     });
 </script>

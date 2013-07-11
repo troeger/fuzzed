@@ -1,0 +1,150 @@
+.fuzzed-node {
+    text-align: center;
+    z-index: 100; /* above connection */
+}
+
+.fuzzed-node.highlighted path,
+.fuzzed-node.highlighted rect,
+.fuzzed-node.highlighted circle
+{
+    stroke: #409FFF !important;
+}
+
+.fuzzed-node.ui-selected path,
+.fuzzed-node.ui-selected rect,
+.fuzzed-node.ui-selected circle,
+.fuzzed-node.ui-selected.highlighted path,
+.fuzzed-node.ui-selected.highlighted rect,
+.fuzzed-node.ui-selected.highlighted circle,
+.fuzzed-node.ui-selecting path,
+.fuzzed-node.ui-selecting rect,
+.fuzzed-node.ui-selecting circle,
+.fuzzed-node.ui-selecting.highlighted path,
+.fuzzed-node.ui-selecting.highlighted rect,
+.fuzzed-node.ui-selecting.highlighted circle
+{
+    stroke: #FF9640 !important;
+}
+
+.fuzzed-node.disabled path,
+.fuzzed-node.disabled rect,
+.fuzzed-node.disabled circle,
+.fuzzed-node.disabled.ui-selected path,
+.fuzzed-node.disabled.ui-selected rect,
+.fuzzed-node.disabled.ui-selected circle,
+.fuzzed-node.disabled.ui-selected.highlighted path,
+.fuzzed-node.disabled.ui-selected.highlighted rect,
+.fuzzed-node.disabled.ui-selected.highlighted circle
+{
+    stroke: #CCCCCC !important;
+}
+
+.fuzzed-node.disabled svg
+{
+    opacity: 0.5;
+}
+
+.fuzzed-node.optional path,
+.fuzzed-node.optional rect,
+.fuzzed-node.optional circle
+{
+    stroke-dasharray: 4.8 2;
+}
+
+.fuzzed-node .badge {
+    position: absolute;
+    top:      0;
+    right:    0;
+    margin:   -7px -7px 0 0;
+}
+
+.fuzzed-node .badge-info {
+    background-color: #409FFF;
+}
+
+.fuzzed-node-halo-connect {
+    /* XXX: this is a temporary solution */
+    background-color:       #409FFF;
+    color:                  #FFFFFF;
+    position:               absolute;
+    visibility:             hidden;
+    z-index:                150; /* above image, TODO: let halo care about that */
+    cursor:                 move;
+    -webkit-border-radius:  8px;
+    -moz-border-radius:     8px;
+    -ms-border-radius:      8px;
+    -o-border-radius:       8px;
+    border-radius:          8px;
+    font-size:              13px;
+    line-height:            15px;
+    padding:                1px 3px 0 3px;
+    margin:                 -10px -8px 0 -8px;
+}
+
+.fuzzed-node.ui-selected .fuzzed-node-halo-connect {
+    background-color: #FF9640;
+}
+
+.fuzzed-node:hover .fuzzed-node-halo-connect {
+    visibility: visible;
+}
+
+.fuzzed-node-optional-indicator {
+    width:   12px;
+    height:  12px;
+    margin:  0 auto -1px auto; /* let it melt with the node image below */
+}
+
+.fuzzed-mirror {
+    background-color: white;
+    display:          block;
+    font-size:        11px;
+    word-wrap:        break-word;
+    margin-bottom:    -3px;
+    z-index:          110; /* above connection */
+}
+
+.fuzzed-mirror-italic {
+    font-style: italic;
+}
+
+.fuzzed-mirror-bold {
+    font-weight: bold;
+}
+
+.fuzzed-mirror-large {
+    font-size: 13px;
+}
+
+.jsplumb-endpoint
+{
+    opacity: 0;
+}
+
+.jsplumb-endpoint.highlighted
+{
+    opacity: 1;
+}
+
+.jsplumb-connector.highlighted
+{
+    z-index: 100; /* above selection, below mirror */
+}
+
+.jsplumb-connector.highlighted path
+{
+    stroke: #409FFF;
+}
+
+.jsplumb-connector.ui-selected,
+{
+    z-index: 50;
+}
+
+.jsplumb-connector.ui-selected path,
+.jsplumb-connector.ui-selecting path,
+.jsplumb-connector.ui-selected.highlighted path,
+.jsplumb-connector.ui-selecting.highlighted path
+{
+    stroke: #FF9640;
+}
