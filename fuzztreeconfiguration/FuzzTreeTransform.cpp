@@ -293,14 +293,28 @@ ErrorType FuzzTreeTransform::generateFaultTreeRecursive(
 			if (currentChild.children().size() > 1)
 				return WRONG_CHILD_NUM;
 
-			if (!isEventSet(typeid(currentChild.children().front()).name())) 
-				return WRONG_CHILD_TYPE;
+			const auto& firstChild = currentChild.children().front();
+			const string childTypeName = typeid(firstChild).name();
+			const auto kOutOfN = configuration.getRedundancyCount(id);
+
+			faulttree::VotingOr votingOrGate(id, get<0>(kOutOfN));
+			if (childTypeName == BASICEVENTSET)
+			{
+				const fuzztree::BasicEventSet& bes = 
+					static_cast<const fuzztree::BasicEventSet&>(firstChild);
+
+				expandBasicEventSet(&bes, &votingOrGate, id, get<1>(kOutOfN));
+			}
+			else if (childTypeName == INTERMEDIATEEVENTSET)
+			{
+				const fuzztree::IntermediateEventSet& ies = 
+					static_cast<const fuzztree::IntermediateEventSet&>(firstChild);
+
+				expandIntermediateEventSet(&ies, &votingOrGate, id, configuration, get<1>(kOutOfN));
+			}
+			else return WRONG_CHILD_TYPE;
 			
-			handleRedundancyVP(
-				&currentChild, 
-				node, 
-				configuration.getRedundancyCount(id), 
-				id); // returns a VotingOR Gate
+			node->children().push_back(votingOrGate);
 
 			continue; // stop recursion
 		}
@@ -322,12 +336,12 @@ ErrorType FuzzTreeTransform::generateFaultTreeRecursive(
 		}
 		else if (typeName == INTERMEDIATEEVENTSET)
 		{
-			auto ret = expandIntermediateEventSet(&currentChild, node, id, 0);
+			auto ret = expandIntermediateEventSet(&currentChild, node, id, configuration, 0);
 			if (ret != NO_ERROR) return ret;
 			continue;
 		}
 		// remaining types
-		copyNode(typeName, node, id, currentChild);
+		else copyNode(typeName, node, id, currentChild);
 		
 		// break recursion
 		if (bLeaf) continue;
@@ -372,6 +386,7 @@ ErrorType FuzzTreeTransform::expandIntermediateEventSet(
 	const fuzztree::Node* templateNode,
 	faulttree::Node* parentNode, 
 	const FuzzTreeConfiguration::id_type& id,
+	const FuzzTreeConfiguration& configuration,
 	const int& defaultQuantity /*= 0*/) const
 {
 	assert(parentNode && templateNode);
@@ -386,12 +401,13 @@ ErrorType FuzzTreeTransform::expandIntermediateEventSet(
 
 	if (numChildren <= 0) return INVALID_ATTRIBUTE;
 
-	const auto nextNode = eventSet->children().front();
+	const auto& nextNode = eventSet->children().front();
 
 	int i = 0;
 	while (i < numChildren)
 	{
 		copyNode(typeid(nextNode).name(), parentNode, eventSetId, nextNode);
+		generateFaultTreeRecursive(&nextNode, &parentNode->children().back(), configuration);
 		i++;
 	}
 }
@@ -445,12 +461,7 @@ bool FuzzTreeTransform::handleRedundancyVP(
 {
 	assert(node && templateNode);
 
-	const fuzztree::BasicEventSet& basicEventSet = 
-		static_cast<const fuzztree::BasicEventSet&>(templateNode->children().front());
 	
-	faulttree::VotingOr votingOrGate(id, get<0>(kOutOfN));
-	expandBasicEventSet(&basicEventSet, &votingOrGate, id, get<1>(kOutOfN));
-	node->children().push_back(votingOrGate);
 	return true;
 }
 
@@ -512,4 +523,5 @@ void FuzzTreeTransform::copyNode(
 	else if (typeName == VOTINGOR)	node->children().push_back(faulttree::VotingOr(id, (static_cast<const fuzztree::VotingOr&>(currentChild)).k()));
 	else if (typeName == XOR)		node->children().push_back(faulttree::Xor(id));
 	else if (typeName == BASICEVENT)node->children().push_back(treeHelpers::copyBasicEvent(static_cast<const fuzztree::BasicEvent&>(currentChild)));
+	else assert(false);
 }

@@ -73,6 +73,7 @@ protected:
 		const fuzztree::Node* templateNode,
 		faulttree::Node* parentNode,
 		const FuzzTreeConfiguration::id_type& id,
+		const FuzzTreeConfiguration& configuration,
 		const int& defaultQuantity = 0) const;
 	
 	void generateConfigurations(std::vector<FuzzTreeConfiguration>& configurations) const;
