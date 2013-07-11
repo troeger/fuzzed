@@ -222,6 +222,62 @@
             }
         },
 
+        "seqGate": {
+            "nodeDisplayName": "Sequential Gate",
+            "inherits": "gate",
+
+            "image": "seq_gate.svg",
+            "help": "Sequential Gate",
+
+            "properties": {
+                "name": {
+                    "default": "Sequential Gate"
+                }
+            }
+        },
+
+        "cspGate": {
+            "nodeDisplayName": "Cold Spare Gate",
+            "inherits": "gate",
+
+            "image": "csp_gate.svg",
+            "help": "Cold Spare Gate",
+
+            "properties": {
+                "name": {
+                    "default": "Cold Spare Gate"
+                }
+            }
+        },
+
+        "fdepGate": {
+            "nodeDisplayName": "FDEP Gate",
+            "inherits": "gate",
+
+            "image": "fdep_gate.svg",
+            "help": "FDEP Gate",
+
+            "properties": {
+                "name": {
+                    "default": "FDEP Gate"
+                }
+            }
+        },
+
+        "priorityAndGate": {
+            "nodeDisplayName": "Priority AND Gate",
+            "inherits": "gate",
+
+            "image": "priority_and_gate.svg",
+            "help": "Priority AND Gate",
+
+            "properties": {
+                "name": {
+                    "default": "Priority AND Gate"
+                }
+            }
+        },
+
         "undevelopedEvent": {
             "nodeDisplayName": "Undeveloped Event",
             "inherits": "event",
@@ -312,6 +368,10 @@
         "orGate",
         "xorGate",
         "votingOrGate",
+        "seqGate",
+        "cspGate",
+        "fdepGate",
+        "priorityAndGate",
         "undevelopedEvent",
         "houseEvent",
         "transferIn",
