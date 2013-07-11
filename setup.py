@@ -234,10 +234,10 @@ def inherit(node_name, node, nodes, node_cache):
 class build(_build):
     def run(self):
         _build.run(self)
-#        build_analysis_server()
-#        build_notations()
-#        build_schema_files()
-#        build_xmlschema_wrapper()
+        build_analysis_server()
+        build_notations()
+        build_schema_files()
+        build_xmlschema_wrapper()
         build_shape_lib()
 
 def clean_docs():

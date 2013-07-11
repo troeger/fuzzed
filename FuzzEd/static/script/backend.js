@@ -1,4 +1,4 @@
-define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alerts) {
+define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, Job, Alerts) {
 
     /**
      * Class: Backend
@@ -344,10 +344,9 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
          */
         calculateTopEventProbability: function(event, success, error, complete) {
             jQuery.ajax({
-                url:      this._fullUrlForTopEventProbability(),
-                dataType: 'json',
+                url:    this._fullUrlForTopEventProbability(),
                 // don't show progress
-                global:   false,
+                global: false,
 
                 statusCode: {
                     201: function(data, status, req) {
@@ -358,7 +357,7 @@ define(['class', 'config', 'job', 'alerts'], function (Class, Config, Job, Alert
                     }
                 },
 
-                error:    function(jqXHR, errorStatus, errorThrown) {
+                error: function(jqXHR, errorStatus, errorThrown) {
                     var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
                     Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);

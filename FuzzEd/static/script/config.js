@@ -11,7 +11,7 @@ define(['underscore'], function() {
         interpolate: /\{\{(.+?)\}\}/g,
         evaluate:    /\{%(.+?)%\}/g,
         escape:      /\{-(.+?)-\}/g
-    }
+    };
 
     /**
      *  Constants:
@@ -89,7 +89,11 @@ define(['underscore'], function() {
          *    Names of certain CSS classes.
          *
          *  Constants:
-         *    {String} JQUERY_UI_SELECTED      - Class assigned to selected elements by jQuery UI.
+         *    {String} HIGHLIGHTED             - Class assigned to highlighted elements.
+         *    {String} SELECTED                - Class assigned to selected elements (using jQuery UI Selectable).
+         *    {String} SELECTING               - Class assigned to elements that are currently being selected
+         *                                       (using jQuery UI Selectable).
+         *    {String} DISABLED                - Class assigned to disabled (grayed-out) elements.
          *
          *    {String} JSPLUMB_ENDPOINT        - Class assigned to endpoints by jsPlumb.
          *    {String} JSPLUMB_ENDPOINT_HOVER  - Class assigned to hovered endpoints by jsPlumb.
@@ -105,8 +109,7 @@ define(['underscore'], function() {
          *    {String} MIRROR_ITALIC           - Class of italic mirror labels.
          *    {String} MIRROR_LARGE            - Class of larger mirror labels.
          *
-         *    {String} NODE                    - Class of a node's container
-         *    {String} NODE_SELECTED           - Class assigned to a node's container when selected.
+         *    {String} NODE                    - Class of a node's container.
          *    {String} NODE_IMAGE              - Class of the node's image (the SVG).
          *    {String} NODE_DROP_ACTIVE        - Class assigned to nodes that are valid connection targets
          *                                       (when dragging a new connection).
@@ -117,14 +120,15 @@ define(['underscore'], function() {
          *    {String} PROPERTY_WARNING        - Class for property input fields if they are erroneous.
          */
         Classes: {
+            HIGHLIGHTED:             'highlighted',
+            SELECTED:                'ui-selected',
+            SELECTING:               'ui-selecting',
+            DISABLED:                'disabled',
+
             GRID_HIDDEN:             'fuzzed-grid-hidden',
 
-            JQUERY_UI_SELECTED:      'ui-selected',
-
             JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
-            JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover',
             JSPLUMB_CONNECTOR:       'jsplumb-connector',
-            JSPLUMB_CONNECTOR_HOVER: 'jsplumb-connector-hover',
 
             MENU_CONTROLS:           'menu-controls',
             MENU_CLOSE:              'menu-close',
@@ -136,7 +140,6 @@ define(['underscore'], function() {
             MIRROR_LARGE:            'fuzzed-mirror-large',
 
             NODE:                    'fuzzed-node',
-            NODE_SELECTED:           'fuzzed-node-selected',
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
             NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
@@ -299,7 +302,7 @@ define(['underscore'], function() {
          */
         Keys: {
             NODE:       'node',
-            SELECTABLE: 'selectable'
+            SELECTABLE: 'ui-selectable'
         },
 
         /**

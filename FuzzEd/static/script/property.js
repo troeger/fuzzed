@@ -1,4 +1,4 @@
-define(['class', 'config', 'decimal', 'propertyMenuEntry', 'mirror', 'alerts', 'underscore'],
+define(['class', 'config', 'decimal', 'propertyMenuEntry', 'mirror', 'alerts', 'jquery', 'underscore'],
 function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
     var isNumber = function(number) {

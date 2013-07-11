@@ -1,4 +1,4 @@
-define(['config', 'class'], function(Config, Class) {
+define(['config', 'class', 'jquery'], function(Config, Class) {
 
     /**
      * Class: Menu
@@ -202,7 +202,7 @@ define(['config', 'class'], function(Config, Class) {
         },
 
         show: function() {
-            var selected = jQuery('.' + Config.Classes.JQUERY_UI_SELECTED + '.' + Config.Classes.NODE);
+            var selected = jQuery('.' + Config.Classes.SELECTED + '.' + Config.Classes.NODE);
             this._removeEntries();
 
             // display the properties menu only if there is exactly one node selected

@@ -277,13 +277,17 @@ class Node(models.Model):
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
                 probability = self.get_property('probability', None)
                 if isinstance(probability, list):
-                    point = probability[0]
-                    alpha = probability[1]
+                    point = probability[-1][0]
+                    alpha = probability[-1][1]
+
+                    print probability, point, alpha
+
                     if alpha == 0:
                         properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
                     else:
-                        properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(   a=point - alpha, b1=point,
-                                                                                           b2=point, c=point + alpha)
+                        properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(
+                            a=point - alpha, b1=point, b2=point, c=point + alpha
+                        )
                 elif isinstance(probability, (long, int, float)):
                     properties['probability'] = xml_fuzztree.CrispProbability(value_=probability)
                 else:
@@ -326,14 +330,12 @@ class Node(models.Model):
         try:
             return self.properties.get(key=key).value
         except ObjectDoesNotExist:
-            logger.debug('Node instance has no property "%s", trying to use default from notation' % key)
-            props = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']
-            if props.has_key(key) and isinstance(props[key], dict):
-                # Ordinary property configuration dict, which also includes the default value
-                return props[key]['default']
-            else:
-                # Currently only possible for "optional: None", or if this node does node have this property
-                logger.debug('Node definition has no property "%s", using provided default' % key)
+            try:
+                logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
+                prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
+                return prop['default'] if prop is not None else default
+            except KeyError:
+                logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
                 return default
 
     def get_attr(self, key):

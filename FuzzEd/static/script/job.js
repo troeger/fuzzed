@@ -1,4 +1,4 @@
-define(["class"], function(Class) {
+define(['class', 'jquery'], function(Class) {
 
     /**
      *  Class: Job
@@ -77,6 +77,7 @@ define(["class"], function(Class) {
             jQuery.ajax({
                 url: this._url,
                 dataType: 'json',
+                global: false,
                 statusCode: {
                     200: function(data) { // success
                         this.successCallback(data);

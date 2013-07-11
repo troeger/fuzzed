@@ -64,6 +64,40 @@ tikz_shapes='''
 \\pgfusepath{stroke, fill}
         \\pgfusepath{stroke}
 }}
+\\pgfdeclareshape{cspGate}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
+        \\pgftransformrotate{180} 
+        \\pgfsetfillcolor{white}
+        \\pgfpathsvg{M 0.7,17.5 34.3,17.5}
+        \\pgfpathsvg{M 17.5,34.3 17.5,25.55 34.3,25.55}
+        \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
+\\pgfusepath{stroke, fill}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{fdepGate}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
+        \\pgftransformrotate{180} 
+        \\pgfsetfillcolor{white}
+        \\pgfpathsvg{M 0.7,17.5 34.3,17.5}
+        \\pgfpathsvg{M 1,34.3 17.5,19 34,34.3}
+        \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
+\\pgfusepath{stroke, fill}
+        \\pgfusepath{stroke}
+}}
 \\pgfdeclareshape{houseEvent}{
     \\anchor{center}{\pgfpoint{18}{18}}
     \\anchor{north}{\pgfpoint{18}{36}}
@@ -167,6 +201,37 @@ tikz_shapes='''
         \\pgftransformrotate{180} 
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{16.800000}
+\\pgfusepath{stroke, fill}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{priorityAndGate}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
+        \\pgftransformrotate{180} 
+        \\pgfsetfillcolor{white}
+        \\pgfpathsvg{M 0.7,34.3 L 34.3,34.3 34.3,21 C 34.3,21 34.3,0.7 17.5,0.7 C 0.7,0.7 0.7,21 0.7,21 z}
+        \\pgfpathsvg{M 1,34.3 17.5,2.8 34,34.3}
+        \\pgfusepath{stroke}
+}}
+\\pgfdeclareshape{seqGate}{
+    \\anchor{center}{\pgfpoint{18}{18}}
+    \\anchor{north}{\pgfpoint{18}{36}}
+    \\anchor{south}{\pgfpoint{18}{0}}
+    \\anchor{west}{\pgfpoint{0}{18}}
+    \\anchor{east}{\pgfpoint{36}{18}}
+    \\foregroundpath{
+        \\pgfsetlinewidth{1.4}
+        \\pgftransformshift{\pgfpoint{36}{36}}
+        \\pgftransformrotate{180} 
+        \\pgfsetfillcolor{white}
+        \\pgfpathsvg{M 0.7,17.5 34.3,17.5}
+        \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
 \\pgfusepath{stroke, fill}
         \\pgfusepath{stroke}
 }}

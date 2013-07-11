@@ -1,4 +1,4 @@
-define(['class', 'config'], function(Class, Config) {
+define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Package: Base
@@ -447,7 +447,7 @@ define(['class', 'config'], function(Class, Config) {
         },
 
         _value: function(newValue) {
-            if (typeof newValue === 'undefined') return this.inputs.attr('checked') === 'checked';
+            if (typeof newValue === 'undefined') return this.inputs.is(':checked');
             this.inputs.attr('checked', newValue ? 'checked' : null);
 
             return this;
