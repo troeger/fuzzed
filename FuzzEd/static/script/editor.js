@@ -426,6 +426,10 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'], fu
 
             event.preventDefault();
 
+            //XXX: trigger selection start event manually here
+            //XXX: hack to emulate a new selection process
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+
             var NODES           = '.' + this.config.Classes.NODE;
             var NODES_AND_EDGES = NODES + ', .' + this.config.Classes.JSPLUMB_CONNECTOR;
 
@@ -436,8 +440,8 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'], fu
                        .addClass(this.config.Classes.SELECTED);
             }.bind(this));
 
-            // XXX: trigger selection stop event manually here
-            // XXX:nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
+            //XXX: trigger selection stop event manually here
+            //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
 
             return this;

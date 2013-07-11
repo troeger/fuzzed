@@ -138,6 +138,107 @@ class Node(models.Model):
 
         raise ValueError('Node %s has unsupported kind' % self)
 
+    def get_all_mirror_properties(self, hiddenProps=[]):
+        """
+        Returns a sorted set of all node properties and their values, according to the notation rendering rules.
+        """
+        result = []
+        # Only consider properties that have to be displayed in the mirror 
+        displayOrder = notations.by_kind[self.graph.kind]['propertiesDisplayOrder']
+        propdetails = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']
+        for prop in displayOrder:
+            if propdetails.has_key(prop) and prop not in hiddenProps:   # the displayOrder list is static, the property does not have to be part of this node
+                val = self.get_property(prop, None)
+                if isinstance(propdetails[prop],dict):          # Some properties do not have a config dict in notations, such as optional=None
+                    kind = propdetails[prop]['kind']
+                else:
+                    logger.debug("Property %s in %s has no config dictionary"%(prop, self.kind))
+                    kind="text"
+                if val != None:
+                    if kind == "range":
+                        format = propdetails[prop]['mirror']['format']
+                        format = format.replace(u"\xb1","$\\pm$")    # Special unicodes used in format strings, such as \xb1
+                        val = format.replace("{{$0}}",str(val[0])).replace("{{$1}}",str(val[1]))
+                    elif kind == "compound":
+                        active_part = val[0]    # Compounds are unions, the first number tells us the active part defintion
+                        partkind = propdetails[prop]['parts'][active_part]['kind']
+                        format =   propdetails[prop]['parts'][active_part]['mirror']['format']
+                        format = format.replace(u"\xb1","$\\pm$")    # Special unicodes used in format strings, such as \xb1
+                        if partkind == 'epsilon': 
+                            val = format.replace("{{$0}}",str(val[1][0])).replace("{{$1}}",str(val[1][1]))
+                        elif partkind == 'choice':
+                            val = format.replace("{{$0}}",str(val[1][0]))
+                    elif propdetails[prop].has_key('mirror'):
+                        if propdetails[prop]['mirror'].has_key('format'):
+                            val = propdetails[prop]['mirror']['format'].replace("{{$0}}",str(val))
+                        else:
+                            val = str(val)
+                    else:
+                        # Property has no special type and no mirror definition, so it shouldn't be shown
+                        # One example is the name of the top event
+                        continue
+                    result.append(val)
+        return result
+
+
+    def to_tikz(self, x_offset=0, y_offset=0, parent_kind=None):
+        """
+        Serializes this node and all its children into a TiKZ representation.
+        A positive x offset shifts the resulting tree accordingly to the right.
+        Negative offsets are allowed.
+
+        We are intentionally do not use the TiKZ tree rendering capabilities, since this
+        would ignore all user formatting of the tree from the editor.
+
+        TikZ starts the coordinate system in the upper left corner, while we start in the lower left corner.
+        This demands some coordinate mangling on the Y axis.
+
+        Returns:
+         {str} the node and its children in LaTex representation
+        """
+        nodekind = self.kind.lower()
+        # Optional nodes are dashed
+        if self.get_property("optional", False):
+            nodeStyle = "shapeStyleDashed"
+        else:
+            nodeStyle = "shapeStyle"     
+        # If this is a child node, we need to check if the parent wants to hide some child property
+        hiddenProps = []
+        if parent_kind:
+            nodeConfig = notations.by_kind[self.graph.kind]['nodes'][parent_kind]
+            if nodeConfig.has_key('childProperties'):
+                for childPropName in nodeConfig['childProperties']:
+                    for childPropSettingName, childPropSettingVal in nodeConfig['childProperties'][childPropName].iteritems():
+                        if childPropSettingName == "hidden" and childPropSettingVal == True:
+                            hiddenProps.append(childPropName)
+        # Create Tikz snippet for tree node, we start with the TiKZ node for the graph icon
+        # Y coordinates are stretched a little bit, for optics
+        result = "\\node [shape=%s, %s] at (%u, -%f) (%u) {};\n"%(self.kind, nodeStyle, self.x+x_offset, (self.y+y_offset)*1.2, self.pk)
+        # Determine the mirror text based on all properties
+        # Text width is exactly the double width of the icons
+        mirrorText = ""
+        for index,propvalue in enumerate(self.get_all_mirror_properties(hiddenProps)):
+            propvalue = propvalue.replace("#","\\#")    # consider special LaTex character in mirror text
+            if index==0:
+                # Make the first property bigger, since it is supposed to be the name
+                propvalue = "\\baselineskip=0.8\\baselineskip\\textbf{{\\footnotesize %s}}"%propvalue  
+            else:
+                propvalue = "{\\it\\scriptsize %s}"%propvalue                                
+            mirrorText += "%s\\\\"%propvalue
+        # Create child nodes and their edges
+        for edge in self.outgoing.filter(deleted=False):
+            # Add child node rendering
+            result += edge.target.to_tikz(x_offset, y_offset, self.kind)
+            # Add connector from this node to the added child, consider if dashed line is needed
+            if notations.by_kind[self.graph.kind]['nodes'][self.kind]['connector'].has_key('dashstyle'):
+                result += "\path[fork edge, dashed] (%s.south) edge (%u.north);\n"%(self.pk, edge.target.pk)
+            else:
+                result += "\path[fork edge] (%s.south) edge (%u.north);\n"%(self.pk, edge.target.pk)
+        # Add the mirror text as separate text node, which makes formatting more precise
+        if mirrorText != "":
+            result += "\\node [mirrorStyle] at (%u.south) (text%u) {%s};\n"%(self.pk, self.pk, mirrorText)
+        return result
+
     def to_xml(self, xmltype=None):
         """
         Method: to_xml

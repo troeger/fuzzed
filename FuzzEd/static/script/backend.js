@@ -359,7 +359,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
                 error: function(jqXHR, errorStatus, errorThrown) {
                     var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
-                    Alerts.showErrorAlert('Failed to calculate Top Event probability:', message, Config.Alerts.TIMEOUT);
+                    Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
                 complete: complete || jQuery.noop

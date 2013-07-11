@@ -23,6 +23,7 @@ from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponse
                               HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands, Job
 from analysis import cutsets, top_event_probability
+from rendering import renderClient
 
 import logging, json
 logger = logging.getLogger('FuzzEd')
@@ -147,7 +148,15 @@ def graph_download(request, graph_id):
     elif export_format == 'json':
         response.content = graph.to_json()
         response['Content-Type'] = 'application/javascript'
-
+    elif export_format == 'pdf':
+        response.content = renderClient.latex2pdf(graph.to_tikz())
+        response['Content-Type'] = 'application/pdf'
+    elif export_format == 'eps':
+        response.content = renderClient.latex2eps(graph.to_tikz())
+        response['Content-Type'] = 'application/eps'
+    elif export_format == 'tex':
+        response.content = graph.to_tikz()
+        response['Content-Type'] = 'application/text'
     else:
         raise HttpResponseNotFoundAnswer()
 
@@ -532,9 +541,9 @@ def analyze_top_event_probability(request, graph_id):
         return response
 
     except top_event_probability.InternalError as exception:
-        logger.error('Exception while using analysis server: %s' % exception)
+        logger.error('Exception while using analysis server: %s' % str(exception))
         #TODO: Perform some smarter error handling here
-        raise HttpResponseServerErrorAnswer()
+        raise HttpResponseServerErrorAnswer(str(exception))
 
 @login_required
 @csrf_exempt
