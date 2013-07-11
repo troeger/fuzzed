@@ -1,12 +1,13 @@
 {% extends "util/base.html" %}
 
 {% block script %}
-<script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
+<script src="{{ STATIC_URL }}lib/requirejs/require-2.1.6.min.js" type="text/javascript" language="javascript"></script>
 <script type="text/javascript">
     require.config({
         baseUrl: '{{ STATIC_URL }}',
         waitSeconds: 5,
         paths: {
+            'jquery':          'lib/jquery/jquery-2.0.2',
             'openid-selector': 'lib/openid-selector/js'
         },
         // define dependencies for libs that are not AMD compatible
@@ -21,7 +22,7 @@
 
     require(['openid-selector/openid-jquery', 'openid-selector/openid-en'], function() {
         $(document).ready(function() {
-            openid.img_path="{{ STATIC_URL }}lib/openid-selector/images/";
+            openid.img_path = "{{ STATIC_URL }}lib/openid-selector/images/";
             openid.init('openid_identifier');
         });
     });
@@ -38,15 +39,20 @@
 </div>
 
 <div class="alert alert-block">
-    <h4 class="alert-heading"><a href="http://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">Public Alpha</a></h4>
-    Feel free to try out everything. However, please excuse sudden service outages as the site is still under development.<br>
-    If you have any <a href="http://fuzztrees.uservoice.com">feedback</a> we would be happy to hear it. 
+    <h4 class="alert-heading">
+        <a href="http://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">Public Alpha</a>
+    </h4>
+    Feel free to try out everything. However, please excuse sudden service outages as the site is still under
+    development.<br>
+    If you have any <a href="http://fuzztrees.uservoice.com">feedback</a> we would be happy to hear it.
 </div>
 
 <section>
     <div class="row">
         <div class="span4">
-            <h3>Dependability Modeling <br/><small>Fault Trees and RBDs</small></h3>
+            <h4>Dependability Modeling
+                <br><small>Fault Trees and RBDs</small>
+            </h4>
             <p>
                 If you need a quick way for drawing and analyzing system 
                 availability characteristics, this one is for you. 
@@ -55,7 +61,9 @@
         </div>
 
         <div class="span4">
-            <h3>Uncertainties in Modeling <br/><small>Introducing FuzzTrees</small></h3>
+            <h4>Uncertainties in Modeling
+                <br><small>Introducing FuzzTrees</small>
+            </h4>
             <p>
                 Our novel concept for fault tree modeling allows you to express
                 configurable and uncertain parts of the system. 
@@ -65,7 +73,9 @@
         </div>
 
         <div class="span4">
-            <h3>Collaboration and Teaching </br><small>Share your Graphs</small></h3>
+            <h4>Collaboration and Teaching
+                <br><small>Share your Graphs</small>
+            </h4>
             <p>
                 Graphs are planned to be easily sharable between users to support academic
                 teaching and professional collaboration projects. 
@@ -75,7 +85,7 @@
 </section>
 
 <section>
-    <h6>Please use one of these authentication providers.</h6>
+    <h5>Please use one of these authentication providers</h5>
 
     <form action="/login/" method="get" id="openid_form">
         <input type="hidden" name="action" value="verify" />
@@ -90,7 +100,8 @@
             <noscript>
                 <p>
                     OpenID is service that allows you to log-on to many different websites using a single identity.
-                    Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.
+                    Find out <a href="http://openid.net/what/">more about OpenID</a> and
+                    <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.
                 </p>
             </noscript>
         </fieldset>
