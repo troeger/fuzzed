@@ -391,17 +391,11 @@ function(Property, Mirror, Canvas, Class) {
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
 
-                        var x = initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter;
-                        var y = initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter;
-
                         // move the other selectee by the dragging offset, do NOT report to the backend yet
                         nodeInstance._moveContainerToPixel({
-                            'x': Math.max(x, Canvas.gridSize),
-                            'y': Math.max(y, Canvas.gridSize)
+                            'x': initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
+                            'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
                         });
-
-                        // ask jsPlumb to repaint the selectee in order to redraw its connections
-                        jsPlumb.repaint(nodeInstance.container);
                     }.bind(this));
                 }.bind(this),
 
@@ -416,19 +410,15 @@ function(Property, Mirror, Canvas, Class) {
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
 
-                        var x = initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter;
-                        var y = initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter;
-
                         // ... and report to the backend this time because dragging ended
                         nodeInstance.moveTo({
-                            'x': Math.max(x, Canvas.gridSize),
-                            'y': Math.max(y, Canvas.gridSize)
+                            'x': initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
+                            'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
                         });
                     }.bind(this));
 
                     // forget the initial position of the nodes to allow new dragging
                     initialPositions = {};
-
                     jQuery(document).trigger(this.config.Events.NODE_DRAG_STOPPED);
                 }.bind(this)
             });
@@ -713,6 +703,26 @@ function(Property, Mirror, Canvas, Class) {
          */
 
         /**
+         * Method: moveBy
+         *   Moves the node's visual representation by the given offset and reports to backend. The center of the
+         *   node's image is the anchor point for the translation.
+         *
+         * Parameters:
+         *   {Object} offset - Object of the form of {x: ..., y: ...} containing the pixel offset to move the node by.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        moveBy: function(offset) {
+            var position = this.container.position();
+
+            return this.moveTo({
+                x: position.left + this._nodeImage.xCenter + offset.x,
+                y: position.top  + this._nodeImage.yCenter + offset.y
+            });
+        },
+
+        /**
          * Method: moveTo
          *   Moves the node's visual representation to the given coordinates and reports to backend. The center of the
          *   node's image is the anchor point for the translation.
@@ -729,8 +739,8 @@ function(Property, Mirror, Canvas, Class) {
          */
         moveTo: function(position) {
             var gridPos = Canvas.toGrid(position);
-            this.x = gridPos.x;
-            this.y = gridPos.y;
+            this.x = Math.max(gridPos.x, 0);
+            this.y = Math.max(gridPos.y, 0);
 
             this._moveContainerToPixel(position);
             // call home
@@ -771,10 +781,12 @@ function(Property, Mirror, Canvas, Class) {
          */
         _moveContainerToPixel: function(position) {
             this.container.css({
-                left: position.x - this._nodeImage.xCenter,
-                top:  position.y - this._nodeImage.yCenter
+                left: Math.max(position.x, Canvas.gridSize) - this._nodeImage.xCenter,
+                top:  Math.max(position.y, Canvas.gridSize) - this._nodeImage.yCenter
             });
             Canvas.enlarge(position);
+            // ask jsPlumb to repaint the selectee in order to redraw its connections
+            jsPlumb.repaint(this.container);
 
             return this;
         },

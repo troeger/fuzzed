@@ -1,4 +1,4 @@
-define(['class', 'config', 'jquery-ui'], function(Class, Config) {
+define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Config) {
     /**
      * Package: Base
      */
@@ -190,22 +190,6 @@ define(['class', 'config', 'jquery-ui'], function(Class, Config) {
 
             this.container.selectable({
                 filter: '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
-                selecting: function(event, ui) {
-                    //XXX: jQuery selectable can't handle SVG elements yet, so we need to manually assign the
-                    //     corresponding selection class to the SVG elements of the jsPlumb connectors.
-                    var classList = ui.selecting.classList;
-                    if (classList && classList.contains(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        classList.add(Config.Classes.SELECTED);
-                    }
-                },
-                unselecting: function(event, ui) {
-                    //XXX: jQuery selectable can't handle SVG elements yet, so we need to manually remove the
-                    //     corresponding selection class fron the SVG elements of the jsPlumb connectors.
-                    var classList = ui.unselecting.classList;
-                    if (classList && classList.contains(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        classList.remove(Config.Classes.SELECTED);
-                    }
-                },
                 stop: function() {
                     // tell other (e.g. <PropertyMenu>) that selection is done and react to the new selection
                     jQuery(document).trigger(Config.Events.CANVAS_SELECTION_STOPPED);

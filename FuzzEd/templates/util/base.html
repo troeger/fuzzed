@@ -28,8 +28,9 @@
                 'text' :      '../lib/requirejs/plugins/text-2.0.7', // required by json plugin
                 'json' :      '../lib/requirejs/plugins/json-0.3.1',
                 // jquery and plugins
-                'jquery':     '../lib/jquery/jquery-2.0.2.min',
-                'jquery-ui':  '../lib/jquery-ui/jquery-ui-1.10.3.min',
+                'jquery':           '../lib/jquery/jquery-2.0.2.min',
+                'jquery-ui':        '../lib/jquery-ui/jquery-ui-1.10.3.min',
+                'jquery-classlist': '../lib/jquery-classlist/jquery-classlist-1.0.0',
                 // other libs
                 'bignumber':  '../lib/bignumber/bignumber-1.0.1.min',
                 'bootstrap':  '../lib/bootstrap/bootstrap-2.3.2.min',
@@ -46,6 +47,9 @@
                     deps: ['jquery']
                 },
                 'jquery-ui': {
+                    deps: ['jquery']
+                },
+                'jquery-classlist': {
                     deps: ['jquery']
                 },
                 'jsplumb': {

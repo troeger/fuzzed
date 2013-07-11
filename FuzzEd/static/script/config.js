@@ -91,6 +91,8 @@ define(['underscore'], function() {
          *  Constants:
          *    {String} HIGHLIGHTED             - Class assigned to highlighted elements.
          *    {String} SELECTED                - Class assigned to selected elements (using jQuery UI Selectable).
+         *    {String} SELECTING               - Class assigned to elements that are currently being selected
+         *                                       (using jQuery UI Selectable).
          *    {String} DISABLED                - Class assigned to disabled (grayed-out) elements.
          *
          *    {String} JSPLUMB_ENDPOINT        - Class assigned to endpoints by jsPlumb.
@@ -120,6 +122,7 @@ define(['underscore'], function() {
         Classes: {
             HIGHLIGHTED:             'highlighted',
             SELECTED:                'ui-selected',
+            SELECTING:               'ui-selecting',
             DISABLED:                'disabled',
 
             GRID_HIDDEN:             'fuzzed-grid-hidden',
