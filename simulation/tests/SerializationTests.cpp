@@ -35,6 +35,7 @@ namespace
 	const string featureFileName		= "feature.fuzztree";
 	const string exampleSystemFileName	= "example_system.fuzztree";
 	const string config1				= "config1.fuzztree";
+	const string intermediate			= "intermediate.fuzztree";
 }
 
 TEST(Serialization, PNML)
@@ -89,6 +90,11 @@ TEST(Serialization, Optional)
 TEST(Serialization, FeatureVP)
 {
 	TEST_NUM_CONFIGURATIONS(dir + featureFileName, 6);
+}
+
+TEST(Serialization, Intermediate)
+{
+	TEST_NUM_CONFIGURATIONS(dir + intermediate, 6);
 }
 
 TEST(Serialization, RedundancyVP)

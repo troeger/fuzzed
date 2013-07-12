@@ -96,7 +96,14 @@ void convertFaultTreeRecursive(FaultTreeNode* node, const faulttree::Node& templ
 			current = new SpareGate(id, spares, dormancyFactor); 
 		}
 
-		node->addChild(current);
-		convertFaultTreeRecursive(current, child);
+		if (current)
+		{
+			node->addChild(current);
+			convertFaultTreeRecursive(current, child);
+		}
+		else
+		{
+			convertFaultTreeRecursive(node, child);
+		}
 	}
 }

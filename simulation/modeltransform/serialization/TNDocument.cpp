@@ -108,6 +108,7 @@ bool TNDocument::save(const string& fileName)
 	file << "-- END OF SPECIFICATION FILE" << std::endl;
 	file.close();
 
+	m_bSaved = true;
 	return true;
 }
 
