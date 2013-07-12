@@ -268,7 +268,7 @@ class clean(_clean):
 # Our overloaded 'setup.py sdist' command
 class sdist(_sdist):
     def run(self):
-        build_naturaldocs()
+        #build_naturaldocs()
         build_django_require()
         _sdist.run(self)
 

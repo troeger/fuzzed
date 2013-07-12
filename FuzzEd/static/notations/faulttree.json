@@ -180,6 +180,9 @@
             "nodeDisplayName": "House Event",
             "inherits": "basicEvent",
 
+            "numberOfOutgoingConnections": 0,
+            "allowConnectionTo": [],
+
             "image": "house_event.svg",
             "help": "An event that is expected to occur and typically does not denote a failure",
 
@@ -307,6 +310,11 @@
             "image": "csp_gate.svg",
             "help": "Cold Spare Gate",
 
+            "allowConnectionTo": [
+                "basicEvent", "basicEventSet", "undevelopedEvent", "houseEvent", "staticGate",
+                "cspGate", "priorityAndGate", "seqGate", "transferIn"
+            ],
+
             "properties": {
                 "dormancyFactor": {
                     "kind": "numeric",
@@ -330,7 +338,8 @@
 
             "numberOfOutgoingConnections": 1,
             "allowConnectionTo": [
-                "basicEvent", "houseEvent", "undevelopedEvent", "staticGate", "cspGate", "priorityAndGate", "seqGate"
+                "basicEvent", "houseEvent", "undevelopedEvent", "staticGate",
+                "cspGate", "priorityAndGate", "seqGate", "transferIn"
             ],
 
             "image": "fdep_gate.svg",
