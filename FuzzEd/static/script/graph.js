@@ -387,19 +387,20 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
                 BaseClass = this.nodeClassFor(inherits);
             }
 
+            var graph    = this;
             var newClass = BaseClass.extend({
                 init: function(properties, propertiesDisplayOrder) {
                     this._super(jQuery.extend(true, {}, definition, properties), propertiesDisplayOrder);
+                    _.each(this.allowConnectionTo, function(value, index) {
+                        if (typeof value !== 'string') return;
+                        this.allowConnectionTo[index] = graph.nodeClassFor(value);
+                        this.inherits = BaseClass;
+                    }.bind(this));
                 }
             });
 
+            newClass.toString = function() { return definition.nodeDisplayName; };
             this._nodeClasses[definition.kind] = newClass;
-
-            // replace the node kind strings in the allowConnection field with actual classes
-            // this allows for instanceof checks later
-            _.each(definition.allowConnectionTo, function(kind, index) {
-                definition.allowConnectionTo[index] = this.nodeClassFor(kind);
-            }.bind(this));
 
             return newClass;
         },

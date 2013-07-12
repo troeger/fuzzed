@@ -566,7 +566,7 @@ function(Property, Mirror, Canvas, Class) {
          */
         allowsConnectionsTo: function(otherNode) {
             // no connections to same node
-            if (this == otherNode) return false;
+            if (this === otherNode) return false;
 
             // otherNode must be in the 'allowConnectionTo' list defined in the notations
             var allowed = _.any(this.allowConnectionTo, function(nodeClass) {
