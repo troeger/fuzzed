@@ -28,35 +28,13 @@
             "properties": {
                 "name": {
                     "kind": "text",
-                    "default": "Event",
                     "displayName": "Name",
+                    "default": "Event",
 
                     "mirror": {
                         "position": "bottom",
-                        "style": ["bold", "large"]
-                    }
-                }
-            }
-        },
-
-        "eventSet": {
-            "nodeDisplayName": "Event Set",
-            "inherits": "event",
-
-            "properties": {
-                "name": {
-                    "default": "Event Set"
-                },
-                "cardinality": {
-                    "kind": "numeric",
-                    "displayName": "Cardinality",
-                    "min": 1,
-                    "step": 1,
-                    "default": 1,
-                    "mirror": {
-                        "position": "bottom",
-                        "style": ["italic"],
-                        "format": "#{{$0}}"
+                        "style": ["bold", "large"],
+                        "format": "{{$0}}"
                     }
                 }
             }
@@ -95,7 +73,7 @@
                         }
                     }, {
                         "kind": "numeric",
-                        "partName": "Rate λ",
+                        "partName": "λ Rate",
                         "min": 0,
                         "step": 0.01,
                         "default": 17532,
@@ -105,6 +83,109 @@
                             "format": "λ={{$0}}"
                         }
                     }]
+                }
+            }
+        },
+
+        "houseEvent": {
+            "nodeDisplayName": "House Event",
+            "inherits": "basicEvent",
+
+            "numberOfOutgoingConnections": 0,
+            "allowConnectionTo": [],
+
+            "image": "house_event.svg",
+            "help": "An event that is expected to occur and typically does not denote a failure",
+
+            "properties": {
+                "name": {
+                    "default": "House Event"
+                }
+            }
+        },
+
+        "intermediateEvent": {
+            "nodeDisplayName": "Intermediate Event",
+            "inherits": "event",
+
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["staticGate", "cspGate", "priorityAndGate", "seqGate"],
+
+            "image": "intermediate_event.svg",
+            "help": "Failure resulting from a combination of previous events",
+
+            "properties": {
+                "name": {
+                    "default": "Intermediate Event"
+                }
+            }
+        },
+
+        "topEvent": {
+            "nodeDisplayName": "Top Event",
+            "inherits": "intermediateEvent",
+
+            "numberOfIncomingConnections": 0,
+            "allowConnectionTo": [
+                "basicEvent", "undevelopedEvent", "houseEvent", "staticGate", "cspGate", "priorityAndGate", "seqGate"
+            ],
+
+            "image": "top_event.svg",
+            "help": "Top Event - the root of all evil",
+
+            "excludeFromShapesMenu": true,
+            "deletable": false,
+
+            "properties": {
+                "name": {
+                    "default": "Top Event"
+                },
+                "missionTime": {
+                    "kind": "numeric",
+                    "displayName": "Mission in h",
+                    "min": 0,
+                    "step": 1,
+                    "default": 17532
+                }
+            }
+        },
+
+        "undevelopedEvent": {
+            "nodeDisplayName": "Undeveloped Event",
+            "inherits": "event",
+
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["fdepGate"],
+
+            "image": "undeveloped_event.svg",
+            "help": "Event with no information available or insignificant impact",
+
+            "properties": {
+                "name": {
+                    "default": "Undeveloped Event"
+                }
+            }
+        },
+
+        "eventSet": {
+            "nodeDisplayName": "Event Set",
+            "inherits": "event",
+
+            "properties": {
+                "name": {
+                    "default": "Event Set"
+                },
+                "cardinality": {
+                    "kind": "numeric",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1,
+                    "default": 1,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "#{{$0}}"
+                    }
                 }
             }
         },
@@ -142,7 +223,7 @@
                         }
                     }, {
                         "kind": "numeric",
-                        "partName": "Rate λ",
+                        "partName": "λ Rate",
                         "min": 0,
                         "step": 0.01,
                         "default": 17532,
@@ -152,23 +233,6 @@
                             "format": "λ={{$0}}"
                         }
                     }]
-                }
-            }
-        },
-
-        "intermediateEvent": {
-            "nodeDisplayName": "Intermediate Event",
-            "inherits": "event",
-
-            "numberOfOutgoingConnections": 1,
-            "allowConnectionTo": ["staticGate", "cspGate", "priorityAndGate", "seqGate"],
-
-            "image": "intermediate_event.svg",
-            "help": "Failure resulting from a combination of previous events",
-
-            "properties": {
-                "name": {
-                    "default": "Intermediate Event"
                 }
             }
         },
@@ -190,67 +254,6 @@
             }
         },
 
-        "topEvent": {
-            "nodeDisplayName": "Top Event",
-            "inherits": "intermediateEvent",
-
-            "numberOfIncomingConnections": 0,
-            "allowConnectionTo": [
-                "basicEvent", "undevelopedEvent", "houseEvent", "staticGate", "cspGate", "priorityAndGate", "seqGate"
-            ],
-
-            "image": "top_event.svg",
-            "excludeFromShapesMenu": true,
-            "deletable": false,
-
-            "properties": {
-                "name": {
-                    "default": "Top Event"
-                },
-                "missionTime": {
-                    "kind": "numeric",
-                    "displayName": "Mission in h",
-                    "min": 0,
-                    "step": 1,
-                    "default": 17532
-                }
-            }
-        },
-
-        "houseEvent": {
-            "nodeDisplayName": "House Event",
-            "inherits": "basicEvent",
-
-            "numberOfOutgoingConnections": 0,
-            "allowConnectionTo": [],
-
-            "image": "house_event.svg",
-            "help": "An event that is expected to occur and typically does not denote a failure",
-
-            "properties": {
-                "name": {
-                    "default": "House Event"
-                }
-            }
-        },
-
-        "undevelopedEvent": {
-            "nodeDisplayName": "Undeveloped Event",
-            "inherits": "event",
-
-            "numberOfOutgoingConnections": -1,
-            "allowConnectionTo": ["fdepGate"],
-
-            "image": "undeveloped_event.svg",
-            "help": "Event with no information available or insignificant impact",
-
-            "properties": {
-                "name": {
-                    "default": "Undeveloped Event"
-                }
-            }
-        },
-
         "gate": {
             "nodeDisplayName": "Gate",
             "inherits": "node",
@@ -260,11 +263,6 @@
 
         "staticGate": {
             "nodeDisplayName": "Static Gate",
-            "inherits": "gate"
-        },
-
-        "dynamicGate": {
-            "nodeDisplayName": "Dynamic Gate",
             "inherits": "gate"
         },
 
@@ -321,27 +319,9 @@
             }
         },
 
-        "transferIn": {
-            "nodeDisplayName": "Transfer In",
-            "inherits": "dynamicGate",
-
-            "numberOfOutgoingConnections": 0,
-
-            "image": "transfer_in.svg",
-            "help": "Connects the output of a related FaultTree, e.g. a subsystem, to this one",
-
-            "properties": {
-                "transfer": {
-                    "kind": "transfer",
-                    "displayName": "Transfer",
-                    "default": -1,
-                    "mirror": {
-                        "position": "bottom",
-                        "style": ["bold", "large"],
-                        "format": "◄ {{$0}}"
-                    }
-                }
-            }
+        "dynamicGate": {
+            "nodeDisplayName": "Dynamic Gate",
+            "inherits": "gate"
         },
 
         "cspGate": {
@@ -401,6 +381,29 @@
 
             "image": "seq_gate.svg",
             "help": "Sequential Gate"
+        },
+
+        "transferIn": {
+            "nodeDisplayName": "Transfer In",
+            "inherits": "dynamicGate",
+
+            "numberOfOutgoingConnections": 0,
+
+            "image": "transfer_in.svg",
+            "help": "Connects the output of a related FaultTree, e.g. a subsystem, to this one",
+
+            "properties": {
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer",
+                    "default": -1,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "◄ {{$0}}"
+                    }
+                }
+            }
         }
     },
 
@@ -427,12 +430,12 @@
         "orGate",
         "xorGate",
         "votingOrGate",
-        "transferIn",
 
         "cspGate",
         "fdepGate",
         "priorityAndGate",
-        "seqGate"
+        "seqGate",
+        "transferIn"
     ],
 
     "defaults": {
