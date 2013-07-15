@@ -15,7 +15,7 @@ public:
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
-	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
+	virtual int serializePTNet(boost::shared_ptr<PNDocument> doc) const override;
 
 protected:
 	virtual int addSequenceViolatedPlace(boost::shared_ptr<PNDocument> doc) const;

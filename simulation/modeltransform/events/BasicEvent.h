@@ -10,7 +10,7 @@ public:
 
 	virtual void addChild(FaultTreeNode* child) override;
 	
-	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
+	virtual int serializePTNet(boost::shared_ptr<PNDocument> doc) const override;
 	
 	std::pair<int /*placeID*/,int /*spareActivationTransition*/> 
 		serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const;

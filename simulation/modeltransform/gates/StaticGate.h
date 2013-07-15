@@ -14,6 +14,8 @@ public:
 	virtual long double computeUnreliability() const;
 	bool isDynamic() const { return false; }
 
+	virtual int serializeTimeNet(boost::shared_ptr<TNDocument> doc) const override;
+
 protected:
 	virtual void initActivationFunc() = 0;
 

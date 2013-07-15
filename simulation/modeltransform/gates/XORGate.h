@@ -8,7 +8,7 @@ public:
 	
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
-	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
+	virtual int serializePTNet(boost::shared_ptr<PNDocument> doc) const override;
 	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const;
 
 protected:

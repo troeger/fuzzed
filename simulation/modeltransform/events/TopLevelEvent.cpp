@@ -7,7 +7,7 @@ TopLevelEvent::TopLevelEvent(const std::string& ID /*= 0*/)
 	: Event(ID, 0.0L)
 {}
 
-int TopLevelEvent::serialize(boost::shared_ptr<PNDocument> doc) const 
+int TopLevelEvent::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
 {
 	assert(m_children.size() <= 1 && "Top Level Event cannot have multiple children");
 	
@@ -18,7 +18,7 @@ int TopLevelEvent::serialize(boost::shared_ptr<PNDocument> doc) const
 		if (!m_children.empty())
 		{
 			FaultTreeNode* gate = m_children.front();
-			int gatePlaceID = gate->serialize(doc);
+			int gatePlaceID = gate->serializePTNet(doc);
 			int transitionID = doc->addImmediateTransition();
 
 			doc->placeToTransition(gatePlaceID, transitionID);

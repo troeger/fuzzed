@@ -10,7 +10,7 @@ public:
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
 	virtual void addChild(FaultTreeNode* child) override;
-	virtual int serialize(boost::shared_ptr<PNDocument> doc) const override;
+	virtual int serializePTNet(boost::shared_ptr<PNDocument> doc) const override;
 	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const override;
 
 	virtual bool isValid() const override { return m_children.size() == 1; };

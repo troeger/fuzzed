@@ -287,7 +287,7 @@ void SimulationProxy::simulateFaultTree(FaultTreeNode* ft, const std::string& ne
 		break;
 	}
 
-	ft->serialize(doc);
+	ft->serializePTNet(doc);
 	std::cout << ft->serializeAsFormula(doc) << endl;
 	
 	if (STRUCTUREFORMULA_ONLY) return; // TODO some kind of output

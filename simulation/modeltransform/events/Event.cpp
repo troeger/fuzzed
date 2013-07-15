@@ -15,5 +15,5 @@ Event::Event(const std::string& ID, FuzzyNumber fuzzyFailureRate)
 
 std::string Event::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
 {
-	return PLACE_IDENTIFIER + util::toString(serialize(doc));
+	return PLACE_IDENTIFIER + util::toString(serializePTNet(doc));
 }

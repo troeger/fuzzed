@@ -5,12 +5,12 @@ FDEPGate::FDEPGate(const std::string& id, const std::string& trigger, std::vecto
 	: DynamicGate(id, name), m_triggerID(trigger), m_dependentEvents(dependentEvents)
 {}
 
-int FDEPGate::serialize(boost::shared_ptr<PNDocument> doc) const 
+int FDEPGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
 {
 	int gateTriggered = doc->addPlace(0, 1, "FDEP triggered");
 
 	assert(m_children.size() == 1); // this should be the triggering event
-	int childTriggered = m_children.front()->serialize(doc);
+	int childTriggered = m_children.front()->serializePTNet(doc);
 
 	int triggerTrans = doc->addImmediateTransition();
 

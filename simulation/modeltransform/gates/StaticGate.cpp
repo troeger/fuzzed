@@ -25,6 +25,21 @@ long double StaticGate::computeUnreliability() const
 	return m_activationFunc(unreliabilities);
 }
 
+int StaticGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+{
+	assert(doc.get());
+
+	std::string staticFormula = serializeAsFormula(doc);
+	int gateInput = doc->addPlace(1, 1);
+	int fulfilFormula = doc->addGuardedTransition(staticFormula);
+	int gateFired = doc->addPlace(0, 1);
+
+	doc->placeToTransition(gateInput, fulfilFormula);
+	doc->transitionToPlace(fulfilFormula, gateFired);
+
+	return gateFired;
+}
+
 const std::string StaticGate::s_NOToperator = " NOT ";
 const std::string StaticGate::s_ORoperator = " OR ";
 const std::string StaticGate::s_ANDoperator = " AND ";

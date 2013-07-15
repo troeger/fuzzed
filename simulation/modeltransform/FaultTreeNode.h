@@ -5,8 +5,7 @@
 #include <ostream>
 
 #include "pugixml.hpp"
-
-class PNDocument;
+#include "serialization/TNDocument.h"
 
 class FaultTreeNode
 {
@@ -53,7 +52,9 @@ public:
 	/************************************************************************/
 
 	// returns ID of the "top level" place
-	virtual int serialize(boost::shared_ptr<PNDocument> doc) const = 0;
+	virtual int serializePTNet(boost::shared_ptr<PNDocument> doc) const = 0;
+
+	virtual int serializeTimeNet(boost::shared_ptr<TNDocument> doc) const { return serializePTNet(doc); }
 	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const = 0;
 
 	std::pair<int /*placeID*/,int /*spareActivationTransition*/> 

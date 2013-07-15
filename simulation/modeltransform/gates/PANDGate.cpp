@@ -8,13 +8,13 @@ PANDGate::PANDGate(const string& id, const std::vector<std::string>& ordering, c
 {}
 
 
-int PANDGate::serialize(boost::shared_ptr<PNDocument> doc) const 
+int PANDGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
 {
 	int previousChildFailed = -1;
 	int garbage = addSequenceViolatedPlace(doc);
 	for (auto& child : m_children)
 	{
-		int childFailed = child->serialize(doc);
+		int childFailed = child->serializePTNet(doc);
 		if (previousChildFailed > 0)
 		{
 			int discard		= doc->addImmediateTransition(1, "discard");

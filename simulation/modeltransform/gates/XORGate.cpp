@@ -9,11 +9,11 @@ XORGate::XORGate(const std::string& ID, const std::string& name)
 	: StaticGate(ID, name)
 {}
 
-int XORGate::serialize(boost::shared_ptr<PNDocument> doc) const 
+int XORGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
 {
 	vector<int> childIDs;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
-		childIDs.push_back((*it)->serialize(doc));
+		childIDs.push_back((*it)->serializePTNet(doc));
 
 	int oneChildFailed			= doc->addPlace(0, 1, "XOR_Failed");
 	int failedChildren			= doc->addPlace(0, childIDs.size(), "Failed_Children");

@@ -14,11 +14,11 @@ ORGate::~ORGate(void)
 {
 }
 
-int ORGate::serialize(boost::shared_ptr<PNDocument> doc) const 
+int ORGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
 {
 	vector<int> childIDs;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
-		childIDs.push_back((*it)->serialize(doc));
+		childIDs.push_back((*it)->serializePTNet(doc));
 
 	int oneChildFailed = doc->addPlace(0, 1, "OR_Failed");
 	for (int id : childIDs)

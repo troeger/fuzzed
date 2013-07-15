@@ -51,7 +51,7 @@ TimeNETSimulation::TimeNETSimulation(std::auto_ptr<FaultTreeNode> faultTree,
 	const string TNpath = "foo.TN";
 
 	boost::shared_ptr<TNDocument> doc(new TNDocument);
-	faultTree->serialize(doc);
+	faultTree->serializePTNet(doc);
 	doc->save(TNpath);
 	m_properties->filePath = TNpath;
 }

@@ -174,3 +174,18 @@ const std::string TNDocument::placeIdentifier(const int& id)
 {
 	return PLACE_IDENTIFIER + util::toString(id);
 }
+
+int TNDocument::addGuardedTransition(const std::string& guard, unsigned int priority /*= 1*/)
+{
+	const string id = TRANSITION_IDENTIFIER + util::toString((int)m_transitions.size());
+	m_transitions[id] = TN_TransitionSpec((boost::format(IMMEDIATETRANSITIONTEMPLATE) % id % 0 % priority).str());
+
+	addEnablingFunction(id, guard);
+
+	return m_transitions.size()-1;	
+}
+
+void TNDocument::addEnablingFunction(const std::string& id, const std::string& guard)
+{
+	throw std::exception("The method or operation is not implemented.");
+}

@@ -11,7 +11,7 @@ SpareGate::SpareGate(const std::string& id, const set<string>& spareIndices, con
 	m_dormancyFactor(dormancyFactor)
 {}
 
-int SpareGate::serialize(boost::shared_ptr<PNDocument> doc) const 
+int SpareGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
 {
 	vector<pair<int,int>> spares;
 	vector<int> regularIds;
@@ -21,7 +21,7 @@ int SpareGate::serialize(boost::shared_ptr<PNDocument> doc) const
 		if (CONTAINS(m_spareIndices, basicEvent->getId())) // TODO
 			spares.push_back(basicEvent->serializeAsColdSpare(doc));
 		else
-			regularIds.push_back(basicEvent->serialize(doc));
+			regularIds.push_back(basicEvent->serializePTNet(doc));
 	}
 
 	const int allFailed	= doc->addPlace(0, getNumChildren(), "SpareGateFailure");
