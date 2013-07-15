@@ -77,17 +77,34 @@
                     "default": "Basic Event"
                 },
                 "probability": {
-                    "kind": "numeric",
+                    "kind": "compound",
                     "displayName": "Probability",
-                    "min": 0,
-                    "max": 1,
-                    "step": 0.0000000001,
-                    "default": 0,
-                    "mirror": {
-                        "position": "bottom",
-                        "style": ["italic"],
-                        "format": "p={{$0}}"
-                    }
+                    "default": [0, 0],
+
+                    "parts": [{
+                        "kind": "numeric",
+                        "partName": "Exact",
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "default": 0,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate λ",
+                        "min": 0,
+                        "step": 0.01,
+                        "default": 17532,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }]
                 }
             }
         },
@@ -107,17 +124,34 @@
                     "default": "Basic Event Set"
                 },
                 "probability": {
-                    "kind": "numeric",
+                    "kind": "compound",
                     "displayName": "Probability",
-                    "min": 0,
-                    "max": 1,
-                    "step": 0.0000000001,
-                    "default": 0,
-                    "mirror": {
-                        "position": "bottom",
-                        "style": ["italic"],
-                        "format": "p={{$0}}"
-                    }
+                    "default": [0, 0],
+
+                    "parts": [{
+                        "kind": "numeric",
+                        "partName": "Exact",
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "default": 0,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate λ",
+                        "min": 0,
+                        "step": 0.01,
+                        "default": 17532,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }]
                 }
             }
         },
@@ -172,6 +206,13 @@
             "properties": {
                 "name": {
                     "default": "Top Event"
+                },
+                "missionTime": {
+                    "kind": "numeric",
+                    "displayName": "Mission in h",
+                    "min": 0,
+                    "step": 1,
+                    "default": 17532
                 }
             }
         },
@@ -365,6 +406,7 @@
 
     "propertiesDisplayOrder": [
         "name",
+        "missionTime",
         "probability",
         "cardinality",
         "k",
