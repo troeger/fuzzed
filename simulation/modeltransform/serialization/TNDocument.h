@@ -51,4 +51,5 @@ protected:
 	std::map<std::string, TN_TransitionSpec> m_transitions;
 	std::map<std::string, std::string> m_places;
 	std::vector<std::string> m_measures; // TODO
+	std::vector<std::string> m_enablingFunctions;
 };

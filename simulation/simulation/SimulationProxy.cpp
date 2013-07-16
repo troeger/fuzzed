@@ -208,7 +208,7 @@ void SimulationProxy::parseCommandline(int numArguments, char** arguments)
 		if (!is_regular_file(fPath))
 			throw runtime_error("Not a file: " + filePath);
 
-		simulateFile(fPath, /*useTimeNET ? TIMENET : DEFAULT*/STRUCTUREFORMULA_ONLY, simulatePetriNet);
+		simulateFile(fPath, useTimeNET ? TIMENET : DEFAULT/*STRUCTUREFORMULA_ONLY*/, simulatePetriNet);
 	}
 }
 
@@ -278,19 +278,19 @@ void SimulationProxy::simulateFaultTree(FaultTreeNode* ft, const std::string& ne
 	{
 	case DEFAULT:
 		doc = boost::shared_ptr<PNMLDocument>(new PNMLDocument());
+		ft->serializePTNet(doc);
 		break;
 	case TIMENET:
-		doc = boost::shared_ptr<TNDocument>(new TNDocument());
-		break;
 	case STRUCTUREFORMULA_ONLY:
-		doc = boost::shared_ptr<TNDocument>(new TNDocument());
+		auto TNdoc = boost::shared_ptr<TNDocument>(new TNDocument());
+		ft->serializeTimeNet(TNdoc);
+		doc = TNdoc;
 		break;
 	}
-
-	ft->serializePTNet(doc);
+	
 	std::cout << ft->serializeAsFormula(doc) << endl;
 	
-	if (STRUCTUREFORMULA_ONLY) return; // TODO some kind of output
+	if (impl == STRUCTUREFORMULA_ONLY) return;
 
 	doc->save(newFileName);	
 	runSimulationInternal(newFileName, impl, m_timeNetProperties);

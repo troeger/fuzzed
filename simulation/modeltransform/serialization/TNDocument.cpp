@@ -27,7 +27,8 @@ namespace
 	const string CONTENTTEMLPATE = ""
 		"\n%1%\n\n"
 		"\n%2%\n\n"
-		"\n%3%\n";
+		"\n%3%\n\n"
+		"\n%4%\n";
 
 	// NAME, MARKING, (X,Y)-POSITION (PLACE & TAG)
 	// 1: NAME
@@ -100,11 +101,15 @@ bool TNDocument::save(const string& fileName)
 	for (const auto& t : m_transitions)
 		transitions += transitionString(t.second);
 
+	string enablingFunctions;
+	for (const auto& f : m_enablingFunctions)
+		enablingFunctions += f;
+
  	string measures = "-- DEFINITION OF PARAMETERS:\n-- REWARD MEASURES:\n\n"; // more than a comment...
 	for (const auto& m : m_measures)
 		measures += m;
 
-	file << boost::format(CONTENTTEMLPATE) % places % transitions % measures;
+	file << boost::format(CONTENTTEMLPATE) % places % transitions % enablingFunctions % measures;
 	file << "-- END OF SPECIFICATION FILE" << std::endl;
 	file.close();
 
@@ -185,7 +190,8 @@ int TNDocument::addGuardedTransition(const std::string& guard, unsigned int prio
 	return m_transitions.size()-1;	
 }
 
-void TNDocument::addEnablingFunction(const std::string& id, const std::string& guard)
+void TNDocument::addEnablingFunction(const std::string& transitionId, const std::string& guard)
 {
-	throw std::exception("The method or operation is not implemented.");
+	static const string functionPrefix = "FUNCTION ";
+	m_enablingFunctions.emplace_back(functionPrefix + transitionId + " " + guard + ";");
 }

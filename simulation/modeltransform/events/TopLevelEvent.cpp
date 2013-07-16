@@ -68,3 +68,29 @@ std::string TopLevelEvent::serializeAsFormula(boost::shared_ptr<PNDocument> doc)
 	assert(m_children.size() == 1);
 	return m_children.front()->serializeAsFormula(doc);
 }
+
+int TopLevelEvent::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+{
+	assert(m_children.size() <= 1 && "Top Level Event cannot have multiple children");
+
+	int finalPlaceID = doc->addTopLevelPlace("SystemFailure");
+
+	try
+	{
+		if (!m_children.empty())
+		{
+			FaultTreeNode* gate = m_children.front();
+			int gatePlaceID = gate->serializeTimeNet(doc);
+			int transitionID = doc->addImmediateTransition();
+
+			doc->placeToTransition(gatePlaceID, transitionID);
+			doc->transitionToPlace(transitionID, finalPlaceID);
+		}
+	}
+	catch (exception& e)
+	{
+		cout << e.what() << endl;
+	}
+
+	return finalPlaceID;
+}
