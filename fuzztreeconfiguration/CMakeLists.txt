@@ -19,7 +19,7 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_SOURCE_DIR}/lib)
 endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
 
-find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
+find_package(Boost COMPONENTS system filesystem program_options date_time regex REQUIRED)
 message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
 
 include(common)
@@ -40,10 +40,15 @@ else(XSD_FOUND)
   message(FATAL_ERROR "The package CodeSynthesis XSD has not been found")
 endif(XSD_FOUND)  
 include_directories(${XSD_INCLUDE_DIR})
+
+find_package(beanstalkpp REQUIRED)
+message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
+include_directories(${BEANSTALKPP_INCLUDE})
                                                                                                                                                                                                                         
 set(SOURCES
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
+   FuzzTreeConfigClient.cpp
    TreeHelpers.cpp
    main.cpp
    faulttree.cpp
@@ -53,8 +58,10 @@ set(SOURCES
 set(HEADERS
    FuzzTreeTransform.h
    FuzzTreeConfiguration.h
+   FuzzTreeConfigClient.h
    TreeHelpers.h
    platform.h
+   beanstalkdconfig.h
    faulttree.h
    fuzztree.h
    FaultTreeTypes.h
@@ -73,13 +80,15 @@ set(FUZZTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/fuzztree.xsd")
 
 set(SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
 
+set(LINKED_LIBS ${Boost_LIBRARIES} ${XERCESC_LIBRARIES} ${BEANSTALKPP_LIB})
+
 add_library(ftconfiguration STATIC ${SOURCES} ${HEADERS} ${SCHEMAS})
-target_link_libraries(ftconfiguration ${Boost_LIBRARIES} ${XERCESC_LIBRARIES})
+target_link_libraries(ftconfiguration ${LINKED_LIBS})
 
 option(BUILD_TEST_EXECUTABLE OFF)#just for testing
 if (BUILD_TEST_EXECUTABLE)
   add_executable(ftconfiguration_exe ${SOURCES} ${HEADERS} ${SCHEMAS})
-  target_link_libraries(ftconfiguration_exe ${Boost_LIBRARIES} ${XERCESC_LIBRARIES})
+  target_link_libraries(ftconfiguration_exe ${LINKED_LIBS})
 endif(BUILD_TEST_EXECUTABLE)
 
 set(XSD_TO_FAULTTREE_ARGS

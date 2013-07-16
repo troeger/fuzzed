@@ -1,16 +1,22 @@
 #include "FuzzTreeTransform.h"
+#include "FuzzTreeConfigClient.h"
+#include "beanstalkdconfig.h"
 
 int main(int argc, char **argv)
 {
-	if (argc < 2)
-	{
-		std::cout << "Too few arguments. Please specify a filename.";
-		return -1;
-	}
-	const std::string fileName(argv[1]);
-	auto fttransform = FuzzTreeTransform(fileName);
+	FuzzTreeConfigClient client("foo", BEANSTALK_SERVER, BEANSTALK_PORT);
+	client.run();
 
-	for (auto tree : fttransform.transform())
-	{
-	}
+
+// 	if (argc < 2)
+// 	{
+// 		std::cout << "Too few arguments. Please specify a filename.";
+// 		return -1;
+// 	}
+// 	const std::string fileName(argv[1]);
+// 	auto fttransform = FuzzTreeTransform(fileName);
+// 
+// 	for (auto tree : fttransform.transform())
+// 	{
+// 	}
 }
