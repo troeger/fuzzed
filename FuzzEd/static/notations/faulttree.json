@@ -54,7 +54,7 @@
                     "displayName": "Probability",
                     "min": 0,
                     "max": 1,
-                    "step": 0.01
+                    "step": 0.0000000001
                 }
             },
 
@@ -109,6 +109,7 @@
             "image": "intermediate_event_set.svg",
             "help": "Set of intermediate events",
             "cardinality": 1,
+            "excludeFromShapesMenu": true,
 
             "propertyMenuEntries": {
                 "cardinality": {

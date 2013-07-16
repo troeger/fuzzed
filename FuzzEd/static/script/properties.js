@@ -1,4 +1,4 @@
-define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, Class) {
+define(['config', 'decimal', 'class', 'alerts', 'underscore'], function(Config, Decimal, Class, Alerts) {
     var get = function(object, key, defaultValue) {
         var value = object[key];
         return (typeof value !== 'undefined' ? value : defaultValue);
@@ -176,11 +176,17 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
             var register = this.registerOn();
 
             _.each(this.blurEvents(), function(event) {
-                register.on(event, this.blurred.bind(this));
+                register.on(event, function(event) {
+                    // defere call so that paste and cut change the value before the event is triggered
+                    _.defer(this.blurred.bind(this), event);
+                }.bind(this));
             }.bind(this));
 
             _.each(this.changeEvents(), function(event) {
-                register.on(event, this.changed.bind(this));
+                register.on(event, function(event) {
+                    // defere call so that paste and cut change the value before the event is triggered
+                    _.defer(this.changed.bind(this), event);
+                }.bind(this));
             }.bind(this));
 
             return this;
@@ -346,7 +352,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
 
         _initialValue: undefined,
 
-        changeEvents: function() { return ['keyup', 'change']; },
+        changeEvents: function() { return ['keyup', 'change', 'paste', 'cut']; },
 
         fix: function(event) {
             if (event.type !== 'change' && event.type !== 'blur') return this;
@@ -467,7 +473,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
 
         _initialValue: undefined,
 
-        changeEvents: function() { return ['keyup', 'change']; },
+        changeEvents: function() { return ['keyup', 'change', 'paste', 'cut']; },
 
         inputValue: function(newValue) {
             if (typeof newValue === 'undefined') return window.parseFloat(this.input.val());
@@ -520,7 +526,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         _register:     undefined,
         _initialValue: undefined,
 
-        changeEvents: function() { return ['keyup', 'change']; },
+        changeEvents: function() { return ['keyup', 'change', 'paste', 'cut']; },
 
         fix: function(event) {
             if (event.type !== 'change' && event.type !== 'blur') return this;
@@ -697,7 +703,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
     });
 
     var Text = Property.extend({
-        changeEvents: function() { return ['keyup', 'change']; },
+        changeEvents: function() { return ['keyup', 'change', 'paste', 'cut']; },
 
         inputValue: function(newValue) {
             if (typeof newValue === 'undefined') return this.input.val();
@@ -767,6 +773,8 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
                 url:      this.GRAPHS_URL + this._graphId + Config.Backend.TRANSFERS_URL,
                 type:     'GET',
                 dataType: 'json',
+                // don't show progress
+                global:   false,
 
                 success:  this._setupGraphOptions.bind(this),
                 error:    this._throwError.bind(this)
@@ -863,7 +871,7 @@ define(['config', 'decimal', 'class', 'underscore'], function(Config, Decimal, C
         },
 
         _throwError: function(xhr, textStatus, errorThrown) {
-            throw '[AJAX ERROR] Could not fetch graph for transfer, reason: ' + errorThrown;
+            Alerts.showWarningAlert('Could not fetch graph for transfer:', errorThrown, Config.Alerts.TIMEOUT);
         }
     });
 

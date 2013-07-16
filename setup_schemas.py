@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns:ft="net.fuzztree" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztree">
+commonXsd='''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xsd:schema xmlns:ft="{0}" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="{0}">
   
   <!--Abstract Types-->
   <xsd:complexType abstract="true" name="Annotation"/>
@@ -39,7 +39,7 @@
   </xsd:complexType>
 
   <!--Tree-->
-  <xsd:complexType name="FuzzTree">
+  <xsd:complexType name="{1}">
     <xsd:complexContent>
       <xsd:extension base="ft:Model">
         <xsd:sequence>
@@ -48,7 +48,7 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  <xsd:element name="FuzzTree" type="ft:FuzzTree"/>
+  <xsd:element name="{1}" type="ft:{1}"/>
 
   <xsd:complexType name="TopEvent">
     <xsd:complexContent>
@@ -105,7 +105,7 @@
   <!--Tree Leaf Nodes-->
   <xsd:complexType name="TransferIn">
     <xsd:complexContent>
-      <xsd:extension base="ft:VariationPoint">
+      <xsd:extension base="{2}">
         <xsd:attribute name="fromModelId" type="xsd:int" use="required"/>
         <xsd:attribute default="0" name="maxCosts" type="xsd:int"/>
       </xsd:extension>
@@ -129,11 +129,11 @@
 
   <xsd:complexType name="BasicEvent">
     <xsd:complexContent>
-      <xsd:extension base="ft:InclusionVariationPoint">
+      <xsd:extension base="{3}">
         <xsd:sequence>
           <xsd:element maxOccurs="1" minOccurs="1" name="probability" type="ft:Probability"/>
         </xsd:sequence>
-        <xsd:attribute name="costs" type="xsd:int"/>
+        {4}
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -141,7 +141,7 @@
 
   <xsd:complexType name="IntermediateEvent">
     <xsd:complexContent>
-      <xsd:extension base="ft:InclusionVariationPoint"/>
+      <xsd:extension base="{3}"/>
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:element name="IntermediateEvent" type="ft:IntermediateEvent"/>
@@ -163,7 +163,58 @@
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:element name="IntermediateEventSet" type="ft:IntermediateEventSet"/>  
+'''
 
+faultTreeXsd = '''
+  <!--Dynamic Fault Tree Gates-->
+  <xsd:complexType abstract="true" name="DynamicGate">
+    <xsd:complexContent>
+      <xsd:extension base="ft:Gate"/>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:simpleType name="idlist">
+    <xsd:list itemType="xsd:int"/>
+  </xsd:simpleType>
+
+  <xsd:complexType name="ColdSpare">
+    <xsd:complexContent>
+      <xsd:extension base="ft:DynamicGate">
+        <xsd:attribute name="spareIds" type="ft:idlist" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="ColdSpare" type="ft:ColdSpare"/>
+
+  <xsd:complexType name="PriorityAnd">
+    <xsd:complexContent>
+      <xsd:extension base="ft:DynamicGate">
+        <xsd:attribute name="priorityIds" type="ft:idlist" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="PriorityAnd" type="ft:PriorityAnd"/>
+
+  <xsd:complexType name="Sequence">
+    <xsd:complexContent>
+      <xsd:extension base="ft:DynamicGate">
+        <xsd:attribute name="eventSequence" type="ft:idlist" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="Sequence" type="ft:Sequence"/>
+
+  <xsd:complexType name="FDEP">
+    <xsd:complexContent>
+      <xsd:extension base="ft:DynamicGate">
+        <xsd:attribute name="triggeredEvents" type="ft:idlist" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="FDEP" type="ft:FDEP"/>
+'''
+
+fuzzTreeXsd = '''
   <!--FuzzTree Variation Points-->
 
   <xsd:complexType name="FeatureVariationPoint">
@@ -234,4 +285,28 @@
     <xsd:attribute name="upperBound" type="xsd:double" use="required"/>
   </xsd:complexType>
   <xsd:element name="Interval" type="ft:Interval"/>
-</xsd:schema>
+'''
+
+def createFaultTreeSchema(fname):
+	xsd = commonXsd.format( 'net.faulttree', 
+                          'FaultTree', 
+                          'ft:ChildNode',
+                          'ft:ChildNode',
+                          '') + faultTreeXsd + '</xsd:schema>'
+	print "Writing new XSD file to "+fname
+	f=open(fname,'w')
+	f.write(xsd)
+	f.close()
+
+def createFuzzTreeSchema(fname):
+	xsd = commonXsd.format( 'net.fuzztree', 
+                          'FuzzTree', 
+                          'ft:VariationPoint',
+                          'ft:InclusionVariationPoint',
+                          '<xsd:attribute name="costs" type="xsd:int"/>') + fuzzTreeXsd + '</xsd:schema>'
+	print "Writing new XSD file to "+fname
+	f=open(fname,'w')
+	f.write(xsd)
+	f.close()
+
+

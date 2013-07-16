@@ -10,8 +10,8 @@
               <probability xsi:type="ft:CrispProbability" value="0.2"/>
             </children>
         </children>
-        <children xsi:type="ft:RedundancyVariationPoint" id="12" name="Power Failure" start="4" end="5" formula="N-2" costFormula="N/2">
-        	<children xsi:type="ft:BasicEventSet" id="120" name="Power Unit Failure">
+        <children xsi:type="ft:RedundancyVariationPoint" id="12" name="Power Failure" start="4" end="5" formula="N-2">
+        	<children xsi:type="ft:BasicEventSet" id="120" name="Power Unit Failure" costs="50">
           		<probability xsi:type="ft:CrispProbability" value="0.5"/>
         	</children>
       	</children>
