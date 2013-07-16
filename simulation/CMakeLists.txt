@@ -67,6 +67,10 @@ else(XSD_FOUND)
 endif(XSD_FOUND)  
 include_directories(${XSD_INCLUDE_DIR})
 
+find_package(beanstalkpp REQUIRED)
+message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
+include_directories(${BEANSTALKPP_INCLUDE})
+
 option(BUILD_SIMULATION_EXECUTABLE ON)
 option(USE_TIMENET ON)
 
