@@ -32,7 +32,8 @@ public:
 	virtual void placeToTransition(int placeID, int transitionID, int consumeCount = 1, const std::string& inscription = "x");
 	virtual void transitionToPlace(int transitionID, int placeID, int procudeCount = 1, const std::string& inscription = "x");
 	
-	virtual void addSequenceConstraint(const std::vector<int>&, SequenceType) {}; // SEQGate
+	virtual void addInhibitorArc(int inhibitingPlace, int inhbitedTransitions, int tokenCount = 0) = 0;
+
 	virtual void addUserDescription(const std::string& description);
 	
 	virtual bool save(const std::string& fileName);

@@ -11,6 +11,7 @@ Event::Event(const std::string& ID, long double failureRate, const std::string& 
 Event::Event(const std::string& ID, FuzzyNumber fuzzyFailureRate)
 	: FaultTreeNode(ID), m_failureRate(fuzzyFailureRate)
 {
+	assert(false);
 }
 
 std::string Event::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 

@@ -124,7 +124,7 @@ void TNDocument::addArc(
 	const string trans = transitionIdentifier(transitionID);
 	
 	auto it = m_transitions.find(trans);
-	if (it == m_transitions.end()) return; // TODO throw?
+	if (it == m_transitions.end()) return;
 
 	const string arc = util::toString(tokenCount) + " " + placeIdentifier(placeID) + " " + util::toString(0) + "\n";
 	if (direction == TRANSITION_TO_PLACE)
@@ -194,4 +194,15 @@ void TNDocument::addEnablingFunction(const std::string& transitionId, const std:
 {
 	static const string functionPrefix = "FUNCTION ";
 	m_enablingFunctions.emplace_back(functionPrefix + transitionId + " " + guard + ";");
+}
+
+void TNDocument::addInhibitorArc(int inhibitingPlace, int inhbitedTransition, int tokenCount /*= 0*/)
+{
+	const string trans = transitionIdentifier(inhbitedTransition);
+
+	auto it = m_transitions.find(trans);
+	if (it == m_transitions.end()) return;
+
+	const string arc = util::toString(tokenCount) + " " + placeIdentifier(inhibitingPlace) + " " + util::toString(0) + "\n";
+	it->second.inhibitArcs.emplace_back(arc);
 }

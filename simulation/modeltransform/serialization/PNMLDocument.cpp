@@ -145,16 +145,7 @@ int PNMLDocument::addTopLevelPlace(const string& label)
 	return m_placeCount;
 }
 
-void DEPRECATED PNMLDocument::addSequenceConstraint(const vector<int>& sequence, SequenceType type)
+void PNMLDocument::addInhibitorArc(int inhibitingPlace, int inhbitedTransitions, int tokenCount /*= 0*/)
 {
-	xml_node node = m_root.append_child(TOOL_SPECIFIC_TAG);
-	xml_node constraintNode = node.append_child(SEQUENCE_CONSTRAINT);
-
-	string sequenceString = "";
-	for (const int& id : sequence)
-	{
-		assert(m_placeCount >= id);
-		sequenceString += ((type == DYNAMIC_PLACE_SEQ) ? PLACE_IDENTIFIER : TRANSITION_IDENTIFIER) + util::toString(id) + " ";
-	}
-	constraintNode.append_attribute(SEQUENCE_LIST).set_value(sequenceString.c_str());
+	// TODO!!
 }
