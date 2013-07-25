@@ -75,7 +75,7 @@ int TNDocument::addImmediateTransition(const unsigned int priority /*= 1*/, cons
 
 int TNDocument::addPlace(
 	int initialMarking,
-	int capacity /*= 1*/,
+	int /*capacity = 1*/,
 	const std::string& /*= ""*/,
 	PlaceSemantics semantics /*= DEFAULT_PLACE*/)
 {
