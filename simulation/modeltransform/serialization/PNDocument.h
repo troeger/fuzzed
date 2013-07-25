@@ -38,7 +38,7 @@ public:
 	
 	virtual bool save(const std::string& fileName);
 
-	bool valid() const { return !pugi::xml_document::empty(); } // TODO
+	bool valid() const { return !pugi::xml_document::empty(); }
 	const bool& saved() const { return m_bSaved; }
 
 protected:

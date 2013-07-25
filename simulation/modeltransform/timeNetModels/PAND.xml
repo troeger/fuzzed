@@ -157,8 +157,8 @@
     </handle>
   </arc>
   <inhibit fromNode="0.14" id="0.16" toNode="0.6" type="connector">
-    <inscription id="0.16.0" text="1" type="inscriptionText">
-      <graphics x="0" y="0"/>
+    <inscription id="0.16.0" text="3" type="inscriptionText">
+      <graphics x="12" y="-15"/>
     </inscription>
     <handle id="0.16.1">
       <graphics orientation="0" x="458" y="225"/>
@@ -172,4 +172,7 @@
       <graphics orientation="0" x="592" y="235"/>
     </handle>
   </inhibit>
+  <measure expression="P{#P6>0};" id="0.27" name="PANDFailure" result="" type="text">
+    <graphics x="584" y="244"/>
+  </measure>
 </net>

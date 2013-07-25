@@ -31,3 +31,9 @@ FaultTreeNode* FDEPGate::clone() const
 	return newNode;
 }
 
+int FDEPGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+{
+	assert(false);
+	return -1;
+}
+

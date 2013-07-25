@@ -4,12 +4,13 @@
 using namespace std;
 
 #define DEBUG true
-#define DETECT_MEM_LEAKS true
+//#define DETECT_MEM_LEAKS true
 
 #ifdef DETECT_MEM_LEAKS
 #define _CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
+// #include <vld.h>
 #endif
 
 int main(int argc, char** argv)

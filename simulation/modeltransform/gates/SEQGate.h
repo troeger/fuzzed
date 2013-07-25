@@ -15,6 +15,7 @@ public:
 	SEQGate(const std::string& id, const std::vector<std::string>& ordering, const std::string& name = "");
 	virtual ~SEQGate(void) {};
 
+	virtual int serializeTimeNet(boost::shared_ptr<TNDocument> doc) const override;
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
 protected:

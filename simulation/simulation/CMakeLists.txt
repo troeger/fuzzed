@@ -3,6 +3,7 @@ project(ftsimulation CXX)
 set(SOURCES
    ${SOURCE}
    main.cpp
+   SimulationExtern.cpp
    SimulationProxy.cpp
    ResultDocument.cpp
 
@@ -22,6 +23,7 @@ set(SOURCES
 
 set(HEADERS
    ${HEADERS}
+   SimulationExtern.h
    SimulationProxy.h
    ResultDocument.h
    ResultStruct.h

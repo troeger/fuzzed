@@ -13,6 +13,8 @@ SpareGate::SpareGate(const std::string& id, const set<string>& spareIndices, con
 
 int SpareGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
 {
+	// just cold spare behaviour in PNML, regardless of dormancy factor
+	
 	vector<pair<int,int>> spares;
 	vector<int> regularIds;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
@@ -59,4 +61,10 @@ FaultTreeNode* SpareGate::clone() const
 		newNode->addChild(child->clone());
 
 	return newNode;
+}
+
+int SpareGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+{
+	assert(false);
+	return -1;
 }

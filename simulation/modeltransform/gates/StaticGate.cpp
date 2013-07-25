@@ -30,9 +30,11 @@ int StaticGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const
 	assert(doc.get());
 
 	std::string staticFormula = serializeAsFormula(doc);
-	int gateInput = doc->addPlace(1, 1);
-	int fulfilFormula = doc->addGuardedTransition(staticFormula);
-	int gateFired = doc->addPlace(0, 1);
+	const int gateInput = doc->addPlace(1, 1);
+
+	// TODO: this only works if all children were static. otherwise, fallback to standard PT serialization
+	const int fulfilFormula = doc->addGuardedTransition(staticFormula);
+	const int gateFired = doc->addPlace(0, 1);
 
 	doc->placeToTransition(gateInput, fulfilFormula);
 	doc->transitionToPlace(fulfilFormula, gateFired);

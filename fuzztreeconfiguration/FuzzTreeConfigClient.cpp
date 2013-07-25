@@ -12,7 +12,7 @@ FuzzTreeConfigClient::FuzzTreeConfigClient(const string& tubeName, const string&
 	{
 		Client::connect();
 	} 
-	catch(exception& e)
+	catch (exception& e)
 	{
 		cerr << e.what() << endl;
 		exit(1);

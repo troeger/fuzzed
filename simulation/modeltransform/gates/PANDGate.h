@@ -15,6 +15,7 @@ public:
 
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
+	virtual int serializeTimeNet(boost::shared_ptr<TNDocument> doc) const override;
 	virtual int serializePTNet(boost::shared_ptr<PNDocument> doc) const override;
 
 protected:

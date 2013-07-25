@@ -1,4 +1,6 @@
 #pragma once
+#include "FaultTreeNode.h"
+
 #include <assert.h>
 #include <boost/filesystem/path.hpp>
 #include <iostream>
@@ -9,8 +11,6 @@ struct SimulationRoundResult
 	bool valid;
 	unsigned int failureTime; // number of logical time steps until the failure event
 };
-
-class FaultTreeNode;
 
 class Simulation
 {
@@ -24,7 +24,7 @@ public:
 		m_simulationTimeSeconds(simulationTime),
 		m_numSimulationSteps(simulationSteps),
 		m_numRounds(numRounds),
-		m_bRunning(false){};
+		m_bRunning(false) {};
 
 
 	Simulation(
@@ -37,7 +37,7 @@ public:
 		m_simulationTimeSeconds(simulationTime),
 		m_numSimulationSteps(simulationSteps),
 		m_numRounds(numRounds),
-		m_bRunning(false){};
+		m_bRunning(false) {};
 
 	virtual ~Simulation() { assert(!m_bRunning); };
 

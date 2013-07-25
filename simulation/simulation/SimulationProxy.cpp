@@ -229,7 +229,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 		if (!file.is_open())
 			throw runtime_error("Could not open file");
 
-		auto ftTransform = FuzzTreeTransform(file);
+		FuzzTreeTransform ftTransform(file);
 		int i = 0;
 		for (const auto& ft : ftTransform.transform())
 		{
@@ -284,13 +284,13 @@ void SimulationProxy::simulateFaultTree(FaultTreeNode* ft, const std::string& ne
 	case STRUCTUREFORMULA_ONLY:
 		auto TNdoc = boost::shared_ptr<TNDocument>(new TNDocument());
 		ft->serializeTimeNet(TNdoc);
+		std::cout << ft->serializeAsFormula(TNdoc) << endl;
 		doc = TNdoc;
 		break;
 	}
-	
-	std::cout << ft->serializeAsFormula(doc) << endl;
-	
-	if (impl == STRUCTUREFORMULA_ONLY) return;
+
+	if (impl == STRUCTUREFORMULA_ONLY)
+		return;
 
 	doc->save(newFileName);	
 	runSimulationInternal(newFileName, impl, m_timeNetProperties);
@@ -307,7 +307,7 @@ void runSimulation(
 	{
 		SimulationProxy p = SimulationProxy(missionTime, numRounds, convergenceThreshold, maxTime);
 		
-		auto ftTransform = FuzzTreeTransform(fuzztreeXML);
+		FuzzTreeTransform ftTransform(fuzztreeXML);
 		int i = 0;
 		for (const auto& ft : ftTransform.transform())
 		{

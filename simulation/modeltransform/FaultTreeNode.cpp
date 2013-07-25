@@ -76,7 +76,7 @@ bool FaultTreeNode::addChildBelow(const std::string& id, FaultTreeNode* inserted
 
 FaultTreeNode::~FaultTreeNode()
 {
-	for (auto child : m_children)
+	for (const auto& child : m_children)
 		delete child;
 }
 
@@ -95,4 +95,9 @@ int FaultTreeNode::getCost() const
 	for (auto& child : m_children)
 		result += child->getCost();
 	return result;
+}
+
+int FaultTreeNode::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const
+{
+	return serializePTNet(doc);
 }

@@ -305,13 +305,13 @@ namespace faulttree
 
   Idlist::
   Idlist ()
-  : ::xsd::cxx::tree::list< ::xml_schema::Int, char > ( ::xml_schema::Flags (0), this)
+  : ::xsd::cxx::tree::list< ::xml_schema::String, char > ( ::xml_schema::Flags (0), this)
   {
   }
 
   Idlist::
-  Idlist (size_type n, const ::xml_schema::Int& x)
-  : ::xsd::cxx::tree::list< ::xml_schema::Int, char > (n, x, this)
+  Idlist (size_type n, const ::xml_schema::String& x)
+  : ::xsd::cxx::tree::list< ::xml_schema::String, char > (n, x, this)
   {
   }
 
@@ -320,63 +320,81 @@ namespace faulttree
           ::xml_schema::Flags f,
           ::xml_schema::Container* c)
   : ::xml_schema::SimpleType (o, f, c),
-    ::xsd::cxx::tree::list< ::xml_schema::Int, char > (o, f, this)
+    ::xsd::cxx::tree::list< ::xml_schema::String, char > (o, f, this)
   {
   }
 
-  // ColdSpare
+  // Spare
   // 
 
-  const ColdSpare::SpareIdsType& ColdSpare::
+  const Spare::SpareIdsType& Spare::
   spareIds () const
   {
     return this->spareIds_.get ();
   }
 
-  ColdSpare::SpareIdsType& ColdSpare::
+  Spare::SpareIdsType& Spare::
   spareIds ()
   {
     return this->spareIds_.get ();
   }
 
-  void ColdSpare::
+  void Spare::
   spareIds (const SpareIdsType& x)
   {
     this->spareIds_.set (x);
   }
 
-  void ColdSpare::
+  void Spare::
   spareIds (::std::auto_ptr< SpareIdsType > x)
   {
     this->spareIds_.set (x);
+  }
+
+  const Spare::DormancyFactorType& Spare::
+  dormancyFactor () const
+  {
+    return this->dormancyFactor_.get ();
+  }
+
+  Spare::DormancyFactorType& Spare::
+  dormancyFactor ()
+  {
+    return this->dormancyFactor_.get ();
+  }
+
+  void Spare::
+  dormancyFactor (const DormancyFactorType& x)
+  {
+    this->dormancyFactor_.set (x);
   }
 
 
   // PriorityAnd
   // 
 
-  const PriorityAnd::PriorityIdsType& PriorityAnd::
-  priorityIds () const
+  const PriorityAnd::EventSequenceType& PriorityAnd::
+  eventSequence () const
   {
-    return this->priorityIds_.get ();
+    return this->eventSequence_.get ();
   }
 
-  PriorityAnd::PriorityIdsType& PriorityAnd::
-  priorityIds ()
+  PriorityAnd::EventSequenceType& PriorityAnd::
+  eventSequence ()
   {
-    return this->priorityIds_.get ();
-  }
-
-  void PriorityAnd::
-  priorityIds (const PriorityIdsType& x)
-  {
-    this->priorityIds_.set (x);
+    return this->eventSequence_.get ();
   }
 
   void PriorityAnd::
-  priorityIds (::std::auto_ptr< PriorityIdsType > x)
+  eventSequence (const EventSequenceType& x)
   {
-    this->priorityIds_.set (x);
+    this->eventSequence_.set (x);
+  }
+
+  void PriorityAnd::
+  eventSequence (::std::auto_ptr< EventSequenceType > x)
+  {
+    this->eventSequence_.set (x);
   }
 
 
@@ -410,6 +428,30 @@ namespace faulttree
 
   // FDEP
   // 
+
+  const FDEP::TriggerType& FDEP::
+  trigger () const
+  {
+    return this->trigger_.get ();
+  }
+
+  FDEP::TriggerType& FDEP::
+  trigger ()
+  {
+    return this->trigger_.get ();
+  }
+
+  void FDEP::
+  trigger (const TriggerType& x)
+  {
+    this->trigger_.set (x);
+  }
+
+  void FDEP::
+  trigger (::std::auto_ptr< TriggerType > x)
+  {
+    this->trigger_.set (x);
+  }
 
   const FDEP::TriggeredEventsType& FDEP::
   triggeredEvents () const
@@ -515,6 +557,10 @@ namespace faulttree
 
 
   // HouseEvent
+  // 
+
+
+  // IntermediateEvent
   // 
 }
 
@@ -1527,7 +1573,7 @@ namespace faulttree
           ::xml_schema::Flags f,
           ::xml_schema::Container* c)
   : ::xml_schema::SimpleType (e, f, c),
-    ::xsd::cxx::tree::list< ::xml_schema::Int, char > (e, f, this)
+    ::xsd::cxx::tree::list< ::xml_schema::String, char > (e, f, this)
   {
   }
 
@@ -1536,7 +1582,7 @@ namespace faulttree
           ::xml_schema::Flags f,
           ::xml_schema::Container* c)
   : ::xml_schema::SimpleType (a, f, c),
-    ::xsd::cxx::tree::list< ::xml_schema::Int, char > (a, f, this)
+    ::xsd::cxx::tree::list< ::xml_schema::String, char > (a, f, this)
   {
   }
 
@@ -1546,7 +1592,7 @@ namespace faulttree
           ::xml_schema::Flags f,
           ::xml_schema::Container* c)
   : ::xml_schema::SimpleType (s, e, f, c),
-    ::xsd::cxx::tree::list< ::xml_schema::Int, char > (s, e, f, this)
+    ::xsd::cxx::tree::list< ::xml_schema::String, char > (s, e, f, this)
   {
   }
 
@@ -1568,32 +1614,36 @@ namespace faulttree
     "idlist",
     "net.faulttree");
 
-  // ColdSpare
+  // Spare
   //
 
-  ColdSpare::
-  ColdSpare (const IdType& id,
-             const SpareIdsType& spareIds)
+  Spare::
+  Spare (const IdType& id,
+         const SpareIdsType& spareIds,
+         const DormancyFactorType& dormancyFactor)
   : ::faulttree::DynamicGate (id),
-    spareIds_ (spareIds, ::xml_schema::Flags (), this)
+    spareIds_ (spareIds, ::xml_schema::Flags (), this),
+    dormancyFactor_ (dormancyFactor, ::xml_schema::Flags (), this)
   {
   }
 
-  ColdSpare::
-  ColdSpare (const ColdSpare& x,
-             ::xml_schema::Flags f,
-             ::xml_schema::Container* c)
+  Spare::
+  Spare (const Spare& x,
+         ::xml_schema::Flags f,
+         ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (x, f, c),
-    spareIds_ (x.spareIds_, f, this)
+    spareIds_ (x.spareIds_, f, this),
+    dormancyFactor_ (x.dormancyFactor_, f, this)
   {
   }
 
-  ColdSpare::
-  ColdSpare (const ::xercesc::DOMElement& e,
-             ::xml_schema::Flags f,
-             ::xml_schema::Container* c)
+  Spare::
+  Spare (const ::xercesc::DOMElement& e,
+         ::xml_schema::Flags f,
+         ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (e, f | ::xml_schema::Flags::base, c),
-    spareIds_ (f, this)
+    spareIds_ (f, this),
+    dormancyFactor_ (f, this)
   {
     if ((f & ::xml_schema::Flags::base) == 0)
     {
@@ -1602,7 +1652,7 @@ namespace faulttree
     }
   }
 
-  void ColdSpare::
+  void Spare::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -1624,6 +1674,12 @@ namespace faulttree
         this->spareIds_.set (r);
         continue;
       }
+
+      if (n.name () == "dormancyFactor" && n.namespace_ ().empty ())
+      {
+        this->dormancyFactor_.set (DormancyFactorTraits::create (i, f, this));
+        continue;
+      }
     }
 
     if (!spareIds_.present ())
@@ -1632,24 +1688,31 @@ namespace faulttree
         "spareIds",
         "");
     }
+
+    if (!dormancyFactor_.present ())
+    {
+      throw ::xsd::cxx::tree::expected_attribute< char > (
+        "dormancyFactor",
+        "");
+    }
   }
 
-  ColdSpare* ColdSpare::
+  Spare* Spare::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class ColdSpare (*this, f, c);
+    return new class Spare (*this, f, c);
   }
 
-  ColdSpare::
-  ~ColdSpare ()
+  Spare::
+  ~Spare ()
   {
   }
 
   static
-  const ::xsd::cxx::tree::type_factory_initializer< 0, char, ColdSpare >
-  _xsd_ColdSpare_type_factory_init (
-    "ColdSpare",
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, Spare >
+  _xsd_Spare_type_factory_init (
+    "Spare",
     "net.faulttree");
 
   // PriorityAnd
@@ -1657,9 +1720,9 @@ namespace faulttree
 
   PriorityAnd::
   PriorityAnd (const IdType& id,
-               const PriorityIdsType& priorityIds)
+               const EventSequenceType& eventSequence)
   : ::faulttree::DynamicGate (id),
-    priorityIds_ (priorityIds, ::xml_schema::Flags (), this)
+    eventSequence_ (eventSequence, ::xml_schema::Flags (), this)
   {
   }
 
@@ -1668,7 +1731,7 @@ namespace faulttree
                ::xml_schema::Flags f,
                ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (x, f, c),
-    priorityIds_ (x.priorityIds_, f, this)
+    eventSequence_ (x.eventSequence_, f, this)
   {
   }
 
@@ -1677,7 +1740,7 @@ namespace faulttree
                ::xml_schema::Flags f,
                ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (e, f | ::xml_schema::Flags::base, c),
-    priorityIds_ (f, this)
+    eventSequence_ (f, this)
   {
     if ((f & ::xml_schema::Flags::base) == 0)
     {
@@ -1700,20 +1763,20 @@ namespace faulttree
       const ::xsd::cxx::xml::qualified_name< char > n (
         ::xsd::cxx::xml::dom::name< char > (i));
 
-      if (n.name () == "priorityIds" && n.namespace_ ().empty ())
+      if (n.name () == "eventSequence" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< PriorityIdsType > r (
-          PriorityIdsTraits::create (i, f, this));
+        ::std::auto_ptr< EventSequenceType > r (
+          EventSequenceTraits::create (i, f, this));
 
-        this->priorityIds_.set (r);
+        this->eventSequence_.set (r);
         continue;
       }
     }
 
-    if (!priorityIds_.present ())
+    if (!eventSequence_.present ())
     {
       throw ::xsd::cxx::tree::expected_attribute< char > (
-        "priorityIds",
+        "eventSequence",
         "");
     }
   }
@@ -1825,8 +1888,10 @@ namespace faulttree
 
   FDEP::
   FDEP (const IdType& id,
+        const TriggerType& trigger,
         const TriggeredEventsType& triggeredEvents)
   : ::faulttree::DynamicGate (id),
+    trigger_ (trigger, ::xml_schema::Flags (), this),
     triggeredEvents_ (triggeredEvents, ::xml_schema::Flags (), this)
   {
   }
@@ -1836,6 +1901,7 @@ namespace faulttree
         ::xml_schema::Flags f,
         ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (x, f, c),
+    trigger_ (x.trigger_, f, this),
     triggeredEvents_ (x.triggeredEvents_, f, this)
   {
   }
@@ -1845,6 +1911,7 @@ namespace faulttree
         ::xml_schema::Flags f,
         ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (e, f | ::xml_schema::Flags::base, c),
+    trigger_ (f, this),
     triggeredEvents_ (f, this)
   {
     if ((f & ::xml_schema::Flags::base) == 0)
@@ -1868,6 +1935,15 @@ namespace faulttree
       const ::xsd::cxx::xml::qualified_name< char > n (
         ::xsd::cxx::xml::dom::name< char > (i));
 
+      if (n.name () == "trigger" && n.namespace_ ().empty ())
+      {
+        ::std::auto_ptr< TriggerType > r (
+          TriggerTraits::create (i, f, this));
+
+        this->trigger_.set (r);
+        continue;
+      }
+
       if (n.name () == "triggeredEvents" && n.namespace_ ().empty ())
       {
         ::std::auto_ptr< TriggeredEventsType > r (
@@ -1876,6 +1952,13 @@ namespace faulttree
         this->triggeredEvents_.set (r);
         continue;
       }
+    }
+
+    if (!trigger_.present ())
+    {
+      throw ::xsd::cxx::tree::expected_attribute< char > (
+        "trigger",
+        "");
     }
 
     if (!triggeredEvents_.present ())
@@ -2207,6 +2290,49 @@ namespace faulttree
   const ::xsd::cxx::tree::type_factory_initializer< 0, char, HouseEvent >
   _xsd_HouseEvent_type_factory_init (
     "HouseEvent",
+    "net.faulttree");
+
+  // IntermediateEvent
+  //
+
+  IntermediateEvent::
+  IntermediateEvent (const IdType& id)
+  : ::faulttree::ChildNode (id)
+  {
+  }
+
+  IntermediateEvent::
+  IntermediateEvent (const IntermediateEvent& x,
+                     ::xml_schema::Flags f,
+                     ::xml_schema::Container* c)
+  : ::faulttree::ChildNode (x, f, c)
+  {
+  }
+
+  IntermediateEvent::
+  IntermediateEvent (const ::xercesc::DOMElement& e,
+                     ::xml_schema::Flags f,
+                     ::xml_schema::Container* c)
+  : ::faulttree::ChildNode (e, f, c)
+  {
+  }
+
+  IntermediateEvent* IntermediateEvent::
+  _clone (::xml_schema::Flags f,
+          ::xml_schema::Container* c) const
+  {
+    return new class IntermediateEvent (*this, f, c);
+  }
+
+  IntermediateEvent::
+  ~IntermediateEvent ()
+  {
+  }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, IntermediateEvent >
+  _xsd_IntermediateEvent_type_factory_init (
+    "IntermediateEvent",
     "net.faulttree");
 }
 
@@ -3086,20 +3212,20 @@ namespace faulttree
   void
   operator<< (::xercesc::DOMElement& e, const Idlist& i)
   {
-    e << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::Int, char >& > (i);
+    e << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::String, char >& > (i);
   }
 
   void
   operator<< (::xercesc::DOMAttr& a, const Idlist& i)
   {
-    a << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::Int, char >& > (i);
+    a << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::String, char >& > (i);
   }
 
   void
   operator<< (::xml_schema::ListStream& l,
               const Idlist& i)
   {
-    l << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::Int, char >& > (i);
+    l << static_cast< const ::xsd::cxx::tree::list< ::xml_schema::String, char >& > (i);
   }
 
   static
@@ -3110,7 +3236,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const ColdSpare& i)
+  operator<< (::xercesc::DOMElement& e, const Spare& i)
   {
     e << static_cast< const ::faulttree::DynamicGate& > (i);
 
@@ -3124,12 +3250,23 @@ namespace faulttree
 
       a << i.spareIds ();
     }
+
+    // dormancyFactor
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "dormancyFactor",
+          e));
+
+      a << ::xml_schema::AsDouble(i.dormancyFactor ());
+    }
   }
 
   static
-  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, ColdSpare >
-  _xsd_ColdSpare_type_serializer_init (
-    "ColdSpare",
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, Spare >
+  _xsd_Spare_type_serializer_init (
+    "Spare",
     "net.faulttree");
 
 
@@ -3138,15 +3275,15 @@ namespace faulttree
   {
     e << static_cast< const ::faulttree::DynamicGate& > (i);
 
-    // priorityIds
+    // eventSequence
     //
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
-          "priorityIds",
+          "eventSequence",
           e));
 
-      a << i.priorityIds ();
+      a << i.eventSequence ();
     }
   }
 
@@ -3185,6 +3322,17 @@ namespace faulttree
   operator<< (::xercesc::DOMElement& e, const FDEP& i)
   {
     e << static_cast< const ::faulttree::DynamicGate& > (i);
+
+    // trigger
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "trigger",
+          e));
+
+      a << i.trigger ();
+    }
 
     // triggeredEvents
     //
@@ -3299,6 +3447,19 @@ namespace faulttree
   const ::xsd::cxx::tree::type_serializer_initializer< 0, char, HouseEvent >
   _xsd_HouseEvent_type_serializer_init (
     "HouseEvent",
+    "net.faulttree");
+
+
+  void
+  operator<< (::xercesc::DOMElement& e, const IntermediateEvent& i)
+  {
+    e << static_cast< const ::faulttree::ChildNode& > (i);
+  }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, IntermediateEvent >
+  _xsd_IntermediateEvent_type_serializer_init (
+    "IntermediateEvent",
     "net.faulttree");
 }
 

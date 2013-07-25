@@ -267,7 +267,7 @@ namespace faulttree
   class VotingOr;
   class DynamicGate;
   class Idlist;
-  class ColdSpare;
+  class Spare;
   class PriorityAnd;
   class Sequence;
   class FDEP;
@@ -275,6 +275,7 @@ namespace faulttree
   class UndevelopedEvent;
   class BasicEvent;
   class HouseEvent;
+  class IntermediateEvent;
 }
 
 
@@ -869,16 +870,16 @@ namespace faulttree
   };
 
   class Idlist: public ::xml_schema::SimpleType,
-    public ::xsd::cxx::tree::list< ::xml_schema::Int, char >
+    public ::xsd::cxx::tree::list< ::xml_schema::String, char >
   {
     public:
     Idlist ();
 
-    Idlist (size_type n, const ::xml_schema::Int& x);
+    Idlist (size_type n, const ::xml_schema::String& x);
 
     template < typename I >
     Idlist (const I& begin, const I& end)
-    : ::xsd::cxx::tree::list< ::xml_schema::Int, char > (begin, end, this)
+    : ::xsd::cxx::tree::list< ::xml_schema::String, char > (begin, end, this)
     {
     }
 
@@ -907,7 +908,7 @@ namespace faulttree
     ~Idlist ();
   };
 
-  class ColdSpare: public ::faulttree::DynamicGate
+  class Spare: public ::faulttree::DynamicGate
   {
     public:
     // spareIds
@@ -927,25 +928,40 @@ namespace faulttree
     void
     spareIds (::std::auto_ptr< SpareIdsType > p);
 
+    // dormancyFactor
+    // 
+    typedef ::xml_schema::Double DormancyFactorType;
+    typedef ::xsd::cxx::tree::traits< DormancyFactorType, char, ::xsd::cxx::tree::schema_type::double_ > DormancyFactorTraits;
+
+    const DormancyFactorType&
+    dormancyFactor () const;
+
+    DormancyFactorType&
+    dormancyFactor ();
+
+    void
+    dormancyFactor (const DormancyFactorType& x);
+
     // Constructors.
     //
-    ColdSpare (const IdType&,
-               const SpareIdsType&);
+    Spare (const IdType&,
+           const SpareIdsType&,
+           const DormancyFactorType&);
 
-    ColdSpare (const ::xercesc::DOMElement& e,
-               ::xml_schema::Flags f = 0,
-               ::xml_schema::Container* c = 0);
+    Spare (const ::xercesc::DOMElement& e,
+           ::xml_schema::Flags f = 0,
+           ::xml_schema::Container* c = 0);
 
-    ColdSpare (const ColdSpare& x,
-               ::xml_schema::Flags f = 0,
-               ::xml_schema::Container* c = 0);
+    Spare (const Spare& x,
+           ::xml_schema::Flags f = 0,
+           ::xml_schema::Container* c = 0);
 
-    virtual ColdSpare*
+    virtual Spare*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~ColdSpare ();
+    ~Spare ();
 
     // Implementation.
     //
@@ -956,32 +972,33 @@ namespace faulttree
 
     protected:
     ::xsd::cxx::tree::one< SpareIdsType > spareIds_;
+    ::xsd::cxx::tree::one< DormancyFactorType > dormancyFactor_;
   };
 
   class PriorityAnd: public ::faulttree::DynamicGate
   {
     public:
-    // priorityIds
+    // eventSequence
     // 
-    typedef ::faulttree::Idlist PriorityIdsType;
-    typedef ::xsd::cxx::tree::traits< PriorityIdsType, char > PriorityIdsTraits;
+    typedef ::faulttree::Idlist EventSequenceType;
+    typedef ::xsd::cxx::tree::traits< EventSequenceType, char > EventSequenceTraits;
 
-    const PriorityIdsType&
-    priorityIds () const;
+    const EventSequenceType&
+    eventSequence () const;
 
-    PriorityIdsType&
-    priorityIds ();
-
-    void
-    priorityIds (const PriorityIdsType& x);
+    EventSequenceType&
+    eventSequence ();
 
     void
-    priorityIds (::std::auto_ptr< PriorityIdsType > p);
+    eventSequence (const EventSequenceType& x);
+
+    void
+    eventSequence (::std::auto_ptr< EventSequenceType > p);
 
     // Constructors.
     //
     PriorityAnd (const IdType&,
-                 const PriorityIdsType&);
+                 const EventSequenceType&);
 
     PriorityAnd (const ::xercesc::DOMElement& e,
                  ::xml_schema::Flags f = 0,
@@ -1006,7 +1023,7 @@ namespace faulttree
            ::xml_schema::Flags);
 
     protected:
-    ::xsd::cxx::tree::one< PriorityIdsType > priorityIds_;
+    ::xsd::cxx::tree::one< EventSequenceType > eventSequence_;
   };
 
   class Sequence: public ::faulttree::DynamicGate
@@ -1063,6 +1080,23 @@ namespace faulttree
   class FDEP: public ::faulttree::DynamicGate
   {
     public:
+    // trigger
+    // 
+    typedef ::xml_schema::String TriggerType;
+    typedef ::xsd::cxx::tree::traits< TriggerType, char > TriggerTraits;
+
+    const TriggerType&
+    trigger () const;
+
+    TriggerType&
+    trigger ();
+
+    void
+    trigger (const TriggerType& x);
+
+    void
+    trigger (::std::auto_ptr< TriggerType > p);
+
     // triggeredEvents
     // 
     typedef ::faulttree::Idlist TriggeredEventsType;
@@ -1083,6 +1117,7 @@ namespace faulttree
     // Constructors.
     //
     FDEP (const IdType&,
+          const TriggerType&,
           const TriggeredEventsType&);
 
     FDEP (const ::xercesc::DOMElement& e,
@@ -1108,6 +1143,7 @@ namespace faulttree
            ::xml_schema::Flags);
 
     protected:
+    ::xsd::cxx::tree::one< TriggerType > trigger_;
     ::xsd::cxx::tree::one< TriggeredEventsType > triggeredEvents_;
   };
 
@@ -1279,6 +1315,29 @@ namespace faulttree
 
     virtual 
     ~HouseEvent ();
+  };
+
+  class IntermediateEvent: public ::faulttree::ChildNode
+  {
+    public:
+    // Constructors.
+    //
+    IntermediateEvent (const IdType&);
+
+    IntermediateEvent (const ::xercesc::DOMElement& e,
+                       ::xml_schema::Flags f = 0,
+                       ::xml_schema::Container* c = 0);
+
+    IntermediateEvent (const IntermediateEvent& x,
+                       ::xml_schema::Flags f = 0,
+                       ::xml_schema::Container* c = 0);
+
+    virtual IntermediateEvent*
+    _clone (::xml_schema::Flags f = 0,
+            ::xml_schema::Container* c = 0) const;
+
+    virtual 
+    ~IntermediateEvent ();
   };
 }
 
@@ -1532,7 +1591,7 @@ namespace faulttree
               const Idlist&);
 
   void
-  operator<< (::xercesc::DOMElement&, const ColdSpare&);
+  operator<< (::xercesc::DOMElement&, const Spare&);
 
   void
   operator<< (::xercesc::DOMElement&, const PriorityAnd&);
@@ -1554,6 +1613,9 @@ namespace faulttree
 
   void
   operator<< (::xercesc::DOMElement&, const HouseEvent&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const IntermediateEvent&);
 }
 
 #include <xsd/cxx/post.hxx>

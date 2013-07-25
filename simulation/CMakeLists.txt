@@ -7,6 +7,7 @@ set(Boost_USE_MULTITHREADED     ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
 #add_definitions(-DBOOST_ALL_NO_LIB)
 #add_definitions(-DBoost_DEBUG=1)
+add_definitions(-D_ALLOW_KEYWORD_MACROS)
 
 set(BOOST_ROOT $ENV{BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
 set(BOOST_INCLUDEDIR ${BOOST_ROOT}/Include)

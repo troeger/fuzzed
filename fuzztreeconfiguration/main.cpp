@@ -4,6 +4,8 @@
 
 int main(int argc, char **argv)
 {
+	
+	
 	FuzzTreeConfigClient client("foo", BEANSTALK_SERVER, BEANSTALK_PORT);
 	client.run();
 

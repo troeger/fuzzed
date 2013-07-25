@@ -10,6 +10,8 @@ PANDGate::PANDGate(const string& id, const std::vector<std::string>& ordering, c
 
 int PANDGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
 {
+	// old version which discards invalid child sequences in a separate place
+
 	int previousChildFailed = -1;
 	int garbage = addSequenceViolatedPlace(doc);
 	for (auto& child : m_children)
@@ -50,4 +52,16 @@ FaultTreeNode* PANDGate::clone() const
 int PANDGate::addSequenceViolatedPlace(boost::shared_ptr<PNDocument> doc) const
 {
 	return doc->addPlace(0, 0, "SequenceViolated");
+}
+
+int PANDGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+{
+	for (const auto& child : m_children)
+	{
+		int childFailed = child->serializeTimeNet(doc);
+
+
+	}
+
+	return -1;
 }

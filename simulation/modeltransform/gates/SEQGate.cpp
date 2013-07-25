@@ -21,3 +21,9 @@ int SEQGate::addSequenceViolatedPlace(boost::shared_ptr<PNDocument> doc) const
 {
 	return doc->addPlace(0, 1, "SequenceViolated", CONSTRAINT_VIOLATED_PLACE);
 }
+
+int SEQGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+{
+	assert(false);
+	return -1;
+}
