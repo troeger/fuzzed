@@ -36,7 +36,7 @@ public:
 	virtual int addTopLevelPlace(const std::string&) override;
 	virtual int addPlace(int initialMarking, int capacity = 1,  const std::string& label = "", PlaceSemantics semantics = DEFAULT_PLACE) override;
 
-	virtual void addInhibitorArc(int inhibitingPlace, int inhbitedTransitions, int tokenCount = 0) override;
+	virtual void addInhibitorArc(int inhibitingPlace, int inhbitedTransition, int tokenCount = 0) override;
 	
 	virtual bool save(const std::string& fileName) override;
 

@@ -5,12 +5,12 @@
 using namespace std;
 
 SEQGate::SEQGate(const string& id, const vector<string>& ordering, const string& name /*= ""*/)
-	: PANDGate(id, ordering, name), m_ordering(ordering)
+	: PANDGate(id, ordering, name), m_enforcedSequence(ordering)
 {}
 
 FaultTreeNode* SEQGate::clone() const 
 {
-	SEQGate* cloned  = new SEQGate(m_id, m_ordering, m_name);
+	SEQGate* cloned  = new SEQGate(m_id, m_enforcedSequence, m_name);
 	for (auto& child : m_children)
 		cloned->addChild(child->clone());
 

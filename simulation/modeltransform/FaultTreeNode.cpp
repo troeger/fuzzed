@@ -48,6 +48,24 @@ FaultTreeNode* FaultTreeNode::getChildById(const std::string& id)
 	return nullptr;
 }
 
+
+const FaultTreeNode* FaultTreeNode::getChildById(const std::string& id) const
+{
+	if (m_id == id) return this;
+
+	for (auto& child : m_children)
+	{
+		if (child->getId() == id) return child;
+
+		else 
+		{
+			FaultTreeNode* c = child->getChildById(id);
+			if (c !=  nullptr) return c;
+		}
+	}
+	return nullptr;
+}
+
 string FaultTreeNode::description() const
 {
 	return 

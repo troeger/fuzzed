@@ -3,12 +3,6 @@
 #include <vector>
 #include "PANDGate.h"
 
-// TODO: think about the semantics.
-// currently, simulations where the children do not occur in the right sequence are aborted.
-// since the probability of the specific sequence can be low, this results in very few completed simulation rounds.
-
-#define STATIC_SEQUENCE 1
-
 class SEQGate : public PANDGate
 {
 public:
@@ -21,5 +15,5 @@ public:
 protected:
 	virtual int addSequenceViolatedPlace(boost::shared_ptr<PNDocument> doc) const override;
 
-	std::vector<std::string> m_ordering;
+	std::vector<std::string> m_enforcedSequence;
 };

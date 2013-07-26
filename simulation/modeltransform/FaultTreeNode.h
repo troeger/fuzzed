@@ -36,6 +36,7 @@ public:
 	/* data access                                                          */
 	/************************************************************************/
 	FaultTreeNode* getChildById(const std::string& ID);
+	const FaultTreeNode* getChildById(const std::string& ID) const; // TODO copy-pasted just to enforce const-ness
 
 	int getNumChildren() const { return m_children.size(); };
 

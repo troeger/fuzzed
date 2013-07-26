@@ -21,5 +21,5 @@ public:
 protected:
 	virtual int addSequenceViolatedPlace(boost::shared_ptr<PNDocument> doc) const;
 
-	std::vector<std::string> m_prioIDs;
+	std::vector<std::string> m_requiredSequence;
 };

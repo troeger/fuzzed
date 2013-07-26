@@ -18,6 +18,6 @@ namespace faultTreeType
 
 	const std::string FDEP	= "class faulttree::FDEP";
 	const std::string SPARE = "class faulttree::Spare";
-	const std::string PAND	= "class faulttree::PAND";
+	const std::string PAND	= "class faulttree::PriorityAnd";
 	const std::string SEQ	= "class faulttree::SEQ";
 }
