@@ -36,7 +36,9 @@ void convertFaultTreeRecursive(FaultTreeNode* node, const faulttree::Node& templ
 
 			current = new BasicEvent(id, failureRate);
 			node->addChild(current);
-			continue;
+			
+			// BasicEvents can have FDEP children...
+			// continue;
 		}
 		else if (typeName == HOUSEEVENT)
 		{ // TODO find out if this is legitimate

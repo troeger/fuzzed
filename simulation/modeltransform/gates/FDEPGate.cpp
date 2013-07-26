@@ -7,19 +7,8 @@ FDEPGate::FDEPGate(const std::string& id, const std::string& trigger, std::vecto
 
 int FDEPGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
 {
-	int gateTriggered = doc->addPlace(0, 1, "FDEP triggered");
-
-	assert(m_children.size() == 1); // this should be the triggering event
-	int childTriggered = m_children.front()->serializePTNet(doc);
-
-	int triggerTrans = doc->addImmediateTransition();
-
-	doc->placeToTransition(childTriggered, triggerTrans);
-	doc->transitionToPlace(triggerTrans, gateTriggered);
-
-	// TODO: find the dependent events' output places and connect to them...
-
-	return gateTriggered;
+	const auto& triggerChild = getChildById(m_triggerID);
+	return triggerChild->serializePTNet(doc); // FDEP gates do not propagate upwards
 }
 
 FaultTreeNode* FDEPGate::clone() const 
@@ -33,7 +22,7 @@ FaultTreeNode* FDEPGate::clone() const
 
 int FDEPGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
 {
-	assert(false);
-	return -1;
+	const auto& triggerChild = getChildById(m_triggerID);
+	return triggerChild->serializeTimeNet(doc); // FDEP gates do not propagate upwards
 }
 

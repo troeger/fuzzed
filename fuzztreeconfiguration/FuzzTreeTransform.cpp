@@ -334,7 +334,8 @@ ErrorType FuzzTreeTransform::generateFaultTreeRecursive(
 		{
 			auto ret = expandBasicEventSet(&currentChild, node, id, 0);
 			if (ret != NO_ERROR) return ret;
-			continue;
+			// BasicEvents can have FDEP children...
+			// continue;
 		}
 		else if (typeName == INTERMEDIATEEVENTSET)
 		{
@@ -346,7 +347,8 @@ ErrorType FuzzTreeTransform::generateFaultTreeRecursive(
 		else copyNode(typeName, node, id, currentChild);
 		
 		// break recursion
-		if (bLeaf) continue;
+		// BasicEvents can have FDEP children...
+		// continue;
 
 		generateFaultTreeRecursive(&currentChild, bChanged ? &node->children().back() : node, configuration);
 	}
