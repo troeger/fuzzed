@@ -28,7 +28,9 @@ namespace
 		"\n%1%\n\n"
 		"\n%2%\n\n"
 		"\n%3%\n\n"
-		"\n%4%\n";
+		"\n%4%\n\n"
+		"\n%5%\n\n"
+		"\n%6%\n";
 
 	// NAME, MARKING, (X,Y)-POSITION (PLACE & TAG)
 	// 1: NAME
@@ -50,6 +52,14 @@ namespace
 	//	"OUTPARCS %6% \n %7%";
 
 	const string MEASURETEMPLATE = "MEASURE %1%\n%2%";
+
+	// 1: NAME
+	// 2: VALUE
+	const string DEFINITIONTEMPLATE = "DELAYPAR %1% %2% 0.0 0.0";
+	
+	// 1: TRANSITIONID
+	// 2: TERM DEPENDING ON A DEFINITION
+	const string DELAYTEMPLATE = "EXP_DELAY %1% %2%;";
 }
 
 TNDocument::TNDocument()
@@ -63,6 +73,20 @@ int TNDocument::addTimedTransition(long double rate, const std::string& /*= ""*/
 
 	return m_transitions.size()-1;
 }
+
+
+int TNDocument::addParametrisedTransition(const std::string& dependencyTerm)
+{
+	static const std::string MD = "<MD>";
+	
+	const string id = TRANSITION_IDENTIFIER + util::toString((int)m_transitions.size());
+	m_transitions[id] = TN_TransitionSpec((boost::format(EXPTRANSITIONTEMPLATE) % id % MD % 1).str());
+
+	addParametrisedDelay(id, dependencyTerm);
+
+	return m_transitions.size()-1;
+}
+
 
 int TNDocument::addImmediateTransition(const unsigned int priority /*= 1*/, const std::string& /*= ""*/)
 {
@@ -97,19 +121,34 @@ bool TNDocument::save(const string& fileName)
 	for (const auto& p : m_places)
 		places += p.second;
 
+	string definitions = "-- LIST OF DELAY PARAMETERS (NAME, VALUE, (X,Y)-POSITION):\n";
+	for (const auto& d : m_definitions)
+		definitions += d;
+
  	string transitions;
 	for (const auto& t : m_transitions)
 		transitions += transitionString(t.second);
+
+	string delays = "-- MARKING DEPENDENT FIRING DELAYS FOR EXP. TRANSITIONS:\n";
+	for (const auto& d : m_delays)
+		delays += d;
 
 	string enablingFunctions;
 	for (const auto& f : m_enablingFunctions)
 		enablingFunctions += f;
 
- 	string measures = "-- DEFINITION OF PARAMETERS:\n-- REWARD MEASURES:\n\n"; // more than a comment...
+ 	string measures = "-- REWARD MEASURES:\n\n"; // more than a comment...
 	for (const auto& m : m_measures)
 		measures += m;
 
-	file << boost::format(CONTENTTEMLPATE) % places % transitions % enablingFunctions % measures;
+	file << boost::format(CONTENTTEMLPATE) 
+		% places 
+		% definitions 
+		% transitions 
+		% delays
+		% enablingFunctions
+		% measures;
+
 	file << "-- END OF SPECIFICATION FILE" << std::endl;
 	file.close();
 
@@ -205,4 +244,14 @@ void TNDocument::addInhibitorArc(int inhibitingPlace, int inhbitedTransition, in
 
 	const string arc = util::toString(tokenCount) + " " + placeIdentifier(inhibitingPlace) + " " + util::toString(0) + "\n";
 	it->second.inhibitArcs.emplace_back(arc);
+}
+
+void TNDocument::addDefinition(const std::string& name, const double& val)
+{
+	m_definitions.emplace_back((boost::format(DEFINITIONTEMPLATE) % name % val).str());
+}
+
+void TNDocument::addParametrisedDelay(const std::string& transitionID, const std::string& delayTerm)
+{
+	m_delays.emplace_back((boost::format(DELAYTEMPLATE) % transitionID % delayTerm).str());
 }
