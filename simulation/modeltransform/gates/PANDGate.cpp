@@ -61,7 +61,7 @@ int PANDGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const
 	
 	vector<int> inhibitingPlaces;
 	
-	const int pandFailed = doc->addPlace(0);
+	const int pandFailed = doc->addPlace(0, 1);
 	const int failPand = doc->addImmediateTransition();
 
 	// fail just once
@@ -76,7 +76,7 @@ int PANDGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const
 
 		const int childFailed				= child->serializeTimeNet(doc);
 		const int propagateChildFailure		= doc->addImmediateTransition();
-		const int childFailurePropagated	= doc->addPlace(0);
+		const int childFailurePropagated	= doc->addPlace(0, 1);
 
 		doc->placeToTransition(childFailed, propagateChildFailure);
 		doc->transitionToPlace(propagateChildFailure, childFailed);

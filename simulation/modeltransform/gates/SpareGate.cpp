@@ -67,7 +67,7 @@ FaultTreeNode* SpareGate::clone() const
 int SpareGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
 {
 	// see FuzzTrees / simulation / modeltransform / timeNetModels / spare.xml
-	const int spareGateFailed = doc->addPlace(0);
+	const int spareGateFailed = doc->addPlace(0, 1);
 	const int failSpareGate = doc->addImmediateTransition();
 
 	// fail just once

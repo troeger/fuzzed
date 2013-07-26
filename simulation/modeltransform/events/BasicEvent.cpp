@@ -14,7 +14,7 @@ int BasicEvent::serializePTNet(boost::shared_ptr<PNDocument> doc) const
 	int failComponent = doc->addTimedTransition(m_failureRate);
 	doc->placeToTransition(notFailed, failComponent);
 	
-	int failed = doc->addPlace(0, 100, "BasicEvent" + m_id + "_occured");
+	int failed = doc->addPlace(0, 1, "BasicEvent" + m_id + "_occured");
 	doc->transitionToPlace(failComponent, failed);
 	return failed;
 }
