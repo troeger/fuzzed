@@ -39,7 +39,7 @@ void convertFaultTreeRecursive(FaultTreeNode* node, const faulttree::Node& templ
 			continue;
 		}
 		else if (typeName == HOUSEEVENT)
-		{
+		{ // TODO find out if this is legitimate
 			current = new BasicEvent(id, 0);
 			node->addChild(current);
 			continue;

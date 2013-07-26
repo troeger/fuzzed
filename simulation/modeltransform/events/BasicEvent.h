@@ -15,8 +15,8 @@ public:
 	std::pair<int /*placeID*/,int /*spareActivationTransition*/> 
 		serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const;
 
-	std::pair<int /*placeID*/, int /*timedTransitionID*/>
-		serializeSequential(boost::shared_ptr<PNDocument> doc) const;
+	std::tuple<int /*not failed*/, int /*failed*/, int /*failure transition*/>
+		serializeAsSpare(boost::shared_ptr<PNDocument> doc) const;
 
 	virtual int getCost() const override { return m_cost; };
 

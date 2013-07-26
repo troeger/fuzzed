@@ -74,10 +74,47 @@ int SpareGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const
 	doc->transitionToPlace(failSpareGate, spareGateFailed);
 	doc->addInhibitorArc(spareGateFailed, failSpareGate);
 	
-	static const string dormancy = "dormancyFactor";
-	doc->addDefinition(dormancy, m_dormancyFactor);
+// 	static const string dormancy = "dormancyFactor";
+// 	doc->addDefinition(dormancy, m_dormancyFactor); // not necessary actually
 
-	doc->addParametrisedTransition(dormancy + " * 2.0");
+	const auto& primaryChild = getChildById(m_primaryId);
+	const int primaryFailed = primaryChild->serializeTimeNet(doc);
+
+	doc->placeToTransition(primaryFailed, failSpareGate);
+	doc->transitionToPlace(failSpareGate, primaryFailed);
+
+	// spares
+	for (const auto& child : m_children)
+	{
+		if (child->getId() == m_primaryId) continue;
+
+		// TODO: in theory, BasicEventSets and house/undeveloped events are allowed as well
+		// the assumption is that BasicEventSets have previously been expanded
+		const BasicEvent* be = dynamic_cast<const BasicEvent*>(child);
+		if (!be) throw runtime_error("Spares must be BasicEvents");
+
+		const auto failureRate = be->getFailureRate();
+		const auto spare = be->serializeAsSpare(doc);
+
+		const int spareRunning		= get<0>(spare);
+		const int spareFailed		= get<1>(spare);
+		const int failSparePassive	= get<2>(spare);
+
+		const int spareActivated = doc->addPlace(0);
+		const int activateSpare = doc->addImmediateTransition();
+		doc->placeToTransition(spareRunning, activateSpare);
+		doc->placeToTransition(primaryFailed, activateSpare);
+		doc->transitionToPlace(activateSpare, spareActivated);
+
+		// once the spare has become activated, it has a different failure distribution
+		const int failSpareActive = doc->addTimedTransition(failureRate * m_dormancyFactor);
+		doc->placeToTransition(spareActivated, failSpareActive);
+		doc->addInhibitorArc(spareActivated, failSparePassive);
+		doc->transitionToPlace(failSpareActive, spareFailed);
+
+		doc->placeToTransition(spareFailed, failSpareGate);
+		doc->transitionToPlace(failSpareGate, spareFailed);
+	}
 
 	return spareGateFailed;
 }
