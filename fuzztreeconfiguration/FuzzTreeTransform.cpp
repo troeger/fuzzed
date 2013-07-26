@@ -248,6 +248,8 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 		}
 		generateConfigurationsRecursive(&child, configurations);
 	}
+
+	return NO_ERROR;
 }
 
 /************************************************************************/
@@ -348,6 +350,8 @@ ErrorType FuzzTreeTransform::generateFaultTreeRecursive(
 
 		generateFaultTreeRecursive(&currentChild, bChanged ? &node->children().back() : node, configuration);
 	}
+
+	return NO_ERROR;
 }
 
 ErrorType FuzzTreeTransform::expandBasicEventSet(
@@ -380,6 +384,8 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 		parentNode->children().push_back(be);
 		i++;
 	}
+
+	return NO_ERROR;
 }
 
 ErrorType FuzzTreeTransform::expandIntermediateEventSet(
@@ -410,6 +416,8 @@ ErrorType FuzzTreeTransform::expandIntermediateEventSet(
 		generateFaultTreeRecursive(&nextNode, &parentNode->children().back(), configuration);
 		i++;
 	}
+
+	return NO_ERROR;
 }
 
 bool FuzzTreeTransform::handleFeatureVP(
