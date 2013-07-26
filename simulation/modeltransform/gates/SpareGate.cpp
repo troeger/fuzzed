@@ -5,22 +5,23 @@
 
 #include <set>
 
-SpareGate::SpareGate(const std::string& id, const set<string>& spareIndices, const double& dormancyFactor, const string& name)
+SpareGate::SpareGate(const std::string& id, const std::string& primaryId, const double& dormancyFactor, const string& name)
 	: DynamicGate(id, name), 
-	m_spareIndices(spareIndices),
+	m_primaryId(primaryId),
 	m_dormancyFactor(dormancyFactor)
 {}
 
 int SpareGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
 {
 	// just cold spare behaviour in PNML, regardless of dormancy factor
+	// works only with basic events so far...
 	
 	vector<pair<int,int>> spares;
 	vector<int> regularIds;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
 	{
 		BasicEvent* basicEvent = dynamic_cast<BasicEvent*>(*it);
-		if (CONTAINS(m_spareIndices, basicEvent->getId())) // TODO
+		if (m_primaryId == basicEvent->getId()) // TODO
 			spares.push_back(basicEvent->serializeAsColdSpare(doc));
 		else
 			regularIds.push_back(basicEvent->serializePTNet(doc));
@@ -56,7 +57,7 @@ int SpareGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const
 
 FaultTreeNode* SpareGate::clone() const
 {
-	FaultTreeNode* newNode = new SpareGate(m_id, m_spareIndices, m_dormancyFactor, m_name);
+	FaultTreeNode* newNode = new SpareGate(m_id, m_primaryId, m_dormancyFactor, m_name);
 	for (auto& child : m_children)
 		newNode->addChild(child->clone());
 
@@ -65,6 +66,18 @@ FaultTreeNode* SpareGate::clone() const
 
 int SpareGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
 {
-	assert(false);
-	return -1;
+	// see FuzzTrees / simulation / modeltransform / timeNetModels / spare.xml
+	const int spareGateFailed = doc->addPlace(0);
+	const int failSpareGate = doc->addImmediateTransition();
+
+	// fail just once
+	doc->transitionToPlace(failSpareGate, spareGateFailed);
+	doc->addInhibitorArc(spareGateFailed, failSpareGate);
+	
+	static const string dormancy = "dormancyFactor";
+	doc->addDefinition(dormancy, m_dormancyFactor);
+
+	doc->addParametrisedTransition(dormancy + " * 2.0");
+
+	return spareGateFailed;
 }

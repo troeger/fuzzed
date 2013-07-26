@@ -119,11 +119,8 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 		}
 		else if (typeDescriptor == COLD_SPARE_GATE)
 		{
-			const string spareIds = child.attribute(SPARE_ID_ATTRIBUTE).as_string("");
-			vector<string> spareIndices;
-			util::tokenizeString(spareIds, spareIndices);
-
-			gate = new SpareGate(id, set<string>(spareIndices.begin(), spareIndices.end()), 1.0, name);
+			const string primaryId = child.attribute(SPARE_ID_ATTRIBUTE).as_string("");
+			gate = new SpareGate(id, primaryId, 1.0, name);
 		}
 		else if (typeDescriptor == PAND_GATE)
 		{

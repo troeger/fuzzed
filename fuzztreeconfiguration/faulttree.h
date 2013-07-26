@@ -911,22 +911,22 @@ namespace faulttree
   class Spare: public ::faulttree::DynamicGate
   {
     public:
-    // spareIds
+    // primaryID
     // 
-    typedef ::faulttree::Idlist SpareIdsType;
-    typedef ::xsd::cxx::tree::traits< SpareIdsType, char > SpareIdsTraits;
+    typedef ::xml_schema::String PrimaryIDType;
+    typedef ::xsd::cxx::tree::traits< PrimaryIDType, char > PrimaryIDTraits;
 
-    const SpareIdsType&
-    spareIds () const;
+    const PrimaryIDType&
+    primaryID () const;
 
-    SpareIdsType&
-    spareIds ();
-
-    void
-    spareIds (const SpareIdsType& x);
+    PrimaryIDType&
+    primaryID ();
 
     void
-    spareIds (::std::auto_ptr< SpareIdsType > p);
+    primaryID (const PrimaryIDType& x);
+
+    void
+    primaryID (::std::auto_ptr< PrimaryIDType > p);
 
     // dormancyFactor
     // 
@@ -945,7 +945,7 @@ namespace faulttree
     // Constructors.
     //
     Spare (const IdType&,
-           const SpareIdsType&,
+           const PrimaryIDType&,
            const DormancyFactorType&);
 
     Spare (const ::xercesc::DOMElement& e,
@@ -971,7 +971,7 @@ namespace faulttree
            ::xml_schema::Flags);
 
     protected:
-    ::xsd::cxx::tree::one< SpareIdsType > spareIds_;
+    ::xsd::cxx::tree::one< PrimaryIDType > primaryID_;
     ::xsd::cxx::tree::one< DormancyFactorType > dormancyFactor_;
   };
 

@@ -89,11 +89,7 @@ void convertFaultTreeRecursive(FaultTreeNode* node, const faulttree::Node& templ
 		else if (typeName == SPARE)
 		{
 			const faulttree::Spare& spareGate = static_cast<const faulttree::Spare&>(child);
-			const double dormancyFactor = spareGate.dormancyFactor();
-			std::set<string> spares;
-			for (const string& e : spareGate.spareIds())
-				spares.insert(e);
-			current = new SpareGate(id, spares, dormancyFactor); 
+			current = new SpareGate(id, spareGate.primaryID(), spareGate.dormancyFactor()); 
 		}
 
 		if (current)

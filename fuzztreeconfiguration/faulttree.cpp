@@ -327,28 +327,28 @@ namespace faulttree
   // Spare
   // 
 
-  const Spare::SpareIdsType& Spare::
-  spareIds () const
+  const Spare::PrimaryIDType& Spare::
+  primaryID () const
   {
-    return this->spareIds_.get ();
+    return this->primaryID_.get ();
   }
 
-  Spare::SpareIdsType& Spare::
-  spareIds ()
+  Spare::PrimaryIDType& Spare::
+  primaryID ()
   {
-    return this->spareIds_.get ();
-  }
-
-  void Spare::
-  spareIds (const SpareIdsType& x)
-  {
-    this->spareIds_.set (x);
+    return this->primaryID_.get ();
   }
 
   void Spare::
-  spareIds (::std::auto_ptr< SpareIdsType > x)
+  primaryID (const PrimaryIDType& x)
   {
-    this->spareIds_.set (x);
+    this->primaryID_.set (x);
+  }
+
+  void Spare::
+  primaryID (::std::auto_ptr< PrimaryIDType > x)
+  {
+    this->primaryID_.set (x);
   }
 
   const Spare::DormancyFactorType& Spare::
@@ -1619,10 +1619,10 @@ namespace faulttree
 
   Spare::
   Spare (const IdType& id,
-         const SpareIdsType& spareIds,
+         const PrimaryIDType& primaryID,
          const DormancyFactorType& dormancyFactor)
   : ::faulttree::DynamicGate (id),
-    spareIds_ (spareIds, ::xml_schema::Flags (), this),
+    primaryID_ (primaryID, ::xml_schema::Flags (), this),
     dormancyFactor_ (dormancyFactor, ::xml_schema::Flags (), this)
   {
   }
@@ -1632,7 +1632,7 @@ namespace faulttree
          ::xml_schema::Flags f,
          ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (x, f, c),
-    spareIds_ (x.spareIds_, f, this),
+    primaryID_ (x.primaryID_, f, this),
     dormancyFactor_ (x.dormancyFactor_, f, this)
   {
   }
@@ -1642,7 +1642,7 @@ namespace faulttree
          ::xml_schema::Flags f,
          ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (e, f | ::xml_schema::Flags::base, c),
-    spareIds_ (f, this),
+    primaryID_ (f, this),
     dormancyFactor_ (f, this)
   {
     if ((f & ::xml_schema::Flags::base) == 0)
@@ -1666,12 +1666,12 @@ namespace faulttree
       const ::xsd::cxx::xml::qualified_name< char > n (
         ::xsd::cxx::xml::dom::name< char > (i));
 
-      if (n.name () == "spareIds" && n.namespace_ ().empty ())
+      if (n.name () == "primaryID" && n.namespace_ ().empty ())
       {
-        ::std::auto_ptr< SpareIdsType > r (
-          SpareIdsTraits::create (i, f, this));
+        ::std::auto_ptr< PrimaryIDType > r (
+          PrimaryIDTraits::create (i, f, this));
 
-        this->spareIds_.set (r);
+        this->primaryID_.set (r);
         continue;
       }
 
@@ -1682,10 +1682,10 @@ namespace faulttree
       }
     }
 
-    if (!spareIds_.present ())
+    if (!primaryID_.present ())
     {
       throw ::xsd::cxx::tree::expected_attribute< char > (
-        "spareIds",
+        "primaryID",
         "");
     }
 
@@ -3240,15 +3240,15 @@ namespace faulttree
   {
     e << static_cast< const ::faulttree::DynamicGate& > (i);
 
-    // spareIds
+    // primaryID
     //
     {
       ::xercesc::DOMAttr& a (
         ::xsd::cxx::xml::dom::create_attribute (
-          "spareIds",
+          "primaryID",
           e));
 
-      a << i.spareIds ();
+      a << i.primaryID ();
     }
 
     // dormancyFactor
