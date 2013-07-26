@@ -13,10 +13,6 @@
 #include "Config.h"
 #include "platform.h"
 
-namespace faulttree
-{
-	class FaultTree;
-}
 class FaultTreeNode;
 
 enum SimulationImpl
@@ -43,8 +39,12 @@ public:
 
 	virtual ~SimulationProxy();
 
-	// simulates all configurations from one file
+	// triggers a faulttree simulation on a fuzztree or faulttree file
 	void simulateFile(const boost::filesystem::path& p, SimulationImpl impl, bool simulatePetriNet);
+
+	// simulates all configurations from one file
+	void simulateAllConfigurations(const boost::filesystem::path&p, SimulationImpl impl);
+
 	void simulateFaultTree(FaultTreeNode* ft, const std::string& newFileName, SimulationImpl impl);
 
 protected:

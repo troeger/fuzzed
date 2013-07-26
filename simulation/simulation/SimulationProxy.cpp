@@ -219,41 +219,25 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 	assert(is_regular_file(p) && acceptFileExtension(p));
 
 	const auto ext = p.extension();
-
 	if (((ext == PNML::PNML_EXT && impl == DEFAULT) || (ext == timeNET::TN_EXT)) && simulatePetriNet)
 		runSimulationInternal(p, impl); // run simulation directly
 
 	else if (ext == fuzzTree::FUZZ_TREE_EXT)
-	{ // transform into fault trees first
-		ifstream file(p.generic_string(), ios::in | ios::binary);
-		if (!file.is_open())
-			throw runtime_error("Could not open file");
-
-		FuzzTreeTransform ftTransform(file);
-		int i = 0;
-		for (const auto& ft : ftTransform.transform())
-		{
-			auto simTree = fromGeneratedFaultTree(ft.topEvent()); 
-			std::string newFileName = p.generic_string();
-			util::replaceFileExtensionInPlace(newFileName, util::toString(++i) + ((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT));
-			simulateFaultTree(simTree.get(), newFileName, impl);
-		}
-		return;
-	}
+		simulateAllConfigurations(p, impl);
 
 	else if (ext == faultTree::FAULT_TREE_EXT)
-	{ // already a fault tree
-		FaultTreeNode* ft = FaultTreeImport::loadFaultTree(p.generic_string());
-		if (!ft) 
-			throw runtime_error("Could not load Fault Tree");
-		
+	{
+		ifstream file(p.generic_string(), ios::in | ios::binary);
+		if (!file.is_open()) throw runtime_error("Could not open file");
+
+		const auto simTree = faulttree::faultTree(file, xml_schema::Flags::dont_validate);
+		std::auto_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
 		ft->print(cout);
 
 		string newFileName = p.generic_string();
 		util::replaceFileExtensionInPlace(newFileName, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
-		simulateFaultTree(ft, newFileName, impl);
-		delete ft;
-	}		
+		simulateFaultTree(ft.get(), newFileName, impl);
+	}
 }
 
 bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
@@ -294,4 +278,21 @@ void SimulationProxy::simulateFaultTree(FaultTreeNode* ft, const std::string& ne
 
 	doc->save(newFileName);	
 	runSimulationInternal(newFileName, impl, m_timeNetProperties);
+}
+
+void SimulationProxy::simulateAllConfigurations(const fs::path &p, SimulationImpl impl)
+{
+	ifstream file(p.generic_string(), ios::in | ios::binary);
+	if (!file.is_open()) throw runtime_error("Could not open file");
+
+	FuzzTreeTransform ftTransform(file);
+	int i = 0;
+	for (const auto& ft : ftTransform.transform())
+	{
+		std::auto_ptr<TopLevelEvent> simTree = fromGeneratedFaultTree(ft.topEvent()); 
+		std::string newFileName = p.generic_string();
+		util::replaceFileExtensionInPlace(newFileName, util::toString(++i) + ((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT));
+		simTree->print(cout);
+		simulateFaultTree(simTree.get(), newFileName, impl);
+	}
 }
