@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ft:FaultTree name = "ExampleSystem">
+<ft:FaultTree id="0" xmlns:ft="net.faulttree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <topEvent id="1" name="Server Failure">
   	<children xsi:type="ft:Or" id="11">
         
@@ -11,7 +11,7 @@
           <probability xsi:type="ft:CrispProbability" value="0.0001"/>
         </children>
 	    
-	    <children xsi:type="ft:ColdSpare" id="4" spareIds="5">
+	    <children xsi:type="ft:Spare" id="4" spareIds="5">
 	      	<children costs="1" id="5" name="" xsi:type="ft:BasicEvent" name="Secondary CPU Failure">
 	      		<probability value="0.001" xsi:type="ft:CrispProbability"/>
 	    	</children>

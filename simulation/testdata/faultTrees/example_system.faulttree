@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ft:FaultTree name = "ExampleSystem">
+<ft:FaultTree id="0" xmlns:ft="net.faulttree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <topEvent id="1" name="Server Failure">
     <children xsi:type="ft:Or" id="11">
         

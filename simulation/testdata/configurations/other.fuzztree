@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ft:FuzzTree xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="net.fuzztree">
+<ft:FuzzTree id="0" xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="net.fuzztree">
   <topEvent id="1" name="Other">
     <children xsi:type="ft:FeatureVariationPoint" id="2">
       <children xsi:type="ft:BasicEvent" id="110" name="BE 1" costs="20" optional="true">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ft:FaultTree name="Test_And" blocksimReliability="0.623">
+<ft:FaultTree name="Test_And" blocksimReliability="0.623" id="0" xmlns:ft="net.fuzztree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <topEvent id="1" name="Server Failure">
     <children xsi:type="ft:And" id="2">
       <children xsi:type="ft:BasicEvent" id="2.1" name="Component Failure">
