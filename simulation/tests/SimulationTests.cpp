@@ -8,7 +8,7 @@
 #pragma warning(pop)
 #endif
 
-#include "SimulationProxy.h"
+#include "SimulationExtern.h"
 #include "ResultStruct.h"
 #include "Constants.h"
 #include "util.h"
