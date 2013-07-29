@@ -32,7 +32,9 @@ int StaticGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const
 	std::string staticFormula = serializeAsFormula(doc);
 	const int gateInput = doc->addPlace(1, 1);
 
-	// TODO: this only works if all children were static. otherwise, fallback to standard PT serialization
+	if (hasDynamicChildren())
+		return serializePTNet(doc);
+	
 	const int fulfilFormula = doc->addGuardedTransition(staticFormula);
 	const int gateFired = doc->addPlace(0, 1);
 
@@ -40,6 +42,11 @@ int StaticGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const
 	doc->transitionToPlace(fulfilFormula, gateFired);
 
 	return gateFired;
+}
+
+bool StaticGate::hasDynamicChildren() const
+{
+	return !m_bStaticSubTree; // TODO
 }
 
 const std::string StaticGate::s_NOToperator = " NOT ";

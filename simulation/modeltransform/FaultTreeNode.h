@@ -65,6 +65,8 @@ public:
 	virtual void print(std::ostream& stream, int indentLevel=0) const;
 
 protected:
+	void markDynamic(); 
+
 	virtual std::string description() const;
 
 	NodeList m_children;
@@ -74,4 +76,7 @@ protected:
 	int m_cost;
 
 	std::string m_name;
+
+	bool m_bDynamic;
+	bool m_bStaticSubTree;
 };

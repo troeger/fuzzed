@@ -12,11 +12,12 @@ public:
 	virtual ~StaticGate() {}
 
 	virtual long double computeUnreliability() const;
-	bool isDynamic() const { return false; }
-
+	
 	virtual int serializeTimeNet(boost::shared_ptr<TNDocument> doc) const override;
 
 protected:
+	bool hasDynamicChildren() const;
+
 	virtual void initActivationFunc() = 0;
 
 	// from all the input values, compute the value of the gate. only for static gates.
