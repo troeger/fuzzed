@@ -94,7 +94,7 @@ TEST(Serialization, FeatureVP)
 
 TEST(Serialization, Intermediate)
 {
-	TEST_NUM_CONFIGURATIONS(dir + intermediate, 6);
+	TEST_NUM_CONFIGURATIONS(dir + intermediate, 1);
 }
 
 TEST(Serialization, RedundancyVP)

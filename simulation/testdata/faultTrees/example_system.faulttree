@@ -11,11 +11,11 @@
           <probability xsi:type="ft:CrispProbability" value="0.0001"/>
         </children>
       
-      <children xsi:type="ft:ColdSpare" id="4" spareIds="5">
-          <children costs="1" id="5" name="" xsi:type="ft:BasicEvent" name="Secondary CPU Failure">
+      <children xsi:type="ft:Spare" id="4" primaryID="5" dormancyFactor="0.7">
+          <children costs="1" id="5" xsi:type="ft:BasicEvent" name="Secondary CPU Failure">
             <probability value="0.001" xsi:type="ft:CrispProbability"/>
         </children>
-      <children costs="1" id="6" name="" xsi:type="ft:BasicEvent" name="Primary CPU Failure">
+      <children costs="1" id="6" xsi:type="ft:BasicEvent" name="Primary CPU Failure">
             <probability value="0.001" xsi:type="ft:CrispProbability"/>
         </children>
       </children>

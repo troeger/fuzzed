@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ft:FuzzTree id="209" name="config1" xmlns:fuzzTree="net.fuzztree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<ft:FuzzTree xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="net.fuzztree" name="Config1" id="0">
 <topEvent id="8614" name="Top Event">
 	<children id="8617" name="AND Gate" xsi:type="ft:And">
 		<children end="2" formula="N-1" id="8615" name="Redundancy Variation" start="1" xsi:type="ft:RedundancyVariationPoint">
