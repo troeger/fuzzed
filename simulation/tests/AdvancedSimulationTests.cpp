@@ -1,13 +1,5 @@
 #include <gtest/gtest.h>
 
-#if IS_WINDOWS 
-#pragma warning(push, 3) 
-#endif
-#include "pugixml.hpp"
-#if IS_WINDOWS 
-#pragma warning(pop)
-#endif
-
 #include "SimulationExtern.h"
 #include "ResultStruct.h"
 #include "Constants.h"

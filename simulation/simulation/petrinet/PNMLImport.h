@@ -1,5 +1,4 @@
 #pragma once
-#include <pugixml.hpp>
 #include <boost/filesystem/path.hpp>
 
 #include "XMLImport.h"
