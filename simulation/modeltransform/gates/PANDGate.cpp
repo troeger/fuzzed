@@ -40,9 +40,9 @@ int PANDGate::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	return previousChildFailed;
 }
 
-FaultTreeNode* PANDGate::clone() const
+FaultTreeNode::Ptr PANDGate::clone() const
 {
-	FaultTreeNode* newNode = new PANDGate(m_id, m_requiredSequence, m_name);
+	FaultTreeNode::Ptr newNode = std::make_shared<PANDGate>(m_id, m_requiredSequence, m_name);
 	for (auto& child : m_children)
 	{
 		newNode->addChild(child->clone());

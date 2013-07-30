@@ -7,9 +7,9 @@ public:
 	TopLevelEvent(const std::string& ID);
 	virtual ~TopLevelEvent() {};
 
-	virtual FaultTreeNode* clone() const override; // virtual deep copying
+	virtual FaultTreeNode::Ptr clone() const override; // virtual deep copying
 
-	virtual void addChild(FaultTreeNode* child) override;
+	virtual void addChild(FaultTreeNode::Ptr child) override;
 
 	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const override;
 	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const override;

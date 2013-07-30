@@ -10,7 +10,7 @@ public:
 	virtual ~SEQGate(void) {};
 
 	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const override;
-	virtual FaultTreeNode* clone() const override; // virtual deep copying
+	virtual FaultTreeNode::Ptr clone() const override; // virtual deep copying
 
 protected:
 	virtual int addSequenceViolatedPlace(std::shared_ptr<PNDocument> doc) const override;

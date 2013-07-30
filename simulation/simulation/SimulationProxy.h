@@ -37,15 +37,13 @@ public:
 		double convergenceThreshold,
 		unsigned int maxTime);
 
-	virtual ~SimulationProxy();
-
 	// triggers a faulttree simulation on a fuzztree or faulttree file
 	void simulateFile(const boost::filesystem::path& p, SimulationImpl impl, bool simulatePetriNet);
 
 	// simulates all configurations from one file
 	void simulateAllConfigurations(const boost::filesystem::path&p, SimulationImpl impl);
 
-	void simulateFaultTree(FaultTreeNode* ft, const std::string& newFileName, SimulationImpl impl);
+	void simulateFaultTree(std::shared_ptr<FaultTreeNode> ft, const std::string& newFileName, SimulationImpl impl);
 
 protected:
 	void parseCommandline(int numArguments, char** arguments);
@@ -66,5 +64,5 @@ protected:
 	
 	static bool acceptFileExtension(const boost::filesystem::path& p);
 
-	TimeNETProperties* m_timeNetProperties;
+	TimeNETProperties* m_timeNetProperties; // ownership usually transferred to Simulation -.-
 };

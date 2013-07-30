@@ -8,9 +8,9 @@ SEQGate::SEQGate(const string& id, const vector<string>& ordering, const string&
 	: PANDGate(id, ordering, name), m_enforcedSequence(ordering)
 {}
 
-FaultTreeNode* SEQGate::clone() const 
+FaultTreeNode::Ptr SEQGate::clone() const 
 {
-	SEQGate* cloned  = new SEQGate(m_id, m_enforcedSequence, m_name);
+	auto cloned  = make_shared<SEQGate>(m_id, m_enforcedSequence, m_name);
 	for (auto& child : m_children)
 		cloned->addChild(child->clone());
 

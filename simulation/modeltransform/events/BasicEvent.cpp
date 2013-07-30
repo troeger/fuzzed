@@ -22,9 +22,9 @@ int BasicEvent::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	return failed;
 }
 
-FaultTreeNode* BasicEvent::clone() const
+FaultTreeNode::Ptr BasicEvent::clone() const
 {
-	return new BasicEvent(m_id, m_failureRate, m_name, m_cost);
+	return make_shared<BasicEvent>(m_id, m_failureRate, m_name, m_cost);
 }
 
 std::string BasicEvent::description() const 
@@ -74,8 +74,9 @@ void BasicEvent::serializeFDEPChildren(std::shared_ptr<PNDocument> doc, const in
 	const int fdepTriggerTransition = doc->addImmediateTransition();
 	for (const auto& child : m_children)
 	{
-		const FDEPGate* fdep = dynamic_cast<const FDEPGate*>(child);
-		if (!fdep) throw runtime_error("Spares must be BasicEvents");
+		auto fdep = std::dynamic_pointer_cast<FDEPGate>(child);
+		if (!fdep)
+			throw runtime_error("Spares must be BasicEvents");
 		// TODO differentiate between the different serialization implementations here?
 		const int fdepTriggered = fdep->serializePTNet(doc);
 		doc->placeToTransition(fdepTriggered, fdepTriggerTransition);

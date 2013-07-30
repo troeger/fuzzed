@@ -43,9 +43,9 @@ int XORGate::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	return oneChildFailed;
 }
 
-FaultTreeNode* XORGate::clone() const 
+FaultTreeNode::Ptr XORGate::clone() const 
 {
-	FaultTreeNode* newNode = new XORGate(m_id, m_name);
+	FaultTreeNode::Ptr newNode = make_shared<XORGate>(m_id, m_name);
 	for (auto& child : m_children)
 		newNode->addChild(child->clone());
 

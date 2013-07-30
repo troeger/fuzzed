@@ -8,7 +8,7 @@ FaultTreeNode::FaultTreeNode(const std::string& ID, const std::string& name)
 	: m_id(ID), m_name(name), m_parent(nullptr), m_cost(0), m_bDynamic(false), m_bStaticSubTree(true)
 {}
 
-void FaultTreeNode::addChild(FaultTreeNode* child)
+void FaultTreeNode::addChild(FaultTreeNode::Ptr child)
 {
 	m_children.emplace_back(child);
 	child->setParent(this);
@@ -33,9 +33,9 @@ void FaultTreeNode::print(std::ostream& stream, int indentLevel) const
 	}
 }
 
-FaultTreeNode* FaultTreeNode::getChildById(const std::string& id) 
+FaultTreeNode::Ptr FaultTreeNode::getChildById(const std::string& id) 
 {
-	if (m_id == id) return this;
+	// if (m_id == id) return this;
 
 	for (auto& child : m_children)
 	{
@@ -43,7 +43,7 @@ FaultTreeNode* FaultTreeNode::getChildById(const std::string& id)
 		
 		else 
 		{
-			FaultTreeNode* c = child->getChildById(id);
+			FaultTreeNode::Ptr c = child->getChildById(id);
 			if (c !=  nullptr) return c;
 		}
 	}
@@ -51,9 +51,9 @@ FaultTreeNode* FaultTreeNode::getChildById(const std::string& id)
 }
 
 
-const FaultTreeNode* FaultTreeNode::getChildById(const std::string& id) const
+const FaultTreeNode::Ptr FaultTreeNode::getChildById(const std::string& id) const
 {
-	if (m_id == id) return this;
+	// if (m_id == id) return this;
 
 	for (auto& child : m_children)
 	{
@@ -61,7 +61,7 @@ const FaultTreeNode* FaultTreeNode::getChildById(const std::string& id) const
 
 		else 
 		{
-			FaultTreeNode* c = child->getChildById(id);
+			FaultTreeNode::Ptr c = child->getChildById(id);
 			if (c !=  nullptr) return c;
 		}
 	}
@@ -77,7 +77,7 @@ string FaultTreeNode::description() const
 		+ " S: " + (m_bStaticSubTree ? "y" : "n");
 }
 
-bool FaultTreeNode::addChildBelow(const std::string& id, FaultTreeNode* insertedChild)
+bool FaultTreeNode::addChildBelow(const std::string& id, FaultTreeNode::Ptr insertedChild)
 {
 	for (auto& child : m_children)
 	{
@@ -97,14 +97,14 @@ bool FaultTreeNode::addChildBelow(const std::string& id, FaultTreeNode* inserted
 
 FaultTreeNode::~FaultTreeNode()
 {
-	for (const auto& child : m_children)
-		delete child;
+// 	for (const auto& child : m_children)
+// 		delete child;
 }
 
 const FaultTreeNode* FaultTreeNode::getRoot() const
 {
-	const FaultTreeNode* top = this;
-	while (top->getParent() != nullptr)
+	auto top = getParent();
+	while (top && top->getParent())
 		top = top->getParent();
 
 	return top;
@@ -128,4 +128,9 @@ void FaultTreeNode::markDynamic()
 	m_bStaticSubTree = false;
 	if (m_parent)
 		m_parent->markDynamic();
+}
+
+const FaultTreeNode* FaultTreeNode::getParent() const
+{
+	return m_parent;
 }

@@ -34,9 +34,9 @@ int VotingORGate::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	return gateFailed;
 }
 
-FaultTreeNode* VotingORGate::clone() const
+FaultTreeNode::Ptr VotingORGate::clone() const
 {
-	FaultTreeNode* newNode = new VotingORGate(m_id, m_numVotes, m_name);
+	FaultTreeNode::Ptr newNode = make_shared<VotingORGate>(m_id, m_numVotes, m_name);
 	for (auto& child : m_children)
 	{
 		newNode->addChild(child->clone());

@@ -39,9 +39,9 @@ int ANDGate::serializePTNet(std::shared_ptr<PNDocument> doc) const
 ANDGate::~ANDGate(void)
 {}
 
-FaultTreeNode* ANDGate::clone() const
+FaultTreeNode::Ptr ANDGate::clone() const
 {
-	FaultTreeNode* newNode = new ANDGate(m_id, m_name);
+	FaultTreeNode::Ptr newNode = make_shared<ANDGate>(m_id, m_name);
 	for (auto& child : m_children)
 		newNode->addChild(child->clone());
 

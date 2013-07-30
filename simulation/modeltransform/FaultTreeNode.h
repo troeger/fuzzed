@@ -10,12 +10,13 @@
 class FaultTreeNode
 {
 public:
-	typedef std::vector<FaultTreeNode*> NodeList;
+	typedef std::shared_ptr<FaultTreeNode> Ptr;
+	typedef std::vector<FaultTreeNode::Ptr> NodeList;
 
 	/************************************************************************/
 	/* object creation                                                      */
 	/************************************************************************/
-	virtual FaultTreeNode* clone() const = 0; // virtual deep copying
+	virtual FaultTreeNode::Ptr clone() const = 0; // virtual deep copying
 	virtual ~FaultTreeNode();
 	
 	FaultTreeNode(const std::string& ID, const std::string& name = "");
@@ -23,20 +24,20 @@ public:
 	/************************************************************************/
 	/* tree manipulation                                                    */
 	/************************************************************************/
-	virtual void addChild(FaultTreeNode* child);
-	virtual bool addChildBelow(const std::string& ID, FaultTreeNode* child);
+	virtual void addChild(FaultTreeNode::Ptr child);
+	virtual bool addChildBelow(const std::string& ID, FaultTreeNode::Ptr child);
 
-	virtual void setParent(FaultTreeNode* parent) { m_parent = parent; };
+	virtual void setParent(FaultTreeNode* parent) { m_parent = parent; }
 
-	NodeList::const_iterator getChildrenBegin() const { return m_children.begin(); };
-	NodeList::const_iterator getChildrenEnd()	const { return m_children.end(); };
+	NodeList::const_iterator getChildrenBegin() const { return m_children.begin(); }
+	NodeList::const_iterator getChildrenEnd()	const { return m_children.end(); }
 
 
 	/************************************************************************/
 	/* data access                                                          */
 	/************************************************************************/
-	FaultTreeNode* getChildById(const std::string& ID);
-	const FaultTreeNode* getChildById(const std::string& ID) const; // TODO copy-pasted just to enforce const-ness
+	FaultTreeNode::Ptr getChildById(const std::string& ID);
+	const FaultTreeNode::Ptr getChildById(const std::string& ID) const; // TODO copy-pasted just to enforce const-ness
 
 	int getNumChildren() const { return m_children.size(); };
 
@@ -46,7 +47,7 @@ public:
 	virtual int getCost() const;
 
 	const FaultTreeNode* getRoot() const;
-	const FaultTreeNode* getParent() const { return m_parent; };
+	const FaultTreeNode* getParent() const;;
 	
 	/************************************************************************/
 	/* serialization                                                        */

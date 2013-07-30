@@ -11,9 +11,9 @@ int FDEPGate::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	return triggerChild->serializePTNet(doc); // FDEP gates do not propagate upwards
 }
 
-FaultTreeNode* FDEPGate::clone() const 
+FaultTreeNode::Ptr FDEPGate::clone() const 
 {
-	FaultTreeNode* newNode = new FDEPGate(m_id, m_triggerID, m_dependentEvents, m_name);
+	FaultTreeNode::Ptr newNode = std::make_shared<FDEPGate>(m_id, m_triggerID, m_dependentEvents, m_name);
 	for (auto& child : m_children)
 		newNode->addChild(child->clone());
 

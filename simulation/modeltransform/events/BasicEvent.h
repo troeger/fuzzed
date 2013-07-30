@@ -6,7 +6,7 @@ class BasicEvent : public Event
 public:
 	BasicEvent(const std::string& ID, long double failureRate, const std::string& name = "", const int cost = 1);
 	
-	virtual FaultTreeNode* clone() const override; // virtual deep copying
+	virtual FaultTreeNode::Ptr clone() const override; // virtual deep copying
 
 	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const override;
 	

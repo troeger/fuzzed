@@ -18,12 +18,12 @@ UndevelopedEvent::UndevelopedEvent(const std::string& ID, long double failureRat
 	: Event(ID, failureRate, name)
 {}
 
-void UndevelopedEvent::addChild(FaultTreeNode*)
+void UndevelopedEvent::addChild(FaultTreeNode::Ptr)
 {
 	assert(false && "This is a leaf node!");
 }
 
-FaultTreeNode* UndevelopedEvent::clone() const
+FaultTreeNode::Ptr UndevelopedEvent::clone() const
 {
-	return new UndevelopedEvent(m_id, m_failureRate, m_name);
+	return make_shared<UndevelopedEvent>(m_id, m_failureRate, m_name);
 }

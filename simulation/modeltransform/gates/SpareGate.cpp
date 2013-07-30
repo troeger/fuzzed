@@ -20,7 +20,8 @@ int SpareGate::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	vector<int> regularIds;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
 	{
-		BasicEvent* basicEvent = dynamic_cast<BasicEvent*>(*it);
+		auto basicEvent = dynamic_pointer_cast<BasicEvent>(*it);
+		assert(basicEvent);
 		if (m_primaryId == basicEvent->getId()) // TODO
 			spares.push_back(basicEvent->serializeAsColdSpare(doc));
 		else
@@ -55,9 +56,9 @@ int SpareGate::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	return allFailed;
 }
 
-FaultTreeNode* SpareGate::clone() const
+FaultTreeNode::Ptr SpareGate::clone() const
 {
-	FaultTreeNode* newNode = new SpareGate(m_id, m_primaryId, m_dormancyFactor, m_name);
+	FaultTreeNode::Ptr newNode = make_shared<SpareGate>(m_id, m_primaryId, m_dormancyFactor, m_name);
 	for (auto& child : m_children)
 		newNode->addChild(child->clone());
 
@@ -90,7 +91,7 @@ int SpareGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const
 
 		// TODO: in theory, BasicEventSets and house/undeveloped events are allowed as well
 		// the assumption is that BasicEventSets have previously been expanded
-		const BasicEvent* be = dynamic_cast<const BasicEvent*>(child);
+		auto be = dynamic_pointer_cast<BasicEvent>(child);
 		if (!be) throw runtime_error("Spares must be BasicEvents");
 
 		const auto failureRate = be->getFailureRate();

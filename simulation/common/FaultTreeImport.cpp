@@ -17,7 +17,7 @@ using namespace faultTree;
 using namespace std;
 using namespace pugi;
 
-FaultTreeNode* FaultTreeImport::loadFaultTree(const string& fileName) noexcept
+FaultTreeNode::Ptr FaultTreeImport::loadFaultTree(const string& fileName) noexcept
 {
 	try
 	{
@@ -55,19 +55,19 @@ bool FaultTreeImport::loadRootNode()
 	return true;
 }
 
-FaultTreeNode* FaultTreeImport::loadTree()
+FaultTreeNode::Ptr FaultTreeImport::loadTree()
 {
 	assert(m_rootNode);
 	const xml_node topEvent = m_rootNode.child(TOP_EVENT);
 	if (!topEvent)
 		EXIT_ERROR("Missing Top Event");
 
-	FaultTreeNode* tree = new TopLevelEvent(topEvent.attribute("id").as_string());
+	FaultTreeNode::Ptr tree = make_shared<TopLevelEvent>(topEvent.attribute("id").as_string());
 	loadNode(topEvent, tree);
 	return tree;
 }
 
-void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
+void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode::Ptr tree)
 {
 	assert(tree != nullptr);
 
@@ -84,30 +84,30 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 		/************************************************************************/
 		if (typeDescriptor == BASIC_EVENT)
 		{
-			tree->addChild(new BasicEvent(id, parseFailureRate(child), name));
+			tree->addChild(make_shared<BasicEvent>(id, parseFailureRate(child), name));
 			continue; // end recursion
 		}
 		else if (typeDescriptor == UNDEVELOPED_EVENT)
 		{
-			tree->addChild(new UndevelopedEvent(id, parseFailureRate(child), name));
+			tree->addChild(make_shared<UndevelopedEvent>(id, parseFailureRate(child), name));
 			continue; // end recursion
 		}
 
 		/************************************************************************/
 		/* Gates                                                                */
 		/************************************************************************/
-		FaultTreeNode* gate = nullptr;
+		FaultTreeNode::Ptr gate = nullptr;
 		if (typeDescriptor == AND_GATE)
 		{
-			gate = new ANDGate(id, name);
+			gate = make_shared<ANDGate>(id, name);
 		}
 		else if (typeDescriptor == OR_GATE)
 		{
-			gate = new ORGate(id, name);
+			gate = make_shared<ORGate>(id, name);
 		}
 		else if (typeDescriptor == XOR_GATE)
 		{
-			gate = new XORGate(id, name);
+			gate = make_shared<XORGate>(id, name);
 		}
 		else if (typeDescriptor == VOTING_OR_GATE)
 		{
@@ -115,12 +115,12 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 			if (k < 0)
 				throw runtime_error("Invalid k for VotingORGate");
 
-			gate = new VotingORGate(id, k, name);
+			gate = make_shared<VotingORGate>(id, k, name);
 		}
 		else if (typeDescriptor == COLD_SPARE_GATE)
 		{
 			const string primaryId = child.attribute(SPARE_ID_ATTRIBUTE).as_string("");
-			gate = new SpareGate(id, primaryId, 1.0, name);
+			gate = make_shared<SpareGate>(id, primaryId, 1.0, name);
 		}
 		else if (typeDescriptor == PAND_GATE)
 		{
@@ -128,7 +128,7 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 			vector<string> prioIndices;
 			util::tokenizeString(prioIds, prioIndices);
 
-			gate = new PANDGate(id, prioIndices, name);
+			gate = make_shared<PANDGate>(id, prioIndices, name);
 		}
 		else if (typeDescriptor == SEQ_GATE)
 		{
@@ -136,7 +136,7 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode* tree)
 			vector<string> idSequence;
 			util::tokenizeString(sequence, idSequence);
 
-			gate = new SEQGate(id, idSequence, name);
+			gate = make_shared<SEQGate>(id, idSequence, name);
 		}
 		else
 		{

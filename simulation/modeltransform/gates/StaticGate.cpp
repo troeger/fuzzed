@@ -1,6 +1,8 @@
 #include "StaticGate.h"
 #include "events/BasicEvent.h"
 
+using std::dynamic_pointer_cast;
+
 StaticGate::StaticGate(const std::string& ID, const std::string& name)
 	: Gate(ID, name)
 {}
@@ -8,14 +10,14 @@ StaticGate::StaticGate(const std::string& ID, const std::string& name)
 long double StaticGate::computeUnreliability() const
 {
 	NodeValueMap unreliabilities;
-	for (const FaultTreeNode* childNode : m_children)
+	for (const FaultTreeNode::Ptr childNode : m_children)
 	{
-		const StaticGate* child = dynamic_cast<const StaticGate*>(childNode);
+		auto child = dynamic_pointer_cast<StaticGate>(childNode);
 		if (child)
 			unreliabilities.insert(std::make_pair(childNode->getId(), child->computeUnreliability()));
 		else
 		{
-			const BasicEvent* be = dynamic_cast<const BasicEvent*>(childNode);
+			auto be = dynamic_pointer_cast<BasicEvent>(childNode);
 			if (be)
 				unreliabilities.insert(std::make_pair(childNode->getId(), be->getFailureRate()));
 			else

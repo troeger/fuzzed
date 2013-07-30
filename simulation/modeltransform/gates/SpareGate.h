@@ -6,7 +6,7 @@ class SpareGate : public DynamicGate
 public:
 	SpareGate(const std::string& id, const std::string& primaryId, const double& dormancyFactor, const std::string& name ="");
 	
-	virtual FaultTreeNode* clone() const override; // virtual deep copying
+	virtual FaultTreeNode::Ptr clone() const override; // virtual deep copying
 
 	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const override;
 	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const override;

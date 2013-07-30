@@ -39,9 +39,9 @@ int ORGate::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	return oneChildFailed;
 }
 
-FaultTreeNode* ORGate::clone() const
+FaultTreeNode::Ptr ORGate::clone() const
 {
-	FaultTreeNode* newNode = new ORGate(m_id, m_name);
+	FaultTreeNode::Ptr newNode = std::make_shared<ORGate>(m_id, m_name);
 	for (auto& child : m_children)
 		newNode->addChild(child->clone());
 	

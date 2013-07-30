@@ -236,7 +236,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 
 		string newFileName = p.generic_string();
 		util::replaceFileExtensionInPlace(newFileName, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
-		simulateFaultTree(ft.get(), newFileName, impl);
+		simulateFaultTree(ft, newFileName, impl);
 	}
 }
 
@@ -249,13 +249,7 @@ bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
 		p.extension() == timeNET::TN_EXT;
 }
 
-SimulationProxy::~SimulationProxy()
-{
-	if (m_timeNetProperties)
-		delete m_timeNetProperties;
-}
-
-void SimulationProxy::simulateFaultTree(FaultTreeNode* ft, const std::string& newFileName, SimulationImpl impl)
+void SimulationProxy::simulateFaultTree(FaultTreeNode::Ptr ft, const std::string& newFileName, SimulationImpl impl)
 {
 	std::shared_ptr<PNDocument> doc;
 	switch (impl)
@@ -293,6 +287,6 @@ void SimulationProxy::simulateAllConfigurations(const fs::path &p, SimulationImp
 		std::string newFileName = p.generic_string();
 		util::replaceFileExtensionInPlace(newFileName, util::toString(++i) + ((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT));
 		simTree->print(cout);
-		simulateFaultTree(simTree.get(), newFileName, impl);
+		simulateFaultTree(simTree, newFileName, impl);
 	}
 }

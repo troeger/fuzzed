@@ -17,7 +17,7 @@ int TopLevelEvent::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	{
 		if (!m_children.empty())
 		{
-			FaultTreeNode* gate = m_children.front();
+			FaultTreeNode::Ptr gate = m_children.front();
 			int gatePlaceID = gate->serializePTNet(doc);
 			int transitionID = doc->addImmediateTransition();
 
@@ -33,7 +33,7 @@ int TopLevelEvent::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	return finalPlaceID;
 }
 
-void TopLevelEvent::addChild(FaultTreeNode* child)
+void TopLevelEvent::addChild(FaultTreeNode::Ptr child)
 {
 	if (!m_children.empty())
 	{
@@ -47,9 +47,9 @@ void TopLevelEvent::addChild(FaultTreeNode* child)
 	child->setParent(this);
 }
 
-FaultTreeNode* TopLevelEvent::clone() const
+FaultTreeNode::Ptr TopLevelEvent::clone() const
 {
-	FaultTreeNode* newNode = new TopLevelEvent(m_id);
+	FaultTreeNode::Ptr newNode = make_shared<TopLevelEvent>(m_id);
 	for (auto& child : m_children)
 	{
 		newNode->addChild(child->clone());
@@ -79,7 +79,7 @@ int TopLevelEvent::serializeTimeNet(std::shared_ptr<TNDocument> doc) const
 	{
 		if (!m_children.empty())
 		{
-			FaultTreeNode* gate = m_children.front();
+			FaultTreeNode::Ptr gate = m_children.front();
 			int gatePlaceID = gate->serializeTimeNet(doc);
 			int transitionID = doc->addImmediateTransition();
 

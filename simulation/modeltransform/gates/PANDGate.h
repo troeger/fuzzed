@@ -13,7 +13,7 @@ public:
 	PANDGate(const std::string& id, const std::vector<std::string>& ordering, const std::string& name = "");
 	virtual ~PANDGate(void) {};
 
-	virtual FaultTreeNode* clone() const override; // virtual deep copying
+	virtual FaultTreeNode::Ptr clone() const override; // virtual deep copying
 
 	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const override;
 	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const override;
