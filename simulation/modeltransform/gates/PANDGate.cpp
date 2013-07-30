@@ -8,7 +8,7 @@ PANDGate::PANDGate(const string& id, const std::vector<std::string>& ordering, c
 {}
 
 
-int PANDGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
+int PANDGate::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
 	// old version which discards invalid child sequences in a separate place
 	// this is ugly modeling...
@@ -50,12 +50,12 @@ FaultTreeNode* PANDGate::clone() const
 	return newNode;
 }
 
-int PANDGate::addSequenceViolatedPlace(boost::shared_ptr<PNDocument> doc) const
+int PANDGate::addSequenceViolatedPlace(std::shared_ptr<PNDocument> doc) const
 {
 	return doc->addPlace(0, 0, "SequenceViolated");
 }
 
-int PANDGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+int PANDGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const 
 {
 	// see: FuzzTrees / simulation / modeltransform / timeNetModels / PAND.xml
 	

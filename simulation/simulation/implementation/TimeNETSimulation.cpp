@@ -28,7 +28,7 @@ TimeNETSimulation::TimeNETSimulation(const boost::filesystem::path &p,
 									 int simulationSteps, // the number of logical simulation steps performed in each round
 									 int numRounds,
 									 void* args)
-	: Simulation(p, simulationTime, simulationSteps, numRounds)
+	: Simulation(p, simulationTime, simulationSteps, numRounds), m_properties(nullptr)
 {
 	TimeNETProperties* props = (TimeNETProperties*)(args);
 	assert(props);
@@ -37,12 +37,12 @@ TimeNETSimulation::TimeNETSimulation(const boost::filesystem::path &p,
 	m_properties->filePath = p.generic_string();
 }
 
-TimeNETSimulation::TimeNETSimulation(std::auto_ptr<FaultTreeNode> faultTree, 
+TimeNETSimulation::TimeNETSimulation(std::shared_ptr<FaultTreeNode> faultTree, 
 									 int simulationTime, /* the maximum duration of one simulation in seconds */ 
 									 int simulationSteps, /* the number of logical simulation steps performed in each round */ 
 									 int numRounds, 
 									 void* additionalArgmuments)
-	: Simulation(faultTree, simulationTime, simulationSteps, numRounds)
+	: Simulation(faultTree, simulationTime, simulationSteps, numRounds), m_properties(nullptr)
 {
 	TimeNETProperties* props = (TimeNETProperties*)(additionalArgmuments);
 	assert(props);
@@ -50,7 +50,7 @@ TimeNETSimulation::TimeNETSimulation(std::auto_ptr<FaultTreeNode> faultTree,
 	m_properties = props;
 	const string TNpath = "foo.TN";
 
-	boost::shared_ptr<TNDocument> doc(new TNDocument);
+	std::shared_ptr<TNDocument> doc(new TNDocument);
 	faultTree->serializePTNet(doc);
 	doc->save(TNpath);
 	m_properties->filePath = TNpath;
@@ -77,4 +77,10 @@ bool TimeNETSimulation::run()
 
 	cout << "TimeNET not configured through CMake. Please check the USE_TIMENET option." << endl;
 	return -1;
+}
+
+TimeNETSimulation::~TimeNETSimulation()
+{
+	if (m_properties)
+		delete m_properties;
 }

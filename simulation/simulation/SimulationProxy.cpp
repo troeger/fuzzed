@@ -231,7 +231,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 		if (!file.is_open()) throw runtime_error("Could not open file");
 
 		const auto simTree = faulttree::faultTree(file, xml_schema::Flags::dont_validate);
-		std::auto_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
+		std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
 		ft->print(cout);
 
 		string newFileName = p.generic_string();
@@ -257,16 +257,16 @@ SimulationProxy::~SimulationProxy()
 
 void SimulationProxy::simulateFaultTree(FaultTreeNode* ft, const std::string& newFileName, SimulationImpl impl)
 {
-	boost::shared_ptr<PNDocument> doc;
+	std::shared_ptr<PNDocument> doc;
 	switch (impl)
 	{
 	case DEFAULT:
-		doc = boost::shared_ptr<PNMLDocument>(new PNMLDocument());
+		doc = std::shared_ptr<PNMLDocument>(new PNMLDocument());
 		ft->serializePTNet(doc);
 		break;
 	case TIMENET:
 	case STRUCTUREFORMULA_ONLY:
-		auto TNdoc = boost::shared_ptr<TNDocument>(new TNDocument());
+		auto TNdoc = std::shared_ptr<TNDocument>(new TNDocument());
 		ft->serializeTimeNet(TNdoc);
 		std::cout << ft->serializeAsFormula(TNdoc) << endl;
 		doc = TNdoc;
@@ -289,7 +289,7 @@ void SimulationProxy::simulateAllConfigurations(const fs::path &p, SimulationImp
 	int i = 0;
 	for (const auto& ft : ftTransform.transform())
 	{
-		std::auto_ptr<TopLevelEvent> simTree = fromGeneratedFaultTree(ft.topEvent()); 
+		std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFaultTree(ft.topEvent()); 
 		std::string newFileName = p.generic_string();
 		util::replaceFileExtensionInPlace(newFileName, util::toString(++i) + ((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT));
 		simTree->print(cout);

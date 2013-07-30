@@ -14,7 +14,7 @@ ORGate::~ORGate(void)
 {
 }
 
-int ORGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
+int ORGate::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
 	vector<int> childIDs;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
@@ -48,7 +48,7 @@ FaultTreeNode* ORGate::clone() const
 	return newNode;
 }
 
-std::string ORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
+std::string ORGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) const 
 {	
 	string result = s_formulaBegin;
 

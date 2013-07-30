@@ -11,7 +11,7 @@ SpareGate::SpareGate(const std::string& id, const std::string& primaryId, const 
 	m_dormancyFactor(dormancyFactor)
 {}
 
-int SpareGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
+int SpareGate::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
 	// just cold spare behaviour in PNML, regardless of dormancy factor
 	// works only with basic events so far...
@@ -64,7 +64,7 @@ FaultTreeNode* SpareGate::clone() const
 	return newNode;
 }
 
-int SpareGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+int SpareGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const 
 {
 	// see FuzzTrees / simulation / modeltransform / timeNetModels / spare.xml
 	const int spareGateFailed = doc->addPlace(0, 1);

@@ -8,18 +8,18 @@ public:
 	
 	virtual FaultTreeNode* clone() const override; // virtual deep copying
 
-	virtual int serializePTNet(boost::shared_ptr<PNDocument> doc) const override;
+	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const override;
 	
 	std::pair<int /*placeID*/,int /*spareActivationTransition*/> 
-		serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const;
+		serializeAsColdSpare(std::shared_ptr<PNDocument> doc) const;
 
 	std::tuple<int /*not failed*/, int /*failed*/, int /*failure transition*/>
-		serializeAsSpare(boost::shared_ptr<PNDocument> doc) const;
+		serializeAsSpare(std::shared_ptr<PNDocument> doc) const;
 
 	virtual int getCost() const override { return m_cost; };
 
 protected:
-	void serializeFDEPChildren(boost::shared_ptr<PNDocument> doc, const int& failedPlaceId) const;
+	void serializeFDEPChildren(std::shared_ptr<PNDocument> doc, const int& failedPlaceId) const;
 
 	virtual std::string description() const override;
 };

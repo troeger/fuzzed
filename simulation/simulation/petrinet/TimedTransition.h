@@ -6,7 +6,7 @@
 class TimedTransition : public Transition
 {
 public:
-	typedef boost::shared_ptr<TimedTransition> Ptr;
+	typedef std::shared_ptr<TimedTransition> Ptr;
 
 	TimedTransition(const std::string& ID, double rate, const std::string& label = "");
 

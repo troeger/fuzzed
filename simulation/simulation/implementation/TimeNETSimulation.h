@@ -26,17 +26,16 @@ public:
 		void* additionalArgmuments);
 
 	TimeNETSimulation(
-		std::auto_ptr<FaultTreeNode> faultTree, 
+		std::shared_ptr<FaultTreeNode> faultTree, 
 		int simulationTime, // the maximum duration of one simulation in seconds
 		int simulationSteps, // the number of logical simulation steps performed in each round
 		int numRounds,
 		void* additionalArgmuments);
 
-	virtual ~TimeNETSimulation() {}; // TODO
+	virtual ~TimeNETSimulation();
 
 	virtual bool run() override;
 
 protected:
-
 	TimeNETProperties* m_properties;
 };

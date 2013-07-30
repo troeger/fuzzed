@@ -3,7 +3,7 @@
 #include "serialization/PNDocument.h"
 #include "util.h"
 
-int UndevelopedEvent::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
+int UndevelopedEvent::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
 	int placeID = doc->addPlace(1, 1, "UndevelopedEvent" + m_id);
 	int transitionID = doc->addTimedTransition(m_failureRate);

@@ -5,7 +5,7 @@ FDEPGate::FDEPGate(const std::string& id, const std::string& trigger, std::vecto
 	: DynamicGate(id, name), m_triggerID(trigger), m_dependentEvents(dependentEvents)
 {}
 
-int FDEPGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
+int FDEPGate::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
 	const auto& triggerChild = getChildById(m_triggerID);
 	return triggerChild->serializePTNet(doc); // FDEP gates do not propagate upwards
@@ -20,7 +20,7 @@ FaultTreeNode* FDEPGate::clone() const
 	return newNode;
 }
 
-int FDEPGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+int FDEPGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const 
 {
 	const auto& triggerChild = getChildById(m_triggerID);
 	return triggerChild->serializeTimeNet(doc); // FDEP gates do not propagate upwards

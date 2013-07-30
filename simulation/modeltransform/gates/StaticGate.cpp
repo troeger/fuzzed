@@ -25,7 +25,7 @@ long double StaticGate::computeUnreliability() const
 	return m_activationFunc(unreliabilities);
 }
 
-int StaticGate::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+int StaticGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const 
 {
 	assert(doc.get());
 

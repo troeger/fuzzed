@@ -5,11 +5,11 @@
 #include "FaultTreeTypes.h"
 
 using std::string;
-using std::auto_ptr;
+using std::shared_ptr;
 
-std::auto_ptr<TopLevelEvent> fromGeneratedFaultTree(const faulttree::TopEvent& generatedTree)
+std::shared_ptr<TopLevelEvent> fromGeneratedFaultTree(const faulttree::TopEvent& generatedTree)
 {
-	auto_ptr<TopLevelEvent> top(new TopLevelEvent(generatedTree.id()));
+	shared_ptr<TopLevelEvent> top(new TopLevelEvent(generatedTree.id()));
 	convertFaultTreeRecursive(top.get(), generatedTree);
 	return top;
 }

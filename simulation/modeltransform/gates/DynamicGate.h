@@ -11,10 +11,10 @@ public:
 		m_bStaticSubTree = false;
 	}
 
-	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const override
+	virtual std::string serializeAsFormula(std::shared_ptr<PNDocument> doc) const override
 	{
 		return "DYNAMIC_BEHAVIOUR";
 	}
 
-	virtual int serializeTimeNet(boost::shared_ptr<TNDocument> doc) const override = 0;
+	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const override = 0;
 };

@@ -8,7 +8,7 @@ VotingORGate::VotingORGate(const std::string& id, int numVotes, const string& na
 	initActivationFunc();
 }
 
-int VotingORGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
+int VotingORGate::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
 	if (getNumChildren() == 0)
 		return -1;
@@ -49,7 +49,7 @@ std::string VotingORGate::description() const
 	return util::toString(m_numVotes) + " out of " + util::toString(getNumChildren());
 }
 
-std::string VotingORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
+std::string VotingORGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) const 
 {
 	vector<std::string> childFormulas;
 	for (const auto child : m_children)

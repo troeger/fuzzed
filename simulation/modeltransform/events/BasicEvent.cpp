@@ -9,7 +9,7 @@ BasicEvent::BasicEvent(const std::string& ID, long double failureRate, const std
 	m_cost = cost;
 }
 
-int BasicEvent::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
+int BasicEvent::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
 	int notFailed = doc->addPlace(1, 1, "BasicEvent" + m_id);
 	int failComponent = doc->addTimedTransition(m_failureRate);
@@ -34,7 +34,7 @@ std::string BasicEvent::description() const
 }
 
 std::pair<int /*placeID*/,int /*spareActivationTransition*/>
-	BasicEvent::serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const
+	BasicEvent::serializeAsColdSpare(std::shared_ptr<PNDocument> doc) const
 {
 	int sparePassive = doc->addPlace(1, 1, "ColdSpare" + m_id);
 	int activateTransition = doc->addImmediateTransition();
@@ -52,7 +52,7 @@ std::pair<int /*placeID*/,int /*spareActivationTransition*/>
 }
 
 std::tuple<int /*not failed*/, int /*failed*/, int /*failure transition*/> 
-	BasicEvent::serializeAsSpare(boost::shared_ptr<PNDocument> doc) const
+	BasicEvent::serializeAsSpare(std::shared_ptr<PNDocument> doc) const
 {
 	int notFailed = doc->addPlace(1, 1, "BasicEvent" + m_id);
 	int failComponent = doc->addTimedTransition(m_failureRate);
@@ -66,7 +66,7 @@ std::tuple<int /*not failed*/, int /*failed*/, int /*failure transition*/>
 	return make_tuple(notFailed, failed, failComponent);
 }
 
-void BasicEvent::serializeFDEPChildren(boost::shared_ptr<PNDocument> doc, const int& failedPlaceId) const
+void BasicEvent::serializeFDEPChildren(std::shared_ptr<PNDocument> doc, const int& failedPlaceId) const
 {
 	if (getNumChildren() == 0) return;
 	

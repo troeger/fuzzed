@@ -19,7 +19,7 @@ class PetriNet
 	friend class SequentialConstraint; // yikes.
 
 public:
-	typedef boost::shared_ptr<PetriNet> Ptr;
+	typedef std::shared_ptr<PetriNet> Ptr;
 
 	// explicit constructor, from file import
 	PetriNet(

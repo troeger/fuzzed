@@ -11,9 +11,9 @@ public:
 
 	virtual void addChild(FaultTreeNode* child) override;
 
-	virtual int serializeTimeNet(boost::shared_ptr<TNDocument> doc) const override;
-	virtual int serializePTNet(boost::shared_ptr<PNDocument> doc) const override;
-	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const override;
+	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const override;
+	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const override;
+	virtual std::string serializeAsFormula(std::shared_ptr<PNDocument> doc) const override;
 
 	virtual bool isValid() const override { return m_children.size() == 1; };
 

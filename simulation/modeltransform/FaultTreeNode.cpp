@@ -118,7 +118,7 @@ int FaultTreeNode::getCost() const
 	return result;
 }
 
-int FaultTreeNode::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const
+int FaultTreeNode::serializeTimeNet(std::shared_ptr<TNDocument> doc) const
 {
 	return serializePTNet(doc);
 }

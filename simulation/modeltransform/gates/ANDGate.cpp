@@ -11,7 +11,7 @@ ANDGate::ANDGate(const string& id, const string& name /*= ""*/)
 	initActivationFunc();
 }
 
-int ANDGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
+int ANDGate::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
 	vector<int> childIDs;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
@@ -48,7 +48,7 @@ FaultTreeNode* ANDGate::clone() const
 	return newNode;
 }
 
-std::string ANDGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
+std::string ANDGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) const 
 {
 	string result = s_formulaBegin;
 

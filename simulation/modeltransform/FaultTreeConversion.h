@@ -11,5 +11,5 @@ namespace faulttree
 class FaultTreeNode;
 class TopLevelEvent;
 
-std::auto_ptr<TopLevelEvent> fromGeneratedFaultTree(const faulttree::TopEvent& generatedTree);
+std::shared_ptr<TopLevelEvent> fromGeneratedFaultTree(const faulttree::TopEvent& generatedTree);
 void convertFaultTreeRecursive(FaultTreeNode* node, const faulttree::Node& templateNode);

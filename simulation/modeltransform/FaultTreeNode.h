@@ -53,13 +53,13 @@ public:
 	/************************************************************************/
 
 	// returns ID of the "top level" place
-	virtual int serializePTNet(boost::shared_ptr<PNDocument> doc) const = 0;
-	virtual int serializeTimeNet(boost::shared_ptr<TNDocument> doc) const;
+	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const = 0;
+	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const;
 
-	virtual std::string serializeAsFormula(boost::shared_ptr<PNDocument> doc) const = 0;
+	virtual std::string serializeAsFormula(std::shared_ptr<PNDocument> doc) const = 0;
 
 	std::pair<int /*placeID*/,int /*spareActivationTransition*/> 
-		serializeAsColdSpare(boost::shared_ptr<PNDocument> doc) const;
+		serializeAsColdSpare(std::shared_ptr<PNDocument> doc) const;
 
 	// uses RTTI
 	virtual void print(std::ostream& stream, int indentLevel=0) const;

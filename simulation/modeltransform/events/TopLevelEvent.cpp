@@ -7,7 +7,7 @@ TopLevelEvent::TopLevelEvent(const std::string& ID /*= 0*/)
 	: Event(ID, 0.0L)
 {}
 
-int TopLevelEvent::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
+int TopLevelEvent::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
 	assert(m_children.size() <= 1 && "Top Level Event cannot have multiple children");
 	
@@ -63,13 +63,13 @@ void TopLevelEvent::print(std::ostream& stream, int indentLevel/*=0*/) const
 	FaultTreeNode::print(stream, indentLevel);
 }
 
-std::string TopLevelEvent::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const 
+std::string TopLevelEvent::serializeAsFormula(std::shared_ptr<PNDocument> doc) const 
 {
 	assert(m_children.size() == 1);
 	return m_children.front()->serializeAsFormula(doc);
 }
 
-int TopLevelEvent::serializeTimeNet(boost::shared_ptr<TNDocument> doc) const 
+int TopLevelEvent::serializeTimeNet(std::shared_ptr<TNDocument> doc) const 
 {
 	assert(m_children.size() <= 1 && "Top Level Event cannot have multiple children");
 

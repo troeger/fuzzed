@@ -22,7 +22,7 @@ class Transition;
 class Place
 {
 public:
-	typedef boost::shared_ptr<Place> Ptr;
+	typedef std::shared_ptr<Place> Ptr;
 
 	Place(const string& id, int initialMarking, int capacity, PlaceSemantics semantics);
 	Place(); // satisfy the compiler

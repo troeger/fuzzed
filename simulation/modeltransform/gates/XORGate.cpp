@@ -9,7 +9,7 @@ XORGate::XORGate(const std::string& ID, const std::string& name)
 	: StaticGate(ID, name)
 {}
 
-int XORGate::serializePTNet(boost::shared_ptr<PNDocument> doc) const 
+int XORGate::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
 	vector<int> childIDs;
 	for (auto it = getChildrenBegin(); it != getChildrenEnd(); ++it)
@@ -52,7 +52,7 @@ FaultTreeNode* XORGate::clone() const
 	return newNode;
 }
 
-std::string XORGate::serializeAsFormula(boost::shared_ptr<PNDocument> doc) const
+std::string XORGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) const
 {
 	vector<std::string> childFormulas;
 	for (const auto child : m_children)

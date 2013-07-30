@@ -28,7 +28,7 @@ public:
 
 
 	Simulation(
-		std::auto_ptr<FaultTreeNode> tree, 
+		std::shared_ptr<FaultTreeNode> tree, 
 		unsigned int simulationTime, // the maximum duration of one simulation in seconds
 		unsigned int simulationSteps, // the number of logical simulation steps performed in each round
 		unsigned int numRounds) : // the number of simulation rounds for the entire net
@@ -45,7 +45,7 @@ public:
 
 protected:
 	boost::filesystem::path m_netFile;
-	std::auto_ptr<FaultTreeNode> m_faultTree;
+	std::shared_ptr<FaultTreeNode> m_faultTree;
 	
 	bool m_bRunning;
 
