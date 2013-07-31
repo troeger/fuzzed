@@ -14,7 +14,8 @@ PetriNet::PetriNet(
 	m_arcs(arcDict),
 	m_constraints(constraints),
 	m_topLevelPlace(nullptr),
-	m_finalFiringTime(MAX_INT)
+	m_finalFiringTime(MAX_INT),
+	m_avgFiringTime(MAX_INT)
 {
 	// setup();
 	// simplify();

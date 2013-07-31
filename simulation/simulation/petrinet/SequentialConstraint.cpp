@@ -13,19 +13,8 @@ SequentialConstraint::SequentialConstraint(const vector<string>& sequence, Seque
 
 bool SequentialConstraint::isSatisfied(const PetriNet* const pn)
 {
-	assert(m_satisfied);
-
-	switch (m_type)
-	{
-	case STATIC_TRANSITIION_SEQ: 
-		return checkTransitionSequence(pn); 
-	case DYNAMIC_PLACE_SEQ:
-		return checkPlaceSequence(pn);
-	default:
-		assert(false);
-	}
-
-	return checkPlaceSequence(pn);
+	checkPlaceSequence(pn);
+	return m_satisfied;
 }
 
 bool SequentialConstraint::checkPlaceSequence(const PetriNet* const pn)

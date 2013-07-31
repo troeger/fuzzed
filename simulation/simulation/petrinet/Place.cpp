@@ -49,7 +49,7 @@ Place::Place(const Place& other) :
 		throw runtime_error("Invalid Place configuration: the initial marking must not be larger than capacity.");
 }
 
-Place::Place() : m_initialMarking(0), m_capacity(0)
+Place::Place() : m_initialMarking(0), m_capacity(0), m_marking(0)
 {
 	assert(false);
 }

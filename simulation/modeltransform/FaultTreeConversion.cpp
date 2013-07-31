@@ -25,6 +25,7 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 	{
 		const string id = child.id();
 		const string typeName = typeid(child).name();
+		bool alreadyAdded = false;
 		
 		// Leaf nodes...
 		if (typeName == BASICEVENT) 
@@ -37,6 +38,7 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 
 			current = make_shared<BasicEvent>(id, failureRate);
 			node->addChild(current);
+			alreadyAdded = true;
 			
 			// BasicEvents can have FDEP children...
 			// continue;
@@ -97,7 +99,8 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 
 		if (current)
 		{
-			node->addChild(current);
+			if (!alreadyAdded)
+				node->addChild(current);
 			convertFaultTreeRecursive(current, child);
 		}
 		else
