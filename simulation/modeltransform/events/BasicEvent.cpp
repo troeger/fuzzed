@@ -4,13 +4,19 @@
 #include "util.h"
 
 BasicEvent::BasicEvent(const std::string& ID, long double failureRate, const std::string& name/* = ""*/, int cost /*=1*/)
-	: Event(ID, failureRate, name)
+	: Event(ID, failureRate, name),
+	m_serializedPlaceID(-1)
 {
 	m_cost = cost;
 }
 
 int BasicEvent::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
+	if (m_serializedPlaceID != -1)
+	{
+		return m_serializedPlaceID;
+	}
+	
 	int notFailed = doc->addPlace(1, 1, "BasicEvent" + m_id);
 	int failComponent = doc->addTimedTransition(m_failureRate);
 	doc->placeToTransition(notFailed, failComponent);
@@ -19,6 +25,9 @@ int BasicEvent::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	doc->transitionToPlace(failComponent, failed);
 
 	serializeFDEPChildren(doc, failed);
+
+	assert(failed >= 0);
+	m_serializedPlaceID = failed;
 	return failed;
 }
 
