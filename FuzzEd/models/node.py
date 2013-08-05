@@ -319,7 +319,8 @@ class Node(models.Model):
 
             # determine fuzzy or crisp probability, set it accordingly
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
-                properties['probability'] = xml_faulttree.CrispProbability(value_=self.get_property('probability', None))
+                probability_property = self.get_property('probability', None)
+                properties['probability'] = xml_faulttree.CrispProbability(value_=probability_property[1])
 
             xml_node = faulttree_classes[self.kind](**properties)
 
