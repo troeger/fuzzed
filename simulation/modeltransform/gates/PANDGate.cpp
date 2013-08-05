@@ -10,34 +10,41 @@ PANDGate::PANDGate(const string& id, const std::vector<std::string>& ordering, c
 
 int PANDGate::serializePTNet(std::shared_ptr<PNDocument> doc) const 
 {
-	// old version which discards invalid child sequences in a separate place
-	// this is ugly modeling...
+	// see: FuzzTrees / simulation / modeltransform / timeNetModels / PAND.xml
 
-	int previousChildFailed = -1;
-	int garbage = addSequenceViolatedPlace(doc);
-	for (auto& child : m_children)
+	vector<int> inhibitingPlaces;
+
+	const int pandFailed = addSequenceViolatedPlace(doc);// doc->addPlace(0, 1);
+	const int failPand = doc->addImmediateTransition();
+
+	// fail just once
+	doc->transitionToPlace(failPand, pandFailed);
+	doc->addInhibitorArc(pandFailed, failPand);
+
+	// TODO this can be optimized I suppose
+	for (const auto& childId : m_requiredSequence)
 	{
-		int childFailed = child->serializePTNet(doc);
-		if (previousChildFailed > 0)
-		{
-			int discard		= doc->addImmediateTransition(1, "discard");
-			int propagate	= doc->addImmediateTransition(2, "propagate");
+		const auto& child = getChildById(childId);
+		assert(child != nullptr);
 
-			doc->placeToTransition(previousChildFailed, propagate);
-			doc->placeToTransition(childFailed, discard);
-			doc->transitionToPlace(discard, garbage);
+		const int childFailed				= child->serializePTNet(doc);
+		const int propagateChildFailure		= doc->addImmediateTransition();
+		const int childFailurePropagated	= doc->addPlace(0, 1);
 
-			int currentSequence = doc->addPlace(0, 1);
-			doc->transitionToPlace(propagate, currentSequence);
+		doc->placeToTransition(childFailed, propagateChildFailure);
+		doc->transitionToPlace(propagateChildFailure, childFailed);
 
-			previousChildFailed = currentSequence;
-		}
-		else
-		{
-			previousChildFailed = childFailed;
-		}
+		doc->transitionToPlace(propagateChildFailure, childFailurePropagated);
+
+		for (const auto& inhibitor : inhibitingPlaces)
+			doc->addInhibitorArc(inhibitor, propagateChildFailure);
+
+		inhibitingPlaces.emplace_back(childFailurePropagated);
+
+		doc->placeToTransition(childFailurePropagated, failPand);
 	}
-	return previousChildFailed;
+
+	return pandFailed;
 }
 
 FaultTreeNode::Ptr PANDGate::clone() const
@@ -52,7 +59,7 @@ FaultTreeNode::Ptr PANDGate::clone() const
 
 int PANDGate::addSequenceViolatedPlace(std::shared_ptr<PNDocument> doc) const
 {
-	return doc->addPlace(0, 0, "SequenceViolated");
+	return doc->addPlace(0, 1, "SequenceViolated");
 }
 
 int PANDGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const 
@@ -61,7 +68,7 @@ int PANDGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const
 	
 	vector<int> inhibitingPlaces;
 	
-	const int pandFailed = doc->addPlace(0, 1);
+	const int pandFailed = addSequenceViolatedPlace(doc);
 	const int failPand = doc->addImmediateTransition();
 
 	// fail just once
