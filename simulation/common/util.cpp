@@ -243,3 +243,15 @@ SimulationResult util::readResultFile(const std::string& fileName)
 
 	return res;
 }
+
+double util::rateFromProbability(double prob, int missionTime)
+{
+	// http://www.wolframalpha.com/input/?i=solve+1-e%5E%28-x+*+t%29+%3D+p+for+x+and+p%3E%3D0+and+p%3C%3D1+and+t%3E0+and+x%3E%3D0
+	assert(missionTime > 0);
+	
+	static const double THRESHOLD = 0.00000001;
+	if (1.0 - prob < THRESHOLD)
+		return 1.0;
+
+	return std::log(1.0 / (1.0 - prob)) / missionTime;
+}

@@ -9,7 +9,8 @@ namespace faultTreeType
 	const std::string XOR		= "class faulttree::Xor";
 	const std::string VOTINGOR	= "class faulttree::VotingOr";
 
-	const std::string CRISPPROB	= "class faulttree::CrispProbability";
+	const std::string CRISPPROB		= "class faulttree::CrispProbability";
+	const std::string FAILURERATE	= "class faulttree::FailureRate";
 
 	const std::string BASICEVENT		= "class faulttree::BasicEvent";
 	const std::string INTERMEDIATEEVENT	= "class faulttree::IntermediateEvent";

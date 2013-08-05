@@ -374,9 +374,15 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 	if (numChildren <= 0) return INVALID_ATTRIBUTE;
 
 	const auto& prob = eventSet->probability();
-	const auto& copiedProb = (typeid(prob).name() == fuzztreeType::CRISPPROB) ? 
-		faulttree::CrispProbability(static_cast<const fuzztree::CrispProbability&>(prob).value()) :
-		faulttree::CrispProbability(0);
+	const auto& probType = typeid(prob).name();
+
+	faulttree::Probability copiedProb;
+	if (probType == fuzztreeType::CRISPPROB)
+		copiedProb = faulttree::CrispProbability(static_cast<const fuzztree::CrispProbability&>(prob).value());
+	else if (probType == fuzztreeType::FAILURERATE)
+		copiedProb = faulttree::FailureRate(static_cast<const fuzztree::FailureRate&>(prob).value());
+	else
+		copiedProb = faulttree::FailureRate(0.0); 
 
 	int i = 0;
 	const auto eventSetId = eventSet->id();

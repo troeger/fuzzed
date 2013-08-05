@@ -3,6 +3,7 @@
 
 #include "faulttree.h"
 #include "FaultTreeTypes.h"
+#include "util.h"
 
 using std::string;
 using std::shared_ptr;
@@ -10,12 +11,15 @@ using std::make_shared;
 
 std::shared_ptr<TopLevelEvent> fromGeneratedFaultTree(const faulttree::TopEvent& generatedTree)
 {
-	shared_ptr<TopLevelEvent> top(new TopLevelEvent(generatedTree.id()));
-	convertFaultTreeRecursive(top, generatedTree);
+	const auto mt = generatedTree.missionTime();
+	unsigned int missionTime = mt.present() ? mt.get() : 1;
+	
+	shared_ptr<TopLevelEvent> top(new TopLevelEvent(generatedTree.id(), missionTime));
+	convertFaultTreeRecursive(top, generatedTree, missionTime);
 	return top;
 }
 
-void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& templateNode)
+void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& templateNode, const unsigned int& missionTime)
 {
 	using namespace faultTreeType;
 
@@ -32,10 +36,15 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 		{
 			const auto& prob = (static_cast<const faulttree::BasicEvent&>(child)).probability();
 			const string probName = typeid(prob).name();
-			assert(probName == CRISPPROB);
-
-			float failureRate = static_cast<const faulttree::CrispProbability&>(prob).value();
-
+			
+			float failureRate = 0.f;
+			if (probName == CRISPPROB)
+				failureRate = util::rateFromProbability(static_cast<const faulttree::CrispProbability&>(prob).value(), missionTime);
+			else
+			{
+				assert(dynamic_cast<const faulttree::CrispProbability*>(&prob));
+				failureRate = static_cast<const faulttree::FailureRate&>(prob).value();
+			}
 			current = make_shared<BasicEvent>(id, failureRate);
 			node->addChild(current);
 			alreadyAdded = true;
@@ -101,11 +110,11 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 		{
 			if (!alreadyAdded)
 				node->addChild(current);
-			convertFaultTreeRecursive(current, child);
+			convertFaultTreeRecursive(current, child, missionTime);
 		}
 		else
 		{
-			convertFaultTreeRecursive(node, child);
+			convertFaultTreeRecursive(node, child, missionTime);
 		}
 	}
 }

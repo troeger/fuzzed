@@ -20,5 +20,6 @@ namespace fuzztreeType
 	const std::string FEATUREVP		= "class fuzztree::FeatureVariationPoint";
 
 	const std::string CRISPPROB		= "class fuzztree::CrispProbability";
+	const std::string FAILURERATE	= "class fuzztree::FailureRate";
 	const std::string FUZZYPROB		= "class fuzztree::DecomposedFuzzyProbability";
 }

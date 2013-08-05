@@ -52,7 +52,9 @@
 
   <xsd:complexType name="TopEvent">
     <xsd:complexContent>
-      <xsd:extension base="ft:Node"/>
+      <xsd:extension base="ft:Node">
+        <xsd:attribute name="missionTime" type="xsd:int"/>
+      </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
   <xsd:element name="TopEvent" type="ft:TopEvent"/>
@@ -64,7 +66,17 @@
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-
+  <xsd:element name="CrispProbability" type="ft:CrispProbability"/>
+  
+  <xsd:complexType name="FailureRate">
+    <xsd:complexContent>
+      <xsd:extension base="ft:Probability">
+        <xsd:attribute name="value" type="xsd:double" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="FailureRate" type="ft:FailureRate"/>
+  
   <!--Static Fault Tree Gates-->
   <xsd:complexType abstract="true" name="Gate">
     <xsd:complexContent>

@@ -4,7 +4,7 @@
 class TopLevelEvent : public Event
 {
 public:
-	TopLevelEvent(const std::string& ID);
+	TopLevelEvent(const std::string& ID, const unsigned int& missionTime = 1);
 	virtual ~TopLevelEvent() {};
 
 	virtual FaultTreeNode::Ptr clone() const override; // virtual deep copying
@@ -18,4 +18,7 @@ public:
 	virtual bool isValid() const override { return m_children.size() == 1; };
 
 	virtual void print(std::ostream& stream, int indentLevel=0) const override;
+
+protected:
+	unsigned int m_missionTime;
 };

@@ -154,10 +154,9 @@ void FaultTreeImport::loadNode(const xml_node& node, FaultTreeNode::Ptr tree)
 
 double FaultTreeImport::parseFailureRate(const xml_node &child)
 {
+	// TODO support failure rate directly
 	for (const auto& probabilityNode : child.children("probability"))
 	{
-		if (!probabilityNode) throw runtime_error("Could not find Probability Node for Basic event");
-
 		if (string(probabilityNode.attribute(NODE_TYPE).as_string()) != CRISP_NUM)
 			throw runtime_error("Fuzzy Probabilites are not supported yet");
 

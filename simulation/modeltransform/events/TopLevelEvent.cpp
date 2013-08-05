@@ -3,8 +3,9 @@
 #include "util.h"
 #include "gates/Gate.h"
 
-TopLevelEvent::TopLevelEvent(const std::string& ID /*= 0*/)
+TopLevelEvent::TopLevelEvent(const std::string& ID /*= 0*/, const unsigned int& missionTime)
 	: Event(ID, 0.0L)
+	, m_missionTime(missionTime)
 {}
 
 int TopLevelEvent::serializePTNet(std::shared_ptr<PNDocument> doc) const 
