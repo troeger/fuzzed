@@ -52,13 +52,13 @@ unsigned int RandomNumberGenerator::randomFiringTime(double rate)
 	return t;
 }
 
-boost::once_flag RandomNumberGenerator::s_flag  = BOOST_ONCE_INIT;
 unordered_map<int, RandomNumberGenerator*> RandomNumberGenerator::s_generators = unordered_map<int, RandomNumberGenerator*>();
 
 RandomNumberGenerator* RandomNumberGenerator::instanceForCurrentThread()
 {
+	static std::once_flag s_flag;
 	if (s_generators.size() !=  omp_get_max_threads()) // TODO is this safe??
-		boost::call_once(s_flag, initGenerators);
+		std::call_once(s_flag, initGenerators);
 	
 	return s_generators.at(omp_get_thread_num());
 }
