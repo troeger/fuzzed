@@ -5,13 +5,13 @@
       <children xsi:type="ft:IntermediateEvent" id="3" optional="false">
         <children xsi:type="ft:RedundancyVariationPoint" id="12" name="Power Failure" start="4" end="5" formula="N-2" costFormula="N/2">
           <children xsi:type="ft:BasicEventSet" id="121" name="Power Unit Failure">
-            <probability xsi:type="ft:CrispProbability" value="0.5"/>
+            <probability xsi:type="ft:FailureRate" value="0.5"/>
           </children>
         </children>
       </children>
       <children xsi:type="ft:RedundancyVariationPoint" id="13" name="Power Failure" start="4" end="5" formula="N-2" costFormula="N/2">
         <children xsi:type="ft:BasicEventSet" id="122" name="Power Unit Failure">
-          <probability xsi:type="ft:CrispProbability" value="0.5"/>
+          <probability xsi:type="ft:FailureRate" value="0.5"/>
         </children>
       </children>
     </children>
