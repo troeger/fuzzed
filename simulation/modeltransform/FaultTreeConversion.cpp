@@ -11,11 +11,9 @@ using std::make_shared;
 
 std::shared_ptr<TopLevelEvent> fromGeneratedFaultTree(const faulttree::TopEvent& generatedTree)
 {
-	const auto mt = generatedTree.missionTime();
-	unsigned int missionTime = mt.present() ? mt.get() : 1;
-	
-	shared_ptr<TopLevelEvent> top(new TopLevelEvent(generatedTree.id(), missionTime));
-	convertFaultTreeRecursive(top, generatedTree, missionTime);
+	const unsigned int mt = generatedTree.missionTime();
+	shared_ptr<TopLevelEvent> top(new TopLevelEvent(generatedTree.id(), mt));
+	convertFaultTreeRecursive(top, generatedTree, mt);
 	return top;
 }
 
