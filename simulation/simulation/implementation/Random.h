@@ -31,5 +31,4 @@ private:
 	// this is a weird per-thread singleton pattern.
 	static void initGenerators();
 	static unordered_map<int, RandomNumberGenerator*> s_generators;
-	static boost::once_flag s_flag;
 };
