@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ft:FuzzTree xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="net.fuzztree" id="15022013" name="Basic Gate Test">
-  <topEvent name="Result">
+  <topEvent name="Result" missionTime="1">
     <children xsi:type="ft:FeatureVariationPoint" id="100" name="Test Cases">
       <children xsi:type="ft:IntermediateEvent" id="1" name="Basic Event A alone">
         <children xsi:type="ft:BasicEvent" name="A">

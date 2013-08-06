@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ft:FuzzTree xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="net.fuzztree" name="EWDC 2013" decompositionNumber="2" id="0">
-  <topEvent id="1" name="Server Failure">
+  <topEvent id="1" name="Server Failure" missionTime="1">
   	<children xsi:type="ft:Or" id="11">
         <children xsi:type="ft:BasicEvent" id="2" name="Bus Failure">
           <probability xsi:type="ft:CrispProbability" value="0.0001"/>
