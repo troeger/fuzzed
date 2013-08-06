@@ -35,12 +35,12 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 			const auto& prob = (static_cast<const faulttree::BasicEvent&>(child)).probability();
 			const string probName = typeid(prob).name();
 			
-			float failureRate = 0.f;
+			double failureRate = 0.f;
 			if (probName == CRISPPROB)
 				failureRate = util::rateFromProbability(static_cast<const faulttree::CrispProbability&>(prob).value(), missionTime);
 			else
 			{
-				assert(dynamic_cast<const faulttree::CrispProbability*>(&prob));
+				assert(dynamic_cast<const faulttree::FailureRate*>(&prob));
 				failureRate = static_cast<const faulttree::FailureRate&>(prob).value();
 			}
 			current = make_shared<BasicEvent>(id, failureRate);

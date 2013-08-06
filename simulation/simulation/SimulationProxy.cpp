@@ -37,7 +37,6 @@ namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
 SimulationProxy::SimulationProxy(int argc, char** arguments) :
-	m_missionTime(0),
 	m_numRounds(0),
 	m_convergenceThresh(0.0),
 	m_simulationTime(0),
@@ -59,8 +58,7 @@ SimulationProxy::SimulationProxy(int argc, char** arguments) :
 	}
 }
 
-SimulationProxy::SimulationProxy(unsigned int missionTime, unsigned int numRounds, double convergenceThreshold, unsigned int maxTime) : 
-	m_missionTime(missionTime),
+SimulationProxy::SimulationProxy(unsigned int numRounds, double convergenceThreshold, unsigned int maxTime) : 
 	m_numRounds(numRounds),
 	m_convergenceThresh(convergenceThreshold),
 	m_simulationTime(maxTime),
@@ -155,7 +153,7 @@ void SimulationProxy::parseCommandline(int numArguments, char** arguments)
 		("conf",		po::value<int>(&confidence)->default_value(DEFAULT_CONFIDENCE),						"Confidence level (TimeNET only)")
 		("epsilon,e",	po::value<float>(&epsilon)->default_value(DEFAULT_EPSILON),							"Epsilon (TimeNET only)")
 		("MTTF",		po::value<bool>(&m_bSimulateUntilFailure)->default_value(true),						"Simulate each Round until System Failure, necessary for MTTF")
-		("converge,c",	po::value<double>(&m_convergenceThresh)->default_value((double)0.0001),				"Cancel simulation after the resulting reliability differs in less than this threshold")
+		("converge,c",	po::value<double>(&m_convergenceThresh)->default_value((double)0.0000),				"Cancel simulation after the resulting reliability differs in less than this threshold")
 		("adaptive,a",	po::value<unsigned int>(&numAdaptiveRounds)->default_value(0),						"Adaptively adjust the number of Simulation Rounds, NOT YET IMPLEMENTED");
 
 	po::variables_map optionsMap;
@@ -249,9 +247,12 @@ bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
 		p.extension() == timeNET::TN_EXT;
 }
 
-void SimulationProxy::simulateFaultTree(FaultTreeNode::Ptr ft, const std::string& newFileName, SimulationImpl impl)
+void SimulationProxy::simulateFaultTree(std::shared_ptr<TopLevelEvent> ft, const std::string& newFileName, SimulationImpl impl)
 {
 	std::shared_ptr<PNDocument> doc;
+
+	m_missionTime = ft->getMissionTime();
+
 	switch (impl)
 	{
 	case DEFAULT:

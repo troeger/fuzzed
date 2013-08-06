@@ -10,15 +10,14 @@
 using namespace std;
 
 void runSimulation(
-	char* fuzztreeXML,
-	int missionTime, 
+	char* fuzztreeXML, 
 	int numRounds,
 	double convergenceThreshold,
 	int maxTime) noexcept
 {	
 	try
 	{
-		SimulationProxy p = SimulationProxy(missionTime, numRounds, convergenceThreshold, maxTime);
+		SimulationProxy p = SimulationProxy(numRounds, convergenceThreshold, maxTime);
 		
 		FuzzTreeTransform ftTransform(fuzztreeXML);
 		int i = 0;
@@ -41,14 +40,13 @@ void runSimulation(
 
 void runSimulationOnFile(
 	char* filePath,
-	int missionTime, 
 	int numRounds,
 	double convergenceThreshold,
 	int maxTime) noexcept
 {	
 	try
 	{
-		SimulationProxy p = SimulationProxy(missionTime, numRounds, convergenceThreshold, maxTime);
+		SimulationProxy p = SimulationProxy(numRounds, convergenceThreshold, maxTime);
 		p.simulateFile(filePath, DEFAULT, false); // TODO make configurable
 
 	}

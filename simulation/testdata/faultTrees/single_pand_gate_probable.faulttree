@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FaultTree id="0" xmlns:ft="net.faulttree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <topEvent id="1" name="Server Failure" missionTime="1">
+    <children xsi:type="ft:PriorityAnd" id="2" eventSequence="3 4">
+      <children xsi:type="ft:BasicEvent" id="3" name="Component Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.5"/>
+        </children>
+        <children xsi:type="ft:BasicEvent" id="4" name="Component Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.5"/>
+        </children>
+    </children>
+  </topEvent>
+</ft:FaultTree>

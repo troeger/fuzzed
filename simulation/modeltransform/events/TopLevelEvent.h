@@ -19,6 +19,8 @@ public:
 
 	virtual void print(std::ostream& stream, int indentLevel=0) const override;
 
+	const unsigned int& getMissionTime() { return m_missionTime; }
+
 protected:
 	unsigned int m_missionTime;
 };

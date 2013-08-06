@@ -13,7 +13,7 @@
 #include "Config.h"
 #include "platform.h"
 
-class FaultTreeNode;
+class TopLevelEvent;
 
 enum SimulationImpl
 {
@@ -32,7 +32,6 @@ public:
 
 	// constructor for library calls
 	SimulationProxy(
-		unsigned int missionTime,
 		unsigned int numRounds,
 		double convergenceThreshold,
 		unsigned int maxTime);
@@ -43,7 +42,7 @@ public:
 	// simulates all configurations from one file
 	void simulateAllConfigurations(const boost::filesystem::path&p, SimulationImpl impl);
 
-	void simulateFaultTree(std::shared_ptr<FaultTreeNode> ft, const std::string& newFileName, SimulationImpl impl);
+	void simulateFaultTree(std::shared_ptr<TopLevelEvent> ft, const std::string& newFileName, SimulationImpl impl);
 
 protected:
 	void parseCommandline(int numArguments, char** arguments);

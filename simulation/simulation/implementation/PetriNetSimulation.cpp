@@ -140,8 +140,7 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	{
 		tryImmediateTransitions(pn, tick, immediateCanFire);
 	}
-	vector<TimedTransition*> toRemove; // TODO: this appears to be a hotspot
-
+	vector<TimedTransition*> toRemove;
 	for (TimedTransition* tt : pn->m_inactiveTimedTransitions)
 	{
 		if (tt->tryUpdateStartupTime(tick))
@@ -158,7 +157,9 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 
 SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 {
-	const int maxTime = m_simulationTimeSeconds * 1000;
+	static const int milli = 1000;
+	
+	const int maxTime = m_simulationTimeSeconds * milli;
 	const auto start = high_resolution_clock::now();
 
 	SimulationRoundResult result;
