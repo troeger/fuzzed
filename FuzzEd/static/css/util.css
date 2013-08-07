@@ -22,10 +22,6 @@ section {
     display: none;
 }
 
-.brand {
-    color: white !important;
-}
-
 .center-vertical {
     text-align: center;
     vertical-align: middle;

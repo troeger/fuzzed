@@ -51,15 +51,15 @@
 <form action="/dashboard/new/" method="post">
     {% csrf_token %}
     <div class="btn-group pull-right">
-        <button type="submit" name="kind" value="faulttree" class="btn">
+        <button type="submit" name="kind" value="faulttree" class="btn btn-default">
             <i class="icon-file"></i>
             New FaultTree
         </button>
-        <button type="submit" name="kind" value="fuzztree" class="btn">
+        <button type="submit" name="kind" value="fuzztree" class="btn btn-default">
             <i class="icon-file"></i>
             New FuzzTree
         </button>
-        <button type="submit" name="kind" value="rbd" class="btn">
+        <button type="submit" name="kind" value="rbd" class="btn btn-default">
             <i class="icon-file"></i>
             New RBD
         </button>
@@ -95,25 +95,25 @@
                     <td>
                         <strong class="graph_name">{{ graph }}</strong>
                     </td>
-                    <td><span class="label">{{ name }}</span></td>
+                    <td><span class="label label-default">{{ name }}</span></td>
                     <td>{{ graph.created }}</td>
                     <td style="text-align: right;">
                         <form action="/dashboard/{{ graph.pk }}/" method="POST">
                             {% csrf_token %}
                             <input type="hidden" class="delete_flag">
-                            <button type="submit" name="edit" value="edit" class="btn">
+                            <button type="submit" name="edit" value="edit" class="btn btn-default btn-small">
                                 <i class="icon-wrench"></i>
                                 Settings
                             </button>
-                            <button type="submit" name="copy" value="copy" class="btn">
+                            <button type="submit" name="copy" value="copy" class="btn btn-default btn-small">
                                 <i class="icon-plus-sign"></i>
                                 Copy
                             </button>
-                            <button type="submit" name="snapshot" value="snapshot" class="btn">
+                            <button type="submit" name="snapshot" value="snapshot" class="btn btn-default btn-small">
                                 <i class="icon-camera"></i>
                                 Snapshot
                             </button>
-                            <button type="button" class="btn btn-danger require-dialog">
+                            <button type="button" class="btn btn-danger btn-small require-dialog">
                                 <i class="icon-white icon-trash"></i>
                                 Delete
                             </button>
@@ -141,7 +141,7 @@
             <i class="icon-white icon-trash"></i>
             Delete
         </button>
-        <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">
+        <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">
             Cancel
         </button>
     </div>
