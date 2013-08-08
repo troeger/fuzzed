@@ -3,6 +3,8 @@ project(ftsimulation CXX)
 set(SOURCES
    ${SOURCE}
    main.cpp
+   StructureFormulaClient.cpp
+   SimulationClient.cpp
    SimulationExtern.cpp
    SimulationProxy.cpp
    ResultDocument.cpp
@@ -23,11 +25,15 @@ set(SOURCES
 
 set(HEADERS
    ${HEADERS}
+   StructureFormulaClient.h
+   SimulationClient.h
    SimulationExtern.h
    SimulationProxy.h
    ResultDocument.h
    ResultStruct.h
    Config.h
+
+   beanstalkdconfig.h
    
    implementation/PetriNetSimulation.h
    implementation/TimeNETSimulation.h
@@ -48,6 +54,10 @@ set(HEADERS
 if (USE_TIMENET)
 	find_package(TimeNET REQUIRED)
 endif (USE_TIMENET)
+
+find_package(beanstalkpp REQUIRED)
+message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
+include_directories(${BEANSTALKPP_INCLUDE})
 
 find_package(OpenMP REQUIRED)
 if(OPENMP_FOUND)

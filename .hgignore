@@ -30,3 +30,4 @@ simulation/testdata/faultTrees/*.xml
 fuzztreeconfiguration/build/*
 *.DEFINFO
 *.AUX
+fuzztreeconfiguration/bin/*

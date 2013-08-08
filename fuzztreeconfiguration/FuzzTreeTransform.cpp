@@ -9,9 +9,20 @@
 #include <xsd/cxx/xml/dom/serialization-header.hxx>
 #include <boost/range/counting_range.hpp>
 
+#include <functional>
+
 using xercesc::DOMNode;
 using xercesc::DOMDocument;
 using namespace std;
+
+enum ErrorType
+{
+	NO_ERROR,
+	WRONG_CHILD_TYPE,
+	WRONG_CHILD_NUM,
+	INVALID_NODE,
+	INVALID_ATTRIBUTE
+};
 
 FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 	m_count(0)

@@ -1,14 +1,8 @@
 #pragma once
-#if IS_WINDOWS 
-#pragma warning(push, 3) 
-#endif
-#include <boost/filesystem/path.hpp>
+
 #include <string>
 #include <set>
 #include <iostream>
-#if IS_WINDOWS 
-#pragma warning(pop) 
-#endif
 
 #include "platform.h"
 #include "FuzzTreeConfiguration.h"
@@ -17,14 +11,7 @@
 #include "faultTree.h"
 #include "fuzzTree.h"
 
-enum ErrorType
-{
-	NO_ERROR,
-	WRONG_CHILD_TYPE,
-	WRONG_CHILD_NUM,
-	INVALID_NODE,
-	INVALID_ATTRIBUTE
-};
+enum ErrorType;
 
 class FuzzTreeTransform
 {
