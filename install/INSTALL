@@ -1,0 +1,38 @@
+
+Installation instructions
+=========================
+This project uses Puppet for installing all dependencies.
+Puppet installation instructions are available here:
+
+http://docs.puppetlabs.com/guides/installation.html
+
+Make sure to install the necessary puppet extensions:
+
+> sudo puppet module install puppetlabs/java
+
+Installation of development machine
+-----------------------------------
+> sudo puppet apply install/dev.pp
+
+Run development server
+----------------------
+> ./manage.py runserver
+
+Compile install packages to ./dist on developer machine
+-------------------------------------------------------
+> ./setup.py build sdist
+
+Installation of production web server
+-------------------------------------
+> sudo puppet apply install/prod_web.pp
+
+Installation of production backend server
+-----------------------------------------
+> sudo puppet apply install/prod_backend.pp
+
+Install new release on production machine
+------------------------------------------
+> tar xvfz FuzzEdx.xx.tgz .
+> ./manage.py syncdb
+> ./manage.py migrate
+

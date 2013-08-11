@@ -14,17 +14,6 @@ IS_WINDOWS = os.name == 'nt'
 FILE_EXTENSION = '.py' if IS_WINDOWS else ''
 FILE_PREFIX = 'file:///' + os.getcwd() + '/' if IS_WINDOWS else '' 
 
-def check_python_version():
-    version_message = 'This Django project requires Python 2.7+'
-
-    if sys.version_info.major < 2 or sys.version_info.major == 2 and sys.version_info.minor < 7:
-        print version_message
-        exit(-1)
-    elif sys.version_info.major > 2:
-        print(version_message)
-        exit(-1)
-check_python_version()
-
 def svg2pgf_shape(filename):
     '''
         Convert given SVG file to TiKZ code.
