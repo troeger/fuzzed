@@ -42,13 +42,14 @@ bool PetriNetSimulation::run()
 #pragma omp parallel for\
 	reduction(+:numFailures, count, sumFailureTime_all, sumFailureTime_fail)\
 	reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak)\
-	schedule(dynamic) if (m_numRounds > PAR_THRESH)\
+	schedule(static) if (m_numRounds > PAR_THRESH)\
 	default(none) firstprivate(pn) // rely on OpenMP magical copying
 
 	for (int i = 0; i < m_numRounds; ++i)
 	{
 		if (privateBreak) continue;
 
+		START:
 		pn.restoreInitialMarking();
 		pn.generateRandomFiringTimes();
 		SimulationRoundResult res = runOneRound(&pn);
@@ -78,7 +79,15 @@ bool PetriNetSimulation::run()
 			}
 			privateLast = current;
 		}
+		else
+		{
+// 			auto foo = &i;
+// 			*(foo) = i - 1;
+//			++m_numRounds;
+			// goto START;
+		}
 	}
+
 
 	const double endTime = omp_get_wtime();
 
@@ -209,6 +218,9 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 		(m_outStream ? *m_outStream : cout) << "Unknown Exception during Simulation" << endl;
 		result.valid = false;
 	}
+	if (rand() % 2)
+		result.valid = false;
+
 	return result;
 }
 

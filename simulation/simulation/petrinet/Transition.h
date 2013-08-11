@@ -15,6 +15,7 @@ public:
 
 	void addInPlace(Place* p, const unsigned int& numTokens);
 	void addOutPlace(Place* p, const unsigned int& numTokens);
+	void addInhibitingPlace(Place* p, const unsigned int& numTokens);
 
 	void removeInPlace(Place* p);
 	void removeOutPlace(Place* p);
@@ -27,7 +28,7 @@ public:
 	PlaceTokenMap::iterator outPlacesBegin()	{ return m_outPlaces.begin(); }
 	PlaceTokenMap::iterator outPlacesEnd()		{ return m_outPlaces.end(); }
 
-	bool isActive() const		{ return m_hasNotFired; }
+	bool isActive() const				{ return m_hasNotFired; }
 	const std::string& getID() const	{ return m_ID; }
 	
 	bool wantsToFire(int tick);
@@ -47,6 +48,7 @@ protected:
 	virtual bool stochasticallyEnabled(unsigned int tick) const = 0;
 
 	PlaceTokenMap m_inPlaces;
+	PlaceTokenMap m_inhibitingPlaces;
 	PlaceTokenMap m_outPlaces;
 
 	std::string m_ID;

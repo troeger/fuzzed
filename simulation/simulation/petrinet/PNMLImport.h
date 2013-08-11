@@ -5,13 +5,11 @@
 #include "ImmediateTransition.h"
 #include "TimedTransition.h"
 #include "SequentialConstraint.h"
-#include "Place.h"
+#include "PetriNet.h"
 #include "platform.h"
 
 #include <set>
 #include <map>
-
-class PetriNet;
 
 /************************************************************************/
 /* Imports a PNML document												*/
@@ -34,7 +32,7 @@ private:
 		std::vector<ImmediateTransition>& immediateTransitions, 
 		std::vector<TimedTransition>& timedTransitions);
 
-	void loadArcs(std::vector<std::tuple<std::string,std::string,int>>& arcDict);
+	void loadArcs(ArcList& arcDict);
 
 	void loadUserDescription(std::string& description);
 

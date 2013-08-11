@@ -1,5 +1,6 @@
 #pragma once
 
+const std::string EMPTY = "";
 const char* const NOT_IMPLEMENTED = "not yet implemented";
 
 /************************************************************************/
@@ -35,6 +36,8 @@ namespace PNML
 	const char* const ROOT_TAG = "net";
 	const char* const PNML_TAG = "pnml";
 	const char* const INSCRIPTION_TAG = "inscription";
+	const char* const TYPE_TAG = "type";
+	const char* const INHIBITOR_ATTR = "inhibitor";
 	const char* const INITIALMARKING_TAG = "initialMarking";
 	const char* const TOPLEVEL_TAG = "isTopLevelEvent";
 	const char* const CONSTRAINT_TAG = "isConstraintPlace";

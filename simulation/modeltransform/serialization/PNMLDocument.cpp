@@ -147,5 +147,19 @@ int PNMLDocument::addTopLevelPlace(const string& label)
 
 void PNMLDocument::addInhibitorArc(int inhibitingPlace, int inhbitedTransitions, int tokenCount /*= 0*/)
 {
-	// TODO!!
+	xml_node arcNode = m_root.append_child(ARC_TAG);
+	auto arcChild = arcNode.append_child(ID_ATTRIBUTE);
+	setNodeValue(arcChild, ARC_IDENTIFIER + util::toString(++m_arcCount));
+
+	const string p = PLACE_IDENTIFIER + util::toString(inhibitingPlace);
+	const string t = TRANSITION_IDENTIFIER + util::toString(inhbitedTransitions);
+
+	arcNode.append_attribute(SOURCE_TAG).set_value(p.c_str());
+	arcNode.append_attribute(TARGET_TAG).set_value(t.c_str());
+	
+	auto inscrChild = arcNode.append_child(INSCRIPTION_TAG);
+	setNodeValue(inscrChild, util::toString(tokenCount));
+
+	arcNode.append_child(TYPE_TAG).append_attribute(VALUE_TAG).set_value(INHIBITOR_ATTR);
+	assert(m_arcCount > 0);
 }

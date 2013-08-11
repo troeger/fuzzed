@@ -1,10 +1,4 @@
-#if IS_WINDOWS 
-	#pragma warning(push, 3) 
-#endif
 #include <iostream>
-#if IS_WINDOWS 
-	#pragma warning(pop) 
-#endif
 
 #include "PNMLImport.h"
 #include "Constants.h"
@@ -90,6 +84,8 @@ void PNMLImport::loadArcs(ArcList& arcs)
 		const string dst = childNode.attribute(TARGET_TAG).as_string();
 		
 		int weight = 1;
+		bool isInhibitor = false;
+
 		const xml_node valNode = childNode.child(INSCRIPTION_TAG);
 		if (!valNode.empty())
 		{ // in the inscription node, the number of tokens is written comma-separated from the token type
@@ -101,7 +97,15 @@ void PNMLImport::loadArcs(ArcList& arcs)
 			util::tokenizeIntegerString(c.text().as_string(""), results);
 			weight = results.back();
 		}
-		arcs.emplace_back(src, dst, weight);
+
+		const xml_node typeNode = childNode.child(TYPE_TAG);
+		if (!typeNode.empty())
+		{
+			if (string(typeNode.attribute(VALUE_TAG).as_string()) == INHIBITOR_ATTR)
+				isInhibitor = true;
+		}
+
+		arcs.emplace_back(src, dst, weight, isInhibitor ? INHIBITOR_ARC : NORMAL_ARC);
 	}
 }
 

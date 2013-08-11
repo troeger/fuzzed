@@ -42,10 +42,16 @@ void PetriNet::setup()
 		for (const auto& tup : m_arcs)
 		{
 			if (get<0>(tup) == ID) // transition-to-place
+			{
 				t.addOutPlace(&m_placeDict[get<1>(tup)], get<2>(tup));
-
-			else if (get<1>(tup) == ID) // place-to-transition
-				t.addInPlace(&m_placeDict[get<0>(tup)], get<2>(tup));
+			}
+			else if (get<1>(tup) == ID) // place-to-transition or inhibitor arc
+			{
+				if (get<3>(tup) == INHIBITOR_ARC)
+					t.addInhibitingPlace(&m_placeDict[get<0>(tup)], get<2>(tup));
+				else
+					t.addInPlace(&m_placeDict[get<0>(tup)], get<2>(tup));
+			}
 		}
 	};
 	

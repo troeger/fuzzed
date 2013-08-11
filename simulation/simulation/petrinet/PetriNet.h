@@ -9,8 +9,14 @@
 #include <map>
 #include <unordered_map>
 
-typedef tuple<string, string, int>	ArcSpec;
-typedef vector<ArcSpec>				ArcList;
+enum ArcType
+{
+	NORMAL_ARC,
+	INHIBITOR_ARC
+};
+
+typedef tuple<string, string, int, ArcType>	ArcSpec;
+typedef vector<ArcSpec> ArcList;
 typedef multimap<unsigned int, TimedTransition*> TransitionTimeMapping;
 
 class PetriNet

@@ -137,7 +137,7 @@ bool TNDocument::save(const string& fileName)
 	for (const auto& f : m_enablingFunctions)
 		enablingFunctions += f;
 
- 	string measures = "-- REWARD MEASURES:\n\n"; // more than a comment...
+ 	string measures = "\n\n"; // more than a comment...
 	for (const auto& m : m_measures)
 		measures += m;
 

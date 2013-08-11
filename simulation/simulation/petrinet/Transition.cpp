@@ -59,6 +59,13 @@ bool Transition::enoughTokens() const
 		if (currentMarking < p.second)
 			return false;
 	}
+	for (const auto& p: m_inhibitingPlaces)
+	{
+		const unsigned int currentMarking = p.first->getCurrentMarking();
+		assert(currentMarking >= 0);
+		if (currentMarking > p.second)
+			return false;
+	}
 	return true;
 }
 
@@ -71,6 +78,13 @@ void Transition::addInPlace(Place* p, const unsigned int& numTokens)
 {
 	m_inPlaces[p] = numTokens;
 }
+
+
+void Transition::addInhibitingPlace(Place* p, const unsigned int& numTokens)
+{
+	m_inhibitingPlaces[p] = numTokens;
+}
+
 
 void Transition::addOutPlace(Place* p, const unsigned int& numTokens)
 {
