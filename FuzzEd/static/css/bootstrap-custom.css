@@ -1,0 +1,19 @@
+
+.navbar-brand {
+    max-width: 500px;
+    float: left;
+}
+
+.navbar-inverse .navbar-brand {
+    color: white;
+}
+
+.navbar-collapse-clear {
+    clear: both;
+}
+
+@media (min-width: 768px) {
+    .navbar-collapse-clear {
+        clear: none;
+    }
+}
