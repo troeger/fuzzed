@@ -6,9 +6,12 @@
 
 {% block style %}
     {{ block.super }}
+    {% load less %}
+
     @import url("{{ STATIC_URL }}css/jquery-ui/jquery-ui-1.10.3.min.css");
+    @import url("{{ STATIC_URL }}{% less "less/jquery-ui-custom.less" %}");
     @import url("{{ STATIC_URL }}css/slickgrid/slick.grid-2.0.2.css");
-    @import url("{{ STATIC_URL }}css/editor.css");
+    @import url("{{ STATIC_URL }}{% less "less/editor.less" %}");
     @import url("{{ STATIC_URL }}css/node.css");
     @import url("{{ STATIC_URL }}css/menus.css");
 {% endblock %}
