@@ -7,8 +7,12 @@ package { "beanstalkd":
 	ensure => latest;
 }
 
-package { "texlive":
-	ensure => latest;
+if $operatingsystem == "Darwin" {
+	notice("Latex cannot be installed through Puppet on Mac OS X. Please do this manually.")
+} else {
+	package { "texlive":
+		ensure => latest;
+	}
 }
 
 package { [ "pyxb", "beanstalkc" ]:
