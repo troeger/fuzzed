@@ -12,7 +12,7 @@
         @import url("{{ STATIC_URL }}{% less "less/bootstrap/bootstrap.less" %}");
         @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-3.2.1.min.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
-        @import url("{{ STATIC_URL }}css/util.css");
+        @import url("{{ STATIC_URL }}{% less "less/util.less" %}");
         @import url("{{ STATIC_URL }}{% less "less/bootstrap-custom.less" %}");
         @import url("{{ STATIC_URL }}css/print.css") print;
         {% endblock %}
