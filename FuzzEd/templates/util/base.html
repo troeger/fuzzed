@@ -6,8 +6,10 @@
         {% block title %}FuzzEd{% endblock %}
     </title>
     <style type="text/css">
+        {% load less %}
+
         {% block style %}
-        @import url("{{ STATIC_URL }}css/bootstrap/bootstrap-3.0.0rc1.min.css");
+        @import url("{{ STATIC_URL }}{% less "less/bootstrap/bootstrap.less" %}");
         @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-3.2.1.min.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         @import url("{{ STATIC_URL }}css/util.css");
