@@ -1,12 +1,19 @@
-class { "java":
-	version => "7",
-	distribution => "jre";
-}
+#TODO: Test this on Linux
+
+import "common.pp"
+import "java.pp"
 
 package { "beanstalkd":
-	ensure => "latest";
+	ensure => latest;
 }
 
-packacke { "latex":
-	ensure => "latest";
+package { "texlive":
+	ensure => latest;
 }
+
+package { [ "pyxb", "beanstalkc" ]:
+        ensure => latest,
+        provider => "pip";
+}
+
+#TODO: Install init script for rendering service
