@@ -2,18 +2,18 @@ $pip_latest = [ "south", "openid2rp", "django-require", "pyxb", "beanstalkc" ]
 
 import "common.pp"
 
-package { "java":
-	ensure => "7",
-	provider => "brew";
-}
-
-package { "ant":
-	ensure => latest,
-	subscribe => "java";
+# ANT is included in Mac OS X
+if $operatingsystem != "Darwin" {
+	package { "ant":
+		ensure => latest;
+	}
 }
 
 package { "beanstalkd":
-	ensure => "latest";
+	ensure => "latest",
+	provider => $operatingsystem ? {
+    	"Darwin" => brew,
+	}	
 }
 
 package { "django":

@@ -6,9 +6,9 @@ Puppet installation instructions are available here:
 
 http://docs.puppetlabs.com/guides/installation.html
 
-Make sure to install the necessary puppet extensions:
+Make sure to install the following puppet module:
 
-> sudo puppet module install puppetlabs/java
+> sudo puppet module install rcoleman/puppet_module
 
 Installation of development machine
 -----------------------------------
