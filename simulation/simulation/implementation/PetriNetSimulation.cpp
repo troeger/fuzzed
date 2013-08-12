@@ -218,8 +218,6 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 		(m_outStream ? *m_outStream : cout) << "Unknown Exception during Simulation" << endl;
 		result.valid = false;
 	}
-	if (rand() % 2)
-		result.valid = false;
 
 	return result;
 }
