@@ -16,10 +16,7 @@ PetriNet::PetriNet(
 	m_topLevelPlace(nullptr),
 	m_finalFiringTime(MAX_INT),
 	m_avgFiringTime(MAX_INT)
-{
-	// setup();
-	// simplify();
-}
+{}
 
 PetriNet::PetriNet(const PetriNet& otherNet) :
 	m_immediateTransitions(otherNet.m_immediateTransitions),
@@ -191,12 +188,15 @@ void PetriNet::generateRandomFiringTimes()
 	for (TimedTransition& tt : m_timedTransitions)
 	{
 		// compute random firing times for all transitions
-		const unsigned int time = gen->randomFiringTime(tt.getRate());
+		unsigned int time = gen->randomFiringTime(tt.getRate());
 		tt.setFiringTime(time);
 
 		// save the activated transitions separately
 		if (tt.enoughTokens())
 		{
+			while (CONTAINS(m_activeTimedTransitions, time))
+				time = gen->randomFiringTime(tt.getRate());
+
 			m_activeTimedTransitions.insert(make_pair(time, &tt));
 			sumFiringTimes += time;
 		}

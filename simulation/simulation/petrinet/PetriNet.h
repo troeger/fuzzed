@@ -17,7 +17,7 @@ enum ArcType
 
 typedef tuple<string, string, int, ArcType>	ArcSpec;
 typedef vector<ArcSpec> ArcList;
-typedef multimap<unsigned int, TimedTransition*> TransitionTimeMapping;
+typedef map<unsigned int, TimedTransition*> TransitionTimeMapping;
 
 class PetriNet
 {

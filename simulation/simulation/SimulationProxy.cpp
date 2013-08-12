@@ -252,6 +252,11 @@ void SimulationProxy::simulateFaultTree(std::shared_ptr<TopLevelEvent> ft, const
 	std::shared_ptr<PNDocument> doc;
 
 	m_missionTime = ft->getMissionTime();
+	if (m_missionTime <= 1)
+		std::cout 
+			<< "Warning: Components are assumed to fail one at the time."
+			<< "For a very short mission time, possible failures may never occur." 
+			<< std::endl;
 
 	switch (impl)
 	{
