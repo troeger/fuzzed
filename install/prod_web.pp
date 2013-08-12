@@ -1,6 +1,6 @@
 $pip_latest = [ "south", "openid2rp", "pyxb", "psycopg2", "beanstalkc" ]
 
-include common.pp
+import "common.pp"
 
 package { "postgresql":
 	version => latest;

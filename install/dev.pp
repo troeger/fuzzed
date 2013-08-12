@@ -1,14 +1,14 @@
 $pip_latest = [ "south", "openid2rp", "django-require", "pyxb", "beanstalkc" ]
 
-include common.pp
+import "common.pp"
 
-class { "java":
-	version => "7",
-	distribution => "jdk";
+package { "java":
+	ensure => "7",
+	provider => "brew";
 }
 
 package { "ant":
-	version => latest,
+	ensure => latest,
 	subscribe => "java";
 }
 
