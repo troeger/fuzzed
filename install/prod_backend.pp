@@ -18,5 +18,3 @@ package { [ "pyxb", "beanstalkc" ]:
 include beanstalkd
 include latex
 include jre
-
-#TODO: Install init script for rendering service

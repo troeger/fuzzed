@@ -51,6 +51,3 @@ package { [ "south", "openid2rp", "pyxb", "beanstalkc" ]:
         ensure => latest,
         provider => "pip";
 }
-
-#TODO: Configure PostgreSQL database
-#TODO: Tweak settings.py for the correct configuration

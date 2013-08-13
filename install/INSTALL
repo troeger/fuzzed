@@ -1,7 +1,7 @@
 
 Installation instructions
 =========================
-This project uses Puppet for installing all dependencies.
+This project uses Puppet for installing software dependencies.
 Puppet installation instructions are available here:
 
 http://docs.puppetlabs.com/guides/installation.html
@@ -17,7 +17,7 @@ http://docs.puppetlabs.com/windows/running.html
 Development machine
 ====================
 
-Installation of development machine
+Preparation of development machine
 -----------------------------------
 > sudo puppet apply install/dev.pp
 
@@ -41,12 +41,14 @@ Production machine
 Installation of production backend server
 -----------------------------------------
 > sudo puppet apply install/prod_backend.pp
+> tar xvfz FuzzEdAnalysis-x.xx.tgz .
+> tar xvfz FuzzEdRendering-x.xx.tgz .
 
 Install new release on production web server
 --------------------------------------------
 > cd /var/www/fuzztrees.net/www/
 > sudo puppet apply install/prod_web.pp
-> tar xvfz FuzzEdx.xx.tgz .
+> tar xvfz FuzzEd-x.xx.tgz .
 > ./manage.py syncdb
 > ./manage.py migrate
 > service apache2 restart

@@ -23,5 +23,3 @@ package { [ "south", "openid2rp", "django-require", "pyxb", "beanstalkc" ]:
         ensure => latest,
         provider => "pip";
 }
-
-#TODO: Tweak settings.py for the correct configuration

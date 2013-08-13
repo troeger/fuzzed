@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os, json, pprint, sys, shutil, subprocess
+import os, json, pprint, sys, shutil, subprocess, tarfile
 from xml.dom.minidom import parse as parseXml
 
 from setuptools import setup
@@ -147,6 +147,30 @@ def build_analysis_server():
 
     os.chdir(current)
 
+def sdist_analysis_server():
+    current = os.getcwd()
+    os.chdir('dist')
+
+    basename="FuzzEdAnalysis-%s"%__version__
+    tar = tarfile.open(basename+".tar.gz","w:gz")
+    tar.add("../analysis/fuzzTreeAnalysis.sh", arcname=basename+"/fuzzTreeAnalysis.sh")
+    tar.add("../analysis/initscript", arcname=basename+"/initscript")
+    tar.add("../analysis/jar/fuzzTreeAnalysis.jar", arcname=basename+"/jar/fuzzTreeAnalysis.jar")
+    tar.close()
+
+    os.chdir(current)
+
+def sdist_rendering_server():
+    current = os.getcwd()
+    os.chdir('dist')
+
+    basename="FuzzEdRendering-%s"%__version__
+    tar = tarfile.open(basename+".tar.gz","w:gz")
+    tar.add("../rendering/renderServer.py", arcname=basename+"/renderServer.py")
+    tar.close()
+
+    os.chdir(current)
+
 def build_django_require():
     print 'Building compressed static files ...'
     # Use Django collectstatic, which triggers django-require optimization
@@ -259,7 +283,10 @@ class sdist(_sdist):
     def run(self):
         #build_naturaldocs()
         build_django_require()
-        _sdist.run(self)
+        _sdist.run(self)  # file collection based on MANIFEST.IN for FuzzEd release
+        # now build extra packages for analysis and rendering server
+        sdist_analysis_server()
+        sdist_rendering_server()
 
 setup(
     name = 'FuzzEd',
