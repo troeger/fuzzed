@@ -129,6 +129,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     #'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'less.finders.LessFinder',
 )
 
 REQUIRE_BASE_URL = 'script'
@@ -180,6 +181,7 @@ INSTALLED_APPS = (
     'openid2rp.django',
     'south',
     'require',
+    'less',
     'FuzzEd'
 )
 

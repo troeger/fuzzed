@@ -2,10 +2,10 @@ django>=1.5
 south
 openid2rp
 django-require
+django-less
 minbool
 lxml
 pyxb
 psycopg2
 pyyaml
 beanstalkc
-

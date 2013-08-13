@@ -1,0 +1,30 @@
+/**
+ *  File: bootstrap-custom.less
+ *      This file contains all FuzzEd-specific overrides for Bootstrap.
+ */
+
+@import "bootstrap/variables";
+
+/**
+ * Section: Navbar
+ */
+
+.navbar-brand {
+    // allow a wider brand
+    max-width: 500px;
+    // allways float so that the activity indicator is always right of it (even in collapsed state)
+    float: left;
+}
+
+.navbar-inverse .navbar-brand {
+    color: white;
+}
+
+// Small helper that seperates the activity indicator from the rest of the navbar.
+// Ensures that the activity indicator is always left of the brand and will not be collapsed.
+.navbar-collapse-clear {
+    clear: both;
+    @media screen and (min-width: @grid-float-breakpoint) {
+        clear: none;
+    }
+}

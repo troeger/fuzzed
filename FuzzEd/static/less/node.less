@@ -1,0 +1,147 @@
+/**
+ *  File: node.less
+ *      This file contains all styles that apply to graph nodes.
+ */
+
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+
+@highlight-color: #409FFF;
+@selection-color: #FF9640;
+@disabled-color:  #CCCCCC;
+
+.fuzzed-node {
+    text-align: center;
+    z-index: 100; /* above connection */
+
+    // highlighted state
+    &.highlighted {
+        path, rect, circle {
+            stroke: @highlight-color !important;
+        }
+    }
+
+    // selected/selecting state
+    &.ui-selected, &.ui-selecting {
+        &, &.highlighted {
+            path, rect, circle {
+                stroke: @selection-color !important;
+            }
+        }
+    }
+
+    // disabled state
+    &.disabled {
+        &, &.ui-selected {
+            &, &.highlighted {
+                path, rect, circle {
+                    stroke: @disabled-color !important;
+                }
+            }
+        }
+        
+        svg {
+            opacity: 0.5;
+        }
+    }
+
+    // optional indication
+    &.optional {
+        path, rect, circle {
+            stroke-dasharray: 4.8 2;
+        }
+    }
+
+    // node badges
+    .badge {
+        position: absolute;
+        top:      0;
+        right:    0;
+        margin:   -7px -7px 0 0;
+
+        &.badge-info {
+            background-color: @highlight-color;
+        }
+
+        &.badge-important {
+            background-color: @brand-danger;
+        }
+    }
+
+    // halo elements (only connector for the moment)
+    .fuzzed-node-halo-connect {
+        /* XXX: this is a temporary solution */
+        background-color:       @highlight-color;
+        color:                  white;
+        position:               absolute;
+        visibility:             hidden;
+        z-index:                150; /* above image, TODO: let halo care about that */
+        cursor:                 move;
+        -webkit-border-radius:  8px;
+        -moz-border-radius:     8px;
+        -ms-border-radius:      8px;
+        -o-border-radius:       8px;
+        border-radius:          8px;
+        font-size:              13px;
+        line-height:            15px;
+        padding:                1px 3px 0 3px;
+        margin:                 -10px -8px 0 -8px;
+    }
+    &.ui-selected .fuzzed-node-halo-connect {
+        background-color: @selection-color;
+    }
+    &:hover .fuzzed-node-halo-connect {
+        visibility: visible;
+    }
+
+    // mirrors
+    .fuzzed-mirror {
+        background-color: white;
+        display:          block;
+        font-size:        11px;
+        word-wrap:        break-word;
+        margin-bottom:    -3px;
+        z-index:          110; /* above connection */
+
+        &.fuzzed-mirror-italic {
+            font-style: italic;
+        }
+        &.fuzzed-mirror-bold {
+            font-weight: bold;
+        }
+        &.fuzzed-mirror-large {
+            font-size: 13px;
+        }
+    }
+}
+
+.jsplumb-endpoint
+{
+    .opacity(0);
+    
+    .highlighted {
+        .opacity(1);
+    }
+}
+
+.jsplumb-connector {
+    &.highlighted {
+        z-index: 100; /* above selection, below mirror */
+
+        path {
+            stroke: @highlight-color;
+        }
+    }
+
+    &.ui-selected {
+        z-index: 50;
+    }
+
+    &.ui-selected, &.ui-selecting {
+        &, &.highlighted {
+            path {
+                stroke: @selection-color;
+            }
+        }
+    }
+}
