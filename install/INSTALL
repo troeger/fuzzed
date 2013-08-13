@@ -6,9 +6,13 @@ Puppet installation instructions are available here:
 
 http://docs.puppetlabs.com/guides/installation.html
 
-Make sure to install the following puppet module:
+Make sure to install the "rcoleman/puppet_module" puppet module, e.g. like this:
 
 > sudo puppet module install rcoleman/puppet_module
+
+On Windows hosts, make sure that you run all puppet commands with admin privileges, as described here:
+
+http://docs.puppetlabs.com/windows/running.html
 
 Development machine
 ====================
