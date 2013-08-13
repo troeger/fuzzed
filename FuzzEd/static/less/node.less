@@ -3,12 +3,8 @@
  *      This file contains all styles that apply to graph nodes.
  */
 
-@import "bootstrap/variables";
+@import "theme/variables";
 @import "bootstrap/mixins";
-
-@highlight-color: #409FFF;
-@selection-color: #FF9640;
-@disabled-color:  #CCCCCC;
 
 .fuzzed-node {
     text-align: center;
@@ -111,37 +107,6 @@
         }
         &.fuzzed-mirror-large {
             font-size: 13px;
-        }
-    }
-}
-
-.jsplumb-endpoint
-{
-    .opacity(0);
-    
-    .highlighted {
-        .opacity(1);
-    }
-}
-
-.jsplumb-connector {
-    &.highlighted {
-        z-index: 100; /* above selection, below mirror */
-
-        path {
-            stroke: @highlight-color;
-        }
-    }
-
-    &.ui-selected {
-        z-index: 50;
-    }
-
-    &.ui-selected, &.ui-selecting {
-        &, &.highlighted {
-            path {
-                stroke: @selection-color;
-            }
         }
     }
 }
