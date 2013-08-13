@@ -111,8 +111,6 @@
 }
 
 #FuzzEdProperties .form-horizontal .control-label {
-    width: 90px;
-
     font-weight: bold;
     color: #333;
 
