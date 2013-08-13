@@ -1,5 +1,10 @@
 - Install NaturalDocs via Puppet
 - Configure PostgreSQL database on production server with Puppet
 - Tweak settings.py on Puppet execution, e.g. by creating a settings.local.py
-- Use Fabric for the steps described in the INSTALL doc, maybe even for setup.py steps
-- Introduce init script for rendering service
+- Work on Windows installation of dev machine
+- Pre-test Linux installation of production machine
+- Configure init script for rendering service (via puppet service resource)
+	- Needs fixed symbolic link in TAR file so that initscript dest path remains the same
+
+
+
