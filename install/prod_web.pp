@@ -1,9 +1,5 @@
 import "common.pp"
 
-module { 'puppetlabs/apache':
-	  ensure     => present;
-}
-
 class { 'apache':
   default_vhost => false;
 }
