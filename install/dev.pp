@@ -3,7 +3,9 @@
 
 import "common.pp"
 
-# class definitions
+#####################
+# class definitions #
+#####################
 
 class build_preparation {
 	exec { "build_schema_wrappers":
@@ -14,24 +16,9 @@ class build_preparation {
 	}
 }
 
-class jdk {
-	# JDK installation for compiling analysis server
-	if $operatingsystem == "Darwin" {
-		# Java puppet module does not work on MacOS X so far
-		err("JDK 7 cannot be installed through Puppet on Mac OS X. Please do this manually.")
-		# ANT is included in Mac OS X
-	} else {
-	    class { 'java':
-	      distribution => 'jdk',
-	      version      => 'latest';
-	    }
-		package { "ant":
-			ensure => latest;
-		}
-	}
-}
-
-# class declarations with relevant ordering
+############################################
+# class declaration with relevant ordering #
+############################################
 
 class { 'puppet_config':
 	stage => pre1,

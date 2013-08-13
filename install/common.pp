@@ -73,3 +73,31 @@ class beanstalkd {
 		ensure => latest;
 	}
 }
+
+class jdk {
+	if $operatingsystem == "Darwin" {
+		# Java puppet module does not work on MacOS X so far
+		err("JDK 7 cannot be installed through Puppet on Mac OS X. Please do this manually.")
+		# ANT is included in Mac OS X
+	} else {
+	    class { 'java':
+	      distribution => 'jdk',
+	      version      => 'latest';
+	    }
+		package { "ant":
+			ensure => latest;
+		}
+	}
+}
+
+class jre {
+	if $operatingsystem == "Darwin" {
+		# Java puppet module does not work on MacOS X so far
+		notice("JRE 7 cannot be installed through Puppet on Mac OS X. Please do this manually.")
+	} else {
+	    class { 'java':
+	      distribution => 'jre',
+	      version      => 'latest',
+	    }
+	}
+}
