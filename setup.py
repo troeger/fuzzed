@@ -130,7 +130,7 @@ def build_naturaldocs():
     # Build natural docs in 'docs' subdirectory
     if not os.path.exists('docs'):
         os.mkdir('docs')
-    if os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -o HTML docs -p docs') != 0:
+    if os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -i analysis -i rendering -xi FuzzEd/static/lib -o HTML docs -p docs ') != 0:
         raise Exception('Execution of NaturalDocs compiler failed.')
 
 def build_analysis_server():
@@ -243,16 +243,6 @@ def inherit(node_name, node, nodes, node_cache):
 
     return resolved
 
-# Our overloaded 'setup.py build' command
-class build(_build):
-    def run(self):
-        _build.run(self)
-        build_analysis_server()
-        build_notations()
-        build_schema_files()
-        build_xmlschema_wrapper()
-        build_shape_lib()
-
 def clean_docs():
     os.system('rm -rf docs')
 
@@ -270,6 +260,16 @@ def clean_pycs():
                 print 'Removing %s' % fullname
                 os.remove(fullname)
 
+# Our overloaded 'setup.py build' command
+class build(_build):
+    def run(self):
+        _build.run(self)
+        build_analysis_server()
+        build_notations()
+        build_schema_files()
+        build_xmlschema_wrapper()
+        build_shape_lib()
+
 # Our overloaded 'setup.py clean' command
 class clean(_clean):
     def run(self):
@@ -281,7 +281,7 @@ class clean(_clean):
 # Our overloaded 'setup.py sdist' command
 class sdist(_sdist):
     def run(self):
-        #build_naturaldocs()
+        build_naturaldocs()
         build_django_require()
         _sdist.run(self)  # file collection based on MANIFEST.IN for FuzzEd release
         # now build extra packages for analysis and rendering server
