@@ -45,10 +45,6 @@ Compile install packages to ./dist on developer machine
 -------------------------------------------------------
 > ./setup.py build sdist
 
-Upload install packages to BitBucket (only Peter)
---------------------------------------------------
-> ./setup.py upload -R troeger/FuzzTrees
-
 Production machine
 ==================
 
