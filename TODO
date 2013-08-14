@@ -1,5 +1,3 @@
-- Tweak settings.py on Puppet execution, e.g. by creating a settings.local.py
-
 - Configure PostgreSQL database on production server with Puppet
 - Work on Windows installation of dev machine
 - Pre-test Linux installation of production machine

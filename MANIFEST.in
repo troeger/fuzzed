@@ -1,10 +1,12 @@
-include distribute_setup.py
 include manage.py
 include setup.py
 include analysis/*.py
 include rendering/__init__.py
 include rendering/renderClient.py
 recursive-include FuzzEd *.py
+exclude FuzzEd/settings_local.py.backup
+exclude FuzzEd/settings_production.py
+exclude FuzzEd/setup_schemas.py
 graft FuzzEd/lib
 graft FuzzEd/management
 graft FuzzEd/migrations

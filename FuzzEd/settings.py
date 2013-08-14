@@ -1,74 +1,28 @@
 import os.path, logging
 
-is_production = False
-cwd = os.path.dirname(__file__)
-
-if cwd.startswith('/var/www'):
-    is_production = True
-
-ADMINS = (
-    ('Peter Troeger', 'peter.troeger@hpi.uni-potsdam.de'),
-)
-MANAGERS = ADMINS
-EMAIL_SUBJECT_PREFIX = '[FuzzEd] '
-
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
-if is_production:
-    DEBUG                   = True
-    TEMPLATE_DEBUG          = DEBUG
-    SEND_BROKEN_LINK_EMAILS = False     
-    EMAIL_BACKEND           = 'django.core.mail.backends.smtp.EmailBackend'
-    SERVER_EMAIL            = 'webmaster@fuzztrees.net'
-    EMAIL_HOST              = 'localhost'
-    OPENID_RETURN           = 'http://www.fuzztrees.net/login/?openidreturn'
+DEBUG          = True
+TEMPLATE_DEBUG = True
+EMAIL_BACKEND  = 'django.core.mail.backends.console.EmailBackend'
+OPENID_RETURN  = 'http://localhost:8000/login/?openidreturn'
 
-    DATABASES = {
-        'default': {
-            #TODO: rename database to 'FuzzEd'?
-            'ENGINE':   'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME':     'fuzztrees',                              # Or path to database file if using sqlite3.
-            'USER':     'fuzztrees',                              # Not used with sqlite3.
-            'PASSWORD': 'fuzztrees',                              # Not used with sqlite3.
-            'HOST':     '',                                       # Set to empty string for localhost. Not used with sqlite3.
-            'PORT':     '',                                       # Set to empty string for default. Not used with sqlite3.
-        }
+DATABASES = {
+    'default': {
+        'ENGINE':   'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME':     'FuzzEd/database.sqlite',     # Or path to database file if using sqlite3.
+        'USER':     '',                           # Not used with sqlite3.
+        'PASSWORD': '',                           # Not used with sqlite3.
+        'HOST':     '',                           # Set to empty string for localhost. Not used with sqlite3.
+        'PORT':     '',                           # Set to empty string for default. Not used with sqlite3.
     }
+}
 
-    TEMPLATE_DIRS = (
-        # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-        # Always use forward slashes, even on Windows.
-        # Don't forget to use absolute paths, not relative paths.
-        PROJECT_ROOT+'/static-release/img',
-    )
-    ANALYZE_TOP_EVENT_PROBABILITY_SERVER = 'http://t420.asg-platform.org:8080'
-
-else:
-    DEBUG          = True
-    TEMPLATE_DEBUG = True
-    EMAIL_BACKEND  = 'django.core.mail.backends.console.EmailBackend'
-    OPENID_RETURN  = 'http://localhost:8000/login/?openidreturn'
-
-    DATABASES = {
-        'default': {
-            'ENGINE':   'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME':     'FuzzEd/database.sqlite',     # Or path to database file if using sqlite3.
-            'USER':     '',                           # Not used with sqlite3.
-            'PASSWORD': '',                           # Not used with sqlite3.
-            'HOST':     '',                           # Set to empty string for localhost. Not used with sqlite3.
-            'PORT':     '',                           # Set to empty string for default. Not used with sqlite3.
-        }
-    }
-
-    TEMPLATE_DIRS = (
-        # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-        # Always use forward slashes, even on Windows.
-        # Don't forget to use absolute paths, not relative paths.
-        'FuzzEd/templates',
-        'FuzzEd/static/img'
-    )
-    ANALYZE_TOP_EVENT_PROBABILITY_SERVER = 'http://localhost:8080'
-
+TEMPLATE_DIRS = (
+    'FuzzEd/templates',
+    'FuzzEd/static/img'
+)
+ANALYZE_TOP_EVENT_PROBABILITY_SERVER = 'http://localhost:8080'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -183,11 +137,6 @@ INSTALLED_APPS = (
     'FuzzEd'
 )
 
-
-class RequireDebugTrue(logging.Filter):
-    def filter(self, record):
-        return DEBUG
-
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -195,34 +144,17 @@ LOGGING = {
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
         },
-        'simple': {
-            'format': '%(levelname)s: %(message)s'
-        },
     }, 
-    'filters': {
-        'require_django_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        },
-        'require_django_debug_true': {
-            '()': 'FuzzEd.settings.RequireDebugTrue'
-        }
-    },
     'handlers': {
-        'mail_admins': {
-            'level':   'ERROR',
-            'filters': ['require_django_debug_false'],
-            'class':   'django.utils.log.AdminEmailHandler'
-        },
         'console': {
             'level':     'DEBUG',
-            'filters':   ['require_django_debug_true'],
             'class':     'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'verbose'
         }
     },
     'loggers': {
         'django.request': {
-            'handlers':  ['mail_admins'],
+            'handlers':  ['console'],
             'level':     'ERROR',
             'propagate': True,
         },
@@ -244,3 +176,7 @@ AUTH_PROFILE_MODULE = 'FuzzEd.UserProfile'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGIN_URL = '/'
 
+try:
+    from settings_local import *
+except:
+    pass

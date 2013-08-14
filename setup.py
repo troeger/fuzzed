@@ -278,13 +278,25 @@ class clean(_clean):
         clean_pycs()
         clean_build_garbage()
 
+
 # Our overloaded 'setup.py sdist' command
 class sdist(_sdist):
     def run(self):
-        build_naturaldocs()
-        build_django_require()
+        #build_naturaldocs()
+        #build_django_require()
+        # keep the settings_local on this machine and
+        # prepare the one for the production system
+        try:
+            shutil.move('FuzzEd/settings_local.py','FuzzEd/settings_local.py.backup')
+        except:
+            pass
+        shutil.copyfile('FuzzEd/settings_production.py','FuzzEd/settings_local.py')
         _sdist.run(self)  # file collection based on MANIFEST.IN for FuzzEd release
-        # now build extra packages for analysis and rendering server
+        os.remove('FuzzEd/settings_local.py')
+        try:
+            shutil.move('FuzzEd/settings_local.py.backup','FuzzEd/settings_local.py')
+        except:
+            pass
         sdist_analysis_server()
         sdist_rendering_server()
 
