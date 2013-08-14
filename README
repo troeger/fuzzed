@@ -1,3 +1,13 @@
+FuzzTrees
+=========
+
+People who contributed to this project so far:
+
+Franz Becker <>
+Markus Götz <>
+Lena Herscheid <>
+Frank Schlegel <>
+
 
 Installation instructions
 =========================
@@ -35,21 +45,18 @@ Compile install packages to ./dist on developer machine
 -------------------------------------------------------
 > ./setup.py build sdist
 
+Upload install packages to BitBucket (only Peter)
+--------------------------------------------------
+> ./setup.py upload -R troeger/FuzzTrees
+
 Production machine
 ==================
 
 Installation of production backend server
 -----------------------------------------
 > sudo puppet apply install/prod_backend.pp
-> tar xvfz FuzzEdAnalysis-x.xx.tgz .
-> tar xvfz FuzzEdRendering-x.xx.tgz .
 
 Install new release on production web server
 --------------------------------------------
-> cd /var/www/fuzztrees.net/www/
 > sudo puppet apply install/prod_web.pp
-> tar xvfz FuzzEd-x.xx.tgz .
-> ./manage.py syncdb
-> ./manage.py migrate
-> service apache2 restart
 

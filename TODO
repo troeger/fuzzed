@@ -1,6 +1,7 @@
 - Configure PostgreSQL database on production server with Puppet
 - Work on Windows installation of dev machine
 - Pre-test Linux installation of production machine
+
 - Configure init script for rendering service (via puppet service resource)
 - Needs fixed symbolic link in TAR file so that initscript dest path remains the same
 
