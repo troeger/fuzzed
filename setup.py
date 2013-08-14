@@ -282,8 +282,8 @@ class clean(_clean):
 # Our overloaded 'setup.py sdist' command
 class sdist(_sdist):
     def run(self):
-        #build_naturaldocs()
-        #build_django_require()
+        build_naturaldocs()
+        build_django_require()
         # keep the settings_local on this machine and
         # prepare the one for the production system
         try:
