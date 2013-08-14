@@ -18,19 +18,24 @@
     {% csrf_token %}
     <fieldset>
         <div class="form-group">
-            <div class="form-controls">
-                <strong>{{ name }}</strong>
+            <label class="col-lg-2 control-label">Kind</label>
+            <div class="col-lg-10">
+                <p class="form-control-static">{{ name }}</p>
             </div>
         </div>
 
         <div class="form-group">
-            <label class="from-label" for="name">Title</label>
-            <input type="text" class="form-control input-xlarge" name="name" value="Reliability Diagram" id="name">
+            <label class="col-lg-2 control-label" for="name">Title</label>
+            <div class="col-lg-10">
+                <input type="text" class="form-control" name="name" value="Reliability Diagram" id="name">
+            </div>
         </div>
 
         <div class="form-group">
-            <button type="submit" name="save" value="save" class="btn btn-primary">Create</button>
-            <a class="btn btn-default" href="/dashboard/">Cancel</a>
+            <div class="col-push-2 col-lg-10">
+                <button type="submit" name="save" value="save" class="btn btn-primary">Create</button>
+                <a class="btn btn-default" href="/dashboard/">Cancel</a>
+            </div>
         </div>
 
         <input type="hidden" name="kind" value="{{ kind }}">
