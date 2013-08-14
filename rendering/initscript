@@ -1,14 +1,14 @@
 #!/bin/bash
 #
-# fuzzTreeAnalysis 
+# fuzzTreeRendering
 #
-# This script and its surrounding content is expected to live in /etc/fuzztrees/analysis
+# This script and its surrounding content is expected to live in /etc/fuzztrees/rendering
 #
 # Make sure that you link this script in /etc/init.d and enable it's startup:
-# chkconfig --level 345 fuzzTreeAnalysis on
+# chkconfig --level 345 fuzzTreeRendering on
 #
 ### BEGIN INIT INFO
-# Provides: fuzzTreeAnalysis 
+# Provides: fuzzTreeRendering 
 # Required-Start: $local_fs $remote_fs $network
 # Required-Stop: $local_fs $remote_fs $network
 # chkconfig: 345 99 01
@@ -17,10 +17,10 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
-prog="FuzzTrees Analysis Server"
-exec=/home/fuzztrees/analysis/fuzzTreeAnalysis.sh
-pidfile=/var/run/fuzzTreeAnalysis.pid
-lockfile=/var/lock/subsys/fuzzTreeAnalysis
+prog="FuzzTrees Rendering Server"
+exec=/home/fuzztrees/rendering/fuzzTreeRendering.sh
+pidfile=/var/run/fuzzTreeRendering.pid
+lockfile=/var/lock/subsys/fuzzTreeRendering
 
 start() {
     echo -n $"Starting $prog ..."

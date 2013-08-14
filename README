@@ -37,11 +37,12 @@ Compile static stuff and prepare SQLite database
 > ./manage.py syncdb
 > ./manage.py migrate
 
-Run development server
-----------------------
+Run development web server and backend servers
+----------------------------------------------
+> ./manage.py runbackend
 > ./manage.py runserver
 
-Compile install packages to ./dist on developer machine
+Create install packages in ./dist on developer machine
 -------------------------------------------------------
 > ./setup.py build sdist
 
@@ -51,8 +52,17 @@ Production machine
 Installation of production backend server
 -----------------------------------------
 > sudo puppet apply install/prod_backend.pp
+> tar xvfz FuzzEdAnalysis-x.x.x.tar.gz /home/fuzztrees
+> ln -s /home/fuzztrees/FuzzEdAnalysis-x.x.x /home/fuzztrees/analysis 
+> ln -s /home/fuzztrees/analysis/initscript /etc/init.d/fuzzTreesAnalysis
+> tar xvfz FuzzEdRendering-x.x.x.tar.gz /home/fuzztrees
+> ln -s /home/fuzztrees/FuzzEdRendering-x.x.x /home/fuzztrees/rendering 
+> ln -s /home/fuzztrees/rendering/initscript /etc/init.d/fuzzTreesRendering
 
 Install new release on production web server
 --------------------------------------------
 > sudo puppet apply install/prod_web.pp
+> tar xvfz FuzzEd-x.x.x.tar.gz /var/www/fuzztrees.net/
+> ln -s /var/www/fuzztrees.net/FuzzEd-x.x.x /var/www/fuzztrees.net/www
+> service apache2 restart
 

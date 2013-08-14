@@ -1,9 +1,44 @@
-- Configure PostgreSQL database on production server with Puppet
-- Work on Windows installation of dev machine
-- Pre-test Linux installation of production machine
+New development infrastructure:
 
-- Configure init script for rendering service (via puppet service resource)
-- Needs fixed symbolic link in TAR file so that initscript dest path remains the same
+- Clone sources.
+- Install Puppet, let it prepare the dev machine.
+- Puppet installs Python and Fabric (and all the other stuff)
+- Second, start the dev server with one fabric task
+	- Checks if initial building or SQLite creation is needed
+	- Starts the backend servers
+	- Starts the django web server
+- Performing releases is just another Fabric task
+	- Push the new release on the server
+	- Trigger puppet with updated manifest on production machine to update the software installation.
+	- Restart the web server / analysis server / rendering server.
 
+TODO:
 
+- Make coleman thing an explicit part of this repo, to have only puppet installation being needed on dev and production machine.
+- Write Fabfile to be usable as above.
+- Make Apache vhost configuration a Fabric task (explicit paths). 
+- Transform README instructions into Fabric tasks
+	- Fabfile tasks for web server / rendering server / analysis server deployment.
+	- Correct installation of init scripts through fabfile.
+- Migrate setup.py build and sdist steps into Fabric tasks, only perform package creation from MANIFEST in it. 
+- Test releasing and deployment
+	- Are all servers restarted ?
+	- Are the init scripts in place ?
+- Initialize PostgreSQL database on production server with Puppet (no paths)
+- Work on Windows installation of dev machine (Vagrant ? Or Windows Puppet ?)
 
+CREDO:
+
+Puppet is needed for:
+- Easier (OS-agnostic) management of software dependencies on development and production machine.
+- Doing this as part of a generated software install package (e.g. DEB) or through explicit Fabric commands would make the solution very OS-specific, and would not solve the dev machine problem.
+- Vagrant is also not solving the dev machine problem, is still needs a software dependency description.
+
+Fabric is needed for:
+- Avoiding a long README file with everything the developer must take care of.
+- Avoiding distutils for Make-alike tasks, which must be all done in the 'build' step.
+- Avoiding the need for a private repository with our released software that is used as puppet package installation source. We just push the release explicitely.
+- Avoiding the handling of initscript installation, database setup a.s.o. in the software install package. Generating correct DEB files is very hard. 
+
+RULE OF THUMB: 
+Everything with a specific path belongs into Fabric, the rest into Puppet.
