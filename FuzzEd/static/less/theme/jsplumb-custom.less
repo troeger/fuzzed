@@ -16,7 +16,7 @@
         z-index: 100; /* above selection, below mirror */
 
         path {
-            stroke: @highlight-color;
+            stroke: @theme-highlight;
         }
     }
 
@@ -27,7 +27,7 @@
     &.ui-selected, &.ui-selecting {
         &, &.highlighted {
             path {
-                stroke: @selection-color;
+                stroke: @theme-selection;
             }
         }
     }
