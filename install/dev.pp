@@ -19,7 +19,7 @@ include django
 include latex
 include beanstalkd
 include jdk
-package { [ "bitbucket-distutils", "south", "openid2rp", "django-require", "pyxb", "beanstalkc" ]:
+package { [ "south", "openid2rp", "django-require", "pyxb", "beanstalkc" ]:
         ensure => latest,
         provider => "pip";
 }
