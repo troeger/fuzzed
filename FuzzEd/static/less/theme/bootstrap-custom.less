@@ -30,3 +30,10 @@
     padding-top: 6px;
     margin-bottom: 0;
 }
+
+// The default button needs another hover color
+.btn-default {
+    &:hover, &:focus, &:active {
+        color: @btn-default-color;
+    }
+}
