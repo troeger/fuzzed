@@ -17,18 +17,24 @@
     {% csrf_token %}
     <fieldset>
         <div class="form-group">
-            <label class="control-label" for="kind">Kind</label>
-            <strong class="form-control">{{ kind }}</strong>
+            <label class="col-lg-2 control-label">Kind</label>
+            <div class="col-lg-10">
+                <p class="form-control-static">{{ kind }}</p>
+            </div>
         </div>
 
         <div class="form-group">
-            <label class="control-label" for="name">Title</label>
-            <input type="text" class="form-control input-xlarge" name="name" value="{{ graph }}" id="name">
+            <label class="col-lg-2 control-label" for="name">Title</label>
+            <div class="col-lg-10">
+                <input type="text" class="form-control" name="name" value="{{ graph }}" id="name">
+            </div>
         </div>
 
         <div class="form-group">
-            <button type="submit" name="save" value="save" class="btn btn-primary">Save</button>
-            <button class="btn btn-default" onclick="history.go(-1); return false;">Cancel</button>
+            <div class="col-push-2 col-lg-10">
+                <button type="submit" name="save" value="save" class="btn btn-primary">Save</button>
+                <button class="btn btn-default" onclick="history.go(-1); return false;">Cancel</button>
+            </div>
         </div>
     </fieldset>
 </form>

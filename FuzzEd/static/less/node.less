@@ -3,12 +3,8 @@
  *      This file contains all styles that apply to graph nodes.
  */
 
-@import "bootstrap/variables";
+@import "theme/variables";
 @import "bootstrap/mixins";
-
-@highlight-color: #409FFF;
-@selection-color: #FF9640;
-@disabled-color:  #CCCCCC;
 
 .fuzzed-node {
     text-align: center;
@@ -17,7 +13,7 @@
     // highlighted state
     &.highlighted {
         path, rect, circle {
-            stroke: @highlight-color !important;
+            stroke: @theme-highlight !important;
         }
     }
 
@@ -25,7 +21,7 @@
     &.ui-selected, &.ui-selecting {
         &, &.highlighted {
             path, rect, circle {
-                stroke: @selection-color !important;
+                stroke: @theme-selection !important;
             }
         }
     }
@@ -35,7 +31,7 @@
         &, &.ui-selected {
             &, &.highlighted {
                 path, rect, circle {
-                    stroke: @disabled-color !important;
+                    stroke: @theme-disabled !important;
                 }
             }
         }
@@ -60,7 +56,7 @@
         margin:   -7px -7px 0 0;
 
         &.badge-info {
-            background-color: @highlight-color;
+            background-color: @theme-highlight;
         }
 
         &.badge-important {
@@ -71,7 +67,7 @@
     // halo elements (only connector for the moment)
     .fuzzed-node-halo-connect {
         /* XXX: this is a temporary solution */
-        background-color:       @highlight-color;
+        background-color:       @theme-highlight;
         color:                  white;
         position:               absolute;
         visibility:             hidden;
@@ -88,7 +84,7 @@
         margin:                 -10px -8px 0 -8px;
     }
     &.ui-selected .fuzzed-node-halo-connect {
-        background-color: @selection-color;
+        background-color: @theme-selection;
     }
     &:hover .fuzzed-node-halo-connect {
         visibility: visible;
@@ -111,37 +107,6 @@
         }
         &.fuzzed-mirror-large {
             font-size: 13px;
-        }
-    }
-}
-
-.jsplumb-endpoint
-{
-    .opacity(0);
-    
-    .highlighted {
-        .opacity(1);
-    }
-}
-
-.jsplumb-connector {
-    &.highlighted {
-        z-index: 100; /* above selection, below mirror */
-
-        path {
-            stroke: @highlight-color;
-        }
-    }
-
-    &.ui-selected {
-        z-index: 50;
-    }
-
-    &.ui-selected, &.ui-selecting {
-        &, &.highlighted {
-            path {
-                stroke: @selection-color;
-            }
         }
     }
 }

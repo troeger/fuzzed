@@ -61,7 +61,7 @@
 
                     "parts": [{
                         "kind": "numeric",
-                        "partName": "Exact",
+                        "partName": "Point",
                         "min": 0,
                         "max": 1,
                         "step": 0.0000000001,
@@ -73,7 +73,7 @@
                         }
                     }, {
                         "kind": "numeric",
-                        "partName": "λ Rate",
+                        "partName": "Rate",
                         "min": 0,
                         "step": 0.01,
                         "default": 17532,
@@ -211,7 +211,7 @@
 
                     "parts": [{
                         "kind": "numeric",
-                        "partName": "Exact",
+                        "partName": "Point",
                         "min": 0,
                         "max": 1,
                         "step": 0.0000000001,
@@ -223,7 +223,7 @@
                         }
                     }, {
                         "kind": "numeric",
-                        "partName": "λ Rate",
+                        "partName": "Rate",
                         "min": 0,
                         "step": 0.01,
                         "default": 17532,

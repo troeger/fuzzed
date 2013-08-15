@@ -3,7 +3,7 @@
  *      This file contains all FuzzEd-specific overrides for Bootstrap.
  */
 
-@import "bootstrap/variables";
+@import "../bootstrap/variables";
 
 /**
  * Section: Navbar
@@ -16,15 +16,24 @@
     float: left;
 }
 
-.navbar-inverse .navbar-brand {
-    color: white;
-}
-
 // Small helper that seperates the activity indicator from the rest of the navbar.
 // Ensures that the activity indicator is always left of the brand and will not be collapsed.
 .navbar-collapse-clear {
     clear: both;
     @media screen and (min-width: @grid-float-breakpoint) {
         clear: none;
+    }
+}
+
+// For some reason this is missing in the bootstrap less but existist in the docs
+.form-control-static {
+    padding-top: 6px;
+    margin-bottom: 0;
+}
+
+// The default button needs another hover color
+.btn-default {
+    &:hover, &:focus, &:active {
+        color: @btn-default-color;
     }
 }
