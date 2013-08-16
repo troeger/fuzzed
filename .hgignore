@@ -9,7 +9,6 @@ syntax: glob
 distribute-*
 FuzzEd/static-release/*
 docs/*
-FuzzEd.egg-info/*
 dist/*
 build/*
 analysis/jar/bin/*
@@ -23,4 +22,3 @@ simulation/tests/output
 *.log
 *.pnml
 *.log.debug
-MANIFEST
