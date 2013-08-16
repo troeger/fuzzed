@@ -232,6 +232,23 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         },
 
         /**
+         *  Method: insertAfter
+         *      Adds this Entry after another element to the properties menu.
+         *
+         *  Parameters:
+         *      {jQuery Selector} element - The element this Entry should be inserted after.
+         *
+         *  Returns:
+         *      This Entry for chaining.
+         */
+        insertAfter: function(element) {
+            element.after(this.container);
+            this._setupCallbacks();
+
+            return this;
+        },
+
+        /**
          *  Method: remove
          *      Removes this Entry to the container in the properties menu.
          *
@@ -329,7 +346,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         _setupVisualRepresentation: function() {
             this._setupContainer()
                 ._setupInput();
-            this.container.find('.controls').prepend(this.inputs);
+            this.container.find('.inputs').prepend(this.inputs);
 
             this.setReadonly(this.property.readonly);
             this.setHidden(this.property.hidden);
@@ -346,9 +363,9 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          */
         _setupContainer: function() {
             this.container = jQuery(
-                '<div class="control-group" data-toggle="tooltip" data-trigger="manual" data-placement="left">\
-                    <label class="control-label" for="' + this.id + '">' + (this.property.displayName || '') + '</label>\
-                    <div class="controls"></div>\
+                '<div class="form-group" data-toggle="tooltip" data-trigger="manual" data-placement="left">\
+                    <label class="col-4 control-label" for="' + this.id + '">' + (this.property.displayName || '') + '</label>\
+                    <div class="inputs col-8"></div>\
                 </div>'
             );
 
@@ -471,7 +488,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         _setupInput: function() {
             var value    = this.property.value;
-            this.inputs  = jQuery('<select class="input-medium">').attr('id', this.id);
+            this.inputs  = jQuery('<select class="form-control input-small">').attr('id', this.id);
 
             var selected = this.property.choices[this._indexForValue(value)];
 
@@ -528,7 +545,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         appendTo: function(on) {
             this._super(on);
             _.each(this.property.parts, function(part, index) {
-                part.menuEntry.appendTo(this.container);
+                part.menuEntry.insertAfter(this.container);
                 // child entries should not update on remove because only visible entries should be allowed
                 // to propagate their value which is ensured by the parent compound (on remove)
                 part.menuEntry.inputs.off('remove');
@@ -538,6 +555,14 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         },
 
+        remove: function() {
+            _.each(this.property.parts, function(part, index) {
+                part.menuEntry.remove();
+            });
+
+            return this._super();
+        },
+
         setReadonly: function(readonly) {
             this.inputs.attr('disabled', readonly ? 'disabled' : null);
 
@@ -545,13 +570,15 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         },
 
         _setupInput: function() {
-            this.inputs = jQuery('<div class="btn-group" data-toggle="buttons-radio">');
+            this.inputs = jQuery('<div class="btn-group" data-toggle="buttons">');
 
             _.each(this.property.parts, function(part, index) {
-                var button = jQuery('<button type="button" class="btn">');
-                button.text(part.partName);
-                button.toggleClass('active', index === this.property.value);
-                this.inputs.append(button);
+                var buttonLabel = jQuery('<label class="btn btn-default btn-small"></label>')
+                var button = jQuery('<input type="radio">');
+                buttonLabel.text(part.partName);
+                button.attr('active', index === this.property.value ? 'active' : '');
+                buttonLabel.append(button);
+                this.inputs.append(buttonLabel);
             }.bind(this));
         },
 
@@ -604,7 +631,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         },
 
         _setupInput: function() {
-            this.inputs = jQuery('<input type="number" class="input-medium">')
+            this.inputs = jQuery('<input type="number" class="form-control input-small">')
                 .attr('id',   this.id)
                 .attr('min',  this.property.min)
                 .attr('max',  this.property.max)
@@ -661,7 +688,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
             jQuery('<form class="form-inline">')
                 .append(this.inputs)
-                .appendTo(this.container.find('.controls'));
+                .appendTo(this.container.find('.inputs'));
 
             this.setReadonly(this.property.readonly);
             this.setHidden(this.property.hidden);
@@ -675,9 +702,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             var max   = this.property.max;
             var step  = this.property.step;
 
-            this.inputs = this._setupMiniNumeric(min, max, step, value[0])
+            this.inputs = this._setupMiniNumeric(min, max, step, value[0]).css('width', '45%')
                 .attr('id', this.id) // clicking the label should focus the first input
-                .add(this._setupMiniNumeric(min, max, step, value[1]));
+                .add(jQuery('<label> – </label>').css('width', '10%').css('text-align', 'center'))
+                .add(this._setupMiniNumeric(min, max, step, value[1]).css('width', '45%'));
 
             return this;
         },
@@ -696,7 +724,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *      A jQuery object containing the newly constructed number input.
          */
         _setupMiniNumeric: function(min, max, step, value) {
-            return jQuery('<input type="number" class="input-mini">')
+            return jQuery('<input type="number" class="form-control input-small">')
                 .attr('min',  this.property.min)
                 .attr('max',  this.property.max)
                 .attr('step', this.property.step)
@@ -760,9 +788,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             var min   = this.property.min;
             var max   = this.property.max;
 
-            this.inputs = this._setupMiniNumeric(min, max, this.property.step, value[0])
+            this.inputs = this._setupMiniNumeric(min, max, this.property.step, value[0]).css('width', '45%')
                 .attr('id', this.id) // clicking the label should focus the first input
-                .add(this._setupMiniNumeric(0, max, this.property.epsilonStep, value[1]));
+                .add(jQuery('<label> ± </label>').css('width', '10%').css('text-align', 'center'))
+                .add(this._setupMiniNumeric(0, max, this.property.epsilonStep, value[1]).css('width', '45%'));
 
             return this;
         }
@@ -778,7 +807,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         },
 
         _setupInput: function() {
-            this.inputs = jQuery('<input type="text" class="input-medium">').attr('id', this.id);
+            this.inputs = jQuery('<input type="text" class="form-control input-small">').attr('id', this.id);
             return this;
         },
 
@@ -826,7 +855,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         },
 
         _setupInput: function() {
-            this.inputs = jQuery('<select class="input-medium">')
+            this.inputs = jQuery('<select class="form-control input-small">')
                 .attr('id', this.id)
                 .css('display', 'none');
 
@@ -837,11 +866,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
                 .attr('value', this.property.UNLINK_VALUE);
 
             this._openButton = jQuery('<button type="button">')
-                .addClass('btn')
-                .addClass('input-medium')
+                .addClass('btn btn-default btn-small col-12')
                 .addClass(Config.Classes.PROPERTY_OPEN_BUTTON)
                 .text('Open in new tab')
-                .appendTo(this.container.children('.controls'))
+                .appendTo(this.container.children('.inputs'))
                 .css('display', 'none');
 
             return this._setupProgressIndicator();
@@ -904,7 +932,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         _setupProgressIndicator: function() {
             this._progressIndicator = jQuery('<div class="progress progress-striped active">\
                 <div class="bar" style="width: 100%;"></div>\
-            </div>').appendTo(this.container.children('.controls'));
+            </div>').appendTo(this.container.children('.inputs'));
 
             return this;
         },

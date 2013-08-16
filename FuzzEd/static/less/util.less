@@ -1,6 +1,7 @@
-section {
-    padding-top: 40px;
-}
+/**
+ *  File: util.less
+ *      This file contains all styles that are not directly related to any specific component of the webapp.
+ */
 
 #FuzzEdAlertContainer {
     position: fixed;
@@ -14,16 +15,11 @@ section {
     display: none;
     float: left;
 }
-
 #FuzzEdSaveIndicator {
     display: none;
 }
 #FuzzEdErrorIndicator {
     display: none;
-}
-
-.brand {
-    color: white !important;
 }
 
 .center-vertical {
@@ -35,10 +31,10 @@ section {
     margin-top: 35px;
     padding: 35px 0px 35px 0px;
     border-top: 1px solid #E5E5E5;
-}
 
-.footer p {
-    margin-bottom: 0;
+    p {
+        margin-bottom: 0;
+    }
 }
 
 .overlay {
@@ -59,18 +55,20 @@ section {
     padding-bottom: 80px;
 }
 
-.table td {
-    vertical-align: middle;
-}
+.table {
+    td {
+        vertical-align: middle;
+    }
 
-.table tbody tr:hover {
-    cursor: pointer;
-}
-
-.table tbody form {
-    margin: 0;
-}
-
-.table tbody button {
-    cursor: default;
+    tbody {
+        tr:hover {
+            cursor: pointer;
+        }
+        form {
+            margin: 0;
+        }
+        button {
+            cursor: default;
+        }
+    }
 }

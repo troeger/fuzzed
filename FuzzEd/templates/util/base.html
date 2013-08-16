@@ -6,13 +6,15 @@
         {% block title %}FuzzEd{% endblock %}
     </title>
     <style type="text/css">
+        {% load less %}
+
         {% block style %}
-        @import url("{{ STATIC_URL }}css/bootstrap/bootstrap-2.3.2.min.css");
-        @import url("{{ STATIC_URL }}css/bootstrap/bootstrap-responsive-2.3.2.min.css");
+        @import url("{{ STATIC_URL }}{% less "less/bootstrap/bootstrap.less" %}");
         @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-3.2.1.min.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
-        @import url("{{ STATIC_URL }}css/util.css");
-        @import url("{{ STATIC_URL }}css/print.css") print;
+        @import url("{{ STATIC_URL }}{% less "less/theme/theme.less" %}");
+        @import url("{{ STATIC_URL }}{% less "less/util.less" %}");
+        @import url("{{ STATIC_URL }}{% less "less/print.less" %}") print;
         {% endblock %}
     </style>
 
@@ -33,7 +35,7 @@
                 'jquery-classlist': '../lib/jquery-classlist/jquery-classlist-1.0.0',
                 // other libs
                 'bignumber':  '../lib/bignumber/bignumber-1.0.1.min',
-                'bootstrap':  '../lib/bootstrap/bootstrap-2.3.2.min',
+                'bootstrap':  '../lib/bootstrap/bootstrap-3.0.0rc1.min',
                 'highcharts': '../lib/highcharts/highcharts-3.0.2.min',
                 'jsplumb':    '../lib/jsplumb/jsplumb-1.4.1.min',
                 'slickgrid':  '../lib/slickgrid/slick.grid-2.0.2',
@@ -92,13 +94,26 @@
 
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top no-print">
-        <div class="navbar-inner">
-            <div class="container">
-                <a class="brand" anchor="#">
-                    FuzzEd{% if graph %} - {{ graph }}{% endif %}
-                </a>
-                {% block nav_center %}{% endblock %}
-                <ul class="nav pull-right">
+        <div class="container">
+            <a class="navbar-brand" anchor="#">
+                FuzzEd{% if graph %} - {{ graph }}{% endif %}
+            </a>
+
+            {% block nav_center %}{% endblock %}
+
+            <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+
+            <!-- Used to clear the float on small devices to get the collaps menu right -->
+            <div class="navbar-collapse-clear"></div>
+
+            <!-- Place everything within .nav-collapse to hide it until above 768px -->
+            <div class="nav-collapse collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav pull-right">
                     {% block menu_right %}{% endblock %}
                     {%  if user.is_authenticated %}
                     <li><a href="/?logout"><i class="icon-off icon-white"></i> Logout </a></li>

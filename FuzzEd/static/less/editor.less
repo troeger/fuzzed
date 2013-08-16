@@ -1,25 +1,25 @@
+/**
+ *  File: editor.less
+ *      This file contains all styles related to the Editor view.
+ */
+
 #FuzzEdContent {
     position: absolute;
-    top:      40px;
+    top:      50px;
     bottom:   0;
     left:     0;
     width:    100%;
 }
 
 #FuzzEdCanvas {
-    background-image:      url(../../static/img/background.svg);
+    background-image:      url(../img/background.svg);
     background-attachment: local;
     position:              absolute;
     width:                 100%;
     height:                100%;
     z-index:               0;
-}
 
-#FuzzEdCanvas.fuzzed-grid-hidden {
-    background-image: none;
-}
-
-.ui-selectable-helper {
-    position: absolute;
-    border:   1px gray dashed;
+    &.fuzzed-grid-hidden {
+        background-image: none;
+    }
 }

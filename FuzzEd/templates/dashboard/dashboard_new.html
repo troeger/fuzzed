@@ -17,22 +17,25 @@
 <form method="POST" action="/dashboard/new/" class="form-horizontal">
     {% csrf_token %}
     <fieldset>
-        <div class="control-group">
-            <div class="controls">
-                <strong>{{ name }}</strong>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">Kind</label>
+            <div class="col-lg-10">
+                <p class="form-control-static">{{ name }}</p>
             </div>
         </div>
 
-        <div class="control-group">
-            <label class="control-label" for="name">Title</label>
-            <div class="controls">
-                <input type="text" class="input-xlarge" name="name" value="Reliability Diagram" id="name">
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="name">Title</label>
+            <div class="col-lg-10">
+                <input type="text" class="form-control" name="name" value="Reliability Diagram" id="name">
             </div>
         </div>
 
-        <div class="form-actions">
-            <button type="submit" name="save" value="save" class="btn btn-primary">Create</button>
-            <a class="btn" href="/dashboard/">Cancel</a>
+        <div class="form-group">
+            <div class="col-push-2 col-lg-10">
+                <button type="submit" name="save" value="save" class="btn btn-primary">Create</button>
+                <a class="btn btn-default" href="/dashboard/">Cancel</a>
+            </div>
         </div>
 
         <input type="hidden" name="kind" value="{{ kind }}">

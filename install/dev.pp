@@ -15,11 +15,13 @@ class { 'python27_and_pip':
 	stage => pre2,
 }
 
+
+
 include django
 include latex
 include beanstalkd
 include jdk
-package { [ "south", "openid2rp", "django-require", "pyxb", "beanstalkc", "fabric" ]:
+package { [ "south", "openid2rp", "django-require", "pyxb", "beanstalkc", "fabric", "django-less" ]:
         ensure => latest,
         provider => "pip";
 }

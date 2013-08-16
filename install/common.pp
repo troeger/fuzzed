@@ -15,11 +15,19 @@ if $operatingsystem == "Darwin" {
 	# Install Puppet extension to support Homebrew on Darwin
 	module { 'bjoernalbers/homebrew':
 	  ensure     => present,
-	  modulepath => '/etc/puppet/modules',
 	}
 	include homebrew
 	Package { provider => "brew" }
 	notice("Using homebrew for software installation.")
+}
+
+# Enable lessc installation through Puppet
+	module { 'jacksoncage/less':
+	  ensure     => present,
+}
+
+class { "less":
+  autoupdate => false,
 }
 
 # Our custom classes used in different constellations
