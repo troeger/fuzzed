@@ -1,4 +1,4 @@
-import os, json, pprint, shutil, tarfile
+import os, json, pprint, shutil, tarfile, sys
 from contextlib import contextmanager
 from xml.dom.minidom import parse as parseXml
 # check FuzzEd/__init__.py for the project version number
@@ -6,7 +6,6 @@ from FuzzEd import __version__, util
 from FuzzEd.setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 
 from fabric.api import run, local, task
-import cuisine
 
 def svg2pgf_shape(filename):
     '''
@@ -347,4 +346,6 @@ def package():
 @task 
 def bootstrap():
     '''Installs all software needed for a development machine.'''
-    pass
+    sys.path.append('tools')    # not needed when cuisine comes from PyPI
+    import cuisine
+    cuisine.package_update()
