@@ -6,6 +6,7 @@ from FuzzEd import __version__, util
 from FuzzEd.setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 
 from fabric.api import run, local, task
+import cuisine
 
 def svg2pgf_shape(filename):
     '''
