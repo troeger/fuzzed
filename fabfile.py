@@ -345,7 +345,12 @@ def package():
 
 @task 
 def bootstrap():
-    '''Installs all software needed for a development machine.'''
+    '''Installs all software needed to make the local machine a development machine.'''
     sys.path.append('tools')    # not needed when cuisine comes from PyPI
     import cuisine
-    cuisine.package_update()
+    cuisine.mode_local()
+    for package in ["django", "south", "openid2rp", "django-require", "pyxb", "beanstalkc", "django-less"]:
+        print "Ensuring %s ..."%package
+        cuisine.python_package_ensure(package)        
+
+
