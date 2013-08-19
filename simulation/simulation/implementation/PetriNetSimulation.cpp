@@ -19,8 +19,7 @@ bool PetriNetSimulation::run()
 	unsigned int numFailures = 0;
 	unsigned long sumFailureTime_all = 0;
 	unsigned long sumFailureTime_fail = 0;
-	unsigned int count = 0;
-
+	
 	PetriNet pn = *PNMLImport::loadPNML(m_netFile.generic_string());
 	if (!pn.valid()) 
 		throw runtime_error("Invalid Petri Net.");
@@ -35,59 +34,52 @@ bool PetriNetSimulation::run()
 
 	// for checking global convergence, shared variable
 	bool globalConvergence = true;
-	
+	int count = 0;
+
 	const double startTime = omp_get_wtime();
 
 	// sum up all the failures from all simulation rounds in parallel, counting how many rounds were successful
 #pragma omp parallel for\
-	reduction(+:numFailures, count, sumFailureTime_all, sumFailureTime_fail)\
+	reduction(+:numFailures, sumFailureTime_all, sumFailureTime_fail, count)\
 	reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak)\
-	schedule(static) if (m_numRounds > PAR_THRESH)\
+	schedule(dynamic, 1)\
 	default(none) firstprivate(pn) // rely on OpenMP magical copying
 
 	for (int i = 0; i < m_numRounds; ++i)
 	{
 		if (privateBreak) continue;
 
-		START:
 		pn.restoreInitialMarking();
 		pn.generateRandomFiringTimes();
-		SimulationRoundResult res = runOneRound(&pn);
+		SimulationRoundResult res;
+		res.valid = false;
+		while (!res.valid) 
+			res = runOneRound(&pn);
 		
-		if (res.valid)
-		{
-			++count;
-			sumFailureTime_all += res.failureTime;
-			
-			if (res.failed && res.failureTime <= m_numSimulationSteps)
-			{ // the failure occurred before the end of mission time -> add up to compute R(mission time)
-				++numFailures;
-				sumFailureTime_fail += res.failureTime;
-			}
+		sumFailureTime_all += res.failureTime;
+		++count;
 
-			const long double current = (count == 0) ? 0 : ((long double)numFailures/(long double)count);
-			const long double diff = std::abs(privateLast - current);
+		if (res.failed && res.failureTime <= m_numSimulationSteps)
+		{ // the failure occurred before the end of mission time -> add up to compute R(mission time)
+			++numFailures;
+			sumFailureTime_fail += res.failureTime;
+		}
 
-			if ((current > 0.0L) && (current < 1.0L) && (diff < m_convergenceThresh))
-			{
-				privateConvergence = true;
-				globalConvergence &= privateConvergence;
-				
-				#pragma omp flush(globalConvergence)
-				if (globalConvergence)
-					privateBreak = true;
-			}
-			privateLast = current;
-		}
-		else
+		const long double current = (count == 0) ? 0 : ((long double)numFailures/(long double)count);
+		const long double diff = std::abs(privateLast - current);
+
+		if ((current > 0.0L) && (current < 1.0L) && (diff < m_convergenceThresh))
 		{
-// 			auto foo = &i;
-// 			*(foo) = i - 1;
-//			++m_numRounds;
-			// goto START;
+			privateConvergence = true;
+			globalConvergence &= privateConvergence;
+
+			#pragma omp flush(globalConvergence)
+			if (globalConvergence)
+				privateBreak = true;
 		}
+		privateLast = current;
+
 	}
-
 
 	const double endTime = omp_get_wtime();
 
