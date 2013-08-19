@@ -222,7 +222,8 @@ class Node(models.Model):
         # Text width is exactly the double width of the icons
         mirrorText = ""
         for index,propvalue in enumerate(self.get_all_mirror_properties(hiddenProps)):
-            propvalue = propvalue.replace("#","\\#")    # consider special LaTex character in mirror text
+            if type(propvalue) == type('string'):
+                propvalue = propvalue.replace("#","\\#")    # consider special LaTex character in mirror text
             if index==0:
                 # Make the first property bigger, since it is supposed to be the name
                 propvalue = "\\baselineskip=0.8\\baselineskip\\textbf{{\\footnotesize %s}}"%propvalue  
@@ -280,20 +281,22 @@ class Node(models.Model):
             # determine fuzzy or crisp probability, set it accordingly
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
                 probability = self.get_property('probability', None)
-                if isinstance(probability, list):
-                    point = probability[-1][0]
-                    alpha = probability[-1][1]
-
-                    print probability, point, alpha
-
+                # Probability is a 2-tuple, were the first value is a type indicator and the second the value
+                if probability[0] == 1:
+                    # Failure rate
+                    #TODO: Determine mission time and compute value, or give rate to the backend
+                    #properties['probability'] = xml_fuzztree.CrispProbability(value_=42)
+                    assert(False)
+                elif probability[0] in [0,2]:
+                    # Point value with uncertainty range, type 0 (direct) or 2 (fuzzy terms)
+                    point = probability[1][0]
+                    alpha = probability[1][1]
                     if alpha == 0:
                         properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
                     else:
                         properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(
                             a=point - alpha, b1=point, b2=point, c=point + alpha
                         )
-                elif isinstance(probability, (long, int, float)):
-                    properties['probability'] = xml_fuzztree.CrispProbability(value_=probability)
                 else:
                     raise ValueError('Cannot handle probability value: "%s"' % probability)
                 # nodes that have a probability also have costs in FuzzTrees
