@@ -26,11 +26,21 @@ namespace
 	// 3: MEASURES
 	const string CONTENTTEMLPATE = ""
 		"\n%1%\n\n"
+		"-- LIST OF DELAY PARAMETERS (NAME, VALUE, (X,Y)-POSITION):"
 		"\n%2%\n\n"
 		"\n%3%\n\n"
 		"\n%4%\n\n"
+		"-- DEFINITION OF PARAMETERS:\n"
+		"-- MARKING DEPENDENT FIRING DELAYS FOR EXP. TRANSITIONS:\n"
+		"-- MARKING DEPENDENT FIRING DELAYS FOR DET. TRANSITIONS:\n"
+		"-- PROBABILITY MASS FUNCTION DEFINITIONS FOR GEN. TRANSITIONS:\n"
+		"-- MARKING DEPENDENT WEIGHTS FOR IMMEDIATE TRANSITIONS:\n"
+		"-- ENABLING FUNCTIONS FOR IMMEDIATE TRANSITIONS:\n"
 		"\n%5%\n\n"
-		"\n%6%\n";
+		"-- MARKING DEPENDENT ARC CARDINALITIES:\n"
+		"-- REWARD MEASURES:\n"
+		"\n%6%\n"
+		"-- END OF SPECIFICATION FILE";
 
 	// NAME, MARKING, (X,Y)-POSITION (PLACE & TAG)
 	// 1: NAME
@@ -121,7 +131,7 @@ bool TNDocument::save(const string& fileName)
 	for (const auto& p : m_places)
 		places += p.second;
 
-	string definitions = "-- LIST OF DELAY PARAMETERS (NAME, VALUE, (X,Y)-POSITION):\n";
+	string definitions;
 	for (const auto& d : m_definitions)
 		definitions += d;
 
@@ -129,7 +139,7 @@ bool TNDocument::save(const string& fileName)
 	for (const auto& t : m_transitions)
 		transitions += transitionString(t.second);
 
-	string delays = "-- MARKING DEPENDENT FIRING DELAYS FOR EXP. TRANSITIONS:\n";
+	string delays;
 	for (const auto& d : m_delays)
 		delays += d;
 
@@ -149,7 +159,6 @@ bool TNDocument::save(const string& fileName)
 		% enablingFunctions
 		% measures;
 
-	file << "-- END OF SPECIFICATION FILE" << std::endl;
 	file.close();
 
 	m_bSaved = true;

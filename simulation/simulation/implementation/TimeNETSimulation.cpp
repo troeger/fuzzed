@@ -21,8 +21,6 @@
 
 using boost::format;
 
-#define JS_TEMPLATE_PATH "C:/dev/masterarbeit/simulation/repeat.js";
-
 TimeNETSimulation::TimeNETSimulation(const boost::filesystem::path &p, 
 									 int simulationTime, // the maximum duration of one simulation in seconds
 									 int simulationSteps, // the number of logical simulation steps performed in each round
