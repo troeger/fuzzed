@@ -1,4 +1,4 @@
-import os, json, pprint, shutil, tarfile, sys
+import os, json, pprint, shutil, tarfile, sys, platform, subprocess
 from contextlib import contextmanager
 from xml.dom.minidom import parse as parseXml
 # check FuzzEd/__init__.py for the project version number
@@ -6,6 +6,10 @@ from FuzzEd import __version__, util
 from FuzzEd.setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 
 from fabric.api import run, local, task
+
+sys.path.append('tools')    # not needed when cuisine comes from PyPI
+import cuisine
+cuisine.mode_local()
 
 def svg2pgf_shape(filename):
     '''
@@ -344,13 +348,59 @@ def package():
     package_rendering_server()
 
 @task 
-def bootstrap():
-    '''Installs all software needed to make the local machine a development machine.'''
-    sys.path.append('tools')    # not needed when cuisine comes from PyPI
-    import cuisine
-    cuisine.mode_local()
+def bootstrap_dev():
+    '''Installs all software needed to make the machine a development machine.'''
     for package in ["django", "south", "openid2rp", "django-require", "pyxb", "beanstalkc", "django-less"]:
-        print "Ensuring %s ..."%package
         cuisine.python_package_ensure(package)        
+    cuisine.package_ensure("beanstalkd")
+    if platform.system() != 'Darwin':
+        cuisine.package_ensure("texlive")
+        cuisine.package_ensure("openjdk-7-jdk")
+        cuisine.package_ensure("node-less")
+    else:
+        # check Java version
+        output = cuisine.run('javac -version')
+        if not '1.7' in output:
+            raise Exception('We need at least JDK 7 to build the analysis server. We found ' + output)
+        # check if latex is installed
+        output = cuisine.run('dvips')
+        if 'command not found' in output:
+            raise Exception('We need a working Latex for the rendering server. Please install it manually.')
+        # Install LESS compiler via NPM, since no brew exists for that
+        cuisine.package_ensure("npm")
+        output = cuisine.run('lessc')
+        if 'command not found' in output:
+            cuisine.sudo("npm install less --global")
 
+@task 
+def bootstrap_web():
+    '''Installs all software needed to make the machine a web server machine.'''
+    for package in ["django", "south", "openid2rp", "pyxb", "beanstalkc", "django-less"]:
+        cuisine.python_package_ensure(package)        
+    cuisine.package_ensure("apache2")
+    cuisine.package_ensure("libapache2-mod-wsgi")
+    cuisine.package_ensure("postgresql")
+    cuisine.package_ensure("python-psycopg2")
+    #TODO: Prepare database
+    #TODO: Prepare Apache config
+    #TODO: Ask for IP of Beanstalk server
+
+@task 
+def bootstrap_backend():
+    '''Installs all software needed to make the machine a backend machine.'''
+    for package in ["pyxb", "beanstalkc"]:
+        cuisine.python_package_ensure(package)        
+    cuisine.package_ensure("beanstalkd")
+    if platform.system() != 'Darwin':
+        cuisine.package_ensure("texlive")
+        cuisine.package_ensure("openjdk-7-jre")
+    else:
+        # check Java version
+        output = subprocess.check_output('java -version', stderr=subprocess.STDOUT, shell=True)
+        if (not 'version' in output) or (not '1.7' in output):
+            raise Exception('We need at least JDK 7 to build the analysis server. Please install it manually.')
+        # check if latex is installed
+        if not cmd_exists("latex"):
+            raise Exception('We need a working Latex for the rendering server. Please install it manually.')
+    #TODO: Ask if Beanstalkd should be installed here
 
