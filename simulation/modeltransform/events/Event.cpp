@@ -16,5 +16,6 @@ Event::Event(const std::string& ID, FuzzyNumber fuzzyFailureRate)
 
 std::string Event::serializeAsFormula(std::shared_ptr<PNDocument> doc) const 
 {
-	return PLACE_IDENTIFIER + util::toString(serializePTNet(doc));
+	static const std::string gartenzaun = "#";
+	return gartenzaun + PLACE_IDENTIFIER + util::toString(serializePTNet(doc)) + ">0";
 }

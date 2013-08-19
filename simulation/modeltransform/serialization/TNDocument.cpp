@@ -111,7 +111,7 @@ int TNDocument::addPlace(
 	int initialMarking,
 	int /*capacity = 1*/,
 	const std::string& /*= ""*/,
-	PlaceSemantics semantics /*= DEFAULT_PLACE*/)
+	PlaceSemantics /*= DEFAULT_PLACE*/)
 {
 	const string id = PLACE_IDENTIFIER + util::toString((int)m_places.size());
 	m_places[id] = (boost::format(PLACETEMPLATE) % id % initialMarking).str();
