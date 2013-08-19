@@ -404,3 +404,35 @@ def bootstrap_backend():
             raise Exception('We need a working Latex for the rendering server. Please install it manually.')
     #TODO: Ask if Beanstalkd should be installed here
 
+#TODO: Introduce task to start the dev server with one fabric task
+#    - Checks if initial building or SQLite creation is needed
+#    - Starts the backend servers
+#    - Starts the django web server
+
+#TODO: Introduce DEPLOY task:
+#    - Push the packaged release on the server(s).
+#    - Trigger cuisine on production machine to update the software installation.
+#    - Restart the web server / analysis server / rendering server.
+#    - Extra fab tasks for web server / rendering server / analysis server deployment.
+#    - Check for correct installation of init scripts.
+#
+#    Installation of production backend server
+#    -----------------------------------------
+#    > sudo puppet apply install/prod_backend.pp
+#    > tar xvfz FuzzEdAnalysis-x.x.x.tar.gz /home/fuzztrees
+#    > ln -s /home/fuzztrees/FuzzEdAnalysis-x.x.x /home/fuzztrees/analysis 
+#    > ln -s /home/fuzztrees/analysis/initscript /etc/init.d/fuzzTreesAnalysis
+#    > tar xvfz FuzzEdRendering-x.x.x.tar.gz /home/fuzztrees
+#    > ln -s /home/fuzztrees/FuzzEdRendering-x.x.x /home/fuzztrees/rendering 
+#    > ln -s /home/fuzztrees/rendering/initscript /etc/init.d/fuzzTreesRendering##
+#
+#    Install new release on production web server
+#    --------------------------------------------
+#    > sudo puppet apply install/prod_web.pp
+#    > tar xvfz FuzzEd-x.x.x.tar.gz /var/www/fuzztrees.net/
+#    > ln -s /var/www/fuzztrees.net/FuzzEd-x.x.x /var/www/fuzztrees.net/www
+#    > service apache2 restart
+#
+#TODO: test how well this works with Vagrant for Linux dev machines
+
+

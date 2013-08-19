@@ -8,32 +8,18 @@ Markus Götz <>
 Lena Herscheid <>
 Frank Schlegel <>
 
-
-Installation instructions
-=========================
-This project uses Puppet for installing software dependencies.
-Puppet installation instructions are available here:
-
-http://docs.puppetlabs.com/guides/installation.html
-
-Make sure to install the "rcoleman/puppet_module" puppet module, e.g. like this:
-
-> sudo puppet module install rcoleman/puppet_module
-
-On Windows hosts, make sure that you run all puppet commands with admin privileges, as described here:
-
-http://docs.puppetlabs.com/windows/running.html
-
-Development machine
-====================
+Installation instructions for development machine 
+==================================================
+This project uses Python 2.7 and Fabric for installing software dependencies and managing the build process.
+Please use 'easy_install fabric' or 'pip install fabric' to get it.
 
 Preparation of development machine
 -----------------------------------
-> sudo puppet apply install/dev.pp
+> fab bootstrap_dev
 
 Compile static stuff and prepare SQLite database
 ------------------------------------------------
-> ./setup.py build
+> fab build
 > ./manage.py syncdb
 > ./manage.py migrate
 
@@ -44,25 +30,20 @@ Run development web server and backend servers
 
 Create install packages in ./dist on developer machine
 -------------------------------------------------------
-> ./setup.py build sdist
+> fab build
+> fab package
 
-Production machine
-==================
+Some thoughts
+=============
+Fabric is used for:
 
-Installation of production backend server
------------------------------------------
-> sudo puppet apply install/prod_backend.pp
-> tar xvfz FuzzEdAnalysis-x.x.x.tar.gz /home/fuzztrees
-> ln -s /home/fuzztrees/FuzzEdAnalysis-x.x.x /home/fuzztrees/analysis 
-> ln -s /home/fuzztrees/analysis/initscript /etc/init.d/fuzzTreesAnalysis
-> tar xvfz FuzzEdRendering-x.x.x.tar.gz /home/fuzztrees
-> ln -s /home/fuzztrees/FuzzEdRendering-x.x.x /home/fuzztrees/rendering 
-> ln -s /home/fuzztrees/rendering/initscript /etc/init.d/fuzzTreesRendering
+- Avoiding distutils for Make-alike tasks, which must be all done in the 'build' step.
+- Avoiding the need for a private repository when software installation is done with Puppet.
+  We just push the release explicitely.
+- Avoiding the handling of initscript installation, database setup a.s.o. in such a software 
+  install package. Generating correct DEB files is very hard. 
 
-Install new release on production web server
---------------------------------------------
-> sudo puppet apply install/prod_web.pp
-> tar xvfz FuzzEd-x.x.x.tar.gz /var/www/fuzztrees.net/
-> ln -s /var/www/fuzztrees.net/FuzzEd-x.x.x /var/www/fuzztrees.net/www
-> service apache2 restart
+Cuisine is used for:
 
+- Easier (mostly OS-agnostic) management of software dependencies on development and production machine.
+  Doing this as part of a generated software install package (e.g. DEB) or through explicit Fabric commands would make the solution very OS-specific, and would not solve the dev machine problem. Vagrant is also not solving the dev machine problem, is still needs a software dependency description.
