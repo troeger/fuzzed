@@ -11,7 +11,14 @@
 #include "faultTree.h"
 #include "fuzzTree.h"
 
-enum ErrorType;
+enum ErrorType
+{
+	OK,
+	WRONG_CHILD_TYPE,
+	WRONG_CHILD_NUM,
+	INVALID_NODE,
+	INVALID_ATTRIBUTE
+};
 
 class FuzzTreeTransform
 {

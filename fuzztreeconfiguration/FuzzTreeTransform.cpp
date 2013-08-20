@@ -15,15 +15,6 @@ using xercesc::DOMNode;
 using xercesc::DOMDocument;
 using namespace std;
 
-enum ErrorType
-{
-	NO_ERROR,
-	WRONG_CHILD_TYPE,
-	WRONG_CHILD_NUM,
-	INVALID_NODE,
-	INVALID_ATTRIBUTE
-};
-
 FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 	m_count(0)
 {
@@ -260,7 +251,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 		generateConfigurationsRecursive(&child, configurations);
 	}
 
-	return NO_ERROR;
+	return OK;
 }
 
 /************************************************************************/
@@ -272,7 +263,7 @@ faulttree::FaultTree FuzzTreeTransform::generateFaultTree(const FuzzTreeConfigur
 	const fuzztree::TopEvent topEvent = m_fuzzTree->topEvent();
 	auto newTopEvent = treeHelpers::copyTopEvent(topEvent);
 
-	if (generateFaultTreeRecursive(&topEvent, &newTopEvent, configuration) == NO_ERROR)
+	if (generateFaultTreeRecursive(&topEvent, &newTopEvent, configuration) == OK)
 		return faulttree::FaultTree(generateUniqueId(topEvent.id()), newTopEvent);
 	else
 	{
@@ -344,14 +335,14 @@ ErrorType FuzzTreeTransform::generateFaultTreeRecursive(
 		else if (typeName == BASICEVENTSET)
 		{
 			auto ret = expandBasicEventSet(&currentChild, node, id, 0);
-			if (ret != NO_ERROR) return ret;
+			if (ret != OK) return ret;
 			// BasicEvents can have FDEP children...
 			// continue;
 		}
 		else if (typeName == INTERMEDIATEEVENTSET)
 		{
 			auto ret = expandIntermediateEventSet(&currentChild, node, id, configuration, 0);
-			if (ret != NO_ERROR) return ret;
+			if (ret != OK) return ret;
 			continue;
 		}
 		// remaining types
@@ -364,7 +355,7 @@ ErrorType FuzzTreeTransform::generateFaultTreeRecursive(
 		generateFaultTreeRecursive(&currentChild, bChanged ? &node->children().back() : node, configuration);
 	}
 
-	return NO_ERROR;
+	return OK;
 }
 
 ErrorType FuzzTreeTransform::expandBasicEventSet(
@@ -404,7 +395,7 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 		i++;
 	}
 
-	return NO_ERROR;
+	return OK;
 }
 
 ErrorType FuzzTreeTransform::expandIntermediateEventSet(
@@ -436,7 +427,7 @@ ErrorType FuzzTreeTransform::expandIntermediateEventSet(
 		i++;
 	}
 
-	return NO_ERROR;
+	return OK;
 }
 
 bool FuzzTreeTransform::handleFeatureVP(
