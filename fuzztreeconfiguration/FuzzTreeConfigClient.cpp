@@ -13,32 +13,63 @@ FuzzTreeConfigClient::FuzzTreeConfigClient(const string& serverIP, int port)
 {
 	try
 	{
+		cout << "Connecting Config Client... " << endl;
 		Client::connect();
+		cout << "...done." << endl;
 
 		Client::use(BEANSTALK_CONFIG_RESULT_QUEUE);
 		Client::watch(BEANSTALK_CONFIG_QUEUE);
+
+		cout 
+			<< "Watching Queue: " << BEANSTALK_CONFIG_QUEUE << endl
+			<< "Using Queue:	" << BEANSTALK_CONFIG_RESULT_QUEUE << endl;
+
+		for (const auto& t : Client::listTubes())
+			cout << " - " << t << endl;
 	} 
 	catch (exception& e)
 	{
-		cerr << e.what() << endl;
+		cerr << "ERROR: " << e.what() << endl;
 		exit(1);
 	}
 }
 
 void FuzzTreeConfigClient::run()
 {
-	while (true) 
+	try
 	{
-		Job j = Client::reserve();
-		const auto jobXML = j.asString();
+		cout << "Running Config Client... " << endl;
+		while (true) 
+		{
+			boost::shared_ptr<Job> jobPtr;
 
-		FuzzTreeTransform transform(jobXML);
-		
-		Client::put( 
-			(boost::format("[%1] \n %2") 
-				% j.getJobId() 
-				% concatXMLString(transform.transform())).str() );
-		Client::del(j);
+			Client::put("foobar");
+
+			Client::reserveWithTimeout(jobPtr, 10);
+			Client::peekReady(jobPtr);
+			if (jobPtr)
+			{
+				const auto jobXML = jobPtr->asString();
+				cout << "Received job: " << jobXML << endl;
+
+				FuzzTreeTransform transform(jobXML);
+
+				Client::put( 
+					(boost::format("[%1] \n %2") 
+					% jobPtr->getJobId() 
+					% concatXMLString(transform.transform())).str() );
+				Client::del(jobPtr);
+			}
+			else
+			{
+				cout << "Timeout without receiving job... " << endl;
+			}
+		}
+	}
+	catch (const exception& e)
+	{
+		cerr << "ERROR: " << e.what() << endl;
+		exit(1);
 	}
 }
 

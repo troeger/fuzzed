@@ -61,7 +61,6 @@ set(HEADERS
    FuzzTreeConfigClient.h
    TreeHelpers.h
    platform.h
-   beanstalkdconfig.h
    faulttree.h
    fuzztree.h
    FaultTreeTypes.h

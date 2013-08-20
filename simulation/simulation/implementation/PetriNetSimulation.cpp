@@ -78,7 +78,6 @@ bool PetriNetSimulation::run()
 				privateBreak = true;
 		}
 		privateLast = current;
-
 	}
 
 	const double endTime = omp_get_wtime();

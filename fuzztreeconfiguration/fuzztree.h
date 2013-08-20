@@ -271,6 +271,7 @@ namespace fuzztree
   class Annotation;
   class Probability;
   class CrispProbability;
+  class FailureRate;
   class TriangularFuzzyInterval;
   class UndevelopedEvent;
   class IntermediateEvent;
@@ -749,9 +750,24 @@ namespace fuzztree
   class TopEvent: public ::fuzztree::Node
   {
     public:
+    // missionTime
+    // 
+    typedef ::xml_schema::Int MissionTimeType;
+    typedef ::xsd::cxx::tree::traits< MissionTimeType, char > MissionTimeTraits;
+
+    const MissionTimeType&
+    missionTime () const;
+
+    MissionTimeType&
+    missionTime ();
+
+    void
+    missionTime (const MissionTimeType& x);
+
     // Constructors.
     //
-    TopEvent (const IdType&);
+    TopEvent (const IdType&,
+              const MissionTimeType&);
 
     TopEvent (const ::xercesc::DOMElement& e,
               ::xml_schema::Flags f = 0,
@@ -767,6 +783,16 @@ namespace fuzztree
 
     virtual 
     ~TopEvent ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::Flags);
+
+    protected:
+    ::xsd::cxx::tree::one< MissionTimeType > missionTime_;
   };
 
   class And: public ::fuzztree::Gate
@@ -1179,6 +1205,53 @@ namespace fuzztree
 
     virtual 
     ~CrispProbability ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::Flags);
+
+    protected:
+    ::xsd::cxx::tree::one< ValueType > value_;
+  };
+
+  class FailureRate: public ::fuzztree::Probability
+  {
+    public:
+    // value
+    // 
+    typedef ::xml_schema::Double ValueType;
+    typedef ::xsd::cxx::tree::traits< ValueType, char, ::xsd::cxx::tree::schema_type::double_ > ValueTraits;
+
+    const ValueType&
+    value () const;
+
+    ValueType&
+    value ();
+
+    void
+    value (const ValueType& x);
+
+    // Constructors.
+    //
+    FailureRate (const ValueType&);
+
+    FailureRate (const ::xercesc::DOMElement& e,
+                 ::xml_schema::Flags f = 0,
+                 ::xml_schema::Container* c = 0);
+
+    FailureRate (const FailureRate& x,
+                 ::xml_schema::Flags f = 0,
+                 ::xml_schema::Container* c = 0);
+
+    virtual FailureRate*
+    _clone (::xml_schema::Flags f = 0,
+            ::xml_schema::Container* c = 0) const;
+
+    virtual 
+    ~FailureRate ();
 
     // Implementation.
     //
@@ -1952,6 +2025,9 @@ namespace fuzztree
 
   void
   operator<< (::xercesc::DOMElement&, const CrispProbability&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const FailureRate&);
 
   void
   operator<< (::xercesc::DOMElement&, const TriangularFuzzyInterval&);

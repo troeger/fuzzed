@@ -315,6 +315,24 @@ namespace fuzztree
   // TopEvent
   // 
 
+  const TopEvent::MissionTimeType& TopEvent::
+  missionTime () const
+  {
+    return this->missionTime_.get ();
+  }
+
+  TopEvent::MissionTimeType& TopEvent::
+  missionTime ()
+  {
+    return this->missionTime_.get ();
+  }
+
+  void TopEvent::
+  missionTime (const MissionTimeType& x)
+  {
+    this->missionTime_.set (x);
+  }
+
 
   // And
   // 
@@ -518,6 +536,28 @@ namespace fuzztree
   }
 
   void CrispProbability::
+  value (const ValueType& x)
+  {
+    this->value_.set (x);
+  }
+
+
+  // FailureRate
+  // 
+
+  const FailureRate::ValueType& FailureRate::
+  value () const
+  {
+    return this->value_.get ();
+  }
+
+  FailureRate::ValueType& FailureRate::
+  value ()
+  {
+    return this->value_.get ();
+  }
+
+  void FailureRate::
   value (const ValueType& x)
   {
     this->value_.set (x);
@@ -1561,8 +1601,10 @@ namespace fuzztree
   //
 
   TopEvent::
-  TopEvent (const IdType& id)
-  : ::fuzztree::Node (id)
+  TopEvent (const IdType& id,
+            const MissionTimeType& missionTime)
+  : ::fuzztree::Node (id),
+    missionTime_ (missionTime, ::xml_schema::Flags (), this)
   {
   }
 
@@ -1570,7 +1612,8 @@ namespace fuzztree
   TopEvent (const TopEvent& x,
             ::xml_schema::Flags f,
             ::xml_schema::Container* c)
-  : ::fuzztree::Node (x, f, c)
+  : ::fuzztree::Node (x, f, c),
+    missionTime_ (x.missionTime_, f, this)
   {
   }
 
@@ -1578,8 +1621,43 @@ namespace fuzztree
   TopEvent (const ::xercesc::DOMElement& e,
             ::xml_schema::Flags f,
             ::xml_schema::Container* c)
-  : ::fuzztree::Node (e, f, c)
+  : ::fuzztree::Node (e, f | ::xml_schema::Flags::base, c),
+    missionTime_ (f, this)
   {
+    if ((f & ::xml_schema::Flags::base) == 0)
+    {
+      ::xsd::cxx::xml::dom::parser< char > p (e, true, true);
+      this->parse (p, f);
+    }
+  }
+
+  void TopEvent::
+  parse (::xsd::cxx::xml::dom::parser< char >& p,
+         ::xml_schema::Flags f)
+  {
+    this->::fuzztree::Node::parse (p, f);
+
+    p.reset_attributes ();
+
+    while (p.more_attributes ())
+    {
+      const ::xercesc::DOMAttr& i (p.next_attribute ());
+      const ::xsd::cxx::xml::qualified_name< char > n (
+        ::xsd::cxx::xml::dom::name< char > (i));
+
+      if (n.name () == "missionTime" && n.namespace_ ().empty ())
+      {
+        this->missionTime_.set (MissionTimeTraits::create (i, f, this));
+        continue;
+      }
+    }
+
+    if (!missionTime_.present ())
+    {
+      throw ::xsd::cxx::tree::expected_attribute< char > (
+        "missionTime",
+        "");
+    }
   }
 
   TopEvent* TopEvent::
@@ -2272,6 +2350,82 @@ namespace fuzztree
   const ::xsd::cxx::tree::type_factory_initializer< 0, char, CrispProbability >
   _xsd_CrispProbability_type_factory_init (
     "CrispProbability",
+    "net.fuzztree");
+
+  // FailureRate
+  //
+
+  FailureRate::
+  FailureRate (const ValueType& value)
+  : ::fuzztree::Probability (),
+    value_ (value, ::xml_schema::Flags (), this)
+  {
+  }
+
+  FailureRate::
+  FailureRate (const FailureRate& x,
+               ::xml_schema::Flags f,
+               ::xml_schema::Container* c)
+  : ::fuzztree::Probability (x, f, c),
+    value_ (x.value_, f, this)
+  {
+  }
+
+  FailureRate::
+  FailureRate (const ::xercesc::DOMElement& e,
+               ::xml_schema::Flags f,
+               ::xml_schema::Container* c)
+  : ::fuzztree::Probability (e, f | ::xml_schema::Flags::base, c),
+    value_ (f, this)
+  {
+    if ((f & ::xml_schema::Flags::base) == 0)
+    {
+      ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+      this->parse (p, f);
+    }
+  }
+
+  void FailureRate::
+  parse (::xsd::cxx::xml::dom::parser< char >& p,
+         ::xml_schema::Flags f)
+  {
+    while (p.more_attributes ())
+    {
+      const ::xercesc::DOMAttr& i (p.next_attribute ());
+      const ::xsd::cxx::xml::qualified_name< char > n (
+        ::xsd::cxx::xml::dom::name< char > (i));
+
+      if (n.name () == "value" && n.namespace_ ().empty ())
+      {
+        this->value_.set (ValueTraits::create (i, f, this));
+        continue;
+      }
+    }
+
+    if (!value_.present ())
+    {
+      throw ::xsd::cxx::tree::expected_attribute< char > (
+        "value",
+        "");
+    }
+  }
+
+  FailureRate* FailureRate::
+  _clone (::xml_schema::Flags f,
+          ::xml_schema::Container* c) const
+  {
+    return new class FailureRate (*this, f, c);
+  }
+
+  FailureRate::
+  ~FailureRate ()
+  {
+  }
+
+  static
+  const ::xsd::cxx::tree::type_factory_initializer< 0, char, FailureRate >
+  _xsd_FailureRate_type_factory_init (
+    "FailureRate",
     "net.fuzztree");
 
   // TriangularFuzzyInterval
@@ -3894,6 +4048,17 @@ namespace fuzztree
   operator<< (::xercesc::DOMElement& e, const TopEvent& i)
   {
     e << static_cast< const ::fuzztree::Node& > (i);
+
+    // missionTime
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "missionTime",
+          e));
+
+      a << i.missionTime ();
+    }
   }
 
   static
@@ -4141,6 +4306,30 @@ namespace fuzztree
   const ::xsd::cxx::tree::type_serializer_initializer< 0, char, CrispProbability >
   _xsd_CrispProbability_type_serializer_init (
     "CrispProbability",
+    "net.fuzztree");
+
+
+  void
+  operator<< (::xercesc::DOMElement& e, const FailureRate& i)
+  {
+    e << static_cast< const ::fuzztree::Probability& > (i);
+
+    // value
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "value",
+          e));
+
+      a << ::xml_schema::AsDouble(i.value ());
+    }
+  }
+
+  static
+  const ::xsd::cxx::tree::type_serializer_initializer< 0, char, FailureRate >
+  _xsd_FailureRate_type_serializer_init (
+    "FailureRate",
     "net.fuzztree");
 
 

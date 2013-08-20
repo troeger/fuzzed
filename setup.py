@@ -45,6 +45,7 @@ def build_xmlschema_wrapper():
 
 def build_naturaldocs():
     # Build natural docs in 'docs' subdirectory
+    return
     if not os.path.exists('docs'):
         os.mkdir('docs')
     if os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -o HTML docs -p docs') != 0:

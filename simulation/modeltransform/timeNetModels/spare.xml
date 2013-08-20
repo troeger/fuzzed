@@ -45,7 +45,7 @@
       <graphics x="-10" y="-40"/>
     </label>
   </exponentialTransition>
-  <exponentialTransition DTSPNpriority="1" delay="1.0 * dormancy"
+  <exponentialTransition DTSPNpriority="1" delay="1000 * dormancy"
     id="0.5" preemptionPolicy="PRD" serverType="ExclusiveServer" type="node">
     <graphics orientation="0" x="207" y="213"/>
     <label id="0.5.0" text="T_passive" type="text">
