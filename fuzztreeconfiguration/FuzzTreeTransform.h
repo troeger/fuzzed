@@ -8,8 +8,11 @@
 #include "FuzzTreeConfiguration.h"
 
 // generated model files
-#include "faultTree.h"
-#include "fuzzTree.h"
+#include "faulttree.h"
+#include "fuzztree.h"
+
+
+
 
 enum ErrorType
 {
@@ -19,6 +22,7 @@ enum ErrorType
 	INVALID_NODE,
 	INVALID_ATTRIBUTE
 };
+
 
 class FuzzTreeTransform
 {

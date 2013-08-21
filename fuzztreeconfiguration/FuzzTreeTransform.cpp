@@ -7,7 +7,6 @@
 
 #include <xsd/cxx/tree/elements.hxx>
 #include <xsd/cxx/xml/dom/serialization-header.hxx>
-#include <boost/range/counting_range.hpp>
 
 #include <functional>
 
@@ -139,7 +138,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 
 	const string parentType = typeid(node).name();
 
-	for (const auto& child : node->children())
+	for (const auto child : node->children())
 	{
 		const string id = child.id();
 		const string childType = typeid(child).name();
@@ -186,7 +185,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			{
 				if (config.isIncluded(id))
 				{
-					for (int i : boost::counting_range(from, to+1))
+					for (int i = from; i < to+1; ++i)
 					{
 						FuzzTreeConfiguration copied = config;
 						const int numVotes = formula(i);

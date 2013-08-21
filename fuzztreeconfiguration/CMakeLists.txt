@@ -19,8 +19,9 @@ foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_SOURCE_DIR}/lib)
 endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
 
-find_package(Boost COMPONENTS system filesystem program_options date_time regex REQUIRED)
+find_package(Boost COMPONENTS system range filesystem program_options date_time regex REQUIRED)
 message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
+message(STATUS "** Boost Include dirs: ${Boost_INCLUDE_DIRS}")
 
 include(common)
 find_package(XercesC REQUIRED) # XSD DEPENDS ON ${XERCESC_FOUND}
@@ -80,6 +81,7 @@ set(FUZZTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/fuzztree.xsd")
 set(SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
 
 set(LINKED_LIBS ${Boost_LIBRARIES} ${XERCESC_LIBRARIES} ${BEANSTALKPP_LIB})
+message(${Boost_LIBRARIES})
 
 add_library(ftconfiguration STATIC ${SOURCES} ${HEADERS} ${SCHEMAS})
 target_link_libraries(ftconfiguration ${LINKED_LIBS})
@@ -89,6 +91,10 @@ if (BUILD_TEST_EXECUTABLE)
   add_executable(ftconfiguration_exe ${SOURCES} ${HEADERS} ${SCHEMAS})
   target_link_libraries(ftconfiguration_exe ${LINKED_LIBS})
 endif(BUILD_TEST_EXECUTABLE)
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  list(APPEND CMAKE_CXX_FLAGS "-Wno-deprecated -std=c++0x -fpermissive ${CMAKE_CXX_FLAGS}")
+endif()
 
 set(XSD_TO_FAULTTREE_ARGS
   --include-with-brackets	#include with <> instead of ""

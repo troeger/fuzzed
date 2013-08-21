@@ -5,10 +5,9 @@
 #include <stdarg.h> 
 #include <boost/lexical_cast.hpp>
 #include <boost/math/special_functions/binomial.hpp>
-#include <boost/range/counting_range.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
+
 #include <fstream>
 #include <cmath>
 #include <chrono>
@@ -91,7 +90,7 @@ long double util::kOutOfN(long double rate, int k, int N)
 		return rate;
 	
 	long double sum = 0.0L;
-	for (int i : counting_range(k, N))
+	for (int i = k; i<N; ++i)
 	{
 		double binom = math::binomial_coefficient<double>(N, i);
 		sum += binom * std::pow(rate, i) * std::pow(1.0L - rate, N-i);
@@ -165,17 +164,19 @@ string util::nestedIDString(int n, ...)
 
 int util::countFiles(const string& path, const string& ext /*= ""*/)
 {
-	return std::count_if(
-		filesystem::directory_iterator(path),
-		filesystem::directory_iterator(),
-		[&](filesystem::path p) { return is_regular_file(p) && p.extension() == ext; } );
+	assert(false && "this had to be removed because of boost issues");
+	return 0;
+	//return std::count_if(
+	//	filesystem::directory_iterator(path),
+	//	filesystem::directory_iterator(),
+	//	[&](filesystem::path p) { return is_regular_file(p) && p.extension() == ext; } );
 }
 
 void util::clearDirectory(const string& dir)
 {
-	filesystem::directory_iterator end;
-	for(filesystem::directory_iterator iter(dir) ; iter != end ; ++iter)
-		filesystem::remove_all(*iter);
+	//filesystem::directory_iterator end;
+	//for(filesystem::directory_iterator iter(dir) ; iter != end ; ++iter)
+	//	filesystem::remove_all(*iter);
 }
 
 bool util::beginsWith(const string& subject, const string& prefix)
