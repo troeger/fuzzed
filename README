@@ -11,8 +11,11 @@ Frank Schlegel <>
 Installation instructions for development machine 
 ==================================================
 This project uses Python 2.7 and Fabric for installing software dependencies and managing the build process.
-Please use 'easy_install fabric' or 'pip install fabric' to get it. Make sure to check the supported
-Fabric tasks with 'fab -l'.
+
+In order to install Fabric, please run 'easy_install fabric' or 'pip install fabric' to get it. 
+This demands a working C compiler (gcc), Python header files (python-dev), pip / distutils (python-pip) and sudo being installed. All of this is given anyway on a reasonable Linux box.
+
+Make sure to check the supported Fabric tasks with 'fab -l'.
 
 Preparation of development machine
 -----------------------------------
