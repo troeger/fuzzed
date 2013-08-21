@@ -350,13 +350,16 @@ def package():
 @task 
 def bootstrap_dev():
     '''Installs all software needed to make the machine a development machine.'''
+    print "Installing Python packages..."
     for package in ["django", "south", "openid2rp", "django-require", "pyxb", "beanstalkc", "django-less"]:
-        cuisine.python_package_ensure(package)        
-    cuisine.package_ensure("beanstalkd")
+        print cuisine.python_package_ensure(package)        
+    print "Installing native packages ..."
+    print cuisine.package_ensure("beanstalkd")
     if platform.system() != 'Darwin':
-        cuisine.package_ensure("texlive")
-        cuisine.package_ensure("openjdk-7-jdk")
-        cuisine.package_ensure("node-less")
+        print cuisine.package_ensure("texlive")
+        print cuisine.package_ensure("openjdk-7-jdk")
+        print cuisine.package_ensure("node-less")  # only in Debian unstable
+	print cuisine.package_ensure("ant-gcj")
     else:
         # check Java version
         output = cuisine.run('javac -version')
