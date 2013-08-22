@@ -57,7 +57,7 @@ namespace
 	//	"INPARCS %4% \n %5%"
 	//	"OUTPARCS %6% \n %7%";
 
-	const string IMMEDIATETRANSITIONTEMPLATE = "TRANSITION %1% %2% IS IM RE %3% 0 1 0 1.000000 0.0 0.0 0.0 0.0 0.0 0.0\n";
+	const string IMMEDIATETRANSITIONTEMPLATE = "TRANSITION %1% %2% SS IM RE %3% 0 1 0 1.000000 0.0 0.0 0.0 0.0 0.0 0.0\n";
 	//	"INPARCS %4% \n %5%"
 	//	"OUTPARCS %6% \n %7%";
 
@@ -231,7 +231,7 @@ const std::string TNDocument::placeIdentifier(const int& id)
 int TNDocument::addGuardedTransition(const std::string& guard, unsigned int priority /*= 1*/)
 {
 	const string id = TRANSITION_IDENTIFIER + util::toString((int)m_transitions.size());
-	m_transitions[id] = TN_TransitionSpec((boost::format(IMMEDIATETRANSITIONTEMPLATE) % id % 0 % priority).str());
+	m_transitions[id] = TN_TransitionSpec((boost::format(IMMEDIATETRANSITIONTEMPLATE) % id % 1 % priority).str());
 
 	addEnablingFunction(id, guard);
 

@@ -53,7 +53,7 @@ const char* const USER_DESCRIPTION_LABEL = "userDescription";
 
 const char* const FAILURE_LABEL = "SystemFailure";
 
-const char* const TRANSITION_IDENTIFIER = "t"; 
+const char* const TRANSITION_IDENTIFIER = "T"; 
 const char* const PLACE_IDENTIFIER = "p";
 const char* const ARC_IDENTIFIER = "a";
 
