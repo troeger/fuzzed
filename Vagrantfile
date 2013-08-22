@@ -24,8 +24,7 @@ Vagrant::Config.run do |config|
     #config.vm.boot_mode = :gui
     
 	config.vm.network :bridged
-    config.vm.forward_port 80, 8080 
-    config.vm.forward_port 8000, 8001
+    config.vm.forward_port 8000, 8000
 
     config.vm.share_folder "fuzztrees", "/home/fuzztrees", "."
 
