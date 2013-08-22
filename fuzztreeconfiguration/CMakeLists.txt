@@ -1,50 +1,3 @@
-cmake_minimum_required(VERSION 2.8.8)
-project(ftconfiguration CXX)
-
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-message("${CMAKE_MODULE_PATH}")
-
-set(Boost_USE_STATIC_LIBS       ON)
-set(Boost_USE_MULTITHREADED     ON)
-set(Boost_USE_STATIC_RUNTIME    OFF)
-
-set(BOOST_ROOT $ENV{BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
-set(BOOST_INCLUDEDIR ${BOOST_ROOT}/Include)
-set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
-
-foreach(OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES})
-    string(TOUPPER ${OUTPUTCONFIG} OUTPUTCONFIG)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_SOURCE_DIR}/bin)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_SOURCE_DIR}/lib)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${OUTPUTCONFIG} ${PROJECT_SOURCE_DIR}/lib)
-endforeach(OUTPUTCONFIG CMAKE_CONFIGURATION_TYPES)
-
-find_package(Boost COMPONENTS system filesystem program_options date_time regex REQUIRED)
-message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
-
-include(common)
-find_package(XercesC REQUIRED) # XSD DEPENDS ON ${XERCESC_FOUND}
-if(XERCESC_FOUND)
-  message(STATUS "Found Xerces-C: ${XERCESC_LIBRARIES}")
-  message(STATUS "              : ${XERCESC_INCLUDE_DIR}")
-  message(STATUS "       Version: ${XERCESC_VERSION}")
-else(XERCESC_FOUND)
-  message(FATAL_ERROR "The package Apache Xerces-C++ has not been found")
-endif(XERCESC_FOUND)
-include_directories(${XERCESC_INCLUDE_DIR})
-
-find_package(Xsd REQUIRED) # CODESYNTHESIS
-if(XSD_FOUND)
-  message(STATUS "Package CodeSynthesis XSD found: ${XSD_INCLUDE_DIR}")
-else(XSD_FOUND)
-  message(FATAL_ERROR "The package CodeSynthesis XSD has not been found")
-endif(XSD_FOUND)  
-include_directories(${XSD_INCLUDE_DIR})
-
-find_package(beanstalkpp REQUIRED)
-message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
-include_directories(${BEANSTALKPP_INCLUDE})
-                                                                                                                                                                                                                        
 set(SOURCES
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
@@ -53,7 +6,6 @@ set(SOURCES
    main.cpp
    faulttree.cpp
    fuzztree.cpp
-   #fuzztree_custom.cpp # custom methods. not generated.
 )
 set(HEADERS
    FuzzTreeTransform.h
@@ -65,14 +17,7 @@ set(HEADERS
    fuzztree.h
    FaultTreeTypes.h
    FuzzTreeTypes.h
-   #fuzztree_custom.h # custom methods. not generated.
 )
-
-include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/thirdParty)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
 
 set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faulttree.xsd")
 set(FUZZTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/fuzztree.xsd")
@@ -81,6 +26,7 @@ set(SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
 
 set(LINKED_LIBS ${Boost_LIBRARIES} ${XERCESC_LIBRARIES} ${BEANSTALKPP_LIB})
 
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${FT_LIB_DIR}")
 add_library(ftconfiguration STATIC ${SOURCES} ${HEADERS} ${SCHEMAS})
 target_link_libraries(ftconfiguration ${LINKED_LIBS})
 
@@ -99,7 +45,8 @@ set(XSD_TO_FAULTTREE_ARGS
   --function-naming lcc
   --generate-serialization
   --namespace-map net.faulttree=faulttree
-  --hxx-suffix .h --cxx-suffix .cpp
+  --hxx-suffix .h
+  --cxx-suffix .cpp
 )
 
 set(XSD_TO_FUZZTREE_ARGS
@@ -111,13 +58,8 @@ set(XSD_TO_FUZZTREE_ARGS
   --function-naming lcc
   --generate-serialization
   --namespace-map net.fuzztree=fuzztree 
-  --hxx-suffix .h --cxx-suffix .cpp
-  # the following options enable custom class implementations, but it seems easier to write helpers by hand
-  #--custom-type "Node=Node_impl<Node_base>/Node_base"
-  #--custom-type "VotingOr=VotingOr_impl<VotingOr_base>/VotingOr_base"
-  #--custom-type "BasicEvent=BasicEvent_impl<BasicEvent_base>/BasicEvent_base"
-  #--custom-type "BasicEventSet=BasicEventSet_impl<BasicEventSet_base>/BasicEventSet_base"
-  #--hxx-epilogue #include "fuzztree_custom.h"
+  --hxx-suffix .h
+  --cxx-suffix .cpp
 )
 
 add_custom_target(generateFaultTreeModel

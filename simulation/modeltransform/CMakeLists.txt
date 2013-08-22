@@ -55,9 +55,6 @@ set(HEADERS
    serialization/TNDocument.h
 )
 
-set(LIBRARY_OUTPUT_PATH ${FT_LIB_DIR})
-
-include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${FT_INCLUDE_DIR})
 include_directories(${PUGIXML_INCLUDE_DIR})
 

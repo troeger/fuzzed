@@ -70,8 +70,9 @@ endif()
 if (BUILD_SIMULATION_EXECUTABLE)
    add_executable(ftsimulation ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation
-      ftmodeltransform
-      ftcommon
+     ftmodeltransform
+     ftcommon
+     ftconfiguration
 	  ${FT_CONFIG_LIB}
 	  ${XERCESC_LIBRARIES}
 	  ${Boost_LIBRARIES}
@@ -80,9 +81,10 @@ if (BUILD_SIMULATION_EXECUTABLE)
 else (BUILD_SIMULATION_EXECUTABLE) # shared library
    add_library(ftsimulation SHARED ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation 
-      ftmodeltransform
+     ftmodeltransform
 	  ftcommon
-	  ${FT_CONFIG_LIB}
+	  ftconfiguration
+     ${FT_CONFIG_LIB}
 	  ${XERCESC_LIBRARIES}
 	  ${Boost_LIBRARIES}
    )
@@ -90,7 +92,6 @@ else (BUILD_SIMULATION_EXECUTABLE) # shared library
    message("Building shared simulation library")
 endif (BUILD_SIMULATION_EXECUTABLE)
 
-include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${FT_INCLUDE_DIR})
 include_directories(${PUGIXML_INCLUDE_DIR})
