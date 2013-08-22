@@ -24,7 +24,7 @@ class Command(BaseCommand):
 
 	def handle(self, *args, **options):
 		print "Starting beanstalkd messaging server ..."
-		beanstalk = Popen(["beanstalkd","-z 5000000"])
+		beanstalk = Popen(["beanstalkd","-z", "5000000"])
 		if beanstalk.returncode != None:
 			print "Error %u while starting beanstalkd"%beanstalk.returncode
 			exit(-1)
