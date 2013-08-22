@@ -18,8 +18,9 @@ if (MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
   add_definitions(/D_CRT_SECURE_NO_WARNINGS /DNOMINMAX /DWIN32_LEAN_AND_MEAN)
+  set(TPN_WIN32 "${TPN_WIN32} /EHsc")
 elseif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -std=c++0x -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -std=c++0x -fPIC -fexceptions")
   set(Boost_USE_STATIC_LIBS OFF)
 endif()
 
@@ -29,8 +30,7 @@ endif()
 set(Boost_USE_STATIC_LIBS       ON)
 set(Boost_USE_MULTITHREADED     ON)
 set(Boost_USE_STATIC_RUNTIME    OFF)
-add_definitions(-DBOOST_NO_EXCEPTIONS=0)
-#add_definitions(-DBOOST_ALL_NO_LIB)
+add_definitions(-DBOOST_DATE_TIME_NO_LIB -DBOOST_REGEX_NO_LIB)
 #add_definitions(-DBoost_DEBUG=1)
 add_definitions(-D_ALLOW_KEYWORD_MACROS)
 
@@ -45,6 +45,7 @@ find_package(Boost 1.51.0 COMPONENTS
 	system
 	filesystem
 	program_options
+	exception
 REQUIRED)
 
 message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
