@@ -1,20 +1,29 @@
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+
+option(USE_INTEL_COMPILER ON)
+if (USE_INTEL_COMPILER)
+  include(ForceCompiler)
+  set(CMAKE_VS_PLATFORM_TOOLSET "Intel C++ Compiler XE 13")
+  CMAKE_FORCE_C_COMPILER(icc Intel)
+  CMAKE_FORCE_CXX_COMPILER(icpc Intel)
+  message(STATUS "Using compiler: ${CMAKE_CXX_COMPILER_ID}")
+endif()
+
+if (APPLE)
+  include(ForceCompiler)
+  CMAKE_FORCE_C_COMPILER(gcc-4.7 GNU)
+  CMAKE_FORCE_CXX_COMPILER(g++-4.7 GNU)
+  set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "4.7")
+endif ()
+
 project(FuzztreeServices)
 cmake_minimum_required(VERSION 2.8.8)
-
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 set(FT_LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
-
-option(USE_INTEL_COMPILER OFF)
-if (USE_INTEL_COMPILER)
-  include(ForceCompiler)
-  set(CMAKE_VS_PLATFORM_TOOLSET "Intel C++ Compiler XE 13")
-  CMAKE_FORCE_C_COMPILER(icc "Intel C Compiler")
-  CMAKE_FORCE_CXX_COMPILER(icpc "Intel C++ Compiler")
-endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # TODO
@@ -23,6 +32,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(Boost_USE_STATIC_LIBS OFF)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # using Intel C++
+  message(STATUS "using intel")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
