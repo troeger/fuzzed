@@ -1,18 +1,26 @@
 #pragma once
 #include <utility>
+#include <iostream>
 #include <typeinfo>
 
-using namespace std;
-
-template <typename BaseType>
-class Visitable : public BaseType
+namespace faulttree
 {
-public:
-	template <typename... Args>
-	Visitable(Args&&... arg) : BaseType(std::forward<Args>(arg)...) {}
-
-	virtual void accept(int i)
+	template <typename BaseType>
+	class Visitable : public BaseType
 	{
-		std::cout << typeid(BaseType).name() << " " << i << std::endl;
-	}
-};
+	public:
+		template <typename... Args>
+		Visitable(Args&&... arg) : BaseType(std::forward<Args>(arg)...) {}
+
+		virtual Visitable<BaseType>*
+			_clone (xml_schema::Flags f = 0, xml_schema::Container* c = 0) const
+		{
+			return new Visitable<BaseType>(*this, f, c);
+		}
+
+		virtual void accept(int i)
+		{
+			std::cout << typeid(BaseType).name() << " " << i << std::endl;
+		}
+	};
+}

@@ -31,3 +31,4 @@ fuzztreeconfiguration/build/*
 *.DEFINFO
 *.AUX
 fuzztreeconfiguration/bin/*
+build_cmake/*

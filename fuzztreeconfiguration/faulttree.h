@@ -48,7 +48,247 @@
 
 #include <xsd/cxx/pre.hxx>
 
-#include <faulttree-fwd.hxx>
+#ifndef XSD_USE_CHAR
+#define XSD_USE_CHAR
+#endif
+
+#ifndef XSD_CXX_TREE_USE_CHAR
+#define XSD_CXX_TREE_USE_CHAR
+#endif
+
+#include <xsd/cxx/xml/char-utf8.hxx>
+
+#include <xsd/cxx/tree/exceptions.hxx>
+#include <xsd/cxx/tree/elements.hxx>
+#include <xsd/cxx/tree/types.hxx>
+
+#include <xsd/cxx/xml/error-handler.hxx>
+
+#include <xsd/cxx/xml/dom/auto-ptr.hxx>
+
+#include <xsd/cxx/tree/parsing.hxx>
+#include <xsd/cxx/tree/parsing/byte.hxx>
+#include <xsd/cxx/tree/parsing/unsigned-byte.hxx>
+#include <xsd/cxx/tree/parsing/short.hxx>
+#include <xsd/cxx/tree/parsing/unsigned-short.hxx>
+#include <xsd/cxx/tree/parsing/int.hxx>
+#include <xsd/cxx/tree/parsing/unsigned-int.hxx>
+#include <xsd/cxx/tree/parsing/long.hxx>
+#include <xsd/cxx/tree/parsing/unsigned-long.hxx>
+#include <xsd/cxx/tree/parsing/boolean.hxx>
+#include <xsd/cxx/tree/parsing/float.hxx>
+#include <xsd/cxx/tree/parsing/double.hxx>
+#include <xsd/cxx/tree/parsing/decimal.hxx>
+
+#include <xsd/cxx/xml/dom/serialization-header.hxx>
+#include <xsd/cxx/tree/serialization.hxx>
+#include <xsd/cxx/tree/serialization/byte.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-byte.hxx>
+#include <xsd/cxx/tree/serialization/short.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-short.hxx>
+#include <xsd/cxx/tree/serialization/int.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-int.hxx>
+#include <xsd/cxx/tree/serialization/long.hxx>
+#include <xsd/cxx/tree/serialization/unsigned-long.hxx>
+#include <xsd/cxx/tree/serialization/boolean.hxx>
+#include <xsd/cxx/tree/serialization/float.hxx>
+#include <xsd/cxx/tree/serialization/double.hxx>
+#include <xsd/cxx/tree/serialization/decimal.hxx>
+
+namespace xml_schema
+{
+  // anyType and anySimpleType.
+  //
+  typedef ::xsd::cxx::tree::type Type;
+  typedef ::xsd::cxx::tree::simple_type< Type > SimpleType;
+  typedef ::xsd::cxx::tree::type Container;
+
+  // 8-bit
+  //
+  typedef signed char Byte;
+  typedef unsigned char UnsignedByte;
+
+  // 16-bit
+  //
+  typedef short Short;
+  typedef unsigned short UnsignedShort;
+
+  // 32-bit
+  //
+  typedef int Int;
+  typedef unsigned int UnsignedInt;
+
+  // 64-bit
+  //
+  typedef long long Long;
+  typedef unsigned long long UnsignedLong;
+
+  // Supposed to be arbitrary-length integral types.
+  //
+  typedef long long Integer;
+  typedef long long NonPositiveInteger;
+  typedef unsigned long long NonNegativeInteger;
+  typedef unsigned long long PositiveInteger;
+  typedef long long NegativeInteger;
+
+  // Boolean.
+  //
+  typedef bool Boolean;
+
+  // Floating-point types.
+  //
+  typedef float Float;
+  typedef double Double;
+  typedef double Decimal;
+
+  // String types.
+  //
+  typedef ::xsd::cxx::tree::string< char, SimpleType > String;
+  typedef ::xsd::cxx::tree::normalized_string< char, String > NormalizedString;
+  typedef ::xsd::cxx::tree::token< char, NormalizedString > Token;
+  typedef ::xsd::cxx::tree::name< char, Token > Name;
+  typedef ::xsd::cxx::tree::nmtoken< char, Token > Nmtoken;
+  typedef ::xsd::cxx::tree::nmtokens< char, SimpleType, Nmtoken > Nmtokens;
+  typedef ::xsd::cxx::tree::ncname< char, Name > Ncname;
+  typedef ::xsd::cxx::tree::language< char, Token > Language;
+
+  // ID/IDREF.
+  //
+  typedef ::xsd::cxx::tree::id< char, Ncname > Id;
+  typedef ::xsd::cxx::tree::idref< char, Ncname, Type > Idref;
+  typedef ::xsd::cxx::tree::idrefs< char, SimpleType, Idref > Idrefs;
+
+  // URI.
+  //
+  typedef ::xsd::cxx::tree::uri< char, SimpleType > Uri;
+
+  // Qualified name.
+  //
+  typedef ::xsd::cxx::tree::qname< char, SimpleType, Uri, Ncname > Qname;
+
+  // Binary.
+  //
+  typedef ::xsd::cxx::tree::buffer< char > Buffer;
+  typedef ::xsd::cxx::tree::base64_binary< char, SimpleType > Base64Binary;
+  typedef ::xsd::cxx::tree::hex_binary< char, SimpleType > HexBinary;
+
+  // Date/time.
+  //
+  typedef ::xsd::cxx::tree::time_zone TimeZone;
+  typedef ::xsd::cxx::tree::date< char, SimpleType > Date;
+  typedef ::xsd::cxx::tree::date_time< char, SimpleType > DateTime;
+  typedef ::xsd::cxx::tree::duration< char, SimpleType > Duration;
+  typedef ::xsd::cxx::tree::gday< char, SimpleType > Gday;
+  typedef ::xsd::cxx::tree::gmonth< char, SimpleType > Gmonth;
+  typedef ::xsd::cxx::tree::gmonth_day< char, SimpleType > GmonthDay;
+  typedef ::xsd::cxx::tree::gyear< char, SimpleType > Gyear;
+  typedef ::xsd::cxx::tree::gyear_month< char, SimpleType > GyearMonth;
+  typedef ::xsd::cxx::tree::time< char, SimpleType > Time;
+
+  // Entity.
+  //
+  typedef ::xsd::cxx::tree::entity< char, Ncname > Entity;
+  typedef ::xsd::cxx::tree::entities< char, SimpleType, Entity > Entities;
+
+  // Namespace information and list stream. Used in
+  // serialization functions.
+  //
+  typedef ::xsd::cxx::xml::dom::namespace_info< char > NamespaceInfo;
+  typedef ::xsd::cxx::xml::dom::namespace_infomap< char > NamespaceInfomap;
+  typedef ::xsd::cxx::tree::list_stream< char > ListStream;
+  typedef ::xsd::cxx::tree::as_double< Double > AsDouble;
+  typedef ::xsd::cxx::tree::as_decimal< Decimal > AsDecimal;
+  typedef ::xsd::cxx::tree::facet Facet;
+
+  // Flags and properties.
+  //
+  typedef ::xsd::cxx::tree::flags Flags;
+  typedef ::xsd::cxx::tree::properties< char > Properties;
+
+  // Parsing/serialization diagnostics.
+  //
+  typedef ::xsd::cxx::tree::severity Severity;
+  typedef ::xsd::cxx::tree::error< char > Error;
+  typedef ::xsd::cxx::tree::diagnostics< char > Diagnostics;
+
+  // Exceptions.
+  //
+  typedef ::xsd::cxx::tree::exception< char > Exception;
+  typedef ::xsd::cxx::tree::bounds< char > Bounds;
+  typedef ::xsd::cxx::tree::duplicate_id< char > DuplicateId;
+  typedef ::xsd::cxx::tree::parsing< char > Parsing;
+  typedef ::xsd::cxx::tree::expected_element< char > ExpectedElement;
+  typedef ::xsd::cxx::tree::unexpected_element< char > UnexpectedElement;
+  typedef ::xsd::cxx::tree::expected_attribute< char > ExpectedAttribute;
+  typedef ::xsd::cxx::tree::unexpected_enumerator< char > UnexpectedEnumerator;
+  typedef ::xsd::cxx::tree::expected_text_content< char > ExpectedTextContent;
+  typedef ::xsd::cxx::tree::no_prefix_mapping< char > NoPrefixMapping;
+  typedef ::xsd::cxx::tree::no_type_info< char > NoTypeInfo;
+  typedef ::xsd::cxx::tree::not_derived< char > NotDerived;
+  typedef ::xsd::cxx::tree::serialization< char > Serialization;
+
+  // Error handler callback interface.
+  //
+  typedef ::xsd::cxx::xml::error_handler< char > ErrorHandler;
+
+  // DOM interaction.
+  //
+  namespace dom
+  {
+    // Automatic pointer for DOMDocument.
+    //
+    using ::xsd::cxx::xml::dom::auto_ptr;
+
+#ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
+#define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
+    // DOM user data key for back pointers to tree nodes.
+    //
+    const XMLCh* const treeNodeKey = ::xsd::cxx::tree::user_data_keys::node;
+#endif
+  }
+}
+
+// Forward declarations.
+//
+namespace faulttree
+{
+  class Annotation;
+  class Probability;
+  class AnnotatedElement;
+  class Model;
+  class Node_base;
+  typedef Visitable<Node_base> Node;
+  class ChildNode_base;
+  typedef Visitable<ChildNode_base> ChildNode;
+  class FaultTree;
+  class TopEvent_base;
+  typedef Visitable<TopEvent_base> TopEvent;
+  class CrispProbability;
+  class FailureRate;
+  class Gate_base;
+  typedef Visitable<Gate_base> Gate;
+  class And_base;
+  typedef Visitable<And_base> And;
+  class Or_base;
+  typedef Visitable<Or_base> Or;
+  class Xor_base;
+  typedef Visitable<Xor_base> Xor;
+  class VotingOr_base;
+  typedef Visitable<VotingOr_base> VotingOr;
+  class DynamicGate_base;
+  typedef Visitable<DynamicGate_base> DynamicGate;
+  class Idlist;
+  class Spare;
+  class PriorityAnd;
+  class Sequence;
+  class FDEP;
+  class TransferIn;
+  class UndevelopedEvent;
+  class BasicEvent;
+  class HouseEvent;
+  class IntermediateEvent;
+}
+
 
 #include <memory>    // std::auto_ptr
 #include <limits>    // std::numeric_limits

@@ -45,7 +45,7 @@ set(XSD_TO_FAULTTREE_ARGS
   --root-element "FaultTree"
   --type-naming ucc
   --function-naming lcc
-  --generate-serialization --generate-forward
+  --generate-serialization
   --namespace-map net.faulttree=faulttree
   --hxx-suffix .h
   --cxx-suffix .cpp
