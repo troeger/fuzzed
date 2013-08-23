@@ -130,77 +130,77 @@ namespace faulttree
   // 
 
 
-  // Node
+  // Node_base
   // 
 
-  const Node::ChildrenSequence& Node::
+  const Node_base::ChildrenSequence& Node_base::
   children () const
   {
     return this->children_;
   }
 
-  Node::ChildrenSequence& Node::
+  Node_base::ChildrenSequence& Node_base::
   children ()
   {
     return this->children_;
   }
 
-  void Node::
+  void Node_base::
   children (const ChildrenSequence& s)
   {
     this->children_ = s;
   }
 
-  const Node::XOptional& Node::
+  const Node_base::XOptional& Node_base::
   x () const
   {
     return this->x_;
   }
 
-  Node::XOptional& Node::
+  Node_base::XOptional& Node_base::
   x ()
   {
     return this->x_;
   }
 
-  void Node::
+  void Node_base::
   x (const XType& x)
   {
     this->x_.set (x);
   }
 
-  void Node::
+  void Node_base::
   x (const XOptional& x)
   {
     this->x_ = x;
   }
 
-  const Node::YOptional& Node::
+  const Node_base::YOptional& Node_base::
   y () const
   {
     return this->y_;
   }
 
-  Node::YOptional& Node::
+  Node_base::YOptional& Node_base::
   y ()
   {
     return this->y_;
   }
 
-  void Node::
+  void Node_base::
   y (const YType& x)
   {
     this->y_.set (x);
   }
 
-  void Node::
+  void Node_base::
   y (const YOptional& x)
   {
     this->y_ = x;
   }
 
 
-  // ChildNode
+  // ChildNode_base
   // 
 
 
@@ -232,22 +232,22 @@ namespace faulttree
   }
 
 
-  // TopEvent
+  // TopEvent_base
   // 
 
-  const TopEvent::MissionTimeType& TopEvent::
+  const TopEvent_base::MissionTimeType& TopEvent_base::
   missionTime () const
   {
     return this->missionTime_.get ();
   }
 
-  TopEvent::MissionTimeType& TopEvent::
+  TopEvent_base::MissionTimeType& TopEvent_base::
   missionTime ()
   {
     return this->missionTime_.get ();
   }
 
-  void TopEvent::
+  void TopEvent_base::
   missionTime (const MissionTimeType& x)
   {
     this->missionTime_.set (x);
@@ -298,45 +298,45 @@ namespace faulttree
   }
 
 
-  // Gate
+  // Gate_base
   // 
 
 
-  // And
+  // And_base
   // 
 
 
-  // Or
+  // Or_base
   // 
 
 
-  // Xor
+  // Xor_base
   // 
 
 
-  // VotingOr
+  // VotingOr_base
   // 
 
-  const VotingOr::KType& VotingOr::
+  const VotingOr_base::KType& VotingOr_base::
   k () const
   {
     return this->k_.get ();
   }
 
-  VotingOr::KType& VotingOr::
+  VotingOr_base::KType& VotingOr_base::
   k ()
   {
     return this->k_.get ();
   }
 
-  void VotingOr::
+  void VotingOr_base::
   k (const KType& x)
   {
     this->k_.set (x);
   }
 
 
-  // DynamicGate
+  // DynamicGate_base
   // 
 
 
@@ -911,11 +911,11 @@ namespace faulttree
     "Model",
     "net.faulttree");
 
-  // Node
+  // Node_base
   //
 
-  Node::
-  Node (const IdType& id)
+  Node_base::
+  Node_base (const IdType& id)
   : ::faulttree::AnnotatedElement (id),
     children_ (::xml_schema::Flags (), this),
     x_ (::xml_schema::Flags (), this),
@@ -923,10 +923,10 @@ namespace faulttree
   {
   }
 
-  Node::
-  Node (const Node& x,
-        ::xml_schema::Flags f,
-        ::xml_schema::Container* c)
+  Node_base::
+  Node_base (const Node_base& x,
+             ::xml_schema::Flags f,
+             ::xml_schema::Container* c)
   : ::faulttree::AnnotatedElement (x, f, c),
     children_ (x.children_, f, this),
     x_ (x.x_, f, this),
@@ -934,10 +934,10 @@ namespace faulttree
   {
   }
 
-  Node::
-  Node (const ::xercesc::DOMElement& e,
-        ::xml_schema::Flags f,
-        ::xml_schema::Container* c)
+  Node_base::
+  Node_base (const ::xercesc::DOMElement& e,
+             ::xml_schema::Flags f,
+             ::xml_schema::Container* c)
   : ::faulttree::AnnotatedElement (e, f | ::xml_schema::Flags::base, c),
     children_ (f, this),
     x_ (f, this),
@@ -950,7 +950,7 @@ namespace faulttree
     }
   }
 
-  void Node::
+  void Node_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -1015,15 +1015,15 @@ namespace faulttree
     }
   }
 
-  Node* Node::
+  Node_base* Node_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class Node (*this, f, c);
+    return new class Node_base (*this, f, c);
   }
 
-  Node::
-  ~Node ()
+  Node_base::
+  ~Node_base ()
   {
   }
 
@@ -1033,40 +1033,40 @@ namespace faulttree
     "Node",
     "net.faulttree");
 
-  // ChildNode
+  // ChildNode_base
   //
 
-  ChildNode::
-  ChildNode (const IdType& id)
+  ChildNode_base::
+  ChildNode_base (const IdType& id)
   : ::faulttree::Node (id)
   {
   }
 
-  ChildNode::
-  ChildNode (const ChildNode& x,
-             ::xml_schema::Flags f,
-             ::xml_schema::Container* c)
+  ChildNode_base::
+  ChildNode_base (const ChildNode_base& x,
+                  ::xml_schema::Flags f,
+                  ::xml_schema::Container* c)
   : ::faulttree::Node (x, f, c)
   {
   }
 
-  ChildNode::
-  ChildNode (const ::xercesc::DOMElement& e,
-             ::xml_schema::Flags f,
-             ::xml_schema::Container* c)
+  ChildNode_base::
+  ChildNode_base (const ::xercesc::DOMElement& e,
+                  ::xml_schema::Flags f,
+                  ::xml_schema::Container* c)
   : ::faulttree::Node (e, f, c)
   {
   }
 
-  ChildNode* ChildNode::
+  ChildNode_base* ChildNode_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class ChildNode (*this, f, c);
+    return new class ChildNode_base (*this, f, c);
   }
 
-  ChildNode::
-  ~ChildNode ()
+  ChildNode_base::
+  ~ChildNode_base ()
   {
   }
 
@@ -1190,30 +1190,30 @@ namespace faulttree
     "FaultTree",
     "net.faulttree");
 
-  // TopEvent
+  // TopEvent_base
   //
 
-  TopEvent::
-  TopEvent (const IdType& id,
-            const MissionTimeType& missionTime)
+  TopEvent_base::
+  TopEvent_base (const IdType& id,
+                 const MissionTimeType& missionTime)
   : ::faulttree::Node (id),
     missionTime_ (missionTime, ::xml_schema::Flags (), this)
   {
   }
 
-  TopEvent::
-  TopEvent (const TopEvent& x,
-            ::xml_schema::Flags f,
-            ::xml_schema::Container* c)
+  TopEvent_base::
+  TopEvent_base (const TopEvent_base& x,
+                 ::xml_schema::Flags f,
+                 ::xml_schema::Container* c)
   : ::faulttree::Node (x, f, c),
     missionTime_ (x.missionTime_, f, this)
   {
   }
 
-  TopEvent::
-  TopEvent (const ::xercesc::DOMElement& e,
-            ::xml_schema::Flags f,
-            ::xml_schema::Container* c)
+  TopEvent_base::
+  TopEvent_base (const ::xercesc::DOMElement& e,
+                 ::xml_schema::Flags f,
+                 ::xml_schema::Container* c)
   : ::faulttree::Node (e, f | ::xml_schema::Flags::base, c),
     missionTime_ (f, this)
   {
@@ -1224,7 +1224,7 @@ namespace faulttree
     }
   }
 
-  void TopEvent::
+  void TopEvent_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -1253,15 +1253,15 @@ namespace faulttree
     }
   }
 
-  TopEvent* TopEvent::
+  TopEvent_base* TopEvent_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class TopEvent (*this, f, c);
+    return new class TopEvent_base (*this, f, c);
   }
 
-  TopEvent::
-  ~TopEvent ()
+  TopEvent_base::
+  ~TopEvent_base ()
   {
   }
 
@@ -1423,40 +1423,40 @@ namespace faulttree
     "FailureRate",
     "net.faulttree");
 
-  // Gate
+  // Gate_base
   //
 
-  Gate::
-  Gate (const IdType& id)
+  Gate_base::
+  Gate_base (const IdType& id)
   : ::faulttree::ChildNode (id)
   {
   }
 
-  Gate::
-  Gate (const Gate& x,
-        ::xml_schema::Flags f,
-        ::xml_schema::Container* c)
+  Gate_base::
+  Gate_base (const Gate_base& x,
+             ::xml_schema::Flags f,
+             ::xml_schema::Container* c)
   : ::faulttree::ChildNode (x, f, c)
   {
   }
 
-  Gate::
-  Gate (const ::xercesc::DOMElement& e,
-        ::xml_schema::Flags f,
-        ::xml_schema::Container* c)
+  Gate_base::
+  Gate_base (const ::xercesc::DOMElement& e,
+             ::xml_schema::Flags f,
+             ::xml_schema::Container* c)
   : ::faulttree::ChildNode (e, f, c)
   {
   }
 
-  Gate* Gate::
+  Gate_base* Gate_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class Gate (*this, f, c);
+    return new class Gate_base (*this, f, c);
   }
 
-  Gate::
-  ~Gate ()
+  Gate_base::
+  ~Gate_base ()
   {
   }
 
@@ -1466,40 +1466,40 @@ namespace faulttree
     "Gate",
     "net.faulttree");
 
-  // And
+  // And_base
   //
 
-  And::
-  And (const IdType& id)
+  And_base::
+  And_base (const IdType& id)
   : ::faulttree::Gate (id)
   {
   }
 
-  And::
-  And (const And& x,
-       ::xml_schema::Flags f,
-       ::xml_schema::Container* c)
+  And_base::
+  And_base (const And_base& x,
+            ::xml_schema::Flags f,
+            ::xml_schema::Container* c)
   : ::faulttree::Gate (x, f, c)
   {
   }
 
-  And::
-  And (const ::xercesc::DOMElement& e,
-       ::xml_schema::Flags f,
-       ::xml_schema::Container* c)
+  And_base::
+  And_base (const ::xercesc::DOMElement& e,
+            ::xml_schema::Flags f,
+            ::xml_schema::Container* c)
   : ::faulttree::Gate (e, f, c)
   {
   }
 
-  And* And::
+  And_base* And_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class And (*this, f, c);
+    return new class And_base (*this, f, c);
   }
 
-  And::
-  ~And ()
+  And_base::
+  ~And_base ()
   {
   }
 
@@ -1509,40 +1509,40 @@ namespace faulttree
     "And",
     "net.faulttree");
 
-  // Or
+  // Or_base
   //
 
-  Or::
-  Or (const IdType& id)
+  Or_base::
+  Or_base (const IdType& id)
   : ::faulttree::Gate (id)
   {
   }
 
-  Or::
-  Or (const Or& x,
-      ::xml_schema::Flags f,
-      ::xml_schema::Container* c)
+  Or_base::
+  Or_base (const Or_base& x,
+           ::xml_schema::Flags f,
+           ::xml_schema::Container* c)
   : ::faulttree::Gate (x, f, c)
   {
   }
 
-  Or::
-  Or (const ::xercesc::DOMElement& e,
-      ::xml_schema::Flags f,
-      ::xml_schema::Container* c)
+  Or_base::
+  Or_base (const ::xercesc::DOMElement& e,
+           ::xml_schema::Flags f,
+           ::xml_schema::Container* c)
   : ::faulttree::Gate (e, f, c)
   {
   }
 
-  Or* Or::
+  Or_base* Or_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class Or (*this, f, c);
+    return new class Or_base (*this, f, c);
   }
 
-  Or::
-  ~Or ()
+  Or_base::
+  ~Or_base ()
   {
   }
 
@@ -1552,40 +1552,40 @@ namespace faulttree
     "Or",
     "net.faulttree");
 
-  // Xor
+  // Xor_base
   //
 
-  Xor::
-  Xor (const IdType& id)
+  Xor_base::
+  Xor_base (const IdType& id)
   : ::faulttree::Gate (id)
   {
   }
 
-  Xor::
-  Xor (const Xor& x,
-       ::xml_schema::Flags f,
-       ::xml_schema::Container* c)
+  Xor_base::
+  Xor_base (const Xor_base& x,
+            ::xml_schema::Flags f,
+            ::xml_schema::Container* c)
   : ::faulttree::Gate (x, f, c)
   {
   }
 
-  Xor::
-  Xor (const ::xercesc::DOMElement& e,
-       ::xml_schema::Flags f,
-       ::xml_schema::Container* c)
+  Xor_base::
+  Xor_base (const ::xercesc::DOMElement& e,
+            ::xml_schema::Flags f,
+            ::xml_schema::Container* c)
   : ::faulttree::Gate (e, f, c)
   {
   }
 
-  Xor* Xor::
+  Xor_base* Xor_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class Xor (*this, f, c);
+    return new class Xor_base (*this, f, c);
   }
 
-  Xor::
-  ~Xor ()
+  Xor_base::
+  ~Xor_base ()
   {
   }
 
@@ -1595,30 +1595,30 @@ namespace faulttree
     "Xor",
     "net.faulttree");
 
-  // VotingOr
+  // VotingOr_base
   //
 
-  VotingOr::
-  VotingOr (const IdType& id,
-            const KType& k)
+  VotingOr_base::
+  VotingOr_base (const IdType& id,
+                 const KType& k)
   : ::faulttree::Gate (id),
     k_ (k, ::xml_schema::Flags (), this)
   {
   }
 
-  VotingOr::
-  VotingOr (const VotingOr& x,
-            ::xml_schema::Flags f,
-            ::xml_schema::Container* c)
+  VotingOr_base::
+  VotingOr_base (const VotingOr_base& x,
+                 ::xml_schema::Flags f,
+                 ::xml_schema::Container* c)
   : ::faulttree::Gate (x, f, c),
     k_ (x.k_, f, this)
   {
   }
 
-  VotingOr::
-  VotingOr (const ::xercesc::DOMElement& e,
-            ::xml_schema::Flags f,
-            ::xml_schema::Container* c)
+  VotingOr_base::
+  VotingOr_base (const ::xercesc::DOMElement& e,
+                 ::xml_schema::Flags f,
+                 ::xml_schema::Container* c)
   : ::faulttree::Gate (e, f | ::xml_schema::Flags::base, c),
     k_ (f, this)
   {
@@ -1629,7 +1629,7 @@ namespace faulttree
     }
   }
 
-  void VotingOr::
+  void VotingOr_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -1658,15 +1658,15 @@ namespace faulttree
     }
   }
 
-  VotingOr* VotingOr::
+  VotingOr_base* VotingOr_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class VotingOr (*this, f, c);
+    return new class VotingOr_base (*this, f, c);
   }
 
-  VotingOr::
-  ~VotingOr ()
+  VotingOr_base::
+  ~VotingOr_base ()
   {
   }
 
@@ -1676,40 +1676,40 @@ namespace faulttree
     "VotingOr",
     "net.faulttree");
 
-  // DynamicGate
+  // DynamicGate_base
   //
 
-  DynamicGate::
-  DynamicGate (const IdType& id)
+  DynamicGate_base::
+  DynamicGate_base (const IdType& id)
   : ::faulttree::Gate (id)
   {
   }
 
-  DynamicGate::
-  DynamicGate (const DynamicGate& x,
-               ::xml_schema::Flags f,
-               ::xml_schema::Container* c)
+  DynamicGate_base::
+  DynamicGate_base (const DynamicGate_base& x,
+                    ::xml_schema::Flags f,
+                    ::xml_schema::Container* c)
   : ::faulttree::Gate (x, f, c)
   {
   }
 
-  DynamicGate::
-  DynamicGate (const ::xercesc::DOMElement& e,
-               ::xml_schema::Flags f,
-               ::xml_schema::Container* c)
+  DynamicGate_base::
+  DynamicGate_base (const ::xercesc::DOMElement& e,
+                    ::xml_schema::Flags f,
+                    ::xml_schema::Container* c)
   : ::faulttree::Gate (e, f, c)
   {
   }
 
-  DynamicGate* DynamicGate::
+  DynamicGate_base* DynamicGate_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class DynamicGate (*this, f, c);
+    return new class DynamicGate_base (*this, f, c);
   }
 
-  DynamicGate::
-  ~DynamicGate ()
+  DynamicGate_base::
+  ~DynamicGate_base ()
   {
   }
 
@@ -2946,7 +2946,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const Node& i)
+  operator<< (::xercesc::DOMElement& e, const Node_base& i)
   {
     e << static_cast< const ::faulttree::AnnotatedElement& > (i);
 
@@ -2956,11 +2956,11 @@ namespace faulttree
       ::xsd::cxx::tree::type_serializer_map< char >& tsm (
         ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      for (Node::ChildrenConstIterator
+      for (Node_base::ChildrenConstIterator
            b (i.children ().begin ()), n (i.children ().end ());
            b != n; ++b)
       {
-        if (typeid (Node::ChildrenType) == typeid (*b))
+        if (typeid (Node_base::ChildrenType) == typeid (*b))
         {
           ::xercesc::DOMElement& s (
             ::xsd::cxx::xml::dom::create_element (
@@ -3010,7 +3010,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const ChildNode& i)
+  operator<< (::xercesc::DOMElement& e, const ChildNode_base& i)
   {
     e << static_cast< const ::faulttree::Node& > (i);
   }
@@ -3238,7 +3238,7 @@ namespace faulttree
   }
 
   void
-  operator<< (::xercesc::DOMElement& e, const TopEvent& i)
+  operator<< (::xercesc::DOMElement& e, const TopEvent_base& i)
   {
     e << static_cast< const ::faulttree::Node& > (i);
 
@@ -3310,7 +3310,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const Gate& i)
+  operator<< (::xercesc::DOMElement& e, const Gate_base& i)
   {
     e << static_cast< const ::faulttree::ChildNode& > (i);
   }
@@ -3323,7 +3323,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const And& i)
+  operator<< (::xercesc::DOMElement& e, const And_base& i)
   {
     e << static_cast< const ::faulttree::Gate& > (i);
   }
@@ -3336,7 +3336,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const Or& i)
+  operator<< (::xercesc::DOMElement& e, const Or_base& i)
   {
     e << static_cast< const ::faulttree::Gate& > (i);
   }
@@ -3349,7 +3349,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const Xor& i)
+  operator<< (::xercesc::DOMElement& e, const Xor_base& i)
   {
     e << static_cast< const ::faulttree::Gate& > (i);
   }
@@ -3362,7 +3362,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const VotingOr& i)
+  operator<< (::xercesc::DOMElement& e, const VotingOr_base& i)
   {
     e << static_cast< const ::faulttree::Gate& > (i);
 
@@ -3386,7 +3386,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const DynamicGate& i)
+  operator<< (::xercesc::DOMElement& e, const DynamicGate_base& i)
   {
     e << static_cast< const ::faulttree::Gate& > (i);
   }

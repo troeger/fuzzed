@@ -36,6 +36,7 @@
 
 // Begin prologue.
 //
+#include <faulttree_custom.h>
 //
 // End prologue.
 
@@ -47,238 +48,7 @@
 
 #include <xsd/cxx/pre.hxx>
 
-#ifndef XSD_USE_CHAR
-#define XSD_USE_CHAR
-#endif
-
-#ifndef XSD_CXX_TREE_USE_CHAR
-#define XSD_CXX_TREE_USE_CHAR
-#endif
-
-#include <xsd/cxx/xml/char-utf8.hxx>
-
-#include <xsd/cxx/tree/exceptions.hxx>
-#include <xsd/cxx/tree/elements.hxx>
-#include <xsd/cxx/tree/types.hxx>
-
-#include <xsd/cxx/xml/error-handler.hxx>
-
-#include <xsd/cxx/xml/dom/auto-ptr.hxx>
-
-#include <xsd/cxx/tree/parsing.hxx>
-#include <xsd/cxx/tree/parsing/byte.hxx>
-#include <xsd/cxx/tree/parsing/unsigned-byte.hxx>
-#include <xsd/cxx/tree/parsing/short.hxx>
-#include <xsd/cxx/tree/parsing/unsigned-short.hxx>
-#include <xsd/cxx/tree/parsing/int.hxx>
-#include <xsd/cxx/tree/parsing/unsigned-int.hxx>
-#include <xsd/cxx/tree/parsing/long.hxx>
-#include <xsd/cxx/tree/parsing/unsigned-long.hxx>
-#include <xsd/cxx/tree/parsing/boolean.hxx>
-#include <xsd/cxx/tree/parsing/float.hxx>
-#include <xsd/cxx/tree/parsing/double.hxx>
-#include <xsd/cxx/tree/parsing/decimal.hxx>
-
-#include <xsd/cxx/xml/dom/serialization-header.hxx>
-#include <xsd/cxx/tree/serialization.hxx>
-#include <xsd/cxx/tree/serialization/byte.hxx>
-#include <xsd/cxx/tree/serialization/unsigned-byte.hxx>
-#include <xsd/cxx/tree/serialization/short.hxx>
-#include <xsd/cxx/tree/serialization/unsigned-short.hxx>
-#include <xsd/cxx/tree/serialization/int.hxx>
-#include <xsd/cxx/tree/serialization/unsigned-int.hxx>
-#include <xsd/cxx/tree/serialization/long.hxx>
-#include <xsd/cxx/tree/serialization/unsigned-long.hxx>
-#include <xsd/cxx/tree/serialization/boolean.hxx>
-#include <xsd/cxx/tree/serialization/float.hxx>
-#include <xsd/cxx/tree/serialization/double.hxx>
-#include <xsd/cxx/tree/serialization/decimal.hxx>
-
-namespace xml_schema
-{
-  // anyType and anySimpleType.
-  //
-  typedef ::xsd::cxx::tree::type Type;
-  typedef ::xsd::cxx::tree::simple_type< Type > SimpleType;
-  typedef ::xsd::cxx::tree::type Container;
-
-  // 8-bit
-  //
-  typedef signed char Byte;
-  typedef unsigned char UnsignedByte;
-
-  // 16-bit
-  //
-  typedef short Short;
-  typedef unsigned short UnsignedShort;
-
-  // 32-bit
-  //
-  typedef int Int;
-  typedef unsigned int UnsignedInt;
-
-  // 64-bit
-  //
-  typedef long long Long;
-  typedef unsigned long long UnsignedLong;
-
-  // Supposed to be arbitrary-length integral types.
-  //
-  typedef long long Integer;
-  typedef long long NonPositiveInteger;
-  typedef unsigned long long NonNegativeInteger;
-  typedef unsigned long long PositiveInteger;
-  typedef long long NegativeInteger;
-
-  // Boolean.
-  //
-  typedef bool Boolean;
-
-  // Floating-point types.
-  //
-  typedef float Float;
-  typedef double Double;
-  typedef double Decimal;
-
-  // String types.
-  //
-  typedef ::xsd::cxx::tree::string< char, SimpleType > String;
-  typedef ::xsd::cxx::tree::normalized_string< char, String > NormalizedString;
-  typedef ::xsd::cxx::tree::token< char, NormalizedString > Token;
-  typedef ::xsd::cxx::tree::name< char, Token > Name;
-  typedef ::xsd::cxx::tree::nmtoken< char, Token > Nmtoken;
-  typedef ::xsd::cxx::tree::nmtokens< char, SimpleType, Nmtoken > Nmtokens;
-  typedef ::xsd::cxx::tree::ncname< char, Name > Ncname;
-  typedef ::xsd::cxx::tree::language< char, Token > Language;
-
-  // ID/IDREF.
-  //
-  typedef ::xsd::cxx::tree::id< char, Ncname > Id;
-  typedef ::xsd::cxx::tree::idref< char, Ncname, Type > Idref;
-  typedef ::xsd::cxx::tree::idrefs< char, SimpleType, Idref > Idrefs;
-
-  // URI.
-  //
-  typedef ::xsd::cxx::tree::uri< char, SimpleType > Uri;
-
-  // Qualified name.
-  //
-  typedef ::xsd::cxx::tree::qname< char, SimpleType, Uri, Ncname > Qname;
-
-  // Binary.
-  //
-  typedef ::xsd::cxx::tree::buffer< char > Buffer;
-  typedef ::xsd::cxx::tree::base64_binary< char, SimpleType > Base64Binary;
-  typedef ::xsd::cxx::tree::hex_binary< char, SimpleType > HexBinary;
-
-  // Date/time.
-  //
-  typedef ::xsd::cxx::tree::time_zone TimeZone;
-  typedef ::xsd::cxx::tree::date< char, SimpleType > Date;
-  typedef ::xsd::cxx::tree::date_time< char, SimpleType > DateTime;
-  typedef ::xsd::cxx::tree::duration< char, SimpleType > Duration;
-  typedef ::xsd::cxx::tree::gday< char, SimpleType > Gday;
-  typedef ::xsd::cxx::tree::gmonth< char, SimpleType > Gmonth;
-  typedef ::xsd::cxx::tree::gmonth_day< char, SimpleType > GmonthDay;
-  typedef ::xsd::cxx::tree::gyear< char, SimpleType > Gyear;
-  typedef ::xsd::cxx::tree::gyear_month< char, SimpleType > GyearMonth;
-  typedef ::xsd::cxx::tree::time< char, SimpleType > Time;
-
-  // Entity.
-  //
-  typedef ::xsd::cxx::tree::entity< char, Ncname > Entity;
-  typedef ::xsd::cxx::tree::entities< char, SimpleType, Entity > Entities;
-
-  // Namespace information and list stream. Used in
-  // serialization functions.
-  //
-  typedef ::xsd::cxx::xml::dom::namespace_info< char > NamespaceInfo;
-  typedef ::xsd::cxx::xml::dom::namespace_infomap< char > NamespaceInfomap;
-  typedef ::xsd::cxx::tree::list_stream< char > ListStream;
-  typedef ::xsd::cxx::tree::as_double< Double > AsDouble;
-  typedef ::xsd::cxx::tree::as_decimal< Decimal > AsDecimal;
-  typedef ::xsd::cxx::tree::facet Facet;
-
-  // Flags and properties.
-  //
-  typedef ::xsd::cxx::tree::flags Flags;
-  typedef ::xsd::cxx::tree::properties< char > Properties;
-
-  // Parsing/serialization diagnostics.
-  //
-  typedef ::xsd::cxx::tree::severity Severity;
-  typedef ::xsd::cxx::tree::error< char > Error;
-  typedef ::xsd::cxx::tree::diagnostics< char > Diagnostics;
-
-  // Exceptions.
-  //
-  typedef ::xsd::cxx::tree::exception< char > Exception;
-  typedef ::xsd::cxx::tree::bounds< char > Bounds;
-  typedef ::xsd::cxx::tree::duplicate_id< char > DuplicateId;
-  typedef ::xsd::cxx::tree::parsing< char > Parsing;
-  typedef ::xsd::cxx::tree::expected_element< char > ExpectedElement;
-  typedef ::xsd::cxx::tree::unexpected_element< char > UnexpectedElement;
-  typedef ::xsd::cxx::tree::expected_attribute< char > ExpectedAttribute;
-  typedef ::xsd::cxx::tree::unexpected_enumerator< char > UnexpectedEnumerator;
-  typedef ::xsd::cxx::tree::expected_text_content< char > ExpectedTextContent;
-  typedef ::xsd::cxx::tree::no_prefix_mapping< char > NoPrefixMapping;
-  typedef ::xsd::cxx::tree::no_type_info< char > NoTypeInfo;
-  typedef ::xsd::cxx::tree::not_derived< char > NotDerived;
-  typedef ::xsd::cxx::tree::serialization< char > Serialization;
-
-  // Error handler callback interface.
-  //
-  typedef ::xsd::cxx::xml::error_handler< char > ErrorHandler;
-
-  // DOM interaction.
-  //
-  namespace dom
-  {
-    // Automatic pointer for DOMDocument.
-    //
-    using ::xsd::cxx::xml::dom::auto_ptr;
-
-#ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
-#define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
-    // DOM user data key for back pointers to tree nodes.
-    //
-    const XMLCh* const treeNodeKey = ::xsd::cxx::tree::user_data_keys::node;
-#endif
-  }
-}
-
-// Forward declarations.
-//
-namespace faulttree
-{
-  class Annotation;
-  class Probability;
-  class AnnotatedElement;
-  class Model;
-  class Node;
-  class ChildNode;
-  class FaultTree;
-  class TopEvent;
-  class CrispProbability;
-  class FailureRate;
-  class Gate;
-  class And;
-  class Or;
-  class Xor;
-  class VotingOr;
-  class DynamicGate;
-  class Idlist;
-  class Spare;
-  class PriorityAnd;
-  class Sequence;
-  class FDEP;
-  class TransferIn;
-  class UndevelopedEvent;
-  class BasicEvent;
-  class HouseEvent;
-  class IntermediateEvent;
-}
-
+#include <faulttree-fwd.hxx>
 
 #include <memory>    // std::auto_ptr
 #include <limits>    // std::numeric_limits
@@ -472,7 +242,7 @@ namespace faulttree
     ~Model ();
   };
 
-  class Node: public ::faulttree::AnnotatedElement
+  class Node_base: public ::faulttree::AnnotatedElement
   {
     public:
     // children
@@ -530,22 +300,22 @@ namespace faulttree
 
     // Constructors.
     //
-    Node (const IdType&);
+    Node_base (const IdType&);
 
-    Node (const ::xercesc::DOMElement& e,
-          ::xml_schema::Flags f = 0,
-          ::xml_schema::Container* c = 0);
+    Node_base (const ::xercesc::DOMElement& e,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
 
-    Node (const Node& x,
-          ::xml_schema::Flags f = 0,
-          ::xml_schema::Container* c = 0);
+    Node_base (const Node_base& x,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
 
-    virtual Node*
+    virtual Node_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Node ();
+    ~Node_base ();
 
     // Implementation.
     //
@@ -560,27 +330,27 @@ namespace faulttree
     YOptional y_;
   };
 
-  class ChildNode: public ::faulttree::Node
+  class ChildNode_base: public ::faulttree::Node
   {
     public:
     // Constructors.
     //
-    ChildNode (const IdType&);
+    ChildNode_base (const IdType&);
 
-    ChildNode (const ::xercesc::DOMElement& e,
-               ::xml_schema::Flags f = 0,
-               ::xml_schema::Container* c = 0);
+    ChildNode_base (const ::xercesc::DOMElement& e,
+                    ::xml_schema::Flags f = 0,
+                    ::xml_schema::Container* c = 0);
 
-    ChildNode (const ChildNode& x,
-               ::xml_schema::Flags f = 0,
-               ::xml_schema::Container* c = 0);
+    ChildNode_base (const ChildNode_base& x,
+                    ::xml_schema::Flags f = 0,
+                    ::xml_schema::Container* c = 0);
 
-    virtual ChildNode*
+    virtual ChildNode_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~ChildNode ();
+    ~ChildNode_base ();
   };
 
   class FaultTree: public ::faulttree::Model
@@ -637,7 +407,7 @@ namespace faulttree
     ::xsd::cxx::tree::one< TopEventType > topEvent_;
   };
 
-  class TopEvent: public ::faulttree::Node
+  class TopEvent_base: public ::faulttree::Node
   {
     public:
     // missionTime
@@ -656,23 +426,23 @@ namespace faulttree
 
     // Constructors.
     //
-    TopEvent (const IdType&,
-              const MissionTimeType&);
+    TopEvent_base (const IdType&,
+                   const MissionTimeType&);
 
-    TopEvent (const ::xercesc::DOMElement& e,
-              ::xml_schema::Flags f = 0,
-              ::xml_schema::Container* c = 0);
+    TopEvent_base (const ::xercesc::DOMElement& e,
+                   ::xml_schema::Flags f = 0,
+                   ::xml_schema::Container* c = 0);
 
-    TopEvent (const TopEvent& x,
-              ::xml_schema::Flags f = 0,
-              ::xml_schema::Container* c = 0);
+    TopEvent_base (const TopEvent_base& x,
+                   ::xml_schema::Flags f = 0,
+                   ::xml_schema::Container* c = 0);
 
-    virtual TopEvent*
+    virtual TopEvent_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~TopEvent ();
+    ~TopEvent_base ();
 
     // Implementation.
     //
@@ -779,99 +549,99 @@ namespace faulttree
     ::xsd::cxx::tree::one< ValueType > value_;
   };
 
-  class Gate: public ::faulttree::ChildNode
+  class Gate_base: public ::faulttree::ChildNode
   {
     public:
     // Constructors.
     //
-    Gate (const IdType&);
+    Gate_base (const IdType&);
 
-    Gate (const ::xercesc::DOMElement& e,
-          ::xml_schema::Flags f = 0,
-          ::xml_schema::Container* c = 0);
+    Gate_base (const ::xercesc::DOMElement& e,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
 
-    Gate (const Gate& x,
-          ::xml_schema::Flags f = 0,
-          ::xml_schema::Container* c = 0);
+    Gate_base (const Gate_base& x,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
 
-    virtual Gate*
+    virtual Gate_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Gate ();
+    ~Gate_base ();
   };
 
-  class And: public ::faulttree::Gate
+  class And_base: public ::faulttree::Gate
   {
     public:
     // Constructors.
     //
-    And (const IdType&);
+    And_base (const IdType&);
 
-    And (const ::xercesc::DOMElement& e,
-         ::xml_schema::Flags f = 0,
-         ::xml_schema::Container* c = 0);
+    And_base (const ::xercesc::DOMElement& e,
+              ::xml_schema::Flags f = 0,
+              ::xml_schema::Container* c = 0);
 
-    And (const And& x,
-         ::xml_schema::Flags f = 0,
-         ::xml_schema::Container* c = 0);
+    And_base (const And_base& x,
+              ::xml_schema::Flags f = 0,
+              ::xml_schema::Container* c = 0);
 
-    virtual And*
+    virtual And_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~And ();
+    ~And_base ();
   };
 
-  class Or: public ::faulttree::Gate
+  class Or_base: public ::faulttree::Gate
   {
     public:
     // Constructors.
     //
-    Or (const IdType&);
+    Or_base (const IdType&);
 
-    Or (const ::xercesc::DOMElement& e,
-        ::xml_schema::Flags f = 0,
-        ::xml_schema::Container* c = 0);
+    Or_base (const ::xercesc::DOMElement& e,
+             ::xml_schema::Flags f = 0,
+             ::xml_schema::Container* c = 0);
 
-    Or (const Or& x,
-        ::xml_schema::Flags f = 0,
-        ::xml_schema::Container* c = 0);
+    Or_base (const Or_base& x,
+             ::xml_schema::Flags f = 0,
+             ::xml_schema::Container* c = 0);
 
-    virtual Or*
+    virtual Or_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Or ();
+    ~Or_base ();
   };
 
-  class Xor: public ::faulttree::Gate
+  class Xor_base: public ::faulttree::Gate
   {
     public:
     // Constructors.
     //
-    Xor (const IdType&);
+    Xor_base (const IdType&);
 
-    Xor (const ::xercesc::DOMElement& e,
-         ::xml_schema::Flags f = 0,
-         ::xml_schema::Container* c = 0);
+    Xor_base (const ::xercesc::DOMElement& e,
+              ::xml_schema::Flags f = 0,
+              ::xml_schema::Container* c = 0);
 
-    Xor (const Xor& x,
-         ::xml_schema::Flags f = 0,
-         ::xml_schema::Container* c = 0);
+    Xor_base (const Xor_base& x,
+              ::xml_schema::Flags f = 0,
+              ::xml_schema::Container* c = 0);
 
-    virtual Xor*
+    virtual Xor_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Xor ();
+    ~Xor_base ();
   };
 
-  class VotingOr: public ::faulttree::Gate
+  class VotingOr_base: public ::faulttree::Gate
   {
     public:
     // k
@@ -890,23 +660,23 @@ namespace faulttree
 
     // Constructors.
     //
-    VotingOr (const IdType&,
-              const KType&);
+    VotingOr_base (const IdType&,
+                   const KType&);
 
-    VotingOr (const ::xercesc::DOMElement& e,
-              ::xml_schema::Flags f = 0,
-              ::xml_schema::Container* c = 0);
+    VotingOr_base (const ::xercesc::DOMElement& e,
+                   ::xml_schema::Flags f = 0,
+                   ::xml_schema::Container* c = 0);
 
-    VotingOr (const VotingOr& x,
-              ::xml_schema::Flags f = 0,
-              ::xml_schema::Container* c = 0);
+    VotingOr_base (const VotingOr_base& x,
+                   ::xml_schema::Flags f = 0,
+                   ::xml_schema::Container* c = 0);
 
-    virtual VotingOr*
+    virtual VotingOr_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~VotingOr ();
+    ~VotingOr_base ();
 
     // Implementation.
     //
@@ -919,27 +689,27 @@ namespace faulttree
     ::xsd::cxx::tree::one< KType > k_;
   };
 
-  class DynamicGate: public ::faulttree::Gate
+  class DynamicGate_base: public ::faulttree::Gate
   {
     public:
     // Constructors.
     //
-    DynamicGate (const IdType&);
+    DynamicGate_base (const IdType&);
 
-    DynamicGate (const ::xercesc::DOMElement& e,
-                 ::xml_schema::Flags f = 0,
-                 ::xml_schema::Container* c = 0);
+    DynamicGate_base (const ::xercesc::DOMElement& e,
+                      ::xml_schema::Flags f = 0,
+                      ::xml_schema::Container* c = 0);
 
-    DynamicGate (const DynamicGate& x,
-                 ::xml_schema::Flags f = 0,
-                 ::xml_schema::Container* c = 0);
+    DynamicGate_base (const DynamicGate_base& x,
+                      ::xml_schema::Flags f = 0,
+                      ::xml_schema::Container* c = 0);
 
-    virtual DynamicGate*
+    virtual DynamicGate_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~DynamicGate ();
+    ~DynamicGate_base ();
   };
 
   class Idlist: public ::xml_schema::SimpleType,
@@ -1553,10 +1323,10 @@ namespace faulttree
   operator<< (::xercesc::DOMElement&, const Model&);
 
   void
-  operator<< (::xercesc::DOMElement&, const Node&);
+  operator<< (::xercesc::DOMElement&, const Node_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const ChildNode&);
+  operator<< (::xercesc::DOMElement&, const ChildNode_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const FaultTree&);
@@ -1630,7 +1400,7 @@ namespace faulttree
              ::xml_schema::Flags f = 0);
 
   void
-  operator<< (::xercesc::DOMElement&, const TopEvent&);
+  operator<< (::xercesc::DOMElement&, const TopEvent_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const CrispProbability&);
@@ -1639,22 +1409,22 @@ namespace faulttree
   operator<< (::xercesc::DOMElement&, const FailureRate&);
 
   void
-  operator<< (::xercesc::DOMElement&, const Gate&);
+  operator<< (::xercesc::DOMElement&, const Gate_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const And&);
+  operator<< (::xercesc::DOMElement&, const And_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const Or&);
+  operator<< (::xercesc::DOMElement&, const Or_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const Xor&);
+  operator<< (::xercesc::DOMElement&, const Xor_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const VotingOr&);
+  operator<< (::xercesc::DOMElement&, const VotingOr_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const DynamicGate&);
+  operator<< (::xercesc::DOMElement&, const DynamicGate_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const Idlist&);

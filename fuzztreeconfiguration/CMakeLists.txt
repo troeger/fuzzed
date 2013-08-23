@@ -17,6 +17,7 @@ set(HEADERS
    fuzztree.h
    FaultTreeTypes.h
    FuzzTreeTypes.h
+   faulttree_custom.h
 )
 
 set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faulttree.xsd")
@@ -44,10 +45,21 @@ set(XSD_TO_FAULTTREE_ARGS
   --root-element "FaultTree"
   --type-naming ucc
   --function-naming lcc
-  --generate-serialization
+  --generate-serialization --generate-forward
   --namespace-map net.faulttree=faulttree
   --hxx-suffix .h
   --cxx-suffix .cpp
+  --custom-type Node=Visitable<Node_base>/Node_base
+  --custom-type TopEvent=Visitable<TopEvent_base>/TopEvent_base
+  --custom-type ChildNode=Visitable<ChildNode_base>/ChildNode_base
+  --custom-type Gate=Visitable<Gate_base>/Gate_base
+  --custom-type And=Visitable<And_base>/And_base
+  --custom-type Or=Visitable<Or_base>/Or_base
+  --custom-type Xor=Visitable<Xor_base>/Xor_base
+  --custom-type VotingOr=Visitable<VotingOr_base>/VotingOr_base
+  --custom-type DynamicGate=Visitable<DynamicGate_base>/DynamicGate_base
+  #--fwd-prologue "#include <faulttree_custom_fwd.cpp>"
+  --hxx-prologue "#include <faulttree_custom.h>"
 )
 
 set(XSD_TO_FUZZTREE_ARGS
