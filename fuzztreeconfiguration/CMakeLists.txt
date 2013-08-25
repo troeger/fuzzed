@@ -62,6 +62,13 @@ set(TREE_CUSTOMIZATION_ARGS
   --custom-type PriorityAnd=Visitable<PriorityAnd_base>/PriorityAnd_base
 )
 
+set(FUZZTREE_CUSTOMIZATION_ARGS
+  --custom-type RedundancyVariationPoint=Visitable<RedundancyVariationPoint_base>/RedundancyVariationPoint_base
+  --custom-type FeatureVariationPoint=Visitable<FeatureVariationPoint_base>/FeatureVariationPoint_base
+  --custom-type VariationPoint=Visitable<VariationPoint_base>/VariationPoint_base
+  --custom-type IntermediateEventSet=Visitable<IntermediateEventSet_base>/IntermediateEventSet_base
+)
+
 set(XSD_TO_FAULTTREE_ARGS
   --include-with-brackets	#include with <> instead of ""
   --generate-polymorphic	#needed for xsi:type
@@ -89,6 +96,7 @@ set(XSD_TO_FUZZTREE_ARGS
   --hxx-suffix .h
   --cxx-suffix .cpp
   ${TREE_CUSTOMIZATION_ARGS}
+  ${FUZZTREE_CUSTOMIZATION_ARGS}
   --hxx-prologue "#include <fuzztree_custom.h>"
 )
 

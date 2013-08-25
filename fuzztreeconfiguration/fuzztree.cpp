@@ -228,7 +228,7 @@ namespace fuzztree
   // 
 
 
-  // VariationPoint
+  // VariationPoint_base
   // 
 
 
@@ -368,98 +368,98 @@ namespace fuzztree
   }
 
 
-  // FeatureVariationPoint
+  // FeatureVariationPoint_base
   // 
 
 
-  // RedundancyVariationPoint
+  // RedundancyVariationPoint_base
   // 
 
-  const RedundancyVariationPoint::StartType& RedundancyVariationPoint::
+  const RedundancyVariationPoint_base::StartType& RedundancyVariationPoint_base::
   start () const
   {
     return this->start_.get ();
   }
 
-  RedundancyVariationPoint::StartType& RedundancyVariationPoint::
+  RedundancyVariationPoint_base::StartType& RedundancyVariationPoint_base::
   start ()
   {
     return this->start_.get ();
   }
 
-  void RedundancyVariationPoint::
+  void RedundancyVariationPoint_base::
   start (const StartType& x)
   {
     this->start_.set (x);
   }
 
-  const RedundancyVariationPoint::EndType& RedundancyVariationPoint::
+  const RedundancyVariationPoint_base::EndType& RedundancyVariationPoint_base::
   end () const
   {
     return this->end_.get ();
   }
 
-  RedundancyVariationPoint::EndType& RedundancyVariationPoint::
+  RedundancyVariationPoint_base::EndType& RedundancyVariationPoint_base::
   end ()
   {
     return this->end_.get ();
   }
 
-  void RedundancyVariationPoint::
+  void RedundancyVariationPoint_base::
   end (const EndType& x)
   {
     this->end_.set (x);
   }
 
-  const RedundancyVariationPoint::FormulaType& RedundancyVariationPoint::
+  const RedundancyVariationPoint_base::FormulaType& RedundancyVariationPoint_base::
   formula () const
   {
     return this->formula_.get ();
   }
 
-  RedundancyVariationPoint::FormulaType& RedundancyVariationPoint::
+  RedundancyVariationPoint_base::FormulaType& RedundancyVariationPoint_base::
   formula ()
   {
     return this->formula_.get ();
   }
 
-  void RedundancyVariationPoint::
+  void RedundancyVariationPoint_base::
   formula (const FormulaType& x)
   {
     this->formula_.set (x);
   }
 
-  void RedundancyVariationPoint::
+  void RedundancyVariationPoint_base::
   formula (::std::auto_ptr< FormulaType > x)
   {
     this->formula_.set (x);
   }
 
-  const RedundancyVariationPoint::CostFormulaOptional& RedundancyVariationPoint::
+  const RedundancyVariationPoint_base::CostFormulaOptional& RedundancyVariationPoint_base::
   costFormula () const
   {
     return this->costFormula_;
   }
 
-  RedundancyVariationPoint::CostFormulaOptional& RedundancyVariationPoint::
+  RedundancyVariationPoint_base::CostFormulaOptional& RedundancyVariationPoint_base::
   costFormula ()
   {
     return this->costFormula_;
   }
 
-  void RedundancyVariationPoint::
+  void RedundancyVariationPoint_base::
   costFormula (const CostFormulaType& x)
   {
     this->costFormula_.set (x);
   }
 
-  void RedundancyVariationPoint::
+  void RedundancyVariationPoint_base::
   costFormula (const CostFormulaOptional& x)
   {
     this->costFormula_ = x;
   }
 
-  void RedundancyVariationPoint::
+  void RedundancyVariationPoint_base::
   costFormula (::std::auto_ptr< CostFormulaType > x)
   {
     this->costFormula_.set (x);
@@ -680,28 +680,28 @@ namespace fuzztree
   // 
 
 
-  // IntermediateEventSet
+  // IntermediateEventSet_base
   // 
 
-  const IntermediateEventSet::QuantityOptional& IntermediateEventSet::
+  const IntermediateEventSet_base::QuantityOptional& IntermediateEventSet_base::
   quantity () const
   {
     return this->quantity_;
   }
 
-  IntermediateEventSet::QuantityOptional& IntermediateEventSet::
+  IntermediateEventSet_base::QuantityOptional& IntermediateEventSet_base::
   quantity ()
   {
     return this->quantity_;
   }
 
-  void IntermediateEventSet::
+  void IntermediateEventSet_base::
   quantity (const QuantityType& x)
   {
     this->quantity_.set (x);
   }
 
-  void IntermediateEventSet::
+  void IntermediateEventSet_base::
   quantity (const QuantityOptional& x)
   {
     this->quantity_ = x;
@@ -1353,40 +1353,40 @@ namespace fuzztree
     "Gate",
     "net.fuzztree");
 
-  // VariationPoint
+  // VariationPoint_base
   //
 
-  VariationPoint::
-  VariationPoint (const IdType& id)
+  VariationPoint_base::
+  VariationPoint_base (const IdType& id)
   : ::fuzztree::ChildNode (id)
   {
   }
 
-  VariationPoint::
-  VariationPoint (const VariationPoint& x,
-                  ::xml_schema::Flags f,
-                  ::xml_schema::Container* c)
+  VariationPoint_base::
+  VariationPoint_base (const VariationPoint_base& x,
+                       ::xml_schema::Flags f,
+                       ::xml_schema::Container* c)
   : ::fuzztree::ChildNode (x, f, c)
   {
   }
 
-  VariationPoint::
-  VariationPoint (const ::xercesc::DOMElement& e,
-                  ::xml_schema::Flags f,
-                  ::xml_schema::Container* c)
+  VariationPoint_base::
+  VariationPoint_base (const ::xercesc::DOMElement& e,
+                       ::xml_schema::Flags f,
+                       ::xml_schema::Container* c)
   : ::fuzztree::ChildNode (e, f, c)
   {
   }
 
-  VariationPoint* VariationPoint::
+  VariationPoint_base* VariationPoint_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class VariationPoint (*this, f, c);
+    return new class VariationPoint_base (*this, f, c);
   }
 
-  VariationPoint::
-  ~VariationPoint ()
+  VariationPoint_base::
+  ~VariationPoint_base ()
   {
   }
 
@@ -1888,40 +1888,40 @@ namespace fuzztree
     "VotingOr",
     "net.fuzztree");
 
-  // FeatureVariationPoint
+  // FeatureVariationPoint_base
   //
 
-  FeatureVariationPoint::
-  FeatureVariationPoint (const IdType& id)
+  FeatureVariationPoint_base::
+  FeatureVariationPoint_base (const IdType& id)
   : ::fuzztree::VariationPoint (id)
   {
   }
 
-  FeatureVariationPoint::
-  FeatureVariationPoint (const FeatureVariationPoint& x,
-                         ::xml_schema::Flags f,
-                         ::xml_schema::Container* c)
+  FeatureVariationPoint_base::
+  FeatureVariationPoint_base (const FeatureVariationPoint_base& x,
+                              ::xml_schema::Flags f,
+                              ::xml_schema::Container* c)
   : ::fuzztree::VariationPoint (x, f, c)
   {
   }
 
-  FeatureVariationPoint::
-  FeatureVariationPoint (const ::xercesc::DOMElement& e,
-                         ::xml_schema::Flags f,
-                         ::xml_schema::Container* c)
+  FeatureVariationPoint_base::
+  FeatureVariationPoint_base (const ::xercesc::DOMElement& e,
+                              ::xml_schema::Flags f,
+                              ::xml_schema::Container* c)
   : ::fuzztree::VariationPoint (e, f, c)
   {
   }
 
-  FeatureVariationPoint* FeatureVariationPoint::
+  FeatureVariationPoint_base* FeatureVariationPoint_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class FeatureVariationPoint (*this, f, c);
+    return new class FeatureVariationPoint_base (*this, f, c);
   }
 
-  FeatureVariationPoint::
-  ~FeatureVariationPoint ()
+  FeatureVariationPoint_base::
+  ~FeatureVariationPoint_base ()
   {
   }
 
@@ -1931,14 +1931,14 @@ namespace fuzztree
     "FeatureVariationPoint",
     "net.fuzztree");
 
-  // RedundancyVariationPoint
+  // RedundancyVariationPoint_base
   //
 
-  RedundancyVariationPoint::
-  RedundancyVariationPoint (const IdType& id,
-                            const StartType& start,
-                            const EndType& end,
-                            const FormulaType& formula)
+  RedundancyVariationPoint_base::
+  RedundancyVariationPoint_base (const IdType& id,
+                                 const StartType& start,
+                                 const EndType& end,
+                                 const FormulaType& formula)
   : ::fuzztree::VariationPoint (id),
     start_ (start, ::xml_schema::Flags (), this),
     end_ (end, ::xml_schema::Flags (), this),
@@ -1947,10 +1947,10 @@ namespace fuzztree
   {
   }
 
-  RedundancyVariationPoint::
-  RedundancyVariationPoint (const RedundancyVariationPoint& x,
-                            ::xml_schema::Flags f,
-                            ::xml_schema::Container* c)
+  RedundancyVariationPoint_base::
+  RedundancyVariationPoint_base (const RedundancyVariationPoint_base& x,
+                                 ::xml_schema::Flags f,
+                                 ::xml_schema::Container* c)
   : ::fuzztree::VariationPoint (x, f, c),
     start_ (x.start_, f, this),
     end_ (x.end_, f, this),
@@ -1959,10 +1959,10 @@ namespace fuzztree
   {
   }
 
-  RedundancyVariationPoint::
-  RedundancyVariationPoint (const ::xercesc::DOMElement& e,
-                            ::xml_schema::Flags f,
-                            ::xml_schema::Container* c)
+  RedundancyVariationPoint_base::
+  RedundancyVariationPoint_base (const ::xercesc::DOMElement& e,
+                                 ::xml_schema::Flags f,
+                                 ::xml_schema::Container* c)
   : ::fuzztree::VariationPoint (e, f | ::xml_schema::Flags::base, c),
     start_ (f, this),
     end_ (f, this),
@@ -1976,7 +1976,7 @@ namespace fuzztree
     }
   }
 
-  void RedundancyVariationPoint::
+  void RedundancyVariationPoint_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -2043,15 +2043,15 @@ namespace fuzztree
     }
   }
 
-  RedundancyVariationPoint* RedundancyVariationPoint::
+  RedundancyVariationPoint_base* RedundancyVariationPoint_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class RedundancyVariationPoint (*this, f, c);
+    return new class RedundancyVariationPoint_base (*this, f, c);
   }
 
-  RedundancyVariationPoint::
-  ~RedundancyVariationPoint ()
+  RedundancyVariationPoint_base::
+  ~RedundancyVariationPoint_base ()
   {
   }
 
@@ -2778,29 +2778,29 @@ namespace fuzztree
     "HouseEvent",
     "net.fuzztree");
 
-  // IntermediateEventSet
+  // IntermediateEventSet_base
   //
 
-  IntermediateEventSet::
-  IntermediateEventSet (const IdType& id)
+  IntermediateEventSet_base::
+  IntermediateEventSet_base (const IdType& id)
   : ::fuzztree::IntermediateEvent (id),
     quantity_ (::xml_schema::Flags (), this)
   {
   }
 
-  IntermediateEventSet::
-  IntermediateEventSet (const IntermediateEventSet& x,
-                        ::xml_schema::Flags f,
-                        ::xml_schema::Container* c)
+  IntermediateEventSet_base::
+  IntermediateEventSet_base (const IntermediateEventSet_base& x,
+                             ::xml_schema::Flags f,
+                             ::xml_schema::Container* c)
   : ::fuzztree::IntermediateEvent (x, f, c),
     quantity_ (x.quantity_, f, this)
   {
   }
 
-  IntermediateEventSet::
-  IntermediateEventSet (const ::xercesc::DOMElement& e,
-                        ::xml_schema::Flags f,
-                        ::xml_schema::Container* c)
+  IntermediateEventSet_base::
+  IntermediateEventSet_base (const ::xercesc::DOMElement& e,
+                             ::xml_schema::Flags f,
+                             ::xml_schema::Container* c)
   : ::fuzztree::IntermediateEvent (e, f | ::xml_schema::Flags::base, c),
     quantity_ (f, this)
   {
@@ -2811,7 +2811,7 @@ namespace fuzztree
     }
   }
 
-  void IntermediateEventSet::
+  void IntermediateEventSet_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -2833,15 +2833,15 @@ namespace fuzztree
     }
   }
 
-  IntermediateEventSet* IntermediateEventSet::
+  IntermediateEventSet_base* IntermediateEventSet_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class IntermediateEventSet (*this, f, c);
+    return new class IntermediateEventSet_base (*this, f, c);
   }
 
-  IntermediateEventSet::
-  ~IntermediateEventSet ()
+  IntermediateEventSet_base::
+  ~IntermediateEventSet_base ()
   {
   }
 
@@ -3960,7 +3960,7 @@ namespace fuzztree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const VariationPoint& i)
+  operator<< (::xercesc::DOMElement& e, const VariationPoint_base& i)
   {
     e << static_cast< const ::fuzztree::ChildNode& > (i);
   }
@@ -4132,7 +4132,7 @@ namespace fuzztree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const FeatureVariationPoint& i)
+  operator<< (::xercesc::DOMElement& e, const FeatureVariationPoint_base& i)
   {
     e << static_cast< const ::fuzztree::VariationPoint& > (i);
   }
@@ -4145,7 +4145,7 @@ namespace fuzztree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const RedundancyVariationPoint& i)
+  operator<< (::xercesc::DOMElement& e, const RedundancyVariationPoint_base& i)
   {
     e << static_cast< const ::fuzztree::VariationPoint& > (i);
 
@@ -4455,7 +4455,7 @@ namespace fuzztree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const IntermediateEventSet& i)
+  operator<< (::xercesc::DOMElement& e, const IntermediateEventSet_base& i)
   {
     e << static_cast< const ::fuzztree::IntermediateEvent& > (i);
 

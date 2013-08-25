@@ -261,7 +261,8 @@ namespace fuzztree
   typedef Visitable<ChildNode_base> ChildNode;
   class Gate_base;
   typedef Visitable<Gate_base> Gate;
-  class VariationPoint;
+  class VariationPoint_base;
+  typedef Visitable<VariationPoint_base> VariationPoint;
   class InclusionVariationPoint;
   class BasicEvent_base;
   typedef Visitable<BasicEvent_base> BasicEvent;
@@ -275,8 +276,10 @@ namespace fuzztree
   typedef Visitable<Xor_base> Xor;
   class VotingOr_base;
   typedef Visitable<VotingOr_base> VotingOr;
-  class FeatureVariationPoint;
-  class RedundancyVariationPoint;
+  class FeatureVariationPoint_base;
+  typedef Visitable<FeatureVariationPoint_base> FeatureVariationPoint;
+  class RedundancyVariationPoint_base;
+  typedef Visitable<RedundancyVariationPoint_base> RedundancyVariationPoint;
   class TransferIn;
   class Annotation;
   class Probability;
@@ -290,7 +293,8 @@ namespace fuzztree
   class BasicEventSet;
   class HouseEvent_base;
   typedef Visitable<HouseEvent_base> HouseEvent;
-  class IntermediateEventSet;
+  class IntermediateEventSet_base;
+  typedef Visitable<IntermediateEventSet_base> IntermediateEventSet;
   class EventSet;
   class DecomposedFuzzyProbability;
   class DoubleToIntervalMap;
@@ -614,27 +618,27 @@ namespace fuzztree
     ~Gate_base ();
   };
 
-  class VariationPoint: public ::fuzztree::ChildNode
+  class VariationPoint_base: public ::fuzztree::ChildNode
   {
     public:
     // Constructors.
     //
-    VariationPoint (const IdType&);
+    VariationPoint_base (const IdType&);
 
-    VariationPoint (const ::xercesc::DOMElement& e,
-                    ::xml_schema::Flags f = 0,
-                    ::xml_schema::Container* c = 0);
+    VariationPoint_base (const ::xercesc::DOMElement& e,
+                         ::xml_schema::Flags f = 0,
+                         ::xml_schema::Container* c = 0);
 
-    VariationPoint (const VariationPoint& x,
-                    ::xml_schema::Flags f = 0,
-                    ::xml_schema::Container* c = 0);
+    VariationPoint_base (const VariationPoint_base& x,
+                         ::xml_schema::Flags f = 0,
+                         ::xml_schema::Container* c = 0);
 
-    virtual VariationPoint*
+    virtual VariationPoint_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~VariationPoint ();
+    ~VariationPoint_base ();
   };
 
   class InclusionVariationPoint: public ::fuzztree::VariationPoint
@@ -925,30 +929,30 @@ namespace fuzztree
     ::xsd::cxx::tree::one< KType > k_;
   };
 
-  class FeatureVariationPoint: public ::fuzztree::VariationPoint
+  class FeatureVariationPoint_base: public ::fuzztree::VariationPoint
   {
     public:
     // Constructors.
     //
-    FeatureVariationPoint (const IdType&);
+    FeatureVariationPoint_base (const IdType&);
 
-    FeatureVariationPoint (const ::xercesc::DOMElement& e,
-                           ::xml_schema::Flags f = 0,
-                           ::xml_schema::Container* c = 0);
+    FeatureVariationPoint_base (const ::xercesc::DOMElement& e,
+                                ::xml_schema::Flags f = 0,
+                                ::xml_schema::Container* c = 0);
 
-    FeatureVariationPoint (const FeatureVariationPoint& x,
-                           ::xml_schema::Flags f = 0,
-                           ::xml_schema::Container* c = 0);
+    FeatureVariationPoint_base (const FeatureVariationPoint_base& x,
+                                ::xml_schema::Flags f = 0,
+                                ::xml_schema::Container* c = 0);
 
-    virtual FeatureVariationPoint*
+    virtual FeatureVariationPoint_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~FeatureVariationPoint ();
+    ~FeatureVariationPoint_base ();
   };
 
-  class RedundancyVariationPoint: public ::fuzztree::VariationPoint
+  class RedundancyVariationPoint_base: public ::fuzztree::VariationPoint
   {
     public:
     // start
@@ -1019,25 +1023,25 @@ namespace fuzztree
 
     // Constructors.
     //
-    RedundancyVariationPoint (const IdType&,
-                              const StartType&,
-                              const EndType&,
-                              const FormulaType&);
+    RedundancyVariationPoint_base (const IdType&,
+                                   const StartType&,
+                                   const EndType&,
+                                   const FormulaType&);
 
-    RedundancyVariationPoint (const ::xercesc::DOMElement& e,
-                              ::xml_schema::Flags f = 0,
-                              ::xml_schema::Container* c = 0);
+    RedundancyVariationPoint_base (const ::xercesc::DOMElement& e,
+                                   ::xml_schema::Flags f = 0,
+                                   ::xml_schema::Container* c = 0);
 
-    RedundancyVariationPoint (const RedundancyVariationPoint& x,
-                              ::xml_schema::Flags f = 0,
-                              ::xml_schema::Container* c = 0);
+    RedundancyVariationPoint_base (const RedundancyVariationPoint_base& x,
+                                   ::xml_schema::Flags f = 0,
+                                   ::xml_schema::Container* c = 0);
 
-    virtual RedundancyVariationPoint*
+    virtual RedundancyVariationPoint_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~RedundancyVariationPoint ();
+    ~RedundancyVariationPoint_base ();
 
     // Implementation.
     //
@@ -1500,7 +1504,7 @@ namespace fuzztree
     ~HouseEvent_base ();
   };
 
-  class IntermediateEventSet: public ::fuzztree::IntermediateEvent
+  class IntermediateEventSet_base: public ::fuzztree::IntermediateEvent
   {
     public:
     // quantity
@@ -1523,22 +1527,22 @@ namespace fuzztree
 
     // Constructors.
     //
-    IntermediateEventSet (const IdType&);
+    IntermediateEventSet_base (const IdType&);
 
-    IntermediateEventSet (const ::xercesc::DOMElement& e,
-                          ::xml_schema::Flags f = 0,
-                          ::xml_schema::Container* c = 0);
+    IntermediateEventSet_base (const ::xercesc::DOMElement& e,
+                               ::xml_schema::Flags f = 0,
+                               ::xml_schema::Container* c = 0);
 
-    IntermediateEventSet (const IntermediateEventSet& x,
-                          ::xml_schema::Flags f = 0,
-                          ::xml_schema::Container* c = 0);
+    IntermediateEventSet_base (const IntermediateEventSet_base& x,
+                               ::xml_schema::Flags f = 0,
+                               ::xml_schema::Container* c = 0);
 
-    virtual IntermediateEventSet*
+    virtual IntermediateEventSet_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~IntermediateEventSet ();
+    ~IntermediateEventSet_base ();
 
     // Implementation.
     //
@@ -1984,7 +1988,7 @@ namespace fuzztree
   operator<< (::xercesc::DOMElement&, const Gate_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const VariationPoint&);
+  operator<< (::xercesc::DOMElement&, const VariationPoint_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const InclusionVariationPoint&);
@@ -2008,10 +2012,10 @@ namespace fuzztree
   operator<< (::xercesc::DOMElement&, const VotingOr_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const FeatureVariationPoint&);
+  operator<< (::xercesc::DOMElement&, const FeatureVariationPoint_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const RedundancyVariationPoint&);
+  operator<< (::xercesc::DOMElement&, const RedundancyVariationPoint_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const TransferIn&);
@@ -2058,7 +2062,7 @@ namespace fuzztree
   operator<< (::xercesc::DOMElement&, const HouseEvent_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const IntermediateEventSet&);
+  operator<< (::xercesc::DOMElement&, const IntermediateEventSet_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const EventSet&);
