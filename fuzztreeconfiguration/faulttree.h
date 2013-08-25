@@ -278,15 +278,23 @@ namespace faulttree
   class DynamicGate_base;
   typedef Visitable<DynamicGate_base> DynamicGate;
   class Idlist;
-  class Spare;
-  class PriorityAnd;
-  class Sequence;
-  class FDEP;
+  class Spare_base;
+  typedef Visitable<Spare_base> Spare;
+  class PriorityAnd_base;
+  typedef Visitable<PriorityAnd_base> PriorityAnd;
+  class Sequence_base;
+  typedef Visitable<Sequence_base> Sequence;
+  class FDEP_base;
+  typedef Visitable<FDEP_base> FDEP;
   class TransferIn;
-  class UndevelopedEvent;
-  class BasicEvent;
-  class HouseEvent;
-  class IntermediateEvent;
+  class UndevelopedEvent_base;
+  typedef Visitable<UndevelopedEvent_base> UndevelopedEvent;
+  class BasicEvent_base;
+  typedef Visitable<BasicEvent_base> BasicEvent;
+  class HouseEvent_base;
+  typedef Visitable<HouseEvent_base> HouseEvent;
+  class IntermediateEvent_base;
+  typedef Visitable<IntermediateEvent_base> IntermediateEvent;
 }
 
 
@@ -991,7 +999,7 @@ namespace faulttree
     ~Idlist ();
   };
 
-  class Spare: public ::faulttree::DynamicGate
+  class Spare_base: public ::faulttree::DynamicGate
   {
     public:
     // primaryID
@@ -1027,24 +1035,24 @@ namespace faulttree
 
     // Constructors.
     //
-    Spare (const IdType&,
-           const PrimaryIDType&,
-           const DormancyFactorType&);
+    Spare_base (const IdType&,
+                const PrimaryIDType&,
+                const DormancyFactorType&);
 
-    Spare (const ::xercesc::DOMElement& e,
-           ::xml_schema::Flags f = 0,
-           ::xml_schema::Container* c = 0);
+    Spare_base (const ::xercesc::DOMElement& e,
+                ::xml_schema::Flags f = 0,
+                ::xml_schema::Container* c = 0);
 
-    Spare (const Spare& x,
-           ::xml_schema::Flags f = 0,
-           ::xml_schema::Container* c = 0);
+    Spare_base (const Spare_base& x,
+                ::xml_schema::Flags f = 0,
+                ::xml_schema::Container* c = 0);
 
-    virtual Spare*
+    virtual Spare_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Spare ();
+    ~Spare_base ();
 
     // Implementation.
     //
@@ -1058,7 +1066,7 @@ namespace faulttree
     ::xsd::cxx::tree::one< DormancyFactorType > dormancyFactor_;
   };
 
-  class PriorityAnd: public ::faulttree::DynamicGate
+  class PriorityAnd_base: public ::faulttree::DynamicGate
   {
     public:
     // eventSequence
@@ -1080,23 +1088,23 @@ namespace faulttree
 
     // Constructors.
     //
-    PriorityAnd (const IdType&,
-                 const EventSequenceType&);
+    PriorityAnd_base (const IdType&,
+                      const EventSequenceType&);
 
-    PriorityAnd (const ::xercesc::DOMElement& e,
-                 ::xml_schema::Flags f = 0,
-                 ::xml_schema::Container* c = 0);
+    PriorityAnd_base (const ::xercesc::DOMElement& e,
+                      ::xml_schema::Flags f = 0,
+                      ::xml_schema::Container* c = 0);
 
-    PriorityAnd (const PriorityAnd& x,
-                 ::xml_schema::Flags f = 0,
-                 ::xml_schema::Container* c = 0);
+    PriorityAnd_base (const PriorityAnd_base& x,
+                      ::xml_schema::Flags f = 0,
+                      ::xml_schema::Container* c = 0);
 
-    virtual PriorityAnd*
+    virtual PriorityAnd_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~PriorityAnd ();
+    ~PriorityAnd_base ();
 
     // Implementation.
     //
@@ -1109,7 +1117,7 @@ namespace faulttree
     ::xsd::cxx::tree::one< EventSequenceType > eventSequence_;
   };
 
-  class Sequence: public ::faulttree::DynamicGate
+  class Sequence_base: public ::faulttree::DynamicGate
   {
     public:
     // eventSequence
@@ -1131,23 +1139,23 @@ namespace faulttree
 
     // Constructors.
     //
-    Sequence (const IdType&,
-              const EventSequenceType&);
+    Sequence_base (const IdType&,
+                   const EventSequenceType&);
 
-    Sequence (const ::xercesc::DOMElement& e,
-              ::xml_schema::Flags f = 0,
-              ::xml_schema::Container* c = 0);
+    Sequence_base (const ::xercesc::DOMElement& e,
+                   ::xml_schema::Flags f = 0,
+                   ::xml_schema::Container* c = 0);
 
-    Sequence (const Sequence& x,
-              ::xml_schema::Flags f = 0,
-              ::xml_schema::Container* c = 0);
+    Sequence_base (const Sequence_base& x,
+                   ::xml_schema::Flags f = 0,
+                   ::xml_schema::Container* c = 0);
 
-    virtual Sequence*
+    virtual Sequence_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Sequence ();
+    ~Sequence_base ();
 
     // Implementation.
     //
@@ -1160,7 +1168,7 @@ namespace faulttree
     ::xsd::cxx::tree::one< EventSequenceType > eventSequence_;
   };
 
-  class FDEP: public ::faulttree::DynamicGate
+  class FDEP_base: public ::faulttree::DynamicGate
   {
     public:
     // trigger
@@ -1199,24 +1207,24 @@ namespace faulttree
 
     // Constructors.
     //
-    FDEP (const IdType&,
-          const TriggerType&,
-          const TriggeredEventsType&);
+    FDEP_base (const IdType&,
+               const TriggerType&,
+               const TriggeredEventsType&);
 
-    FDEP (const ::xercesc::DOMElement& e,
-          ::xml_schema::Flags f = 0,
-          ::xml_schema::Container* c = 0);
+    FDEP_base (const ::xercesc::DOMElement& e,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
 
-    FDEP (const FDEP& x,
-          ::xml_schema::Flags f = 0,
-          ::xml_schema::Container* c = 0);
+    FDEP_base (const FDEP_base& x,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
 
-    virtual FDEP*
+    virtual FDEP_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~FDEP ();
+    ~FDEP_base ();
 
     // Implementation.
     //
@@ -1296,30 +1304,30 @@ namespace faulttree
     ::xsd::cxx::tree::one< MaxCostsType > maxCosts_;
   };
 
-  class UndevelopedEvent: public ::faulttree::ChildNode
+  class UndevelopedEvent_base: public ::faulttree::ChildNode
   {
     public:
     // Constructors.
     //
-    UndevelopedEvent (const IdType&);
+    UndevelopedEvent_base (const IdType&);
 
-    UndevelopedEvent (const ::xercesc::DOMElement& e,
-                      ::xml_schema::Flags f = 0,
-                      ::xml_schema::Container* c = 0);
+    UndevelopedEvent_base (const ::xercesc::DOMElement& e,
+                           ::xml_schema::Flags f = 0,
+                           ::xml_schema::Container* c = 0);
 
-    UndevelopedEvent (const UndevelopedEvent& x,
-                      ::xml_schema::Flags f = 0,
-                      ::xml_schema::Container* c = 0);
+    UndevelopedEvent_base (const UndevelopedEvent_base& x,
+                           ::xml_schema::Flags f = 0,
+                           ::xml_schema::Container* c = 0);
 
-    virtual UndevelopedEvent*
+    virtual UndevelopedEvent_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~UndevelopedEvent ();
+    ~UndevelopedEvent_base ();
   };
 
-  class BasicEvent: public ::faulttree::ChildNode
+  class BasicEvent_base: public ::faulttree::ChildNode
   {
     public:
     // probability
@@ -1341,26 +1349,26 @@ namespace faulttree
 
     // Constructors.
     //
-    BasicEvent (const IdType&,
-                const ProbabilityType&);
+    BasicEvent_base (const IdType&,
+                     const ProbabilityType&);
 
-    BasicEvent (const IdType&,
-                ::std::auto_ptr< ProbabilityType >&);
+    BasicEvent_base (const IdType&,
+                     ::std::auto_ptr< ProbabilityType >&);
 
-    BasicEvent (const ::xercesc::DOMElement& e,
-                ::xml_schema::Flags f = 0,
-                ::xml_schema::Container* c = 0);
+    BasicEvent_base (const ::xercesc::DOMElement& e,
+                     ::xml_schema::Flags f = 0,
+                     ::xml_schema::Container* c = 0);
 
-    BasicEvent (const BasicEvent& x,
-                ::xml_schema::Flags f = 0,
-                ::xml_schema::Container* c = 0);
+    BasicEvent_base (const BasicEvent_base& x,
+                     ::xml_schema::Flags f = 0,
+                     ::xml_schema::Container* c = 0);
 
-    virtual BasicEvent*
+    virtual BasicEvent_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~BasicEvent ();
+    ~BasicEvent_base ();
 
     // Implementation.
     //
@@ -1373,54 +1381,54 @@ namespace faulttree
     ::xsd::cxx::tree::one< ProbabilityType > probability_;
   };
 
-  class HouseEvent: public ::faulttree::BasicEvent
+  class HouseEvent_base: public ::faulttree::BasicEvent
   {
     public:
     // Constructors.
     //
-    HouseEvent (const IdType&,
-                const ProbabilityType&);
+    HouseEvent_base (const IdType&,
+                     const ProbabilityType&);
 
-    HouseEvent (const IdType&,
-                ::std::auto_ptr< ProbabilityType >&);
+    HouseEvent_base (const IdType&,
+                     ::std::auto_ptr< ProbabilityType >&);
 
-    HouseEvent (const ::xercesc::DOMElement& e,
-                ::xml_schema::Flags f = 0,
-                ::xml_schema::Container* c = 0);
+    HouseEvent_base (const ::xercesc::DOMElement& e,
+                     ::xml_schema::Flags f = 0,
+                     ::xml_schema::Container* c = 0);
 
-    HouseEvent (const HouseEvent& x,
-                ::xml_schema::Flags f = 0,
-                ::xml_schema::Container* c = 0);
+    HouseEvent_base (const HouseEvent_base& x,
+                     ::xml_schema::Flags f = 0,
+                     ::xml_schema::Container* c = 0);
 
-    virtual HouseEvent*
+    virtual HouseEvent_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~HouseEvent ();
+    ~HouseEvent_base ();
   };
 
-  class IntermediateEvent: public ::faulttree::ChildNode
+  class IntermediateEvent_base: public ::faulttree::ChildNode
   {
     public:
     // Constructors.
     //
-    IntermediateEvent (const IdType&);
+    IntermediateEvent_base (const IdType&);
 
-    IntermediateEvent (const ::xercesc::DOMElement& e,
-                       ::xml_schema::Flags f = 0,
-                       ::xml_schema::Container* c = 0);
+    IntermediateEvent_base (const ::xercesc::DOMElement& e,
+                            ::xml_schema::Flags f = 0,
+                            ::xml_schema::Container* c = 0);
 
-    IntermediateEvent (const IntermediateEvent& x,
-                       ::xml_schema::Flags f = 0,
-                       ::xml_schema::Container* c = 0);
+    IntermediateEvent_base (const IntermediateEvent_base& x,
+                            ::xml_schema::Flags f = 0,
+                            ::xml_schema::Container* c = 0);
 
-    virtual IntermediateEvent*
+    virtual IntermediateEvent_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~IntermediateEvent ();
+    ~IntermediateEvent_base ();
   };
 }
 
@@ -1677,31 +1685,31 @@ namespace faulttree
               const Idlist&);
 
   void
-  operator<< (::xercesc::DOMElement&, const Spare&);
+  operator<< (::xercesc::DOMElement&, const Spare_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const PriorityAnd&);
+  operator<< (::xercesc::DOMElement&, const PriorityAnd_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const Sequence&);
+  operator<< (::xercesc::DOMElement&, const Sequence_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const FDEP&);
+  operator<< (::xercesc::DOMElement&, const FDEP_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const TransferIn&);
 
   void
-  operator<< (::xercesc::DOMElement&, const UndevelopedEvent&);
+  operator<< (::xercesc::DOMElement&, const UndevelopedEvent_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const BasicEvent&);
+  operator<< (::xercesc::DOMElement&, const BasicEvent_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const HouseEvent&);
+  operator<< (::xercesc::DOMElement&, const HouseEvent_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const IntermediateEvent&);
+  operator<< (::xercesc::DOMElement&, const IntermediateEvent_base&);
 }
 
 #include <xsd/cxx/post.hxx>

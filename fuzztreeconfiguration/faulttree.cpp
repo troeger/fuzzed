@@ -364,154 +364,154 @@ namespace faulttree
   {
   }
 
-  // Spare
+  // Spare_base
   // 
 
-  const Spare::PrimaryIDType& Spare::
+  const Spare_base::PrimaryIDType& Spare_base::
   primaryID () const
   {
     return this->primaryID_.get ();
   }
 
-  Spare::PrimaryIDType& Spare::
+  Spare_base::PrimaryIDType& Spare_base::
   primaryID ()
   {
     return this->primaryID_.get ();
   }
 
-  void Spare::
+  void Spare_base::
   primaryID (const PrimaryIDType& x)
   {
     this->primaryID_.set (x);
   }
 
-  void Spare::
+  void Spare_base::
   primaryID (::std::auto_ptr< PrimaryIDType > x)
   {
     this->primaryID_.set (x);
   }
 
-  const Spare::DormancyFactorType& Spare::
+  const Spare_base::DormancyFactorType& Spare_base::
   dormancyFactor () const
   {
     return this->dormancyFactor_.get ();
   }
 
-  Spare::DormancyFactorType& Spare::
+  Spare_base::DormancyFactorType& Spare_base::
   dormancyFactor ()
   {
     return this->dormancyFactor_.get ();
   }
 
-  void Spare::
+  void Spare_base::
   dormancyFactor (const DormancyFactorType& x)
   {
     this->dormancyFactor_.set (x);
   }
 
 
-  // PriorityAnd
+  // PriorityAnd_base
   // 
 
-  const PriorityAnd::EventSequenceType& PriorityAnd::
+  const PriorityAnd_base::EventSequenceType& PriorityAnd_base::
   eventSequence () const
   {
     return this->eventSequence_.get ();
   }
 
-  PriorityAnd::EventSequenceType& PriorityAnd::
+  PriorityAnd_base::EventSequenceType& PriorityAnd_base::
   eventSequence ()
   {
     return this->eventSequence_.get ();
   }
 
-  void PriorityAnd::
+  void PriorityAnd_base::
   eventSequence (const EventSequenceType& x)
   {
     this->eventSequence_.set (x);
   }
 
-  void PriorityAnd::
+  void PriorityAnd_base::
   eventSequence (::std::auto_ptr< EventSequenceType > x)
   {
     this->eventSequence_.set (x);
   }
 
 
-  // Sequence
+  // Sequence_base
   // 
 
-  const Sequence::EventSequenceType& Sequence::
+  const Sequence_base::EventSequenceType& Sequence_base::
   eventSequence () const
   {
     return this->eventSequence_.get ();
   }
 
-  Sequence::EventSequenceType& Sequence::
+  Sequence_base::EventSequenceType& Sequence_base::
   eventSequence ()
   {
     return this->eventSequence_.get ();
   }
 
-  void Sequence::
+  void Sequence_base::
   eventSequence (const EventSequenceType& x)
   {
     this->eventSequence_.set (x);
   }
 
-  void Sequence::
+  void Sequence_base::
   eventSequence (::std::auto_ptr< EventSequenceType > x)
   {
     this->eventSequence_.set (x);
   }
 
 
-  // FDEP
+  // FDEP_base
   // 
 
-  const FDEP::TriggerType& FDEP::
+  const FDEP_base::TriggerType& FDEP_base::
   trigger () const
   {
     return this->trigger_.get ();
   }
 
-  FDEP::TriggerType& FDEP::
+  FDEP_base::TriggerType& FDEP_base::
   trigger ()
   {
     return this->trigger_.get ();
   }
 
-  void FDEP::
+  void FDEP_base::
   trigger (const TriggerType& x)
   {
     this->trigger_.set (x);
   }
 
-  void FDEP::
+  void FDEP_base::
   trigger (::std::auto_ptr< TriggerType > x)
   {
     this->trigger_.set (x);
   }
 
-  const FDEP::TriggeredEventsType& FDEP::
+  const FDEP_base::TriggeredEventsType& FDEP_base::
   triggeredEvents () const
   {
     return this->triggeredEvents_.get ();
   }
 
-  FDEP::TriggeredEventsType& FDEP::
+  FDEP_base::TriggeredEventsType& FDEP_base::
   triggeredEvents ()
   {
     return this->triggeredEvents_.get ();
   }
 
-  void FDEP::
+  void FDEP_base::
   triggeredEvents (const TriggeredEventsType& x)
   {
     this->triggeredEvents_.set (x);
   }
 
-  void FDEP::
+  void FDEP_base::
   triggeredEvents (::std::auto_ptr< TriggeredEventsType > x)
   {
     this->triggeredEvents_.set (x);
@@ -564,43 +564,43 @@ namespace faulttree
   }
 
 
-  // UndevelopedEvent
+  // UndevelopedEvent_base
   // 
 
 
-  // BasicEvent
+  // BasicEvent_base
   // 
 
-  const BasicEvent::ProbabilityType& BasicEvent::
+  const BasicEvent_base::ProbabilityType& BasicEvent_base::
   probability () const
   {
     return this->probability_.get ();
   }
 
-  BasicEvent::ProbabilityType& BasicEvent::
+  BasicEvent_base::ProbabilityType& BasicEvent_base::
   probability ()
   {
     return this->probability_.get ();
   }
 
-  void BasicEvent::
+  void BasicEvent_base::
   probability (const ProbabilityType& x)
   {
     this->probability_.set (x);
   }
 
-  void BasicEvent::
+  void BasicEvent_base::
   probability (::std::auto_ptr< ProbabilityType > x)
   {
     this->probability_.set (x);
   }
 
 
-  // HouseEvent
+  // HouseEvent_base
   // 
 
 
-  // IntermediateEvent
+  // IntermediateEvent_base
   // 
 }
 
@@ -1768,33 +1768,33 @@ namespace faulttree
     "idlist",
     "net.faulttree");
 
-  // Spare
+  // Spare_base
   //
 
-  Spare::
-  Spare (const IdType& id,
-         const PrimaryIDType& primaryID,
-         const DormancyFactorType& dormancyFactor)
+  Spare_base::
+  Spare_base (const IdType& id,
+              const PrimaryIDType& primaryID,
+              const DormancyFactorType& dormancyFactor)
   : ::faulttree::DynamicGate (id),
     primaryID_ (primaryID, ::xml_schema::Flags (), this),
     dormancyFactor_ (dormancyFactor, ::xml_schema::Flags (), this)
   {
   }
 
-  Spare::
-  Spare (const Spare& x,
-         ::xml_schema::Flags f,
-         ::xml_schema::Container* c)
+  Spare_base::
+  Spare_base (const Spare_base& x,
+              ::xml_schema::Flags f,
+              ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (x, f, c),
     primaryID_ (x.primaryID_, f, this),
     dormancyFactor_ (x.dormancyFactor_, f, this)
   {
   }
 
-  Spare::
-  Spare (const ::xercesc::DOMElement& e,
-         ::xml_schema::Flags f,
-         ::xml_schema::Container* c)
+  Spare_base::
+  Spare_base (const ::xercesc::DOMElement& e,
+              ::xml_schema::Flags f,
+              ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (e, f | ::xml_schema::Flags::base, c),
     primaryID_ (f, this),
     dormancyFactor_ (f, this)
@@ -1806,7 +1806,7 @@ namespace faulttree
     }
   }
 
-  void Spare::
+  void Spare_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -1851,15 +1851,15 @@ namespace faulttree
     }
   }
 
-  Spare* Spare::
+  Spare_base* Spare_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class Spare (*this, f, c);
+    return new class Spare_base (*this, f, c);
   }
 
-  Spare::
-  ~Spare ()
+  Spare_base::
+  ~Spare_base ()
   {
   }
 
@@ -1869,30 +1869,30 @@ namespace faulttree
     "Spare",
     "net.faulttree");
 
-  // PriorityAnd
+  // PriorityAnd_base
   //
 
-  PriorityAnd::
-  PriorityAnd (const IdType& id,
-               const EventSequenceType& eventSequence)
+  PriorityAnd_base::
+  PriorityAnd_base (const IdType& id,
+                    const EventSequenceType& eventSequence)
   : ::faulttree::DynamicGate (id),
     eventSequence_ (eventSequence, ::xml_schema::Flags (), this)
   {
   }
 
-  PriorityAnd::
-  PriorityAnd (const PriorityAnd& x,
-               ::xml_schema::Flags f,
-               ::xml_schema::Container* c)
+  PriorityAnd_base::
+  PriorityAnd_base (const PriorityAnd_base& x,
+                    ::xml_schema::Flags f,
+                    ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (x, f, c),
     eventSequence_ (x.eventSequence_, f, this)
   {
   }
 
-  PriorityAnd::
-  PriorityAnd (const ::xercesc::DOMElement& e,
-               ::xml_schema::Flags f,
-               ::xml_schema::Container* c)
+  PriorityAnd_base::
+  PriorityAnd_base (const ::xercesc::DOMElement& e,
+                    ::xml_schema::Flags f,
+                    ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (e, f | ::xml_schema::Flags::base, c),
     eventSequence_ (f, this)
   {
@@ -1903,7 +1903,7 @@ namespace faulttree
     }
   }
 
-  void PriorityAnd::
+  void PriorityAnd_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -1935,15 +1935,15 @@ namespace faulttree
     }
   }
 
-  PriorityAnd* PriorityAnd::
+  PriorityAnd_base* PriorityAnd_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class PriorityAnd (*this, f, c);
+    return new class PriorityAnd_base (*this, f, c);
   }
 
-  PriorityAnd::
-  ~PriorityAnd ()
+  PriorityAnd_base::
+  ~PriorityAnd_base ()
   {
   }
 
@@ -1953,30 +1953,30 @@ namespace faulttree
     "PriorityAnd",
     "net.faulttree");
 
-  // Sequence
+  // Sequence_base
   //
 
-  Sequence::
-  Sequence (const IdType& id,
-            const EventSequenceType& eventSequence)
+  Sequence_base::
+  Sequence_base (const IdType& id,
+                 const EventSequenceType& eventSequence)
   : ::faulttree::DynamicGate (id),
     eventSequence_ (eventSequence, ::xml_schema::Flags (), this)
   {
   }
 
-  Sequence::
-  Sequence (const Sequence& x,
-            ::xml_schema::Flags f,
-            ::xml_schema::Container* c)
+  Sequence_base::
+  Sequence_base (const Sequence_base& x,
+                 ::xml_schema::Flags f,
+                 ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (x, f, c),
     eventSequence_ (x.eventSequence_, f, this)
   {
   }
 
-  Sequence::
-  Sequence (const ::xercesc::DOMElement& e,
-            ::xml_schema::Flags f,
-            ::xml_schema::Container* c)
+  Sequence_base::
+  Sequence_base (const ::xercesc::DOMElement& e,
+                 ::xml_schema::Flags f,
+                 ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (e, f | ::xml_schema::Flags::base, c),
     eventSequence_ (f, this)
   {
@@ -1987,7 +1987,7 @@ namespace faulttree
     }
   }
 
-  void Sequence::
+  void Sequence_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -2019,15 +2019,15 @@ namespace faulttree
     }
   }
 
-  Sequence* Sequence::
+  Sequence_base* Sequence_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class Sequence (*this, f, c);
+    return new class Sequence_base (*this, f, c);
   }
 
-  Sequence::
-  ~Sequence ()
+  Sequence_base::
+  ~Sequence_base ()
   {
   }
 
@@ -2037,33 +2037,33 @@ namespace faulttree
     "Sequence",
     "net.faulttree");
 
-  // FDEP
+  // FDEP_base
   //
 
-  FDEP::
-  FDEP (const IdType& id,
-        const TriggerType& trigger,
-        const TriggeredEventsType& triggeredEvents)
+  FDEP_base::
+  FDEP_base (const IdType& id,
+             const TriggerType& trigger,
+             const TriggeredEventsType& triggeredEvents)
   : ::faulttree::DynamicGate (id),
     trigger_ (trigger, ::xml_schema::Flags (), this),
     triggeredEvents_ (triggeredEvents, ::xml_schema::Flags (), this)
   {
   }
 
-  FDEP::
-  FDEP (const FDEP& x,
-        ::xml_schema::Flags f,
-        ::xml_schema::Container* c)
+  FDEP_base::
+  FDEP_base (const FDEP_base& x,
+             ::xml_schema::Flags f,
+             ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (x, f, c),
     trigger_ (x.trigger_, f, this),
     triggeredEvents_ (x.triggeredEvents_, f, this)
   {
   }
 
-  FDEP::
-  FDEP (const ::xercesc::DOMElement& e,
-        ::xml_schema::Flags f,
-        ::xml_schema::Container* c)
+  FDEP_base::
+  FDEP_base (const ::xercesc::DOMElement& e,
+             ::xml_schema::Flags f,
+             ::xml_schema::Container* c)
   : ::faulttree::DynamicGate (e, f | ::xml_schema::Flags::base, c),
     trigger_ (f, this),
     triggeredEvents_ (f, this)
@@ -2075,7 +2075,7 @@ namespace faulttree
     }
   }
 
-  void FDEP::
+  void FDEP_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -2123,15 +2123,15 @@ namespace faulttree
     }
   }
 
-  FDEP* FDEP::
+  FDEP_base* FDEP_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class FDEP (*this, f, c);
+    return new class FDEP_base (*this, f, c);
   }
 
-  FDEP::
-  ~FDEP ()
+  FDEP_base::
+  ~FDEP_base ()
   {
   }
 
@@ -2236,40 +2236,40 @@ namespace faulttree
     "TransferIn",
     "net.faulttree");
 
-  // UndevelopedEvent
+  // UndevelopedEvent_base
   //
 
-  UndevelopedEvent::
-  UndevelopedEvent (const IdType& id)
+  UndevelopedEvent_base::
+  UndevelopedEvent_base (const IdType& id)
   : ::faulttree::ChildNode (id)
   {
   }
 
-  UndevelopedEvent::
-  UndevelopedEvent (const UndevelopedEvent& x,
-                    ::xml_schema::Flags f,
-                    ::xml_schema::Container* c)
+  UndevelopedEvent_base::
+  UndevelopedEvent_base (const UndevelopedEvent_base& x,
+                         ::xml_schema::Flags f,
+                         ::xml_schema::Container* c)
   : ::faulttree::ChildNode (x, f, c)
   {
   }
 
-  UndevelopedEvent::
-  UndevelopedEvent (const ::xercesc::DOMElement& e,
-                    ::xml_schema::Flags f,
-                    ::xml_schema::Container* c)
+  UndevelopedEvent_base::
+  UndevelopedEvent_base (const ::xercesc::DOMElement& e,
+                         ::xml_schema::Flags f,
+                         ::xml_schema::Container* c)
   : ::faulttree::ChildNode (e, f, c)
   {
   }
 
-  UndevelopedEvent* UndevelopedEvent::
+  UndevelopedEvent_base* UndevelopedEvent_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class UndevelopedEvent (*this, f, c);
+    return new class UndevelopedEvent_base (*this, f, c);
   }
 
-  UndevelopedEvent::
-  ~UndevelopedEvent ()
+  UndevelopedEvent_base::
+  ~UndevelopedEvent_base ()
   {
   }
 
@@ -2279,38 +2279,38 @@ namespace faulttree
     "UndevelopedEvent",
     "net.faulttree");
 
-  // BasicEvent
+  // BasicEvent_base
   //
 
-  BasicEvent::
-  BasicEvent (const IdType& id,
-              const ProbabilityType& probability)
+  BasicEvent_base::
+  BasicEvent_base (const IdType& id,
+                   const ProbabilityType& probability)
   : ::faulttree::ChildNode (id),
     probability_ (probability, ::xml_schema::Flags (), this)
   {
   }
 
-  BasicEvent::
-  BasicEvent (const IdType& id,
-              ::std::auto_ptr< ProbabilityType >& probability)
+  BasicEvent_base::
+  BasicEvent_base (const IdType& id,
+                   ::std::auto_ptr< ProbabilityType >& probability)
   : ::faulttree::ChildNode (id),
     probability_ (probability, ::xml_schema::Flags (), this)
   {
   }
 
-  BasicEvent::
-  BasicEvent (const BasicEvent& x,
-              ::xml_schema::Flags f,
-              ::xml_schema::Container* c)
+  BasicEvent_base::
+  BasicEvent_base (const BasicEvent_base& x,
+                   ::xml_schema::Flags f,
+                   ::xml_schema::Container* c)
   : ::faulttree::ChildNode (x, f, c),
     probability_ (x.probability_, f, this)
   {
   }
 
-  BasicEvent::
-  BasicEvent (const ::xercesc::DOMElement& e,
-              ::xml_schema::Flags f,
-              ::xml_schema::Container* c)
+  BasicEvent_base::
+  BasicEvent_base (const ::xercesc::DOMElement& e,
+                   ::xml_schema::Flags f,
+                   ::xml_schema::Container* c)
   : ::faulttree::ChildNode (e, f | ::xml_schema::Flags::base, c),
     probability_ (f, this)
   {
@@ -2321,7 +2321,7 @@ namespace faulttree
     }
   }
 
-  void BasicEvent::
+  void BasicEvent_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -2375,15 +2375,15 @@ namespace faulttree
     }
   }
 
-  BasicEvent* BasicEvent::
+  BasicEvent_base* BasicEvent_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class BasicEvent (*this, f, c);
+    return new class BasicEvent_base (*this, f, c);
   }
 
-  BasicEvent::
-  ~BasicEvent ()
+  BasicEvent_base::
+  ~BasicEvent_base ()
   {
   }
 
@@ -2393,50 +2393,50 @@ namespace faulttree
     "BasicEvent",
     "net.faulttree");
 
-  // HouseEvent
+  // HouseEvent_base
   //
 
-  HouseEvent::
-  HouseEvent (const IdType& id,
-              const ProbabilityType& probability)
+  HouseEvent_base::
+  HouseEvent_base (const IdType& id,
+                   const ProbabilityType& probability)
   : ::faulttree::BasicEvent (id,
                              probability)
   {
   }
 
-  HouseEvent::
-  HouseEvent (const IdType& id,
-              ::std::auto_ptr< ProbabilityType >& probability)
+  HouseEvent_base::
+  HouseEvent_base (const IdType& id,
+                   ::std::auto_ptr< ProbabilityType >& probability)
   : ::faulttree::BasicEvent (id,
                              probability)
   {
   }
 
-  HouseEvent::
-  HouseEvent (const HouseEvent& x,
-              ::xml_schema::Flags f,
-              ::xml_schema::Container* c)
+  HouseEvent_base::
+  HouseEvent_base (const HouseEvent_base& x,
+                   ::xml_schema::Flags f,
+                   ::xml_schema::Container* c)
   : ::faulttree::BasicEvent (x, f, c)
   {
   }
 
-  HouseEvent::
-  HouseEvent (const ::xercesc::DOMElement& e,
-              ::xml_schema::Flags f,
-              ::xml_schema::Container* c)
+  HouseEvent_base::
+  HouseEvent_base (const ::xercesc::DOMElement& e,
+                   ::xml_schema::Flags f,
+                   ::xml_schema::Container* c)
   : ::faulttree::BasicEvent (e, f, c)
   {
   }
 
-  HouseEvent* HouseEvent::
+  HouseEvent_base* HouseEvent_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class HouseEvent (*this, f, c);
+    return new class HouseEvent_base (*this, f, c);
   }
 
-  HouseEvent::
-  ~HouseEvent ()
+  HouseEvent_base::
+  ~HouseEvent_base ()
   {
   }
 
@@ -2446,40 +2446,40 @@ namespace faulttree
     "HouseEvent",
     "net.faulttree");
 
-  // IntermediateEvent
+  // IntermediateEvent_base
   //
 
-  IntermediateEvent::
-  IntermediateEvent (const IdType& id)
+  IntermediateEvent_base::
+  IntermediateEvent_base (const IdType& id)
   : ::faulttree::ChildNode (id)
   {
   }
 
-  IntermediateEvent::
-  IntermediateEvent (const IntermediateEvent& x,
-                     ::xml_schema::Flags f,
-                     ::xml_schema::Container* c)
+  IntermediateEvent_base::
+  IntermediateEvent_base (const IntermediateEvent_base& x,
+                          ::xml_schema::Flags f,
+                          ::xml_schema::Container* c)
   : ::faulttree::ChildNode (x, f, c)
   {
   }
 
-  IntermediateEvent::
-  IntermediateEvent (const ::xercesc::DOMElement& e,
-                     ::xml_schema::Flags f,
-                     ::xml_schema::Container* c)
+  IntermediateEvent_base::
+  IntermediateEvent_base (const ::xercesc::DOMElement& e,
+                          ::xml_schema::Flags f,
+                          ::xml_schema::Container* c)
   : ::faulttree::ChildNode (e, f, c)
   {
   }
 
-  IntermediateEvent* IntermediateEvent::
+  IntermediateEvent_base* IntermediateEvent_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class IntermediateEvent (*this, f, c);
+    return new class IntermediateEvent_base (*this, f, c);
   }
 
-  IntermediateEvent::
-  ~IntermediateEvent ()
+  IntermediateEvent_base::
+  ~IntermediateEvent_base ()
   {
   }
 
@@ -3425,7 +3425,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const Spare& i)
+  operator<< (::xercesc::DOMElement& e, const Spare_base& i)
   {
     e << static_cast< const ::faulttree::DynamicGate& > (i);
 
@@ -3460,7 +3460,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const PriorityAnd& i)
+  operator<< (::xercesc::DOMElement& e, const PriorityAnd_base& i)
   {
     e << static_cast< const ::faulttree::DynamicGate& > (i);
 
@@ -3484,7 +3484,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const Sequence& i)
+  operator<< (::xercesc::DOMElement& e, const Sequence_base& i)
   {
     e << static_cast< const ::faulttree::DynamicGate& > (i);
 
@@ -3508,7 +3508,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const FDEP& i)
+  operator<< (::xercesc::DOMElement& e, const FDEP_base& i)
   {
     e << static_cast< const ::faulttree::DynamicGate& > (i);
 
@@ -3578,7 +3578,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const UndevelopedEvent& i)
+  operator<< (::xercesc::DOMElement& e, const UndevelopedEvent_base& i)
   {
     e << static_cast< const ::faulttree::ChildNode& > (i);
   }
@@ -3591,7 +3591,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const BasicEvent& i)
+  operator<< (::xercesc::DOMElement& e, const BasicEvent_base& i)
   {
     e << static_cast< const ::faulttree::ChildNode& > (i);
 
@@ -3601,8 +3601,8 @@ namespace faulttree
       ::xsd::cxx::tree::type_serializer_map< char >& tsm (
         ::xsd::cxx::tree::type_serializer_map_instance< 0, char > ());
 
-      const BasicEvent::ProbabilityType& x (i.probability ());
-      if (typeid (BasicEvent::ProbabilityType) == typeid (x))
+      const BasicEvent_base::ProbabilityType& x (i.probability ());
+      if (typeid (BasicEvent_base::ProbabilityType) == typeid (x))
       {
         ::xercesc::DOMElement& s (
           ::xsd::cxx::xml::dom::create_element (
@@ -3627,7 +3627,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const HouseEvent& i)
+  operator<< (::xercesc::DOMElement& e, const HouseEvent_base& i)
   {
     e << static_cast< const ::faulttree::BasicEvent& > (i);
   }
@@ -3640,7 +3640,7 @@ namespace faulttree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const IntermediateEvent& i)
+  operator<< (::xercesc::DOMElement& e, const IntermediateEvent_base& i)
   {
     e << static_cast< const ::faulttree::ChildNode& > (i);
   }

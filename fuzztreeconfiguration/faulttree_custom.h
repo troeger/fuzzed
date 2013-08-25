@@ -2,6 +2,7 @@
 #include <utility>
 #include <iostream>
 #include <typeinfo>
+#include "Visitor.h"
 
 namespace faulttree
 {
@@ -18,9 +19,9 @@ namespace faulttree
 			return new Visitable<BaseType>(*this, f, c);
 		}
 
-		virtual void accept(int i)
+		virtual void accept(Visitor& visitor)
 		{
-			std::cout << typeid(BaseType).name() << " " << i << std::endl;
+			visitor.visit(this);
 		}
 	};
 }

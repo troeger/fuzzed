@@ -6,6 +6,7 @@ set(SOURCES
    main.cpp
    faulttree.cpp
    fuzztree.cpp
+   PrintVisitor.cpp
 )
 set(HEADERS
    FuzzTreeTransform.h
@@ -18,6 +19,9 @@ set(HEADERS
    FaultTreeTypes.h
    FuzzTreeTypes.h
    faulttree_custom.h
+   fuzztree_custom.h
+   Visitor.h
+   PrintVisitor.h
 )
 
 set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faulttree.xsd")
@@ -38,6 +42,26 @@ if (BUILD_TEST_EXECUTABLE)
   target_link_libraries(ftconfiguration_exe ${LINKED_LIBS})
 endif(BUILD_TEST_EXECUTABLE)
 
+set(TREE_CUSTOMIZATION_ARGS
+  --custom-type Node=Visitable<Node_base>/Node_base
+  --custom-type TopEvent=Visitable<TopEvent_base>/TopEvent_base
+  --custom-type BasicEvent=Visitable<BasicEvent_base>/BasicEvent_base
+  --custom-type HouseEvent=Visitable<HouseEvent_base>/HouseEvent_base
+  --custom-type UndevelopedEvent=Visitable<UndevelopedEvent_base>/UndevelopedEvent_base
+  --custom-type IntermediateEvent=Visitable<IntermediateEvent_base>/IntermediateEvent_base
+  --custom-type ChildNode=Visitable<ChildNode_base>/ChildNode_base
+  --custom-type Gate=Visitable<Gate_base>/Gate_base
+  --custom-type And=Visitable<And_base>/And_base
+  --custom-type Or=Visitable<Or_base>/Or_base
+  --custom-type Xor=Visitable<Xor_base>/Xor_base
+  --custom-type VotingOr=Visitable<VotingOr_base>/VotingOr_base
+  --custom-type DynamicGate=Visitable<DynamicGate_base>/DynamicGate_base
+  --custom-type Spare=Visitable<Spare_base>/Spare_base
+  --custom-type FDEP=Visitable<FDEP_base>/FDEP_base
+  --custom-type Sequence=Visitable<Sequence_base>/Sequence_base
+  --custom-type PriorityAnd=Visitable<PriorityAnd_base>/PriorityAnd_base
+)
+
 set(XSD_TO_FAULTTREE_ARGS
   --include-with-brackets	#include with <> instead of ""
   --generate-polymorphic	#needed for xsi:type
@@ -49,16 +73,7 @@ set(XSD_TO_FAULTTREE_ARGS
   --namespace-map net.faulttree=faulttree
   --hxx-suffix .h
   --cxx-suffix .cpp
-  --custom-type Node=Visitable<Node_base>/Node_base
-  --custom-type TopEvent=Visitable<TopEvent_base>/TopEvent_base
-  --custom-type ChildNode=Visitable<ChildNode_base>/ChildNode_base
-  --custom-type Gate=Visitable<Gate_base>/Gate_base
-  --custom-type And=Visitable<And_base>/And_base
-  --custom-type Or=Visitable<Or_base>/Or_base
-  --custom-type Xor=Visitable<Xor_base>/Xor_base
-  --custom-type VotingOr=Visitable<VotingOr_base>/VotingOr_base
-  --custom-type DynamicGate=Visitable<DynamicGate_base>/DynamicGate_base
-  #--fwd-prologue "#include <faulttree_custom_fwd.cpp>"
+  ${TREE_CUSTOMIZATION_ARGS}
   --hxx-prologue "#include <faulttree_custom.h>"
 )
 
@@ -73,6 +88,8 @@ set(XSD_TO_FUZZTREE_ARGS
   --namespace-map net.fuzztree=fuzztree 
   --hxx-suffix .h
   --cxx-suffix .cpp
+  ${TREE_CUSTOMIZATION_ARGS}
+  --hxx-prologue "#include <fuzztree_custom.h>"
 )
 
 add_custom_target(generateFaultTreeModel

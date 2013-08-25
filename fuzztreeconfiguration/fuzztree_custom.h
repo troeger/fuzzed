@@ -1,23 +1,28 @@
 #pragma once
 #include <utility>
-#include "xsd\cxx\tree\elements.hxx"
-#include "xsd\cxx\xml\dom\parsing-source.hxx"
+#include <iostream>
+#include <typeinfo>
 
-class Visitor;
+#include "Visitor.h"
 
 namespace fuzztree
 {
-	template <class C>
-	class Visitable : public xsd::cxx::tree::container
+	template <typename BaseType>
+	class Visitable : public BaseType
 	{
-	protected:
-		C contained;
-		virtual void parse(::xsd::cxx::xml::dom::parser< char >& p, ::xml_schema::Flags f) { contained.parse(p, f); };
-
 	public:
-		template <typename... Args> 
-		Visitable(Args&&... a) : contained(std::forward<Args>(a)...) {};
+		template <typename... Args>
+		Visitable(Args&&... arg) : BaseType(std::forward<Args>(arg)...) {}
 
-		virtual C* operator->() { return &contained; };
+		virtual Visitable<BaseType>*
+			_clone (xml_schema::Flags f = 0, xml_schema::Container* c = 0) const
+		{
+			return new Visitable<BaseType>(*this, f, c);
+		}
+
+		virtual void accept(Visitor& visitor)
+		{
+			visitor.visit(this);
+		}
 	};
 }

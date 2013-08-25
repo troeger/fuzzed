@@ -36,6 +36,7 @@
 
 // Begin prologue.
 //
+#include <fuzztree_custom.h>
 //
 // End prologue.
 
@@ -254,17 +255,26 @@ namespace fuzztree
   class AnnotatedElement;
   class Model;
   class FuzzTree;
-  class Node;
-  class ChildNode;
-  class Gate;
+  class Node_base;
+  typedef Visitable<Node_base> Node;
+  class ChildNode_base;
+  typedef Visitable<ChildNode_base> ChildNode;
+  class Gate_base;
+  typedef Visitable<Gate_base> Gate;
   class VariationPoint;
   class InclusionVariationPoint;
-  class BasicEvent;
-  class TopEvent;
-  class And;
-  class Or;
-  class Xor;
-  class VotingOr;
+  class BasicEvent_base;
+  typedef Visitable<BasicEvent_base> BasicEvent;
+  class TopEvent_base;
+  typedef Visitable<TopEvent_base> TopEvent;
+  class And_base;
+  typedef Visitable<And_base> And;
+  class Or_base;
+  typedef Visitable<Or_base> Or;
+  class Xor_base;
+  typedef Visitable<Xor_base> Xor;
+  class VotingOr_base;
+  typedef Visitable<VotingOr_base> VotingOr;
   class FeatureVariationPoint;
   class RedundancyVariationPoint;
   class TransferIn;
@@ -273,10 +283,13 @@ namespace fuzztree
   class CrispProbability;
   class FailureRate;
   class TriangularFuzzyInterval;
-  class UndevelopedEvent;
-  class IntermediateEvent;
+  class UndevelopedEvent_base;
+  typedef Visitable<UndevelopedEvent_base> UndevelopedEvent;
+  class IntermediateEvent_base;
+  typedef Visitable<IntermediateEvent_base> IntermediateEvent;
   class BasicEventSet;
-  class HouseEvent;
+  class HouseEvent_base;
+  typedef Visitable<HouseEvent_base> HouseEvent;
   class IntermediateEventSet;
   class EventSet;
   class DecomposedFuzzyProbability;
@@ -467,7 +480,7 @@ namespace fuzztree
     ::xsd::cxx::tree::one< TopEventType > topEvent_;
   };
 
-  class Node: public ::fuzztree::AnnotatedElement
+  class Node_base: public ::fuzztree::AnnotatedElement
   {
     public:
     // children
@@ -525,22 +538,22 @@ namespace fuzztree
 
     // Constructors.
     //
-    Node (const IdType&);
+    Node_base (const IdType&);
 
-    Node (const ::xercesc::DOMElement& e,
-          ::xml_schema::Flags f = 0,
-          ::xml_schema::Container* c = 0);
+    Node_base (const ::xercesc::DOMElement& e,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
 
-    Node (const Node& x,
-          ::xml_schema::Flags f = 0,
-          ::xml_schema::Container* c = 0);
+    Node_base (const Node_base& x,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
 
-    virtual Node*
+    virtual Node_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Node ();
+    ~Node_base ();
 
     // Implementation.
     //
@@ -555,50 +568,50 @@ namespace fuzztree
     YOptional y_;
   };
 
-  class ChildNode: public ::fuzztree::Node
+  class ChildNode_base: public ::fuzztree::Node
   {
     public:
     // Constructors.
     //
-    ChildNode (const IdType&);
+    ChildNode_base (const IdType&);
 
-    ChildNode (const ::xercesc::DOMElement& e,
-               ::xml_schema::Flags f = 0,
-               ::xml_schema::Container* c = 0);
+    ChildNode_base (const ::xercesc::DOMElement& e,
+                    ::xml_schema::Flags f = 0,
+                    ::xml_schema::Container* c = 0);
 
-    ChildNode (const ChildNode& x,
-               ::xml_schema::Flags f = 0,
-               ::xml_schema::Container* c = 0);
+    ChildNode_base (const ChildNode_base& x,
+                    ::xml_schema::Flags f = 0,
+                    ::xml_schema::Container* c = 0);
 
-    virtual ChildNode*
+    virtual ChildNode_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~ChildNode ();
+    ~ChildNode_base ();
   };
 
-  class Gate: public ::fuzztree::ChildNode
+  class Gate_base: public ::fuzztree::ChildNode
   {
     public:
     // Constructors.
     //
-    Gate (const IdType&);
+    Gate_base (const IdType&);
 
-    Gate (const ::xercesc::DOMElement& e,
-          ::xml_schema::Flags f = 0,
-          ::xml_schema::Container* c = 0);
+    Gate_base (const ::xercesc::DOMElement& e,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
 
-    Gate (const Gate& x,
-          ::xml_schema::Flags f = 0,
-          ::xml_schema::Container* c = 0);
+    Gate_base (const Gate_base& x,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
 
-    virtual Gate*
+    virtual Gate_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Gate ();
+    ~Gate_base ();
   };
 
   class VariationPoint: public ::fuzztree::ChildNode
@@ -693,7 +706,7 @@ namespace fuzztree
     CostsOptional costs_;
   };
 
-  class BasicEvent: public ::fuzztree::InclusionVariationPoint
+  class BasicEvent_base: public ::fuzztree::InclusionVariationPoint
   {
     public:
     // probability
@@ -715,26 +728,26 @@ namespace fuzztree
 
     // Constructors.
     //
-    BasicEvent (const IdType&,
-                const ProbabilityType&);
+    BasicEvent_base (const IdType&,
+                     const ProbabilityType&);
 
-    BasicEvent (const IdType&,
-                ::std::auto_ptr< ProbabilityType >&);
+    BasicEvent_base (const IdType&,
+                     ::std::auto_ptr< ProbabilityType >&);
 
-    BasicEvent (const ::xercesc::DOMElement& e,
-                ::xml_schema::Flags f = 0,
-                ::xml_schema::Container* c = 0);
+    BasicEvent_base (const ::xercesc::DOMElement& e,
+                     ::xml_schema::Flags f = 0,
+                     ::xml_schema::Container* c = 0);
 
-    BasicEvent (const BasicEvent& x,
-                ::xml_schema::Flags f = 0,
-                ::xml_schema::Container* c = 0);
+    BasicEvent_base (const BasicEvent_base& x,
+                     ::xml_schema::Flags f = 0,
+                     ::xml_schema::Container* c = 0);
 
-    virtual BasicEvent*
+    virtual BasicEvent_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~BasicEvent ();
+    ~BasicEvent_base ();
 
     // Implementation.
     //
@@ -747,7 +760,7 @@ namespace fuzztree
     ::xsd::cxx::tree::one< ProbabilityType > probability_;
   };
 
-  class TopEvent: public ::fuzztree::Node
+  class TopEvent_base: public ::fuzztree::Node
   {
     public:
     // missionTime
@@ -766,23 +779,23 @@ namespace fuzztree
 
     // Constructors.
     //
-    TopEvent (const IdType&,
-              const MissionTimeType&);
+    TopEvent_base (const IdType&,
+                   const MissionTimeType&);
 
-    TopEvent (const ::xercesc::DOMElement& e,
-              ::xml_schema::Flags f = 0,
-              ::xml_schema::Container* c = 0);
+    TopEvent_base (const ::xercesc::DOMElement& e,
+                   ::xml_schema::Flags f = 0,
+                   ::xml_schema::Container* c = 0);
 
-    TopEvent (const TopEvent& x,
-              ::xml_schema::Flags f = 0,
-              ::xml_schema::Container* c = 0);
+    TopEvent_base (const TopEvent_base& x,
+                   ::xml_schema::Flags f = 0,
+                   ::xml_schema::Container* c = 0);
 
-    virtual TopEvent*
+    virtual TopEvent_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~TopEvent ();
+    ~TopEvent_base ();
 
     // Implementation.
     //
@@ -795,76 +808,76 @@ namespace fuzztree
     ::xsd::cxx::tree::one< MissionTimeType > missionTime_;
   };
 
-  class And: public ::fuzztree::Gate
+  class And_base: public ::fuzztree::Gate
   {
     public:
     // Constructors.
     //
-    And (const IdType&);
+    And_base (const IdType&);
 
-    And (const ::xercesc::DOMElement& e,
-         ::xml_schema::Flags f = 0,
-         ::xml_schema::Container* c = 0);
+    And_base (const ::xercesc::DOMElement& e,
+              ::xml_schema::Flags f = 0,
+              ::xml_schema::Container* c = 0);
 
-    And (const And& x,
-         ::xml_schema::Flags f = 0,
-         ::xml_schema::Container* c = 0);
+    And_base (const And_base& x,
+              ::xml_schema::Flags f = 0,
+              ::xml_schema::Container* c = 0);
 
-    virtual And*
+    virtual And_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~And ();
+    ~And_base ();
   };
 
-  class Or: public ::fuzztree::Gate
+  class Or_base: public ::fuzztree::Gate
   {
     public:
     // Constructors.
     //
-    Or (const IdType&);
+    Or_base (const IdType&);
 
-    Or (const ::xercesc::DOMElement& e,
-        ::xml_schema::Flags f = 0,
-        ::xml_schema::Container* c = 0);
+    Or_base (const ::xercesc::DOMElement& e,
+             ::xml_schema::Flags f = 0,
+             ::xml_schema::Container* c = 0);
 
-    Or (const Or& x,
-        ::xml_schema::Flags f = 0,
-        ::xml_schema::Container* c = 0);
+    Or_base (const Or_base& x,
+             ::xml_schema::Flags f = 0,
+             ::xml_schema::Container* c = 0);
 
-    virtual Or*
+    virtual Or_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Or ();
+    ~Or_base ();
   };
 
-  class Xor: public ::fuzztree::Gate
+  class Xor_base: public ::fuzztree::Gate
   {
     public:
     // Constructors.
     //
-    Xor (const IdType&);
+    Xor_base (const IdType&);
 
-    Xor (const ::xercesc::DOMElement& e,
-         ::xml_schema::Flags f = 0,
-         ::xml_schema::Container* c = 0);
+    Xor_base (const ::xercesc::DOMElement& e,
+              ::xml_schema::Flags f = 0,
+              ::xml_schema::Container* c = 0);
 
-    Xor (const Xor& x,
-         ::xml_schema::Flags f = 0,
-         ::xml_schema::Container* c = 0);
+    Xor_base (const Xor_base& x,
+              ::xml_schema::Flags f = 0,
+              ::xml_schema::Container* c = 0);
 
-    virtual Xor*
+    virtual Xor_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Xor ();
+    ~Xor_base ();
   };
 
-  class VotingOr: public ::fuzztree::Gate
+  class VotingOr_base: public ::fuzztree::Gate
   {
     public:
     // k
@@ -883,23 +896,23 @@ namespace fuzztree
 
     // Constructors.
     //
-    VotingOr (const IdType&,
-              const KType&);
+    VotingOr_base (const IdType&,
+                   const KType&);
 
-    VotingOr (const ::xercesc::DOMElement& e,
-              ::xml_schema::Flags f = 0,
-              ::xml_schema::Container* c = 0);
+    VotingOr_base (const ::xercesc::DOMElement& e,
+                   ::xml_schema::Flags f = 0,
+                   ::xml_schema::Container* c = 0);
 
-    VotingOr (const VotingOr& x,
-              ::xml_schema::Flags f = 0,
-              ::xml_schema::Container* c = 0);
+    VotingOr_base (const VotingOr_base& x,
+                   ::xml_schema::Flags f = 0,
+                   ::xml_schema::Container* c = 0);
 
-    virtual VotingOr*
+    virtual VotingOr_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~VotingOr ();
+    ~VotingOr_base ();
 
     // Implementation.
     //
@@ -1359,50 +1372,50 @@ namespace fuzztree
     ::xsd::cxx::tree::one< CType > c_;
   };
 
-  class UndevelopedEvent: public ::fuzztree::ChildNode
+  class UndevelopedEvent_base: public ::fuzztree::ChildNode
   {
     public:
     // Constructors.
     //
-    UndevelopedEvent (const IdType&);
+    UndevelopedEvent_base (const IdType&);
 
-    UndevelopedEvent (const ::xercesc::DOMElement& e,
-                      ::xml_schema::Flags f = 0,
-                      ::xml_schema::Container* c = 0);
+    UndevelopedEvent_base (const ::xercesc::DOMElement& e,
+                           ::xml_schema::Flags f = 0,
+                           ::xml_schema::Container* c = 0);
 
-    UndevelopedEvent (const UndevelopedEvent& x,
-                      ::xml_schema::Flags f = 0,
-                      ::xml_schema::Container* c = 0);
+    UndevelopedEvent_base (const UndevelopedEvent_base& x,
+                           ::xml_schema::Flags f = 0,
+                           ::xml_schema::Container* c = 0);
 
-    virtual UndevelopedEvent*
+    virtual UndevelopedEvent_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~UndevelopedEvent ();
+    ~UndevelopedEvent_base ();
   };
 
-  class IntermediateEvent: public ::fuzztree::InclusionVariationPoint
+  class IntermediateEvent_base: public ::fuzztree::InclusionVariationPoint
   {
     public:
     // Constructors.
     //
-    IntermediateEvent (const IdType&);
+    IntermediateEvent_base (const IdType&);
 
-    IntermediateEvent (const ::xercesc::DOMElement& e,
-                       ::xml_schema::Flags f = 0,
-                       ::xml_schema::Container* c = 0);
+    IntermediateEvent_base (const ::xercesc::DOMElement& e,
+                            ::xml_schema::Flags f = 0,
+                            ::xml_schema::Container* c = 0);
 
-    IntermediateEvent (const IntermediateEvent& x,
-                       ::xml_schema::Flags f = 0,
-                       ::xml_schema::Container* c = 0);
+    IntermediateEvent_base (const IntermediateEvent_base& x,
+                            ::xml_schema::Flags f = 0,
+                            ::xml_schema::Container* c = 0);
 
-    virtual IntermediateEvent*
+    virtual IntermediateEvent_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~IntermediateEvent ();
+    ~IntermediateEvent_base ();
   };
 
   class BasicEventSet: public ::fuzztree::BasicEvent
@@ -1460,31 +1473,31 @@ namespace fuzztree
     QuantityOptional quantity_;
   };
 
-  class HouseEvent: public ::fuzztree::BasicEvent
+  class HouseEvent_base: public ::fuzztree::BasicEvent
   {
     public:
     // Constructors.
     //
-    HouseEvent (const IdType&,
-                const ProbabilityType&);
+    HouseEvent_base (const IdType&,
+                     const ProbabilityType&);
 
-    HouseEvent (const IdType&,
-                ::std::auto_ptr< ProbabilityType >&);
+    HouseEvent_base (const IdType&,
+                     ::std::auto_ptr< ProbabilityType >&);
 
-    HouseEvent (const ::xercesc::DOMElement& e,
-                ::xml_schema::Flags f = 0,
-                ::xml_schema::Container* c = 0);
+    HouseEvent_base (const ::xercesc::DOMElement& e,
+                     ::xml_schema::Flags f = 0,
+                     ::xml_schema::Container* c = 0);
 
-    HouseEvent (const HouseEvent& x,
-                ::xml_schema::Flags f = 0,
-                ::xml_schema::Container* c = 0);
+    HouseEvent_base (const HouseEvent_base& x,
+                     ::xml_schema::Flags f = 0,
+                     ::xml_schema::Container* c = 0);
 
-    virtual HouseEvent*
+    virtual HouseEvent_base*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~HouseEvent ();
+    ~HouseEvent_base ();
   };
 
   class IntermediateEventSet: public ::fuzztree::IntermediateEvent
@@ -1962,13 +1975,13 @@ namespace fuzztree
             ::xml_schema::Flags f = 0);
 
   void
-  operator<< (::xercesc::DOMElement&, const Node&);
+  operator<< (::xercesc::DOMElement&, const Node_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const ChildNode&);
+  operator<< (::xercesc::DOMElement&, const ChildNode_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const Gate&);
+  operator<< (::xercesc::DOMElement&, const Gate_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const VariationPoint&);
@@ -1977,22 +1990,22 @@ namespace fuzztree
   operator<< (::xercesc::DOMElement&, const InclusionVariationPoint&);
 
   void
-  operator<< (::xercesc::DOMElement&, const BasicEvent&);
+  operator<< (::xercesc::DOMElement&, const BasicEvent_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const TopEvent&);
+  operator<< (::xercesc::DOMElement&, const TopEvent_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const And&);
+  operator<< (::xercesc::DOMElement&, const And_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const Or&);
+  operator<< (::xercesc::DOMElement&, const Or_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const Xor&);
+  operator<< (::xercesc::DOMElement&, const Xor_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const VotingOr&);
+  operator<< (::xercesc::DOMElement&, const VotingOr_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const FeatureVariationPoint&);
@@ -2033,16 +2046,16 @@ namespace fuzztree
   operator<< (::xercesc::DOMElement&, const TriangularFuzzyInterval&);
 
   void
-  operator<< (::xercesc::DOMElement&, const UndevelopedEvent&);
+  operator<< (::xercesc::DOMElement&, const UndevelopedEvent_base&);
 
   void
-  operator<< (::xercesc::DOMElement&, const IntermediateEvent&);
+  operator<< (::xercesc::DOMElement&, const IntermediateEvent_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const BasicEventSet&);
 
   void
-  operator<< (::xercesc::DOMElement&, const HouseEvent&);
+  operator<< (::xercesc::DOMElement&, const HouseEvent_base&);
 
   void
   operator<< (::xercesc::DOMElement&, const IntermediateEventSet&);
