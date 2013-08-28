@@ -13,7 +13,7 @@ faulttree::BasicEvent treeHelpers::copyBasicEvent(const fuzztree::BasicEvent& be
 	
 	faulttree::BasicEvent res(
 		be.id(),
-		typeid(prob).name() == fuzztreeType::CRISPPROB ? 
+		typeid(prob) == *fuzztreeType::CRISPPROB ? 
 			faulttree::CrispProbability(static_cast<const fuzztree::CrispProbability&>(prob).value()) :
 			faulttree::CrispProbability(0));
 

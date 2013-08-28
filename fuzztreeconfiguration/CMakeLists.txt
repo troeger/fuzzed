@@ -6,6 +6,8 @@ set(SOURCES
    main.cpp
    faulttree.cpp
    fuzztree.cpp
+   FaultTreeTypes.cpp
+   FuzzTreeTypes.cpp
    PrintVisitor.cpp
 )
 set(HEADERS

@@ -1,25 +1,34 @@
 #pragma once
 
+#include <typeinfo>
+#include "fuzztree.h"
+
+using std::type_info;
+
 namespace fuzztreeType
 {
-	const std::string AND		= "class fuzztree::And";
-	const std::string OR		= "class fuzztree::Or";
-	const std::string XOR		= "class fuzztree::Xor";
-	const std::string VOTINGOR	= "class fuzztree::VotingOr";
+	extern const type_info* AND;
+	extern const type_info* OR;
+	extern const type_info* XOR;
+	extern const type_info* VOTINGOR;
 
-	const std::string BASICEVENTSET			= "class fuzztree::BasicEventSet";
-	const std::string INTERMEDIATEEVENTSET	= "class fuzztree::IntermediateEventSet";
+	extern const type_info* BASICEVENTSET;
+	extern const type_info* INTERMEDIATEEVENTSET;
+	extern const type_info* REDUNDANCYVP;
+	extern const type_info* INCLUSIONVP;
+	extern const type_info* FEATUREVP;
 
-	const std::string BASICEVENT		= "class fuzztree::BasicEvent";
-	const std::string INTERMEDIATEEVENT	= "class fuzztree::IntermediateEvent";
-	const std::string HOUSEEVENT		= "class fuzztree::HouseEvent";
-	const std::string UNDEVELOPEDEVENT	= "class fuzztree::UndevelopedEvent";
+	extern const type_info* CRISPPROB;
+	extern const type_info* FAILURERATE;
+	extern const type_info* FUZZYPROB;
 
-	const std::string REDUNDANCYVP	= "class fuzztree::RedundancyVariationPoint";
-	const std::string INCLUSIONVP	= "class fuzztree::InclusionVariationPoint";
-	const std::string FEATUREVP		= "class fuzztree::FeatureVariationPoint";
+	extern const type_info* BASICEVENT;
+	extern const type_info* INTERMEDIATEEVENT;
+	extern const type_info* HOUSEEVENT;
+	extern const type_info* UNDEVELOPEDEVENT;
 
-	const std::string CRISPPROB		= "class fuzztree::CrispProbability";
-	const std::string FAILURERATE	= "class fuzztree::FailureRate";
-	const std::string FUZZYPROB		= "class fuzztree::DecomposedFuzzyProbability";
+// 	const type_info* FDEP	= &typeid(fuzztree::FDEP);
+// 	const type_info* SPARE	= &typeid(fuzztree::Spare);
+// 	const type_info* PAND	= &typeid(fuzztree::PriorityAnd);
+// 	const type_info* SEQ	= &typeid(fuzztree::Sequence);
 }

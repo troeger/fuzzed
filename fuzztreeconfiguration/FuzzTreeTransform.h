@@ -8,8 +8,8 @@
 #include "FuzzTreeConfiguration.h"
 
 // generated model files
-#include "faultTree.h"
-#include "fuzzTree.h"
+#include "faulttree.h"
+#include "fuzztree.h"
 
 enum ErrorType
 {
@@ -38,7 +38,7 @@ protected:
 		const FuzzTreeConfiguration& configuration) const;
 
 	static void copyNode(
-		const std::string typeName,
+		const std::type_info& typeName,
 		faulttree::Node* node,
 		const std::string id,
 		const fuzztree::ChildNode& currentChild);
@@ -76,13 +76,11 @@ protected:
 		std::vector<FuzzTreeConfiguration>& configurations) const;
 
 	static bool isOptional(const fuzztree::Node& node);
-	static bool isGate(const std::string& node);
-	static bool isLeaf(const std::string& node);
-	static bool isVariationPoint(const std::string& node);
-	static bool isEventSet(const std::string& node);
+	static bool isGate(const std::type_info& node);
+	static bool isLeaf(const std::type_info& node);
+	static bool isVariationPoint(const std::type_info& node);
+	static bool isEventSet(const std::type_info& node);
 
-	static bool connectionRuleViolated(const std::string& parentType, const std::string& childType);
-	
 	std::string generateUniqueId(const std::string& oldId);
 	
 private:

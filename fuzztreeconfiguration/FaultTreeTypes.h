@@ -1,24 +1,27 @@
 #pragma once
 
-// TODO: generate this. otherwise it will break the build whenever the xsd changes
+#include <typeinfo>
+#include "faulttree.h"
+
+using std::type_info;
 
 namespace faultTreeType
 {
-	const std::string AND		= "class faulttree::And";
-	const std::string OR		= "class faulttree::Or";
-	const std::string XOR		= "class faulttree::Xor";
-	const std::string VOTINGOR	= "class faulttree::VotingOr";
+	extern const type_info* AND;
+	extern const type_info* OR;
+	extern const type_info* XOR;
+	extern const type_info* VOTINGOR;
 
-	const std::string CRISPPROB		= "class faulttree::CrispProbability";
-	const std::string FAILURERATE	= "class faulttree::FailureRate";
+	extern const type_info* CRISPPROB;
+	extern const type_info* FAILURERATE;
 
-	const std::string BASICEVENT		= "class faulttree::BasicEvent";
-	const std::string INTERMEDIATEEVENT	= "class faulttree::IntermediateEvent";
-	const std::string HOUSEEVENT		= "class faulttree::HouseEvent";
-	const std::string UNDEVELOPEDEVENT	= "class faulttree::UndevelopedEvent";
+	extern const type_info* BASICEVENT;
+	extern const type_info* INTERMEDIATEEVENT;
+	extern const type_info* HOUSEEVENT;
+	extern const type_info* UNDEVELOPEDEVENT;
 
-	const std::string FDEP	= "class faulttree::FDEP";
-	const std::string SPARE = "class faulttree::Spare";
-	const std::string PAND	= "class faulttree::PriorityAnd";
-	const std::string SEQ	= "class faulttree::Sequence";
+	extern const type_info* FDEP;
+	extern const type_info* SPARE;
+	extern const type_info* PAND;
+	extern const type_info* SEQ;
 }
