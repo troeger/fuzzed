@@ -361,7 +361,7 @@ def edges(request, graph_id):
 
     # either the graph, the source or the destination node are not in the database
     except ObjectDoesNotExist:
-        raise HttpResponseNotFoundAnswer()
+        raise HttpResponseNotFoundAnswer("Invalid graph or node ID")
 
     # should never happen, just for completeness reasons here
     except MultipleObjectsReturned:
@@ -408,7 +408,7 @@ def edge(request, graph_id, edge_id):
         raise HttpResponseBadRequestAnswer()
 
     except ObjectDoesNotExist:
-        raise HttpResponseNotFoundAnswer()
+        raise HttpResponseNotFoundAnswer("Invalid edge ID")
 
     except MultipleObjectsReturned:
         raise HttpResponseServerErrorAnswer()

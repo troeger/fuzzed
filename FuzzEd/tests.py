@@ -15,6 +15,13 @@ class FuzzTreesTestCase(TestCase):
                     orGate (4, 222)
                         basicEvent (5, 88)
                         basicEvent (6, 99)
+
+        The following edges are defined, with pk and client_id:
+            1 / 65: 1->2
+            2 / 66: 2->3
+            3 / 77: 2->4
+            4 / 88: 4->5
+            5 / 99: 4->6
     """
 
     def setUp(self):
@@ -78,6 +85,19 @@ class BasicApiTestCase(FuzzTreesTestCase):
         response=self.ajaxPost('/api/graphs', {"kind": "foo", "name":"Third graph"})
         self.assertEqual(response.status_code, 400)
 
+    def testDeleteEdge(self):
+        response=self.ajaxDelete('/api/graphs/1/edges/66')
+        self.assertEqual(response.status_code, 204)
+        #TODO: Check if really gone 
+
+    def testCreateEdge(self):
+        # Delete edge before re-creating it
+        response=self.ajaxDelete('/api/graphs/1/edges/77')
+        self.assertEqual(response.status_code, 204)
+        response=self.ajaxPost('/api/graphs/1/edges', {'id': 4714, 'source':4711, 'destination':222} )
+        self.assertEqual(response.status_code, 201)
+        #TODO: Check if really created 
+
 class AnalysisTestCase(FuzzTreesTestCase):
     def requestAnalysis(self):
         """ Helper function for requesting an analysis run. Returns the analysis result as dictionary."""
@@ -85,7 +105,7 @@ class AnalysisTestCase(FuzzTreesTestCase):
         self.assertNotEqual(response.status_code, 500) # you forgot to start the analysis server
         self.assertEqual(response.status_code, 201)
         jobUrl = response['Location']
-        self.assertEqual(jobUrl.startswith('http://testserver/api/jobs/'), True)
+        self.assertEqual(jobUrl.startswith('http://testserver/api/jobs/'), True) # check job creation
         response=self.ajaxGet(jobUrl)
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
