@@ -82,7 +82,7 @@ def graphs(request):
 
     # something was not right with the request parameters
     except (ValueError, KeyError):
-        raise HttpResponseBadRequestAnswer()
+        raise HttpResponseBadRequestAnswer('Bad request parameters.')
 
 @login_required
 @csrf_exempt
@@ -246,7 +246,7 @@ def nodes(request, graph_id):
 
     # a int conversion of one of the parameters failed or kind is not supported by the graph
     except (ValueError, AssertionError, KeyError):
-        raise HttpResponseBadRequestAnswer()
+        raise HttpResponseBadRequestAnswer("Bad arguments in the request.")
 
     # the looked up graph does not exist
     except ObjectDoesNotExist:

@@ -136,15 +136,6 @@
     },
     {
         "pk": 1,
-        "model": "FuzzEd.addnode",
-        "fields": {
-            "node": 1,
-            "insert_date": "2012-08-30T13:22:47.201",
-            "undoable": false
-        }
-    },
-    {
-        "pk": 1,
         "model": "FuzzEd.graph",
         "fields": {
             "owner": 2,
