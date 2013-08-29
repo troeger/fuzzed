@@ -53,7 +53,6 @@ class FuzzTreesTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
 
-
 class BasicApiTestCase(FuzzTreesTestCase):
     fixtures = ['basic.json']
     """ This fixture tree looks like this, with pk and client_id per node:
