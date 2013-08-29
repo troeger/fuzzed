@@ -1,5 +1,7 @@
 #pragma once
 #include <utility>
+#include <xsd/cxx/tree/elements.hxx>
+#include <xsd/cxx/tree/types.hxx>
 
 namespace faulttree
 {
@@ -19,7 +21,7 @@ public:
 	FaultTreeVisitable(Args&&... args) : Base(std::forward<Args>(args) ...) {};
 
 	virtual FaultTreeVisitable<Base>*
-		_clone (xml_schema::Flags f = 0, xml_schema::Container* c = 0) const
+		_clone (::xsd::cxx::tree::flags f = 0, ::xsd::cxx::tree::flags* c = 0) const
 	{
 		return new FaultTreeVisitable<Base>(*this, f, c);
 	};
@@ -38,7 +40,7 @@ public:
 
 
 	virtual FuzzTreeVisitable<Base>*
-		_clone (xml_schema::Flags f = 0, xml_schema::Container* c = 0) const
+		_clone (::xsd::cxx::tree::flags  f = 0, ::xsd::cxx::tree::flags* c = 0) const
 	{
 		return new FuzzTreeVisitable<Base>(*this, f, c);
 	};

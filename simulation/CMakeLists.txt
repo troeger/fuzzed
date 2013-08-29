@@ -8,13 +8,6 @@ set(FT_INCLUDE_DIR
 option(BUILD_SIMULATION_EXECUTABLE ON)
 option(USE_TIMENET ON)
 
-option(BUILD_TESTS OFF)
-if (${BUILD_TESTS})
-  find_package(gtest REQUIRED)
-  add_subdirectory(tests)
-  message("Building Tests")
-endif()
-
 add_subdirectory(common)
 add_subdirectory(modeltransform)
 add_subdirectory(simulation)

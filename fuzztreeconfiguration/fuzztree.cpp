@@ -648,28 +648,28 @@ namespace fuzztree
   // 
 
 
-  // BasicEventSet
+  // BasicEventSet_base
   // 
 
-  const BasicEventSet::QuantityOptional& BasicEventSet::
+  const BasicEventSet_base::QuantityOptional& BasicEventSet_base::
   quantity () const
   {
     return this->quantity_;
   }
 
-  BasicEventSet::QuantityOptional& BasicEventSet::
+  BasicEventSet_base::QuantityOptional& BasicEventSet_base::
   quantity ()
   {
     return this->quantity_;
   }
 
-  void BasicEventSet::
+  void BasicEventSet_base::
   quantity (const QuantityType& x)
   {
     this->quantity_.set (x);
   }
 
-  void BasicEventSet::
+  void BasicEventSet_base::
   quantity (const QuantityOptional& x)
   {
     this->quantity_ = x;
@@ -2641,40 +2641,40 @@ namespace fuzztree
     "IntermediateEvent",
     "net.fuzztree");
 
-  // BasicEventSet
+  // BasicEventSet_base
   //
 
-  BasicEventSet::
-  BasicEventSet (const IdType& id,
-                 const ProbabilityType& probability)
+  BasicEventSet_base::
+  BasicEventSet_base (const IdType& id,
+                      const ProbabilityType& probability)
   : ::fuzztree::BasicEvent (id,
                             probability),
     quantity_ (::xml_schema::Flags (), this)
   {
   }
 
-  BasicEventSet::
-  BasicEventSet (const IdType& id,
-                 ::std::auto_ptr< ProbabilityType >& probability)
+  BasicEventSet_base::
+  BasicEventSet_base (const IdType& id,
+                      ::std::auto_ptr< ProbabilityType >& probability)
   : ::fuzztree::BasicEvent (id,
                             probability),
     quantity_ (::xml_schema::Flags (), this)
   {
   }
 
-  BasicEventSet::
-  BasicEventSet (const BasicEventSet& x,
-                 ::xml_schema::Flags f,
-                 ::xml_schema::Container* c)
+  BasicEventSet_base::
+  BasicEventSet_base (const BasicEventSet_base& x,
+                      ::xml_schema::Flags f,
+                      ::xml_schema::Container* c)
   : ::fuzztree::BasicEvent (x, f, c),
     quantity_ (x.quantity_, f, this)
   {
   }
 
-  BasicEventSet::
-  BasicEventSet (const ::xercesc::DOMElement& e,
-                 ::xml_schema::Flags f,
-                 ::xml_schema::Container* c)
+  BasicEventSet_base::
+  BasicEventSet_base (const ::xercesc::DOMElement& e,
+                      ::xml_schema::Flags f,
+                      ::xml_schema::Container* c)
   : ::fuzztree::BasicEvent (e, f | ::xml_schema::Flags::base, c),
     quantity_ (f, this)
   {
@@ -2685,7 +2685,7 @@ namespace fuzztree
     }
   }
 
-  void BasicEventSet::
+  void BasicEventSet_base::
   parse (::xsd::cxx::xml::dom::parser< char >& p,
          ::xml_schema::Flags f)
   {
@@ -2707,15 +2707,15 @@ namespace fuzztree
     }
   }
 
-  BasicEventSet* BasicEventSet::
+  BasicEventSet_base* BasicEventSet_base::
   _clone (::xml_schema::Flags f,
           ::xml_schema::Container* c) const
   {
-    return new class BasicEventSet (*this, f, c);
+    return new class BasicEventSet_base (*this, f, c);
   }
 
-  BasicEventSet::
-  ~BasicEventSet ()
+  BasicEventSet_base::
+  ~BasicEventSet_base ()
   {
   }
 
@@ -4417,7 +4417,7 @@ namespace fuzztree
 
 
   void
-  operator<< (::xercesc::DOMElement& e, const BasicEventSet& i)
+  operator<< (::xercesc::DOMElement& e, const BasicEventSet_base& i)
   {
     e << static_cast< const ::fuzztree::BasicEvent& > (i);
 

@@ -26,17 +26,17 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 	for (const auto& child : templateNode.children())
 	{
 		const string id = child.id();
-		const string typeName = typeid(child).name();
+		const type_info& typeName = typeid(child);
 		bool alreadyAdded = false;
 		
 		// Leaf nodes...
-		if (typeName == BASICEVENT) 
+		if (typeName == *BASICEVENT) 
 		{
 			const auto& prob = (static_cast<const faulttree::BasicEvent&>(child)).probability();
-			const string probName = typeid(prob).name();
+			const type_info& probName = typeid(prob);
 			
 			double failureRate = 0.f;
-			if (probName == CRISPPROB)
+			if (probName == *CRISPPROB)
 				failureRate = util::rateFromProbability(static_cast<const faulttree::CrispProbability&>(prob).value(), missionTime);
 			else
 			{
@@ -50,30 +50,30 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 			// BasicEvents can have FDEP children...
 			// continue;
 		}
-		else if (typeName == HOUSEEVENT)
+		else if (typeName == *HOUSEEVENT)
 		{ // TODO find out if this is legitimate
 			current = make_shared<BasicEvent>(id, 0);
 			node->addChild(current);
 			continue;
 		}
-		else if (typeName == UNDEVELOPEDEVENT)
+		else if (typeName == *UNDEVELOPEDEVENT)
 		{
 			throw std::runtime_error("Cannot simulate trees with undeveloped events!");
 			continue;
 		}
-		else if (typeName == INTERMEDIATEEVENT)
+		else if (typeName == *INTERMEDIATEEVENT)
 		{
 			// TODO
 		}
 
 		// Static Gates...
-		else if (typeName == AND)				current = make_shared<ANDGate>(id);
-		else if (typeName == OR)				current = make_shared<ORGate>(id);
-		else if (typeName == XOR)				current = make_shared<XORGate>(id);
-		else if (typeName == VOTINGOR)			current = make_shared<VotingORGate>(id, static_cast<const faulttree::VotingOr&>(child).k());
+		else if (typeName == *AND)				current = make_shared<ANDGate>(id);
+		else if (typeName == *OR)				current = make_shared<ORGate>(id);
+		else if (typeName == *XOR)				current = make_shared<XORGate>(id);
+		else if (typeName == *VOTINGOR)			current = make_shared<VotingORGate>(id, static_cast<const faulttree::VotingOr&>(child).k());
 		
 		// Dynamic gates...
-		else if (typeName == FDEP)
+		else if (typeName == *FDEP)
 		{
 			const faulttree::FDEP& fdep = static_cast<const faulttree::FDEP&>(child);
 			const string trigger = fdep.trigger();
@@ -82,7 +82,7 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 				dependentEvents.emplace_back(e);
 			current = make_shared<FDEPGate>(id, trigger, dependentEvents);
 		}
-		else if (typeName == PAND)
+		else if (typeName == *PAND)
 		{
 			const faulttree::PriorityAnd& pand = static_cast<const faulttree::PriorityAnd&>(child);
 			std::vector<string> eventSequence;
@@ -90,7 +90,7 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 				eventSequence.emplace_back(e);
 			current = make_shared<PANDGate>(id, eventSequence); 
 		}
-		else if (typeName == SEQ)
+		else if (typeName == *SEQ)
 		{
 			const faulttree::Sequence& seq = static_cast<const faulttree::Sequence&>(child);
 			std::vector<string> eventSequence;
@@ -98,7 +98,7 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 				eventSequence.emplace_back(e);
 			current = make_shared<SEQGate>(id, eventSequence); 
 		}
-		else if (typeName == SPARE)
+		else if (typeName == *SPARE)
 		{
 			const faulttree::Spare& spareGate = static_cast<const faulttree::Spare&>(child);
 			current = make_shared<SpareGate>(id, spareGate.primaryID(), spareGate.dormancyFactor()); 

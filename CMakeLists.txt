@@ -1,5 +1,6 @@
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
+
 option(USE_INTEL_COMPILER ON)
 if (USE_INTEL_COMPILER)
   include(ForceCompiler)
@@ -7,6 +8,7 @@ if (USE_INTEL_COMPILER)
   CMAKE_FORCE_C_COMPILER(icc Intel)
   CMAKE_FORCE_CXX_COMPILER(icpc Intel)
   message(STATUS "Using compiler: ${CMAKE_CXX_COMPILER_ID}")
+  message("CMake support for ICC is crappy. Enforce the generation of Visual Studio Projects using this tool: http://software.intel.com/en-us/articles/ICProjConvert100")
 endif()
 
 if (APPLE)
@@ -16,7 +18,7 @@ if (APPLE)
   set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "4.7")
 endif ()
 
-project(FuzztreeServices)
+project(FuzztreeBackends)
 cmake_minimum_required(VERSION 2.8.8)
 set(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 set(FT_LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
@@ -33,6 +35,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # using Intel C++
   message(STATUS "using intel")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qstd=c++0x")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
     string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
@@ -114,5 +117,16 @@ include_directories(
 	fuzztreeconfiguration
 )
 
+############### UNIT TESTS ##############
+#########################################
+
+option(BUILD_TESTS OFF)
+if (${BUILD_TESTS})
+  find_package(gtest REQUIRED)
+  add_subdirectory(backendtests)
+  message("Building Tests")
+endif()
+
 add_subdirectory(fuzztreeconfiguration)
+add_subdirectory(fuzztreeanalysis)
 add_subdirectory(simulation)
