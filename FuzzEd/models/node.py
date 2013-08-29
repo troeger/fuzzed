@@ -289,8 +289,12 @@ class Node(models.Model):
                     assert(False)
                 elif probability[0] in [0,2]:
                     # Point value with uncertainty range, type 0 (direct) or 2 (fuzzy terms)
-                    point = probability[1][0]
-                    alpha = probability[1][1]
+                    if isinstance(probability[1], int):
+                        point = probability[1]
+                        alpha = 0
+                    else:
+                        point = probability[1][0]
+                        alpha = probability[1][1]
                     if alpha == 0:
                         properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
                     else:

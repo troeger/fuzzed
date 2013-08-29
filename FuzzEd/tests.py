@@ -1,9 +1,12 @@
-import json
+import json, logging
 from xml.dom import minidom
 from django.test import TestCase
 from django.test.client import Client
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
+
+# Remove this comment if you want to get rid of all the server logging output
+#logging.disable(logging.CRITICAL)
 
 class FuzzTreesTestCase(TestCase):
     fixtures = ['test_data.json']
@@ -99,19 +102,23 @@ class BasicApiTestCase(FuzzTreesTestCase):
         #TODO: Check if really created 
 
 class AnalysisTestCase(FuzzTreesTestCase):
-    def requestAnalysis(self):
+    fixtures = ['analysis.json']
+    def requestAnalysis(self, graphid):
         """ Helper function for requesting an analysis run. Returns the analysis result as dictionary."""
-        response=self.ajaxGet('/api/graphs/1/analysis/topEventProbability')
+        response=self.ajaxGet('/api/graphs/%u/analysis/topEventProbability'%graphid)
         self.assertNotEqual(response.status_code, 500) # you forgot to start the analysis server
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 201)    # you got the wrong graph ID
         jobUrl = response['Location']
         self.assertEqual(jobUrl.startswith('http://testserver/api/jobs/'), True) # check job creation
-        response=self.ajaxGet(jobUrl)
+        code = 202
+        while (code == 202):
+            response=self.ajaxGet(jobUrl)
+            code = response.status_code 
         self.assertEqual(response.status_code, 200)
         return json.loads(response.content)
 
     def testStandardFixtureAnalysis(self):
-        result=self.requestAnalysis()
+        result=self.requestAnalysis(4)
         self.assertEqual(bool(result['validResult']),True)
         self.assertEqual(result['errors'],{})
         self.assertEqual(result['warnings'],{})
