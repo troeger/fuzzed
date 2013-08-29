@@ -255,3 +255,11 @@ double util::rateFromProbability(double prob, int missionTime)
 
 	return std::log(1.0 / (1.0 - prob)) / missionTime;
 }
+
+
+double util::probabilityFromRate(double rate, int missionTime)
+{
+	assert(missionTime > 0);
+	// TODO
+	return rate;
+}

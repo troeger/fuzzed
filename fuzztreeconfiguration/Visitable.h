@@ -21,7 +21,7 @@ public:
 	FaultTreeVisitable(Args&&... args) : Base(std::forward<Args>(args) ...) {};
 
 	virtual FaultTreeVisitable<Base>*
-		_clone (::xsd::cxx::tree::flags f = 0, ::xsd::cxx::tree::flags* c = 0) const
+		_clone (::xsd::cxx::tree::flags f = 0, ::xsd::cxx::tree::type* c = 0) const
 	{
 		return new FaultTreeVisitable<Base>(*this, f, c);
 	};
@@ -40,7 +40,7 @@ public:
 
 
 	virtual FuzzTreeVisitable<Base>*
-		_clone (::xsd::cxx::tree::flags  f = 0, ::xsd::cxx::tree::flags* c = 0) const
+		_clone (::xsd::cxx::tree::flags  f = 0, ::xsd::cxx::tree::type* c = 0) const
 	{
 		return new FuzzTreeVisitable<Base>(*this, f, c);
 	};

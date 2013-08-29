@@ -88,6 +88,7 @@ namespace util
 	long double kOutOfN(long double rate, int k, int N);
 
 	double rateFromProbability(double prob, int missionTime);
+	double probabilityFromRate(double rate, int missionTime);
 
 
 	/************************************************************************/

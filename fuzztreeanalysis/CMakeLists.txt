@@ -4,16 +4,22 @@ set(SOURCES
    main.cpp
    AlphaCutAnalysisTask.cpp
    InstanceAnalysisTask.cpp
+   Probability.cpp
 )
 
 set(HEADERS
    AlphaCutAnalysisTask.h
    InstanceAnalysisTask.h
+   Interval.h
+   DecomposedFuzzyInterval.h
+   Probability.h
 )
 
 find_package(beanstalkpp REQUIRED)
 message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
 include_directories(${BEANSTALKPP_INCLUDE})
+
+message("${FT_CONFIG_LIB}")
 
 option(BUILD_ANAlYSIS_EXECUTABLE ON)
 if (BUILD_ANAlYSIS_EXECUTABLE)

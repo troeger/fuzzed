@@ -1,13 +1,17 @@
 #pragma once
 #include "faulttree.h"
-typedef double InstanceAnalysisResult; // TODO find out how this is structured
+#include "DecomposedFuzzyInterval.h"
+#include <map>
+
+typedef DecomposedFuzzyInterval InstanceAnalysisResult;
+
 
 class InstanceAnalysisTask
 {
 public:
 	InstanceAnalysisTask(faulttree::TopEvent& tree, unsigned int decompositionNumber);
 
-	void compute();
+	InstanceAnalysisResult compute();
 	
 protected:
 	faulttree::TopEvent& m_tree;
