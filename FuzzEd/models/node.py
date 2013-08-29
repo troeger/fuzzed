@@ -332,7 +332,7 @@ class Node(models.Model):
             xml_node = faulttree_classes[self.kind](**properties)
 
         # serialize children
-        logger.debug('[XML] Added node "%s" with properties %s' % (self.kind, properties))
+        logger.debug('Added node "%s" with properties %s' % (self.kind, properties))
         for edge in self.outgoing.filter(deleted=False):
             xml_node.children.append(edge.target.to_xml(xmltype))
 
@@ -343,11 +343,16 @@ class Node(models.Model):
             return self.properties.get(key=key).value
         except ObjectDoesNotExist:
             try:
-                logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
-                prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
-                return prop['default'] if prop is not None else default
+                prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]                
+                if prop is None:
+                    logger.warning("Notation configuration has empty default for node property "+key)
+                    result = default
+                else:
+                    result = prop['default']
+                logger.debug('Node has no property "%s", using default "%s"' % (key, str(result)))
+                return result
             except KeyError:
-                logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
+                logger.debug('No default given in notation, using given default "%s" instead' % default)
                 return default
 
     def get_attr(self, key):

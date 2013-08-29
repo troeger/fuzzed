@@ -5,11 +5,57 @@ from django.test.client import Client
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
 
-# Remove this comment if you want to get rid of all the server logging output
-#logging.disable(logging.CRITICAL)
+# This is the test suite.
+#
+# The typical workflow to add new tests is the following:
+# 1.) Get yourself an empty local database with 'fab reset_db'.
+# 2.) Draw one or more test graphs. 
+# 3.) Create a fixture file from it with 'fab fixture_save:<filename.json>'. 
+# 4.) Write your test class / methods as the ones below. Make heavy use of 
+#     all the helper functions in FuzzTreesTestCase.
+# 5.) Run the tests with 'fab run_tests'.
+# 6.) Edit your fixture file by loading it into the local database 
+#     with 'fab fixture_load:<filename.json>'
+
+# This disables all the debug output. Sometimes it may be helpful.
+logging.disable(logging.CRITICAL)
 
 class FuzzTreesTestCase(TestCase):
-    fixtures = ['test_data.json']
+    def setUp(self):
+        self.c=Client()
+        self.c.login(username='testadmin', password='testadmin') # added by 'fab fixture_save'
+
+    def ajaxGet(self, url):
+        return self.c.get( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
+
+    def ajaxPost(self, url, data):
+        return self.c.post( url, data, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
+
+    def ajaxPostNode(self, data):
+        return self.ajaxPost('/api/graphs/1/nodes/88', {'properties': json.dumps(data)})
+
+    def ajaxDelete(self, url):
+        return self.c.delete( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
+
+    def requestAnalysis(self, graph_id):
+        """ Helper function for requesting an analysis run. 
+            Returns the analysis result as dictionary as received by the frontend.
+        """
+        response=self.ajaxGet('/api/graphs/%u/analysis/topEventProbability'%graph_id)
+        self.assertNotEqual(response.status_code, 500) # you forgot to start the analysis server
+        self.assertEqual(response.status_code, 201)    # you got the wrong graph ID
+        jobUrl = response['Location']
+        self.assertEqual(jobUrl.startswith('http://testserver/api/jobs/'), True) # check job creation
+        code = 202
+        while (code == 202):
+            response=self.ajaxGet(jobUrl)
+            code = response.status_code 
+        self.assertEqual(response.status_code, 200)
+        return json.loads(response.content)
+
+
+class BasicApiTestCase(FuzzTreesTestCase):
+    fixtures = ['basic.json']
     """ This fixture tree looks like this, with pk and client_id per node:
         graph(1)
             topEvent (1, -2147483647)
@@ -27,23 +73,6 @@ class FuzzTreesTestCase(TestCase):
             5 / 99: 4->6
     """
 
-    def setUp(self):
-        self.c=Client()
-        self.c.login(username='testadmin', password='testadmin')
-
-    def ajaxGet(self, url):
-        return self.c.get( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
-
-    def ajaxPost(self, url, data):
-        return self.c.post( url, data, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
-
-    def ajaxPostNode(self, data):
-        return self.ajaxPost('/api/graphs/1/nodes/88', {'properties': json.dumps(data)})
-
-    def ajaxDelete(self, url):
-        return self.c.delete( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
-
-class BasicApiTestCase(FuzzTreesTestCase):
     def testGetGraph(self):
         response=self.ajaxGet('/api/graphs/1')
         self.assertEqual(response.status_code, 200)
@@ -103,25 +132,15 @@ class BasicApiTestCase(FuzzTreesTestCase):
 
 class AnalysisTestCase(FuzzTreesTestCase):
     fixtures = ['analysis.json']
-    def requestAnalysis(self, graphid):
-        """ Helper function for requesting an analysis run. Returns the analysis result as dictionary."""
-        response=self.ajaxGet('/api/graphs/%u/analysis/topEventProbability'%graphid)
-        self.assertNotEqual(response.status_code, 500) # you forgot to start the analysis server
-        self.assertEqual(response.status_code, 201)    # you got the wrong graph ID
-        jobUrl = response['Location']
-        self.assertEqual(jobUrl.startswith('http://testserver/api/jobs/'), True) # check job creation
-        code = 202
-        while (code == 202):
-            response=self.ajaxGet(jobUrl)
-            code = response.status_code 
-        self.assertEqual(response.status_code, 200)
-        return json.loads(response.content)
 
     def testStandardFixtureAnalysis(self):
         result=self.requestAnalysis(4)
         self.assertEqual(bool(result['validResult']),True)
         self.assertEqual(result['errors'],{})
         self.assertEqual(result['warnings'],{})
+        self.assertEqual(result['configurations'][0]['alphaCuts']['1.0'],[0.5, 0.5])
+        self.assertEqual(result['configurations'][1]['alphaCuts']['1.0'],[0.4, 0.4])
+
 
 
 

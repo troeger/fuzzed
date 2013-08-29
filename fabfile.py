@@ -2,7 +2,7 @@ import os, json, pprint, shutil, tarfile, sys, platform, subprocess
 from contextlib import contextmanager
 from xml.dom.minidom import parse as parseXml
 # check FuzzEd/__init__.py for the project version number
-from FuzzEd import __version__, util
+from FuzzEd import __version__, util, settings
 from FuzzEd.setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 
 from fabric.api import run, local, task
@@ -373,6 +373,13 @@ def fixture_load(fname=None):
         print "Usage: fab fixture_load:<filename>"
         return
     os.system('./manage.py loaddata ./FuzzEd/fixtures/'+fname)
+
+@task
+def reset_db():
+    '''Resets the database without further questions.'''
+    # We don't want to do that on the production database. Ever.
+    assert(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3')
+    os.system('./manage.py syncdb --noinput --no-initial-data --migrate')
 
 @task
 def run_tests():
