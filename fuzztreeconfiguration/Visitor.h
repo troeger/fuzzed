@@ -1,29 +1,35 @@
 #pragma once
 
-/************************************************************************/
-/* To implement custom behaviour on Fault- or Fuzztrees,                */
-/* derive from this class and implement visit() for all subclasses.		*/
-/************************************************************************/
-
-#define VISITOR(NodeType)\
-	class Visitor\
-	{\
-	public:\
-		virtual void visit(NodeType*) = 0;\
-	};\
-
+#include "faulttree-fwd.hxx"
+#include "fuzztree-fwd.hxx"
+#include "Visitable.h"
 
 namespace faulttree
 {
-	class Node_base;
-	template<typename Node_base> class Visitable;
-	VISITOR(Visitable<Node_base>)
+	class Visitor
+	{
+	public:
+		virtual void visit(Node& n) = 0;
+	};
 }
-
 
 namespace fuzztree
 {
-	class Node_base;
-	template<typename Node_base> class Visitable;
-	VISITOR(Visitable<Node_base>)
+	class Visitor
+	{
+	public:
+		virtual void visit(Node& n) = 0;
+	};
+}
+
+template <typename Base>
+void FaultTreeVisitable<Base>::accept(faulttree::Visitor& visitor)
+{
+	visitor.visit(static_cast< FaultTreeVisitable<Base>& >(*this));
+}
+
+template <typename Base>
+void FuzzTreeVisitable<Base>::accept(fuzztree::Visitor& visitor)
+{
+	visitor.visit(static_cast< FuzzTreeVisitable<Base>& >(*this));
 }

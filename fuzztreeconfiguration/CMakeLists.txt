@@ -20,9 +20,8 @@ set(HEADERS
    fuzztree.h
    FaultTreeTypes.h
    FuzzTreeTypes.h
-   faulttree_custom.h
-   fuzztree_custom.h
    Visitor.h
+   Visitable.h
    PrintVisitor.h
 )
 
@@ -45,30 +44,47 @@ if (BUILD_TEST_EXECUTABLE)
 endif(BUILD_TEST_EXECUTABLE)
 
 set(TREE_CUSTOMIZATION_ARGS
-  --custom-type Node=Visitable<Node_base>/Node_base
-  --custom-type TopEvent=Visitable<TopEvent_base>/TopEvent_base
-  --custom-type BasicEvent=Visitable<BasicEvent_base>/BasicEvent_base
-  --custom-type HouseEvent=Visitable<HouseEvent_base>/HouseEvent_base
-  --custom-type UndevelopedEvent=Visitable<UndevelopedEvent_base>/UndevelopedEvent_base
-  --custom-type IntermediateEvent=Visitable<IntermediateEvent_base>/IntermediateEvent_base
-  --custom-type ChildNode=Visitable<ChildNode_base>/ChildNode_base
-  --custom-type Gate=Visitable<Gate_base>/Gate_base
-  --custom-type And=Visitable<And_base>/And_base
-  --custom-type Or=Visitable<Or_base>/Or_base
-  --custom-type Xor=Visitable<Xor_base>/Xor_base
-  --custom-type VotingOr=Visitable<VotingOr_base>/VotingOr_base
-  --custom-type DynamicGate=Visitable<DynamicGate_base>/DynamicGate_base
-  --custom-type Spare=Visitable<Spare_base>/Spare_base
-  --custom-type FDEP=Visitable<FDEP_base>/FDEP_base
-  --custom-type Sequence=Visitable<Sequence_base>/Sequence_base
-  --custom-type PriorityAnd=Visitable<PriorityAnd_base>/PriorityAnd_base
+  --custom-type Node=FaultTreeVisitable<Node_base>/Node_base
+  --custom-type TopEvent=FaultTreeVisitable<TopEvent_base>/TopEvent_base
+  --custom-type BasicEvent=FaultTreeVisitable<BasicEvent_base>/BasicEvent_base
+  --custom-type HouseEvent=FaultTreeVisitable<HouseEvent_base>/HouseEvent_base
+  --custom-type UndevelopedEvent=FaultTreeVisitable<UndevelopedEvent_base>/UndevelopedEvent_base
+  --custom-type IntermediateEvent=FaultTreeVisitable<IntermediateEvent_base>/IntermediateEvent_base
+  --custom-type ChildNode=FaultTreeVisitable<ChildNode_base>/ChildNode_base
+  --custom-type Gate=FaultTreeVisitable<Gate_base>/Gate_base
+  --custom-type And=FaultTreeVisitable<And_base>/And_base
+  --custom-type Or=FaultTreeVisitable<Or_base>/Or_base
+  --custom-type Xor=FaultTreeVisitable<Xor_base>/Xor_base
+  --custom-type VotingOr=FaultTreeVisitable<VotingOr_base>/VotingOr_base
+  --custom-type DynamicGate=FaultTreeVisitable<DynamicGate_base>/DynamicGate_base
+  --custom-type Spare=FaultTreeVisitable<Spare_base>/Spare_base
+  --custom-type FDEP=FaultTreeVisitable<FDEP_base>/FDEP_base
+  --custom-type Sequence=FaultTreeVisitable<Sequence_base>/Sequence_base
+  --custom-type PriorityAnd=FaultTreeVisitable<PriorityAnd_base>/PriorityAnd_base
 )
 
 set(FUZZTREE_CUSTOMIZATION_ARGS
-  --custom-type RedundancyVariationPoint=Visitable<RedundancyVariationPoint_base>/RedundancyVariationPoint_base
-  --custom-type FeatureVariationPoint=Visitable<FeatureVariationPoint_base>/FeatureVariationPoint_base
-  --custom-type VariationPoint=Visitable<VariationPoint_base>/VariationPoint_base
-  --custom-type IntermediateEventSet=Visitable<IntermediateEventSet_base>/IntermediateEventSet_base
+  --custom-type Node=FuzzTreeVisitable<Node_base>/Node_base
+  --custom-type TopEvent=FuzzTreeVisitable<TopEvent_base>/TopEvent_base
+  --custom-type BasicEvent=FuzzTreeVisitable<BasicEvent_base>/BasicEvent_base
+  --custom-type HouseEvent=FuzzTreeVisitable<HouseEvent_base>/HouseEvent_base
+  --custom-type UndevelopedEvent=FuzzTreeVisitable<UndevelopedEvent_base>/UndevelopedEvent_base
+  --custom-type IntermediateEvent=FuzzTreeVisitable<IntermediateEvent_base>/IntermediateEvent_base
+  --custom-type ChildNode=FuzzTreeVisitable<ChildNode_base>/ChildNode_base
+  --custom-type Gate=FuzzTreeVisitable<Gate_base>/Gate_base
+  --custom-type And=FuzzTreeVisitable<And_base>/And_base
+  --custom-type Or=FuzzTreeVisitable<Or_base>/Or_base
+  --custom-type Xor=FuzzTreeVisitable<Xor_base>/Xor_base
+  --custom-type VotingOr=FuzzTreeVisitable<VotingOr_base>/VotingOr_base
+  --custom-type DynamicGate=FuzzTreeVisitable<DynamicGate_base>/DynamicGate_base
+  --custom-type Spare=FuzzTreeVisitable<Spare_base>/Spare_base
+  --custom-type FDEP=FuzzTreeVisitable<FDEP_base>/FDEP_base
+  --custom-type Sequence=FuzzTreeVisitable<Sequence_base>/Sequence_base
+  --custom-type PriorityAnd=FuzzTreeVisitable<PriorityAnd_base>/PriorityAnd_base
+  --custom-type RedundancyVariationPoint=FuzzTreeVisitable<RedundancyVariationPoint_base>/RedundancyVariationPoint_base
+  --custom-type FeatureVariationPoint=FuzzTreeVisitable<FeatureVariationPoint_base>/FeatureVariationPoint_base
+  --custom-type VariationPoint=FuzzTreeVisitable<VariationPoint_base>/VariationPoint_base
+  --custom-type IntermediateEventSet=FuzzTreeVisitable<IntermediateEventSet_base>/IntermediateEventSet_base
 )
 
 set(XSD_TO_FAULTTREE_ARGS
@@ -80,10 +96,11 @@ set(XSD_TO_FAULTTREE_ARGS
   --function-naming lcc
   --generate-serialization
   --namespace-map net.faulttree=faulttree
+  --generate-forward
   --hxx-suffix .h
   --cxx-suffix .cpp
   ${TREE_CUSTOMIZATION_ARGS}
-  --hxx-prologue "#include <faulttree_custom.h>"
+  --fwd-prologue "#include <Visitable.h>"
 )
 
 set(XSD_TO_FUZZTREE_ARGS
@@ -95,11 +112,11 @@ set(XSD_TO_FUZZTREE_ARGS
   --function-naming lcc
   --generate-serialization
   --namespace-map net.fuzztree=fuzztree 
+  --generate-forward
   --hxx-suffix .h
   --cxx-suffix .cpp
-  ${TREE_CUSTOMIZATION_ARGS}
   ${FUZZTREE_CUSTOMIZATION_ARGS}
-  --hxx-prologue "#include <fuzztree_custom.h>"
+   --fwd-prologue "#include <Visitable.h>"
 )
 
 add_custom_target(generateFaultTreeModel

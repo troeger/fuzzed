@@ -32,3 +32,6 @@ fuzztreeconfiguration/build/*
 *.AUX
 fuzztreeconfiguration/bin/*
 build_cmake/*
+fuzztreeconfiguration/faulttree-fwd.hxx
+fuzztreeconfiguration/faulttree-fwd.hxx
+fuzztreeconfiguration/fuzztree-fwd.hxx
