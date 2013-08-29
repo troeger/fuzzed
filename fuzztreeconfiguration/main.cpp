@@ -8,7 +8,7 @@
 
 int main(int argc, char **argv)
 {
-	static const std::string testfile = "C:\dev\fuzztrees\simulation\testdata\configurations\optional.fuzztree";
+	static const std::string testfile = "C:\\dev\\fuzztrees\\simulation\\testdata\\configurations\\optional.fuzztree";
 	std::ifstream file(testfile);
 	if (!file.is_open())
 		return -1;
@@ -16,11 +16,12 @@ int main(int argc, char **argv)
 	FuzzTreeTransform t(file);
 	for (auto result : t.transform())
 	{
-		treeHelpers::printTree(result.topEvent(), 0);
+		// treeHelpers::printTree(result.topEvent(), 0);
+// 		PrintVisitor pv;
+// 		pv.visit(result.topEvent());
 	}
 
-// 	PrintVisitor pv;
-// 	pv.visit(&topevent);
+
 
 // 	FuzzTreeConfigClient client(BEANSTALK_SERVER, BEANSTALK_PORT);
 // 	client.run();

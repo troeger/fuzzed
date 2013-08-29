@@ -85,6 +85,7 @@ set(FUZZTREE_CUSTOMIZATION_ARGS
   --custom-type FeatureVariationPoint=FuzzTreeVisitable<FeatureVariationPoint_base>/FeatureVariationPoint_base
   --custom-type VariationPoint=FuzzTreeVisitable<VariationPoint_base>/VariationPoint_base
   --custom-type IntermediateEventSet=FuzzTreeVisitable<IntermediateEventSet_base>/IntermediateEventSet_base
+  --custom-type BasicEventSet=FuzzTreeVisitable<BasicEventSet_base>/BasicEventSet_base
 )
 
 set(XSD_TO_FAULTTREE_ARGS
