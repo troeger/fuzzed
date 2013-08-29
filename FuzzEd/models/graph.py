@@ -44,6 +44,17 @@ class Graph(models.Model):
     def __unicode__(self):
         return unicode('%s%s' % ('[DELETED] ' if self.deleted else '', self.name))
 
+    def top_node(self):
+        """
+        Method: top_node
+
+        Return the top node of this graph, if applicable for the given type.
+
+        Returns:
+         {Node} instance
+        """
+        return self.nodes.all().get(kind='topEvent')
+
     def to_json(self):
         """
         Method: to_json

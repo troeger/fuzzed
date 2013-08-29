@@ -525,8 +525,11 @@ def analyze_top_event_probability(request, graph_id):
     try:
         # The Java analysis server currently only likes FuzzTree XML
         post_data = graph.to_xml('fuzztree')
+        # Determine stored decomposition number
+        decompNumber = graph.top_node().get_property('decompositions')
+        logger.debug('Decomposition number of this graph is '+str(decompNumber))
         logger.debug('Sending XML to analysis server:\n' + post_data)
-        job_id, configuration_count, node_count = top_event_probability.create_job(post_data,10)
+        job_id, configuration_count, node_count = top_event_probability.create_job(post_data,decompNumber)
 
         # store job information for this graph
         job = Job(name=job_id, configurations=configuration_count,

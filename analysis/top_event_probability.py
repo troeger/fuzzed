@@ -122,7 +122,6 @@ def analysis_result_as_json(xml_text):
 def create_job(xml, decomposition_number, verify_only=False):
     verify = str(verify_only).lower()
     post_data = xml.encode('utf-8')
-    import pdb; pdb.set_trace()
 
     try:
         server_url = '%s/fuzztree/analysis/createJob?decompositionNumber=%d&verifyOnly=%s' % (BASE_URL, decomposition_number, verify)
