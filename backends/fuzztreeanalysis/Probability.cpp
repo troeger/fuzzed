@@ -1,4 +1,5 @@
 #include "Probability.h"
+#include "common/util.h"
 
 namespace probability
 {
@@ -10,7 +11,6 @@ namespace probability
 
 
 	Interval getAlphaCutBounds(
-		const faulttree::DecomposedFuzzyProbability& prob,
 		const DecomposedFuzzyInterval& alphaCuts,
 		const double& alpha)
 	{

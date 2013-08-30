@@ -41,10 +41,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 		}
 		else if (probType == *FUZZYPROB)
 		{
-			// 				return probability::getAlphaCutBounds(
-			// 					static_cast<const faulttree::DecomposedFuzzyProbability&>(prob),
-			// 					m_tree->missionTime(), 
-			// 					m_alpha);
+// 			return probability::getAlphaCutBounds(
+// 				DecomposedFuzzyInterval(static_cast<const faulttree::DecomposedFuzzyProbability&>(prob)), m_alpha);
 		}
 		else if (probType == *FAILURERATE)
 		{

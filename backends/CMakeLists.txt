@@ -123,7 +123,7 @@ include_directories(
 option(BUILD_TESTS OFF)
 if (${BUILD_TESTS})
   find_package(gtest REQUIRED)
-  add_subdirectory(backendtests)
+  add_subdirectory(tests)
   message("Building Tests")
 endif()
 
