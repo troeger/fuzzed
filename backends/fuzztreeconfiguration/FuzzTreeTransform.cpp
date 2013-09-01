@@ -448,24 +448,24 @@ bool FuzzTreeTransform::handleFeatureVP(
 	}
 	
 	const fuzztree::ChildNode featuredTemplate = *it;
-	const type_info& featuredTypeName = typeid(featuredTemplate);
+	const type_info& featuredType = typeid(featuredTemplate);
 	
 	using namespace fuzztreeType;
 	if (isOptional(featuredTemplate) && !configuration.isIncluded(configuredChildId))
 	{
 		return true;
 	}
-	else if (featuredTypeName == *BASICEVENTSET)
+	else if (featuredType == *BASICEVENTSET)
 	{
 		expandBasicEventSet(&featuredTemplate, node, configuredChildId, 0);
 		return true;
 	}
-	else if (featuredTypeName == *AND)		node->children().push_back(faulttree::And(configuredChildId));
-	else if (featuredTypeName == *OR)		node->children().push_back(faulttree::Or(configuredChildId));
-	else if (featuredTypeName == *VOTINGOR)	node->children().push_back(faulttree::VotingOr(configuredChildId, (static_cast<const fuzztree::VotingOr&>(featuredTemplate)).k()));
-	else if (featuredTypeName == *XOR)		node->children().push_back(faulttree::Xor(configuredChildId));
-	else if (isLeaf(featuredTypeName))		node->children().push_back(treeHelpers::copyBasicEvent(static_cast<const fuzztree::BasicEvent&>(featuredTemplate)));
-	else if (isVariationPoint(featuredTypeName))
+	else if (featuredType == *AND)		node->children().push_back(faulttree::And(configuredChildId));
+	else if (featuredType == *OR)		node->children().push_back(faulttree::Or(configuredChildId));
+	else if (featuredType == *VOTINGOR)	node->children().push_back(faulttree::VotingOr(configuredChildId, (static_cast<const fuzztree::VotingOr&>(featuredTemplate)).k()));
+	else if (featuredType == *XOR)		node->children().push_back(faulttree::Xor(configuredChildId));
+	else if (isLeaf(featuredType))		node->children().push_back(treeHelpers::copyBasicEvent(static_cast<const fuzztree::BasicEvent&>(featuredTemplate)));
+	else if (isVariationPoint(featuredType))
 	{
 		return false;
 	}

@@ -8,6 +8,7 @@ if (USE_INTEL_COMPILER)
   CMAKE_FORCE_C_COMPILER(icc Intel)
   CMAKE_FORCE_CXX_COMPILER(icpc Intel)
   message(STATUS "Using compiler: ${CMAKE_CXX_COMPILER_ID}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qstd=c++0x")
   message("CMake support for ICC is crappy. Enforce the generation of Visual Studio Projects using this tool: http://software.intel.com/en-us/articles/ICProjConvert100")
 endif()
 
@@ -108,13 +109,26 @@ else()
   message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
 endif()
 
+############### COMMON ##################
+#########################################
+
 include_directories(
 	${XERCESC_INCLUDE_DIR}
 	${XSD_INCLUDE_DIR}
 	${BEANSTALKPP_INCLUDE}
 	${Boost_INCLUDE_DIRS}
-	thirdParty
-	fuzztreeconfiguration
+	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
+	${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration
+  ${CMAKE_CURRENT_SOURCE_DIR}/common
+)
+
+set(COMMON_SOURCES
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/util.cpp
+)
+
+set(COMMON_HEADERS
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/platform.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/common/util.h
 )
 
 ############### UNIT TESTS ##############

@@ -1,8 +1,6 @@
 #pragma once
-#include "Interval.h"
 #include "faulttree.h"
-
-class DecomposedFuzzyInterval;
+#include "DecomposedFuzzyInterval.h"
 
 namespace probability
 {

@@ -1,5 +1,6 @@
 #include "Probability.h"
-#include "common/util.h"
+#include "DecomposedFuzzyInterval.h"
+#include "util.h"
 
 namespace probability
 {
@@ -15,7 +16,7 @@ namespace probability
 		const double& alpha)
 	{
 		if (alphaCuts.find(alpha) != alphaCuts.end())
-			return alphaCuts[alpha];
+			return alphaCuts.at(alpha);
 
 		// Alpha-cut needs to be approximated
 		double lowerAlpha = 0.0;
@@ -33,8 +34,8 @@ namespace probability
 		}
 
 		
-		const Interval lowerInterval = alphaCuts[lowerAlpha];
-		const Interval upperInterval = alphaCuts[upperAlpha];
+		const Interval lowerInterval = alphaCuts.at(lowerAlpha);
+		const Interval upperInterval = alphaCuts.at(upperAlpha);
 
 		const double lowerBound = 
 			lowerInterval.lowerBound + (alpha - lowerAlpha) * 

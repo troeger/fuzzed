@@ -5,6 +5,7 @@ set(SOURCES
    AlphaCutAnalysisTask.cpp
    InstanceAnalysisTask.cpp
    Probability.cpp
+   ${COMMON_SOURCES}
 )
 
 set(HEADERS
@@ -13,6 +14,7 @@ set(HEADERS
    Interval.h
    DecomposedFuzzyInterval.h
    Probability.h
+   ${COMMON_HEADERS}
 )
 
 find_package(beanstalkpp REQUIRED)

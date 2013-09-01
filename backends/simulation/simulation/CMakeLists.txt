@@ -1,7 +1,10 @@
 project(ftsimulation CXX)
                                                                                                                                                                                                                         
 set(SOURCES
-   ${SOURCE}
+   ${SOURCES}
+   ${COMMON_SOURCES}
+   ${SIM_COMMON_SOURCES}
+
    main.cpp
    StructureFormulaClient.cpp
    SimulationClient.cpp
@@ -17,7 +20,6 @@ set(SOURCES
    petrinet/Transition.cpp
    petrinet/TimedTransition.cpp
    petrinet/ImmediateTransition.cpp
-   petrinet/TransitionCondition.cpp
    petrinet/PNMLImport.cpp
    petrinet/PetriNet.cpp
    petrinet/SequentialConstraint.cpp
@@ -25,6 +27,9 @@ set(SOURCES
 
 set(HEADERS
    ${HEADERS}
+   ${COMMON_HEADERS}
+   ${SIM_COMMON_HEADERS}
+
    StructureFormulaClient.h
    SimulationClient.h
    SimulationExtern.h
@@ -44,7 +49,6 @@ set(HEADERS
    petrinet/Transition.h
    petrinet/TimedTransition.h
    petrinet/ImmediateTransition.h
-   petrinet/TransitionCondition.h
    petrinet/PNMLImport.h
    petrinet/PetriNet.h
    petrinet/SequentialConstraint.h
