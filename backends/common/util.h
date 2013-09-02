@@ -61,6 +61,8 @@ namespace util
 	void replaceStringInPlace(string& subject, const string& search, const std::string& replacement);
 	void replaceFileExtensionInPlace(string& subject, const string& newExtension);
 
+	bool bitSet(const int var, const int pos);
+
 	/************************************************************************/
 	/* Timing                                                               */
 	/************************************************************************/
@@ -84,7 +86,6 @@ namespace util
 
 	double rateFromProbability(double prob, int missionTime);
 	double probabilityFromRate(double rate, int missionTime);
-
 
 	/************************************************************************/
 	/* Code for generating n-combinations out of k, taken from:             */ 

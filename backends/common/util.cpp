@@ -229,3 +229,8 @@ double util::probabilityFromRate(double rate, int missionTime)
 	// TODO
 	return rate;
 }
+
+bool util::bitSet(const int var, const int pos)
+{
+	return (var) & (1<<(pos));
+}

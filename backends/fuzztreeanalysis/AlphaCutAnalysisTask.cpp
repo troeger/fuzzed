@@ -5,6 +5,8 @@
 
 #include <math.h>
 #include <algorithm>
+#include <bitset>
+#include <climits>
 
 using namespace fuzztree;
 using std::vector;
@@ -49,6 +51,12 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 			return probability::getAlphaCutBounds(static_cast<const fuzztree::FailureRate&>(prob), m_tree->missionTime());
 		}
 	}
+	else if (typeName == *BASICEVENTSET || typeName == *INTERMEDIATEEVENTSET)
+	{
+		// the java code handled this, so the event sets were not expanded by the configuration
+		// the C++ configuration code already expands event sets
+		assert(false);
+	}
 	else if (typeName == *HOUSEEVENT)
 	{
 		return NumericInterval(1.0, 1.0);
@@ -60,7 +68,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 	}
 	else if (typeName == *INTERMEDIATEEVENT)
 	{
-
+		assert(node.children().size() == 1);
+		return analyzeRecursive(node.children().front());
 	}
 
 	// Static Gates...
@@ -110,16 +119,15 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 			upperBounds.emplace_back(1 - res.upperBound);
 		}
 
-		// Get all permutations of lower and upper bounds (idea see Voting Or gate).
+		// Get all permutations of lower and upper bounds (idea see VotingOr gate).
 		const unsigned int numberOfCombinations = (int) std::pow(2, n);
 		vector<double> combinations(numberOfCombinations);
 		for (unsigned int i = 0; i < numberOfCombinations; ++i)
 		{
-			const bool choice = true;// TODO: find out what this does: String.format("%" + n + "s", Integer.toBinaryString(i)).replace(' ', '0').getBytes();
-			
+			const std::bitset<UINT_MAX> choice(i);
 			vector<double> perm(n);
 			for (unsigned int j = 0; j < n; j++)
-				perm.emplace_back(choice ? upperBounds[j] : lowerBounds[j]);
+				perm.emplace_back(choice[j] ? upperBounds[j] : lowerBounds[j]);
 
 			combinations[i] = calculateExactlyOneOutOfN(perm, n);
 		}
