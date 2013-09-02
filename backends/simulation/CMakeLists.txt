@@ -2,7 +2,8 @@ set(FT_CONFIG_DIR "${PROJECT_SOURCE_DIR}/fuzztreeconfiguration")
 set(FT_INCLUDE_DIR
   "${CMAKE_CURRENT_SOURCE_DIR}/modeltransform"
   "${CMAKE_CURRENT_SOURCE_DIR}/simulation"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration")
+  "${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration"
+  "${CMAKE_CURRENT_SOURCE_DIR}/util")
 
 option(BUILD_SIMULATION_EXECUTABLE ON)
 option(USE_TIMENET ON)
@@ -22,7 +23,8 @@ set(SIM_COMMON_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/util/Condition.h
 )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/util)
+include_directories(${FT_INCLUDE_DIR})
+
 
 add_subdirectory(modeltransform)
 add_subdirectory(simulation)

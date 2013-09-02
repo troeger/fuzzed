@@ -9,7 +9,7 @@ namespace faultTreeType
 
 	const type_info* CRISPPROB		= &typeid(faulttree::CrispProbability);
 	const type_info* FAILURERATE	= &typeid(faulttree::FailureRate);
-	const type_info* FUZZYPROB		= &typeid(faulttree::DecomposedFuzzyProbability);
+	//const type_info* FUZZYPROB		= &typeid(faulttree::DecomposedFuzzyProbability);
 
 	const type_info* BASICEVENT			= &typeid(faulttree::BasicEvent);
 	const type_info* INTERMEDIATEEVENT	= &typeid(faulttree::IntermediateEvent);

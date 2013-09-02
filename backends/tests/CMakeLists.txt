@@ -1,4 +1,4 @@
-project(Tests)
+project(Tests CXX)
 
 set(SOURCES
 	${SOURCE}
@@ -19,7 +19,6 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ../dll)
 add_executable(Tests ${SOURCES} ${HEADERS})
 
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${FT_INCLUDE_DIR})
 include_directories(${GTEST_INCLUDE_DIR})
 target_link_libraries(Tests ${GTEST_LIB})
 
@@ -27,8 +26,7 @@ include_directories(${PUGIXML_INCLUDE_DIR})
 target_link_libraries(Tests optimized ${PUGIXML_LIB_RELEASE})
 target_link_libraries(Tests debug ${PUGIXML_LIB_DEBUG})
 
-target_link_libraries(Tests 
-	ftcommon
+target_link_libraries(Tests
 	ftsimulation_static
 	${FT_CONFIG_LIB}
 	${XERCESC_LIBRARIES}

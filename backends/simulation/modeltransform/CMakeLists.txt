@@ -55,7 +55,6 @@ set(HEADERS
    serialization/TNDocument.h
 )
 
-include_directories(${FT_INCLUDE_DIR})
 include_directories(${PUGIXML_INCLUDE_DIR})
 
 if (WIN32)

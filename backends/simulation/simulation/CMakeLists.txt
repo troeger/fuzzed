@@ -75,7 +75,6 @@ if (BUILD_SIMULATION_EXECUTABLE)
    add_executable(ftsimulation ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation
      ftmodeltransform
-     ftcommon
      ftconfiguration
 	  ${FT_CONFIG_LIB}
 	  ${XERCESC_LIBRARIES}
@@ -86,7 +85,6 @@ else (BUILD_SIMULATION_EXECUTABLE) # shared library
    add_library(ftsimulation SHARED ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation 
      ftmodeltransform
-	  ftcommon
 	  ftconfiguration
      ${FT_CONFIG_LIB}
 	  ${XERCESC_LIBRARIES}
@@ -97,7 +95,6 @@ else (BUILD_SIMULATION_EXECUTABLE) # shared library
 endif (BUILD_SIMULATION_EXECUTABLE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${FT_INCLUDE_DIR})
 include_directories(${PUGIXML_INCLUDE_DIR})
 
 target_link_libraries(ftsimulation ${Boost_LIBRARIES})
@@ -110,7 +107,6 @@ if (BUILD_TESTS)
    add_library(ftsimulation_static STATIC ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation_static
       ftmodeltransform
-      ftcommon
 	  ${FT_CONFIG_LIB}
    )
    set_target_properties(ftsimulation_static PROPERTIES COMPILE_DEFINITIONS "SIMULATION_STATIC")

@@ -20,11 +20,12 @@ set(HEADERS
 find_package(beanstalkpp REQUIRED)
 message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
 include_directories(${BEANSTALKPP_INCLUDE})
+include_directories(${PUGIXML_INCLUDE})
 
 message("${FT_CONFIG_LIB}")
 
-option(BUILD_ANAlYSIS_EXECUTABLE ON)
-if (BUILD_ANAlYSIS_EXECUTABLE)
+option(BUILD_ANALYSIS_EXECUTABLE ON)
+if (BUILD_ANALYSIS_EXECUTABLE)
    add_executable(ftanalysis ${SOURCES} ${HEADERS})
    target_link_libraries(ftanalysis
     ${FT_CONFIG_LIB}
@@ -37,12 +38,9 @@ else (BUILD_ANAlYSIS_EXECUTABLE) # shared library
     ${FT_CONFIG_LIB}
     ${Boost_LIBRARIES}
    )
-endif (BUILD_ANAlYSIS_EXECUTABLE)
+endif (BUILD_ANALYSIS_EXECUTABLE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${FT_INCLUDE_DIR})
-include_directories(${PUGIXML_INCLUDE_DIR})
-
 target_link_libraries(ftanalysis ${Boost_LIBRARIES})
 if (WIN32)
    target_link_libraries(ftanalysis optimized ${PUGIXML_LIB_RELEASE})
