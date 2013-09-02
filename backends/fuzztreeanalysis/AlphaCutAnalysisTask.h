@@ -2,6 +2,7 @@
 #include "Interval.h"
 #include "fuzztree.h"
 #include <future>
+#include <vector>
 
 typedef NumericInterval AlphaCutAnalysisResult;
 
@@ -16,6 +17,10 @@ public:
 	const double& getAlpha() const { return m_alpha; }
 
 protected:
+	static double calculateExactlyOneOutOfN(const std::vector<double>& values, unsigned int n);
+	static double calculateKOutOfN(const std::vector<double>& values, unsigned int k, unsigned int n);
+
+
 	AlphaCutAnalysisResult analyze();
 	AlphaCutAnalysisResult analyzeRecursive(const fuzztree::ChildNode&);
 

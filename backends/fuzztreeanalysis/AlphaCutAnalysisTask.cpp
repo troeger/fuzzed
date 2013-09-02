@@ -3,7 +3,11 @@
 #include "Probability.h"
 #include "Interval.h"
 
+#include <math.h>
+#include <algorithm>
+
 using namespace fuzztree;
+using std::vector;
 
 AlphaCutAnalysisTask::AlphaCutAnalysisTask(const TopEvent* topEvent, const double& alpha)
 	: m_tree(topEvent),
@@ -90,10 +94,91 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 	}
 	else if (typeName == *XOR)
 	{
+		// Calculate results of children first.
+		const unsigned int n = node.children().size();
 
+		vector<double> lowerBounds(n);
+		vector<double> upperBounds(n);
+		for (const auto& c : node.children())
+		{
+			const auto res = analyzeRecursive(c);
+			/*
+			 * ATTENTION: Here the values are negated since this is more efficient
+			 * (there are much more negated terms than not-negated).
+			 */
+			lowerBounds.emplace_back(1 - res.lowerBound);
+			upperBounds.emplace_back(1 - res.upperBound);
+		}
+
+		// Get all permutations of lower and upper bounds (idea see Voting Or gate).
+		const unsigned int numberOfCombinations = (int) std::pow(2, n);
+		vector<double> combinations(numberOfCombinations);
+		for (unsigned int i = 0; i < numberOfCombinations; ++i)
+		{
+			const bool choice = true;// TODO: find out what this does: String.format("%" + n + "s", Integer.toBinaryString(i)).replace(' ', '0').getBytes();
+			
+			vector<double> perm(n);
+			for (unsigned int j = 0; j < n; j++)
+				perm.emplace_back(choice ? upperBounds[j] : lowerBounds[j]);
+
+			combinations[i] = calculateExactlyOneOutOfN(perm, n);
+		}
+
+		return NumericInterval(
+			*std::min_element(combinations.begin(), combinations.end()),
+			*std::max_element(combinations.begin(), combinations.end()));
 	}
 	else if (typeName == *VOTINGOR)
 	{
+		const auto votingOr = static_cast<const fuzztree::VotingOr&>(node);
+		
+		const int k = votingOr.k();
+		const int n = votingOr.children().size();
 
+		vector<double> lowerBounds(n);
+		vector<double> upperBounds(n);
+
+		int i = 0;
+		for (const auto& c : node.children())
+		{
+			const auto res = analyzeRecursive(c);
+			lowerBounds.emplace_back(res.lowerBound);
+			upperBounds.emplace_back(res.upperBound);
+		}
+
+		return NumericInterval(calculateKOutOfN(lowerBounds, k, n), calculateKOutOfN(upperBounds, k, n));
 	}
+}
+
+double AlphaCutAnalysisTask::calculateExactlyOneOutOfN(const vector<double>& values, unsigned int n)
+{
+	double result = 0.0;
+	for (unsigned int i = 0; i < n; i++)
+	{
+		double termResult = 1.0;
+		for (unsigned int j = 0; j < n; j++)
+		{
+			// un-negate the ith value 
+			termResult *= (i == j) ? (1 - values[j]) :  values[j];
+		}
+		result += termResult;
+	}
+	return result;
+}
+
+double AlphaCutAnalysisTask::calculateKOutOfN(const vector<double>& values, unsigned int k, unsigned int n)
+{
+	assert(values.size() == n);
+	
+	vector<double> p(k+1);
+	p.emplace_back(1.0);
+
+	for (unsigned int i = 1; i <= k; i++)
+		p.emplace_back(0.0);
+
+	for (unsigned int i = 0; i < n; i++)
+		for (unsigned int j = k; j >= 1; j--)
+			p[j] = values[i] * p[j-1] + (1-values[i]) * p[j];
+
+	return p[k];
 }
