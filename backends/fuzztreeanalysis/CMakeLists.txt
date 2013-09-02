@@ -5,7 +5,12 @@ set(SOURCES
    AlphaCutAnalysisTask.cpp
    InstanceAnalysisTask.cpp
    Probability.cpp
+   DecomposedFuzzyInterval.cpp
    ${COMMON_SOURCES}
+   ${COMMON_DIR}/fuzztree.cpp
+   ${COMMON_DIR}/faulttree.cpp
+   ${COMMON_DIR}/FuzzTreeTypes.cpp
+   ${COMMON_DIR}/FaultTreeTypes.cpp
 )
 
 set(HEADERS
@@ -15,12 +20,16 @@ set(HEADERS
    DecomposedFuzzyInterval.h
    Probability.h
    ${COMMON_HEADERS}
+   ${COMMON_DIR}/fuzztree.h
+   ${COMMON_DIR}/faulttree.h
+   ${COMMON_DIR}/FuzzTreeTypes.h
+   ${COMMON_DIR}/FaultTreeTypes.h
 )
 
 find_package(beanstalkpp REQUIRED)
 message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
 include_directories(${BEANSTALKPP_INCLUDE})
-include_directories(${PUGIXML_INCLUDE})
+include_directories(${PUGIXML_INCLUDE_DIR})
 
 message("${FT_CONFIG_LIB}")
 
@@ -30,6 +39,7 @@ if (BUILD_ANALYSIS_EXECUTABLE)
    target_link_libraries(ftanalysis
     ${FT_CONFIG_LIB}
     ${Boost_LIBRARIES}
+	${XERCESC_LIBRARIES}
    )
    message("Building analysis executable")
 else (BUILD_ANAlYSIS_EXECUTABLE) # shared library
@@ -37,6 +47,7 @@ else (BUILD_ANAlYSIS_EXECUTABLE) # shared library
    target_link_libraries(ftanalysis 
     ${FT_CONFIG_LIB}
     ${Boost_LIBRARIES}
+	${XERCESC_LIBRARIES}
    )
 endif (BUILD_ANALYSIS_EXECUTABLE)
 
@@ -51,6 +62,7 @@ if (BUILD_TESTS)
    add_library(ftanalysis_static STATIC ${SOURCES} ${HEADERS})
    target_link_libraries(ftanalysis_static
     ${FT_CONFIG_LIB}
+	${XERCESC_LIBRARIES}s
    )
    set_target_properties(ftanalysis_static PROPERTIES COMPILE_DEFINITIONS "ANALYSIS_STATIC")
 endif (BUILD_TESTS)

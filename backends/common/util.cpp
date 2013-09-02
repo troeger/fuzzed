@@ -1,5 +1,4 @@
 #include "util.h"
-#include "Constants.h"
 
 #include <cstdlib>
 #include <stdarg.h> 
@@ -65,19 +64,6 @@ int util::fileSize(const char* filename)
 	return (int)in.tellg(); 
 }
 
-string util::conditionString(const int placeID, ConditionType cond, const int argument)
-{
-	return 
-		"#" + string(PLACE_IDENTIFIER) + util::toString(placeID) 
-		+ conditionTypeString(cond) + util::toString(argument);
-}
-
-string util::conditionString(const string& placeIdentifier, ConditionType cond, const int argument)
-{
-	return 
-		"#" + placeIdentifier
-		+ conditionTypeString(cond) + util::toString(argument);
-}
 
 string util::timeStamp()
 {
@@ -223,26 +209,6 @@ int util::parseIntegerValue(const xml_node& node, const string& type, const int 
 	return child.text().as_int(defaultValue);
 }
 
-SimulationResult util::readResultFile(const std::string& fileName)
-{
-	using namespace simulation;
-	
-	SimulationResult res;
-	pugi::xml_document resultDoc;
-	if (!resultDoc.load_file(fileName.c_str()))
-		return res;
-	pugi::xml_node topNode = resultDoc.child(SIMULATION_RESULT);
-	if (topNode.empty())
-		return res;
-
-	res.reliability			= topNode.attribute(RELIABILITY).as_double(-1.0);
-	res.meanAvailability	= topNode.attribute(AVAILABILTIY).as_double(-1.0);
-	res.mttf				= topNode.attribute(MTTF).as_double(-1.0);
-	res.nRounds				= topNode.attribute(NROUNDS).as_uint(0);
-	res.nFailures			= topNode.attribute(NFAILURES).as_uint(0);
-
-	return res;
-}
 
 double util::rateFromProbability(double prob, int missionTime)
 {

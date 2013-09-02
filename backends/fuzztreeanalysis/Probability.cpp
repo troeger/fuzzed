@@ -1,5 +1,6 @@
 #include "Probability.h"
 #include "DecomposedFuzzyInterval.h"
+#include "Interval.h"
 #include "util.h"
 
 namespace probability
@@ -33,7 +34,6 @@ namespace probability
 				upperAlpha = a;
 		}
 
-		
 		const Interval lowerInterval = alphaCuts.at(lowerAlpha);
 		const Interval upperInterval = alphaCuts.at(upperAlpha);
 

@@ -5,9 +5,7 @@
 #include <set>
 #include <algorithm>
 #include <pugixml.hpp>
-#include "Types.h"
 #include "platform.h"
-#include "ResultStruct.h"
 
 using namespace std;
 
@@ -54,9 +52,6 @@ namespace util
 	string toString(const double& d, const int& prec = 10);
 	string toString(const long double& d, const int& prec = 10);
 
-	// returns something like #p[placeID] [cond] [argument]
-	string conditionString(const int placeID, ConditionType cond, const int argument);
-	string conditionString(const string& placeIdentifier, ConditionType cond, const int argument);
 
 	bool beginsWith(const string& subject, const string& prefix);
 
@@ -166,6 +161,4 @@ namespace util
 	int		parseIntegerValue(const pugi::xml_node& node, const std::string& type, const int defaultValue);
 	double	parseDoubleValue(const pugi::xml_node& node, const std::string& type, const double defaultValue);
 	bool	parseBooleanValue(const pugi::xml_node& node, const std::string& type, const bool defaultValue);
-
-	SimulationResult readResultFile(const std::string& fileName);
 }

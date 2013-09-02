@@ -4,10 +4,10 @@ set(SOURCES
    FuzzTreeConfigClient.cpp
    TreeHelpers.cpp
    main.cpp
-   faulttree.cpp
-   fuzztree.cpp
-   FaultTreeTypes.cpp
-   FuzzTreeTypes.cpp
+   ${COMMON_DIR}/faulttree.cpp
+   ${COMMON_DIR}/fuzztree.cpp
+   ${COMMON_DIR}/FuzzTreeTypes.cpp
+   ${COMMON_DIR}/FaultTreeTypes.cpp
 )
 set(HEADERS
    FuzzTreeTransform.h
@@ -15,10 +15,10 @@ set(HEADERS
    FuzzTreeConfigClient.h
    TreeHelpers.h
    platform.h
-   faulttree.h
-   fuzztree.h
-   FaultTreeTypes.h
-   FuzzTreeTypes.h
+   ${COMMON_DIR}/faulttree.h
+   ${COMMON_DIR}/fuzztree.h
+   ${COMMON_DIR}/FuzzTreeTypes.h
+   ${COMMON_DIR}/FaultTreeTypes.h
 )
 
 if (VARIADIC_TEMPLATES)
@@ -135,7 +135,7 @@ if (VARIADIC_TEMPLATES)
       ${XSD_TO_FAULTTREE_ARGS} 
       ${TREE_CUSTOMIZATION_ARGS}
       --fwd-prologue "#include <Visitable.h>"
-      --output-dir ${CMAKE_CURRENT_SOURCE_DIR}
+      --output-dir ${COMMON_DIR}
       ${FAULTTREE_XSD}
   COMMENT "Generating C++ / XML mapping files for FaultTrees"
   VERBATIM)
@@ -147,7 +147,8 @@ add_custom_target(generateFuzzTreeModel
       ${XSD_TO_FUZZTREE_ARGS}
       ${FUZZTREE_CUSTOMIZATION_ARGS}
       --fwd-prologue "#include <Visitable.h>"
-      --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FUZZTREE_XSD}
+      --output-dir ${COMMON_DIR}
+	  ${FUZZTREE_XSD}
   COMMENT "Generating C++ / XML mapping files for FuzzTrees"
   VERBATIM)
 
@@ -155,13 +156,13 @@ else()
 
   add_custom_target(generateFaultTreeModel
   DEPENDS ${FAULTTREE_XSD}
-  COMMAND ${XSD_EXECUTABLE} cxx-tree ${XSD_TO_FAULTTREE_ARGS} --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FAULTTREE_XSD}
+  COMMAND ${XSD_EXECUTABLE} cxx-tree ${XSD_TO_FAULTTREE_ARGS} --output-dir ${COMMON_DIR} ${FAULTTREE_XSD}
   COMMENT "Generating C++ / XML mapping files for FaultTrees"
   VERBATIM)
 
-add_custom_target(generateFuzzTreeModel
+  add_custom_target(generateFuzzTreeModel
   DEPENDS ${FUZZTREE_XSD}
-  COMMAND ${XSD_EXECUTABLE} cxx-tree ${XSD_TO_FUZZTREE_ARGS} --output-dir ${CMAKE_CURRENT_SOURCE_DIR} ${FUZZTREE_XSD}
+  COMMAND ${XSD_EXECUTABLE} cxx-tree ${XSD_TO_FUZZTREE_ARGS} --output-dir ${COMMON_DIR} ${FUZZTREE_XSD}
   COMMENT "Generating C++ / XML mapping files for FuzzTrees"
   VERBATIM)
 

@@ -5,12 +5,10 @@
 
 typedef DecomposedFuzzyInterval InstanceAnalysisResult;
 
-
 class InstanceAnalysisTask
 {
 public:
 	InstanceAnalysisTask(faulttree::TopEvent& tree, unsigned int decompositionNumber);
-
 	InstanceAnalysisResult compute();
 	
 protected:

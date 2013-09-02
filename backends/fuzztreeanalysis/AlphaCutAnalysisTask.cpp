@@ -26,24 +26,22 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 	using namespace faultTreeType;
 
 	const type_info& typeName = typeid(node);
-	bool alreadyAdded = false;
-
+	
 	// Leaf nodes...
 	if (typeName == *BASICEVENT) 
 	{
 		const auto& prob = (static_cast<const faulttree::BasicEvent&>(node)).probability();
 		const type_info& probType = typeid(prob);
 
-		double failureRate = 0.f;
 		if (probType == *CRISPPROB)
 		{
 			return probability::getAlphaCutBounds(static_cast<const faulttree::CrispProbability&>(prob));
 		}
-		else if (probType == *FUZZYPROB)
-		{
-// 			return probability::getAlphaCutBounds(
-// 				DecomposedFuzzyInterval(static_cast<const faulttree::DecomposedFuzzyProbability&>(prob)), m_alpha);
-		}
+// 		else if (probType == *FUZZYPROB)
+// 		{
+// // 			return probability::getAlphaCutBounds(
+// // 				DecomposedFuzzyInterval(static_cast<const faulttree::DecomposedFuzzyProbability&>(prob)), m_alpha);
+// 		}
 		else if (probType == *FAILURERATE)
 		{
 			return probability::getAlphaCutBounds(static_cast<const faulttree::FailureRate&>(prob), m_tree->missionTime());

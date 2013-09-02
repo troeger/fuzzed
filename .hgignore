@@ -40,3 +40,7 @@ backends/lib/*
 */CMakeFiles/*
 *.vcxproj*
 *.sln
+backends/thirdParty/cppcheck/cppcheck.exe
+backends/thirdParty/cppcheck/cppcheck.bat
+backends/thirdParty/cppcheck/cppcheck-core.lib
+backends/thirdParty/cppcheck/*
