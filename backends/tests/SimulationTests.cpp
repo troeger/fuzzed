@@ -20,7 +20,6 @@ namespace
 	const string BigTreeTest		= "big_tree.faulttree";
 	const string SpareTest			= "single_spare_gate.faulttree";
 
-	const int MISSION_TIME			= 1000;
 	const int NUM_ROUNDS			= 10000;
 	const double CONVERGE_THRESH	= 0.00001;
 	const int MAX_TIME				= 1000;
