@@ -57,7 +57,7 @@ TimeNETSimulation::TimeNETSimulation(std::shared_ptr<FaultTreeNode> faultTree,
 bool TimeNETSimulation::run()
 {
 #ifdef TNETDIR
-	string serverCall = 
+	const string serverCall = 
 		string("python ") + TNETSCRIPT 
 		+ " " + m_properties->filePath
 		+ " " + TNETDIR

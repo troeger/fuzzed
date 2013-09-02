@@ -23,7 +23,7 @@ void runSimulation(
 		int i = 0;
 		for (const auto& ft : ftTransform.transform())
 		{
-			p.simulateFaultTree(fromGeneratedFaultTree(ft.topEvent()), "foo" + util::toString(++i) + ".TN", TIMENET);
+			p.simulateFaultTree(fromGeneratedFuzzTree(ft.topEvent()), "foo" + util::toString(++i) + ".TN", TIMENET);
 		}
 
 	}

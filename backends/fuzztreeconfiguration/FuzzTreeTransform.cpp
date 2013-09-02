@@ -138,8 +138,6 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 	using namespace fuzztree;
 	using namespace fuzztreeType;
 
-	const type_info& parentType = typeid(node);
-
 	for (const auto& child : node->children())
 	{
 		const string id = child.id();

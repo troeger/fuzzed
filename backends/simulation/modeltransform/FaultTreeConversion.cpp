@@ -3,6 +3,9 @@
 
 #include "faulttree.h"
 #include "FaultTreeTypes.h"
+#include "fuzztree.h"
+#include "FuzzTreeTypes.h"
+
 #include "util.h"
 
 using std::string;
@@ -113,6 +116,82 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 		else
 		{
 			convertFaultTreeRecursive(node, child, missionTime);
+		}
+	}
+}
+
+std::shared_ptr<TopLevelEvent> fromGeneratedFuzzTree(const fuzztree::TopEvent& generatedTree)
+{
+	const unsigned int mt = generatedTree.missionTime();
+	shared_ptr<TopLevelEvent> top(new TopLevelEvent(generatedTree.id(), mt));
+	convertFuzzTreeRecursive(top, generatedTree, mt);
+	return top;
+}
+
+void convertFuzzTreeRecursive(FaultTreeNode::Ptr node, const fuzztree::Node& templateNode, const unsigned int& missionTime)
+{
+	using namespace fuzztreeType;
+
+	FaultTreeNode::Ptr current = nullptr;
+
+	for (const auto& child : templateNode.children())
+	{
+		const string id = child.id();
+		const type_info& typeName = typeid(child);
+		bool alreadyAdded = false;
+
+		// Leaf nodes...
+		if (typeName == *BASICEVENT) 
+		{
+			const auto& prob = (static_cast<const fuzztree::BasicEvent&>(child)).probability();
+			const type_info& probName = typeid(prob);
+
+			double failureRate = 0.f;
+			if (probName == *CRISPPROB)
+				failureRate = util::rateFromProbability(static_cast<const fuzztree::CrispProbability&>(prob).value(), missionTime);
+			else
+			{
+				assert(dynamic_cast<const fuzztree::FailureRate*>(&prob));
+				failureRate = static_cast<const fuzztree::FailureRate&>(prob).value();
+			}
+			current = make_shared<BasicEvent>(id, failureRate);
+			node->addChild(current);
+			alreadyAdded = true;
+
+			// BasicEvents can have FDEP children...
+			// continue;
+		}
+		else if (typeName == *HOUSEEVENT)
+		{ // TODO find out if this is legitimate
+			current = make_shared<BasicEvent>(id, 0);
+			node->addChild(current);
+			continue;
+		}
+		else if (typeName == *UNDEVELOPEDEVENT)
+		{
+			throw std::runtime_error("Cannot simulate trees with undeveloped events!");
+			continue;
+		}
+		else if (typeName == *INTERMEDIATEEVENT)
+		{
+			// TODO
+		}
+
+		// Static Gates...
+		else if (typeName == *AND)				current = make_shared<ANDGate>(id);
+		else if (typeName == *OR)				current = make_shared<ORGate>(id);
+		else if (typeName == *XOR)				current = make_shared<XORGate>(id);
+		else if (typeName == *VOTINGOR)			current = make_shared<VotingORGate>(id, static_cast<const fuzztree::VotingOr&>(child).k());
+
+		if (current)
+		{
+			if (!alreadyAdded)
+				node->addChild(current);
+			convertFuzzTreeRecursive(current, child, missionTime);
+		}
+		else
+		{
+			convertFuzzTreeRecursive(node, child, missionTime);
 		}
 	}
 }

@@ -20,9 +20,6 @@ int main(int argc, char **argv)
 // 		PrintVisitor pv;
 // 		pv.visit(result.topEvent());
 	}
-
-
-
 // 	FuzzTreeConfigClient client(BEANSTALK_SERVER, BEANSTALK_PORT);
 // 	client.run();
 }
