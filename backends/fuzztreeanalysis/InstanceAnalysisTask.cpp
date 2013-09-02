@@ -8,7 +8,7 @@
 using std::vector;
 using std::future;
 
-InstanceAnalysisTask::InstanceAnalysisTask(faulttree::TopEvent& tree, unsigned int decompositionNumber) :
+InstanceAnalysisTask::InstanceAnalysisTask(fuzztree::TopEvent& tree, unsigned int decompositionNumber) :
 	m_tree(tree),
 	m_decompositionNumber(decompositionNumber)
 {}

@@ -1,14 +1,14 @@
 #pragma once
 #include "Interval.h"
-#include "faulttree.h"
+#include "fuzztree.h"
 #include <future>
 
-typedef Interval AlphaCutAnalysisResult;
+typedef NumericInterval AlphaCutAnalysisResult;
 
 class AlphaCutAnalysisTask
 {
 public:
-	AlphaCutAnalysisTask(const faulttree::TopEvent* topEvent, const double& alpha);
+	AlphaCutAnalysisTask(const fuzztree::TopEvent* topEvent, const double& alpha);
 
 	void run();
 
@@ -17,10 +17,10 @@ public:
 
 protected:
 	AlphaCutAnalysisResult analyze();
-	AlphaCutAnalysisResult analyzeRecursive(const faulttree::ChildNode&);
+	AlphaCutAnalysisResult analyzeRecursive(const fuzztree::ChildNode&);
 
 	const double m_alpha;
-	const faulttree::TopEvent* m_tree;
+	const fuzztree::TopEvent* m_tree;
 
 	std::future<AlphaCutAnalysisResult> m_future;
 };

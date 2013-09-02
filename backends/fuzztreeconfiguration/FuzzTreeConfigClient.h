@@ -3,9 +3,9 @@
 #include <string>
 #include <client.h>
 
-namespace faulttree
+namespace fuzztree
 {
-	class FaultTree;
+	class FuzzTree;
 }
 
 class FuzzTreeConfigClient : public Beanstalkpp::Client
@@ -15,5 +15,5 @@ public:
 	void run();
 	
 private:
-	static std::string concatXMLString(const std::vector<faulttree::FaultTree>& trees);
+	static std::string concatXMLString(const std::vector<fuzztree::FuzzTree>& trees);
 };

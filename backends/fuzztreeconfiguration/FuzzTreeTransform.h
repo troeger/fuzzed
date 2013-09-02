@@ -28,44 +28,44 @@ public:
 
 	~FuzzTreeTransform();
 
-	std::vector<faulttree::FaultTree> transform();
+	std::vector<fuzztree::FuzzTree> transform();
 
 protected:
-	faulttree::FaultTree generateFaultTree(const FuzzTreeConfiguration& configuration);
-	ErrorType generateFaultTreeRecursive(
+	fuzztree::FuzzTree generateVariationFreeFuzzTree(const FuzzTreeConfiguration& configuration);
+	ErrorType generateVariationFreeFuzzTreeRecursive(
 		const fuzztree::Node* templateNode,
-		faulttree::Node* node,
+		fuzztree::Node* node,
 		const FuzzTreeConfiguration& configuration) const;
 
 	static void copyNode(
 		const std::type_info& typeName,
-		faulttree::Node* node,
+		fuzztree::Node* node,
 		const std::string id,
 		const fuzztree::ChildNode& currentChild);
 
 	// add the configured VotingOR gate, return true if leaf was reached
 	bool handleRedundancyVP(
 		const fuzztree::ChildNode* templateNode,
-		faulttree::Node* node,
+		fuzztree::Node* node,
 		const std::tuple<int,int> configuredN,
 		const FuzzTreeConfiguration::id_type& id) const;
 
 	// add the configured child gate, return true if leaf was reached
 	bool handleFeatureVP(
 		const fuzztree::ChildNode* templateNode,
-		faulttree::Node* node,
+		fuzztree::Node* node,
 		const FuzzTreeConfiguration& configuration,
 		const FuzzTreeConfiguration::id_type& configuredChildId) const;
 
 	ErrorType expandBasicEventSet(
 		const fuzztree::Node* templateNode,
-		faulttree::Node* parentNode, 
+		fuzztree::Node* parentNode, 
 		const FuzzTreeConfiguration::id_type& id,
 		const int& defaultQuantity = 0) const;
 
 	ErrorType expandIntermediateEventSet(
 		const fuzztree::Node* templateNode,
-		faulttree::Node* parentNode,
+		fuzztree::Node* parentNode,
 		const FuzzTreeConfiguration::id_type& id,
 		const FuzzTreeConfiguration& configuration,
 		const int& defaultQuantity = 0) const;

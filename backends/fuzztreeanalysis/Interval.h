@@ -1,10 +1,10 @@
 #pragma once
 
-struct Interval
+struct NumericInterval
 {
-	Interval() : lowerBound(0.0), upperBound(0.0) {}
+	NumericInterval() : lowerBound(0.0), upperBound(0.0) {}
 
-	Interval(const double& lower, const double& upper):
+	NumericInterval(const double& lower, const double& upper):
 		lowerBound(lower), upperBound(upper) {}
 
 	double lowerBound;

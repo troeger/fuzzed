@@ -1,10 +1,10 @@
 #pragma once
-#include "faulttree.h"
+#include "fuzztree.h"
 #include "DecomposedFuzzyInterval.h"
 
 namespace probability
 {
-	Interval getAlphaCutBounds(const faulttree::CrispProbability& prob);
-	Interval getAlphaCutBounds(const DecomposedFuzzyInterval& alphaCuts, const double& alpha);
-	Interval getAlphaCutBounds(const faulttree::FailureRate& prob, const unsigned int& missionTime);
+	NumericInterval getAlphaCutBounds(const fuzztree::CrispProbability& prob);
+	NumericInterval getAlphaCutBounds(const DecomposedFuzzyInterval& alphaCuts, const double& alpha);
+	NumericInterval getAlphaCutBounds(const fuzztree::FailureRate& prob, const unsigned int& missionTime);
 }

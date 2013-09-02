@@ -5,14 +5,14 @@
 
 namespace probability
 {
-	Interval getAlphaCutBounds(const faulttree::CrispProbability& prob)
+	NumericInterval getAlphaCutBounds(const fuzztree::CrispProbability& prob)
 	{
 		const double val = prob.value();
-		return Interval(val, val);
+		return NumericInterval(val, val);
 	}
 
 
-	Interval getAlphaCutBounds(
+	NumericInterval getAlphaCutBounds(
 		const DecomposedFuzzyInterval& alphaCuts,
 		const double& alpha)
 	{
@@ -34,8 +34,8 @@ namespace probability
 				upperAlpha = a;
 		}
 
-		const Interval lowerInterval = alphaCuts.at(lowerAlpha);
-		const Interval upperInterval = alphaCuts.at(upperAlpha);
+		const NumericInterval lowerInterval = alphaCuts.at(lowerAlpha);
+		const NumericInterval upperInterval = alphaCuts.at(upperAlpha);
 
 		const double lowerBound = 
 			lowerInterval.lowerBound + (alpha - lowerAlpha) * 
@@ -45,13 +45,13 @@ namespace probability
 			upperInterval.upperBound + (upperAlpha - alpha) * 
 			(lowerInterval.upperBound - upperInterval.upperBound);
 
-		return Interval(lowerBound, upperBound);
+		return NumericInterval(lowerBound, upperBound);
 	}
 
-	Interval getAlphaCutBounds(const faulttree::FailureRate& prob, const unsigned int& missionTime)
+	NumericInterval getAlphaCutBounds(const fuzztree::FailureRate& prob, const unsigned int& missionTime)
 	{
 		const double val = util::probabilityFromRate(prob.value(), missionTime);
-		return Interval(val, val);
+		return NumericInterval(val, val);
 	}
 
 }

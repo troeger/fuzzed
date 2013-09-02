@@ -1,12 +1,11 @@
 #include "AlphaCutAnalysisTask.h"
-#include "faulttree.h"
-#include "FaultTreeTypes.h"
+#include "FuzzTreeTypes.h"
 #include "Probability.h"
 #include "Interval.h"
 
-using namespace faulttree;
+using namespace fuzztree;
 
-AlphaCutAnalysisTask::AlphaCutAnalysisTask(const faulttree::TopEvent* topEvent, const double& alpha)
+AlphaCutAnalysisTask::AlphaCutAnalysisTask(const TopEvent* topEvent, const double& alpha)
 	: m_tree(topEvent),
 	m_alpha(alpha)
 {}
@@ -23,38 +22,37 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyze()
 
 AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& node)
 {
-	using namespace faultTreeType;
+	using namespace fuzztreeType;
 
 	const type_info& typeName = typeid(node);
 	
 	// Leaf nodes...
 	if (typeName == *BASICEVENT) 
 	{
-		const auto& prob = (static_cast<const faulttree::BasicEvent&>(node)).probability();
+		const auto& prob = (static_cast<const fuzztree::BasicEvent&>(node)).probability();
 		const type_info& probType = typeid(prob);
 
 		if (probType == *CRISPPROB)
 		{
-			return probability::getAlphaCutBounds(static_cast<const faulttree::CrispProbability&>(prob));
+			return probability::getAlphaCutBounds(static_cast<const fuzztree::CrispProbability&>(prob));
 		}
-// 		else if (probType == *FUZZYPROB)
-// 		{
-// // 			return probability::getAlphaCutBounds(
-// // 				DecomposedFuzzyInterval(static_cast<const faulttree::DecomposedFuzzyProbability&>(prob)), m_alpha);
-// 		}
+		else if (probType == *FUZZYPROB)
+		{
+			return probability::getAlphaCutBounds(parse(static_cast<const fuzztree::DecomposedFuzzyProbability&>(prob)), m_alpha);
+		}
 		else if (probType == *FAILURERATE)
 		{
-			return probability::getAlphaCutBounds(static_cast<const faulttree::FailureRate&>(prob), m_tree->missionTime());
+			return probability::getAlphaCutBounds(static_cast<const fuzztree::FailureRate&>(prob), m_tree->missionTime());
 		}
 	}
 	else if (typeName == *HOUSEEVENT)
 	{
-		return Interval(1.0, 1.0);
+		return NumericInterval(1.0, 1.0);
 	}
 	else if (typeName == *UNDEVELOPEDEVENT)
 	{
 		throw std::runtime_error("Cannot analyze trees with undeveloped events!");
-		return Interval();
+		return NumericInterval();
 	}
 	else if (typeName == *INTERMEDIATEEVENT)
 	{
@@ -73,7 +71,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 			lowerBound *= res.lowerBound;
 			upperBound *= res.upperBound;
 		}
-		return Interval(lowerBound, upperBound);
+		return NumericInterval(lowerBound, upperBound);
 	}
 	else if (typeName == *OR)
 	{
@@ -88,7 +86,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 			upperBound += res.upperBound - (upperBound * res.upperBound);
 		}
 
-		return Interval(lowerBound, upperBound);
+		return NumericInterval(lowerBound, upperBound);
 	}
 	else if (typeName == *XOR)
 	{
