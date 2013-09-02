@@ -25,8 +25,8 @@ using namespace boost;
 
 namespace
 {
-	const string dir = "C:/dev/fuzztrees/simulation/testdata/configurations/";
-	const string targetDir = "C:/dev/fuzztrees/simulation/testdata/configurations/output/";
+	const string dir = "C:/dev/fuzztrees/backends/simulation/testdata/configurations/";
+	const string targetDir = "C:/dev/fuzztrees/backends/simulation/testdata/configurations/output/";
 
 	const string optFileName			= "optional.fuzztree";
 	const string optRedundancyFileName	= "optional_redundancy.fuzztree";

@@ -1,23 +1,15 @@
 #include <gtest/gtest.h>
 
 #include "SimulationExtern.h"
+#include "TestUtil.h"
 #include "ResultStruct.h"
 #include "Constants.h"
 #include "util.h"
 
-#define EXPECT_SIMILAR(expected, actual, maxDeviation) EXPECT_TRUE(std::abs(expected - actual) <= maxDeviation)
-
-#define TEST_SIMULATION(fileName, expectedReliability) \
-	string fn = fileName; \
-	EXPECT_NO_THROW(runSimulationOnFile(_strdup(fn.c_str()), NUM_ROUNDS, CONVERGE_THRESH, MAX_TIME)); \
-	util::replaceFileExtensionInPlace(fn, ".xml"); \
-	SimulationResult res = util::readResultFile(fn); \
-	EXPECT_SIMILAR(res.reliability, expectedReliability, MAX_DEVIATION);
-
 namespace
 {
-	const string dir = "C:/dev/fuzztrees/simulation/testdata/faultTrees/";
-	const string targetDir = "C:/dev/fuzztrees/simulation/tests/output/";
+	const string dir = "C:/dev/fuzztrees/backends/simulation/testdata/faultTrees/";
+	const string targetDir = "C:/dev/fuzztrees/backends/simulation/tests/output/";
 
 	const string AndOrTest			= "and_or.faulttree";
 	const string ExampleSystemTest	= "example_system.faulttree";
@@ -73,12 +65,12 @@ TEST(Simulation, Convergence)
 	string fn = dir + ExampleSystemTest;
 	EXPECT_NO_THROW(runSimulationOnFile(_strdup(fn.c_str()), NUM_ROUNDS, CONVERGE_THRESH * 100, MAX_TIME)); 
 	util::replaceFileExtensionInPlace(fn, ".xml");
-	SimulationResult res1 = util::readResultFile(fn);
+	SimulationResult res1 = readResultFile(fn);
 	
 	util::replaceFileExtensionInPlace(fn, ".faulttree");
 	EXPECT_NO_THROW(runSimulationOnFile(_strdup(fn.c_str()), NUM_ROUNDS, CONVERGE_THRESH, MAX_TIME)); 
 	util::replaceFileExtensionInPlace(fn, ".xml");
-	SimulationResult res2 = util::readResultFile(fn);
+	SimulationResult res2 = readResultFile(fn);
 
 	EXPECT_SIMILAR(res1.reliability, res2.reliability, MAX_DEVIATION);
 	EXPECT_SIMILAR(res1.duration, res2.duration, MAX_DEVIATION);

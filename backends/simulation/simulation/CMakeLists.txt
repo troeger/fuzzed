@@ -64,19 +64,18 @@ message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
 include_directories(${BEANSTALKPP_INCLUDE})
 
 find_package(OpenMP REQUIRED)
-if(OPENMP_FOUND)
+if (OPENMP_FOUND)
 	message("OPENMP FOUND")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-endif()
+endif ()
 
 if (BUILD_SIMULATION_EXECUTABLE)
    add_executable(ftsimulation ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation
-     ftmodeltransform
-     ftconfiguration
-	  ${FT_CONFIG_LIB}
+      ftmodeltransform
+      ftconfiguration
 	  ${XERCESC_LIBRARIES}
 	  ${Boost_LIBRARIES}
    )
@@ -84,9 +83,8 @@ if (BUILD_SIMULATION_EXECUTABLE)
 else (BUILD_SIMULATION_EXECUTABLE) # shared library
    add_library(ftsimulation SHARED ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation 
-     ftmodeltransform
+      ftmodeltransform
 	  ftconfiguration
-     ${FT_CONFIG_LIB}
 	  ${XERCESC_LIBRARIES}
 	  ${Boost_LIBRARIES}
    )

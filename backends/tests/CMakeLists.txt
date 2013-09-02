@@ -1,13 +1,15 @@
 project(Tests CXX)
 
 set(SOURCES
-	${SOURCE}
+	${SOURCES}
 	main.cpp
 	
 	SerializationTests.cpp
 	FaultTreeTests.cpp
 	SimulationTests.cpp
 	AdvancedSimulationTests.cpp
+	TestUtil.h
+	TestUtil.cpp
 )
 
 if(MSVC) # VS2012 doesn't support correctly the tuples yet
@@ -23,11 +25,18 @@ include_directories(${GTEST_INCLUDE_DIR})
 target_link_libraries(Tests ${GTEST_LIB})
 
 include_directories(${PUGIXML_INCLUDE_DIR})
+include_directories(
+	${CMAKE_CURRENT_SOURCE_DIR}/../simulation
+	${CMAKE_CURRENT_SOURCE_DIR}/../simulation/modeltransform
+	${CMAKE_CURRENT_SOURCE_DIR}/../simulation/simulation
+	${CMAKE_CURRENT_SOURCE_DIR}/../simulation/util
+)
+
 target_link_libraries(Tests optimized ${PUGIXML_LIB_RELEASE})
 target_link_libraries(Tests debug ${PUGIXML_LIB_DEBUG})
 
 target_link_libraries(Tests
 	ftsimulation_static
-	${FT_CONFIG_LIB}
+	ftconfiguration
 	${XERCESC_LIBRARIES}
 	ftmodeltransform)
