@@ -31,4 +31,8 @@ namespace fuzztreeType
 // 	const type_info* SPARE	= &typeid(fuzztree::Spare);
 // 	const type_info* PAND	= &typeid(fuzztree::PriorityAnd);
 // 	const type_info* SEQ	= &typeid(fuzztree::Sequence);
+	bool isGate(const std::type_info& node);
+	bool isLeaf(const std::type_info& node);
+	bool isVariationPoint(const std::type_info& node);
+	bool isEventSet(const std::type_info& node);
 }

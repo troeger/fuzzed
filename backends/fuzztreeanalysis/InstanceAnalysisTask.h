@@ -5,6 +5,11 @@
 
 typedef DecomposedFuzzyInterval InstanceAnalysisResult;
 
+/************************************************************************/
+/* Analyzes one instance of a fuzztree.									*/
+/* The fuzztree should ideally no longer contain variation points!		*/
+/************************************************************************/
+
 class InstanceAnalysisTask
 {
 public:

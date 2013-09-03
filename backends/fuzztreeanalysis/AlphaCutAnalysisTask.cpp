@@ -146,7 +146,6 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 		vector<double> lowerBounds(n);
 		vector<double> upperBounds(n);
 
-		int i = 0;
 		for (const auto& c : node.children())
 		{
 			const auto res = analyzeRecursive(c);

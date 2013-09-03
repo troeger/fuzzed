@@ -60,55 +60,11 @@ FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML)
 FuzzTreeTransform::~FuzzTreeTransform()
 {}
 
-/************************************************************************/
-/* Utility methods                                                      */
-/************************************************************************/
-
-bool FuzzTreeTransform::isGate(const type_info& typeName)
-{
-	using namespace fuzztreeType;
-	return
-		typeName == *AND ||
-		typeName == *OR ||
-		typeName == *XOR ||
-		typeName == *VOTINGOR;
-}
-
-bool FuzzTreeTransform::isLeaf(const type_info& typeName)
-{
-	using namespace fuzztreeType;
-	return
-		typeName == *BASICEVENT ||
-		typeName == *HOUSEEVENT ||
-		typeName == *UNDEVELOPEDEVENT ||
-		typeName == *BASICEVENTSET;
-}
-
-
-bool FuzzTreeTransform::isVariationPoint(const type_info& typeName)
-{
-	using namespace fuzztreeType;
-	return
-		typeName == *FEATUREVP ||
-		typeName == *REDUNDANCYVP;
-}
-
-
-
-bool FuzzTreeTransform::isEventSet(const type_info& typeName)
-{
-	using namespace fuzztreeType;
-	return
-		typeName == *BASICEVENTSET ||
-		typeName == *INTERMEDIATEEVENTSET;
-}
-
-
 bool FuzzTreeTransform::isOptional(const fuzztree::Node& node)
 {
 	const type_info& typeName = typeid(node);
 	
-	if (typeName != *fuzztreeType::INTERMEDIATEEVENT && !isLeaf(typeName)) 
+	if (typeName != *fuzztreeType::INTERMEDIATEEVENT && !fuzztreeType::isLeaf(typeName)) 
 		return false;
 	
 	const fuzztree::InclusionVariationPoint* inclusionNode =

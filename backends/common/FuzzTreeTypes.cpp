@@ -26,4 +26,37 @@ namespace fuzztreeType
 // 	const type_info* SPARE	= &typeid(fuzztree::Spare);
 // 	const type_info* PAND	= &typeid(fuzztree::PriorityAnd);
 // 	const type_info* SEQ	= &typeid(fuzztree::Sequence);
+
+	bool isGate(const type_info& typeName)
+	{
+		return
+			typeName == *AND ||
+			typeName == *OR ||
+			typeName == *XOR ||
+			typeName == *VOTINGOR;
+	}
+
+	bool isLeaf(const type_info& typeName)
+	{
+		return
+			typeName == *BASICEVENT ||
+			typeName == *HOUSEEVENT ||
+			typeName == *UNDEVELOPEDEVENT ||
+			typeName == *BASICEVENTSET;
+	}
+
+
+	bool isVariationPoint(const type_info& typeName)
+	{
+		return
+			typeName == *FEATUREVP ||
+			typeName == *REDUNDANCYVP;
+	}
+
+	bool isEventSet(const type_info& typeName)
+	{
+		return
+			typeName == *BASICEVENTSET ||
+			typeName == *INTERMEDIATEEVENTSET;
+	}
 }

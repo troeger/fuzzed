@@ -76,10 +76,6 @@ protected:
 		std::vector<FuzzTreeConfiguration>& configurations) const;
 
 	static bool isOptional(const fuzztree::Node& node);
-	static bool isGate(const std::type_info& node);
-	static bool isLeaf(const std::type_info& node);
-	static bool isVariationPoint(const std::type_info& node);
-	static bool isEventSet(const std::type_info& node);
 
 	std::string generateUniqueId(const std::string& oldId);
 	
