@@ -173,8 +173,6 @@ void SimulationProxy::parseCommandline(int numArguments, char** arguments)
 		m_timeNetProperties->seed = rand();
 		m_timeNetProperties->confLevel = confidence;
 		m_timeNetProperties->epsilon = epsilon;
-		m_timeNetProperties->maxExecutionTime = m_simulationTime;
-		m_timeNetProperties->transientSimTime = m_missionTime;
 	}
 
 	const bool bDir = optionsMap.count("dir") > 0;
@@ -265,6 +263,8 @@ void SimulationProxy::simulateFaultTree(std::shared_ptr<TopLevelEvent> ft, const
 		ft->serializePTNet(doc);
 		break;
 	case TIMENET:
+		m_timeNetProperties->maxExecutionTime = m_simulationTime;
+		m_timeNetProperties->transientSimTime = m_missionTime;
 	case STRUCTUREFORMULA_ONLY:
 		auto TNdoc = std::shared_ptr<TNDocument>(new TNDocument());
 		ft->serializeTimeNet(TNdoc);
