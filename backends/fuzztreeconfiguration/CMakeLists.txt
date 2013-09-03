@@ -2,6 +2,7 @@ set(SOURCES
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
    FuzzTreeConfigClient.cpp
+   VerificationTask.cpp
    TreeHelpers.cpp
    main.cpp
    ${COMMON_DIR}/faulttree.cpp
@@ -14,6 +15,8 @@ set(HEADERS
    FuzzTreeConfiguration.h
    FuzzTreeConfigClient.h
    TreeHelpers.h
+   VerificationTask.h
+   VerificationResult.h
    platform.h
    ${COMMON_DIR}/faulttree.h
    ${COMMON_DIR}/fuzztree.h
