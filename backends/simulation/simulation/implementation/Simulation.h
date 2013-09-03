@@ -17,9 +17,9 @@ class Simulation
 public:
 	Simulation(
 		const boost::filesystem::path& p, 
-		unsigned int simulationTime, // the maximum duration of one simulation in seconds
-		unsigned int simulationSteps, // the number of logical simulation steps performed in each round
-		unsigned int numRounds) : // the number of simulation rounds for the entire net
+		unsigned int simulationTime,	// the maximum duration of one simulation in seconds
+		unsigned int simulationSteps,	// the number of logical simulation steps performed in each round
+		unsigned int numRounds) :		// the number of simulation rounds for the entire net
 		m_netFile(p),
 		m_simulationTimeSeconds(simulationTime),
 		m_numSimulationSteps(simulationSteps),
@@ -29,9 +29,9 @@ public:
 
 	Simulation(
 		std::shared_ptr<FaultTreeNode> tree, 
-		unsigned int simulationTime, // the maximum duration of one simulation in seconds
-		unsigned int simulationSteps, // the number of logical simulation steps performed in each round
-		unsigned int numRounds) : // the number of simulation rounds for the entire net
+		unsigned int simulationTime,	// the maximum duration of one simulation in seconds
+		unsigned int simulationSteps,	// the number of logical simulation steps performed in each round
+		unsigned int numRounds) :		// the number of simulation rounds for the entire net
 		m_netFile(""),
 		m_faultTree(tree),
 		m_simulationTimeSeconds(simulationTime),
