@@ -3,17 +3,18 @@
 #include "fuzztree.h"
 #include <future>
 #include <vector>
+#pragma strict_gs_check(on)
 
 typedef NumericInterval AlphaCutAnalysisResult;
 
 class AlphaCutAnalysisTask
 {
 public:
-	AlphaCutAnalysisTask(const fuzztree::TopEvent* topEvent, const double& alpha);
+	AlphaCutAnalysisTask(const fuzztree::TopEvent* topEvent, const double alpha);
+	~AlphaCutAnalysisTask();
 
-	void run();
+	std::future<AlphaCutAnalysisResult> run();
 
-	std::future<AlphaCutAnalysisResult>* getFuture() { return &m_future; }
 	const double& getAlpha() const { return m_alpha; }
 
 protected:
@@ -26,6 +27,4 @@ protected:
 
 	const double m_alpha;
 	const fuzztree::TopEvent* m_tree;
-
-	std::future<AlphaCutAnalysisResult> m_future;
 };

@@ -7,29 +7,36 @@
 #include <algorithm>
 #include <bitset>
 #include <climits>
+#include <exception>
 
 using namespace fuzztree;
 using std::vector;
+using std::runtime_error;
 
-AlphaCutAnalysisTask::AlphaCutAnalysisTask(const TopEvent* topEvent, const double& alpha)
-	: m_tree(topEvent),
-	m_alpha(alpha)
+namespace
+{
+	static const std::string UNDEVELOPED_ERROR	= "Cannot analyze trees with undeveloped events!";
+	static const std::string UNKNOWN_TYPE		= "Unknown Child Node Type";
+}
+
+
+AlphaCutAnalysisTask::AlphaCutAnalysisTask(const TopEvent* topEvent, const double alpha)
+	: m_tree(topEvent), m_alpha(alpha)
 {}
 
-void AlphaCutAnalysisTask::run()
+std::future<AlphaCutAnalysisResult> AlphaCutAnalysisTask::run()
 {
-	m_future = std::async(&AlphaCutAnalysisTask::analyze, this);
+	return std::async(std::launch::async, &AlphaCutAnalysisTask::analyze, this);
 }
 
 AlphaCutAnalysisResult AlphaCutAnalysisTask::analyze()
 {
-	return analyzeRecursive(m_tree->children().front());
+	return analyzeRecursive(static_cast<const ChildNode&>(m_tree->children().at(0)));
 }
 
-AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& node)
+AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::ChildNode& node)
 {
 	using namespace fuzztreeType;
-
 	const type_info& typeName = typeid(node);
 	
 	// Leaf nodes...
@@ -50,6 +57,11 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 		{
 			return probability::getAlphaCutBounds(static_cast<const fuzztree::FailureRate&>(prob), m_tree->missionTime());
 		}
+		else
+		{
+			assert(false);
+			return NumericInterval();
+		}
 	}
 	else if (typeName == *BASICEVENTSET || typeName == *INTERMEDIATEEVENTSET)
 	{
@@ -59,11 +71,12 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 	}
 	else if (typeName == *HOUSEEVENT)
 	{
+		// TODO: new House Variation Point?
 		return NumericInterval(1.0, 1.0);
 	}
 	else if (typeName == *UNDEVELOPEDEVENT)
 	{
-		throw std::runtime_error("Cannot analyze trees with undeveloped events!");
+		throw runtime_error(UNDEVELOPED_ERROR);
 		return NumericInterval();
 	}
 	else if (typeName == *INTERMEDIATEEVENT)
@@ -71,7 +84,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 		assert(node.children().size() == 1);
 		return analyzeRecursive(node.children().front());
 	}
-
+	
 	// Static Gates...
 	else if (typeName == *AND)
 	{
@@ -118,13 +131,13 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 			lowerBounds.emplace_back(1 - res.lowerBound);
 			upperBounds.emplace_back(1 - res.upperBound);
 		}
-
+		
 		// Get all permutations of lower and upper bounds (idea see VotingOr gate).
-		const unsigned int numberOfCombinations = (int) std::pow(2, n);
+		const unsigned int numberOfCombinations = (int)std::pow(2, n);
 		vector<double> combinations(numberOfCombinations);
 		for (unsigned int i = 0; i < numberOfCombinations; ++i)
 		{
-			const std::bitset<UINT_MAX> choice(i);
+ 			const std::bitset<128> choice(i); // TODO: we need numberofcombinations bits here...
 			vector<double> perm(n);
 			for (unsigned int j = 0; j < n; j++)
 				perm.emplace_back(choice[j] ? upperBounds[j] : lowerBounds[j]);
@@ -155,6 +168,14 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const ChildNode& n
 
 		return NumericInterval(calculateKOutOfN(lowerBounds, k, n), calculateKOutOfN(upperBounds, k, n));
 	}
+	else
+	{
+		throw runtime_error(UNKNOWN_TYPE);
+		return NumericInterval();
+	}
+
+
+	return NumericInterval();
 }
 
 double AlphaCutAnalysisTask::calculateExactlyOneOutOfN(const vector<double>& values, unsigned int n)
@@ -188,4 +209,9 @@ double AlphaCutAnalysisTask::calculateKOutOfN(const vector<double>& values, unsi
 			p[j] = values[i] * p[j-1] + (1-values[i]) * p[j];
 
 	return p[k];
+}
+
+AlphaCutAnalysisTask::~AlphaCutAnalysisTask()
+{
+	;
 }
