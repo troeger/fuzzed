@@ -49,9 +49,13 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		{
 			return probability::getAlphaCutBounds(static_cast<const fuzztree::CrispProbability&>(prob));
 		}
-		else if (probType == *FUZZYPROB)
+		else if (probType == *DECOMPOSEDFUZZYINTERVAL)
 		{
 			return probability::getAlphaCutBounds(parse(static_cast<const fuzztree::DecomposedFuzzyProbability&>(prob)), m_alpha);
+		}
+		else if (probType == *TRIANGULARFUZZYINTERVAL)
+		{
+			return probability::getAlphaCutBounds(static_cast<const fuzztree::TriangularFuzzyInterval&>(prob), m_alpha);
 		}
 		else if (probType == *FAILURERATE)
 		{

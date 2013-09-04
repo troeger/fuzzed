@@ -15,7 +15,8 @@ namespace fuzztreeType
 
 	const type_info* CRISPPROB		= &typeid(fuzztree::CrispProbability);
 	const type_info* FAILURERATE	= &typeid(fuzztree::FailureRate);
-	const type_info* FUZZYPROB		= &typeid(fuzztree::TriangularFuzzyInterval);
+	const type_info* TRIANGULARFUZZYINTERVAL = &typeid(fuzztree::TriangularFuzzyInterval);
+	const type_info* DECOMPOSEDFUZZYINTERVAL = &typeid(fuzztree::DecomposedFuzzyProbability);
 
 	const type_info* BASICEVENT			= &typeid(fuzztree::BasicEvent);
 	const type_info* INTERMEDIATEEVENT	= &typeid(fuzztree::IntermediateEvent);

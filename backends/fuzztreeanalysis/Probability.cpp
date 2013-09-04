@@ -54,4 +54,14 @@ namespace probability
 		return NumericInterval(val, val);
 	}
 
+	NumericInterval getAlphaCutBounds(const fuzztree::TriangularFuzzyInterval& interval, const double& alpha)
+	{
+		const auto a = interval.a();
+		const auto c = interval.c();
+		
+		const double lowerBound = alpha * (interval.b1() - a) + a;
+		const double upperBound = c - alpha * (c - interval.b2());
+
+		return NumericInterval(lowerBound, upperBound);
+	}
 }

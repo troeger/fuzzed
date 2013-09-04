@@ -20,7 +20,8 @@ namespace fuzztreeType
 
 	extern const type_info* CRISPPROB;
 	extern const type_info* FAILURERATE;
-	extern const type_info* FUZZYPROB;
+	extern const type_info* TRIANGULARFUZZYINTERVAL;
+	extern const type_info* DECOMPOSEDFUZZYINTERVAL;
 
 	extern const type_info* BASICEVENT;
 	extern const type_info* INTERMEDIATEEVENT;
