@@ -226,8 +226,9 @@ double util::rateFromProbability(double prob, int missionTime)
 double util::probabilityFromRate(double rate, int missionTime)
 {
 	assert(missionTime > 0);
-	// TODO
-	return rate;
+	
+	static const double e = 2.71828182845904523536;
+	return (1.0 - std::pow(e, -1.0 * rate * missionTime));
 }
 
 bool util::bitSet(const int var, const int pos)
