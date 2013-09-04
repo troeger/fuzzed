@@ -2,37 +2,35 @@
 #include "AlphaCutAnalysisTask.h"
 
 #include <assert.h>
-#include <vector>
+#include <map>
 #include <future>
 
-using std::vector;
+using std::map;
 using std::future;
 
-InstanceAnalysisTask::InstanceAnalysisTask(fuzztree::TopEvent& tree, unsigned int decompositionNumber) :
+InstanceAnalysisTask::InstanceAnalysisTask(fuzztree::TopEvent* tree, unsigned int decompositionNumber) :
 	m_tree(tree),
 	m_decompositionNumber(decompositionNumber)
 {}
 
 InstanceAnalysisResult InstanceAnalysisTask::compute()
 {
-	vector<AlphaCutAnalysisTask*> alphaCutTasks;
+	map<double, future<AlphaCutAnalysisResult>> alphaCutResults;
 	const double m = (double)m_decompositionNumber;
 	
 	// FORK
-	for (unsigned int i = 0; i <= m_decompositionNumber; ++i)
+	for (unsigned int i = 1; i <= m_decompositionNumber; ++i)
 	{
 		const double alpha = i / m;
-		AlphaCutAnalysisTask* subTask = new AlphaCutAnalysisTask(&m_tree, alpha);
-		subTask->run();
-		alphaCutTasks.emplace_back(subTask);
+		AlphaCutAnalysisTask task(m_tree, alpha);
+		alphaCutResults[alpha] = task.run();
 	}
 
 	// JOIN
 	DecomposedFuzzyInterval result;
-	for (auto& t : alphaCutTasks)
+	for (auto& t : alphaCutResults)
 	{
-		result[t->getAlpha()] = t->getFuture()->get();
-		delete t;
+		result[t.first] = t.second.get();
 	}
 
 	return result;
