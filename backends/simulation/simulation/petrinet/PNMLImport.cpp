@@ -18,7 +18,7 @@ int		parseIntegerValue(const pugi::xml_node& node, const std::string& type, cons
 double	parseDoubleValue(const pugi::xml_node& node, const std::string& type, const double defaultValue);
 bool	parseBooleanValue(const pugi::xml_node& node, const std::string& type, const bool defaultValue);
 
-bool util::parseBooleanValue(const xml_node& node, const string& type, const bool defaultValue)
+bool parseBooleanValue(const xml_node& node, const string& type, const bool defaultValue)
 {
 	const xml_node valNode = node.child(type.c_str());
 	if (valNode.empty())
@@ -31,7 +31,7 @@ bool util::parseBooleanValue(const xml_node& node, const string& type, const boo
 	return child.text().as_bool(defaultValue);
 }
 
-double util::parseDoubleValue(const xml_node& node, const string& type, const double defaultValue)
+double parseDoubleValue(const xml_node& node, const string& type, const double defaultValue)
 {
 	const xml_node valNode = node.child(type.c_str());
 	if (valNode.empty())
@@ -44,7 +44,7 @@ double util::parseDoubleValue(const xml_node& node, const string& type, const do
 	return child.text().as_double(defaultValue);
 }
 
-int util::parseIntegerValue(const xml_node& node, const string& type, const int defaultValue)
+int parseIntegerValue(const xml_node& node, const string& type, const int defaultValue)
 {
 	xml_node valNode = node.child(type.c_str());
 	if (!valNode)
@@ -115,12 +115,12 @@ void PNMLImport::loadPlaces(map<string, Place>& places)
 {
 	for (const xml_node& child : m_rootNode.children(PLACE_TAG))
 	{
-		const int initialMarking = util::parseIntegerValue(child, INITIALMARKING_TAG, 0);
+		const int initialMarking = parseIntegerValue(child, INITIALMARKING_TAG, 0);
 		const string ID = child.attribute(ID_ATTRIBUTE).as_string();
 		const bool isTopLevel = child.attribute(TOPLEVEL_TAG).as_bool(false);
 		const bool isConstraint = child.attribute(CONSTRAINT_TAG).as_bool(false);
 
-		const int capacity = util::parseIntegerValue(child, CAPACITY_TAG, 0);
+		const int capacity = parseIntegerValue(child, CAPACITY_TAG, 0);
 		places.insert(make_pair(ID, 
 			Place(
 			ID, initialMarking, capacity, 
@@ -168,9 +168,9 @@ void PNMLImport::loadTransitions(
 	for (const xml_node& child : m_rootNode.children(TRANSITION_TAG))
 	{
 		const string ID = child.attribute(ID_ATTRIBUTE).as_string();
-		if (util::parseBooleanValue(child, TIMED_TAG, false))
+		if (parseBooleanValue(child, TIMED_TAG, false))
 		{ // timedTransition
-			const double rate = util::parseDoubleValue(child, RATE_TAG, -1.0);
+			const double rate = parseDoubleValue(child, RATE_TAG, -1.0);
 			if (rate < 0.0)
 				throw runtime_error("Invalid rate for transition detected");
 
@@ -178,8 +178,8 @@ void PNMLImport::loadTransitions(
 		}
 		else
 		{ // immediateTransition
-			const double rate = util::parseDoubleValue(child, RATE_TAG, 1.0);
-			const int prio = util::parseIntegerValue(child, PRIORITY_TAG, 1.0);
+			const double rate = parseDoubleValue(child, RATE_TAG, 1.0);
+			const int prio = parseIntegerValue(child, PRIORITY_TAG, 1.0);
 			immediateTransitions.emplace_back(ID, rate, prio);
 		}
 	}
