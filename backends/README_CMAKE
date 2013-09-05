@@ -17,7 +17,8 @@ Building with CMake
 		- exception
 	- Codesynthesis XSD: http://www.codesynthesis.com/products/xsd/download.xhtml
 	- OpenMP
-5. press "Generate" to generate Makefiles or IDE Projects
+5. Press "Generate" to generate Makefiles or IDE Projects
+6. After first generating, you need to build the targets "generateFuzzTreeModel" and "generateFaultTreeModel"
 
 Options
 =======

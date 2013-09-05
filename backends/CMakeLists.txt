@@ -13,13 +13,6 @@ if (USE_INTEL_COMPILER)
   message("CMake support for ICC is crappy. Enforce the generation of Visual Studio Projects using this tool: http://software.intel.com/en-us/articles/ICProjConvert100")
 endif()
 
-if (APPLE)
-  include(ForceCompiler)
-  CMAKE_FORCE_C_COMPILER(gcc-4.7 GNU)
-  CMAKE_FORCE_CXX_COMPILER(g++-4.7 GNU)
-  set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "4.7")
-endif ()
-
 project(FuzztreeBackends)
 cmake_minimum_required(VERSION 2.8.8)
 set(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
@@ -28,9 +21,12 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
+set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
+set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
+
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # TODO
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -std=c++0x -fPIC -fexceptions")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -std=c++0x -fPIC -fexceptions")
   set(Boost_USE_STATIC_LIBS OFF)
@@ -121,19 +117,39 @@ include_directories(
 	${Boost_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
 	${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration
-    ${CMAKE_CURRENT_SOURCE_DIR}/common
+  ${CMAKE_CURRENT_SOURCE_DIR}/common
 )
 
 set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
 
+include(TouchFile)
+ 
+set(XSD_GENERATED_FILES
+  ${COMMON_DIR}/fuzztree.h
+  ${COMMON_DIR}/faulttree.h
+  ${COMMON_DIR}/fuzztree.cpp
+  ${COMMON_DIR}/faulttree.cpp)
+
+generate_if_not_existing("${XSD_GENERATED_FILES}")
+
 set(COMMON_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/common/util.cpp
+  ${COMMON_DIR}/util.cpp
+  ${COMMON_DIR}/FaultTreeTypes.cpp
+  ${COMMON_DIR}/FuzzTreeTypes.cpp
 )
 
 set(COMMON_HEADERS
-  ${CMAKE_CURRENT_SOURCE_DIR}/common/platform.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/common/util.h
+  ${COMMON_DIR}/platform.h
+  ${COMMON_DIR}/util.h
+  ${COMMON_DIR}/FaultTreeTypes.h
+  ${COMMON_DIR}/FuzzTreeTypes.h
+  ${COMMON_DIR}/faulttree.h
+  ${COMMON_DIR}/fuzztree.h
 )
+
+SET_SOURCE_FILES_PROPERTIES(
+  XSD_GENERATED_FILES 
+  PROPERTIES GENERATED true)
 
 ############### UNIT TESTS ##############
 #########################################

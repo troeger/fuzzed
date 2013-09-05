@@ -9,8 +9,6 @@ set(SOURCES
    ${COMMON_SOURCES}
    ${COMMON_DIR}/fuzztree.cpp
    ${COMMON_DIR}/faulttree.cpp
-   ${COMMON_DIR}/FuzzTreeTypes.cpp
-   ${COMMON_DIR}/FaultTreeTypes.cpp
 )
 
 set(HEADERS
@@ -22,8 +20,6 @@ set(HEADERS
    ${COMMON_HEADERS}
    ${COMMON_DIR}/fuzztree.h
    ${COMMON_DIR}/faulttree.h
-   ${COMMON_DIR}/FuzzTreeTypes.h
-   ${COMMON_DIR}/FaultTreeTypes.h
 )
 
 find_package(beanstalkpp REQUIRED)
