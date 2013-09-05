@@ -4,8 +4,14 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 import pyxb.utils.domutils
-from xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlFuzzTreeNamespace
-from xml_faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace
+try:
+    from xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlFuzzTreeNamespace
+    from xml_faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace
+except:
+    print "ERROR: Run './setup.py build' to create the XML schema wrappers first"
+    exit(-1)
+
+from node_rendering import tikz_shapes
 
 import json, notations
 
@@ -37,6 +43,17 @@ class Graph(models.Model):
 
     def __unicode__(self):
         return unicode('%s%s' % ('[DELETED] ' if self.deleted else '', self.name))
+
+    def top_node(self):
+        """
+        Method: top_node
+
+        Return the top node of this graph, if applicable for the given type.
+
+        Returns:
+         {Node} instance
+        """
+        return self.nodes.all().get(kind='topEvent')
 
     def to_json(self):
         """
@@ -76,6 +93,42 @@ class Graph(models.Model):
     def to_bool_term(self):
         root = self.nodes.get(kind__exact = 'topEvent')
         return root.to_bool_term()
+
+    def to_tikz(self):
+        """
+        Method: to_tikz
+            Translates the graph into a LaTex TIKZ representation.
+
+        Returns:
+            {string} The TIKZ representation of the graph
+        """
+        # Latex preambel
+        result = """
+\\documentclass{article}
+\\usepackage[landscape, top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\\usepackage{helvet}
+\\renewcommand{\\familydefault}{\\sfdefault}
+\\usepackage{tikz}
+\\usetikzlibrary{positioning, trees, svg.path} 
+\\tikzset{shapeStyle/.style={inner sep=0em, outer sep=0em}}
+\\tikzset{shapeStyleDashed/.style={inner sep=0em, outer sep=0em, dashed, dash pattern=on 4.2 off 1.4}}
+\\tikzset{mirrorStyle/.style={fill=white,text width=50pt, below, align=center, inner sep=0.2em, outer sep=0.3em}}
+\\tikzset{fork edge/.style={line width=1.4, to path={|- ([shift={(\\tikztotarget)}] +0pt,+18pt) -| (\\tikztotarget) }}}
+\\begin{document}
+\\pagestyle{empty}
+        """     
+        result += tikz_shapes + "\n\\begin{figure}\n\\begin{tikzpicture}[auto, trim left]"
+        # Find most left node and takes it's x coordinate as start offset
+        # This basically shifts the whole tree to the left border
+        minx = self.nodes.aggregate(min_x = models.Min('x'))['min_x']
+        # Find root node and start from there
+        # Use the TOP node Y coordinate as starting point at the upper border
+        # Note: (0,0) is the upper left corder in TiKZ, but the lower left in the DB
+        top_event = self.nodes.get(kind='topEvent')
+        result += top_event.to_tikz(x_offset = -minx, y_offset = top_event.y)
+#        result += top_event.to_tikz_tree()
+        result += "\\end{tikzpicture}\n\\end{figure}\n\\end{document}"
+        return result
 
     def to_xml(self, xmltype=None):
         """

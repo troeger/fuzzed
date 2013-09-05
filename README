@@ -1,0 +1,53 @@
+FuzzTrees
+=========
+
+People who contributed to this project so far:
+
+Franz Becker <>
+Markus Götz <>
+Lena Herscheid <>
+Frank Schlegel <>
+
+Installation instructions for development machine 
+==================================================
+This project uses Python 2.7 and Fabric for installing software dependencies and managing the build process.
+
+In order to install Fabric, please run 'easy_install fabric' or 'pip install fabric' to get it. 
+This demands a working C compiler (gcc), Python header files (python-dev), pip / distutils (python-pip) and sudo being installed. All of this is given anyway on a reasonable Linux box.
+
+Make sure to check the supported Fabric tasks with 'fab -l'.
+
+Preparation of development machine
+-----------------------------------
+> fab bootstrap_dev
+
+Compile static stuff and prepare SQLite database
+------------------------------------------------
+> fab build
+> ./manage.py syncdb
+> ./manage.py migrate
+
+Run development web server and backend servers
+----------------------------------------------
+> ./manage.py runbackend
+> ./manage.py runserver
+
+Create install packages in ./dist on developer machine
+-------------------------------------------------------
+> fab build
+> fab package
+
+Some thoughts
+=============
+Fabric is used for:
+
+- Avoiding distutils for Make-alike tasks, which must be all done in the 'build' step.
+- Avoiding the need for a private repository when software installation is done with Puppet.
+  We just push the release explicitely.
+- Avoiding the handling of initscript installation, database setup a.s.o. in such a software 
+  install package. Generating correct DEB files is very hard. 
+
+Cuisine is used for:
+
+- Easier (mostly OS-agnostic) management of software dependencies on development and production machine.
+  Doing this as part of a generated software install package (e.g. DEB) or through explicit Fabric commands would make the solution very OS-specific, and would not solve the dev machine problem. Vagrant is also not solving the dev machine problem, is still needs a software dependency description.

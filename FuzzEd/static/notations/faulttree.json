@@ -3,9 +3,12 @@
     "name": "Fault Tree",
     "nodes": {
         "node": {
+            "nodeDisplayName": "Node",
+
             "numberOfIncomingConnections":  1,
             "numberOfOutgoingConnections": -1,
-            "allowConnectionTo": ["node"],
+            "allowConnectionTo": [],
+
             "deletable": true,
 
             "connector": {
@@ -13,134 +16,268 @@
                     "top":    0,
                     "bottom": 0
                 }
-            }
+            },
+
+            "properties": {}
         },
 
         "event": {
+            "nodeDisplayName": "Event",
             "inherits": "node",
 
-            "propertyMenuEntries": {
+            "properties": {
                 "name": {
                     "kind": "text",
-                    "displayName": "Name"
-                }
-            },
+                    "displayName": "Name",
+                    "default": "Event",
 
-            "propertyMirrors": {
-                "name": {
-                    "position": "bottom",
-                    "style": ["bold", "large"]
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "{{$0}}"
+                    }
                 }
             }
-        },
-
-        "gate": {
-            "inherits": "node"
         },
 
         "basicEvent": {
+            "nodeDisplayName": "Basic Event",
             "inherits": "event",
 
-            "name": "Basic Event",
-            "numberOfOutgoingConnections": 0,
+            "numberOfOutoingConnections": -1,
+            "allowConnectionTo": ["fdepGate"],
+
             "image": "basic_event.svg",
             "help": "Initiating failure in a basic component",
 
-            "probability": 0,
-
-            "propertyMenuEntries": {
+            "properties": {
+                "name": {
+                    "default": "Basic Event"
+                },
                 "probability": {
-                    "kind": "number",
+                    "kind": "compound",
                     "displayName": "Probability",
-                    "min": 0,
-                    "max": 1,
-                    "step": 0.0000000001
-                }
-            },
+                    "default": [0, 0],
 
-            "propertyMirrors": {
-                "probability": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "p="
+                    "parts": [{
+                        "kind": "numeric",
+                        "partName": "Point",
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "default": 0,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate",
+                        "min": 0,
+                        "step": 0.01,
+                        "default": 17532,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }]
                 }
             }
         },
 
-        "basicEventSet": {
+        "houseEvent": {
+            "nodeDisplayName": "House Event",
             "inherits": "basicEvent",
 
-            "name": "Basic Event Set",
-            "image": "basic_event_set.svg",
-            "help": "Set of basic events with identical properties",
+            "numberOfOutgoingConnections": 0,
+            "allowConnectionTo": [],
 
-            "cardinality": 1,
+            "image": "house_event.svg",
+            "help": "An event that is expected to occur and typically does not denote a failure",
 
-            "propertyMenuEntries": {
-                "cardinality": {
-                    "kind": "number",
-                    "displayName": "Cardinality",
-                    "min": 1,
-                    "step": 1
-                }
-            },
-
-            "propertyMirrors": {
-                "cardinality": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "#"
+            "properties": {
+                "name": {
+                    "default": "House Event"
                 }
             }
         },
 
         "intermediateEvent": {
+            "nodeDisplayName": "Intermediate Event",
             "inherits": "event",
 
-            "name": "Intermediate Event",
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["staticGate", "cspGate", "priorityAndGate", "seqGate"],
+
             "image": "intermediate_event.svg",
-            "help": "Failure resulting from a combination of previous events"
-        },
+            "help": "Failure resulting from a combination of previous events",
 
-        "intermediateEventSet": {
-            "inherits": "intermediateEvent",
-
-            "name": "Intermediate Event Set",
-            "image": "intermediate_event_set.svg",
-            "help": "Set of intermediate events",
-            "cardinality": 1,
-            "excludeFromShapesMenu": true,
-
-            "propertyMenuEntries": {
-                "cardinality": {
-                    "kind": "number",
-                    "displayName": "Cardinality",
-                    "min": 1,
-                    "step": 1
-                }
-            },
-
-            "propertyMirrors": {
-                "cardinality": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "#"
+            "properties": {
+                "name": {
+                    "default": "Intermediate Event"
                 }
             }
         },
 
-        "andGate": {
-            "inherits": "gate",
+        "topEvent": {
+            "nodeDisplayName": "Top Event",
+            "inherits": "intermediateEvent",
 
-            "name": "AND Gate",
+            "numberOfIncomingConnections": 0,
+            "allowConnectionTo": [
+                "basicEvent", "undevelopedEvent", "houseEvent", "staticGate", "cspGate", "priorityAndGate", "seqGate"
+            ],
+
+            "image": "top_event.svg",
+            "help": "Top Event - the root of all evil",
+
+            "excludeFromShapesMenu": true,
+            "deletable": false,
+
+            "properties": {
+                "name": {
+                    "default": "Top Event"
+                },
+                "missionTime": {
+                    "kind": "numeric",
+                    "displayName": "Mission in h",
+                    "min": 0,
+                    "step": 1,
+                    "default": 17532
+                }
+            }
+        },
+
+        "undevelopedEvent": {
+            "nodeDisplayName": "Undeveloped Event",
+            "inherits": "event",
+
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["fdepGate"],
+
+            "image": "undeveloped_event.svg",
+            "help": "Event with no information available or insignificant impact",
+
+            "properties": {
+                "name": {
+                    "default": "Undeveloped Event"
+                }
+            }
+        },
+
+        "eventSet": {
+            "nodeDisplayName": "Event Set",
+            "inherits": "event",
+
+            "properties": {
+                "name": {
+                    "default": "Event Set"
+                },
+                "cardinality": {
+                    "kind": "numeric",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1,
+                    "default": 1,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "#{{$0}}"
+                    }
+                }
+            }
+        },
+
+        "basicEventSet": {
+            "nodeDisplayName": "Basic Event Set",
+            "inherits": "eventSet",
+
+            "numberOfOutoingConnections": -1,
+            "allowConnectionTo": ["fdepGate"],
+
+            "image": "basic_event_set.svg",
+            "help": "Set of basic events with identical properties",
+
+            "properties": {
+                "name": {
+                    "default": "Basic Event Set"
+                },
+                "probability": {
+                    "kind": "compound",
+                    "displayName": "Probability",
+                    "default": [0, 0],
+
+                    "parts": [{
+                        "kind": "numeric",
+                        "partName": "Point",
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "default": 0,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate",
+                        "min": 0,
+                        "step": 0.01,
+                        "default": 17532,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }]
+                }
+            }
+        },
+
+        "intermediateEventSet": {
+            "nodeDisplayName": "Intermediate Event Set",
+            "inherits": "eventSet",
+
+            "numberOfOutgoingConnections": 0,
+
+            "image": "intermediate_event_set.svg",
+            "help": "Set of intermediate events",
+            "excludeFromShapesMenu": true,
+
+            "properties": {
+                "name": {
+                    "default": "Intermediate Event Set"
+                }
+            }
+        },
+
+        "gate": {
+            "nodeDisplayName": "Gate",
+            "inherits": "node",
+
+            "allowConnectionTo": ["event", "staticGate", "cspGate", "priorityAndGate", "seqGate", "transferIn"]
+        },
+
+        "staticGate": {
+            "nodeDisplayName": "Static Gate",
+            "inherits": "gate"
+        },
+
+        "andGate": {
+            "nodeDisplayName": "AND Gate",
+            "inherits": "staticGate",
+
             "image": "and_gate.svg",
             "help": "Output event occurs if all input events occur"
         },
 
         "orGate": {
-            "inherits": "gate",
+            "nodeDisplayName": "OR Gate",
+            "inherits": "staticGate",
 
-            "name": "OR Gate",
             "image": "or_gate.svg",
             "help": "Output event occurs if one or more input events occur",
 
@@ -152,98 +289,131 @@
         },
 
         "xorGate": {
-            "inherits": "gate",
+            "nodeDisplayName": "XOR Gate",
+            "inherits": "orGate",
 
-            "name": "XOR Gate",
             "image": "xor_gate.svg",
             "help": "Output event occurs if exactly one of the input events occur"
         },
 
         "votingOrGate": {
-            "inherits": "gate",
+            "nodeDisplayName": "Voting OR Gate",
+            "inherits": "orGate",
 
-            "name": "Voting OR Gate",
             "image": "voting_or_gate.svg",
             "help": "Output event occurs if the given number of input events occur",
 
-            "k": 1,
-
-            "propertyMenuEntries": {
+            "properties": {
                 "k": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "k",
                     "min": 1,
-                    "step": 1
-                }
-            },
-            "propertyMirrors": {
-                "k": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "k="
+                    "step": 1,
+                    "default": 1,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "k={{$0}}"
+                    }
                 }
             }
         },
 
-        "undevelopedEvent": {
-            "inherits": "event",
-            "name": "Undeveloped Event",
-            "numberOfOutgoingConnections": 0,
-            "image": "undeveloped_event.svg",
-            "help": "Event with no information available or insignificant impact"
+        "dynamicGate": {
+            "nodeDisplayName": "Dynamic Gate",
+            "inherits": "gate"
         },
 
-        "houseEvent": {
-            "inherits": "basicEvent",
-            "name": "House Event",
-            "image": "house_event.svg",
-            "help": "An event that is expected to occur and typically does not denote a failure"
+        "cspGate": {
+            "nodeDisplayName": "Cold Spare Gate",
+            "inherits": "dynamicGate",
+
+            "image": "csp_gate.svg",
+            "help": "Cold Spare Gate",
+
+            "allowConnectionTo": [
+                "basicEvent", "basicEventSet", "undevelopedEvent", "houseEvent", "staticGate",
+                "cspGate", "priorityAndGate", "seqGate", "transferIn"
+            ],
+
+            "properties": {
+                "dormancyFactor": {
+                    "kind": "numeric",
+                    "displayName": "Dormancy",
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.001,
+                    "default": 0,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "d={{$0}}"
+                    }
+                }
+            }
+        },
+
+        "fdepGate": {
+            "nodeDisplayName": "FDEP Gate",
+            "inherits": "dynamicGate",
+
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": [
+                "basicEvent", "houseEvent", "undevelopedEvent", "staticGate",
+                "cspGate", "priorityAndGate", "seqGate", "transferIn"
+            ],
+
+            "image": "fdep_gate.svg",
+            "help": "FDEP Gate"
+        },
+
+        "priorityAndGate": {
+            "nodeDisplayName": "Priority AND Gate",
+            "inherits": "dynamicGate",
+
+            "image": "priority_and_gate.svg",
+            "help": "Priority AND Gate"
+        },
+
+        "seqGate": {
+            "nodeDisplayName": "Sequential Gate",
+            "inherits": "dynamicGate",
+
+            "image": "seq_gate.svg",
+            "help": "Sequential Gate"
         },
 
         "transferIn": {
-            "inherits": "node",
-            "name": "Transfer In",
+            "nodeDisplayName": "Transfer In",
+            "inherits": "dynamicGate",
+
+            "numberOfOutgoingConnections": 0,
+
             "image": "transfer_in.svg",
             "help": "Connects the output of a related FaultTree, e.g. a subsystem, to this one",
 
-            "numberOfIncomingConnections": 1,
-            "numberOfOutgoingConnections": 0,
-
-            "transfer": -1,
-
-            "propertyMenuEntries": {
+            "properties": {
                 "transfer": {
                     "kind": "transfer",
-                    "displayName": "Transfer"
-                }
-            },
-
-            "propertyMirrors": {
-                "transfer": {
-                    "position": "bottom",
-                    "style": ["bold", "large"],
-                    "prefix": "◄ "
+                    "displayName": "Transfer",
+                    "default": -1,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "◄ {{$0}}"
+                    }
                 }
             }
-        },
-
-        "topEvent": {
-            "inherits": "event",
-            "name": "Top Event",
-            "image": "top_event.svg",
-
-            "excludeFromShapesMenu": true,
-            "numberOfIncomingConnections": 0,
-            "numberOfOutgoingConnections": 1,
-            "deletable": false
         }
     },
 
     "propertiesDisplayOrder": [
         "name",
+        "missionTime",
         "probability",
         "cardinality",
         "k",
+        "dormancyFactor",
         "transfer"
     ],
 
@@ -252,14 +422,20 @@
         "basicEventSet",
         "intermediateEvent",
         "intermediateEventSet",
+        "topEvent",
+        "houseEvent",
+        "undevelopedEvent",
+
         "andGate",
         "orGate",
         "xorGate",
         "votingOrGate",
-        "undevelopedEvent",
-        "houseEvent",
-        "transferIn",
-        "topEvent"
+
+        "cspGate",
+        "fdepGate",
+        "priorityAndGate",
+        "seqGate",
+        "transferIn"
     ],
 
     "defaults": {

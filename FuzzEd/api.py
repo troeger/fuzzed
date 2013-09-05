@@ -23,6 +23,7 @@ from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponse
                               HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands, Job
 from analysis import cutsets, top_event_probability
+from rendering import renderClient
 
 import logging, json
 logger = logging.getLogger('FuzzEd')
@@ -81,7 +82,7 @@ def graphs(request):
 
     # something was not right with the request parameters
     except (ValueError, KeyError):
-        raise HttpResponseBadRequestAnswer()
+        raise HttpResponseBadRequestAnswer('Bad request parameters.')
 
 @login_required
 @csrf_exempt
@@ -147,7 +148,15 @@ def graph_download(request, graph_id):
     elif export_format == 'json':
         response.content = graph.to_json()
         response['Content-Type'] = 'application/javascript'
-
+    elif export_format == 'pdf':
+        response.content = renderClient.latex2pdf(graph.to_tikz())
+        response['Content-Type'] = 'application/pdf'
+    elif export_format == 'eps':
+        response.content = renderClient.latex2eps(graph.to_tikz())
+        response['Content-Type'] = 'application/eps'
+    elif export_format == 'tex':
+        response.content = graph.to_tikz()
+        response['Content-Type'] = 'application/text'
     else:
         raise HttpResponseNotFoundAnswer()
 
@@ -237,7 +246,7 @@ def nodes(request, graph_id):
 
     # a int conversion of one of the parameters failed or kind is not supported by the graph
     except (ValueError, AssertionError, KeyError):
-        raise HttpResponseBadRequestAnswer()
+        raise HttpResponseBadRequestAnswer("Bad arguments in the request.")
 
     # the looked up graph does not exist
     except ObjectDoesNotExist:
@@ -352,7 +361,7 @@ def edges(request, graph_id):
 
     # either the graph, the source or the destination node are not in the database
     except ObjectDoesNotExist:
-        raise HttpResponseNotFoundAnswer()
+        raise HttpResponseNotFoundAnswer("Invalid graph or node ID")
 
     # should never happen, just for completeness reasons here
     except MultipleObjectsReturned:
@@ -399,7 +408,7 @@ def edge(request, graph_id, edge_id):
         raise HttpResponseBadRequestAnswer()
 
     except ObjectDoesNotExist:
-        raise HttpResponseNotFoundAnswer()
+        raise HttpResponseNotFoundAnswer("Invalid edge ID")
 
     except MultipleObjectsReturned:
         raise HttpResponseServerErrorAnswer()
@@ -516,8 +525,11 @@ def analyze_top_event_probability(request, graph_id):
     try:
         # The Java analysis server currently only likes FuzzTree XML
         post_data = graph.to_xml('fuzztree')
+        # Determine stored decomposition number
+        decompNumber = graph.top_node().get_property('decompositions')
+        logger.debug('Decomposition number of this graph is '+str(decompNumber))
         logger.debug('Sending XML to analysis server:\n' + post_data)
-        job_id, configuration_count, node_count = top_event_probability.create_job(post_data,10)
+        job_id, configuration_count, node_count = top_event_probability.create_job(post_data,decompNumber)
 
         # store job information for this graph
         job = Job(name=job_id, configurations=configuration_count,
@@ -532,9 +544,9 @@ def analyze_top_event_probability(request, graph_id):
         return response
 
     except top_event_probability.InternalError as exception:
-        logger.error('Exception while using analysis server: %s' % exception)
+        logger.error('Exception while using analysis server: %s' % str(exception))
         #TODO: Perform some smarter error handling here
-        raise HttpResponseServerErrorAnswer()
+        raise HttpResponseServerErrorAnswer(str(exception))
 
 @login_required
 @csrf_exempt

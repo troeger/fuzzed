@@ -6,12 +6,13 @@
 
 {% block style %}
     {{ block.super }}
-    @import url("{{ STATIC_URL }}css/editor/editor.css");
-    @import url("{{ STATIC_URL }}css/editor/menus.css");
+    {% load less %}
 
-    @import url("{{ STATIC_URL }}css/jquery.ui.custom.css");
-    @import url("{{ STATIC_URL }}css/slick.grid.css");
-    @import url("{{ STATIC_URL }}css/slick.grid.theme.css");
+    @import url("{{ STATIC_URL }}css/jquery-ui/jquery-ui-1.10.3.min.css");
+    @import url("{{ STATIC_URL }}css/slickgrid/slick.grid-2.0.2.css");
+    @import url("{{ STATIC_URL }}{% less "less/editor.less" %}");
+    @import url("{{ STATIC_URL }}{% less "less/node.less" %}");
+    @import url("{{ STATIC_URL }}{% less "less/menus.less" %}");
 {% endblock %}
 
 {% block script %}
@@ -20,32 +21,62 @@
     // start editor
     require(['{{ graph.kind }}/editor', 'bootstrap' /* needed for dropdown menu */], function(Editor) {
         jQuery(document).ready(function() {
-            new Editor({{ graph.pk }});
+            var editor = new Editor({{ graph.pk }});
         });
     });
 </script>
 {% endblock %}
 
-{% block navigation_fields %}
-<li>
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <i class="icon-cog icon-white"></i> Actions <b class="caret"></b>
-        </a>
-        <ul id="FuzzEdNavbarActions" class="dropdown-menu">
-                <li>
-                    <a href="{% url 'graph_download' graph.pk %}?format=xml">
-                        Save as XML <i class="icon-download"></i>
-                    </a>
-                </li>
-            <li>
-                <a href="{% url 'graph_download' graph.pk %}?format=json">
-                    Save as JSON <i class="icon-download"></i>
-                </a>
-            </li>
-        </ul>
-    </li>
+{% block nav_center %}
+<p class="navbar-text" style="float: left;">
+    <img id="FuzzEdProgressIndicator" src="{{ STATIC_URL }}img/ajax-loader.gif">
+    <span id="FuzzEdSaveIndicator">
+        <i class="icon-ok icon-white"></i>
+        Saved
+    </span>
+    <span id="FuzzEdErrorIndicator">
+        <i class="icon-warning-sign icon-white"></i>
+        Not saved!
+    </span>
+</p>
+{% endblock %}
+
+{% block menu_right %}
+<li><a href="/"><i class="icon-home icon-white"></i> Dashboard </a></li>
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-download icon-white"></i> Export <b class="caret"></b>
+    </a>
+    <ul id="FuzzEdNavbarActions" class="dropdown-menu">
+        {% if graph.kind != 'rbd'%}
+            <li><a href="{% url 'graph_download' graph.pk %}?format=xml">as XML File</a></li>
+        {% endif %}
+        <li><a href="{% url 'graph_download' graph.pk %}?format=json">as JSON File</a></li>
+        <li><a href="{% url 'graph_download' graph.pk %}?format=tex">as LaTex Document</a></li>
+        <li><a href="{% url 'graph_download' graph.pk %}?format=eps">as EPS Image</a></li>
+        <li><a href="{% url 'graph_download' graph.pk %}?format=pdf">as PDF Document</a></li>
+    </ul>
 </li>
+{% if graph.kind != 'rbd'%}
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-cog icon-white"></i> Compute <b class="caret"></b>
+    </a>
+    <ul id="FuzzEdNavbarActions" class="dropdown-menu">
+<!--        <li><a href="#" id="FuzzEdActionCutSets">Cut sets</a></li>-->
+        <li><a href="#" id="FuzzEdActionAnalytical">Analytical results</a></li>
+    </ul>
+</li>
+{% endif %}
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-eye-open icon-white"></i> View <b class="caret"></b>
+    </a>
+    <ul id="FuzzEdNavbarActions" class="dropdown-menu">
+        <li><a href="#" id="FuzzEdActionGridToggle">Toogle grid</a></li>
+    </ul>
+</li>
+
 {% endblock %}
 
 {% block content %}

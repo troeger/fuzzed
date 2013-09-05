@@ -1,4 +1,4 @@
-define(['canvas', 'class'], function(Canvas, Class) {
+define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
     /**
      *  Package: Base
      */
@@ -82,7 +82,6 @@ define(['canvas', 'class'], function(Canvas, Class) {
                 edge._fuzzedId = jsonEdge.id;
 
                 this.addEdge(edge);
-
             }.bind(this));
 
             return this;
@@ -90,15 +89,13 @@ define(['canvas', 'class'], function(Canvas, Class) {
 
         /**
          *  Method: _registerEventHandlers
-         *    Register on <Canvas> events in order to recognize shape drops and node/edge selection and register to
+         *    Register on <Canvas> events in order to recognize shape drops and register to
          *    jsPlumb events in order to recognize connection events.
          *    This should be done _after_ the initial graph loading from the backend to avoid the creation
          *    of duplicate nodes/edges.
          *
          *  On:
          *    <Config::Events::CANVAS_SHAPE_DROPPED>
-         *    <Config::Events::CANVAS_EDGE_SELECTED>
-         *    <Config::Events::CANVAS_EDGE_UNSELECTED>
          *
          *  Returns:
          *    This <Graph> instance for chaining.
@@ -113,8 +110,6 @@ define(['canvas', 'class'], function(Canvas, Class) {
             }.bind(this));
 
             jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED,   this._shapeDropped.bind(this));
-            jQuery(document).on(this.config.Events.CANVAS_EDGE_SELECTED,   this._edgeSelected.bind(this));
-            jQuery(document).on(this.config.Events.CANVAS_EDGE_UNSELECTED, this._edgeUnselected.bind(this));
 
             return this;
         },
@@ -149,6 +144,8 @@ define(['canvas', 'class'], function(Canvas, Class) {
             var sourceNode = edge.source.data(this.config.Keys.NODE);
             var targetNode = edge.target.data(this.config.Keys.NODE);
 
+            sourceNode.setChildProperties(targetNode);
+
             jQuery(document).trigger(
                 this.config.Events.GRAPH_EDGE_ADDED,
                 [edge._fuzzedId,
@@ -181,6 +178,8 @@ define(['canvas', 'class'], function(Canvas, Class) {
             var sourceNode = edge.source.data(this.config.Keys.NODE);
             var targetNode = edge.target.data(this.config.Keys.NODE);
 
+            sourceNode.restoreChildProperties(targetNode);
+
             sourceNode.outgoingEdges = _.without(sourceNode.outgoingEdges, edge);
             targetNode.incomingEdges = _.without(targetNode.incomingEdges, edge);
 
@@ -206,6 +205,7 @@ define(['canvas', 'class'], function(Canvas, Class) {
          */
         addNode: function(kind, properties) {
             properties.readOnly = this.readOnly;
+            properties.graph    = this;
 
             var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
             jQuery(document).trigger(this.config.Events.GRAPH_NODE_ADDED, [node.id, kind, node.x, node.y]);
@@ -387,19 +387,20 @@ define(['canvas', 'class'], function(Canvas, Class) {
                 BaseClass = this.nodeClassFor(inherits);
             }
 
+            var graph    = this;
             var newClass = BaseClass.extend({
                 init: function(properties, propertiesDisplayOrder) {
                     this._super(jQuery.extend(true, {}, definition, properties), propertiesDisplayOrder);
+                    _.each(this.allowConnectionTo, function(value, index) {
+                        if (typeof value !== 'string') return;
+                        this.allowConnectionTo[index] = graph.nodeClassFor(value);
+                        this.inherits = BaseClass;
+                    }.bind(this));
                 }
             });
 
+            newClass.toString = function() { return definition.nodeDisplayName; };
             this._nodeClasses[definition.kind] = newClass;
-
-            // replace the node kind strings in the allowConnection field with actual classes
-            // this allows for instanceof checks later
-            _.each(definition.allowConnectionTo, function(kind, index) {
-                definition.allowConnectionTo[index] = this.nodeClassFor(kind);
-            }.bind(this));
 
             return newClass;
         },
@@ -423,52 +424,6 @@ define(['canvas', 'class'], function(Canvas, Class) {
         _shapeDropped: function(event, kind, position) {
             this.addNode(kind, Canvas.toGrid(position))
                 .container.click(); // emulate a click in order to select the new node
-        },
-
-        /**
-         *  Method: _edgeSelected
-         *    Callback that gets called when an edge is selected.
-         *    It will change the visual representation to the 'selected' style specified in the <Config>.
-         *
-         *  Parameters:
-         *    {jQuery::Event} event  - The event object passed by the jQuery event handling framework.
-         *    {int}           edgeId - The _fuzzedId of the edge that has been selected.
-         */
-        _edgeSelected: function(event, edgeId) {
-            var edge = this.getEdgeById(edgeId);
-            //XXX: Normally we could use jsPlumb's 'Connection Type' mechanism which allows the definition of
-            //     different styles and toggling between them. Unfortunately this causes the connector to get
-            //     completely redrawn (replace DOM element) which prevents us from associating it with the connection
-            //     object (via DOM attribute). So we need to toggle the styles manually for the moment.
-            edge.setPaintStyle({
-                strokeStyle: this.config.JSPlumb.STROKE_COLOR_SELECTED,
-                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
-            });
-            edge.setHoverPaintStyle({
-                strokeStyle: this.config.JSPlumb.STROKE_COLOR_SELECTED,
-                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
-            });
-        },
-
-        /**
-         *  Method: _edgeUnselected
-         *    Callback that gets called when an edge is unselected.
-         *    It will change the visual representation back to normal.
-         *
-         *  Parameters:
-         *    {jQuery::Event} event  - The event object passed by the jQuery event handling framework.
-         *    {int}           edgeId - The _fuzzedId of the edge that has been unselected.
-         */
-        _edgeUnselected: function(event, edgeId) {
-            var edge = this.getEdgeById(edgeId);
-            edge.setPaintStyle({
-                strokeStyle: this.config.JSPlumb.STROKE_COLOR,
-                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
-            });
-            edge.setHoverPaintStyle({
-                strokeStyle: this.config.JSPlumb.STROKE_COLOR_HIGHLIGHTED,
-                lineWidth:   this.config.JSPlumb.STROKE_WIDTH
-            });
         }
     });
 });

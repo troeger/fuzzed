@@ -2,6 +2,8 @@
 #
 # fuzzTreeAnalysis 
 #
+# This script and its surrounding content is expected to live in /etc/fuzztrees/analysis
+#
 # Make sure that you link this script in /etc/init.d and enable it's startup:
 # chkconfig --level 345 fuzzTreeAnalysis on
 #
@@ -16,7 +18,7 @@
 . /etc/rc.d/init.d/functions
 
 prog="FuzzTrees Analysis Server"
-exec=/home/fuzztrees/fuzzed/analysis/jar/fuzzTreeAnalysis.sh
+exec=/home/fuzztrees/analysis/fuzzTreeAnalysis.sh
 pidfile=/var/run/fuzzTreeAnalysis.pid
 lockfile=/var/lock/subsys/fuzzTreeAnalysis
 

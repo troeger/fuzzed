@@ -1,7 +1,17 @@
-define(function() {
+define(['underscore'], function() {
     /**
      *  Package: Base
      */
+
+    /**
+     *  Underscore template configuration:
+     *    Configure underscores template language to match Django's style.
+     */
+    _.templateSettings = {
+        interpolate: /\{\{(.+?)\}\}/g,
+        evaluate:    /\{%(.+?)%\}/g,
+        escape:      /\{-(.+?)-\}/g
+    };
 
     /**
      *  Constants:
@@ -79,7 +89,11 @@ define(function() {
          *    Names of certain CSS classes.
          *
          *  Constants:
-         *    {String} JQUERY_UI_SELECTED      - Class assigned to selected elements by jQuery UI.
+         *    {String} HIGHLIGHTED             - Class assigned to highlighted elements.
+         *    {String} SELECTED                - Class assigned to selected elements (using jQuery UI Selectable).
+         *    {String} SELECTING               - Class assigned to elements that are currently being selected
+         *                                       (using jQuery UI Selectable).
+         *    {String} DISABLED                - Class assigned to disabled (grayed-out) elements.
          *
          *    {String} JSPLUMB_ENDPOINT        - Class assigned to endpoints by jsPlumb.
          *    {String} JSPLUMB_ENDPOINT_HOVER  - Class assigned to hovered endpoints by jsPlumb.
@@ -95,8 +109,7 @@ define(function() {
          *    {String} MIRROR_ITALIC           - Class of italic mirror labels.
          *    {String} MIRROR_LARGE            - Class of larger mirror labels.
          *
-         *    {String} NODE                    - Class of a node's container
-         *    {String} NODE_SELECTED           - Class assigned to a node's container when selected.
+         *    {String} NODE                    - Class of a node's container.
          *    {String} NODE_IMAGE              - Class of the node's image (the SVG).
          *    {String} NODE_DROP_ACTIVE        - Class assigned to nodes that are valid connection targets
          *                                       (when dragging a new connection).
@@ -107,14 +120,15 @@ define(function() {
          *    {String} PROPERTY_WARNING        - Class for property input fields if they are erroneous.
          */
         Classes: {
+            HIGHLIGHTED:             'highlighted',
+            SELECTED:                'ui-selected',
+            SELECTING:               'ui-selecting',
+            DISABLED:                'disabled',
+
             GRID_HIDDEN:             'fuzzed-grid-hidden',
 
-            JQUERY_UI_SELECTED:      'ui-selected',
-
             JSPLUMB_ENDPOINT:        'jsplumb-endpoint',
-            JSPLUMB_ENDPOINT_HOVER:  'jsplumb-endpoint-hover',
             JSPLUMB_CONNECTOR:       'jsplumb-connector',
-            JSPLUMB_CONNECTOR_HOVER: 'jsplumb-connector-hover',
 
             MENU_CONTROLS:           'menu-controls',
             MENU_CLOSE:              'menu-close',
@@ -126,7 +140,6 @@ define(function() {
             MIRROR_LARGE:            'fuzzed-mirror-large',
 
             NODE:                    'fuzzed-node',
-            NODE_SELECTED:           'fuzzed-node-selected',
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
             NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
@@ -159,32 +172,40 @@ define(function() {
          *    Name of global events triggered on the document with jQuery.trigger().
          *
          *  Constants:
-         *    {String} CANVAS_SELECTION_STOPPED - Event triggered when a selection was performed.
-         *    {String} CANVAS_SHAPE_DROPPED     - Event triggered when a new shape was dropped on the canvas.
-         *    {String} CANVAS_EDGE_SELECTED     - Event triggered when an edge got selected.
-         *    {String} CANVAS_EDGE_UNSELECTED   - Event triggered when an edge got unselected.
+         *    {String} CANVAS_SELECTION_STOPPED  - Event triggered when a selection was performed.
+         *    {String} CANVAS_SHAPE_DROPPED      - Event triggered when a new shape was dropped on the canvas.
+         *    {String} CANVAS_EDGE_SELECTED      - Event triggered when an edge got selected.
+         *    {String} CANVAS_EDGE_UNSELECTED    - Event triggered when an edge got unselected.
          *
-         *    {String} NODE_PROPERTY_CHANGED    - Event triggered when a property of a node changed.
-         *    {String} NODE_DRAG_STOPPED        - Event triggered when a dragged node is dropped again.
+         *    {String} GRAPH_NODE_ADDED          - Event triggered when a node was added to the graph.
+         *    {String} GRAPH_NODE_DELETED        - Event triggered when a node was deleted from the graph.
+         *    {String} GRAPH_EDGE_ADDED          - Event triggered when an edge was added to the graph.
+         *    {String} GRAPH_EDGE_DELETED        - Event triggered when an edge was deleted from the graph.
          *
-         *    {String} GRAPH_NODE_ADDED         - Event triggered when a node was added to the graph.
-         *    {String} GRAPH_NODE_DELETED       - Event triggered when a node was deleted from the graph.
-         *    {String} GRAPH_EDGE_ADDED         - Event triggered when an edge was added to the graph.
-         *    {String} GRAPH_EDGE_DELETED       - Event triggered when an edge was deleted from the graph.
+         *    {String} NODE_DRAG_STOPPED         - Event triggered when a dragged node is dropped again.
+         *
+         *    {String} PROPERTY_CHANGED          - Event triggered when a property of a node changed.
+         *    {String} PROPERTY_HIDDEN_CHANGED   - Event triggered when a property's hidden state changed.
+         *    {String} PROPERTY_READONLY_CHANGED - Event triggered when a property's readonly state changed.
+         *    {String} PROPERTY_SYNCHRONIZED     - Event triggered when a property synced itself with the backend.
          */
         Events: {
-            CANVAS_SELECTION_STOPPED: 'canvas-selection-stopped',
-            CANVAS_SHAPE_DROPPED:     'canvas-shape-dropped',
-            CANVAS_EDGE_SELECTED:     'canvas-edge-selected',
-            CANVAS_EDGE_UNSELECTED:   'canvas-edge-unselected',
+            CANVAS_SELECTION_STOPPED:  'canvas-selection-stopped',
+            CANVAS_SHAPE_DROPPED:      'canvas-shape-dropped',
+            CANVAS_EDGE_SELECTED:      'canvas-edge-selected',
+            CANVAS_EDGE_UNSELECTED:    'canvas-edge-unselected',
 
-            NODE_PROPERTY_CHANGED:    'node-property-changed',
-            NODE_DRAG_STOPPED:        'node-drag-stopped',
+            GRAPH_NODE_ADDED:          'graph-node-added',
+            GRAPH_NODE_DELETED:        'graph-node-deleted',
+            GRAPH_EDGE_ADDED:          'graph-edge-added',
+            GRAPH_EDGE_DELETED:        'graph-edge-deleted',
 
-            GRAPH_NODE_ADDED:         'graph-node-added',
-            GRAPH_NODE_DELETED:       'graph-node-deleted',
-            GRAPH_EDGE_ADDED:         'graph-edge-added',
-            GRAPH_EDGE_DELETED:       'graph-edge-deleted'
+            NODE_DRAG_STOPPED:         'node-drag-stopped',
+
+            PROPERTY_CHANGED:          'property-changed',
+            PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',
+            PROPERTY_READONLY_CHANGED: 'property-readonly-changed',
+            PROPERTY_SYNCHRONIZED:     'property-synchronized'
         },
 
         /**
@@ -215,8 +236,9 @@ define(function() {
          *    {String} PROPERTIES_MENU           - The container for the properties menu.
          *    {String} SHAPES_MENU               - The container for the shapes menu.
          *    {String} SPLASH                    - The splash screen element.
-         *    {String} NAVBAR_ACTIONS            - The list element that contains the action buttons in the navbar.
-         *    {String} NAVBAR_ACTION_GRID_TOGGLE - The list element that contains the grid toggle item.
+         *    {String} ACTION_GRID_TOGGLE        - The list element that contains the grid toggle menu entry.
+         *    {String} ACTION_CUTSETS            - The list element that contains the cut set analysis menu entry.
+         *    {String} ACTION_ANALYTICAL        - The list element that contains the analytical analysis menu entry.                  
          *    {String} PROGRESS_INDICATOR        - The animated progress indicator gif.
          *    {String} SAVE_INDICATOR            - The navbar entry indicating the save state.
          *    {String} ERROR_INDICATOR           - The navbar entry indicating the error state.
@@ -228,10 +250,11 @@ define(function() {
             PROPERTIES_MENU:           'FuzzEdProperties',
             SHAPES_MENU:               'FuzzEdShapes',
             SPLASH:                    'FuzzEdSplash',
-            NAVBAR_ACTIONS:            'FuzzEdNavbarActions',
-            NAVBAR_ACTION_GRID_TOGGLE: 'FuzzEdNavbarActionGridToggle',
+            ACTION_GRID_TOGGLE:        'FuzzEdActionGridToggle',
+            ACTION_CUTSETS:            'FuzzEdActionCutsets',
+            ACTION_ANALYTICAL:         'FuzzEdActionAnalytical',            
             PROGRESS_INDICATOR:        'FuzzEdProgressIndicator',
-            SAVE_INDICATOR:            'FuzzEdSaveIndicator',
+            SAVE_INDICATOR:            'FuzzEdSaveIndicator',            
             ERROR_INDICATOR:           'FuzzEdErrorIndicator'
         },
 
@@ -279,7 +302,7 @@ define(function() {
          */
         Keys: {
             NODE:       'node',
-            SELECTABLE: 'selectable'
+            SELECTABLE: 'ui-selectable'
         },
 
         /**
@@ -287,12 +310,14 @@ define(function() {
          *    Menu configurations.
          *
          *  Constants:
-         *    {Number} ANIMATION_DURATION     - Duration of the minimize animation (in ms).
-         *    {Number} PROPERTIES_MENU_OFFSET - Offset of the properties menu from the borders.
+         *    {Number} ANIMATION_DURATION      - Duration of the minimize animation (in ms).
+         *    {Number} PROPERTIES_MENU_OFFSET  - Offset of the properties menu from the borders.
+         *    {Number} PROPERTIES_MENU_TIMEOUT - Number of milliseconds after which a change is propagated.
          */
         Menus: {
-            ANIMATION_DURATION:     200,
-            PROPERTIES_MENU_OFFSET: 20
+            ANIMATION_DURATION:      200,
+            PROPERTIES_MENU_OFFSET:  20,
+            PROPERTIES_MENU_TIMEOUT: 500
         },
 
         /**

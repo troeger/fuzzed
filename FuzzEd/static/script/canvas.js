@@ -1,5 +1,4 @@
-define(['class', 'config', 'jquery.svgdom', 'jquery.ui/jquery.ui.droppable', 'jquery.ui/jquery.ui.selectable'],
-function(Class, Config) {
+define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Config) {
     /**
      * Package: Base
      */
@@ -191,32 +190,6 @@ function(Class, Config) {
 
             this.container.selectable({
                 filter: '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
-                selecting: function(event, ui) {
-                    // highlight nodes...
-                    var selection = jQuery(ui.selecting);
-                    if (selection.hasClass(Config.Classes.NODE)) {
-                        selection.data(Config.Keys.NODE).select();
-                    }
-
-                    // ... and edges that are part of the new selection
-                    if (selection.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        var edgeId = selection.attr(Config.Attributes.CONNECTION_ID);
-                        jQuery(document).trigger(Config.Events.CANVAS_EDGE_SELECTED, edgeId);
-                    }
-                },
-                unselecting: function(event, ui) {
-                    // unhighlight nodes...
-                    var unselection = jQuery(ui.unselecting);
-                    if (unselection.hasClass(Config.Classes.NODE)) {
-                        unselection.data(Config.Keys.NODE).deselect();
-                    }
-
-                    // ... and edges when the selection is cleared
-                    if (unselection.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        var edgeId = unselection.attr(Config.Attributes.CONNECTION_ID);
-                        jQuery(document).trigger(Config.Events.CANVAS_EDGE_UNSELECTED, edgeId);
-                    }
-                },
                 stop: function() {
                     // tell other (e.g. <PropertyMenu>) that selection is done and react to the new selection
                     jQuery(document).trigger(Config.Events.CANVAS_SELECTION_STOPPED);

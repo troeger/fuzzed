@@ -1,4 +1,4 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus, Canvas, Backend, Alerts) {
+define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'], function(Class, Menus, Canvas, Backend, Alerts) {
     /**
      *  Package: Base
      */
@@ -22,7 +22,6 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *                                                    the available shapes for the kind of the edited graph.
          *    {Backend}        _backend                     - The instance of the <Backend> that is used to communicate
          *                                                    graph changes to the server.
-         *    {jQuery Selector} _navbarActionsGroup         - Navbar dropdown menu that contains the available actions.
          *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
          *    {jQuery Selector} _nodeOffsetPrintStylesheet  - The dynamically generated and maintained stylesheet
          *                                                    used to fix the node offset when printing the page.
@@ -35,7 +34,6 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
         shapes:                        undefined,
 
         _backend:                      undefined,
-        _navbarActionsGroup:           undefined,
         _currentMinNodeOffsets:        {'top': 0, 'left': 0},
         _nodeOffsetPrintStylesheet:    undefined,
         _nodeOffsetStylesheetTemplate: undefined,
@@ -57,13 +55,12 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
 
             this.config              = this.getConfig();
             this._backend            = new Backend(graphId);
-            this._navbarActionsGroup = jQuery('#' + this.config.IDs.NAVBAR_ACTIONS);
 
             // run a few sub initializer
             this._setupJsPlumb()
                 ._setupNodeOffsetPrintStylesheet()
                 ._setupEventCallbacks()
-                ._setupGridToggleAction();
+                ._setupMenuActions();
 
             // fetch the content from the backend
             this._loadGraph(graphId);
@@ -183,22 +180,15 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          */
 
         /**
-         *  Method: _setupGridToggleAction
+         *  Method: _setupMenuActions
          *
-         *  Adds a button to the action group that allows to toggle the visibility of the background grid.
+         *  Registers the event handlers for graph type - independent menu entries that trigger JS calls
          *
          *  Returns:
          *    This {<Node>} instance for chaining.
          */
-        _setupGridToggleAction: function() {
-            var navbarActionsEntry = jQuery(
-                '<li>' +
-                    '<a id="' + this.config.IDs.NAVBAR_ACTION_GRID_TOGGLE + '" href="#">Toggle grid</a>' +
-                '</li>');
-            this._navbarActionsGroup.append(navbarActionsEntry);
-
-            // register for clicks on the corresponding nav action
-            navbarActionsEntry.click(function() {
+        _setupMenuActions: function() {
+            jQuery("#"+this.config.IDs.ACTION_GRID_TOGGLE).click(function() {
                 Canvas.toggleGrid();
             }.bind(this));
 
@@ -220,16 +210,13 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
                 Endpoint:        [this.config.JSPlumb.ENDPOINT_STYLE, {
                     radius:      this.config.JSPlumb.ENDPOINT_RADIUS,
                     cssClass:    this.config.Classes.JSPLUMB_ENDPOINT,
-                    hoverClass:  this.config.Classes.JSPLUMB_ENDPOINT_HOVER
+                    hoverClass:  this.config.Classes.HIGHLIGHTED
                 }],
                 PaintStyle: {
                     strokeStyle: this.config.JSPlumb.STROKE_COLOR,
                     lineWidth:   this.config.JSPlumb.STROKE_WIDTH
                 },
-                HoverPaintStyle: {
-                    strokeStyle: this.config.JSPlumb.STROKE_COLOR_HIGHLIGHTED
-                },
-                HoverClass:      this.config.Classes.JSPLUMB_CONNECTOR_HOVER,
+                HoverClass:      this.config.Classes.HIGHLIGHTED,
                 Connector:       [this.config.JSPlumb.CONNECTOR_STYLE, this.config.JSPlumb.CONNECTOR_OPTIONS],
                 ConnectionsDetachable: false
             });
@@ -253,37 +240,21 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
         _setupKeyBindings: function(readOnly) {
             if (readOnly) return this;
 
-            var selectedNodes = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE;
-            var selectedEdges = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
-
             jQuery(document).keydown(function(event) {
                 if (event.which == jQuery.ui.keyCode.ESCAPE) {
-                    event.preventDefault();
-                    //XXX: deselect everything
-                    // This uses the jQuery.ui.selectable internal functions.
-                    // We need to trigger them manually in order to simulate a click on the canvas.
-                    Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
-                    Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
-                } else if (event.which == jQuery.ui.keyCode.DELETE) {
-                    // prevent that node is being deleted when we edit an input field
-                    if (jQuery(event.target).is('input')) {
-                        return;
-                    }
-
-                    event.preventDefault();
-                    // delete selected nodes
-                    jQuery(selectedNodes).each(function(index, element) {
-                        this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
-                    }.bind(this));
-
-                    this.properties.hide();
-
-                    // delete selected edges
-                    jQuery(selectedEdges).each(function(index, element) {
-                        var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
-                        jsPlumb.detach(edge);
-                        this.graph.deleteEdge(edge);
-                    }.bind(this));
+                    this._escapePressed(event);
+                } else if (event.which === jQuery.ui.keyCode.DELETE) {
+                    this._deletePressed(event);
+                } else if (event.which === jQuery.ui.keyCode.UP) {
+                    this._arrowKeyPressed(event, 0, -1);
+                } else if (event.which === jQuery.ui.keyCode.RIGHT) {
+                    this._arrowKeyPressed(event, 1, 0);
+                } else if (event.which === jQuery.ui.keyCode.DOWN) {
+                    this._arrowKeyPressed(event, 0, 1);
+                } else if (event.which === jQuery.ui.keyCode.LEFT) {
+                    this._arrowKeyPressed(event, -1, 0);
+                } else if (event.which === 'A'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
+                    this._selectAllPressed(event);
                 }
             }.bind(this));
 
@@ -347,6 +318,136 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
         },
 
         /**
+         *  Group: Keyboard Interaction
+         */
+
+        /**
+         *  Method: _arrowKeyPressed
+         *
+         *    Event callback for handling presses of arrow keys. Will move the selected nodes in the given direction by
+         *    and offset equal to the canvas' grid size. The movement is not done when an input field is currently in
+         *    focus.
+         *
+         *  Parameters:
+         *    {jQuery::Event} event      - the issued delete keypress event
+         *    {Number}        xDirection - signum of the arrow key's x direction movement (e.g. -1 for left)
+         *    {Number}        yDirection - signum of the arrow key's y direction movement (e.g.  1 for down)
+         *
+         *  Return:
+         *    This Editor instance for chaining
+         */
+        _arrowKeyPressed: function(event, xDirection, yDirection) {
+            if (jQuery(event.target).is('input')) return this;
+
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            jQuery(selectedNodes).each(function(index, element) {
+                var node = jQuery(element).data(this.config.Keys.NODE);
+                node.moveBy({
+                    x: xDirection * Canvas.gridSize,
+                    y: yDirection * Canvas.gridSize
+                });
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _deletePressed
+         *
+         *    Event callback for handling delete key presses. Will remove the selected nodes and edges as long as no
+         *    input field is currently focused (allows e.g. character removal in properties).
+         *
+         *  Parameters:
+         *    {jQuery::Event} event - the issued delete keypress event
+         *
+         *  Return:
+         *    This Editor instance for chaining
+         */
+        _deletePressed: function(event) {
+            // prevent that node is being deleted when we edit an input field
+            if (jQuery(event.target).is('input')) return this;
+
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+
+            event.preventDefault();
+            // delete selected nodes
+            jQuery(selectedNodes).each(function(index, element) {
+                this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
+            }.bind(this));
+
+            // delete selected edges
+            jQuery(selectedEdges).each(function(index, element) {
+                var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
+                jsPlumb.detach(edge);
+                this.graph.deleteEdge(edge);
+            }.bind(this));
+
+            this.properties.hide();
+
+            return this;
+        },
+
+        /**
+         *  Method: _escapePressed
+         *
+         *    Event callback for handling escape key presses. Will deselect any selected nodes and edges.
+         *
+         *  Parameters:
+         *    {jQuery::Event} event - the issued escape keypress event
+         *
+         *  Returns:
+         *    This Editor instance for chaining
+         */
+        _escapePressed: function(event) {
+            event.preventDefault();
+            //XXX: deselect everything
+            // This uses the jQuery.ui.selectable internal functions.
+            // We need to trigger them manually in order to simulate a click on the canvas.
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
+
+            return this;
+        },
+
+        /**
+         * Method: _selectAllPressed
+         *
+         *   Event callback for handling a select all (CTRL/CMD + A) key presses. Will select all nodes and edges.
+         *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _selectAllPressed: function(event) {
+            if (jQuery(event.target).is('input')) return this;
+
+            event.preventDefault();
+
+            //XXX: trigger selection start event manually here
+            //XXX: hack to emulate a new selection process
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+
+            var NODES           = '.' + this.config.Classes.NODE;
+            var NODES_AND_EDGES = NODES + ', .' + this.config.Classes.JSPLUMB_CONNECTOR;
+
+            jQuery(NODES_AND_EDGES).each(function(index, domElement) {
+                var element = jQuery(domElement);
+
+                element.addClass(this.config.Classes.SELECTING)
+                       .addClass(this.config.Classes.SELECTED);
+            }.bind(this));
+
+            //XXX: trigger selection stop event manually here
+            //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
+
+            return this;
+        },
+
+        /**
          *  Group: Progress Indication
          */
 
@@ -358,7 +459,10 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _showProgressIndicator: function() {
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+            // show indicator only if it takes longer then 500 ms
+            this._progressIndicatorTimeout = setTimeout(function() {
+                jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+            }.bind(this), 500);
 
             return this;
         },
@@ -371,6 +475,8 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _hideProgressIndicator: function() {
+            // prevent indicator from showing before 500 ms are passed
+            clearTimeout(this._progressIndicatorTimeout);
             jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
 
             return this;
@@ -384,7 +490,11 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _flashSaveIndicator: function() {
-            jQuery('#' + this.config.IDs.SAVE_INDICATOR).fadeIn(200).delay(600).fadeOut(200);
+            var indicator = jQuery('#' + this.config.IDs.SAVE_INDICATOR);
+            // only flash if not already visible
+            if (indicator.is(':hidden')) {
+                indicator.fadeIn(200).delay(600).fadeOut(200);
+            }
 
             return this;
         },
@@ -397,7 +507,11 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    This Editor instance for chaining.
          */
         _flashErrorIndicator: function() {
-            jQuery('#' + this.config.IDs.ERROR_INDICATOR).fadeIn(200).delay(5000).fadeOut(200);
+            var indicator = jQuery('#' + this.config.IDs.ERROR_INDICATOR);
+            // only flash if not already visible
+            if (indicator.is(':hidden')) {
+                indicator.fadeIn(200).delay(5000).fadeOut(200);
+            }
 
             return this;
         },
