@@ -23,3 +23,5 @@ simulation/tests/output
 *.log
 *.pnml
 *.log.debug
+FuzzEd.egg-info
+MANIFEST
