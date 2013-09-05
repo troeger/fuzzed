@@ -129,7 +129,6 @@ set(XSD_GENERATED_FILES
   ${COMMON_DIR}/faulttree.h
   ${COMMON_DIR}/fuzztree.cpp
   ${COMMON_DIR}/faulttree.cpp)
-
 generate_if_not_existing("${XSD_GENERATED_FILES}")
 
 set(COMMON_SOURCES
@@ -146,10 +145,6 @@ set(COMMON_HEADERS
   ${COMMON_DIR}/faulttree.h
   ${COMMON_DIR}/fuzztree.h
 )
-
-SET_SOURCE_FILES_PROPERTIES(
-  XSD_GENERATED_FILES 
-  PROPERTIES GENERATED true)
 
 ############### UNIT TESTS ##############
 #########################################
