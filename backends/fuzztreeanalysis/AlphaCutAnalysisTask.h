@@ -3,7 +3,6 @@
 #include "fuzztree.h"
 #include <future>
 #include <vector>
-#pragma strict_gs_check(on)
 
 typedef NumericInterval AlphaCutAnalysisResult;
 
@@ -18,8 +17,8 @@ public:
 	const double& getAlpha() const { return m_alpha; }
 
 protected:
-	static double calculateExactlyOneOutOfN(const std::vector<double>& values, unsigned int n);
-	static double calculateKOutOfN(const std::vector<double>& values, unsigned int k, unsigned int n);
+	static double calculateExactlyOneOutOfN(const std::vector<interval_t>& values, unsigned int n);
+	static double calculateKOutOfN(const std::vector<interval_t>& values, unsigned int k, unsigned int n);
 
 
 	AlphaCutAnalysisResult analyze();

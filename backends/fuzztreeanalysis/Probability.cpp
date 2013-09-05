@@ -7,7 +7,7 @@ namespace probability
 {
 	NumericInterval getAlphaCutBounds(const fuzztree::CrispProbability& prob)
 	{
-		const double val = prob.value();
+		const interval_t val = (interval_t)prob.value();
 		return NumericInterval(val, val);
 	}
 
@@ -20,8 +20,8 @@ namespace probability
 			return alphaCuts.at(alpha);
 
 		// Alpha-cut needs to be approximated
-		double lowerAlpha = 0.0;
-		double upperAlpha = 1.0;
+		interval_t lowerAlpha = 0.0;
+		interval_t upperAlpha = 1.0;
 
 		// Search the biggest "lowerAlpha" and the lowest "upperAlpha"
 		// such that lowerAlpha < alpha < upperAlpha 
@@ -37,11 +37,11 @@ namespace probability
 		const NumericInterval lowerInterval = alphaCuts.at(lowerAlpha);
 		const NumericInterval upperInterval = alphaCuts.at(upperAlpha);
 
-		const double lowerBound = 
+		const interval_t lowerBound = 
 			lowerInterval.lowerBound + (alpha - lowerAlpha) * 
 			(upperInterval.lowerBound- lowerInterval.lowerBound);
 
-		const double upperBound = 
+		const interval_t upperBound = 
 			upperInterval.upperBound + (upperAlpha - alpha) * 
 			(lowerInterval.upperBound - upperInterval.upperBound);
 
@@ -50,7 +50,7 @@ namespace probability
 
 	NumericInterval getAlphaCutBounds(const fuzztree::FailureRate& prob, const unsigned int& missionTime)
 	{
-		const double val = util::probabilityFromRate(prob.value(), missionTime);
+		const interval_t val = util::probabilityFromRate(prob.value(), missionTime);
 		return NumericInterval(val, val);
 	}
 
@@ -59,8 +59,8 @@ namespace probability
 		const auto a = interval.a();
 		const auto c = interval.c();
 		
-		const double lowerBound = alpha * (interval.b1() - a) + a;
-		const double upperBound = c - alpha * (c - interval.b2());
+		const interval_t lowerBound = alpha * (interval.b1() - a) + a;
+		const interval_t upperBound = c - alpha * (c - interval.b2());
 
 		return NumericInterval(lowerBound, upperBound);
 	}

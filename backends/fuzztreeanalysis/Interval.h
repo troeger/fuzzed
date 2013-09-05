@@ -1,12 +1,14 @@
 #pragma once
 
+typedef long double interval_t;
+
 struct NumericInterval
 {
 	NumericInterval() : lowerBound(0.0), upperBound(0.0) {};
 
-	NumericInterval(const double& lower, const double& upper):
+	NumericInterval(const interval_t& lower, const interval_t& upper):
 		lowerBound(lower), upperBound(upper) {};
 
-	double lowerBound;
-	double upperBound;
+	interval_t lowerBound;
+	interval_t upperBound;
 };

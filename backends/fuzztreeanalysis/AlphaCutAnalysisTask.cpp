@@ -31,7 +31,7 @@ std::future<AlphaCutAnalysisResult> AlphaCutAnalysisTask::run()
 
 AlphaCutAnalysisResult AlphaCutAnalysisTask::analyze()
 {
-	return analyzeRecursive(static_cast<const ChildNode&>(m_tree->children().at(0)));
+	return analyzeRecursive(m_tree->children().front());
 }
 
 AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::ChildNode& node)
@@ -92,8 +92,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	// Static Gates...
 	else if (typeName == *AND)
 	{
-		double lowerBound = 1.0;
-		double upperBound = 1.0;
+		interval_t lowerBound = 1.0;
+		interval_t upperBound = 1.0;
 		for (const auto& c : node.children())
 		{
 			const auto res = analyzeRecursive(c);
@@ -105,8 +105,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	}
 	else if (typeName == *OR)
 	{
-		double lowerBound = 0.0;
-		double upperBound = 0.0;
+		interval_t lowerBound = 0.0;
+		interval_t upperBound = 0.0;
 
 		for (const auto& c : node.children())
 		{
@@ -123,8 +123,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		// Calculate results of children first.
 		const unsigned int n = node.children().size();
 
-		vector<double> lowerBounds(n);
-		vector<double> upperBounds(n);
+		vector<interval_t> lowerBounds(n);
+		vector<interval_t> upperBounds(n);
 		for (const auto& c : node.children())
 		{
 			const auto res = analyzeRecursive(c);
@@ -138,11 +138,11 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		
 		// Get all permutations of lower and upper bounds (idea see VotingOr gate).
 		const unsigned int numberOfCombinations = (int)std::pow(2, n);
-		vector<double> combinations(numberOfCombinations);
+		vector<interval_t> combinations(numberOfCombinations);
 		for (unsigned int i = 0; i < numberOfCombinations; ++i)
 		{
  			const std::bitset<128> choice(i); // TODO: we need numberofcombinations bits here...
-			vector<double> perm(n);
+			vector<interval_t> perm(n);
 			for (unsigned int j = 0; j < n; j++)
 				perm.emplace_back(choice[j] ? upperBounds[j] : lowerBounds[j]);
 
@@ -160,8 +160,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		const int k = votingOr.k();
 		const int n = votingOr.children().size();
 
-		vector<double> lowerBounds(n);
-		vector<double> upperBounds(n);
+		vector<interval_t> lowerBounds(n);
+		vector<interval_t> upperBounds(n);
 
 		for (const auto& c : node.children())
 		{
@@ -170,7 +170,9 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 			upperBounds.emplace_back(res.upperBound);
 		}
 
-		return NumericInterval(calculateKOutOfN(lowerBounds, k, n), calculateKOutOfN(upperBounds, k, n));
+		return NumericInterval(
+			calculateKOutOfN(lowerBounds, k, n),
+			calculateKOutOfN(upperBounds, k, n));
 	}
 	else
 	{
@@ -182,12 +184,12 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	return NumericInterval();
 }
 
-double AlphaCutAnalysisTask::calculateExactlyOneOutOfN(const vector<double>& values, unsigned int n)
+double AlphaCutAnalysisTask::calculateExactlyOneOutOfN(const vector<interval_t>& values, unsigned int n)
 {
-	double result = 0.0;
+	interval_t result = 0.0;
 	for (unsigned int i = 0; i < n; i++)
 	{
-		double termResult = 1.0;
+		interval_t termResult = 1.0;
 		for (unsigned int j = 0; j < n; j++)
 		{
 			// un-negate the ith value 
@@ -198,7 +200,7 @@ double AlphaCutAnalysisTask::calculateExactlyOneOutOfN(const vector<double>& val
 	return result;
 }
 
-double AlphaCutAnalysisTask::calculateKOutOfN(const vector<double>& values, unsigned int k, unsigned int n)
+double AlphaCutAnalysisTask::calculateKOutOfN(const vector<interval_t>& values, unsigned int k, unsigned int n)
 {
 	assert(values.size() == n);
 	
