@@ -1,5 +1,6 @@
 #include "InstanceAnalysisTask.h"
 #include "AlphaCutAnalysisTask.h"
+#include "Probability.h"
 
 #include <assert.h>
 #include <map>
@@ -15,24 +16,29 @@ InstanceAnalysisTask::InstanceAnalysisTask(fuzztree::TopEvent* tree, unsigned in
 
 InstanceAnalysisResult InstanceAnalysisTask::compute()
 {
-	map<double, future<AlphaCutAnalysisResult>> alphaCutResults;
+	map<AlphaCutAnalysisTask*, future<AlphaCutAnalysisResult>> alphaCutResults;
+	DecomposedFuzzyInterval resultInterval;
+
 	const double m = (double)m_decompositionNumber;
 	
 	// FORK
-	for (unsigned int i = 1; i <= m_decompositionNumber; ++i)
+	for (unsigned int i = 0; i <= m_decompositionNumber; ++i)
 	{
-		const double alpha = i / m;
-		AlphaCutAnalysisTask task(m_tree, alpha);
-		alphaCutResults[alpha] = task.run();
+		const double alpha = (double)(i / m);
+		AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, alpha);
+		alphaCutResults[task] = task->run();
 	}
 
 	// JOIN
-	DecomposedFuzzyInterval result;
 	for (auto& t : alphaCutResults)
 	{
-		result[t.first] = t.second.get();
+		const auto task		= t.first;
+		const auto alphaCut = t.second.get(); // blocks until result is ready
+		
+		resultInterval[task->getAlpha()] = alphaCut;
+		
+		delete task;
 	}
-
-	return result;
+	return resultInterval;
 }
 

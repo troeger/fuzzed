@@ -6,10 +6,10 @@ DecomposedFuzzyInterval parse(const fuzztree::DecomposedFuzzyProbability& prob)
 
 	for (const auto& alphaCut : prob.alphaCuts())
 	{
-		const auto alpha = alphaCut.key();
-		const auto interval = alphaCut.value();
+		const auto alpha	= alphaCut.key();
+		const auto interval	= alphaCut.value();
 
-		res[alpha]  = NumericInterval(interval.lowerBound(), interval.upperBound());
+		res[alpha] = NumericInterval(interval.lowerBound(), interval.upperBound());
 	}
 	return res;
 }
