@@ -75,5 +75,13 @@ void FuzzTreeConfigClient::run()
 
 std::string FuzzTreeConfigClient::concatXMLString(const std::vector<fuzztree::FuzzTree>& trees)
 {
-	return ""; // TODO
+	std::stringstream res;
+	
+	for (const auto& tree : trees)
+	{
+		fuzztree::fuzzTree(res, tree);
+	}
+
+	std::cout << res;
+	return res.str(); // TODO
 }
