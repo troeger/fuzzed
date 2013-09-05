@@ -146,16 +146,17 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
 
             sourceNode.setChildProperties(targetNode);
 
+            this.edges[edge._fuzzedId] = edge;
+
+            sourceNode.outgoingEdges.push(edge);
+            targetNode.incomingEdges.push(edge);
+
             jQuery(document).trigger(
                 this.config.Events.GRAPH_EDGE_ADDED,
                 [edge._fuzzedId,
                 sourceNode.id,
                 targetNode.id]
             );
-            this.edges[edge._fuzzedId] = edge;
-
-            sourceNode.outgoingEdges.push(edge);
-            targetNode.incomingEdges.push(edge);
 
             return this;
         },
