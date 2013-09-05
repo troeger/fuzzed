@@ -24,7 +24,7 @@ classes should alter those!
   display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
-  height: 16px;
+  /*height: 16px;*/
   line-height: 16px;
   margin: 0;
   padding: 4px;
