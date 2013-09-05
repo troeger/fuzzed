@@ -154,12 +154,4 @@ namespace util
 	{
 		return detail::next_combination(middle , last , first , middle);
 	}
-
-	/************************************************************************/
-	/* XML                                                                  */
-	/************************************************************************/
-
-	int		parseIntegerValue(const pugi::xml_node& node, const std::string& type, const int defaultValue);
-	double	parseDoubleValue(const pugi::xml_node& node, const std::string& type, const double defaultValue);
-	bool	parseBooleanValue(const pugi::xml_node& node, const std::string& type, const bool defaultValue);
 }

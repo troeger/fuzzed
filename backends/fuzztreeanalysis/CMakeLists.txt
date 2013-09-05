@@ -58,7 +58,7 @@ if (BUILD_TESTS)
    add_library(ftanalysis_static STATIC ${SOURCES} ${HEADERS})
    target_link_libraries(ftanalysis_static
     ${FT_CONFIG_LIB}
-	${XERCESC_LIBRARIES}s
+	${XERCESC_LIBRARIES}
    )
    set_target_properties(ftanalysis_static PROPERTIES COMPILE_DEFINITIONS "ANALYSIS_STATIC")
 endif (BUILD_TESTS)

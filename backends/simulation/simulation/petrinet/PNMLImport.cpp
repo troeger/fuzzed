@@ -10,6 +10,58 @@ using namespace PNML;
 using namespace std;
 using namespace pugi;
 
+/************************************************************************/
+/* XML                                                                  */
+/************************************************************************/
+
+int		parseIntegerValue(const pugi::xml_node& node, const std::string& type, const int defaultValue);
+double	parseDoubleValue(const pugi::xml_node& node, const std::string& type, const double defaultValue);
+bool	parseBooleanValue(const pugi::xml_node& node, const std::string& type, const bool defaultValue);
+
+bool util::parseBooleanValue(const xml_node& node, const string& type, const bool defaultValue)
+{
+	const xml_node valNode = node.child(type.c_str());
+	if (valNode.empty())
+		return defaultValue;
+
+	const xml_node child = valNode.child("value");
+	if (child.empty())
+		throw runtime_error("Value node not found");
+
+	return child.text().as_bool(defaultValue);
+}
+
+double util::parseDoubleValue(const xml_node& node, const string& type, const double defaultValue)
+{
+	const xml_node valNode = node.child(type.c_str());
+	if (valNode.empty())
+		return defaultValue;
+
+	const xml_node child = valNode.child("value");
+	if (child.empty())
+		throw runtime_error("Value node not found");
+
+	return child.text().as_double(defaultValue);
+}
+
+int util::parseIntegerValue(const xml_node& node, const string& type, const int defaultValue)
+{
+	xml_node valNode = node.child(type.c_str());
+	if (!valNode)
+		return defaultValue;
+
+	xml_node child = valNode.child("value");
+	if (!child)
+		throw runtime_error("Value node not found");
+
+	return child.text().as_int(defaultValue);
+}
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+
+
 PetriNet* PNMLImport::loadPNML(const string& fileName) noexcept
 {
 	try
