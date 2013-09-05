@@ -74,6 +74,12 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
             this.container.show();
 
+            // ensure that maximized menus will be visible (in case the window has been resized)
+            destinationTransformation.left =
+                Math.min(destinationTransformation.left, jQuery(window).width()  - this.container.outerWidth()  - 10);
+            destinationTransformation.top  =
+                Math.min(destinationTransformation.top,  jQuery(window).height() - this.container.outerHeight() - 10);
+
             this.container.animate(destinationTransformation, {
                 duration: Config.Menus.ANIMATION_DURATION
             });
