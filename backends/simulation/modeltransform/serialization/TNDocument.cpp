@@ -121,7 +121,7 @@ int TNDocument::addPlace(
 
 bool TNDocument::save(const string& fileName)
 {
-	std::ofstream file = std::ofstream(fileName, ios::binary);
+	std::ofstream file(fileName, ios::binary);
 	if (!file)
 		return false;
 

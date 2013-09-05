@@ -2,6 +2,8 @@
 #include "events/BasicEvent.h"
 #include "serialization/PNDocument.h"
 
+#include <stdexcept>
+
 FDEPGate::FDEPGate(const std::string& id, const std::string& trigger, std::vector<std::string> dependentEvents, const std::string& name /*= ""*/)
 	: DynamicGate(id, name), m_triggerID(trigger), m_dependentEvents(dependentEvents)
 {}

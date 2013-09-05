@@ -28,7 +28,7 @@ set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -std=c++0x -fPIC -fexceptions")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -std=c++0x -fPIC -fexceptions")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive -pedantic -std=c++0x -fexceptions")
   set(Boost_USE_STATIC_LIBS OFF)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # using Intel C++
@@ -60,7 +60,6 @@ set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
 
 set(Boost_DIR ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
 find_package(Boost 1.51.0 COMPONENTS
-	regex
 	date_time
 	system
 	filesystem

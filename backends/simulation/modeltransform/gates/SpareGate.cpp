@@ -4,6 +4,7 @@
 #include "util.h"
 
 #include <set>
+#include <stdexcept>
 
 SpareGate::SpareGate(const std::string& id, const std::string& primaryId, const double& dormancyFactor, const string& name)
 	: DynamicGate(id, name), 
