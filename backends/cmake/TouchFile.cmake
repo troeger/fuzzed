@@ -1,0 +1,8 @@
+macro(generate_if_not_existing files)
+foreach(file ${files})
+	if (NOT EXISTS file)
+		message("Creating empty ${file}")
+		file(WRITE "${file}" "")
+	endif()
+endforeach()
+endmacro()
