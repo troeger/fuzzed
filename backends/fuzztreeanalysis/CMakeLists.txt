@@ -18,11 +18,8 @@ set(HEADERS
    ${COMMON_HEADERS}
 )
 
-message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
 include_directories(${BEANSTALKPP_INCLUDE})
 include_directories(${PUGIXML_INCLUDE_DIR})
-
-message("${FT_CONFIG_LIB}")
 
 option(BUILD_ANALYSIS_EXECUTABLE ON)
 if (BUILD_ANALYSIS_EXECUTABLE)
@@ -43,11 +40,7 @@ else (BUILD_ANAlYSIS_EXECUTABLE) # shared library
 endif (BUILD_ANALYSIS_EXECUTABLE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(ftanalysis ${Boost_LIBRARIES})
-if (WIN32)
-   target_link_libraries(ftanalysis optimized ${PUGIXML_LIB_RELEASE})
-   target_link_libraries(ftanalysis debug ${PUGIXML_LIB_DEBUG})
-endif (WIN32)
+target_link_libraries(ftanalysis ${Boost_LIBRARIES} ${PUGIXML_LIB})
 
 if (BUILD_TESTS)
    add_library(ftanalysis_static STATIC ${SOURCES} ${HEADERS})

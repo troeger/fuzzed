@@ -59,10 +59,6 @@ if (USE_TIMENET)
 	find_package(TimeNET REQUIRED)
 endif (USE_TIMENET)
 
-find_package(beanstalkpp REQUIRED)
-message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
-include_directories(${BEANSTALKPP_INCLUDE})
-
 find_package(OpenMP REQUIRED)
 if (OPENMP_FOUND)
 	message("OPENMP FOUND")
@@ -96,10 +92,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${PUGIXML_INCLUDE_DIR})
 
 target_link_libraries(ftsimulation ${Boost_LIBRARIES})
-if (WIN32)
-   target_link_libraries(ftsimulation optimized ${PUGIXML_LIB_RELEASE})
-   target_link_libraries(ftsimulation debug ${PUGIXML_LIB_DEBUG})
-endif (WIN32)
+target_link_libraries(ftsimulation ${PUGIXML_LIB})
 
 if (BUILD_TESTS)
    add_library(ftsimulation_static STATIC ${SOURCES} ${HEADERS})

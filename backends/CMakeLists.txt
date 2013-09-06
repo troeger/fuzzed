@@ -92,16 +92,16 @@ endif(XSD_FOUND)
 ############### BEANSTALK ###############
 #########################################
 
-option(BUILD_BEANSTALKPP ON)
+option(BUILD_BEANSTALKPP OFF)
 if (${BUILD_BEANSTALKPP})
   add_subdirectory(thirdParty/beanstalkpp)
   message("Building beanstalkpp")
   set(BEANSTALKPP_INCLUDE thirdParty/beanstalkpp)
-  if (WIN32)
-	set(BEANSTALK_LIB thirdParty/beanstalkpp.lib)
-  endif (WIN32)#TODO
-	set(BEANSTALKPP_INCLUDE thirdParty/beanstalkpp)
-  else (WIN32)
+  if(WIN32)
+    set(BEANSTALK_LIB "${FT_LIB_DIR}/beanstalkpp.lib")
+  else(WIN32)#TODO
+    set(BEANSTALK_LIB "${FT_LIB_DIR}/libbeanstalkpp")
+  endif(WIN32)
 else()
   find_package(beanstalkpp REQUIRED)
   message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
@@ -110,15 +110,19 @@ endif()
 ############### PUGI ####################
 #########################################
 
-option(BUILD_PUGIXML ON)
+option(BUILD_PUGIXML OFF)
 if (${BUILD_PUGIXML})
   add_subdirectory(thirdParty/pugixml)
-  message("Building beanstalkpp")
-  set(PUGIXML_LIB "${FT_LIB_DIR}/beanstalkpp")
-  set(BEANSTALKPP_INCLUDE thirdParty/beanstalkpp)
+  message("Building pugixml")
+  if(WIN32)
+    set(PUGIXML_LIB "${FT_LIB_DIR}/pugixml.lib")
+  else(WIN32)#TODO
+    set(PUGIXML_LIB "${FT_LIB_DIR}/libpugixml")
+  endif(WIN32)
+  set(PUGIXML_INCLUDE_DIR thirdParty/pugixml)
 else()
   find_package(pugixml REQUIRED)
-  message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
+  message(STATUS "Found Pugixml lib: ${PUGIXML_LIB}")
 endif()
 
 ############### COMMON ##################
@@ -132,7 +136,7 @@ include_directories(
 	${Boost_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
 	${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration
-  ${CMAKE_CURRENT_SOURCE_DIR}/common
+	${CMAKE_CURRENT_SOURCE_DIR}/common
 )
 
 set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)

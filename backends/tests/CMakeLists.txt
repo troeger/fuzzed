@@ -32,9 +32,7 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../simulation/util
 )
 
-target_link_libraries(Tests optimized ${PUGIXML_LIB_RELEASE})
-target_link_libraries(Tests debug ${PUGIXML_LIB_DEBUG})
-
+target_link_libraries(Tests ${PUGIXML_LIB})
 target_link_libraries(Tests
 	ftsimulation_static
 	ftconfiguration

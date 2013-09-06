@@ -1,7 +1,7 @@
 project(ftmodeltransform CXX)
                                                                                                                                                                                                                         
 set(SOURCES
-   ${SOURCE}
+   ${SOURCES}
    FaultTreeNode.cpp
    FaultTreeConversion.cpp
    
@@ -59,12 +59,10 @@ include_directories(${PUGIXML_INCLUDE_DIR})
 
 if (WIN32)
    add_library(ftmodeltransform STATIC ${SOURCES} ${HEADERS})
-   target_link_libraries(ftmodeltransform optimized ${PUGIXML_LIB_RELEASE})
-   target_link_libraries(ftmodeltransform debug ${PUGIXML_LIB_DEBUG})
 else()
    add_library(ftmodeltransform SHARED ${SOURCES} ${HEADERS})
    if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
       set_target_properties(ftmodeltransform PROPERTIES COMPILE_FLAGS "-fPIC -rdynamic")
    endif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif(WIN32)
-target_link_libraries(ftmodeltransform ${Boost_LIBRARIES} ${FT_CONFIG_LIB})
+target_link_libraries(ftmodeltransform ${Boost_LIBRARIES} ${FT_CONFIG_LIB} ${PUGIXML_LIB})

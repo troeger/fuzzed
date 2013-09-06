@@ -1,16 +1,14 @@
 set(SOURCES
+   ${COMMON_SOURCES}
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
    FuzzTreeConfigClient.cpp
    VerificationTask.cpp
    TreeHelpers.cpp
    main.cpp
-   ${COMMON_DIR}/faulttree.cpp
-   ${COMMON_DIR}/fuzztree.cpp
-   ${COMMON_DIR}/FuzzTreeTypes.cpp
-   ${COMMON_DIR}/FaultTreeTypes.cpp
 )
 set(HEADERS
+   ${COMMON_HEADERS}
    FuzzTreeTransform.h
    FuzzTreeConfiguration.h
    FuzzTreeConfigClient.h
@@ -18,10 +16,6 @@ set(HEADERS
    VerificationTask.h
    VerificationResult.h
    platform.h
-   ${COMMON_DIR}/faulttree.h
-   ${COMMON_DIR}/fuzztree.h
-   ${COMMON_DIR}/FuzzTreeTypes.h
-   ${COMMON_DIR}/FaultTreeTypes.h
 )
 
 if (VARIADIC_TEMPLATES)
@@ -40,7 +34,7 @@ set(FUZZTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/fuzztree.xsd")
 
 set(SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
 
-set(LINKED_LIBS ${XERCESC_LIBRARIES} ${BEANSTALKPP_LIB} ${Boost_LIBRARIES})
+set(LINKED_LIBS ${XERCESC_LIBRARIES} ${Boost_LIBRARIES})
 message(STATUS "${LINKED_LIBS}")
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${FT_LIB_DIR}")
@@ -170,8 +164,6 @@ else()
   VERBATIM)
 
 endif(VARIADIC_TEMPLATES)
-
-
 
 add_definitions(-DFUZZTREEXSD="${FUZZTREE_XSD}")
 add_definitions(-DFAULTTREEXSD="${FAULTTREE_XSD}")
