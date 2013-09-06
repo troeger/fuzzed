@@ -96,8 +96,12 @@ option(BUILD_BEANSTALKPP ON)
 if (${BUILD_BEANSTALKPP})
   add_subdirectory(thirdParty/beanstalkpp)
   message("Building beanstalkpp")
-  set(BEANSTALKPP_LIB "${FT_LIB_DIR}/beanstalkpp")
   set(BEANSTALKPP_INCLUDE thirdParty/beanstalkpp)
+  if (WIN32)
+	set(BEANSTALK_LIB thirdParty/beanstalkpp.lib)
+  endif (WIN32)#TODO
+	set(BEANSTALKPP_INCLUDE thirdParty/beanstalkpp)
+  else (WIN32)
 else()
   find_package(beanstalkpp REQUIRED)
   message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
@@ -133,14 +137,14 @@ include_directories(
 
 set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
 
-include(TouchFile)
+#include(TouchFile)
  
 set(XSD_GENERATED_FILES
   ${COMMON_DIR}/fuzztree.h
   ${COMMON_DIR}/faulttree.h
   ${COMMON_DIR}/fuzztree.cpp
   ${COMMON_DIR}/faulttree.cpp)
-generate_if_not_existing("${XSD_GENERATED_FILES}")
+#generate_if_not_existing("${XSD_GENERATED_FILES}")
 
 set(COMMON_SOURCES
   ${COMMON_DIR}/util.cpp

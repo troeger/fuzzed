@@ -2,7 +2,8 @@ find_path(BEANSTALKPP_INCLUDE beanstalkpp.h
     ${PROJECT_SOURCE_DIR}/thirdParty/beanstalkpp
 )
 
-find_library(BEANSTALKPP_LIB beanstalkpp 
+find_library(BEANSTALKPP_LIB NAMES 
+	beanstalkpp libbeanstalkpp
 	PATHS 
 		${PROJECT_SOURCE_DIR}/thirdParty/beanstalkpp
 		${FT_LIB_DIR})

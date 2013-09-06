@@ -7,8 +7,6 @@ set(SOURCES
    Probability.cpp
    DecomposedFuzzyInterval.cpp
    ${COMMON_SOURCES}
-   ${COMMON_DIR}/fuzztree.cpp
-   ${COMMON_DIR}/faulttree.cpp
 )
 
 set(HEADERS
@@ -18,11 +16,8 @@ set(HEADERS
    DecomposedFuzzyInterval.h
    Probability.h
    ${COMMON_HEADERS}
-   ${COMMON_DIR}/fuzztree.h
-   ${COMMON_DIR}/faulttree.h
 )
 
-find_package(beanstalkpp REQUIRED)
 message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
 include_directories(${BEANSTALKPP_INCLUDE})
 include_directories(${PUGIXML_INCLUDE_DIR})
