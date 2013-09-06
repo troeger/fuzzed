@@ -68,8 +68,6 @@ find_package(Boost 1.51.0 COMPONENTS
 REQUIRED)
 
 message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
-find_package(pugixml REQUIRED)
-
 
 ################# XSD ###################
 #########################################
@@ -102,6 +100,20 @@ if (${BUILD_BEANSTALKPP})
   set(BEANSTALKPP_INCLUDE thirdParty/beanstalkpp)
 else()
   find_package(beanstalkpp REQUIRED)
+  message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
+endif()
+
+############### PUGI ####################
+#########################################
+
+option(BUILD_PUGIXML ON)
+if (${BUILD_PUGIXML})
+  add_subdirectory(thirdParty/pugixml)
+  message("Building beanstalkpp")
+  set(PUGIXML_LIB "${FT_LIB_DIR}/beanstalkpp")
+  set(BEANSTALKPP_INCLUDE thirdParty/beanstalkpp)
+else()
+  find_package(pugixml REQUIRED)
   message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
 endif()
 
