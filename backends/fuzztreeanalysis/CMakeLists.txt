@@ -6,6 +6,7 @@ set(SOURCES
    InstanceAnalysisTask.cpp
    Probability.cpp
    DecomposedFuzzyInterval.cpp
+   AnalysisResult.cpp
 )
 
 set(HEADERS
@@ -14,6 +15,7 @@ set(HEADERS
    Interval.h
    DecomposedFuzzyInterval.h
    Probability.h
+   AnalysisResult.h
 )
 
 include_directories(${BEANSTALKPP_INCLUDE})

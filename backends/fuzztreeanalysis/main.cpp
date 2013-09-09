@@ -1,5 +1,8 @@
 #include "InstanceAnalysisTask.h"
 #include "AlphaCutAnalysisTask.h"
+#include "AnalysisResult.h"
+#include "util.h"
+
 #include <fstream>
 #include <iostream>
 
@@ -17,7 +20,16 @@ int main()
 		auto topEvent = fuzztree::TopEvent(t->topEvent());
 		
 		InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, 10);
-		const auto foo = analysis->compute();
+		const auto result = analysis->compute();
+
+		std::string xmlFile = testfile;
+		util::replaceFileExtensionInPlace(xmlFile, ".xml");
+
+		AnalysisResult resultDocument;
+		resultDocument.setModelId(t->id());
+		resultDocument.setDecompositionNumber(10);
+		resultDocument.addConfiguration(result);
+		resultDocument.save(xmlFile);
 	}
 	catch (const std::exception& e)
 	{

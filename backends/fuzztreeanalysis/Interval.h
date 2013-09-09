@@ -1,6 +1,6 @@
 #pragma once
 
-typedef long double interval_t;
+typedef double interval_t;
 
 struct NumericInterval
 {

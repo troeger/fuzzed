@@ -212,12 +212,12 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 {	
 	cout << "Simulating..." << endl;
 	
-	//assert(is_regular_file(p) && acceptFileExtension(p));
 	auto ext = p.generic_string();
 	ext = ext.substr(ext.find_last_of("."), ext.length());
-	cout << ext  << endl;
+	
 	// DO NOT USE boost::filesystem::extension. EVER. IT SEGFAULTS.
 	// auto ext = p.extension();
+
 	if (((ext == PNML::PNML_EXT && impl == DEFAULT) || (ext == timeNET::TN_EXT)) && simulatePetriNet)
 		runSimulationInternal(p, impl); // run simulation directly
 
