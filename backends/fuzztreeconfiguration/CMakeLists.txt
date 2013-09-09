@@ -1,5 +1,4 @@
 set(SOURCES
-   ${COMMON_SOURCES}
    FuzzTreeTransform.cpp
    FuzzTreeConfiguration.cpp
    FuzzTreeConfigClient.cpp
@@ -7,8 +6,8 @@ set(SOURCES
    TreeHelpers.cpp
    main.cpp
 )
+
 set(HEADERS
-   ${COMMON_HEADERS}
    FuzzTreeTransform.h
    FuzzTreeConfiguration.h
    FuzzTreeConfigClient.h
@@ -34,17 +33,17 @@ set(FUZZTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/fuzztree.xsd")
 
 set(SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
 
-set(LINKED_LIBS ${XERCESC_LIBRARIES} ${Boost_LIBRARIES})
+set(LINKED_LIBS ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${BEANSTALKPP_LIB})
 message(STATUS "${LINKED_LIBS}")
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${FT_LIB_DIR}")
 add_library(ftconfiguration STATIC ${SOURCES} ${HEADERS} ${SCHEMAS})
-target_link_libraries(ftconfiguration ${LINKED_LIBS})
+target_link_libraries(ftconfiguration ${COMMON_LINKED_LIBS})
 
 option(BUILD_CONFIGURATION_EXECUTABLE OFF)#just for testing
 if (BUILD_CONFIGURATION_EXECUTABLE)
   add_executable(ftconfiguration_exe ${SOURCES} ${HEADERS} ${SCHEMAS})
-  target_link_libraries(ftconfiguration_exe ${LINKED_LIBS})
+  target_link_libraries(ftconfiguration_exe ${COMMON_LINKED_LIBS})
 endif(BUILD_CONFIGURATION_EXECUTABLE)
 
 set(XSD_TO_FAULTTREE_ARGS

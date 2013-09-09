@@ -2,7 +2,6 @@ project(ftsimulation CXX)
                                                                                                                                                                                                                         
 set(SOURCES
    ${SOURCES}
-   ${COMMON_SOURCES}
    ${SIM_COMMON_SOURCES}
 
    main.cpp
@@ -27,7 +26,6 @@ set(SOURCES
 
 set(HEADERS
    ${HEADERS}
-   ${COMMON_HEADERS}
    ${SIM_COMMON_HEADERS}
 
    StructureFormulaClient.h
@@ -70,29 +68,23 @@ endif ()
 if (BUILD_SIMULATION_EXECUTABLE)
    add_executable(ftsimulation ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation
-      ftmodeltransform
+      ${COMMON_LINKED_LIBS}
+	  ftmodeltransform
       ftconfiguration
-	  ${XERCESC_LIBRARIES}
-	  ${Boost_LIBRARIES}
    )
    message("Building simulation executable")
 else (BUILD_SIMULATION_EXECUTABLE) # shared library
    add_library(ftsimulation SHARED ${SOURCES} ${HEADERS})
-   target_link_libraries(ftsimulation 
+   target_link_libraries(ftsimulation
+	  ${COMMON_LINKED_LIBS}
       ftmodeltransform
 	  ftconfiguration
-	  ${XERCESC_LIBRARIES}
-	  ${Boost_LIBRARIES}
    )
    add_definitions(-DSIMULATION_DLL)
    message("Building shared simulation library")
 endif (BUILD_SIMULATION_EXECUTABLE)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${PUGIXML_INCLUDE_DIR})
-
-target_link_libraries(ftsimulation ${Boost_LIBRARIES})
-target_link_libraries(ftsimulation ${PUGIXML_LIB})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PUGIXML_INCLUDE_DIR})
 
 if (BUILD_TESTS)
    add_library(ftsimulation_static STATIC ${SOURCES} ${HEADERS})
@@ -101,4 +93,4 @@ if (BUILD_TESTS)
 	  ${FT_CONFIG_LIB}
    )
    set_target_properties(ftsimulation_static PROPERTIES COMPILE_DEFINITIONS "SIMULATION_STATIC")
-endif (BUILD_TESTS)
+endif(BUILD_TESTS)

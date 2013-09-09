@@ -142,7 +142,6 @@ include_directories(
 set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
 
 #include(TouchFile)
- 
 set(XSD_GENERATED_FILES
   ${COMMON_DIR}/fuzztree.h
   ${COMMON_DIR}/faulttree.h
@@ -154,6 +153,10 @@ set(COMMON_SOURCES
   ${COMMON_DIR}/util.cpp
   ${COMMON_DIR}/FaultTreeTypes.cpp
   ${COMMON_DIR}/FuzzTreeTypes.cpp
+  ${COMMON_DIR}/FaultTreeTypes.cpp
+  ${COMMON_DIR}/FuzzTreeTypes.cpp
+  ${COMMON_DIR}/faulttree.cpp
+  ${COMMON_DIR}/fuzztree.cpp
 )
 
 set(COMMON_HEADERS
@@ -164,6 +167,16 @@ set(COMMON_HEADERS
   ${COMMON_DIR}/faulttree.h
   ${COMMON_DIR}/fuzztree.h
 )
+
+set(COMMON_LINKED_LIBS
+	${XERCESC_LIBRARIES}
+	${Boost_LIBRARIES}
+	${BEANSTALKPP_LIB})
+add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
+target_link_libraries(common_model ${COMMON_LINKED_LIBS})
+set(COMMON_LINKED_LIBS
+	${COMMON_LINKED_LIBS}
+	common_model)
 
 ############### UNIT TESTS ##############
 #########################################

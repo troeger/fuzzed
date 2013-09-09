@@ -6,7 +6,6 @@ set(SOURCES
    InstanceAnalysisTask.cpp
    Probability.cpp
    DecomposedFuzzyInterval.cpp
-   ${COMMON_SOURCES}
 )
 
 set(HEADERS
@@ -15,7 +14,6 @@ set(HEADERS
    Interval.h
    DecomposedFuzzyInterval.h
    Probability.h
-   ${COMMON_HEADERS}
 )
 
 include_directories(${BEANSTALKPP_INCLUDE})
@@ -26,17 +24,13 @@ if (BUILD_ANALYSIS_EXECUTABLE)
    add_executable(ftanalysis ${SOURCES} ${HEADERS})
    target_link_libraries(ftanalysis
     ${FT_CONFIG_LIB}
-    ${Boost_LIBRARIES}
-	${XERCESC_LIBRARIES}
-   )
+	${COMMON_LINKED_LIBS})
    message("Building analysis executable")
 else (BUILD_ANAlYSIS_EXECUTABLE) # shared library
    add_library(ftanalysis SHARED ${SOURCES} ${HEADERS})
    target_link_libraries(ftanalysis 
     ${FT_CONFIG_LIB}
-    ${Boost_LIBRARIES}
-	${XERCESC_LIBRARIES}
-   )
+    ${COMMON_LINKED_LIBS})
 endif (BUILD_ANALYSIS_EXECUTABLE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

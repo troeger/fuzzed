@@ -25,3 +25,9 @@ simulation/tests/output
 *.log.debug
 FuzzEd.egg-info
 MANIFEST
+backends/common/fuzztree.h
+backends/common/fuzztree.cpp
+backends/common/fuzztree-fwd.hxx
+backends/common/faulttree.h
+backends/common/faulttree.cpp
+backends/common/faulttree-fwd.hxx
