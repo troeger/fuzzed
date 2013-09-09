@@ -39,6 +39,7 @@ void AnalysisResult::addError(const string& msg, const string& elementID)
 {
 	auto errorNode = m_root.append_child(ANALYSIS_ERROR);
 	errorNode.append_attribute(ELEMENT_ID).set_value(elementID.c_str());
+	errorNode.append_child(node_pcdata).set_value(msg.c_str());
 	errorNode.append_attribute(ISSUE_ID).set_value(++m_errors);
 }
 
@@ -46,6 +47,7 @@ void AnalysisResult::addWarning(const string& msg, const string& elementID)
 {
 	auto warningNode = m_root.append_child(ANALYSIS_WARNING);
 	warningNode.append_attribute(ELEMENT_ID).set_value(elementID.c_str());
+	warningNode.append_child(node_pcdata).set_value(msg.c_str());
 	warningNode.append_attribute(ISSUE_ID).set_value(++m_warnings);
 }
 

@@ -19,7 +19,9 @@ int main()
 
 		auto topEvent = fuzztree::TopEvent(t->topEvent());
 		
-		InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, 10);
+		const int dn = 10; // TODO where does this come from?
+
+		InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, dn);
 		const auto result = analysis->compute();
 
 		std::string xmlFile = testfile;
@@ -27,7 +29,7 @@ int main()
 
 		AnalysisResult resultDocument;
 		resultDocument.setModelId(t->id());
-		resultDocument.setDecompositionNumber(10);
+		resultDocument.setDecompositionNumber(dn);
 		resultDocument.addConfiguration(result);
 		resultDocument.save(xmlFile);
 	}
