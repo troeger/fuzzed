@@ -30,7 +30,6 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -fPIC -fexceptions")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -fpermissive -std=c++0x -fexceptions")
-  set(Boost_USE_STATIC_LIBS OFF)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # using Intel C++
   message(STATUS "using intel")
@@ -49,8 +48,8 @@ endif()
 #########################################
 
 set(Boost_USE_STATIC_LIBS       ON)
-set(Boost_USE_MULTITHREADED     ON)
-set(Boost_USE_STATIC_RUNTIME    OFF)
+#set(Boost_USE_MULTITHREADED     ON)
+#set(Boost_USE_STATIC_RUNTIME    OFF)
 add_definitions(-DBOOST_DATE_TIME_NO_LIB -DBOOST_REGEX_NO_LIB)
 #add_definitions(-DBoost_DEBUG=1)
 add_definitions(-D_ALLOW_KEYWORD_MACROS)
