@@ -6,13 +6,15 @@ find_path(PUGIXML_ROOT src/pugiconfig.hpp
 find_path(PUGIXML_INCLUDE_DIR pugiconfig.hpp ${PUGIXML_ROOT}/src)
 
 find_library(PUGIXML_LIB_DEBUG
-  NAMES pugixmld pugixml
-  PATHS PATHS ${PUGIXML_ROOT}/lib
+  NAMES pugixmld pugixml libpugixml
+  PATHS 
+	${PUGIXML_ROOT}/lib
   )
 
 find_library(PUGIXML_LIB_RELEASE
-  NAMES pugixml
-  PATHS PATHS ${PUGIXML_ROOT}/lib
+  NAMES pugixml libpugixml
+  PATHS
+	${PUGIXML_ROOT}/lib
   )
 
 set(PUGIXML_LIB
