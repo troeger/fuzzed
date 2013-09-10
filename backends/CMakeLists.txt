@@ -27,7 +27,7 @@ set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
 
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -fPIC -fexceptions -Wno-deprecated-declarations -fpermissive")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -std=c++0x -fPIC -fexceptions -Wno-deprecated-declarations -fpermissive")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
   # using Intel C++
   message(STATUS "using intel")
