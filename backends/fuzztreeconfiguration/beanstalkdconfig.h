@@ -3,7 +3,7 @@
 // This defines the default server to use for the client binaries bundled with the library
 
 #ifndef BEANSTALK_SERVER
-#define BEANSTALK_SERVER "localhost"
+#define BEANSTALK_SERVER "127.0.0.1"
 #endif
 
 #ifndef BEANSTALK_PORT

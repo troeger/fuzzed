@@ -43,8 +43,6 @@ void FuzzTreeConfigClient::run()
 		{
 			boost::shared_ptr<Job> jobPtr;
 
-			Client::put("foobar");
-
 			Client::reserveWithTimeout(jobPtr, 10);
 			Client::peekReady(jobPtr);
 			if (jobPtr)
