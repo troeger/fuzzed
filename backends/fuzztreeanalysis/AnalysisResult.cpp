@@ -16,7 +16,7 @@ namespace
 	const char* const DECOMPOSITIONNUMBER = "decompositionNumber";
 
 	const char* const DECOMPOZEDFUZZYPROG = "DecomposedFuzzyProbability";
-	const char* const CONFIGURATION = "Configuration";
+	const char* const CONFIGURATION = "configurations";
 	const char* const ALPHACUTS = "alphaCuts";
 	const char* const KEY = "key";
 	const char* const VALUE = "value";
