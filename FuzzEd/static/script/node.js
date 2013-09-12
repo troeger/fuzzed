@@ -716,10 +716,10 @@ function(Property, Mirror, Canvas, Class) {
          * accessed by the base class.
          *
          * Throws:
-         *   [ABSTRACT] Subclass Responsibility
+         *   SubclassResponsibility
          */
         getConfig: function() {
-            throw '[ABSTRACT] Subclass Responsibility';
+            throw new SubclassResponsibility();
         },
 
         /**

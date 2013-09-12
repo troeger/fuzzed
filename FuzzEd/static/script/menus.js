@@ -100,7 +100,7 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         },
 
         _setupContainer: function() {
-            throw '[ABSTRACT] Override in subclass';
+            throw new SubclassResponsibility();
         },
 
         _setupControls: function() {

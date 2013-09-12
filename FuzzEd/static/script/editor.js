@@ -51,7 +51,8 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'], fu
          *    {int} graphId - The ID of the graph that is going to be edited by this editor.
          */
         init: function(graphId) {
-            if (typeof graphId !== 'number') throw 'You need a graph ID to initialize the editor.';
+            if (typeof graphId !== 'number')
+                throw new TypeError('numeric graph ID', typeof graphId);
 
             this.config              = this.getConfig();
             this._backend            = new Backend(graphId);
@@ -78,7 +79,7 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'], fu
          *    The <Config> object that corresponds to the loaded graph's kind.
          */
         getConfig: function() {
-            throw '[ABSTRACT] Subclass responsibility';
+            throw new SubclassResponsibility();
         },
 
         /**
@@ -90,7 +91,7 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'], fu
          *    loaded from the backend.
          */
         getGraphClass: function() {
-            throw '[ABSTRACT] Subclass responsibility';
+            throw new SubclassResponsibility();
         },
 
         /**
@@ -153,8 +154,7 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'], fu
          *    Callback that gets called in case <_loadGraph> results in an error.
          */
         _loadGraphError: function(response, textStatus, errorThrown) {
-            alert('Could not load graph, reason: ' + textStatus + ' ' + errorThrown);
-            throw 'Could not load the graph from the backend';
+            throw new NetworkError('could not retrieve graph');
         },
 
         /**
