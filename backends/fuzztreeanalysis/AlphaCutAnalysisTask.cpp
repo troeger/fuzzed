@@ -141,10 +141,9 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		vector<interval_t> combinations(numberOfCombinations);
 		for (unsigned int i = 0; i < numberOfCombinations; ++i)
 		{
- 			const std::bitset<128> choice(i); // TODO: we need numberofcombinations bits here...
 			vector<interval_t> perm(n);
 			for (unsigned int j = 0; j < n; j++)
-				perm.emplace_back(choice[j] ? upperBounds[j] : lowerBounds[j]);
+				perm.emplace_back((i >> j)&1 ? upperBounds[j] : lowerBounds[j]);
 
 			combinations[i] = calculateExactlyOneOutOfN(perm, n);
 		}
