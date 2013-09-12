@@ -10,6 +10,7 @@
 #include <math.h>
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
+#include <thread>
 
 using namespace chrono;
 using boost::format;
@@ -23,8 +24,7 @@ bool PetriNetSimulation::run()
 	PetriNet pn = *PNMLImport::loadPNML(m_netFile.generic_string());
 	if (!pn.valid()) 
 		throw runtime_error("Invalid Petri Net.");
-	
-	SimulationResult res;
+
 	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads...";
 
 	// for checking local convergence, thread-local
@@ -39,6 +39,9 @@ bool PetriNetSimulation::run()
 	const double startTime = omp_get_wtime();
 
 	// sum up all the failures from all simulation rounds in parallel, counting how many rounds were successful
+
+// #define OMP_PARALLELIZATION
+#ifdef OMP_PARALLELIZATION
 #pragma omp parallel for\
 	reduction(+:numFailures, sumFailureTime_all, sumFailureTime_fail, count)\
 	reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak)\
@@ -80,6 +83,58 @@ bool PetriNetSimulation::run()
 		privateLast = current;
 	}
 
+#else
+
+	const int threadNum = omp_get_max_threads();
+	const int blockSize = std::ceil(m_numRounds / threadNum);
+	std::vector<std::thread> workers(threadNum);
+	std::mutex resultsMutex;
+
+	for (int n = 0; n < threadNum; ++n)
+	{
+		const int startIndex = n * blockSize;
+	
+		workers[n] = std::thread( [&](void)
+		{
+			PetriNet threadLocalPN = PetriNet(pn);
+			int				localCount = 0;
+			unsigned long	localSumFailureTime_all = 0;
+			unsigned long	localSumFailureTime_fail = 0;
+			unsigned int	localNumFailures = 0;
+
+			for (int i = startIndex; i < startIndex + blockSize; ++i)
+			{
+				threadLocalPN.restoreInitialMarking();
+				threadLocalPN.generateRandomFiringTimes();
+				
+				SimulationRoundResult res;
+				res.valid = false;
+				while (!res.valid) 
+					res = runOneRound(&threadLocalPN);
+
+				localSumFailureTime_all += res.failureTime;
+				++localCount;
+
+				if (res.failed && res.failureTime <= m_numSimulationSteps)
+				{ // the failure occurred before the end of mission time -> add up to compute R(mission time)
+					++numFailures;
+					localSumFailureTime_fail += res.failureTime;
+				}
+			}
+
+			resultsMutex.lock();
+			count				+= localCount;
+			sumFailureTime_all	+= localSumFailureTime_all;
+			sumFailureTime_fail += localSumFailureTime_fail;
+			numFailures			+= localNumFailures;
+			resultsMutex.unlock();
+		});
+	}
+
+	for (int n = 0; n < threadNum; ++n)
+		workers[n].join();
+#endif
+
 	const double endTime = omp_get_wtime();
 
 	long double unreliability		= (long double)numFailures			/(long double)count;
@@ -89,6 +144,7 @@ bool PetriNetSimulation::run()
 	
 	cout << "...done." << endl;
 
+	SimulationResult res;
 	res.reliability			= 1.0 - unreliability;
 	res.meanAvailability	= meanAvailability;
 	res.nFailures			= numFailures;
