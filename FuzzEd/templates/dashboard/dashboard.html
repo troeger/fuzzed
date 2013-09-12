@@ -126,24 +126,33 @@
 </section>
 
 <!-- hidden modal dialog for graph deletion confirmation -->
-<div class="modal hide fade" id="delete_dialog" role="dialog" aria-labelledby="header" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="header">Confirmation</h3>
-    </div>
-    
-    <div class="modal-body">
-        <p>Are you sure you want to delete <strong id="delete_name"></strong>?</p>
-    </div>
+<div class="modal fade" id="delete_dialog" role="dialog" aria-labelledby="header" aria-hidden="true">
 
-    <div class="modal-footer">
-        <button type="button" class="btn btn-danger" id="confirm_delete">
-            <i class="icon-white icon-trash"></i>
-            Delete
-        </button>
-        <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">
-            Cancel
-        </button>
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="header">Confirmation</h3>
+            </div>
+
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="delete_name"></strong>?</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirm_delete">
+                    <i class="icon-white icon-trash"></i>
+                    Delete
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">
+                    Cancel
+                </button>
+            </div>
+
+        </div>
+
     </div>
 </div>
 {% endblock %}

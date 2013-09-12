@@ -9,11 +9,11 @@ syntax: glob
 distribute-*
 FuzzEd/static-release/*
 docs/*
-FuzzEd.egg-info/*
 dist/*
 build/*
 analysis/jar/bin/*
 analysis/jar/fuzzTreeAnalysis.jar
+FuzzEd/models/node_rendering.py
 FuzzEd/models/notations.py
 FuzzEd/models/xml_analysis.py
 FuzzEd/models/xml_faulttree.py
@@ -23,4 +23,5 @@ simulation/tests/output
 *.log
 *.pnml
 *.log.debug
+FuzzEd.egg-info
 MANIFEST

@@ -1,0 +1,15 @@
+Vagrant Setup
+=========
+
+You can use Vagrant for setting up a virtual Linux development environment under Windows.
+For this, you need to
+
+1. Install Vagrant from http://downloads.vagrantup.com/
+2. Install VirtualBox from https://www.virtualbox.org/wiki/Downloads
+3. Run vagrant up
+4. Once the provisioning script has run through, you can run vagrant ssh
+5. cd /home/fuzztrees
+6. fab -l
+
+Edit the Vagrantfile in order to get graphical mode: uncomment
+#config.vm.boot_mode = :gui

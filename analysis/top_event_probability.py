@@ -122,9 +122,11 @@ def analysis_result_as_json(xml_text):
 def create_job(xml, decomposition_number, verify_only=False):
     verify = str(verify_only).lower()
     post_data = xml.encode('utf-8')
+
     try:
-        connection = urllib.urlopen('%s/fuzztree/analysis/createJob?decompositionNumber=%d&verifyOnly=%s'
-                                    % (BASE_URL, decomposition_number, verify), post_data)
+        server_url = '%s/fuzztree/analysis/createJob?decompositionNumber=%d&verifyOnly=%s' % (BASE_URL, decomposition_number, verify)
+        logger.debug('Using '+server_url)
+        connection = urllib.urlopen(server_url, post_data)
     except:
         raise InternalError('Sorry, the analysis service is unavailable at the moment.')        
 

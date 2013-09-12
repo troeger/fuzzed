@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        {% block title %}FuzzEd{% endblock %}
+        {% block title %}DMod{% endblock %}
     </title>
     <style type="text/css">
         {% load less %}
@@ -96,7 +96,11 @@
     <div class="navbar navbar-inverse navbar-fixed-top no-print">
         <div class="container">
             <a class="navbar-brand" anchor="#">
-                FuzzEd{% if graph %} - {{ graph }}{% endif %}
+                {% if graph %}
+                    DMod - {{ graph }}
+                {% else %}
+                    DMod
+                {% endif %}
             </a>
 
             {% block nav_center %}{% endblock %}

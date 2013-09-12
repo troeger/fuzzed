@@ -70,20 +70,16 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
             this._navbarButton.remove();
             this._navbarButton = undefined;
 
-            var destinationTransformation = _.extend({
-                // those lines might seem weird but they are very necessary
-                // if the window changed its bounding box while being minimized (e.g. properties menu)
-                // we need to capture this change here first...
-                width:  this.container.width(),
-                height: this.container.height()
-            }, eventObject.data);
+            var destinationTransformation = eventObject.data;
 
-            // ... then we resize the window to zero...
-            this.container.width(0);
-            this.container.height(0);
             this.container.show();
 
-            // ... so that this animation can finally resize it back to the captured value :O
+            // ensure that maximized menus will be visible (in case the window has been resized)
+            destinationTransformation.left =
+                Math.min(destinationTransformation.left, jQuery(window).width()  - this.container.outerWidth()  - 10);
+            destinationTransformation.top  =
+                Math.min(destinationTransformation.top,  jQuery(window).height() - this.container.outerHeight() - 10);
+
             this.container.animate(destinationTransformation, {
                 duration: Config.Menus.ANIMATION_DURATION
             });
@@ -185,13 +181,8 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         },
 
         maximize: function(eventObject) {
-            this._navbarButton.remove();
-            this._navbarButton = undefined;
-
+            this._super(eventObject);
             this.show();
-            this.container.animate(eventObject.data, {
-                duration: Config.Menus.ANIMATION_DURATION
-            });
             return this;
         },
 

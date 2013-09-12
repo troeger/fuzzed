@@ -222,7 +222,8 @@ class Node(models.Model):
         # Text width is exactly the double width of the icons
         mirrorText = ""
         for index,propvalue in enumerate(self.get_all_mirror_properties(hiddenProps)):
-            propvalue = propvalue.replace("#","\\#")    # consider special LaTex character in mirror text
+            if type(propvalue) == type('string'):
+                propvalue = propvalue.replace("#","\\#")    # consider special LaTex character in mirror text
             if index==0:
                 # Make the first property bigger, since it is supposed to be the name
                 propvalue = "\\baselineskip=0.8\\baselineskip\\textbf{{\\footnotesize %s}}"%propvalue  
@@ -280,20 +281,26 @@ class Node(models.Model):
             # determine fuzzy or crisp probability, set it accordingly
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
                 probability = self.get_property('probability', None)
-                if isinstance(probability, list):
-                    point = probability[-1][0]
-                    alpha = probability[-1][1]
-
-                    print probability, point, alpha
-
+                # Probability is a 2-tuple, were the first value is a type indicator and the second the value
+                if probability[0] == 1:
+                    # Failure rate
+                    #TODO: Determine mission time and compute value, or give rate to the backend
+                    #properties['probability'] = xml_fuzztree.CrispProbability(value_=42)
+                    assert(False)
+                elif probability[0] in [0,2]:
+                    # Point value with uncertainty range, type 0 (direct) or 2 (fuzzy terms)
+                    if isinstance(probability[1], int):
+                        point = probability[1]
+                        alpha = 0
+                    else:
+                        point = probability[1][0]
+                        alpha = probability[1][1]
                     if alpha == 0:
                         properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
                     else:
                         properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(
                             a=point - alpha, b1=point, b2=point, c=point + alpha
                         )
-                elif isinstance(probability, (long, int, float)):
-                    properties['probability'] = xml_fuzztree.CrispProbability(value_=probability)
                 else:
                     raise ValueError('Cannot handle probability value: "%s"' % probability)
                 # nodes that have a probability also have costs in FuzzTrees
@@ -325,7 +332,7 @@ class Node(models.Model):
             xml_node = faulttree_classes[self.kind](**properties)
 
         # serialize children
-        logger.debug('[XML] Added node "%s" with properties %s' % (self.kind, properties))
+        logger.debug('Added node "%s" with properties %s' % (self.kind, properties))
         for edge in self.outgoing.filter(deleted=False):
             xml_node.children.append(edge.target.to_xml(xmltype))
 
@@ -336,11 +343,16 @@ class Node(models.Model):
             return self.properties.get(key=key).value
         except ObjectDoesNotExist:
             try:
-                logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
-                prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
-                return prop['default'] if prop is not None else default
+                prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]                
+                if prop is None:
+                    logger.warning("Notation configuration has empty default for node property "+key)
+                    result = default
+                else:
+                    result = prop['default']
+                logger.debug('Node has no property "%s", using default "%s"' % (key, str(result)))
+                return result
             except KeyError:
-                logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
+                logger.debug('No default given in notation, using given default "%s" instead' % default)
                 return default
 
     def get_attr(self, key):
