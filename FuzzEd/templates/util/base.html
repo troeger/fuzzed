@@ -96,7 +96,11 @@
     <div class="navbar navbar-inverse navbar-fixed-top no-print">
         <div class="container">
             <a class="navbar-brand" anchor="#">
-                {% if graph %}DMod - {{ graph }}{% endif %}
+                {% if graph %}
+                    DMod - {{ graph }}
+                {% else %}
+                    DMod
+                {% endif %}
             </a>
 
             {% block nav_center %}{% endblock %}
