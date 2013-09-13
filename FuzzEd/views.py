@@ -10,7 +10,7 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
-from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
+from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
 from FuzzEd.models import Graph, notations, commands
 import FuzzEd.settings
 
@@ -316,7 +316,11 @@ def login(request):
         open_id = GET['openid_identifier']
         request.session['openid_identifier'] = open_id
 
-        return preAuthenticate(open_id, FuzzEd.settings.OPENID_RETURN)
+        try:
+           return preAuthenticate(open_id, FuzzEd.settings.OPENID_RETURN)
+        except IncorrectClaimError:
+           messages.add_message(request, messages.ERROR, 'This OpenID claim is not valid.')
+           return redirect('index')
 
     elif 'openidreturn' in GET:
         user = auth.authenticate(openidrequest=request)
@@ -379,5 +383,5 @@ def login(request):
             return redirect('/login/?openid_identifier=%s' % 
                             urllib.quote_plus(request.session['openid_identifier'])) 
 
-    auth.login(request, user)
+        auth.login(request, user)
     return redirect('dashboard')
