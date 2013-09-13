@@ -48,7 +48,7 @@
             "allowConnectionTo": ["fdepGate"],
 
             "image": "basic_event.svg",
-            "help": "Initiating failure in a basic component",
+            "help": "An initial fault or a primary component failure event.",
 
             "properties": {
                 "name": {
@@ -95,7 +95,7 @@
             "allowConnectionTo": [],
 
             "image": "house_event.svg",
-            "help": "An event that is expected to occur and typically does not denote a failure",
+            "help": "A basic event that is expected to occur in specific situations, such as maintenance-related shutdown activities.",
 
             "properties": {
                 "name": {
@@ -112,7 +112,7 @@
             "allowConnectionTo": ["staticGate", "cspGate", "priorityAndGate", "seqGate"],
 
             "image": "intermediate_event.svg",
-            "help": "Failure resulting from a combination of previous events",
+            "help": "An error event resulting from a combination of previous events.",
 
             "properties": {
                 "name": {
@@ -131,7 +131,7 @@
             ],
 
             "image": "top_event.svg",
-            "help": "Top Event - the root of all evil",
+            "help": "The system failure event.",
 
             "excludeFromShapesMenu": true,
             "deletable": false,
@@ -158,7 +158,7 @@
             "allowConnectionTo": ["fdepGate"],
 
             "image": "undeveloped_event.svg",
-            "help": "Event with no information available or insignificant impact",
+            "help": "An event with unknown details or insignificant impact.",
 
             "properties": {
                 "name": {
@@ -198,7 +198,7 @@
             "allowConnectionTo": ["fdepGate"],
 
             "image": "basic_event_set.svg",
-            "help": "Set of basic events with identical properties",
+            "help": "A set of basic events with identical properties.",
 
             "properties": {
                 "name": {
@@ -244,7 +244,7 @@
             "numberOfOutgoingConnections": 0,
 
             "image": "intermediate_event_set.svg",
-            "help": "Set of intermediate events",
+            "help": "A set of intermediate events with identical child trees.",
             "excludeFromShapesMenu": true,
 
             "properties": {
@@ -271,7 +271,7 @@
             "inherits": "staticGate",
 
             "image": "and_gate.svg",
-            "help": "Output event occurs if all input events occur"
+            "help": "The output event occurs if all input events occur."
         },
 
         "orGate": {
@@ -279,7 +279,7 @@
             "inherits": "staticGate",
 
             "image": "or_gate.svg",
-            "help": "Output event occurs if one or more input events occur",
+            "help": "The output event occurs if one or more input events occur.",
 
             "connector": {
                 "offset": {
@@ -293,7 +293,7 @@
             "inherits": "orGate",
 
             "image": "xor_gate.svg",
-            "help": "Output event occurs if exactly one of the input events occur"
+            "help": "The output event occurs if exactly one of the input events occur."
         },
 
         "votingOrGate": {
@@ -301,7 +301,7 @@
             "inherits": "orGate",
 
             "image": "voting_or_gate.svg",
-            "help": "Output event occurs if the given number of input events occur",
+            "help": "The output event occurs if the given number of input events occur.",
 
             "properties": {
                 "k": {
@@ -329,7 +329,7 @@
             "inherits": "dynamicGate",
 
             "image": "csp_gate.svg",
-            "help": "Cold Spare Gate",
+            "help": "The output event occurs if the primary and all secondary events occur. The primary event changes the probability of the secondary events.",
 
             "allowConnectionTo": [
                 "basicEvent", "basicEventSet", "undevelopedEvent", "houseEvent", "staticGate",
@@ -364,7 +364,7 @@
             ],
 
             "image": "fdep_gate.svg",
-            "help": "FDEP Gate"
+            "help": "The dependent events occur immediately if the trigger event occurs."
         },
 
         "priorityAndGate": {
@@ -372,7 +372,7 @@
             "inherits": "dynamicGate",
 
             "image": "priority_and_gate.svg",
-            "help": "Priority AND Gate"
+            "help": "The output event occurs if all input events occur from left to right."
         },
 
         "seqGate": {
@@ -380,7 +380,7 @@
             "inherits": "dynamicGate",
 
             "image": "seq_gate.svg",
-            "help": "Sequential Gate"
+            "help": "The output event occurs if all input events occur from left to right."
         },
 
         "transferIn": {
@@ -390,7 +390,7 @@
             "numberOfOutgoingConnections": 0,
 
             "image": "transfer_in.svg",
-            "help": "Connects the output of a related FaultTree, e.g. a subsystem, to this one",
+            "help": "Includes the top event of another tree at this point in the tree.",
 
             "properties": {
                 "transfer": {

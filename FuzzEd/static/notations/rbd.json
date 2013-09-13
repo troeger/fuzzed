@@ -32,6 +32,7 @@
 
         "start": {
             "nodeDisplayName": "Start",
+            "help": "The starting point for the diagram.",
             "inherits": "node",
             "image": "start.svg",
 
@@ -57,6 +58,7 @@
 
         "end": {
             "nodeDisplayName": "End",
+            "help": "The terminal point for the diagram.",
             "inherits": "node",
             "image": "end.svg",
 
@@ -80,6 +82,7 @@
 
         "block": {
             "nodeDisplayName": "Block",
+            "help": "A functional block in the system.",
             "inherits": "node",
             "image": "block.svg",
 
@@ -107,6 +110,7 @@
 
         "out_of": {
             "nodeDisplayName": "Out of",
+            "help": "The output is active if at least the given number of inputs is active.",
             "inherits": "node",
             "image": "out_of.svg",
 
