@@ -138,16 +138,17 @@ class Graph(models.Model):
         Returns:
             {string} The XML representation of the graph
         """
+        bds = pyxb.utils.domutils.BindingDOMSupport()        
         if xmltype:
             kind=xmltype
         else:
             kind=self.kind
         if kind == "fuzztree":
             tree = XmlFuzzTree(name = self.name, id = self.pk)
-            pyxb.utils.domutils.BindingDOMSupport.DeclareNamespace(XmlFuzzTreeNamespace, 'fuzzTree')
+            bds.DeclareNamespace(XmlFuzzTreeNamespace, 'fuzzTree')
         elif kind == "faulttree":
             tree = XmlFaultTree(name = self.name, id = self.pk)
-            pyxb.utils.domutils.BindingDOMSupport.DeclareNamespace(XmlFaultTreeNamespace, 'faultTree')
+            bds.DeclareNamespace(XmlFaultTreeNamespace, 'faultTree')
         else:
             raise ValueError('No XML support for this graph type.')
 
@@ -155,7 +156,8 @@ class Graph(models.Model):
         top_event = self.nodes.get(kind='topEvent')
         tree.topEvent = top_event.to_xml(kind)
 
-        return unicode(tree.toxml('utf-8'),'utf-8')
+        dom = tree.toDOM(bds)
+        return dom.toprettyxml()
 
     def copy_values(self, other):
         # copy all nodes and their properties
