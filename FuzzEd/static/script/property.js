@@ -26,11 +26,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         },
 
         menuEntryClass: function() {
-            throw '[ABSTRACT] subclass responsibility';
+            throw new SubclassResponsibility();
         },
 
         validate: function(value, validationResult) {
-            throw '[ABSTRACT] subclass responsibility';
+            throw new SubclassResponsibility();
         },
 
         setValue: function(newValue, issuer, propagate) {
@@ -44,7 +44,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
             var validationResult = {};
             if (!this.validate(newValue, validationResult)) {
-                throw '[VALUE ERROR] ' + validationResult.message;
+                var ErrorClass = validationResult.kind || Error;
+                throw new ErrorClass(validationResult.message);
             }
 
             this.value = newValue;
@@ -80,7 +81,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         _sanitize: function() {
             var validationResult = {};
             if (!this.validate(this.value, validationResult)) {
-                throw validationResult.message;
+                var ErrorClass = validationResult.kind || Error;
+                throw new ErrorClass(validationResult.message);
             }
 
             return this;
@@ -111,7 +113,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         validate: function(value, validationResult) {
             if (typeof value !== 'boolean') {
-                validationResult.message = '[TYPE ERROR] value must be boolean';
+                validationResult.kind    = TypeError;
+                validationResult.message = 'value must be boolean';
                 return false;
             }
             return true;
@@ -138,7 +141,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         validate: function(value, validationResult) {
             if (!_.find(this.values, function(val){ return _.isEqual(val, value); }, this)) {
-                validationResult.message = '[TYPE ERROR] no such value ' + value;
+                validationResult.kind    = ValueError;
+                validationResult.message = 'no such value ' + value;
                 return false;
             }
             return true;
@@ -148,11 +152,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             this.value = typeof this.value === 'undefined' ? this.default : this.value;
 
             if (typeof this.choices === 'undefined' || this.choices.length === 0) {
-                throw '[VALUE ERROR] there must be at least one choice';
+                throw new ValueError('there must be at least one choice');
             } else if (this.choices.length != this.values.length) {
-                throw '[VALUE ERROR] there must be a value for each choice';
+                throw new ValueError('there must be a value for each choice');
             } else if (!_.find(this.values, function(value){ return _.isEqual(value, this.value); }, this)) {
-                throw '[VALUE ERROR] unknown value ' + this.value;
+                throw new ValueError('unknown value ' + this.value);
             }
             return this._super();
         },
@@ -196,7 +200,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
             var validationResult = {};
             if (!this.validate(newValue, validationResult)) {
-                throw '[VALUE ERROR] ' + validationResult;
+                var ErrorClass = validationResult.kind || Error;
+                throw new ErrorClass(validationResult.message);
             }
             // trigger a change in the newly selected part to propagate the new index (stored in the part)
             // to the backend
@@ -211,11 +216,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         validate: function(value, validationResult) {
             if (!isNumber(value) || value % 1 !== 0) {
-                validationResult.message = '[VALUE ERROR] value must be an integer';
+                validationResult.message = 'value must be an integer';
                 return false;
             }
             if (value < 0 || value > this.parts.length) {
-                validationResult.message = '[VALUE ERROR] value out of bounds';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'out of bounds';
                 return false;
             }
 
@@ -226,12 +232,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             var value = typeof this.value === 'undefined' ? this.default : this.value;
 
             if (!_.isArray(value) && value.length === 2) {
-                throw '[VALUE ERROR] value from backend must be a tuple';
+                throw new TypeError('expected tuple');
             }
             this.value = value[0];
 
             if (!_.isArray(this.parts) || this.parts.length < 1) {
-                throw '[VALUE ERROR] there must be at least one part';
+                throw new ValueError('there must be at least one part');
             }
             this._super();
 
@@ -268,29 +274,37 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         validate: function(value, validationResult) {
             if (!_.isArray(value) || value.length != 2) {
-                validationResult.message = '[TYPE ERROR] value must be a tuple';
+                validationResult.kind    = TypeError;
+                validationResult.message = 'value must be a tuple';
                 return false;
             }
 
             var center  = value[0];
             var epsilon = value[1];
 
-            if (typeof center  !== 'number' || window.isNaN(center) ||
-                typeof epsilon !== 'number' || window.isNaN(epsilon)) {
-                validationResult.message = '[TYPE ERROR] center and epsilon must be numbers';
+            if (typeof center  !== 'number' || window.isNaN(center)) {
+                validationResult.kind    = TypeError;
+                validationResult.message = 'center must be numeric';
+            } else if (typeof epsilon !== 'number' || window.isNaN(epsilon)) {
+                validationResult.kind    = TypeError;
+                validationResult.message = 'epsilon must be numeric';
                 return false;
             } else if (epsilon < 0) {
-                validationResult.message = '[VALUE ERROR] epsilon must not be negative';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'epsilon must not be negative';
                 return false;
             } else if (this.min.gt(center - epsilon) || this.max.lt(center + epsilon)) {
-                validationResult.message = '[VALUE ERROR] value out of bounds';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'value out of bounds';
                 return false;
             } else if (typeof this.step !== 'undefined' && !this.default[0].minus(center).mod(this.step).eq(0)) {
-                validationResult.message = '[VALUE ERROR] center not in value range (step)';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'center not in value range (step)';
                 return false;
             } else if (typeof this.epsilonStep !== 'undefined' &&
                        !this.default[1].minus(epsilon).mod(this.epsilonStep).eq(0)) {
-                validationResult.message = '[VALUE ERROR] epsilon not in value range (step)';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'epsilon not in value range (step)';
                 return false;
             }
             return true;
@@ -298,7 +312,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         _sanitize: function() {
             if (!_.isArray(this.default) || this.default.length != 2) {
-                throw '[TYPE ERROR] default must be a tuple';
+                throw new TypeError('tuple', typeof this.default);
             }
 
             this.value = typeof this.value === 'undefined' ? this.default.slice(0) : this.value;
@@ -306,35 +320,35 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             if (!(this.default[0] instanceof Decimal) && isNumber(this.default[0])) {
                 this.default[0] = new Decimal(this.default[0]);
             } else {
-                throw '[VALUE ERROR] default lower bound must be Decimal or number';
+                throw new TypeError('numeric lower bound', typeof this.default[0]);
             }
             if (!(this.default[1] instanceof Decimal) && isNumber(this.default[1])) {
                 this.default[1] = new Decimal(this.default[1]);
             } else {
-                throw '[VALUE ERROR] default upper bound must be Decimal or number';
+                throw new TypeError('numeric upper bound', typeof this.default[1]);
             }
 
             if (!(this.min instanceof Decimal) && isNumber(this.min)) {
                 this.min = new Decimal(this.min);
             } else {
-                throw '[VALUE ERROR] min must be Decimal or number';
+                throw new TypeError('numeric minimum', typeof this.min);
             }
             if (!(this.max instanceof Decimal) && isNumber(this.max)) {
                 this.max = new Decimal(this.max);
             } else {
-                throw '[VALUE ERROR] max must be Decimal or number';
+                throw new TypeError('numeric maximum', typeof this.max);
             }
             if (typeof this.step !== 'undefined' && !isNumber(this.step)) {
-                throw '[VALUE ERROR] step must be a number';
+                throw new TypeError('numeric step', typeof this.step);
             }
             if (typeof this.epsilonStep !== 'undefined' && !isNumber(this.epsilonStep)) {
-                throw '[VALUE ERROR] epsilon step must be a number';
+                throw new TypeError('numeric epsilon step', typeof this.epsilonStep);
             }
 
             if (this.min.gt(this.max)) {
-                throw '[VALUE ERROR] bounds violation min/max: ' + this.min + '/' + this.max;
+                throw new ValueError('bounds violation min/max: ' + this.min + '/' + this.max);
             } else if (typeof this.step !== 'undefined' && this.step < 0) {
-                throw '[VALUE ERROR] step must be positive: ' + this.step;
+                throw new ValueError('step must be positive, got: ' + this.step);
             }
 
             return this._super();
@@ -352,13 +366,16 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         validate: function(value, validationResult) {
             if (!isNumber(value)) {
-                validationResult.message = '[TYPE ERROR] value is not a number';
+                validationResult.kind    = TypeError;
+                validationResult.message = 'value must be numeric';
                 return false;
             } else if (this.min.gt(value) || this.max.lt(value)) {
-                validationResult.message = '[VALUE ERROR] value out of bounds';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'value out of bounds';
                 return false;
             } else if (typeof this.step !== 'undefined' && !this.default.minus(value).mod(this.step).eq(0)) {
-                validationResult.message = '[VALUE ERROR] value not in value range (step)';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'value not in value range (step)';
                 return false;
             }
             return true;
@@ -370,26 +387,26 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             if (isNumber(this.default)) {
                 this.default = new Decimal(this.default);
             } else {
-                throw '[VALUE ERROR] default must be Decimal or number';
+                throw new TypeError('numeric default', this.default);
             }
             if (isNumber(this.min)) {
                 this.min = new Decimal(this.min);
             } else {
-                throw '[VALUE ERROR] min must be Decimal or number';
+                throw new TypeError('numeric min', this.min);
             }
             if (isNumber(this.max)) {
                 this.max = new Decimal(this.max);
             } else {
-                throw '[VALUE ERROR] max must be Decimal or number';
+                throw new TypeError('numeric max', this.max);
             }
             if (typeof this.step !== 'undefined' && !isNumber(this.step)) {
-                throw '[VALUE ERROR] step must be a number';
+                throw new TypeError('numeric step', this.step);
             }
 
             if (this.min.gt(this.max)) {
-                throw '[VALUE ERROR] bounds violation min/max: ' + this.min + '/' + this.max;
+                throw new ValueError('bounds violation min/max: ' + this.min + '/' + this.max);
             } else if (typeof this.step !== 'undefined'  && this.step < 0) {
-                throw '[VALUE ERROR] step must be positive: ' + this.step;
+                throw new ValueError('step must be positive, got: ' + this.step);
             }
 
             return this._super();
@@ -407,21 +424,25 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         validate: function(value, validationResult) {
             if (!_.isArray(this.value) || this.value.length != 2) {
-                validationResult.message = '[TYPE ERROR] value must be a tuple';
+                validationResult.kind    = TypeError;
+                validationResult.message = 'value must be a tuple';
                 return false;
             }
 
             var lower = value[0];
             var upper = value[1];
             if (!isNumber(lower) || !isNumber(upper)) {
-                validationResult.message = '[VALUE ERROR] lower and upper bound must be numbers';
+                validationResult.kind    = TypeError;
+                validationResult.message = 'lower and upper bound must be numeric';
                 return false;
             } else if (lower > upper) {
-                validationResult.message = '[VALUE ERROR] lower bound must be less or equal upper bound';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'lower bound must be less or equal upper bound';
                 return false;
             } else if (typeof this.step !== 'undefined' && !this.default[0].minus(lower).mod(this.step).eq(0) ||
                                                            !this.default[1].minus(upper).mod(this.step).eq(0)) {
-                validationResult.message = '[VALUE ERROR] value not in value range (step)';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'value not in value range (step)';
                 return false;
             }
             return true;
@@ -430,7 +451,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         _sanitize: function() {
 
             if (!_.isArray(this.default) || this.default.length != 2) {
-                throw '[TYPE ERROR] default must be a tuple';
+                throw new TypeError('tuple', this.default);
             }
 
             this.value = typeof this.value === 'undefined' ? this.default.slice(0) : this.value;
@@ -438,32 +459,32 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             if (!(this.default[0] instanceof Decimal) && isNumber(this.default[0])) {
                 this.default[0] = new Decimal(this.default[0]);
             } else {
-                throw '[VALUE ERROR] default lower bound must be Decimal or number';
+                throw new TypeError('numeric default lower bound', this.default[0]);
             }
             if (!(this.default[1] instanceof Decimal) && isNumber(this.default[1])) {
                 this.default[1] = new Decimal(this.default[1]);
             } else {
-                throw '[VALUE ERROR] default upper bound must be Decimal or number';
+                throw new TypeError('numeric default upper bound', this.default[1]);
             }
 
             if (!(this.min instanceof Decimal) && isNumber(this.min)) {
                 this.min = new Decimal(this.min);
             } else {
-                throw '[VALUE ERROR] min must be Decimal or number';
+                throw new TypeError('numeric min', this.min);
             }
             if (!(this.max instanceof Decimal) && isNumber(this.max)) {
                 this.max = new Decimal(this.max);
             } else {
-                throw '[VALUE ERROR] max must be Decimal or number';
+                throw new TypeError('numeric max', this.max);
             }
             if (typeof this.step !== 'undefined' && !isNumber(this.step)) {
-                throw '[VALUE ERROR] step must be a number';
+                throw new ValueError('numeric step', this.step);
             }
 
             if (this.min.gt(this.max)) {
-                throw '[VALUE ERROR] bounds violation min/max: ' + this.min + '/' + this.max;
+                throw new ValueError('bounds violation min/max: ' + this.min + '/' + this.max);
             } else if (typeof this.step !== 'undefined' && this.step < 0) {
-                throw '[VALUE ERROR] step must be positive: ' + this.step;
+                throw new ValueError('step must be positive: ' + this.step);
             }
 
             return this._super();
@@ -479,10 +500,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         validate: function(value, validationResult) {
             if (typeof value !== 'string') {
-                validationResult.message = '[TYPE ERROR] value must be string';
+                validationResult.kind    = TypeError;
+                validationResult.message = 'value must be string';
                 return false;
             } else if (this.notEmpty && value === '') {
-                validationResult.message = '[VALUE ERROR] must not be empty';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'value must not be empty';
                 return false;
             }
             return true;
@@ -516,9 +539,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         validate: function(value, validationResult) {
             if (value === this.UNLINK_VALUE) {
-                validationResult.message = '[WARNING] No link set';
+                validationResult.kind    = Warning;
+                validationResult.message = 'no link set';
             } else if (!_.has(this.transferGraphs, value)) {
-                validationResult.message = '[VALUE ERROR] Specified graph unknown';
+                validationResult.kind    = ValueError;
+                validationResult.message = 'specified graph unknown';
                 return false;
             }
 
@@ -592,7 +617,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             case 'text':     return new Text(node, definition);
             case 'transfer': return new Transfer(node, definition);
 
-            default: throw '[VALUE ERROR] unknown property kind ' + definition.kind;
+            default: throw ValueError('unknown property kind ' + definition.kind);
         }
     };
 
