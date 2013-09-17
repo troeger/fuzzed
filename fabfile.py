@@ -412,7 +412,8 @@ def bootstrap_dev():
         cuisine.package_ensure("npm")
         output = cuisine.run('lessc')
         if 'command not found' in output:
-            cuisine.sudo("npm install less --global")
+            cuisine.sudo("npm install -g less")
+            cuisine.sudo("ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
 
 @task 
 def bootstrap_web():
