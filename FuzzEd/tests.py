@@ -140,6 +140,10 @@ class AnalysisTestCase(FuzzTreesTestCase):
         self.assertEqual(result['configurations'][0]['alphaCuts']['1.0'],[0.5, 0.5])
         self.assertEqual(result['configurations'][1]['alphaCuts']['1.0'],[0.4, 0.4])
 
+    def testIssue150(self):
+        result=self.requestAnalysis(4)
+        # This tree can lead to a k=0 redundancy configuration, which is not allowed
+        self.assertEqual(result['validResult'],False)
 
 
 
