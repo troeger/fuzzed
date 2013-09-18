@@ -1,4 +1,4 @@
-import os, json, pprint, shutil, tarfile, sys, platform, subprocess
+import os, json, pprint, shutil, tarfile, sys, platform, subprocess, urllib
 from contextlib import contextmanager
 from xml.dom.minidom import parse as parseXml
 # check FuzzEd/__init__.py for the project version number
@@ -244,8 +244,7 @@ def build_naturaldocs():
     if os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -i analysis -i rendering -xi FuzzEd/static/lib -o HTML docs -p docs ') != 0:
         raise Exception('Execution of NaturalDocs compiler failed.')
 
-@task
-def build_analysis_server():
+def build_analysis_server_java():
     '''Builds analysis server.'''
     print 'Building analysis server JAR file ...'
     current = os.getcwd()
@@ -260,13 +259,23 @@ def build_analysis_server():
     os.chdir(current)
 
 @task
+def build_backend_servers():
+    '''Builds configuration and analysis server with CMAKE / C++11 compiler.'''
+    print 'Building backend servers ...'
+    current = os.getcwd()
+    os.chdir('backends')
+    os.system("cmake .")
+    os.system('make all')
+    os.chdir(current)
+
+@task
 def build():
     '''Builds all.'''
     build_shapes()
     build_xmlschemas()
     build_naturaldocs()
-    build_analysis_server()
     build_notations()
+    build_backend_servers()    
 
 @task
 def package_web_server():
@@ -394,11 +403,14 @@ def bootstrap_dev():
         print cuisine.python_package_ensure(package)        
     print "Installing native packages ..."
     print cuisine.package_ensure("beanstalkd")
+    print cuisine.package_ensure("cmake")
+    print cuisine.package_ensure("boost") # if you mess around with this, you also need to fix the CMAKE configuration
+    print cuisine.package_ensure("xerces-c") # if you mess around with this, you also need to fix the CMAKE configuration
     if platform.system() != 'Darwin':
-        print cuisine.package_ensure("texlive")
         print cuisine.package_ensure("openjdk-7-jdk")
+        print cuisine.package_ensure("ant-gcj")
+        print cuisine.package_ensure("texlive")
         print cuisine.package_ensure("node-less")  # only in Debian unstable
-	print cuisine.package_ensure("ant-gcj")
     else:
         # check Java version
         output = cuisine.run('javac -version')
@@ -414,6 +426,19 @@ def bootstrap_dev():
         if 'command not found' in output:
             cuisine.sudo("npm install -g less")
             cuisine.sudo("ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
+        # COnfigure support for GCC versions from HOnebrew
+        print cuisine.run("brew tap homebrew/versions")
+        # There is no brew for this XSD compiler
+        # Fetch binary installation package for the XSD compiler, install the package
+        if not os.path.exists("/tmp/xsd-3.3.0.tar.bz2"):
+            print "Fetching XSD compiler from the web ..."
+            urllib.urlretrieve("http://www.codesynthesis.com/download/xsd/3.3/macosx/i686/xsd-3.3.0-i686-macosx.tar.bz2","/tmp/xsd-3.3.0.tar.bz2")
+        else:
+            print "Using existing XSD compiler download from /tmp/ ..."           
+        os.system("tar xvfz /tmp/xsd-3.3.0.tar.bz2")
+        os.system("mv /tmp/xsd-3.3.0-i686-macosx tools/xsdcompile")
+
+    print cuisine.package_ensure("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
 
 @task 
 def bootstrap_web():
@@ -427,6 +452,13 @@ def bootstrap_web():
     #TODO: Prepare database
     #TODO: Prepare Apache config
     #TODO: Ask for IP of Beanstalk server
+    #    Install new release on production web server
+    #    --------------------------------------------
+    #    > sudo puppet apply install/prod_web.pp
+    #    > tar xvfz FuzzEd-x.x.x.tar.gz /var/www/fuzztrees.net/
+    #    > ln -s /var/www/fuzztrees.net/FuzzEd-x.x.x /var/www/fuzztrees.net/www
+    #    > service apache2 restart
+
 
 @task 
 def bootstrap_backend():
@@ -446,11 +478,17 @@ def bootstrap_backend():
         if not cmd_exists("latex"):
             raise Exception('We need a working Latex for the rendering server. Please install it manually.')
     #TODO: Ask if Beanstalkd should be installed here
+    #    Installation of production backend server
+    #    -----------------------------------------
+    #    > sudo puppet apply install/prod_backend.pp
+    #    > tar xvfz FuzzEdAnalysis-x.x.x.tar.gz /home/fuzztrees
+    #    > ln -s /home/fuzztrees/FuzzEdAnalysis-x.x.x /home/fuzztrees/analysis 
+    #    > ln -s /home/fuzztrees/analysis/initscript /etc/init.d/fuzzTreesAnalysis
+    #    > tar xvfz FuzzEdRendering-x.x.x.tar.gz /home/fuzztrees
+    #    > ln -s /home/fuzztrees/FuzzEdRendering-x.x.x /home/fuzztrees/rendering 
+    #    > ln -s /home/fuzztrees/rendering/initscript /etc/init.d/fuzzTreesRendering##
 
-#TODO: Introduce task to start the dev server with one fabric task
-#    - Checks if initial building or SQLite creation is needed
-#    - Starts the backend servers
-#    - Starts the django web server
+
 
 #TODO: Introduce DEPLOY task:
 #    - Push the packaged release on the server(s).
@@ -458,24 +496,6 @@ def bootstrap_backend():
 #    - Restart the web server / analysis server / rendering server.
 #    - Extra fab tasks for web server / rendering server / analysis server deployment.
 #    - Check for correct installation of init scripts.
-#
-#    Installation of production backend server
-#    -----------------------------------------
-#    > sudo puppet apply install/prod_backend.pp
-#    > tar xvfz FuzzEdAnalysis-x.x.x.tar.gz /home/fuzztrees
-#    > ln -s /home/fuzztrees/FuzzEdAnalysis-x.x.x /home/fuzztrees/analysis 
-#    > ln -s /home/fuzztrees/analysis/initscript /etc/init.d/fuzzTreesAnalysis
-#    > tar xvfz FuzzEdRendering-x.x.x.tar.gz /home/fuzztrees
-#    > ln -s /home/fuzztrees/FuzzEdRendering-x.x.x /home/fuzztrees/rendering 
-#    > ln -s /home/fuzztrees/rendering/initscript /etc/init.d/fuzzTreesRendering##
-#
-#    Install new release on production web server
-#    --------------------------------------------
-#    > sudo puppet apply install/prod_web.pp
-#    > tar xvfz FuzzEd-x.x.x.tar.gz /var/www/fuzztrees.net/
-#    > ln -s /var/www/fuzztrees.net/FuzzEd-x.x.x /var/www/fuzztrees.net/www
-#    > service apache2 restart
-#
 #TODO: test how well this works with Vagrant for Linux dev machines
 
 

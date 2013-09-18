@@ -1,5 +1,9 @@
 syntax: glob
 *.pyc
+Makefile
+CMakeCache.txt
+cmake_install.cmake
+analysis/*.log
 *.class
 .DS_Store
 *.orig
@@ -31,3 +35,7 @@ backends/common/fuzztree-fwd.hxx
 backends/common/faulttree.h
 backends/common/faulttree.cpp
 backends/common/faulttree-fwd.hxx
+backends/fuzztreeanalysis/CMakeFiles/*
+backends/fuzztreeconfiguration/CMakeFiles/*
+backends/CMakeFiles/*
+tools/xsdcompile

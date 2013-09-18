@@ -2,7 +2,23 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 option(VARIADIC_TEMPLATES OFF)
 
-option(USE_INTEL_COMPILER ON)
+if(APPLE)
+   message("This is Apple, expecting GCC-4.9 and library installations.")
+   # Mac OS X specific code
+   SET(CMAKE_CXX_FLAGS "-std=c++11")
+   SET(CMAKE_C_COMPILER "gcc-4.9")
+   SET(CMAKE_CXX_COMPILER "gcc-4.9")
+   SET(CMAKE_INCLUDE_PATH "/usr/local/include/")
+   SET(XSD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../tools/xsdcompile/include/)
+   SET(XSD_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}"../tools/xsdcompile/bin/xsd")
+   option(USE_INTEL_COMPILER OFF)
+   option(BUILD_BEANSTALKPP ON)
+elseif(WIN32)
+   message("This is Windows, using Intel compiler.")
+   option(USE_INTEL_COMPILER ON)
+   option(BUILD_BEANSTALKPP OFF)
+endif() 
+
 if (USE_INTEL_COMPILER)
   include(ForceCompiler)
   set(CMAKE_VS_PLATFORM_TOOLSET "Intel C++ Compiler XE 13")
@@ -90,7 +106,6 @@ endif(XSD_FOUND)
 ############### BEANSTALK ###############
 #########################################
 
-option(BUILD_BEANSTALKPP OFF)
 if (${BUILD_BEANSTALKPP})
   add_subdirectory(thirdParty/beanstalkpp)
   message("Building beanstalkpp")
