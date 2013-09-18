@@ -3,74 +3,74 @@
   xmlns="http://pdv.cs.tu-berlin.de/TimeNET/schema/eDSPN"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pdv.cs.tu-berlin.de/TimeNET/schema/eDSPN etc/schemas/eDSPN.xsd">
   <place id="0.0" initialMarking="1" type="node">
-    <graphics orientation="0" x="133" y="128"/>
-    <label id="0.0.0" text="Primary" type="text">
-      <graphics x="-17" y="-37"/>
+    <graphics orientation="0" x="130" y="120"/>
+    <label id="0.0.0" text="primary_functional" type="text">
+      <graphics x="-44" y="-39"/>
     </label>
   </place>
   <place id="0.2" initialMarking="1" type="node">
     <graphics orientation="0" x="130" y="210"/>
-    <label id="0.2.0" text="Spare" type="text">
-      <graphics x="-18" y="-40"/>
+    <label id="0.2.0" text="spare_functional" type="text">
+      <graphics x="-39" y="-39"/>
     </label>
   </place>
   <place id="0.10" initialMarking="0" type="node">
-    <graphics orientation="0" x="253" y="278"/>
-    <label id="0.10.0" text="P1" type="text">
-      <graphics x="-10" y="-40"/>
+    <graphics orientation="0" x="250" y="280"/>
+    <label id="0.10.0" text="spare_active" type="text">
+      <graphics x="-8" y="-39"/>
     </label>
   </place>
   <place id="0.16" initialMarking="0" type="node">
-    <graphics orientation="0" x="357" y="215"/>
-    <label id="0.16.0" text="P2" type="text">
-      <graphics x="-10" y="-40"/>
+    <graphics orientation="0" x="360" y="210"/>
+    <label id="0.16.0" text="spare_failed" type="text">
+      <graphics x="-68" y="-38"/>
     </label>
   </place>
   <place id="0.1" initialMarking="0" type="node">
-    <graphics orientation="0" x="263" y="122"/>
-    <label id="0.1.0" text="P0" type="text">
-      <graphics x="-10" y="-40"/>
+    <graphics orientation="0" x="260" y="120"/>
+    <label id="0.1.0" text="primary_failed" type="text">
+      <graphics x="-28" y="-40"/>
     </label>
   </place>
   <place id="0.21" initialMarking="0" type="node">
-    <graphics orientation="0" x="545" y="162"/>
+    <graphics orientation="0" x="560" y="161"/>
     <label id="0.21.0" text="failed" type="text">
-      <graphics x="23" y="-9"/>
+      <graphics x="21" y="-6"/>
     </label>
   </place>
   <exponentialTransition DTSPNpriority="1" delay="1.0" id="0.3"
     preemptionPolicy="PRD" serverType="ExclusiveServer" type="node">
-    <graphics orientation="0" x="213" y="125"/>
-    <label id="0.3.0" text="T0" type="text">
+    <graphics orientation="0" x="210" y="120"/>
+    <label id="0.3.0" text="fail" type="text">
       <graphics x="-10" y="-40"/>
     </label>
   </exponentialTransition>
   <exponentialTransition DTSPNpriority="1" delay="1000 * dormancy"
     id="0.5" preemptionPolicy="PRD" serverType="ExclusiveServer" type="node">
-    <graphics orientation="0" x="207" y="213"/>
-    <label id="0.5.0" text="T_passive" type="text">
-      <graphics x="-26" y="-42"/>
+    <graphics orientation="0" x="210" y="210"/>
+    <label id="0.5.0" text="fail_passive" type="text">
+      <graphics x="-26" y="-41"/>
     </label>
   </exponentialTransition>
   <exponentialTransition DTSPNpriority="1" delay="1000" id="0.14"
     preemptionPolicy="PRD" serverType="ExclusiveServer" type="node">
-    <graphics orientation="0" x="306" y="277"/>
-    <label id="0.14.0" text="T_active" type="text">
-      <graphics x="-25" y="18"/>
+    <graphics orientation="0" x="360" y="280"/>
+    <label id="0.14.0" text="fail_active" type="text">
+      <graphics x="-23" y="18"/>
     </label>
   </exponentialTransition>
   <immediateTransition enablingFunction="" id="0.9" priority="1"
     type="node" weight="1">
-    <graphics orientation="0" x="205" y="278"/>
+    <graphics orientation="0" x="200" y="280"/>
     <label id="0.9.0" text="activate_spare" type="text">
-      <graphics x="-88" y="-2"/>
+      <graphics x="-90" y="-7"/>
     </label>
   </immediateTransition>
   <immediateTransition enablingFunction="" id="0.19" priority="1"
     type="node" weight="1">
-    <graphics orientation="0" x="497" y="161"/>
-    <label id="0.19.0" text="T1" type="text">
-      <graphics x="-10" y="-40"/>
+    <graphics orientation="0" x="500" y="160"/>
+    <label id="0.19.0" text="propagate_error" type="text">
+      <graphics x="-5" y="-47"/>
     </label>
   </immediateTransition>
   <arc fromNode="0.2" id="0.6" toNode="0.5" type="connector">
@@ -117,14 +117,17 @@
     <inscription id="0.7.0" text="1" type="inscriptionText">
       <graphics x="0" y="0"/>
     </inscription>
+    <handle id="0.7.4">
+      <graphics orientation="0" x="282" y="140"/>
+    </handle>
     <handle id="0.7.2">
-      <graphics orientation="0" x="406" y="145"/>
+      <graphics orientation="0" x="410" y="141"/>
     </handle>
     <handle id="0.7.1">
-      <graphics orientation="0" x="407" y="335"/>
+      <graphics orientation="0" x="410" y="336"/>
     </handle>
     <handle id="0.7.3">
-      <graphics orientation="0" x="206" y="334"/>
+      <graphics orientation="0" x="199" y="334"/>
     </handle>
   </arc>
   <arc fromNode="0.1" id="0.20" toNode="0.19" type="connector">
@@ -132,7 +135,7 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.20.1">
-      <graphics orientation="0" x="289" y="158"/>
+      <graphics orientation="0" x="260" y="157"/>
     </handle>
   </arc>
   <arc fromNode="0.16" id="0.22" toNode="0.19" type="connector">
@@ -140,7 +143,7 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.22.1">
-      <graphics orientation="0" x="475" y="218"/>
+      <graphics orientation="0" x="499" y="207"/>
     </handle>
   </arc>
   <arc fromNode="0.19" id="0.23" toNode="0.21" type="connector">
@@ -153,7 +156,7 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.24.1">
-      <graphics orientation="0" x="449" y="118"/>
+      <graphics orientation="0" x="484" y="123"/>
     </handle>
   </arc>
   <arc fromNode="0.19" id="0.25" toNode="0.16" type="connector">
@@ -161,10 +164,10 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.25.2">
-      <graphics orientation="0" x="480" y="174"/>
+      <graphics orientation="0" x="483" y="177"/>
     </handle>
     <handle id="0.25.1">
-      <graphics orientation="0" x="376" y="180"/>
+      <graphics orientation="0" x="395" y="179"/>
     </handle>
   </arc>
   <inhibit fromNode="0.10" id="0.13" toNode="0.5" type="connector">
@@ -177,10 +180,10 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.27.1">
-      <graphics orientation="0" x="522" y="135"/>
+      <graphics orientation="0" x="523" y="139"/>
     </handle>
   </inhibit>
   <definition defType="real" expression="0.5" id="0.26" name="dormancy" type="text">
-    <graphics x="480" y="281"/>
+    <graphics x="100" y="284"/>
   </definition>
 </net>
