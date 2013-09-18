@@ -264,6 +264,366 @@
         }
     }, 
     {
+        "pk": 23, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "orGate", 
+            "deleted": false, 
+            "graph": 4, 
+            "client_id": 1372872771964, 
+            "y": 3, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEventSet", 
+            "deleted": false, 
+            "graph": 4, 
+            "client_id": 1372872775301, 
+            "y": 5, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 25, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 4, 
+            "client_id": 1372872969332, 
+            "y": 5, 
+            "x": 7
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "intermediateEvent", 
+            "deleted": false, 
+            "graph": 4, 
+            "client_id": 1372872973328, 
+            "y": 5, 
+            "x": 13
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 4, 
+            "client_id": 1372873119451, 
+            "y": 7, 
+            "x": 13
+        }
+    }, 
+    {
+        "pk": 28, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "transferIn", 
+            "deleted": true, 
+            "graph": 4, 
+            "client_id": 1372873156042, 
+            "y": 5, 
+            "x": 16
+        }
+    }, 
+    {
+        "pk": 29, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "topEvent", 
+            "deleted": false, 
+            "graph": 6, 
+            "client_id": 0, 
+            "y": 1, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 30, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 6, 
+            "client_id": 1372873315594, 
+            "y": 3, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 31, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "transferIn", 
+            "deleted": true, 
+            "graph": 4, 
+            "client_id": 1372873502649, 
+            "y": 5, 
+            "x": 16
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "transferIn", 
+            "deleted": true, 
+            "graph": 4, 
+            "client_id": 1372948259850, 
+            "y": 5, 
+            "x": 15
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "topEvent", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 0, 
+            "y": 1, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 34, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "andGate", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484872297, 
+            "y": 3, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 35, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484876581, 
+            "y": 5, 
+            "x": 5
+        }
+    }, 
+    {
+        "pk": 36, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEventSet", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484882156, 
+            "y": 5, 
+            "x": 7
+        }
+    }, 
+    {
+        "pk": 37, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "intermediateEvent", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484886862, 
+            "y": 5, 
+            "x": 9
+        }
+    }, 
+    {
+        "pk": 38, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "intermediateEventSet", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484890926, 
+            "y": 5, 
+            "x": 11
+        }
+    }, 
+    {
+        "pk": 39, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "orGate", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484897704, 
+            "y": 5, 
+            "x": 13
+        }
+    }, 
+    {
+        "pk": 40, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "xorGate", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484904120, 
+            "y": 7, 
+            "x": 12
+        }
+    }, 
+    {
+        "pk": 41, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "votingOrGate", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484909768, 
+            "y": 7, 
+            "x": 15
+        }
+    }, 
+    {
+        "pk": 42, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "featureVariation", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484919503, 
+            "y": 9, 
+            "x": 11
+        }
+    }, 
+    {
+        "pk": 43, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "redundancyVariation", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484923565, 
+            "y": 9, 
+            "x": 13
+        }
+    }, 
+    {
+        "pk": 44, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "houseEvent", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484928886, 
+            "y": 9, 
+            "x": 15
+        }
+    }, 
+    {
+        "pk": 45, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "undevelopedEvent", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484936378, 
+            "y": 12, 
+            "x": 11
+        }
+    }, 
+    {
+        "pk": 46, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "transferIn", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484940451, 
+            "y": 12, 
+            "x": 9
+        }
+    }, 
+    {
+        "pk": 47, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEventSet", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1373484949580, 
+            "y": 12, 
+            "x": 13
+        }
+    }, 
+    {
+        "pk": 48, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "start", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 0, 
+            "y": 1, 
+            "x": 5
+        }
+    }, 
+    {
+        "pk": 49, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "end", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 1, 
+            "y": 1, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 50, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "topEvent", 
+            "deleted": false, 
+            "graph": 9, 
+            "client_id": 0, 
+            "y": 1, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 51, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "redundancyVariation", 
+            "deleted": false, 
+            "graph": 9, 
+            "client_id": 1379446213632, 
+            "y": 3, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 52, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEventSet", 
+            "deleted": false, 
+            "graph": 9, 
+            "client_id": 1379446223752, 
+            "y": 6, 
+            "x": 10
+        }
+    }, 
+    {
         "pk": 1, 
         "model": "FuzzEd.edge", 
         "fields": {
@@ -451,6 +811,270 @@
         }
     }, 
     {
+        "pk": 18, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 4, 
+            "target": 25, 
+            "client_id": 1372872971259, 
+            "source": 23
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 4, 
+            "target": 26, 
+            "client_id": 1372872975031, 
+            "source": 23
+        }
+    }, 
+    {
+        "pk": 20, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 4, 
+            "target": 27, 
+            "client_id": 1372873121638, 
+            "source": 26
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": true, 
+            "graph": 4, 
+            "target": 28, 
+            "client_id": 1372873222583, 
+            "source": 23
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 6, 
+            "target": 30, 
+            "client_id": 1372873317033, 
+            "source": 29
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": true, 
+            "graph": 4, 
+            "target": 31, 
+            "client_id": 1372873505325, 
+            "source": 23
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": true, 
+            "graph": 4, 
+            "target": 32, 
+            "client_id": 1372948262581, 
+            "source": 23
+        }
+    }, 
+    {
+        "pk": 25, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 34, 
+            "client_id": 1373484874344, 
+            "source": 33
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 35, 
+            "client_id": 1373484880135, 
+            "source": 34
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 36, 
+            "client_id": 1373484884914, 
+            "source": 34
+        }
+    }, 
+    {
+        "pk": 28, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 37, 
+            "client_id": 1373484888973, 
+            "source": 34
+        }
+    }, 
+    {
+        "pk": 29, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 38, 
+            "client_id": 1373484893675, 
+            "source": 34
+        }
+    }, 
+    {
+        "pk": 30, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 39, 
+            "client_id": 1373484901140, 
+            "source": 34
+        }
+    }, 
+    {
+        "pk": 31, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 40, 
+            "client_id": 1373484905954, 
+            "source": 39
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 41, 
+            "client_id": 1373484912295, 
+            "source": 39
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 42, 
+            "client_id": 1373484921165, 
+            "source": 40
+        }
+    }, 
+    {
+        "pk": 34, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 43, 
+            "client_id": 1373484925417, 
+            "source": 40
+        }
+    }, 
+    {
+        "pk": 35, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 44, 
+            "client_id": 1373484930580, 
+            "source": 41
+        }
+    }, 
+    {
+        "pk": 36, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 45, 
+            "client_id": 1373484938106, 
+            "source": 42
+        }
+    }, 
+    {
+        "pk": 37, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 46, 
+            "client_id": 1373484943389, 
+            "source": 42
+        }
+    }, 
+    {
+        "pk": 38, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 47, 
+            "client_id": 1373484951635, 
+            "source": 43
+        }
+    }, 
+    {
+        "pk": 39, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 49, 
+            "client_id": 1379446076867, 
+            "source": 48
+        }
+    }, 
+    {
+        "pk": 40, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 9, 
+            "target": 51, 
+            "client_id": 1379446217005, 
+            "source": 50
+        }
+    }, 
+    {
+        "pk": 41, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 9, 
+            "target": 52, 
+            "client_id": 1379446225612, 
+            "source": 51
+        }
+    }, 
+    {
         "pk": 1, 
         "model": "FuzzEd.graph", 
         "fields": {
@@ -494,6 +1118,66 @@
             "kind": "fuzztree", 
             "name": "Valid FuzzTree", 
             "created": "2013-08-29T13:48:28.225", 
+            "deleted": false, 
+            "owner": 2
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "rbd", 
+            "name": "Reliability Diagram", 
+            "created": "2013-06-30T00:36:13.323", 
+            "deleted": true, 
+            "owner": 2
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "faulttree", 
+            "name": "Child Diagram", 
+            "created": "2013-07-03T19:40:00.811", 
+            "deleted": true, 
+            "owner": 2
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "fuzztree", 
+            "name": "All Icons", 
+            "created": "2013-07-10T21:34:26.602", 
+            "deleted": true, 
+            "owner": 2
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "rbd", 
+            "name": "Reliability Diagram", 
+            "created": "2013-09-17T21:27:50.966", 
+            "deleted": true, 
+            "owner": 2
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "fuzztree", 
+            "name": "Issue #150", 
+            "created": "2013-09-17T21:29:59.297", 
             "deleted": false, 
             "owner": 2
         }
@@ -566,6 +1250,126 @@
             "deleted": false, 
             "key": "probability", 
             "value": "[0, [0.4, 0]]"
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 16, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "F"
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 7, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "System Failure"
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 28, 
+            "deleted": false, 
+            "key": "transfer", 
+            "value": 6
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 30, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": 0.5
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 31, 
+            "deleted": false, 
+            "key": "transfer", 
+            "value": 6
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 24, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": 0.25
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 24, 
+            "deleted": false, 
+            "key": "cardinality", 
+            "value": 2
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 35, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.5, 0]]"
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 36, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.5, 0]]"
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 44, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.5, 0]]"
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 47, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.5, 0]]"
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 44, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": true
         }
     }, 
     {

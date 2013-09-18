@@ -67,7 +67,7 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
             else if (properties.position === 'top')
                 this._containment.prepend(this.container);
             else
-                throw '[VALUE ERROR] unknown mirror position: ' + properties.position;
+                throw ValueError('unknown mirror position: ' + properties.position);
 
             this._setupEvents();
         },

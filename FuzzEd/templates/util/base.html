@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        {% block title %}DMod{% endblock %}
+        {% block title %}D-Mod{% endblock %}
     </title>
     <style type="text/css">
         {% load less %}
@@ -34,6 +34,7 @@
                 'jquery-ui':        '../lib/jquery-ui/jquery-ui-1.10.3.min',
                 'jquery-classlist': '../lib/jquery-classlist/jquery-classlist-1.0.0',
                 // other libs
+                'openid-selector': '../lib/openid-selector/js',
                 'bignumber':  '../lib/bignumber/bignumber-1.0.1.min',
                 'bootstrap':  '../lib/bootstrap/bootstrap-3.0.0rc1.min',
                 'highcharts': '../lib/highcharts/highcharts-3.0.2.min',
@@ -45,6 +46,13 @@
             },
             // define dependencies for libs that are not AMD compatible
             shim: {
+
+                'openid-selector/openid-jquery': {
+                    deps: ['jquery'],
+                    exports: 'openid'
+               },
+                'openid-selector/openid-en': 
+                    ['openid-selector/openid-jquery'],
                 'bootstrap': {
                     deps: ['jquery']
                 },
@@ -96,7 +104,11 @@
     <div class="navbar navbar-inverse navbar-fixed-top no-print">
         <div class="container">
             <a class="navbar-brand" anchor="#">
-                {% if graph %}DMod - {{ graph }}{% endif %}
+                {% if graph %}
+                    D-Mod - {{ graph }}
+                {% else %}
+                    Welcome to D-Mod. 
+                {% endif %}
             </a>
 
             {% block nav_center %}{% endblock %}

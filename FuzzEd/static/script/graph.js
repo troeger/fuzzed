@@ -146,16 +146,17 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
 
             sourceNode.setChildProperties(targetNode);
 
+            this.edges[edge._fuzzedId] = edge;
+
+            sourceNode.outgoingEdges.push(edge);
+            targetNode.incomingEdges.push(edge);
+
             jQuery(document).trigger(
                 this.config.Events.GRAPH_EDGE_ADDED,
                 [edge._fuzzedId,
                 sourceNode.id,
                 targetNode.id]
             );
-            this.edges[edge._fuzzedId] = edge;
-
-            sourceNode.outgoingEdges.push(edge);
-            targetNode.incomingEdges.push(edge);
 
             return this;
         },
@@ -266,8 +267,7 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
 
             var notationDefinition = this.getNotation().nodes[kind];
             if (typeof notationDefinition === 'undefined')
-                throw 'No definition for node of kind ' + kind;
-
+                throw TypeError('no definition for kind ' + kind);
             notationDefinition.kind = kind;
 
             return this._newNodeClassForKind(notationDefinition);
@@ -282,7 +282,7 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
          *    The Notation for the graph.
          */
         getNotation: function() {
-            throw '[ABSTRACT] Subclass responsibility';
+            throw new SubclassResponsibility();
         },
 
         /**
@@ -294,7 +294,7 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
          *    The abstract <Node> class for all <Nodes> of this graph.
          */
         getNodeClass: function() {
-            throw '[ABSTRACT] Subclass responsibility';
+            throw new SubclassResponsibility();
         },
 
         /**
@@ -357,7 +357,7 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
          *    <Node::getConfig>
          */
         getConfig: function() {
-            throw '[ABSTRACT] subclass responsibility';
+            throw new SubclassResponsibility();
         },
 
 

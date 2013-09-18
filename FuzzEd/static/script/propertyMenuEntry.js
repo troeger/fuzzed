@@ -380,7 +380,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *      This Entry for chaining.
          */
         _setupInput: function() {
-            throw '[ABSTRACT] subclass responsibility';
+            throw SubclassResponsibility();
         },
 
         /**
@@ -439,7 +439,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *      The currently set value.
          */
         _value: function(newValue) {
-            throw '[ABSTRACT] subclass responsibility';
+            throw SubclassResponsibility();
         }
     });
 

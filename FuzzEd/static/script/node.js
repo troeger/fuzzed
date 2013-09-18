@@ -100,7 +100,9 @@ function(Property, Mirror, Canvas, Class) {
                 ._setupDragging()
                 ._setupMouse()
                 ._setupSelection()
-                ._setupProperties(propertiesDisplayOrder);
+                ._setupProperties(propertiesDisplayOrder)
+                // Events
+                ._registerEventHandlers();
         },
 
         /**
@@ -498,6 +500,42 @@ function(Property, Mirror, Canvas, Class) {
         },
 
         /**
+         *  Group: Event Handling
+         */
+
+        /**
+         *  Method: _registerEventHandlers
+         *      Register a listener for edge add and delete events so that we can check the edge count
+         *      and hide the connection handle in case we are 'full'.
+         *
+         *  Returns:
+         *      This Node instance for chaining.
+         */
+        _registerEventHandlers: function() {
+            jQuery(document).on(this.config.Events.GRAPH_EDGE_ADDED,   this._checkEdgeCapacity.bind(this));
+            jQuery(document).on(this.config.Events.GRAPH_EDGE_DELETED, this._checkEdgeCapacity.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _checkEdgeCapacity
+         *      Check if we reached the max. number of outgoing edges allowed and hide the connection handle
+         *      in this case.
+         */
+        _checkEdgeCapacity: function() {
+            // no need to hide the connection handle if there is none or if we allow infinite connections
+            if (typeof this._connectionHandle === 'undefined' || this.numberOfOutgoingConnections == -1) return;
+
+            if (this.outgoingEdges.length >= this.numberOfOutgoingConnections) {
+                // full
+                this._connectionHandle.hide();
+            } else {
+                this._connectionHandle.show();
+            }
+        },
+
+        /**
          * Group: Configuration
          */
 
@@ -678,10 +716,10 @@ function(Property, Mirror, Canvas, Class) {
          * accessed by the base class.
          *
          * Throws:
-         *   [ABSTRACT] Subclass Responsibility
+         *   SubclassResponsibility
          */
         getConfig: function() {
-            throw '[ABSTRACT] Subclass Responsibility';
+            throw new SubclassResponsibility();
         },
 
         /**
