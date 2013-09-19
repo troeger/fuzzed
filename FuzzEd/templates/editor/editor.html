@@ -4,17 +4,6 @@
     {{ block.super }} - {{ graph.name }}
 {% endblock %}
 
-{% block style %}
-    {{ block.super }}
-    {% load less %}
-
-    @import url("{{ STATIC_URL }}css/jquery-ui/jquery-ui-1.10.3.min.css");
-    @import url("{{ STATIC_URL }}css/slickgrid/slick.grid-2.0.2.css");
-    @import url("{{ STATIC_URL }}{% less "less/editor.less" %}");
-    @import url("{{ STATIC_URL }}{% less "less/node.less" %}");
-    @import url("{{ STATIC_URL }}{% less "less/menus.less" %}");
-{% endblock %}
-
 {% block script %}
 {{ block.super }}
 <script type="text/javascript" language="javascript">

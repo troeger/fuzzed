@@ -34,7 +34,7 @@ define(['config', 'jquery'], function(Config) {
             _showAlert('warning', message, description, timeout);
         },
         showErrorAlert: function(message, description, timeout) {
-            _showAlert('error', message, description, timeout);
+            _showAlert('danger', message, description, timeout);
         },
         showSuccessAlert: function(message, description, timeout) {
             _showAlert('success', message, description, timeout);
