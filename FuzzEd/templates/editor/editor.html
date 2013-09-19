@@ -19,9 +19,26 @@
 {{ block.super }}
 <script type="text/javascript" language="javascript">
     // start editor
-    require(['{{ graph.kind }}/editor', 'bootstrap' /* needed for dropdown menu */], function(Editor) {
+    require(['{{ graph.kind }}/editor', 'bootstrap', 'exception'], function(Editor) {
         jQuery(document).ready(function() {
-            var editor = new Editor({{ graph.pk }});
+            try {
+                var editor = new Editor({{ graph.pk }});
+            } catch (exception) {
+                var exceptions = jQuery('#FuzzEdExceptions');
+
+                exceptions.modal({
+                    keyboard: false,
+                    backdrop: 'static'
+                }).show();
+                exceptions.find('#FuzzEdErrorMessage')
+                    .html('<p><strong>' + exception.toString() + '</strong></p>');
+
+                if (exception instanceof Error && exception.stack) {
+                    jQuery('#FuzzEdStacktrace').show()
+                        .children('pre')
+                        .text(exception.stack);
+                }
+            }
         });
     });
 </script>
@@ -80,8 +97,39 @@
 {% endblock %}
 
 {% block content %}
+    <div id="FuzzEdExceptions" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="header" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="icon-warning-sign"></i> Error...</h3>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        ...occured while trying to load your graph. It says:
+                        <div id="FuzzEdErrorMessage"></div>
+                        You might want to try one of these things:
+                        <ul>
+                            <li>Reload the graph</li>
+                            <li>Delete your model and build it from scratch</li>
+                            <li>Contact us via our <a href="http://fuzztrees.uservoice.com">feedback page</a></li>
+                        </ul>
+                        <div id="FuzzEdStacktrace">
+                            <p>
+                                <strong>Stacktrace (for techies)</strong>
+                            </p>
+                            <pre class="pre-scrollable"></pre>
+                        </div>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <a href='/' class="btn btn-danger" aria-hidden="true">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
     {% include "editor/editor_splash.html" %}
-
     <div id="FuzzEdContent">
         {% include "editor/editor_canvas.html" %}
         {% include "editor/editor_shapes.html" %}
