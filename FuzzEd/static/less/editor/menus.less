@@ -27,9 +27,9 @@
         width: 100%;
         padding: 5px 15px;
 
-        color: #fff;
+        color: @navbar-color;
         font-size: 14px;
-        font-weight: 200;
+        font-weight: bolder;
         text-align: center;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -37,7 +37,8 @@
 
         .box-sizing(border-box);
 
-        border: 1px solid #2C2C2C;
+        border-top: 1px solid @navbar-color;
+        border-bottom: 1px solid @navbar-color;
         .border-top-radius(4px);
 
         background-color: @navbar-bg;
