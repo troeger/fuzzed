@@ -3,5 +3,17 @@
 
 .navbar-fixed-top {
     border-bottom: 1px solid @theme-border;
-    .box-shadow(0 0px 3px @theme-border);
+    .box-shadow(0px 1px 3px @theme-border);
+}
+
+.dropdown-menu {
+    .box-shadow(1px 1px 3px @theme-border);
+
+    > li > a {
+        &:hover,
+        &:focus {
+            background-color: @dropdown-link-hover-bg;
+            background-image: none;
+        }
+    }
 }

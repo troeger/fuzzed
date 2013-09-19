@@ -5,12 +5,14 @@
 
 @import "../../bootstrap/variables";
 
-@theme-base:     #FFFFFF;
-@theme-contrast: #333333; // contrast color to light base color (e.g., for text)
+@theme-base:        #FFFFFF;
+@theme-contrast:    #333333; // contrast color to light base color (e.g., for text)
+@theme-contrast-bg: #F6F6F6; // background for contrasting sections inside a base-colored background, e.g., wells
 
-@theme-highlight: #007FFF;
-@theme-selection: #F2B138;
-@theme-disabled:  #CCCCCC;
+@theme-highlight:    #007FFF;
+@theme-highlight-bg: lighten(@theme-highlight, 45%);
+@theme-selection:    #F2B138;
+@theme-disabled:     #CCCCCC;
 
 @theme-border:    lighten(@theme-contrast, 20%); // default border color
 
@@ -25,7 +27,7 @@
 // Brand colors
 // -------------------------
 
-@brand-primary:         @theme-base;
+@brand-primary:         @theme-highlight;
 //@brand-success:         #5cb85c;
 @brand-warning:         @theme-selection;
 //@brand-danger:          #d9534f;
@@ -41,7 +43,7 @@
 // -------------------------
 // Based on 14px font-size and 1.428 line-height (~20px to start)
 
-@component-active-bg:            @brand-primary;
+@component-active-bg:            @theme-base;
 
 
 // Buttons
@@ -52,7 +54,7 @@
 @btn-default-border:             @theme-border;
 
 @btn-primary-color:              #FFF;
-@btn-primary-bg:                 @brand-primary;
+@btn-primary-bg:                 @brand-info;
 @btn-primary-border:             @btn-primary-bg;
 
 @btn-success-color:              #FFF;
@@ -87,7 +89,7 @@
 @navbar-link-hover-color:           @theme-highlight;
 @navbar-link-hover-bg:              transparent;
 @navbar-link-active-color:          @navbar-link-hover-color;
-@navbar-link-active-bg:             darken(@navbar-bg, 5%);
+@navbar-link-active-bg:             @theme-highlight-bg;
 @navbar-link-disabled-color:        lighten(@navbar-link-color, 50%);
 @navbar-link-disabled-bg:           transparent;
 
@@ -117,7 +119,7 @@
 
 @dropdown-link-color:            @navbar-link-color;
 @dropdown-link-hover-color:      @navbar-link-hover-color;
-@dropdown-link-hover-bg:         @component-active-bg;
+@dropdown-link-hover-bg:         @theme-highlight-bg;
 
 @dropdown-caret-color:           @dropdown-link-color;
 
@@ -149,3 +151,17 @@
 // -------------------------
 @modal-header-border-color:   @theme-border;
 @modal-footer-border-color:   @theme-border;
+
+// Form states and alerts
+// -------------------------
+@state-warning-text:          @theme-selection;
+@state-warning-bg:            lighten(@state-warning-text, 35%);
+@state-warning-border:        darken(spin(@state-warning-bg, -10), 3%);
+
+// Forms
+// -------------------------
+@input-border:                @theme-border;
+
+// Wells
+// -------------------------
+@well-bg:                     @theme-contrast-bg;

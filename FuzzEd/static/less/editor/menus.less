@@ -11,12 +11,14 @@
 
     z-index: 0;
 
-    border: 1px solid @gray;
+    border: 1px solid @theme-border;
     border-radius: 4px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
 
-    background-color: #F6F6F6;
+    .box-shadow(1px 1px 3px @theme-border);
+
+    background-color: @theme-contrast-bg;
 
     &:after {
         content: attr(header);
@@ -37,8 +39,8 @@
 
         .box-sizing(border-box);
 
-        border-top: 1px solid @navbar-color;
-        border-bottom: 1px solid @navbar-color;
+        border-top: 1px solid @theme-border;
+        border-bottom: 1px solid @theme-border;
         .border-top-radius(4px);
 
         background-color: @navbar-bg;
