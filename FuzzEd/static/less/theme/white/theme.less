@@ -17,3 +17,12 @@
         }
     }
 }
+
+.navbar-brand {
+    small {
+        color: @headings-small-color;
+        font-weight: normal;
+        // for some reason the small element is higher then the brand...
+        line-height: @line-height-computed - 4;
+    }
+}
