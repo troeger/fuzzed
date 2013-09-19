@@ -400,45 +400,51 @@ def bootstrap_dev():
     '''Installs all software needed to make the machine a development machine.'''
     print "Installing Python packages..."
     for package in ["django", "south", "openid2rp", "django-require", "pyxb", "beanstalkc", "django-less"]:
-        print cuisine.python_package_ensure(package)        
-    print "Installing native packages ..."
-    print cuisine.package_ensure("beanstalkd")
-    print cuisine.package_ensure("cmake")
-    print cuisine.package_ensure("boost") # if you mess around with this, you also need to fix the CMAKE configuration
-    print cuisine.package_ensure("xerces-c") # if you mess around with this, you also need to fix the CMAKE configuration
+        print package
+        cuisine.python_package_ensure(package)        
+    print "Checking and installing native packages ..."
+    for p in ["beanstalkd", "cmake", "boost", "xerces-c"]:
+        print p
+        cuisine.package_ensure(p)
     if platform.system() != 'Darwin':
-        print cuisine.package_ensure("openjdk-7-jdk")
-        print cuisine.package_ensure("ant-gcj")
-        print cuisine.package_ensure("texlive")
-        print cuisine.package_ensure("node-less")  # only in Debian unstable
+        for p in ["openjdk-7-jdk", "ant-gcj", "texlive", "node-less"]:
+            print p
+            cuisine.package_ensure(p)
     else:
         # check Java version
+        print "javac"
         output = cuisine.run('javac -version')
         if not '1.7' in output:
             raise Exception('We need at least JDK 7 to build the analysis server. We found ' + output)
         # check if latex is installed
+        print "dvips"
         output = cuisine.run('dvips')
         if 'command not found' in output:
             raise Exception('We need a working Latex for the rendering server. Please install it manually.')
         # Install LESS compiler via NPM, since no brew exists for that
+        print "npm"
         cuisine.package_ensure("npm")
+        print "less"
         output = cuisine.run('lessc')
         if 'command not found' in output:
             cuisine.sudo("npm install -g less")
             cuisine.sudo("ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
+        print "gcc"
         # COnfigure support for GCC versions from HOnebrew
-        print cuisine.run("brew tap homebrew/versions")
+        cuisine.run("brew tap homebrew/versions")
         # There is no brew for this XSD compiler
         # Fetch binary installation package for the XSD compiler, install the package
+        print "CodeSynthesis XSD"
         if not os.path.exists("/tmp/xsd-3.3.0.tar.bz2"):
             print "Fetching XSD compiler from the web ..."
             urllib.urlretrieve("http://www.codesynthesis.com/download/xsd/3.3/macosx/i686/xsd-3.3.0-i686-macosx.tar.bz2","/tmp/xsd-3.3.0.tar.bz2")
         else:
             print "Using existing XSD compiler download from /tmp/ ..."           
-        os.system("tar xvfz /tmp/xsd-3.3.0.tar.bz2")
-        os.system("mv /tmp/xsd-3.3.0-i686-macosx tools/xsdcompile")
+        cuisine.run("tar xvzf /tmp/xsd-3.3.0.tar.bz2 -C /tmp")
+        cuisine.run("mv /tmp/xsd-3.3.0-i686-macosx tools/xsdcompile")
 
-    print cuisine.package_ensure("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
+    print "gcc"
+    cuisine.package_ensure("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
 
 @task 
 def bootstrap_web():
