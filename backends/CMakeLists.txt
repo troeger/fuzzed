@@ -19,6 +19,10 @@ elseif(WIN32)
    set(USE_INTEL_COMPILER ON)
    set(BUILD_BEANSTALKPP OFF)
    set(BUILD_PUGIXML OFF)
+elseif(UNIX)
+   set(USE_INTEL_COMPILER OFF)
+   set(BUILD_BEANSTALKPP ON)   
+   set(BUILD_PUGIXML ON)
 endif() 
 
 if (USE_INTEL_COMPILER)
@@ -58,10 +62,11 @@ else()
   message("Unsupported compiler")
 endif()
 
+
 ################# BOOST #################
 #########################################
 
-set(Boost_USE_STATIC_LIBS       ON)
+#set(Boost_USE_STATIC_LIBS       ON)
 #set(Boost_USE_MULTITHREADED     ON)
 #set(Boost_USE_STATIC_RUNTIME    OFF)
 add_definitions(-DBOOST_DATE_TIME_NO_LIB -DBOOST_REGEX_NO_LIB)
@@ -129,17 +134,16 @@ if (BUILD_PUGIXML)
   if(WIN32)
     set(PUGIXML_LIB "${FT_LIB_DIR}/pugixml.lib")
   else(WIN32)#TODO
-    set(PUGIXML_LIB "${FT_LIB_DIR}/libpugixml")
+    set(PUGIXML_LIB "${FT_LIB_DIR}/libpugixml.a")
   endif(WIN32)
-  set(PUGIXML_INCLUDE_DIR thirdParty/pugixml)
+  set(PUGIXML_INCLUDE_DIR thirdParty/pugixml/src)
 else()
   find_package(pugixml REQUIRED)
   message(STATUS "Found Pugixml lib: ${PUGIXML_LIB}")
 endif()
 
-############### COMMON ##################
+################# Directories ###########
 #########################################
-
 include_directories(
 	${XERCESC_INCLUDE_DIR}
 	${XSD_INCLUDE_DIR}
@@ -153,6 +157,9 @@ include_directories(
 
 set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
 
+############### XSD COMPILER ############
+#########################################
+
 #include(TouchFile)
 set(XSD_GENERATED_FILES
   ${COMMON_DIR}/fuzztree.h
@@ -160,6 +167,114 @@ set(XSD_GENERATED_FILES
   ${COMMON_DIR}/fuzztree.cpp
   ${COMMON_DIR}/faulttree.cpp)
 #generate_if_not_existing("${XSD_GENERATED_FILES}")
+
+set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faulttree.xsd")
+set(FUZZTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/fuzztree.xsd")
+set(SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
+
+set(XSD_TO_FAULTTREE_ARGS
+  --include-with-brackets	#include with <> instead of ""
+  --generate-polymorphic	#needed for xsi:type
+  --polymorphic-type-all
+  --root-element "FaultTree"
+  --type-naming ucc
+  --function-naming lcc
+  --generate-serialization
+  --namespace-map net.faulttree=faulttree
+  --generate-forward
+  --hxx-suffix .h
+  --cxx-suffix .cpp
+)
+
+set(XSD_TO_FUZZTREE_ARGS
+  --include-with-brackets	#include with <> instead of ""
+  --generate-polymorphic	#needed for xsi:type
+  --polymorphic-type-all
+  --root-element "FuzzTree"
+  --type-naming ucc 
+  --function-naming lcc
+  --generate-serialization
+  --namespace-map net.fuzztree=fuzztree 
+  --generate-forward
+  --hxx-suffix .h
+  --cxx-suffix .cpp
+ 
+)
+
+if (VARIADIC_TEMPLATES)
+  # the following options, which generate a tree visitor, need C++0x support for variadic templates
+  # GCC >= 4.7 and Intel 13.0 support it, but not VS2012...
+
+  set(TREE_CUSTOMIZATION_ARGS
+    --custom-type Node=FaultTreeVisitable<Node_base>/Node_base
+    --custom-type TopEvent=FaultTreeVisitable<TopEvent_base>/TopEvent_base
+    --custom-type BasicEvent=FaultTreeVisitable<BasicEvent_base>/BasicEvent_base
+    --custom-type HouseEvent=FaultTreeVisitable<HouseEvent_base>/HouseEvent_base
+    --custom-type UndevelopedEvent=FaultTreeVisitable<UndevelopedEvent_base>/UndevelopedEvent_base
+    --custom-type IntermediateEvent=FaultTreeVisitable<IntermediateEvent_base>/IntermediateEvent_base
+    --custom-type ChildNode=FaultTreeVisitable<ChildNode_base>/ChildNode_base
+    --custom-type Gate=FaultTreeVisitable<Gate_base>/Gate_base
+    --custom-type And=FaultTreeVisitable<And_base>/And_base
+    --custom-type Or=FaultTreeVisitable<Or_base>/Or_base
+    --custom-type Xor=FaultTreeVisitable<Xor_base>/Xor_base
+    --custom-type VotingOr=FaultTreeVisitable<VotingOr_base>/VotingOr_base
+    --custom-type DynamicGate=FaultTreeVisitable<DynamicGate_base>/DynamicGate_base
+    --custom-type Spare=FaultTreeVisitable<Spare_base>/Spare_base
+    --custom-type FDEP=FaultTreeVisitable<FDEP_base>/FDEP_base
+    --custom-type Sequence=FaultTreeVisitable<Sequence_base>/Sequence_base
+    --custom-type PriorityAnd=FaultTreeVisitable<PriorityAnd_base>/PriorityAnd_base
+  )
+
+  set(FUZZTREE_CUSTOMIZATION_ARGS
+    --custom-type Node=FuzzTreeVisitable<Node_base>/Node_base
+    --custom-type TopEvent=FuzzTreeVisitable<TopEvent_base>/TopEvent_base
+    --custom-type BasicEvent=FuzzTreeVisitable<BasicEvent_base>/BasicEvent_base
+    --custom-type HouseEvent=FuzzTreeVisitable<HouseEvent_base>/HouseEvent_base
+    --custom-type UndevelopedEvent=FuzzTreeVisitable<UndevelopedEvent_base>/UndevelopedEvent_base
+    --custom-type IntermediateEvent=FuzzTreeVisitable<IntermediateEvent_base>/IntermediateEvent_base
+    --custom-type ChildNode=FuzzTreeVisitable<ChildNode_base>/ChildNode_base
+    --custom-type Gate=FuzzTreeVisitable<Gate_base>/Gate_base
+    --custom-type And=FuzzTreeVisitable<And_base>/And_base
+    --custom-type Or=FuzzTreeVisitable<Or_base>/Or_base
+    --custom-type Xor=FuzzTreeVisitable<Xor_base>/Xor_base
+    --custom-type VotingOr=FuzzTreeVisitable<VotingOr_base>/VotingOr_base
+    --custom-type DynamicGate=FuzzTreeVisitable<DynamicGate_base>/DynamicGate_base
+    --custom-type Spare=FuzzTreeVisitable<Spare_base>/Spare_base
+    --custom-type FDEP=FuzzTreeVisitable<FDEP_base>/FDEP_base
+    --custom-type Sequence=FuzzTreeVisitable<Sequence_base>/Sequence_base
+    --custom-type PriorityAnd=FuzzTreeVisitable<PriorityAnd_base>/PriorityAnd_base
+    --custom-type RedundancyVariationPoint=FuzzTreeVisitable<RedundancyVariationPoint_base>/RedundancyVariationPoint_base
+    --custom-type FeatureVariationPoint=FuzzTreeVisitable<FeatureVariationPoint_base>/FeatureVariationPoint_base
+    --custom-type VariationPoint=FuzzTreeVisitable<VariationPoint_base>/VariationPoint_base
+    --custom-type IntermediateEventSet=FuzzTreeVisitable<IntermediateEventSet_base>/IntermediateEventSet_base
+    --custom-type BasicEventSet=FuzzTreeVisitable<BasicEventSet_base>/BasicEventSet_base
+  )
+
+endif(VARIADIC_TEMPLATES)
+
+add_custom_command(OUTPUT ${XSD_GENERATED_FILES}
+  COMMAND ${XSD_EXECUTABLE}
+    cxx-tree 
+      ${XSD_TO_FAULTTREE_ARGS} 
+      ${TREE_CUSTOMIZATION_ARGS}
+      --fwd-prologue "#include <Visitable.h>"
+      --output-dir ${COMMON_DIR}
+      ${FAULTTREE_XSD}
+  COMMAND ${XSD_EXECUTABLE} 
+    cxx-tree
+      ${XSD_TO_FUZZTREE_ARGS}
+      ${FUZZTREE_CUSTOMIZATION_ARGS}
+      --fwd-prologue "#include <Visitable.h>"
+      --output-dir ${COMMON_DIR}
+	  ${FUZZTREE_XSD}
+  COMMENT "Generating C++ / XML mapping files"
+  VERBATIM)
+
+add_definitions(-DFUZZTREEXSD="${FUZZTREE_XSD}")
+add_definitions(-DFAULTTREEXSD="${FAULTTREE_XSD}")
+
+############### COMMON ##################
+#########################################
 
 set(COMMON_SOURCES
   ${COMMON_DIR}/util.cpp
@@ -183,6 +298,7 @@ set(COMMON_HEADERS
 set(COMMON_LINKED_LIBS
 	${XERCESC_LIBRARIES}
 	${Boost_LIBRARIES}
+	${PUGIXML_LIB}
 	${BEANSTALKPP_LIB})
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
 target_link_libraries(common_model ${COMMON_LINKED_LIBS})

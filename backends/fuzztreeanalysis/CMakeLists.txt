@@ -36,7 +36,6 @@ else (BUILD_ANAlYSIS_EXECUTABLE) # shared library
 endif (BUILD_ANALYSIS_EXECUTABLE)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(ftanalysis ${Boost_LIBRARIES} ${PUGIXML_LIB})
 
 if (BUILD_TESTS)
    add_library(ftanalysis_static STATIC ${SOURCES} ${HEADERS})

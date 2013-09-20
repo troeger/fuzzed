@@ -264,6 +264,7 @@ def build_backend_servers():
     print 'Building backend servers ...'
     current = os.getcwd()
     os.chdir('backends')
+    os.system("rm CMakeCache.txt") 
     os.system("cmake .")
     os.system('make all')
     os.chdir(current)
@@ -403,11 +404,11 @@ def bootstrap_dev():
         print package
         cuisine.python_package_ensure(package)        
     print "Checking and installing native packages ..."
-    for p in ["beanstalkd", "cmake", "boost", "xerces-c"]:
+    for p in ["beanstalkd", "cmake"]:
         print p
         cuisine.package_ensure(p)
     if platform.system() != 'Darwin':
-        for p in ["openjdk-7-jdk", "ant-gcj", "texlive", "node-less"]:
+        for p in ["openjdk-7-jdk", "ant-gcj", "texlive", "node-less", "libxerces-c-dev", "libboost1.53-all-dev", "xsdcxx"]:
             print p
             cuisine.package_ensure(p)
     else:
@@ -429,6 +430,12 @@ def bootstrap_dev():
         if 'command not found' in output:
             cuisine.sudo("npm install -g less")
             cuisine.sudo("ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
+	# Install Boost
+	print "boost"
+	cuisine.package_ensure("boost")
+	# Install Xerces
+	print "xerces"
+	cuisine.package_ensure("xerces-c")
         print "gcc"
         # COnfigure support for GCC versions from HOnebrew
         cuisine.run("brew tap homebrew/versions")

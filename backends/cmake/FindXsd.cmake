@@ -18,7 +18,7 @@ FIND_PATH(XSD_INCLUDE_DIR xsd/cxx/parser/elements.hxx
 
 FIND_PROGRAM(XSD_EXECUTABLE 
   NAMES 
-    xsd
+    xsd xsdcxx
   PATHS
     "[HKEY_CURRENT_USER\\xsd\\bin"
     $ENV{XSDDIR}/bin 
