@@ -31,6 +31,9 @@ set(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 # All libraries should end up in the same directory
 set(FT_LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${FT_LIB_DIR})
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FT_LIB_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FT_LIB_DIR})
+set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY ${FT_LIB_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
@@ -100,9 +103,9 @@ if(BUILD_BEANSTALKPP)
 	message("Building beanstalkpp")
 	set(BEANSTALKPP_INCLUDE thirdParty/beanstalkpp)
 	if(WIN32)
-		set(BEANSTALK_LIB "${FT_LIB_DIR}/beanstalkpp.lib")
+		set(BEANSTALKPP_LIB "${FT_LIB_DIR}/beanstalkpp.lib")
 	else(WIN32)#TODO
-		set(BEANSTALK_LIB "${FT_LIB_DIR}/libbeanstalkpp")
+		set(BEANSTALKPP_LIB "${FT_LIB_DIR}/libbeanstalkpp.a")
 	endif(WIN32)
 else()
 	find_package(beanstalkpp REQUIRED)
@@ -283,6 +286,7 @@ set(COMMON_LINKED_LIBS
 	${Boost_LIBRARIES}
 	${PUGIXML_LIB}
 	${BEANSTALKPP_LIB})
+message("${COMMON_LINKED_LIBS}")
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
 target_link_libraries(common_model ${COMMON_LINKED_LIBS})
 set(COMMON_LINKED_LIBS
