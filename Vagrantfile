@@ -9,17 +9,22 @@ apt-get -y install build-essential make
 apt-get -y install libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
 apt-get -y install python python-dev python-pip
 pip install fabric
+echo ...done.
 
 echo Bootstrapping Dev Environment...
 cd /home/fuzztrees
 fab bootstrap_dev
+echo ...done.
+
+echo Building Dev Environment...
 fab build
+echo ...done.
 
 SCRIPT
 
 Vagrant::Config.run do |config|
-    config.vm.box = "precise64"
-    config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+    config.vm.box = "raring64"
+    config.vm.box_url = "https://dl.dropboxusercontent.com/u/547671/thinkstack-raring64.box"
     
     #config.vm.boot_mode = :gui
     
