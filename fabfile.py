@@ -264,7 +264,8 @@ def build_backend_servers():
     print 'Building backend servers ...'
     current = os.getcwd()
     os.chdir('backends')
-    os.system("rm CMakeCache.txt") 
+    if os.path.isfile("CMakeCache.txt"):
+        os.system("rm CMakeCache.txt") 
     os.system("cmake .")
     os.system('make all')
     os.chdir(current)
