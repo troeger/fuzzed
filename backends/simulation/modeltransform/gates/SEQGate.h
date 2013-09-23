@@ -9,6 +9,6 @@ public:
 	SEQGate(const std::string& id, const std::vector<std::string>& ordering, const std::string& name = "");
 	virtual ~SEQGate(void) {};
 
-	int SEQGate::addSequenceViolatedPlace(std::shared_ptr<PNDocument> doc) const override;
+	int addSequenceViolatedPlace(std::shared_ptr<PNDocument> doc) const override;
 	virtual FaultTreeNode::Ptr clone() const override; // virtual deep copying
 };
