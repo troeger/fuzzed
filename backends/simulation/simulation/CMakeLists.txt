@@ -90,7 +90,6 @@ if (BUILD_TESTS)
    add_library(ftsimulation_static STATIC ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation_static
       ftmodeltransform
-	  ${FT_CONFIG_LIB}
-   )
+	  ${FT_CONFIG_LIB})
    set_target_properties(ftsimulation_static PROPERTIES COMPILE_DEFINITIONS "SIMULATION_STATIC")
 endif(BUILD_TESTS)

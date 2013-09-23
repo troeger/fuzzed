@@ -24,6 +24,5 @@ set(SIM_COMMON_HEADERS
 
 include_directories(${FT_INCLUDE_DIR})
 
-
 add_subdirectory(modeltransform)
 add_subdirectory(simulation)
