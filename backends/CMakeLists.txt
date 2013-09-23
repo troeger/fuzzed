@@ -11,29 +11,19 @@ if(APPLE)
    set(CMAKE_INCLUDE_PATH "/usr/local/include/")
    set(XSD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../tools/xsdcompile/include/)
    set(XSD_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}"../tools/xsdcompile/bin/xsd")
-   set(USE_INTEL_COMPILER OFF)
    set(BUILD_BEANSTALKPP ON)
    set(BUILD_PUGIXML ON)
 elseif(WIN32)
-   message("This is Windows, using Intel compiler.")
-   set(USE_INTEL_COMPILER ON)
+   message("This is Windows.")
    set(BUILD_BEANSTALKPP OFF)
    set(BUILD_PUGIXML OFF)
+   set(Boost_USE_STATIC_LIBS ON)
 elseif(UNIX)
+   message("This is Linux.")
    set(USE_INTEL_COMPILER OFF)
    set(BUILD_BEANSTALKPP ON)   
    set(BUILD_PUGIXML ON)
 endif() 
-
-if (USE_INTEL_COMPILER)
-  include(ForceCompiler)
-  set(CMAKE_VS_PLATFORM_TOOLSET "Intel C++ Compiler XE 13")
-  CMAKE_FORCE_C_COMPILER(icc Intel)
-  CMAKE_FORCE_CXX_COMPILER(icpc Intel)
-  message(STATUS "Using compiler: ${CMAKE_CXX_COMPILER_ID}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qstd=c++0x")
-  message("CMake support for ICC is crappy. Enforce the generation of Visual Studio Projects using this tool: http://software.intel.com/en-us/articles/ICProjConvert100")
-endif()
 
 project(FuzztreeBackends)
 cmake_minimum_required(VERSION 2.8.8)
@@ -47,7 +37,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
 set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
 set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
 
-
 if (CMAKE_COMPILER_IS_GNUCC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -std=c++0x -fPIC -fexceptions -Wno-deprecated-declarations -fpermissive")
 elseif (MSVC)
@@ -59,14 +48,13 @@ elseif (MSVC)
   add_definitions(/D_CRT_SECURE_NO_WARNINGS /DNOMINMAX /DWIN32_LEAN_AND_MEAN)
   set(TPN_WIN32 "${TPN_WIN32} /EHsc")
 else()
-  message("Unsupported compiler")
+  message("Unsupported compiler") # TODO see if we can support clang too
 endif()
 
 
 ################# BOOST #################
 #########################################
 
-#set(Boost_USE_STATIC_LIBS       ON)
 #set(Boost_USE_MULTITHREADED     ON)
 #set(Boost_USE_STATIC_RUNTIME    OFF)
 add_definitions(-DBOOST_DATE_TIME_NO_LIB -DBOOST_REGEX_NO_LIB)
@@ -223,6 +211,7 @@ if (VARIADIC_TEMPLATES)
     --custom-type FDEP=FaultTreeVisitable<FDEP_base>/FDEP_base
     --custom-type Sequence=FaultTreeVisitable<Sequence_base>/Sequence_base
     --custom-type PriorityAnd=FaultTreeVisitable<PriorityAnd_base>/PriorityAnd_base
+	--fwd-prologue "#include <Visitable.h>"
   )
 
   set(FUZZTREE_CUSTOMIZATION_ARGS
@@ -248,6 +237,7 @@ if (VARIADIC_TEMPLATES)
     --custom-type VariationPoint=FuzzTreeVisitable<VariationPoint_base>/VariationPoint_base
     --custom-type IntermediateEventSet=FuzzTreeVisitable<IntermediateEventSet_base>/IntermediateEventSet_base
     --custom-type BasicEventSet=FuzzTreeVisitable<BasicEventSet_base>/BasicEventSet_base
+	--fwd-prologue "#include <Visitable.h>"
   )
 
 endif(VARIADIC_TEMPLATES)
@@ -257,14 +247,12 @@ add_custom_command(OUTPUT ${XSD_GENERATED_FILES}
     cxx-tree 
       ${XSD_TO_FAULTTREE_ARGS} 
       ${TREE_CUSTOMIZATION_ARGS}
-      --fwd-prologue "#include <Visitable.h>"
       --output-dir ${COMMON_DIR}
       ${FAULTTREE_XSD}
   COMMAND ${XSD_EXECUTABLE} 
     cxx-tree
       ${XSD_TO_FUZZTREE_ARGS}
       ${FUZZTREE_CUSTOMIZATION_ARGS}
-      --fwd-prologue "#include <Visitable.h>"
       --output-dir ${COMMON_DIR}
 	  ${FUZZTREE_XSD}
   COMMENT "Generating C++ / XML mapping files"

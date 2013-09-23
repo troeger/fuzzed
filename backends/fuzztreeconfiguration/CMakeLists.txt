@@ -19,8 +19,7 @@ set(HEADERS
 
 if (VARIADIC_TEMPLATES)
   set(SOURCES ${SOURCES}
-    PrintVisitor.cpp
-  )
+    PrintVisitor.cpp)
 
   set(HEADERS ${HEADERS}
     Visitor.h
