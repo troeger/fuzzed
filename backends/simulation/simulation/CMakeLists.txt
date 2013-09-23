@@ -65,24 +65,11 @@ if (OPENMP_FOUND)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif ()
 
-if (BUILD_SIMULATION_EXECUTABLE)
-   add_executable(ftsimulation ${SOURCES} ${HEADERS})
+add_executable(ftsimulation ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation
       ${COMMON_LINKED_LIBS}
 	  ftmodeltransform
-      ftconfiguration
-   )
-   message("Building simulation executable")
-else (BUILD_SIMULATION_EXECUTABLE) # shared library
-   add_library(ftsimulation SHARED ${SOURCES} ${HEADERS})
-   target_link_libraries(ftsimulation
-	  ${COMMON_LINKED_LIBS}
-      ftmodeltransform
-	  ftconfiguration
-   )
-   add_definitions(-DSIMULATION_DLL)
-   message("Building shared simulation library")
-endif (BUILD_SIMULATION_EXECUTABLE)
+      ftconfiguration)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PUGIXML_INCLUDE_DIR})
 
