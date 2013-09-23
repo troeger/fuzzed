@@ -6,22 +6,17 @@
 #include <tuple>
 #include <fstream>
 
-namespace
+struct TN_TransitionSpec 
 {
-	struct TN_TransitionSpec 
-	{
-		TN_TransitionSpec() {}
-		TN_TransitionSpec(const std::string& description) : transitionDescription(description) {}
-		
-		std::string transitionDescription;
+	TN_TransitionSpec() {}
+	TN_TransitionSpec(const std::string& description) : transitionDescription(description) {}
 
-		std::vector<std::string> inputArcs;
-		std::vector<std::string> outputArcs;
-		std::vector<std::string> inhibitArcs;
-	};
-}
+	std::string transitionDescription;
 
-
+	std::vector<std::string> inputArcs;
+	std::vector<std::string> outputArcs;
+	std::vector<std::string> inhibitArcs;
+};
 
 class TNDocument : public PNDocument
 {
