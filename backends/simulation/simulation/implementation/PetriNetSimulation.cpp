@@ -36,11 +36,11 @@ bool PetriNetSimulation::run()
 	bool globalConvergence = true;
 	int count = 0;
 
-	const double startTime = omp_get_wtime();
+	double startTime = omp_get_wtime();
 
 	// sum up all the failures from all simulation rounds in parallel, counting how many rounds were successful
 
-// #define OMP_PARALLELIZATION
+#define OMP_PARALLELIZATION
 #ifdef OMP_PARALLELIZATION
 #pragma omp parallel for\
 	reduction(+:numFailures, sumFailureTime_all, sumFailureTime_fail, count)\
@@ -82,6 +82,8 @@ bool PetriNetSimulation::run()
 		}
 		privateLast = current;
 	}
+// 	const double ompTime = omp_get_wtime() - startTime;
+// 	startTime = omp_get_wtime();
 
 #else
 
@@ -133,24 +135,23 @@ bool PetriNetSimulation::run()
 
 	for (int n = 0; n < threadNum; ++n)
 		workers[n].join();
+
+/*	const double cppTime = omp_get_wtime() - startTime;*/
+
 #endif
-
-	const double endTime = omp_get_wtime();
-
+	
 	long double unreliability		= (long double)numFailures			/(long double)count;
 	long double avgFailureTime_all	= (long double)sumFailureTime_all	/(long double)count;
 	long double avgFailureTime_fail = (long double)sumFailureTime_fail	/(long double)numFailures;
 	long double meanAvailability	= avgFailureTime_fail				/(long double)m_numSimulationSteps;
 	
-	cout << "...done." << endl;
-
 	SimulationResult res;
 	res.reliability			= 1.0 - unreliability;
 	res.meanAvailability	= meanAvailability;
 	res.nFailures			= numFailures;
 	res.nRounds				= count;
 	res.mttf				= avgFailureTime_all;
-	res.duration			= endTime - startTime;
+	res.duration			= omp_get_wtime() - startTime;
 
 	printResults(res);
 	writeResultXML(res);
