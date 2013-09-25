@@ -3,12 +3,18 @@
  *      This file contains all styles that are not directly related to any specific component of the webapp.
  */
 
+@import "print";
+
 #FuzzEdAlertContainer {
     position: fixed;
-    top:      50px;
+    top:      60px;
     width:    30%;
     left:     35%;
     z-index:  9999; /*above all*/
+
+    .alert {
+        margin-bottom: 10px;
+    }
 }
 
 #FuzzEdProgressIndicator {
@@ -30,7 +36,7 @@
 .footer {
     margin-top: 35px;
     padding: 35px 0px 35px 0px;
-    border-top: 1px solid #E5E5E5;
+    border-top: 1px solid @theme-border;
 
     p {
         margin-bottom: 0;
@@ -66,9 +72,6 @@
         }
         form {
             margin: 0;
-        }
-        button {
-            cursor: default;
         }
     }
 }

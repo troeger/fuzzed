@@ -1,36 +1,58 @@
 function NetworkError(message) {
-    Error.apply(this, arguments);
-    this.name = 'NetworkError';
+    var error = Error.apply(this, arguments);
+
+    this.name    = 'NetworkError';
+    this.message = message || '';
+    this.stack   = error.stack;
 }
-NetworkError.prototype = Error.prototype;
+NetworkError.prototype = new Error();
+NetworkError.prototype.constructor = NetworkError;
 
 function SubclassResponsibility(message) {
-    Error.apply(this, arguments);
-    this.name = 'SubclassResponsibility';
+    var error = Error.apply(this, arguments);
+
+    this.name    = 'SubclassResponsibility';
+    this.message = message || '';
+    this.stack   = error.stack;
 }
-SubclassResponsibility.prototype = Error.prototype;
+SubclassResponsibility.prototype = new Error();
+SubclassResponsibility.prototype.constructor = SubclassResponsibility;
 
 var BuiltinTypeError = TypeError;
-function TypeError(expectedOrMessage, got) {
+function CustomTypeError(expectedOrMessage, got) {
+    var error = BuiltinTypeError.apply(this, arguments);
+
+    this.name = 'TypeError';
     if (typeof got !== 'undefined') {
-        BuiltinTypeError.apply(this, ['got "' + expectedOrMessage + '", expected "' + got '"']);
+        this.message =  'got "' + expectedOrMessage + '", expected "' + got + '"';
     } else {
-        BuiltinTypeError.apply(this, arguments);
+        this.message = expectedOrMessage || '';
     }
+    this.stack = error.stack;
 }
-TypeError.prototype = BuiltinTypeError;
+CustomTypeError.prototype = new BuiltinTypeError();
+CustomTypeError.prototype.constructor = CustomTypeError;
+TypeError = CustomTypeError;
 
 function ValueError(expectedOrMessage, got) {
-    if (typeof got !== 'undefined')
-        Error.apply(this, ['got "' + expectedOrMessage + '", expected "' + got + '"']);
-    else
-        Error.apply(this, arguments);
+    var error = Error.apply(this, arguments);
+
     this.name = 'ValueError';
+    if (typeof got !== 'undefined')
+        this.message = 'got "' + expectedOrMessage + '", expected "' + got + '"';
+    else
+        this.message = expectedOrMessage || message;
+    this.stack = error.stack;
 }
-ValueError.prototype = Error.prototype;
+ValueError.prototype = new Error();
+ValueError.prototype.constructor = ValueError;
 
 function Warning(message) {
-    Error.apply(this, arguments);
-    this.name = 'Warning';
+    var error = Error.apply(this, arguments);
+
+    this.name    = 'Warning';
+    this.message = message || '';
+    this.stack   = error.stack;
 }
-Warning.prototype = Error.Prototype;
+Warning.prototype = new Error();
+Warning.prototype.constructor = Warning;

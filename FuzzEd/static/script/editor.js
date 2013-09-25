@@ -1,4 +1,5 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'], function(Class, Menus, Canvas, Backend, Alerts) {
+define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'],
+function(Class, Menus, Canvas, Backend, Alerts) {
     /**
      *  Package: Base
      */
@@ -54,8 +55,8 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'], fu
             if (typeof graphId !== 'number')
                 throw new TypeError('numeric graph ID', typeof graphId);
 
-            this.config              = this.getConfig();
-            this._backend            = new Backend(graphId);
+            this.config   = this.getConfig();
+            this._backend = new Backend(graphId);
 
             // run a few sub initializer
             this._setupJsPlumb()

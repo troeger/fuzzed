@@ -3,9 +3,6 @@
  *      This file contains all styles that apply to editor menus.
  */
 
-@import "theme/variables";
-@import "bootstrap/mixins";
-
 .menu {
     position: fixed;
     min-height: 50px;
@@ -14,12 +11,14 @@
 
     z-index: 0;
 
-    border: 1px solid @gray;
+    border: 1px solid @theme-border;
     border-radius: 4px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
 
-    background-color: #F6F6F6;
+    .box-shadow(1px 1px 3px @theme-border);
+
+    background-color: @theme-base;
 
     &:after {
         content: attr(header);
@@ -30,9 +29,9 @@
         width: 100%;
         padding: 5px 15px;
 
-        color: #fff;
+        color: @navbar-color;
         font-size: 14px;
-        font-weight: 200;
+        font-weight: bolder;
         text-align: center;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -40,10 +39,11 @@
 
         .box-sizing(border-box);
 
-        border: 1px solid #2C2C2C;
+        border-top: 1px solid @theme-border;
+        border-bottom: 1px solid @theme-border;
         .border-top-radius(4px);
 
-        background-color: @navbar-inverse-bg;
+        background-color: @navbar-bg;
     }
 
     .menu-controls {
@@ -51,11 +51,13 @@
         top: 6px;
         right: 12px;
         z-index: 1;
-        color: @navbar-inverse-link-color;
+        color: @navbar-link-color;
         cursor: pointer;
 
-        &:hover {
-            color: @navbar-inverse-link-hover-color;
+        span {
+            &:hover {
+                color: @navbar-link-hover-color;
+            }
         }
     }
 }

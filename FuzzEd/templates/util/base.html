@@ -9,12 +9,11 @@
         {% load less %}
 
         {% block style %}
-        @import url("{{ STATIC_URL }}{% less "less/bootstrap/bootstrap.less" %}");
+        @import url("{{ STATIC_URL }}css/jquery-ui/jquery-ui-1.10.3.min.css");
+        @import url("{{ STATIC_URL }}{% less "less/theme/white/theme.less" %}");
         @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-3.2.1.min.css");
+        @import url("{{ STATIC_URL }}css/slickgrid/slick.grid-2.0.2.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
-        @import url("{{ STATIC_URL }}{% less "less/theme/theme.less" %}");
-        @import url("{{ STATIC_URL }}{% less "less/util.less" %}");
-        @import url("{{ STATIC_URL }}{% less "less/print.less" %}") print;
         {% endblock %}
     </style>
 
@@ -41,7 +40,7 @@
                 'jsplumb':    '../lib/jsplumb/jsplumb-1.4.1.min',
                 'slickgrid':  '../lib/slickgrid/slick.grid-2.0.2',
                 'underscore': '../lib/underscore/underscore-1.4.4.min',
-                // notations directory
+                // fuzzed specifics
                 'notations':  '../notations'
             },
             // define dependencies for libs that are not AMD compatible
@@ -101,11 +100,11 @@
 </head>
 
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top no-print">
+    <div class="navbar navbar-fixed-top no-print">
         <div class="container">
             <a class="navbar-brand" anchor="#">
                 {% if graph %}
-                    D-Mod - {{ graph }}
+                    D-Mod <small>{{ graph }}</small>
                 {% else %}
                     Welcome to D-Mod. 
                 {% endif %}

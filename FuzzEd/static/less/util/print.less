@@ -1,0 +1,37 @@
+/**
+ *  File: print.less
+ *      This file contains all print-specific style overwrites.
+ */
+
+@media print {
+
+    .no-print {
+        display:    none   !important;
+        visibility: hidden !important;
+    }
+
+    .menu {
+        display:    none   !important;
+        visibility: hidden !important;
+    }
+
+    .fuzzed-node {
+        .fuzzed-node-optional-indicator circle {
+            fill: #000 !important;
+        }
+
+        &.fuzzed-node-optional .fuzzed-node-optional-indicator circle {
+            fill: #fff !important;
+        }
+    }
+
+    rect, circle, line, path {
+        stroke: #000 !important;
+    }
+
+    #FuzzEdCanvas {
+        overflow: visible !important;
+        height:   auto    !important;
+    }
+
+}
