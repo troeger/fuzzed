@@ -25,7 +25,7 @@ bool PetriNetSimulation::run()
 	if (!pn.valid()) 
 		throw runtime_error("Invalid Petri Net.");
 
-	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads...";
+	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads..." << std::endl;
 
 	// for checking local convergence, thread-local
 	long double privateLast = 10000.0L;
@@ -46,9 +46,11 @@ bool PetriNetSimulation::run()
 
 #ifdef RELIABILITY_DISTRIBUTION
 	auto fileName = m_netFile.generic_string();
-	util::replaceFileExtensionInPlace(fileName, ".statistics_timenet");
+	util::replaceFileExtensionInPlace(fileName, ".statistics_custom");
 	ofstream statdoc(fileName);
 	statdoc << std::endl;
+
+	cout << "----- Simulating entire reliability distribution up to mission time " << m_numSimulationSteps << "..." << std::endl;
 
 	const auto maxTime = m_numSimulationSteps;
 	for (int k = 0; k < maxTime; ++k)
