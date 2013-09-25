@@ -56,7 +56,20 @@ TimeNETSimulation::TimeNETSimulation(std::shared_ptr<FaultTreeNode> faultTree,
 
 bool TimeNETSimulation::run()
 {
+	int ret;
 #ifdef TNETDIR
+#define RELIABILITY_DISTRIBUTION
+#ifdef RELIABILITY_DISTRIBUTION
+	auto fileName = m_properties->filePath;
+	util::replaceFileExtensionInPlace(fileName, ".statistics_timenet");
+	ofstream statdoc(fileName);
+	statdoc << std::endl;
+
+	const auto maxTime = m_properties->transientSimTime;
+	for (int k = 1; k < maxTime; ++k)
+	{
+		m_properties->transientSimTime = k;
+#endif
 	const string serverCall = 
 		string("python ") + TNETSCRIPT 
 		+ " " + m_properties->filePath
@@ -69,9 +82,17 @@ bool TimeNETSimulation::run()
 
 	cout << "Simulation Parameters: " << endl << serverCall;
 
-	int ret = system(serverCall.c_str());
-	return (ret == 0);
+	ret = system(serverCall.c_str());
+	
+	double r = -1.0;
+	parseReliability(r);
+
+#ifdef RELIABILITY_DISTRIBUTION
+	statdoc << util::toString(1.0 - r) << std::endl;
+	}
 #endif
+	return (ret == 0);
+#endif // TNETDIR
 
 	cout << "TimeNET not configured through CMake. Please check the USE_TIMENET option." << endl;
 	return -1;
@@ -81,4 +102,27 @@ TimeNETSimulation::~TimeNETSimulation()
 {
 	if (m_properties)
 		delete m_properties;
+}
+
+void TimeNETSimulation::parseReliability(double& res)
+{
+	auto fileName = m_properties->filePath;
+	util::replaceFileExtensionInPlace(fileName, ".RESULTS");
+	std::ifstream resultDoc(fileName);
+	if (!resultDoc.good())
+		return;
+
+	std::string line;
+	while (std::getline(resultDoc, line))
+	{
+		if (line.find("S") != 0) continue;
+		// correct line
+		const auto eqpos = line.find("=");
+		const auto foo = line.substr(eqpos+1, line.length()-1);
+		std::stringstream i;
+		i << foo;
+		double x = 0.0;
+		if (i >> x)
+			res = x;
+	}
 }

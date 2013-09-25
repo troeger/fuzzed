@@ -36,6 +36,8 @@ public:
 
 	virtual bool run() override;
 
+	void parseReliability(double& res);
+
 protected:
 	TimeNETProperties* m_properties;
 };

@@ -38,10 +38,24 @@ bool PetriNetSimulation::run()
 
 	double startTime = omp_get_wtime();
 
-	// sum up all the failures from all simulation rounds in parallel, counting how many rounds were successful
+#define RELIABILITY_DISTRIBUTION	// compute the entire reliability distribution up to mission time, for statistical tests
+#define OMP_PARALLELIZATION			// use OpenMP to parallelize. alternative: manual (static) work splitting over a number of C++11 threads 
 
-#define OMP_PARALLELIZATION
+
 #ifdef OMP_PARALLELIZATION
+
+#ifdef RELIABILITY_DISTRIBUTION
+	auto fileName = m_netFile.generic_string();
+	util::replaceFileExtensionInPlace(fileName, ".statistics_timenet");
+	ofstream statdoc(fileName);
+	statdoc << std::endl;
+
+	const auto maxTime = m_numSimulationSteps;
+	for (int k = 0; k < maxTime; ++k)
+	{
+		m_numSimulationSteps = k;
+#endif
+
 #pragma omp parallel for\
 	reduction(+:numFailures, sumFailureTime_all, sumFailureTime_fail, count)\
 	reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak)\
@@ -152,9 +166,14 @@ bool PetriNetSimulation::run()
 	res.nRounds				= count;
 	res.mttf				= avgFailureTime_all;
 	res.duration			= omp_get_wtime() - startTime;
-
+	
+#ifdef RELIABILITY_DISTRIBUTION
+	statdoc << util::toString(res.reliability) << std::endl;
+	}
+#else
 	printResults(res);
 	writeResultXML(res);
+#endif
 
 	return true;
 }
@@ -330,6 +349,7 @@ void PetriNetSimulation::printResults(const SimulationResult& res)
 
 	cout << results << endl << endl;
 }
+
 
 void PetriNetSimulation::writeResultXML(const SimulationResult& res)
 {
