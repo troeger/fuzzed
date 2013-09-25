@@ -18,7 +18,6 @@ set(HEADERS
   AnalysisResult.h
 )
 
-include_directories(${BEANSTALKPP_INCLUDE})
 include_directories(${PUGIXML_INCLUDE_DIR})
 
 add_executable(ftanalysis ${SOURCES} ${HEADERS})

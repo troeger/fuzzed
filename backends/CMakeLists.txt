@@ -10,17 +10,14 @@ if(APPLE)
 	set(CMAKE_INCLUDE_PATH "/usr/local/include/")
 	set(XSD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../tools/xsdcompile/include/)
 	set(XSD_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}"../tools/xsdcompile/bin/xsd")
-	set(BUILD_BEANSTALKPP ON)
 	set(BUILD_PUGIXML ON)
 elseif(WIN32)
 	 message("This is Windows.")
-	 set(BUILD_BEANSTALKPP ON)
 	 set(BUILD_PUGIXML ON)
 	 set(Boost_USE_STATIC_LIBS ON)
 elseif(UNIX)
 	 message("This is Linux.")
-	 set(USE_INTEL_COMPILER OFF)
-	 set(BUILD_BEANSTALKPP ON)   
+	 set(USE_INTEL_COMPILER OFF) 
 	 set(BUILD_PUGIXML ON)
 endif() 
 
@@ -95,23 +92,6 @@ else(XSD_FOUND)
 	message(FATAL_ERROR "The package CodeSynthesis XSD has not been found")
 endif(XSD_FOUND)  
 
-############### BEANSTALK ###############
-#########################################
-
-if(BUILD_BEANSTALKPP)
-	add_subdirectory(thirdParty/beanstalkpp)
-	message("Building beanstalkpp")
-	set(BEANSTALKPP_INCLUDE thirdParty/beanstalkpp)
-	if(WIN32)
-		set(BEANSTALKPP_LIB "${FT_LIB_DIR}/beanstalkpp.lib")
-	else(WIN32)#TODO
-		set(BEANSTALKPP_LIB "${FT_LIB_DIR}/libbeanstalkpp.a")
-	endif(WIN32)
-else()
-	find_package(beanstalkpp REQUIRED)
-	message(STATUS "Found Beanstalk Client lib: ${BEANSTALKPP_LIB}")
-endif()
-
 ############### PUGI ####################
 #########################################
 
@@ -136,7 +116,6 @@ include_directories(
 	${XERCESC_INCLUDE_DIR}
 	${XSD_INCLUDE_DIR}
 	${PUGIXML_INCLUDE_DIR}
-	${BEANSTALKPP_INCLUDE}
 	${Boost_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
 	${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration
@@ -284,8 +263,7 @@ set(COMMON_HEADERS
 set(COMMON_LINKED_LIBS
 	${XERCESC_LIBRARIES}
 	${Boost_LIBRARIES}
-	${PUGIXML_LIB}
-	${BEANSTALKPP_LIB})
+	${PUGIXML_LIB})
 message("${COMMON_LINKED_LIBS}")
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
 target_link_libraries(common_model ${COMMON_LINKED_LIBS})
