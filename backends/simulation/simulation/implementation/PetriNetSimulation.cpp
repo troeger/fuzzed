@@ -56,6 +56,16 @@ bool PetriNetSimulation::run()
 	for (int k = 0; k < maxTime; ++k)
 	{
 		m_numSimulationSteps = k;
+		if (k > 0) RandomNumberGenerator::reseed();
+
+		numFailures = 0;
+		sumFailureTime_all = 0;
+		sumFailureTime_fail = 0;
+		privateLast = 10000.0L;
+		privateConvergence = false;
+		privateBreak = false;
+		globalConvergence = true;
+		count = 0;
 #endif
 
 #pragma omp parallel for\
@@ -255,7 +265,8 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 		while ((nextStep <= m_numSimulationSteps || m_simulateUntilFailure)  && elapsedTime < maxTime)
 		{
 			elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();
-			if (!simulationStep(net, nextStep))
+			const bool validResult = simulationStep(net, nextStep);
+			if (!validResult)
 			{
 				result.valid = false;
 				return result;
