@@ -244,6 +244,12 @@ def build_naturaldocs():
     if os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -i analysis -i rendering -xi FuzzEd/static/lib -o HTML docs -p docs ') != 0:
         raise Exception('Execution of NaturalDocs compiler failed.')
 
+@task 
+def build_configs():
+    '''Builds the configuration files for sub projects out of settings.ini'''
+    print 'Building configs...'
+    
+
 def build_analysis_server_java():
     '''Builds analysis server.'''
     print 'Building analysis server JAR file ...'
