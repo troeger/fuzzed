@@ -68,3 +68,10 @@ void RandomNumberGenerator::initGenerators()
 	for (int i = 0; i < omp_get_max_threads(); ++i)
 		s_generators[i] = new RandomNumberGenerator();
 }
+
+void RandomNumberGenerator::reseed()
+{
+	static int k = 0;
+	for (int i = 0; i < omp_get_max_threads(); ++i)
+		s_generators[i]->m_generator.seed(++k);
+}
