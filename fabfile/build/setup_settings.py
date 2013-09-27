@@ -11,7 +11,7 @@ DATABASES = {
         'NAME':     '%(db_name)s',                        
         'USER':     '%(db_user)s',                              
         'PASSWORD': '%(db_password)s',                       
-        'HOST':     '',                                       
+        'HOST':     '%(db_host)s',                                       
         'PORT':     '',                                       
     }
 }
@@ -65,6 +65,11 @@ INSTALLED_APPS = (
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
     'handlers': {
         'console': {
             'level':   'DEBUG',
@@ -72,7 +77,8 @@ LOGGING = {
         },
         'mail_admins': {
             'level':   'ERROR',
-            'class':   'django.utils.log.AdminEmailHandler'
+            'class':   'django.utils.log.AdminEmailHandler',
+            'filters': ['require_debug_false'],
         },        
         'False': {
             'level': 'DEBUG',
@@ -101,7 +107,7 @@ AUTHENTICATION_BACKENDS = (
 
 import ConfigParser
 
-def createDjangoSettings(addSection):
+def createDjangoSettings(confFile, addSection):
     ''' Parse settings.ini and fill the upper template.
         The result is a valid Django setttings.py file,
         based on the configuration from the INI file.
@@ -110,7 +116,7 @@ def createDjangoSettings(addSection):
     '''
     conf = ConfigParser.ConfigParser()
     conf.optionxform = str   # preserve case in keys
-    conf.read('settings.ini')
+    conf.read(confFile)
     replacements = {}
     conf_lines = []
     for section in ('all', addSection):
@@ -124,4 +130,3 @@ def createDjangoSettings(addSection):
     replacements['conf_lines']='\n'.join(sorted(conf_lines))
     return settings%replacements
 
-print createDjangoSettings('development')
