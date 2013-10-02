@@ -1,6 +1,6 @@
 from fabric.api import task
 import cuisine
-import platform
+import platform, os, urllib
 cuisine.mode_local()
 
 @task 
