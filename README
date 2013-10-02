@@ -23,7 +23,7 @@ Preparation of development machine
 
 Compile static stuff and prepare database
 -----------------------------------------
-> fab build
+> fab build.all
 > fab reset_db
 
 Run development web server and backend servers
@@ -33,6 +33,6 @@ Run development web server and backend servers
 
 Create install packages in ./dist on developer machine
 -------------------------------------------------------
-> fab build
-> fab package
+> fab build.all
+> fab package.all
 
