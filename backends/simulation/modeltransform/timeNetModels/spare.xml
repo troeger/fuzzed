@@ -33,7 +33,7 @@
     </label>
   </place>
   <place id="0.21" initialMarking="0" type="node">
-    <graphics orientation="0" x="560" y="161"/>
+    <graphics orientation="0" x="530" y="160"/>
     <label id="0.21.0" text="failed" type="text">
       <graphics x="21" y="-6"/>
     </label>
@@ -68,7 +68,7 @@
   </immediateTransition>
   <immediateTransition enablingFunction="" id="0.19" priority="1"
     type="node" weight="1">
-    <graphics orientation="0" x="500" y="160"/>
+    <graphics orientation="0" x="470" y="160"/>
     <label id="0.19.0" text="propagate_error" type="text">
       <graphics x="-5" y="-47"/>
     </label>
@@ -118,16 +118,16 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.7.4">
-      <graphics orientation="0" x="282" y="140"/>
+      <graphics orientation="0" x="282" y="141"/>
     </handle>
     <handle id="0.7.2">
-      <graphics orientation="0" x="410" y="141"/>
+      <graphics orientation="0" x="410" y="142"/>
     </handle>
     <handle id="0.7.1">
-      <graphics orientation="0" x="410" y="336"/>
+      <graphics orientation="0" x="410" y="337"/>
     </handle>
     <handle id="0.7.3">
-      <graphics orientation="0" x="199" y="334"/>
+      <graphics orientation="0" x="199" y="335"/>
     </handle>
   </arc>
   <arc fromNode="0.1" id="0.20" toNode="0.19" type="connector">
@@ -135,7 +135,7 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.20.1">
-      <graphics orientation="0" x="260" y="157"/>
+      <graphics orientation="0" x="260" y="160"/>
     </handle>
   </arc>
   <arc fromNode="0.16" id="0.22" toNode="0.19" type="connector">
@@ -143,7 +143,7 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.22.1">
-      <graphics orientation="0" x="499" y="207"/>
+      <graphics orientation="0" x="470" y="210"/>
     </handle>
   </arc>
   <arc fromNode="0.19" id="0.23" toNode="0.21" type="connector">
@@ -156,7 +156,7 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.24.1">
-      <graphics orientation="0" x="484" y="123"/>
+      <graphics orientation="0" x="460" y="120"/>
     </handle>
   </arc>
   <arc fromNode="0.19" id="0.25" toNode="0.16" type="connector">
@@ -164,10 +164,10 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.25.2">
-      <graphics orientation="0" x="483" y="177"/>
+      <graphics orientation="0" x="449" y="181"/>
     </handle>
     <handle id="0.25.1">
-      <graphics orientation="0" x="395" y="179"/>
+      <graphics orientation="0" x="391" y="180"/>
     </handle>
   </arc>
   <inhibit fromNode="0.10" id="0.13" toNode="0.5" type="connector">
@@ -180,10 +180,10 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.27.1">
-      <graphics orientation="0" x="523" y="139"/>
+      <graphics orientation="0" x="510" y="130"/>
     </handle>
   </inhibit>
   <definition defType="real" expression="0.5" id="0.26" name="dormancy" type="text">
-    <graphics x="100" y="284"/>
+    <graphics x="105" y="286"/>
   </definition>
 </net>

@@ -3,13 +3,13 @@
   xmlns="http://pdv.cs.tu-berlin.de/TimeNET/schema/eDSPN"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pdv.cs.tu-berlin.de/TimeNET/schema/eDSPN etc/schemas/eDSPN.xsd">
   <place id="0.0" initialMarking="1" type="node">
-    <graphics orientation="0" x="200" y="160"/>
+    <graphics orientation="0" x="230" y="160"/>
     <label id="0.0.0" text="A_functional" type="text">
       <graphics x="-31" y="-40"/>
     </label>
   </place>
   <place id="0.1" initialMarking="1" type="node">
-    <graphics orientation="0" x="200" y="300"/>
+    <graphics orientation="0" x="230" y="300"/>
     <label id="0.1.0" text="B_functional" type="text">
       <graphics x="-33" y="-43"/>
     </label>
@@ -39,21 +39,21 @@
     </label>
   </place>
   <place id="0.22" initialMarking="0" type="node">
-    <graphics orientation="0" x="650" y="220"/>
+    <graphics orientation="0" x="620" y="220"/>
     <label id="0.22.0" text="failed" type="text">
       <graphics x="-14" y="22"/>
     </label>
   </place>
   <exponentialTransition DTSPNpriority="1" delay="1.0" id="0.2"
     preemptionPolicy="PRD" serverType="ExclusiveServer" type="node">
-    <graphics orientation="0" x="280" y="160"/>
+    <graphics orientation="0" x="290" y="160"/>
     <label id="0.2.0" text="fail_A" type="text">
       <graphics x="-18" y="-40"/>
     </label>
   </exponentialTransition>
   <exponentialTransition DTSPNpriority="1" delay="1.0" id="0.3"
     preemptionPolicy="PRD" serverType="ExclusiveServer" type="node">
-    <graphics orientation="0" x="280" y="300"/>
+    <graphics orientation="0" x="290" y="300"/>
     <label id="0.3.0" text="fail_B" type="text">
       <graphics x="-15" y="-42"/>
     </label>
@@ -169,11 +169,11 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.26.1">
-      <graphics orientation="0" x="598" y="246"/>
+      <graphics orientation="0" x="600" y="250"/>
     </handle>
   </inhibit>
   <measure expression="P{ #failed > 0 };" id="0.27" name="P_fail"
     result="" type="text">
-    <graphics x="580" y="280"/>
+    <graphics x="530" y="260"/>
   </measure>
 </net>

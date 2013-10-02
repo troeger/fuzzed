@@ -33,7 +33,7 @@
     </label>
   </place>
   <place id="0.15" initialMarking="1" type="node">
-    <graphics orientation="0" x="60" y="150"/>
+    <graphics orientation="0" x="83" y="150"/>
     <label id="0.15.0" text="trigger_functional" type="text">
       <graphics x="-42" y="22"/>
     </label>
@@ -60,7 +60,7 @@
   </exponentialTransition>
   <exponentialTransition DTSPNpriority="1" delay="1.0" id="0.16"
     preemptionPolicy="PRD" serverType="ExclusiveServer" type="node">
-    <graphics orientation="0" x="130" y="150"/>
+    <graphics orientation="0" x="141" y="150"/>
     <label id="0.16.0" text="fail_trigger" type="text">
       <graphics x="-25" y="-40"/>
     </label>
@@ -69,7 +69,7 @@
     type="node" weight="1">
     <graphics orientation="0" x="360" y="150"/>
     <label id="0.11.0" text="trigger_dependent_events" type="text">
-      <graphics x="-23" y="-40"/>
+      <graphics x="-50" y="-40"/>
     </label>
   </immediateTransition>
   <immediateTransition enablingFunction="" id="0.20" priority="1"
@@ -112,10 +112,10 @@
       <graphics x="0" y="0"/>
     </inscription>
     <handle id="0.14.3">
-      <graphics orientation="0" x="431" y="149"/>
+      <graphics orientation="0" x="419" y="149"/>
     </handle>
     <handle id="0.14.1">
-      <graphics orientation="0" x="430" y="331"/>
+      <graphics orientation="0" x="420" y="330"/>
     </handle>
   </arc>
   <arc fromNode="0.15" id="0.17" toNode="0.16" type="connector">
@@ -152,6 +152,22 @@
     </inscription>
     <handle id="0.23.1">
       <graphics orientation="0" x="270" y="160"/>
+    </handle>
+  </inhibit>
+  <inhibit fromNode="0.7" id="0.24" toNode="0.3" type="connector">
+    <inscription id="0.24.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+    <handle id="0.24.1">
+      <graphics orientation="0" x="299" y="275"/>
+    </handle>
+  </inhibit>
+  <inhibit fromNode="0.8" id="0.25" toNode="0.4" type="connector">
+    <inscription id="0.25.0" text="1" type="inscriptionText">
+      <graphics x="0" y="0"/>
+    </inscription>
+    <handle id="0.25.1">
+      <graphics orientation="0" x="302" y="348"/>
     </handle>
   </inhibit>
 </net>
