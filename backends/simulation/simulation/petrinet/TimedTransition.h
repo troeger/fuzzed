@@ -18,9 +18,8 @@ public:
 	unsigned int getFiringTime() const { return m_r; }
 
 	// TODO: find out if float would increase precision
-	void setFiringTime(unsigned int t) { m_r = t; }
-
-	bool tryUpdateStartupTime(unsigned int tick);
+	void setFiringTime(const unsigned int& t);
+	bool tryUpdateStartupTime(const unsigned int& tick);
 
 protected:
 	virtual bool stochasticallyEnabled(unsigned int tick) const override;

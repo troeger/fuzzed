@@ -35,8 +35,6 @@ set(HEADERS
    ResultDocument.h
    ResultStruct.h
    Config.h
-
-   beanstalkdconfig.h
    
    implementation/PetriNetSimulation.h
    implementation/TimeNETSimulation.h

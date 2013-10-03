@@ -10,6 +10,7 @@ class RandomNumberGenerator
 {
 public:
 	static RandomNumberGenerator* instanceForCurrentThread();
+	static void reseed();
 
 	// uniform distribution
 	double randomNumberInInterval(double L, double H);

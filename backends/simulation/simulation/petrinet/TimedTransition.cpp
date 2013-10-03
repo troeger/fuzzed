@@ -28,7 +28,7 @@ TimedTransition& TimedTransition::operator=(const TimedTransition &other)
 	return *this;
 }
 
-bool TimedTransition::tryUpdateStartupTime(unsigned int tick)
+bool TimedTransition::tryUpdateStartupTime(const unsigned int& tick)
 {
 	if (m_hasNotFired && m_wasNotEnabled && enoughTokens())
 	{
@@ -37,4 +37,9 @@ bool TimedTransition::tryUpdateStartupTime(unsigned int tick)
 		return true;
 	}
 	return false;
+}
+
+void TimedTransition::setFiringTime(const unsigned int& t)
+{
+	m_r = t;
 }

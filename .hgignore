@@ -40,3 +40,7 @@ backends/fuzztreeanalysis/CMakeFiles/*
 backends/fuzztreeconfiguration/CMakeFiles/*
 backends/CMakeFiles/*
 tools/xsdcompile
+*/CMakeFiles/*
+*.prefs
+*.pdb
+*.ilk

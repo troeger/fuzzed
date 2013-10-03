@@ -25,7 +25,7 @@ bool PetriNetSimulation::run()
 	if (!pn.valid()) 
 		throw runtime_error("Invalid Petri Net.");
 
-	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads...";
+	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads..." << std::endl;
 
 	// for checking local convergence, thread-local
 	long double privateLast = 10000.0L;
@@ -46,14 +46,26 @@ bool PetriNetSimulation::run()
 
 #ifdef RELIABILITY_DISTRIBUTION
 	auto fileName = m_netFile.generic_string();
-	util::replaceFileExtensionInPlace(fileName, ".statistics_timenet");
+	util::replaceFileExtensionInPlace(fileName, ".statistics_custom");
 	ofstream statdoc(fileName);
 	statdoc << std::endl;
+
+	cout << "----- Simulating entire reliability distribution up to mission time " << m_numSimulationSteps << "..." << std::endl;
 
 	const auto maxTime = m_numSimulationSteps;
 	for (int k = 0; k < maxTime; ++k)
 	{
 		m_numSimulationSteps = k;
+		if (k > 0) RandomNumberGenerator::reseed();
+
+		numFailures = 0;
+		sumFailureTime_all = 0;
+		sumFailureTime_fail = 0;
+		privateLast = 10000.0L;
+		privateConvergence = false;
+		privateBreak = false;
+		globalConvergence = true;
+		count = 0;
 #endif
 
 #pragma omp parallel for\
@@ -253,7 +265,8 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 		while ((nextStep <= m_numSimulationSteps || m_simulateUntilFailure)  && elapsedTime < maxTime)
 		{
 			elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();
-			if (!simulationStep(net, nextStep))
+			const bool validResult = simulationStep(net, nextStep);
+			if (!validResult)
 			{
 				result.valid = false;
 				return result;
