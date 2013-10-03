@@ -23,10 +23,19 @@ def pycs():
                 fullname = os.path.join(root, name)
                 os.remove(fullname)
 
+def cmake_dirs():
+    '''Remove temporary stuff created by CMake.'''
+    for root, dirs, files in os.walk('.'):
+        for name in dirs:
+            if name == "CMakeFiles":
+                fullname = os.path.join(root, name)
+                os.system("rm -r "+fullname)
+
 @task
 def all():
     '''Cleans all.'''    
     docs()
     build_garbage()
     pycs()
+    cmake_dirs()
 
