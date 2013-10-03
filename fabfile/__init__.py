@@ -1,23 +1,8 @@
 from fabric.api import task
-from contextlib import contextmanager
-import sys, os
+import sys, os, subprocess, json
 
 sys.path.append('..')                       # Some of the sub-tasks import stuff from FuzzEd
 import bootstrap, build, clean, package     # Import sub-tasks
-
-@contextmanager
-def created_dir(dirname):
-    ''' Allows to operate in a subdirectory that is created, in case.'''
-    try:
-        os.mkdir(dirname)
-    except:
-        pass
-    current = os.getcwd()
-    os.chdir(dirname)
-    yield
-    os.chdir(current)
-
-
 
 @task
 def fixture_save(fname=None):

@@ -1,15 +1,32 @@
-import os
+import os, ConfigParser, tarfile
+from contextlib import contextmanager
 from fabric.api import task
+
+# determine version
+conf = ConfigParser.ConfigParser()
+conf.optionxform = str   # preserve case in keys    
+conf.read('settings.ini')
+version=dict(conf.items('all'))['VERSION']
+
+
+@contextmanager
+def created_dir(dirname):
+    ''' Allows to operate in a subdirectory that is created, in case.'''
+    try:
+        os.mkdir(dirname)
+    except:
+        pass
+    current = os.getcwd()
+    os.chdir(dirname)
+    yield
+    os.chdir(current)
 
 @task
 def web_server():
     '''Performs packaging of web server. Assumes successful build.'''
     with created_dir("dist"):
         exclusion_suffix=[".pyc", ".sqlite"]
-        exclusion_files =[
-            "../FuzzEd/setup_schemas.py",
-            "../FuzzEd/settings_production.py"
-        ]
+        exclusion_files = []
         exclusion_dirs =[
             "../FuzzEd/static/",
             "../FuzzEd/fixtures/"
@@ -18,7 +35,6 @@ def web_server():
             ["../manage.py", "manage.py"],
             ["../rendering/__init__.py", "rendering/__init__.py"],
             ["../rendering/renderClient.py", "rendering/renderClient.py"],
-            ["../FuzzEd/settings_production.py", "FuzzEd/settings_local.py"],
             ["../FuzzEd", "FuzzEd"],
         ]
 
@@ -34,26 +50,26 @@ def web_server():
                     return False
             print "Adding "+fname
 
-        basename="FuzzEd-%s"%__version__
+        basename="FuzzEd-%s"%version
         tar = tarfile.open(basename+".tar.gz","w:gz")
         for src, dest in inclusions:
             tar.add(src, arcname=basename+"/"+dest, exclude=add_filter)
         tar.close()
 
-@task
-def analysis_server():
-    '''Performs packaging of analysis server. Assumes successful build.'''
-    current = os.getcwd()
-    os.chdir('dist')
+#@task
+#def analysis_server():
+#    '''Performs packaging of analysis server. Assumes successful build.'''
+#    current = os.getcwd()
+#    os.chdir('dist')#
 
-    basename="FuzzEdAnalysis-%s"%__version__
-    tar = tarfile.open(basename+".tar.gz","w:gz")
-    tar.add("../analysis/fuzzTreeAnalysis.sh", arcname=basename+"/fuzzTreeAnalysis.sh")
-    tar.add("../analysis/initscript", arcname=basename+"/initscript")
-    tar.add("../analysis/jar/fuzzTreeAnalysis.jar", arcname=basename+"/jar/fuzzTreeAnalysis.jar")
-    tar.close()
+#    basename="FuzzEdAnalysis-%s"%__version__
+#    tar = tarfile.open(basename+".tar.gz","w:gz")
+#    tar.add("../analysis/fuzzTreeAnalysis.sh", arcname=basename+"/fuzzTreeAnalysis.sh")
+#    tar.add("../analysis/initscript", arcname=basename+"/initscript")
+#    tar.add("../analysis/jar/fuzzTreeAnalysis.jar", arcname=basename+"/jar/fuzzTreeAnalysis.jar")
+#    tar.close()
 
-    os.chdir(current)
+#    os.chdir(current)
 
 @task
 def rendering_server():
@@ -61,7 +77,7 @@ def rendering_server():
     current = os.getcwd()
     os.chdir('dist')
 
-    basename="FuzzEdRendering-%s"%__version__
+    basename="FuzzEdRendering-%s"%version
     tar = tarfile.open(basename+".tar.gz","w:gz")
     tar.add("../rendering/renderServer.py", arcname=basename+"/renderServer.py")
     tar.close()
@@ -76,6 +92,6 @@ def all():
     if os.system('./manage.py collectstatic -v3 --noinput') != 0:
         raise Exception('Execution of collectstatic failed. Please check the previous output.\n'
                         'Try "sudo setup.py test" for installing all dependencies.')
-    package_web_server()
-    package_analysis_server()
-    package_rendering_server()
+    web_server()
+#   package_analysis_server()
+    rendering_server()
