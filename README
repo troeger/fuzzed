@@ -1,5 +1,5 @@
-FuzzTrees
-=========
+FuzzEd
+======
 
 People who contributed to this project so far:
 
@@ -8,36 +8,60 @@ Markus Götz <>
 Lena Herscheid <>
 Frank Schlegel <>
 
-Installation instructions for development machine 
-==================================================
-This project uses Python 2.7 and Fabric for installing software dependencies and managing the build process. The supported database is PostgreSQL.
+Installation of development machine
+===================================
 
-In order to install Fabric, please run 'easy_install fabric' or 'pip install fabric' to get it. 
-This demands a working C compiler (gcc), Python header files (python-dev), pip / distutils (python-pip) and sudo being installed. All of this is given anyway on a reasonable Linux box.
+A development machine needs sudo, gcc, Python 2.7 + header files, pip, Fabric (from PyPI) and PostgreSQL as minimum starting point. You can install them directly, or use Vagrant to create a Virtual Machine with them from our Vagrantfile.
 
-Make sure to check the supported Fabric tasks with 'fab -l'.
+Running Vagrant for a dev VM
+----------------------------
+1. Install Vagrant from http://downloads.vagrantup.com/
+2. Install VirtualBox from https://www.virtualbox.org/wiki/Downloads
+3. Run vagrant up
+4. Once the provisioning script has run through, you can run vagrant ssh
+5. cd /home/fuzztrees
+6. fab -l
 
-Preparation of the database
----------------------------
+Edit the Vagrantfile in order to get graphical mode: uncomment
+#config.vm.boot_mode = :gui
+
+Prepare the PostgreSQL database
+--------------------------------
 > psql
 =# CREATE USER fuzztrees WITH CREATEDB PASSWORD 'fuzztrees';
 =# CREATE DATABASE fuzztrees WITH OWNER fuzztrees;
 
-Preparation of development machine
-----------------------------------
+Install additional dev machine software
+----------------------------------------
 > fab bootstrap_dev
 
-Compile static stuff and prepare database
------------------------------------------
+Developing for FuzzEd
+=====================
+
+Compile static stuff and create sync database tables
+----------------------------------------------------
 > fab build.all
+> ./manage.py syncdb --migrate
 
 Run development web server and backend servers
 ----------------------------------------------
 > ./manage.py runbackend
 > ./manage.py runserver
 
-Create install packages in ./dist on developer machine
--------------------------------------------------------
-> fab build.all
-> fab package.all
+Writing tests for FuzzEd
+========================
+> fab fixture_save:testgraphs.json
+
+Saves a new fixture file from the current database. It can be referenced
+in the unit tests stored in tests.py.
+
+> fab fixture_load:testgraphs.json
+
+Overwrites the current database with the test fixture. This allows local
+editing of the test database with the editor, which can than be saved again.
+
+> fab run_tests
+
+Run all tests stored in tests.py.
+
 
