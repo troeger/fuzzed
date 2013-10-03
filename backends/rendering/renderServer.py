@@ -1,4 +1,4 @@
-import beanstalkc, tempfile, os, shutil, signal
+import tempfile, os, shutil, signal
 
 def shutdown(sig, func=None):
     print "Shutting down beanstalk connection ..."
