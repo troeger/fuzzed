@@ -59,7 +59,9 @@ def dev():
 
     print "gcc"
     cuisine.package_ensure("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
-
+    print "Database initialization"
+    os.system('./manage.py syncdb --noinput --no-initial-data --migrate')
+    
 @task 
 def web():
     '''Installs all software needed to make the machine a web server machine.'''

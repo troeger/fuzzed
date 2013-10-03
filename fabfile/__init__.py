@@ -1,6 +1,6 @@
 from fabric.api import task
 from contextlib import contextmanager
-import sys
+import sys, os
 
 sys.path.append('..')                       # Some of the sub-tasks import stuff from FuzzEd
 import bootstrap, build, clean, package     # Import sub-tasks
@@ -45,13 +45,6 @@ def fixture_load(fname=None):
         print "Usage: fab fixture_load:<filename>"
         return
     os.system('./manage.py loaddata ./FuzzEd/fixtures/'+fname)
-
-@task
-def reset_db():
-    '''Resets the database without further questions.'''
-    # We don't want to do that on the production database. Ever.
-    assert(settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3')
-    os.system('./manage.py syncdb --noinput --no-initial-data --migrate')
 
 @task
 def run_tests():
