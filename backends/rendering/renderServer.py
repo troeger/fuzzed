@@ -1,22 +1,28 @@
-import tempfile, os, shutil, signal
+import tempfile, os, shutil, signal, sys, ConfigParser
+from .pg_msgqueue import PgMessageQueue
 
 def shutdown(sig, func=None):
     print "Shutting down beanstalk connection ..."
     b.close()    
 
+# Initialize message queue, based on config file given on the command line
+if len(sys.argv) != 2:
+    print("%s configFile"%sys.argv[0])
+    exit(-1)
+queue = PgMessageQueue(sys.argv[1], ('renderEps','renderPdf'))
+
 # Register cleanup code for termination
 signal.signal(signal.SIGTERM, shutdown)
-b=beanstalkc.Connection()
-# We expect the requester to send the graph TIKZ code through the "rendering" tube
-b.watch('renderEps')
-b.watch('renderPdf')
+
+# We expect the requester to send the database ID in the TikzCache table
 while 1:
-    job=b.reserve()
-    tube = job.stats()['tube']
+    message = queue.pull_message()
+    tikzCacheId = int(message['payload'])
     # perform Latex compilation in temporary directory
     tmpdir = tempfile.mkdtemp() 
     # Store TiKZ code there
     f = open(tmpdir+os.sep+'graph.tex','w')
+    tikzCode = 
     f.write(job.body)
     f.close()
     # Run Latex, copy resulting document to current directory

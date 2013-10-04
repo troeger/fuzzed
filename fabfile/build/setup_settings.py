@@ -107,6 +107,31 @@ AUTHENTICATION_BACKENDS = (
 
 import ConfigParser
 
+def configOptions(confFile, addSection):
+    ''' Parse settings.ini and deliver content.
+        The argument defines the special section in the
+        INI file that is considered beside 'all'.
+    '''
+    conf = ConfigParser.ConfigParser()
+    conf.optionxform = str   # preserve case in keys
+    conf.read(confFile)
+    for section in ('all', addSection):
+        for key, value in conf.items(section):
+            yield (key, value)
+
+
+def createBackendSettings(confFile, addSection):
+    ''' Parse settings.ini and create a dedicated database.ini
+        for the backend projects. They need the DB credentials for notification channels.
+        The argument tells the special section in the
+        INI file that is considered beside 'all'.
+    '''
+    conf_lines = ['[all]']    
+    for key, value in configOptions(confFile, addSection):
+        if key.startswith('db_'):
+            conf_lines.append("%s = %s"%(key, value))
+    return '\n'.join(conf_lines)
+
 def createDjangoSettings(confFile, addSection):
     ''' Parse settings.ini and fill the upper template.
         The result is a valid Django setttings.py file,
@@ -114,19 +139,15 @@ def createDjangoSettings(confFile, addSection):
         The argument tells the special section in the
         INI file that is considered beside 'all'.
     '''
-    conf = ConfigParser.ConfigParser()
-    conf.optionxform = str   # preserve case in keys
-    conf.read(confFile)
     replacements = {}
     conf_lines = []
-    for section in ('all', addSection):
-        for key, value in conf.items(section):
-            if key.isupper():
-                # Add the configuration from the INI file directly
-                conf_lines.append('%s=%s'%(key, value))
-            else:
-                # Register it as replacement value
-                replacements[key] = value
+    for key, value in configOptions(confFile, addSection):
+        if key.isupper():
+            # Add the configuration from the INI file directly
+            conf_lines.append('%s=%s'%(key, value))
+        else:
+            # Register it as replacement value
+            replacements[key] = value
     replacements['conf_lines']='\n'.join(sorted(conf_lines))
     return settings%replacements
 
