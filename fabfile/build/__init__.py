@@ -1,7 +1,7 @@
 import os, json, pprint
 from xml.dom.minidom import parse as parseXml
 from setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
-from setup_settings import createDjangoSettings, createBackendSettings
+from setup_settings import createDjangoSettings
 from fabric.api import task
 from FuzzEd import util
 # check FuzzEd/__init__.py for the project version number
@@ -207,9 +207,6 @@ def configs():
     print 'Building configs...'
     f=open('FuzzEd/settings.py','w')
     f.write(createDjangoSettings('settings.ini', 'development'))
-    f.close()
-    f=open('backends/database.ini','w')
-    f.write(createBackendSettings('settings.ini', 'development'))
     f.close()
 
 def build_analysis_server_java():
