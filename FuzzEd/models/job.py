@@ -1,5 +1,11 @@
 from django.db import models
 from graph import Graph
+from south.modelsinspector import add_introspection_rules
+
+class NativeXmlField(models.Field):
+    def db_type(self, connection):
+        return 'xml'
+add_introspection_rules([], ["^FuzzEd\.models\.job\.NativeXmlField"])        
 
 class Job(models.Model):
     class Meta:
@@ -22,4 +28,5 @@ class Job(models.Model):
     kind  = models.CharField(max_length=127, choices=JOB_TYPES)
     done = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
+    data = NativeXmlField(null=True)
     result = models.BinaryField(null=True)    

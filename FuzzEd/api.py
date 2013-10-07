@@ -523,6 +523,10 @@ def job_create(request, graph_id, job_kind):
         graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
     # store job information for this graph
+    if kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB):
+        data = graph.to_xml();
+    else:
+        raise HttpResponseBadRequestAnswer()
     job = Job(graph=graph, kind=job_kind)
     job.save()
 
