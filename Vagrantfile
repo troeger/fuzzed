@@ -23,13 +23,15 @@ echo ...done.
 SCRIPT
 
 Vagrant::Config.run do |config|
-    config.vm.box = "raring64"
-    config.vm.box_url = "https://dl.dropboxusercontent.com/u/547671/thinkstack-raring64.box"
+    config.vm.box = "precise64"
+    config.vm.box_url = "https://dl.dropboxusercontent.com/u/165709740/boxes/precise64-vanilla.box"
     
-    #config.vm.boot_mode = :gui
-    
-	config.vm.network :bridged
-    config.vm.forward_port 8000, 8000
+    #"https://dl.dropboxusercontent.com/u/547671/thinkstack-raring64.box"
+    config.vm.boot_mode = :gui
+	#config.vm.network :bridged
+    config.vm.forward_port 8000, 8080
+    config.vm.network :hostonly, "192.168.33.10"
+    #config.vm.network :hostonly, "33.33.33.10"
 
     config.vm.share_folder "fuzztrees", "/home/fuzztrees", "."
 

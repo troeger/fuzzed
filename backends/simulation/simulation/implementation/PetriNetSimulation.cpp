@@ -38,6 +38,7 @@ bool PetriNetSimulation::run()
 
 	double startTime = omp_get_wtime();
 
+//#define NUM_MONTE_CARLO_ROUNDS 1000 
 #define RELIABILITY_DISTRIBUTION	// compute the entire reliability distribution up to mission time, for statistical tests
 #define OMP_PARALLELIZATION			// use OpenMP to parallelize. alternative: manual (static) work splitting over a number of C++11 threads 
 
@@ -66,6 +67,28 @@ bool PetriNetSimulation::run()
 		privateBreak = false;
 		globalConvergence = true;
 		count = 0;
+#endif
+
+#ifdef NUM_MONTE_CARLO_ROUNDS
+		auto fileName = m_netFile.generic_string();
+		util::replaceFileExtensionInPlace(fileName, ".statistics_custom");
+		ofstream statdoc(fileName);
+		statdoc << std::endl;
+
+		cout << "----- Running many simulation rounds" << std::endl;
+
+		for (int k = 0; k < NUM_MONTE_CARLO_ROUNDS; ++k)
+		{
+			if (k>0) RandomNumberGenerator::reseed();
+
+			numFailures = 0;
+			sumFailureTime_all = 0;
+			sumFailureTime_fail = 0;
+			privateLast = 10000.0L;
+			privateConvergence = false;
+			privateBreak = false;
+			globalConvergence = true;
+			count = 0;
 #endif
 
 #pragma omp parallel for\
@@ -179,7 +202,7 @@ bool PetriNetSimulation::run()
 	res.mttf				= avgFailureTime_all;
 	res.duration			= omp_get_wtime() - startTime;
 	
-#ifdef RELIABILITY_DISTRIBUTION
+#if  defined(RELIABILITY_DISTRIBUTION) || defined(NUM_MONTE_CARLO_ROUNDS)
 	statdoc << util::toString(res.reliability) << std::endl;
 	}
 #else
