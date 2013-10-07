@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from FuzzEd.models import Job
+
 from django.contrib import admin
 admin.autodiscover()
 
@@ -48,9 +50,10 @@ urlpatterns = patterns('',
     url(r'^api/graphs/(?P<graph_id>\d+)/undos$','FuzzEd.api.undos', name='undos'),
 
     # analysis
-    url(r'^api/graphs/(?P<graph_id>\d+)/analysis/cutsets$', 'FuzzEd.api.analyze_cutsets', name='analyze_cutsets'),
+    url(r'^api/graphs/(?P<graph_id>\d+)/analysis/cutsets$', 
+        'FuzzEd.api.job_create', {'job_kind': Job.CUTSETS_JOB}, name='analyze_cutsets'),
     url(r'^api/graphs/(?P<graph_id>\d+)/analysis/topEventProbability$',
-        'FuzzEd.api.analyze_top_event_probability', name='analyze_top_event_probability'),
+        'FuzzEd.api.job_create', {'job_kind': Job.TOP_EVENT_JOB}, name='analyze_top_event_probability'),
 
     # jobs
     url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.job_status', name='job_status'),

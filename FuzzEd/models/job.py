@@ -22,4 +22,4 @@ class Job(models.Model):
     kind  = models.CharField(max_length=127, choices=JOB_TYPES)
     done = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    result = models.BinaryField()    
+    result = models.BinaryField(null=True)    

@@ -22,8 +22,6 @@ from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponse
                               HttpResponseForbiddenAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, \
                               HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands, Job
-from analysis import cutsets, top_event_probability
-from rendering import renderClient
 
 import logging, json
 logger = logging.getLogger('FuzzEd')
@@ -551,7 +549,7 @@ def job_status(request, job_id):
         # TODO: Add reason for cancellation to body as plain text
         raise HttpResponseNotFoundAnswer()
 
-    if job.state == Job.STATE_DONE:
+    if job.done:
         # response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
         return HttpResponse(job.result) 
     else:       
