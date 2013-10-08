@@ -22,8 +22,6 @@ from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponse
                               HttpResponseForbiddenAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, \
                               HttpResponseServerErrorAnswer
 from FuzzEd.models import Graph, Node, notations, commands, Job
-from analysis import cutsets, top_event_probability
-from rendering import renderClient
 
 import logging, json
 logger = logging.getLogger('FuzzEd')
@@ -82,7 +80,7 @@ def graphs(request):
 
     # something was not right with the request parameters
     except (ValueError, KeyError):
-        raise HttpResponseBadRequestAnswer('Bad request parameters.')
+        raise HttpResponseBadRequestAnswer()
 
 @login_required
 @csrf_exempt
@@ -144,24 +142,27 @@ def graph_download(request, graph_id):
     if export_format == 'xml':
         response.content = graph.to_xml()
         response['Content-Type'] = 'application/xml'
-
+        response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
     elif export_format == 'json':
         response.content = graph.to_json()
         response['Content-Type'] = 'application/javascript'
+        response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
     elif export_format == 'pdf':
-        response.content = renderClient.latex2pdf(graph.to_tikz())
-        response['Content-Type'] = 'application/pdf'
+        # Create new rendering job and redirect to status
+        job = Job(graph=graph, kind=Job.PDF_RENDERING_JOB)
+        job.save()
+        response['Location'] = reverse('job_status', args=[job.pk])
     elif export_format == 'eps':
-        response.content = renderClient.latex2eps(graph.to_tikz())
-        response['Content-Type'] = 'application/eps'
+        # Create new rendering job and redirect to status
+        job = Job(graph=graph, kind=Job.EPS_RENDERING_JOB)
+        job.save()
+        response['Location'] = reverse('job_status', args=[job.pk])
     elif export_format == 'tex':
         response.content = graph.to_tikz()
         response['Content-Type'] = 'application/text'
+        response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)        
     else:
         raise HttpResponseNotFoundAnswer()
-
-    response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
-
     return response
 
 @login_required
@@ -246,7 +247,7 @@ def nodes(request, graph_id):
 
     # a int conversion of one of the parameters failed or kind is not supported by the graph
     except (ValueError, AssertionError, KeyError):
-        raise HttpResponseBadRequestAnswer("Bad arguments in the request.")
+        raise HttpResponseBadRequestAnswer()
 
     # the looked up graph does not exist
     except ObjectDoesNotExist:
@@ -476,108 +477,85 @@ def redos(request, graph_id):
         #TODO Perform top command on redo stack
         return HttpResponseNoResponse()
 
-@login_required
 @csrf_exempt
-@require_ajax
-@require_GET
+@require_http_methods(['GET', 'POST'])
 @transaction.commit_on_success
 @never_cache
-def analyze_cutsets(request, graph_id):
+def job_data(request, job_id):
     """
-    The function provides all cut sets of the given graph.
-    It currently performs the computation (of unknown duration) synchronously,
-    so the client is expected to perform an asynchronous REST call on its own
-
-    API Request:  GET /api/graphs/[graphID]/cutsets, no body
-    API Response: JSON body with list of dicts, one dict per cut set, 'nodes' key has list of client_id's value
+    Allows to fetch the data for an existing job via GET, and to POST the according result data.
+    The Job object is expected to be already created by another API call.
+    Typically, this function should be called by backend servers when they get a notification
+    for doing some work.
     """
-    if request.user.is_staff:
-        graph = get_object_or_404(Graph, pk=graph_id)
-    else:
-        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    # minbool is NP-complete, so more than 10 basic events are not feasible for computation
-    node_count = graph.nodes.all().filter(kind__exact='basicEvent', deleted__exact=False).count()
-
-    if node_count >= 10:
-        raise HttpResponseServerErrorAnswer()
-
-    result = cutsets.get(graph.to_bool_term())
-    #TODO: check the command stack if meanwhile the graph was modified
-    return HttpResponse(json.dumps(result), 'application/javascript')
+    job = get_object_or_404(Job, pk=job_id)
+    if request.method == 'GET':
+        response = HttpResponse()
+        logger.debug("Delivering job %d data to requestor"%job.pk)
+        if job.kind in (Job.CUTSETS_JOB, Job.TOP_EVENT_JOB):
+            response.content = job.graph.to_xml()
+            response['Content-Type'] = 'application/xml'
+        elif job.kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB):
+            response.content = job.graph.to_tikz()
+            response['Content-Type'] = 'application/text'
+        else:
+            raise HttpResponseBadRequestAnswer()
+        return response
+    elif request.method == 'POST':
+        logger.debug("Storing result data for job %d"%job.pk)
+        # Retrieve binary file and store it
+        fileData = request.POST.get('file')
+        job.result = fileData
+        job.save()
+        return HttpResponse()        
 
 @login_required
 @csrf_exempt
 @require_http_methods(['GET'])
-def analyze_top_event_probability(request, graph_id):
+def job_create(request, graph_id, job_kind):
     """
-    Function: analyze_top_event_probability
-
-    This API handler is responsible for starting an analysis run in the analysis engine.
+    Starts a job of the given kind for the given graph.
     It is intended to return immediately with job information for the frontend.
-    If the analysis engine cannot start the job (most likely due to broken XML data generated here),
-    the view returns HttpResponseServerErrorAnswer to the front-end.
     """
     if request.user.is_staff:
         graph = get_object_or_404(Graph, pk=graph_id)
     else:
         graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
-    try:
-        # The Java analysis server currently only likes FuzzTree XML
-        post_data = graph.to_xml('fuzztree')
-        # Determine stored decomposition number
-        decompNumber = graph.top_node().get_property('decompositions')
-        logger.debug('Decomposition number of this graph is '+str(decompNumber))
-        logger.debug('Sending XML to analysis server:\n' + post_data)
-        job_id, configuration_count, node_count = top_event_probability.create_job(post_data,decompNumber)
+    # store job information for this graph
+    if job_kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB, Job.TOP_EVENT_JOB, Job.CUTSETS_JOB):
+        data = graph.to_xml();
+    else:
+        raise HttpResponseBadRequestAnswer()
+    job = Job(graph=graph, kind=job_kind)
+    job.save()
 
-        # store job information for this graph
-        job = Job(name=job_id, configurations=configuration_count,
-                  nodes=node_count, graph=graph, kind=Job.TOP_EVENT_JOB)
-        job.save()
-
-        # return URL for job status information
-        logger.debug('Got new job \'%s\' with ID %d for graph %d' % (job.name, job.pk, graph.pk))
-        response = HttpResponse(status=201)
-        response['Location'] = reverse('job_status', args=[job.pk])
-
-        return response
-
-    except top_event_probability.InternalError as exception:
-        logger.error('Exception while using analysis server: %s' % str(exception))
-        #TODO: Perform some smarter error handling here
-        raise HttpResponseServerErrorAnswer(str(exception))
-
+    # return URL for job status information
+    logger.debug('Created new %s job with ID %d for graph %d' % (job.kind, job.pk, graph.pk))
+    response = HttpResponse(status=201)
+    response['Location'] = reverse('job_status', args=[job.pk])
+    return response
+ 
 @login_required
 @csrf_exempt
 @require_http_methods(['GET'])
 def job_status(request, job_id):
+    ''' Returns the status information for the given job.
+        202 is delivered if the job is pending, otherwise the result is immediately returned.
+    '''
     try:
         job = Job.objects.get(pk=job_id)
         # Prevent cross-checking of jobs by different users
         assert(job.graph.owner == request.user or request.user.is_staff)
 
     except:
-        # Inform the frontend that the job no longer exists
+        # Inform the frontend nicely that the job no longer exists.
         # TODO: Add reason for cancellation to body as plain text
         raise HttpResponseNotFoundAnswer()
 
-    if job.kind != Job.TOP_EVENT_JOB:
-        raise HttpResponseBadRequestAnswer()
+    if job.done:
+        # response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
+        return HttpResponse(job.result) 
+    else:       
+        return HttpResponse(status=202)
 
-    # query status from analysis engine, based on job type
-    try:
-        result = top_event_probability.get_job_result(job.name)
-
-        if result is None:
-            return HttpResponse(status=202)
-
-        else:
-            logger.debug('Analysis result:\n%s' % result)
-            return HttpResponse(result)
-
-    except Exception as exception:
-        # Analysis engine does not know this job, or something else went wrong
-        # for the frontend, this is basically an unspecified backend error
-        logger.error('Error while fetching analysis server job status: %s' % exception)
-        raise HttpResponseServerErrorAnswer()
