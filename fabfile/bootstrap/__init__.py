@@ -7,23 +7,18 @@ cuisine.mode_local()
 def dev():
     '''Installs all software needed to make the machine a development machine.'''
     print "Installing Python packages..."
-    for package in ["django", "south", "openid2rp", "django-require", "pyxb", "beanstalkc", "django-less"]:
+    for package in ["django", "south", "openid2rp", "django-require", "pyxb", "django-less"]:
         print package
         cuisine.python_package_ensure(package)        
     print "Checking and installing native packages ..."
-    for p in ["beanstalkd", "cmake"]:
+    for p in ["cmake"]:
         print p
         cuisine.package_ensure(p)
     if platform.system() != 'Darwin':
-        for p in ["openjdk-7-jdk", "ant-gcj", "texlive", "node-less", "libxerces-c-dev", "libboost1.53-all-dev", "xsdcxx"]:
+        for p in ["texlive", "node-less", "libxerces-c-dev", "libboost1.53-all-dev", "xsdcxx"]:
             print p
             cuisine.package_ensure(p)
     else:
-        # check Java version
-        print "javac"
-        output = cuisine.run('javac -version')
-        if not '1.7' in output:
-            raise Exception('We need at least JDK 7 to build the analysis server. We found ' + output)
         # check if latex is installed
         print "dvips"
         output = cuisine.run('dvips')
@@ -65,7 +60,7 @@ def dev():
 @task 
 def web():
     '''Installs all software needed to make the machine a web server machine.'''
-    for package in ["django", "south", "openid2rp", "pyxb", "beanstalkc", "django-less"]:
+    for package in ["django", "south", "openid2rp", "pyxb", "django-less"]:
         cuisine.python_package_ensure(package)        
     cuisine.package_ensure("apache2")
     cuisine.package_ensure("libapache2-mod-wsgi")
@@ -73,7 +68,6 @@ def web():
     cuisine.package_ensure("python-psycopg2")
     #TODO: Prepare database
     #TODO: Prepare Apache config
-    #TODO: Ask for IP of Beanstalk server
     #    Install new release on production web server
     #    --------------------------------------------
     #    > sudo puppet apply install/prod_web.pp
@@ -85,21 +79,14 @@ def web():
 @task 
 def backend():
     '''Installs all software needed to make the machine a backend machine.'''
-    for package in ["pyxb", "beanstalkc"]:
+    for package in ["pyxb"]:
         cuisine.python_package_ensure(package)        
-    cuisine.package_ensure("beanstalkd")
     if platform.system() != 'Darwin':
         cuisine.package_ensure("texlive")
-        cuisine.package_ensure("openjdk-7-jre")
     else:
-        # check Java version
-        output = subprocess.check_output('java -version', stderr=subprocess.STDOUT, shell=True)
-        if (not 'version' in output) or (not '1.7' in output):
-            raise Exception('We need at least JDK 7 to build the analysis server. Please install it manually.')
         # check if latex is installed
         if not cmd_exists("latex"):
             raise Exception('We need a working Latex for the rendering server. Please install it manually.')
-    #TODO: Ask if Beanstalkd should be installed here
     #    Installation of production backend server
     #    -----------------------------------------
     #    > sudo puppet apply install/prod_backend.pp
