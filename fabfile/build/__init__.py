@@ -198,7 +198,7 @@ def naturaldocs():
     # Build natural docs in 'docs' subdirectory
     if not os.path.exists('docs'):
         os.mkdir('docs')
-    if os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -i analysis -i rendering -xi FuzzEd/static/lib -o HTML docs -p docs ') != 0:
+    if os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -xi FuzzEd/static/lib -o HTML docs -p docs ') != 0:
         raise Exception('Execution of NaturalDocs compiler failed.')
 
 @task 
@@ -246,4 +246,4 @@ def all():
     naturaldocs()
     notations()
     configs()
-    backend_servers()    
+    #backend_servers()    
