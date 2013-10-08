@@ -1,6 +1,6 @@
 from fabric.api import task
 from subprocess import Popen
-import sys
+import sys, os
 
 @task
 def backend():
