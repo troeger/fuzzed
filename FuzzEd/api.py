@@ -80,7 +80,7 @@ def graphs(request):
 
     # something was not right with the request parameters
     except (ValueError, KeyError):
-        raise HttpResponseBadRequestAnswer('Bad request parameters.')
+        raise HttpResponseBadRequestAnswer()
 
 @login_required
 @csrf_exempt
@@ -247,7 +247,7 @@ def nodes(request, graph_id):
 
     # a int conversion of one of the parameters failed or kind is not supported by the graph
     except (ValueError, AssertionError, KeyError):
-        raise HttpResponseBadRequestAnswer("Bad arguments in the request.")
+        raise HttpResponseBadRequestAnswer()
 
     # the looked up graph does not exist
     except ObjectDoesNotExist:
@@ -523,7 +523,7 @@ def job_create(request, graph_id, job_kind):
         graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
     # store job information for this graph
-    if kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB):
+    if job_kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB, Job.TOP_EVENT_JOB, Job.CUTSETS_JOB):
         data = graph.to_xml();
     else:
         raise HttpResponseBadRequestAnswer()
@@ -531,7 +531,7 @@ def job_create(request, graph_id, job_kind):
     job.save()
 
     # return URL for job status information
-    logger.debug('Created new job with ID %d for graph %d' % (job.pk, graph.pk))
+    logger.debug('Created new %s job with ID %d for graph %d' % (job.kind, job.pk, graph.pk))
     response = HttpResponse(status=201)
     response['Location'] = reverse('job_status', args=[job.pk])
     return response

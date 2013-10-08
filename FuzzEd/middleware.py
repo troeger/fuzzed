@@ -12,7 +12,7 @@ class FuzzEdException(Exception):
         return self._message
     def _set_message(self, message): 
         self._message = message
-    def __init__(self, message):
+    def __init__(self, message=''):
         self.message = message
     message = property(_get_message, _set_message)
 
