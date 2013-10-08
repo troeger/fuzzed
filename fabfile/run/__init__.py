@@ -3,17 +3,17 @@ from subprocess import Popen
 import sys
 
 @task
-def rendering():
-    '''Runs the rendering backend service.'''
-    rendering = Popen(["python","backends/rendering/renderServer.py"])
-    if rendering.returncode != None:
-        print "Error %u while starting rendering server"%rendering.returncode
+def backend():
+    '''Runs the backend connector daemon, who serves all configured backends.'''
+    backend = Popen(["python","backends/daemon.py","backends/daemon.ini"])
+    if backend.returncode != None:
+        print "Error %u while starting backend daemon"%backend.returncode
         exit(-1)
+    print "Enter 'q' for quitting ..."
     while 1:
-        print "Press 'q' for quitting ..."
         line = sys.stdin.readline()
         if line.startswith('q'):
-            rendering.terminate()
+            backend.terminate()
             exit(0)
 
 

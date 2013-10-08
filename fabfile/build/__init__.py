@@ -206,10 +206,10 @@ def configs():
     '''Builds the configuration files for sub projects out of settings.ini'''
     print 'Building configs...'
     f=open('FuzzEd/settings.py','w')
-    f.write(createDjangoSettings('settings.ini', 'development'))
+    f.write(createDjangoSettings('settings.ini', ['development']))
     f.close()
-    f=open('backends/database.ini','w')
-    f.write(createBackendSettings('settings.ini', 'development'))
+    f=open('backends/daemon.ini','w')
+    f.write(createBackendSettings('settings.ini', ['development', 'backend_']))
     f.close()
 
 def build_analysis_server_java():

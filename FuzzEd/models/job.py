@@ -11,10 +11,10 @@ class Job(models.Model):
     class Meta:
         app_label = 'FuzzEd'
 
-    CUTSETS_JOB   = 'C'
-    TOP_EVENT_JOB = 'T'
-    EPS_RENDERING_JOB = 'E'
-    PDF_RENDERING_JOB = 'P'    
+    CUTSETS_JOB   = 'CUTSETS'
+    TOP_EVENT_JOB = 'TOPEVENT'
+    EPS_RENDERING_JOB = 'EPS'
+    PDF_RENDERING_JOB = 'PDF'    
 
     JOB_TYPES = (
         (CUTSETS_JOB,   'Cutset computation'),
@@ -29,5 +29,3 @@ class Job(models.Model):
     done = models.BooleanField(default=False)               # Backend is done with this, can be deleted after delivery
     created = models.DateTimeField(auto_now_add=True, editable=False)
     data = NativeXmlField(null=True)                        # The graph as xml, input for the backend services
-    binary_result = models.BinaryField(null=True)           # A file result from a backend service  
-    text_result = models.TextField(null=True)               # A text result from a backend service
