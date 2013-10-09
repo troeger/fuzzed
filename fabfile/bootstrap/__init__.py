@@ -62,7 +62,7 @@ def dev():
     cuisine.run('psql -c \"CREATE DATABASE fuzztrees WITH OWNER fuzztrees;\" postgres')             # Create FuzzTrees DB
 
     print "Initializing and syncing local database ..."
-    os.system('./manage.py syncdb --noinput --no-initial-data --migrate')
+    os.system('.\\manage.py syncdb --noinput --no-initial-data --migrate')
     
 @task 
 def web():
