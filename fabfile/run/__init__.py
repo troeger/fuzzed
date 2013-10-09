@@ -16,6 +16,18 @@ def backend():
             backend.terminate()
             exit(0)
 
+@task
+def server():
+    '''Runs the server.'''
+    ip = None
+    if os.path.exists('.vagrantip'):
+        with open('.vagrantip') as f:
+            ip = f.read().rstrip()
+            print 'Using Vagrant IP: ' + ip
+    if ip:
+        os.system('./manage.py runserver %s:8000' % ip)
+    else:
+        os.system('./manage.py runserver')
 
 @task
 def tests():

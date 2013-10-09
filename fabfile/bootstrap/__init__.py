@@ -11,11 +11,11 @@ def dev():
         print "Installing "+package
         cuisine.python_package_ensure(package)        
     print "Checking and installing native packages ..."
-    for p in ["cmake"]:
+    for p in ["cmake","npm"]:
         print "Installing "+p
         cuisine.package_ensure(p)
     if platform.system() != 'Darwin':
-        for p in ["postgresql", "texlive", "node-less", "libxerces-c-dev", "libboost1.48-all-dev", "xsdcxx", "python-psycopg2"]:
+        for p in ["postgresql", "texlive", "libxerces-c-dev", "libboost1.48-all-dev", "xsdcxx", "python-psycopg2"]:
             print p
             cuisine.package_ensure(p)
     else:
@@ -27,14 +27,12 @@ def dev():
         output = cuisine.run('dvips')
         if 'command not found' in output:
             raise Exception('We need a working Latex for the rendering server. Please install it manually.')
-        # Install LESS compiler via NPM, since no brew exists for that
-        print "Installing npm"
-        cuisine.package_ensure("npm")
-        print "Installing lessc"
-        output = cuisine.run('lessc')
-        if 'command not found' in output:
-            cuisine.sudo("npm install -g less")
-            cuisine.sudo("ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
+    # Installing less via npm: no brew on Darwin, too old in Linux apt
+    print "Installing lessc"
+    output = cuisine.run('lessc')
+    if 'command not found' in output:
+        cuisine.sudo("npm install -g less")
+        cuisine.sudo("ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
 	# Install Boost
 	print "Installing boost"
 	cuisine.package_ensure("boost")
