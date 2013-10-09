@@ -6,7 +6,6 @@ fi
 echo Provisioning Machine...
 apt-get update
 apt-get -y install build-essential make
-apt-get -y install libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev
 apt-get -y install python python-dev python-pip perl
 pip install fabric
 echo ...done.

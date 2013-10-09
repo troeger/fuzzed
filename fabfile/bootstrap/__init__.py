@@ -15,7 +15,7 @@ def dev():
         print "Installing "+p
         cuisine.package_ensure(p)
     if platform.system() != 'Darwin':
-        for p in ["postgresql", "texlive", "node-less", "libxerces-c-dev", "libboost1.53-all-dev", "xsdcxx", "python-psycopg2"]:
+        for p in ["postgresql", "texlive", "node-less", "libxerces-c-dev", "libboost1.48-all-dev", "xsdcxx", "python-psycopg2"]:
             print p
             cuisine.package_ensure(p)
     else:
