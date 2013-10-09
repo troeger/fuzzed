@@ -108,7 +108,7 @@ AUTHENTICATION_BACKENDS = (
 )
 '''
 
-import ConfigParser
+import ConfigParser, os
 
 def configOptions(confFile, sectionPrefixes):
     ''' Parse settings.ini and deliver content.
@@ -157,12 +157,20 @@ def createDjangoSettings(confFile, forDevelopment):
     '''
     replacements = {}
     conf_lines = []
+    # Read ip address from Vagrant-generated file
+    ip = None
+    if os.path.exists('.vagrantip'):
+        with open('.vagrantip') as f:
+            ip = f.read().rstrip()
+            print 'Using Vagrant IP: ' + ip
     if forDevelopment:
         prefixes = ['all', 'development']
     else:
         prefixes = ['all', 'production']          
     for section, key, value in configOptions(confFile, prefixes):
         if key.isupper():
+            if key == 'OPENID_RETURN' and ip:
+                value = "'http://%s:8000/login/?openidreturn'" % ip
             # Add the configuration from the INI file directly
             conf_lines.append('%s=%s'%(key, value))
         else:

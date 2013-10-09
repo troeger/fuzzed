@@ -21,7 +21,7 @@ def created_dir(dirname):
     yield
     os.chdir(current)
 
-@task
+#@task
 def web_server():
     '''Performs packaging of web server. Assumes successful build.'''
     with created_dir("dist"):
@@ -71,7 +71,7 @@ def web_server():
 
 #    os.chdir(current)
 
-@task
+#@task
 def rendering_server():
     '''Performs packaging of rendering server.'''
     current = os.getcwd()
@@ -92,6 +92,6 @@ def all():
     if os.system('./manage.py collectstatic -v3 --noinput') != 0:
         raise Exception('Execution of collectstatic failed. Please check the previous output.\n'
                         'Try "sudo setup.py test" for installing all dependencies.')
-    web_server()
+#    web_server()
 #   package_analysis_server()
-    rendering_server()
+#    rendering_server()

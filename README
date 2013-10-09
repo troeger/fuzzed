@@ -39,10 +39,13 @@ Compile static stuff and create sync database tables
 > fab build.all
 > ./manage.py syncdb --migrate
 
-Run development web server and backend servers
-----------------------------------------------
-> ./manage.py runbackend
+Run development web server
+--------------------------
 > ./manage.py runserver
+
+Run backend services
+--------------------
+> fab run.backend
 
 Writing tests for FuzzEd
 ========================

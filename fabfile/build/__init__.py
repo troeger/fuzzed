@@ -1,4 +1,4 @@
-import os, json, pprint
+import platform, os, json, pprint
 from xml.dom.minidom import parse as parseXml
 from setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 from setup_settings import createDjangoSettings, createBackendSettings
@@ -198,7 +198,7 @@ def naturaldocs():
     # Build natural docs in 'docs' subdirectory
     if not os.path.exists('docs'):
         os.mkdir('docs')
-    if os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -i analysis -i rendering -xi FuzzEd/static/lib -o HTML docs -p docs ') != 0:
+    if os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -xi FuzzEd/static/lib -o HTML docs -p docs ') != 0:
         raise Exception('Execution of NaturalDocs compiler failed.')
 
 @task 
@@ -233,8 +233,11 @@ def backend_servers():
     current = os.getcwd()
     os.chdir('backends')
     if os.path.isfile("CMakeCache.txt"):
-        os.system("rm CMakeCache.txt") 
-    os.system("cmake .")
+        os.system("rm CMakeCache.txt")
+    if platform.system() == "Darwin":
+        os.system("cmake . ")
+    else:
+        os.system("cmake . -DCMAKE_CXX_COMPILER=/usr/bin/gcc-4.7")
     os.system('make all')
     os.chdir(current)
 
@@ -246,4 +249,5 @@ def all():
     naturaldocs()
     notations()
     configs()
-    backend_servers()    
+    #backend_servers()    
+

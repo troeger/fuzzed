@@ -5,6 +5,7 @@
 #include <map>
 #include <tuple>
 #include <fstream>
+#include <string>
 
 struct TN_TransitionSpec 
 {
