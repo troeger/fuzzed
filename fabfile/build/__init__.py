@@ -1,4 +1,4 @@
-import os, json, pprint
+import platform, os, json, pprint
 from xml.dom.minidom import parse as parseXml
 from setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 from setup_settings import createDjangoSettings, createBackendSettings
@@ -233,8 +233,11 @@ def backend_servers():
     current = os.getcwd()
     os.chdir('backends')
     if os.path.isfile("CMakeCache.txt"):
-        os.system("rm CMakeCache.txt") 
-    os.system("cmake .")
+        os.system("rm CMakeCache.txt")
+    if platform.system() == "Darwin":
+        os.system("cmake . ")
+    else:
+        os.system("cmake . -DCMAKE_CXX_COMPILER=/usr/bin/gcc-4.7")
     os.system('make all')
     os.chdir(current)
 

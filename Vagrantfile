@@ -4,15 +4,16 @@ if `tty -s`; then
 fi
 
 echo Provisioning Machine...
+apt-get -y install python-software-properties
+add-apt-repository ppa:george-edison55/gcc4.7-precise
 apt-get update
-apt-get -y install build-essential make
+apt-get -y install build-essential make gcc-4.7 g++-4.7
 apt-get -y install python python-dev python-pip perl
 pip install fabric
 echo ...done.
 
 echo Bootstrapping Dev Environment...
 cd /home/fuzztrees
-echo Changed directory
 fab bootstrap.dev
 echo ...done.
 
