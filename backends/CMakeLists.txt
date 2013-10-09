@@ -63,12 +63,11 @@ set(BOOST_INCLUDEDIR ${BOOST_ROOT}/Include)
 set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
 
 set(Boost_DIR ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
-find_package(Boost 1.51.0 COMPONENTS # TODO find out which version is really required. Maybe 1.50 would suffice too.
+find_package(Boost 1.48 COMPONENTS # TODO find out which version is really required. Maybe 1.50 would suffice too.
 	date_time
 	system
 	filesystem
 	program_options
-	exception
 REQUIRED)
 
 message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")

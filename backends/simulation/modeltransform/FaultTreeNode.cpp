@@ -2,6 +2,7 @@
 #include "events/Event.h"
 #include "serialization/PNDocument.h"
 #include <typeinfo>
+#include <iostream>
 #include "util.h"
 
 FaultTreeNode::FaultTreeNode(const std::string& ID, const std::string& name)
