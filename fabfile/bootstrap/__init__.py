@@ -67,6 +67,8 @@ def dev():
         cuisine.run('/usr/local/bin/psql -f /tmp/sql.txt postgres')
     else:
         cuisine.run('sudo su - postgres -c \"psql -f /tmp/sql.txt postgres\"')    
+    print "Performing complete build to get loadable Django project code"
+    os.system("fab build.all")
     print "Initializing and syncing local database ..."
     os.system('./manage.py syncdb --noinput --no-initial-data --migrate')
     
