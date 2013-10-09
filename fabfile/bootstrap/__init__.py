@@ -11,14 +11,17 @@ def dev():
         print "Installing "+package
         cuisine.python_package_ensure(package)        
     print "Checking and installing native packages ..."
-    for p in ["postgres", "cmake"]:
+    for p in ["cmake"]:
         print "Installing "+p
         cuisine.package_ensure(p)
     if platform.system() != 'Darwin':
-        for p in ["texlive", "node-less", "libxerces-c-dev", "libboost1.53-all-dev", "xsdcxx"]:
+        for p in ["postgresql", "texlive", "node-less", "libxerces-c-dev", "libboost1.53-all-dev", "xsdcxx", "python-psycopg2"]:
             print p
             cuisine.package_ensure(p)
     else:
+        # Postgres
+        print "Installing Postgres"
+        cuisine.package_ensure("postgres")
         # check if latex is installed
         print "Checking for dvips"
         output = cuisine.run('dvips')
@@ -53,16 +56,18 @@ def dev():
     # Configure support for GCC versions from HOnebrew
     cuisine.run("brew tap homebrew/versions")
     cuisine.package_ensure("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
-    print "Configuring and starting PostgreSQL"
+    print "Configuring and starting PostgreSQL ..."
+    os.system('cp fabfile/bootstrap/sql.txt /tmp/')
     if platform.system() == "Darwin":
         cuisine.run('initdb /usr/local/var/postgres -E utf8')                                           # Initialize system database
         cuisine.run('ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents')                 # Enable autostart  
         cuisine.run('launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist')             # Start it now
-    cuisine.run('psql -c \"CREATE USER fuzztrees WITH CREATEDB PASSWORD \'fuzztrees\';\" postgres') # Create FuzzTrees user
-    cuisine.run('psql -c \"CREATE DATABASE fuzztrees WITH OWNER fuzztrees;\" postgres')             # Create FuzzTrees DB
-
+        cuisine.run('psql -f /tmp/sql.txt postgres')
+    else:
+        cuisine.run('sudo su - postgres -c \"psql -f /tmp/sql.txt postgres\"')
+    
     print "Initializing and syncing local database ..."
-    os.system('.\\manage.py syncdb --noinput --no-initial-data --migrate')
+    os.system('./manage.py syncdb --noinput --no-initial-data --migrate')
     
 @task 
 def web():
