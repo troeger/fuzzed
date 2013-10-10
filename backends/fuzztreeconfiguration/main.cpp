@@ -49,13 +49,8 @@ int main(int argc, char **argv)
 		const auto dirPath = fs::path(outDir.c_str());
 		const auto inFilePath = fs::path(inFile.c_str());
 		if (!fs::is_directory(dirPath))
-		{
+		{ // TODO: find out write permissions. not featured by Boost 1.48.
 			cout << "Not a valid directory name: " << dirPath << endl;
-			return -1;
-		}
-		else if (!(status(dirPath).permissions() & fs::owner_write))
-		{
-			cout << "Cannot write to folder: " << dirPath << endl;
 			return -1;
 		}
 		else if (!fs::is_regular_file(inFilePath))
@@ -74,7 +69,7 @@ int main(int argc, char **argv)
 			for (const auto& res : transform.transform())
 			{ // TODO: proper naming
 				std::string newFileName = outDir + "/" + util::toString(++count) + fileName;
-				auto outstream = std::ofstream(newFileName);
+				std::ofstream outstream(newFileName);
 				fuzztree::fuzzTree(outstream, res);
 			}
 		}

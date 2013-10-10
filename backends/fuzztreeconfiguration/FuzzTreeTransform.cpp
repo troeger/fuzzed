@@ -396,7 +396,7 @@ bool FuzzTreeTransform::handleFeatureVP(
 {
 	assert(node && templateNode);
 	// find the configured child
-	auto& it = templateNode->children().begin();
+	auto it = templateNode->children().begin();
 	while (it != templateNode->children().end())
 	{
 		if (it->id() == configuredChildId)
