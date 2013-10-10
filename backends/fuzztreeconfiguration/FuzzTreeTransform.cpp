@@ -216,7 +216,10 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 fuzztree::FuzzTree FuzzTreeTransform::generateVariationFreeFuzzTree(const FuzzTreeConfiguration& configuration)
 {
 	const fuzztree::TopEvent topEvent = m_fuzzTree->topEvent();
-	fuzztree::TopEvent newTopEvent(topEvent);// treeHelpers::copyTopEvent(topEvent);
+
+	// Create a new empty top event to fill up with the configuration
+	fuzztree::TopEvent newTopEvent(topEvent.id(), topEvent.missionTime());
+	newTopEvent.name() = topEvent.name();
 
 	if (generateVariationFreeFuzzTreeRecursive(&topEvent, &newTopEvent, configuration) == OK)
 		return fuzztree::FuzzTree(generateUniqueId(topEvent.id()), newTopEvent);
@@ -393,7 +396,7 @@ bool FuzzTreeTransform::handleFeatureVP(
 {
 	assert(node && templateNode);
 	// find the configured child
-	auto it = templateNode->children().begin();
+	auto& it = templateNode->children().begin();
 	while (it != templateNode->children().end())
 	{
 		if (it->id() == configuredChildId)
@@ -401,7 +404,7 @@ bool FuzzTreeTransform::handleFeatureVP(
 		++it;
 	}
 	
-	const fuzztree::ChildNode featuredTemplate = *it;
+	const auto featuredTemplate = *it;
 	const type_info& featuredType = typeid(featuredTemplate);
 	
 	using namespace fuzztreeType;
