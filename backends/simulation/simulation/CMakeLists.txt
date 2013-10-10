@@ -5,8 +5,6 @@ set(SOURCES
    ${SIM_COMMON_SOURCES}
 
    main.cpp
-   StructureFormulaClient.cpp
-   SimulationClient.cpp
    SimulationExtern.cpp
    SimulationProxy.cpp
    ResultDocument.cpp
@@ -28,8 +26,6 @@ set(HEADERS
    ${HEADERS}
    ${SIM_COMMON_HEADERS}
 
-   StructureFormulaClient.h
-   SimulationClient.h
    SimulationExtern.h
    SimulationProxy.h
    ResultDocument.h
