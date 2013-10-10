@@ -39,5 +39,7 @@ public:
 	void parseReliability(double& res);
 
 protected:
+	void tidyUp() override;
+
 	TimeNETProperties* m_properties;
 };

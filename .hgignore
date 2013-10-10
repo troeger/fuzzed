@@ -2,6 +2,8 @@ syntax: glob
 *.sqlite
 *.pyc
 *.orig
+.DS_Store
+.vagrant
 FuzzEd/models/xml_analysis.py
 FuzzEd/models/xml_faulttree.py
 FuzzEd/models/xml_fuzztree.py
@@ -9,8 +11,9 @@ FuzzEd/models/graph_notations.py
 FuzzEd/models/node_rendering.py
 FuzzEd/models/notations.py
 FuzzEd/models/spreadsheet_notations.py
+FuzzEd/static-release
 FuzzEd/settings.py
-backends/database.ini
+backends/daemon.ini
 tools/xsdcompile/*
 docs/*
 CMakeFiles

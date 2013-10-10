@@ -126,3 +126,8 @@ void TimeNETSimulation::parseReliability(double& res)
 			res = x;
 	}
 }
+
+void TimeNETSimulation::tidyUp()
+{
+	// TODO
+}

@@ -42,7 +42,7 @@ See also:
 
 from __future__ import with_statement
 import base64, hashlib, os, re, string, tempfile, subprocess, types
-import tempfile, functools, StringIO, platform, pwd
+import tempfile, functools, StringIO, platform
 import fabric, fabric.api, fabric.operations, fabric.context_managers, fabric.state
 
 VERSION               = "0.6.4"
@@ -1228,6 +1228,7 @@ def user_check(name=None, uid=None, need_passwd=True):
 	if IS_DARWIN:
 		# We prefer to let Python parse the user database
 		# This may be reasonable also for non-Darwin platforms
+		import pwd
 		if name != None:
 			pwd_data = pwd.getpwnam(name)
 		elif uid != None:

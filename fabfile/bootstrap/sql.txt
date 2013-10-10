@@ -1,0 +1,2 @@
+CREATE USER fuzztrees WITH CREATEDB PASSWORD 'fuzztrees';
+CREATE DATABASE fuzztrees WITH OWNER fuzztrees;

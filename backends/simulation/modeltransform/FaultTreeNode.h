@@ -1,8 +1,9 @@
 #pragma once
 
-#include <boost/shared_ptr.hpp>
 #include <vector>
 #include <ostream>
+#include <string>
+#include <memory>
 
 #include "pugixml.hpp"
 #include "serialization/TNDocument.h"
@@ -24,7 +25,7 @@ public:
 	/************************************************************************/
 	/* tree manipulation                                                    */
 	/************************************************************************/
-	virtual void addChild(FaultTreeNode::Ptr child);
+	virtual void addChild(Ptr child);
 	virtual bool addChildBelow(const std::string& ID, FaultTreeNode::Ptr child);
 
 	virtual void setParent(FaultTreeNode* parent) { m_parent = parent; }

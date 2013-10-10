@@ -7,11 +7,13 @@ Franz Becker <>
 Markus Götz <>
 Lena Herscheid <>
 Frank Schlegel <>
+Stefan Richter <>
 
 Installation of development machine
 ===================================
 
-A development machine needs sudo, gcc, Python 2.7 + header files, pip, Fabric (from PyPI) and PostgreSQL as minimum starting point. You can install them directly, or use Vagrant to create a Virtual Machine with them from our Vagrantfile.
+A development machine needs sudo, gcc, Python 2.7 + header files, pip, and Fabric (from PyPI) as minimum starting point. 
+You can install them directly, or use Vagrant to create a Virtual Machine with them from our Vagrantfile.
 
 Running Vagrant for a dev VM
 ----------------------------
@@ -25,14 +27,8 @@ Running Vagrant for a dev VM
 Edit the Vagrantfile in order to get graphical mode: uncomment
 #config.vm.boot_mode = :gui
 
-Prepare the PostgreSQL database
---------------------------------
-> psql
-=# CREATE USER fuzztrees WITH CREATEDB PASSWORD 'fuzztrees';
-=# CREATE DATABASE fuzztrees WITH OWNER fuzztrees;
-
-Install additional dev machine software
-----------------------------------------
+Install all software dependencies, create the database
+------------------------------------------------------
 > fab bootstrap_dev
 
 Developing for FuzzEd
@@ -43,10 +39,13 @@ Compile static stuff and create sync database tables
 > fab build.all
 > ./manage.py syncdb --migrate
 
-Run development web server and backend servers
-----------------------------------------------
-> ./manage.py runbackend
+Run development web server
+--------------------------
 > ./manage.py runserver
+
+Run backend services
+--------------------
+> fab run.backend
 
 Writing tests for FuzzEd
 ========================
