@@ -21,14 +21,17 @@
             "properties": {}
         },
         
-        "stickynote": {
+        "stickyNote": {
             "nodeDisplayName": "Sticky Note",
             "inherits": "node",
+            "image": "sticky_note.svg",
 
             "properties": {
-                "text": {
-                    "kind": "text",
-                }
+              "description": {
+                  "kind": "textfield",
+                  "displayName": "Text",
+                  "default": "Sample Text"
+              }
             }
         },
 
@@ -425,7 +428,8 @@
         "cardinality",
         "k",
         "dormancyFactor",
-        "transfer"
+        "transfer",
+        "description"
     ],
 
     "shapeMenuNodeDisplayOrder": [
@@ -446,7 +450,8 @@
         "fdepGate",
         "priorityAndGate",
         "seqGate",
-        "transferIn"
+        "transferIn",
+        "stickyNote"
     ],
 
     "defaults": {

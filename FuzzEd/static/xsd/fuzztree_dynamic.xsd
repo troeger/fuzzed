@@ -15,7 +15,7 @@
   <xsd:complexType name="SpareGate">
     <xsd:complexContent>
       <xsd:extension base="ftd:DynamicGate">
-        <xsd:attribute name="spareIds" type="fta:idlist" use="required"/>
+        <xsd:attribute name="spareIds" type="ftd:idlist" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
@@ -33,7 +33,7 @@
   <xsd:complexType name="SEQGate">
     <xsd:complexContent>
       <xsd:extension base="ftd:DynamicGate">
-        <xsd:attribute name="eventSequence" type="fta:idlist" use="required"/>
+        <xsd:attribute name="eventSequence" type="ftd:idlist" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

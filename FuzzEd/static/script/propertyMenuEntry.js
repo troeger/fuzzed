@@ -818,7 +818,30 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         }
     });
+	
+	/**
+	 * Class: TextArea
+	 *	Simple HTML textarea for a <Text><Property>
+	 */
+	
+    var TextArea = Entry.extend({
+        changeEvents: function() {
+            return ['keyup', 'cut', 'paste'];
+        },
 
+        _setupInput: function() {
+            this.inputs = jQuery('<textarea type="text" class="form-control">').attr('id', this.id);
+            return this;
+        },
+
+        _value: function(newValue) {
+            if (typeof newValue === 'undefined') return this.inputs.val();
+            this.inputs.val(newValue);
+
+            return this;
+        }
+    });
+	
     /**
      *  TransferEntry
      *      Allows to link to other entities in the database. Looks like a normal <ChoiceEntry>,
@@ -988,6 +1011,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         'NumericEntry':  NumericEntry,
         'RangeEntry':    RangeEntry,
         'TextEntry':     TextEntry,
+		'TextArea'	:    TextArea, 
         'TransferEntry': TransferEntry
     }
 });

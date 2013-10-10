@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FuzzTree xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="net.fuzztree" name="EWDC 2013" decompositionNumber="2" id="0">
+  <topEvent id="1" name="Server Failure" missionTime="1000">
+  	<children xsi:type="ft:Or" id="11">
+        <children xsi:type="ft:BasicEvent" id="2" name="Bus Failure">
+          <probability xsi:type="ft:FailureRate" value="0.0001"/>
+        </children>
+
+        <children xsi:type="ft:BasicEvent" id="3" name="Hard Disk Failure">
+          <probability xsi:type="ft:FailureRate" value="0.0001"/>
+        </children>
+	    
+	    <children xsi:type="ft:And" id="4">
+	      	<children costs="1" id="5" xsi:type="ft:BasicEvent" name="Secondary CPU Failure">
+	      		<probability value="0.001" xsi:type="ft:FailureRate"/>
+	    	</children>
+			<children costs="1" id="6" xsi:type="ft:BasicEvent" name="Primary CPU Failure">
+	      		<probability value="0.001" xsi:type="ft:FailureRate"/>
+	    	</children>
+	    </children>
+
+	    <children xsi:type="ft:RedundancyVariationPoint" id="7" name="Power Failure" start="1" end="5" formula="N-2">
+	      	<children xsi:type="ft:BasicEventSet" id="8" name="Power Unit Failure" quantity="5">
+          		<probability xsi:type="ft:FailureRate" value="0.0001"/>
+        	</children>
+	    </children>
+	</children>
+  </topEvent>
+</ft:FuzzTree>

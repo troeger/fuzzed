@@ -516,6 +516,33 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             return this._super();
         }
     });
+	
+	var TextField = Property.extend({
+		notEmpty: false,
+		
+        menuEntryClass: function() {
+            return PropertyMenuEntry.TextArea;
+        },
+		
+        validate: function(value, validationResult) {
+            if (typeof value !== 'string') {
+                validationResult.kind    = TypeError;
+                validationResult.message = 'value must be string';
+                return false;
+            } else if (this.notEmpty && value === '') {
+                validationResult.kind    = ValueError;
+                validationResult.message = 'value must not be empty';
+                return false;
+            }
+            return true;
+        },
+
+        _sanitize: function() {
+            this.value = typeof this.value === 'undefined' ? this.default : this.value;
+            return this._super();
+        }
+		
+	});
 
     var Transfer = Property.extend({
         UNLINK_VALUE: -1,
@@ -615,6 +642,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             case 'numeric':  return new Numeric(node, definition);
             case 'range':    return new Range(node, definition);
             case 'text':     return new Text(node, definition);
+			case 'textfield':return new TextField(node, definition);
             case 'transfer': return new Transfer(node, definition);
 
             default: throw ValueError('unknown property kind ' + definition.kind);
@@ -622,15 +650,16 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
     };
 
     return {
-        Bool:     Bool,
-        Choice:   Choice,
-        Compound: Compound,
-        Epsilon:  Epsilon,
-        Numeric:  Numeric,
-        Property: Property,
-        Range:    Range,
-        Text:     Text,
-        Transfer: Transfer,
+        Bool:      Bool,
+        Choice:    Choice,
+        Compound:  Compound,
+        Epsilon:   Epsilon,
+        Numeric:   Numeric,
+        Property:  Property,
+        Range:     Range,
+        Text:      Text,
+		TextField: TextField,
+        Transfer:  Transfer,
 
         from: from
     };
