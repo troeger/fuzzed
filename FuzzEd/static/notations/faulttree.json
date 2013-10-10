@@ -20,6 +20,17 @@
 
             "properties": {}
         },
+        
+        "stickynote": {
+            "nodeDisplayName": "Sticky Note",
+            "inherits": "node",
+
+            "properties": {
+                "text": {
+                    "kind": "text",
+                }
+            }
+        },
 
         "event": {
             "nodeDisplayName": "Event",
