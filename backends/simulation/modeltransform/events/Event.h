@@ -1,5 +1,6 @@
 #pragma once
 #include "FaultTreeNode.h"
+#include <cassert>
 
 typedef float FuzzyNumber;
 

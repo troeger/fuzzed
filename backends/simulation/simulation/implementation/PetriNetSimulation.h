@@ -36,6 +36,8 @@ protected:
 	void tryTimedTransitions(PetriNet* pn, int tick);
 	void tryImmediateTransitions(PetriNet* pn, int tick, bool& immediateOnly);
 
+	void tidyUp() override;
+
 	std::string m_outputFileName;
 	std::ofstream* m_outStream;
 	std::ofstream* m_debugOutStream;

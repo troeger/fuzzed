@@ -44,6 +44,8 @@ public:
 	virtual bool run() = 0;
 
 protected:
+	virtual void tidyUp() = 0;
+
 	boost::filesystem::path m_netFile;
 	std::shared_ptr<FaultTreeNode> m_faultTree;
 	

@@ -1,6 +1,7 @@
 #include "Event.h"
 #include "Constants.h"
 #include "util.h"
+#include <cassert>
 
 Event::Event(const std::string& ID, long double failureRate, const std::string& name/* = ""*/)
 	: FaultTreeNode(ID, name), m_failureRate(failureRate)
