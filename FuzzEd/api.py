@@ -477,38 +477,6 @@ def redos(request, graph_id):
         #TODO Perform top command on redo stack
         return HttpResponseNoResponse()
 
-@csrf_exempt
-@require_http_methods(['GET', 'POST'])
-@transaction.commit_on_success
-@never_cache
-def job_data(request, job_id):
-    """
-    Allows to fetch the data for an existing job via GET, and to POST the according result data.
-    The Job object is expected to be already created by another API call.
-    Typically, this function should be called by backend servers when they get a notification
-    for doing some work.
-    """
-    job = get_object_or_404(Job, pk=job_id)
-    if request.method == 'GET':
-        response = HttpResponse()
-        logger.debug("Delivering job %d data to requestor"%job.pk)
-        if job.kind in (Job.CUTSETS_JOB, Job.TOP_EVENT_JOB):
-            response.content = job.graph.to_xml()
-            response['Content-Type'] = 'application/xml'
-        elif job.kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB):
-            response.content = job.graph.to_tikz()
-            response['Content-Type'] = 'application/text'
-        else:
-            raise HttpResponseBadRequestAnswer()
-        return response
-    elif request.method == 'POST':
-        logger.debug("Storing result data for job %d"%job.pk)
-        # Retrieve binary file and store it
-        fileData = request.POST.get('file')
-        job.result = fileData
-        job.save()
-        return HttpResponse()        
-
 @login_required
 @csrf_exempt
 @require_http_methods(['GET'])
@@ -558,4 +526,29 @@ def job_status(request, job_id):
         return HttpResponse(job.result) 
     else:       
         return HttpResponse(status=202)
+
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def job_files(request, job_secret):
+    ''' Allows to retrieve a job input file (GET), or to upload job result files (POST).
+        This method is expected to only be used by our backend daemon script, 
+        which gets the complete URL including shared secret as part of the PostgreSQL notification message.
+        This reduces the security down to the ability of connecting to the PostgreSQL database,
+        otherwise the job URL cannot be determined.
+    '''
+    job = get_object_or_404(Job, secret=job_secret)
+    if request.method == 'GET':
+        logger.debug("Delivering input data for job %d"%job.pk)
+        response = HttpResponse()
+        response.content, response['Content-Type'] = job.input_data()
+        return response
+    elif request.method == 'POST':
+        logger.debug("Storing result data for job %d"%job.pk)
+        if job.kind != Job.PING_JOB:
+            # Retrieve binary file and store it
+            fileData = request.POST.get('file')
+            job.result = fileData
+        job.done = True
+        job.save()
+        return HttpResponse()        
 

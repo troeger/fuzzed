@@ -2,6 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from FuzzEd.models import Job
+from FuzzEd import settings
 
 from django.contrib import admin
 admin.autodiscover()
@@ -56,6 +57,7 @@ urlpatterns = patterns('',
         'FuzzEd.api.job_create', {'job_kind': Job.TOP_EVENT_JOB}, name='analyze_top_event_probability'),
 
     # jobs
+    url(r'^api/jobs/(?P<job_secret>\w+)/files$', 'FuzzEd.api.job_files', name='job_files'),
     url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.job_status', name='job_status'),
 )
 urlpatterns += staticfiles_urlpatterns()
