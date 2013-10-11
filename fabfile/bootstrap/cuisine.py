@@ -1089,9 +1089,9 @@ def python_package_install_pip(package=None,r=None,pip=None):
 	'''
 	pip=pip or fabric.api.env.get('pip','pip')
 	if package:
-		return run('%s install %s' %(pip,package))
+		return sudo('%s install %s' %(pip,package))
 	elif r:
-		return run('%s install -r %s' %(pip,r))
+		return sudo('%s install -r %s' %(pip,r))
 	else:
 		raise Exception("Either a package name or the requirements file has to be provided.")
 
