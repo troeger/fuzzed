@@ -9,7 +9,7 @@ def dev():
 
     # Install Python packages, independent from OS
     print "Installing Python packages..."
-    for package in ["django", "south", "openid2rp", "django-require", "pyxb", "django-less"]:
+    for package in ["django", "south", "openid2rp", "django-require", "pyxb", "django-less", "poster"]:
         print "Installing "+package
         cuisine.python_package_ensure(package)        
 
@@ -94,7 +94,7 @@ def web():
 @task 
 def backend():
     '''Installs all software needed to make the machine a backend machine.'''
-    for package in ["pyxb"]:
+    for package in ["pyxb","poster"]:
         cuisine.python_package_ensure(package)        
     if platform.system() != 'Darwin':
         cuisine.package_ensure("texlive")

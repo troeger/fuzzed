@@ -7,6 +7,8 @@ from FuzzEd import settings
 from django.contrib import admin
 admin.autodiscover()
 
+re_uuid = "[0-F]{8}-[0-F]{4}-[0-F]{4}-[0-F]{4}-[0-F]{12}"
+
 urlpatterns = patterns('',
     # admin
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
@@ -57,7 +59,7 @@ urlpatterns = patterns('',
         'FuzzEd.api.job_create', {'job_kind': Job.TOP_EVENT_JOB}, name='analyze_top_event_probability'),
 
     # jobs
-    url(r'^api/jobs/(?P<job_secret>\w+)/files$', 'FuzzEd.api.job_files', name='job_files'),
     url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.job_status', name='job_status'),
+    url(r'^api/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.job_files', name='job_files'),
 )
 urlpatterns += staticfiles_urlpatterns()

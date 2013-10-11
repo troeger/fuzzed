@@ -490,11 +490,6 @@ def job_create(request, graph_id, job_kind):
     else:
         graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
-    # store job information for this graph
-    if job_kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB, Job.TOP_EVENT_JOB, Job.CUTSETS_JOB):
-        data = graph.to_xml();
-    else:
-        raise HttpResponseBadRequestAnswer()
     job = Job(graph=graph, kind=job_kind)
     job.save()
 
@@ -544,10 +539,9 @@ def job_files(request, job_secret):
         return response
     elif request.method == 'POST':
         logger.debug("Storing result data for job %d"%job.pk)
-        if job.kind != Job.PING_JOB:
-            # Retrieve binary file and store it
-            fileData = request.POST.get('file')
-            job.result = fileData
+        # Retrieve binary file and store it
+        assert(len(request.FILES.values())==1)
+        job.result = request.FILES.values()[0]
         job.done = True
         job.save()
         return HttpResponse()        

@@ -9,10 +9,15 @@ and is generated through 'fab build.configs' from the central settings file.
 If you want this thing on a development machine for backend services, use 'fab run.backend'.
 '''
 
-import ConfigParser, sys, psycopg2, select, logging, urllib2
+import ConfigParser, sys, psycopg2, select, logging, urllib2, tempfile, shutil, os
+from poster.encode import multipart_encode
+from poster.streaminghttp import register_openers
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')
+
+# Register the streaming http handlers from poster package with urllib2
+register_openers()
 
 def server():
     # Read configuration
@@ -52,17 +57,31 @@ def server():
             if notify.channel in backends.keys():
                 try:
                     logger.debug(str(notify)) 
-                    # The server sends us the job URL as payload, so we can GET the input file and PUT the output files
-                    if notify.channel == 'ping':
-                        # The only intention of this job type is heartbeats, so there only an empty result PUT
-                        urllib2.urlopen(notify.payload, data='')
-                        pass
-                    else:
-                        # TODO run executable from configuration dictionary
-                        pass
+                    tmpdir = tempfile.mkdtemp()
+                    tmpfile = tempfile.NamedTemporaryFile(dir=tmpdir, delete=False)
+                    joburl = notify.payload
+                    # Fetch input data and store it
+                    input_data = urllib2.urlopen(joburl)
+                    tmpfile.write(input_data.read())
+                    tmpfile.close()
+                    # There trick is that we do not need to know the operational details of this job here,
+                    # since the calling convention comes from daemon.ini and the input file format is determined
+                    # by the web server on download.
+                    # Alle backend executables are just expected to follow the same command-line pattern as render.py.
+                    cmd = "%s %s %s %s"%(backends[notify.channel]['executable'], tmpdir, tmpfile.name, backends[notify.channel]['output'])
+                    logger.info("Running "+cmd)
+                    os.system(cmd)
+                    # Upload result file(s) with poster library, which fixes the multipart encoding for us
+                    logger.info("Uploading result to "+joburl)
+                    output_file = backends[notify.channel]['output']
+                    datagen, headers = multipart_encode({output_file: open(tmpdir+os.sep+output_file, "rb")})
+                    request = urllib2.Request(joburl, datagen, headers)
+                    urllib2.urlopen(request)                    
                 except Exception as e:
                     logger.debug('Error: '+str(e))
                     pass
+                finally:
+                    shutil.rmtree(tmpdir, ignore_errors=True)
 
 if __name__ == '__main__':
     server()
