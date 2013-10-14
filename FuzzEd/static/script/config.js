@@ -71,8 +71,6 @@ define(['underscore'], function() {
          *    {String} TRANSFERS_URL             - Part of the sub-URL used to perform transferable specific API calls.
          *    {String} CUTSETS_URL               - Part of the sub-URL used to perform cutset-specific API calls.
          *    {String} TOP_EVENT_PROBABILITY_URL - Part of the sub-URL used to top event calculation API calls.
-         *    {String} PDF_DOWNLOAD_URL          - Part of the sub-URL used to perform graph PDF download API calls.
-         *    {String} EPS_DOWNLOAD_URL          - Part of the sub-URL used to perform graph EPS download API calls.
          */
         Backend: {
             ANALYSIS_URL:              '/analysis',
@@ -84,7 +82,7 @@ define(['underscore'], function() {
             TRANSFERS_URL:             '/transfers',
             CUTSETS_URL:               '/cutsets',
             TOP_EVENT_PROBABILITY_URL: '/topEventProbability',
-            GRAPH_DOWNLOAD_URL:        '/graph_download'
+            GRAPH_EXPORT_URL:          '/exports'
         },
 
         /**
@@ -256,8 +254,8 @@ define(['underscore'], function() {
             ACTION_GRID_TOGGLE:        'FuzzEdActionGridToggle',
             ACTION_CUTSETS:            'FuzzEdActionCutsets',
             ACTION_ANALYTICAL:         'FuzzEdActionAnalytical',            
-            ACTION_DOWNLOAD_PDF:       'FuzzEdActionDownloadPDF',
-            ACTION_DOWNLOAD_EPS:       'FuzzEdActionDownloadEPS',
+            ACTION_EXPORT_PDF:         'FuzzEdActionExportPDF',
+            ACTION_EXPORT_EPS:         'FuzzEdActionExportEPS',
             PROGRESS_INDICATOR:        'FuzzEdProgressIndicator',
             SAVE_INDICATOR:            'FuzzEdSaveIndicator',            
             ERROR_INDICATOR:           'FuzzEdErrorIndicator'

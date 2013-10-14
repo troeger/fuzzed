@@ -59,8 +59,8 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 .on(Config.Events.GRAPH_EDGE_ADDED,         this.graphEdgeAdded.bind(this))
                 .on(Config.Events.GRAPH_EDGE_DELETED,       this.graphEdgeDeleted.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_CUTSETS, this.calculateCutsets.bind(this))
-                .on(Config.Events.EDITOR_DOWNLOAD_PDF,      this.downloadPDF.bind(this))
-                .on(Config.Events.EDITOR_DOWNLOAD_EPS,      this.downloadEPS.bind(this))
+                .on(Config.Events.EDITOR_GRAPH_EXPORT_PDF,  this.graphExport.bind(this))
+                .on(Config.Events.EDITOR_GRAPH_EXPORT_EPS,  this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY, this.calculateTopEventProbability.bind(this));
             return this;
         },
@@ -88,8 +88,8 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 .off(Config.Events.GRAPH_NODE_DELETED)
                 .off(Config.Events.GRAPH_EDGE_ADDED)
                 .off(Config.Events.GRAPH_EDGE_DELETED)
-                .off(Config.Events.EDITOR_DOWNLOAD_PDF)   
-                .off(Config.Events.EDITOR_DOWNLOAD_EPS)                
+                .off(Config.Events.EDITOR_GRAPH_EXPORT_PDF)   
+                .off(Config.Events.EDITOR_GRAPH_EXPORT_EPS)                
                 .off(Config.Events.EDITOR_CALCULATE_CUTSETS)
                 .off(Config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY);
             return this;
@@ -370,9 +370,9 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
             });
         },
 
-        downloadPDF: function(event, success, error, complete) {
+        graphExport: function(event, success, error, complete) {
             jQuery.ajax({
-                url:    this._fullUrlForDownload('pdf'),
+                url:    this._fullUrlForExport(event),
                 // don't show progress
                 global: false,
 
@@ -386,31 +386,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 },
 
                 error: function(jqXHR, errorStatus, errorThrown) {
-                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
-                    Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
-                    (error || jQuery.noop).apply(arguments);
-                },
-                complete: complete || jQuery.noop
-            });
-        },
-
-        downloadEPS: function(event, success, error, complete) {
-            jQuery.ajax({
-                url:    this._fullUrlForDownload('eps'),
-                // don't show progress
-                global: false,
-
-                statusCode: {
-                    201: function(data, status, req) {
-                        var jobUrl = req.getResponseHeader('location');
-                        if (typeof success !== 'undefined') {
-                            success(new Job(jobUrl));
-                        }
-                    }
-                },
-
-                error: function(jqXHR, errorStatus, errorThrown) {
-                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
+                    var message = jqXHR.responseText || errorThrown || 'Sorry, export failed, could not connect to backend.';
                     Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
@@ -518,15 +494,25 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
         },
 
         /**
-         * Method: _fullUrlForDownload
+         * Method: _fullUrlForExport
          *
-         * Calculates the AJAX backend URL for graph downloads.
+         * Calculates the AJAX backend URL for graph export.
          *
          * Returns:
-         *   The download URL as {String}.
+         *   The export URL as {String}.
          */
-        _fullUrlForDownload: function(downloadType) {
-            return this._fullUrlForGraph() + Config.Backend.GRAPH_DOWNLOAD_URL + '?format='+downloadType;
+        _fullUrlForExport: function(event) {
+            if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_PDF) {
+                exportType = 'pdf';
+            }
+            else if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_EPS) {
+                exportType = 'eps';
+            }
+            else {
+                //TODO: Raise a meaningful exception here
+                exportType = 'invalid';
+            }
+            return this._fullUrlForGraph() + Config.Backend.GRAPH_EXPORT_URL + '/'+exportType;
         },
 
 

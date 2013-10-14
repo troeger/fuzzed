@@ -6,7 +6,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
     /**
      *  Class: CutsetsMenu
-     *
+     *∂DOW
      *  A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
      *  cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
      *
@@ -113,6 +113,79 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             this._super();
             return this;
         }
+    });
+
+
+    /**
+     *  Class: DownloadMenu
+     *∂DOW
+     *  A menu for displaying available actions for a download that was fetched from a job result.
+     *
+     *  Extends: <Base::Menus::Menu>
+     */
+    var DownloadMenu = Menus.Menu.extend({
+        /**
+         *  Group: Members
+         *
+         *  Properties:
+         *    {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
+         */
+        _editor: undefined,
+
+        /**
+         *  Group: Initialization
+         */
+
+        /**
+         *  Constructor: init
+         *    Sets up the menu.
+         *
+         *  Parameters:
+         *    {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
+         */
+        init: function(editor) {
+            this._super();
+            this._editor = editor;
+        },
+
+        /**
+         *  Method: _setupContainer
+         *    Sets up the DOM container element for this menu and appends it to the DOM.
+         *
+         *  Returns:
+         *    A jQuery object of the container.
+         */
+        _setupContainer: function() {
+            // TODO: Make this optional in the super class
+            return jQuery('#' + FaulttreeConfig.IDs.CONTENT);
+        },
+
+        /**
+         *  Group: Actions
+         */
+
+        show: function(job) {
+            job.successCallback  = this._localDownload.bind(this);
+            job.updateCallback   = this._displayProgress.bind(this);
+            //job.errorCallback    = this._displayNetworkError.bind(this);
+            //job.notFoundCallback = this._displayNotFoundError.bind(this);
+            job.queryInterval    = 500;
+
+            this._job = job;
+            job.start();
+
+            this._super();
+            return this;
+        },
+
+        _localDownload: function(data) {
+            alert("Job done, got "+data.responseText.length+" bytes of something.");
+        },
+
+        _displayProgress: function(data) {
+            alert("progress");
+        },
+
     });
 
     var ProbabilityMenu = Menus.Menu.extend({
@@ -715,6 +788,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         cutsetsMenu:     undefined,
         probabilityMenu: undefined,
+        downloadMenu:    undefined,
 
         /**
          *  Group: Initialization
@@ -757,9 +831,12 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         _loadGraphCompleted: function(readOnly) {
             //this.cutsetsMenu     = new CutsetsMenu(this);
             this.probabilityMenu = new ProbabilityMenu(this);
+            this.downloadMenu = new DownloadMenu(this);
 
             this._setupCutsetsAction();
             this._setupAnalyticalAction();
+            this._setupExportPDFAction();
+            this._setupExportEPSAction();
 
             return this._super(readOnly);
         },
@@ -782,17 +859,27 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             return this;
         },
 
-        _setupDownloadPDFAction: function() {
-            jQuery("#"+this.config.IDs.ACTION_DOWNLOAD_PDF).click(function() {
+        _setupExportPDFAction: function() {
+            jQuery("#"+this.config.IDs.ACTION_EXPORT_PDF).click(function() {
                 jQuery(document).trigger(
-                    this.config.Events.EDITOR_CALCULATE_CUTSETS,
-                    this.cutsetsMenu.show.bind(this.cutsetsMenu)
-                );
+                    this.config.Events.EDITOR_GRAPH_EXPORT_PDF,
+                    this.downloadMenu.show.bind(this.downloadMenu)
+                )
             }.bind(this));
 
             return this;
         },
 
+        _setupExportEPSAction: function() {
+            jQuery("#"+this.config.IDs.ACTION_EXPORT_EPS).click(function() {
+                jQuery(document).trigger(
+                    this.config.Events.EDITOR_GRAPH_EXPORT_EPS,
+                    this.downloadMenu.show.bind(this.downloadMenu)
+                )
+            }.bind(this));
+
+            return this;
+        },
 
         /**
          *  Method: _setupAnalyticalAction

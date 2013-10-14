@@ -147,16 +147,6 @@ def graph_download(request, graph_id):
         response.content = graph.to_json()
         response['Content-Type'] = 'application/javascript'
         response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
-    elif export_format == 'pdf':
-        # Create new rendering job and redirect to status
-        job = Job(graph=graph, kind=Job.PDF_RENDERING_JOB)
-        job.save()
-        response['Location'] = reverse('job_status', args=[job.pk])
-    elif export_format == 'eps':
-        # Create new rendering job and redirect to status
-        job = Job(graph=graph, kind=Job.EPS_RENDERING_JOB)
-        job.save()
-        response['Location'] = reverse('job_status', args=[job.pk])
     elif export_format == 'tex':
         response.content = graph.to_tikz()
         response['Content-Type'] = 'application/text'

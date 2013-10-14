@@ -34,6 +34,12 @@ urlpatterns = patterns('',
     url(r'^api/graphs/(?P<graph_id>\d+)/transfers$', 'FuzzEd.api.graph_transfers', name='graph_transfers'),
     url(r'^api/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.graph_download', name='graph_download'),
 
+    # exports (graph downloads that return a job location instead of the direct result)
+    url(r'^api/graphs/(?P<graph_id>\d+)/exports/pdf$', 
+        'FuzzEd.api.job_create', {'job_kind': Job.PDF_RENDERING_JOB}, name='export_pdf'),
+    url(r'^api/graphs/(?P<graph_id>\d+)/exports/eps$', 
+        'FuzzEd.api.job_create', {'job_kind': Job.EPS_RENDERING_JOB}, name='export_eps'),
+
     # node
     url(r'^api/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.nodes', name='nodes'),
     url(r'^api/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$', 'FuzzEd.api.node', name='node'),
