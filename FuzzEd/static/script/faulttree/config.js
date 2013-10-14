@@ -23,6 +23,8 @@ define(['config', 'jquery'], function(Config) {
         Events: {
             EDITOR_CALCULATE_CUTSETS:               'editor-calculate-cutsets',
             EDITOR_CALCULATE_TOP_EVENT_PROBABILITY: 'editor-calculate-topevent-probability'
+            EDITOR_DOWNLOAD_PDF:                    'editor-download-pdf'
+            EDITOR_DOWNLOAD_EPS:                    'editor-download-eps'
         },
 
         /**

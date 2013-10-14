@@ -782,6 +782,18 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             return this;
         },
 
+        _setupDownloadPDFAction: function() {
+            jQuery("#"+this.config.IDs.ACTION_DOWNLOAD_PDF).click(function() {
+                jQuery(document).trigger(
+                    this.config.Events.EDITOR_CALCULATE_CUTSETS,
+                    this.cutsetsMenu.show.bind(this.cutsetsMenu)
+                );
+            }.bind(this));
+
+            return this;
+        },
+
+
         /**
          *  Method: _setupAnalyticalAction
          *    Registers the click handler for the 'analytical analysis' menu entry. Clicking will
