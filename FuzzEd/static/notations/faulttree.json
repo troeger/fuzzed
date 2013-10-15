@@ -10,6 +10,7 @@
             "allowConnectionTo": [],
 
             "deletable": true,
+            "resizable": false,
 
             "connector": {
                 "offset": {
@@ -24,8 +25,10 @@
         "stickyNote": {
             "nodeDisplayName": "Sticky Note",
             "inherits": "node",
+            "numberOfOutgoingConnections": 0,
             "image": "sticky_note.html",
-
+            "resizable": true,
+            
             "properties": {
               "description": {
                   "kind": "textfield",

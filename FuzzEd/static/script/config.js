@@ -147,7 +147,9 @@ define(['underscore'], function() {
             NO_PRINT:                'no-print',
 
             PROPERTY_WARNING:        'error',
-            PROPERTY_OPEN_BUTTON:    'fuzzed-property-open'
+            PROPERTY_OPEN_BUTTON:    'fuzzed-property-open',
+			DRAGGABLE_WRAP_DIV: 	 'draggableDiv',
+			STICKY_NOTE:			 'sticky_note',   
         },
 
         /**

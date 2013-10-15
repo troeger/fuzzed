@@ -98,6 +98,7 @@ function(Property, Mirror, Canvas, Class) {
                 ._setupEndpoints()
                 // Interaction
                 ._setupDragging()
+				._setupResizable()
                 ._setupMouse()
                 ._setupSelection()
                 ._setupProperties(propertiesDisplayOrder)
@@ -498,6 +499,23 @@ function(Property, Mirror, Canvas, Class) {
 
             return this;
         },
+		
+		/*
+		 * Method: _setupResizable
+		 *
+		 * This initialization method is called in the constructor and is responsible for setting up the resizing of a node.
+		 * Until now the resizing functionality is intended only for use in resizing sticky notes on the canvas.
+		 *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+		 */
+		_setupResizable: function(){
+			
+			if(!this.resizable) return this;
+			
+			this.container.find('.'+ this.config.Classes.STICKY_NOTE).resizable();
+			return this;
+		},
 
         /**
          *  Group: Event Handling
