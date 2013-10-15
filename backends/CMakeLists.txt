@@ -249,6 +249,7 @@ set(COMMON_SOURCES
 	${COMMON_DIR}/faulttree.cpp
 	${COMMON_DIR}/fuzztree.cpp
 	${COMMON_DIR}/CommandLineParser.cpp
+	${COMMON_DIR}/AbstractResultDocument.cpp
 )
 
 set(COMMON_HEADERS
@@ -259,6 +260,7 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/faulttree.h
 	${COMMON_DIR}/fuzztree.h
 	${COMMON_DIR}/CommandLineParser.h
+	${COMMON_DIR}/AbstractResultDocument.h
 )
 
 set(COMMON_LINKED_LIBS
