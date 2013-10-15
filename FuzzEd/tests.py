@@ -47,7 +47,7 @@ class FuzzTreesTestCase(LiveServerTestCase):
         assert('Location' in response)
         jobUrl = response['Location']
         code = 202
-        print "Waiting for result .",
+        print "Waiting for result from "+jobUrl,
         while (code == 202):
             response=self.ajaxGet(jobUrl)
             code = response.status_code 
@@ -60,7 +60,8 @@ class FuzzTreesTestCase(LiveServerTestCase):
             Returns the analysis result as dictionary as received by the frontend.
         """
         url=self.ajaxGet('/api/graphs/%u/analysis/topEventProbability'%graph_id)
-        return json.loads(self.requestJob(url))
+        data = self.requestJob(url)
+        return json.loads(data)
 
 class BasicApiTestCase(FuzzTreesTestCase):
     fixtures = ['basic.json']
@@ -164,7 +165,7 @@ class BackendTestCase(FuzzTreesTestCase):
         self.assertEqual(result['configurations'][0]['alphaCuts']['1.0'],[0.5, 0.5])
         self.assertEqual(result['configurations'][1]['alphaCuts']['1.0'],[0.4, 0.4])
 
-    def _testIssue150(self):
+    def testIssue150(self):
         result=self.requestAnalysis(4)
         # This tree can lead to a k=0 redundancy configuration, which is not allowed
         self.assertEqual(result['validResult'],False)

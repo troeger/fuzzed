@@ -38,6 +38,7 @@ def server():
             logger.info("Using test database")
             conf.readfp(open('./daemon.ini'))
             conf.set('db','db_name', conf.get('db','db_test_name'))
+            # And now we make sure that the received Job URL is patched
             patch_host = True
         else:
             # Use provided INI file
@@ -56,7 +57,8 @@ def server():
     conn = psycopg2.connect("host=%(db_host)s dbname=%(db_name)s user=%(db_user)s password=%(db_password)s"%options)
     conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()
-    logger.info("Notification from:"+str(conn.dsn))
+    logger.debug("Notification from:"+str(conn.dsn))
+
     # Set listen mode for the job kinds we know from our configuration
     for channel in backends.keys():
         cursor.execute("LISTEN %s;"%channel)
@@ -78,6 +80,7 @@ def server():
                     joburl = notify.payload
                     if patch_host:
                         joburl = joburl.replace("localhost:8000","localhost:8081")
+                    logger.info("Working for job URL: "+joburl)
                     # Fetch input data and store it
                     input_data = urllib2.urlopen(joburl)
                     tmpfile.write(input_data.read())
@@ -92,7 +95,13 @@ def server():
                     # Upload result file(s) with poster library, which fixes the multipart encoding for us
                     logger.info("Uploading result to "+joburl)
                     output_file = backends[notify.channel]['output']
-                    datagen, headers = multipart_encode({output_file: open(tmpdir+os.sep+output_file, "rb")})
+                    if output_file.startswith("*"):
+                        suffix = output_file[1:]
+                        results = {fname: open(tmpdir+"/"+fname, "rb") for fname in os.listdir(tmpdir) if fname.endswith(suffix)}
+                    else:
+                        results = {output_file: open(tmpdir+os.sep+output_file, "rb")}
+                    logger.debug("Sending results: "+str(results))
+                    datagen, headers = multipart_encode(results)
                     request = urllib2.Request(joburl, datagen, headers)
                     urllib2.urlopen(request)                    
                 except Exception as e:
