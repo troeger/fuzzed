@@ -448,7 +448,7 @@ std::vector<fuzztree::FuzzTree> FuzzTreeTransform::transform()
 		vector<fuzztree::FuzzTree> results;
 		if (!m_fuzzTree.get())
 		{
-			cout << "Invalid Fuzztree." << endl;
+			std::cerr << "Invalid Fuzztree." << endl;
 			return results;
 		}
 
@@ -456,15 +456,15 @@ std::vector<fuzztree::FuzzTree> FuzzTreeTransform::transform()
 		generateConfigurations(configs);
 
 		int indent = 0;
-		treeHelpers::printTree(m_fuzzTree->topEvent(), indent);
-		cout << endl << " ...... configurations: ...... " << endl;
+		// treeHelpers::printTree(m_fuzzTree->topEvent(), indent);
+		// cout << endl << " ...... configurations: ...... " << endl;
 
 		for (const auto& instanceConfiguration : configs)
 		{
 			auto ft = generateVariationFreeFuzzTree(instanceConfiguration);
 			indent = 0;
-			treeHelpers::printTree(ft.topEvent(), indent);
-			cout << endl;
+// 			treeHelpers::printTree(ft.topEvent(), indent);
+// 			cout << endl;
 
 			results.emplace_back(ft);
 		}
@@ -473,15 +473,15 @@ std::vector<fuzztree::FuzzTree> FuzzTreeTransform::transform()
 	}
 	catch (xsd::cxx::exception& e)
 	{
-		cout << "Parse Error: " << e.what() << endl;
+		std::cerr << "Parse Error: " << e.what() << endl;
 	}
 	catch (std::exception& e)
 	{
-		cout << "Error during FuzzTree Transformation: " << e.what() << endl;
+		std::cerr << "Error during FuzzTree Transformation: " << e.what() << endl;
 	}
 	catch (...)
 	{
-		cout << "Unknown Error during FuzzTree Transformation" << endl;
+		std::cerr << "Unknown Error during FuzzTree Transformation" << endl;
 	}
 
 	return vector<fuzztree::FuzzTree>();

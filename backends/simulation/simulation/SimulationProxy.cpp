@@ -50,11 +50,11 @@ SimulationProxy::SimulationProxy(int argc, char** arguments) :
 	}
 	catch (const exception& e)
 	{
-		cout << "Exception when invoking simulation: " << e.what();
+		std::cerr << "Exception when invoking simulation: " << e.what();
 	}
 	catch (...)
 	{
-		cout << "Unknown exception when invoking simulation";
+		std::cerr << "Unknown exception when invoking simulation";
 	}
 }
 
@@ -106,8 +106,6 @@ bool SimulationProxy::runSimulationInternal(const fs::path& p, SimulationImpl im
 	bool success = false;
 	try
 	{
-// uncomment to do one simulation run for all possible numbers of threads
-// #define MEASURE_SPEEDUP true
 #ifdef MEASURE_SPEEDUP
 		for (int i : boost::counting_range(1, omp_get_max_threads()))
 		{
@@ -190,7 +188,7 @@ void SimulationProxy::parseCommandline(int numArguments, char** arguments)
 		if (!is_directory(dirPath))
 			throw runtime_error("Not a directory: " + directoryName);
 
-		cout << "Simulating all files in directory " << dirPath.generic_string() << endl;
+		// cout << "Simulating all files in directory " << dirPath.generic_string() << endl;
 		fs::directory_iterator it(dirPath), eod;
 		BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))   
 		{
@@ -210,7 +208,9 @@ void SimulationProxy::parseCommandline(int numArguments, char** arguments)
 
 void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool simulatePetriNet)
 {	
-	cout << "Simulating..." << endl;
+	// TODO: make this file ending oblivious
+
+	// cout << "Simulating..." << endl;
 	
 	auto ext = p.generic_string();
 	ext = ext.substr(ext.find_last_of("."), ext.length());
@@ -227,11 +227,14 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 	else if (ext == faultTree::FAULT_TREE_EXT)
 	{
 		ifstream file(p.generic_string(), ios::in | ios::binary);
-		if (!file.is_open()) throw runtime_error("Could not open file");
+		if (!file.is_open())
+		{
+			std::cerr << "Could not open file: " << p.generic_string() << std::endl;
+		}
 
 		const auto simTree = faulttree::faultTree(file, xml_schema::Flags::dont_validate);
 		std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
-		ft->print(cout);
+		// ft->print(cout);
 
 		string newFileName = p.generic_string();
 		util::replaceFileExtensionInPlace(newFileName, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
@@ -253,7 +256,7 @@ void SimulationProxy::simulateFaultTree(std::shared_ptr<TopLevelEvent> ft, const
 	std::shared_ptr<PNDocument> doc;
 
 	m_missionTime = ft->getMissionTime();
-	if (m_missionTime <= 1)
+	if (m_missionTime <= 1) // TODO: print simulation warning here!
 		std::cout 
 			<< "Warning: Components are assumed to fail one at the time."
 			<< "For a very short mission time, possible failures may never occur." 
@@ -271,7 +274,7 @@ void SimulationProxy::simulateFaultTree(std::shared_ptr<TopLevelEvent> ft, const
 	case STRUCTUREFORMULA_ONLY:
 		auto TNdoc = std::shared_ptr<TNDocument>(new TNDocument());
 		ft->serializeTimeNet(TNdoc);
-		std::cout << ft->serializeAsFormula(TNdoc) << endl;
+		std::cout << ft->serializeAsFormula(TNdoc) << endl; // TODO: provide a StructureFormulaResultDocument
 		doc = TNdoc;
 		break;
 	}
@@ -295,7 +298,7 @@ void SimulationProxy::simulateAllConfigurations(const fs::path &p, SimulationImp
 		std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.topEvent()); 
 		std::string newFileName = p.generic_string();
 		util::replaceFileExtensionInPlace(newFileName, util::toString(++i) + ((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT));
-		simTree->print(cout);
+		// simTree->print(cout);
 		simulateFaultTree(simTree, newFileName, impl);
 	}
 }
