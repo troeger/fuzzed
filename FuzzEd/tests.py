@@ -145,9 +145,10 @@ class BackendTestCase(FuzzTreesTestCase):
         # Start up backend daemon in testing mode, 
         # so that it connects to the testing database and uses port 8081 of the live test server
         print "Starting backend daemon"
-        os.chdir('backends')
-        self.backend = Popen(["python","daemon.py","--testing"], cwd='../backends/')
+        os.chdir("backends")
+        self.backend = Popen(["python","daemon.py","--testing"])
         time.sleep(2)
+        os.chdir("..")
         super(BackendTestCase, self).setUp()
 
     def tearDown(self):
@@ -175,3 +176,12 @@ class BackendTestCase(FuzzTreesTestCase):
         tmp.write(result)
         output = subprocess.check_output(['file', tmp.name])
         assert('PDF' in output)
+
+    def testEpsExport(self):
+        result = self.requestJob('/api/graphs/1/exports/eps')
+        assert(len(result)>0)
+        tmp = tempfile.NamedTemporaryFile()
+        tmp.write(result)
+        output = subprocess.check_output(['file', tmp.name])
+        print output
+        assert('EPS' in output)
