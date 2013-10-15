@@ -24,7 +24,7 @@
         "stickyNote": {
             "nodeDisplayName": "Sticky Note",
             "inherits": "node",
-            "image": "sticky_note.svg",
+            "image": "sticky_note.html",
 
             "properties": {
               "description": {

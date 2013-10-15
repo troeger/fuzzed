@@ -8,7 +8,9 @@
         {% if not node.excludeFromShapesMenu %}
             {% cycle '<tr>' '' %}
                 <td class="right-tooltip" title="{{ node.help }}">
-                    {% include graph.kind|add:'/'|add:node.image %}
+                    <div class="draggableDiv">
+                      {% include graph.kind|add:'/'|add:node.image %}
+                    </div>  
                     <span>{{ node.nodeDisplayName }}</span>
                 </td>
             {% cycle '' '</tr>' as row_terminator %}
