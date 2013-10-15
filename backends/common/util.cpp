@@ -194,3 +194,17 @@ bool util::bitSet(const int var, const int pos)
 {
 	return (var) & (1<<(pos));
 }
+
+bool util::isWritable(const string& path)
+{
+	FILE *fp = fopen(path.c_str(), "w");
+	if (fp == nullptr)
+	{
+		if (errno == EACCES)
+			std::cerr << "Permission denied" << std::endl;
+		else
+			std::cerr << "Something went wrong: " << strerror(errno) << std::endl;
+		return false;
+	}
+	return true;
+}

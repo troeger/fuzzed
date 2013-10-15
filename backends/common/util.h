@@ -79,6 +79,8 @@ namespace util
 
 	void clearDirectory(const string& dir); // remove all files from dir
 
+	bool isWritable(const string& path);
+
 	/************************************************************************/
 	/* Maths                                                                */
 	/************************************************************************/
