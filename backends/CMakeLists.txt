@@ -63,7 +63,7 @@ set(BOOST_INCLUDEDIR ${BOOST_ROOT}/Include)
 set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
 
 set(Boost_DIR ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
-find_package(Boost 1.48 COMPONENTS # TODO find out which version is really required. Maybe 1.50 would suffice too.
+find_package(Boost 1.48 COMPONENTS
 	date_time
 	system
 	filesystem
@@ -248,6 +248,7 @@ set(COMMON_SOURCES
 	${COMMON_DIR}/FuzzTreeTypes.cpp
 	${COMMON_DIR}/faulttree.cpp
 	${COMMON_DIR}/fuzztree.cpp
+	${COMMON_DIR}/CommandLineParser.cpp
 )
 
 set(COMMON_HEADERS
@@ -257,6 +258,7 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/FuzzTreeTypes.h
 	${COMMON_DIR}/faulttree.h
 	${COMMON_DIR}/fuzztree.h
+	${COMMON_DIR}/CommandLineParser.h
 )
 
 set(COMMON_LINKED_LIBS
