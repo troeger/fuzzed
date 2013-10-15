@@ -11,7 +11,8 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.%(db_type)s', 
-        'NAME':     '%(db_name)s',                        
+        'NAME':     '%(db_name)s',  
+        'TEST_NAME':'%(db_test_name)s',                      
         'USER':     '%(db_user)s',                              
         'PASSWORD': '%(db_password)s',                       
         'HOST':     '%(db_host)s',                                       

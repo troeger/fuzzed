@@ -36,7 +36,7 @@ class Job(models.Model):
     graph = models.ForeignKey(Graph, null=True, related_name='jobs')
     secret  = models.CharField(max_length=64, default=gen_uuid)     
     kind  = models.CharField(max_length=127, choices=JOB_TYPES)
-    done = models.BooleanField(default=False)                               # Backend is done with this, can be deleted after delivery
+    done = models.BooleanField(default=False)                                       # Backend is done with this, can be deleted after delivery
     created = models.DateTimeField(auto_now_add=True, editable=False)
     result = models.FileField(upload_to='jobs', null=True)
 
@@ -57,9 +57,18 @@ def job_post_save(sender, instance, created, **kwargs):
         and upload the input / output files for this job.
     '''
     if created:
+        # The only way to determine our own hostname + port number at runtime in Django
+        # is from an HttpRequest object, which we do not have here. 
+        # Option 1 is to fetch this information from the HttpRequest and somehow move it here.
+        # This works nice as long as LiveServerTestCase is not used, since the Django Test
+        # Client still accesses the http://testserver URL and not the live server URL.
+        # We therefore take the static approach with a setting here, which is overriden
+        # by the test suite run accordingly
+
         #TODO: job_files_url = reverse('job_files', kwargs={'job_secret': instance.secret})
         job_files_url = settings.SERVER + '/api/jobs/'+instance.secret+'/files'
         cursor = connection.cursor()
         cursor.execute("NOTIFY %s, '%s';"%(instance.kind, job_files_url))
+        #print "Notification to: "+str(cursor.db.connection.dsn)
         transaction.commit_unless_managed()
 

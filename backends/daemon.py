@@ -9,7 +9,7 @@ and is generated through 'fab build.configs' from the central settings file.
 If you want this thing on a development machine for backend services, use 'fab run.backend'.
 '''
 
-import ConfigParser, sys, psycopg2, select, logging, urllib2, tempfile, shutil, os
+import ConfigParser, sys, psycopg2, select, logging, urllib2, tempfile, shutil, os, subprocess
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 
@@ -20,13 +20,28 @@ logger = logging.getLogger('FuzzEd')
 register_openers()
 
 def server():
+    # I will burn in hell for this.
+    # There is no smart way to convince the Django code that it delivers the correct URL for a job
+    # if we run the test suite. This is related to the usage of LiveServerTestCase in tests.py.
+    # For this reason, we let the test suite start this code with "--testing" and patch the job host then.
+    patch_host = False
     # Read configuration
     assert(len(sys.argv) < 3)
     conf=ConfigParser.ConfigParser()
     if len(sys.argv) == 1:
+        # Use default INI file in local directory
         conf.readfp(open('./daemon.ini'))
     elif len(sys.argv) == 2:
-        conf.readfp(open(sys.argv[1]))
+        if sys.argv[1] == '--testing':
+            # This is a test suite run, so we take the default INI and patch the database name
+            # to connect to the test database for getting notifications
+            logger.info("Using test database")
+            conf.readfp(open('./daemon.ini'))
+            conf.set('db','db_name', conf.get('db','db_test_name'))
+            patch_host = True
+        else:
+            # Use provided INI file
+            conf.readfp(open(sys.argv[1]))
 
     # Parse list of available backends
     backends = {}
@@ -41,8 +56,7 @@ def server():
     conn = psycopg2.connect("host=%(db_host)s dbname=%(db_name)s user=%(db_user)s password=%(db_password)s"%options)
     conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
     cursor = conn.cursor()
-    logger.info("Connected to PostgreSQL (%s)"%conn.server_version)
-
+    logger.info("Notification from:"+str(conn.dsn))
     # Set listen mode for the job kinds we know from our configuration
     for channel in backends.keys():
         cursor.execute("LISTEN %s;"%channel)
@@ -52,14 +66,18 @@ def server():
         logger.debug("Waiting for work ...")
         select.select([conn],[],[])
         conn.poll()
+        logger.debug("Got data...")
         while conn.notifies:
             notify = conn.notifies.pop()
+            logger.debug("Got notification on channel "+notify.channel)
             if notify.channel in backends.keys():
                 try:
                     logger.debug(str(notify)) 
                     tmpdir = tempfile.mkdtemp()
                     tmpfile = tempfile.NamedTemporaryFile(dir=tmpdir, delete=False)
                     joburl = notify.payload
+                    if patch_host:
+                        joburl = joburl.replace("localhost:8000","localhost:8081")
                     # Fetch input data and store it
                     input_data = urllib2.urlopen(joburl)
                     tmpfile.write(input_data.read())
