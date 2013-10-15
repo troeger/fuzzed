@@ -1,4 +1,4 @@
-#include "ResultDocument.h"
+#include "SimulationResultDocument.h"
 #include "Constants.h"
 
 using namespace pugi;
