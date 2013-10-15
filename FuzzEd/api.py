@@ -528,11 +528,15 @@ def job_files(request, job_secret):
         response.content, response['Content-Type'] = job.input_data()
         return response
     elif request.method == 'POST':
-        logger.debug("Storing result data for job %d"%job.pk)
-        # Retrieve binary file and store it
-        assert(len(request.FILES.values())==1)
-        job.result = request.FILES.values()[0]
-        job.done = True
-        job.save()
-        return HttpResponse()        
+        if job.done:
+            logger.error("Job already done, discarding uploaded results")
+            return HttpResponse() 
+        else:
+            logger.debug("Storing result data for job %d"%job.pk)
+            # Retrieve binary file and store it
+            assert(len(request.FILES.values())==1)
+            job.result = request.FILES.values()[0]
+            job.done = True
+            job.save()
+            return HttpResponse()        
 
