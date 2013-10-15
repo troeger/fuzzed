@@ -3,11 +3,11 @@
 #include "DecomposedFuzzyInterval.h"
 
 // TODO: make this similar to the ResultDocument.h from the simulation sources
-class AnalysisResult : public pugi::xml_document
+class AnalysisResultDocument : public pugi::xml_document
 {
 public:
-	AnalysisResult();
-	virtual ~AnalysisResult() {}
+	AnalysisResultDocument();
+	virtual ~AnalysisResultDocument() {}
 
 	void addError(const std::string& message, const std::string& elementID);
 	void addWarning(const std::string& message, const std::string& elementID);

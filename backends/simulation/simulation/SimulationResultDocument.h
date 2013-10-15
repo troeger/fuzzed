@@ -10,11 +10,11 @@
 
 #include "ResultStruct.h"
 
-class ResultDocument : public pugi::xml_document
+class SimulationResultDocument : public pugi::xml_document
 {
 public:
-	ResultDocument();
-	virtual ~ResultDocument() {}
+	SimulationResultDocument();
+	virtual ~SimulationResultDocument() {}
 
 	void addError(const std::string& message);
 	void addWarning(const std::string& message);

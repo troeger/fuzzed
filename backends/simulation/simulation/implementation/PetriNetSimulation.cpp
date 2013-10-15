@@ -1,7 +1,7 @@
 #include "PetriNetSimulation.h"
 #include "util.h"
 #include "Config.h"
-#include "ResultDocument.h"
+#include "SimulationResultDocument.h"
 #include "petrinet/PNMLImport.h"
 #include "petrinet/PetriNet.h"
 
@@ -25,7 +25,7 @@ bool PetriNetSimulation::run()
 	if (!pn.valid()) 
 		throw runtime_error("Invalid Petri Net.");
 
-	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads..." << std::endl;
+	// cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads..." << std::endl;
 
 	// for checking local convergence, thread-local
 	long double privateLast = 10000.0L;
@@ -38,11 +38,6 @@ bool PetriNetSimulation::run()
 
 	double startTime = omp_get_wtime();
 
-#define NUM_MONTE_CARLO_ROUNDS 1000 
-// #define RELIABILITY_DISTRIBUTION	// compute the entire reliability distribution up to mission time, for statistical tests
-#define OMP_PARALLELIZATION			// use OpenMP to parallelize. alternative: manual (static) work splitting over a number of C++11 threads 
-
-
 #ifdef OMP_PARALLELIZATION
 
 #ifdef RELIABILITY_DISTRIBUTION
@@ -51,7 +46,7 @@ bool PetriNetSimulation::run()
 	ofstream statdoc(fileName);
 	statdoc << std::endl;
 
-	cout << "----- Simulating entire reliability distribution up to mission time " << m_numSimulationSteps << "..." << std::endl;
+	// cout << "----- Simulating entire reliability distribution up to mission time " << m_numSimulationSteps << "..." << std::endl;
 
 	const auto maxTime = m_numSimulationSteps;
 	for (int k = 0; k < maxTime; ++k)
@@ -131,9 +126,6 @@ bool PetriNetSimulation::run()
 		}
 		privateLast = current;
 	}
-// 	const double ompTime = omp_get_wtime() - startTime;
-// 	startTime = omp_get_wtime();
-
 #else
 
 	const int threadNum = omp_get_max_threads();
@@ -184,9 +176,6 @@ bool PetriNetSimulation::run()
 
 	for (int n = 0; n < threadNum; ++n)
 		workers[n].join();
-
-/*	const double cppTime = omp_get_wtime() - startTime;*/
-
 #endif
 	
 	long double unreliability		= (long double)numFailures			/(long double)count;
@@ -385,13 +374,13 @@ void PetriNetSimulation::printResults(const SimulationResult& res)
 	(*m_outStream) << results << endl;
 	m_outStream->close();
 
-	cout << results << endl << endl;
+	// cout << results << endl << endl;
 }
 
 
 void PetriNetSimulation::writeResultXML(const SimulationResult& res)
 {
-	ResultDocument doc;
+	SimulationResultDocument doc;
 	doc.setResult(res);
 	doc.save(m_outputFileName + ".xml");
 }

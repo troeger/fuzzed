@@ -1,11 +1,11 @@
-#include "AnalysisResult.h"
+#include "AnalysisResultDocument.h"
 
 using namespace pugi;
 using std::string;
 
 namespace
 {
-	const char* const ANALYSIS_RESULT = "AnalysisResult";
+	const char* const ANALYSIS_RESULT = "AnalysisResultDocument";
 	const char* const ANALYSIS_ERROR = "AnalysisError";
 	const char* const ANALYSIS_WARNING = "AnalysisWarning";
 	const char* const ISSUE_ID = "issueId";
@@ -25,17 +25,17 @@ namespace
 	const char* const NAMESPACE = ""; // TODO
 }
 
-AnalysisResult::AnalysisResult() : xml_document()
+AnalysisResultDocument::AnalysisResultDocument() : xml_document()
 {
 	initXML();
 }
 
-void AnalysisResult::initXML()
+void AnalysisResultDocument::initXML()
 {
 	m_root = append_child(ANALYSIS_RESULT);
 }
 
-void AnalysisResult::addError(const string& msg, const string& elementID)
+void AnalysisResultDocument::addError(const string& msg, const string& elementID)
 {
 	auto errorNode = m_root.append_child(ANALYSIS_ERROR);
 	errorNode.append_attribute(ELEMENT_ID).set_value(elementID.c_str());
@@ -43,7 +43,7 @@ void AnalysisResult::addError(const string& msg, const string& elementID)
 	errorNode.append_attribute(ISSUE_ID).set_value(++m_errors);
 }
 
-void AnalysisResult::addWarning(const string& msg, const string& elementID)
+void AnalysisResultDocument::addWarning(const string& msg, const string& elementID)
 {
 	auto warningNode = m_root.append_child(ANALYSIS_WARNING);
 	warningNode.append_attribute(ELEMENT_ID).set_value(elementID.c_str());
@@ -51,28 +51,28 @@ void AnalysisResult::addWarning(const string& msg, const string& elementID)
 	warningNode.append_attribute(ISSUE_ID).set_value(++m_warnings);
 }
 
-void AnalysisResult::setModelId(const string& modelID)
+void AnalysisResultDocument::setModelId(const string& modelID)
 {
 	m_root.append_attribute(MODELID).set_value(modelID.c_str());
 }
 
-void AnalysisResult::setTimeStamp(const int& timeStamp)
+void AnalysisResultDocument::setTimeStamp(const int& timeStamp)
 {
 	m_root.append_attribute(TIMESTAMP).set_value(timeStamp);
 }
 
-void AnalysisResult::setDecompositionNumber(const int& decompositionNum)
+void AnalysisResultDocument::setDecompositionNumber(const int& decompositionNum)
 {
 	m_root.append_attribute(DECOMPOSITIONNUMBER).set_value(decompositionNum);
 }
 
-bool AnalysisResult::save(const string& fileName)
+bool AnalysisResultDocument::save(const string& fileName)
 {
 	m_bSaved = xml_document::save_file(fileName.c_str());
 	return m_bSaved;
 }
 
-void AnalysisResult::addConfiguration(const DecomposedFuzzyInterval& prob)
+void AnalysisResultDocument::addConfiguration(const DecomposedFuzzyInterval& prob)
 {
 	auto confignode = m_root.append_child(CONFIGURATION);
 	auto probnode = confignode.append_child(PROBABILITY);
