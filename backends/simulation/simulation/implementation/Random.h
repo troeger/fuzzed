@@ -23,13 +23,14 @@ public:
 	
 	static void generateExponentialRandomNumbers(const string& fileName, double rate, int count);
 
+	// this is a weird per-thread singleton pattern.
+	static void initGenerators();
+
 private:
 	RandomNumberGenerator();
 
 	mt19937 m_generator;
 	unordered_map<double, exponential_distribution<double>> m_exponentialDistributions;
 
-	// this is a weird per-thread singleton pattern.
-	static void initGenerators();
 	static unordered_map<int, RandomNumberGenerator*> s_generators;
 };

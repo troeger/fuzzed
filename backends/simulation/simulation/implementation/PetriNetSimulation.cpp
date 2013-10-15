@@ -37,6 +37,7 @@ bool PetriNetSimulation::run()
 	int count = 0;
 
 	double startTime = omp_get_wtime();
+	RandomNumberGenerator::initGenerators();
 
 #ifdef OMP_PARALLELIZATION
 
