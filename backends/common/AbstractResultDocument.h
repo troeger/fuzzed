@@ -4,7 +4,7 @@
 class AbstractResultDocument : public pugi::xml_document
 {
 public:
-	AbstractResultDocument(const std::string rootNodeName);
+	AbstractResultDocument(const std::string prefix);
 	virtual ~AbstractResultDocument() {}
 
 	void addError(const std::string& message, const std::string& elementID);
@@ -27,5 +27,5 @@ protected:
 	int m_warnings;
 	int m_errors;
 
-	std::string m_rootNodeName;
+	std::string m_prefix;
 };

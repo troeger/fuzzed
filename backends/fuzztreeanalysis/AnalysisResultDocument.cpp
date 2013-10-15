@@ -18,7 +18,7 @@ namespace
 	const char* const NAMESPACE = ""; // TODO
 }
 
-AnalysisResultDocument::AnalysisResultDocument() : AbstractResultDocument("AnalysisResult")
+AnalysisResultDocument::AnalysisResultDocument() : AbstractResultDocument("Analysis")
 {}
 
 void AnalysisResultDocument::setDecompositionNumber(const int& decompositionNum)

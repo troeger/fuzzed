@@ -6,7 +6,9 @@ using namespace pugi;
 using std::string;
 
 namespace
-{
+{	
+	const char* const RESULT = "Result";
+	
 	const char* const RES_ERROR		= "Error";
 	const char* const RES_WARNING	= "Warning";
 	const char* const ISSUE_ID		= "issueId";
@@ -19,21 +21,20 @@ namespace
 	const char* const NAMESPACE = ""; // TODO
 }
 
-AbstractResultDocument::AbstractResultDocument(const std::string rootNodeName) : xml_document(),
-	m_rootNodeName(rootNodeName)
+AbstractResultDocument::AbstractResultDocument(const std::string prefix) : xml_document(),
+	m_prefix(prefix)
 {
 	initXML();
 }
 
 void AbstractResultDocument::initXML()
 {
-	assert(!m_rootNodeName.empty());
-	m_root = append_child(m_rootNodeName.c_str());
+	m_root = append_child(std::string(m_prefix + RESULT).c_str());
 }
 
 void AbstractResultDocument::addError(const string& msg, const string& elementID)
 {
-	auto errorNode = m_root.append_child(RES_ERROR);
+	auto errorNode = m_root.append_child(std::string(m_prefix + RES_ERROR).c_str());
 	errorNode.append_attribute(ELEMENT_ID).set_value(elementID.c_str());
 	errorNode.append_child(node_pcdata).set_value(msg.c_str());
 	errorNode.append_attribute(ISSUE_ID).set_value(++m_errors);
@@ -41,7 +42,7 @@ void AbstractResultDocument::addError(const string& msg, const string& elementID
 
 void AbstractResultDocument::addWarning(const string& msg, const string& elementID)
 {
-	auto warningNode = m_root.append_child(RES_WARNING);
+	auto warningNode = m_root.append_child(std::string(m_prefix + RES_WARNING).c_str());
 	warningNode.append_attribute(ELEMENT_ID).set_value(elementID.c_str());
 	warningNode.append_child(node_pcdata).set_value(msg.c_str());
 	warningNode.append_attribute(ISSUE_ID).set_value(++m_warnings);

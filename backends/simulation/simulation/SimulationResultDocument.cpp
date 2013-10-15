@@ -13,7 +13,7 @@ namespace simulation
 }
 using namespace simulation;
 
-SimulationResultDocument::SimulationResultDocument() : AbstractResultDocument("SimulationResult")
+SimulationResultDocument::SimulationResultDocument() : AbstractResultDocument("Simulation")
 {}
 
 void SimulationResultDocument::setResult(const SimulationResult& result)
