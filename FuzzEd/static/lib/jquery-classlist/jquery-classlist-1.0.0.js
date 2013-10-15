@@ -19,6 +19,15 @@
 			var elem, i, l;
 			for (i = 0, l = this.length ; i < l; ++i) {
 				elem = this[i];
+
+                // for certain nodes that do not have classList (SVG in Safari -.-)
+                if (typeof elem.classList === 'undefined') {
+                    var classAttr = elem.getAttribute('class') || '';
+                    var regex = new RegExp('(^|\\s+)' + selector + '(\\s+|$)');
+
+                    return classAttr.search(regex) != -1;
+                }
+
 				if (elem.nodeType === 1 && elem.classList.contains(selector)) {
 					return true;
 				}
@@ -32,7 +41,18 @@
 				for (i = 0, l = this.length ; i < l; ++i) {
 					elem = this[i];
 					if (elem.nodeType === 1) {
-						elem.classList.add(value);
+
+                        // for certain nodes that do not have classList (SVG in Safari -.-)
+                        if (typeof elem.classList === 'undefined') {
+                            var classAttr = elem.getAttribute('class') || '';
+                            var regex = new RegExp('(^|\\s+)' + value + '(\\s+|$)');
+
+                            if (classAttr.search(regex) == -1) {
+                                elem.setAttribute('class', (classAttr + ' ' + value).trim());
+                            }
+                        } else {
+						    elem.classList.add(value);
+                        }
 					}
 				}
 			} else {
@@ -47,7 +67,16 @@
 				for (i = 0, l = this.length ; i < l; ++i) {
 					elem = this[i];
 					if (elem.nodeType === 1) {
-						elem.classList.remove(value);
+
+                        // for certain nodes that do not have classList (SVG in Safari -.-)
+                        if (typeof elem.classList === 'undefined') {
+                            var classAttr = elem.getAttribute('class') || '';
+
+                            var regex = new RegExp('(^|\\s+)' + value + '(\\s+|$)');
+                            elem.setAttribute('class', classAttr.replace(regex, ' ').trim());
+                        } else {
+						    elem.classList.remove(value);
+                        }
 					}
 				}
 			} else {
