@@ -10,4 +10,7 @@ public:
 	virtual ~ConfigurationResultDocument() {}
 
 	void addConfigurations(const std::vector<FuzzTreeConfiguration>& configs);
+
+protected:
+	pugi::xml_node choiceNode(FuzzTreeConfiguration::id_type ID);
 };

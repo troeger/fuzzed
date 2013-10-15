@@ -9,10 +9,12 @@
 struct FuzzTreeConfiguration
 {
 public:
+	friend class ConfigurationResultDocument;
+
 	typedef std::string id_type;
 
 	FuzzTreeConfiguration();
-	virtual ~FuzzTreeConfiguration();
+	~FuzzTreeConfiguration();
 
 	void setNodeOptional(const id_type& ID, bool optional);
 	void setRedundancyNumber(const id_type& ID, int k, int outOfN);
