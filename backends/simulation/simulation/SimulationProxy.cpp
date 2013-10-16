@@ -110,8 +110,8 @@ bool SimulationProxy::runSimulationInternal(const fs::path& p, SimulationImpl im
 		for (int i : boost::counting_range(1, omp_get_max_threads()))
 		{
 			omp_set_num_threads(i);
-			cout << "*** " << i << "THREADS ***" << endl;
-			success &= sim->run(false);
+//			cout << "*** " << i << "THREADS ***" << endl;
+			success &= sim->run();
 		}
 #else
 		success = sim->run();
@@ -210,7 +210,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl, bool 
 {	
 	// TODO: make this file ending oblivious
 
-	// cout << "Simulating..." << endl;
+	//cout << "Simulating..." << endl;
 	
 	auto ext = p.generic_string();
 	ext = ext.substr(ext.find_last_of("."), ext.length());

@@ -21,6 +21,7 @@ bool PetriNetSimulation::run()
 	unsigned long sumFailureTime_all = 0;
 	unsigned long sumFailureTime_fail = 0;
 	
+	
 	PetriNet pn = *PNMLImport::loadPNML(m_netFile.generic_string());
 	if (!pn.valid()) 
 		throw runtime_error("Invalid Petri Net.");
@@ -200,8 +201,13 @@ bool PetriNetSimulation::run()
 	writeResultXML(res);
 #endif
 
+#ifndef MEASURE_SPEEDUP
 	tidyUp();
+#endif
 
+#ifdef MEASURE_SPEEDUP
+	cout << res.duration << endl;
+#endif
 	return true;
 }
 
