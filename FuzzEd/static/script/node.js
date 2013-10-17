@@ -99,6 +99,7 @@ function(Property, Mirror, Canvas, Class) {
                 // Interaction
                 ._setupDragging()
 				._setupResizable()
+				._setupEditable()
                 ._setupMouse()
                 ._setupSelection()
                 ._setupProperties(propertiesDisplayOrder)
@@ -513,9 +514,48 @@ function(Property, Mirror, Canvas, Class) {
 			
 			if(!this.resizable) return this;
 			
-			this.container.find('.'+ this.config.Classes.STICKY_NOTE).resizable();
+			this.container.find('.'+ this.config.Classes.RESIZABLE).resizable();
 			return this;
 		},
+		
+		/*
+		 * Method: _setupEditable
+		 *
+		 * This initialization method is called in the constructor and is responsible for setting up the editing of a node.
+		 * Until now the editing functionality is intended only for editing sticky notes on the canvas.
+		 * If the sticky note is clicked ,the html paragraph inside the sticky note will be replaced with a textarea, in order to edit the content.
+		 * If the focus on the texarea is left it will be replaced again with a paragraph.
+		 *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+		 */
+		_setupEditable: function(){
+			if(!this.editable) return this;
+			
+			var editable = this.container.find('.'+ this.config.Classes.EDITABLE);
+			
+			editable.on("click", function(event){
+				if(editable.find("textarea").length) return;
+				
+				var paragraph = editable.find("p");
+				var textarea = jQuery('<textarea></textarea>').val(paragraph.text());
+				paragraph.replaceWith(textarea);
+				textarea.focus();
+			});
+			
+			editable.on("blur", "textarea", function(){
+				var textarea = editable.find("textarea");
+				var paragraph = jQuery('<p></p>').text(textarea.val());
+				textarea.replaceWith(paragraph);
+			});
+			
+			jQuery(document).on('node_unselected', function(event){
+				var textarea = editable.find("textarea");
+				if (textarea.length) textarea.blur();
+			});
+				
+			return this;
+		}, 
 
         /**
          *  Group: Event Handling

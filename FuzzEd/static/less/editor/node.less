@@ -109,14 +109,26 @@
     
     
     .sticky_note{
-        background-color: #F9EFAF;
-        padding: 5px;
-        font-family: 'Gloria Hallelujah', cursive;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: 160px;
-        height: 160px;
-      	box-shadow:0 4px 6px rgba(0,0,0,0.1);
-        border: 30px "Black";
+        
+        @sticky_color: white;
+        //#F9EFAF;
+        
+        background-color: @sticky_color;
+        padding:          5px;
+        font-family:      'Gloria Hallelujah', cursive;
+        overflow:         hidden;
+        text-overflow:    ellipsis;
+        width:            160px;
+        height:           160px;
+      	box-shadow:       0 4px 6px rgba(0,0,0,0.1);
+        border:           30px "Black";
+        
+        textarea{
+                background-color: @sticky_color;
+                width:            100%;
+                height:           100%;
+        }
+    
     }
+    
 }

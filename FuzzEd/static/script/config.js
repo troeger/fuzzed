@@ -149,7 +149,8 @@ define(['underscore'], function() {
             PROPERTY_WARNING:        'error',
             PROPERTY_OPEN_BUTTON:    'fuzzed-property-open',
 			DRAGGABLE_WRAP_DIV: 	 'draggableDiv',
-			STICKY_NOTE:			 'sticky_note',   
+			RESIZABLE:			 	 'resizable',
+			EDITABLE:			 	 'editable',   
         },
 
         /**
@@ -207,7 +208,8 @@ define(['underscore'], function() {
             PROPERTY_CHANGED:          'property-changed',
             PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',
             PROPERTY_READONLY_CHANGED: 'property-readonly-changed',
-            PROPERTY_SYNCHRONIZED:     'property-synchronized'
+            PROPERTY_SYNCHRONIZED:     'property-synchronized',
+			NODE_UNSELECTED:		   'node_unselected'
         },
 
         /**

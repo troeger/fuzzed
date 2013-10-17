@@ -11,6 +11,7 @@
 
             "deletable": true,
             "resizable": false,
+            "editable": false,
 
             "connector": {
                 "offset": {
@@ -28,6 +29,7 @@
             "numberOfOutgoingConnections": 0,
             "image": "sticky_note.html",
             "resizable": true,
+            "editable": true,
             
             "properties": {
               "description": {
