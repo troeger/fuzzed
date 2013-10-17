@@ -4,6 +4,7 @@
 #include "TreeHelpers.h"
 #include "FuzzTreeTypes.h"
 #include "FaultTreeTypes.h"
+#include "ConfigurationResultDocument.h"
 
 #include <xsd/cxx/tree/elements.hxx>
 #include <xsd/cxx/xml/dom/serialization-header.hxx>
@@ -27,7 +28,7 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 
 	try
 	{
-		m_fuzzTree = fuzztree::fuzzTree(fuzzTreeXML.c_str(), xml_schema::Flags::dont_validate);//fuzztree::fuzzTree(fuzzTreeXML.c_str(), 0, props);
+		m_fuzzTree = fuzztree::fuzzTree(fuzzTreeXML.c_str(), xml_schema::Flags::dont_validate);
 		assert(m_fuzzTree.get());
 	}
 	catch (const xml_schema::Exception& e)
@@ -501,4 +502,16 @@ void FuzzTreeTransform::copyNode(
 	else if (typeName == *INTERMEDIATEEVENT) node->children().push_back(fuzztree::IntermediateEvent(id));
 	else if (typeName == *BASICEVENT)		node->children().push_back(fuzztree::BasicEvent(static_cast<const fuzztree::BasicEvent&>(currentChild)));
 	else assert(false);
+}
+
+void FuzzTreeTransform::generateConfigurationsFile(const std::string& outputXML)
+{
+	ConfigurationResultDocument doc;
+
+	vector<FuzzTreeConfiguration> results;
+	generateConfigurations(results);
+
+	doc.addTreeSpecification(m_fuzzTree);
+	doc.addConfigurations(results);
+	doc.save(outputXML);
 }

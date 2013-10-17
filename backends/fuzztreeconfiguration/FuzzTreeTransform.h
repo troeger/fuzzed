@@ -28,6 +28,7 @@ public:
 
 	~FuzzTreeTransform();
 
+	void generateConfigurationsFile(const std::string& outputXML);
 	std::vector<fuzztree::FuzzTree> transform();
 
 protected:

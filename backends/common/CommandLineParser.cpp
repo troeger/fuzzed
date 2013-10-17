@@ -38,26 +38,33 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 	// #1: input file. usually FuzzTree XML
 	// #2: output path. for result documents
 
-	else if (numArguments != 3)
+	else if (numArguments != 4)
 	{
-		std::cerr << "Faulty command line options. Use [program_name] [inputfile] [outputfile]" << std::endl;
+		std::cerr << "Faulty command line options. Use [program_name] [inputfile] [outputfile] [workingdirectory]" << std::endl;
 		exit(-1);
 	}
-	std::string outFile, inFile;
-	inFile = arguments[1];
-	outFile = arguments[2];
+	std::string outFile, inFile, workingDirectory;
+	inFile				= arguments[1];
+	outFile				= arguments[2];
+	workingDirectory	= arguments[3];
 
-	const auto outFilePath	= fs::path(outFile.c_str());
-	const auto inFilePath	= fs::path(inFile.c_str());
+	m_outFilePath	= fs::path(outFile.c_str());
+	m_inFilePath	= fs::path(inFile.c_str());
+	m_workingDir	= fs::path(workingDirectory.c_str());
 
 	if (!util::isWritable(outFile))
 	{ // TODO: find out write permissions. not featured by Boost 1.48.
-		std::cerr << "Cannot write to file: " << outFilePath << std::endl;
+		std::cerr << "Cannot write to file: " << outFile << std::endl;
 		exit(-1);
 	}
-	else if (!fs::is_regular_file(inFilePath))
+	else if (!fs::is_regular_file(m_inFilePath))
 	{
 		std::cerr << "Not a valid file name: " << inFile << std::endl;
+		exit(-1);
+	}
+	else if (!fs::is_directory(m_workingDir) || !util::isWritable(workingDirectory+"foo"))
+	{
+		std::cerr << "Not a writable directory: " << inFile << std::endl;
 		exit(-1);
 	}
 }
@@ -70,4 +77,9 @@ const boost::filesystem::path& CommandLineParser::getInputFilePath() const
 const boost::filesystem::path& CommandLineParser::getOutputFilePath() const
 {
 	return m_outFilePath;
+}
+
+const boost::filesystem::path& CommandLineParser::getWorkingDirectory() const
+{
+	return m_workingDir;
 }

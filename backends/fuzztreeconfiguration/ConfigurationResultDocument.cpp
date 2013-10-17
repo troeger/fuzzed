@@ -11,14 +11,11 @@ namespace
 }
 
 ConfigurationResultDocument::ConfigurationResultDocument()
-	: AbstractResultDocument("ConfigurationResult")
+	: AbstractResultDocument("Configuration")
 {}
 
 void ConfigurationResultDocument::addConfigurations(const std::vector<FuzzTreeConfiguration>& configs)
 {
-	// first serialize the existing FuzzTree?
-
-
 	// for each configuration, write only the Choice information
 	for (const auto& config : configs)
 	{
@@ -51,4 +48,12 @@ pugi::xml_node ConfigurationResultDocument::choiceNode(FuzzTreeConfiguration::id
 	cm.append_attribute("key").set_value(ID.c_str());
 
 	return cm;
+}
+
+void ConfigurationResultDocument::addTreeSpecification(std::auto_ptr<fuzztree::FuzzTree> m_fuzzTree)
+{
+// 	std::ostringstream sstream;
+// 	const fuzztree::FuzzTree& foo = m_fuzzTree.get();
+// 	fuzztree::fuzzTree(sstream, foo);
+// 	m_root.append_child(pugi::node_pcdata).set_value(sstream.str().c_str());
 }

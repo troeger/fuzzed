@@ -15,6 +15,7 @@ public:
 
 	const boost::filesystem::path& getInputFilePath() const;
 	const boost::filesystem::path& getOutputFilePath() const;
+	const boost::filesystem::path& getWorkingDirectory() const;
 	const bool& isVerbose() const;
 
 	void parseCommandline(int numArguments, char** arguments);
@@ -22,6 +23,7 @@ public:
 protected:
 	boost::filesystem::path m_inFilePath;
 	boost::filesystem::path m_outFilePath;
+	boost::filesystem::path m_workingDir;
 	bool m_bVerbose;
 
 	boost::program_options::variables_map					m_optionsMap;

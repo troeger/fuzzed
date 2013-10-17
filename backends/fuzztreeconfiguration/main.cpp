@@ -23,8 +23,8 @@ int main(int argc, char **argv)
 	{
 		CommandLineParser parser;
 		parser.parseCommandline(argc, argv);
-		const auto inFile = parser.getInputFilePath().generic_string();
-		const auto outFile = parser.getOutputFilePath().generic_string();
+		const auto inFile	= parser.getInputFilePath().generic_string();
+		const auto outFile	= parser.getOutputFilePath().generic_string();
 
 		{// do the actual transformation, write all files to dirPath
 			std::ifstream instream(inFile);
@@ -33,14 +33,16 @@ int main(int argc, char **argv)
 			FuzzTreeTransform transform(instream);
 			const auto fileName = util::fileNameFromPath(inFile);
 
+			transform.generateConfigurationsFile(outFile);
+
 			// this code simply writes all configured XML documents to a single large file.
 			// TODO: replace by configuration XML serialization.
-			std::string newFileName = outFile;
-			std::ofstream outstream(newFileName);
-			for (const auto& res : transform.transform())
-			{
-				fuzztree::fuzzTree(outstream, res);
-			}
+// 			std::string newFileName = outFile;
+// 			std::ofstream outstream(newFileName);
+// 			for (const auto& res : transform.transform())
+// 			{
+// 				fuzztree::fuzzTree(outstream, res);
+// 			}
 		}
 
 		return 0;
