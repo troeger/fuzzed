@@ -45,13 +45,6 @@ protected:
 		const std::string id,
 		const fuzztree::ChildNode& currentChild);
 
-	// add the configured VotingOR gate, return true if leaf was reached
-	bool handleRedundancyVP(
-		const fuzztree::ChildNode* templateNode,
-		fuzztree::Node* node,
-		const std::tuple<int,int> configuredN,
-		const FuzzTreeConfiguration::id_type& id) const;
-
 	// add the configured child gate, return true if leaf was reached
 	bool handleFeatureVP(
 		const fuzztree::ChildNode* templateNode,
@@ -62,13 +55,11 @@ protected:
 	ErrorType expandBasicEventSet(
 		const fuzztree::Node* templateNode,
 		fuzztree::Node* parentNode, 
-		const FuzzTreeConfiguration::id_type& id,
 		const int& defaultQuantity = 0) const;
 
 	ErrorType expandIntermediateEventSet(
 		const fuzztree::Node* templateNode,
 		fuzztree::Node* parentNode,
-		const FuzzTreeConfiguration::id_type& id,
 		const FuzzTreeConfiguration& configuration,
 		const int& defaultQuantity = 0) const;
 	
@@ -78,6 +69,7 @@ protected:
 		std::vector<FuzzTreeConfiguration>& configurations) const;
 
 	static bool isOptional(const fuzztree::Node& node);
+	static int parseCost(const fuzztree::InclusionVariationPoint& node);
 
 	std::string generateUniqueId(const std::string& oldId);
 

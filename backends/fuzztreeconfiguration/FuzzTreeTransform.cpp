@@ -82,7 +82,8 @@ void FuzzTreeTransform::generateConfigurations(std::vector<FuzzTreeConfiguration
 }
 
 ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
-	const fuzztree::Node* node, std::vector<FuzzTreeConfiguration>& configurations) const
+	const fuzztree::Node* node, 
+	std::vector<FuzzTreeConfiguration>& configurations) const
 {
 	using namespace fuzztree;
 	using namespace fuzztreeType;
@@ -101,8 +102,13 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 					continue;
 
 				FuzzTreeConfiguration copied = config;
-				copied.setNodeOptional(id, true);
-				config.setNodeOptional(id, false);
+				// one configuration with this node
+				copied.setOptionalEnabled(id, true);
+				if (childType == *BASICEVENT || childType == *INTERMEDIATEEVENT)
+					copied.setCost(copied.getCost() + parseCost(static_cast<const InclusionVariationPoint&>(child)));
+
+				// one configuration without this node
+				config.setOptionalEnabled(id, false);
 				config.setNotIncluded(id);
 
 				additional.emplace_back(copied);
@@ -240,7 +246,6 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		if (!configuration.isIncluded(id) || (opt && !configuration.isOptionalEnabled(id)))
 			continue; // do not add this node
 
-		const bool bLeaf = isLeaf(typeName);
 		bool bChanged = true;
 		
 		if (typeName == *REDUNDANCYVP)
@@ -258,14 +263,14 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 				const fuzztree::BasicEventSet& bes = 
 					static_cast<const fuzztree::BasicEventSet&>(firstChild);
 
-				expandBasicEventSet(&bes, &votingOrGate, id, get<1>(kOutOfN));
+				expandBasicEventSet(&bes, &votingOrGate, get<1>(kOutOfN));
 			}
 			else if (childTypeName == *INTERMEDIATEEVENTSET)
 			{
 				const fuzztree::IntermediateEventSet& ies = 
 					static_cast<const fuzztree::IntermediateEventSet&>(firstChild);
 
-				expandIntermediateEventSet(&ies, &votingOrGate, id, configuration, get<1>(kOutOfN));
+				expandIntermediateEventSet(&ies, &votingOrGate, configuration, get<1>(kOutOfN));
 			}
 			else return WRONG_CHILD_TYPE;
 			
@@ -285,14 +290,14 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		}
 		else if (typeName == *BASICEVENTSET)
 		{
-			auto ret = expandBasicEventSet(&currentChild, node, id, 0);
+			auto ret = expandBasicEventSet(&currentChild, node, 0);
 			if (ret != OK) return ret;
 			// BasicEvents can have FDEP children...
 			// continue;
 		}
 		else if (typeName == *INTERMEDIATEEVENTSET)
 		{
-			auto ret = expandIntermediateEventSet(&currentChild, node, id, configuration, 0);
+			auto ret = expandIntermediateEventSet(&currentChild, node, configuration, 0);
 			if (ret != OK) return ret;
 			continue;
 		}
@@ -312,7 +317,6 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 ErrorType FuzzTreeTransform::expandBasicEventSet(
 	const fuzztree::Node* templateNode,
 	fuzztree::Node* parentNode, 
-	const FuzzTreeConfiguration::id_type& id,
 	const int& defaultQuantity /*= 0*/) const
 {
 	assert(parentNode && templateNode);
@@ -321,22 +325,14 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 	assert(eventSet);
 
 	// barharhar
+	// TODO: WTF was i thinking
 	const int numChildren = 
 		defaultQuantity == 0 ? eventSet->quantity().present() ? eventSet->quantity().get() : defaultQuantity : defaultQuantity;
 
 	if (numChildren <= 0) return INVALID_ATTRIBUTE;
 
 	const auto& prob = eventSet->probability();
-	const type_info& probType = typeid(prob);
-
-// 	faulttree::Probability copiedProb;
-// 	if (probType == *fuzztreeType::CRISPPROB)
-// 		copiedProb = faulttree::CrispProbability(static_cast<const fuzztree::CrispProbability&>(prob).value());
-// 	else if (probType == *fuzztreeType::FAILURERATE)
-// 		copiedProb = faulttree::FailureRate(static_cast<const fuzztree::FailureRate&>(prob).value());
-// 	else
-// 		copiedProb = faulttree::FailureRate(0.0); 
-
+	
 	int i = 0;
 	const auto eventSetId = eventSet->id();
 	while (i < numChildren)
@@ -352,7 +348,6 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 ErrorType FuzzTreeTransform::expandIntermediateEventSet(
 	const fuzztree::Node* templateNode,
 	fuzztree::Node* parentNode, 
-	const FuzzTreeConfiguration::id_type& id,
 	const FuzzTreeConfiguration& configuration,
 	const int& defaultQuantity /*= 0*/) const
 {
@@ -407,7 +402,7 @@ bool FuzzTreeTransform::handleFeatureVP(
 	}
 	else if (featuredType == *BASICEVENTSET)
 	{
-		expandBasicEventSet(&featuredTemplate, node, configuredChildId, 0);
+		expandBasicEventSet(&featuredTemplate, node, 0);
 		return true;
 	}
 	else if (featuredType == *AND)		node->children().push_back(fuzztree::And(configuredChildId));
@@ -420,18 +415,6 @@ bool FuzzTreeTransform::handleFeatureVP(
 		return false;
 	}
 	return false;
-}
-
-bool FuzzTreeTransform::handleRedundancyVP(
-	const fuzztree::ChildNode* templateNode,
-	fuzztree::Node* node,
-	const tuple<int,int> kOutOfN,
-	const FuzzTreeConfiguration::id_type& id) const
-{
-	assert(node && templateNode);
-
-	
-	return true;
 }
 
 std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>>
@@ -517,4 +500,12 @@ xml_schema::Properties FuzzTreeTransform::validationProperties()
 	props.no_namespace_schema_location(fuzztreeSchema);
 
 	return props;
+}
+
+int FuzzTreeTransform::parseCost(const fuzztree::InclusionVariationPoint& node)
+{
+	auto c = node.costs();
+	if (c.present())
+		return c.get();
+	return 0;
 }
