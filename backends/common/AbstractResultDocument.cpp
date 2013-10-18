@@ -15,23 +15,25 @@ namespace
 	const char* const ELEMENT_ID	= "elementId";
 	const char* const MODELID		= "modelId";
 	const char* const TIMESTAMP		= "timestamp";
-	const char* const KEY = "key";
-	const char* const VALUE = "value";
+	const char* const VALID			= "validResult";
+	const char* const KEY			= "key";
+	const char* const VALUE			= "value";
+	const char* const COSTS			= "costs";
 	
 	// Configurations are part of every other result document.
 	// Results are always per-config
-	const char* const CHOICE = "Choice";
 	const char* const FEATURE_CHOICE= "FeatureChoice";
 	const char* const REDUNDANCY_CHOICE = "RedundancyChoice";
 	const char* const INCLUSION_CHOICE = "InclusionChoice";
 	const char* const INCLUDED = "included";
-	const char* const INT_TO_CHOICE	= "IntegerToChoiceMap";
+	const char* const CHOICES	= "choices";
 
 	const char* const NAMESPACE = ""; // TODO
 }
 
 AbstractResultDocument::AbstractResultDocument(const std::string prefix) : xml_document(),
-	m_prefix(prefix)
+	m_prefix(prefix),
+	m_issues(0)
 {
 	initXML();
 }
@@ -41,20 +43,12 @@ void AbstractResultDocument::initXML()
 	m_root = append_child(std::string(m_prefix + RESULT).c_str());
 }
 
-void AbstractResultDocument::addError(const string& msg, const string& elementID)
+void AbstractResultDocument::addIssue(const string& msg, const string& elementID)
 {
-	auto errorNode = m_root.append_child(std::string(m_prefix + RES_ERROR).c_str());
-	errorNode.append_attribute(ELEMENT_ID).set_value(elementID.c_str());
-	errorNode.append_child(node_pcdata).set_value(msg.c_str());
-	errorNode.append_attribute(ISSUE_ID).set_value(++m_errors);
-}
-
-void AbstractResultDocument::addWarning(const string& msg, const string& elementID)
-{
-	auto warningNode = m_root.append_child(std::string(m_prefix + RES_WARNING).c_str());
-	warningNode.append_attribute(ELEMENT_ID).set_value(elementID.c_str());
-	warningNode.append_child(node_pcdata).set_value(msg.c_str());
-	warningNode.append_attribute(ISSUE_ID).set_value(++m_warnings);
+	auto issueNode = m_root.append_child("issues");
+	issueNode.append_attribute(ELEMENT_ID).set_value(elementID.c_str());
+	issueNode.append_child(node_pcdata).set_value(msg.c_str());
+	issueNode.append_attribute(ISSUE_ID).set_value(++m_issues);
 }
 
 void AbstractResultDocument::setModelId(const string& modelID)
@@ -77,26 +71,27 @@ pugi::xml_node AbstractResultDocument::addConfigurationNode(
 	const FuzzTreeConfiguration &config,
 	xml_node& parent)
 {
-	xml_node configNode = parent.append_child("Configuration");
+	xml_node configNode = parent.append_child("configurations");
+	configNode.append_attribute(COSTS).set_value(config.getCost());
 	
 	for (const auto& inclusionChoice : config.m_optionalNodes)
 	{
 		auto cm = choiceNode(inclusionChoice.first, configNode);
-		auto cn = cm.append_child(INCLUSION_CHOICE);
+		auto cn = cm.append_child(VALUE);
 		cn.append_attribute(INCLUDED).set_value(inclusionChoice.second ? "true" : "false");
 	}
 
 	for (const auto& redundancyChoice : config.m_redundancyNodes)
 	{
 		auto cm = choiceNode(redundancyChoice.first, configNode);
-		auto cn = cm.append_child(REDUNDANCY_CHOICE);
+		auto cn = cm.append_child(VALUE);
 		cn.append_attribute("n").set_value(std::get<0>(redundancyChoice.second));
 	}
 
 	for (const auto& featureChoice : config.m_featureNodes)
 	{
 		auto cm = choiceNode(featureChoice.first, configNode);
-		auto cn = cm.append_child(FEATURE_CHOICE);
+		auto cn = cm.append_child(VALUE);
 		cn.append_attribute("featureId").set_value(featureChoice.second.c_str());
 	}
 
@@ -105,8 +100,13 @@ pugi::xml_node AbstractResultDocument::addConfigurationNode(
 
 pugi::xml_node AbstractResultDocument::choiceNode(FuzzTreeConfiguration::id_type ID, xml_node& parent)
 {
-	auto cm = parent.append_child(INT_TO_CHOICE);
+	auto cm = parent.append_child(CHOICES);
 	cm.append_attribute("key").set_value(ID.c_str());
 	return cm;
+}
+
+void AbstractResultDocument::setValid(bool valid)
+{
+	m_root.append_attribute(VALID).set_value(valid);
 }
 

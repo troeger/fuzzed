@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 		assert(stream.good());
 		auto tree = fuzztree::fuzzTree(stream, xml_schema::Flags::dont_validate);
 		
-		const int decompositionNumber = tree->topEvent().decompositionNumber(); // TODO where does this come from?
+		const int decompositionNumber = tree->topEvent().decompositionNumber();
 
 		AnalysisResultDocument resultDocument;
 		resultDocument.setModelId(tree->id());
@@ -43,6 +43,7 @@ int main(int argc, char** argv)
 			const auto result = analysis->compute();
 			resultDocument.addConfigurationResult(t.first, result);
 		}
+		resultDocument.setValid(true);
 		resultDocument.setTimeStamp(util::timeStamp());
 		resultDocument.save(outFile);
 	}
