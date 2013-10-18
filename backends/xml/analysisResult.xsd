@@ -2,18 +2,22 @@
 <xsd:schema xmlns:ft="net.fuzztree" xmlns:fta="net.fuzztree.analysis" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztree.analysis">
   <xsd:import namespace="net.fuzztree" schemaLocation="fuzztree.xsd"/>
   <xsd:complexType name="AnalysisResult">
+    
     <xsd:sequence>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="errors" type="fta:AnalysisError"/>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="warnings" type="fta:AnalysisWarning"/>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="configurations" type="fta:Configuration"/>
     </xsd:sequence>
+
     <xsd:attribute name="id" type="xsd:int"/>
     <xsd:attribute name="modelId" type="xsd:int" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
     <xsd:attribute name="validResult" type="xsd:boolean" use="required"/>
     <xsd:attribute name="decompositionNumber" type="xsd:int" use="required"/>
     <xsd:attribute default="default" name="engine" type="xsd:string"/>
+
   </xsd:complexType>
+  
   <xsd:element name="AnalysisResult" type="fta:AnalysisResult"/>
   <xsd:complexType name="AnalysisError">
     <xsd:attribute name="issueId" type="xsd:int" use="required"/>
@@ -25,13 +29,12 @@
     <xsd:attribute name="elementId" type="xsd:int" use="required"/>
   </xsd:complexType>
   <xsd:element name="AnalysisWarning" type="fta:AnalysisWarning"/>
-  
+
   <!-- One Probability Result per Configuration -->
   <xsd:complexType name="Configuration">
     <xsd:sequence>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="choices" type="fta:IntegerToChoiceMap"/>
       <xsd:element maxOccurs="1" minOccurs="0" name="probability" type="ft:DecomposedFuzzyProbability"/>
-      <!-- <xsd:element maxOccurs="unbounded" minOccurs="0" name="minimalCutSets" type="fta:CutSet"/> -->
     </xsd:sequence>
     <xsd:attribute name="costs" type="xsd:int" use="required"/>
   </xsd:complexType>
