@@ -25,11 +25,14 @@ class FuzzTreeTransform
 public:
 	FuzzTreeTransform(const std::string& fuzzTreeXML);
 	FuzzTreeTransform(std::istream& fuzzTreeXML);
+	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft);
+
+	
 
 	~FuzzTreeTransform();
 
 	void generateConfigurationsFile(const std::string& outputXML);
-	std::vector<fuzztree::FuzzTree> transform();
+	std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>> transform();
 
 protected:
 	fuzztree::FuzzTree generateVariationFreeFuzzTree(const FuzzTreeConfiguration& configuration);
@@ -79,6 +82,8 @@ protected:
 	static bool isOptional(const fuzztree::Node& node);
 
 	std::string generateUniqueId(const std::string& oldId);
+
+	static xml_schema::Properties validationProperties(); // throwing an error. not used currently.
 	
 private:
 	std::auto_ptr<fuzztree::FuzzTree> m_fuzzTree;

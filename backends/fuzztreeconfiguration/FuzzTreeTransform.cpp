@@ -19,13 +19,6 @@ using namespace std;
 FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 	m_count(0)
 {
-	static const string fuzztreeSchema = FUZZTREEXSD; // Path to schema from CMakeLists.txt
-	assert(!fuzztreeSchema.empty());
-
-	xml_schema::Properties props;
-	props.schema_location("ft", fuzztreeSchema);
-	props.no_namespace_schema_location(fuzztreeSchema);
-
 	try
 	{
 		m_fuzzTree = fuzztree::fuzzTree(fuzzTreeXML.c_str(), xml_schema::Flags::dont_validate);
@@ -40,13 +33,6 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 
 FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML)
 {
-	static const string fuzztreeSchema = FUZZTREEXSD; // Path to schema from CMakeLists.txt
-	assert(!fuzztreeSchema.empty());
-
-	xml_schema::Properties props;
-	props.schema_location("ft", fuzztreeSchema);
-	props.no_namespace_schema_location(fuzztreeSchema);
-
 	try
 	{
 		m_fuzzTree = fuzztree::fuzzTree(fuzzTreeXML, xml_schema::Flags::dont_validate);
@@ -56,6 +42,12 @@ FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML)
 	{
 		std::cout << e.what() << std::endl;
 	}
+}
+
+FuzzTreeTransform::FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft) :
+	m_fuzzTree(ft)
+{
+	assert(m_fuzzTree.get());
 }
 
 FuzzTreeTransform::~FuzzTreeTransform()
@@ -442,11 +434,12 @@ bool FuzzTreeTransform::handleRedundancyVP(
 	return true;
 }
 
-std::vector<fuzztree::FuzzTree> FuzzTreeTransform::transform()
+std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>>
+	FuzzTreeTransform::transform()
 {
+	vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>> results;
 	try
 	{
-		vector<fuzztree::FuzzTree> results;
 		if (!m_fuzzTree.get())
 		{
 			std::cerr << "Invalid Fuzztree." << endl;
@@ -467,10 +460,8 @@ std::vector<fuzztree::FuzzTree> FuzzTreeTransform::transform()
 // 			treeHelpers::printTree(ft.topEvent(), indent);
 // 			cout << endl;
 
-			results.emplace_back(ft);
+			results.emplace_back(std::make_pair(instanceConfiguration, ft));
 		}
-
-		return results;
 	}
 	catch (xsd::cxx::exception& e)
 	{
@@ -485,7 +476,7 @@ std::vector<fuzztree::FuzzTree> FuzzTreeTransform::transform()
 		std::cerr << "Unknown Error during FuzzTree Transformation" << endl;
 	}
 
-	return vector<fuzztree::FuzzTree>();
+	return results;
 }
 
 void FuzzTreeTransform::copyNode(
@@ -514,4 +505,16 @@ void FuzzTreeTransform::generateConfigurationsFile(const std::string& outputXML)
 	doc.addTreeSpecification(m_fuzzTree);
 	doc.addConfigurations(results);
 	doc.save(outputXML);
+}
+
+xml_schema::Properties FuzzTreeTransform::validationProperties()
+{
+	static const string fuzztreeSchema = FUZZTREEXSD; // Path to schema from CMakeLists.txt
+	assert(!fuzztreeSchema.empty());
+
+	xml_schema::Properties props;
+	props.schema_location("ft", fuzztreeSchema);
+	props.no_namespace_schema_location(fuzztreeSchema);
+
+	return props;
 }

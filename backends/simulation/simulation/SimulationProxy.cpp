@@ -295,7 +295,7 @@ void SimulationProxy::simulateAllConfigurations(const fs::path &p, SimulationImp
 	int i = 0;
 	for (const auto& ft : ftTransform.transform())
 	{
-		std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.topEvent()); 
+		std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent()); 
 		std::string newFileName = p.generic_string();
 		util::replaceFileExtensionInPlace(newFileName, util::toString(++i) + ((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT));
 		// simTree->print(cout);
