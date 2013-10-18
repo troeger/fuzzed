@@ -8,6 +8,8 @@
 #include "FuzzTreeTransform.h"
 #include "FaultTreeConversion.h"
 
+#include "SimulationResultDocument.h"
+
 #include "util.h"
 #include "Config.h"
 #include "Constants.h"
@@ -70,7 +72,7 @@ SimulationProxy::SimulationProxy(unsigned int numRounds, double convergenceThres
 	m_timeNetProperties(nullptr)
 {}
 
-bool SimulationProxy::runSimulationInternal(
+SimulationResult SimulationProxy::runSimulationInternal(
 	const boost::filesystem::path& petriNetFile,
 	const boost::filesystem::path& outPath,
 	const boost::filesystem::path& workingDir,
@@ -78,6 +80,7 @@ bool SimulationProxy::runSimulationInternal(
 	void* additionalArguments) 
 {
 	Simulation* sim;
+	SimulationResult res;
 	switch (implementationType)
 	{
 	case TIMENET:
@@ -103,13 +106,9 @@ bool SimulationProxy::runSimulationInternal(
 			break;
 		}
 	default:
-		{
-			assert(false);
-			return false;
-		}
+		assert(false);
 	}
 	
-	bool success = false;
 	try
 	{
 #ifdef MEASURE_SPEEDUP
@@ -117,10 +116,12 @@ bool SimulationProxy::runSimulationInternal(
 		{
 			omp_set_num_threads(i);
 //			cout << "*** " << i << "THREADS ***" << endl;
-			success &= sim->run();
+			sim->run();
 		}
 #else
-		success = sim->run();
+		sim->run();
+		if (implementationType == DEFAULT)
+			res = ((PetriNetSimulation*)sim)->result();
 #endif
 	}
 	catch (exception& e)
@@ -131,9 +132,9 @@ bool SimulationProxy::runSimulationInternal(
 	{
 		cout << "Unknown Exception during simulation";
 	}
-
+	
 	delete sim;
-	return success;
+	return res;
 }
 
 void SimulationProxy::parseCommandline(int numArguments, char** arguments)
@@ -247,7 +248,7 @@ bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
 		p.extension() == timeNET::TN_EXT;
 }
 
-void SimulationProxy::simulateFaultTree(
+SimulationResult SimulationProxy::simulateFaultTree(
 	std::shared_ptr<TopLevelEvent> ft,
 	const boost::filesystem::path& input,
 	const boost::filesystem::path& output,
@@ -281,13 +282,13 @@ void SimulationProxy::simulateFaultTree(
 	}
 
 	if (impl == STRUCTUREFORMULA_ONLY)
-		return;
+		return SimulationResult();
 
 	std::string petriNetFile = workingDir.generic_string() + util::fileNameFromPath(input.generic_string());
 	util::replaceFileExtensionInPlace(petriNetFile, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
 
 	doc->save(petriNetFile);
-	runSimulationInternal(petriNetFile, output, workingDir, impl, m_timeNetProperties);
+	return runSimulationInternal(petriNetFile, output, workingDir, impl, m_timeNetProperties);
 }
 
 void SimulationProxy::simulateAllConfigurations(
@@ -307,7 +308,12 @@ void SimulationProxy::simulateAllConfigurations(
 		const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
 		std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
 		if (ft)
-			simulateFaultTree(ft, inputFile, outputFile, workingDir, impl);
+		{
+			SimulationResultDocument doc;
+			auto res = simulateFaultTree(ft, inputFile, outputFile, workingDir, impl);
+			doc.setResult(res);
+			doc.save(outputFile.generic_string());
+		}
 		else
 			std::cerr << "Could handle fault tree file: " << inFile << endl;
 			
@@ -315,11 +321,16 @@ void SimulationProxy::simulateAllConfigurations(
 	}
 
 	int i = 0;
+	SimulationResultDocument doc;
 	for (const auto& ft : ftTransform.transform())
 	{
-		std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent()); 
-		simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
+		std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
+		{
+			auto res = simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
+			doc.addSimulationResult(ft.first, res);
+		}
 	}
+	doc.save(outputFile.generic_string());
 }
 
 void SimulationProxy::parseCommandline_default(int numArguments, char** arguments)

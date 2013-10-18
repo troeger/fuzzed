@@ -197,8 +197,8 @@ bool PetriNetSimulation::run()
 	statdoc << util::toString(res.reliability) << std::endl;
 	}
 #else
-	printResults(res);
-	writeResultXML(res);
+	// printResults(res);
+	// writeResultXML(res);
 #endif
 
 #ifndef MEASURE_SPEEDUP
@@ -208,6 +208,8 @@ bool PetriNetSimulation::run()
 #ifdef MEASURE_SPEEDUP
 	cout << res.duration << endl;
 #endif
+
+	m_result = res;
 	return true;
 }
 

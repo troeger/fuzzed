@@ -22,6 +22,8 @@ public:
 
 	virtual bool run() override;
 
+	const SimulationResult& result() const { return m_result; }
+
 	void writeResultXML(const SimulationResult& res);
 	void printResults(const SimulationResult& res);
 
@@ -44,4 +46,6 @@ protected:
 	const bool m_simulateUntilFailure;
 	const int m_numAdaptiveRounds;
 	double m_convergenceThresh;
+
+	SimulationResult m_result;
 };

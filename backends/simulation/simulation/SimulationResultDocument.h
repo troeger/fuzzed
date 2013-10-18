@@ -9,4 +9,5 @@ public:
 	virtual ~SimulationResultDocument() {}
 
 	void setResult(const SimulationResult& result);
+	void addSimulationResult(const FuzzTreeConfiguration& config, const SimulationResult& prob);
 };
