@@ -9,7 +9,7 @@
 struct FuzzTreeConfiguration
 {
 public:
-	friend class ConfigurationResultDocument;
+	friend class AbstractResultDocument;
 
 	typedef std::string id_type;
 
