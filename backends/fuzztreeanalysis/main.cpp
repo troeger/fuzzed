@@ -1,6 +1,7 @@
 #include "InstanceAnalysisTask.h"
 #include "AlphaCutAnalysisTask.h"
 #include "AnalysisResultDocument.h"
+#include "FuzzTreeTransform.h"
 
 #include <string>
 #include <iostream>
@@ -23,21 +24,26 @@ int main(int argc, char** argv)
 		const auto inFile = parser.getInputFilePath().generic_string();
 		const auto outFile = parser.getOutputFilePath().generic_string();
 
-		std::ifstream file(inFile);
-		auto t = fuzztree::fuzzTree(file, xml_schema::Flags::dont_validate);
-		file.close();
-
-		auto topEvent = fuzztree::TopEvent(t->topEvent());
+		std::ifstream stream(inFile);
+		assert(stream.good());
+		auto tree = fuzztree::fuzzTree(stream, xml_schema::Flags::dont_validate);
 		
-		const int decompositionNumber = 10; // TODO where does this come from?
-
-		InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, decompositionNumber);
-		const auto result = analysis->compute();
+		const int decompositionNumber = tree->topEvent().decompositionNumber(); // TODO where does this come from?
 
 		AnalysisResultDocument resultDocument;
-		resultDocument.setModelId(t->id());
+		resultDocument.setModelId(tree->id());
 		resultDocument.setDecompositionNumber(decompositionNumber);
-		resultDocument.addConfiguration(result);
+
+		FuzzTreeTransform tf(tree);
+		for (const auto& t : tf.transform())
+		{
+			auto topEvent = fuzztree::TopEvent(t.second.topEvent());
+			InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, decompositionNumber);
+			
+			const auto result = analysis->compute();
+			resultDocument.addConfigurationResult(t.first, result);
+		}
+		resultDocument.setTimeStamp(util::timeStamp());
 		resultDocument.save(outFile);
 	}
 	catch (const std::exception& e)

@@ -22,7 +22,6 @@ include_directories(${PUGIXML_INCLUDE_DIR})
 
 add_executable(ftanalysis ${SOURCES} ${HEADERS})
   target_link_libraries(ftanalysis
-    ${FT_CONFIG_LIB}
     ${COMMON_LINKED_LIBS})
   message("Building analysis executable")
 

@@ -272,7 +272,8 @@ add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
 target_link_libraries(common_model ${COMMON_LINKED_LIBS})
 set(COMMON_LINKED_LIBS
 	${COMMON_LINKED_LIBS}
-	common_model)
+	common_model
+	ftconfiguration)
 
 ############### UNIT TESTS ##############
 #########################################
