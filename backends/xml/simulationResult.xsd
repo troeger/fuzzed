@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns:fts="net.faulttree.simulation" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.faulttree.simulation">
-  <!-- <xsd:import namespace="net.faulttree" schemaLocation="faulttree.xsd"/>
- -->
+<xsd:schema xmlns:fts="net.fuzztree.simulation" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztree.simulation">
   <xsd:complexType name="SimulationResult">
     <xsd:sequence>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="error" type="fts:SimulationError"/>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="warning" type="fts:SimulationWarning"/>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="configurations" type="fts:Configuration"/>
     </xsd:sequence>
     <xsd:attribute name="id" type="xsd:int"/>
     <xsd:attribute name="modelId" type="xsd:int" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
-    <xsd:attribute name="reliability" type="xsd:double" use="required"/>
-    <xsd:attribute name="nFailures" type="xsd:int" use="required"/>
-    <xsd:attribute name="nSimulatedRounds" type="xsd:int" use="required"/>
-    <xsd:attribute name="availability" type="xsd:double"/>
-    <xsd:attribute name="duration" type="xsd:double"/>
-    <xsd:attribute name="mttf" type="xsd:double"/>
   </xsd:complexType>
   <xsd:element name="SimulationResult" type="fts:SimulationResult"/>
 
@@ -31,4 +24,18 @@
   </xsd:complexType>
   <xsd:element name="SimulationWarning" type="fts:SimulationWarning"/>
 
+ <!-- One Probability Result per Configuration -->
+ <xsd:complexType name="Configuration">
+    <xsd:sequence>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="choices" type="fta:IntegerToChoiceMap"/>
+      <xsd:element maxOccurs="1" minOccurs="0" name="probability" type="ft:DecomposedFuzzyProbability"/>
+    </xsd:sequence>
+    <xsd:attribute name="costs" type="xsd:int" use="required"/>
+    <xsd:attribute name="reliability" type="xsd:double" use="required"/>
+    <xsd:attribute name="nFailures" type="xsd:int" use="required"/>
+    <xsd:attribute name="nSimulatedRounds" type="xsd:int" use="required"/>
+    <xsd:attribute name="availability" type="xsd:double"/>
+    <xsd:attribute name="duration" type="xsd:double"/>
+    <xsd:attribute name="mttf" type="xsd:double"/>
+  </xsd:complexType>
 </xsd:schema>

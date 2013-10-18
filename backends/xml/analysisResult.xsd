@@ -25,11 +25,13 @@
     <xsd:attribute name="elementId" type="xsd:int" use="required"/>
   </xsd:complexType>
   <xsd:element name="AnalysisWarning" type="fta:AnalysisWarning"/>
+  
+  <!-- One Probability Result per Configuration -->
   <xsd:complexType name="Configuration">
     <xsd:sequence>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="choices" type="fta:IntegerToChoiceMap"/>
       <xsd:element maxOccurs="1" minOccurs="0" name="probability" type="ft:DecomposedFuzzyProbability"/>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="minimalCutSets" type="fta:CutSet"/>
+      <!-- <xsd:element maxOccurs="unbounded" minOccurs="0" name="minimalCutSets" type="fta:CutSet"/> -->
     </xsd:sequence>
     <xsd:attribute name="costs" type="xsd:int" use="required"/>
   </xsd:complexType>
