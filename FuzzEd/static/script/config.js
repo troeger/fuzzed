@@ -239,10 +239,9 @@ define(['underscore'], function() {
          *    {String} SPLASH                    - The splash screen element.
          *    {String} ACTION_GRID_TOGGLE        - The list element that contains the grid toggle menu entry.
          *    {String} ACTION_CUTSETS            - The list element that contains the cut set analysis menu entry.
-         *    {String} ACTION_ANALYTICAL        - The list element that contains the analytical analysis menu entry.                  
+         *    {String} ACTION_ANALYTICAL         - The list element that contains the analytical analysis menu entry.
          *    {String} PROGRESS_INDICATOR        - The animated progress indicator gif.
-         *    {String} SAVE_INDICATOR            - The navbar entry indicating the save state.
-         *    {String} ERROR_INDICATOR           - The navbar entry indicating the error state.
+         *    {String} PROGRESS_MESSAGE          - The text field containing the progress message.
          */
         IDs: {
             ALERT_CONTAINER:           'FuzzEdAlertContainer',
@@ -257,7 +256,7 @@ define(['underscore'], function() {
             ACTION_EXPORT_PDF:         'FuzzEdActionExportPDF',
             ACTION_EXPORT_EPS:         'FuzzEdActionExportEPS',
             PROGRESS_INDICATOR:        'FuzzEdProgressIndicator',
-            SAVE_INDICATOR:            'FuzzEdSaveIndicator',            
+            PROGRESS_MESSAGE:          'FuzzEdProgressMessage',
             ERROR_INDICATOR:           'FuzzEdErrorIndicator'
         },
 
