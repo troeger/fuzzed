@@ -48,7 +48,7 @@ void runSimulationOnFile(
 	try
 	{
 		SimulationProxy p = SimulationProxy(numRounds, convergenceThreshold, maxTime);
-		p.simulateFile(filePath, DEFAULT, false); // TODO make configurable
+		p.simulateFile(filePath, DEFAULT);
 
 	}
 	catch (const exception& e)

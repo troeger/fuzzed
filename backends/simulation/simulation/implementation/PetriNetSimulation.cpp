@@ -212,30 +212,22 @@ bool PetriNetSimulation::run()
 }
 
 PetriNetSimulation::PetriNetSimulation(
-	const boost::filesystem::path& path,
-	const string& outputFileName, 
+	const boost::filesystem::path& inPath,
+	const boost::filesystem::path& outputFileName, 
+	const boost::filesystem::path& workingDir, 
 	unsigned int simulationTime,	// the maximum duration of one simulation in seconds
 	unsigned int simulationSteps,	// the number of logical simulation steps performed in each round
 	unsigned int numRounds,
 	double convergenceThresh,
 	bool simulateUntilFailure,
 	unsigned int numAdaptiveRounds /*= 0*/)
-	: Simulation(path, simulationTime, simulationSteps, numRounds), 
-	m_outStream(nullptr),
-	m_outputFileName(outputFileName),
+	: Simulation(inPath, simulationTime, simulationSteps, numRounds),
+	m_outputFileName(outputFileName.generic_string()),
 	m_simulateUntilFailure(simulateUntilFailure),
 	m_numAdaptiveRounds(numAdaptiveRounds),
 	m_convergenceThresh(convergenceThresh)
 {
 	assert(!m_netFile.empty());
-	
-	if (!outputFileName.empty())
-	{
-		m_outStream = new ofstream(outputFileName+ ".log");
-		m_debugOutStream = new ofstream(outputFileName+".debug");
-	}
-
-	cout << "Results will be written to " << outputFileName << endl;
 }
 
 // returns false, if a sequence constraint was violated
@@ -311,12 +303,12 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 	}
 	catch (const exception& e)
 	{
-		(m_outStream ? *m_outStream : cout) << "Exception during Simulation" << e.what() << endl;
+		std::cerr << "Exception during Simulation" << e.what() << endl;
 		result.valid = false;
 	}
 	catch (...)
 	{
-		(m_outStream ? *m_outStream : cout) << "Unknown Exception during Simulation" << endl;
+		std::cerr << "Unknown Exception during Simulation" << endl;
 		result.valid = false;
 	}
 
@@ -378,10 +370,7 @@ void PetriNetSimulation::printResults(const SimulationResult& res)
 			   % res.duration
 			   % res.meanAvailability);
 
-	(*m_outStream) << results << endl;
-	m_outStream->close();
-
-	// cout << results << endl << endl;
+	cout << results << endl << endl;
 }
 
 
@@ -389,7 +378,7 @@ void PetriNetSimulation::writeResultXML(const SimulationResult& res)
 {
 	SimulationResultDocument doc;
 	doc.setResult(res);
-	doc.save(m_outputFileName + ".xml");
+	doc.save(m_outputFileName);
 }
 
 void PetriNetSimulation::tidyUp()
