@@ -122,7 +122,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 destination: targetNodeId
             };
 
-            jQuery.ajax({
+            var xhr = jQuery.ajax({
                 url:      this._fullUrlForEdges(),
                 type:     'POST',
                 dataType: 'json',
@@ -136,6 +136,9 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 },
                 complete: complete || jQuery.noop
             });
+            // set messages for progress indicator
+            xhr.successMessage = 'Saved';
+            xhr.errorMessage   = 'Not saved!';
 
             return this;
         },
@@ -164,7 +167,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 y:    y
             };
 
-            jQuery.ajax({
+            var xhr = jQuery.ajax({
                 url:      this._fullUrlForNodes(),
                 type:     'POST',
                 dataType: 'json',
@@ -178,6 +181,9 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 },
                 complete: complete || jQuery.noop
             });
+            // set messages for progress indicator
+            xhr.successMessage = 'Saved';
+            xhr.errorMessage   = 'Not saved!';
 
             return this;
         },
@@ -195,7 +201,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
          *                         AJAX call.
          */
         graphEdgeDeleted: function(event, edgeId, success, error, complete) {
-            jQuery.ajax({
+            var xhr = jQuery.ajax({
                 url:      this._fullUrlForEdge(edgeId),
                 type:     'DELETE',
                 dataType: 'json',
@@ -208,6 +214,9 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 },
                 complete: complete || jQuery.noop
             });
+            // set messages for progress indicator
+            xhr.successMessage = 'Saved';
+            xhr.errorMessage   = 'Not saved!';
 
             return this;
         },
@@ -225,7 +234,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
          *   {function} complete - [optional] Callback that is invoked in both cases, successful and errornous requests.
          */
         graphNodeDeleted: function(event, nodeId, success, error, complete) {
-            jQuery.ajax({
+            var xhr = jQuery.ajax({
                 url:      this._fullUrlForNode(nodeId),
                 type:     'DELETE',
                 dataType: 'json',
@@ -238,6 +247,9 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 },
                 complete: complete || jQuery.noop
             });
+            // set messages for progress indicator
+            xhr.successMessage = 'Saved';
+            xhr.errorMessage   = 'Not saved!';
 
             return this;
         },
@@ -258,7 +270,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
          *                           or erroneous.
          */
         nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
-            jQuery.ajax({
+            var xhr = jQuery.ajax({
                 url:      this._fullUrlForNode(nodeId),
                 type:     'POST',
                 data:{
@@ -274,6 +286,9 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 },
                 complete: complete || jQuery.noop
             });
+            // set messages for progress indicator
+            xhr.successMessage = 'Saved';
+            xhr.errorMessage   = 'Not saved!';
 
             return this;
         },

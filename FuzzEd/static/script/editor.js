@@ -21,7 +21,9 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *                                                    for changing the properties of nodes of the edited graph.
          *    {ShapesMenu}     shapes                       - The <Menu::ShapeMenu> instance use by this editor to show
          *                                                    the available shapes for the kind of the edited graph.
-         *    {Backend}        _backend                     - The instance of the <Backend> that is used to communicate
+         *    {jQuery Selector} _progressIndicator          - The AJAX spinner image.
+         *    {jQuery Selector} _progressMessage            - The span containing the progress message.
+         *    {Backend}         _backend                    - The instance of the <Backend> that is used to communicate
          *                                                    graph changes to the server.
          *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
          *    {jQuery Selector} _nodeOffsetPrintStylesheet  - The dynamically generated and maintained stylesheet
@@ -34,6 +36,9 @@ function(Class, Menus, Canvas, Backend, Alerts) {
         properties:                    undefined,
         shapes:                        undefined,
 
+
+        _progressIndicator:            undefined,
+        _progressMessage:              undefined,
         _backend:                      undefined,
         _currentMinNodeOffsets:        {'top': 0, 'left': 0},
         _nodeOffsetPrintStylesheet:    undefined,
@@ -57,6 +62,10 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             this.config   = this.getConfig();
             this._backend = new Backend(graphId);
+
+            // remember certain UI elements
+            this._progressIndicator = jQuery('#' + this.config.IDs.PROGRESS_INDICATOR);
+            this._progressMessage = jQuery('#' + this.config.IDs.PROGRESS_MESSAGE);
 
             // run a few sub initializer
             this._setupJsPlumb()
@@ -312,8 +321,8 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             jQuery(document).ajaxStart(this._showProgressIndicator.bind(this));
             jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
-            jQuery(document).ajaxSuccess(this._flashSaveIndicator.bind(this));
-            jQuery(document).ajaxError(this._flashErrorIndicator.bind(this));
+            jQuery(document).ajaxSuccess(this._flashSuccessMessage.bind(this));
+            jQuery(document).ajaxError(this._flashErrorMessage.bind(this));
 
             return this;
         },
@@ -484,34 +493,46 @@ function(Class, Menus, Canvas, Backend, Alerts) {
         },
 
         /**
-         *  Method: _flashSaveIndicator
-         *    Flash the save indicator to show that the current graph is saved in the backend.
+         *  Method: _flashSuccessMessage
+         *    Flash the success message to show that the current AJAX request was successful.
+         *
+         *  Parameters:
+         *    {Event}      event - The event object for the AJAX callback (unused).
+         *    {jQuery XHR} xhr   - The jQuery AJAX request object that triggered this request.
          *
          *  Returns:
          *    This Editor instance for chaining.
          */
-        _flashSaveIndicator: function() {
-            var indicator = jQuery('#' + this.config.IDs.SAVE_INDICATOR);
-            // only flash if not already visible
-            if (indicator.is(':hidden')) {
-                indicator.fadeIn(200).delay(600).fadeOut(200);
+        _flashSuccessMessage: function(event, xhr) {
+            // only flash if not already visible and if there is a message
+            if (this._progressMessage.is(':hidden') && xhr.successMessage) {
+                this._progressMessage.find('span').text(xhr.successMessage);
+                this._progressMessage.find('i').removeClass().addClass('icon-ok');
+
+                this._progressMessage.fadeIn(200).delay(600).fadeOut(200);
             }
 
             return this;
         },
 
         /**
-         *  Method _flashErrorIndicator
-         *    Flash the error indicator to show that the current graph has not been saved to the backend.
+         *  Method _flashErrorMessage
+         *    Flash the error message to show that the current AJAX request was unsuccessful.
+         *
+         *  Parameters:
+         *    {Event}      event - The event object for the AJAX callback (unused).
+         *    {jQuery XHR} xhr   - The jQuery AJAX request object that triggered this request.
          *
          *  Returns:
          *    This Editor instance for chaining.
          */
-        _flashErrorIndicator: function() {
-            var indicator = jQuery('#' + this.config.IDs.ERROR_INDICATOR);
-            // only flash if not already visible
-            if (indicator.is(':hidden')) {
-                indicator.fadeIn(200).delay(5000).fadeOut(200);
+        _flashErrorMessage: function(event, xhr) {
+            // only flash if there is a message
+            if (xhr.errorMessage) {
+                this._progressMessage.find('span').text(xhr.errorMessage);
+                this._progressMessage.find('i').removeClass().addClass('icon-warning-sign');
+
+                this._progressMessage.fadeIn(200).delay(5000).fadeOut(200);
             }
 
             return this;
