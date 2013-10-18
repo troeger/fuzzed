@@ -62,9 +62,9 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 		std::cerr << "Not a valid file name: " << inFile << std::endl;
 		exit(-1);
 	}
-	else if (!fs::is_directory(m_workingDir) || !util::isWritable(workingDirectory+"foo"))
+	else if (!fs::is_directory(m_workingDir) || !util::isWritable(workingDirectory + util::slash + "foo"))
 	{
-		std::cerr << "Not a writable directory: " << inFile << std::endl;
+		std::cerr << "Not a writable directory: " << workingDirectory << std::endl;
 		exit(-1);
 	}
 }

@@ -251,7 +251,10 @@ bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
 		p.extension() == timeNET::TN_EXT;
 }
 
-void SimulationProxy::simulateFaultTree(std::shared_ptr<TopLevelEvent> ft, const std::string& newFileName, SimulationImpl impl)
+void SimulationProxy::simulateFaultTree(
+	std::shared_ptr<TopLevelEvent> ft,
+	const std::string& newFileName,
+	SimulationImpl impl)
 {
 	std::shared_ptr<PNDocument> doc;
 
@@ -274,7 +277,7 @@ void SimulationProxy::simulateFaultTree(std::shared_ptr<TopLevelEvent> ft, const
 	case STRUCTUREFORMULA_ONLY:
 		auto TNdoc = std::shared_ptr<TNDocument>(new TNDocument());
 		ft->serializeTimeNet(TNdoc);
-		std::cout << ft->serializeAsFormula(TNdoc) << endl; // TODO: provide a StructureFormulaResultDocument
+		// std::cout << ft->serializeAsFormula(TNdoc) << endl; // TODO: provide a StructureFormulaResultDocument
 		doc = TNdoc;
 		break;
 	}

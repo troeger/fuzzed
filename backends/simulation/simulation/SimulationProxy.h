@@ -24,6 +24,19 @@ enum SimulationImpl
  
 struct TimeNETProperties;
 
+/************************************************************************/
+/* This class handles the different simulations:						*/
+/*	- TimeNET-based														*/
+/*	  (no support for PAND, SEQ, MTTF)									*/
+/*		- with normal petri net structures only							*/
+/*		- with structure formula-annotated conditional transitions		*/
+/*	- own Petri Net Simulation Algorithm								*/
+/*	  (no support for constant-time eval of structure formulas)			*/
+/*		- OpenMP parallelization										*/
+/*		- C++11-thread parallelization (slightly slower)				*/
+/*	- just outputting the structure formula								*/
+/************************************************************************/
+
 class SimulationProxy
 {
 public:

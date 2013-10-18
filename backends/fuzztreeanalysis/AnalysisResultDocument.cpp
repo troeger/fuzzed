@@ -29,7 +29,7 @@ void AnalysisResultDocument::setDecompositionNumber(const int& decompositionNum)
 
 void AnalysisResultDocument::addConfigurationResult(const FuzzTreeConfiguration& config, const DecomposedFuzzyInterval& prob)
 {
-	auto confignode = AbstractResultDocument::addConfigurationNode(config, m_root);// m_root.append_child(CONFIGURATION);
+	auto confignode = AbstractResultDocument::addConfigurationNode(config, m_root);
 	auto probnode = confignode.append_child(PROBABILITY);
 	
 	for (const auto& ac : prob)
