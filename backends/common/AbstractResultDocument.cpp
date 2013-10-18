@@ -62,9 +62,9 @@ void AbstractResultDocument::setModelId(const string& modelID)
 	m_root.append_attribute(MODELID).set_value(modelID.c_str());
 }
 
-void AbstractResultDocument::setTimeStamp(const int& timeStamp)
+void AbstractResultDocument::setTimeStamp(const string& timeStamp)
 {
-	m_root.append_attribute(TIMESTAMP).set_value(timeStamp);
+	m_root.append_attribute(TIMESTAMP).set_value(timeStamp.c_str());
 }
 
 bool AbstractResultDocument::save(const string& fileName)
@@ -73,33 +73,39 @@ bool AbstractResultDocument::save(const string& fileName)
 	return m_bSaved;
 }
 
-void AbstractResultDocument::addConfiguration(const FuzzTreeConfiguration& config)
+pugi::xml_node AbstractResultDocument::addConfigurationNode(
+	const FuzzTreeConfiguration &config,
+	xml_node& parent)
 {
+	xml_node configNode = parent.append_child("Configuration");
+	
 	for (const auto& inclusionChoice : config.m_optionalNodes)
 	{
-		auto cm = choiceNode(inclusionChoice.first);
+		auto cm = choiceNode(inclusionChoice.first, configNode);
 		auto cn = cm.append_child(INCLUSION_CHOICE);
 		cn.append_attribute(INCLUDED).set_value(inclusionChoice.second ? "true" : "false");
 	}
 
 	for (const auto& redundancyChoice : config.m_redundancyNodes)
 	{
-		auto cm = choiceNode(redundancyChoice.first);
+		auto cm = choiceNode(redundancyChoice.first, configNode);
 		auto cn = cm.append_child(REDUNDANCY_CHOICE);
 		cn.append_attribute("n").set_value(std::get<0>(redundancyChoice.second));
 	}
 
 	for (const auto& featureChoice : config.m_featureNodes)
 	{
-		auto cm = choiceNode(featureChoice.first);
+		auto cm = choiceNode(featureChoice.first, configNode);
 		auto cn = cm.append_child(FEATURE_CHOICE);
 		cn.append_attribute("featureId").set_value(featureChoice.second.c_str());
 	}
+
+	return configNode;
 }
 
-pugi::xml_node AbstractResultDocument::choiceNode(FuzzTreeConfiguration::id_type ID)
+pugi::xml_node AbstractResultDocument::choiceNode(FuzzTreeConfiguration::id_type ID, xml_node& parent)
 {
-	auto cm = m_root.append_child(INT_TO_CHOICE);
+	auto cm = parent.append_child(INT_TO_CHOICE);
 	cm.append_attribute("key").set_value(ID.c_str());
 	return cm;
 }

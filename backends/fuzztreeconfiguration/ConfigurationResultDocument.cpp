@@ -8,7 +8,7 @@ void ConfigurationResultDocument::addConfigurations(const std::vector<FuzzTreeCo
 {
 	// for each configuration, write only the Choice information
 	for (const auto& config : configs)
-		addConfiguration(config);
+		addConfigurationNode(config, m_root);
 }
 
 void ConfigurationResultDocument::addTreeSpecification(std::auto_ptr<fuzztree::FuzzTree> m_fuzzTree)

@@ -9,5 +9,5 @@ public:
 	virtual ~AnalysisResultDocument() {}
 
 	void setDecompositionNumber(const int& decompositionNum);
-	void addConfiguration(const DecomposedFuzzyInterval& prob);
+	void addConfigurationResult(const FuzzTreeConfiguration& config, const DecomposedFuzzyInterval& prob);
 };

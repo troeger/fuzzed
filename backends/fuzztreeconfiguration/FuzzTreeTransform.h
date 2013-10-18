@@ -27,8 +27,6 @@ public:
 	FuzzTreeTransform(std::istream& fuzzTreeXML);
 	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft);
 
-	
-
 	~FuzzTreeTransform();
 
 	void generateConfigurationsFile(const std::string& outputXML);

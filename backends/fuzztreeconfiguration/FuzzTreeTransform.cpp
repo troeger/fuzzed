@@ -211,7 +211,7 @@ fuzztree::FuzzTree FuzzTreeTransform::generateVariationFreeFuzzTree(const FuzzTr
 	const fuzztree::TopEvent topEvent = m_fuzzTree->topEvent();
 
 	// Create a new empty top event to fill up with the configuration
-	fuzztree::TopEvent newTopEvent(topEvent.id(), topEvent.missionTime());
+	fuzztree::TopEvent newTopEvent(topEvent.id(), topEvent.missionTime(), topEvent.decompositionNumber());
 	newTopEvent.name() = topEvent.name();
 
 	if (generateVariationFreeFuzzTreeRecursive(&topEvent, &newTopEvent, configuration) == OK)

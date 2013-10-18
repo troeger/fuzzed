@@ -11,20 +11,18 @@ public:
 	void addError(const std::string& message, const std::string& elementID);
 	void addWarning(const std::string& message, const std::string& elementID);
 
-	pugi::xml_node addConfiguration();
-
 	void setModelId(const std::string& modelID);
-	void setTimeStamp(const int& timeStamp);
+	void setTimeStamp(const std::string& timeStamp);
 
 	bool save(const std::string& fileName);
 
 	bool valid() const { return !pugi::xml_document::empty(); }
 	bool saved() const { return m_bSaved; }
 
-	void addConfiguration(const FuzzTreeConfiguration &config);
+	xml_node addConfigurationNode(const FuzzTreeConfiguration &config, xml_node& parent);
 
 protected:
-	pugi::xml_node choiceNode(FuzzTreeConfiguration::id_type ID);
+	pugi::xml_node choiceNode(FuzzTreeConfiguration::id_type ID, xml_node& parent);
 	
 	void initXML();
 
