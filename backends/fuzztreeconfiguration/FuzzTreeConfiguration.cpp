@@ -1,16 +1,15 @@
 #include "FuzzTreeConfiguration.h"
 
 FuzzTreeConfiguration::FuzzTreeConfiguration()
-{
-
-}
+	: m_costs(0)
+{}
 
 FuzzTreeConfiguration::~FuzzTreeConfiguration()
 {} // nothing
 
-void FuzzTreeConfiguration::setNodeOptional(const id_type& ID, bool optional)
+void FuzzTreeConfiguration::setOptionalEnabled(const id_type& ID, bool enabled)
 {
-	m_optionalNodes[ID] = optional;
+	m_optionalNodes[ID] = enabled;
 }
 
 void FuzzTreeConfiguration::setRedundancyNumber(const id_type& ID, int k, int outOfN)

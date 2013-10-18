@@ -16,7 +16,7 @@ public:
 	FuzzTreeConfiguration();
 	~FuzzTreeConfiguration();
 
-	void setNodeOptional(const id_type& ID, bool optional);
+	void setOptionalEnabled(const id_type& ID, bool enabled);
 	void setRedundancyNumber(const id_type& ID, int k, int outOfN);
 	void setFeatureNumber(const id_type& ID, const id_type& configuredChild);
 
@@ -28,9 +28,14 @@ public:
 	const std::tuple<int,int>& getRedundancyCount(const id_type& ID)const { return m_redundancyNodes.at(ID); }
 	const id_type& getFeaturedChild(const id_type& ID)				const { return m_featureNodes.at(ID); }
 
+	void setCost(int cost) { m_costs = cost; }
+	const int getCost() const { return m_costs; }
+
 protected:
 	std::set<id_type>										m_notIncluded;
 	std::map<id_type, bool /*enabled*/>						m_optionalNodes;
 	std::map<id_type, std::tuple<int,int> /*n out of m*/>	m_redundancyNodes;
 	std::map<id_type, id_type>								m_featureNodes;
+
+	int m_costs;
 };
