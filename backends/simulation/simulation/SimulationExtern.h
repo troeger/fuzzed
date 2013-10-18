@@ -10,12 +10,5 @@ extern "C"
 		double convergenceThreshold,	/* stop after reliability changes no more than this threshold */
 		int maxTime						/* maximum duration of simulation in milliseconds */
 		) noexcept;
-
-	void /*FT_DLL_API*/ runSimulation(
-		char* fuzztreeXML,				/* fuzztree XML */
-		int numRounds,					/* the max number of simulation rounds. if convergence is specified, the actual number may be lower*/
-		double convergenceThreshold,	/* stop after reliability changes no more than this threshold */
-		int maxTime						/* maximum duration of simulation in milliseconds */
-		) noexcept;
 }
 

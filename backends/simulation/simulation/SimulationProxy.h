@@ -53,9 +53,17 @@ public:
 	void simulateFile(const boost::filesystem::path& p, SimulationImpl impl);
 
 	// simulates all configurations from one file
-	void simulateAllConfigurations(const boost::filesystem::path& input, const boost::filesystem::path& output, const boost::filesystem::path& workingDir, SimulationImpl impl);
+	void simulateAllConfigurations(
+		const boost::filesystem::path& input,
+		const boost::filesystem::path& output,
+		const boost::filesystem::path& workingDir,
+		SimulationImpl impl);
 
-	void simulateFaultTree(std::shared_ptr<TopLevelEvent> ft, const std::string& newFileName, SimulationImpl impl);
+	void simulateFaultTree(std::shared_ptr<TopLevelEvent> ft,
+		const boost::filesystem::path& input,
+		const boost::filesystem::path& output,
+		const boost::filesystem::path& workingDir,
+		SimulationImpl impl);
 
 	void parseCommandline_default(int numArguments, char** arguments);
 

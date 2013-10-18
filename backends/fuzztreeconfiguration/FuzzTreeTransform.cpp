@@ -17,7 +17,8 @@ using xercesc::DOMDocument;
 using namespace std;
 
 FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
-	m_count(0)
+	m_count(0),
+	m_bValid(true)
 {
 	try
 	{
@@ -27,6 +28,7 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 	catch (const xml_schema::Exception& e)
 	{
 		std::cout << e.what() << std::endl;
+		m_bValid = false;
 	}
 }
 
@@ -41,6 +43,7 @@ FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML)
 	catch (const xml_schema::Exception& e)
 	{
 		std::cout << e.what() << std::endl;
+		m_bValid = false;
 	}
 }
 

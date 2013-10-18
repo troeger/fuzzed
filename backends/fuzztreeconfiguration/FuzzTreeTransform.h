@@ -32,6 +32,8 @@ public:
 	void generateConfigurationsFile(const std::string& outputXML);
 	std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>> transform();
 
+	bool isValid() const { return m_bValid; }
+
 protected:
 	fuzztree::FuzzTree generateVariationFreeFuzzTree(const FuzzTreeConfiguration& configuration);
 	ErrorType generateVariationFreeFuzzTreeRecursive(
@@ -79,4 +81,5 @@ private:
 	std::auto_ptr<fuzztree::FuzzTree> m_fuzzTree;
 
 	int m_count;
+	bool m_bValid;
 };

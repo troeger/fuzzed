@@ -5,7 +5,6 @@
 #include "serialization/PNMLDocument.h"
 #include "serialization/TNDocument.h"
 #include "events/TopLevelEvent.h"
-#include "FaultTreeImport.h"
 #include "FuzzTreeTransform.h"
 #include "FaultTreeConversion.h"
 
@@ -235,7 +234,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl)
 
 		string pnFile = p.generic_string();
 		util::replaceFileExtensionInPlace(pnFile, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
-		simulateFaultTree(ft, pnFile, impl);
+		simulateFaultTree(ft, p, outFile, workingDir, impl);
 	}
 }
 
@@ -250,7 +249,9 @@ bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
 
 void SimulationProxy::simulateFaultTree(
 	std::shared_ptr<TopLevelEvent> ft,
-	const std::string& petriNetFile,
+	const boost::filesystem::path& input,
+	const boost::filesystem::path& output,
+	const boost::filesystem::path& workingDir,
 	SimulationImpl impl)
 {
 	std::shared_ptr<PNDocument> doc;
@@ -282,13 +283,11 @@ void SimulationProxy::simulateFaultTree(
 	if (impl == STRUCTUREFORMULA_ONLY)
 		return;
 
-	doc->save(petriNetFile);
-	std::string outFile = petriNetFile;
-	std::string workingDir = petriNetFile;
-	util::replaceFileExtensionInPlace(outFile, ".xml");
-	util::replaceFileExtensionInPlace(workingDir, "");
+	std::string petriNetFile = workingDir.generic_string() + util::fileNameFromPath(input.generic_string());
+	util::replaceFileExtensionInPlace(petriNetFile, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
 
-	runSimulationInternal(petriNetFile, outFile, workingDir, impl, m_timeNetProperties);
+	doc->save(petriNetFile);
+	runSimulationInternal(petriNetFile, output, workingDir, impl, m_timeNetProperties);
 }
 
 void SimulationProxy::simulateAllConfigurations(
@@ -302,22 +301,33 @@ void SimulationProxy::simulateAllConfigurations(
 	if (!file.is_open())
 		throw runtime_error("Could not open file");
 
-	// TODO: find out whether this is a fuzz- or a fault tree.
 	FuzzTreeTransform ftTransform(file);
+	if (!ftTransform.isValid())
+	{
+		const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
+		std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
+		if (ft)
+			simulateFaultTree(ft, inputFile, outputFile, workingDir, impl);
+		else
+			std::cerr << "Could handle fault tree file: " << inFile << endl;
+			
+		return;
+	}
+
 	int i = 0;
 	for (const auto& ft : ftTransform.transform())
 	{
 		std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent()); 
-		
-		std::string newFileName = util::fileNameFromPath(inFile);
-		util::replaceFileExtensionInPlace(newFileName, util::toString(++i) + ((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT));
-
-		simulateFaultTree(simTree, newFileName, impl);
+		simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
 	}
 }
 
 void SimulationProxy::parseCommandline_default(int numArguments, char** arguments)
 {
+	// TODO: command line options
+	m_numRounds = DEFAULT_SIMULATION_ROUNDS;
+	m_simulationTime = DEFAULT_SIMULATION_TIME;
+	
 	CommandLineParser parser;
 	parser.parseCommandline(numArguments, arguments);
 	simulateAllConfigurations(parser.getInputFilePath(), parser.getOutputFilePath(), parser.getWorkingDirectory(), DEFAULT);
