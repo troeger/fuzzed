@@ -123,8 +123,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		// Calculate results of children first.
 		const unsigned int n = node.children().size();
 
-		vector<interval_t> lowerBounds(n);
-		vector<interval_t> upperBounds(n);
+		vector<interval_t> lowerBounds;
+		vector<interval_t> upperBounds;
 		for (const auto& c : node.children())
 		{
 			const auto res = analyzeRecursive(c);
@@ -141,7 +141,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		vector<interval_t> combinations(numberOfCombinations);
 		for (unsigned int i = 0; i < numberOfCombinations; ++i)
 		{
-			vector<interval_t> perm(n);
+			vector<interval_t> perm;
 			for (unsigned int j = 0; j < n; j++)
 				perm.emplace_back((i >> j)&1 ? upperBounds[j] : lowerBounds[j]);
 
@@ -159,8 +159,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		const int k = votingOr.k();
 		const int n = votingOr.children().size();
 
-		vector<interval_t> lowerBounds(n);
-		vector<interval_t> upperBounds(n);
+		vector<interval_t> lowerBounds;
+		vector<interval_t> upperBounds;
 
 		for (const auto& c : node.children())
 		{
