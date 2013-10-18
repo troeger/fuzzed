@@ -67,8 +67,12 @@ int util::fileSize(const char* filename)
 
 string util::timeStamp()
 {
-	const int time = (int)duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-	return util::toString(time);
+	time_t t;
+	time(&t);
+
+	std::stringstream strm;
+	strm << t;
+	return strm.str();
 }
 
 long double util::kOutOfN(long double rate, int k, int N)
