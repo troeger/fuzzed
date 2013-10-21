@@ -1,5 +1,5 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'],
-function(Class, Menus, Canvas, Backend, Alerts) {
+define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progressIndicator', 'jquery-classlist'],
+function(Class, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base
      */
@@ -15,14 +15,12 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *  Group: Members
          *
          *  Properties:
-         *    {Object}         config                       - Graph-specific <Config> object.
-         *    {Graph}          graph                        - <Graph> instance to be edited.
-         *    {PropertiesMenu} properties                   - The <Menu::PropertiesMenu> instance used by this editor
+         *    {Object}          config                      - Graph-specific <Config> object.
+         *    {Graph}           graph                       - <Graph> instance to be edited.
+         *    {PropertiesMenu}  properties                  - The <Menu::PropertiesMenu> instance used by this editor
          *                                                    for changing the properties of nodes of the edited graph.
-         *    {ShapesMenu}     shapes                       - The <Menu::ShapeMenu> instance use by this editor to show
+         *    {ShapesMenu}      shapes                      - The <Menu::ShapeMenu> instance use by this editor to show
          *                                                    the available shapes for the kind of the edited graph.
-         *    {jQuery Selector} _progressIndicator          - The AJAX spinner image.
-         *    {jQuery Selector} _progressMessage            - The span containing the progress message.
          *    {Backend}         _backend                    - The instance of the <Backend> that is used to communicate
          *                                                    graph changes to the server.
          *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
@@ -36,9 +34,6 @@ function(Class, Menus, Canvas, Backend, Alerts) {
         properties:                    undefined,
         shapes:                        undefined,
 
-
-        _progressIndicator:            undefined,
-        _progressMessage:              undefined,
         _backend:                      undefined,
         _currentMinNodeOffsets:        {'top': 0, 'left': 0},
         _nodeOffsetPrintStylesheet:    undefined,
@@ -319,10 +314,10 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,   this._updatePrintOffsets.bind(this));
             jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED, this._updatePrintOffsets.bind(this));
 
-            jQuery(document).ajaxStart(this._showProgressIndicator.bind(this));
-            jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
-            jQuery(document).ajaxSuccess(this._flashSuccessMessage.bind(this));
-            jQuery(document).ajaxError(this._flashErrorMessage.bind(this));
+            jQuery(document).ajaxStart(Progress.showProgressIndicator);
+            jQuery(document).ajaxStop(Progress.hideProgressIndicator);
+            jQuery(document).ajaxSuccess(Progress.flashSuccessMessage);
+            jQuery(document).ajaxError(Progress.flashErrorMessage);
 
             return this;
         },
@@ -457,86 +452,6 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             return this;
         },
 
-        /**
-         *  Group: Progress Indication
-         */
-
-        /**
-         *  Method _showProgressIndicator
-         *    Display the progress indicator.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _showProgressIndicator: function() {
-            // show indicator only if it takes longer then 500 ms
-            this._progressIndicatorTimeout = setTimeout(function() {
-                jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
-            }.bind(this), 500);
-
-            return this;
-        },
-
-        /**
-         *  Method _hideProgressIndicator
-         *    Hides the progress indicator.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _hideProgressIndicator: function() {
-            // prevent indicator from showing before 500 ms are passed
-            clearTimeout(this._progressIndicatorTimeout);
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
-
-            return this;
-        },
-
-        /**
-         *  Method: _flashSuccessMessage
-         *    Flash the success message to show that the current AJAX request was successful.
-         *
-         *  Parameters:
-         *    {Event}      event - The event object for the AJAX callback (unused).
-         *    {jQuery XHR} xhr   - The jQuery AJAX request object that triggered this request.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _flashSuccessMessage: function(event, xhr) {
-            // only flash if not already visible and if there is a message
-            if (this._progressMessage.is(':hidden') && xhr.successMessage) {
-                this._progressMessage.find('span').text(xhr.successMessage);
-                this._progressMessage.find('i').removeClass().addClass('icon-ok');
-
-                this._progressMessage.fadeIn(200).delay(600).fadeOut(200);
-            }
-
-            return this;
-        },
-
-        /**
-         *  Method _flashErrorMessage
-         *    Flash the error message to show that the current AJAX request was unsuccessful.
-         *
-         *  Parameters:
-         *    {Event}      event - The event object for the AJAX callback (unused).
-         *    {jQuery XHR} xhr   - The jQuery AJAX request object that triggered this request.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _flashErrorMessage: function(event, xhr) {
-            // only flash if there is a message
-            if (xhr.errorMessage) {
-                this._progressMessage.find('span').text(xhr.errorMessage);
-                this._progressMessage.find('i').removeClass().addClass('icon-warning-sign');
-
-                this._progressMessage.fadeIn(200).delay(5000).fadeOut(200);
-            }
-
-            return this;
-        },
 
         /**
          *  Group: Print Offset Calculation

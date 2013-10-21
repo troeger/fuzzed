@@ -256,8 +256,7 @@ define(['underscore'], function() {
             ACTION_EXPORT_PDF:         'FuzzEdActionExportPDF',
             ACTION_EXPORT_EPS:         'FuzzEdActionExportEPS',
             PROGRESS_INDICATOR:        'FuzzEdProgressIndicator',
-            PROGRESS_MESSAGE:          'FuzzEdProgressMessage',
-            ERROR_INDICATOR:           'FuzzEdErrorIndicator'
+            PROGRESS_MESSAGE:          'FuzzEdProgressMessage'
         },
 
         /**

@@ -528,8 +528,6 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 exportType = 'invalid';
             }
             return this._fullUrlForGraph() + Config.Backend.GRAPH_EXPORT_URL + '/'+exportType;
-        },
-
-
+        }
     });
 });
