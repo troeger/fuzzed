@@ -316,8 +316,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             jQuery(document).ajaxStart(Progress.showProgressIndicator);
             jQuery(document).ajaxStop(Progress.hideProgressIndicator);
-            jQuery(document).ajaxSuccess(Progress.flashSuccessMessage);
-            jQuery(document).ajaxError(Progress.flashErrorMessage);
+            jQuery(document).ajaxSuccess(Progress.flashAjaxSuccessMessage);
+            jQuery(document).ajaxError(Progress.flashAjaxErrorMessage);
 
             return this;
         },
