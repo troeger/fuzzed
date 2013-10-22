@@ -30,7 +30,10 @@ int main(int argc, char **argv)
 			std::ifstream instream(inFile);
 			if (!instream.good())
 				return -1; // TODO some output here
+
 			FuzzTreeTransform transform(instream);
+			if (!transform.isValid())
+				return -1;
 			const auto fileName = util::fileNameFromPath(inFile);
 
 			transform.generateConfigurationsFile(outFile);
