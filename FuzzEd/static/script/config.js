@@ -365,7 +365,7 @@ define(['underscore'], function() {
             ERROR_FLASH_DELAY:         5000,
             PROGRESS_APPEARANCE_DELAY: 500,
 
-            DEFAULT_PROGRESS_MESSAGE:  'Processing…',
+            DEFAULT_PROGRESS_MESSAGE:  'Working…',
             DEFAULT_SUCCESS_MESSAGE:   'Done',
             DEFAULT_ERROR_MESSAGE:     'Error'
         },
