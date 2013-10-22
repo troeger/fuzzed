@@ -8,7 +8,8 @@
 
 #include "CommandLineParser.h"
 #include "util.h"
-
+#include "xmlutil.h"
+#include "analysisResult.h"
 
 using std::endl;
 using std::cerr;
@@ -26,8 +27,11 @@ int main(int argc, char** argv)
 		std::ifstream stream(inFile);
 		assert(stream.good());
 		auto tree = fuzztree::fuzzTree(stream, xml_schema::Flags::dont_validate);
-		
+
 		const int decompositionNumber = tree->topEvent().decompositionNumber();
+		const auto modelId = tree->id();
+
+		analysisResults::AnalysisResults analysisResults;
 
 		FuzzTreeTransform tf(tree);
 		for (const auto& t : tf.transform())
@@ -36,7 +40,15 @@ int main(int argc, char** argv)
 			InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, decompositionNumber);
 			
 			const auto result = analysis->compute();
+
+			analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+			r.configuration(serializedConfiguration(t.first));
+			r.probability(serialize(result));
+			analysisResults.result().push_back(r);
 		}
+
+		std::ofstream output(outFile);
+		analysisResults::analysisResults(output, analysisResults);
 	}
 	catch (const std::exception& e)
 	{
