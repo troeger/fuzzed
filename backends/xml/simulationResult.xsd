@@ -23,8 +23,8 @@
       <xsd:element minOccurs="0" maxOccurs="1" name="configuration" type="configurations:Configuration"/>
       <xsd:element minOccurs="0" maxOccurs="1" name="probability" type="common:Probability"/>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:int"/>
-    <xsd:attribute name="modelId" type="xsd:int" use="required"/>
+    <xsd:attribute name="id" type="xsd:string"/>
+    <xsd:attribute name="modelId" type="xsd:string" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
     <xsd:attribute name="costs" type="xsd:int" use="required"/>
     <xsd:attribute name="reliability" type="xsd:double" use="required"/>

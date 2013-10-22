@@ -23,15 +23,15 @@
       <xsd:element minOccurs="0" maxOccurs="1" name="configuration" type="configurations:Configuration"/>
       <xsd:element minOccurs="0" maxOccurs="1" name="probability" type="common:Probability"/>
     </xsd:sequence>
-    <xsd:attribute name="id" type="xsd:int"/>
-    <xsd:attribute name="modelId" type="xsd:int" use="required"/>
+    <xsd:attribute name="id" type="xsd:string"/>
+    <xsd:attribute name="modelId" type="xsd:string" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
     <xsd:attribute name="validResult" type="xsd:boolean" use="required"/>
     <xsd:attribute name="decompositionNumber" type="xsd:int" use="required"/>
     <xsd:attribute default="default" name="engine" type="xsd:string"/>
   </xsd:complexType>           
 
-  <xsd:element name="analysisResult">
+  <xsd:element name="analysisResults">
     <xsd:complexType>
         <xsd:sequence>
           <xsd:element minOccurs="0" maxOccurs="unbounded" name="result" type="Result"/>
