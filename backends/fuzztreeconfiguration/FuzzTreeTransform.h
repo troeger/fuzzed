@@ -30,6 +30,7 @@ public:
 	~FuzzTreeTransform();
 
 	void generateConfigurationsFile(const std::string& outputXML);
+
 	std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>> transform();
 
 	bool isValid() const { return m_bValid; }

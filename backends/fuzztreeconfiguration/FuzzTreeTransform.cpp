@@ -5,6 +5,7 @@
 #include "FuzzTreeTypes.h"
 #include "FaultTreeTypes.h"
 
+#include "xmlutil.h"
 #include "configurationResult.h"
 
 #include <xsd/cxx/tree/elements.hxx>
@@ -490,36 +491,10 @@ void FuzzTreeTransform::generateConfigurationsFile(const std::string& outputXML)
 	generateConfigurations(results);
 
 	configurationResults::ConfigurationResults configResults;
-	for (const auto& c : results)
+	for (const FuzzTreeConfiguration& c : results)
 	{
 		configurationResults::Result r;
-		configurations::Configuration conf(c.getCost());
-
-		for (const auto& inclusionChoice : c.m_optionalNodes)
-		{
-			conf.choice().push_back(
-				configurations::IntegerToChoiceMap(
-				configurations::InclusionChoice(inclusionChoice.second),
-				inclusionChoice.first));
-		}
-
-		for (const auto& redundancyChoice : c.m_redundancyNodes)
-		{
-			conf.choice().push_back(
-				configurations::IntegerToChoiceMap(
-					configurations::RedundancyChoice(std::get<0>(redundancyChoice.second)),
-					redundancyChoice.first));
-		}
-
-		for (const auto& featureChoice : c.m_featureNodes)
-		{
-			conf.choice().push_back(
-				configurations::IntegerToChoiceMap(
-					configurations::FeatureChoice(featureChoice.first),
-					featureChoice.second));
-		}
-
-		r.configuration(conf);
+		r.configuration(serializedConfiguration(c));
 		configResults.result().push_back(r);
 	}
 

@@ -9,8 +9,6 @@
 struct FuzzTreeConfiguration
 {
 public:
-	friend class FuzzTreeTransform;
-
 	typedef std::string id_type;
 
 	FuzzTreeConfiguration();
@@ -22,14 +20,20 @@ public:
 
 	void setNotIncluded(const id_type& ID);
 
-	const bool& isOptionalEnabled(const id_type& ID)	const { return m_optionalNodes.at(ID); }
-	const bool isIncluded(const id_type& ID)			const { return m_notIncluded.find(ID) == m_notIncluded.end(); }
+	const bool& isOptionalEnabled(const id_type& ID) const;
+	const bool isIncluded(const id_type& ID) const;
 	
-	const std::tuple<int,int>& getRedundancyCount(const id_type& ID)const { return m_redundancyNodes.at(ID); }
-	const id_type& getFeaturedChild(const id_type& ID)				const { return m_featureNodes.at(ID); }
+	const std::tuple<int,int>& getRedundancyCount(const id_type& ID) const;
+	const id_type& getFeaturedChild(const id_type& ID) const;
 
-	void setCost(int cost) { m_costs = cost; }
-	const int getCost() const { return m_costs; }
+	void setCost(int cost);
+	const int getCost() const;
+
+	// TODO: provide iterators here
+	const std::map<id_type, bool>&					getOptionalNodes() const;
+	const std::map<id_type, std::tuple<int,int>>&	getRedundancyNodes() const;
+	const std::map<id_type, id_type>&				getFeaturedNodes() const;
+
 
 protected:
 	std::set<id_type>										m_notIncluded;

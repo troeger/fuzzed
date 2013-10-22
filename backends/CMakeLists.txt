@@ -307,6 +307,7 @@ add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FIL
 
 set(COMMON_SOURCES
 	${COMMON_DIR}/util.cpp
+	${COMMON_DIR}/xmlutil.cpp
 	${COMMON_DIR}/FaultTreeTypes.cpp
 	${COMMON_DIR}/FuzzTreeTypes.cpp
 	${COMMON_DIR}/FaultTreeTypes.cpp
@@ -324,6 +325,7 @@ set(COMMON_SOURCES
 set(COMMON_HEADERS
 	${COMMON_DIR}/platform.h
 	${COMMON_DIR}/util.h
+	${COMMON_DIR}/xmlutil.h
 	${COMMON_DIR}/FaultTreeTypes.h
 	${COMMON_DIR}/FuzzTreeTypes.h
 	${COMMON_DIR}/faulttree.h
