@@ -134,11 +134,15 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                     Alerts.showErrorAlert('Edge could not be saved:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
             });
-            // set messages for progress indicator
-            xhr.successMessage = 'Saved';
-            xhr.errorMessage   = 'Not saved!';
 
             return this;
         },
@@ -179,11 +183,15 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                     Alerts.showErrorAlert('Node could not be created:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
             });
-            // set messages for progress indicator
-            xhr.successMessage = 'Saved';
-            xhr.errorMessage   = 'Not saved!';
 
             return this;
         },
@@ -212,11 +220,15 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                     Alerts.showErrorAlert('Edge could not be deleted:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
             });
-            // set messages for progress indicator
-            xhr.successMessage = 'Saved';
-            xhr.errorMessage   = 'Not saved!';
 
             return this;
         },
@@ -245,11 +257,15 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                     Alerts.showErrorAlert('Node could not be deleted:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
             });
-            // set messages for progress indicator
-            xhr.successMessage = 'Saved';
-            xhr.errorMessage   = 'Not saved!';
 
             return this;
         },
@@ -284,11 +300,15 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                     Alerts.showErrorAlert('Node could not be changed:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
             });
-            // set messages for progress indicator
-            xhr.successMessage = 'Saved';
-            xhr.errorMessage   = 'Not saved!';
 
             return this;
         },

@@ -7,6 +7,10 @@ define(['config', 'jquery', 'underscore'], function(Config) {
     var _progressList = {};
 
 
+    /**
+     *  Section: API
+     */
+
     function showProgress(progressID, message) {
         if (_progressList[progressID]) return; //TODO: What happens with repeating requests?
 
@@ -52,6 +56,30 @@ define(['config', 'jquery', 'underscore'], function(Config) {
     function flashErrorMessage(progressID, message) {
         _flashMessage(progressID, message, Config.Classes.ICON_ERROR, Config.ProgressIndicator.ERROR_FLASH_DELAY);
     }
+
+    /**
+     *  Section: AJAX
+     */
+
+    function showAjaxProgress(event, xhr) {
+        // assign an ID for later reference
+        xhr.progressID = _.uniqueId('progress_');
+
+        showProgress(xhr.progressID, xhr.progressMessage || Config.ProgressIndicator.DEFAULT_PROGRESS_MESSAGE);
+    }
+
+    function flashAjaxSuccessMessage(event, xhr) {
+        flashSuccessMessage(xhr.progressID, xhr.progressSuccessMessage || Config.ProgressIndicator.DEFAULT_SUCCESS_MESSAGE);
+    }
+
+    function flashAjaxErrorMessage(event, xhr) {
+        flashErrorMessage(xhr.progressID, xhr.progressErrorMessage || Config.ProgressIndicator.DEFAULT_ERROR_MESSAGE);
+    }
+
+
+    /**
+     *  Section: Internal
+     */
 
     function _flashMessage(progressID, message, iconClass, delay) {
         if (!_progressList[progressID]) return; // there is not such active progress indicator
@@ -101,6 +129,9 @@ define(['config', 'jquery', 'underscore'], function(Config) {
     return {
         'showProgress': showProgress,
         'flashSuccessMessage': flashSuccessMessage,
-        'flashErrorMessage': flashErrorMessage
+        'flashErrorMessage': flashErrorMessage,
+        'showAjaxProgress': showAjaxProgress,
+        'flashAjaxSuccessMessage': flashAjaxSuccessMessage,
+        'flashAjaxErrorMessage': flashAjaxErrorMessage
     };
 });

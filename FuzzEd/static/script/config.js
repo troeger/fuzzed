@@ -355,11 +355,19 @@ define(['underscore'], function() {
          *    {Number} SUCCESS_FLASH_DELAY       - Delay in ms before hiding the progress indicator of a successful action.
          *    {Number} ERROR_FLASH_DELAY         - Delay in ms before hiding the progress indicator of an erroneous action.
          *    {Number} PROGRESS_APPEARANCE_DELAY - Delay in ms before showing a progress indicator.
+         *
+         *    {String} DEFAULT_PROGRESS_MESSAGE  - The default status message for active actions.
+         *    {String} DEFAULT_SUCCESS_MESSAGE   - The default status message for successful actions.
+         *    {String} DEFAULT_ERROR_MESSAGE     - The default status message for erroneous actions.
          */
         ProgressIndicator: {
             SUCCESS_FLASH_DELAY:       600,
             ERROR_FLASH_DELAY:         5000,
-            PROGRESS_APPEARANCE_DELAY: 500
+            PROGRESS_APPEARANCE_DELAY: 500,
+
+            DEFAULT_PROGRESS_MESSAGE:  'Processing…',
+            DEFAULT_SUCCESS_MESSAGE:   'Done',
+            DEFAULT_ERROR_MESSAGE:     'Error'
         },
 
         /**

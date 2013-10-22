@@ -314,11 +314,10 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,   this._updatePrintOffsets.bind(this));
             jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED, this._updatePrintOffsets.bind(this));
 
-            //TODO
-//            jQuery(document).ajaxStart(Progress.showProgressIndicator);
-//            jQuery(document).ajaxStop(Progress.hideProgressIndicator);
-//            jQuery(document).ajaxSuccess(Progress.flashAjaxSuccessMessage);
-//            jQuery(document).ajaxError(Progress.flashAjaxErrorMessage);
+            // show status of global AJAX events in navbar
+            jQuery(document).ajaxSend(Progress.showAjaxProgress);
+            jQuery(document).ajaxSuccess(Progress.flashAjaxSuccessMessage);
+            jQuery(document).ajaxError(Progress.flashAjaxErrorMessage);
 
             return this;
         },
