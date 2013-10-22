@@ -55,6 +55,10 @@ define(['config', 'jquery', 'underscore'], function(Config) {
 
     function flashErrorMessage(progressID, message) {
         _flashMessage(progressID, message, Config.Classes.ICON_ERROR, Config.ProgressIndicator.ERROR_FLASH_DELAY);
+        // if the erroneous entry is in the dropdown, show the dropdown menu
+        if (!_progressIndicatorDropdown.is(':hidden')) {
+            _progressIndicatorDropdown.find('.dropdown-menu').show();
+        }
     }
 
     /**
