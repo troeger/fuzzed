@@ -1,97 +1,106 @@
-define(['config', 'jquery'], function(Config) {
+define(['config', 'jquery', 'underscore'], function(Config) {
 
-    var _progressIndicatorTimeout;
-    var _progressIndicator = jQuery('#' + Config.IDs.PROGRESS_INDICATOR);
-    var _progressMessage   = jQuery('#' + Config.IDs.PROGRESS_MESSAGE);
+    var _progressIndicatorSingle   = jQuery('#' + Config.IDs.PROGRESS_INDICATOR_SINGLE);
+    var _progressIndicatorDropdown = jQuery('#' + Config.IDs.PROGRESS_INDICATOR_DROPDOWN);
+    var _progressIndicatorEntry    = jQuery(_progressIndicatorSingle.html()); // copy an entry form template
 
-    /**
-     *  Function: showProgressIndicator
-     *    Display the progress indicator.
-     */
-    function showProgressIndicator() {
-        // show indicator only if it takes longer then 500 ms
-        _progressIndicatorTimeout = setTimeout(function() {
-            _progressIndicator.show();
-        }, 500);
-    }
+    var _progressList = {};
 
-    /**
-     *  Function: hideProgressIndicator
-     *    Hides the progress indicator.
-     */
-    function hideProgressIndicator() {
-        // prevent indicator from showing before 500 ms are passed
-        clearTimeout(_progressIndicatorTimeout);
-        _progressIndicator.hide();
-    }
 
-    /**
-     *  Function: flashSuccessMessage
-     *    Flash the success message to show that some background activity was successful.
-     *
-     *  Parameters:
-     *    {String} message - The text that should be displayed in the progress indicator.
-     */
-    function flashSuccessMessage(message) {
-        // only flash if not already visible and if there is a message
-        if (_progressMessage.is(':hidden')) {
-            _progressMessage.find('span').text(message);
-            _progressMessage.find('i').removeClass().addClass('icon-ok');
+    function showProgress(progressID, message) {
+        if (_progressList[progressID]) return; //TODO: What happens with repeating requests?
 
-            _progressMessage.fadeIn(200).delay(600).fadeOut(200);
+        // create a new progress entry
+        var entry = _progressIndicatorEntry.clone();
+        entry.find('i').removeClass().addClass(Config.Classes.ICON_PROGRESS);
+        entry.find('span').text(message);
+        entry.hide();
+        var timeout = setTimeout(function() {
+            entry.show();
+        }, Config.ProgressIndicator.PROGRESS_APPEARANCE_DELAY);
+
+        if (_.size(_progressList) == 0) {
+            // this is the first active job
+            _progressIndicatorSingle.empty().append(entry);
+            _progressIndicatorSingle.show();
+        } else if (_.size(_progressList) == 1) {
+            // this is the second job, so we need to put both in the dropdown
+            var prevEntry = _progressIndicatorSingle.children().detach();
+            _progressIndicatorSingle.hide();
+
+            _progressIndicatorDropdown.find('.dropdown-menu').append(jQuery('<li>').append(prevEntry));
+            _progressIndicatorDropdown.find('.dropdown-menu').append(jQuery('<li>').append(entry));
+            _progressIndicatorDropdown.find('.badge').text('2');
+            _progressIndicatorDropdown.show();
+        } else {
+            // there is already a list in the dropdown, so append this indicator
+            _progressIndicatorDropdown.find('.dropdown-menu').append(jQuery('<li>').append(entry));
+            _progressIndicatorDropdown.find('.badge').text(_.size(_progressList) + 1);
+        }
+
+        // remember the new entry for later reference
+        _progressList[progressID] = {
+            'timeout': timeout,
+            'entry': entry
         }
     }
 
-    /**
-     *  Function: flashAjaxSuccessMessage
-     *    Flash the success message to show that the current AJAX request was successful.
-     *    Use this message for binding to the jQuery ajaxSuccess event.
-     *
-     *  Parameters:
-     *    {Event}      event - The event object for the AJAX callback (unused).
-     *    {jQuery XHR} xhr   - The jQuery AJAX request object that triggered this request.
-     */
-    function flashAjaxSuccessMessage(event, xhr) {
-        if (xhr.successMessage) {
-            flashSuccessMessage(xhr.successMessage);
+    function flashSuccessMessage(progressID, message) {
+        _flashMessage(progressID, message, Config.Classes.ICON_SUCCESS, Config.ProgressIndicator.SUCCESS_FLASH_DELAY);
+    }
+
+    function flashErrorMessage(progressID, message) {
+        _flashMessage(progressID, message, Config.Classes.ICON_ERROR, Config.ProgressIndicator.ERROR_FLASH_DELAY);
+    }
+
+    function _flashMessage(progressID, message, iconClass, delay) {
+        if (!_progressList[progressID]) return; // there is not such active progress indicator
+
+        // prevent the progress indicator (spinner) from showing if it's finished shortly after spawning
+        clearTimeout(_progressList[progressID].timeout);
+
+        var entry = _progressList[progressID].entry;
+        // update UI
+        entry.find('i').removeClass().addClass(iconClass);
+        entry.find('span').text(message);
+        if (entry.is(':hidden')) entry.fadeIn(200);
+
+        entry.delay(delay).fadeOut(200, function() {
+            _removeEntry(progressID);
+        });
+    }
+
+    function _removeEntry(progressID) {
+        var entry = _progressList[progressID].entry;
+
+        // if the entry is in the dropdown, we need to remove the <li> as well
+        if (entry.parents('.dropdown-menu').length != 0) {
+            entry.parent().remove();
+        } else {
+            entry.remove();
+        }
+
+        delete _progressList[progressID];
+
+        _progressIndicatorDropdown.find('.badge').text(_.size(_progressList));
+
+        // if there is only one entry left, display it in the single progress indicator instead
+        if (_.size(_progressList) == 1) {
+            var remainingEntry = _.first(_.values(_progressList)).entry;
+            var listNode = remainingEntry.parent();
+
+            _progressIndicatorSingle.append(remainingEntry.detach());
+            listNode.remove();
+
+            _progressIndicatorDropdown.hide();
+            _progressIndicatorSingle.show();
         }
     }
 
-    /**
-     *  Function: flashErrorMessage
-     *    Flash the error message to show that the current AJAX request was unsuccessful.
-     *
-     *  Parameters:
-     *    {String} message - The text that should be displayed in the progress indicator.
-     */
-    function flashErrorMessage(message) {
-        _progressMessage.find('span').text(message);
-        _progressMessage.find('i').removeClass().addClass('icon-warning-sign');
-
-        _progressMessage.fadeIn(200).delay(5000).fadeOut(200);
-    }
-
-    /**
-     *  Function: flashAjaxErrorMessage
-     *    Flash the error message to show that the current AJAX request was unsuccessful.
-     *    Use this message for binding to the jQuery ajaxError event.
-     *
-     *  Parameters:
-     *    {Event}      event - The event object for the AJAX callback (unused).
-     *    {jQuery XHR} xhr   - The jQuery AJAX request object that triggered this request.
-     */
-    function flashAjaxErrorMessage(event, xhr) {
-        if (xhr.errorMessage) {
-            flashErrorMessage(xhr.errorMessage);
-        }
-    }
 
     return {
-        'showProgressIndicator': showProgressIndicator,
-        'hideProgressIndicator': hideProgressIndicator,
+        'showProgress': showProgress,
         'flashSuccessMessage': flashSuccessMessage,
-        'flashAjaxSuccessMessage': flashAjaxSuccessMessage,
-        'flashErrorMessage': flashErrorMessage,
-        'flashAjaxErrorMessage': flashAjaxErrorMessage
+        'flashErrorMessage': flashErrorMessage
     };
 });

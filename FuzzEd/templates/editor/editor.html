@@ -34,13 +34,29 @@
 {% endblock %}
 
 {% block nav_center %}
-<p class="navbar-text" style="float: left;">
-    <img id="FuzzEdProgressIndicator" src="{{ STATIC_URL }}img/ajax-loader.gif">
-    <span id="FuzzEdProgressMessage">
-        <i></i>
-        <span></span>
-    </span>
-</p>
+<ul class="nav navbar-nav" style="float: left;">
+    <li id="FuzzEdProgressIndicatorSingle" style="display: none;">
+        <a><i class="icon-progress"></i>&nbsp;<span></span></a>
+    </li>
+    <li id="FuzzEdProgressIndicatorDropdown" class="dropdown" style="display: none;">
+        <a data-toggle="dropdown" href="#">
+            <i class="icon-progress"></i>
+            <span>Processing…</span>
+            <span class="badge"></span>
+            <i class="icon-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            {# multiple progress indicators will be inserted here #}
+        </ul>
+    </li>
+</ul>
+
+
+{#    <img id="FuzzEdProgressIndicator" src="{{ STATIC_URL }}img/ajax-loader.gif">#}
+{#    <span id="FuzzEdProgressMessage">#}
+{#        <i></i>#}
+{#        <span></span>#}
+{#    </span>#}
 {% endblock %}
 
 {% block menu_right %}
