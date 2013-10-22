@@ -7,7 +7,6 @@ set(SOURCES
    main.cpp
    SimulationExtern.cpp
    SimulationProxy.cpp
-   SimulationResultDocument.cpp
 
    implementation/PetriNetSimulation.cpp
    implementation/TimeNETSimulation.cpp
@@ -28,7 +27,6 @@ set(HEADERS
 
    SimulationExtern.h
    SimulationProxy.h
-   SimulationResultDocument.h
    ResultStruct.h
    Config.h
    

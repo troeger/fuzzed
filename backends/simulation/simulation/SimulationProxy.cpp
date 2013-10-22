@@ -8,8 +8,6 @@
 #include "FuzzTreeTransform.h"
 #include "FaultTreeConversion.h"
 
-#include "SimulationResultDocument.h"
-
 #include "util.h"
 #include "Config.h"
 #include "Constants.h"
@@ -17,12 +15,11 @@
 
 #include <omp.h>
 
+// Generated files...
 #include "faulttree.h"
 #include "fuzztree.h"
+#include "simulationResult.h"
 
-#if IS_WINDOWS 
-	#pragma warning(push, 3) 
-#endif
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/foreach.hpp>
@@ -32,10 +29,6 @@
 #include <set>
 #include <iostream>
 #include <fstream>
-#if IS_WINDOWS 
-	#pragma warning(pop)
-#endif
-
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -94,8 +87,6 @@ SimulationResult SimulationProxy::runSimulationInternal(
 		{
 			sim = new PetriNetSimulation(
 				petriNetFile,
-				outPath,
-				workingDir,
 				m_simulationTime, 
 				m_missionTime, 
 				m_numRounds,
@@ -308,11 +299,8 @@ void SimulationProxy::simulateAllConfigurations(
 		const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
 		std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
 		if (ft)
-		{
-			SimulationResultDocument doc;
+		{ // in this case there is only a faulttree, so no configuration information will be serialized
 			auto res = simulateFaultTree(ft, inputFile, outputFile, workingDir, impl);
-			doc.setResult(res);
-			doc.save(outputFile.generic_string());
 		}
 		else
 			std::cerr << "Could handle fault tree file: " << inFile << endl;
@@ -320,17 +308,14 @@ void SimulationProxy::simulateAllConfigurations(
 		return;
 	}
 
-	int i = 0;
-	SimulationResultDocument doc;
 	for (const auto& ft : ftTransform.transform())
 	{
 		std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
 		{
 			auto res = simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
-			doc.addSimulationResult(ft.first, res);
+			simTree->print(cout);
 		}
 	}
-	doc.save(outputFile.generic_string());
 }
 
 void SimulationProxy::parseCommandline_default(int numArguments, char** arguments)

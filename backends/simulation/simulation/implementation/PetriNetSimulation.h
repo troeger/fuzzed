@@ -10,9 +10,7 @@ class PetriNetSimulation : public Simulation
 {
 public:
 	PetriNetSimulation(
-		const boost::filesystem::path& p,
-		const boost::filesystem::path& outputFileName, 
-		const boost::filesystem::path& workingDir, 
+		const boost::filesystem::path& p, 
 		unsigned int simulationTime,		// the maximum duration of one simulation in seconds
 		unsigned int simulationSteps,		// the number of logical simulation steps performed in each round
 		unsigned int numRounds,				// the number of simulation rounds performed in parallel
@@ -24,7 +22,6 @@ public:
 
 	const SimulationResult& result() const { return m_result; }
 
-	void writeResultXML(const SimulationResult& res);
 	void printResults(const SimulationResult& res);
 
 	virtual ~PetriNetSimulation();
@@ -40,8 +37,6 @@ protected:
 	void tryImmediateTransitions(PetriNet* pn, int tick, bool& immediateOnly);
 
 	void tidyUp() override;
-
-	std::string m_outputFileName;
 
 	const bool m_simulateUntilFailure;
 	const int m_numAdaptiveRounds;

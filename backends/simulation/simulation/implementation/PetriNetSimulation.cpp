@@ -1,7 +1,6 @@
 #include "PetriNetSimulation.h"
 #include "util.h"
 #include "Config.h"
-#include "SimulationResultDocument.h"
 #include "petrinet/PNMLImport.h"
 #include "petrinet/PetriNet.h"
 
@@ -39,8 +38,6 @@ bool PetriNetSimulation::run()
 
 	double startTime = omp_get_wtime();
 	RandomNumberGenerator::initGenerators();
-
-#ifdef OMP_PARALLELIZATION
 
 #ifdef RELIABILITY_DISTRIBUTION
 	auto fileName = m_netFile.generic_string();
@@ -86,8 +83,10 @@ bool PetriNetSimulation::run()
 			privateBreak = false;
 			globalConvergence = true;
 			count = 0;
+			startTime = omp_get_wtime();
 #endif
 
+#ifdef OMP_PARALLELIZATION
 #pragma omp parallel for\
 	reduction(+:numFailures, sumFailureTime_all, sumFailureTime_fail, count)\
 	reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak)\
@@ -194,7 +193,7 @@ bool PetriNetSimulation::run()
 	res.duration			= omp_get_wtime() - startTime;
 	
 #if  defined(RELIABILITY_DISTRIBUTION) || defined(NUM_MONTE_CARLO_ROUNDS)
-	statdoc << util::toString(res.reliability) << std::endl;
+	statdoc << util::toString(res.duration) << std::endl;
 	}
 #else
 	// printResults(res);
@@ -215,8 +214,6 @@ bool PetriNetSimulation::run()
 
 PetriNetSimulation::PetriNetSimulation(
 	const boost::filesystem::path& inPath,
-	const boost::filesystem::path& outputFileName, 
-	const boost::filesystem::path& workingDir, 
 	unsigned int simulationTime,	// the maximum duration of one simulation in seconds
 	unsigned int simulationSteps,	// the number of logical simulation steps performed in each round
 	unsigned int numRounds,
@@ -224,7 +221,6 @@ PetriNetSimulation::PetriNetSimulation(
 	bool simulateUntilFailure,
 	unsigned int numAdaptiveRounds /*= 0*/)
 	: Simulation(inPath, simulationTime, simulationSteps, numRounds),
-	m_outputFileName(outputFileName.generic_string()),
 	m_simulateUntilFailure(simulateUntilFailure),
 	m_numAdaptiveRounds(numAdaptiveRounds),
 	m_convergenceThresh(convergenceThresh)
@@ -373,14 +369,6 @@ void PetriNetSimulation::printResults(const SimulationResult& res)
 			   % res.meanAvailability);
 
 	cout << results << endl << endl;
-}
-
-
-void PetriNetSimulation::writeResultXML(const SimulationResult& res)
-{
-	SimulationResultDocument doc;
-	doc.setResult(res);
-	doc.save(m_outputFileName);
 }
 
 void PetriNetSimulation::tidyUp()

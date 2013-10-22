@@ -489,9 +489,7 @@ void FuzzTreeTransform::generateConfigurationsFile(const std::string& outputXML)
 	vector<FuzzTreeConfiguration> results;
 	generateConfigurations(results);
 
-	using namespace TREE_SCHEMAS;
 	configurationResults::ConfigurationResults configResults;
-
 	for (const auto& c : results)
 	{
 		configurationResults::Result r;

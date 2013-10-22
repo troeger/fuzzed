@@ -1,6 +1,5 @@
 #include "InstanceAnalysisTask.h"
 #include "AlphaCutAnalysisTask.h"
-#include "AnalysisResultDocument.h"
 #include "FuzzTreeTransform.h"
 
 #include <string>
@@ -30,10 +29,6 @@ int main(int argc, char** argv)
 		
 		const int decompositionNumber = tree->topEvent().decompositionNumber();
 
-		AnalysisResultDocument resultDocument;
-		resultDocument.setModelId(tree->id());
-		resultDocument.setDecompositionNumber(decompositionNumber);
-
 		FuzzTreeTransform tf(tree);
 		for (const auto& t : tf.transform())
 		{
@@ -41,11 +36,7 @@ int main(int argc, char** argv)
 			InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, decompositionNumber);
 			
 			const auto result = analysis->compute();
-			resultDocument.addConfigurationResult(t.first, result);
 		}
-		resultDocument.setValid(true);
-		resultDocument.setTimeStamp(util::timeStamp());
-		resultDocument.save(outFile);
 	}
 	catch (const std::exception& e)
 	{

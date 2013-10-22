@@ -6,7 +6,6 @@ set(SOURCES
   InstanceAnalysisTask.cpp
   Probability.cpp
   DecomposedFuzzyInterval.cpp
-  AnalysisResultDocument.cpp
 )
 
 set(HEADERS
@@ -15,7 +14,6 @@ set(HEADERS
   Interval.h
   DecomposedFuzzyInterval.h
   Probability.h
-  AnalysisResultDocument.h
 )
 
 include_directories(${PUGIXML_INCLUDE_DIR})
