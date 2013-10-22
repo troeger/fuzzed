@@ -1,76 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns:ft="net.fuzztree" xmlns:fta="net.fuzztree.analysis" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztree.analysis">
-  <!-- <xsd:import namespace="net.fuzztree" schemaLocation="fuzztree.xsd"/> -->
-  <xsd:element name="Configuration" type="fta:Configuration"/>
+<xsd:schema version="1.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.fuzztrees.net/TREE_SCHEMAS/configurations"
+            targetNamespace="http://www.fuzztrees.net/TREE_SCHEMAS/configurations">
   
   <xsd:complexType abstract="true" name="Choice"/>
+
+  <xsd:complexType name="IntegerToChoiceMap">
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="1" name="value" type="Choice"/>
+    </xsd:sequence>
+    <xsd:attribute name="key" type="xsd:string" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="Configuration">
+    <xsd:sequence>
+      <xsd:element maxOccurs="unbounded" minOccurs="0" name="choice" type="IntegerToChoiceMap"/>
+    </xsd:sequence>
+    <xsd:attribute name="costs" type="xsd:int" use="required"/>
+  </xsd:complexType>
   
   <xsd:complexType name="InclusionChoice">
     <xsd:complexContent>
-      <xsd:extension base="fta:Choice">
+      <xsd:extension base="Choice">
         <xsd:attribute name="included" type="xsd:boolean" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  <xsd:element name="InclusionChoice" type="fta:InclusionChoice"/>
   
   <xsd:complexType name="RedundancyChoice">
     <xsd:complexContent>
-      <xsd:extension base="fta:Choice">
+      <xsd:extension base="Choice">
         <xsd:attribute name="n" type="xsd:int" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  <xsd:element name="RedundancyChoice" type="fta:RedundancyChoice"/>
   
   <xsd:complexType name="FeatureChoice">
     <xsd:complexContent>
-      <xsd:extension base="fta:Choice">
-        <xsd:attribute name="featureId" type="xsd:int" use="required"/>
+      <xsd:extension base="Choice">
+        <xsd:attribute name="featureId" type="xsd:string" use="required"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  <xsd:element name="FeatureChoice" type="fta:FeatureChoice"/>
-  
-  <xsd:complexType name="ConfigurationInstance">
-    <xsd:complexContent>
-      <xsd:extension base="ft:Annotation">
-        <xsd:sequence>
-          <xsd:element maxOccurs="1" minOccurs="1" name="configuration" type="fta:Configuration"/>
-        </xsd:sequence>
-        <xsd:attribute name="ancestorModelId" type="xsd:int" use="required"/>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-  <xsd:element name="ConfigurationInstance" type="fta:ConfigurationInstance"/>
-  
-  <xsd:complexType name="IntegerToChoiceMap">
-    <xsd:sequence>
-      <xsd:element maxOccurs="1" minOccurs="1" name="value" type="fta:Choice"/>
-    </xsd:sequence>
-    <xsd:attribute name="key" type="xsd:int" use="required"/>
-  </xsd:complexType>
-  <xsd:element name="IntegerToChoiceMap" type="fta:IntegerToChoiceMap"/>
-  
-  <xsd:complexType name="TransferInResult">
-    <xsd:complexContent>
-      <xsd:extension base="ft:Annotation">
-        <xsd:sequence>
-          <xsd:element maxOccurs="1" minOccurs="1" name="analysisResult" type="fta:AnalysisResult"/>
-        </xsd:sequence>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-  <xsd:element name="TransferInResult" type="fta:TransferInResult"/>
   
   <xsd:complexType name="TransferInChoice">
     <xsd:complexContent>
-      <xsd:extension base="fta:Choice">
+      <xsd:extension base="Choice">
         <xsd:sequence>
-          <xsd:element maxOccurs="1" minOccurs="1" name="chosenConfiguration" type="fta:Configuration"/>
+          <xsd:element maxOccurs="1" minOccurs="1" name="chosenConfiguration" type="Configuration"/>
         </xsd:sequence>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>
-  <xsd:element name="TransferInChoice" type="fta:TransferInChoice"/>
+  
 </xsd:schema>

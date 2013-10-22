@@ -2,7 +2,7 @@
 #include "AbstractResultDocument.h"
 #include "ResultStruct.h"
 
-class SimulationResultDocument : public AbstractResultDocument
+class SimulationResultDocument
 {
 public:
 	SimulationResultDocument();

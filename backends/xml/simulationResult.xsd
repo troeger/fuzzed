@@ -1,35 +1,31 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns:fts="net.fuzztree.simulation" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztree.simulation">
-  <xsd:complexType name="SimulationResult">
+<?xml version="1.0"?>
+<xsd:schema version="1.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:configurations="http://www.fuzztrees.net/TREE_SCHEMAS/configurations"
+            xmlns:common="http://www.fuzztrees.net/TREE_SCHEMAS/commonTypes"
+            targetNamespace = "http://www.fuzztrees.net/TREE_SCHEMAS/simulationResults"
+            xmlns:sr="http://www.fuzztrees.net/TREE_SCHEMAS/simulationResults"
+            xmlns="http://www.fuzztrees.net/TREE_SCHEMAS/simulationResults">
+
+  <xsd:import schemaLocation="commonTypes.xsd"
+              namespace="http://www.fuzztrees.net/TREE_SCHEMAS/commonTypes"/>
+  
+  <xsd:import schemaLocation="configurations.xsd"
+              namespace="http://www.fuzztrees.net/TREE_SCHEMAS/configurations"/>
+
+  <xsd:complexType name="Issue">
+      <xsd:attribute name="issueId" type="xsd:int" use="required"/>
+      <xsd:attribute name="elementId" type="xsd:int" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="Result">
     <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="error" type="fts:SimulationError"/>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="warning" type="fts:SimulationWarning"/>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="configurations" type="fts:Configuration"/>
+      <xsd:element minOccurs="0" maxOccurs="1" name="configuration" type="configurations:Configuration"/>
+      <xsd:element minOccurs="0" maxOccurs="1" name="probability" type="common:Probability"/>
     </xsd:sequence>
     <xsd:attribute name="id" type="xsd:int"/>
     <xsd:attribute name="modelId" type="xsd:int" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
-  </xsd:complexType>
-  <xsd:element name="SimulationResult" type="fts:SimulationResult"/>
-
-  <xsd:complexType name="SimulationError">
-    <xsd:attribute name="message" type="xsd:string" use="required"/>
-    <xsd:attribute name="elementId" type="xsd:int" use="required"/>
-  </xsd:complexType>
-  <xsd:element name="SimulationError" type="fts:SimulationError"/>
-
-  <xsd:complexType name="SimulationWarning">
-    <xsd:attribute name="message" type="xsd:string" use="required"/>
-    <xsd:attribute name="elementId" type="xsd:int" use="required"/>
-  </xsd:complexType>
-  <xsd:element name="SimulationWarning" type="fts:SimulationWarning"/>
-
- <!-- One Probability Result per Configuration -->
- <xsd:complexType name="Configuration">
-    <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="choices" type="fta:IntegerToChoiceMap"/>
-      <xsd:element maxOccurs="1" minOccurs="0" name="probability" type="ft:DecomposedFuzzyProbability"/>
-    </xsd:sequence>
     <xsd:attribute name="costs" type="xsd:int" use="required"/>
     <xsd:attribute name="reliability" type="xsd:double" use="required"/>
     <xsd:attribute name="nFailures" type="xsd:int" use="required"/>
@@ -37,5 +33,15 @@
     <xsd:attribute name="availability" type="xsd:double"/>
     <xsd:attribute name="duration" type="xsd:double"/>
     <xsd:attribute name="mttf" type="xsd:double"/>
-  </xsd:complexType>
+  </xsd:complexType>           
+
+  <xsd:element name="simulationResults">
+    <xsd:complexType>
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="result" type="Result"/>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="issue" type="Issue"/>
+        </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
 </xsd:schema>

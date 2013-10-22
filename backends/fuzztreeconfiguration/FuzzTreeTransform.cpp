@@ -4,13 +4,15 @@
 #include "TreeHelpers.h"
 #include "FuzzTreeTypes.h"
 #include "FaultTreeTypes.h"
-#include "ConfigurationResultDocument.h"
+
+#include "configurationResult.h"
 
 #include <xsd/cxx/tree/elements.hxx>
 #include <xsd/cxx/xml/dom/serialization-header.hxx>
 #include <boost/range/counting_range.hpp>
 
 #include <functional>
+#include <fstream>
 
 using xercesc::DOMNode;
 using xercesc::DOMDocument;
@@ -301,7 +303,8 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		else if (typeName == *INTERMEDIATEEVENTSET)
 		{
 			auto ret = expandIntermediateEventSet(&currentChild, node, configuration, 0);
-			if (ret != OK) return ret;
+			if (ret != OK)
+				return ret;
 			continue;
 		}
 		// remaining types
@@ -327,10 +330,9 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 	const fuzztree::BasicEventSet* eventSet = static_cast<const fuzztree::BasicEventSet*>(templateNode);
 	assert(eventSet);
 
-	// barharhar
-	// TODO: WTF was i thinking
-	const int numChildren = 
-		defaultQuantity == 0 ? eventSet->quantity().present() ? eventSet->quantity().get() : defaultQuantity : defaultQuantity;
+	int numChildren = defaultQuantity;
+	if (numChildren == 0 && eventSet->quantity().present())
+		numChildren = eventSet->quantity().get();
 
 	if (numChildren <= 0) return INVALID_ATTRIBUTE;
 
@@ -410,7 +412,8 @@ bool FuzzTreeTransform::handleFeatureVP(
 	}
 	else if (featuredType == *AND)		node->children().push_back(fuzztree::And(configuredChildId));
 	else if (featuredType == *OR)		node->children().push_back(fuzztree::Or(configuredChildId));
-	else if (featuredType == *VOTINGOR)	node->children().push_back(fuzztree::VotingOr(configuredChildId, (static_cast<const fuzztree::VotingOr&>(featuredTemplate)).k()));
+	else if (featuredType == *VOTINGOR)
+		node->children().push_back(fuzztree::VotingOr(configuredChildId, (static_cast<const fuzztree::VotingOr&>(featuredTemplate)).k()));
 	else if (featuredType == *XOR)		node->children().push_back(fuzztree::Xor(configuredChildId));
 	else if (isLeaf(featuredType))		node->children().push_back(fuzztree::BasicEvent(static_cast<const fuzztree::BasicEvent&>(featuredTemplate)));
 	else if (isVariationPoint(featuredType))
@@ -483,19 +486,52 @@ void FuzzTreeTransform::copyNode(
 
 void FuzzTreeTransform::generateConfigurationsFile(const std::string& outputXML)
 {
-	ConfigurationResultDocument doc;
-
 	vector<FuzzTreeConfiguration> results;
 	generateConfigurations(results);
 
-	doc.addTreeSpecification(m_fuzzTree);
-	doc.addConfigurations(results);
-	doc.save(outputXML);
+	using namespace TREE_SCHEMAS;
+	configurationResults::ConfigurationResults configResults;
+
+	for (const auto& c : results)
+	{
+		configurationResults::Result r;
+		configurations::Configuration conf(c.getCost());
+
+		for (const auto& inclusionChoice : c.m_optionalNodes)
+		{
+			conf.choice().push_back(
+				configurations::IntegerToChoiceMap(
+				configurations::InclusionChoice(inclusionChoice.second),
+				inclusionChoice.first));
+		}
+
+		for (const auto& redundancyChoice : c.m_redundancyNodes)
+		{
+			conf.choice().push_back(
+				configurations::IntegerToChoiceMap(
+					configurations::RedundancyChoice(std::get<0>(redundancyChoice.second)),
+					redundancyChoice.first));
+		}
+
+		for (const auto& featureChoice : c.m_featureNodes)
+		{
+			conf.choice().push_back(
+				configurations::IntegerToChoiceMap(
+					configurations::FeatureChoice(featureChoice.first),
+					featureChoice.second));
+		}
+
+		r.configuration(conf);
+		configResults.result().push_back(r);
+	}
+
+	std::ofstream output(outputXML);
+	configurationResults::configurationResults(output, configResults);
 }
 
 xml_schema::Properties FuzzTreeTransform::validationProperties()
 {
-	static const string fuzztreeSchema = FUZZTREEXSD; // Path to schema from CMakeLists.txt
+	static const string fuzztreeSchema = "FUZZTREEXSD"; // Path to schema from CMakeLists.txt
 	assert(!fuzztreeSchema.empty());
 
 	xml_schema::Properties props;

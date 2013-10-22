@@ -1,41 +1,43 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xsd:schema xmlns:ft="net.fuzztree" xmlns:fta="net.fuzztree.analysis" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="net.fuzztree.analysis">
-  <xsd:import namespace="net.fuzztree" schemaLocation="fuzztree.xsd"/>
-  <xsd:complexType name="AnalysisResult">
-    
-    <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="errors" type="fta:AnalysisError"/>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="warnings" type="fta:AnalysisWarning"/>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="configurations" type="fta:Configuration"/>
-    </xsd:sequence>
+<?xml version="1.0"?>
+<xsd:schema version="1.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:configurations="http://www.fuzztrees.net/TREE_SCHEMAS/configurations"
+            xmlns:common="http://www.fuzztrees.net/TREE_SCHEMAS/commonTypes"
+            targetNamespace = "http://www.fuzztrees.net/TREE_SCHEMAS/analysisResults"
+            xmlns:sr="http://www.fuzztrees.net/TREE_SCHEMAS/analysisResults"
+            xmlns="http://www.fuzztrees.net/TREE_SCHEMAS/analysisResults">
 
+  <xsd:import schemaLocation="commonTypes.xsd"
+              namespace="http://www.fuzztrees.net/TREE_SCHEMAS/commonTypes"/>
+  
+  <xsd:import schemaLocation="configurations.xsd"
+              namespace="http://www.fuzztrees.net/TREE_SCHEMAS/configurations"/>
+
+  <xsd:complexType name="Issue">
+      <xsd:attribute name="issueId" type="xsd:int" use="required"/>
+      <xsd:attribute name="elementId" type="xsd:int" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="Result">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" maxOccurs="1" name="configuration" type="configurations:Configuration"/>
+      <xsd:element minOccurs="0" maxOccurs="1" name="probability" type="common:Probability"/>
+    </xsd:sequence>
     <xsd:attribute name="id" type="xsd:int"/>
     <xsd:attribute name="modelId" type="xsd:int" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
     <xsd:attribute name="validResult" type="xsd:boolean" use="required"/>
     <xsd:attribute name="decompositionNumber" type="xsd:int" use="required"/>
     <xsd:attribute default="default" name="engine" type="xsd:string"/>
+  </xsd:complexType>           
 
-  </xsd:complexType>
-  
-  <xsd:element name="AnalysisResult" type="fta:AnalysisResult"/>
-  <xsd:complexType name="AnalysisError">
-    <xsd:attribute name="issueId" type="xsd:int" use="required"/>
-    <xsd:attribute name="elementId" type="xsd:int" use="required"/>
-  </xsd:complexType>
-  <xsd:element name="AnalysisError" type="fta:AnalysisError"/>
-  <xsd:complexType name="AnalysisWarning">
-    <xsd:attribute name="issueId" type="xsd:int" use="required"/>
-    <xsd:attribute name="elementId" type="xsd:int" use="required"/>
-  </xsd:complexType>
-  <xsd:element name="AnalysisWarning" type="fta:AnalysisWarning"/>
+  <xsd:element name="analysisResult">
+    <xsd:complexType>
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="result" type="Result"/>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="issue" type="Issue"/>
+        </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
 
-  <!-- One Probability Result per Configuration -->
-  <xsd:complexType name="Configuration">
-    <xsd:sequence>
-      <xsd:element maxOccurs="unbounded" minOccurs="0" name="choices" type="fta:IntegerToChoiceMap"/>
-      <xsd:element maxOccurs="1" minOccurs="0" name="probability" type="ft:DecomposedFuzzyProbability"/>
-    </xsd:sequence>
-    <xsd:attribute name="costs" type="xsd:int" use="required"/>
-  </xsd:complexType>
 </xsd:schema>
