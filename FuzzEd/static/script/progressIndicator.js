@@ -57,7 +57,7 @@ define(['config', 'jquery', 'underscore'], function(Config) {
         _flashMessage(progressID, message, Config.Classes.ICON_ERROR, Config.ProgressIndicator.ERROR_FLASH_DELAY);
         // if the erroneous entry is in the dropdown, show the dropdown menu
         if (!_progressIndicatorDropdown.is(':hidden')) {
-            _progressIndicatorDropdown.find('.dropdown-menu').show();
+            _progressIndicatorDropdown.addClass('open');
         }
     }
 
@@ -125,6 +125,8 @@ define(['config', 'jquery', 'underscore'], function(Config) {
             listNode.remove();
 
             _progressIndicatorDropdown.hide();
+            // close the menu so that it's not open when displaying it again
+            _progressIndicatorDropdown.removeClass('open');
             _progressIndicatorSingle.show();
         }
     }
