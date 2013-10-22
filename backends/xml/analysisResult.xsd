@@ -1,17 +1,17 @@
 <?xml version="1.0"?>
 <xsd:schema version="1.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:configurations="http://www.fuzztrees.net/TREE_SCHEMAS/configurations"
-            xmlns:common="http://www.fuzztrees.net/TREE_SCHEMAS/commonTypes"
-            targetNamespace = "http://www.fuzztrees.net/TREE_SCHEMAS/analysisResults"
-            xmlns:sr="http://www.fuzztrees.net/TREE_SCHEMAS/analysisResults"
-            xmlns="http://www.fuzztrees.net/TREE_SCHEMAS/analysisResults">
+            xmlns:configurations="http://www.fuzztrees.net/configurations"
+            xmlns:common="http://www.fuzztrees.net/commonTypes"
+            targetNamespace = "http://www.fuzztrees.net/analysisResults"
+            xmlns:sr="http://www.fuzztrees.net/analysisResults"
+            xmlns="http://www.fuzztrees.net/analysisResults">
 
   <xsd:import schemaLocation="commonTypes.xsd"
-              namespace="http://www.fuzztrees.net/TREE_SCHEMAS/commonTypes"/>
+              namespace="http://www.fuzztrees.net/commonTypes"/>
   
   <xsd:import schemaLocation="configurations.xsd"
-              namespace="http://www.fuzztrees.net/TREE_SCHEMAS/configurations"/>
+              namespace="http://www.fuzztrees.net/configurations"/>
 
   <xsd:complexType name="Issue">
       <xsd:attribute name="issueId" type="xsd:int" use="required"/>
