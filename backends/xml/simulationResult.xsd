@@ -21,7 +21,6 @@
   <xsd:complexType name="Result">
     <xsd:sequence>
       <xsd:element minOccurs="0" maxOccurs="1" name="configuration" type="configurations:Configuration"/>
-      <xsd:element minOccurs="0" maxOccurs="1" name="probability" type="common:Probability"/>
     </xsd:sequence>
     <xsd:attribute name="id" type="xsd:string"/>
     <xsd:attribute name="modelId" type="xsd:string" use="required"/>
