@@ -53,7 +53,9 @@ FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML) :
 }
 
 FuzzTreeTransform::FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft) :
-	m_fuzzTree(ft)
+	m_fuzzTree(ft),
+	m_count(0),
+	m_bValid(true)
 {
 	assert(m_fuzzTree.get());
 }

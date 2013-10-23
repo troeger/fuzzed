@@ -36,18 +36,17 @@ int main(int argc, char** argv)
 
 		analysisResults::AnalysisResults analysisResults;
 
-		FuzzTreeTransform tf(instream);
+		FuzzTreeTransform tf(tree);
 		if (!tf.isValid())
 		{
 			std::cerr << "Could not compute configurations." << std::endl;
 			return -1;
 		}
-
+		
 		for (const auto& t : tf.transform())
 		{
 			auto topEvent = fuzztree::TopEvent(t.second.topEvent());
 			InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, decompositionNumber);
-			
 			const auto result = analysis->compute();
 
 			analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
@@ -55,7 +54,6 @@ int main(int argc, char** argv)
 			r.probability(serialize(result));
 			analysisResults.result().push_back(r);
 		}
-
 		std::ofstream output(outFile);
 		analysisResults::analysisResults(output, analysisResults);
 	}
