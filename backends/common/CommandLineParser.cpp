@@ -38,7 +38,7 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 	// #1: input file. usually FuzzTree XML
 	// #2: output path. for result documents
 
-	else if (numArguments != 4)
+	else if (numArguments < 4)
 	{
 		std::cerr << "Faulty command line options. Use [program_name] [inputfile] [outputfile] [workingdirectory]" << std::endl;
 		exit(-1);
@@ -67,6 +67,10 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 		std::cerr << "Not a writable directory: " << workingDirectory << std::endl;
 		exit(-1);
 	}
+
+	int i = 3;
+	while (++i < numArguments)
+		m_additionalArguments.emplace_back(arguments[i]);
 }
 
 const boost::filesystem::path& CommandLineParser::getInputFilePath() const
@@ -82,4 +86,9 @@ const boost::filesystem::path& CommandLineParser::getOutputFilePath() const
 const boost::filesystem::path& CommandLineParser::getWorkingDirectory() const
 {
 	return m_workingDir;
+}
+
+const std::vector<std::string>& CommandLineParser::getAdditionalArguments() const
+{
+	return m_additionalArguments;
 }

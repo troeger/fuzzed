@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 		}
 		auto tree = fuzztree::fuzzTree(instream, xml_schema::Flags::dont_validate);
 
-		unsigned int decompositionNumber = 10;
+		unsigned int decompositionNumber = DEFAULT_DECOMPOSITION_NUMBER;
 		if (tree->topEvent().decompositionNumber().present())
 			decompositionNumber = tree->topEvent().decompositionNumber().get();
 

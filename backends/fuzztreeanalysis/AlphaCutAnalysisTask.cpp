@@ -2,6 +2,7 @@
 #include "FuzzTreeTypes.h"
 #include "Probability.h"
 #include "Interval.h"
+#include "xmlutil.h"
 
 #include <math.h>
 #include <algorithm>
@@ -61,7 +62,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		}
 		else if (probType == *FAILURERATE)
 		{
-			unsigned int mt = 2; // TODO
+			unsigned int mt = DEFAULT_MISSION_TIME; // TODO
 			if (m_tree->missionTime().present())
 				mt = m_tree->missionTime().get();
 

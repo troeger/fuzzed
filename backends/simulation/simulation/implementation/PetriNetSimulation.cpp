@@ -20,7 +20,6 @@ bool PetriNetSimulation::run()
 	unsigned long sumFailureTime_all = 0;
 	unsigned long sumFailureTime_fail = 0;
 	
-	
 	PetriNet pn = *PNMLImport::loadPNML(m_netFile.generic_string());
 	if (!pn.valid()) 
 		throw runtime_error("Invalid Petri Net.");
