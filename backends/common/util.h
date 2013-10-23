@@ -21,7 +21,7 @@ using namespace std;
 
 inline void exit_error(std::string s)
 {
-	std::cout << s << std::endl; 
+	std::cerr << s << std::endl; 
 	exit(-1);
 }
 

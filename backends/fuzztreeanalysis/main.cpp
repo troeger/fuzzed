@@ -11,19 +11,15 @@
 #include "xmlutil.h"
 #include "analysisResult.h"
 
-using std::endl;
-using std::cerr;
-using std::string;
-
 int main(int argc, char** argv)
 {
+	CommandLineParser parser;
+	parser.parseCommandline(argc, argv);
+	const auto inFile = parser.getInputFilePath().generic_string();
+	const auto outFile = parser.getOutputFilePath().generic_string();
+
 	try
 	{
-		CommandLineParser parser;
-		parser.parseCommandline(argc, argv);
-		const auto inFile = parser.getInputFilePath().generic_string();
-		const auto outFile = parser.getOutputFilePath().generic_string();
-
 		std::ifstream stream(inFile);
 		assert(stream.good());
 		auto tree = fuzztree::fuzzTree(stream, xml_schema::Flags::dont_validate);
@@ -52,11 +48,12 @@ int main(int argc, char** argv)
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cerr << "Exception while trying to analyze" << inFile << e.what() << std::endl;
+		return -1;
 	}
 	catch (...)
 	{
-		cout << "Unknown error in Configuration" << endl;
+		std::cerr << "Exception while trying to analyze" << inFile << std::endl;
 		return -1;
 	}
 

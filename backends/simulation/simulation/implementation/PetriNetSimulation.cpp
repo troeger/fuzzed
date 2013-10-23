@@ -261,7 +261,7 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 	const int maxTime = m_simulationTimeSeconds * milli;
 	const auto start = high_resolution_clock::now();
 
-	SimulationRoundResult result;
+	SimulationRoundResult result();
 	if (net->m_activeTimedTransitions.size() == 0)
 	{
 		result.valid = true;

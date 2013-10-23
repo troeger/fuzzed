@@ -30,7 +30,7 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 	}
 	catch (const xml_schema::Exception& e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cerr << "Exception while reading: " << fuzzTreeXML << e.what() << std::endl;
 		m_bValid = false;
 	}
 }
@@ -45,7 +45,7 @@ FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML)
 	}
 	catch (const xml_schema::Exception& e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cerr << "Exception while reading: " << fuzzTreeXML << e.what() << std::endl;
 		m_bValid = false;
 	}
 }
@@ -230,7 +230,7 @@ fuzztree::FuzzTree FuzzTreeTransform::generateVariationFreeFuzzTree(const FuzzTr
 		return fuzztree::FuzzTree(generateUniqueId(topEvent.id()), newTopEvent);
 	else
 	{
-		cout << "Error during FaultTree generation: " << endl;
+		std::cerr << "Error during FaultTree generation: " << endl;
 		return fuzztree::FuzzTree("", newTopEvent); // TODO handle properly
 	}
 }

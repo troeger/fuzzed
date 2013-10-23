@@ -271,18 +271,21 @@ add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FIL
 		cxx-tree 
 			${XSD_RESULT_ARGS} 
 			--output-dir ${COMMON_DIR}
+			--root-element "analysisResults"
 			${ANALYSIS_RESULT_XSD}
 
 	COMMAND ${XSD_EXECUTABLE} 
 		cxx-tree
 			${XSD_RESULT_ARGS}
 			--output-dir ${COMMON_DIR}
+			--root-element "configurationResults"
 			${CONFIGURATION_RESULT_XSD}
 
 	COMMAND ${XSD_EXECUTABLE} 
 		cxx-tree
 			${XSD_RESULT_ARGS}
 			--output-dir ${COMMON_DIR}
+			--root-element "simulationResults"
 			${SIMULATION_RESULT_XSD}
 
 	COMMAND ${XSD_EXECUTABLE}
