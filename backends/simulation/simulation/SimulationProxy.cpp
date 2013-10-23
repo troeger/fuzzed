@@ -223,8 +223,7 @@ void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl)
 
 		const auto simTree = faulttree::faultTree(file, xml_schema::Flags::dont_validate);
 		std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
-		// ft->print(cout);
-
+		
 		string pnFile = p.generic_string();
 		util::replaceFileExtensionInPlace(pnFile, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
 		simulateFaultTree(ft, p, outFile, workingDir, impl);
@@ -328,7 +327,10 @@ void SimulationProxy::simulateAllConfigurations(
 		std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
 		{
 			auto res = simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
-			simTree->print(cout);
+
+			// debug output
+// 			simTree->print(cout, 0);
+// 			fuzztree::fuzzTree(cout, ft.second);
 
 			simulationResults::Result r(
 				simTree->getId(),
