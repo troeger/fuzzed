@@ -30,7 +30,7 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 	}
 	catch (const xml_schema::Exception& e)
 	{
-		std::cerr << "Exception while reading: " << fuzzTreeXML << e.what() << std::endl;
+		std::cerr << "Exception while reading: " << fuzzTreeXML << e << std::endl;
 		m_bValid = false;
 	}
 }
@@ -45,7 +45,7 @@ FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML)
 	}
 	catch (const xml_schema::Exception& e)
 	{
-		std::cerr << "Exception while reading: " << fuzzTreeXML << e.what() << std::endl;
+		std::cerr << "Exception while reading: " << fuzzTreeXML << e << std::endl;
 		m_bValid = false;
 	}
 }
@@ -432,25 +432,19 @@ std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>>
 	{
 		if (!m_fuzzTree.get())
 		{
-			std::cerr << "Invalid Fuzztree." << endl;
+			std::cerr << "Invalid FuzzTree." << endl;
 			return results;
 		}
 
 		vector<FuzzTreeConfiguration> configs;
 		generateConfigurations(configs);
 
-		int indent = 0;
-		// treeHelpers::printTree(m_fuzzTree->topEvent(), indent);
-		// cout << endl << " ...... configurations: ...... " << endl;
-
 		for (const auto& instanceConfiguration : configs)
 		{
-			auto ft = generateVariationFreeFuzzTree(instanceConfiguration);
-			indent = 0;
-// 			treeHelpers::printTree(ft.topEvent(), indent);
-// 			cout << endl;
-
-			results.emplace_back(std::make_pair(instanceConfiguration, ft));
+			results.emplace_back(
+				std::make_pair(
+				instanceConfiguration,
+				generateVariationFreeFuzzTree(instanceConfiguration)));
 		}
 	}
 	catch (xsd::cxx::exception& e)
