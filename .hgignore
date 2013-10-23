@@ -41,3 +41,4 @@ backends/common/commonTypes.h
 backends/common/analysisResult.h
 backends/file
 backends/common/commonTypes.cpp
+backends/lib/*
