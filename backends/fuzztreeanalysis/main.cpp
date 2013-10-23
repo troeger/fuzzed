@@ -24,7 +24,10 @@ int main(int argc, char** argv)
 		assert(stream.good());
 		auto tree = fuzztree::fuzzTree(stream, xml_schema::Flags::dont_validate);
 
-		const int decompositionNumber = tree->topEvent().decompositionNumber();
+		unsigned int decompositionNumber = 10;
+		if (tree->topEvent().decompositionNumber().present())
+			decompositionNumber = tree->topEvent().decompositionNumber().get();
+
 		const auto modelId = tree->id();
 
 		analysisResults::AnalysisResults analysisResults;
