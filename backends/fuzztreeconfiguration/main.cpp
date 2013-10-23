@@ -25,11 +25,17 @@ int main(int argc, char **argv)
 		// do the actual transformation, write all files to dirPath
 		std::ifstream instream(inFile);
 		if (!instream.good())
-			return -1; // TODO some output here
-
+		{
+			std::cerr << "Invalid input file: " << inFile << std::endl;
+			return -1;
+		}
 		FuzzTreeTransform transform(instream);
 		if (!transform.isValid())
+		{
+			std::cerr << "Could not compute configurations." << std::endl;
 			return -1;
+		}
+
 		const auto fileName = util::fileNameFromPath(inFile);
 
 		transform.generateConfigurationsFile(outFile);

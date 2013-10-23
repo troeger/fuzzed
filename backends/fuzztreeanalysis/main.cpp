@@ -20,9 +20,13 @@ int main(int argc, char** argv)
 
 	try
 	{
-		std::ifstream stream(inFile);
-		assert(stream.good());
-		auto tree = fuzztree::fuzzTree(stream, xml_schema::Flags::dont_validate);
+		std::ifstream instream(inFile);
+		if (!instream.good())
+		{
+			std::cerr << "Invalid input file: " << inFile << std::endl;
+			return -1;
+		}
+		auto tree = fuzztree::fuzzTree(instream, xml_schema::Flags::dont_validate);
 
 		unsigned int decompositionNumber = 10;
 		if (tree->topEvent().decompositionNumber().present())
@@ -32,7 +36,13 @@ int main(int argc, char** argv)
 
 		analysisResults::AnalysisResults analysisResults;
 
-		FuzzTreeTransform tf(tree);
+		FuzzTreeTransform tf(instream);
+		if (!tf.isValid())
+		{
+			std::cerr << "Could not compute configurations." << std::endl;
+			return -1;
+		}
+
 		for (const auto& t : tf.transform())
 		{
 			auto topEvent = fuzztree::TopEvent(t.second.topEvent());
