@@ -60,7 +60,7 @@ public:
 		const boost::filesystem::path& workingDir,
 		SimulationImpl impl);
 
-	SimulationResult simulateFaultTree(std::shared_ptr<TopLevelEvent> ft,
+	SimulationResultStruct simulateFaultTree(std::shared_ptr<TopLevelEvent> ft,
 		const boost::filesystem::path& input,
 		const boost::filesystem::path& output,
 		const boost::filesystem::path& workingDir,
@@ -71,7 +71,7 @@ public:
 protected:
 	void parseCommandline(int numArguments, char** arguments);
 	
-	SimulationResult runSimulationInternal(
+	SimulationResultStruct runSimulationInternal(
 		const boost::filesystem::path& inPath,
 		const boost::filesystem::path& outPath,
 		const boost::filesystem::path& workingDir,

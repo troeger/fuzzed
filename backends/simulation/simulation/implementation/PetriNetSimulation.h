@@ -20,9 +20,9 @@ public:
 
 	virtual bool run() override;
 
-	const SimulationResult& result() const { return m_result; }
+	const SimulationResultStruct& result() const { return m_result; }
 
-	void printResults(const SimulationResult& res);
+	void printResults(const SimulationResultStruct& res);
 
 	virtual ~PetriNetSimulation();
 
@@ -42,5 +42,5 @@ protected:
 	const int m_numAdaptiveRounds;
 	double m_convergenceThresh;
 
-	SimulationResult m_result;
+	SimulationResultStruct m_result;
 };

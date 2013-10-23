@@ -184,7 +184,7 @@ bool PetriNetSimulation::run()
 	long double avgFailureTime_fail = (long double)sumFailureTime_fail	/(long double)numFailures;
 	long double meanAvailability	= avgFailureTime_fail				/(long double)m_numSimulationSteps;
 	
-	SimulationResult res;
+	SimulationResultStruct res;
 	res.reliability			= 1.0 - unreliability;
 	res.meanAvailability	= meanAvailability;
 	res.nFailures			= numFailures;
@@ -350,7 +350,7 @@ void PetriNetSimulation::tryTimedTransitions(PetriNet* pn, int tick)
 	}
 }
 
-void PetriNetSimulation::printResults(const SimulationResult& res)
+void PetriNetSimulation::printResults(const SimulationResultStruct& res)
 {
 	string results = str(
 		format("----- File %1%, %2% simulations with %3% simulated time steps \n \

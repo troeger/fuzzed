@@ -9,6 +9,7 @@
 #include "FaultTreeConversion.h"
 
 #include "util.h"
+#include "xmlutil.h"
 #include "Config.h"
 #include "Constants.h"
 #include "CommandLineParser.h"
@@ -65,7 +66,7 @@ SimulationProxy::SimulationProxy(unsigned int numRounds, double convergenceThres
 	m_timeNetProperties(nullptr)
 {}
 
-SimulationResult SimulationProxy::runSimulationInternal(
+SimulationResultStruct SimulationProxy::runSimulationInternal(
 	const boost::filesystem::path& petriNetFile,
 	const boost::filesystem::path& outPath,
 	const boost::filesystem::path& workingDir,
@@ -73,7 +74,7 @@ SimulationResult SimulationProxy::runSimulationInternal(
 	void* additionalArguments) 
 {
 	Simulation* sim;
-	SimulationResult res;
+	SimulationResultStruct res;
 	switch (implementationType)
 	{
 	case TIMENET:
@@ -239,7 +240,7 @@ bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
 		p.extension() == timeNET::TN_EXT;
 }
 
-SimulationResult SimulationProxy::simulateFaultTree(
+SimulationResultStruct SimulationProxy::simulateFaultTree(
 	std::shared_ptr<TopLevelEvent> ft,
 	const boost::filesystem::path& input,
 	const boost::filesystem::path& output,
@@ -273,7 +274,7 @@ SimulationResult SimulationProxy::simulateFaultTree(
 	}
 
 	if (impl == STRUCTUREFORMULA_ONLY)
-		return SimulationResult();
+		return SimulationResultStruct();
 
 	std::string petriNetFile = workingDir.generic_string() + util::fileNameFromPath(input.generic_string());
 	util::replaceFileExtensionInPlace(petriNetFile, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
@@ -293,6 +294,8 @@ void SimulationProxy::simulateAllConfigurations(
 	if (!file.is_open())
 		throw runtime_error("Could not open file");
 
+	simulationResults::SimulationResults simResults;
+
 	FuzzTreeTransform ftTransform(file);
 	if (!ftTransform.isValid())
 	{
@@ -300,7 +303,19 @@ void SimulationProxy::simulateAllConfigurations(
 		std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
 		if (ft)
 		{ // in this case there is only a faulttree, so no configuration information will be serialized
-			auto res = simulateFaultTree(ft, inputFile, outputFile, workingDir, impl);
+		
+			SimulationResultStruct res = simulateFaultTree(ft, inputFile, outputFile, workingDir, impl);
+			simulationResults::Result r(
+				ft->getId(),
+				util::timeStamp(),
+				ft->getCost(),
+				res.reliability,
+				res.nFailures,
+				res.nRounds);
+
+			r.availability(res.meanAvailability);
+			r.duration(res.duration);
+			r.mttf(res.mttf);
 		}
 		else
 			std::cerr << "Could handle fault tree file: " << inFile << endl;
@@ -314,8 +329,26 @@ void SimulationProxy::simulateAllConfigurations(
 		{
 			auto res = simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
 			simTree->print(cout);
+
+			simulationResults::Result r(
+				simTree->getId(),
+				util::timeStamp(),
+				simTree->getCost(),
+				res.reliability,
+				res.nFailures,
+				res.nRounds);
+
+			r.availability(res.meanAvailability);
+			r.duration(res.duration);
+			r.mttf(res.mttf);
+
+			r.configuration(serializedConfiguration(ft.first));
+			simResults.result().push_back(r);
 		}
 	}
+
+	std::ofstream output(outputFile.generic_string());
+	simulationResults::simulationResults(output, simResults);
 }
 
 void SimulationProxy::parseCommandline_default(int numArguments, char** arguments)
