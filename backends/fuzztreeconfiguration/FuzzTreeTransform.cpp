@@ -36,7 +36,9 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 }
 
 
-FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML)
+FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML) :
+	m_count(0),
+	m_bValid(true)
 {
 	try
 	{
