@@ -174,7 +174,7 @@ void convertFuzzTreeRecursive(FaultTreeNode::Ptr node, const fuzztree::Node& tem
 		}
 		else if (typeName == *INTERMEDIATEEVENT)
 		{
-			// TODO
+			current = nullptr;
 		}
 
 		// Static Gates...
