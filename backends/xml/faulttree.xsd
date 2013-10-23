@@ -53,7 +53,7 @@
   <xsd:complexType name="TopEvent">
     <xsd:complexContent>
       <xsd:extension base="ft:Node">
-        <xsd:attribute name="missionTime" type="xsd:int" use="required"/>
+        <xsd:attribute name="missionTime" type="xsd:int"/>
       </xsd:extension>
     </xsd:complexContent>
   </xsd:complexType>

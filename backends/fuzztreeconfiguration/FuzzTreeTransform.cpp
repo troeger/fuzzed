@@ -30,7 +30,7 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML) :
 	}
 	catch (const xml_schema::Exception& e)
 	{
-		std::cerr << "Exception while reading: " << fuzzTreeXML << e.what() << std::endl;
+		std::cerr << "Exception while reading: " << fuzzTreeXML << e << std::endl;
 		m_bValid = false;
 	}
 }
@@ -45,7 +45,7 @@ FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML)
 	}
 	catch (const xml_schema::Exception& e)
 	{
-		std::cerr << "Exception while reading: " << fuzzTreeXML << e.what() << std::endl;
+		std::cerr << "Exception while reading: " << fuzzTreeXML << e << std::endl;
 		m_bValid = false;
 	}
 }
@@ -223,8 +223,10 @@ fuzztree::FuzzTree FuzzTreeTransform::generateVariationFreeFuzzTree(const FuzzTr
 	const fuzztree::TopEvent topEvent = m_fuzzTree->topEvent();
 
 	// Create a new empty top event to fill up with the configuration
-	fuzztree::TopEvent newTopEvent(topEvent.id(), topEvent.missionTime(), topEvent.decompositionNumber());
-	newTopEvent.name() = topEvent.name();
+	fuzztree::TopEvent newTopEvent(topEvent.id());
+	newTopEvent.missionTime(topEvent.missionTime());
+	newTopEvent.decompositionNumber(topEvent.decompositionNumber());
+	newTopEvent.name(topEvent.name());
 
 	if (generateVariationFreeFuzzTreeRecursive(&topEvent, &newTopEvent, configuration) == OK)
 		return fuzztree::FuzzTree(generateUniqueId(topEvent.id()), newTopEvent);
@@ -432,25 +434,19 @@ std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>>
 	{
 		if (!m_fuzzTree.get())
 		{
-			std::cerr << "Invalid Fuzztree." << endl;
+			std::cerr << "Invalid FuzzTree." << endl;
 			return results;
 		}
 
 		vector<FuzzTreeConfiguration> configs;
 		generateConfigurations(configs);
 
-		int indent = 0;
-		// treeHelpers::printTree(m_fuzzTree->topEvent(), indent);
-		// cout << endl << " ...... configurations: ...... " << endl;
-
 		for (const auto& instanceConfiguration : configs)
 		{
-			auto ft = generateVariationFreeFuzzTree(instanceConfiguration);
-			indent = 0;
-// 			treeHelpers::printTree(ft.topEvent(), indent);
-// 			cout << endl;
-
-			results.emplace_back(std::make_pair(instanceConfiguration, ft));
+			results.emplace_back(
+				std::make_pair(
+				instanceConfiguration,
+				generateVariationFreeFuzzTree(instanceConfiguration)));
 		}
 	}
 	catch (xsd::cxx::exception& e)
