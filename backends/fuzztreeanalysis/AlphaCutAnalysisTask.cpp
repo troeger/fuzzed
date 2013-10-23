@@ -31,6 +31,8 @@ std::future<AlphaCutAnalysisResult> AlphaCutAnalysisTask::run()
 
 AlphaCutAnalysisResult AlphaCutAnalysisTask::analyze()
 {
+	if (m_tree->children().size() == 0)
+		return NumericInterval(1.0, 1.0); // trees without children are completely reliable
 	return analyzeRecursive(m_tree->children().front());
 }
 
