@@ -23,8 +23,8 @@ configurations::Configuration serializedConfiguration(const FuzzTreeConfiguratio
 	{
 		conf.choice().push_back(
 			configurations::IntegerToChoiceMap(
-			configurations::FeatureChoice(featureChoice.first),
-			featureChoice.second));
+			configurations::FeatureChoice(featureChoice.second),
+			featureChoice.first));
 	}
 
 	return conf;
