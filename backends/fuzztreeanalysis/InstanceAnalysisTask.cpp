@@ -21,6 +21,9 @@ InstanceAnalysisResult InstanceAnalysisTask::compute()
 
 	const double m = (double)m_decompositionNumber;
 	
+	// TODO: some more intelligent way of dividing work.
+	// find out whether this performs better than the serial version anyway.
+
 	// FORK
 	for (unsigned int i = 0; i <= m_decompositionNumber; ++i)
 	{

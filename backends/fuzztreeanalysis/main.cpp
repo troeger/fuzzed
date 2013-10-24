@@ -59,12 +59,12 @@ int main(int argc, char** argv)
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << "Exception while trying to analyze" << inFile << e.what() << std::endl;
+		std::cerr << "Exception while trying to analyze " << inFile << e.what() << std::endl;
 		return -1;
 	}
 	catch (...)
 	{
-		std::cerr << "Exception while trying to analyze" << inFile << std::endl;
+		std::cerr << "Exception while trying to analyze " << inFile << std::endl;
 		return -1;
 	}
 

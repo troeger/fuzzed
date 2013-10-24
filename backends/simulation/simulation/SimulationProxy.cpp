@@ -361,5 +361,19 @@ void SimulationProxy::parseCommandline_default(int numArguments, char** argument
 	
 	CommandLineParser parser;
 	parser.parseCommandline(numArguments, arguments);
-	simulateAllConfigurations(parser.getInputFilePath(), parser.getOutputFilePath(), parser.getWorkingDirectory(), DEFAULT);
+
+	const auto additionalArgs = parser.getAdditionalArguments();
+	const int numAdditionalArgs = additionalArgs.size();
+	if (numAdditionalArgs > 0) 
+	{
+		m_numRounds = atoi(additionalArgs[0].c_str());
+		if (numAdditionalArgs > 1)
+			m_simulationTime = atoi(additionalArgs[1].c_str());
+	}
+	
+	simulateAllConfigurations(
+		parser.getInputFilePath(),
+		parser.getOutputFilePath(),
+		parser.getWorkingDirectory(),
+		DEFAULT);
 }
