@@ -17,8 +17,12 @@
     // selected/selecting state
     &.ui-selected, &.ui-selecting {
         &, &.highlighted {
-            path, rect, circle {
+            path, rect, circle{
                 stroke: @theme-selection !important;
+            }
+            
+            .sticky_note{
+              border: solid 2px @theme-selection;
             }
         }
     }
@@ -110,12 +114,11 @@
     
     .sticky_note{
         
-        @sticky_color: white;
-        //#F9EFAF;
+        @sticky_color: #F0F07F;
         
         background-color: @sticky_color;
         padding:          5px;
-        font-family:      'Gloria Hallelujah', cursive;
+        font-family:      'American Typewriter', cursive;
         overflow:         hidden;
         text-overflow:    ellipsis;
         width:            160px;

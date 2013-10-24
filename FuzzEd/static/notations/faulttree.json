@@ -34,8 +34,22 @@
             "properties": {
               "description": {
                   "kind": "textfield",
-                  "displayName": "Text",
-                  "default": "Sample Text"
+                  "default": "Sample Text",
+                  "hidden": true
+              },
+              
+              "height": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 160,
+                  "hidden": true
+              },
+              
+              "width": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 160,
+                  "hidden": true
               }
             }
         },
@@ -434,7 +448,9 @@
         "k",
         "dormancyFactor",
         "transfer",
-        "description"
+        "description",
+        "width",
+        "height"
     ],
 
     "shapeMenuNodeDisplayOrder": [

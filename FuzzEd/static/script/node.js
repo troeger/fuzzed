@@ -98,11 +98,11 @@ function(Property, Mirror, Canvas, Class) {
                 ._setupEndpoints()
                 // Interaction
                 ._setupDragging()
-				._setupResizable()
-				._setupEditable()
                 ._setupMouse()
                 ._setupSelection()
                 ._setupProperties(propertiesDisplayOrder)
+				._setupEditable()
+				._setupResizable()
                 // Events
                 ._registerEventHandlers();
         },
@@ -514,7 +514,25 @@ function(Property, Mirror, Canvas, Class) {
 			
 			if(!this.resizable) return this;
 			
-			this.container.find('.'+ this.config.Classes.RESIZABLE).resizable();
+			var properties = this.properties;
+			
+			var height = properties.height.value;
+			var width  = properties.width.value;
+		
+			var resizable = this.container.find('.'+ this.config.Classes.RESIZABLE).resizable();
+			// setup resizable with width/height values stored in the backend
+			jQuery(resizable).height(height).width(width);
+			
+			// if resizable gets resized update width/height attribute		
+			jQuery(resizable).on('resizestop',function() {
+				
+				var newWidth = jQuery(resizable).width();
+				var newHeight = jQuery(resizable).height();
+			
+				properties.width.setValue(newWidth);
+				properties.height.setValue(newHeight);
+			});
+			
 			return this;
 		},
 		
@@ -523,8 +541,7 @@ function(Property, Mirror, Canvas, Class) {
 		 *
 		 * This initialization method is called in the constructor and is responsible for setting up the editing of a node.
 		 * Until now the editing functionality is intended only for editing sticky notes on the canvas.
-		 * If the sticky note is clicked ,the html paragraph inside the sticky note will be replaced with a textarea, in order to edit the content.
-		 * If the focus on the texarea is left it will be replaced again with a paragraph.
+		 * If the sticky note is clicked ,the html paragraph inside the sticky note will be hidden and the textarea will be displayed.
 		 *
          * Returns:
          *   This {<Node>} instance for chaining.
@@ -532,25 +549,21 @@ function(Property, Mirror, Canvas, Class) {
 		_setupEditable: function(){
 			if(!this.editable) return this;
 			
-			var editable = this.container.find('.'+ this.config.Classes.EDITABLE);
+			var container = this.container
+			var editable = container.find('.'+ this.config.Classes.EDITABLE);
 			
-			editable.on("click", function(event){
-				if(editable.find("textarea").length) return;
+			var textarea =  editable.find("textarea");				
+			var paragraph = editable.find("p").text(textarea.val());
+						
+			editable.on("mouseup", function(event){
+				// if element was dragged prevent default behaviour
+				if (container.is('.ui-draggable-dragging')) return;
 				
-				var paragraph = editable.find("p");
-				var textarea = jQuery('<textarea></textarea>').val(paragraph.text());
-				paragraph.replaceWith(textarea);
-				textarea.focus();
-			});
-			
-			editable.on("blur", "textarea", function(){
-				var textarea = editable.find("textarea");
-				var paragraph = jQuery('<p></p>').text(textarea.val());
-				textarea.replaceWith(paragraph);
+				paragraph.toggle(false);
+				textarea.toggle(true).focus();
 			});
 			
 			jQuery(document).on('node_unselected', function(event){
-				var textarea = editable.find("textarea");
 				if (textarea.length) textarea.blur();
 			});
 				

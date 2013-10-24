@@ -338,7 +338,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *    This Editor instance for chaining
          */
         _arrowKeyPressed: function(event, xDirection, yDirection) {
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             jQuery(selectedNodes).each(function(index, element) {
@@ -366,7 +366,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          */
         _deletePressed: function(event) {
             // prevent that node is being deleted when we edit an input field
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
@@ -423,7 +423,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *   This Editor instance for chaining.
          */
         _selectAllPressed: function(event) {
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             event.preventDefault();
 

@@ -820,17 +820,54 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
     });
 	
 	/**
-	 * Class: TextArea
-	 *	Simple HTML textarea for a <Text><Property>
+	 * Class: InlineTextArea
+	 *     TextArea for editing inside a shape on the canvas.
+	 *     So far only used for editing inside a sticky note.
 	 */
 	
-    var TextArea = Entry.extend({
+    var InlineTextArea = Entry.extend({
         changeEvents: function() {
             return ['keyup', 'cut', 'paste'];
         },
-
+		
+        blurEvents: function() {
+            return ['blur'];
+        },
+		
         _setupInput: function() {
             this.inputs = jQuery('<textarea type="text" class="form-control">').attr('id', this.id);
+			//hide textarea at the beginning
+			this.inputs.toggle(false);
+            return this;
+        },
+		
+        appendTo: function(on) {
+			this._setupCallbacks();
+            return this;
+        },
+		
+        blurred: function(event, ui) {
+			 this._super(event, ui);
+			 // hide textarea
+			 this.inputs.toggle(false);
+			 // show paragraph and set value
+			 this.inputs.siblings('p').text(this.inputs.val()).toggle(true);
+		},
+		
+        remove: function() {
+		},
+		
+        _setupContainer: function() {
+            this.container = this.inputs
+			
+            return this;
+        },
+		
+        _setupVisualRepresentation: function() {
+            this._setupInput();
+			this._setupContainer();
+            this.property.node.container.find('.' + Config.Classes.EDITABLE).append(this.inputs);
+
             return this;
         },
 
@@ -1004,14 +1041,14 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
     });
 
     return {
-        'BoolEntry':     BoolEntry,
-        'ChoiceEntry':   ChoiceEntry,
-        'CompoundEntry': CompoundEntry,
-        'EpsilonEntry':  EpsilonEntry,
-        'NumericEntry':  NumericEntry,
-        'RangeEntry':    RangeEntry,
-        'TextEntry':     TextEntry,
-		'TextArea'	:    TextArea, 
-        'TransferEntry': TransferEntry
+        'BoolEntry':     	BoolEntry,
+        'ChoiceEntry':   	ChoiceEntry,
+        'CompoundEntry': 	CompoundEntry,
+        'EpsilonEntry':  	EpsilonEntry,
+        'NumericEntry':  	NumericEntry,
+        'RangeEntry':    	RangeEntry,
+        'TextEntry':     	TextEntry,
+		'InlineTextArea':   InlineTextArea, 
+        'TransferEntry': 	TransferEntry
     }
 });
