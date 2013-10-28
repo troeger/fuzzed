@@ -555,10 +555,7 @@ function(Property, Mirror, Canvas, Class) {
 			var textarea =  editable.find("textarea");				
 			var paragraph = editable.find("p").text(textarea.val());
 						
-			editable.on("mouseup", function(event){
-				// if element was dragged prevent default behaviour
-				if (container.is('.ui-draggable-dragging')) return;
-				
+			editable.on("dblclick", function(event){
 				paragraph.toggle(false);
 				textarea.toggle(true).focus();
 			});
