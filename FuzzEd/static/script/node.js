@@ -383,7 +383,7 @@ function(Property, Mirror, Canvas, Class) {
 
                 drag: function(event, ui) {
                     // enlarge canvas
-                    Canvas.enlarge({x: ui.offset.left, y: ui.offset.top});
+					Canvas.enlarge({x: ui.offset.left, y: ui.offset.top, height: ui.helper.height(), width: ui.helper.width() });
 
                     // determine by how many pixels we moved from our original position (see: start callback)
                     var xOffset = ui.position.left - initialPositions[this.id].left;
@@ -513,6 +513,8 @@ function(Property, Mirror, Canvas, Class) {
 		_setupResizable: function(){
 			
 			if(!this.resizable) return this;
+			// adapt size of container div to inner resizable div
+			this.container.width("auto").height("auto");
 			
 			var properties = this.properties;
 			

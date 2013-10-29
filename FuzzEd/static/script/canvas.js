@@ -47,11 +47,11 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
             var canvasWidth  = this.container.width();
             var canvasHeight = this.container.height();
             var doubleGrid   = this.gridSize << 1;
-
-            while (to.x > canvasWidth - doubleGrid) {
+			
+            while (to.x + to.width  > canvasWidth - doubleGrid) {
                 canvasWidth *= 2;
             }
-            while (to.y > canvasHeight - doubleGrid) {
+            while (to.y + to.height > canvasHeight - doubleGrid) {
                 canvasHeight *= 2;
             }
 
