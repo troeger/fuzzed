@@ -29,6 +29,8 @@ def dev():
         # Perform latest GCC installation on Homebrew
         print "Installing latest GCC"
         cuisine.run("brew tap homebrew/versions")
+        # We had issues. It helped. Don't ask.
+        cuisine.run("brew tap --repair")
         cuisine.package_ensure("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
         # Install native packages on Darwin
         print "Installing Postgres"

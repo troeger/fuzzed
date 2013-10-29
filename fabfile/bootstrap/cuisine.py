@@ -192,12 +192,15 @@ def run(*args, **kwargs):
 	if is_local():
 		if is_sudo():
 			kwargs.setdefault("sudo", True)
-		return run_local(*args, **kwargs)
+		result= run_local(*args, **kwargs)
 	else:
 		if is_sudo():
-			return fabric.api.sudo(*args, **kwargs)
+			result= fabric.api.sudo(*args, **kwargs)
 		else:
-			return fabric.api.run(*args, **kwargs)
+			result= fabric.api.run(*args, **kwargs)
+	if "error:" in result.lower():
+		print result
+	return result
 
 def cd(*args, **kwargs):
 	"""A wrapper around Fabric's cd to change the local directory if
@@ -1089,11 +1092,12 @@ def python_package_install_pip(package=None,r=None,pip=None):
 	'''
 	pip=pip or fabric.api.env.get('pip','pip')
 	if package:
-		return sudo('%s install %s' %(pip,package))
+		result=sudo('%s install %s' %(pip,package))
 	elif r:
-		return sudo('%s install -r %s' %(pip,r))
+		result=sudo('%s install -r %s' %(pip,r))
 	else:
 		raise Exception("Either a package name or the requirements file has to be provided.")
+	return result
 
 def python_package_ensure_pip(package=None, r=None, pip=None):
 	'''
