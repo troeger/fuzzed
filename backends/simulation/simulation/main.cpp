@@ -4,6 +4,7 @@
 using namespace std;
 
 #define DEBUG true
+// This works only under Windows...
 //#define DETECT_MEM_LEAKS true
 
 #ifdef DETECT_MEM_LEAKS

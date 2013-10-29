@@ -25,10 +25,15 @@ class FuzzTreeTransform
 public:
 	FuzzTreeTransform(const std::string& fuzzTreeXML);
 	FuzzTreeTransform(std::istream& fuzzTreeXML);
+	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft);
 
 	~FuzzTreeTransform();
 
-	std::vector<fuzztree::FuzzTree> transform();
+	void generateConfigurationsFile(const std::string& outputXML);
+
+	std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>> transform();
+
+	bool isValid() const { return m_bValid; }
 
 protected:
 	fuzztree::FuzzTree generateVariationFreeFuzzTree(const FuzzTreeConfiguration& configuration);
@@ -43,13 +48,6 @@ protected:
 		const std::string id,
 		const fuzztree::ChildNode& currentChild);
 
-	// add the configured VotingOR gate, return true if leaf was reached
-	bool handleRedundancyVP(
-		const fuzztree::ChildNode* templateNode,
-		fuzztree::Node* node,
-		const std::tuple<int,int> configuredN,
-		const FuzzTreeConfiguration::id_type& id) const;
-
 	// add the configured child gate, return true if leaf was reached
 	bool handleFeatureVP(
 		const fuzztree::ChildNode* templateNode,
@@ -60,13 +58,11 @@ protected:
 	ErrorType expandBasicEventSet(
 		const fuzztree::Node* templateNode,
 		fuzztree::Node* parentNode, 
-		const FuzzTreeConfiguration::id_type& id,
 		const int& defaultQuantity = 0) const;
 
 	ErrorType expandIntermediateEventSet(
 		const fuzztree::Node* templateNode,
 		fuzztree::Node* parentNode,
-		const FuzzTreeConfiguration::id_type& id,
 		const FuzzTreeConfiguration& configuration,
 		const int& defaultQuantity = 0) const;
 	
@@ -76,11 +72,15 @@ protected:
 		std::vector<FuzzTreeConfiguration>& configurations) const;
 
 	static bool isOptional(const fuzztree::Node& node);
+	static int parseCost(const fuzztree::InclusionVariationPoint& node);
 
 	std::string generateUniqueId(const std::string& oldId);
+
+	static xml_schema::Properties validationProperties(); // throwing an error. not used currently.
 	
 private:
 	std::auto_ptr<fuzztree::FuzzTree> m_fuzzTree;
 
 	int m_count;
+	bool m_bValid;
 };

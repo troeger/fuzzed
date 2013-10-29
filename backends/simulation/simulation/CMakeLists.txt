@@ -7,7 +7,6 @@ set(SOURCES
    main.cpp
    SimulationExtern.cpp
    SimulationProxy.cpp
-   ResultDocument.cpp
 
    implementation/PetriNetSimulation.cpp
    implementation/TimeNETSimulation.cpp
@@ -28,7 +27,6 @@ set(HEADERS
 
    SimulationExtern.h
    SimulationProxy.h
-   ResultDocument.h
    ResultStruct.h
    Config.h
    
@@ -70,7 +68,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PUGIXML_INCLUDE_DIR})
 if (BUILD_TESTS)
    add_library(ftsimulation_static STATIC ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation_static
-      ftmodeltransform
-	  ${FT_CONFIG_LIB})
+      ftmodeltransform)
    set_target_properties(ftsimulation_static PROPERTIES COMPILE_DEFINITIONS "SIMULATION_STATIC")
 endif(BUILD_TESTS)

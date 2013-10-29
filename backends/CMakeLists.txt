@@ -63,7 +63,7 @@ set(BOOST_INCLUDEDIR ${BOOST_ROOT}/Include)
 set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
 
 set(Boost_DIR ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
-find_package(Boost 1.48 COMPONENTS # TODO find out which version is really required. Maybe 1.50 would suffice too.
+find_package(Boost 1.48 COMPONENTS
 	date_time
 	system
 	filesystem
@@ -126,7 +126,7 @@ set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
 ############### XSD COMPILER ############
 #########################################
 
-set(XSD_GENERATED_FILES
+set(XSD_GENERATED_TREE_FILES
 	${COMMON_DIR}/fuzztree.h
 	${COMMON_DIR}/faulttree.h
 	${COMMON_DIR}/fuzztree.cpp
@@ -134,7 +134,9 @@ set(XSD_GENERATED_FILES
 
 set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faulttree.xsd")
 set(FUZZTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/fuzztree.xsd")
-set(SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
+set(TREE_SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
+
+########### FAULT TREE MODEL ############
 
 set(XSD_TO_FAULTTREE_ARGS
 	--include-with-brackets #include with <> instead of ""
@@ -162,7 +164,6 @@ set(XSD_TO_FUZZTREE_ARGS
 	--generate-forward
 	--hxx-suffix .h
 	--cxx-suffix .cpp
- 
 )
 
 if (VARIADIC_TEMPLATES)
@@ -218,57 +219,141 @@ if (VARIADIC_TEMPLATES)
 
 endif(VARIADIC_TEMPLATES)
 
-add_custom_command(OUTPUT ${XSD_GENERATED_FILES}
+
+########### RESULT XML ##################
+
+set(XSD_GENERATED_RESULT_FILES
+	${COMMON_DIR}/analysisResult.h
+	${COMMON_DIR}/simulationResult.h
+	${COMMON_DIR}/configurationResult.h
+	${COMMON_DIR}/commonTypes.h
+	${COMMON_DIR}/configurations.h
+	${COMMON_DIR}/analysisResult.cpp
+	${COMMON_DIR}/simulationResult.cpp
+	${COMMON_DIR}/configurationResult.cpp
+	${COMMON_DIR}/commonTypes.cpp
+	${COMMON_DIR}/configurations.cpp)
+
+set(ANALYSIS_RESULT_XSD			"${CMAKE_CURRENT_SOURCE_DIR}/xml/analysisResult.xsd")
+set(SIMULATION_RESULT_XSD		"${CMAKE_CURRENT_SOURCE_DIR}/xml/simulationResult.xsd")
+set(CONFIGURATION_RESULT_XSD	"${CMAKE_CURRENT_SOURCE_DIR}/xml/configurationResult.xsd")
+set(COMMON_TYPES_XSD			"${CMAKE_CURRENT_SOURCE_DIR}/xml/commonTypes.xsd")
+set(CONFIGURATION_XSD			"${CMAKE_CURRENT_SOURCE_DIR}/xml/configurations.xsd")
+
+set(XSD_RESULT_ARGS
+	--include-with-brackets #include with <> instead of ""
+	--generate-polymorphic  #needed for xsi:type
+	--polymorphic-type-all
+	--type-naming ucc
+	--function-naming lcc
+	--generate-serialization
+	--hxx-suffix .h
+	--cxx-suffix .cpp
+)
+
+########### CODE GENERATION ################
+
+add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FILES}
+	
+	COMMAND ${XSD_EXECUTABLE}
+		cxx-tree 
+			${XSD_RESULT_ARGS} 
+			--output-dir ${COMMON_DIR}
+			${COMMON_TYPES_XSD}
+
+	COMMAND ${XSD_EXECUTABLE} 
+		cxx-tree
+			${XSD_RESULT_ARGS}
+			--output-dir ${COMMON_DIR}
+			${CONFIGURATION_XSD}
+
+	COMMAND ${XSD_EXECUTABLE}
+		cxx-tree 
+			${XSD_RESULT_ARGS} 
+			--output-dir ${COMMON_DIR}
+			--root-element "analysisResults"
+			${ANALYSIS_RESULT_XSD}
+
+	COMMAND ${XSD_EXECUTABLE} 
+		cxx-tree
+			${XSD_RESULT_ARGS}
+			--output-dir ${COMMON_DIR}
+			--root-element "configurationResults"
+			${CONFIGURATION_RESULT_XSD}
+
+	COMMAND ${XSD_EXECUTABLE} 
+		cxx-tree
+			${XSD_RESULT_ARGS}
+			--output-dir ${COMMON_DIR}
+			--root-element "simulationResults"
+			${SIMULATION_RESULT_XSD}
+
 	COMMAND ${XSD_EXECUTABLE}
 		cxx-tree 
 			${XSD_TO_FAULTTREE_ARGS} 
 			${TREE_CUSTOMIZATION_ARGS}
 			--output-dir ${COMMON_DIR}
 			${FAULTTREE_XSD}
+
 	COMMAND ${XSD_EXECUTABLE} 
 		cxx-tree
 			${XSD_TO_FUZZTREE_ARGS}
 			${FUZZTREE_CUSTOMIZATION_ARGS}
 			--output-dir ${COMMON_DIR}
-		${FUZZTREE_XSD}
+			${FUZZTREE_XSD}
+
 	COMMENT "Generating C++ / XML mapping files"
 	VERBATIM)
-
-add_definitions(-DFUZZTREEXSD="${FUZZTREE_XSD}")
-add_definitions(-DFAULTTREEXSD="${FAULTTREE_XSD}")
 
 ############### COMMON ##################
 #########################################
 
 set(COMMON_SOURCES
 	${COMMON_DIR}/util.cpp
+	${COMMON_DIR}/xmlutil.cpp
 	${COMMON_DIR}/FaultTreeTypes.cpp
 	${COMMON_DIR}/FuzzTreeTypes.cpp
 	${COMMON_DIR}/FaultTreeTypes.cpp
 	${COMMON_DIR}/FuzzTreeTypes.cpp
 	${COMMON_DIR}/faulttree.cpp
 	${COMMON_DIR}/fuzztree.cpp
+	${COMMON_DIR}/analysisResult.cpp
+	${COMMON_DIR}/simulationResult.cpp
+	${COMMON_DIR}/configurationResult.cpp
+	${COMMON_DIR}/commonTypes.cpp
+	${COMMON_DIR}/configurations.cpp
+	${COMMON_DIR}/CommandLineParser.cpp
 )
 
 set(COMMON_HEADERS
 	${COMMON_DIR}/platform.h
 	${COMMON_DIR}/util.h
+	${COMMON_DIR}/xmlutil.h
 	${COMMON_DIR}/FaultTreeTypes.h
 	${COMMON_DIR}/FuzzTreeTypes.h
 	${COMMON_DIR}/faulttree.h
 	${COMMON_DIR}/fuzztree.h
+	${COMMON_DIR}/analysisResult.h
+	${COMMON_DIR}/simulationResult.h
+	${COMMON_DIR}/configurationResult.h
+	${COMMON_DIR}/commonTypes.h
+	${COMMON_DIR}/configurations.h
+	${COMMON_DIR}/CommandLineParser.h
 )
 
 set(COMMON_LINKED_LIBS
 	${XERCESC_LIBRARIES}
 	${Boost_LIBRARIES}
 	${PUGIXML_LIB})
+
 message("${COMMON_LINKED_LIBS}")
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
 target_link_libraries(common_model ${COMMON_LINKED_LIBS})
+
 set(COMMON_LINKED_LIBS
 	${COMMON_LINKED_LIBS}
-	common_model)
+	common_model
+	ftconfiguration)
 
 ############### UNIT TESTS ##############
 #########################################

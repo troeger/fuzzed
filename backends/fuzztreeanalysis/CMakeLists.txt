@@ -6,7 +6,6 @@ set(SOURCES
   InstanceAnalysisTask.cpp
   Probability.cpp
   DecomposedFuzzyInterval.cpp
-  AnalysisResult.cpp
 )
 
 set(HEADERS
@@ -15,14 +14,12 @@ set(HEADERS
   Interval.h
   DecomposedFuzzyInterval.h
   Probability.h
-  AnalysisResult.h
 )
 
 include_directories(${PUGIXML_INCLUDE_DIR})
 
 add_executable(ftanalysis ${SOURCES} ${HEADERS})
   target_link_libraries(ftanalysis
-    ${FT_CONFIG_LIB}
     ${COMMON_LINKED_LIBS})
   message("Building analysis executable")
 
@@ -33,5 +30,4 @@ if (BUILD_TESTS)
   target_link_libraries(ftanalysis_static
     ${FT_CONFIG_LIB}
     ${XERCESC_LIBRARIES})
-  set_target_properties(ftanalysis_static PROPERTIES COMPILE_DEFINITIONS "ANALYSIS_STATIC")
 endif (BUILD_TESTS)

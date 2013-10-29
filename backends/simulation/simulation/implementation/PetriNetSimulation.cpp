@@ -1,7 +1,6 @@
 #include "PetriNetSimulation.h"
 #include "util.h"
 #include "Config.h"
-#include "ResultDocument.h"
 #include "petrinet/PNMLImport.h"
 #include "petrinet/PetriNet.h"
 
@@ -25,7 +24,7 @@ bool PetriNetSimulation::run()
 	if (!pn.valid()) 
 		throw runtime_error("Invalid Petri Net.");
 
-	cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads..." << std::endl;
+	// cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads..." << std::endl;
 
 	// for checking local convergence, thread-local
 	long double privateLast = 10000.0L;
@@ -37,13 +36,7 @@ bool PetriNetSimulation::run()
 	int count = 0;
 
 	double startTime = omp_get_wtime();
-
-#define NUM_MONTE_CARLO_ROUNDS 1000 
-// #define RELIABILITY_DISTRIBUTION	// compute the entire reliability distribution up to mission time, for statistical tests
-#define OMP_PARALLELIZATION			// use OpenMP to parallelize. alternative: manual (static) work splitting over a number of C++11 threads 
-
-
-#ifdef OMP_PARALLELIZATION
+	RandomNumberGenerator::initGenerators();
 
 #ifdef RELIABILITY_DISTRIBUTION
 	auto fileName = m_netFile.generic_string();
@@ -51,7 +44,7 @@ bool PetriNetSimulation::run()
 	ofstream statdoc(fileName);
 	statdoc << std::endl;
 
-	cout << "----- Simulating entire reliability distribution up to mission time " << m_numSimulationSteps << "..." << std::endl;
+	// cout << "----- Simulating entire reliability distribution up to mission time " << m_numSimulationSteps << "..." << std::endl;
 
 	const auto maxTime = m_numSimulationSteps;
 	for (int k = 0; k < maxTime; ++k)
@@ -89,8 +82,10 @@ bool PetriNetSimulation::run()
 			privateBreak = false;
 			globalConvergence = true;
 			count = 0;
+			startTime = omp_get_wtime();
 #endif
 
+#ifdef OMP_PARALLELIZATION
 #pragma omp parallel for\
 	reduction(+:numFailures, sumFailureTime_all, sumFailureTime_fail, count)\
 	reduction(&: globalConvergence) firstprivate(privateLast, privateConvergence, privateBreak)\
@@ -131,9 +126,6 @@ bool PetriNetSimulation::run()
 		}
 		privateLast = current;
 	}
-// 	const double ompTime = omp_get_wtime() - startTime;
-// 	startTime = omp_get_wtime();
-
 #else
 
 	const int threadNum = omp_get_max_threads();
@@ -184,9 +176,6 @@ bool PetriNetSimulation::run()
 
 	for (int n = 0; n < threadNum; ++n)
 		workers[n].join();
-
-/*	const double cppTime = omp_get_wtime() - startTime;*/
-
 #endif
 	
 	long double unreliability		= (long double)numFailures			/(long double)count;
@@ -194,7 +183,7 @@ bool PetriNetSimulation::run()
 	long double avgFailureTime_fail = (long double)sumFailureTime_fail	/(long double)numFailures;
 	long double meanAvailability	= avgFailureTime_fail				/(long double)m_numSimulationSteps;
 	
-	SimulationResult res;
+	SimulationResultStruct res;
 	res.reliability			= 1.0 - unreliability;
 	res.meanAvailability	= meanAvailability;
 	res.nFailures			= numFailures;
@@ -203,43 +192,39 @@ bool PetriNetSimulation::run()
 	res.duration			= omp_get_wtime() - startTime;
 	
 #if  defined(RELIABILITY_DISTRIBUTION) || defined(NUM_MONTE_CARLO_ROUNDS)
-	statdoc << util::toString(res.reliability) << std::endl;
+	statdoc << util::toString(res.duration) << std::endl;
 	}
 #else
-	printResults(res);
-	writeResultXML(res);
+	// printResults(res);
+	// writeResultXML(res);
 #endif
 
+#ifndef MEASURE_SPEEDUP
 	tidyUp();
+#endif
 
+#ifdef MEASURE_SPEEDUP
+	cout << res.duration << endl;
+#endif
+
+	m_result = res;
 	return true;
 }
 
 PetriNetSimulation::PetriNetSimulation(
-	const boost::filesystem::path& path,
-	const string& outputFileName, 
+	const boost::filesystem::path& inPath,
 	unsigned int simulationTime,	// the maximum duration of one simulation in seconds
 	unsigned int simulationSteps,	// the number of logical simulation steps performed in each round
 	unsigned int numRounds,
 	double convergenceThresh,
 	bool simulateUntilFailure,
 	unsigned int numAdaptiveRounds /*= 0*/)
-	: Simulation(path, simulationTime, simulationSteps, numRounds), 
-	m_outStream(nullptr),
-	m_outputFileName(outputFileName),
+	: Simulation(inPath, simulationTime, simulationSteps, numRounds),
 	m_simulateUntilFailure(simulateUntilFailure),
 	m_numAdaptiveRounds(numAdaptiveRounds),
 	m_convergenceThresh(convergenceThresh)
 {
 	assert(!m_netFile.empty());
-	
-	if (!outputFileName.empty())
-	{
-		m_outStream = new ofstream(outputFileName+ ".log");
-		m_debugOutStream = new ofstream(outputFileName+".debug");
-	}
-
-	cout << "Results will be written to " << outputFileName << endl;
 }
 
 // returns false, if a sequence constraint was violated
@@ -315,12 +300,12 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 	}
 	catch (const exception& e)
 	{
-		(m_outStream ? *m_outStream : cout) << "Exception during Simulation" << e.what() << endl;
+		std::cerr << "Exception during Simulation" << e.what() << endl;
 		result.valid = false;
 	}
 	catch (...)
 	{
-		(m_outStream ? *m_outStream : cout) << "Unknown Exception during Simulation" << endl;
+		std::cerr << "Unknown Exception during Simulation" << endl;
 		result.valid = false;
 	}
 
@@ -364,7 +349,7 @@ void PetriNetSimulation::tryTimedTransitions(PetriNet* pn, int tick)
 	}
 }
 
-void PetriNetSimulation::printResults(const SimulationResult& res)
+void PetriNetSimulation::printResults(const SimulationResultStruct& res)
 {
 	string results = str(
 		format("----- File %1%, %2% simulations with %3% simulated time steps \n \
@@ -382,18 +367,7 @@ void PetriNetSimulation::printResults(const SimulationResult& res)
 			   % res.duration
 			   % res.meanAvailability);
 
-	(*m_outStream) << results << endl;
-	m_outStream->close();
-
 	cout << results << endl << endl;
-}
-
-
-void PetriNetSimulation::writeResultXML(const SimulationResult& res)
-{
-	ResultDocument doc;
-	doc.setResult(res);
-	doc.save(m_outputFileName + ".xml");
 }
 
 void PetriNetSimulation::tidyUp()
