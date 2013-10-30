@@ -11,6 +11,7 @@ except:
     print "ERROR: Run './setup.py build' to create the XML schema wrappers first"
     exit(-1)
 
+from project import Project
 from node_rendering import tikz_shapes
 
 import json, notations
@@ -26,7 +27,7 @@ class Graph(models.Model):
      {str}            kind     - unique identifier that indicates the graph's notation (e.g. fuzztree). Must be an
                                  element of the set of available notations (See also: <notations>)
      {str}            name     - the name of the graph
-     {User}           owner    - a link to the owner of the graph
+     {Project}        project  - the project corresponding corresponding to the graph
      {const datetime} created  - timestamp of the moment of graph creation (default: now)
      {bool}           deleted  - flag indicating whether this graph was deleted or not. Simplifies restoration of the
                                  graph if needed by toggling this member (default: False)
@@ -36,7 +37,7 @@ class Graph(models.Model):
 
     kind      = models.CharField(max_length=127, choices=notations.choices)
     name      = models.CharField(max_length=255)
-    owner     = models.ForeignKey(User, related_name='graphs')
+    project   = models.ForeignKey(Project, related_name='graphs')
     created   = models.DateTimeField(auto_now_add=True, editable=False)
     deleted   = models.BooleanField(default=False)
     read_only = models.BooleanField(default=False)

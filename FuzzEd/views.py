@@ -58,6 +58,12 @@ def about(request):
      {HttpResponse} a django response object
     """
     return render(request, 'util/about.html')
+    
+@login_required
+def projects(request):
+    
+    
+    return render(request, 'project_menu/projects.html')
 
 @login_required
 def dashboard(request):
