@@ -1,9 +1,15 @@
 #include "Random.h"
 #include <time.h>
 #include <iostream>
-#include <omp.h>
 #include <stdexcept>
+#include <cassert>
 #include "util.h"
+
+#ifdef OMP_PARALLELIZATION
+#include <omp.h>
+#endif
+
+using std::unordered_map;
 
 RandomNumberGenerator::RandomNumberGenerator()
 {
@@ -52,22 +58,35 @@ unsigned int RandomNumberGenerator::randomFiringTime(double rate)
 	return t;
 }
 
-unordered_map<int, RandomNumberGenerator*> RandomNumberGenerator::s_generators = unordered_map<int, RandomNumberGenerator*>();
+RandomNumberGenerator::GeneratorMap RandomNumberGenerator::s_generators = RandomNumberGenerator::GeneratorMap();
 
 RandomNumberGenerator* RandomNumberGenerator::instanceForCurrentThread()
-{
-	return s_generators.at(omp_get_thread_num());
+{ 
+#ifndef OMP_PARALLELIZATION
+	const auto tid = std::this_thread::get_id();
+	if (!CONTAINS(s_generators, tid))
+	{
+		s_generators[tid] = new RandomNumberGenerator();
+	}
+	return s_generators[tid];
+#else
+	return s_generators[omp_get_thread_num()];
+#endif
 }
 
 void RandomNumberGenerator::initGenerators()
 {
-	for (int i = 0; i < omp_get_max_threads(); ++i)
+#ifdef OMP_PARALLELIZATION
+	for (int i = 0; i <= std::thread::hardware_concurrency(); ++i)
 		s_generators[i] = new RandomNumberGenerator();
+#endif
 }
 
 void RandomNumberGenerator::reseed()
 {
+#ifdef OMP_PARALLELIZATION
 	static int k = 0;
-	for (int i = 0; i < omp_get_max_threads(); ++i)
+	for (int i = 0; i <= std::thread::hardware_concurrency(); ++i)
 		s_generators[i]->m_generator.seed(++k);
+#endif
 }

@@ -24,13 +24,13 @@ class Place
 public:
 	typedef std::shared_ptr<Place> Ptr;
 
-	Place(const string& id, int initialMarking, int capacity, PlaceSemantics semantics);
+	Place(const std::string& id, int initialMarking, int capacity, PlaceSemantics semantics);
 	Place(); // satisfy the compiler
 
 	// copying
 	Place(const Place& other);
 	
-	const string& getID() const { return m_ID; }
+	const std::string& getID() const { return m_ID; }
 	int getCurrentMarking() const { return m_marking; }
 	
 	bool hasRequests() const { return !m_transitionQueue.empty(); }
@@ -49,12 +49,12 @@ public:
 
 protected:
 	// the set of transitions who requested a token and are enabled
-	set<Transition*> m_transitionQueue;
+	std::set<Transition*> m_transitionQueue;
 
 	int m_marking;
 	const int m_initialMarking;
 	
-	const string m_ID;
+	const std::string m_ID;
 	const int m_capacity;
 
 	PlaceSemantics m_semantics;

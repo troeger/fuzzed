@@ -5,7 +5,9 @@
 #include "petrinet/PetriNet.h"
 
 #include <chrono>
-#include <omp.h>
+#ifdef OMP_PARALLELIZATION
+	#include <omp.h>
+#endif
 #include <math.h>
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
@@ -35,7 +37,7 @@ bool PetriNetSimulation::run()
 	bool globalConvergence = true;
 	int count = 0;
 
-	double startTime = omp_get_wtime();
+	auto startTime = std::chrono::system_clock::now();
 	RandomNumberGenerator::initGenerators();
 
 #ifdef RELIABILITY_DISTRIBUTION
@@ -128,7 +130,7 @@ bool PetriNetSimulation::run()
 	}
 #else
 
-	const int threadNum = omp_get_max_threads();
+	const int threadNum = std::thread::hardware_concurrency();
 	const int blockSize = std::ceil(m_numRounds / threadNum);
 	std::vector<std::thread> workers(threadNum);
 	std::mutex resultsMutex;
@@ -178,6 +180,8 @@ bool PetriNetSimulation::run()
 		workers[n].join();
 #endif
 	
+	const auto elapsedTime = std::chrono::system_clock::now() - startTime;
+
 	long double unreliability		= (long double)numFailures			/(long double)count;
 	long double avgFailureTime_all	= (long double)sumFailureTime_all	/(long double)count;
 	long double avgFailureTime_fail = (long double)sumFailureTime_fail	/(long double)numFailures;
@@ -189,7 +193,7 @@ bool PetriNetSimulation::run()
 	res.nFailures			= numFailures;
 	res.nRounds				= count;
 	res.mttf				= avgFailureTime_all;
-	res.duration			= omp_get_wtime() - startTime;
+	res.duration			= elapsedTime.count();
 	
 #if  defined(RELIABILITY_DISTRIBUTION) || defined(NUM_MONTE_CARLO_ROUNDS)
 	statdoc << util::toString(res.duration) << std::endl;

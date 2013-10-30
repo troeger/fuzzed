@@ -14,8 +14,9 @@
 #include "Constants.h"
 #include "CommandLineParser.h"
 
+#if defined(MEASURE_SPEEDUP)
 #include <omp.h>
-
+#endif
 // Generated files...
 #include "faulttree.h"
 #include "fuzztree.h"
