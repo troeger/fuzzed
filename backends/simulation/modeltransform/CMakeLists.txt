@@ -1,4 +1,4 @@
-project(ftmodeltransform CXX)
+project(ftmodeltransform)
                                                                                                                                                                                                                         
 set(SOURCES
    ${SOURCES}
@@ -55,14 +55,11 @@ set(HEADERS
    serialization/TNDocument.h
 )
 
-include_directories(${PUGIXML_INCLUDE_DIR})
+add_library(ftmodeltransform STATIC ${SOURCES} ${HEADERS})
+#if(UNIX)
+#   set_target_properties(ftmodeltransform PROPERTIES COMPILE_FLAGS "-fPIC -rdynamic")
+#elseif(APPLE)
+#   set_target_properties(ftmodeltransform PROPERTIES COMPILE_FLAGS "-fPIC")
+#endif()
 
-if (WIN32)
-   add_library(ftmodeltransform STATIC ${SOURCES} ${HEADERS})
-else()
-   add_library(ftmodeltransform SHARED ${SOURCES} ${HEADERS})
-   if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-      set_target_properties(ftmodeltransform PROPERTIES COMPILE_FLAGS "-fPIC -rdynamic")
-   endif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-endif(WIN32)
-target_link_libraries(ftmodeltransform ${Boost_LIBRARIES} ${PUGIXML_LIB})
+target_link_libraries(ftmodeltransform ${Boost_LIBRARIES} pugixml)

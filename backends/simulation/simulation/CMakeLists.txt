@@ -1,4 +1,4 @@
-project(ftsimulation CXX)
+project(ftsimulation)
                                                                                                                                                                                                                         
 set(SOURCES
    ${SOURCES}
@@ -60,12 +60,9 @@ if (NOT APPLE)
 endif()
 
 add_executable(ftsimulation ${SOURCES} ${HEADERS})
-   target_link_libraries(ftsimulation
-      ${COMMON_LINKED_LIBS}
-	  ftmodeltransform
-      ftconfiguration)
+target_link_libraries(ftsimulation pugixml common_model ftconfiguration ftmodeltransform )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PUGIXML_INCLUDE_DIR})
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PUGIXML_INCLUDE_DIR})
 
 if (BUILD_TESTS)
    add_library(ftsimulation_static STATIC ${SOURCES} ${HEADERS})

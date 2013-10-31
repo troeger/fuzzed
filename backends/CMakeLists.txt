@@ -1,42 +1,49 @@
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+##################################################
+# Overwriting the default compiler is a bad thing:
+# http://www.cmake.org/Wiki/CMake_FAQ
+# It must be done before the project definition.
+#
+# We only need this for Mac's, were Codesynthesis
+# cannot deal with the default CLang compiler.
+# A manual switch to g++ is therefore needed.
+##################################################
 if(APPLE)
-	message("This is Apple, expecting GCC-4.9 and library installations.")
-	# Mac OS X specific code
-	set(CMAKE_CXX_FLAGS "-std=c++11")
-	set(CMAKE_C_COMPILER "gcc-4.9")
-	set(CMAKE_CXX_COMPILER "gcc-4.9")
-	set(CMAKE_INCLUDE_PATH "/usr/local/include/")
-	set(XSD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../tools/xsdcompile/include/)
-	set(XSD_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/../tools/xsdcompile/bin/xsd)
-	set(BUILD_PUGIXML ON)
+    message("Warning: Please run CMake like this on Apple:\n'cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 .'")
+endif()
+
+###################
+# Generic settings
+###################
+project(FuzzedBackend)
+cmake_minimum_required(VERSION 2.8.7)
+
+# Load some additional CMake find... scripts 
+SET (CMAKE_MODULE_PATH              "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# Store all binary output in /lib
+SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+
+
+############################################################################
+# Platform-specific compilation behavior
+############################################################################
+if(APPLE)
+	# Homebrew on Mac OS X has no Codesynthesis XSD available, so we use our own copy
+	set(XSD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/xsd_apple/libxsd/)
+	set(XSD_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/xsd_apple/bin/xsd)
 elseif(WIN32)
-	 message("This is Windows.")
-	 set(BUILD_PUGIXML ON)
 	 set(Boost_USE_STATIC_LIBS ON)
 	 add_definitions(-DOMP_PARALLELIZATION=1)
 elseif(UNIX)
-	 message("This is Linux.")
 	 set(USE_INTEL_COMPILER OFF) 
-	 set(BUILD_PUGIXML ON)
 	 add_definitions(-DOMP_PARALLELIZATION=1)
 endif() 
 
-project(FuzztreeBackends)
-cmake_minimum_required(VERSION 2.8.7)
-set(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
-
-# All libraries should end up in the same directory
-set(FT_LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${FT_LIB_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FT_LIB_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FT_LIB_DIR})
-set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY ${FT_LIB_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
-set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
-set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
+############################################################################
+# Compiler-specific compilation behavior
+############################################################################
 
 if (CMAKE_COMPILER_IS_GNUCC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -std=c++0x -fPIC -fexceptions -Wno-deprecated-declarations -fpermissive")
@@ -49,7 +56,7 @@ elseif (MSVC)
 	add_definitions(/D_CRT_SECURE_NO_WARNINGS /DNOMINMAX /DWIN32_LEAN_AND_MEAN)
 	set(TPN_WIN32 "${TPN_WIN32} /EHsc")
 else()
-	message("Unsupported compiler") # TODO see if we can support clang too
+	message(WARNING "Untested compiler") # TODO see if we can support clang too
 endif()
 
 ################# BOOST #################
@@ -94,29 +101,21 @@ endif(XSD_FOUND)
 ############### PUGI ####################
 #########################################
 
-if(BUILD_PUGIXML)
-	add_subdirectory(thirdParty/pugixml)
-	message("Building pugixml")
-	if(WIN32)
-		set(PUGIXML_LIB "${FT_LIB_DIR}/pugixml.lib")
-	else(WIN32)#TODO
-		set(PUGIXML_LIB "${FT_LIB_DIR}/libpugixml.a")
-	endif(WIN32)
-	set(PUGIXML_INCLUDE_DIR thirdParty/pugixml/src)
-else()
-	find_package(pugixml REQUIRED)
-	message(STATUS "Found Pugixml lib: ${PUGIXML_LIB}")
-endif()
+add_subdirectory(thirdParty/pugixml)
+message("Building pugixml")
+set(PUGIXML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/pugixml/src")
 
 ################# Directories ###########
 #########################################
+
+#TODO: From here on, the common subproject and general stuff gets intermixed
+#      Try to make 'common' a self-hosted compilation unit as the others
 
 include_directories(
 	${XERCESC_INCLUDE_DIR}
 	${XSD_INCLUDE_DIR}
 	${PUGIXML_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
-	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
 	${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration
 	${CMAKE_CURRENT_SOURCE_DIR}/common
 )
@@ -287,19 +286,8 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/CommandLineParser.h
 )
 
-set(COMMON_LINKED_LIBS
-	${XERCESC_LIBRARIES}
-	${Boost_LIBRARIES}
-	${PUGIXML_LIB})
-
-message("${COMMON_LINKED_LIBS}")
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
-target_link_libraries(common_model ${COMMON_LINKED_LIBS})
-
-set(COMMON_LINKED_LIBS
-	${COMMON_LINKED_LIBS}
-	common_model
-	ftconfiguration)
+target_link_libraries(common_model ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB})
 
 ############### UNIT TESTS ##############
 #########################################

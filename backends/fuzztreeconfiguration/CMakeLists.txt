@@ -1,3 +1,5 @@
+project(fuzztreeconfiguration)
+
 set(SOURCES
   FuzzTreeTransform.cpp
   FuzzTreeConfiguration.cpp
@@ -25,17 +27,10 @@ if (VARIADIC_TEMPLATES)
     PrintVisitor.h)
 endif(VARIADIC_TEMPLATES)
 
-set(LINKED_LIBS ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} )
-message(STATUS "${LINKED_LIBS}")
-
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${FT_LIB_DIR}")
-
-# backend components can link against the configuration lib directly
+# Compile as library for usage from analysis executable
 add_library(ftconfiguration STATIC ${SOURCES} ${HEADERS})
-target_link_libraries(ftconfiguration ${COMMON_LINKED_LIBS})
+target_link_libraries(ftconfiguration common_model)
 
-set(BUILD_CONFIGURATION_EXECUTABLE ON)
-if (BUILD_CONFIGURATION_EXECUTABLE)
-  add_executable(ftconfiguration_exe ${SOURCES} ${HEADERS})
-  target_link_libraries(ftconfiguration_exe ${COMMON_LINKED_LIBS})
-endif(BUILD_CONFIGURATION_EXECUTABLE)
+# compile as executable for explicit configuration determination
+add_executable(ftconfiguration_exe ${SOURCES} ${HEADERS})
+target_link_libraries(ftconfiguration_exe common_model)
