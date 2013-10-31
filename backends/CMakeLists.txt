@@ -118,6 +118,7 @@ include_directories(
 	${Boost_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration
 	${CMAKE_CURRENT_SOURCE_DIR}/common
+	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
 )
 
 set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
