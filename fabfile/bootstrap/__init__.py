@@ -46,17 +46,6 @@ def dev():
         cuisine.sudo("npm install -g less")
         cuisine.sudo("ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
 
-    # There is no brew for this XSD compiler
-    # Fetch binary installation package for the XSD compiler, install the package
-    print "Installing CodeSynthesis XSD"
-    if not os.path.exists("/tmp/xsd-3.3.0.tar.bz2"):
-        print "Fetching XSD compiler from the web ..."
-        urllib.urlretrieve("http://www.codesynthesis.com/download/xsd/3.3/macosx/i686/xsd-3.3.0-i686-macosx.tar.bz2","/tmp/xsd-3.3.0.tar.bz2")
-    else:
-        print "Using existing XSD compiler download from /tmp/ ..."           
-    cuisine.run("tar xvzf /tmp/xsd-3.3.0.tar.bz2 -C /tmp")
-    cuisine.run("mv /tmp/xsd-3.3.0-i686-macosx tools/xsdcompile")
-
     # Postgres installation, including database creation
     print "Configuring and starting PostgreSQL ..."
     os.system('cp fabfile/bootstrap/sql.txt /tmp/')
