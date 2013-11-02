@@ -227,7 +227,7 @@ def build_analysis_server_java():
     os.chdir(current)
 
 @task
-def backend_servers():
+def backends():
     '''Builds configuration and analysis server with CMAKE / C++11 compiler.'''
     print 'Building backend servers ...'
     current = os.getcwd()
@@ -235,9 +235,9 @@ def backend_servers():
     if os.path.isfile("CMakeCache.txt"):
         os.system("rm CMakeCache.txt")
     if platform.system() == "Darwin":
-        os.system("cmake . ")
+        os.system("cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 .")
     else:
-        os.system("cmake . -DCMAKE_CXX_COMPILER=/usr/bin/gcc-4.7")
+        os.system("cmake .")
     os.system('make all')
     os.chdir(current)
 
@@ -249,5 +249,5 @@ def all():
     naturaldocs()
     notations()
     configs()
-    #backend_servers()    
+    backends()    
 
