@@ -49,13 +49,16 @@ class Job(models.Model):
             return self.graph.to_tikz(), 'application/text'
         assert(False)
 
+    def done(self):
+        return self.exit_code is not None;
+
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
     ''' Informs notification listeners using the PostgresSQL NOTIFY / LISTEN tools.
         Standard Postgres semantics apply, so if a listener does not pull a messages, than
         it is queued by the database.
-        The payload contains the job files URL, which allows the listener to download
-        and upload the input / output files for this job.
+        The payload contains the job URL prefix with a secret, which allows the listener to 
+        perform according actions
     '''
     if created:
         # The only way to determine our own hostname + port number at runtime in Django
@@ -67,7 +70,7 @@ def job_post_save(sender, instance, created, **kwargs):
         # by the test suite run accordingly
 
         #TODO: job_files_url = reverse('job_files', kwargs={'job_secret': instance.secret})
-        job_files_url = settings.SERVER + '/api/jobs/'+instance.secret+'/files'
+        job_files_url = settings.SERVER + '/api/jobs/'+instance.secret+'/'
         cursor = connection.cursor()
         cursor.execute("NOTIFY %s, '%s';"%(instance.kind, job_files_url))
         #print "Notification to: "+str(cursor.db.connection.dsn)

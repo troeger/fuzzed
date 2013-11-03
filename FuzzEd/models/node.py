@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import logging
@@ -11,7 +11,7 @@ import xml_fuzztree
 import xml_faulttree
 from graph import Graph
 
-import json, notations, sys, time
+import json, notations, sys, datetime, time
 
 def new_client_id():
     return str(int(time.mktime(time.gmtime())))
@@ -394,14 +394,8 @@ class Node(models.Model):
             prop.value = value
             prop.save()
 
-# the handler will ensure that the kind of the node is present in its containing graph notation
-@receiver(pre_save, sender=Node)
-def validate(sender, instance, raw, **kwargs):
-    # raw is true if fixture loading happens, where the graph does not exist so far
-    if not raw:
-        graph = instance.graph
-        if not instance.kind in notations.by_kind[graph.kind]['nodes']:
-            raise ValueError('Graph %s does not support nodes of type %s' % (graph, instance.kind))
-
-# ensures that the validate handler is not exported
-__all__ = ['Node']
+@receiver(post_save, sender=Node)
+def graph_modify(sender, instance, **kwargs):
+    logger.debug("Updating graph modification date.")
+    instance.graph.modified = datetime.datetime.now()
+    instance.graph.save()

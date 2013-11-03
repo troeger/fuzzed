@@ -7,11 +7,10 @@ import pyxb.utils.domutils
 try:
     from xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlFuzzTreeNamespace
     from xml_faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace
+    from node_rendering import tikz_shapes 
 except:
-    print "ERROR: Run './setup.py build' to create the XML schema wrappers first"
+    print "ERROR: Perform a build process first."
     exit(-1)
-
-from node_rendering import tikz_shapes  # If this fails, the you need to perform a static build.all
 
 import json, notations
 
@@ -37,7 +36,8 @@ class Graph(models.Model):
     kind      = models.CharField(max_length=127, choices=notations.choices)
     name      = models.CharField(max_length=255)
     owner     = models.ForeignKey(User, related_name='graphs')
-    created   = models.DateTimeField(auto_now_add=True, editable=False)
+    created   = models.DateTimeField(auto_now_add=True)
+    modified  = models.DateTimeField(auto_now=True)
     deleted   = models.BooleanField(default=False)
     read_only = models.BooleanField(default=False)
 
@@ -190,11 +190,3 @@ class Graph(models.Model):
         self.read_only = other.read_only
         self.save()
 
-# validation handler that ensures that the graph kind is known
-@receiver(pre_save, sender=Graph)
-def validate_kind(sender, instance, **kwargs):
-    if not instance.kind in notations.by_kind:
-        raise ValueError('Graph %s may not be of kind %s' % (instance, instance.kind))
-
-# ensures that the signal handler are not exported
-__all__ = ['Graph']

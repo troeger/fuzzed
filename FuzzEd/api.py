@@ -480,7 +480,7 @@ def job_create(request, graph_id, job_kind):
     else:
         graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
-    job = Job(graph=graph, kind=job_kind)
+    job = Job(graph=graph, kind=job_kind, graph_modified=graph.modified)
     job.save()
 
     # return URL for job status information
@@ -506,10 +506,16 @@ def job_status(request, job_id):
         # TODO: Add reason for cancellation to body as plain text
         raise HttpResponseNotFoundAnswer()
 
-    if job.done:
+    if job.done():
         # response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
-        return HttpResponse(job.result) 
+        if job.exit_code == 0:
+            logger.debug("Job is done, delivering result")
+            return HttpResponse(job.result) 
+        else:
+            logger.debug("Job is done with non-zero exit code, delivering according HTTP error")
+            raise HttpResponseServerErrorAnswer()
     else:       
+        logger.debug("Job is pending, keep the front end waiting.")
         return HttpResponse(status=202)
 
 @csrf_exempt
@@ -517,18 +523,18 @@ def job_status(request, job_id):
 def job_files(request, job_secret):
     ''' Allows to retrieve a job input file (GET), or to upload job result files (POST).
         This method is expected to only be used by our backend daemon script, 
-        which gets the complete URL including shared secret as part of the PostgreSQL notification message.
+        which gets the shared secret as part of the PostgreSQL notification message.
         This reduces the security down to the ability of connecting to the PostgreSQL database,
         otherwise the job URL cannot be determined.
     '''
     job = get_object_or_404(Job, secret=job_secret)
     if request.method == 'GET':
-        logger.debug("Delivering input data for job %d"%job.pk)
+        logger.debug("Delivering data for job %d"%job.pk)
         response = HttpResponse()
         response.content, response['Content-Type'] = job.input_data()
         return response
     elif request.method == 'POST':
-        if job.done:
+        if job.done():
             logger.error("Job already done, discarding uploaded results")
             return HttpResponse() 
         else:
@@ -536,7 +542,21 @@ def job_files(request, job_secret):
             # Retrieve binary file and store it
             assert(len(request.FILES.values())==1)
             job.result = request.FILES.values()[0]
-            job.done = True
+            job.exit_code = 0       # This saves as a roundtrip. Having files means everything is ok.
             job.save()
             return HttpResponse()        
 
+@csrf_exempt
+@require_http_methods(['POST'])
+def job_exitcode(request, job_secret):
+    ''' Allows to set the exit code of a job. 
+        This method is expected to only be used by our backend daemon script, 
+        which gets the shared secret as part of the PostgreSQL notification message.
+        This reduces the security down to the ability of connecting to the PostgreSQL database,
+        otherwise the job URL cannot be determined.
+    '''
+    job = get_object_or_404(Job, secret=job_secret)
+    logger.debug("Storing exit code for job %d"%job.pk)
+    job.exit_code = request.POST['exit_code']
+    job.save()
+    return HttpResponse()        
