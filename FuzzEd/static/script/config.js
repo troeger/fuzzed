@@ -81,7 +81,8 @@ define(['underscore'], function() {
             EDGES_URL:                 '/edges',
             TRANSFERS_URL:             '/transfers',
             CUTSETS_URL:               '/cutsets',
-            TOP_EVENT_PROBABILITY_URL: '/topEventProbability'
+            TOP_EVENT_PROBABILITY_URL: '/topEventProbability',
+            GRAPH_EXPORT_URL:          '/exports'
         },
 
         /**
@@ -118,6 +119,11 @@ define(['underscore'], function() {
          *    {String} NO_PRINT                - Class assigned to elements that should not be printed.
          *
          *    {String} PROPERTY_WARNING        - Class for property input fields if they are erroneous.
+         *    {String} PROPERTY_OPEN_BUTTON    - Class for transfer property 'open' buttons.
+         *
+         *    {String} ICON_SUCCESS            - Class for the icon that indicates a successful action.
+         *    {String} ICON_ERROR              - Class for the icon that indicates an erroneous action.
+         *    {String} ICON_PROGRESS           - Class for the icon that indicates an action in progress.
          */
         Classes: {
             HIGHLIGHTED:             'highlighted',
@@ -147,7 +153,11 @@ define(['underscore'], function() {
             NO_PRINT:                'no-print',
 
             PROPERTY_WARNING:        'error',
-            PROPERTY_OPEN_BUTTON:    'fuzzed-property-open'
+            PROPERTY_OPEN_BUTTON:    'fuzzed-property-open',
+
+            ICON_SUCCESS:            'icon-ok',
+            ICON_ERROR:              'icon-warning-sign',
+            ICON_PROGRESS:           'icon-progress'
         },
 
         /**
@@ -230,32 +240,32 @@ define(['underscore'], function() {
          *    IDs of certain DOM-elements.
          *
          *  Constants:
-         *    {String} ALERT_CONTAINER           - The DOM element containing the alerts messages.
-         *    {String} CANVAS                    - The DOM element containing the canvas.
-         *    {String} CONTENT                   - The container element for the content (without navbar).
-         *    {String} PROPERTIES_MENU           - The container for the properties menu.
-         *    {String} SHAPES_MENU               - The container for the shapes menu.
-         *    {String} SPLASH                    - The splash screen element.
-         *    {String} ACTION_GRID_TOGGLE        - The list element that contains the grid toggle menu entry.
-         *    {String} ACTION_CUTSETS            - The list element that contains the cut set analysis menu entry.
-         *    {String} ACTION_ANALYTICAL        - The list element that contains the analytical analysis menu entry.                  
-         *    {String} PROGRESS_INDICATOR        - The animated progress indicator gif.
-         *    {String} SAVE_INDICATOR            - The navbar entry indicating the save state.
-         *    {String} ERROR_INDICATOR           - The navbar entry indicating the error state.
+         *    {String} ALERT_CONTAINER             - The DOM element containing the alerts messages.
+         *    {String} CANVAS                      - The DOM element containing the canvas.
+         *    {String} CONTENT                     - The container element for the content (without navbar).
+         *    {String} PROPERTIES_MENU             - The container for the properties menu.
+         *    {String} SHAPES_MENU                 - The container for the shapes menu.
+         *    {String} SPLASH                      - The splash screen element.
+         *    {String} ACTION_GRID_TOGGLE          - The list element that contains the grid toggle menu entry.
+         *    {String} ACTION_CUTSETS              - The list element that contains the cut set analysis menu entry.
+         *    {String} ACTION_ANALYTICAL           - The list element that contains the analytical analysis menu entry.
+         *    {String} PROGRESS_INDICATOR_SINGLE   - The nav entry containing the progress indicator for single active jobs.
+         *    {String} PROGRESS_INDICATOR_DROPDOWN - The nav entry containing the dropdown for multiple active jobs.
          */
         IDs: {
-            ALERT_CONTAINER:           'FuzzEdAlertContainer',
-            CANVAS:                    'FuzzEdCanvas',
-            CONTENT:                   'FuzzEdContent',
-            PROPERTIES_MENU:           'FuzzEdProperties',
-            SHAPES_MENU:               'FuzzEdShapes',
-            SPLASH:                    'FuzzEdSplash',
-            ACTION_GRID_TOGGLE:        'FuzzEdActionGridToggle',
-            ACTION_CUTSETS:            'FuzzEdActionCutsets',
-            ACTION_ANALYTICAL:         'FuzzEdActionAnalytical',            
-            PROGRESS_INDICATOR:        'FuzzEdProgressIndicator',
-            SAVE_INDICATOR:            'FuzzEdSaveIndicator',            
-            ERROR_INDICATOR:           'FuzzEdErrorIndicator'
+            ALERT_CONTAINER:             'FuzzEdAlertContainer',
+            CANVAS:                      'FuzzEdCanvas',
+            CONTENT:                     'FuzzEdContent',
+            PROPERTIES_MENU:             'FuzzEdProperties',
+            SHAPES_MENU:                 'FuzzEdShapes',
+            SPLASH:                      'FuzzEdSplash',
+            ACTION_GRID_TOGGLE:          'FuzzEdActionGridToggle',
+            ACTION_CUTSETS:              'FuzzEdActionCutsets',
+            ACTION_ANALYTICAL:           'FuzzEdActionAnalytical',
+            ACTION_EXPORT_PDF:           'FuzzEdActionExportPDF',
+            ACTION_EXPORT_EPS:           'FuzzEdActionExportEPS',
+            PROGRESS_INDICATOR_SINGLE:   'FuzzEdProgressIndicatorSingle',
+            PROGRESS_INDICATOR_DROPDOWN: 'FuzzEdProgressIndicatorDropdown'
         },
 
         /**
@@ -335,6 +345,29 @@ define(['underscore'], function() {
             STROKE_HIGHLIGHTED:        HIGHLIGHTED_COLOR,
             STROKE_SELECTED:           SELECTED_COLOR,
             STROKE_DISABLED:           DISABLED_COLOR
+        },
+
+        /**
+         *  Group: ProgressIndicator
+         *    Configurations for the progress indicator in the navbar.
+         *
+         *  Constants:
+         *    {Number} SUCCESS_FLASH_DELAY       - Delay in ms before hiding the progress indicator of a successful action.
+         *    {Number} ERROR_FLASH_DELAY         - Delay in ms before hiding the progress indicator of an erroneous action.
+         *    {Number} PROGRESS_APPEARANCE_DELAY - Delay in ms before showing a progress indicator.
+         *
+         *    {String} DEFAULT_PROGRESS_MESSAGE  - The default status message for active actions.
+         *    {String} DEFAULT_SUCCESS_MESSAGE   - The default status message for successful actions.
+         *    {String} DEFAULT_ERROR_MESSAGE     - The default status message for erroneous actions.
+         */
+        ProgressIndicator: {
+            SUCCESS_FLASH_DELAY:       600,
+            ERROR_FLASH_DELAY:         5000,
+            PROGRESS_APPEARANCE_DELAY: 500,
+
+            DEFAULT_PROGRESS_MESSAGE:  'Working…',
+            DEFAULT_SUCCESS_MESSAGE:   'Done',
+            DEFAULT_ERROR_MESSAGE:     'Error'
         },
 
         /**

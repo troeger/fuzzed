@@ -11,7 +11,7 @@ except:
     print "ERROR: Run './setup.py build' to create the XML schema wrappers first"
     exit(-1)
 
-from node_rendering import tikz_shapes
+from node_rendering import tikz_shapes  # If this fails, the you need to perform a static build.all
 
 import json, notations
 

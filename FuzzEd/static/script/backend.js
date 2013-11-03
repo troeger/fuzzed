@@ -59,6 +59,8 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 .on(Config.Events.GRAPH_EDGE_ADDED,         this.graphEdgeAdded.bind(this))
                 .on(Config.Events.GRAPH_EDGE_DELETED,       this.graphEdgeDeleted.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_CUTSETS, this.calculateCutsets.bind(this))
+                .on(Config.Events.EDITOR_GRAPH_EXPORT_PDF,  this.graphExport.bind(this))
+                .on(Config.Events.EDITOR_GRAPH_EXPORT_EPS,  this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY, this.calculateTopEventProbability.bind(this));
             return this;
         },
@@ -86,6 +88,8 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 .off(Config.Events.GRAPH_NODE_DELETED)
                 .off(Config.Events.GRAPH_EDGE_ADDED)
                 .off(Config.Events.GRAPH_EDGE_DELETED)
+                .off(Config.Events.EDITOR_GRAPH_EXPORT_PDF)   
+                .off(Config.Events.EDITOR_GRAPH_EXPORT_EPS)                
                 .off(Config.Events.EDITOR_CALCULATE_CUTSETS)
                 .off(Config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY);
             return this;
@@ -118,7 +122,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 destination: targetNodeId
             };
 
-            jQuery.ajax({
+            var xhr = jQuery.ajax({
                 url:      this._fullUrlForEdges(),
                 type:     'POST',
                 dataType: 'json',
@@ -130,7 +134,14 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                     Alerts.showErrorAlert('Edge could not be saved:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
             });
 
             return this;
@@ -160,7 +171,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 y:    y
             };
 
-            jQuery.ajax({
+            var xhr = jQuery.ajax({
                 url:      this._fullUrlForNodes(),
                 type:     'POST',
                 dataType: 'json',
@@ -172,7 +183,14 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                     Alerts.showErrorAlert('Node could not be created:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
             });
 
             return this;
@@ -191,7 +209,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
          *                         AJAX call.
          */
         graphEdgeDeleted: function(event, edgeId, success, error, complete) {
-            jQuery.ajax({
+            var xhr = jQuery.ajax({
                 url:      this._fullUrlForEdge(edgeId),
                 type:     'DELETE',
                 dataType: 'json',
@@ -202,7 +220,14 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                     Alerts.showErrorAlert('Edge could not be deleted:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
             });
 
             return this;
@@ -221,7 +246,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
          *   {function} complete - [optional] Callback that is invoked in both cases, successful and errornous requests.
          */
         graphNodeDeleted: function(event, nodeId, success, error, complete) {
-            jQuery.ajax({
+            var xhr = jQuery.ajax({
                 url:      this._fullUrlForNode(nodeId),
                 type:     'DELETE',
                 dataType: 'json',
@@ -232,7 +257,14 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                     Alerts.showErrorAlert('Node could not be deleted:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
             });
 
             return this;
@@ -254,7 +286,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
          *                           or erroneous.
          */
         nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
-            jQuery.ajax({
+            var xhr = jQuery.ajax({
                 url:      this._fullUrlForNode(nodeId),
                 type:     'POST',
                 data:{
@@ -268,7 +300,14 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                     Alerts.showErrorAlert('Node could not be changed:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
             });
 
             return this;
@@ -359,6 +398,30 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
                 error: function(jqXHR, errorStatus, errorThrown) {
                     var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
+                complete: complete || jQuery.noop
+            });
+        },
+
+        graphExport: function(event, success, error, complete) {
+            jQuery.ajax({
+                url:    this._fullUrlForExport(event),
+                // don't show progress
+                global: false,
+
+                statusCode: {
+                    201: function(data, status, req) {
+                        var jobUrl = req.getResponseHeader('location');
+                        if (typeof success !== 'undefined') {
+                            success(new Job(jobUrl));
+                        }
+                    }
+                },
+
+                error: function(jqXHR, errorStatus, errorThrown) {
+                    var message = jqXHR.responseText || errorThrown || 'Sorry, export failed, could not connect to backend.';
                     Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
@@ -463,6 +526,28 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
         _fullUrlForTopEventProbability: function() {
             return this._fullUrlForAnalysis() + Config.Backend.TOP_EVENT_PROBABILITY_URL;
+        },
+
+        /**
+         * Method: _fullUrlForExport
+         *
+         * Calculates the AJAX backend URL for graph export.
+         *
+         * Returns:
+         *   The export URL as {String}.
+         */
+        _fullUrlForExport: function(event) {
+            if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_PDF) {
+                exportType = 'pdf';
+            }
+            else if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_EPS) {
+                exportType = 'eps';
+            }
+            else {
+                //TODO: Raise a meaningful exception here
+                exportType = 'invalid';
+            }
+            return this._fullUrlForGraph() + Config.Backend.GRAPH_EXPORT_URL + '/'+exportType;
         }
     });
 });

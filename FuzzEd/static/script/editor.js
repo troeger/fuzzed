@@ -1,5 +1,5 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'],
-function(Class, Menus, Canvas, Backend, Alerts) {
+define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progressIndicator', 'jquery-classlist'],
+function(Class, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base
      */
@@ -15,13 +15,13 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *  Group: Members
          *
          *  Properties:
-         *    {Object}         config                       - Graph-specific <Config> object.
-         *    {Graph}          graph                        - <Graph> instance to be edited.
-         *    {PropertiesMenu} properties                   - The <Menu::PropertiesMenu> instance used by this editor
+         *    {Object}          config                      - Graph-specific <Config> object.
+         *    {Graph}           graph                       - <Graph> instance to be edited.
+         *    {PropertiesMenu}  properties                  - The <Menu::PropertiesMenu> instance used by this editor
          *                                                    for changing the properties of nodes of the edited graph.
-         *    {ShapesMenu}     shapes                       - The <Menu::ShapeMenu> instance use by this editor to show
+         *    {ShapesMenu}      shapes                      - The <Menu::ShapeMenu> instance use by this editor to show
          *                                                    the available shapes for the kind of the edited graph.
-         *    {Backend}        _backend                     - The instance of the <Backend> that is used to communicate
+         *    {Backend}         _backend                    - The instance of the <Backend> that is used to communicate
          *                                                    graph changes to the server.
          *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
          *    {jQuery Selector} _nodeOffsetPrintStylesheet  - The dynamically generated and maintained stylesheet
@@ -57,6 +57,10 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             this.config   = this.getConfig();
             this._backend = new Backend(graphId);
+
+            // remember certain UI elements
+            this._progressIndicator = jQuery('#' + this.config.IDs.PROGRESS_INDICATOR);
+            this._progressMessage = jQuery('#' + this.config.IDs.PROGRESS_MESSAGE);
 
             // run a few sub initializer
             this._setupJsPlumb()
@@ -310,10 +314,10 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,   this._updatePrintOffsets.bind(this));
             jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED, this._updatePrintOffsets.bind(this));
 
-            jQuery(document).ajaxStart(this._showProgressIndicator.bind(this));
-            jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
-            jQuery(document).ajaxSuccess(this._flashSaveIndicator.bind(this));
-            jQuery(document).ajaxError(this._flashErrorIndicator.bind(this));
+            // show status of global AJAX events in navbar
+            jQuery(document).ajaxSend(Progress.showAjaxProgress);
+            jQuery(document).ajaxSuccess(Progress.flashAjaxSuccessMessage);
+            jQuery(document).ajaxError(Progress.flashAjaxErrorMessage);
 
             return this;
         },
@@ -448,74 +452,6 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             return this;
         },
 
-        /**
-         *  Group: Progress Indication
-         */
-
-        /**
-         *  Method _showProgressIndicator
-         *    Display the progress indicator.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _showProgressIndicator: function() {
-            // show indicator only if it takes longer then 500 ms
-            this._progressIndicatorTimeout = setTimeout(function() {
-                jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
-            }.bind(this), 500);
-
-            return this;
-        },
-
-        /**
-         *  Method _hideProgressIndicator
-         *    Hides the progress indicator.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _hideProgressIndicator: function() {
-            // prevent indicator from showing before 500 ms are passed
-            clearTimeout(this._progressIndicatorTimeout);
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
-
-            return this;
-        },
-
-        /**
-         *  Method: _flashSaveIndicator
-         *    Flash the save indicator to show that the current graph is saved in the backend.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _flashSaveIndicator: function() {
-            var indicator = jQuery('#' + this.config.IDs.SAVE_INDICATOR);
-            // only flash if not already visible
-            if (indicator.is(':hidden')) {
-                indicator.fadeIn(200).delay(600).fadeOut(200);
-            }
-
-            return this;
-        },
-
-        /**
-         *  Method _flashErrorIndicator
-         *    Flash the error indicator to show that the current graph has not been saved to the backend.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _flashErrorIndicator: function() {
-            var indicator = jQuery('#' + this.config.IDs.ERROR_INDICATOR);
-            // only flash if not already visible
-            if (indicator.is(':hidden')) {
-                indicator.fadeIn(200).delay(5000).fadeOut(200);
-            }
-
-            return this;
-        },
 
         /**
          *  Group: Print Offset Calculation

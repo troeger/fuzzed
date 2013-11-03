@@ -9,7 +9,7 @@ def dev():
 
     # Install Python packages, independent from OS
     print "Installing Python packages..."
-    for package in ["django", "south", "openid2rp", "django-require", "pyxb", "django-less"]:
+    for package in ["django", "south", "openid2rp", "django-require", "pyxb", "django-less", "poster"]:
         print "Installing "+package
         cuisine.python_package_ensure(package)        
 
@@ -29,6 +29,8 @@ def dev():
         # Perform latest GCC installation on Homebrew
         print "Installing latest GCC"
         cuisine.run("brew tap homebrew/versions")
+        # We had issues. It helped. Don't ask.
+        cuisine.run("brew tap --repair")
         cuisine.package_ensure("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
         # Install native packages on Darwin
         print "Installing Postgres"
@@ -83,7 +85,7 @@ def web():
 @task 
 def backend():
     '''Installs all software needed to make the machine a backend machine.'''
-    for package in ["pyxb"]:
+    for package in ["pyxb","poster"]:
         cuisine.python_package_ensure(package)        
     if platform.system() != 'Darwin':
         cuisine.package_ensure("texlive")

@@ -147,16 +147,6 @@ def graph_download(request, graph_id):
         response.content = graph.to_json()
         response['Content-Type'] = 'application/javascript'
         response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
-    elif export_format == 'pdf':
-        # Create new rendering job and redirect to status
-        job = Job(graph=graph, kind=Job.PDF_RENDERING_JOB)
-        job.save()
-        response['Location'] = reverse('job_status', args=[job.pk])
-    elif export_format == 'eps':
-        # Create new rendering job and redirect to status
-        job = Job(graph=graph, kind=Job.EPS_RENDERING_JOB)
-        job.save()
-        response['Location'] = reverse('job_status', args=[job.pk])
     elif export_format == 'tex':
         response.content = graph.to_tikz()
         response['Content-Type'] = 'application/text'
@@ -477,38 +467,6 @@ def redos(request, graph_id):
         #TODO Perform top command on redo stack
         return HttpResponseNoResponse()
 
-@csrf_exempt
-@require_http_methods(['GET', 'POST'])
-@transaction.commit_on_success
-@never_cache
-def job_data(request, job_id):
-    """
-    Allows to fetch the data for an existing job via GET, and to POST the according result data.
-    The Job object is expected to be already created by another API call.
-    Typically, this function should be called by backend servers when they get a notification
-    for doing some work.
-    """
-    job = get_object_or_404(Job, pk=job_id)
-    if request.method == 'GET':
-        response = HttpResponse()
-        logger.debug("Delivering job %d data to requestor"%job.pk)
-        if job.kind in (Job.CUTSETS_JOB, Job.TOP_EVENT_JOB):
-            response.content = job.graph.to_xml()
-            response['Content-Type'] = 'application/xml'
-        elif job.kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB):
-            response.content = job.graph.to_tikz()
-            response['Content-Type'] = 'application/text'
-        else:
-            raise HttpResponseBadRequestAnswer()
-        return response
-    elif request.method == 'POST':
-        logger.debug("Storing result data for job %d"%job.pk)
-        # Retrieve binary file and store it
-        fileData = request.POST.get('file')
-        job.result = fileData
-        job.save()
-        return HttpResponse()        
-
 @login_required
 @csrf_exempt
 @require_http_methods(['GET'])
@@ -522,11 +480,6 @@ def job_create(request, graph_id, job_kind):
     else:
         graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
-    # store job information for this graph
-    if job_kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB, Job.TOP_EVENT_JOB, Job.CUTSETS_JOB):
-        data = graph.to_xml();
-    else:
-        raise HttpResponseBadRequestAnswer()
     job = Job(graph=graph, kind=job_kind)
     job.save()
 
@@ -558,4 +511,32 @@ def job_status(request, job_id):
         return HttpResponse(job.result) 
     else:       
         return HttpResponse(status=202)
+
+@csrf_exempt
+@require_http_methods(['GET', 'POST'])
+def job_files(request, job_secret):
+    ''' Allows to retrieve a job input file (GET), or to upload job result files (POST).
+        This method is expected to only be used by our backend daemon script, 
+        which gets the complete URL including shared secret as part of the PostgreSQL notification message.
+        This reduces the security down to the ability of connecting to the PostgreSQL database,
+        otherwise the job URL cannot be determined.
+    '''
+    job = get_object_or_404(Job, secret=job_secret)
+    if request.method == 'GET':
+        logger.debug("Delivering input data for job %d"%job.pk)
+        response = HttpResponse()
+        response.content, response['Content-Type'] = job.input_data()
+        return response
+    elif request.method == 'POST':
+        if job.done:
+            logger.error("Job already done, discarding uploaded results")
+            return HttpResponse() 
+        else:
+            logger.debug("Storing result data for job %d"%job.pk)
+            # Retrieve binary file and store it
+            assert(len(request.FILES.values())==1)
+            job.result = request.FILES.values()[0]
+            job.done = True
+            job.save()
+            return HttpResponse()        
 
