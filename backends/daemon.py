@@ -106,6 +106,8 @@ def server():
                         request = urllib2.Request(joburl+'files', datagen, headers)
                     else:
                         logger.error("Error on execution: Exit code "+str(exit_code))  
+                        logger.error("Saving input file for later reference: /tmp/lasterror.input")
+                        os.system("cp %s /tmp/lasterror.input"%tmpfile.name)
                         results = {'exit_code':exit_code}
                         datagen, headers = multipart_encode(results)
                         request = urllib2.Request(joburl+'exitcode', datagen, headers)                        
