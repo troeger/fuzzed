@@ -91,19 +91,22 @@ def server():
                     # Alle backend executables are just expected to follow the same command-line pattern as render.py.
                     cmd = "%s %s %s %s"%(backends[notify.channel]['executable'], tmpfile.name, backends[notify.channel]['output'], tmpdir)
                     logger.info("Running "+cmd)
-                    os.system(cmd)
-                    # Upload result file(s) with poster library, which fixes the multipart encoding for us
-                    logger.info("Uploading result to "+joburl)
-                    output_file = backends[notify.channel]['output']
-                    if output_file.startswith("*"):
-                        suffix = output_file[1:]
-                        results = {fname: open(tmpdir+"/"+fname, "rb") for fname in os.listdir(tmpdir) if fname.endswith(suffix)}
+                    exit_code = os.system(cmd)
+                    if exit_code == 0:
+                        # Upload result file(s) with poster library, which fixes the multipart encoding for us
+                        logger.info("Uploading result to "+joburl)
+                        output_file = backends[notify.channel]['output']
+                        if output_file.startswith("*"):
+                            suffix = output_file[1:]
+                            results = {fname: open(tmpdir+"/"+fname, "rb") for fname in os.listdir(tmpdir) if fname.endswith(suffix)}
+                        else:
+                            results = {output_file: open(tmpdir+os.sep+output_file, "rb")}
+                        logger.debug("Sending results: "+str(results))
+                        datagen, headers = multipart_encode(results)
+                        request = urllib2.Request(joburl, datagen, headers)
+                        urllib2.urlopen(request)                  
                     else:
-                        results = {output_file: open(tmpdir+os.sep+output_file, "rb")}
-                    logger.debug("Sending results: "+str(results))
-                    datagen, headers = multipart_encode(results)
-                    request = urllib2.Request(joburl, datagen, headers)
-                    urllib2.urlopen(request)                    
+                        logger.error("Error on execution: Exit code "+str(exit_code))  
                 except Exception as e:
                     logger.debug('Error: '+str(e))
                     pass

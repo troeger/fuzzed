@@ -34,11 +34,12 @@ class Job(models.Model):
     )    
 
     graph = models.ForeignKey(Graph, null=True, related_name='jobs')
-    secret  = models.CharField(max_length=64, default=gen_uuid)     
+    graph_modified = models.DateTimeField()                                # Detect graph changes during job execution
+    secret  = models.CharField(max_length=64, default=gen_uuid)            # Unique secret for this job
     kind  = models.CharField(max_length=127, choices=JOB_TYPES)
-    done = models.BooleanField(default=False)                                       # Backend is done with this, can be deleted after delivery
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    result = models.FileField(upload_to='jobs', null=True)
+    result = models.FileField(upload_to='jobs', null=True)                 # Result file for this job
+    exit_code = models.IntegerField(null=True)                             # Exit code for this job, NULL if pending
 
     def input_data(self):
         ''' Used by the API to get the input data needed for the particular job type.'''
