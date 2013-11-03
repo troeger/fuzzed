@@ -1,15 +1,13 @@
-##################################################
+####################################################################################################
 # Overwriting the default compiler is a bad thing:
 # http://www.cmake.org/Wiki/CMake_FAQ
 # It must be done before the project definition.
 #
 # We only need this for Mac's, were Codesynthesis
 # cannot deal with the default CLang compiler.
-# A manual switch to g++ is therefore needed.
-##################################################
-if(APPLE)
-    message("Warning: Please run CMake like this on Apple:\n'cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 .'")
-endif()
+# A manual switch to g++ is therefore needed by calling:
+# cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 .
+####################################################################################################
 
 ###################
 # Generic settings

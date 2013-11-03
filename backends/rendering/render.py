@@ -7,9 +7,9 @@ if len(sys.argv) != 5:
     logger.error('%s [--eps|--pdf] <working_dir> <input file> <output file>'%sys.argv[0])
     exit(-1)
 kind = sys.argv[1][2:]   
-working_dir = sys.argv[2] 
-input_fname = sys.argv[3]
-output_fname = sys.argv[4]
+working_dir = sys.argv[4] 
+input_fname = sys.argv[2]
+output_fname = sys.argv[3]
 
 # Latex cannot operate well on files in another directory, so we go there directly
 # This is anyway epxected to be the temporary job execution directory created by the daemon
