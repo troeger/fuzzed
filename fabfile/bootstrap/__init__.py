@@ -1,67 +1,64 @@
 from fabric.api import task
-import cuisine
+import fastfood
 import platform, os, urllib
-cuisine.mode_local()
 
 @task 
 def dev():
     '''Installs all software needed to make the machine a development machine.'''
 
+    # Install native packages, independent from OS
+    print "Checking and installing native packages ..."
+    for p in ["cmake"]:
+        print "Installing "+p
+        fastfood.system.install(p)        
+
     # Install Python packages, independent from OS
     print "Installing Python packages..."
     for package in ["django", "south", "openid2rp", "django-require", "pyxb", "django-less", "poster"]:
         print "Installing "+package
-        cuisine.python_package_ensure(package)        
-
-    # Install native packages, independent from OS
-    print "Checking and installing native packages ..."
-    for p in ["cmake","npm","boost","xerces-c"]:
-        print "Installing "+p
-        cuisine.package_ensure(p)
+        fastfood.python.install(package)        
 
     # Install native packages, dependent on OS
     if platform.system() != 'Darwin':
         # Install native packages on Linux
-        for p in ["postgresql", "texlive", "libxerces-c-dev", "libboost1.48-all-dev", "xsdcxx", "python-psycopg2"]:
-            print p
-            cuisine.package_ensure(p)
+        for p in ["nodejs", "postgresql", "texlive", "libxerces-c-dev", "libboost1.48-all-dev", "xsdcxx", "python-psycopg2"]:
+            print "Installing "+p
+            fastfood.system.install(p)
     else:
         # Perform latest GCC installation on Homebrew
         print "Installing latest GCC"
-        cuisine.run("brew tap homebrew/versions")
-        # We had issues. It helped. Don't ask.
-        cuisine.run("brew tap --repair")
-        cuisine.package_ensure("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
+        fastfood.system.tap("homebrew/versions")
+        fastfood.system.install("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
         # Install native packages on Darwin
         print "Installing Postgres"
-        cuisine.package_ensure("postgres")
+        fastfood.system.install("postgres")
         # check if Latex is installed
         print "Checking for dvips"
-        output = cuisine.run('dvips')
+        output = fastfood.system.check_output('dvips')
         if 'command not found' in output:
             raise Exception('We need a working Latex for the rendering server. Please install it manually.')
 
     # Installing less via npm: no brew on Darwin, too old in Linux apt
-    print "Installing lessc"
-    output = cuisine.run('lessc')
-    if 'command not found' in output:
-        cuisine.sudo("npm install -g less")
-        cuisine.sudo("ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
+    print "Checking for lessc"
+    if not fastfood.system.has_command('lessc'):
+        print "Installing lessc"
+        fastfood.npm.install("less")
+        fastfood.system.run("sudo ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
 
     # Postgres installation, including database creation
     print "Configuring and starting PostgreSQL ..."
-    os.system('cp fabfile/bootstrap/sql.txt /tmp/')
+    fastfood.system.run('cp fabfile/bootstrap/sql.txt /tmp/')
     if platform.system() == "Darwin":
-        cuisine.run('initdb /usr/local/var/postgres -E utf8')                                           # Initialize system database
-        cuisine.run('ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents')                 # Enable autostart  
-        cuisine.run('launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist')             # Start it now
-        cuisine.run('/usr/local/bin/psql -f /tmp/sql.txt postgres')
+        fastfood.system.run('initdb /usr/local/var/postgres -E utf8')                                           # Initialize system database
+        fastfood.system.run('ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents')                 # Enable autostart  
+        fastfood.system.run('launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist')             # Start it now
+        fastfood.system.run('/usr/local/bin/psql -f /tmp/sql.txt postgres')
     else:
-        cuisine.run('sudo su - postgres -c \"psql -f /tmp/sql.txt postgres\"')    
+        fastfood.system.run('sudo su - postgres -c \"psql -f /tmp/sql.txt postgres\"', print_output=False)    
     print "Performing complete build to get loadable Django project code"
-    os.system("fab build.all")
+    fastfood.system.run("fab build.all")
     print "Initializing and syncing local database ..."
-    os.system('./manage.py syncdb --noinput --no-initial-data --migrate')
+    fastfood.system.run('./manage.py syncdb --noinput --no-initial-data --migrate')
     
 @task 
 def web():
