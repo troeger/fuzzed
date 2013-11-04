@@ -359,6 +359,11 @@ define(['underscore'], function() {
          *    {String} DEFAULT_PROGRESS_MESSAGE  - The default status message for active actions.
          *    {String} DEFAULT_SUCCESS_MESSAGE   - The default status message for successful actions.
          *    {String} DEFAULT_ERROR_MESSAGE     - The default status message for erroneous actions.
+         *    {String} DEFAULT_NOT_FOUND_MESSAGE - The default status message for actions resulting in a 404.
+         *
+         *    {String} EXPORT_PROGRESS_MESSAGE   - The message displayed when exporting the graph. The file name will be appended.
+         *    {String} EXPORT_SUCCESS_MESSAGE    - The message displayed when the graph has been successfully exported.
+         *    {String} EXPORT_ERROR_MESSAGE      - The message displayed when there was an error while exporting the graph.
          */
         ProgressIndicator: {
             SUCCESS_FLASH_DELAY:       600,
@@ -367,7 +372,12 @@ define(['underscore'], function() {
 
             DEFAULT_PROGRESS_MESSAGE:  'Working…',
             DEFAULT_SUCCESS_MESSAGE:   'Done',
-            DEFAULT_ERROR_MESSAGE:     'Error'
+            DEFAULT_ERROR_MESSAGE:     'Error',
+            DEFAULT_NOT_FOUND_MESSAGE: 'Not found',
+
+            EXPORT_PROGRESS_MESSAGE:   'Exporting graph as ', // file name will be appended
+            EXPORT_SUCCESS_MESSAGE:    'Done',
+            EXPORT_ERROR_MESSAGE:      'Failed to export as ' // file name will be appended
         },
 
         /**

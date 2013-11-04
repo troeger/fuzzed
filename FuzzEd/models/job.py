@@ -31,7 +31,11 @@ class Job(models.Model):
         (TOP_EVENT_JOB, 'Top event calculation'),
         (EPS_RENDERING_JOB, 'EPS rendering job'),
         (PDF_RENDERING_JOB, 'PDF rendering job')
-    )    
+    )
+
+    # List of job types that generate files that require a download.
+    # This means their result will not be served directly but rather a URL to it.
+    DOWNLOAD_TYPES = frozenset({EPS_RENDERING_JOB, PDF_RENDERING_JOB})
 
     graph = models.ForeignKey(Graph, null=True, related_name='jobs')
     graph_modified = models.DateTimeField()                                # Detect graph changes during job execution
@@ -50,7 +54,10 @@ class Job(models.Model):
         assert(False)
 
     def done(self):
-        return self.exit_code is not None;
+        return self.exit_code is not None
+
+    def requires_download(self):
+        return self.kind in Job.DOWNLOAD_TYPES
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
