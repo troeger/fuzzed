@@ -525,14 +525,20 @@ function(Property, Mirror, Canvas, Class) {
 			// setup resizable with width/height values stored in the backend
 			jQuery(resizable).height(height).width(width);
 			
+			var _nodeImage = this._nodeImage;
+			
 			// if resizable gets resized update width/height attribute		
 			jQuery(resizable).on('resizestop',function() {
 				
-				var newWidth = jQuery(resizable).width();
-				var newHeight = jQuery(resizable).height();
+				var newWidth = jQuery(this).width();
+				var newHeight= jQuery(this).height();
 			
 				properties.width.setValue(newWidth);
 				properties.height.setValue(newHeight);
+				
+				// update central point after resizing
+	            _nodeImage.xCenter = jQuery(this).outerWidth() / 2;
+	            _nodeImage.yCenter = jQuery(this).outerHeight() / 2;
 			});
 			
 			return this;
@@ -889,8 +895,8 @@ function(Property, Mirror, Canvas, Class) {
          */
         _moveContainerToPixel: function(position) {
             this.container.css({
-                left: Math.max(position.x, Canvas.gridSize) - this._nodeImage.xCenter,
-                top:  Math.max(position.y, Canvas.gridSize) - this._nodeImage.yCenter
+                left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
+                top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
             });
             Canvas.enlarge(position);
             // ask jsPlumb to repaint the selectee in order to redraw its connections

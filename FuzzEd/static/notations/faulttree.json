@@ -41,14 +41,14 @@
               "height": {
                   "kind": "numeric",
                   "step": 1,
-                  "default": 160,
+                  "default": 150,
                   "hidden": true
               },
               
               "width": {
                   "kind": "numeric",
                   "step": 1,
-                  "default": 160,
+                  "default": 150,
                   "hidden": true
               }
             }
