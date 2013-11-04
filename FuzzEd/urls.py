@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns, static
 
 from FuzzEd.models import Job
 from FuzzEd import settings
@@ -70,3 +70,5 @@ urlpatterns = patterns('',
     url(r'^api/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.job_files', name='job_files'),
 )
 urlpatterns += staticfiles_urlpatterns()
+#TODO: check if we need this only for development
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

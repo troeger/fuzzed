@@ -1,4 +1,4 @@
-define(['class', 'jquery'], function(Class) {
+define(['class', 'config', 'progressIndicator', 'jquery'], function(Class, Config, Progress) {
 
     /**
      *  Class: Job
@@ -19,11 +19,16 @@ define(['class', 'jquery'], function(Class) {
          *    {String}      _url               - The query URL of this job.
          *    {Timeout)     _timeout           - A reference to the current job query timeout.
          */
-        successCallback:  jQuery.noop(),
-        updateCallback:   jQuery.noop(),
-        notFoundCallback: jQuery.noop(),
-        errorCallback:    jQuery.noop(),
+        successCallback:  jQuery.noop,
+        updateCallback:   jQuery.noop,
+        notFoundCallback: jQuery.noop,
+        errorCallback:    jQuery.noop,
         queryInterval:    1000,
+        progressMessage:          Config.ProgressIndicator.DEFAULT_PROGRESS_MESSAGE,
+        progressSuccessMessage:   Config.ProgressIndicator.DEFAULT_SUCCESS_MESSAGE,
+        progressErrorMessage:     Config.ProgressIndicator.DEFAULT_ERROR_MESSAGE,
+        progressNotFoundMessage:  Config.ProgressIndicator.DEFAULT_NOT_FOUND_MESSAGE,
+        progressID:      undefined,
 
         _url:             undefined,
         _timeout:         undefined,
@@ -41,6 +46,7 @@ define(['class', 'jquery'], function(Class) {
          */
         init: function(url) {
             this._url = url;
+            this.progressID = _.uniqueId("job_")
         },
 
         /**
@@ -76,24 +82,33 @@ define(['class', 'jquery'], function(Class) {
         _query: function() {
             jQuery.ajax({
                 url: this._url,
-                dataType: 'json',
+                // we do the progress indication manually so we don't want the global AJAX handlers to trigger here
                 global: false,
+                beforeSend: function() {
+                    Progress.showProgress(this.progressID, this.progressMessage)
+                }.bind(this),
                 statusCode: {
                     200: function(data) { // success
+                        Progress.flashSuccessMessage(this.progressID, this.progressSuccessMessage);
                         this.successCallback(data);
                     }.bind(this),
 
                     202: function(data) { // not finished
+                        //TODO: update progress indicator?
                         this.updateCallback(data);
                         // query again later
                         this._timeout = setTimeout(this._query.bind(this), this.queryInterval);
                     }.bind(this),
 
                     404: function() { // not found / canceled
+                        Progress.flashErrorMessage(this.progressID, this.progressNotFoundMessage);
                         this.notFoundCallback();
                     }.bind(this)
                 },
-                error: this.errorCallback
+                error: function(xhr) {
+                    Progress.flashErrorMessage(this.progressID, this.progressErrorMessage);
+                    this.errorCallback(arguments);
+                }.bind(this)
             });
         }
 

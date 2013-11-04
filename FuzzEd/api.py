@@ -510,7 +510,12 @@ def job_status(request, job_id):
         # response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
         if job.exit_code == 0:
             logger.debug("Job is done, delivering result")
-            return HttpResponse(job.result) 
+            if job.requires_download():
+                # Return the URL to the file created by the job
+                return HttpResponse(job.result.url)
+            else:
+                # Serve directly
+                return HttpResponse(job.result)
         else:
             logger.debug("Job is done with non-zero exit code, delivering according HTTP error")
             raise HttpResponseServerErrorAnswer()
