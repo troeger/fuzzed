@@ -1,4 +1,4 @@
-define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, Job, Alerts) {
+define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], function (Class, Config, Job, Alerts, Progress) {
 
     /**
      * Class: Backend
@@ -58,9 +58,9 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
                 .on(Config.Events.GRAPH_NODE_DELETED,       this.graphNodeDeleted.bind(this))
                 .on(Config.Events.GRAPH_EDGE_ADDED,         this.graphEdgeAdded.bind(this))
                 .on(Config.Events.GRAPH_EDGE_DELETED,       this.graphEdgeDeleted.bind(this))
-                .on(Config.Events.EDITOR_CALCULATE_CUTSETS, this.calculateCutsets.bind(this))
                 .on(Config.Events.EDITOR_GRAPH_EXPORT_PDF,  this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_GRAPH_EXPORT_EPS,  this.graphExport.bind(this))
+                .on(Config.Events.EDITOR_CALCULATE_CUTSETS, this.calculateCutsets.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY, this.calculateTopEventProbability.bind(this));
             return this;
         },
@@ -405,27 +405,57 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
             });
         },
 
-        graphExport: function(event, success, error, complete) {
+        /**
+         *  Method: graphExport
+         *    Starts a <Job> for exporting and eventually downloading the graph in the specified file format.
+         *    The file format depends on the type of the triggering event.
+         *    This method will spawn a <Job> that frequently queries the backend for the exported file and returns
+         *    the URL to the file if successful. The progress indicator will reflect the file generation progress.
+         *
+         *  Parameters:
+         *    {Function} success - Callback function that receives the URL to the generated file.
+         *    {Function} error   - [optional] Callback function that gets called in case of an error (either during
+         *                         job creation or an error in the job itself).
+         */
+        graphExport: function(event, success, error) {
+            var progressID = _.uniqueId('export_');
+            var fileType;
+            if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_PDF) fileType = 'PDF';
+            if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_EPS) fileType = 'EPS';
+            var progressMessage = Config.ProgressIndicator.EXPORT_PROGRESS_MESSAGE + fileType;
+            var progressSuccessMessage = Config.ProgressIndicator.EXPORT_SUCCESS_MESSAGE;
+            var progressErrorMessage = Config.ProgressIndicator.EXPORT_ERROR_MESSAGE + fileType;
+
             jQuery.ajax({
                 url:    this._fullUrlForExport(event),
                 // don't show progress
                 global: false,
-
+                beforeSend: function() {
+                    Progress.showProgress(progressID, progressMessage);
+                },
                 statusCode: {
                     201: function(data, status, req) {
                         var jobUrl = req.getResponseHeader('location');
-                        if (typeof success !== 'undefined') {
-                            success(new Job(jobUrl));
-                        }
+                        var job = new Job(jobUrl);
+                        job.progressID = progressID;
+                        job.progressMessage = progressMessage;
+                        job.progressSuccessMessage = progressSuccessMessage;
+                        job.progressErrorMessage = progressErrorMessage;
+                        job.successCallback = success || jQuery.noop;
+                        job.errorCallback = error || jQuery.noop;
+
+                        job.start();
                     }
                 },
 
                 error: function(jqXHR, errorStatus, errorThrown) {
+                    Progress.flashErrorMessage(progressErrorMessage);
+
                     var message = jqXHR.responseText || errorThrown || 'Sorry, export failed, could not connect to backend.';
                     Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
+
                     (error || jQuery.noop).apply(arguments);
-                },
-                complete: complete || jQuery.noop
+                }
             });
         },
 
@@ -435,8 +465,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
         /**
          * Method: _fullUrlForAnalysis
-         *
-         * Calculates the AJAX backend URL for this analysis resources for this graph (see: <Backend::_graphId>).
+         *   Calculates the AJAX backend URL for this analysis resources for this graph (see: <Backend::_graphId>).
          *
          * Returns:
          *   The analysis URL as {String}.
@@ -447,8 +476,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
         /**
          * Method: _fullUrlForGraph
-         *
-         * Calculates the AJAX backend URL for this graph (see: <Backend::_graphId>).
+         *   Calculates the AJAX backend URL for this graph (see: <Backend::_graphId>).
          *
          * Returns:
          *   The graph URL as {String}.
@@ -459,8 +487,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
         /**
          * Method: _fullUrlForNodes
-         *
-         * Calculates the AJAX backend URL for the graph's nodes. Allows to fetch all of them or to create a new one.
+         *   Calculates the AJAX backend URL for the graph's nodes. Allows to fetch all of them or to create a new one.
          *
          * Returns:
          *   The graph's nodes URL as {String}.
@@ -471,8 +498,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
         /**
          * Method: _fullUrlForNode
-         *
-         * Calculates the AJAX backend URL for on particular node of the graph. Allows to fetch, modify or delete it.
+         *   Calculates the AJAX backend URL for on particular node of the graph. Allows to fetch, modify or delete it.
          *
          * Parameters:
          *   {Number} nodeId - The id of the node.
@@ -486,8 +512,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
         /**
          * Method: _fullUrlForEdges
-         *
-         * Calculates the AJAX backend URL for the graph's edges. Allows to fetch all of them or to create a new one.
+         *   Calculates the AJAX backend URL for the graph's edges. Allows to fetch all of them or to create a new one.
          *
          * Returns:
          *   The graph's edges URL as {String}.
@@ -498,8 +523,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
         /**
          * Method: _fullUrlForEdge
-         *
-         * Calculates the AJAX backend URL for a particular edge of the graph. Allows to fetch, modify or delete it.
+         *   Calculates the AJAX backend URL for a particular edge of the graph. Allows to fetch, modify or delete it.
          *
          * Parameters:
          *   {Number} edgeId - The id of the edge.
@@ -513,8 +537,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
         /**
          * Method: _fullUrlForCutsets
-         *
-         * Calculates the AJAX backend URL calculating the cutsets of a graph. Cutsets are only available in Fault- and
+         *   Calculates the AJAX backend URL calculating the cutsets of a graph. Cutsets are only available in Fault- and
          * Fuzztrees.
          *
          * Returns:
@@ -530,8 +553,7 @@ define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, 
 
         /**
          * Method: _fullUrlForExport
-         *
-         * Calculates the AJAX backend URL for graph export.
+         *   Calculates the AJAX backend URL for graph export.
          *
          * Returns:
          *   The export URL as {String}.
