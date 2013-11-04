@@ -507,9 +507,13 @@ def job_status(request, job_id):
         raise HttpResponseNotFoundAnswer()
 
     if job.done:
-        # response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
-        return HttpResponse(job.result) 
-    else:       
+        if job.requires_download():
+            # Return the URL to the file created by the job
+            return HttpResponse(job.result.url)
+        else:
+            # Serve directly
+            return HttpResponse(job.result)
+    else:
         return HttpResponse(status=202)
 
 @csrf_exempt
