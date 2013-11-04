@@ -34,8 +34,7 @@ def dev():
         fastfood.system.install("postgres")
         # check if Latex is installed
         print "Checking for dvips"
-        output = fastfood.system.check_output('dvips')
-        if 'command not found' in output:
+        if not fastfood.system.has_command('dvips'):
             raise Exception('We need a working Latex for the rendering server. Please install it manually.')
 
     # Installing less via npm: no brew on Darwin, too old in Linux apt
@@ -49,11 +48,12 @@ def dev():
     print "Configuring and starting PostgreSQL ..."
     fastfood.system.run('cp fabfile/bootstrap/sql.txt /tmp/')
     if platform.system() == "Darwin":
-        fastfood.system.run('initdb /usr/local/var/postgres -E utf8')                                           # Initialize system database
-        fastfood.system.run('ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents')                 # Enable autostart  
-        fastfood.system.run('launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist')             # Start it now
-        fastfood.system.run('/usr/local/bin/psql -f /tmp/sql.txt postgres')
+        fastfood.system.run('initdb /usr/local/var/postgres -E utf8', print_output=False)                                 # Initialize system database
+        fastfood.system.run('ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents', print_output=False)       # Enable autostart  
+        fastfood.system.run('launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist', print_output=False)   # Start it now
+        fastfood.system.run('/usr/local/bin/psql -f /tmp/sql.txt postgres', print_output=False)
     else:
+        fastfood.system.run('sudo su - postgres -c \"rm -f /tmp/sql.txt \"', print_output=False)    
         fastfood.system.run('sudo su - postgres -c \"psql -f /tmp/sql.txt postgres\"', print_output=False)    
     print "Performing complete build to get loadable Django project code"
     fastfood.system.run("fab build.all")

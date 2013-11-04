@@ -6,7 +6,7 @@ It works nicely with Fabric, and concentrates only on package installation issue
 '''
 
 from abc import ABCMeta, abstractmethod
-import platform, os, subprocess
+import platform, os, subprocess, time
 
 class FastFood():
     ''' Abstract base class for the FastFood functionality. It provides a set of generic functions
@@ -39,8 +39,12 @@ class FastFood():
             while p.returncode == None:
                 p.poll()
                 if print_output:
-                    print ' '.join(p.stdout.readlines())
-                    print '\033[1;31m'+' '.join(p.stderr.readlines())+'\033[1;m'
+                    stdout = ''.join(p.stdout.readlines()).strip()
+                    stderr = ''.join(p.stderr.readlines()).strip()
+                    if stdout:
+                        print stdout
+                    if stderr:
+                        print '\033[1;31m'+stderr+'\033[1;m'.strip()
             return p.returncode
         except OSError as e:
             print "Error while running "+str(args)+": "+str(e)
@@ -83,11 +87,11 @@ class HomebrewFastFood(FastFood):
 
 class AptFastFood(FastFood):
     def install(self, name):
-        super(AptFastFood, self).run("sudo apt-get install -y "+self.get_mapping(name))
+        super(AptFastFood, self).run("sudo apt-get install -y -qq "+self.get_mapping(name))
 
 class PipFastFood(FastFood):
     def install(self, name):
-        super(PipFastFood, self).run("sudo pip install "+self.get_mapping(name))
+        super(PipFastFood, self).run("sudo pip install -q "+self.get_mapping(name))
 
 class NpmFastFood(FastFood):
     def install(self, name):
