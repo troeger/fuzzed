@@ -95,7 +95,7 @@ def server():
                     # since the calling convention comes from daemon.ini and the input file format is determined
                     # by the web server on download.
                     # Alle backend executables are just expected to follow the same command-line pattern as render.py.
-                    cmd = "%s %s %s %s"%(backends[notify.channel]['executable'], tmpfile.name, backends[notify.channel]['output'], tmpdir)
+                    cmd = "%s %s %s %s"%(backends[notify.channel]['executable'], tmpfile.name, tmpdir+os.sep+backends[notify.channel]['output'], tmpdir)
                     logger.info("Running "+cmd)
                     exit_code = os.system(cmd)
                     if exit_code == 0:
