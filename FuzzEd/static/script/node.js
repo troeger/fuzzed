@@ -541,6 +541,34 @@ function(Property, Mirror, Canvas, Class) {
 	            _nodeImage.yCenter = jQuery(this).outerHeight() / 2;
 			});
 			
+			
+			jQuery(resizable).on('resize',function(event, ui) {
+                // enlarge canvas if resizable is resized out of the canvas
+				Canvas.enlarge({x: ui.helper.offset().left, y: ui.helper.offset().top, height: ui.helper.height(), width: ui.helper.width()});
+				
+				// scroll canvas if resizable is resized out of the visible part of the canvas
+				var scrollable = jQuery('body');
+								
+				var screenWidth  = jQuery(window).width();
+				var screenHeight = jQuery(window).height();
+				
+				var rightScrolled= scrollable.scrollLeft();
+				var downScrolled = scrollable.scrollTop(); 
+				
+				var scrollOffset = 10;
+				
+				// resize to the right	-> scroll right			
+				if( event.clientX > screenWidth - scrollOffset) scrollable.scrollLeft(rightScrolled + Canvas.gridSize);
+				// resize to the left	-> scroll left
+				if( event.clientX <= scrollOffset ) scrollable.scrollLeft(rightScrolled - Canvas.gridSize);
+				
+				// resize downwards -> scroll downwards
+				if( event.clientY > screenHeight - scrollOffset) scrollable.scrollTop(downScrolled + Canvas.gridSize);
+				// resize upwards  -> scroll upwards
+				if( event.clientY <= scrollOffset ) scrollable.scrollTop(downScrolled - Canvas.gridSize);
+				
+			});
+			
 			return this;
 		},
 		
