@@ -19,6 +19,12 @@ logger = logging.getLogger('FuzzEd')
 # Register the streaming http handlers from poster package with urllib2
 register_openers()
 
+def report_problem(joburl, exit_code):
+    results = {'exit_code':exit_code}
+    datagen, headers = multipart_encode(results)
+    request = urllib2.Request(joburl+'exitcode', datagen, headers)                        
+    urllib2.urlopen(request)                  
+
 def server():
     # I will burn in hell for this.
     # There is no smart way to convince the Django code that it delivers the correct URL for a job
@@ -104,16 +110,15 @@ def server():
                         logger.debug("Sending results: "+str(results))
                         datagen, headers = multipart_encode(results)
                         request = urllib2.Request(joburl+'files', datagen, headers)
+                        urllib2.urlopen(request)                  
                     else:
                         logger.error("Error on execution: Exit code "+str(exit_code))  
                         logger.error("Saving input file for later reference: /tmp/lasterror.input")
                         os.system("cp %s /tmp/lasterror.input"%tmpfile.name)
-                        results = {'exit_code':exit_code}
-                        datagen, headers = multipart_encode(results)
-                        request = urllib2.Request(joburl+'exitcode', datagen, headers)                        
-                    urllib2.urlopen(request)                  
+                        report_problem(joburl, exit_code)
                 except Exception as e:
-                    logger.debug('Error: '+str(e))
+                    logger.debug('Exception, delivering -1 exit code to frontend: '+str(e))
+                    report_problem(joburl, -1)
                     pass
                 finally:
                     shutil.rmtree(tmpdir, ignore_errors=True)
