@@ -526,7 +526,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 		
         menuEntryClass: function() {
             return PropertyMenuEntry.InlineTextArea;
-        }	    
+        },
+		
+		validate :	function(value, validationResult) {
+			return true;
+		}    
 	});
 
     var Transfer = Property.extend({
