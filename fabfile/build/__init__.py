@@ -244,7 +244,7 @@ def backends():
 @task
 def css():
     '''Builds the CSS files for the project with lessc.'''
-    os.system('lessc FuzzEd/static/less/theme/white/theme.less FuzzEd/static/css/white.css')
+    os.system('lessc FuzzEd/static/less/theme/white/theme.less FuzzEd/static/css/theme/white.css')
 
 @task()
 def all():
