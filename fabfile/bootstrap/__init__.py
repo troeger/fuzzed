@@ -14,7 +14,7 @@ def dev():
 
     # Install Python packages, independent from OS
     print "Installing Python packages..."
-    for package in ["django", "south", "openid2rp", "django-require", "pyxb", "django-less", "poster"]:
+    for package in ["django", "south", "openid2rp", "django-require", "pyxb", "poster"]:
         print "Installing "+package
         fastfood.python.install(package)        
 
@@ -25,6 +25,8 @@ def dev():
             print "Installing "+p
             fastfood.system.install(p)
     else:
+        # Installing NPM
+        fastfood.system.install("npm")
         # Perform latest GCC installation on Homebrew
         print "Installing latest GCC"
         fastfood.system.tap("homebrew/versions")
@@ -34,15 +36,17 @@ def dev():
         fastfood.system.install("postgres")
         # check if Latex is installed
         print "Checking for dvips"
-        if not fastfood.system.has_command('dvips'):
+        if not fastfood.system.which('dvips'):
             raise Exception('We need a working Latex for the rendering server. Please install it manually.')
-
+ 
     # Installing less via npm: no brew on Darwin, too old in Linux apt
     print "Checking for lessc"
-    if not fastfood.system.has_command('lessc'):
+    if not fastfood.system.which('lessc'):
         print "Installing lessc"
+        # Install less from NPM
         fastfood.npm.install("less")
         fastfood.system.run("sudo ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
+
 
     # Postgres installation, including database creation
     print "Configuring and starting PostgreSQL ..."

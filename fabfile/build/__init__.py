@@ -241,9 +241,15 @@ def backends():
     os.system('make all')
     os.chdir(current)
 
+@task
+def css():
+    '''Builds the CSS files for the project with lessc.'''
+    os.system('lessc FuzzEd/static/less/theme/white/theme.less FuzzEd/static/css/white.css')
+
 @task()
 def all():
     '''Builds all.'''
+    css()
     shapes()
     xmlschemas()
     naturaldocs()

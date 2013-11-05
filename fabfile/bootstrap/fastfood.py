@@ -60,16 +60,24 @@ class FastFood():
             print "Error while checking output of "+str(args)+": "+str(e)
             return None
 
-    def has_command(self, command):
-        ''' Checks if the command works on the system, and returns True or False. '''
-        try:
-            subprocess.check_output([command], shell=True)
-            return True         
-        except OSError:
-            return False
-        except subprocess.CalledProcessError:
-            # We don't care about the exit code, as long as the file is found 
-            return True
+    def which(self, program):
+        ''' Checks if the program exists on the system, returns the full path or None. '''
+        def is_exe(fpath):
+            return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+        fpath, fname = os.path.split(program)
+        if fpath:
+            if is_exe(program):
+                return program
+        else:
+            for path in os.environ["PATH"].split(os.pathsep):
+                path = path.strip('"')
+                exe_file = os.path.join(path, program)
+                if is_exe(exe_file):
+                    return exe_file
+
+        return None
+
 
     @abstractmethod
     def install(self, name):
@@ -91,7 +99,7 @@ class AptFastFood(FastFood):
 
 class PipFastFood(FastFood):
     def install(self, name):
-        super(PipFastFood, self).run("sudo pip install -q "+self.get_mapping(name))
+        super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q "+self.get_mapping(name))
 
 class NpmFastFood(FastFood):
     def install(self, name):
