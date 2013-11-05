@@ -172,6 +172,8 @@ def createDjangoSettings(confFile, forDevelopment):
         if key.isupper():
             if key == 'OPENID_RETURN' and ip:
                 value = "'http://%s:8000/login/?openidreturn'" % ip
+            if key == 'SERVER' and ip:
+                value = "'http://%s:8000'" % ip
             # Add the configuration from the INI file directly
             conf_lines.append('%s=%s'%(key, value))
         else:
