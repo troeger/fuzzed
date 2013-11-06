@@ -146,7 +146,7 @@ define(['underscore'], function() {
 
             NO_PRINT:                'no-print',
 
-            PROPERTY_WARNING:        'error',
+            PROPERTY_WARNING:        'has-error',
             PROPERTY_OPEN_BUTTON:    'fuzzed-property-open'
         },
 

@@ -7,10 +7,8 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
     /**
      *  Constants:
      *      {RegEx} NUMBER_REGEX     - RegEx for matching all kind of number representations with strings.
-     *      {RegEx} ERROR_TYPE_REGEX - RegEx for filtering out the '[...ERROR]' part of a warning message.
      */
-    var NUMBER_REGEX     = /^[+\-]?(?:0|[1-9]\d*)(?:[.,]\d*)?(?:[eE][+\-]?\d+)?$/;
-    var ERROR_TYPE_REGEX = /^\[.+\]\s*(.+)/;
+    var NUMBER_REGEX = /^[+\-]?(?:0|[1-9]\d*)(?:[.,]\d*)?(?:[eE][+\-]?\d+)?$/;
 
     /**
      *  Function: capitalize
@@ -26,7 +24,6 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
      *      and handles the synchronization with it.
      */
     var Entry = Class.extend({
-
         /**
          *  Group: Members
          *
@@ -185,9 +182,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         _sendChange: function() {
             // discard old timeout
             window.clearTimeout(this._timer);
+            var value = this._value();
             // create a new one
             this._timer = window.setTimeout(function() {
-                this.property.setValue(this._value(), this);
+                this.property.setValue(value, this);
             }.bind(this), Config.Menus.PROPERTIES_MENU_TIMEOUT);
 
             return this;
@@ -304,8 +302,6 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *      This Entry for chaining.
          */
         warn: function(text) {
-            text = capitalize(ERROR_TYPE_REGEX.exec(text)[1]);
-
             if (this.container.hasClass(Config.Classes.PROPERTY_WARNING) &&
                 this.container.attr('data-original-title') === text)
                 return this;
@@ -643,7 +639,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         _value: function(newValue) {
             if (typeof newValue === 'undefined') {
                 var val = this.inputs.val();
-                if (this.inputs.is(':invalid') || !NUMBER_REGEX.test(val)) return window.NaN;
+                if (!NUMBER_REGEX.test(val)) return window.NaN;
                 return window.parseFloat(val);
             }
             this.inputs.val(newValue);
@@ -736,9 +732,9 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             var upper = this.inputs.eq(1);
 
             if (typeof newValue === 'undefined') {
-                var lowerVal = (lower.is(':invalid') || !NUMBER_REGEX.test(lower.val()))
+                var lowerVal = (!NUMBER_REGEX.test(lower.val()))
                     ? window.NaN : window.parseFloat(lower.val());
-                var upperVal = (upper.is(':invalid') || !NUMBER_REGEX.test(upper.val()))
+                var upperVal = (!NUMBER_REGEX.test(upper.val()))
                     ? window.NaN : window.parseFloat(upper.val());
                 return [lowerVal, upperVal];
             }
@@ -755,7 +751,6 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
      *      around the first number.
      */
     var EpsilonEntry = RangeEntry.extend({
-
         fix: function(event, ui) {
             var val     = this._value();
             var center  = val[0];
