@@ -151,7 +151,7 @@ def graph_download(request, graph_id):
         response['Content-Type'] = 'application/text'
     elif export_format in ('pdf', 'eps'):
         try:
-            job = graph.jobs.latest('created')
+            job = graph.jobs.filter(kind=export_format).latest('created')
             if not job.done():
                 raise HttpResponseNotFoundAnswer()
             response.content = job.result
