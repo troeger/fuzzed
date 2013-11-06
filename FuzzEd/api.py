@@ -138,19 +138,26 @@ def graph_download(request, graph_id):
     export_format = request.GET.get('format', 'xml')
 
     response = HttpResponse()
+    response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
 
     if export_format == 'xml':
         response.content = graph.to_xml()
         response['Content-Type'] = 'application/xml'
-        response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
     elif export_format == 'json':
         response.content = graph.to_json()
         response['Content-Type'] = 'application/javascript'
-        response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
     elif export_format == 'tex':
         response.content = graph.to_tikz()
         response['Content-Type'] = 'application/text'
-        response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)        
+    elif export_format in ('pdf', 'eps'):
+        try:
+            job = graph.jobs.latest('created')
+            if not job.done():
+                raise HttpResponseNotFoundAnswer()
+            response.content = job.result
+            response['Content-Type'] = 'application/pdf' if export_format == 'pdf' else 'application/postscript'
+        except ObjectDoesNotExist:
+            raise HttpResponseNotFoundAnswer()
     else:
         raise HttpResponseNotFoundAnswer()
     return response
@@ -512,7 +519,7 @@ def job_status(request, job_id):
             logger.debug("Job is done, delivering result")
             if job.requires_download():
                 # Return the URL to the file created by the job
-                return HttpResponse(job.result.url)
+                return HttpResponse(reverse('FuzzEd.api.graph_download', args=(job.graph.pk,)))
             else:
                 # Serve directly
                 return HttpResponse(job.result)

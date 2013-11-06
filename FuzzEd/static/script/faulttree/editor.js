@@ -795,7 +795,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             jQuery("#"+this.config.IDs.ACTION_EXPORT_PDF).click(function() {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_GRAPH_EXPORT_PDF,
-                    this._downloadFileFromURL.bind(this)
+                    function(url) {
+                        this._downloadFileFromURL(url, 'pdf');
+                    }.bind(this)
                 )
             }.bind(this));
 
@@ -813,7 +815,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             jQuery("#"+this.config.IDs.ACTION_EXPORT_EPS).click(function() {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_GRAPH_EXPORT_EPS,
-                    this._downloadFileFromURL.bind(this)
+                    function(url) {
+                        this._downloadFileFromURL(url, 'eps');
+                    }.bind(this)
                 )
             }.bind(this));
 
@@ -846,10 +850,10 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *  Parameters:
          *    {String} url - The URL to the file to be downloaded.
          */
-        _downloadFileFromURL: function(url) {
+        _downloadFileFromURL: function(url, format) {
             //TODO: maybe we can use more sophisticated methods here to get the file to download directly instead
             //      of opening in the same window
-            window.location = url;
+            window.location = url + '?format=' + format;
         }
     });
 });
