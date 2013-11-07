@@ -6,7 +6,9 @@ function(Graph, FuzztreeNode, FuzztreeConfig, FuzztreeNotation) {
 
     /**
      *  Class: Graph
-     *    Fuzztree-specific graph. Extends <Base::Graph>.
+     *    Fuzztree-specific graph.
+     *
+     *  Extends: <Base::Graph>.
      */
     return Graph.extend({
         /**

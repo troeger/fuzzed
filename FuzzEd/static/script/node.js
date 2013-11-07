@@ -475,8 +475,12 @@ function(Property, Mirror, Canvas, Class) {
         /**
          * Method: _setupProperties
          *
+         * Creates the node's properties instances sorted by the passed display order. If a property passed in the
+         * display order is not present in the node it is skipped silently. When a property in the node's definition is
+         * set to null the property is not created and eventually removed if inherited from its parent.
+         *
          * Parameters:
-         *   {Array[str]} propertiesDisplayOrder - bar.
+         *   {Array[str]} propertiesDisplayOrder - The order in which to create the properties.
          *
          * Returns:
          *   This {<Node>} instance for chaining.

@@ -1,6 +1,6 @@
 define(['config', 'jquery'], function(Config) {
     /**
-     *  Package RBD
+     *  Package: RBD
      */
 
     /**

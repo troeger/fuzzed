@@ -717,10 +717,6 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         probabilityMenu: undefined,
 
         /**
-         *  Group: Initialization
-         */
-
-        /**
          *  Group: Accessors
          */
 
@@ -753,7 +749,6 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         /**
          *  Group: Setup
          */
-
         _loadGraphCompleted: function(readOnly) {
             //this.cutsetsMenu     = new CutsetsMenu(this);
             this.probabilityMenu = new ProbabilityMenu(this);

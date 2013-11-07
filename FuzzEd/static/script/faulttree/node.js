@@ -1,5 +1,4 @@
 define(['faulttree/config', 'node'], function(Config, AbstractNode) {
-
     /**
      * Package: Faulttree
      */
