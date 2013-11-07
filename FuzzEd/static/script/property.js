@@ -4,7 +4,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
     };
-
+	
     var Property = Class.extend({
         node:           undefined,
         value:          undefined,
@@ -521,7 +521,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 		
 		init: function(node, definition) {
 			this._super(node, definition);
-			this.node.container.find('p').text(this.value);
+			var paragraph = jQuery('<p align="left">').html(PropertyMenuEntry.escapeHTML(this.value));
+			this.menuEntry.inputs.after(paragraph);
 		},
 		
         menuEntryClass: function() {

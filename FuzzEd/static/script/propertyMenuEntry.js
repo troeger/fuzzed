@@ -19,7 +19,22 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
     var capitalize = function(aString) {
         return aString.charAt(0).toUpperCase() + aString.slice(1);
     };
-
+	
+	/**
+	 *  Function: escapeHTML
+	 *      Helper function for escaping HTML characters + newlines are replaced with HTML < /br> tag
+	 */
+	var escapeHTML = function(text){
+			return text
+				.replace(/&/g, "&amp;")
+      			.replace(/&/g, "&amp;")
+      		  	.replace(/</g, "&lt;")
+      		  	.replace(/>/g, "&gt;")
+      		  	.replace(/"/g, "&quot;")
+      		  	.replace(/'/g, "&#039;")
+				.replace(/\n/g, '<br />');
+			};
+	
     /**
      *  Class: Entry
      *      Abstract base class for an entry in the property menu of a node. It's associated with a <Property> object
@@ -851,7 +866,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 			 // hide textarea
 			 this.inputs.toggle(false);
 			 // show paragraph and set value
-			 this.inputs.siblings('p').text(this.inputs.val()).toggle(true);
+			 this.inputs.siblings('p').html(escapeHTML(this.inputs.val())).toggle(true);
 		},
 		
         remove: function() {
@@ -1049,6 +1064,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         'RangeEntry':    	RangeEntry,
         'TextEntry':     	TextEntry,
 		'InlineTextArea':   InlineTextArea, 
-        'TransferEntry': 	TransferEntry
+        'TransferEntry': 	TransferEntry,
+		'escapeHTML'   :    escapeHTML
     }
 });

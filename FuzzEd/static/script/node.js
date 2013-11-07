@@ -73,6 +73,7 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance.
          */
         init: function(definition, propertiesDisplayOrder) {
+
             // merge all presets of the configuration and data from the backend into this object
             jQuery.extend(true, this, definition);
 
@@ -589,7 +590,7 @@ function(Property, Mirror, Canvas, Class) {
 			var editable = container.find('.'+ this.config.Classes.EDITABLE);
 			
 			var textarea =  editable.find("textarea");				
-			var paragraph = editable.find("p").text(textarea.val());
+			var paragraph = editable.find("p");
 						
 			editable.on("dblclick", function(event){
 				paragraph.toggle(false);
