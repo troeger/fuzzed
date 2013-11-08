@@ -12,9 +12,13 @@ def dev():
         print "Installing "+p
         fastfood.system.install(p)        
 
+    # Install Django 1.6
+    print "Installing Django ..."
+    fastfood.python.install('django','>=1.6')
+
     # Install Python packages, independent from OS
-    print "Installing Python packages..."
-    for package in ["django", "south", "openid2rp", "django-require", "pyxb", "poster"]:
+    print "Installing other Python packages..."
+    for package in ["south", "openid2rp", "django-require", "pyxb", "poster"]:
         print "Installing "+package
         fastfood.python.install(package)        
 
@@ -44,7 +48,7 @@ def dev():
     if not fastfood.system.which('lessc'):
         print "Installing lessc"
         # Install less from NPM
-        fastfood.npm.install("less")
+        fastfood.js.install("less")
         fastfood.system.run("sudo ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
 
 
