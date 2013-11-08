@@ -3,10 +3,14 @@ This is Fastfood.
 
 It is intended as quick and unhealthy partial replacement for the Cuisine project.
 It works nicely with Fabric, and concentrates only on package installation issues.
+
+Peter Troeger <peter@troeger.eu>
 '''
 
 from abc import ABCMeta, abstractmethod
 import platform, os, subprocess, time
+
+system, python, js = None, None, None                          # Force package manager index updates on startup
 
 class FastFood():
     ''' Abstract base class for the FastFood functionality. It provides a set of generic functions
@@ -115,6 +119,8 @@ class HomebrewFastFood(FastFood):
         #TODO: Add version support
         assert(version==None)
         super(HomebrewFastFood, self).run("brew install "+self.get_mapping(name))
+        # May have installed fresh package managers
+        system, python, js = find_package_managers()
 
     def tap(self, name):
         super(HomebrewFastFood, self).run("brew tap "+name)
@@ -133,6 +139,8 @@ class AptFastFood(FastFood):
         #TODO: Add version support
         assert(version==None)
         super(AptFastFood, self).run("sudo apt-get install -y -qq "+self.get_mapping(name))
+        # May have installed fresh package managers
+        system, python, js = find_package_managers()
 
     def supported(self):
         return super(AptFastFood, self).which("apt-get") != None
@@ -202,32 +210,51 @@ class MissingFastFood(FastFood):
 
 missing = MissingFastFood()
 
-# Set system package manager
-if platform.system() == "Darwin":
-    if homebrew.supported():
-        system = homebrew
-    else:
-        system = missing
-else:
-    if apt.supported():
-        system = apt
-    else:
-        system = missing
-# TODO: Better do this on-demand, when the first install request comes along
-system.index_update()
+def find_package_managers():
+    global system
+    global python
+    global js
+    
+    system_old = system
+    python_old = python
+    js_old = js
 
-# Set python package manager
-if pip.supported():
-    python = pip
-elif easy_install.supported():
-    python = easy_install
-else:
-    python = missing
-python.index_update()
+    # Determine system package manager
+    if platform.system() == "Darwin":
+        if homebrew.supported():
+            system = homebrew
+        else:
+            system = missing
+    else:
+        if apt.supported():
+            system = apt
+        else:
+            system = missing
+    if system != system_old:
+        system.index_update()
 
-if npm.supported():
-    js = NpmFastFood()
-else:
-    js = missing
-js.index_update()
+    # Set python package manager
+    if pip.supported():
+        python = pip
+    elif easy_install.supported():
+        python = easy_install
+    else:
+        python = missing
+    if python != python_old:
+        python.index_update()
+
+    # Set JS package manager
+    if npm.supported():
+        js = npm
+    else:
+        js = missing
+    if js != js_old:
+        js.index_update()
+
+    return system, python, js
+
+
+#################################### Module initialization ####################################
+system, python, js = find_package_managers()
+
 

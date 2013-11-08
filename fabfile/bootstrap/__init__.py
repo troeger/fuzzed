@@ -25,7 +25,7 @@ def dev():
     # Install native packages, dependent on OS
     if platform.system() != 'Darwin':
         # Install native packages on Linux
-        for p in ["nodejs", "postgresql", "texlive", "libxerces-c-dev", "libboost1.48-all-dev", "xsdcxx", "python-psycopg2"]:
+        for p in ["nodejs", "npm", "postgresql", "texlive", "libxerces-c-dev", "libboost1.48-all-dev", "xsdcxx", "python-psycopg2"]:
             print "Installing "+p
             fastfood.system.install(p)
     else:
