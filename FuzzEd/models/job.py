@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.core.urlresolvers import reverse
 from graph import Graph
 from south.modelsinspector import add_introspection_rules
+from FuzzEd.models import xml_analysis
 from FuzzEd import settings
 import uuid
 
@@ -58,6 +59,8 @@ class Job(models.Model):
 
     def requires_download(self):
         return self.kind in Job.DOWNLOAD_TYPES
+
+    #TODO: Add fetching of result data, either as URL or as XML->JON conversion result
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
