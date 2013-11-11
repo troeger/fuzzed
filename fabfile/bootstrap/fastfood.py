@@ -8,7 +8,7 @@ Peter Troeger <peter@troeger.eu>
 '''
 
 #TODO: Alles auf Python Logging umstellen
-#      Readme schreiben, welches das Autodetect-Konzept erklärt
+#      Readme schreiben, welches das Autodetect-Konzept erklaert
 #      Nur beim Finden neuer Package-Manager Meldung ausgeben (system_old)
 #      Readme schreiben
 #      Ab auf Github und PyPI
