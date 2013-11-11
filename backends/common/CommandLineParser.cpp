@@ -48,13 +48,9 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 	outFile				= arguments[2];
 	workingDirectory	= arguments[3];
 
-	if (numArguments >= 5)
-		logFile = arguments[4];
-
 	m_outFilePath	= fs::path(outFile.c_str());
 	m_inFilePath	= fs::path(inFile.c_str());
 	m_workingDir	= fs::path(workingDirectory.c_str());
-	m_logFilePath	= fs::path(logFile.c_str());
 
 	if (!util::isWritable(outFile))
 	{ // TODO: find out write permissions. not featured by Boost 1.48.
@@ -66,17 +62,22 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 		std::cerr << "Not a valid file name: " << inFile << std::endl;
 		exit(-1);
 	}
-	else if (!util::isWritable(logFile))
-	{
-		std::cerr << "Log File not writable " << logFile << std::endl;
-		exit(-1);
-	}
 	else if (!fs::is_directory(m_workingDir) || !util::isWritable(workingDirectory + util::slash + "foo"))
 	{
 		std::cerr << "Not a writable directory: " << workingDirectory << std::endl;
 		exit(-1);
 	}
 
+	if (numArguments >= 5)
+	{
+		logFile = arguments[5];
+		if (!util::isWritable(logFile))
+		{
+			std::cerr << "Log File not writable " << logFile << std::endl;
+			exit(-1);
+		}
+		else m_logFilePath	= fs::path(logFile.c_str());
+	}
 	int i = 3;
 	while (++i < numArguments)
 		m_additionalArguments.emplace_back(arguments[i]);

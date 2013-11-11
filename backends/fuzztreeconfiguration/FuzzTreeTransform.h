@@ -12,7 +12,7 @@
 #include "faulttree.h"
 #include "fuzztree.h"
 
-#define DEFAULT_LOG_FILE "errors.txt"
+#define DEFAULT_LOG_FILE "./errors.txt"
 
 enum ErrorType
 {

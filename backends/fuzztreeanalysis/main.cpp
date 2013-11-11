@@ -21,13 +21,14 @@ int main(int argc, char** argv)
 
 	std::ofstream logFileStream(logFile);
 	logFileStream << "Analysis errors for " << inFile << std::endl;
+	const bool logging = logFileStream.good();
 
 	try
 	{
 		std::ifstream instream(inFile);
 		if (!instream.good())
 		{
-			std::cerr << "Invalid input file: " << inFile << std::endl;
+			logging ? logFileStream : std::cerr << "Invalid input file: " << inFile << std::endl;
 			return -1;
 		}
 		auto tree = fuzztree::fuzzTree(instream, xml_schema::Flags::dont_validate);
@@ -40,10 +41,10 @@ int main(int argc, char** argv)
 
 		analysisResults::AnalysisResults analysisResults;
 
-		FuzzTreeTransform tf(tree, logFileStream);
+		FuzzTreeTransform tf = logging ? FuzzTreeTransform(tree, logFileStream) : FuzzTreeTransform(tree);
 		if (!tf.isValid())
 		{
-			std::cerr << "Could not compute configurations." << std::endl;
+			logging ? logFileStream : std::cerr << "Could not compute configurations." << std::endl;
 			return -1;
 		}
 		
@@ -63,7 +64,7 @@ int main(int argc, char** argv)
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << "Exception while trying to analyze " << inFile << e.what() << std::endl;
+		logging ? logFileStream : std::cerr << "Exception while trying to analyze " << inFile << e.what() << std::endl;
 		return -1;
 	}
 	catch (...)
