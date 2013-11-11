@@ -17,6 +17,7 @@ int main(int argc, char** argv)
 	parser.parseCommandline(argc, argv);
 	const auto inFile = parser.getInputFilePath().generic_string();
 	const auto outFile = parser.getOutputFilePath().generic_string();
+	const auto logFile = parser.getLogFilePath().generic_string();
 
 	try
 	{
@@ -36,7 +37,7 @@ int main(int argc, char** argv)
 
 		analysisResults::AnalysisResults analysisResults;
 
-		FuzzTreeTransform tf(tree);
+		FuzzTreeTransform tf(tree, logFile);
 		if (!tf.isValid())
 		{
 			std::cerr << "Could not compute configurations." << std::endl;
