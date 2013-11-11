@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema version="1.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.fuzztrees.net/commonTypes"
+            targetNamespace="http://www.fuzztrees.net/commonTypes">
+
+  <!-- Abstract types -->
+
+  <!-- The model, regardless of the fact whether it is a table or graph. -->
+  <xsd:complexType abstract="true" name="Model">
+    <!-- A unique ID accross all user models. -->
+    <xsd:attribute name="id" type="xsd:string"/>
+  </xsd:complexType>
+
+  <!-- A node in a graph model. -->
+  <xsd:complexType abstract="true" name="GraphNode">
+    <!-- Coordinates in the editor. -->
+    <xsd:attribute name="x" type="xsd:int"/>
+    <xsd:attribute name="y" type="xsd:int"/>
+    <!-- A unique ID inside the graph model scope. -->
+    <xsd:attribute name="id" type="xsd:string"/>
+  </xsd:complexType>
+
+  <!-- A list of id's -->
+  <xsd:simpleType name="idList">
+    <xsd:list itemType="xsd:string"/>
+  </xsd:simpleType>
+
+  <!-- Mapping of double values to double intervals, needed for fuzzy results -->
+  <xsd:complexType name="DoubleToIntervalMap">
+    <xsd:sequence>
+      <xsd:element maxOccurs="1" minOccurs="1" name="value" type="Interval"/>
+    </xsd:sequence>
+    <xsd:attribute name="key" type="xsd:double" use="required"/>
+  </xsd:complexType>
+  
+  <xsd:complexType name="Interval">
+    <xsd:attribute name="lowerBound" type="xsd:double" use="required"/>
+    <xsd:attribute name="upperBound" type="xsd:double" use="required"/>
+  </xsd:complexType>
+
+  <!-- A probability value -->
+  <xsd:complexType name="Probability" abstract="true"/>
+
+  <xsd:complexType name="CrispProbability">
+    <xsd:complexContent>
+      <xsd:extension base="Probability">
+        <xsd:attribute name="val" type="xsd:double" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="DecomposedFuzzyProbability">
+    <xsd:complexContent>
+      <xsd:extension base="Probability">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="alphaCuts" type="DoubleToIntervalMap"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+</xsd:schema>

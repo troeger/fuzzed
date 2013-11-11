@@ -179,10 +179,15 @@ def build_xmlschema_wrappers():
 
         if os.path.exists(path_name):
             os.remove(path_name)
-    if os.system('pyxbgen%s --binding-root=FuzzEd/models/ -u %sFuzzEd/static/xsd/analysis.xsd '
-                 '-m xml_analysis -u %sFuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree -u %sFuzzEd/static/xsd/faulttree.xsd -m xml_faulttree'
-                 % (FILE_EXTENSION, FILE_PREFIX, FILE_PREFIX, FILE_PREFIX,)) != 0:
-        raise Exception('Execution of pyxbgen failed.\nTry "sudo setup.py test" for installing all dependencies.')
+    if os.system('pyxbgen%(extension)s --binding-root=FuzzEd/models/'
+                            '-u %(prefix)sFuzzEd/static/xsd/analysis.xsd -m xml_analysis'
+                            '-u %(prefix)sFuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree'
+                            '-u %(prefix)sFuzzEd/static/xsd/faulttree.xsd -m xml_faulttree'
+                            '-u %(prefix)sFuzzEd/static/xsd/commonTypes.xsd -m xml_common'
+                            '-u %(prefix)sFuzzEd/static/xsd/configurations.xsd -m xml_configurations'
+                            '-u %(prefix)sFuzzEd/static/xsd/configurationResult.xsd -m xml_conf_result'
+                 % {'extension': FILE_EXTENSION, 'prefix': FILE_PREFIX}) != 0:
+        raise Exception('Execution of pyxbgen failed.')
 
 @task
 def xmlschemas():

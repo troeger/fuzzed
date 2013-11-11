@@ -274,9 +274,10 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Evaluates the job result. Either displays the analysis results or the returned error message.
          *
          *  Parameters:
-         *    {JSON} data - Data returned from the backend containing the result of the calculation.
+         *    {string} data - Data returned from the backend containing the result of the calculation.
          */
         _evaluateResult: function(data) {
+            data = jQuery.parseJSON(data);
             if (typeof data.errors !== 'undefined' && _.size(data.errors) != 0) {
                 // errors is a dictionary with the node ID as key
                 //TODO: display validation result at the node
