@@ -23,7 +23,7 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
          *   additionaly observe changes of the optional property in order to render the node accordingly.
          *
          * Parameters:
-         *   {Array[str]}
+         *   {Array[str]} - The order in which to display the properties if present.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
