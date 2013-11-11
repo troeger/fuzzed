@@ -1,9 +1,11 @@
 ''' 
-This is the connector daemon for all backend services. It talks to the FuzzEd web application and retrieves new jobs.
-Based on the retrieved job type, the according backend executable is called.
+This is the connector daemon for all backend services. It talks to the FuzzEd web application
+and retrieves new jobs. Based on the retrieved job type, the according backend executable 
+is called.
 
-This script takes the path of the config file 'daemon.ini' as command-line argument. If not given, the config file
-is searched in the current directory. It contains the database connection information and the details of the backends,
+This script takes the path of the config file 'daemon.ini' as command-line argument. 
+If not given, the config file is searched in the current directory. 
+It contains the database connection information and the details of the backends,
 and is generated through 'fab build.configs' from the central settings file.
 
 If you want this thing on a development machine for backend services, use 'fab run.backend'.
@@ -27,9 +29,11 @@ def report_problem(joburl, exit_code):
 
 def server():
     # I will burn in hell for this.
-    # There is no smart way to convince the Django code that it delivers the correct URL for a job
-    # if we run the test suite. This is related to the usage of LiveServerTestCase in tests.py.
-    # For this reason, we let the test suite start this code with "--testing" and patch the job host then.
+    # There is no smart way to convince the Django code that it delivers the correct URL for
+    # a job if we run the test suite. 
+    # This is related to the usage of LiveServerTestCase in tests.py.
+    # For this reason, we let the test suite start this code with "--testing" and 
+    # patch the job host then.
     patch_host = False
     # Read configuration
     assert(len(sys.argv) < 3)
@@ -91,11 +95,16 @@ def server():
                     input_data = urllib2.urlopen(joburl+'files')
                     tmpfile.write(input_data.read())
                     tmpfile.close()
-                    # There trick is that we do not need to know the operational details of this job here,
-                    # since the calling convention comes from daemon.ini and the input file format is determined
-                    # by the web server on download.
-                    # Alle backend executables are just expected to follow the same command-line pattern as render.py.
-                    cmd = "%s %s %s %s"%(backends[notify.channel]['executable'], tmpfile.name, tmpdir+os.sep+backends[notify.channel]['output'], tmpdir)
+                    # There trick is that we do not need to know the operational details 
+                    # of this job here, since the calling convention comes from daemon.ini 
+                    # and the input file format is determined by the web server on download.
+                    # Alle backend executables are just expected to follow the same 
+                    # command-line pattern as render.py.
+                    cmd = "%s %s %s %s %s"%(backends[notify.channel]['executable'], 
+                                            tmpfile.name, 
+                                            tmpdir+os.sep+backends[notify.channel]['output'],
+                                            tmpdir,
+                                            tmdir+os.sep+backends[notify.channel]['log_file'])
                     logger.info("Running "+cmd)
                     exit_code = os.system(cmd)
                     if exit_code == 0:
