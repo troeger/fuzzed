@@ -10,6 +10,8 @@
             "allowConnectionTo": [],
 
             "deletable": true,
+            "resizable": false,
+            "editable": false,
 
             "connector": {
                 "offset": {
@@ -19,6 +21,37 @@
             },
 
             "properties": {}
+        },
+        
+        "stickyNote": {
+            "nodeDisplayName": "Sticky Note",
+            "inherits": "node",
+            "numberOfOutgoingConnections": 0,
+            "image": "sticky_note.html",
+            "resizable": true,
+            "editable": true,
+            
+            "properties": {
+              "description": {
+                  "kind": "textfield",
+                  "default": "Sample Text",
+                  "hidden": true
+              },
+              
+              "height": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              },
+              
+              "width": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              }
+            }
         },
 
         "event": {
@@ -414,7 +447,10 @@
         "cardinality",
         "k",
         "dormancyFactor",
-        "transfer"
+        "transfer",
+        "description",
+        "width",
+        "height"
     ],
 
     "shapeMenuNodeDisplayOrder": [
@@ -435,7 +471,8 @@
         "fdepGate",
         "priorityAndGate",
         "seqGate",
-        "transferIn"
+        "transferIn",
+        "stickyNote"
     ],
 
     "defaults": {
