@@ -19,6 +19,9 @@ int main(int argc, char** argv)
 	const auto outFile = parser.getOutputFilePath().generic_string();
 	const auto logFile = parser.getLogFilePath().generic_string();
 
+	std::ofstream logFileStream(logFile);
+	logFileStream << "Analysis errors for " << inFile << std::endl;
+
 	try
 	{
 		std::ifstream instream(inFile);
@@ -37,7 +40,7 @@ int main(int argc, char** argv)
 
 		analysisResults::AnalysisResults analysisResults;
 
-		FuzzTreeTransform tf(tree, logFile);
+		FuzzTreeTransform tf(tree, logFileStream);
 		if (!tf.isValid())
 		{
 			std::cerr << "Could not compute configurations." << std::endl;

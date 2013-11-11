@@ -26,9 +26,9 @@ enum ErrorType
 class FuzzTreeTransform
 {
 public:
-	FuzzTreeTransform(const std::string& fuzzTreeXML, const std::string& logFilePath = DEFAULT_LOG_FILE);
-	FuzzTreeTransform(std::istream& fuzzTreeXML, const std::string& logFilePath = DEFAULT_LOG_FILE);
-	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, const std::string& logFilePath = DEFAULT_LOG_FILE);
+	FuzzTreeTransform(const std::string& fuzzTreeXML, std::ofstream& logFile = std::ofstream(DEFAULT_LOG_FILE));
+	FuzzTreeTransform(std::istream& fuzzTreeXML, std::ofstream& logFile = std::ofstream(DEFAULT_LOG_FILE));
+	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, std::ofstream& logFile = std::ofstream(DEFAULT_LOG_FILE));
 
 	~FuzzTreeTransform();
 
@@ -87,5 +87,5 @@ private:
 	int m_count;
 	bool m_bValid;
 
-	std::ofstream m_logFile;
+	std::ofstream& m_logFile;
 };

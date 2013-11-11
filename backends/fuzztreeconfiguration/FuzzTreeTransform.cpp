@@ -19,10 +19,10 @@ using xercesc::DOMNode;
 using xercesc::DOMDocument;
 using namespace std;
 
-FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML, const std::string& logFilePath/* = DEFAULT_LOG_FILE*/) :
+FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML, std::ofstream& logFile /* = DEFAULT_LOG_FILE*/) :
 	m_count(0),
 	m_bValid(true),
-	m_logFile(logFilePath)
+	m_logFile(logFile)
 {
 	try
 	{
@@ -37,10 +37,10 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML, const std::strin
 }
 
 
-FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML, const std::string& logFilePath/* = DEFAULT_LOG_FILE*/) :
+FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML, std::ofstream& logFile/* = DEFAULT_LOG_FILE*/) :
 	m_count(0),
 	m_bValid(true),
-	m_logFile(logFilePath)
+	m_logFile(logFile)
 {
 	try
 	{
@@ -54,11 +54,11 @@ FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML, const std::strin
 	}
 }
 
-FuzzTreeTransform::FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, const std::string& logFilePath/* = DEFAULT_LOG_FILE*/) :
+FuzzTreeTransform::FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, std::ofstream& logFile/* = DEFAULT_LOG_FILE*/) :
 	m_fuzzTree(ft),
 	m_count(0),
 	m_bValid(true),
-	m_logFile(logFilePath)
+	m_logFile(logFile)
 {
 	assert(m_fuzzTree.get());
 }
