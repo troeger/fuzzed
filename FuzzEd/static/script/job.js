@@ -8,7 +8,6 @@ define(['class', 'jquery'], function(Class) {
      *    Wrapper that simplifies continuous querying of a backend job.
      */
     return Class.extend({
-
         /**
          *  Group: Members
          *
