@@ -17,7 +17,22 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
     var capitalize = function(aString) {
         return aString.charAt(0).toUpperCase() + aString.slice(1);
     };
-
+	
+	/**
+	 *  Function: escapeHTML
+	 *      Helper function for escaping HTML characters + newlines are replaced with HTML < /br> tag
+	 */
+	var escapeHTML = function(text){
+			return text
+				.replace(/&/g, "&amp;")
+      			.replace(/&/g, "&amp;")
+      		  	.replace(/</g, "&lt;")
+      		  	.replace(/>/g, "&gt;")
+      		  	.replace(/"/g, "&quot;")
+      		  	.replace(/'/g, "&#039;")
+				.replace(/\n/g, '<br />');
+			};
+	
     /**
      *  Class: Entry
      *      Abstract base class for an entry in the property menu of a node. It's associated with a <Property> object
@@ -813,7 +828,67 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         }
     });
+	
+	/**
+	 * Class: InlineTextArea
+	 *     TextArea for editing inside a shape on the canvas.
+	 *     So far only used for editing inside a sticky note.
+	 */
+	
+    var InlineTextArea = Entry.extend({
+        changeEvents: function() {
+            return ['keyup', 'cut', 'paste'];
+        },
+		
+        blurEvents: function() {
+            return ['blur'];
+        },
+		
+        _setupInput: function() {
+            this.inputs = jQuery('<textarea type="text" class="form-control">').attr('id', this.id);
+			//hide textarea at the beginning
+			this.inputs.toggle(false);
+            return this;
+        },
+		
+        appendTo: function(on) {
+			this._setupCallbacks();
+            return this;
+        },
+		
+        blurred: function(event, ui) {
+			 this._super(event, ui);
+			 // hide textarea
+			 this.inputs.toggle(false);
+			 // show paragraph and set value
+			 this.inputs.siblings('p').html(escapeHTML(this.inputs.val())).toggle(true);
+		},
+		
+        remove: function() {
+		},
+		
+        _setupContainer: function() {
+            this.container = this.inputs
+			
+            return this;
+        },
+		
+        _setupVisualRepresentation: function() {
+            this._setupInput();
+			this._setupContainer();
+            this.property.node.container.find('.' + Config.Classes.EDITABLE).append(this.inputs);
 
+            return this;
+        },
+
+        _value: function(newValue) {
+            if (typeof newValue === 'undefined') return this.inputs.val();
+            this.inputs.val(newValue);
+
+            return this;
+        }
+    });
+	
     /**
      *  TransferEntry
      *      Allows to link to other entities in the database. Looks like a normal <ChoiceEntry>,
@@ -976,13 +1051,15 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
     });
 
     return {
-        'BoolEntry':     BoolEntry,
-        'ChoiceEntry':   ChoiceEntry,
-        'CompoundEntry': CompoundEntry,
-        'EpsilonEntry':  EpsilonEntry,
-        'NumericEntry':  NumericEntry,
-        'RangeEntry':    RangeEntry,
-        'TextEntry':     TextEntry,
-        'TransferEntry': TransferEntry
+        'BoolEntry':     	BoolEntry,
+        'ChoiceEntry':   	ChoiceEntry,
+        'CompoundEntry': 	CompoundEntry,
+        'EpsilonEntry':  	EpsilonEntry,
+        'NumericEntry':  	NumericEntry,
+        'RangeEntry':    	RangeEntry,
+        'TextEntry':     	TextEntry,
+		'InlineTextArea':   InlineTextArea, 
+        'TransferEntry': 	TransferEntry,
+		'escapeHTML'   :    escapeHTML
     }
 });

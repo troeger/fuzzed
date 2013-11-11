@@ -141,20 +141,59 @@
                     }
                 }
             }
+        },
+        
+        "stickyNote": {
+            "nodeDisplayName": "Sticky Note",
+            "inherits": "node",
+            "numberOfOutgoingConnections": 0,
+            "image": "sticky_note.html",
+            "resizable": true,
+            "editable": true,
+            
+            "properties": {
+              "name" : {
+                  "hidden": true
+              },
+        
+              "description": {
+                  "kind": "textfield",
+                  "default": "Sample Text",
+                  "hidden": true
+              },
+              
+              "height": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              },
+              
+              "width": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              }              
+            }
         }
     },
 
     "propertiesDisplayOrder": [
         "name",
         "probability",
-        "out_of"
+        "out_of",
+        "description",
+        "width",
+        "height"
     ],
 
     "shapeMenuNodeDisplayOrder": [
         "block",
         "out_of",
         "start",
-        "end"
+        "end",
+        "stickyNote"
     ],
 
     "defaults": {

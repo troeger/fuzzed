@@ -149,10 +149,11 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         },
 
         _setupThumbnails: function() {
-            var svgs = this.container.find('svg');
+            
+			var thumbnails = this.container.find('.' + Config.Classes.DRAGGABLE_WRAP_DIV).children();
 
             // make shapes in the menu draggable
-            svgs.draggable({
+            thumbnails.draggable({
                 helper:   'clone',
                 opacity:  Config.Dragging.OPACITY,
                 cursor:   Config.Dragging.CURSOR,
@@ -160,7 +161,7 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
                 revert:   'invalid',
                 zIndex:   200
             });
-        }
+		}
 
     });
 
