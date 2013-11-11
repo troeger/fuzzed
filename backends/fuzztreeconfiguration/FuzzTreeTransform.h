@@ -3,6 +3,7 @@
 #include <string>
 #include <set>
 #include <iostream>
+#include <fstream>
 
 #include "platform.h"
 #include "FuzzTreeConfiguration.h"
@@ -10,6 +11,8 @@
 // generated model files
 #include "faulttree.h"
 #include "fuzztree.h"
+
+#define DEFAULT_LOG_FILE "errors.txt"
 
 enum ErrorType
 {
@@ -23,9 +26,9 @@ enum ErrorType
 class FuzzTreeTransform
 {
 public:
-	FuzzTreeTransform(const std::string& fuzzTreeXML);
-	FuzzTreeTransform(std::istream& fuzzTreeXML);
-	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft);
+	FuzzTreeTransform(const std::string& fuzzTreeXML, const std::string& logFilePath = DEFAULT_LOG_FILE);
+	FuzzTreeTransform(std::istream& fuzzTreeXML, const std::string& logFilePath = DEFAULT_LOG_FILE);
+	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, const std::string& logFilePath = DEFAULT_LOG_FILE);
 
 	~FuzzTreeTransform();
 
@@ -40,7 +43,7 @@ protected:
 	ErrorType generateVariationFreeFuzzTreeRecursive(
 		const fuzztree::Node* templateNode,
 		fuzztree::Node* node,
-		const FuzzTreeConfiguration& configuration) const;
+		const FuzzTreeConfiguration& configuration);
 
 	static void copyNode(
 		const std::type_info& typeName,
@@ -53,23 +56,23 @@ protected:
 		const fuzztree::ChildNode* templateNode,
 		fuzztree::Node* node,
 		const FuzzTreeConfiguration& configuration,
-		const FuzzTreeConfiguration::id_type& configuredChildId) const;
+		const FuzzTreeConfiguration::id_type& configuredChildId);
 
 	ErrorType expandBasicEventSet(
 		const fuzztree::Node* templateNode,
 		fuzztree::Node* parentNode, 
-		const int& defaultQuantity = 0) const;
+		const int& defaultQuantity = 0);
 
 	ErrorType expandIntermediateEventSet(
 		const fuzztree::Node* templateNode,
 		fuzztree::Node* parentNode,
 		const FuzzTreeConfiguration& configuration,
-		const int& defaultQuantity = 0) const;
+		const int& defaultQuantity = 0);
 	
-	void generateConfigurations(std::vector<FuzzTreeConfiguration>& configurations) const;
+	void generateConfigurations(std::vector<FuzzTreeConfiguration>& configurations);
 	ErrorType generateConfigurationsRecursive(
 		const fuzztree::Node* node, 
-		std::vector<FuzzTreeConfiguration>& configurations) const;
+		std::vector<FuzzTreeConfiguration>& configurations);
 
 	static bool isOptional(const fuzztree::Node& node);
 	static int parseCost(const fuzztree::InclusionVariationPoint& node);
@@ -83,4 +86,6 @@ private:
 
 	int m_count;
 	bool m_bValid;
+
+	std::ofstream m_logFile;
 };
