@@ -160,10 +160,9 @@ def createDjangoSettings(confFile, forDevelopment):
     conf_lines = []
     # Read ip address from Vagrant-generated file
     ip = None
-    if os.path.exists('.vagrantip'):
-        with open('.vagrantip') as f:
-            ip = f.read().rstrip()
-            print 'Using Vagrant IP: ' + ip
+    if socket.getfqdn() == 'precise64':
+        ip = "192.168.33.10"
+        print 'Using Vagrant IP: ' + ip
     if forDevelopment:
         prefixes = ['all', 'development']
     else:

@@ -219,7 +219,7 @@ table {
   img {
     max-width: 100% !important;
   }
-  @page  {
+  @page {
     margin: 2cm .5cm;
   }
   p,
@@ -499,10 +499,8 @@ dd {
 .dl-horizontal dd:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .dl-horizontal dd:after {
   clear: both;
@@ -511,10 +509,8 @@ dd {
 .dl-horizontal dd:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .dl-horizontal dd:after {
   clear: both;
@@ -625,10 +621,8 @@ pre code {
 .container:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .container:after {
   clear: both;
@@ -637,10 +631,8 @@ pre code {
 .container:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .container:after {
   clear: both;
@@ -649,10 +641,8 @@ pre code {
 .row:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .row:after {
   clear: both;
@@ -661,10 +651,8 @@ pre code {
 .row:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .row:after {
   clear: both;
@@ -1167,7 +1155,6 @@ input[type="checkbox"] {
   margin: 4px 0 0;
   margin-top: 1px \9;
   /* IE8-9 */
-
   line-height: normal;
 }
 input[type="file"] {
@@ -1472,10 +1459,8 @@ select.input-small {
 .form-horizontal .form-group:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .form-horizontal .form-group:after {
   clear: both;
@@ -1484,10 +1469,8 @@ select.input-small {
 .form-horizontal .form-group:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .form-horizontal .form-group:after {
   clear: both;
@@ -2127,10 +2110,8 @@ button.close {
 .nav:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .nav:after {
   clear: both;
@@ -2139,10 +2120,8 @@ button.close {
 .nav:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .nav:after {
   clear: both;
@@ -2287,10 +2266,8 @@ button.close {
 .tabbable:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .tabbable:after {
   clear: both;
@@ -2299,10 +2276,8 @@ button.close {
 .tabbable:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .tabbable:after {
   clear: both;
@@ -2341,10 +2316,8 @@ button.close {
 .navbar:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .navbar:after {
   clear: both;
@@ -2353,10 +2326,8 @@ button.close {
 .navbar:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .navbar:after {
   clear: both;
@@ -2648,10 +2619,8 @@ button.close {
 .btn-toolbar:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .btn-toolbar:after {
   clear: both;
@@ -2660,10 +2629,8 @@ button.close {
 .btn-toolbar:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .btn-toolbar:after {
   clear: both;
@@ -2872,10 +2839,8 @@ button.close {
 .pager:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .pager:after {
   clear: both;
@@ -2884,10 +2849,8 @@ button.close {
 .pager:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .pager:after {
   clear: both;
@@ -3015,10 +2978,8 @@ button.close {
 .modal-footer:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .modal-footer:after {
   clear: both;
@@ -3027,10 +2988,8 @@ button.close {
 .modal-footer:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .modal-footer:after {
   clear: both;
@@ -3829,10 +3788,8 @@ a.list-group-item.active > .badge,
 .clearfix:after {
   content: " ";
   /* 1 */
-
   display: table;
   /* 2 */
-
 }
 .clearfix:after {
   clear: both;
@@ -4139,7 +4096,6 @@ i.icon-progress {
 .jsplumb-connector.highlighted {
   z-index: 100;
   /* above selection, below mirror */
-
 }
 .jsplumb-connector.highlighted path {
   stroke: #007fff;
@@ -4229,6 +4185,15 @@ i.icon-progress {
   color: #333;
   text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
 }
+#FuzzEdShapes td #stickyNote {
+  width: 35px;
+  height: 35px;
+  border: 1.4px black solid;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 6px;
+  background-color: #f0f07f;
+}
 /*
  *  Properties Menu
  */
@@ -4280,12 +4245,14 @@ i.icon-progress {
   text-align: center;
   z-index: 100;
   /* above connection */
-
 }
 .fuzzed-node.highlighted path,
 .fuzzed-node.highlighted rect,
 .fuzzed-node.highlighted circle {
   stroke: #007fff !important;
+}
+.fuzzed-node.highlighted .sticky_note {
+  border: solid 2px #007fff !important;
 }
 .fuzzed-node.ui-selected path,
 .fuzzed-node.ui-selecting path,
@@ -4300,6 +4267,12 @@ i.icon-progress {
 .fuzzed-node.ui-selected.highlighted circle,
 .fuzzed-node.ui-selecting.highlighted circle {
   stroke: #f2b138 !important;
+}
+.fuzzed-node.ui-selected .sticky_note,
+.fuzzed-node.ui-selecting .sticky_note,
+.fuzzed-node.ui-selected.highlighted .sticky_note,
+.fuzzed-node.ui-selecting.highlighted .sticky_note {
+  border: solid 2px #f2b138 !important;
 }
 .fuzzed-node.disabled path,
 .fuzzed-node.disabled.ui-selected path,
@@ -4337,14 +4310,12 @@ i.icon-progress {
 }
 .fuzzed-node .fuzzed-node-halo-connect {
   /* XXX: this is a temporary solution */
-
   background-color: #007fff;
   color: white;
   position: absolute;
   visibility: hidden;
   z-index: 150;
   /* above image, TODO: let halo care about that */
-
   cursor: move;
   -webkit-border-radius: 8px;
   -moz-border-radius: 8px;
@@ -4370,7 +4341,6 @@ i.icon-progress {
   margin-bottom: -3px;
   z-index: 110;
   /* above connection */
-
 }
 .fuzzed-node .fuzzed-mirror.fuzzed-mirror-italic {
   font-style: italic;
@@ -4380,6 +4350,26 @@ i.icon-progress {
 }
 .fuzzed-node .fuzzed-mirror.fuzzed-mirror-large {
   font-size: 13px;
+}
+.fuzzed-node .sticky_note {
+  background-color: #f0f07f;
+  padding: 5px;
+  font-family: 'American Typewriter', cursive;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 160px;
+  height: 160px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 101;
+}
+.fuzzed-node .sticky_note textarea {
+  background-color: #f0f07f;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+}
+.fuzzed-node .sticky_note p {
+  padding: 4px;
 }
 #FuzzEdContent {
   position: absolute;
@@ -4446,7 +4436,6 @@ i.icon-progress {
   left: 35%;
   z-index: 9999;
   /*above all*/
-
 }
 #FuzzEdAlertContainer .alert {
   margin-bottom: 10px;

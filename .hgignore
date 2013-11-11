@@ -1,6 +1,4 @@
 syntax: glob
-.vagrantip
-*.sqlite
 *.pyc
 *.orig
 .DS_Store

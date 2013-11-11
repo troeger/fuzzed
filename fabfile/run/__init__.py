@@ -22,11 +22,9 @@ def backend():
 def server():
     '''Runs the server.'''
     ip = None
-    if os.path.exists('.vagrantip'):
-        with open('.vagrantip') as f:
-            ip = f.read().rstrip()
-            print 'Using Vagrant IP: ' + ip
-    if ip:
+    if socket.getfqdn() == 'precise64':
+        ip = "192.168.33.10"
+        print 'Using Vagrant IP: ' + ip
         os.system('./manage.py runserver %s:8000' % ip)
     else:
         os.system('./manage.py runserver')

@@ -14,7 +14,6 @@ cd /home/fuzztrees
 fab bootstrap.dev
 echo ...done.
 echo Building Dev Environment with Vagrant support...
-echo 192.168.33.10 > .vagrantip
 fab build.all
 echo ...done.
 SCRIPT
