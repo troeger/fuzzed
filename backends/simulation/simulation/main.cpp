@@ -3,17 +3,6 @@
 
 using namespace std;
 
-#define DEBUG true
-// This works only under Windows...
-//#define DETECT_MEM_LEAKS true
-
-#ifdef DETECT_MEM_LEAKS
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
-// #include <vld.h>
-#endif
-
 int main(int argc, char** argv)
 {
 	try
@@ -22,7 +11,7 @@ int main(int argc, char** argv)
 	}
 	catch (exception& e)
 	{
-		cout << e.what() << endl;
+		cout << "Exception during Simulation: " << e.what() << endl;
 		return -1;
 	}
 	catch (...)
@@ -30,9 +19,5 @@ int main(int argc, char** argv)
 		cout << "Unknown error in SimulationProxy" << endl;
 		return -1;
 	}
-
-#ifdef DETECT_MEM_LEAKS
-	_CrtDumpMemoryLeaks();
-#endif
 	return 0;
 }

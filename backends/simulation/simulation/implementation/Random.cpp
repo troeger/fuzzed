@@ -77,7 +77,7 @@ RandomNumberGenerator* RandomNumberGenerator::instanceForCurrentThread()
 void RandomNumberGenerator::initGenerators()
 {
 #ifdef OMP_PARALLELIZATION
-	for (int i = 0; i <= std::thread::hardware_concurrency(); ++i)
+	for (unsigned int i = 0; i < std::thread::hardware_concurrency(); ++i)
 		s_generators[i] = new RandomNumberGenerator();
 #endif
 }
@@ -86,7 +86,7 @@ void RandomNumberGenerator::reseed()
 {
 #ifdef OMP_PARALLELIZATION
 	static int k = 0;
-	for (int i = 0; i <= std::thread::hardware_concurrency(); ++i)
+	for (unsigned int i = 0; i < std::thread::hardware_concurrency(); ++i)
 		s_generators[i]->m_generator.seed(++k);
 #endif
 }
