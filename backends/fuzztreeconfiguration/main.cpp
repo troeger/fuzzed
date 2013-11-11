@@ -19,7 +19,18 @@ int main(int argc, char **argv)
 	parser.parseCommandline(argc, argv);
 	const auto inFile	= parser.getInputFilePath().generic_string();
 	const auto outFile	= parser.getOutputFilePath().generic_string();
-	
+	const auto logFile = parser.getLogFilePath().generic_string();
+
+	std::ofstream* logFileStream = new std::ofstream(logFile);
+	*logFileStream << "Analysis errors for " << inFile << std::endl;
+	if (!logFileStream->good())
+	{// create default log file
+		logFileStream = new std::ofstream(
+			parser.getWorkingDirectory().generic_string() +
+			util::slash +
+			"errors.txt");	
+	}
+
 	try
 	{
 		// do the actual transformation, write all files to dirPath
@@ -29,7 +40,7 @@ int main(int argc, char **argv)
 			std::cerr << "Invalid input file: " << inFile << std::endl;
 			return -1;
 		}
-		FuzzTreeTransform transform(instream);
+		FuzzTreeTransform transform(instream, *logFileStream);
 		if (!transform.isValid())
 		{
 			std::cerr << "Could not compute configurations." << std::endl;
