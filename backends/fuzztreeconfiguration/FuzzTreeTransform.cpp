@@ -132,8 +132,10 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			const int from = redundancyNode->start();
 			const int to = redundancyNode->end();
 			if (from < 0 || to < 0 || from > to)
+			{
+				std::cerr << "Invalid Redundancy VP attributes, to: " << to << ", from: " << from << std::endl;
 				return INVALID_ATTRIBUTE;
-
+			}
 			if (from == to) continue;
 
 			const std::string formulaString = redundancyNode->formula();
@@ -179,7 +181,11 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 				for (const auto& featuredChild : featureNode->children())
 					childIds.emplace_back(featuredChild.id());
 
-				if (childIds.empty()) return WRONG_CHILD_NUM;
+				if (childIds.empty())
+				{
+					std::cerr << "FeatureVP without children found: " << id << std::endl;
+					return WRONG_CHILD_NUM;
+				}
 
 				vector<FuzzTreeConfiguration> newConfigs;
 				for (FuzzTreeConfiguration& config : configurations)
@@ -263,8 +269,10 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		if (typeName == *REDUNDANCYVP)
 		{ // TODO: probably this always ends up with a leaf node
 			if (currentChild.children().size() > 1)
+			{
+				std::cerr << "Redundancy VP with multiple children found: " << id << std::endl;
 				return WRONG_CHILD_NUM;
-
+			}
 			const auto& firstChild = currentChild.children().front();
 			const type_info& childTypeName = typeid(firstChild);
 			const auto kOutOfN = configuration.getRedundancyCount(id);
@@ -284,8 +292,11 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 
 				expandIntermediateEventSet(&ies, &votingOrGate, configuration, get<1>(kOutOfN));
 			}
-			else return WRONG_CHILD_TYPE;
-			
+			else
+			{
+				std::cerr << "Unrecognized Child Type: " << typeName.name() << std::endl;
+				return WRONG_CHILD_TYPE;
+			}
 			node->children().push_back(votingOrGate);
 
 			continue; // stop recursion
