@@ -3,8 +3,8 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')
 
 # Determine parameters from command line 
-if len(sys.argv) != 5:
-    logger.error('%s [--eps|--pdf] <working_dir> <input file> <output file>'%sys.argv[0])
+if len(sys.argv) != 6:
+    logger.error('%s [--eps|--pdf] <working_dir> <input file> <output file> <log file>'%sys.argv[0])
     exit(-1)
 kind = sys.argv[1][2:]   
 working_dir = sys.argv[4] 
