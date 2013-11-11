@@ -6,7 +6,8 @@ from graph import Graph
 from south.modelsinspector import add_introspection_rules
 from FuzzEd.models import xml_analysis
 from FuzzEd import settings
-import uuid
+import uuid, json
+
 
 class NativeXmlField(models.Field):
     def db_type(self, connection):
@@ -34,10 +35,6 @@ class Job(models.Model):
         (PDF_RENDERING_JOB, 'PDF rendering job')
     )
 
-    # List of job types that generate files that require a download.
-    # This means their result will not be served directly but rather a URL to it.
-    DOWNLOAD_TYPES = frozenset({EPS_RENDERING_JOB, PDF_RENDERING_JOB})
-
     graph = models.ForeignKey(Graph, null=True, related_name='jobs')
     graph_modified = models.DateTimeField()                                # Detect graph changes during job execution
     secret  = models.CharField(max_length=64, default=gen_uuid)            # Unique secret for this job
@@ -58,9 +55,34 @@ class Job(models.Model):
         return self.exit_code is not None
 
     def requires_download(self):
-        return self.kind in Job.DOWNLOAD_TYPES
+        ''' Indicates if the result should be delivered directly to the frontend
+            as file, or if it must be preprocessed with self.result_rendering().'''
+        return self.kind in [Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB]
 
-    #TODO: Add fetching of result data, either as URL or as XML->JON conversion result
+    def result_rendering(self):
+        ''' Returns the job result as something that the frontend understands.'''
+        json_result = {"errors": {},"warnings": {}}
+        json_config = []
+        assert(self.kind == Job.TOP_EVENT_JOB)
+        assert(self.result)
+        resultdata = ''.join(self.result.readlines())
+        configurations = xml_analysis.CreateFromDocument(resultdata).result
+        # This will move to the right position in an upcoming schema update
+        json_result["decompositionNumber"]=str(configurations[0].decompositionNumber)
+        json_result["timestamp"]=configurations[0].timestamp
+        json_result["validResult"]=str(configurations[0].validResult)
+        for config in configurations:
+            current_config = {}
+            current_config["costs"] = config.configuration.costs
+            json_alphacuts = {}
+            for ac in config.probability.alphaCuts:
+                json_alphacuts[ac.key] = [ac.value_.lowerBound, ac.value_.upperBound]
+            current_config["alphaCuts"] = json_alphacuts
+            current_config["choices"] = {}
+            json_config.append(current_config)
+        json_result["configurations"]=json_config
+        print json.dumps(json_result)
+        return json.dumps(json_result)
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):

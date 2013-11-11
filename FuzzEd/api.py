@@ -522,7 +522,7 @@ def job_status(request, job_id):
                 return HttpResponse(reverse('FuzzEd.api.graph_download', args=(job.graph.pk,)))
             else:
                 # Serve directly
-                return HttpResponse(job.result)
+                return HttpResponse(job.result_rendering())
         else:
             logger.debug("Job is done with non-zero exit code, delivering according HTTP error")
             raise HttpResponseServerErrorAnswer()
