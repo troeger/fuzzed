@@ -14,7 +14,7 @@
         }
         
         .sticky_note{
-          border: solid 2px @theme-highlight;
+          border: solid 2px @theme-highlight !important;
         }
     }
 
@@ -26,7 +26,7 @@
             }
             
             .sticky_note{
-              border: solid 2px @theme-selection;
+              border: solid 2px @theme-selection !important;
             }
         }
     }
@@ -126,6 +126,7 @@
         width:            160px;
         height:           160px;
       	box-shadow:       0 4px 6px rgba(0,0,0,0.1);
+        z-index:101;
                 
         textarea{
             background-color: @sticky_color;
