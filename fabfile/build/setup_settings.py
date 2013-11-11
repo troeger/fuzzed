@@ -109,7 +109,7 @@ AUTHENTICATION_BACKENDS = (
 )
 '''
 
-import ConfigParser, os
+import ConfigParser, os, socket
 
 def configOptions(confFile, sectionPrefixes):
     ''' Parse settings.ini and deliver content.
