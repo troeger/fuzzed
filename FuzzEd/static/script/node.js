@@ -1,6 +1,10 @@
 define(['property', 'mirror', 'canvas', 'class', 'jquery', 'jsplumb'],
 function(Property, Mirror, Canvas, Class) {
     /**
+     * Package: Base
+     */
+
+    /**
      *  Class: {Abstract} Node
      *
      *  This class models the abstract base class for all nodes. It provides basic functionality for CRUD operations,

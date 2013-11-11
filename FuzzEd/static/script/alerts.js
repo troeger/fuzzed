@@ -1,4 +1,7 @@
 define(['config', 'jquery'], function(Config) {
+    /**
+     * Pacakge: Base
+     */
 
     function _showAlert(type, message, description, timeout) {
         var typeClass = type == 'warning' ? '' : 'alert-' + type;

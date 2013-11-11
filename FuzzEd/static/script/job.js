@@ -1,4 +1,7 @@
 define(['class', 'jquery'], function(Class) {
+    /**
+     * Package: Base
+     */
 
     /**
      *  Class: Job

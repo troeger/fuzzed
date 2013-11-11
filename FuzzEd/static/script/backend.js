@@ -1,4 +1,7 @@
 define(['class', 'config', 'job', 'alerts', 'jquery'], function (Class, Config, Job, Alerts) {
+    /**
+     * Package: Base
+     */
 
     /**
      * Class: Backend

@@ -1,4 +1,7 @@
 define(['config', 'class', 'jquery'], function(Config, Class) {
+    /**
+     * Package: Base
+     */
 
     /**
      * Class: Menu

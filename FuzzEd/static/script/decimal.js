@@ -1,5 +1,9 @@
 define(['bignumber'], function(BigNumber) {
     /**
+     * Package: Base
+     */
+
+    /**
      * Group: Members
      *
      * Properties:

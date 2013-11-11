@@ -1,5 +1,4 @@
 define(['class', 'config', 'jquery'], function(Class, Config) {
-
     /**
      *  Package: Base
      */
@@ -9,14 +8,6 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
      *      {RegEx} NUMBER_REGEX     - RegEx for matching all kind of number representations with strings.
      */
     var NUMBER_REGEX = /^[+\-]?(?:0|[1-9]\d*)(?:[.,]\d*)?(?:[eE][+\-]?\d+)?$/;
-
-    /**
-     *  Function: capitalize
-     *      Helper function for capitalizing the first letter of a string.
-     */
-    var capitalize = function(aString) {
-        return aString.charAt(0).toUpperCase() + aString.slice(1);
-    };
 
     /**
      *  Class: Entry
@@ -32,6 +23,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *      {<Property>} property         - The associated <Property> object.
          *      {jQuery Selector} container   - The container element in the property dialog.
          *      {jQuery Selector} inputs      - A selector containing all relevant form elements.
+         *
          *      {boolean} _editing            - A flag that marks this entry as currently beeing edited.
          *      {Object} _preEditValue        - The last valid value stored before editing this entry.
          *      {jQuery Selector} _editTarget - A selector containing the one form element that is currently being edited.

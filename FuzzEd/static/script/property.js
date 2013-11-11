@@ -1,6 +1,14 @@
 define(['class', 'config', 'decimal', 'propertyMenuEntry', 'mirror', 'alerts', 'jquery', 'underscore'],
 function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
+    /**
+     * Package: Base
+     */
 
+    /**
+     *
+     * @param number
+     * @returns {*|boolean}
+     */
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
     };

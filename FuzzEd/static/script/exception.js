@@ -1,3 +1,7 @@
+/**
+ * Package: Base
+ */
+
 function NetworkError(message) {
     var error = Error.apply(this, arguments);
 
