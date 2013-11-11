@@ -5,7 +5,9 @@ import sys, os
 @task
 def backend():
     '''Runs the backend connector daemon, who serves all configured backends.'''
-    backend = Popen(["python","backends/daemon.py","backends/daemon.ini"])
+    os.chdir('backends')
+    backend = Popen(["python","daemon.py","daemon.ini"])
+    os.chdir('..')
     if backend.returncode != None:
         print "Error %u while starting backend daemon"%backend.returncode
         exit(-1)

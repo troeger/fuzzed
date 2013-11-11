@@ -13,3 +13,18 @@ DecomposedFuzzyInterval parse(const fuzztree::DecomposedFuzzyProbability& prob)
 	}
 	return res;
 }
+
+commonTypes::DecomposedFuzzyProbability serialize(const DecomposedFuzzyInterval& interval)
+{
+	commonTypes::DecomposedFuzzyProbability res;
+
+	for (const auto& alphaCut : interval)
+	{
+		const double alpha = alphaCut.first;
+		const NumericInterval& interval = alphaCut.second; 
+		
+		res.alphaCuts().push_back(commonTypes::DoubleToIntervalMap(
+			commonTypes::Interval(interval.lowerBound, interval.upperBound), alpha));
+	}
+	return res;
+}

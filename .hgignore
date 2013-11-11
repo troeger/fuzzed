@@ -1,4 +1,5 @@
 syntax: glob
+.vagrantip
 *.sqlite
 *.pyc
 *.orig
@@ -30,3 +31,16 @@ backends/common/fuzztree.h
 
 
 
+backends/build/*
+backends/common/analysisResult.cpp
+backends/common/simulationResult.h
+backends/common/simulationResult.cpp
+backends/common/configurations.h
+backends/common/configurations.cpp
+backends/common/configurationResult.h
+backends/common/configurationResult.cpp
+backends/common/commonTypes.h
+backends/common/analysisResult.h
+backends/file
+backends/common/commonTypes.cpp
+backends/lib/*

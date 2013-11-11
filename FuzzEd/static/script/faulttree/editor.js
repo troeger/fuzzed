@@ -6,7 +6,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
     /**
      *  Class: CutsetsMenu
-     *
+     *∂DOW
      *  A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
      *  cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
      *
@@ -274,9 +274,10 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Evaluates the job result. Either displays the analysis results or the returned error message.
          *
          *  Parameters:
-         *    {JSON} data - Data returned from the backend containing the result of the calculation.
+         *    {string} data - Data returned from the backend containing the result of the calculation.
          */
         _evaluateResult: function(data) {
+            data = jQuery.parseJSON(data);
             if (typeof data.errors !== 'undefined' && _.size(data.errors) != 0) {
                 // errors is a dictionary with the node ID as key
                 //TODO: display validation result at the node
@@ -760,6 +761,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             this._setupCutsetsAction();
             this._setupAnalyticalAction();
+            this._setupExportPDFAction();
+            this._setupExportEPSAction();
 
             return this._super(readOnly);
         },
@@ -783,6 +786,46 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         },
 
         /**
+         *  Method: _setupExportPDFAction
+         *    Registers the click handler for the 'export PDF document' menu entry.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
+        _setupExportPDFAction: function() {
+            jQuery("#"+this.config.IDs.ACTION_EXPORT_PDF).click(function() {
+                jQuery(document).trigger(
+                    this.config.Events.EDITOR_GRAPH_EXPORT_PDF,
+                    function(url) {
+                        this._downloadFileFromURL(url, 'pdf');
+                    }.bind(this)
+                )
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _setupExportEPSAction
+         *    Registers the click handler for the 'export EPS document' menu entry.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
+        _setupExportEPSAction: function() {
+            jQuery("#"+this.config.IDs.ACTION_EXPORT_EPS).click(function() {
+                jQuery(document).trigger(
+                    this.config.Events.EDITOR_GRAPH_EXPORT_EPS,
+                    function(url) {
+                        this._downloadFileFromURL(url, 'eps');
+                    }.bind(this)
+                )
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
          *  Method: _setupAnalyticalAction
          *    Registers the click handler for the 'analytical analysis' menu entry. Clicking will
          *    issue an asynchronous backend call which returns a <Job> object that can be queried for the final result.
@@ -799,6 +842,19 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             }.bind(this));
 
             return this;
+        },
+
+        /**
+         *  Method: _downloadFileFromURL
+         *    Triggers a download of the given resource. At the moment, it only opens it in the current window.
+         *
+         *  Parameters:
+         *    {String} url - The URL to the file to be downloaded.
+         */
+        _downloadFileFromURL: function(url, format) {
+            //TODO: maybe we can use more sophisticated methods here to get the file to download directly instead
+            //      of opening in the same window
+            window.location = url + '?format=' + format;
         }
     });
 });

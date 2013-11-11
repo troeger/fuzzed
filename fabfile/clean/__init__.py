@@ -30,6 +30,11 @@ def cmake_dirs():
             if name == "CMakeFiles":
                 fullname = os.path.join(root, name)
                 os.system("rm -r "+fullname)
+        for name in files:
+            if name in ["CMakeCache.txt"]:
+                fullname = os.path.join(root, name)
+                os.system("rm -r "+fullname)
+                
 
 @task
 def all():

@@ -3,11 +3,7 @@ FuzzEd
 
 People who contributed to this project so far:
 
-Franz Becker <>
-Markus Götz <>
-Lena Herscheid <>
-Frank Schlegel <>
-Stefan Richter <>
+Markus Götz, Frank Schlegel, Stefan Richter, Franz Becker, Lena Herscheid, Christian Kieschnick
 
 Installation of development machine
 ===================================
@@ -15,8 +11,8 @@ Installation of development machine
 A development machine needs sudo, gcc, Python 2.7 + header files, pip, and Fabric (from PyPI) as minimum starting point. 
 You can install them directly, or use Vagrant to create a Virtual Machine with them from our Vagrantfile.
 
-Running Vagrant for a dev VM
-----------------------------
+Running Vagrant for a dev VM (optional)
+----------------------------------------
 1. Install Vagrant from http://downloads.vagrantup.com/
 2. Install VirtualBox from https://www.virtualbox.org/wiki/Downloads
 3. Run vagrant up
@@ -34,14 +30,17 @@ Install all software dependencies, create the database
 Developing for FuzzEd
 =====================
 
-Compile static stuff and create sync database tables
-----------------------------------------------------
+Compile static stuff 
+--------------------
 > fab build.all
+
+Synchronize local database with current model
+---------------------------------------------
 > ./manage.py syncdb --migrate
 
 Run development web server
 --------------------------
-> ./manage.py runserver
+> fab run.server
 
 Run backend services
 --------------------

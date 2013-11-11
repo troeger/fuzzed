@@ -179,10 +179,15 @@ def build_xmlschema_wrappers():
 
         if os.path.exists(path_name):
             os.remove(path_name)
-    if os.system('pyxbgen%s --binding-root=FuzzEd/models/ -u %sFuzzEd/static/xsd/analysis.xsd '
-                 '-m xml_analysis -u %sFuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree -u %sFuzzEd/static/xsd/faulttree.xsd -m xml_faulttree'
-                 % (FILE_EXTENSION, FILE_PREFIX, FILE_PREFIX, FILE_PREFIX,)) != 0:
-        raise Exception('Execution of pyxbgen failed.\nTry "sudo setup.py test" for installing all dependencies.')
+    if os.system('pyxbgen%(extension)s --binding-root=FuzzEd/models/'
+                            '-u %(prefix)sFuzzEd/static/xsd/analysis.xsd -m xml_analysis'
+                            '-u %(prefix)sFuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree'
+                            '-u %(prefix)sFuzzEd/static/xsd/faulttree.xsd -m xml_faulttree'
+                            '-u %(prefix)sFuzzEd/static/xsd/commonTypes.xsd -m xml_common'
+                            '-u %(prefix)sFuzzEd/static/xsd/configurations.xsd -m xml_configurations'
+                            '-u %(prefix)sFuzzEd/static/xsd/configurationResult.xsd -m xml_conf_result'
+                 % {'extension': FILE_EXTENSION, 'prefix': FILE_PREFIX}) != 0:
+        raise Exception('Execution of pyxbgen failed.')
 
 @task
 def xmlschemas():
@@ -227,7 +232,7 @@ def build_analysis_server_java():
     os.chdir(current)
 
 @task
-def backend_servers():
+def backends():
     '''Builds configuration and analysis server with CMAKE / C++11 compiler.'''
     print 'Building backend servers ...'
     current = os.getcwd()
@@ -235,19 +240,25 @@ def backend_servers():
     if os.path.isfile("CMakeCache.txt"):
         os.system("rm CMakeCache.txt")
     if platform.system() == "Darwin":
-        os.system("cmake . ")
+        os.system("cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 .")
     else:
-        os.system("cmake . -DCMAKE_CXX_COMPILER=/usr/bin/gcc-4.7")
+        os.system("cmake .")
     os.system('make all')
     os.chdir(current)
+
+@task
+def css():
+    '''Builds the CSS files for the project with lessc.'''
+    os.system('lessc FuzzEd/static/less/theme/white/theme.less FuzzEd/static/css/theme/white.css')
 
 @task()
 def all():
     '''Builds all.'''
+    css()
     shapes()
     xmlschemas()
     naturaldocs()
     notations()
     configs()
-    #backend_servers()    
+    backends()    
 

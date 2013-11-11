@@ -67,8 +67,12 @@ int util::fileSize(const char* filename)
 
 string util::timeStamp()
 {
-	const int time = (int)duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-	return util::toString(time);
+	time_t t;
+	time(&t);
+
+	std::stringstream strm;
+	strm << t;
+	return strm.str();
 }
 
 long double util::kOutOfN(long double rate, int k, int N)
@@ -193,4 +197,18 @@ double util::probabilityFromRate(double rate, int missionTime)
 bool util::bitSet(const int var, const int pos)
 {
 	return (var) & (1<<(pos));
+}
+
+bool util::isWritable(const string& path)
+{
+	FILE *fp = fopen(path.c_str(), "w");
+	if (fp == nullptr)
+	{
+		if (errno == EACCES)
+			std::cerr << "Permission denied" << std::endl;
+		else
+			std::cerr << "Something went wrong: " << strerror(errno) << std::endl;
+		return false;
+	}
+	return true;
 }

@@ -21,7 +21,7 @@ using namespace std;
 
 inline void exit_error(std::string s)
 {
-	std::cout << s << std::endl; 
+	std::cerr << s << std::endl; 
 	exit(-1);
 }
 
@@ -78,6 +78,8 @@ namespace util
 	int countFiles(const string& path, const string& extension = "");
 
 	void clearDirectory(const string& dir); // remove all files from dir
+
+	bool isWritable(const string& path);
 
 	/************************************************************************/
 	/* Maths                                                                */
