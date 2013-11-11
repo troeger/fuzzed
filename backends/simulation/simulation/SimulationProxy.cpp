@@ -22,6 +22,8 @@
 #include "fuzztree.h"
 #include "simulationResult.h"
 
+#include <xsd/cxx/xml/dom/serialization-header.hxx>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/foreach.hpp>
@@ -130,77 +132,6 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 	return res;
 }
 
-void SimulationProxy::parseCommandline(int numArguments, char** arguments)
-{
-	string directoryName, filePath;
-	bool useTimeNET;
-	int confidence;
-	float epsilon;
-
-	m_options.add_options()
-		("help,h", "produce help message")
-		("TN",			po::value<bool>(&useTimeNET)->default_value(false),									"Use TimeNET simulation")
-		("file,f",		po::value<string>(&filePath),														"Path to FuzzTree or PNML file")
-		("dir,d",		po::value<string>(&directoryName),													"Directory containing FuzzTree or PNML files")
-		("time,t",		po::value<unsigned int>(&m_simulationTime)->default_value(DEFAULT_SIMULATION_TIME),	"Maximum Simulation Time in milliseconds")
-		("steps,s",		po::value<unsigned int>(&m_missionTime)->default_value(DEFAULT_SIMULATION_STEPS),	"Number of Simulation Steps")
-		("rounds,r",	po::value<unsigned int>(&m_numRounds)->default_value(DEFAULT_SIMULATION_ROUNDS),	"Number of Simulation Rounds")
-		("conf",		po::value<int>(&confidence)->default_value(DEFAULT_CONFIDENCE),						"Confidence level (TimeNET only)")
-		("epsilon,e",	po::value<float>(&epsilon)->default_value(DEFAULT_EPSILON),							"Epsilon (TimeNET only)")
-		("MTTF",		po::value<bool>(&m_bSimulateUntilFailure)->default_value(true),						"Simulate each Round until System Failure, necessary for MTTF")
-		("converge,c",	po::value<double>(&m_convergenceThresh)->default_value((double)0.0000),				"Cancel simulation after the resulting reliability differs in less than this threshold");
-
-	po::variables_map optionsMap;
-	po::store(po::parse_command_line(numArguments, arguments, m_options), optionsMap);
-	po::notify(optionsMap);
-
-	if (optionsMap.count("help")) 
-	{
-		cout << m_options << endl;
-		return;
-	}
-
-	if (useTimeNET)
-	{
-		m_timeNetProperties = new TimeNETProperties();
-		m_timeNetProperties->filePath = filePath;
-		m_timeNetProperties->seed = rand();
-		m_timeNetProperties->confLevel = confidence;
-		m_timeNetProperties->epsilon = epsilon;
-	}
-
-	const bool bDir = optionsMap.count("dir") > 0;
-	const bool bFile = optionsMap.count("file") > 0;
-	if (!bDir && !bFile)
-	{
-		cout << "Please specify either a directory or a file" << endl;
-		cout << m_options << endl;
-		return;
-	}
-
-	if (bDir)
-	{
-		const auto dirPath = fs::path(directoryName.c_str());
-		if (!is_directory(dirPath))
-			throw runtime_error("Not a directory: " + directoryName);
-
-		fs::directory_iterator it(dirPath), eod;
-		BOOST_FOREACH(fs::path const &p, std::make_pair(it, eod))   
-		{
-			if (is_regular_file(p) && acceptFileExtension(p))
-				simulateFile(p, useTimeNET ? TIMENET : DEFAULT);
-		}
-	}
-	else if (bFile)
-	{
-		const auto fPath = fs::path(filePath.c_str());
-		if (!is_regular_file(fPath))
-			throw runtime_error("Not a file: " + filePath);
-
-		simulateFile(fPath, useTimeNET ? TIMENET : DEFAULT);
-	}
-}
-
 void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl)
 {	
 	auto ext = p.generic_string();
@@ -268,7 +199,6 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 	case STRUCTUREFORMULA_ONLY:
 		auto TNdoc = std::shared_ptr<TNDocument>(new TNDocument());
 		ft->serializeTimeNet(TNdoc);
-		// std::cout << ft->serializeAsFormula(TNdoc) << endl; // TODO: provide a StructureFormulaResultDocument
 		doc = TNdoc;
 		break;
 	}
@@ -349,9 +279,11 @@ void SimulationProxy::simulateAllConfigurations(
 			simResults.result().push_back(r);
 		}
 	}
-
+	xml_schema::NamespaceInfomap map;
+	map["simulationResults"].name = "sr";
+	
 	std::ofstream output(outputFile.generic_string());
-	simulationResults::simulationResults(output, simResults);
+	simulationResults::simulationResults(output, simResults, map, "UTF-8");
 }
 
 void SimulationProxy::parseCommandline_default(int numArguments, char** arguments)

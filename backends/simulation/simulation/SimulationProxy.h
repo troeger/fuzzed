@@ -69,8 +69,6 @@ public:
 	void parseCommandline_default(int numArguments, char** arguments);
 
 protected:
-	void parseCommandline(int numArguments, char** arguments);
-	
 	SimulationResultStruct runSimulationInternal(
 		const boost::filesystem::path& inPath,
 		const boost::filesystem::path& outPath,

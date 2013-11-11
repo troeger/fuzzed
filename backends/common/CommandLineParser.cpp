@@ -43,7 +43,7 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 		std::cerr << "Faulty command line options. Use [program_name] [inputfile] [outputfile] [workingdirectory]" << std::endl;
 		exit(-1);
 	}
-	std::string outFile, inFile, workingDirectory;
+	std::string outFile, inFile, workingDirectory, logFile;
 	inFile				= arguments[1];
 	outFile				= arguments[2];
 	workingDirectory	= arguments[3];
@@ -68,6 +68,16 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 		exit(-1);
 	}
 
+	if (numArguments >= 5)
+	{
+		logFile = arguments[5];
+		if (!util::isWritable(logFile))
+		{
+			std::cerr << "Log File not writable " << logFile << std::endl;
+			exit(-1);
+		}
+		else m_logFilePath	= fs::path(logFile.c_str());
+	}
 	int i = 3;
 	while (++i < numArguments)
 		m_additionalArguments.emplace_back(arguments[i]);
@@ -91,4 +101,9 @@ const boost::filesystem::path& CommandLineParser::getWorkingDirectory() const
 const std::vector<std::string>& CommandLineParser::getAdditionalArguments() const
 {
 	return m_additionalArguments;
+}
+
+const boost::filesystem::path& CommandLineParser::getLogFilePath() const
+{
+	return m_logFilePath;
 }
