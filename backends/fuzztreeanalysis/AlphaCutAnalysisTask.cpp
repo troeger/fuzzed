@@ -21,8 +21,8 @@ namespace
 }
 
 
-AlphaCutAnalysisTask::AlphaCutAnalysisTask(const TopEvent* topEvent, const double alpha)
-	: m_tree(topEvent), m_alpha(alpha)
+AlphaCutAnalysisTask::AlphaCutAnalysisTask(const TopEvent* topEvent, const double alpha, std::ofstream& logfile)
+	: m_tree(topEvent), m_alpha(alpha), m_logFile(logfile)
 {}
 
 std::future<AlphaCutAnalysisResult> AlphaCutAnalysisTask::run()
@@ -70,6 +70,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		}
 		else
 		{
+			m_logFile << "Unexpected probability type: " << probType.name() << std::endl;
+			
 			assert(false);
 			return NumericInterval();
 		}
@@ -78,6 +80,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	{
 		// the java code handled this, so the event sets were not expanded by the configuration
 		// the C++ configuration code already expands event sets
+		m_logFile << "Unexpected Event Set (they should have been removed by configuration): " << typeName.name() << std::endl;
+		
 		assert(false);
 	}
 	else if (typeName == *HOUSEEVENT)
@@ -87,12 +91,17 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	}
 	else if (typeName == *UNDEVELOPEDEVENT)
 	{
+		m_logFile << "Found Undeveloped Event, ID: " << node.id() << std::endl;
+
 		throw runtime_error(UNDEVELOPED_ERROR);
 		return NumericInterval();
 	}
 	else if (typeName == *INTERMEDIATEEVENT)
 	{
 		assert(node.children().size() == 1);
+		if (node.children().size() != 1)
+			m_logFile << "Intermediate Event size != 1, ID: " << node.id() << std::endl;
+
 		return analyzeRecursive(node.children().front());
 	}
 	

@@ -64,9 +64,7 @@ FuzzTreeTransform::FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, std::
 }
 
 FuzzTreeTransform::~FuzzTreeTransform()
-{
-	m_logFile.close();
-}
+{}
 
 bool FuzzTreeTransform::isOptional(const fuzztree::Node& node)
 {

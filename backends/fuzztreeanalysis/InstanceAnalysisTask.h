@@ -13,7 +13,11 @@ typedef DecomposedFuzzyInterval InstanceAnalysisResult;
 class InstanceAnalysisTask
 {
 public:
-	InstanceAnalysisTask(fuzztree::TopEvent* tree, unsigned int decompositionNumber);
+	InstanceAnalysisTask(
+		fuzztree::TopEvent* tree,
+		unsigned int decompositionNumber,
+		std::ofstream& logfile);
+
 	InstanceAnalysisResult compute();
 	
 	// static void serializeResult(const InstanceAnalysisResult& res, pugi::xml_document doc);
@@ -21,4 +25,6 @@ public:
 protected:
 	fuzztree::TopEvent* m_tree;
 	unsigned int m_decompositionNumber;
+
+	std::ofstream& m_logFile;
 };

@@ -19,16 +19,22 @@ int main(int argc, char** argv)
 	const auto outFile = parser.getOutputFilePath().generic_string();
 	const auto logFile = parser.getLogFilePath().generic_string();
 
-	std::ofstream logFileStream(logFile);
-	logFileStream << "Analysis errors for " << inFile << std::endl;
-	const bool logging = logFileStream.good();
+	std::ofstream* logFileStream = new std::ofstream(logFile);
+	*logFileStream << "Analysis errors for " << inFile << std::endl;
+	if (!logFileStream->good())
+	{// create default log file
+		logFileStream = new std::ofstream(
+			parser.getWorkingDirectory().generic_string() +
+			util::slash +
+			"errors.txt");	
+	}
 
 	try
 	{
 		std::ifstream instream(inFile);
 		if (!instream.good())
 		{
-			logging ? logFileStream : std::cerr << "Invalid input file: " << inFile << std::endl;
+			*logFileStream << "Invalid input file: " << inFile << std::endl;
 			return -1;
 		}
 		auto tree = fuzztree::fuzzTree(instream, xml_schema::Flags::dont_validate);
@@ -41,17 +47,17 @@ int main(int argc, char** argv)
 
 		analysisResults::AnalysisResults analysisResults;
 
-		FuzzTreeTransform tf = logging ? FuzzTreeTransform(tree, logFileStream) : FuzzTreeTransform(tree);
+		FuzzTreeTransform tf = FuzzTreeTransform(tree, *logFileStream);
 		if (!tf.isValid())
 		{
-			logging ? logFileStream : std::cerr << "Could not compute configurations." << std::endl;
+			*logFileStream << "Could not compute configurations." << std::endl;
 			return -1;
 		}
 		
 		for (const auto& t : tf.transform())
 		{
 			auto topEvent = fuzztree::TopEvent(t.second.topEvent());
-			InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, decompositionNumber);
+			InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, decompositionNumber, *logFileStream);
 			const auto result = analysis->compute();
 
 			analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
@@ -64,14 +70,17 @@ int main(int argc, char** argv)
 	}
 	catch (const std::exception& e)
 	{
-		logging ? logFileStream : std::cerr << "Exception while trying to analyze " << inFile << e.what() << std::endl;
+		*logFileStream << "Exception while trying to analyze " << inFile << e.what() << std::endl;
 		return -1;
 	}
 	catch (...)
 	{
-		std::cerr << "Exception while trying to analyze " << inFile << std::endl;
+		*logFileStream << "Exception while trying to analyze " << inFile << std::endl;
 		return -1;
 	}
+	
+	logFileStream->close();
+	delete logFileStream;
 
 	return 0;
 }
