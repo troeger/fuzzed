@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 
 		analysisResults::AnalysisResults analysisResults;
 
-		FuzzTreeTransform tf = FuzzTreeTransform(tree, *logFileStream);
+		FuzzTreeTransform tf(tree, *logFileStream);
 		if (!tf.isValid())
 		{
 			*logFileStream << "Could not compute configurations." << std::endl;
