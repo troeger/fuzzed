@@ -226,7 +226,7 @@ void SimulationProxy::simulateAllConfigurations(
 
 	simulationResults::SimulationResults simResults;
 
-	FuzzTreeTransform ftTransform(file);
+	FuzzTreeTransform ftTransform(file, std::ofstream("errors.txt")); // TODO correct stream
 	if (!ftTransform.isValid())
 	{
 		const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
