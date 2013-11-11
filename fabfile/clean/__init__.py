@@ -6,11 +6,10 @@ def docs():
     '''Cleans generated source code documentation.'''     
     os.system('rm -rf docs')
 
-@task
-def build_garbage():
-    '''Cleans build files, including packages in /dist.'''     
-    os.system('rm -rf build')
-    os.system('rm -rf dist')
+@task 
+def gen_files():
+    '''Cleans generated files produced by some of the build.all tasks.'''
+    os.system('rm FuzzEd/models/xml_*.py')
     os.system('rm -rf FuzzEd/static-release')
 
 @task
@@ -40,7 +39,7 @@ def cmake_dirs():
 def all():
     '''Cleans all.'''    
     docs()
-    build_garbage()
+    gen_files()
     pycs()
     cmake_dirs()
 
