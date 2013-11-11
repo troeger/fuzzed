@@ -104,7 +104,7 @@ def server():
                                             tmpfile.name, 
                                             tmpdir+os.sep+backends[notify.channel]['output'],
                                             tmpdir,
-                                            tmpdir+os.sep+backends[notify.channel]['log_file'])
+                                            backends[notify.channel]['log_file'])
                     logger.info("Running "+cmd)
                     exit_code = os.system(cmd)
                     if exit_code == 0:
