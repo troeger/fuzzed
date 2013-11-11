@@ -43,14 +43,18 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 		std::cerr << "Faulty command line options. Use [program_name] [inputfile] [outputfile] [workingdirectory]" << std::endl;
 		exit(-1);
 	}
-	std::string outFile, inFile, workingDirectory;
+	std::string outFile, inFile, workingDirectory, logFile;
 	inFile				= arguments[1];
 	outFile				= arguments[2];
 	workingDirectory	= arguments[3];
 
+	if (numArguments >= 5)
+		logFile = arguments[4];
+
 	m_outFilePath	= fs::path(outFile.c_str());
 	m_inFilePath	= fs::path(inFile.c_str());
 	m_workingDir	= fs::path(workingDirectory.c_str());
+	m_logFilePath	= fs::path(logFile.c_str());
 
 	if (!util::isWritable(outFile))
 	{ // TODO: find out write permissions. not featured by Boost 1.48.
@@ -60,6 +64,11 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 	else if (!fs::is_regular_file(m_inFilePath))
 	{
 		std::cerr << "Not a valid file name: " << inFile << std::endl;
+		exit(-1);
+	}
+	else if (!util::isWritable(logFile))
+	{
+		std::cerr << "Log File not writable " << logFile << std::endl;
 		exit(-1);
 	}
 	else if (!fs::is_directory(m_workingDir) || !util::isWritable(workingDirectory + util::slash + "foo"))
@@ -91,4 +100,9 @@ const boost::filesystem::path& CommandLineParser::getWorkingDirectory() const
 const std::vector<std::string>& CommandLineParser::getAdditionalArguments() const
 {
 	return m_additionalArguments;
+}
+
+const boost::filesystem::path& CommandLineParser::getLogFilePath() const
+{
+	return m_logFilePath;
 }
