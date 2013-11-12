@@ -126,14 +126,16 @@ set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
 ############### XSD COMPILER ############
 #########################################
 
+set(XSD_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../FuzzEd/static/xsd")
+
 set(XSD_GENERATED_TREE_FILES
 	${COMMON_DIR}/fuzztree.h
 	${COMMON_DIR}/faulttree.h
 	${COMMON_DIR}/fuzztree.cpp
 	${COMMON_DIR}/faulttree.cpp)
 
-set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faulttree.xsd")
-set(FUZZTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/fuzztree.xsd")
+set(FAULTTREE_XSD "${XSD_FILE_PATH}/faulttree.xsd")
+set(FUZZTREE_XSD  "${XSD_FILE_PATH}/fuzztree.xsd")
 set(TREE_SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
 
 ########### FAULT TREE MODEL ############
@@ -180,11 +182,11 @@ set(XSD_GENERATED_RESULT_FILES
 	${COMMON_DIR}/commonTypes.cpp
 	${COMMON_DIR}/configurations.cpp)
 
-set(ANALYSIS_RESULT_XSD			"${CMAKE_CURRENT_SOURCE_DIR}/xml/analysisResult.xsd")
-set(SIMULATION_RESULT_XSD		"${CMAKE_CURRENT_SOURCE_DIR}/xml/simulationResult.xsd")
-set(CONFIGURATION_RESULT_XSD	"${CMAKE_CURRENT_SOURCE_DIR}/xml/configurationResult.xsd")
-set(COMMON_TYPES_XSD			"${CMAKE_CURRENT_SOURCE_DIR}/xml/commonTypes.xsd")
-set(CONFIGURATION_XSD			"${CMAKE_CURRENT_SOURCE_DIR}/xml/configurations.xsd")
+set(ANALYSIS_RESULT_XSD			"${XSD_FILE_PATH}/analysisResult.xsd")
+set(SIMULATION_RESULT_XSD		"${XSD_FILE_PATH}/simulationResult.xsd")
+set(CONFIGURATION_RESULT_XSD	"${XSD_FILE_PATH}/configurationResult.xsd")
+set(COMMON_TYPES_XSD			"${XSD_FILE_PATH}/commonTypes.xsd")
+set(CONFIGURATION_XSD			"${XSD_FILE_PATH}/configurations.xsd")
 
 set(XSD_RESULT_ARGS
 	--include-with-brackets #include with <> instead of ""
