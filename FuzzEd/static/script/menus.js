@@ -235,7 +235,7 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         },
 
         /**
-         * 
+         *
          * @returns {Menu}
          */
         minimize: function() {

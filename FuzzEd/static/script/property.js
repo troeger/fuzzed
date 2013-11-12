@@ -5,9 +5,15 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
      */
 
     /**
+     * Function: isNumber
      *
-     * @param number
-     * @returns {*|boolean}
+     * Small helper function that checks the parameter for being a number and not 'NaN'.
+     *
+     * Parameters:
+     *   {Object} number - object to be checked for being a number
+     *
+     * Returns:
+     *   A boolean indicating whether the passed parameter is a number.
      */
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
@@ -171,7 +177,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         _triggerChange: function(value, issuer) {
             var index = -1;
-            for (var i = this.values.length - 1; i >=0; i--) {
+            for (var i = this.values.length - 1; i >=0; --i) {
                 if (_.isEqual(this.values[i], value)) {
                     index = i;
                     break;
