@@ -180,7 +180,7 @@ def build_xmlschema_wrappers():
         if os.path.exists(path_name):
             os.remove(path_name)
     if os.system('pyxbgen%(extension)s --binding-root=FuzzEd/models/ '
-                            ' -u %(prefix)sFuzzEd/static/xsd/analysis.xsd -m xml_analysis'
+                            ' -u %(prefix)sFuzzEd/static/xsd/analysisResult.xsd -m xml_analysis'
                             ' -u %(prefix)sFuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree'
                             ' -u %(prefix)sFuzzEd/static/xsd/faulttree.xsd -m xml_faulttree'
                             ' -u %(prefix)sFuzzEd/static/xsd/commonTypes.xsd -m xml_common'
