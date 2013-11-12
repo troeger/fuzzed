@@ -136,7 +136,6 @@ set(XSD_GENERATED_TREE_FILES
 
 set(FAULTTREE_XSD "${XSD_FILE_PATH}/faulttree.xsd")
 set(FUZZTREE_XSD  "${XSD_FILE_PATH}/fuzztree.xsd")
-set(TREE_SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
 
 ########### FAULT TREE MODEL ############
 
@@ -271,6 +270,7 @@ set(COMMON_SOURCES
 	${COMMON_DIR}/commonTypes.cpp
 	${COMMON_DIR}/configurations.cpp
 	${COMMON_DIR}/CommandLineParser.cpp
+	${COMMON_DIR}/FuzzTreeToFaultTree.cpp
 )
 
 set(COMMON_HEADERS
@@ -287,6 +287,7 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/commonTypes.h
 	${COMMON_DIR}/configurations.h
 	${COMMON_DIR}/CommandLineParser.h
+	${COMMON_DIR}/FuzzTreeToFaultTree.h
 )
 
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
