@@ -29,3 +29,4 @@ void convertFuzzTreeRecursive(
 	std::shared_ptr<FaultTreeNode> node,
 	const fuzztree::Node& templateNode,
 	const unsigned int& missionTime);
+

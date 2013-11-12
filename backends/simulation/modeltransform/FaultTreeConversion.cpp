@@ -15,7 +15,7 @@ using std::make_shared;
 
 std::shared_ptr<TopLevelEvent> fromGeneratedFaultTree(const faulttree::TopEvent& generatedTree)
 {
-	unsigned int mt = DEFAULT_MISSION_TIME; // TODO
+	unsigned int mt = DEFAULT_MISSION_TIME;
 	if (generatedTree.missionTime().present())
 		mt = generatedTree.missionTime().get();
 
@@ -126,7 +126,7 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 
 std::shared_ptr<TopLevelEvent> fromGeneratedFuzzTree(const fuzztree::TopEvent& generatedTree)
 {
-	unsigned int mt = DEFAULT_MISSION_TIME; // TODO
+	unsigned int mt = DEFAULT_MISSION_TIME;
 	if (generatedTree.missionTime().present())
 		mt = generatedTree.missionTime().get();
 
