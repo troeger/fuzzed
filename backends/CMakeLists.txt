@@ -23,6 +23,8 @@ SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
+# Get some symbold for GDB
+SET (CMAKE_BUILD_TYPE Debug)
 
 ############################################################################
 # Platform-specific compilation behavior

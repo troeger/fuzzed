@@ -70,7 +70,7 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 
 	if (numArguments >= 5)
 	{
-		logFile = arguments[5];
+		logFile = arguments[4];
 		if (!util::isWritable(logFile))
 		{
 			std::cerr << "Log File not writable " << logFile << std::endl;
