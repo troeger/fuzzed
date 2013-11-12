@@ -556,6 +556,8 @@ def job_files(request, job_secret):
             job.result = request.FILES.values()[0]
             job.exit_code = 0       # This saves as a roundtrip. Having files means everything is ok.
             job.save()
+            if not job.requires_download():
+                logger.debug(''.join(job.result.readlines()))
             return HttpResponse()        
 
 @csrf_exempt

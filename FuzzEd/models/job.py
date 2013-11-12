@@ -2,12 +2,16 @@ from django.db import models, connection, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.urlresolvers import reverse
+from django.core.mail import mail_managers
 from graph import Graph
 from south.modelsinspector import add_introspection_rules
 from FuzzEd.models import xml_analysis
 from FuzzEd import settings
+from FuzzEd.middleware import HttpResponseServerErrorAnswer
 import uuid, json
 
+import logging
+logger = logging.getLogger('FuzzEd')
 
 class NativeXmlField(models.Field):
     def db_type(self, connection):
@@ -63,26 +67,32 @@ class Job(models.Model):
         ''' Returns the job result as something that the frontend understands.'''
         json_result = {"errors": {},"warnings": {}}
         json_config = []
-        assert(self.kind == Job.TOP_EVENT_JOB)
-        assert(self.result)
-        resultdata = ''.join(self.result.readlines())
-        configurations = xml_analysis.CreateFromDocument(resultdata).result
-        # This will move to the right position in an upcoming schema update
-        json_result["decompositionNumber"]=str(configurations[0].decompositionNumber)
-        json_result["timestamp"]=configurations[0].timestamp
-        json_result["validResult"]=str(configurations[0].validResult)
-        for config in configurations:
-            current_config = {}
-            current_config["costs"] = config.configuration.costs
-            json_alphacuts = {}
-            for ac in config.probability.alphaCuts:
-                json_alphacuts[ac.key] = [ac.value_.lowerBound, ac.value_.upperBound]
-            current_config["alphaCuts"] = json_alphacuts
-            current_config["choices"] = {}
-            json_config.append(current_config)
-        json_result["configurations"]=json_config
-        print json.dumps(json_result)
-        return json.dumps(json_result)
+        try:
+            assert(self.kind == Job.TOP_EVENT_JOB)
+            assert(self.result)
+            resultdata = ''.join(self.result.readlines())
+            configurations = xml_analysis.CreateFromDocument(resultdata).result
+            # This will move to the right position in an upcoming schema update
+            json_result["decompositionNumber"]=str(configurations[0].decompositionNumber)
+            json_result["timestamp"]=configurations[0].timestamp
+            json_result["validResult"]=str(configurations[0].validResult)
+            for config in configurations:
+                current_config = {}
+                current_config["costs"] = config.configuration.costs
+                json_alphacuts = {}
+                for ac in config.probability.alphaCuts:
+                    json_alphacuts[ac.key] = [ac.value_.lowerBound, ac.value_.upperBound]
+                current_config["alphaCuts"] = json_alphacuts
+                current_config["choices"] = {}
+                json_config.append(current_config)
+            json_result["configurations"]=json_config
+            returndata = json.dumps(json_result)
+            logger.debug("Returning result JSON to frontend:\n"+returndata) 
+            return returndata
+        except Exception as e:
+            mail_managers("Error on analysis result XML->JSON conversion",str(resultdata)+"\n\n"+str(e))
+            raise HttpResponseServerErrorAnswer()
+
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):

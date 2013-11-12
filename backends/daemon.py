@@ -122,8 +122,8 @@ def server():
                         urllib2.urlopen(request)                  
                     else:
                         logger.error("Error on execution: Exit code "+str(exit_code))  
-                        logger.error("Saving input file for later reference: /tmp/lasterror.input")
-                        os.system("cp %s /tmp/lasterror.input"%tmpfile.name)
+                        logger.error("Saving input file for later reference: /tmp/lastinput.xml")
+                        os.system("cp %s /tmp/lastinput.xml"%tmpfile.name)
                         report_problem(joburl, exit_code)
                 except Exception as e:
                     logger.debug('Exception, delivering -1 exit code to frontend: '+str(e))
