@@ -7,6 +7,7 @@
 #include <fstream>
 
 #include "CommandLineParser.h"
+#include "FuzzTreeToFaultTree.h"
 #include "util.h"
 #include "xmlutil.h"
 #include "analysisResult.h"
@@ -39,20 +40,36 @@ int main(int argc, char** argv)
 		}
 
 		analysisResults::AnalysisResults analysisResults;
-
+		
 		FuzzTreeTransform tf(instream, *logFileStream);
 		if (!tf.isValid())
 		{ // handle faulttree
-			throw "todo";
+			instream.seekg(0);
+			const auto faultTree = faulttree::faultTree(instream, xml_schema::Flags::dont_validate);
+			const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent());
+
+			const auto modelId = faultTree->id();
+			const unsigned int decompositionNumber = 
+				topEvent->decompositionNumber().present() ? 
+				topEvent->decompositionNumber().get() : 
+				DEFAULT_DECOMPOSITION_NUMBER;
+
+			InstanceAnalysisTask* analysis = new InstanceAnalysisTask(topEvent.get(), decompositionNumber, *logFileStream);
+			const auto result = analysis->compute();
+
+			analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+			r.probability(serialize(result));
+			analysisResults.result().push_back(r);
 		}
 		else
 		{ // handle fuzztree
-			unsigned int decompositionNumber = DEFAULT_DECOMPOSITION_NUMBER;
-			
 			const auto tree = tf.getFuzzTree();
 			const auto modelId = tree->id();
-			if (tree->topEvent().decompositionNumber().present())
-				decompositionNumber = tree->topEvent().decompositionNumber().get();
+			
+			const unsigned int decompositionNumber = 
+				tree->topEvent().decompositionNumber().present() ? 
+					tree->topEvent().decompositionNumber().get() : 
+					DEFAULT_DECOMPOSITION_NUMBER;
 
 			for (const auto& t : tf.transform())
 			{
@@ -69,6 +86,11 @@ int main(int argc, char** argv)
 
 		std::ofstream output(outFile);
 		analysisResults::analysisResults(output, analysisResults);
+	}
+	catch (const xml_schema::Exception& e)
+	{
+		*logFileStream << "Exception while trying to analyze " << inFile << e.what() << std::endl;
+		return -1;
 	}
 	catch (const std::exception& e)
 	{

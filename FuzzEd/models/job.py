@@ -78,7 +78,8 @@ class Job(models.Model):
             json_result["validResult"]=str(configurations[0].validResult)
             for config in configurations:
                 current_config = {}
-                current_config["costs"] = config.configuration.costs
+                if hasattr(config.configuration, "costs"):
+                    current_config["costs"] = config.configuration.costs
                 json_alphacuts = {}
                 for ac in config.probability.alphaCuts:
                     json_alphacuts[ac.key] = [ac.value_.lowerBound, ac.value_.upperBound]
