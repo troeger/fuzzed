@@ -38,6 +38,8 @@ public:
 
 	bool isValid() const { return m_bValid; }
 
+	const fuzztree::FuzzTree* const getFuzzTree() const { return m_fuzzTree.get(); }
+
 protected:
 	fuzztree::FuzzTree generateVariationFreeFuzzTree(const FuzzTreeConfiguration& configuration);
 	ErrorType generateVariationFreeFuzzTreeRecursive(

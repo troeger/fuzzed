@@ -37,34 +37,36 @@ int main(int argc, char** argv)
 			*logFileStream << "Invalid input file: " << inFile << std::endl;
 			return -1;
 		}
-		auto tree = fuzztree::fuzzTree(instream, xml_schema::Flags::dont_validate);
-
-		unsigned int decompositionNumber = DEFAULT_DECOMPOSITION_NUMBER;
-		if (tree->topEvent().decompositionNumber().present())
-			decompositionNumber = tree->topEvent().decompositionNumber().get();
-
-		const auto modelId = tree->id();
 
 		analysisResults::AnalysisResults analysisResults;
 
-		FuzzTreeTransform tf(tree, *logFileStream);
+		FuzzTreeTransform tf(instream, *logFileStream);
 		if (!tf.isValid())
-		{
-			*logFileStream << "Could not compute configurations." << std::endl;
-			return -1;
+		{ // handle faulttree
+			throw "todo";
 		}
-		
-		for (const auto& t : tf.transform())
-		{
-			auto topEvent = fuzztree::TopEvent(t.second.topEvent());
-			InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, decompositionNumber, *logFileStream);
-			const auto result = analysis->compute();
+		else
+		{ // handle fuzztree
+			unsigned int decompositionNumber = DEFAULT_DECOMPOSITION_NUMBER;
+			
+			const auto tree = tf.getFuzzTree();
+			const auto modelId = tree->id();
+			if (tree->topEvent().decompositionNumber().present())
+				decompositionNumber = tree->topEvent().decompositionNumber().get();
 
-			analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
-			r.configuration(serializedConfiguration(t.first));
-			r.probability(serialize(result));
-			analysisResults.result().push_back(r);
+			for (const auto& t : tf.transform())
+			{
+				auto topEvent = fuzztree::TopEvent(t.second.topEvent());
+				InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, decompositionNumber, *logFileStream);
+				const auto result = analysis->compute();
+
+				analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+				r.configuration(serializedConfiguration(t.first));
+				r.probability(serialize(result));
+				analysisResults.result().push_back(r);
+			}
 		}
+
 		std::ofstream output(outFile);
 		analysisResults::analysisResults(output, analysisResults);
 	}
