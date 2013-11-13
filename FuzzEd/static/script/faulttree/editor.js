@@ -491,8 +491,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 },
 
                 xAxis: {
-                    min: 0,
-                    max: 1
+                    min: -0.05,
+                    max:  1.05
                 },
                 yAxis: {
                     min: 0,
