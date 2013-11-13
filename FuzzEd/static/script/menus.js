@@ -189,6 +189,7 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /* Section: Visibility */
         hide: function() {
+            this._removeEntries();
             this._node = undefined;
             return this._super();
         },
