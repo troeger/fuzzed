@@ -14,9 +14,11 @@
 #include <exception>
 #include <algorithm>
 
-using namespace chrono;
 using namespace boost;
 using namespace pugi;
+
+using std::ofstream;
+using std::ifstream;
 
 std::string util::toString(const int& i)
 {
@@ -37,6 +39,14 @@ std::string util::toString(const long double& d, const int& prec /*= 5*/)
 	oss << std::fixed << std::setprecision(prec);
 	oss << d;
 	return oss.str();
+}
+
+string util::toString(istream& istream)
+{
+	int pos = istream.tellg();
+	string result = string(std::istreambuf_iterator<char>(istream), std::istreambuf_iterator<char>());
+	istream.seekg(pos);
+	return result;
 }
 
 bool util::copyFile(const string& src, const string& dst)
@@ -135,7 +145,7 @@ void util::replaceFileExtensionInPlace(string& subject, const string& newExtensi
 
 string util::nestedIDString(int n, ...)
 {
-	stringstream result;
+	std::stringstream result;
 
 	va_list args;
 	va_start(args, n);

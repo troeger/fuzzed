@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <set>
 #include <algorithm>
@@ -51,6 +52,7 @@ namespace util
 	string toString(const int& i);
 	string toString(const double& d, const int& prec = 10);
 	string toString(const long double& d, const int& prec = 10);
+	string toString(std::istream& istream);
 
 
 	bool beginsWith(const string& subject, const string& prefix);
