@@ -86,22 +86,23 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	}
 	else if (typeName == *HOUSEEVENT)
 	{
-		// TODO: new House Variation Point?
+		// TODO: handle like basic event!
 		return NumericInterval(1.0, 1.0);
 	}
 	else if (typeName == *UNDEVELOPEDEVENT)
 	{
 		m_logFile << "Found Undeveloped Event, ID: " << node.id() << std::endl;
 
-		throw runtime_error(UNDEVELOPED_ERROR);
 		return NumericInterval();
 	}
 	else if (typeName == *INTERMEDIATEEVENT)
 	{
-		assert(node.children().size() == 1);
 		if (node.children().size() != 1)
-			m_logFile << "Intermediate Event size != 1, ID: " << node.id() << std::endl;
-
+		{
+			m_logFile << "Intermediate Event size != 1, ID: , size: " << node.id() << std::endl;
+			if (node.children().size() == 0)
+				return NumericInterval(1.0, 1.0);
+		}
 		return analyzeRecursive(node.children().front());
 	}
 	

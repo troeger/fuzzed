@@ -30,6 +30,8 @@ int main(int argc, char** argv)
 			"errors.txt");	
 	}
 
+	std::vector<std::string> errors;
+
 	try
 	{
 		std::ifstream instream(inFile);
@@ -41,7 +43,7 @@ int main(int argc, char** argv)
 
 		analysisResults::AnalysisResults analysisResults;
 		
-		FuzzTreeTransform tf(instream, *logFileStream);
+		FuzzTreeTransform tf(instream,errors);
 		if (!tf.isValid())
 		{ // handle faulttree
 			instream.seekg(0);
@@ -82,6 +84,13 @@ int main(int argc, char** argv)
 				r.probability(serialize(result));
 				analysisResults.result().push_back(r);
 			}
+		}
+
+		// Log errors
+		for (const std::string& errorStr : errors)
+		{
+			// analysisResults.issue().push_back(analysisResults::Issue(errorStr));
+			*logFileStream << errorStr << std::endl;
 		}
 
 		std::ofstream output(outFile);

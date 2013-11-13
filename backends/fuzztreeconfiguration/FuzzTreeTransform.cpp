@@ -19,10 +19,12 @@ using xercesc::DOMNode;
 using xercesc::DOMDocument;
 using namespace std;
 
-FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML, std::ofstream& logFile /* = DEFAULT_LOG_FILE*/) :
+FuzzTreeTransform::FuzzTreeTransform(
+	const string& fuzzTreeXML, 
+	std::vector<std::string>& errors) :
 	m_count(0),
 	m_bValid(true),
-	m_logFile(logFile)
+	m_errors(errors)
 {
 	try
 	{
@@ -31,16 +33,22 @@ FuzzTreeTransform::FuzzTreeTransform(const string& fuzzTreeXML, std::ofstream& l
 	}
 	catch (const xml_schema::Exception& e)
 	{
-		m_logFile << "Exception while reading: " << fuzzTreeXML << e << std::endl;
+		m_errors.emplace_back(
+			std::string("Exception while reading: ") + 
+			fuzzTreeXML + 
+			e.what());
+
 		m_bValid = false;
 	}
 }
 
 
-FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML, std::ofstream& logFile/* = DEFAULT_LOG_FILE*/) :
+FuzzTreeTransform::FuzzTreeTransform(
+	std::istream& fuzzTreeXML,
+	std::vector<std::string>& errors) :
 	m_count(0),
 	m_bValid(true),
-	m_logFile(logFile)
+	m_errors(errors)
 {
 	try
 	{
@@ -49,16 +57,22 @@ FuzzTreeTransform::FuzzTreeTransform(std::istream& fuzzTreeXML, std::ofstream& l
 	}
 	catch (const xml_schema::Exception& e)
 	{
-		m_logFile << "Exception while reading: " << fuzzTreeXML << e << std::endl;
+		m_errors.emplace_back(
+			std::string("Exception while reading: ") +
+			util::toString(fuzzTreeXML) +
+			e.what());
+
 		m_bValid = false;
 	}
 }
 
-FuzzTreeTransform::FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, std::ofstream& logFile/* = DEFAULT_LOG_FILE*/) :
+FuzzTreeTransform::FuzzTreeTransform(
+	std::auto_ptr<fuzztree::FuzzTree> ft,
+	std::vector<std::string>& errors) :
 	m_fuzzTree(ft),
 	m_count(0),
 	m_bValid(true),
-	m_logFile(logFile)
+	m_errors(errors)
 {
 	assert(m_fuzzTree.get());
 }
@@ -136,10 +150,12 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			const int to = redundancyNode->end();
 			if (from < 0 || to < 0 || from > to)
 			{
-				m_logFile << 
-					"Invalid Redundancy VP attributes, to: " << 
-					util::toString(to) << ", from: " << util::toString(from)
-					<< std::endl;
+				m_errors.emplace_back(
+					std::string("Invalid Redundancy VP attributes, to: ") + 
+					util::toString(to) + 
+					", from: " + 
+					util::toString(from));
+				
 				return INVALID_ATTRIBUTE;
 			}
 			
@@ -188,7 +204,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 
 				if (childIds.empty())
 				{
-					m_logFile << "FeatureVP without children found: " << id << std::endl;
+					m_errors.emplace_back(std::string("FeatureVP without children found: ") + id);
 					return WRONG_CHILD_NUM;
 				}
 
@@ -247,7 +263,7 @@ fuzztree::FuzzTree FuzzTreeTransform::generateVariationFreeFuzzTree(const FuzzTr
 		return fuzztree::FuzzTree(generateUniqueId(topEvent.id()), newTopEvent);
 	else
 	{
-		m_logFile << "Error during FaultTree generation: " << endl;
+		// m_logFile << "FaultTree Generation failed." << endl;
 		return fuzztree::FuzzTree("", newTopEvent); // TODO handle properly
 	}
 }
@@ -275,7 +291,7 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		{ // TODO: probably this always ends up with a leaf node
 			if (currentChild.children().size() > 1)
 			{
-				m_logFile << "Redundancy VP with multiple children found: " << id << std::endl;
+				m_errors.emplace_back(std::string("Redundancy VP with multiple children found: ") + id);
 				return WRONG_CHILD_NUM;
 			}
 			const auto& firstChild = currentChild.children().front();
@@ -299,7 +315,7 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 			}
 			else
 			{
-				m_logFile << "Unrecognized Child Type: " << typeName.name() << std::endl;
+				m_errors.emplace_back(std::string("Unrecognized Child Type: ") + typeName.name());
 				return WRONG_CHILD_TYPE;
 			}
 			node->children().push_back(votingOrGate);
@@ -454,7 +470,7 @@ std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>>
 	{
 		if (!m_fuzzTree.get())
 		{
-			m_logFile << "Invalid FuzzTree." << endl;
+			m_errors.emplace_back("Invalid FuzzTree.");
 			return results;
 		}
 
@@ -471,15 +487,15 @@ std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>>
 	}
 	catch (xsd::cxx::exception& e)
 	{
-		m_logFile << "Parse Error: " << e.what() << endl;
+		m_errors.emplace_back(e.what());
 	}
 	catch (std::exception& e)
 	{
-		m_logFile << "Error during FuzzTree Transformation: " << e.what() << endl;
+		m_errors.emplace_back(e.what());
 	}
 	catch (...)
 	{
-		m_logFile << "Unknown Error during FuzzTree Transformation" << endl;
+		m_errors.emplace_back("Unknown Error during FuzzTree Transformation");
 	}
 
 	return results;
