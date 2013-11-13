@@ -4389,6 +4389,9 @@ i.icon-progress {
 #FuzzEdCanvas.fuzzed-grid-hidden {
   background-image: none;
 }
+#FuzzEdCanvas.ui-state-disabled {
+  opacity: 1;
+}
 #FuzzEdExceptions .modal-header > h3 {
   color: #d9534f;
 }
