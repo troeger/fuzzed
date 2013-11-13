@@ -142,8 +142,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 					<< std::endl;
 				return INVALID_ATTRIBUTE;
 			}
-			if (from == to) continue;
-
+			
 			const std::string formulaString = redundancyNode->formula();
 			ExpressionParser<int> parser;
 			const std::function<int(int)> formula = [&](int n) -> int
@@ -158,7 +157,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			{
 				if (config.isIncluded(id))
 				{
-					for (int i : boost::counting_range(from, to+1))
+					for (int i = from; i <= to; ++i)
 					{
 						FuzzTreeConfiguration copied = config;
 						const int numVotes = formula(i);
