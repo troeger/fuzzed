@@ -683,10 +683,12 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
             if (_.isNaN(lower) || _.isNaN(upper)) return this;
 
+            var inputs = this.inputs.filter('input');
+
             var target = jQuery(event.target);
-            if (target.is(this.inputs.eq(0)) && lower > upper) {
+            if (target.is(inputs.eq(0)) && lower > upper) {
                 this._value([lower, lower]);
-            } else if (target.is(this.inputs.eq(1)) && upper < lower) {
+            } else if (target.is(inputs.eq(1)) && upper < lower) {
                 this._value([upper, upper]);
             }
 
@@ -743,8 +745,9 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         },
 
         _value: function(newValue) {
-            var lower = this.inputs.eq(0);
-            var upper = this.inputs.eq(1);
+            var input = this.inputs.filter('input');
+            var lower = input.eq(0);
+            var upper = input.eq(1);
 
             if (typeof newValue === 'undefined') {
                 var lowerVal = (!NUMBER_REGEX.test(lower.val()))
