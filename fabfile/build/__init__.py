@@ -8,6 +8,16 @@ from FuzzEd import util
 # from FuzzEd import __version__, util, settings
 
 
+XSD_PY_FILE_MAP = {
+    'analysisResult':      'xml_analysis',
+    'fuzztree':            'xml_fuzztree',
+    'faulttree':           'xml_faulttree',
+    'commonTypes':         'xml_common',
+    'configurations':      'xml_configurations',
+    'configurationResult': 'xml_conf_result'
+}
+
+
 def svg2pgf_shape(filename):
     '''
         Convert given SVG file to TiKZ code.
@@ -169,24 +179,29 @@ def notations():
 def build_xmlschema_wrappers():
     print 'Building XML schema wrappers ...'
 
-    IS_WINDOWS = os.name == 'nt'
+    IS_WINDOWS     = os.name == 'nt'
     FILE_EXTENSION = '.py' if IS_WINDOWS else ''
-    FILE_PREFIX = 'file:///' + os.getcwd() + '/' if IS_WINDOWS else '' 
+    FILE_PREFIX    = ('file:///' + os.getcwd() + '/' if IS_WINDOWS else '') + 'FuzzEd/static/xsd/'
+    BASE_PATH      = 'FuzzEd/models'
 
     # Remove old binding files and generate new ones
-    for file_name in ['xml_faulttree.py', 'xml_fuzztree.py', 'xml_analysis.py']:
-        path_name = 'FuzzEd/models/%s' % file_name
+    for binding in XSD_PY_FILE_MAP.values():
+        path = '%s/%s.py' % (BASE_PATH, binding,)
+        if os.path.exists(path):
+            os.remove(path)
 
-        if os.path.exists(path_name):
-            os.remove(path_name)
-    if os.system('pyxbgen%(extension)s --binding-root=FuzzEd/models/ '
-                            ' -u %(prefix)sFuzzEd/static/xsd/analysisResult.xsd -m xml_analysis'
-                            ' -u %(prefix)sFuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree'
-                            ' -u %(prefix)sFuzzEd/static/xsd/faulttree.xsd -m xml_faulttree'
-                            ' -u %(prefix)sFuzzEd/static/xsd/commonTypes.xsd -m xml_common'
-                            ' -u %(prefix)sFuzzEd/static/xsd/configurations.xsd -m xml_configurations'
-                            ' -u %(prefix)sFuzzEd/static/xsd/configurationResult.xsd -m xml_conf_result'
-                 % {'extension': FILE_EXTENSION, 'prefix': FILE_PREFIX}) != 0:
+    BINDINGS = ' '.join(['-u %(path)s%(xsd)s.xsd -m %(py)s' % {
+        'path': FILE_PREFIX,
+        'xsd':  xsd,
+        'py':   py
+    } for xsd, py in XSD_PY_FILE_MAP.items()])
+
+    # generate new bindings
+    if os.system('pyxbgen%(extension)s --binding-root=%(root)s %(bindings)s' % {
+        'extension': FILE_EXTENSION,
+        'root':      BASE_PATH,
+        'bindings':  BINDINGS
+    }) != 0:
         raise Exception('Execution of pyxbgen failed.')
 
 @task
