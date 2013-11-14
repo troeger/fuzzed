@@ -103,23 +103,25 @@ class Job(models.Model):
 
                 # tell something about the choices
                 json_choices = {}
-                for choice in config.configuration.choice:
-                    element     = choice.value_
-                    json_choice = {}
 
-                    #TODO: is there a better way to do this with PyXB?
-                    if isinstance(element, FeatureChoice):
-                        json_choice['type']      = 'FeatureChoice'
-                        json_choice['featureId'] = self.graph.nodes.get(id=element.featureId).client_id
-                    elif isinstance(element, InclusionChoice):
-                        json_choice['type']     = 'InclusionChoice'
-                        json_choice['included'] = element.included
-                    elif isinstance(element, RedundancyChoice):
-                        json_choice['type'] = 'RedundancyChoice'
-                        json_choice['n']    = int(element.n)
-                    else:
-                        raise ValueError('Unknown choice %s' % element)
-                    json_choices[self.graph.nodes.get(id=choice.key).client_id] = json_choice
+                if hasattr(config.configuration, 'choice'):
+                    for choice in config.configuration.choice:
+                        element     = choice.value_
+                        json_choice = {}
+
+                        #TODO: is there a better way to do this with PyXB?
+                        if isinstance(element, FeatureChoice):
+                            json_choice['type']      = 'FeatureChoice'
+                            json_choice['featureId'] = self.graph.nodes.get(id=element.featureId).client_id
+                        elif isinstance(element, InclusionChoice):
+                            json_choice['type']     = 'InclusionChoice'
+                            json_choice['included'] = element.included
+                        elif isinstance(element, RedundancyChoice):
+                            json_choice['type'] = 'RedundancyChoice'
+                            json_choice['n']    = int(element.n)
+                        else:
+                            raise ValueError('Unknown choice %s' % element)
+                        json_choices[self.graph.nodes.get(id=choice.key).client_id] = json_choice
                 current_config['choices'] = json_choices
                 json_config.append(current_config)
 

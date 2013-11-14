@@ -86,7 +86,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	}
 	else if (typeName == *HOUSEEVENT)
 	{
-		// TODO: handle like basic event!
+		// TODO: new House Variation Point?
 		return NumericInterval(1.0, 1.0);
 	}
 	else if (typeName == *UNDEVELOPEDEVENT)
@@ -220,7 +220,7 @@ double AlphaCutAnalysisTask::calculateKOutOfN(const vector<interval_t>& values, 
 {
 	assert(values.size() == n);
 	
-	vector<double> p(k+1);
+	vector<double> p;
 	p.emplace_back(1.0);
 
 	for (unsigned int i = 1; i <= k; i++)
