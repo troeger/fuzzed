@@ -14,8 +14,9 @@
               namespace="http://www.fuzztrees.net/configurations"/>
 
   <xsd:complexType name="Issue">
-      <xsd:attribute name="issueId" type="xsd:int" use="required"/>
-      <xsd:attribute name="elementId" type="xsd:int" use="required"/>
+      <xsd:attribute name="issueId" type="xsd:int"/>
+      <xsd:attribute name="elementId" type="xsd:int"/>
+      <xsd:attribute name="message" type="xsd:string"/>
   </xsd:complexType>
 
   <xsd:complexType name="Result">
