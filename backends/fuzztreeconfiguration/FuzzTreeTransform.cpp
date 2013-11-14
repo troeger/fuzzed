@@ -58,10 +58,14 @@ FuzzTreeTransform::FuzzTreeTransform(
 	{
 		m_bValid = false;
 
-		throw FatalException
-			(std::string("Exception while reading: ") +
-			util::toString(fuzzTreeXML) +
-			e.what());
+		// do not throw since this is sometimes expected when calling the analysis on a fault tree.
+		// if !valid, fault tree parser is called instead.
+		// in the future the handling of fault- and fuzztrees should be improved and then this exception is needed again.
+
+// 		throw FatalException
+// 			(std::string("Exception while reading: ") +
+// 			util::toString(fuzzTreeXML) +
+// 			e.what());
 	}
 }
 

@@ -44,12 +44,17 @@ int main(int argc, char** argv)
 
 		analysisResults::AnalysisResults analysisResults;
 		
+		// please keep this here for debugging
+// 		std::istreambuf_iterator<char> eos;
+// 		std::string s(std::istreambuf_iterator<char>(instream), eos);
+// 		*logFileStream << s;
+
 		FuzzTreeTransform tf(instream, issues);
 		instream.close();
 
 		if (!tf.isValid())
 		{ // handle faulttree
-			std::ifstream is(inFile); // TODO: somehow avoid opening two streams here
+			std::ifstream is(inFile); // TODO: somehow avoid opening another stream here
 			const auto faultTree = faulttree::faultTree(inFile, xml_schema::Flags::dont_validate);
 			is.close();
 
