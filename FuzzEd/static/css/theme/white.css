@@ -4188,11 +4188,10 @@ i.icon-progress {
 #FuzzEdShapes td #stickyNote {
   width: 35px;
   height: 35px;
-  border: 1.4px black solid;
+  border: 1px solid black;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 6px;
-  background-color: #f0f07f;
 }
 /*
  *  Properties Menu
@@ -4354,13 +4353,11 @@ i.icon-progress {
 .fuzzed-node .sticky_note {
   background-color: #f0f07f;
   padding: 5px;
-  font-family: 'American Typewriter', cursive;
   overflow: hidden;
   text-overflow: ellipsis;
   width: 160px;
   height: 160px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 101;
 }
 .fuzzed-node .sticky_note textarea {
   background-color: #f0f07f;
@@ -4370,6 +4367,9 @@ i.icon-progress {
 }
 .fuzzed-node .sticky_note p {
   padding: 4px;
+}
+#FuzzEdCanvas.fuzzed-canvas-not-editable .fuzzed-node.highlighted .fuzzed-node-halo-connect {
+  visibility: hidden;
 }
 #FuzzEdContent {
   position: absolute;

@@ -96,6 +96,9 @@ define(['underscore'], function() {
          *                                       (using jQuery UI Selectable).
          *    {String} DISABLED                - Class assigned to disabled (grayed-out) elements.
          *
+         *    {STRING} CANVAS_NOT_EDITABLE     - Class assigned to the canvas in order to hide any interactive elements
+         *                                       while highlighting nodes in any kinds of analytical summary
+         *
          *    {String} JSPLUMB_ENDPOINT        - Class assigned to endpoints by jsPlumb.
          *    {String} JSPLUMB_ENDPOINT_HOVER  - Class assigned to hovered endpoints by jsPlumb.
          *    {String} JSPLUMB_CONNECTOR       - Class assigned to connectors by jsPlumb.
@@ -130,6 +133,8 @@ define(['underscore'], function() {
             SELECTED:                'ui-selected',
             SELECTING:               'ui-selecting',
             DISABLED:                'disabled',
+
+            CANVAS_NOT_EDITABLE:     'fuzzed-canvas-not-editable',
 
             GRID_HIDDEN:             'fuzzed-grid-hidden',
 

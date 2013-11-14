@@ -1,5 +1,5 @@
-define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery-ui', 'slickgrid'],
-function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
+define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery-ui', 'slickgrid'],
+function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig) {
     /**
      *  Package: Faulttree
      */
@@ -638,6 +638,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {String} configID - The ID of the configuration that should be highlighted.
          */
         _highlightConfiguration: function(configID) {
+            // make the anchors visible again
+            Canvas.container.addClass(FaulttreeConfig.Classes.CANVAS_NOT_EDITABLE);
+
             // highlight nodes
             _.invoke(this._configNodeMap[configID], 'highlight');
             // highlight edges
@@ -654,6 +657,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Remove all highlights from the graph.
          */
         _unhighlightConfiguration: function() {
+            // prevents that node edge anchors are being displayed
+            Canvas.container.removeClass(FaulttreeConfig.Classes.CANVAS_NOT_EDITABLE);
+
             // unhighlight all nodes
             _.invoke(this._editor.graph.getNodes(), 'unhighlight');
             // unhighlight all edges
