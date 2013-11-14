@@ -1,5 +1,7 @@
 import urllib, datetime
 
+from django.core.mail import mail_managers
+
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
