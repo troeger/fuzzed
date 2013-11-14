@@ -44,10 +44,14 @@ int main(int argc, char** argv)
 		analysisResults::AnalysisResults analysisResults;
 		
 		FuzzTreeTransform tf(instream,errors);
+		instream.close();
+
 		if (!tf.isValid())
 		{ // handle faulttree
-			instream.seekg(0);
-			const auto faultTree = faulttree::faultTree(instream, xml_schema::Flags::dont_validate);
+			std::ifstream is(inFile); // TODO: somehow avoid opening two streams here
+			const auto faultTree = faulttree::faultTree(inFile, xml_schema::Flags::dont_validate);
+			is.close();
+
 			const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent());
 
 			const auto modelId = faultTree->id();
@@ -89,7 +93,7 @@ int main(int argc, char** argv)
 		// Log errors
 		for (const std::string& errorStr : errors)
 		{
-			analysisResults::Issue issue = analysisResults::Issue();
+			commonTypes::Issue issue;
 			issue.message(errorStr);
 			analysisResults.issue().push_back(issue);
 			*logFileStream << errorStr << std::endl;

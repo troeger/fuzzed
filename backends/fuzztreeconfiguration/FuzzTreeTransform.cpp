@@ -376,12 +376,15 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 	if (numChildren <= 0) return INVALID_ATTRIBUTE;
 
 	const auto& prob = eventSet->probability();
+
+	int costs = eventSet->costs().present() ? eventSet->costs().get() : 0;
 	
 	int i = 0;
 	const auto eventSetId = eventSet->id();
 	while (i < numChildren)
 	{
 		fuzztree::BasicEvent be(eventSetId + "." + treeHelpers::toString(i), prob);
+		be.costs(costs);
 		parentNode->children().push_back(be);
 		i++;
 	}
