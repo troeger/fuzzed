@@ -194,8 +194,11 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
 
             this.container.selectable({
                 filter: '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
-				unselected: function() {
+				unselected: function(event, ui) {
 					jQuery(document).trigger(Config.Events.NODE_UNSELECTED);
+				},
+				selected: function(event,ui){
+					jQuery(document).trigger(Config.Events.NODE_SELECTED);
 				},
                 stop: function() {
                     // tell other (e.g. <PropertyMenu>) that selection is done and react to the new selection

@@ -215,7 +215,8 @@ define(['underscore'], function() {
             PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',
             PROPERTY_READONLY_CHANGED: 'property-readonly-changed',
             PROPERTY_SYNCHRONIZED:     'property-synchronized',
-			NODE_UNSELECTED:		   'node_unselected'
+			NODE_UNSELECTED:		   'node_unselected',
+			NODE_SELECTED:             'node_selected'
         },
 
         /**
