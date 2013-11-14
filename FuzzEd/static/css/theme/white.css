@@ -4330,7 +4330,7 @@ i.icon-progress {
 .fuzzed-node.ui-selected .fuzzed-node-halo-connect {
   background-color: #f2b138;
 }
-.fuzzed-node:hover .fuzzed-node-halo-connect {
+.fuzzed-node.highlighted .fuzzed-node-halo-connect {
   visibility: visible;
 }
 .fuzzed-node .fuzzed-mirror {
