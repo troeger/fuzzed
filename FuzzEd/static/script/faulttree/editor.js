@@ -432,11 +432,13 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {JSON} data - Data returned from the backend with information about the job's progress.
          */
         _displayProgress: function(data) {
+            if (this._chartContainer.find('.progress').length > 0) return;
+
             var progressBar = jQuery(
                 '<div style="text-align: center;">' +
                     '<p>Calculating probability...</p>' +
                     '<div class="progress progress-striped active">' +
-                        '<div class="bar" style="width: 100%;"></div>' +
+                        '<div class="progress-bar" role="progressbar" style="width: 100%;"></div>' +
                     '</div>' +
                 '</div>');
 
