@@ -21,6 +21,8 @@ namespace faultTreeType
 	extern const type_info* HOUSEEVENT;
 	extern const type_info* UNDEVELOPEDEVENT;
 
+	extern const type_info* BASICEVENTSET;
+
 	extern const type_info* FDEP;
 	extern const type_info* SPARE;
 	extern const type_info* PAND;

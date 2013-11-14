@@ -49,6 +49,33 @@ void faultTreeToFuzzTreeRecursive(fuzztree::Node& node, const faulttree::Node& t
 				node.children().push_back(fuzztree::BasicEvent(id, fuzztree::FailureRate(failureRate)));
 			}
 		}
+		else if (typeName == *BASICEVENTSET)
+		{
+			const auto& bes = static_cast<const faulttree::BasicEventSet&>(child);
+			const auto& prob = bes.probability();
+			const type_info& probName = typeid(prob);
+			const int quantity = bes.quantity().present() ? bes.quantity().get() : 1; // TODO: in fault trees, the quantity should not be optional
+
+			if (probName == *CRISPPROB)
+			{
+				const auto probabilityValue = static_cast<const faulttree::CrispProbability&>(prob).value();
+				for (int i = 0;  i < quantity; ++i)
+				{
+					node.children().push_back(fuzztree::BasicEvent(id + "." + util::toString(i), fuzztree::CrispProbability(probabilityValue)));
+				}
+			}
+			else
+			{
+				const auto failureRate = static_cast<const faulttree::FailureRate&>(prob).value();
+				for (int i = 0;  i < quantity; ++i)
+				{
+					node.children().push_back(fuzztree::BasicEvent(id + "." + util::toString(i), fuzztree::FailureRate(failureRate)));
+				}
+			}
+
+			// TODO: FDEPs might trigger an entire event set... this continue doesn't work then...
+			continue;
+		}
 		else if (typeName == *HOUSEEVENT)
 		{ // TODO find out if this is legitimate
 			const auto& prob = (static_cast<const faulttree::BasicEvent&>(child)).probability();
