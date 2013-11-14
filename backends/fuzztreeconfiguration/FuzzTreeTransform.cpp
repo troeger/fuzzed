@@ -512,8 +512,9 @@ void FuzzTreeTransform::copyNode(
 	else if (typeName == *OR)				node->children().push_back(fuzztree::Or(id));
 	else if (typeName == *VOTINGOR)			node->children().push_back(fuzztree::VotingOr(id, (static_cast<const fuzztree::VotingOr&>(currentChild)).k()));
 	else if (typeName == *XOR)				node->children().push_back(fuzztree::Xor(id));
-	else if (typeName == *INTERMEDIATEEVENT) node->children().push_back(fuzztree::IntermediateEvent(id));
+	else if (typeName == *INTERMEDIATEEVENT)node->children().push_back(fuzztree::IntermediateEvent(id));
 	else if (typeName == *BASICEVENT)		node->children().push_back(fuzztree::BasicEvent(static_cast<const fuzztree::BasicEvent&>(currentChild)));
+	else if (typeName == *UNDEVELOPEDEVENT)	node->children().push_back(fuzztree::UndevelopedEvent(id));
 	else assert(false);
 }
 
