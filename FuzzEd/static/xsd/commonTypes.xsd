@@ -40,6 +40,13 @@
     <xsd:attribute name="upperBound" type="xsd:double" use="required"/>
   </xsd:complexType>
 
+  <xsd:complexType name="Issue">
+      <xsd:attribute name="issueId" type="xsd:int"/>
+      <xsd:attribute name="elementId" type="xsd:int"/>
+      <xsd:attribute name="message" type="xsd:string"/>
+      <xsd:attribute name="isFatal" type="xsd:boolean"/>
+  </xsd:complexType>
+
   <!-- A probability value -->
   <xsd:complexType name="Probability" abstract="true"/>
 
