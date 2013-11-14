@@ -182,6 +182,7 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             job.queryInterval    = 500;
 
             this._job = job;
+            job.progressMessage = FaulttreeConfig.ProgressIndicator.CALCULATING_MESSAGE;
             job.start();
 
             this._super();
@@ -190,13 +191,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
         /**
          *  Method: hide
-         *    Hide the menu and clear all its content.
+         *    Hide the menu and clear all its content. Also stops querying for job results.
          *
          *  Returns:
          *    This menu instance for chaining.
          */
         hide: function() {
             this._super();
+            // cancel query job
+            this._job.cancel();
             // clear content
             this._clear();
 

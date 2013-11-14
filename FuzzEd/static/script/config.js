@@ -124,6 +124,8 @@ define(['underscore'], function() {
          *    {String} ICON_SUCCESS            - Class for the icon that indicates a successful action.
          *    {String} ICON_ERROR              - Class for the icon that indicates an erroneous action.
          *    {String} ICON_PROGRESS           - Class for the icon that indicates an action in progress.
+         *
+         *    TODO: Docs
          */
         Classes: {
             HIGHLIGHTED:             'highlighted',
@@ -154,9 +156,14 @@ define(['underscore'], function() {
 
             PROPERTY_WARNING:        'error',
             PROPERTY_OPEN_BUTTON:    'fuzzed-property-open',
+
+            ICON_SUCCESS:            'icon-ok',
+            ICON_ERROR:              'icon-warning-sign',
+            ICON_PROGRESS:           'icon-progress',
+
 			DRAGGABLE_WRAP_DIV: 	 'draggableDiv',
 			RESIZABLE:			 	 'resizable',
-			EDITABLE:			 	 'editable',   
+			EDITABLE:			 	 'editable'
         },
 
         /**
@@ -360,10 +367,13 @@ define(['underscore'], function() {
          *    {String} DEFAULT_SUCCESS_MESSAGE   - The default status message for successful actions.
          *    {String} DEFAULT_ERROR_MESSAGE     - The default status message for erroneous actions.
          *    {String} DEFAULT_NOT_FOUND_MESSAGE - The default status message for actions resulting in a 404.
+         *    {String} DEFAULT_CANCELED_MESSAGE  - The default status message when canceling jobs.
          *
          *    {String} EXPORT_PROGRESS_MESSAGE   - The message displayed when exporting the graph. The file name will be appended.
          *    {String} EXPORT_SUCCESS_MESSAGE    - The message displayed when the graph has been successfully exported.
          *    {String} EXPORT_ERROR_MESSAGE      - The message displayed when there was an error while exporting the graph.
+         *
+         *    {String} CALCULATING_MESSAGE       - The message displayed for calculation jobs.
          */
         ProgressIndicator: {
             SUCCESS_FLASH_DELAY:       600,
@@ -374,10 +384,13 @@ define(['underscore'], function() {
             DEFAULT_SUCCESS_MESSAGE:   'Done',
             DEFAULT_ERROR_MESSAGE:     'Error',
             DEFAULT_NOT_FOUND_MESSAGE: 'Not found',
+            DEFAULT_CANCELED_MESSAGE:  'Canceled',
 
             EXPORT_PROGRESS_MESSAGE:   'Exporting graph as ', // file name will be appended
             EXPORT_SUCCESS_MESSAGE:    'Done',
-            EXPORT_ERROR_MESSAGE:      'Failed to export as ' // file name will be appended
+            EXPORT_ERROR_MESSAGE:      'Failed to export as ', // file name will be appended
+
+            CALCULATING_MESSAGE:       'Calculating...'
         },
 
         /**

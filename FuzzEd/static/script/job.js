@@ -67,6 +67,8 @@ define(['class', 'config', 'progressIndicator', 'jquery'], function(Class, Confi
          *    time this Job is queried.
          */
         cancel: function() {
+            clearTimeout(this._timeout);
+            Progress.flashErrorMessage(this.progressID, Config.ProgressIndicator.DEFAULT_CANCELED_MESSAGE);
             //TODO: call backend as soon as the call is available
         },
 
