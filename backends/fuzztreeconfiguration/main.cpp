@@ -9,6 +9,7 @@
 
 #include "util.h"
 #include "CommandLineParser.h"
+#include "FatalException.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -31,7 +32,7 @@ int main(int argc, char **argv)
 			"errors.txt");	
 	}
 
-	std::vector<std::string> errors;
+	std::vector<Issue> issues;
 	try
 	{
 		// do the actual transformation, write all files to dirPath
@@ -41,7 +42,7 @@ int main(int argc, char **argv)
 			std::cerr << "Invalid input file: " << inFile << std::endl;
 			return -1;
 		}
-		FuzzTreeTransform transform(instream, errors);
+		FuzzTreeTransform transform(instream, issues);
 		if (!transform.isValid())
 		{
 			std::cerr << "Could not compute configurations." << std::endl;

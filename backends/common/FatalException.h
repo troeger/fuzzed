@@ -4,6 +4,7 @@
 
 class FatalException : public std::runtime_error
 {
+public:
 	FatalException(const std::string msg, const int issueId = 0, const std::string elementId = "");
 
 	const Issue& getIssue() const;

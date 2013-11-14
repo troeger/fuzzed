@@ -24,7 +24,7 @@ Issue::Issue(const std::string& msg, const int issueId /*= 0*/, const std::strin
 
 }
 
-commonTypes::Issue Issue::serialized()
+commonTypes::Issue Issue::serialized() const
 {
 	commonTypes::Issue i;
 	i.message(m_message);
@@ -33,4 +33,9 @@ commonTypes::Issue Issue::serialized()
 	i.issueId(m_issueId);
 
 	return i;
+}
+
+const std::string Issue::getMessage() const
+{
+	return m_message;
 }

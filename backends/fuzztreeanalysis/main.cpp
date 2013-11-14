@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "FatalException.h"
 #include "CommandLineParser.h"
 #include "FuzzTreeToFaultTree.h"
 #include "util.h"
@@ -30,7 +31,7 @@ int main(int argc, char** argv)
 			"errors.txt");	
 	}
 
-	std::vector<std::string> errors;
+	std::vector<Issue> issues;
 
 	try
 	{
@@ -43,7 +44,7 @@ int main(int argc, char** argv)
 
 		analysisResults::AnalysisResults analysisResults;
 		
-		FuzzTreeTransform tf(instream,errors);
+		FuzzTreeTransform tf(instream, issues);
 		instream.close();
 
 		if (!tf.isValid())
@@ -91,12 +92,10 @@ int main(int argc, char** argv)
 		}
 
 		// Log errors
-		for (const std::string& errorStr : errors)
+		for (const Issue& issue : issues)
 		{
-			commonTypes::Issue issue;
-			issue.message(errorStr);
-			analysisResults.issue().push_back(issue);
-			*logFileStream << errorStr << std::endl;
+			analysisResults.issue().push_back(issue.serialized());
+			*logFileStream << issue.getMessage() << std::endl;
 		}
 
 		std::ofstream output(outFile);

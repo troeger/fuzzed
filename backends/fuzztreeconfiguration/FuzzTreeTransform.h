@@ -7,12 +7,11 @@
 
 #include "platform.h"
 #include "FuzzTreeConfiguration.h"
+#include "Issue.h"
 
 // generated model files
 #include "faulttree.h"
 #include "fuzztree.h"
-
-#define DEFAULT_LOG_FILE "./errors.txt"
 
 enum ErrorType
 {
@@ -26,9 +25,9 @@ enum ErrorType
 class FuzzTreeTransform
 {
 public:
-	FuzzTreeTransform(const std::string& fuzzTreeXML, std::vector<std::string>& errors);
-	FuzzTreeTransform(std::istream& fuzzTreeXML, std::vector<std::string>& errors);
-	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, std::vector<std::string>& errors);
+	FuzzTreeTransform(const std::string& fuzzTreeXML, std::vector<Issue>& errors);
+	FuzzTreeTransform(std::istream& fuzzTreeXML, std::vector<Issue>& errors);
+	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, std::vector<Issue>& errors);
 
 	~FuzzTreeTransform();
 
@@ -89,5 +88,5 @@ private:
 	int m_count;
 	bool m_bValid;
 
-	std::vector<std::string>& m_errors;
+	std::vector<Issue>& m_issues;
 };

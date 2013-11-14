@@ -13,6 +13,7 @@
 #include "Config.h"
 #include "Constants.h"
 #include "CommandLineParser.h"
+#include "FatalException.h"
 
 #if defined(MEASURE_SPEEDUP)
 #include <omp.h>
@@ -226,8 +227,8 @@ void SimulationProxy::simulateAllConfigurations(
 
 	simulationResults::SimulationResults simResults;
 
-	std::vector<std::string> errors;
-	FuzzTreeTransform ftTransform(file, errors); // TODO correct stream
+	std::vector<Issue> issues;
+	FuzzTreeTransform ftTransform(file, issues); // TODO correct stream
 	if (!ftTransform.isValid())
 	{
 		const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
