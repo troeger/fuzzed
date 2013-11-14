@@ -89,7 +89,9 @@ int main(int argc, char** argv)
 		// Log errors
 		for (const std::string& errorStr : errors)
 		{
-			// analysisResults.issue().push_back(analysisResults::Issue(errorStr));
+			analysisResults::Issue issue = analysisResults::Issue();
+			issue.message(errorStr);
+			analysisResults.issue().push_back(issue);
 			*logFileStream << errorStr << std::endl;
 		}
 
