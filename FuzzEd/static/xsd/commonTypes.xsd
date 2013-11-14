@@ -42,7 +42,7 @@
 
   <xsd:complexType name="Issue">
       <xsd:attribute name="issueId" type="xsd:int"/>
-      <xsd:attribute name="elementId" type="xsd:int"/>
+      <xsd:attribute name="elementId" type="xsd:string"/>
       <xsd:attribute name="message" type="xsd:string"/>
       <xsd:attribute name="isFatal" type="xsd:boolean"/>
   </xsd:complexType>
