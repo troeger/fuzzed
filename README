@@ -13,8 +13,8 @@ You can install them directly, or use Vagrant to create a Virtual Machine with t
 
 Running Vagrant for a dev VM (optional)
 ----------------------------------------
-1. Install Vagrant from http://downloads.vagrantup.com/
-2. Install VirtualBox from https://www.virtualbox.org/wiki/Downloads
+1. Install Vagrant from http://downloads.vagrantup.com/, recommended version: 1.2.7 
+2. Install VirtualBox from https://www.virtualbox.org/wiki/Downloads, recommended version: 4.2.16
 3. Run vagrant up
 4. Once the provisioning script has run through, you can run vagrant ssh
 5. cd /home/fuzztrees
