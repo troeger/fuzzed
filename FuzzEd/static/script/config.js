@@ -128,7 +128,9 @@ define(['underscore'], function() {
          *    {String} ICON_ERROR              - Class for the icon that indicates an erroneous action.
          *    {String} ICON_PROGRESS           - Class for the icon that indicates an action in progress.
          *
-         *    TODO: Docs
+         *    {String} DRAGGABLE_WRAP_DIV	   - Class for div in shapes menu that contains thumbnail
+		 *    {String} RESIZABLE               - Class indicating that a node is resizable
+		 *    {String} EDITABLE                - Class indicating that a node is inline editable
          */
         Classes: {
             HIGHLIGHTED:             'highlighted',
@@ -209,7 +211,10 @@ define(['underscore'], function() {
          *    {String} PROPERTY_HIDDEN_CHANGED   - Event triggered when a property's hidden state changed.
          *    {String} PROPERTY_READONLY_CHANGED - Event triggered when a property's readonly state changed.
          *    {String} PROPERTY_SYNCHRONIZED     - Event triggered when a property synced itself with the backend.
-         */
+         *
+         *    {String} NODE_UNSELECTED           - Event triggered when a node on the canvas is unselected
+		 *    {String} NODE_SELECTED             - Event triggered when a node on the canvas is selected		
+		 */
         Events: {
             CANVAS_SELECTION_STOPPED:  'canvas-selection-stopped',
             CANVAS_SHAPE_DROPPED:      'canvas-shape-dropped',
@@ -227,6 +232,7 @@ define(['underscore'], function() {
             PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',
             PROPERTY_READONLY_CHANGED: 'property-readonly-changed',
             PROPERTY_SYNCHRONIZED:     'property-synchronized',
+			
 			NODE_UNSELECTED:		   'node_unselected',
 			NODE_SELECTED:             'node_selected'
         },
