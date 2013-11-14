@@ -22,9 +22,12 @@ void FuzzTreeConfiguration::setFeatureNumber(const id_type& ID, const id_type& c
 	m_featureNodes[ID] = configuredChild;
 }
 
-void FuzzTreeConfiguration::setNotIncluded(const id_type& ID)
+void FuzzTreeConfiguration::setNotIncludedRecursive(const fuzztree::Node& node)
 {
-	m_notIncluded.insert(ID);
+	for (const auto child : node.children())
+		setNotIncludedRecursive(child);
+	
+	m_notIncluded.insert(node.id());
 }
 
 const bool& FuzzTreeConfiguration::isOptionalEnabled(const id_type& ID) const

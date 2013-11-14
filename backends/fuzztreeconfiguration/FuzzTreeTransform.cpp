@@ -136,7 +136,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 
 				// one configuration without this node
 				config.setOptionalEnabled(id, false);
-				config.setNotIncluded(id);
+				config.setNotIncludedRecursive(child);
 
 				additional.emplace_back(copied);
 			}
@@ -217,9 +217,9 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 						{
 							FuzzTreeConfiguration copied = config;
 							copied.setFeatureNumber(id, i);
-							for (const auto& other : childIds)
-								if (other != i) 
-									copied.setNotIncluded(other);
+							for (const auto& other : featureNode->children())
+								if (other.id() != i) 
+									copied.setNotIncludedRecursive(other);
 							
 							newConfigs.emplace_back(copied);
 						}
