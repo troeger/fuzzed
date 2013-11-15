@@ -178,7 +178,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             job.successCallback  = this._evaluateResult.bind(this);
             job.updateCallback   = this._displayProgress.bind(this);
             job.errorCallback    = this._displayJobError.bind(this);
-            job.notFoundCallback = this._displayNotFoundError.bind(this);
+            job.notFoundCallback = this._displayJobError.bind(this);
             job.queryInterval    = 500;
 
             this._job = job;
@@ -690,7 +690,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
         _displayValidationErrors: function(errors) {
             //TODO: This is a temporary solution. Errors should be displayed per node later.
-            if (errors.length == 1) {
+            if (_.size(errors) == 1) {
                 Alerts.showErrorAlert('Analysis error: ', errors[0]);
             } else {
                 var errorList = '<ul>';
@@ -727,17 +727,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *  Method: _displayJobError
          *    Display an error massage resulting from a job error.
          */
-        _displayJobError: function() {
-            Alerts.showErrorAlert('An error occurred!', 'Are you still connected to the internet? If so it\'s our fault and we are working on it.');
-            this.hide();
-        },
-
-        /**
-         *  Method: _displayNotFoundError
-         *    Display an error massage resulting from a 404.
-         */
-        _displayNotFoundError: function() {
-            Alerts.showErrorAlert('Analysis result not found!', 'Please try again. If the error persists, something is wrong on our side. We are working on it.');
+        _displayJobError: function(xhr) {
+            Alerts.showErrorAlert('An error occurred!', xhr.responseText || 'Are you still connected to the internet? If so it\'s our fault and we are working on it.');
             this.hide();
         }
     });

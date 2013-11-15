@@ -104,12 +104,15 @@ define(['class', 'config', 'progressIndicator', 'jquery'], function(Class, Confi
 
                     404: function() { // not found / canceled
                         Progress.flashErrorMessage(this.progressID, this.progressNotFoundMessage);
-                        this.notFoundCallback();
+                        this.notFoundCallback.apply(this, arguments);
                     }.bind(this)
                 },
                 error: function(xhr) {
+                    // 404 is caught separately
+                    if (xhr.status = 404) return;
+
                     Progress.flashErrorMessage(this.progressID, this.progressErrorMessage);
-                    this.errorCallback(arguments);
+                    this.errorCallback.apply(this, arguments);
                 }.bind(this)
             });
         }
