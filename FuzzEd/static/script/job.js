@@ -32,6 +32,7 @@ define(['class', 'config', 'progressIndicator', 'jquery'], function(Class, Confi
 
         _url:             undefined,
         _timeout:         undefined,
+        _refetch:         true,
 
         /**
          *  Group: Initialization
@@ -68,6 +69,8 @@ define(['class', 'config', 'progressIndicator', 'jquery'], function(Class, Confi
          */
         cancel: function() {
             clearTimeout(this._timeout);
+            // prevent re-fetches due to race conditions
+            this._refetch = false;
             Progress.flashErrorMessage(this.progressID, Config.ProgressIndicator.DEFAULT_CANCELED_MESSAGE);
             //TODO: call backend as soon as the call is available
         },
@@ -99,7 +102,9 @@ define(['class', 'config', 'progressIndicator', 'jquery'], function(Class, Confi
                         //TODO: update progress indicator?
                         this.updateCallback(data);
                         // query again later
-                        this._timeout = setTimeout(this._query.bind(this), this.queryInterval);
+                        if (this._refetch) {
+                            this._timeout = setTimeout(this._query.bind(this), this.queryInterval);
+                        }
                     }.bind(this),
 
                     404: function() { // not found / canceled
