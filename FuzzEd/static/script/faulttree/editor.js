@@ -691,14 +691,14 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         _displayValidationErrors: function(errors) {
             //TODO: This is a temporary solution. Errors should be displayed per node later.
             if (errors.length == 1) {
-                Alerts.showErrorAlert('An error occurred during analysis:', errors[0]);
+                Alerts.showErrorAlert('Analysis error: ', errors[0]);
             } else {
                 var errorList = '<ul>';
                 _.each(errors, function(error) {
                     errorList += '<li>' + error + '</li>';
                 });
                 errorList += '</ul>'
-                Alerts.showErrorAlert('Multiple errors occurred during analysis:', errorList);
+                Alerts.showErrorAlert('Analysis errors: ', errorList);
             }
         },
 
