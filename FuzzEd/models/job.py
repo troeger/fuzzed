@@ -78,71 +78,94 @@ class Job(models.Model):
             result_data = ''.join(self.result.readlines())
             doc = xml_analysis.CreateFromDocument(result_data)
 
-            # Check global issues that are independent from the model
+            # Check global issues that are independent from the particular configuration
+            # Since the frontend always wants an elementID, we stitch them
+            # to the TOP event for the moment (check issue #181)
+            # TODO: This will break for RBD analysis, since there is no top event
+            topId = self.graph.top_node().client_id
+            graphErrors = []
+            graphWarnings = []
             for issue in doc.issue:
-                if issue.isFatal:
-                    errors[issue.elementId]=issue.message
-                else:
-                    warnings[issue.elementId]=issue.message
+                if issue.message and len(issue.message)>0:
+                    if issue.isFatal:
+                        graphErrors.append(issue.message)
+                    else:
+                        graphWarnings.append(issue.message)
+            # TODO: Joining should be no longer needed when #181 is fixed, since we then get list value support
+            if len(graphErrors) > 0:
+                errors[topId] = ','.join(graphErrors)
+            if len(graphWarnings) > 0:
+                warnings[topId] = ','.join(graphWarnings)
 
             results = doc.result
 
-            if len(results)>0:
+            # There is no frontend support for some (not all) valid configuration results in the analysis result
+            # We therefore compute our own valid flag
+            isValid = True
+            if len(results)==0:
+                isValid = False
+            else:
+                for result in results:
+                    if not result.validResult:
+                        isValid = False
+                        break
+
+            if isValid:
                 #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
-                json_result['decompositionNumber'] = str(configurations[0].decompositionNumber)
-                json_result['timestamp']           = configurations[0].timestamp
-                json_result['validResult']         = str(configurations[0].validResult)
+                json_result['decompositionNumber'] = str(results[0].decompositionNumber)
+                json_result['timestamp']           = results[0].timestamp
 
-            json_configs = []
-            for result in results:
-                # Check configuration-specific issues that are independent from the model
-                for issue in result.issue:
-                    if issue.isFatal:
-                        errors[issue.elementId]=issue.message
-                    else:
-                        warnings[issue.elementId]=issue.message
-
-                # get the cost from the xml
-                current_config = {}
-                if hasattr(result.configuration, 'costs'):
-                    current_config['costs'] = result.configuration.costs
-
-                # fetch the alphacuts
-                json_alphacuts = {}
-                for alpha_cut in result.probability.alphaCuts:
-                    json_alphacuts[alpha_cut.key] = [
-                        alpha_cut.value_.lowerBound,
-                        alpha_cut.value_.upperBound
-                    ]
-                current_config['alphaCuts'] = json_alphacuts
-
-                # tell something about the choices
-                json_choices = {}
-
-                if hasattr(result.configuration, 'choice'):
-                    for choice in result.configuration.choice:
-                        element     = choice.value_
-                        json_choice = {}
-
-                        #TODO: Send clientId as elementId from the very beginning
-                        if isinstance(element, FeatureChoice):
-                            json_choice['type']      = 'FeatureChoice'
-                            json_choice['featureId'] = self.graph.nodes.get(id=element.featureId).client_id
-                        elif isinstance(element, InclusionChoice):
-                            json_choice['type']     = 'InclusionChoice'
-                            json_choice['included'] = element.included
-                        elif isinstance(element, RedundancyChoice):
-                            json_choice['type'] = 'RedundancyChoice'
-                            json_choice['n']    = int(element.n)
+                json_configs = []
+                for result in results:
+                    # Check configuration-specific issues 
+                    for issue in result.issue:
+                        if issue.isFatal:
+                            errors[issue.elementId]=issue.message
                         else:
-                            raise ValueError('Unknown choice %s' % element)
-                        json_choices[self.graph.nodes.get(id=choice.key).client_id] = json_choice
-                current_config['choices'] = json_choices
-                json_configs.append(current_config)
+                            warnings[issue.elementId]=issue.message
 
-            json_result['configurations'] = json_configs
+                    # get the cost from the xml
+                    current_config = {}
+                    if hasattr(result.configuration, 'costs'):
+                        current_config['costs'] = result.configuration.costs
+
+                    # fetch the alphacuts
+                    json_alphacuts = {}
+                    for alpha_cut in result.probability.alphaCuts:
+                        json_alphacuts[alpha_cut.key] = [
+                            alpha_cut.value_.lowerBound,
+                            alpha_cut.value_.upperBound
+                        ]
+                    current_config['alphaCuts'] = json_alphacuts
+
+                    # tell something about the choices
+                    json_choices = {}
+                    if hasattr(result.configuration, 'choice'):
+                        for choice in result.configuration.choice:
+                            element     = choice.value_
+                            json_choice = {}
+
+                            #TODO: Send clientId as elementId from the very beginning
+                            if isinstance(element, FeatureChoice):
+                                json_choice['type']      = 'FeatureChoice'
+                                json_choice['featureId'] = self.graph.nodes.get(id=element.featureId).client_id
+                            elif isinstance(element, InclusionChoice):
+                                json_choice['type']     = 'InclusionChoice'
+                                json_choice['included'] = element.included
+                            elif isinstance(element, RedundancyChoice):
+                                json_choice['type'] = 'RedundancyChoice'
+                                json_choice['n']    = int(element.n)
+                            else:
+                                raise ValueError('Unknown choice %s' % element)
+                            json_choices[self.graph.nodes.get(id=choice.key).client_id] = json_choice
+                    current_config['choices'] = json_choices
+
+                    json_configs.append(current_config)
+                json_result['configurations'] = json_configs
+
             json_result['errors']         = errors
             json_result['warnings']       = warnings
+            json_result['validResult']    = str(isValid)
             return_data                   = json.dumps(json_result)
             logger.debug('Returning result JSON to frontend:\n' + return_data)
 

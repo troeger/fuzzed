@@ -284,9 +284,7 @@ class Node(models.Model):
                 # Probability is a 2-tuple, were the first value is a type indicator and the second the value
                 if probability[0] == 1:
                     # Failure rate
-                    #TODO: Determine mission time and compute value, or give rate to the backend
-                    #properties['probability'] = xml_fuzztree.CrispProbability(value_=42)
-                    assert(False)
+                    properties['probability'] = xml_fuzztree.FailureRate(value_=probability[1])
                 elif probability[0] in [0,2]:
                     # Point value with uncertainty range, type 0 (direct) or 2 (fuzzy terms)
                     if isinstance(probability[1], int):
