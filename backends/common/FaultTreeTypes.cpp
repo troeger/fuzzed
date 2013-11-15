@@ -23,5 +23,5 @@ namespace faultTreeType
 	const type_info* PAND	= &typeid(faulttree::PriorityAnd);
 	const type_info* SEQ	= &typeid(faulttree::Sequence);
 
-	const type_info* SEQ	= &typeid(faulttree::TransferIn);
+	const type_info* TRANSFERIN	= &typeid(faulttree::TransferIn);
 }
