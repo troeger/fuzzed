@@ -712,7 +712,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         _displayValidationWarnings: function(warnings) {
             //TODO: This is a temporary solution. Warnings should be displayed per node later.
             if (_.size(warnings) == 1) {
-                Alerts.showErrorAlert('Warning:', warnings[0]);
+                Alerts.showWarningAlert('Warning:', warnings[0]);
             } else {
                 var warningList = '<ul>';
                 _.each(warnings, function(warning) {
