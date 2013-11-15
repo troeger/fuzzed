@@ -181,10 +181,18 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 				{
 					for (int i = from; i <= to; ++i)
 					{
-						FuzzTreeConfiguration copied = config;
 						const int numVotes = formula(i);
-						if (numVotes < 0)
+						if (numVotes <= 0)
+						{
+							m_issues.emplace_back(
+								std::string("Ignoring invalid redundancy configuration with k=") + 
+								util::toString(numVotes) + 
+								std::string(" N=") + 
+								util::toString(i),
+								0, id);
 							continue;
+						}
+						FuzzTreeConfiguration copied = config;
 						copied.setRedundancyNumber(id, numVotes, i);
 						newConfigs.emplace_back(copied);
 					}
@@ -418,16 +426,25 @@ ErrorType FuzzTreeTransform::expandIntermediateEventSet(
 	const fuzztree::IntermediateEventSet* eventSet = static_cast<const fuzztree::IntermediateEventSet*>(templateNode);
 	assert(eventSet);
 	const auto eventSetId = eventSet->id();
-
+	if (eventSet->children().size() == 0)
+	{
+		m_issues.emplace_back(Issue::fatalIssue("Intermediate Event Set has no children.", 0, eventSetId));
+		return WRONG_CHILD_NUM;
+	}
 	// barharhar
 	const int numChildren = 
-		defaultQuantity == 0 ? eventSet->quantity().present() ? eventSet->quantity().get() : defaultQuantity : defaultQuantity;
+		defaultQuantity == 0 ? 
+		eventSet->quantity().present() ? 
+			eventSet->quantity().get() : 
+			defaultQuantity : 
+		defaultQuantity;
 
 	if (numChildren <= 0)
 	{
 		m_issues.emplace_back("Invalid number of Children in IntermediateEventSet", 0 , eventSetId);
 		return INVALID_ATTRIBUTE;
 	}
+
 	const auto& nextNode = eventSet->children().front();
 
 	int i = 0;
