@@ -1,5 +1,5 @@
-define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery-ui', 'slickgrid'],
-function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig) {
+define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'highcharts', 'jquery-ui', 'slickgrid'],
+function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
     /**
      *  Package: Faulttree
      */
@@ -177,7 +177,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             job.successCallback  = this._evaluateResult.bind(this);
             job.updateCallback   = this._displayProgress.bind(this);
-            job.errorCallback    = this._displayNetworkError.bind(this);
+            job.errorCallback    = this._displayJobError.bind(this);
             job.notFoundCallback = this._displayNotFoundError.bind(this);
             job.queryInterval    = 500;
 
@@ -281,16 +281,23 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig) {
          */
         _evaluateResult: function(data) {
             data = jQuery.parseJSON(data);
-            if (typeof data.errors !== 'undefined' && _.size(data.errors) != 0) {
+
+            if (_.size(data.errors) > 0) {
                 // errors is a dictionary with the node ID as key
-                //TODO: display validation result at the node
-                this._displayValidationErrors(_.values(data.errors));
-            } else {
+                this._displayValidationErrors(data.errors);
+            }
+
+            if (_.size(data.warnings) > 0) {
+                // warnings is a dictionary with the node ID as key
+                this._displayValidationWarnings(data.warnings);
+            }
+
+            if (_.size(data.configurations) > 0) {
                 var chartData = {};
                 var tableData = [];
                 var configID = '';
 
-                _.each(data['configurations'], function(config, index) {
+                _.each(data.configurations, function(config, index) {
                     //TODO: better naming?
                     configID = '#' + (index + 1);
                     var displayData = this._convertToDisplayFormat(config);
@@ -316,6 +323,9 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig) {
                 this._displayResultWithSlickGrid(tableData);
 
                 this._setupResizing();
+            } else {
+                // close menu again if there are no results
+                this.hide();
             }
         },
 
@@ -641,7 +651,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {String} configID - The ID of the configuration that should be highlighted.
          */
         _highlightConfiguration: function(configID) {
-            // make the anchors visible again
+            // prevents that node edge anchors are being displayed
             Canvas.container.addClass(FaulttreeConfig.Classes.CANVAS_NOT_EDITABLE);
 
             // highlight nodes
@@ -660,7 +670,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Remove all highlights from the graph.
          */
         _unhighlightConfiguration: function() {
-            // prevents that node edge anchors are being displayed
+            // make the anchors visible again
             Canvas.container.removeClass(FaulttreeConfig.Classes.CANVAS_NOT_EDITABLE);
 
             // unhighlight all nodes
@@ -676,34 +686,59 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Display all errors that are thrown during graph validation.
          *
          *  Parameters:
-         *    {Array} errors - A list of error messages.
+         *    {Object} errors - A dictionary of error messages.
          */
         _displayValidationErrors: function(errors) {
-            //TODO: This is a temporary solution. Should be replaced by error messages later.
-
-            var list = jQuery('<ul></ul>');
-            _.each(errors, function(error) {
-                jQuery('<li></li>').text(error).appendTo(list);
-            });
-            this._chartContainer.html(list);
+            //TODO: This is a temporary solution. Errors should be displayed per node later.
+            if (errors.length == 1) {
+                Alerts.showErrorAlert('An error occurred during analysis:', errors[0]);
+            } else {
+                var errorList = '<ul>';
+                _.each(errors, function(error) {
+                    errorList += '<li>' + error + '</li>';
+                });
+                errorList += '</ul>'
+                Alerts.showErrorAlert('Multiple errors occurred during analysis:', errorList);
+            }
         },
 
         /**
-         *  Method: _displayNetworkError
-         *    Display an error massage resulting from a network error (e.g. 404) in the menu's body.
+         *  Method: _displayValidationWarnings
+         *    Display all warnings that are thrown during graph validation.
+         *
+         *  Parameters:
+         *    {Object} warnings - A dictionary of warning messages.
          */
-        _displayNetworkError: function() {
-            //TODO: This is a temporary solution. Should be replaced by error messages later.
-            this._chartContainer.text('Network error');
+        _displayValidationWarnings: function(warnings) {
+            //TODO: This is a temporary solution. Warnings should be displayed per node later.
+            if (_.size(warnings) == 1) {
+                Alerts.showErrorAlert('Warning:', warnings[0]);
+            } else {
+                var warningList = '<ul>';
+                _.each(warnings, function(warning) {
+                    warningList += '<li>' + warning + '</li>';
+                });
+                warningList += '</ul>'
+                Alerts.showWarningAlert('Multiple warnings returned from analysis:', warningList);
+            }
+        },
+
+        /**
+         *  Method: _displayJobError
+         *    Display an error massage resulting from a job error.
+         */
+        _displayJobError: function() {
+            Alerts.showErrorAlert('An error occurred!', 'Are you still connected to the internet? If so it\'s our fault and we are working on it.');
+            this.hide();
         },
 
         /**
          *  Method: _displayNotFoundError
-         *    Display an error massage resulting from a 404 in the menu's body.
+         *    Display an error massage resulting from a 404.
          */
         _displayNotFoundError: function() {
-            //TODO: This is a temporary solution. Should be replaced by error messages later.
-            this._chartContainer.text('Not found');
+            Alerts.showErrorAlert('Analysis result not found!', 'Please try again. If the error persists, something is wrong on our side. We are working on it.');
+            this.hide();
         }
     });
 
