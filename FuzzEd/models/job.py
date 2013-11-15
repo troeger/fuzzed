@@ -173,7 +173,7 @@ class Job(models.Model):
 
         except Exception as e:
             mail_managers('Error on analysis result XML->JSON conversion', '%s\n\n%s' % (str(result_data), str(e),))
-            raise HttpResponseServerErrorAnswer()
+            raise HttpResponseServerErrorAnswer("We have an internal problem rendering your analysis result. Sorry! The developers are informed.")
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):

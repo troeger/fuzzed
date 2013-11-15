@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.core.mail import mail_managers
 
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
@@ -525,7 +526,8 @@ def job_status(request, job_id):
                 return HttpResponse(job.result_rendering())
         else:
             logger.debug("Job is done with non-zero exit code, delivering according HTTP error")
-            raise HttpResponseServerErrorAnswer()
+            mail_managers('Analysis of job %s ended with non-zero exit code.'%job.pk, job.graph.to_xml() )
+            raise HttpResponseServerErrorAnswer("We have an internal problem analyzing this graph. Sorry! The developers are informed.")
     else:       
         logger.debug("Job is pending, keep the front end waiting.")
         return HttpResponse(status=202)
