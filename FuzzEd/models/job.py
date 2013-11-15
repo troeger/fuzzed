@@ -67,34 +67,49 @@ class Job(models.Model):
 
     def result_rendering(self):
         ''' Returns the job result as something that the frontend understands.'''
-        json_result = {
-            'errors': {},
-            'warnings': {}
-        }
-        json_config = []
-        result_data = ''
+        json_result = {}
+        errors = {}
+        warnings = {}
 
         try:
             assert(self.kind == Job.TOP_EVENT_JOB)
             assert(self.result)
 
-            result_data    = ''.join(self.result.readlines())
-            configurations = xml_analysis.CreateFromDocument(result_data).result
+            result_data = ''.join(self.result.readlines())
+            doc = xml_analysis.CreateFromDocument(result_data)
 
-            # This will move to the right position in an upcoming schema update
-            json_result['decompositionNumber'] = str(configurations[0].decompositionNumber)
-            json_result['timestamp']           = configurations[0].timestamp
-            json_result['validResult']         = str(configurations[0].validResult)
+            # Check global issues that are independent from the model
+            for issue in doc.issue:
+                if issue.isFatal:
+                    errors[issue.elementId]=issue.message
+                else:
+                    warnings[issue.elementId]=issue.message
 
-            for config in configurations:
+            results = doc.result
+
+            if len(results)>0:
+                #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
+                json_result['decompositionNumber'] = str(configurations[0].decompositionNumber)
+                json_result['timestamp']           = configurations[0].timestamp
+                json_result['validResult']         = str(configurations[0].validResult)
+
+            json_configs = []
+            for result in results:
+                # Check configuration-specific issues that are independent from the model
+                for issue in result.issue:
+                    if issue.isFatal:
+                        errors[issue.elementId]=issue.message
+                    else:
+                        warnings[issue.elementId]=issue.message
+
                 # get the cost from the xml
                 current_config = {}
-                if hasattr(config.configuration, 'costs'):
-                    current_config['costs'] = config.configuration.costs
+                if hasattr(result.configuration, 'costs'):
+                    current_config['costs'] = result.configuration.costs
 
                 # fetch the alphacuts
                 json_alphacuts = {}
-                for alpha_cut in config.probability.alphaCuts:
+                for alpha_cut in result.probability.alphaCuts:
                     json_alphacuts[alpha_cut.key] = [
                         alpha_cut.value_.lowerBound,
                         alpha_cut.value_.upperBound
@@ -104,12 +119,12 @@ class Job(models.Model):
                 # tell something about the choices
                 json_choices = {}
 
-                if hasattr(config.configuration, 'choice'):
-                    for choice in config.configuration.choice:
+                if hasattr(result.configuration, 'choice'):
+                    for choice in result.configuration.choice:
                         element     = choice.value_
                         json_choice = {}
 
-                        #TODO: is there a better way to do this with PyXB?
+                        #TODO: Send clientId as elementId from the very beginning
                         if isinstance(element, FeatureChoice):
                             json_choice['type']      = 'FeatureChoice'
                             json_choice['featureId'] = self.graph.nodes.get(id=element.featureId).client_id
@@ -123,9 +138,11 @@ class Job(models.Model):
                             raise ValueError('Unknown choice %s' % element)
                         json_choices[self.graph.nodes.get(id=choice.key).client_id] = json_choice
                 current_config['choices'] = json_choices
-                json_config.append(current_config)
+                json_configs.append(current_config)
 
-            json_result['configurations'] = json_config
+            json_result['configurations'] = json_configs
+            json_result['errors']         = errors
+            json_result['warnings']       = warnings
             return_data                   = json.dumps(json_result)
             logger.debug('Returning result JSON to frontend:\n' + return_data)
 
