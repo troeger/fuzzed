@@ -243,13 +243,17 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *    This editor instance for chaining.
          */
         _setupMouse: function() {
-            jQuery(window).resize(function(event) {
-                var canvas  = Canvas.container;
+            jQuery(window).resize(function() {
                 var content = jQuery('#' + this.config.IDs.CONTENT);
 
+                Canvas.enlarge({
+                    x: content.width(),
+                    y: content.height()
+                }, true);
+
                 //TODO: move that to enlarge with parameter 'precise'
-                canvas.width(content.width());
-                canvas.height(content.height());
+//                canvas.width(content.width());
+//                canvas.height(content.height());
             }.bind(this));
 
             return this;

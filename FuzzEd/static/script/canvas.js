@@ -43,16 +43,21 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
         /**
          * Section: Visual
          */
-        enlarge: function(to) {
+        enlarge: function(to, precise) {
             var canvasWidth  = this.container.width();
             var canvasHeight = this.container.height();
             var doubleGrid   = this.gridSize << 1;
-			
-            while (to.x + to.width  > canvasWidth - doubleGrid) {
-                canvasWidth *= 2;
-            }
-            while (to.y + to.height > canvasHeight - doubleGrid) {
-                canvasHeight *= 2;
+
+            if (precise) {
+                canvasWidth  = to.x;
+                canvasHeight = to.y;
+            } else {
+                while (to.x  > canvasWidth - doubleGrid) {
+                    canvasWidth *= 2;
+                }
+                while (to.y > canvasHeight - doubleGrid) {
+                    canvasHeight *= 2;
+                }
             }
 
             this.container.width(canvasWidth);

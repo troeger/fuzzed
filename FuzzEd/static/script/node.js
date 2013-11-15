@@ -418,7 +418,10 @@ function(Property, Mirror, Canvas, Class) {
 
                 drag: function(event, ui) {
                     // enlarge canvas
-					Canvas.enlarge({x: ui.offset.left, y: ui.offset.top, height: ui.helper.height(), width: ui.helper.width() });
+					Canvas.enlarge({
+                        x: ui.offset.left + ui.helper.width(),
+                        y: ui.offset.top  + ui.helper.height()
+                    });
 
                     // determine by how many pixels we moved from our original position (see: start callback)
                     var xOffset = ui.position.left - initialPositions[this.id].left;
@@ -579,7 +582,10 @@ function(Property, Mirror, Canvas, Class) {
 			
 			jQuery(resizable).on('resize',function(event, ui) {
                 // enlarge canvas if resizable is resized out of the canvas
-				Canvas.enlarge({x: ui.helper.offset().left, y: ui.helper.offset().top, height: ui.helper.height(), width: ui.helper.width()});
+				Canvas.enlarge({
+                    x: ui.helper.offset().left + ui.helper.width(),
+                    y: ui.helper.offset().top  + ui.helper.height()
+                });
 				
 				// scroll canvas if resizable is resized out of the visible part of the canvas
 				var scrollable = jQuery('body');
