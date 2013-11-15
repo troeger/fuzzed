@@ -42,3 +42,5 @@ backends/common/configurationResult.cpp
 backends/common/commonTypes.h
 backends/common/analysisResult.h
 backends/common/commonTypes.cpp
+jobs
+backend_topevent.log
