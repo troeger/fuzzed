@@ -146,10 +146,9 @@ class Job(models.Model):
                             element     = choice.value_
                             json_choice = {}
 
-                            #TODO: Send clientId as elementId from the very beginning
                             if isinstance(element, FeatureChoice):
                                 json_choice['type']      = 'FeatureChoice'
-                                json_choice['featureId'] = self.graph.nodes.get(id=element.featureId).client_id
+                                json_choice['featureId'] = element.featureId
                             elif isinstance(element, InclusionChoice):
                                 json_choice['type']     = 'InclusionChoice'
                                 json_choice['included'] = element.included
@@ -158,7 +157,7 @@ class Job(models.Model):
                                 json_choice['n']    = int(element.n)
                             else:
                                 raise ValueError('Unknown choice %s' % element)
-                            json_choices[self.graph.nodes.get(id=choice.key).client_id] = json_choice
+                            json_choices[choice.key] = json_choice
                     current_config['choices'] = json_choices
 
                     json_configs.append(current_config)

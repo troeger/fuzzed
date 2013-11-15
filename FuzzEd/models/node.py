@@ -273,7 +273,7 @@ class Node(models.Model):
             xmltype = self.graph.kind
 
         properties = {
-            'id':   self.id,
+            'id':   self.client_id,
             'name': self.get_property('name', '-')
         }
 
