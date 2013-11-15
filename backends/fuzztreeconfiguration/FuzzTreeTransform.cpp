@@ -183,7 +183,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 					{
 						FuzzTreeConfiguration copied = config;
 						const int numVotes = formula(i);
-						if (numVotes <= 0)
+						if (numVotes < 0)
 							continue;
 						copied.setRedundancyNumber(id, numVotes, i);
 						newConfigs.emplace_back(copied);
