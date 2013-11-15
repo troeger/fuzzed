@@ -8,7 +8,7 @@
 
 #include "FatalException.h"
 #include "CommandLineParser.h"
-#include "FuzzTreeToFaultTree.h"
+#include "FaultTreeToFuzzTree.h"
 #include "util.h"
 #include "xmlutil.h"
 #include "analysisResult.h"

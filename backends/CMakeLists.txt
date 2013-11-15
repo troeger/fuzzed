@@ -270,7 +270,7 @@ set(COMMON_SOURCES
 	${COMMON_DIR}/commonTypes.cpp
 	${COMMON_DIR}/configurations.cpp
 	${COMMON_DIR}/CommandLineParser.cpp
-	${COMMON_DIR}/FuzzTreeToFaultTree.cpp
+	${COMMON_DIR}/FaultTreeToFuzzTree.cpp
 	${COMMON_DIR}/Issue.cpp
 	${COMMON_DIR}/FatalException.cpp
 )
@@ -289,7 +289,7 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/commonTypes.h
 	${COMMON_DIR}/configurations.h
 	${COMMON_DIR}/CommandLineParser.h
-	${COMMON_DIR}/FuzzTreeToFaultTree.h
+	${COMMON_DIR}/FaultTreeToFuzzTree.h
 	${COMMON_DIR}/Issue.h
 	${COMMON_DIR}/FatalException.h
 )

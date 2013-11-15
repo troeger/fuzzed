@@ -1,4 +1,4 @@
-#include "FuzzTreeToFaultTree.h"
+#include "FaultTreeToFuzzTree.h"
 
 #include "faulttree.h"
 #include "FaultTreeTypes.h"
