@@ -45,7 +45,11 @@ faulttree_classes = {
     'orGate':               xml_faulttree.Or,
     'xorGate':              xml_faulttree.Xor,
     'votingOrGate':         xml_faulttree.VotingOr,
-    'transferIn':           xml_faulttree.TransferIn
+    'transferIn':           xml_faulttree.TransferIn,
+    'fdepGate':             xml_faulttree.FDEP,
+    'priorityAndGate':      xml_faulttree.PriorityAnd,
+    'seqGate':              xml_faulttree.Sequence,
+    'spareGate':            xml_faulttree.Spare
 }
 
 class Node(models.Model):
@@ -141,6 +145,14 @@ class Node(models.Model):
             return str(children[0])
 
         raise ValueError('Node %s has unsupported kind' % self)
+
+    def children(self):
+        from edge import Edge
+        return [edge.target for edge in Edge.objects.filter(source=self)]
+
+    def parents(self):
+        from edge import Edge
+        return [edge.target for edge in Edge.objects.filter(target=self)]
 
     def get_all_mirror_properties(self, hiddenProps=[]):
         """
@@ -326,6 +338,12 @@ class Node(models.Model):
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
                 probability_property = self.get_property('probability', None)
                 properties['probability'] = xml_faulttree.CrispProbability(value_=probability_property[1])
+
+            if self.kind == 'fdepGate':
+                properties['triggeredEvents'] = [parent.client_id for parent in self.parents()]
+                children = self.children()
+                assert(len(children)==1)            # Frontend restriction, comes from notations.json
+                properties['trigger'] = children[0].client_id  
 
             xml_node = faulttree_classes[self.kind](**properties)
 

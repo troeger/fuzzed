@@ -110,6 +110,14 @@ class Job(models.Model):
                         isValid = False
                         break
 
+            # Fetch issues hidden in maybe existing results
+            for result in results:
+                for issue in result.issue:
+                    if issue.isFatal:
+                        errors[issue.elementId]=issue.message
+                    else:
+                        warnings[issue.elementId]=issue.message
+
             if isValid:
                 #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
                 json_result['decompositionNumber'] = str(results[0].decompositionNumber)
@@ -117,13 +125,6 @@ class Job(models.Model):
 
                 json_configs = []
                 for result in results:
-                    # Check configuration-specific issues 
-                    for issue in result.issue:
-                        if issue.isFatal:
-                            errors[issue.elementId]=issue.message
-                        else:
-                            warnings[issue.elementId]=issue.message
-
                     # get the cost from the xml
                     current_config = {}
                     if hasattr(result.configuration, 'costs'):
