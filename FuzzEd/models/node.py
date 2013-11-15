@@ -150,6 +150,9 @@ class Node(models.Model):
         from edge import Edge
         return [edge.target for edge in Edge.objects.filter(source=self)]
 
+    def children_left2right(self):
+        return sorted(self.children(), key=lambda child: child.x)        
+
     def parents(self):
         from edge import Edge
         return [edge.target for edge in Edge.objects.filter(target=self)]
@@ -346,10 +349,13 @@ class Node(models.Model):
                 properties['trigger'] = children[0].client_id  
 
             if self.kind == 'spareGate':
-                children_sorted = sorted(self.children(), key=lambda child: child.x)
+                children_sorted = self.children_left2right()
                 assert(len(children_sorted)>0)      #TODO: This will kill the XML generation if the graph is incompletly drawn. Do we want that?
                 properties['primaryID'] = children_sorted[0].client_id
                 properties['dormancyFactor'] = self.get_property('dormancyFactor')
+
+            if self.kind == 'priorityAndGate':
+                properties['eventSequence'] = [child.client_id for child in self.children_left2right()]
 
             xml_node = faulttree_classes[self.kind](**properties)
 
