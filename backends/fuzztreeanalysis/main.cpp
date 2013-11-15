@@ -13,6 +13,54 @@
 #include "xmlutil.h"
 #include "analysisResult.h"
 
+
+analysisResults::Result analyze(
+	const fuzztree::TopEvent* const topEvent,
+	std::ofstream* logFileStream,
+	analysisResults::AnalysisResults &analysisResults,
+	const std::string modelId,
+	const int decompositionNumber) 
+{
+	try
+	{
+		InstanceAnalysisTask* analysis = new InstanceAnalysisTask(topEvent, decompositionNumber, *logFileStream);
+		const auto result = analysis->compute();
+
+		analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+		r.probability(serialize(result));
+
+		return r;
+	}
+	catch (const FatalException& e)
+	{
+		analysisResults::Result r(modelId, util::timeStamp(), false, decompositionNumber);
+		r.issue().push_back(e.getIssue().serialized());
+		return r;
+	}
+	catch (const std::exception& e)
+	{
+		// assert(false);
+		// TODO make sure only our exceptions are thrown
+		analysisResults::Result r(modelId, util::timeStamp(), false, decompositionNumber);
+		commonTypes::Issue i;
+		i.message(e.what());
+		r.issue().push_back(i);
+		return r;	
+	}
+	catch (...)
+	{
+		// assert(false);
+		// TODO make sure only our exceptions are thrown
+		analysisResults::Result r(modelId, util::timeStamp(), false, decompositionNumber);
+		commonTypes::Issue i;
+		i.message("Unknown Error");
+		r.issue().push_back(i);
+		return r;	
+	}
+}
+
+
+
 int main(int argc, char** argv)
 {
 	CommandLineParser parser;
@@ -59,39 +107,34 @@ int main(int argc, char** argv)
 			is.close();
 
 			const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent());
-
 			const auto modelId = faultTree->id();
+
 			const unsigned int decompositionNumber = 
 				topEvent->decompositionNumber().present() ? 
 				topEvent->decompositionNumber().get() : 
 				DEFAULT_DECOMPOSITION_NUMBER;
 
-			InstanceAnalysisTask* analysis = new InstanceAnalysisTask(topEvent.get(), decompositionNumber, *logFileStream);
-			const auto result = analysis->compute();
-
-			analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
-			r.probability(serialize(result));
-			analysisResults.result().push_back(r);
+			analysisResults.result().push_back(
+				analyze(topEvent.get(), logFileStream, analysisResults, modelId, decompositionNumber));
 		}
 		else
 		{ // handle fuzztree
 			const auto tree = tf.getFuzzTree();
 			const auto modelId = tree->id();
 			
+			const auto topEvent = tree->topEvent();
+
 			const unsigned int decompositionNumber = 
-				tree->topEvent().decompositionNumber().present() ? 
-					tree->topEvent().decompositionNumber().get() : 
-					DEFAULT_DECOMPOSITION_NUMBER;
+				topEvent.decompositionNumber().present() ? 
+				topEvent.decompositionNumber().get() : 
+				DEFAULT_DECOMPOSITION_NUMBER;
 
 			for (const auto& t : tf.transform())
 			{
 				auto topEvent = fuzztree::TopEvent(t.second.topEvent());
-				InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, decompositionNumber, *logFileStream);
-				const auto result = analysis->compute();
 
-				analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+				analysisResults::Result r = analyze(&topEvent, logFileStream, analysisResults, modelId, decompositionNumber); 
 				r.configuration(serializedConfiguration(t.first));
-				r.probability(serialize(result));
 				analysisResults.result().push_back(r);
 			}
 		}
@@ -106,6 +149,8 @@ int main(int argc, char** argv)
 		std::ofstream output(outFile);
 		analysisResults::analysisResults(output, analysisResults);
 	}
+
+	// This should not happen.
 	catch (const xml_schema::Exception& e)
 	{
 		*logFileStream << "Exception while trying to analyze " << inFile << e.what() << std::endl;
