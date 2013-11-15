@@ -79,8 +79,6 @@ int main(int argc, char** argv)
 			"errors.txt");	
 	}
 
-	std::vector<Issue> issues;
-
 	try
 	{
 		std::ifstream instream(inFile);
@@ -97,6 +95,7 @@ int main(int argc, char** argv)
 // 		std::string s(std::istreambuf_iterator<char>(instream), eos);
 // 		*logFileStream << s;
 
+		std::vector<Issue> issues; // issues at fuzztree level
 		FuzzTreeTransform tf(instream, issues);
 		instream.close();
 
@@ -106,7 +105,8 @@ int main(int argc, char** argv)
 			const auto faultTree = faulttree::faultTree(inFile, xml_schema::Flags::dont_validate);
 			is.close();
 
-			const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent());
+			std::vector<Issue> treeIssues;
+			const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent(), treeIssues);
 			const auto modelId = faultTree->id();
 
 			const unsigned int decompositionNumber = 
@@ -114,8 +114,11 @@ int main(int argc, char** argv)
 				topEvent->decompositionNumber().get() : 
 				DEFAULT_DECOMPOSITION_NUMBER;
 
-			analysisResults.result().push_back(
-				analyze(topEvent.get(), logFileStream, analysisResults, modelId, decompositionNumber));
+			analysisResults::Result r = analyze(topEvent.get(), logFileStream, analysisResults, modelId, decompositionNumber);
+			for (const auto& i : treeIssues)
+				r.issue().push_back(i.serialized());
+			
+			analysisResults.result().push_back(r);
 		}
 		else
 		{ // handle fuzztree

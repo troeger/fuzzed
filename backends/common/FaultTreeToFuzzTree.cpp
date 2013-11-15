@@ -8,7 +8,7 @@
 #include "util.h"
 #include "xmlutil.h"
 
-std::shared_ptr<fuzztree::TopEvent> faultTreeToFuzzTree(const faulttree::TopEvent& faultTree)
+std::shared_ptr<fuzztree::TopEvent> faultTreeToFuzzTree(const faulttree::TopEvent& faultTree, std::vector<Issue>& issues)
 {
 	int missionTime = faultTree.missionTime().present() ? faultTree.missionTime().get() : DEFAULT_MISSION_TIME;
 	int decompositionNumber = faultTree.decompositionNumber().present() ? faultTree.decompositionNumber().get() : DEFAULT_DECOMPOSITION_NUMBER;
@@ -18,12 +18,12 @@ std::shared_ptr<fuzztree::TopEvent> faultTreeToFuzzTree(const faulttree::TopEven
 	top->missionTime(missionTime);
 	top->decompositionNumber(decompositionNumber);
 	
-	faultTreeToFuzzTreeRecursive(*(top.get()), faultTree);
+	faultTreeToFuzzTreeRecursive(*(top.get()), faultTree, issues);
 	return top;
 }
 
 
-void faultTreeToFuzzTreeRecursive(fuzztree::Node& node, const faulttree::Node& templateNode)
+void faultTreeToFuzzTreeRecursive(fuzztree::Node& node, const faulttree::Node& templateNode, std::vector<Issue>& issues)
 {
 	using namespace faultTreeType;
 
@@ -103,13 +103,19 @@ void faultTreeToFuzzTreeRecursive(fuzztree::Node& node, const faulttree::Node& t
 		{
 			node.children().push_back(fuzztree::IntermediateEvent(id));
 		}
+		else if (typeName == *TRANSFERIN)
+		{
+			issues.emplace_back("TransferIn is not yet supported.", 0, id);
+			continue; // TODO as issue
+		}
 
 		// Static Gates...
 		else if (typeName == *AND)				node.children().push_back(fuzztree::And(id));
 		else if (typeName == *OR)				node.children().push_back(fuzztree::Or(id));
 		else if (typeName == *XOR)				node.children().push_back(fuzztree::Xor(id));
 		else if (typeName == *VOTINGOR)			node.children().push_back(fuzztree::VotingOr(id, static_cast<const faulttree::VotingOr&>(child).k()));
+		
 
-		faultTreeToFuzzTreeRecursive(node.children().back(), child);
+		faultTreeToFuzzTreeRecursive(node.children().back(), child, issues);
 	}
 }

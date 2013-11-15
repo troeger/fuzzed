@@ -1,5 +1,7 @@
 #pragma once
 #include <memory>
+#include "Issue.h"
+
 namespace faulttree
 {
 	class TopEvent;
@@ -15,7 +17,8 @@ namespace fuzztree
 }
 
 
-std::shared_ptr<fuzztree::TopEvent> faultTreeToFuzzTree(const faulttree::TopEvent& fuzzTree);
+std::shared_ptr<fuzztree::TopEvent> faultTreeToFuzzTree(const faulttree::TopEvent& fuzzTree, std::vector<Issue>& issues);
 void faultTreeToFuzzTreeRecursive(
 	fuzztree::Node& node,
-	const faulttree::Node& templateNode);
+	const faulttree::Node& templateNode,
+	std::vector<Issue>& issues);
