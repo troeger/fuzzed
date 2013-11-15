@@ -297,7 +297,7 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		{ // TODO: probably this always ends up with a leaf node
 			if (currentChild.children().size() > 1)
 			{
-				m_issues.emplace_back(std::string("Redundancy VP with multiple children found: ") + id);
+				m_issues.emplace_back(std::string("Redundancy VP with multiple children found: ") + id, 0, id);
 				return WRONG_CHILD_NUM;
 			}
 			const auto& firstChild = currentChild.children().front();
@@ -321,7 +321,7 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 			}
 			else
 			{
-				m_issues.emplace_back(std::string("Unrecognized Child Type: ") + typeName.name());
+				m_issues.emplace_back(std::string("Unrecognized Child Type: ") + typeName.name(), 0, id);
 				return WRONG_CHILD_TYPE;
 			}
 			node->children().push_back(votingOrGate);
@@ -354,7 +354,8 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		}
 		else if (typeName == *TRANSFERIN)
 		{
-
+			m_issues.emplace_back("TransferIn Gate not yet implemented.", 0, id);
+			continue;
 		}
 
 		// remaining types
@@ -385,8 +386,10 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 		numChildren = eventSet->quantity().get();
 
 	if (numChildren <= 0)
+	{
+		m_issues.emplace_back("Invalid number of Children in BasicEventSet", 0 , eventSet->id());
 		return INVALID_ATTRIBUTE;
-
+	}
 	const auto& prob = eventSet->probability();
 
 	int costs = eventSet->costs().present() ? eventSet->costs().get() : 0;
@@ -422,7 +425,7 @@ ErrorType FuzzTreeTransform::expandIntermediateEventSet(
 
 	if (numChildren <= 0)
 	{
-		m_issues.emplace_back();
+		m_issues.emplace_back("Invalid number of Children in IntermediateEventSet", 0 , eventSetId);
 		return INVALID_ATTRIBUTE;
 	}
 	const auto& nextNode = eventSet->children().front();
