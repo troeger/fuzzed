@@ -250,10 +250,6 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                     x: content.width(),
                     y: content.height()
                 }, true);
-
-                //TODO: move that to enlarge with parameter 'precise'
-//                canvas.width(content.width());
-//                canvas.height(content.height());
             }.bind(this));
 
             return this;

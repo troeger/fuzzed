@@ -49,8 +49,8 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
             var doubleGrid   = this.gridSize << 1;
 
             if (precise) {
-                canvasWidth  = to.x;
-                canvasHeight = to.y;
+                canvasWidth  = _.max(to.x, canvasWidth);
+                canvasHeight = _.max(to.y, canvasHeight);
             } else {
                 while (to.x  > canvasWidth - doubleGrid) {
                     canvasWidth *= 2;
