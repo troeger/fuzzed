@@ -27,4 +27,6 @@ namespace faultTreeType
 	extern const type_info* SPARE;
 	extern const type_info* PAND;
 	extern const type_info* SEQ;
+
+	extern const type_info* TRANSFERIN;
 }
