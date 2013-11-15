@@ -31,6 +31,7 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
         readOnly:     undefined,
 
         _nodeClasses: {},
+        _smallestId:    undefined,
 
         /**
          *  Group: Initialization
@@ -67,10 +68,15 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
 
             var maxX = 0;
             var maxY = 0;
+            // We look for the smallest ID in the current graph (see also: <Graph::getPasteId>
+            this._smallestId = new Date().getTime();
 
             // parse the json nodes and convert them to node objects
             _.each(json.nodes, function(jsonNode) {
-                this.addNode(jsonNode.kind, jsonNode);
+                node = this.addNode(jsonNode.kind, jsonNode);
+
+                // We want to skip the Top Event, whose ID is 0
+                if (node.id != 0) this._smallestId = Math.min(this._smallestId, node.id);
             }.bind(this));
 
             // connect the nodes again
@@ -80,8 +86,9 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
                     target: this.getNodeById(jsonEdge.target).container
                 });
                 edge._fuzzedId = jsonEdge.id;
-
                 this.addEdge(edge);
+
+                this._smallestId = Math.min(this._smallestId, edge._fuzzedId);
             }.bind(this));
 
             return this;
@@ -109,7 +116,7 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
                 this.deleteEdge(edge.connection);
             }.bind(this));
 
-            jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED,   this._shapeDropped.bind(this));
+            jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
 
             return this;
         },
@@ -358,6 +365,23 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
          */
         getConfig: function() {
             throw new SubclassResponsibility();
+        },
+
+
+        /**
+         *  Method: getPasteId
+         *    Background: Pasted items need special IDs. Because a node without an ID gets the current timestamp and
+         *    pasting multiple objects at once would cause ID collisions, this method generates unused IDs by
+         *    counting back from the smallest ID/timestamp in the graph.
+         *
+         *  Returns:
+         *    {number} unused ID
+         *
+         *  See also:
+         *    <Editor::_pastePressed>
+         */
+        getPasteId: function() {
+            return --this._smallestId;
         },
 
 

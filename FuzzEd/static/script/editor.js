@@ -39,6 +39,8 @@ function(Class, Menus, Canvas, Backend, Alerts) {
         _nodeOffsetPrintStylesheet:    undefined,
         _nodeOffsetStylesheetTemplate: undefined,
 
+        _clipboard:                    '',
+
         /**
          *  Group: Initialization
          */
@@ -256,6 +258,12 @@ function(Class, Menus, Canvas, Backend, Alerts) {
                     this._arrowKeyPressed(event, -1, 0);
                 } else if (event.which === 'A'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
                     this._selectAllPressed(event);
+                } else if (event.which === 'C'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
+                    this._copyPressed(event);
+                } else if (event.which === 'V'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
+                    this._pastePressed(event);
+                } else if (event.which === 'X'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
+                    alert('Something was cutted.');
                 }
             }.bind(this));
 
@@ -446,6 +454,93 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
 
             return this;
+        },
+
+        /**
+         * Method: _copyPressed
+         *
+         *   Event callback for handling a copy (CTRL/CMD + C) key press. Will copy selected nodes by serializing and saving them to _clipboard.
+         *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _copyPressed: function(event) {
+            if (jQuery(event.target).is('input')) return this;
+
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+
+            event.preventDefault();
+
+            // reset _clipboard
+            this._clipboard = '';
+            var nodes = new Array;
+
+            // save selected nodes to nodes
+            jQuery(selectedNodes).each(function(index, element) {
+                var wholeNode = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
+                // Copying the Top Event is not allowed
+                if (wholeNode.id == 0) return;
+                var node = _.pick(wholeNode, 'kind', 'incoming', 'outgoing', 'x', 'y')
+                node.properties = new Object()
+                // list of current properties in fault- and fuzztrees. not very nice - how can we automagically gather them?
+                props = ['cardinality', 'name', 'probability', 'k', 'dormancyFactor', 'transfer', 'cost', 'optional', 'kFormula', 'nRange']
+                _.each(props, function(prop) {
+                    if (typeof wholeNode.properties[prop] !== 'undefined') {
+                        // we just need the values, the rest is jquery-stuff (?)
+                        node.properties[prop] = _.pick(wholeNode.properties[prop], 'value');
+                    }
+                }.bind(this));
+                console.log('Added: '+node);
+                //this.graph.addNode(node.kind, node);
+                nodes.push(node);
+            }.bind(this));
+
+            //jQuery(selectedEdges).each(function())
+            this._clipboard = JSON.stringify(nodes);
+            console.log('Clipboard: '+this._clipboard);
+
+            // save selected edges to _clipboard
+            /*jQuery(selectedEdges).each(function(index, element) {
+                var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
+                jsPlumb.detach(edge);
+                //
+            }.bind(this));*/
+        },
+
+        /**
+         * Method: _pastePressed
+         *
+         *   Event callback for handling a paste (CTRL/CMD + V) key press. Will paste previously copied nodes from _clipboard.
+         *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _pastePressed: function(event) {
+            if (jQuery(event.target).is('input')) return this;
+
+            var nodes = JSON.parse(this._clipboard);
+
+            _.each(nodes, function(node) {
+
+                node.id = this.graph.getPasteId();
+                node.x++; node.y++;
+                console.log(node);
+
+                this.graph.addNode(node.kind, node);
+            }.bind(this));
+
+            //var nodes = JSON.parse(this._clipboard);
+            //console.log(nodes);
+
+
+
         },
 
         /**
