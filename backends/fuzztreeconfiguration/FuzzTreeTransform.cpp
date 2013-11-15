@@ -181,10 +181,18 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 				{
 					for (int i = from; i <= to; ++i)
 					{
-						FuzzTreeConfiguration copied = config;
 						const int numVotes = formula(i);
-						if (numVotes < 0)
+						if (numVotes <= 0)
+						{
+							m_issues.emplace_back(
+								std::string("Ignoring invalid redundancy configuration with k=") + 
+								util::toString(numVotes) + 
+								std::string(" N=") + 
+								util::toString(i),
+								0, id);
 							continue;
+						}
+						FuzzTreeConfiguration copied = config;
 						copied.setRedundancyNumber(id, numVotes, i);
 						newConfigs.emplace_back(copied);
 					}
