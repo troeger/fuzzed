@@ -345,6 +345,12 @@ class Node(models.Model):
                 assert(len(children)==1)            # Frontend restriction, comes from notations.json
                 properties['trigger'] = children[0].client_id  
 
+            if self.kind == 'spareGate':
+                children_sorted = sorted(self.children(), key=lambda child: child.x)
+                assert(len(children_sorted)>0)      #TODO: This will kill the XML generation if the graph is incompletly drawn. Do we want that?
+                properties['primaryID'] = children_sorted[0].client_id
+                properties['dormancyFactor'] = self.get_property('dormancyFactor')
+
             xml_node = faulttree_classes[self.kind](**properties)
 
         # serialize children
