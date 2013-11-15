@@ -354,7 +354,7 @@ class Node(models.Model):
                 properties['primaryID'] = children_sorted[0].client_id
                 properties['dormancyFactor'] = self.get_property('dormancyFactor')
 
-            if self.kind == 'priorityAndGate':
+            if self.kind in ['seqGate','priorityAndGate']:
                 properties['eventSequence'] = [child.client_id for child in self.children_left2right()]
 
             xml_node = faulttree_classes[self.kind](**properties)
