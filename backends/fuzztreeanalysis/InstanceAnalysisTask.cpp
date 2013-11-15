@@ -9,7 +9,7 @@
 using std::map;
 using std::future;
 
-InstanceAnalysisTask::InstanceAnalysisTask(fuzztree::TopEvent* tree, unsigned int decompositionNumber, std::ofstream& logfile) :
+InstanceAnalysisTask::InstanceAnalysisTask(const fuzztree::TopEvent* tree, unsigned int decompositionNumber, std::ofstream& logfile) :
 	m_tree(tree),
 	m_decompositionNumber(decompositionNumber),
 	m_logFile(logfile)
