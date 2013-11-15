@@ -79,15 +79,19 @@ int main(int argc, char** argv)
 			"errors.txt");	
 	}
 
+	std::ifstream instream(inFile);
+	if (!instream.good())
+	{
+		*logFileStream << "Invalid input file: " << inFile << std::endl;
+		return -1;
+	}
+
+	std::vector<Issue> issues; // issues at fuzztree level
+	FuzzTreeTransform tf(instream, issues);
+	instream.close();
+
 	try
 	{
-		std::ifstream instream(inFile);
-		if (!instream.good())
-		{
-			*logFileStream << "Invalid input file: " << inFile << std::endl;
-			return -1;
-		}
-
 		analysisResults::AnalysisResults analysisResults;
 		
 		// please keep this here for debugging
@@ -95,14 +99,11 @@ int main(int argc, char** argv)
 // 		std::string s(std::istreambuf_iterator<char>(instream), eos);
 // 		*logFileStream << s;
 
-		std::vector<Issue> issues; // issues at fuzztree level
-		FuzzTreeTransform tf(instream, issues);
-		instream.close();
-
 		if (!tf.isValid())
 		{ // handle faulttree
 			std::ifstream is(inFile); // TODO: somehow avoid opening another stream here
-			const auto faultTree = faulttree::faultTree(inFile, xml_schema::Flags::dont_validate);
+			const std::auto_ptr<faulttree::FaultTree> faultTree = 
+				faulttree::faultTree(inFile, xml_schema::Flags::dont_validate);
 			is.close();
 
 			std::vector<Issue> treeIssues;
@@ -119,6 +120,9 @@ int main(int argc, char** argv)
 				r.issue().push_back(i.serialized());
 			
 			analysisResults.result().push_back(r);
+
+			if (!r.validResult())
+				faulttree::faultTree(*logFileStream, *(faultTree.get()));
 		}
 		else
 		{ // handle fuzztree
@@ -154,14 +158,11 @@ int main(int argc, char** argv)
 	}
 
 	// This should not happen.
-	catch (const xml_schema::Exception& e)
-	{
-		*logFileStream << "Exception while trying to analyze " << inFile << e.what() << std::endl;
-		return -1;
-	}
 	catch (const std::exception& e)
 	{
 		*logFileStream << "Exception while trying to analyze " << inFile << e.what() << std::endl;
+		fuzztree::fuzzTree(*logFileStream, *(tf.getFuzzTree()));
+		
 		return -1;
 	}
 	catch (...)

@@ -250,6 +250,15 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			}
 			else if (isLeaf(childType))
 			{
+				if (childType == *BASICEVENT)
+				{
+					const auto be = static_cast<const fuzztree::BasicEvent*>(&child);
+					if (!be->costs().present())
+						continue;
+					for (FuzzTreeConfiguration& config : configurations)
+						config.setCost(config.getCost() + be->costs().get());
+				}
+				
 				continue; // end recursion
 			}
 		}
@@ -303,9 +312,12 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		
 		if (typeName == *REDUNDANCYVP)
 		{ // TODO: probably this always ends up with a leaf node
-			if (currentChild.children().size() > 1)
+			int numChildren = currentChild.children().size();
+			if (numChildren != 1)
 			{
-				m_issues.emplace_back(std::string("Redundancy VP with multiple children found: ") + id, 0, id);
+				throw FatalException(
+					std::string("Redundancy VP with invalid number of children found: ") + util::toString(numChildren),
+					0, id);
 				return WRONG_CHILD_NUM;
 			}
 			const auto& firstChild = currentChild.children().front();
