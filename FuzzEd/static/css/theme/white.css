@@ -4415,11 +4415,50 @@ i.icon-progress {
     display: none   !important;
     visibility: hidden !important;
   }
-  .fuzzed-node .fuzzed-node-optional-indicator circle {
-    fill: #000 !important;
+  .fuzzed-node.highlighted path,
+  .fuzzed-node.highlighted rect,
+  .fuzzed-node.highlighted circle {
+    stroke: #000 !important;
   }
-  .fuzzed-node.fuzzed-node-optional .fuzzed-node-optional-indicator circle {
-    fill: #fff !important;
+  .fuzzed-node.highlighted .sticky_note {
+    border: none !important;
+  }
+  .fuzzed-node.ui-selected path,
+  .fuzzed-node.ui-selecting path,
+  .fuzzed-node.ui-selected.highlighted path,
+  .fuzzed-node.ui-selecting.highlighted path,
+  .fuzzed-node.ui-selected rect,
+  .fuzzed-node.ui-selecting rect,
+  .fuzzed-node.ui-selected.highlighted rect,
+  .fuzzed-node.ui-selecting.highlighted rect,
+  .fuzzed-node.ui-selected circle,
+  .fuzzed-node.ui-selecting circle,
+  .fuzzed-node.ui-selected.highlighted circle,
+  .fuzzed-node.ui-selecting.highlighted circle {
+    stroke: #000 !important;
+  }
+  .fuzzed-node.ui-selected .sticky_note,
+  .fuzzed-node.ui-selecting .sticky_note,
+  .fuzzed-node.ui-selected.highlighted .sticky_note,
+  .fuzzed-node.ui-selecting.highlighted .sticky_note {
+    border: none !important;
+  }
+  .fuzzed-node.disabled path,
+  .fuzzed-node.disabled.ui-selected path,
+  .fuzzed-node.disabled.highlighted path,
+  .fuzzed-node.disabled.ui-selected.highlighted path,
+  .fuzzed-node.disabled rect,
+  .fuzzed-node.disabled.ui-selected rect,
+  .fuzzed-node.disabled.highlighted rect,
+  .fuzzed-node.disabled.ui-selected.highlighted rect,
+  .fuzzed-node.disabled circle,
+  .fuzzed-node.disabled.ui-selected circle,
+  .fuzzed-node.disabled.highlighted circle,
+  .fuzzed-node.disabled.ui-selected.highlighted circle {
+    stroke: #000 !important;
+  }
+  .fuzzed-node.disabled svg {
+    opacity: 1;
   }
   rect,
   circle,

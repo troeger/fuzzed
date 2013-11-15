@@ -16,15 +16,47 @@
     }
 
     .fuzzed-node {
-        .fuzzed-node-optional-indicator circle {
-            fill: #000 !important;
+        // highlighted state
+        &.highlighted {
+            path, rect, circle {
+                stroke: #000 !important;
+            }
+
+            .sticky_note{
+              border: none !important;
+            }
         }
 
-        &.fuzzed-node-optional .fuzzed-node-optional-indicator circle {
-            fill: #fff !important;
+        // selected/selecting state
+        &.ui-selected, &.ui-selecting {
+            &, &.highlighted {
+                path, rect, circle{
+                    stroke: #000 !important;
+                }
+
+                .sticky_note{
+                  border: none !important;
+                }
+            }
+        }
+
+        // disabled state
+        &.disabled {
+            &, &.ui-selected {
+                &, &.highlighted {
+                    path, rect, circle {
+                        stroke: #000 !important;
+                    }
+                }
+            }
+
+            svg {
+                opacity: 1;
+            }
         }
     }
 
+    // override connector colors
     rect, circle, line, path {
         stroke: #000 !important;
     }
