@@ -218,7 +218,8 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 
 				if (childIds.empty())
 				{
-					m_issues.emplace_back(std::string("FeatureVP without children found: ") + id, 0, id);
+					throw new FatalException(std::string("FeatureVP without children found: ") + id, 0, id);
+					// m_issues.emplace_back(std::string("FeatureVP without children found: ") + id, 0, id);
 					return WRONG_CHILD_NUM;
 				}
 
