@@ -250,15 +250,16 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			}
 			else if (isLeaf(childType))
 			{
-				if (childType == *BASICEVENT)
+				if (childType == *BASICEVENT || childType == *BASICEVENTSET)
 				{
 					const auto be = static_cast<const fuzztree::BasicEvent*>(&child);
+					assert(be); // BasicEventSets inherit from BasicEvents
 					if (!be->costs().present())
 						continue;
 					for (FuzzTreeConfiguration& config : configurations)
 						config.setCost(config.getCost() + be->costs().get());
 				}
-				
+			
 				continue; // end recursion
 			}
 		}
@@ -562,13 +563,20 @@ void FuzzTreeTransform::copyNode(
 	const fuzztree::ChildNode& currentChild)
 {
 	using namespace fuzztreeType;
-	if (typeName == *AND)					node->children().push_back(fuzztree::And(id));
-	else if (typeName == *OR)				node->children().push_back(fuzztree::Or(id));
-	else if (typeName == *VOTINGOR)			node->children().push_back(fuzztree::VotingOr(id, (static_cast<const fuzztree::VotingOr&>(currentChild)).k()));
-	else if (typeName == *XOR)				node->children().push_back(fuzztree::Xor(id));
-	else if (typeName == *INTERMEDIATEEVENT)node->children().push_back(fuzztree::IntermediateEvent(id));
-	else if (typeName == *BASICEVENT)		node->children().push_back(fuzztree::BasicEvent(static_cast<const fuzztree::BasicEvent&>(currentChild)));
-	else if (typeName == *UNDEVELOPEDEVENT)	node->children().push_back(fuzztree::UndevelopedEvent(id));
+	if (typeName == *AND)					
+		node->children().push_back(fuzztree::And(id));
+	else if (typeName == *OR)				
+		node->children().push_back(fuzztree::Or(id));
+	else if (typeName == *VOTINGOR)			
+		node->children().push_back(fuzztree::VotingOr(id, (static_cast<const fuzztree::VotingOr&>(currentChild)).k()));
+	else if (typeName == *XOR)				
+		node->children().push_back(fuzztree::Xor(id));
+	else if (typeName == *INTERMEDIATEEVENT)
+		node->children().push_back(fuzztree::IntermediateEvent(id));
+	else if (typeName == *BASICEVENT)		
+		node->children().push_back(fuzztree::BasicEvent(static_cast<const fuzztree::BasicEvent&>(currentChild)));
+	else if (typeName == *UNDEVELOPEDEVENT)	
+		node->children().push_back(fuzztree::UndevelopedEvent(id));
 	else
 	{
 		throw FatalException(std::string("Unexpected Node Type encountered: ") + typeName.name(), 0, id);
