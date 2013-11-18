@@ -212,14 +212,9 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			if (childType == *FEATUREVP)
 			{ // exactly one subtree. Generate N * #Features configurations.
 				const FeatureVariationPoint* featureNode = static_cast<const FeatureVariationPoint*>(&child);
-				vector<FuzzTreeConfiguration::id_type> childIds;
-				for (const auto& featuredChild : featureNode->children())
-					childIds.emplace_back(featuredChild.id());
-
-				if (childIds.empty())
+				if (featureNode->children().size() == 0)
 				{
-					throw new FatalException(std::string("FeatureVP without children found: ") + id, 0, id);
-					// m_issues.emplace_back(std::string("FeatureVP without children found: ") + id, 0, id);
+					throw FatalException(std::string("FeatureVP without children found: ") + id, 0, id);
 					return WRONG_CHILD_NUM;
 				}
 
@@ -228,14 +223,15 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 				{
 					if (config.isIncluded(id))
 					{
-						for (const auto& i : childIds)
+						for (const auto& featuredChild : featureNode->children())
 						{
 							FuzzTreeConfiguration copied = config;
-							copied.setFeatureNumber(id, i);
+							copied.setFeatureNumber(id, featuredChild.id());
 							for (const auto& other : featureNode->children())
-								if (other.id() != i) 
+							{
+								if (other.id() != featuredChild.id()) 
 									copied.setNotIncludedRecursive(other);
-							
+							}
 							newConfigs.emplace_back(copied);
 						}
 					}
@@ -249,20 +245,33 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 					configurations.assign(newConfigs.begin(), newConfigs.end());
 				}
 			}
-			else if (isLeaf(childType))
-			{
-				if (childType == *BASICEVENT || childType == *BASICEVENTSET)
+			else if (
+				childType == *BASICEVENT || 
+				childType == *BASICEVENTSET)
+			{ // handle costs, TODO intermediateEvents!
+				const auto inclusionVP = static_cast<const fuzztree::BasicEvent*>(&child);
+				assert(inclusionVP); // BasicEventSets inherit from BasicEvents
+				if (!inclusionVP->costs().present())
+					continue;
+
+				int costs = inclusionVP->costs().get();
+
+				// multiply costs...
+				if (childType == *BASICEVENTSET)
 				{
-					const auto be = static_cast<const fuzztree::BasicEvent*>(&child);
-					assert(be); // BasicEventSets inherit from BasicEvents
-					if (!be->costs().present())
-						continue;
-					for (FuzzTreeConfiguration& config : configurations)
-						config.setCost(config.getCost() + be->costs().get());
+					const auto bes = static_cast<const fuzztree::BasicEventSet*>(inclusionVP);
+					costs *= bes->quantity().present() ? 
+						bes->quantity().get() : 1;
 				}
-			
-				continue; // end recursion
+
+				for (FuzzTreeConfiguration& config : configurations)
+				{
+					if (config.isIncluded(id))
+						config.setCost(costs + config.getCost());
+				}
 			}
+
+			if (isLeaf(childType)) continue; // end recursion
 		}
 		generateConfigurationsRecursive(&child, configurations);
 	}
