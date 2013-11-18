@@ -1,9 +1,9 @@
 #pragma once
 
 // a simple data structure for the results computed during Fault Tree Simulation
-struct SimulationResult
+struct SimulationResultStruct
 {
-	SimulationResult() : 
+	SimulationResultStruct() : 
 		reliability(1.0), meanAvailability(1.0), mttf(-1.0), nRounds(0), nFailures(0), duration(0.0) {};
 
 	long double reliability;

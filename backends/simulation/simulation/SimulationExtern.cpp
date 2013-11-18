@@ -9,35 +9,6 @@
 
 using namespace std;
 
-void runSimulation(
-	char* fuzztreeXML, 
-	int numRounds,
-	double convergenceThreshold,
-	int maxTime) noexcept
-{	
-	try
-	{
-		SimulationProxy p = SimulationProxy(numRounds, convergenceThreshold, maxTime);
-		
-		FuzzTreeTransform ftTransform(fuzztreeXML);
-		int i = 0;
-		for (const auto& ft : ftTransform.transform())
-		{
-			p.simulateFaultTree(fromGeneratedFuzzTree(ft.topEvent()), "foo" + util::toString(++i) + ".TN", TIMENET);
-		}
-
-	}
-	catch (const exception& e)
-	{
-		cout << "Unhandled Exception during Simulation: " << e.what() << endl;
-	}
-	catch (...)
-	{
-		cout << "Unknown Exception during Simulation" << endl;
-	}
-}
-
-
 void runSimulationOnFile(
 	char* filePath,
 	int numRounds,
@@ -47,7 +18,7 @@ void runSimulationOnFile(
 	try
 	{
 		SimulationProxy p = SimulationProxy(numRounds, convergenceThreshold, maxTime);
-		p.simulateFile(filePath, DEFAULT, false); // TODO make configurable
+		p.simulateFile(filePath, DEFAULT);
 
 	}
 	catch (const exception& e)

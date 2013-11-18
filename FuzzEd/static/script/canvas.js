@@ -47,11 +47,11 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
             var canvasWidth  = this.container.width();
             var canvasHeight = this.container.height();
             var doubleGrid   = this.gridSize << 1;
-
-            while (to.x > canvasWidth - doubleGrid) {
+			
+            while (to.x + to.width  > canvasWidth - doubleGrid) {
                 canvasWidth *= 2;
             }
-            while (to.y > canvasHeight - doubleGrid) {
+            while (to.y + to.height > canvasHeight - doubleGrid) {
                 canvasHeight *= 2;
             }
 
@@ -178,7 +178,11 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
         _setupCanvas: function() {
             // make canvas droppable for shapes from the shape menu
             this.container.droppable({
-                accept:    'svg',
+                accept: function(draggable) {
+        			if (jQuery(draggable).parent().attr('class') === Config.Classes.DRAGGABLE_WRAP_DIV){
+            			return true;
+						}
+    				},
                 tolerance: 'fit',
                 drop:      function(uiEvent, uiObject) {
                     var kind     = uiObject.draggable.attr('id');
@@ -190,6 +194,12 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
 
             this.container.selectable({
                 filter: '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
+				unselected: function(event, ui) {
+					jQuery(document).trigger(Config.Events.NODE_UNSELECTED);
+				},
+				selected: function(event,ui){
+					jQuery(document).trigger(Config.Events.NODE_SELECTED);
+				},
                 stop: function() {
                     // tell other (e.g. <PropertyMenu>) that selection is done and react to the new selection
                     jQuery(document).trigger(Config.Events.CANVAS_SELECTION_STOPPED);

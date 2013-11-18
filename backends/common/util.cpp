@@ -14,9 +14,11 @@
 #include <exception>
 #include <algorithm>
 
-using namespace chrono;
 using namespace boost;
 using namespace pugi;
+
+using std::ofstream;
+using std::ifstream;
 
 std::string util::toString(const int& i)
 {
@@ -37,6 +39,14 @@ std::string util::toString(const long double& d, const int& prec /*= 5*/)
 	oss << std::fixed << std::setprecision(prec);
 	oss << d;
 	return oss.str();
+}
+
+string util::toString(istream& istream)
+{
+	int pos = istream.tellg();
+	string result = string(std::istreambuf_iterator<char>(istream), std::istreambuf_iterator<char>());
+	istream.seekg(pos);
+	return result;
 }
 
 bool util::copyFile(const string& src, const string& dst)
@@ -67,8 +77,12 @@ int util::fileSize(const char* filename)
 
 string util::timeStamp()
 {
-	const int time = (int)duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-	return util::toString(time);
+	time_t t;
+	time(&t);
+
+	std::stringstream strm;
+	strm << t;
+	return strm.str();
 }
 
 long double util::kOutOfN(long double rate, int k, int N)
@@ -131,7 +145,7 @@ void util::replaceFileExtensionInPlace(string& subject, const string& newExtensi
 
 string util::nestedIDString(int n, ...)
 {
-	stringstream result;
+	std::stringstream result;
 
 	va_list args;
 	va_start(args, n);
@@ -193,4 +207,18 @@ double util::probabilityFromRate(double rate, int missionTime)
 bool util::bitSet(const int var, const int pos)
 {
 	return (var) & (1<<(pos));
+}
+
+bool util::isWritable(const string& path)
+{
+	FILE *fp = fopen(path.c_str(), "w");
+	if (fp == nullptr)
+	{
+		if (errno == EACCES)
+			std::cerr << "Permission denied" << std::endl;
+		else
+			std::cerr << "Something went wrong: " << strerror(errno) << std::endl;
+		return false;
+	}
+	return true;
 }

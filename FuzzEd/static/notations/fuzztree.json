@@ -20,6 +20,37 @@
 
             "properties": {}
         },
+        
+        "stickyNote": {
+            "nodeDisplayName": "Sticky Note",
+            "inherits": "node",
+            "numberOfOutgoingConnections": 0,
+            "image": "sticky_note.html",
+            "resizable": true,
+            "editable": true,
+            
+            "properties": {
+              "description": {
+                  "kind": "textfield",
+                  "default": "Sample Text",
+                  "hidden": true
+              },
+              
+              "height": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              },
+              
+              "width": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              }
+            }
+        },
 
         "event": {
             "nodeDisplayName": "Event",
@@ -578,7 +609,10 @@
         "k",
         "kFormula",
         "transfer",
-        "transferMaxCost"
+        "transferMaxCost",
+        "description",
+        "width",
+        "height"
     ],
 
     "shapeMenuNodeDisplayOrder": [
@@ -597,7 +631,8 @@
         "transferIn",
 
         "featureVariation",
-        "redundancyVariation"
+        "redundancyVariation",
+        "stickyNote"
     ],
 
     "defaults": {

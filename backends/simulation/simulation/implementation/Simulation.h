@@ -7,6 +7,8 @@
 
 struct SimulationRoundResult
 {
+	SimulationRoundResult() : failed(false), valid(false), failureTime(0) {}
+	
 	bool failed; // did the top level event occur?
 	bool valid;
 	unsigned int failureTime; // number of logical time steps until the failure event

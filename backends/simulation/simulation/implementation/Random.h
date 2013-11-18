@@ -3,8 +3,9 @@
 #include <unordered_map>
 #include <fstream>
 #include <mutex>
+#include <thread>
 
-using namespace std;
+#include "Config.h"
 
 class RandomNumberGenerator
 {
@@ -21,15 +22,23 @@ public:
 
 	double randomNumberWeibull(double rate, double k);
 	
-	static void generateExponentialRandomNumbers(const string& fileName, double rate, int count);
+	static void generateExponentialRandomNumbers(const std::string& fileName, double rate, int count);
+
+	// this is a weird per-thread singleton pattern.
+	static void initGenerators();
 
 private:
 	RandomNumberGenerator();
 
-	mt19937 m_generator;
-	unordered_map<double, exponential_distribution<double>> m_exponentialDistributions;
+	std::mt19937 m_generator;
+	std::unordered_map<double, std::exponential_distribution<double>> m_exponentialDistributions;
 
-	// this is a weird per-thread singleton pattern.
-	static void initGenerators();
-	static unordered_map<int, RandomNumberGenerator*> s_generators;
+#ifndef OMP_PARALLELIZATION
+	typedef std::unordered_map<std::thread::id, RandomNumberGenerator*> GeneratorMap;
+#else
+	typedef std::unordered_map<int, RandomNumberGenerator*> GeneratorMap;
+#endif
+
+
+	static GeneratorMap s_generators;
 };

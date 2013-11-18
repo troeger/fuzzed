@@ -10,6 +10,8 @@
             "allowConnectionTo": [],
 
             "deletable": true,
+            "resizable": false,
+            "editable": false,
 
             "connector": {
                 "offset": {
@@ -19,6 +21,37 @@
             },
 
             "properties": {}
+        },
+        
+        "stickyNote": {
+            "nodeDisplayName": "Sticky Note",
+            "inherits": "node",
+            "numberOfOutgoingConnections": 0,
+            "image": "sticky_note.html",
+            "resizable": true,
+            "editable": true,
+            
+            "properties": {
+              "description": {
+                  "kind": "textfield",
+                  "default": "Sample Text",
+                  "hidden": true
+              },
+              
+              "height": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              },
+              
+              "width": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              }
+            }
         },
 
         "event": {
@@ -109,7 +142,7 @@
             "inherits": "event",
 
             "numberOfOutgoingConnections": 1,
-            "allowConnectionTo": ["staticGate", "cspGate", "priorityAndGate", "seqGate"],
+            "allowConnectionTo": ["staticGate", "spareGate", "priorityAndGate", "seqGate"],
 
             "image": "intermediate_event.svg",
             "help": "An error event resulting from a combination of previous events.",
@@ -127,7 +160,7 @@
 
             "numberOfIncomingConnections": 0,
             "allowConnectionTo": [
-                "basicEvent", "undevelopedEvent", "houseEvent", "staticGate", "cspGate", "priorityAndGate", "seqGate"
+                "basicEvent", "undevelopedEvent", "houseEvent", "staticGate", "spareGate", "priorityAndGate", "seqGate"
             ],
 
             "image": "top_event.svg",
@@ -258,7 +291,7 @@
             "nodeDisplayName": "Gate",
             "inherits": "node",
 
-            "allowConnectionTo": ["event", "staticGate", "cspGate", "priorityAndGate", "seqGate", "transferIn"]
+            "allowConnectionTo": ["event", "staticGate", "spareGate", "priorityAndGate", "seqGate", "transferIn"]
         },
 
         "staticGate": {
@@ -324,16 +357,16 @@
             "inherits": "gate"
         },
 
-        "cspGate": {
-            "nodeDisplayName": "Cold Spare Gate",
+        "spareGate": {
+            "nodeDisplayName": "Spare Gate",
             "inherits": "dynamicGate",
 
-            "image": "csp_gate.svg",
+            "image": "spare_gate.svg",
             "help": "The output event occurs if the primary and all secondary events occur. The primary event changes the probability of the secondary events.",
 
             "allowConnectionTo": [
                 "basicEvent", "basicEventSet", "undevelopedEvent", "houseEvent", "staticGate",
-                "cspGate", "priorityAndGate", "seqGate", "transferIn"
+                "spareGate", "priorityAndGate", "seqGate", "transferIn"
             ],
 
             "properties": {
@@ -357,10 +390,11 @@
             "nodeDisplayName": "FDEP Gate",
             "inherits": "dynamicGate",
 
+            "numberOfIncomingConnections": -1,
             "numberOfOutgoingConnections": 1,
             "allowConnectionTo": [
                 "basicEvent", "houseEvent", "undevelopedEvent", "staticGate",
-                "cspGate", "priorityAndGate", "seqGate", "transferIn"
+                "spareGate", "priorityAndGate", "seqGate", "transferIn"
             ],
 
             "image": "fdep_gate.svg",
@@ -414,7 +448,10 @@
         "cardinality",
         "k",
         "dormancyFactor",
-        "transfer"
+        "transfer",
+        "description",
+        "width",
+        "height"
     ],
 
     "shapeMenuNodeDisplayOrder": [
@@ -431,11 +468,12 @@
         "xorGate",
         "votingOrGate",
 
-        "cspGate",
+        "spareGate",
         "fdepGate",
         "priorityAndGate",
         "seqGate",
-        "transferIn"
+        "transferIn",
+        "stickyNote"
     ],
 
     "defaults": {

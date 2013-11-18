@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import logging
@@ -11,7 +11,7 @@ import xml_fuzztree
 import xml_faulttree
 from graph import Graph
 
-import json, notations, sys, time
+import json, notations, sys, datetime, time
 
 def new_client_id():
     return str(int(time.mktime(time.gmtime())))
@@ -45,7 +45,11 @@ faulttree_classes = {
     'orGate':               xml_faulttree.Or,
     'xorGate':              xml_faulttree.Xor,
     'votingOrGate':         xml_faulttree.VotingOr,
-    'transferIn':           xml_faulttree.TransferIn
+    'transferIn':           xml_faulttree.TransferIn,
+    'fdepGate':             xml_faulttree.FDEP,
+    'priorityAndGate':      xml_faulttree.PriorityAnd,
+    'seqGate':              xml_faulttree.Sequence,
+    'spareGate':            xml_faulttree.Spare
 }
 
 class Node(models.Model):
@@ -141,6 +145,17 @@ class Node(models.Model):
             return str(children[0])
 
         raise ValueError('Node %s has unsupported kind' % self)
+
+    def children(self):
+        from edge import Edge
+        return [edge.target for edge in Edge.objects.filter(source=self)]
+
+    def children_left2right(self):
+        return sorted(self.children(), key=lambda child: child.x)        
+
+    def parents(self):
+        from edge import Edge
+        return [edge.target for edge in Edge.objects.filter(target=self)]
 
     def get_all_mirror_properties(self, hiddenProps=[]):
         """
@@ -261,7 +276,7 @@ class Node(models.Model):
             xmltype = self.graph.kind
 
         properties = {
-            'id':   self.id,
+            'id':   self.client_id,
             'name': self.get_property('name', '-')
         }
 
@@ -284,9 +299,7 @@ class Node(models.Model):
                 # Probability is a 2-tuple, were the first value is a type indicator and the second the value
                 if probability[0] == 1:
                     # Failure rate
-                    #TODO: Determine mission time and compute value, or give rate to the backend
-                    #properties['probability'] = xml_fuzztree.CrispProbability(value_=42)
-                    assert(False)
+                    properties['probability'] = xml_fuzztree.FailureRate(value_=probability[1])
                 elif probability[0] in [0,2]:
                     # Point value with uncertainty range, type 0 (direct) or 2 (fuzzy terms)
                     if isinstance(probability[1], int):
@@ -328,6 +341,21 @@ class Node(models.Model):
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
                 probability_property = self.get_property('probability', None)
                 properties['probability'] = xml_faulttree.CrispProbability(value_=probability_property[1])
+
+            if self.kind == 'fdepGate':
+                properties['triggeredEvents'] = [parent.client_id for parent in self.parents()]
+                children = self.children()
+                assert(len(children)==1)            # Frontend restriction, comes from notations.json
+                properties['trigger'] = children[0].client_id  
+
+            if self.kind == 'spareGate':
+                children_sorted = self.children_left2right()
+                assert(len(children_sorted)>0)      #TODO: This will kill the XML generation if the graph is incompletly drawn. Do we want that?
+                properties['primaryID'] = children_sorted[0].client_id
+                properties['dormancyFactor'] = self.get_property('dormancyFactor')
+
+            if self.kind in ['seqGate','priorityAndGate']:
+                properties['eventSequence'] = [child.client_id for child in self.children_left2right()]
 
             xml_node = faulttree_classes[self.kind](**properties)
 
@@ -394,14 +422,8 @@ class Node(models.Model):
             prop.value = value
             prop.save()
 
-# the handler will ensure that the kind of the node is present in its containing graph notation
-@receiver(pre_save, sender=Node)
-def validate(sender, instance, raw, **kwargs):
-    # raw is true if fixture loading happens, where the graph does not exist so far
-    if not raw:
-        graph = instance.graph
-        if not instance.kind in notations.by_kind[graph.kind]['nodes']:
-            raise ValueError('Graph %s does not support nodes of type %s' % (graph, instance.kind))
-
-# ensures that the validate handler is not exported
-__all__ = ['Node']
+@receiver(post_save, sender=Node)
+def graph_modify(sender, instance, **kwargs):
+    logger.debug("Updating graph modification date.")
+    instance.graph.modified = datetime.datetime.now()
+    instance.graph.save()

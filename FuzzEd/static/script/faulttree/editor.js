@@ -1,12 +1,12 @@
-define(['editor', 'faulttree/graph', 'menus', 'faulttree/config', 'highcharts', 'jquery-ui', 'slickgrid'],
-function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
+define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'highcharts', 'jquery-ui', 'slickgrid'],
+function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
     /**
      *  Package: Faulttree
      */
 
     /**
      *  Class: CutsetsMenu
-     *
+     *∂DOW
      *  A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
      *  cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
      *
@@ -177,11 +177,12 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             job.successCallback  = this._evaluateResult.bind(this);
             job.updateCallback   = this._displayProgress.bind(this);
-            job.errorCallback    = this._displayNetworkError.bind(this);
+            job.errorCallback    = this._displayJobError.bind(this);
             job.notFoundCallback = this._displayNotFoundError.bind(this);
             job.queryInterval    = 500;
 
             this._job = job;
+            job.progressMessage = FaulttreeConfig.ProgressIndicator.CALCULATING_MESSAGE;
             job.start();
 
             this._super();
@@ -190,13 +191,15 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
         /**
          *  Method: hide
-         *    Hide the menu and clear all its content.
+         *    Hide the menu and clear all its content. Also stops querying for job results.
          *
          *  Returns:
          *    This menu instance for chaining.
          */
         hide: function() {
             this._super();
+            // cancel query job
+            this._job.cancel();
             // clear content
             this._clear();
 
@@ -274,19 +277,27 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Evaluates the job result. Either displays the analysis results or the returned error message.
          *
          *  Parameters:
-         *    {JSON} data - Data returned from the backend containing the result of the calculation.
+         *    {string} data - Data returned from the backend containing the result of the calculation.
          */
         _evaluateResult: function(data) {
-            if (typeof data.errors !== 'undefined' && _.size(data.errors) != 0) {
+            data = jQuery.parseJSON(data);
+
+            if (_.size(data.errors) > 0) {
                 // errors is a dictionary with the node ID as key
-                //TODO: display validation result at the node
-                this._displayValidationErrors(_.values(data.errors));
-            } else {
+                this._displayValidationErrors(data.errors);
+            }
+
+            if (_.size(data.warnings) > 0) {
+                // warnings is a dictionary with the node ID as key
+                this._displayValidationWarnings(data.warnings);
+            }
+
+            if (_.size(data.configurations) > 0) {
                 var chartData = {};
                 var tableData = [];
                 var configID = '';
 
-                _.each(data['configurations'], function(config, index) {
+                _.each(data.configurations, function(config, index) {
                     //TODO: better naming?
                     configID = '#' + (index + 1);
                     var displayData = this._convertToDisplayFormat(config);
@@ -312,6 +323,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 this._displayResultWithSlickGrid(tableData);
 
                 this._setupResizing();
+            } else {
+                // close menu again if there are no results
+                this.hide();
             }
         },
 
@@ -431,11 +445,13 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {JSON} data - Data returned from the backend with information about the job's progress.
          */
         _displayProgress: function(data) {
+            if (this._chartContainer.find('.progress').length > 0) return;
+
             var progressBar = jQuery(
                 '<div style="text-align: center;">' +
                     '<p>Calculating probability...</p>' +
                     '<div class="progress progress-striped active">' +
-                        '<div class="bar" style="width: 100%;"></div>' +
+                        '<div class="progress-bar" role="progressbar" style="width: 100%;"></div>' +
                     '</div>' +
                 '</div>');
 
@@ -490,8 +506,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
                 },
 
                 xAxis: {
-                    min: 0,
-                    max: 1
+                    min: -0.05,
+                    max:  1.05
                 },
                 yAxis: {
                     min: 0,
@@ -635,6 +651,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    {String} configID - The ID of the configuration that should be highlighted.
          */
         _highlightConfiguration: function(configID) {
+            // prevents that node edge anchors are being displayed
+            Canvas.container.addClass(FaulttreeConfig.Classes.CANVAS_NOT_EDITABLE);
+
             // highlight nodes
             _.invoke(this._configNodeMap[configID], 'highlight');
             // highlight edges
@@ -651,6 +670,9 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Remove all highlights from the graph.
          */
         _unhighlightConfiguration: function() {
+            // make the anchors visible again
+            Canvas.container.removeClass(FaulttreeConfig.Classes.CANVAS_NOT_EDITABLE);
+
             // unhighlight all nodes
             _.invoke(this._editor.graph.getNodes(), 'unhighlight');
             // unhighlight all edges
@@ -664,34 +686,59 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
          *    Display all errors that are thrown during graph validation.
          *
          *  Parameters:
-         *    {Array} errors - A list of error messages.
+         *    {Object} errors - A dictionary of error messages.
          */
         _displayValidationErrors: function(errors) {
-            //TODO: This is a temporary solution. Should be replaced by error messages later.
-
-            var list = jQuery('<ul></ul>');
-            _.each(errors, function(error) {
-                jQuery('<li></li>').text(error).appendTo(list);
-            });
-            this._chartContainer.html(list);
+            //TODO: This is a temporary solution. Errors should be displayed per node later.
+            if (errors.length == 1) {
+                Alerts.showErrorAlert('Analysis error: ', errors[0]);
+            } else {
+                var errorList = '<ul>';
+                _.each(errors, function(error) {
+                    errorList += '<li>' + error + '</li>';
+                });
+                errorList += '</ul>'
+                Alerts.showErrorAlert('Analysis errors: ', errorList);
+            }
         },
 
         /**
-         *  Method: _displayNetworkError
-         *    Display an error massage resulting from a network error (e.g. 404) in the menu's body.
+         *  Method: _displayValidationWarnings
+         *    Display all warnings that are thrown during graph validation.
+         *
+         *  Parameters:
+         *    {Object} warnings - A dictionary of warning messages.
          */
-        _displayNetworkError: function() {
-            //TODO: This is a temporary solution. Should be replaced by error messages later.
-            this._chartContainer.text('Network error');
+        _displayValidationWarnings: function(warnings) {
+            //TODO: This is a temporary solution. Warnings should be displayed per node later.
+            if (_.size(warnings) == 1) {
+                Alerts.showErrorAlert('Warning:', warnings[0]);
+            } else {
+                var warningList = '<ul>';
+                _.each(warnings, function(warning) {
+                    warningList += '<li>' + warning + '</li>';
+                });
+                warningList += '</ul>'
+                Alerts.showWarningAlert('Multiple warnings returned from analysis:', warningList);
+            }
+        },
+
+        /**
+         *  Method: _displayJobError
+         *    Display an error massage resulting from a job error.
+         */
+        _displayJobError: function() {
+            Alerts.showErrorAlert('An error occurred!', 'Are you still connected to the internet? If so it\'s our fault and we are working on it.');
+            this.hide();
         },
 
         /**
          *  Method: _displayNotFoundError
-         *    Display an error massage resulting from a 404 in the menu's body.
+         *    Display an error massage resulting from a 404.
          */
         _displayNotFoundError: function() {
-            //TODO: This is a temporary solution. Should be replaced by error messages later.
-            this._chartContainer.text('Not found');
+            Alerts.showErrorAlert('Analysis result not found!', 'Please try again. If the error persists, something is wrong on our side. We are working on it.');
+            this.hide();
         }
     });
 
@@ -760,6 +807,8 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
 
             this._setupCutsetsAction();
             this._setupAnalyticalAction();
+            this._setupExportPDFAction();
+            this._setupExportEPSAction();
 
             return this._super(readOnly);
         },
@@ -783,6 +832,46 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
         },
 
         /**
+         *  Method: _setupExportPDFAction
+         *    Registers the click handler for the 'export PDF document' menu entry.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
+        _setupExportPDFAction: function() {
+            jQuery("#"+this.config.IDs.ACTION_EXPORT_PDF).click(function() {
+                jQuery(document).trigger(
+                    this.config.Events.EDITOR_GRAPH_EXPORT_PDF,
+                    function(url) {
+                        this._downloadFileFromURL(url, 'pdf');
+                    }.bind(this)
+                )
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _setupExportEPSAction
+         *    Registers the click handler for the 'export EPS document' menu entry.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
+        _setupExportEPSAction: function() {
+            jQuery("#"+this.config.IDs.ACTION_EXPORT_EPS).click(function() {
+                jQuery(document).trigger(
+                    this.config.Events.EDITOR_GRAPH_EXPORT_EPS,
+                    function(url) {
+                        this._downloadFileFromURL(url, 'eps');
+                    }.bind(this)
+                )
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
          *  Method: _setupAnalyticalAction
          *    Registers the click handler for the 'analytical analysis' menu entry. Clicking will
          *    issue an asynchronous backend call which returns a <Job> object that can be queried for the final result.
@@ -799,6 +888,19 @@ function(Editor, FaulttreeGraph, Menus, FaulttreeConfig) {
             }.bind(this));
 
             return this;
+        },
+
+        /**
+         *  Method: _downloadFileFromURL
+         *    Triggers a download of the given resource. At the moment, it only opens it in the current window.
+         *
+         *  Parameters:
+         *    {String} url - The URL to the file to be downloaded.
+         */
+        _downloadFileFromURL: function(url, format) {
+            //TODO: maybe we can use more sophisticated methods here to get the file to download directly instead
+            //      of opening in the same window
+            window.location = url + '?format=' + format;
         }
     });
 });

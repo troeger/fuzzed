@@ -1,96 +1,177 @@
 #include "InstanceAnalysisTask.h"
 #include "AlphaCutAnalysisTask.h"
-#include "AnalysisResult.h"
+#include "FuzzTreeTransform.h"
 
 #include <string>
-#include <boost/filesystem/path.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/program_options.hpp>
 #include <iostream>
 #include <fstream>
 
+#include "FatalException.h"
+#include "CommandLineParser.h"
+#include "FaultTreeToFuzzTree.h"
 #include "util.h"
+#include "xmlutil.h"
+#include "analysisResult.h"
 
-namespace po = boost::program_options;
-namespace fs = boost::filesystem;
 
-using std::endl;
-using std::cout;
-using std::string;
-
-int main(int argc, char** argv)
+analysisResults::Result analyze(
+	const fuzztree::TopEvent* const topEvent,
+	std::ofstream* logFileStream,
+	analysisResults::AnalysisResults &analysisResults,
+	const std::string modelId,
+	const int decompositionNumber) 
 {
-	// const std::string testfile = "C:\\dev\\fuzztrees\\backends\\fuzztreeanalysis\\testdata\\EWDC2013.fuzztree"; // "C:\\dev\\fuzztrees\\backends\\simulation\\testdata\\mixed.fuzztree";
 	try
 	{
-		string outDir, inFile;
-		bool generateFaultTree;
-
-		po::options_description options;
-		options.add_options()
-			("help,h", "produce help message")
-			("infile,i",		po::value<string>(&inFile),		"Path to FuzzTree file")
-			("outdir,o",		po::value<string>(&outDir),		"Output directory for FuzzTree or faulttree files")
-			("faulttree,f",		po::value<bool>(&generateFaultTree));
-
-		po::variables_map optionsMap;
-		po::store(po::parse_command_line(argc, argv, options), optionsMap);
-		po::notify(optionsMap);
-
-		if (optionsMap.count("help")) 
-		{
-			cout << options << endl;
-			return -1;
-		}
-		else if (optionsMap.count("infile") == 0 || optionsMap.count("outdir") == 0)
-		{
-			cout << "Please specify input file and output directory." << endl;
-			cout << options << endl;
-			return -1;
-		}
-
-		const auto dirPath = fs::path(outDir.c_str());
-		const auto inFilePath = fs::path(inFile.c_str());
-		if (!fs::is_directory(dirPath))
-		{ // TODO: find out write permissions. not featured by Boost 1.48.
-			cout << "Not a valid directory name: " << dirPath << endl;
-			return -1;
-		}
-		else if (!fs::is_regular_file(inFilePath))
-		{
-			cout << "Not a valid file name: " << inFile << endl;
-			return -1;
-		}
-
-		std::ifstream file(inFile);
-		auto t = fuzztree::fuzzTree(file, xml_schema::Flags::dont_validate);
-		file.close();
-
-		auto topEvent = fuzztree::TopEvent(t->topEvent());
-		
-		const int dn = 10; // TODO where does this come from?
-
-		InstanceAnalysisTask* analysis = new InstanceAnalysisTask(&topEvent, dn);
+		InstanceAnalysisTask* analysis = new InstanceAnalysisTask(topEvent, decompositionNumber, *logFileStream);
 		const auto result = analysis->compute();
 
-		std::string xmlFile = util::fileNameFromPath(inFile);
-		util::replaceFileExtensionInPlace(xmlFile, ".xml");
+		analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+		r.probability(serialize(result));
 
-		AnalysisResult resultDocument;
-		resultDocument.setModelId(t->id());
-		resultDocument.setDecompositionNumber(dn);
-		resultDocument.addConfiguration(result);
-		resultDocument.save(outDir + "/" + xmlFile);
+		return r;
+	}
+	catch (const FatalException& e)
+	{
+		analysisResults::Result r(modelId, util::timeStamp(), false, decompositionNumber);
+		r.issue().push_back(e.getIssue().serialized());
+		return r;
 	}
 	catch (const std::exception& e)
 	{
-		std::cout << e.what() << std::endl;
+		// assert(false);
+		// TODO make sure only our exceptions are thrown
+		analysisResults::Result r(modelId, util::timeStamp(), false, decompositionNumber);
+		commonTypes::Issue i;
+		i.message(e.what());
+		r.issue().push_back(i);
+		return r;	
 	}
 	catch (...)
 	{
-		cout << "Unknown error in Configuration" << endl;
+		// assert(false);
+		// TODO make sure only our exceptions are thrown
+		analysisResults::Result r(modelId, util::timeStamp(), false, decompositionNumber);
+		commonTypes::Issue i;
+		i.message("Unknown Error");
+		r.issue().push_back(i);
+		return r;	
+	}
+}
+
+
+
+int main(int argc, char** argv)
+{
+	CommandLineParser parser;
+	parser.parseCommandline(argc, argv);
+	const auto inFile = parser.getInputFilePath().generic_string();
+	const auto outFile = parser.getOutputFilePath().generic_string();
+	const auto logFile = parser.getLogFilePath().generic_string();
+
+	std::ofstream* logFileStream = new std::ofstream(logFile);
+	*logFileStream << "Analysis errors for " << inFile << std::endl;
+	if (!logFileStream->good())
+	{// create default log file
+		logFileStream = new std::ofstream(
+			parser.getWorkingDirectory().generic_string() +
+			util::slash +
+			"errors.txt");	
+	}
+
+	try
+	{
+		std::ifstream instream(inFile);
+		if (!instream.good())
+		{
+			*logFileStream << "Invalid input file: " << inFile << std::endl;
+			return -1;
+		}
+
+		analysisResults::AnalysisResults analysisResults;
+		
+		// please keep this here for debugging
+// 		std::istreambuf_iterator<char> eos;
+// 		std::string s(std::istreambuf_iterator<char>(instream), eos);
+// 		*logFileStream << s;
+
+		std::vector<Issue> issues; // issues at fuzztree level
+		FuzzTreeTransform tf(instream, issues);
+		instream.close();
+
+		if (!tf.isValid())
+		{ // handle faulttree
+			std::ifstream is(inFile); // TODO: somehow avoid opening another stream here
+			const auto faultTree = faulttree::faultTree(inFile, xml_schema::Flags::dont_validate);
+			is.close();
+
+			std::vector<Issue> treeIssues;
+			const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent(), treeIssues);
+			const auto modelId = faultTree->id();
+
+			const unsigned int decompositionNumber = 
+				topEvent->decompositionNumber().present() ? 
+				topEvent->decompositionNumber().get() : 
+				DEFAULT_DECOMPOSITION_NUMBER;
+
+			analysisResults::Result r = analyze(topEvent.get(), logFileStream, analysisResults, modelId, decompositionNumber);
+			for (const auto& i : treeIssues)
+				r.issue().push_back(i.serialized());
+			
+			analysisResults.result().push_back(r);
+		}
+		else
+		{ // handle fuzztree
+			const auto tree = tf.getFuzzTree();
+			const auto modelId = tree->id();
+			
+			const auto topEvent = tree->topEvent();
+
+			const unsigned int decompositionNumber = 
+				topEvent.decompositionNumber().present() ? 
+				topEvent.decompositionNumber().get() : 
+				DEFAULT_DECOMPOSITION_NUMBER;
+
+			for (const auto& t : tf.transform())
+			{
+				auto topEvent = fuzztree::TopEvent(t.second.topEvent());
+
+				analysisResults::Result r = analyze(&topEvent, logFileStream, analysisResults, modelId, decompositionNumber); 
+				r.configuration(serializedConfiguration(t.first));
+				analysisResults.result().push_back(r);
+			}
+		}
+
+		// Log errors
+		for (const Issue& issue : issues)
+		{
+			analysisResults.issue().push_back(issue.serialized());
+			*logFileStream << issue.getMessage() << std::endl;
+		}
+
+		std::ofstream output(outFile);
+		analysisResults::analysisResults(output, analysisResults);
+	}
+
+	// This should not happen.
+	catch (const xml_schema::Exception& e)
+	{
+		*logFileStream << "Exception while trying to analyze " << inFile << e.what() << std::endl;
 		return -1;
 	}
+	catch (const std::exception& e)
+	{
+		*logFileStream << "Exception while trying to analyze " << inFile << e.what() << std::endl;
+		return -1;
+	}
+	catch (...)
+	{
+		*logFileStream << "Exception while trying to analyze " << inFile << std::endl;
+		return -1;
+	}
+	
+	logFileStream->close();
+	delete logFileStream;
 
 	return 0;
 }
