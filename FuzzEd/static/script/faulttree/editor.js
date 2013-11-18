@@ -568,12 +568,12 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             }
 
             var columns = [
-                { id: 'id',              name: 'Configuration',     field: 'id',              sortable: true },
-                { id: 'min',             name: 'Minimum',           field: 'min',             sortable: true, formatter: shorten },
+                { id: 'id',              name: 'Config',             field: 'id',              sortable: true },
+                { id: 'min',             name: 'Min',           field: 'min',             sortable: true, formatter: shorten },
                 { id: 'peak',            name: 'Peak',              field: 'peak',            sortable: true, formatter: shorten },
-                { id: 'max',             name: 'Maximum',           field: 'max',             sortable: true, formatter: shorten },
+                { id: 'max',             name: 'Max',           field: 'max',             sortable: true, formatter: shorten },
                 { id: 'costs',           name: 'Costs',             field: 'costs',           sortable: true },
-                { id: 'ineffectiveness', name: 'Risk (Peak/Costs)', field: 'ineffectiveness', sortable: true, minWidth: 150}
+                { id: 'ineffectiveness', name: 'Peak/Costs', field: 'ineffectiveness', sortable: true, minWidth: 150}
             ];
 
             var options = {
