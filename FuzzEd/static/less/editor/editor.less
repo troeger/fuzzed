@@ -15,7 +15,7 @@
 }
 
 #FuzzEdCanvas {
-    background-image:      url(../../../img/background.svg);
+    background-image:      url(/static/img/background.svg);
     background-attachment: local;
     position:              absolute;
     width:                 100%;
@@ -24,6 +24,10 @@
 
     &.fuzzed-grid-hidden {
         background-image: none;
+    }
+
+    &.ui-state-disabled {
+        opacity: 1;
     }
 }
 

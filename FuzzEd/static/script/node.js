@@ -73,6 +73,7 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance.
          */
         init: function(definition, propertiesDisplayOrder) {
+
             // merge all presets of the configuration and data from the backend into this object
             jQuery.extend(true, this, definition);
 
@@ -96,11 +97,14 @@ function(Property, Mirror, Canvas, Class) {
                 ._moveContainerToPixel(Canvas.toPixel(this.x, this.y))
                 ._setupConnectionHandle()
                 ._setupEndpoints()
+				.__setupZIndex()
                 // Interaction
                 ._setupDragging()
                 ._setupMouse()
                 ._setupSelection()
                 ._setupProperties(propertiesDisplayOrder)
+				._setupEditable()
+				._setupResizable()
                 // Events
                 ._registerEventHandlers();
         },
@@ -124,7 +128,7 @@ function(Property, Mirror, Canvas, Class) {
                 .removeAttr('id')
                 // add new classes for the actual node
                 .addClass(this.config.Classes.NODE_IMAGE);
-
+				
             this._badge = jQuery('<span class="badge"></span>')
                 .hide();
 
@@ -138,11 +142,44 @@ function(Property, Mirror, Canvas, Class) {
                 .css('position', 'absolute')
                 .data(this.config.Keys.NODE, this)
                 .append(this._nodeImageContainer);
-
+			
             this.container.appendTo(Canvas.container);
 
             return this;
         },
+		
+        /**
+         * Method: __setupZIndex
+         *
+         * This method implements special treatment of z-Index for sticky notes.
+		 * Sticky notes are normally displayed behind all other nodes, as well as node connections with a z-Index value of "-1"
+		 * If a sticky note gets selected it will be brought in front of all other nodes/connections with a z-Index value of "101"
+		 * If a sticky note gets unselected it will be brought in the background again
+		 *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+		__setupZIndex: function(){
+			if (this.kind != 'stickyNote')
+				return this;
+			
+			jQuery(this.container).css('z-index', '-1');
+			
+			var sticky = this;
+				
+			jQuery(document).on(this.config.Events.NODE_SELECTED, function(event, ui){
+				// bring only the sticky note in front that is selected
+				if (jQuery(sticky.container).hasClass('ui-selected'))
+					jQuery(sticky.container).css('z-index', '101');
+			});
+			
+			jQuery(document).on(this.config.Events.NODE_UNSELECTED, function(event, ui){
+				jQuery(sticky.container).css('z-index', '-1')
+			});	
+			
+			
+			return this;
+		},
 
         /**
          * Method: _setupNodeImage
@@ -381,7 +418,10 @@ function(Property, Mirror, Canvas, Class) {
 
                 drag: function(event, ui) {
                     // enlarge canvas
-                    Canvas.enlarge({x: ui.offset.left, y: ui.offset.top});
+					Canvas.enlarge({
+                        x: ui.offset.left + ui.helper.width(),
+                        y: ui.offset.top  + ui.helper.height()
+                    });
 
                     // determine by how many pixels we moved from our original position (see: start callback)
                     var xOffset = ui.position.left - initialPositions[this.id].left;
@@ -498,6 +538,111 @@ function(Property, Mirror, Canvas, Class) {
 
             return this;
         },
+		
+		/*
+		 * Method: _setupResizable
+		 *
+		 * This initialization method is called in the constructor and is responsible for setting up the resizing of a node.
+		 * Until now the resizing functionality is intended only for use in resizing sticky notes on the canvas.
+		 *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+		 */
+		_setupResizable: function(){
+			
+			if(!this.resizable) return this;
+			// adapt size of container div to inner resizable div
+			this.container.width("auto").height("auto");
+			
+			var properties = this.properties;
+			
+			var height = properties.height.value;
+			var width  = properties.width.value;
+		
+			var resizable = this.container.find('.'+ this.config.Classes.RESIZABLE).resizable();
+			// setup resizable with width/height values stored in the backend
+			jQuery(resizable).height(height).width(width);
+			
+			var _nodeImage = this._nodeImage;
+			
+			// if resizable gets resized update width/height attribute		
+			jQuery(resizable).on('resizestop',function() {
+				
+				var newWidth = jQuery(this).width();
+				var newHeight= jQuery(this).height();
+			
+				properties.width.setValue(newWidth);
+				properties.height.setValue(newHeight);
+				
+				// update central point after resizing
+	            _nodeImage.xCenter = jQuery(this).outerWidth() / 2;
+	            _nodeImage.yCenter = jQuery(this).outerHeight() / 2;
+			});
+			
+			
+			jQuery(resizable).on('resize',function(event, ui) {
+                // enlarge canvas if resizable is resized out of the canvas
+				Canvas.enlarge({
+                    x: ui.helper.offset().left + ui.helper.width(),
+                    y: ui.helper.offset().top  + ui.helper.height()
+                });
+				
+				// scroll canvas if resizable is resized out of the visible part of the canvas
+				var scrollable = jQuery('body');
+								
+				var screenWidth  = jQuery(window).width();
+				var screenHeight = jQuery(window).height();
+				
+				var rightScrolled= scrollable.scrollLeft();
+				var downScrolled = scrollable.scrollTop(); 
+				
+				var scrollOffset = 10;
+				
+				// resize to the right	-> scroll right			
+				if( event.clientX > screenWidth - scrollOffset) scrollable.scrollLeft(rightScrolled + Canvas.gridSize);
+				// resize to the left	-> scroll left
+				if( event.clientX <= scrollOffset ) scrollable.scrollLeft(rightScrolled - Canvas.gridSize);
+				
+				// resize downwards -> scroll downwards
+				if( event.clientY > screenHeight - scrollOffset) scrollable.scrollTop(downScrolled + Canvas.gridSize);
+				// resize upwards  -> scroll upwards
+				if( event.clientY <= scrollOffset ) scrollable.scrollTop(downScrolled - Canvas.gridSize);
+				
+			});
+			
+			return this;
+		},
+		
+		/*
+		 * Method: _setupEditable
+		 *
+		 * This initialization method is called in the constructor and is responsible for setting up the editing of a node.
+		 * Until now the editing functionality is intended only for editing sticky notes on the canvas.
+		 * If the sticky note is clicked ,the html paragraph inside the sticky note will be hidden and the textarea will be displayed.
+		 *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+		 */
+		_setupEditable: function(){
+			if(!this.editable) return this;
+			
+			var container = this.container
+			var editable = container.find('.'+ this.config.Classes.EDITABLE);
+			
+			var textarea =  editable.find("textarea");				
+			var paragraph = editable.find("p");
+						
+			editable.on("dblclick", function(event){
+				paragraph.toggle(false);
+				textarea.toggle(true).focus();
+			});
+			
+			jQuery(document).on('node_unselected', function(event){
+				if (textarea.length) textarea.blur();
+			});
+				
+			return this;
+		}, 
 
         /**
          *  Group: Event Handling
@@ -819,8 +964,8 @@ function(Property, Mirror, Canvas, Class) {
          */
         _moveContainerToPixel: function(position) {
             this.container.css({
-                left: Math.max(position.x, Canvas.gridSize) - this._nodeImage.xCenter,
-                top:  Math.max(position.y, Canvas.gridSize) - this._nodeImage.yCenter
+                left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
+                top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
             });
             Canvas.enlarge(position);
             // ask jsPlumb to repaint the selectee in order to redraw its connections

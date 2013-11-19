@@ -9,9 +9,10 @@
 using std::map;
 using std::future;
 
-InstanceAnalysisTask::InstanceAnalysisTask(fuzztree::TopEvent* tree, unsigned int decompositionNumber) :
+InstanceAnalysisTask::InstanceAnalysisTask(const fuzztree::TopEvent* tree, unsigned int decompositionNumber, std::ofstream& logfile) :
 	m_tree(tree),
-	m_decompositionNumber(decompositionNumber)
+	m_decompositionNumber(decompositionNumber),
+	m_logFile(logfile)
 {}
 
 InstanceAnalysisResult InstanceAnalysisTask::compute()
@@ -21,11 +22,16 @@ InstanceAnalysisResult InstanceAnalysisTask::compute()
 
 	const double m = (double)m_decompositionNumber;
 	
+	// TODO: some more intelligent way of dividing work.
+	// find out whether this performs better than the serial version anyway.
+
+	// TODO: reason about multithreaded logging...
+
 	// FORK
 	for (unsigned int i = 0; i <= m_decompositionNumber; ++i)
 	{
 		const double alpha = (double)(i / m);
-		AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, alpha);
+		AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, alpha, m_logFile);
 		alphaCutResults[task] = task->run();
 	}
 

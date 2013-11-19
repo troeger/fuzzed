@@ -7,6 +7,7 @@
 #include "FuzzTreeTypes.h"
 
 #include "util.h"
+#include "xmlutil.h"
 
 using std::string;
 using std::shared_ptr;
@@ -14,7 +15,10 @@ using std::make_shared;
 
 std::shared_ptr<TopLevelEvent> fromGeneratedFaultTree(const faulttree::TopEvent& generatedTree)
 {
-	const unsigned int mt = generatedTree.missionTime();
+	unsigned int mt = DEFAULT_MISSION_TIME;
+	if (generatedTree.missionTime().present())
+		mt = generatedTree.missionTime().get();
+
 	shared_ptr<TopLevelEvent> top(new TopLevelEvent(generatedTree.id(), mt));
 	convertFaultTreeRecursive(top, generatedTree, mt);
 	return top;
@@ -122,7 +126,10 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 
 std::shared_ptr<TopLevelEvent> fromGeneratedFuzzTree(const fuzztree::TopEvent& generatedTree)
 {
-	const unsigned int mt = generatedTree.missionTime();
+	unsigned int mt = DEFAULT_MISSION_TIME;
+	if (generatedTree.missionTime().present())
+		mt = generatedTree.missionTime().get();
+
 	shared_ptr<TopLevelEvent> top(new TopLevelEvent(generatedTree.id(), mt));
 	convertFuzzTreeRecursive(top, generatedTree, mt);
 	return top;
@@ -174,7 +181,7 @@ void convertFuzzTreeRecursive(FaultTreeNode::Ptr node, const fuzztree::Node& tem
 		}
 		else if (typeName == *INTERMEDIATEEVENT)
 		{
-			// TODO
+			current = nullptr;
 		}
 
 		// Static Gates...

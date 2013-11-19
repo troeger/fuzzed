@@ -23,7 +23,8 @@ faulttree::BasicEvent treeHelpers::copyBasicEvent(const fuzztree::BasicEvent& be
 
 faulttree::TopEvent treeHelpers::copyTopEvent(const fuzztree::TopEvent& topEvent)
 {
-	faulttree::TopEvent res(topEvent.id(), topEvent.missionTime());
+	faulttree::TopEvent res(topEvent.id());
+	res.missionTime() = topEvent.missionTime();
 	res.name() = topEvent.name();
 	return res;
 }

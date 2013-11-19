@@ -22,7 +22,9 @@ define(['config', 'jquery'], function(Config) {
          */
         Events: {
             EDITOR_CALCULATE_CUTSETS:               'editor-calculate-cutsets',
-            EDITOR_CALCULATE_TOP_EVENT_PROBABILITY: 'editor-calculate-topevent-probability'
+            EDITOR_CALCULATE_TOP_EVENT_PROBABILITY: 'editor-calculate-topevent-probability',
+            EDITOR_GRAPH_EXPORT_PDF:                'editor-export-pdf',
+            EDITOR_GRAPH_EXPORT_EPS:                'editor-export-eps'
         },
 
         /**

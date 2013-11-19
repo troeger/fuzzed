@@ -1,11 +1,13 @@
 from fabric.api import task
 from subprocess import Popen
-import sys, os
+import sys, os, socket
 
 @task
 def backend():
     '''Runs the backend connector daemon, who serves all configured backends.'''
-    backend = Popen(["python","backends/daemon.py","backends/daemon.ini"])
+    os.chdir('backends')
+    backend = Popen(["python","daemon.py","daemon.ini"])
+    os.chdir('..')
     if backend.returncode != None:
         print "Error %u while starting backend daemon"%backend.returncode
         exit(-1)
@@ -20,11 +22,9 @@ def backend():
 def server():
     '''Runs the server.'''
     ip = None
-    if os.path.exists('.vagrantip'):
-        with open('.vagrantip') as f:
-            ip = f.read().rstrip()
-            print 'Using Vagrant IP: ' + ip
-    if ip:
+    if socket.getfqdn() == 'precise64':
+        ip = "192.168.33.10"
+        print 'Using Vagrant IP: ' + ip
         os.system('./manage.py runserver %s:8000' % ip)
     else:
         os.system('./manage.py runserver')

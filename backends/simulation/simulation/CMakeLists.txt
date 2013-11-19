@@ -1,4 +1,4 @@
-project(ftsimulation CXX)
+project(ftsimulation)
                                                                                                                                                                                                                         
 set(SOURCES
    ${SOURCES}
@@ -7,7 +7,6 @@ set(SOURCES
    main.cpp
    SimulationExtern.cpp
    SimulationProxy.cpp
-   ResultDocument.cpp
 
    implementation/PetriNetSimulation.cpp
    implementation/TimeNETSimulation.cpp
@@ -28,7 +27,6 @@ set(HEADERS
 
    SimulationExtern.h
    SimulationProxy.h
-   ResultDocument.h
    ResultStruct.h
    Config.h
    
@@ -51,26 +49,24 @@ if (USE_TIMENET)
 	find_package(TimeNET REQUIRED)
 endif (USE_TIMENET)
 
-find_package(OpenMP REQUIRED)
-if (OPENMP_FOUND)
-	message("OPENMP FOUND")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-endif ()
+if (NOT APPLE)
+	find_package(OpenMP REQUIRED)
+	if (OPENMP_FOUND)
+		message("OPENMP FOUND")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+	endif()
+endif()
 
 add_executable(ftsimulation ${SOURCES} ${HEADERS})
-   target_link_libraries(ftsimulation
-      ${COMMON_LINKED_LIBS}
-	  ftmodeltransform
-      ftconfiguration)
+target_link_libraries(ftsimulation pugixml common_model ftconfiguration ftmodeltransform )
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PUGIXML_INCLUDE_DIR})
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PUGIXML_INCLUDE_DIR})
 
 if (BUILD_TESTS)
    add_library(ftsimulation_static STATIC ${SOURCES} ${HEADERS})
    target_link_libraries(ftsimulation_static
-      ftmodeltransform
-	  ${FT_CONFIG_LIB})
+      ftmodeltransform)
    set_target_properties(ftsimulation_static PROPERTIES COMPILE_DEFINITIONS "SIMULATION_STATIC")
 endif(BUILD_TESTS)
