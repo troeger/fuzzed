@@ -24,8 +24,11 @@ def created_dir(dirname):
 #@task
 def web_server():
     '''Performs packaging of web server.'''
-    print 'Performing build, just in case.'
-    os.system('fab build.all')
+    print 'Performing relevant build steps.'
+    os.system('fab build.css')
+    os.system('fab build.xmlschemas')
+    os.system('fab build.notations')
+    os.system('fab build.configs')
     print 'Building compressed static files ...'
     # Use Django collectstatic, which triggers django-require optimization
     if os.system('./manage.py collectstatic -v3 --noinput') != 0:
