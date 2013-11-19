@@ -1,8 +1,31 @@
 #include "FuzzTreeConfiguration.h"
 
+#include "FuzzTreeTypes.h"
+
 FuzzTreeConfiguration::FuzzTreeConfiguration()
-	: m_costs(0)
+	: m_costs(0),
+	m_bValid(true)
 {}
+
+FuzzTreeConfiguration::FuzzTreeConfiguration(const FuzzTreeConfiguration& other)
+	: m_notIncluded(other.m_notIncluded),
+	m_featureNodes(other.m_featureNodes),
+	m_redundancyNodes(other.m_redundancyNodes),
+	m_optionalNodes(other.m_optionalNodes),
+	m_costs(other.m_costs)
+{
+
+}
+
+void FuzzTreeConfiguration::operator=(const FuzzTreeConfiguration &other)
+{
+	m_notIncluded = other.m_notIncluded;
+	m_featureNodes = other.m_featureNodes;
+	m_redundancyNodes = other.m_redundancyNodes;
+	m_optionalNodes = other.m_optionalNodes;
+	m_costs = other.m_costs;
+}
+
 
 FuzzTreeConfiguration::~FuzzTreeConfiguration()
 {} // nothing
@@ -74,4 +97,24 @@ const std::map<FuzzTreeConfiguration::id_type, FuzzTreeConfiguration::id_type>&
 	FuzzTreeConfiguration::getFeaturedNodes() const
 {
 	return m_featureNodes;
+}
+
+void FuzzTreeConfiguration::markInvalid()
+{
+	m_bValid = false;
+}
+
+const int FuzzTreeConfiguration::computeCostRecursive(const fuzztree::Node& node)
+{
+	int result = 0;
+	const type_info& nodeType = typeid(node);
+	if (nodeType == *fuzztreeType::INTERMEDIATEEVENT || nodeType == *fuzztreeType::BASICEVENT)
+	{
+		const auto inclVP = static_cast<const fuzztree::InclusionVariationPoint&>(node);
+		result = inclVP.costs().present() ? inclVP.costs().get() : result;
+	}
+	for (const auto child : node.children())
+		result += computeCostRecursive(child);
+
+	return result;
 }
