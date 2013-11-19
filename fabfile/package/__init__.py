@@ -23,19 +23,23 @@ def created_dir(dirname):
 
 #@task
 def web_server():
-    '''Performs packaging of web server. Assumes successful build.'''
+    '''Performs packaging of web server.'''
+    print 'Performing build, just in case.'
+    os.system('fab build.all')
+    print 'Building compressed static files ...'
+    # Use Django collectstatic, which triggers django-require optimization
+    if os.system('./manage.py collectstatic -v3 --noinput') != 0:
+        raise Exception('Execution of collectstatic failed. Please check the previous output.\n')
     with created_dir("dist"):
-        exclusion_suffix=[".pyc", ".sqlite"]
+        exclusion_suffix=[".pyc", ".sqlite", ".orig"]
         exclusion_files = []
-        exclusion_dirs =[
-            "../FuzzEd/static/",
-            "../FuzzEd/fixtures/"
-        ]
         inclusions = [
             ["../manage.py", "manage.py"],
-            ["../rendering/__init__.py", "rendering/__init__.py"],
-            ["../rendering/renderClient.py", "rendering/renderClient.py"],
             ["../FuzzEd", "FuzzEd"],
+        ]
+        exclusion_dirs =[
+            "../FuzzEd/static/",
+            "../FuzzEd/fixtures/"            
         ]
 
         def add_filter(fname):
@@ -86,12 +90,7 @@ def rendering_server():
 
 @task
 def all():
-    '''Package all. Assumes successful build.'''
-    print 'Building compressed static files ...'
-    # Use Django collectstatic, which triggers django-require optimization
-    if os.system('./manage.py collectstatic -v3 --noinput') != 0:
-        raise Exception('Execution of collectstatic failed. Please check the previous output.\n'
-                        'Try "sudo setup.py test" for installing all dependencies.')
-#    web_server()
+    '''Package all.'''
+    web_server()
 #   package_analysis_server()
 #    rendering_server()
