@@ -30,7 +30,7 @@ def web():
     with created_dir("dist"):
         inclusions = [
             ["../manage.py", "manage.py"],
-            ["../FuzzEd", "FuzzEd"],
+            ["../FuzzEd", "FuzzEd"]
         ]
         exclusion_suffix=[".pyc", ".sqlite", ".orig"]
         exclusion_files = []
