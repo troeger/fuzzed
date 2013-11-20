@@ -285,6 +285,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             if (typeof center  !== 'number' || window.isNaN(center)) {
                 validationResult.kind    = TypeError;
                 validationResult.message = 'center must be numeric';
+                return false;
             } else if (typeof epsilon !== 'number' || window.isNaN(epsilon)) {
                 validationResult.kind    = TypeError;
                 validationResult.message = 'epsilon must be numeric';

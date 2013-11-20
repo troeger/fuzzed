@@ -784,12 +784,14 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             // early out, nothing to fix here
             if (pMin.gt(center) || pMax.lt(center) || pMax.lt(epsilon) || epsilon < 0) return this;
 
-            if (target.is(this.inputs.eq(0))) {
-                var epsBounded = Math.min(Math.abs(pMin.toFloat() - center), epsilon, pMax.toFloat() - center);
-                this._value([center, epsBounded]);
+            var epsBounded = Math.min(Math.abs(pMin.toFloat() - center), epsilon, pMax.toFloat() - center);
+            var cenBounded = Math.max(pMin.plus(epsilon), Math.min(center, pMax.minus(epsilon).toFloat()));
 
+            if (epsilon == epsBounded && cenBounded == center) return this;
+
+            if (target.is(this.inputs.eq(0))) {
+                this._value([center, epsBounded]);
             } else if (target.is(this.inputs.eq(1))) {
-                var cenBounded = Math.max(pMin.plus(epsilon), Math.min(center, pMax.minus(epsilon).toFloat()));
                 this._value([cenBounded, epsilon]);
             }
 
