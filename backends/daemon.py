@@ -15,8 +15,11 @@ import ConfigParser, sys, psycopg2, select, logging, urllib2, tempfile, shutil, 
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 
+#TODO: Make this part of the INI file
+hdlr = logging.FileHandler('/tmp/fuzzed.log')
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')
+logger.addHandler(hdlr)
 
 # Register the streaming http handlers from poster package with urllib2
 register_openers()
