@@ -16,6 +16,52 @@ def created_dir(dirname):
     os.chdir(current)
 
 @task
+def backends():
+    '''Performs packaging of the backend server.'''
+    print 'Performing relevant build steps.'
+    os.system('fab build.configs')
+    os.system('fab build.backends')
+    with created_dir("dist"):
+        inclusions = [
+            ["../backends/lib", "lib"],
+            ["../backends/initscript.sh", "initscript.sh"],
+            ["../backends/daemon.py", "daemon.py"],
+            ["../backends/daemon.ini", "daemon.ini"],
+            ["../backends/rendering", "rendering"]
+        ]
+        exclusion_suffix= []
+        exclusion_files = []
+        exclusion_dirs = []
+
+        def tarfilter(tarinfo):
+            fname = tarinfo.name
+            if tarinfo.isdir():
+                for dirname in exclusion_dirs:
+                    # if the filter is "/static", we still want to add "/static-release"
+                    if fname.endswith(dirname) or dirname+os.sep in fname:
+                        print "Skipping directory "+fname
+                        return None
+                print "Adding directory "+fname
+                return tarinfo
+            elif tarinfo.isfile():
+                if fname in exclusion_files:
+                    print "Skipping file "+fname
+                    return None
+                for suffix in exclusion_suffix:
+                    if fname.endswith(suffix):
+                        print "Skipping file "+fname
+                        return None
+                print "Adding file "+fname
+                return tarinfo
+
+        basename="FuzzEdBackend-%s"%version
+        tar = tarfile.open(basename+".tar.gz","w:gz")
+        for src, dest in inclusions:
+            tar.add(src, arcname=basename+"/"+dest, filter=tarfilter)
+        tar.close()
+
+
+@task
 def web():
     '''Performs packaging of web server.'''
     print 'Performing relevant build steps.'
@@ -71,3 +117,4 @@ def web():
 def all():
     '''Package all.'''
     web()
+    backends()
