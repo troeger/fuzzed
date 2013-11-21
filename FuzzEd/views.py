@@ -61,10 +61,47 @@ def about(request):
     
 @login_required
 def projects(request):
+    """
+    Function: projects
     
+    This view handler renders a project overview containing all projects which are not marked as deleted, as well as in
+    which the actual user is the owner or a project member. The resulting list of projects is ordered descending by its
+    creation date. Also, a user is able to create a new project, as well as to delete a certain project if he is the owner.
     
-    return render(request, 'project_menu/projects.html')
-
+    Parameters:
+     {HttpRequest} request - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    projects = (request.user.projects.filter(deleted=False) | request.user.own_projects.filter(deleted=False)).order_by('-created')
+        
+    parameters = {'projects':[ project.__dict__ for project in projects]}
+            
+    return render(request, 'project_menu/projects.html', parameters)
+    
+@login_required
+def project_new(request):
+    """
+    Function: project_new
+    
+    This handler is responsible for rendering a dialog to the user to create a new project. It is also responsible for
+    processing a save request of such a 'new project' request and forwards the user to the projects site after doing so.
+    
+    Parameters:
+     {HttpRequest} request - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+  
+    if request.method == 'POST':
+        POST = request.POST
+        commands.AddProject.create_from(POST.get('name'), request.user)
+        return redirect('projects')
+        
+    return render(request, 'project_menu/project_new.html')    
+    
 @login_required
 def dashboard(request):
     """

@@ -4,6 +4,7 @@ from FuzzEd.lib.jsonfield import JSONField
 from edge import Edge
 from graph import Graph
 from node import Node
+from project import Project
 
 import notations
 
@@ -46,7 +47,56 @@ class Command(models.Model):
          {None}
         """
         raise NotImplementedError('[Abstract Method] Implement in subclass')
+        
+class AddProject(Command):
+    """
+    Class: AddProject
+    
+    Extends: Command
+        
+    Command that is issued when an a new project was created.
+        
+    """
+    
+    @classmethod
+    def create_from(cls, name, owner):
+        """
+        Method [static]: create_from
+        
+        Convenience factory method for issuing an add project command from parameters as received from API calls.
+        NOTE: A project object is created and saved when invoking this method.
+         
+        Parameters:
+        {str}  name     - name of the project
+        {User} owner    - the user that owns this project
+        """
+        project = Project(name=name, owner=owner)
+        project.save()
+         
+        return
+   
+    def do(self):
+        """
+        Method: do
+        
+        In the context of projects there is no do necessary
+        
+        Returns:
+         {None}
+        """
+        return
 
+    def undo(self):
+        """
+        Method: do
+        
+        In the context of projects there is no undo necessary
+        
+        Returns:
+         {None}
+        """
+        return
+    
 class AddEdge(Command):
     """
     Class: AddEdge
