@@ -15,7 +15,6 @@ Peter Troeger <peter@troeger.eu>
 
 from abc import ABCMeta, abstractmethod
 import platform, os, subprocess, time
-from fabric.operations import run, sudo
 
 class FastFood():
     ''' Abstract base class for the FastFood functionality. It provides a set of generic functions
@@ -40,9 +39,6 @@ class FastFood():
             return name
 
     def run(self, args, print_output=True):
-        run(' '.join(args))
-
-    def run_local(self, args, print_output=True):
         ''' Run command and returns exit code. The command is given as array of command-line arguments,
             were the first argument is the executable.
         '''
@@ -183,7 +179,7 @@ class PipFastFood(FastFood):
         elif version and version.startswith('>='):
             super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q '%s>=%s'"%(self.get_mapping(name), version[2:]))
         else:
-            super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q "+self.get_mapping(name))
+            super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q --upgrade "+self.get_mapping(name))
         super(PipFastFood, self).post_install()
 
     def supported(self):
