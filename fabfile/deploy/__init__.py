@@ -26,8 +26,7 @@ def web():
     put('dist/'+package, '/var/www/')
     run('tar xvfz /var/www/fuzztrees.net/'+package+" -C /var/www/fuzztrees.net/")
     print "Setting directory softlink"
-    run('rm -f /var/www/fuzztrees.net/www')
-    run('ln -s /var/www/fuzztrees.net/FuzzEd-'+version+' /var/www/fuzztrees.net/www')
+    run('ln -fs /var/www/fuzztrees.net/FuzzEd-'+version+' /var/www/fuzztrees.net/www')
     sudo('pg_dump fuzztrees > /tmp/fuzztrees.sql')
     run('cd /var/www/fuzztrees.net/www/; ./manage.py syncdb --migrate')
     sudo('apache2ctl configtest')
@@ -40,10 +39,11 @@ def backend():
     package = "FuzzEdBackend-"+version+".tar.gz"
     assert(os.path.isfile('dist/'+package))
     print "Uploading "+package
-    sudo('mkdir -p /usr/local/fuzzed-backend')
-    put('dist/'+package, '/usr/local/fuzzed-backend/')
-    run('tar xvfz /usr/local/fuzzed-backend/'+package+' -C /usr/local/fuzzed-backend/')
-    sudo('ln -s /etc/init.d/fuzzed-backend /usr/local/fuzzed-backend/initscript.sh')
+    sudo('mkdir -p /usr/local/fuzzed')
+    put('dist/'+package, '/usr/local/fuzzed/')
+    run('tar xvfz /usr/local/fuzzed/'+package+' -C /usr/local/fuzzed/')
+    run('ln -fs /usr/local/fuzzed/FuzzEdBackend-'+version+' /usr/local/fuzzed/FuzzEdBackend')
+    sudo('ln -fs /usr/local/fuzzed/FuzzEdBackend/initscript.sh /etc/init.d/fuzzed-backend')
+    sudo('chmod u+x /etc/init.d/fuzzed-backend')
     sudo('service fuzzed-backend start')
-
 

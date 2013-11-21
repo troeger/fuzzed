@@ -11,7 +11,7 @@
 ### END INIT INFO
 
 THIS=/etc/init.d/fuzzed-backend
-SCRIPTDIR=/usr/local/fuzzed-backend/
+SCRIPTDIR=/usr/local/fuzzed/FuzzEdBackend/
 
 set -e
 
