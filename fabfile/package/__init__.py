@@ -23,7 +23,7 @@ def web():
     os.system('fab build.xmlschemas')
     os.system('fab build.notations')
     os.system('fab build.shapes')
-    os.system('fab build.configs')
+    os.system('fab build.configs:target=production')
     print 'Building compressed static files ...'
     # Use Django collectstatic, which triggers django-require optimization
     if os.system('./manage.py collectstatic -v3 --noinput') != 0:
