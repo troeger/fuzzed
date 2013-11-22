@@ -25,14 +25,15 @@ def web():
     # TODO: Configure web server
     # Put release package
     print "Uploading "+package
-    put('dist/'+package, '/var/www/')
+    put('dist/'+package, '/var/www/fuzztrees.net/')
     run('tar xvfz /var/www/fuzztrees.net/'+package+" -C /var/www/fuzztrees.net/")
     print "Setting directory softlink"
     run('ln -fs /var/www/fuzztrees.net/FuzzEd-'+version+' /var/www/fuzztrees.net/www')
-    print "Storing backup of database, in case something goes wrong"
-    sudo('pg_dump fuzztrees > /tmp/fuzztrees_backup.sql')
+    #print "Storing backup of database, in case something goes wrong"
+    #sudo('su - postgres; pg_dump fuzztrees > /tmp/fuzztrees_backup.sql')
     run('cd /var/www/fuzztrees.net/www/; ./manage.py syncdb --migrate')
     sudo('apache2ctl configtest')
+    print "Restarting web server"
     sudo('service apache2 restart')
 
 @task

@@ -66,16 +66,16 @@ class Job(models.Model):
         return self.kind in [Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB]
 
     def result_rendering(self):
-        ''' Returns the job result as something that the frontend understands.'''
-        json_result = {}
-        errors = {}
-        warnings = {}
+            ''' Returns the job result as something that the frontend understands.'''
+            json_result = {}
+            errors = {}
+            warnings = {}
 
-        try:
+        #try:
             assert(self.kind == Job.TOP_EVENT_JOB)
             assert(self.result)
 
-            result_data = ''.join(self.result.readlines())
+            result_data = str(self.result)
             doc = xml_analysis.CreateFromDocument(result_data)
 
             # Check global issues that are independent from the particular configuration
@@ -171,9 +171,9 @@ class Job(models.Model):
 
             return return_data
 
-        except Exception as e:
-            mail_managers('Error on analysis result XML->JSON conversion', '%s\n\n%s' % (str(result_data), str(e),))
-            raise HttpResponseServerErrorAnswer("We have an internal problem rendering your analysis result. Sorry! The developers are informed.")
+        #except Exception as e:
+        #    mail_managers('Error on analysis result XML->JSON conversion', '%s\n\n%s' % (str(result_data), str(e),))
+        #    raise HttpResponseServerErrorAnswer("We have an internal problem rendering your analysis result. Sorry! The developers are informed.")
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
