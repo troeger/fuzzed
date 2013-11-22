@@ -193,8 +193,12 @@ def job_post_save(sender, instance, created, **kwargs):
         #TODO: job_files_url = reverse('job_files', kwargs={'job_secret': instance.secret})
         job_files_url = '%s/api/jobs/%s/' % (settings.SERVER, instance.secret,)
 
-        # The proxy is instantiated here, since the connection should go away when finished
-        s = xmlrpclib.ServerProxy(settings.BACKEND_DAEMON)
-        logger.debug("Triggering %s job on url %s"%(instance.kind, job_files_url))
-        s.start_job(instance.kind, job_files_url)
+        try:
+            # The proxy is instantiated here, since the connection should go away when finished
+            s = xmlrpclib.ServerProxy(settings.BACKEND_DAEMON)
+            logger.debug("Triggering %s job on url %s"%(instance.kind, job_files_url))
+            s.start_job(instance.kind, job_files_url)
+        except Exception as e:
+            mail_managers("Exception on backend call - "+settings.BACKEND_DAEMON,str(e))
+            raise HttpResponseServerErrorAnswer("Sorry, we seem to have a problem with the analysis backend. The admins are informed, thanks for the patience.")
 

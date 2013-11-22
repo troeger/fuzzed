@@ -83,7 +83,12 @@ LOGGING = {
             'level':   'ERROR',
             'class':   'django.utils.log.AdminEmailHandler',
             'filters': ['require_debug_false'],
-        },        
+        }, 
+        'file':{
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '%(log_file)s',
+        },               
         'False': {
             'level': 'DEBUG',
             'class': 'logging.NullHandler',
