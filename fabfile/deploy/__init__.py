@@ -3,10 +3,16 @@ from fabfile.common import version
 from fabfile import bootstrap
 from fabric.operations import put, run, sudo
 import os.path
-import os
+import os, ConfigParser
 
-env.roledefs['web'] = ['root@web.netclients-services.de']
-env.roledefs['backend'] = ['root@web.netclients-services.de']
+# Determine deployment target hosts from central settings file
+conf = ConfigParser.ConfigParser()
+conf.read('settings.ini')
+webserver = conf.get('production','deployment_web')
+backend = conf.get('production','backend_daemon_host')
+
+env.roledefs['web'] = ['root@'+webserver]
+env.roledefs['backend'] = ['root@'+backend]
 
 @task
 @roles('web')

@@ -224,7 +224,7 @@ def naturaldocs():
 @task 
 def configs(target='development'):
     '''Builds the configuration files for sub projects out of settings.ini'''
-    assert(target=='development' or target=='production')
+    assert(target in ['development','vagrant','production'])
     print 'Building configs...'
     f=open('FuzzEd/settings.py','w')
     f.write(createDjangoSettings('settings.ini', [target]))

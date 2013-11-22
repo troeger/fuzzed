@@ -16,10 +16,10 @@ def created_dir(dirname):
     os.chdir(current)
 
 @task
-def backends():
+def backend():
     '''Performs packaging of the backend server.'''
     print 'Performing relevant build steps.'
-    os.system('fab build.configs')
+    os.system('fab build.configs:target=production')
     os.system('fab build.backends')
     with created_dir("dist"):
         inclusions = [
@@ -117,4 +117,4 @@ def web():
 def all():
     '''Package all.'''
     web()
-    backends()
+    backend()

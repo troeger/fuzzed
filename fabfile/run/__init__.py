@@ -22,11 +22,19 @@ def backend():
 def server():
     '''Runs the server.'''
     ip = None
+    # Perform new config build on every startup. 
+    # This is basically intended for the case were somebody
+    # permanently flips between native development and
+    # Vagrant development. The backend daemon currently has
+    # no Vagrant-specific settings, so we don't need to do the
+    # same stunt in def backend()
     if socket.getfqdn() == 'precise64':
         ip = "192.168.33.10"
         print 'Using Vagrant IP: ' + ip
+        os.system('fab build.configs:target=vagrant')
         os.system('./manage.py runserver %s:8000' % ip)
     else:
+        os.system('fab build.configs:target=development')
         os.system('./manage.py runserver')
 
 @task

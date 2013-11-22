@@ -8,7 +8,7 @@ from south.modelsinspector import add_introspection_rules
 from FuzzEd.models import xml_analysis
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
-import uuid, json
+import uuid, json, xmlrpclib
 
 from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice, TransferInChoice
 
@@ -177,11 +177,9 @@ class Job(models.Model):
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
-    ''' Informs notification listeners using the PostgresSQL NOTIFY / LISTEN tools.
-        Standard Postgres semantics apply, so if a listener does not pull a messages, than
-        it is queued by the database.
-        The payload contains the job URL prefix with a secret, which allows the listener to 
-        perform according actions
+    ''' Informs notification listeners.
+        The payload contains the job URL prefix with a secret, 
+        which allows the listener to perform according actions.
     '''
     if created:
         # The only way to determine our own hostname + port number at runtime in Django
@@ -195,7 +193,8 @@ def job_post_save(sender, instance, created, **kwargs):
         #TODO: job_files_url = reverse('job_files', kwargs={'job_secret': instance.secret})
         job_files_url = '%s/api/jobs/%s/' % (settings.SERVER, instance.secret,)
 
-        cursor = connection.cursor()
-        cursor.execute("NOTIFY %s, '%s';" % (instance.kind, job_files_url,))
-        #print "Notification to: "+str(cursor.db.connection.dsn)
-        transaction.commit_unless_managed()
+        # The proxy is instantiated here, since the connection should go away when finished
+        s = xmlrpclib.ServerProxy(settings.BACKEND_DAEMON)
+        logger.debug("Triggering %s job on url %s"%(instance.kind, job_files_url))
+        s.start_job(instance.kind, job_files_url)
+
