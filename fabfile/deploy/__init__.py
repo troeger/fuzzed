@@ -8,7 +8,7 @@ import os, ConfigParser
 # Determine deployment target hosts from central settings file
 conf = ConfigParser.ConfigParser()
 conf.read('settings.ini')
-webserver = conf.get('production','deployment_web')
+webserver = conf.get('production','deployment_web_host')
 backend = conf.get('production','backend_daemon_host')
 
 env.roledefs['web'] = ['root@'+webserver]
