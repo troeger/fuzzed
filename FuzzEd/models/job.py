@@ -46,7 +46,7 @@ class Job(models.Model):
     secret         = models.CharField(max_length=64, default=gen_uuid)       # Unique secret for this job
     kind           = models.CharField(max_length=127, choices=JOB_TYPES)
     created        = models.DateTimeField(auto_now_add=True, editable=False)
-    result         = models.FileField(upload_to='jobs', null=True)           # Result file for this job
+    result         = models.BinaryField(null=True)                           # Result file for this job
     exit_code      = models.IntegerField(null=True)                          # Exit code for this job, NULL if pending
 
     def input_data(self):
