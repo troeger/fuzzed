@@ -27,7 +27,7 @@ def install_xml_stuff():
 
 def install_backend_stuff():
     print "Installing Python packages..."
-    for package in ["poster"]:
+    for package in ["requests"]:
         print "Installing "+package
         fastfood.python.install(package)        
 

@@ -191,7 +191,7 @@ def job_post_save(sender, instance, created, **kwargs):
         # by the test suite run accordingly
 
         #TODO: job_files_url = reverse('job_files', kwargs={'job_secret': instance.secret})
-        job_files_url = '%s/api/jobs/%s/' % (settings.SERVER, instance.secret,)
+        job_files_url = '%s/api/jobs/%s' % (settings.SERVER, instance.secret,)
 
         try:
             # The proxy is instantiated here, since the connection should go away when finished
