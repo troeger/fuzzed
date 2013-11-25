@@ -1,4 +1,4 @@
-define(['config'], function(Config) {
+define(['config', 'jquery'], function(Config) {
 
     function _showAlert(type, message, description, timeout) {
         var typeClass = type == 'warning' ? '' : 'alert-' + type;
@@ -34,7 +34,7 @@ define(['config'], function(Config) {
             _showAlert('warning', message, description, timeout);
         },
         showErrorAlert: function(message, description, timeout) {
-            _showAlert('error', message, description, timeout);
+            _showAlert('danger', message, description, timeout);
         },
         showSuccessAlert: function(message, description, timeout) {
             _showAlert('success', message, description, timeout);

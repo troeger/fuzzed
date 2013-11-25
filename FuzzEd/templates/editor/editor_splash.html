@@ -1,24 +1,27 @@
 {% comment %} 
-    I know I will burn in hell for using tables to format page layout. But, it is still, even in HTML5 times, the simplest and clearest way to vertically align content with unknown height. Therefore, dear refactorer forgive me and accept my apology! You will definately get a beer on the house, if you can deliver a better solution. Kind regards, murxman@gmail.com.
+    I know I will burn in hell for using tables to format page layout. But, it is still, even in HTML5 times, the
+    simplest and clearest way to vertically align content with unknown height. Therefore, dear refactorer forgive me
+    and accept my apology! You will definitely get a beer on the house, if you can deliver a better solution.
+    Kind regards, murxman@gmail.com.
 {% endcomment %}
 
 <table id="FuzzEdSplash" class="overlay">
     <tr>
-        <td class="span4">&nbsp;</td>
-        <td class="span4 center-vertical">
-            <h1>FuzzEd <small>v{{ fuzzed_version }}</small></h1>
+        <td class="col-4">&nbsp;</td>
+        <td class="col-4 center-vertical">
+            <h1>FuzzEd <small>v{{ version }}</small></h1>
             developed at <strong>Hasso-Plattner-Institute, Germany</strong>
 
             <section>
                 <div class="well">
-                    <div class="progress progress-success progress-striped active">
-                        <div class="bar" style="width: 100%"></div>
+                    <div class="progress progress-striped active">
+                        <div class="progress-bar" style="width: 100%"></div>
                     </div>
 
-                    <h6>{{ greetings|random }}</h6>
+                    <h5><small class="fuzzed-splash">{{ greetings|random }}</small></h5>
                 </div>
             </section>
         </td>
-        <td class="span4">&nbsp;</td>
+        <td class="col-4">&nbsp;</td>
     </tr>
 </table>

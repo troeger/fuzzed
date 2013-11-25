@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<AnalysisResult modelId="239" decompositionNumber="10">
+	<configurations>
+		<probability>
+			<alphaCuts key="0">
+				<Interval lowerBound="0.056224" upperBound="0.741124" />
+			</alphaCuts>
+			<alphaCuts key="0.1">
+				<Interval lowerBound="0.0742098" upperBound="0.698787" />
+			</alphaCuts>
+			<alphaCuts key="0.2">
+				<Interval lowerBound="0.0945464" upperBound="0.656221" />
+			</alphaCuts>
+			<alphaCuts key="0.3">
+				<Interval lowerBound="0.117164" upperBound="0.613644" />
+			</alphaCuts>
+			<alphaCuts key="0.4">
+				<Interval lowerBound="0.141984" upperBound="0.571264" />
+			</alphaCuts>
+			<alphaCuts key="0.5">
+				<Interval lowerBound="0.16892" upperBound="0.52928" />
+			</alphaCuts>
+			<alphaCuts key="0.6">
+				<Interval lowerBound="0.197875" upperBound="0.487882" />
+			</alphaCuts>
+			<alphaCuts key="0.7">
+				<Interval lowerBound="0.228746" upperBound="0.447254" />
+			</alphaCuts>
+			<alphaCuts key="0.8">
+				<Interval lowerBound="0.261418" upperBound="0.407568" />
+			</alphaCuts>
+			<alphaCuts key="0.9">
+				<Interval lowerBound="0.295772" upperBound="0.36899" />
+			</alphaCuts>
+			<alphaCuts key="1">
+				<Interval lowerBound="0.331675" upperBound="0.331675" />
+			</alphaCuts>
+		</probability>
+	</configurations>
+</AnalysisResult>

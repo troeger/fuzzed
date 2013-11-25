@@ -1,4 +1,5 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus, Canvas, Backend, Alerts) {
+define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progressIndicator', 'jquery-classlist'],
+function(Class, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base
      */
@@ -14,15 +15,14 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *  Group: Members
          *
          *  Properties:
-         *    {Object}         config                       - Graph-specific <Config> object.
-         *    {Graph}          graph                        - <Graph> instance to be edited.
-         *    {PropertiesMenu} properties                   - The <Menu::PropertiesMenu> instance used by this editor
+         *    {Object}          config                      - Graph-specific <Config> object.
+         *    {Graph}           graph                       - <Graph> instance to be edited.
+         *    {PropertiesMenu}  properties                  - The <Menu::PropertiesMenu> instance used by this editor
          *                                                    for changing the properties of nodes of the edited graph.
-         *    {ShapesMenu}     shapes                       - The <Menu::ShapeMenu> instance use by this editor to show
+         *    {ShapesMenu}      shapes                      - The <Menu::ShapeMenu> instance use by this editor to show
          *                                                    the available shapes for the kind of the edited graph.
-         *    {Backend}        _backend                     - The instance of the <Backend> that is used to communicate
+         *    {Backend}         _backend                    - The instance of the <Backend> that is used to communicate
          *                                                    graph changes to the server.
-         *    {jQuery Selector} _navbarActionsGroup         - Navbar dropdown menu that contains the available actions.
          *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
          *    {jQuery Selector} _nodeOffsetPrintStylesheet  - The dynamically generated and maintained stylesheet
          *                                                    used to fix the node offset when printing the page.
@@ -35,7 +35,6 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
         shapes:                        undefined,
 
         _backend:                      undefined,
-        _navbarActionsGroup:           undefined,
         _currentMinNodeOffsets:        {'top': 0, 'left': 0},
         _nodeOffsetPrintStylesheet:    undefined,
         _nodeOffsetStylesheetTemplate: undefined,
@@ -53,17 +52,21 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    {int} graphId - The ID of the graph that is going to be edited by this editor.
          */
         init: function(graphId) {
-            if (typeof graphId !== 'number') throw 'You need a graph ID to initialize the editor.';
+            if (typeof graphId !== 'number')
+                throw new TypeError('numeric graph ID', typeof graphId);
 
-            this.config              = this.getConfig();
-            this._backend            = new Backend(graphId);
-            this._navbarActionsGroup = jQuery('#' + this.config.IDs.NAVBAR_ACTIONS);
+            this.config   = this.getConfig();
+            this._backend = new Backend(graphId);
+
+            // remember certain UI elements
+            this._progressIndicator = jQuery('#' + this.config.IDs.PROGRESS_INDICATOR);
+            this._progressMessage = jQuery('#' + this.config.IDs.PROGRESS_MESSAGE);
 
             // run a few sub initializer
             this._setupJsPlumb()
                 ._setupNodeOffsetPrintStylesheet()
                 ._setupEventCallbacks()
-                ._setupGridToggleAction();
+                ._setupMenuActions();
 
             // fetch the content from the backend
             this._loadGraph(graphId);
@@ -81,7 +84,7 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    The <Config> object that corresponds to the loaded graph's kind.
          */
         getConfig: function() {
-            throw '[ABSTRACT] Subclass responsibility';
+            throw new SubclassResponsibility();
         },
 
         /**
@@ -93,7 +96,7 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    loaded from the backend.
          */
         getGraphClass: function() {
-            throw '[ABSTRACT] Subclass responsibility';
+            throw new SubclassResponsibility();
         },
 
         /**
@@ -142,7 +145,10 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
                 Canvas.disableInteraction();
             }
 
-            this._setupKeyBindings(readOnly);
+            // enable user interaction
+            this._setupMouse()
+                ._setupKeyBindings(readOnly);
+
             // fade out the splash screen
             jQuery('#' + this.config.IDs.SPLASH).fadeOut(this.config.Splash.FADE_TIME, function() {
                 jQuery(this).remove();
@@ -156,8 +162,7 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          *    Callback that gets called in case <_loadGraph> results in an error.
          */
         _loadGraphError: function(response, textStatus, errorThrown) {
-            alert('Could not load graph, reason: ' + textStatus + ' ' + errorThrown);
-            throw 'Could not load the graph from the backend';
+            throw new NetworkError('could not retrieve graph');
         },
 
         /**
@@ -183,22 +188,15 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
          */
 
         /**
-         *  Method: _setupGridToggleAction
+         *  Method: _setupMenuActions
          *
-         *  Adds a button to the action group that allows to toggle the visibility of the background grid.
+         *  Registers the event handlers for graph type - independent menu entries that trigger JS calls
          *
          *  Returns:
          *    This {<Node>} instance for chaining.
          */
-        _setupGridToggleAction: function() {
-            var navbarActionsEntry = jQuery(
-                '<li>' +
-                    '<a id="' + this.config.IDs.NAVBAR_ACTION_GRID_TOGGLE + '" href="#">Toggle grid</a>' +
-                '</li>');
-            this._navbarActionsGroup.append(navbarActionsEntry);
-
-            // register for clicks on the corresponding nav action
-            navbarActionsEntry.click(function() {
+        _setupMenuActions: function() {
+            jQuery("#"+this.config.IDs.ACTION_GRID_TOGGLE).click(function() {
                 Canvas.toggleGrid();
             }.bind(this));
 
@@ -220,16 +218,13 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
                 Endpoint:        [this.config.JSPlumb.ENDPOINT_STYLE, {
                     radius:      this.config.JSPlumb.ENDPOINT_RADIUS,
                     cssClass:    this.config.Classes.JSPLUMB_ENDPOINT,
-                    hoverClass:  this.config.Classes.JSPLUMB_ENDPOINT_HOVER
+                    hoverClass:  this.config.Classes.HIGHLIGHTED
                 }],
                 PaintStyle: {
                     strokeStyle: this.config.JSPlumb.STROKE_COLOR,
                     lineWidth:   this.config.JSPlumb.STROKE_WIDTH
                 },
-                HoverPaintStyle: {
-                    strokeStyle: this.config.JSPlumb.STROKE_COLOR_HIGHLIGHTED
-                },
-                HoverClass:      this.config.Classes.JSPLUMB_CONNECTOR_HOVER,
+                HoverClass:      this.config.Classes.HIGHLIGHTED,
                 Connector:       [this.config.JSPlumb.CONNECTOR_STYLE, this.config.JSPlumb.CONNECTOR_OPTIONS],
                 ConnectionsDetachable: false
             });
@@ -240,12 +235,35 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
         },
 
         /**
+         *  Method: _setupMouse
+         *    Sets up callbacks that fire when the user interacts with the editor using his mouse. So far this is only
+         *    concerns resizing the window.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
+        _setupMouse: function() {
+            jQuery(window).resize(function() {
+                var content = jQuery('#' + this.config.IDs.CONTENT);
+
+                Canvas.enlarge({
+                    x: content.width(),
+                    y: content.height()
+                }, true);
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
          *  Method: _setupKeyBindings
          *    Setup the global key bindings
          *
          *  Keys:
-         *    ESCAPE - Clear selection.
-         *    DELETE - Delete all selected elements (nodes/edges).
+         *    ESCAPE             - Clear selection.
+         *    DELETE             - Delete all selected elements (nodes/edges).
+         *    UP/RIGHT/DOWN/LEFT - Move the node in the according direction
+         *    CTRL/CMD + A       - Select all nodes and edges
          *
          *  Returns:
          *    This editor instance for chaining.
@@ -253,37 +271,21 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
         _setupKeyBindings: function(readOnly) {
             if (readOnly) return this;
 
-            var selectedNodes = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.NODE;
-            var selectedEdges = '.' + this.config.Classes.JQUERY_UI_SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
-
             jQuery(document).keydown(function(event) {
                 if (event.which == jQuery.ui.keyCode.ESCAPE) {
-                    event.preventDefault();
-                    //XXX: deselect everything
-                    // This uses the jQuery.ui.selectable internal functions.
-                    // We need to trigger them manually in order to simulate a click on the canvas.
-                    Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
-                    Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
-                } else if (event.which == jQuery.ui.keyCode.DELETE) {
-                    // prevent that node is being deleted when we edit an input field
-                    if (jQuery(event.target).is('input')) {
-                        return;
-                    }
-
-                    event.preventDefault();
-                    // delete selected nodes
-                    jQuery(selectedNodes).each(function(index, element) {
-                        this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
-                    }.bind(this));
-
-                    this.properties.hide();
-
-                    // delete selected edges
-                    jQuery(selectedEdges).each(function(index, element) {
-                        var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
-                        jsPlumb.detach(edge);
-                        this.graph.deleteEdge(edge);
-                    }.bind(this));
+                    this._escapePressed(event);
+                } else if (event.which === jQuery.ui.keyCode.DELETE) {
+                    this._deletePressed(event);
+                } else if (event.which === jQuery.ui.keyCode.UP) {
+                    this._arrowKeyPressed(event, 0, -1);
+                } else if (event.which === jQuery.ui.keyCode.RIGHT) {
+                    this._arrowKeyPressed(event, 1, 0);
+                } else if (event.which === jQuery.ui.keyCode.DOWN) {
+                    this._arrowKeyPressed(event, 0, 1);
+                } else if (event.which === jQuery.ui.keyCode.LEFT) {
+                    this._arrowKeyPressed(event, -1, 0);
+                } else if (event.which === 'A'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
+                    this._selectAllPressed(event);
                 }
             }.bind(this));
 
@@ -338,69 +340,146 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts'], function(Class, Menus,
             jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,   this._updatePrintOffsets.bind(this));
             jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED, this._updatePrintOffsets.bind(this));
 
-            jQuery(document).ajaxStart(this._showProgressIndicator.bind(this));
-            jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
-            jQuery(document).ajaxSuccess(this._flashSaveIndicator.bind(this));
-            jQuery(document).ajaxError(this._flashErrorIndicator.bind(this));
+            // show status of global AJAX events in navbar
+            jQuery(document).ajaxSend(Progress.showAjaxProgress);
+            jQuery(document).ajaxSuccess(Progress.flashAjaxSuccessMessage);
+            jQuery(document).ajaxError(Progress.flashAjaxErrorMessage);
+
+            //
 
             return this;
         },
 
         /**
-         *  Group: Progress Indication
+         *  Group: Keyboard Interaction
          */
 
         /**
-         *  Method _showProgressIndicator
-         *    Display the progress indicator.
+         *  Method: _arrowKeyPressed
+         *
+         *    Event callback for handling presses of arrow keys. Will move the selected nodes in the given direction by
+         *    and offset equal to the canvas' grid size. The movement is not done when an input field is currently in
+         *    focus.
+         *
+         *  Parameters:
+         *    {jQuery::Event} event      - the issued delete keypress event
+         *    {Number}        xDirection - signum of the arrow key's x direction movement (e.g. -1 for left)
+         *    {Number}        yDirection - signum of the arrow key's y direction movement (e.g.  1 for down)
+         *
+         *  Return:
+         *    This Editor instance for chaining
+         */
+        _arrowKeyPressed: function(event, xDirection, yDirection) {
+            if (jQuery(event.target).is('input, textarea')) return this;
+
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            jQuery(selectedNodes).each(function(index, element) {
+                var node = jQuery(element).data(this.config.Keys.NODE);
+                node.moveBy({
+                    x: xDirection * Canvas.gridSize,
+                    y: yDirection * Canvas.gridSize
+                });
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _deletePressed
+         *
+         *    Event callback for handling delete key presses. Will remove the selected nodes and edges as long as no
+         *    input field is currently focused (allows e.g. character removal in properties).
+         *
+         *  Parameters:
+         *    {jQuery::Event} event - the issued delete keypress event
+         *
+         *  Return:
+         *    This Editor instance for chaining
+         */
+        _deletePressed: function(event) {
+            // prevent that node is being deleted when we edit an input field
+            if (jQuery(event.target).is('input, textarea')) return this;
+
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+
+            event.preventDefault();
+            // delete selected nodes
+            jQuery(selectedNodes).each(function(index, element) {
+                this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
+            }.bind(this));
+
+            // delete selected edges
+            jQuery(selectedEdges).each(function(index, element) {
+                var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
+                jsPlumb.detach(edge);
+                this.graph.deleteEdge(edge);
+            }.bind(this));
+
+            this.properties.hide();
+
+            return this;
+        },
+
+        /**
+         *  Method: _escapePressed
+         *
+         *    Event callback for handling escape key presses. Will deselect any selected nodes and edges.
+         *
+         *  Parameters:
+         *    {jQuery::Event} event - the issued escape keypress event
          *
          *  Returns:
-         *    This Editor instance for chaining.
+         *    This Editor instance for chaining
          */
-        _showProgressIndicator: function() {
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+        _escapePressed: function(event) {
+            event.preventDefault();
+            //XXX: deselect everything
+            // This uses the jQuery.ui.selectable internal functions.
+            // We need to trigger them manually in order to simulate a click on the canvas.
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
 
             return this;
         },
 
         /**
-         *  Method _hideProgressIndicator
-         *    Hides the progress indicator.
+         * Method: _selectAllPressed
          *
-         *  Returns:
-         *    This Editor instance for chaining.
+         *   Event callback for handling a select all (CTRL/CMD + A) key presses. Will select all nodes and edges.
+         *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
          */
-        _hideProgressIndicator: function() {
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
+        _selectAllPressed: function(event) {
+            if (jQuery(event.target).is('input, textarea')) return this;
+
+            event.preventDefault();
+
+            //XXX: trigger selection start event manually here
+            //XXX: hack to emulate a new selection process
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+
+            var NODES           = '.' + this.config.Classes.NODE;
+            var NODES_AND_EDGES = NODES + ', .' + this.config.Classes.JSPLUMB_CONNECTOR;
+
+            jQuery(NODES_AND_EDGES).each(function(index, domElement) {
+                var element = jQuery(domElement);
+
+                element.addClass(this.config.Classes.SELECTING)
+                       .addClass(this.config.Classes.SELECTED);
+            }.bind(this));
+
+            //XXX: trigger selection stop event manually here
+            //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
 
             return this;
         },
 
-        /**
-         *  Method: _flashSaveIndicator
-         *    Flash the save indicator to show that the current graph is saved in the backend.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _flashSaveIndicator: function() {
-            jQuery('#' + this.config.IDs.SAVE_INDICATOR).fadeIn(200).delay(600).fadeOut(200);
-
-            return this;
-        },
-
-        /**
-         *  Method _flashErrorIndicator
-         *    Flash the error indicator to show that the current graph has not been saved to the backend.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _flashErrorIndicator: function() {
-            jQuery('#' + this.config.IDs.ERROR_INDICATOR).fadeIn(200).delay(5000).fadeOut(200);
-
-            return this;
-        },
 
         /**
          *  Group: Print Offset Calculation

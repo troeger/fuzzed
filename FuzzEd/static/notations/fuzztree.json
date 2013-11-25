@@ -3,217 +3,419 @@
     "name": "Fuzz Tree",
     "nodes": {
         "node": {
-            "numberOfOutgoingConnections": -1,
-            "numberOfIncomingConnections":  1,
-            "allowConnectionTo": ["node"],
-            "deletable": true,
+            "nodeDisplayName": "Node",
 
-            "optional": null,
+            "numberOfIncomingConnections":  1,
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": [],
+
+            "deletable": true,
 
             "connector": {
                 "offset": {
                     "top":    0,
                     "bottom": 0
                 }
+            },
+
+            "properties": {}
+        },
+        
+        "stickyNote": {
+            "nodeDisplayName": "Sticky Note",
+            "inherits": "node",
+            "numberOfOutgoingConnections": 0,
+            "image": "sticky_note.html",
+            "resizable": true,
+            "editable": true,
+            
+            "properties": {
+              "description": {
+                  "kind": "textfield",
+                  "default": "Sample Text",
+                  "hidden": true
+              },
+              
+              "height": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              },
+              
+              "width": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              }
             }
         },
 
         "event": {
+            "nodeDisplayName": "Event",
             "inherits": "node",
 
-            "optional": false,
+            "numberOfOutgoingConnections": 0,
 
-            "propertyMenuEntries": {
+            "properties": {
                 "name": {
                     "kind": "text",
-                    "displayName": "Name"
+                    "displayName": "Name",
+                    "default": "Event",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "{{$0}}"
+                    }
+
                 },
                 "optional": {
-                    "kind": "checkbox",
-                    "displayName": "Optional"
-                }
-            },
+                    "kind": "bool",
+                    "displayName": "Optional",
+                    "default": false
+                },
+                "cost": {
+                    "kind": "numeric",
+                    "displayName": "Cost",
+                    "min": 0,
+                    "step": 1,
+                    "default": 1,
 
-            "propertyMirrors": {
-                "name": {
-                    "position": "bottom",
-                    "style": ["bold", "large"]
-                }
-            }
-        },
-
-        "gate": {
-            "inherits": "node"
-        },
-
-        "variationPoint": {
-            "inherits": "node",
-
-            "propertyMenuEntries": {
-                "name": {
-                    "kind": "text",
-                    "displayName": "Name"
-                }
-            },
-
-            "propertyMirrors": {
-                "name": {
-                    "position": "bottom",
-                    "style": ["bold", "large"]
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "c={{$0}}"
+                    }
                 }
             }
         },
 
         "basicEvent": {
+            "nodeDisplayName": "Basic Event",
             "inherits": "event",
 
-            "name": "Basic Event",
-            "numberOfOutgoingConnections": 0,
             "image": "basic_event.svg",
-            "help": "Initiating failure in a basic component",
+            "help": "An initial fault or a primary component failure event.",
 
-            "probability": [0.5, 0],
-            "probabilitySelected": "Exact",
-            "cost": 1,
-
-            "propertyMenuEntries": {
+            "properties": {
+                "name": {
+                    "default": "Basic Event"
+                },
                 "probability": {
                     "kind": "compound",
                     "displayName": "Probability",
+                    "default": [0, [0.5, 0]],
 
-                    "choices": {
-                        "Fuzzy": {
-                            "kind": "select",
-                            "choices": [
-                                "never",
-                                "very unlikely",
-                                "unlikely",
-                                "more or less",
-                                "likely",
-                                "very likely",
-                                "always"
-                            ],
-                            "values": {
-                                "never":         [0,    0],
-                                "very unlikely": [0.2,  0.1],
-                                "unlikely":      [0.33, 0.2],
-                                "more or less":  [0.5,  0.3],
-                                "likely":        [0.66, 0.2],
-                                "very likely":   [0.8,  0.1],
-                                "always":        [1,    0]
-                            }
-                        },
-                        "Exact": {
-                            "kind": "neighborhood",
-                            "min": 0,
-                            "max": 1,
-                            "step": 0.0000000001,
-                            "epsilonMin": 0,
-                            "epsilonMax": 1,
-                            "epsilonStep": 0.0000000001
+                    "parts": [{
+                        "kind": "epsilon",
+                        "partName": "Point",
+                        "default": [0.5, 0],
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "epsilonStep": 0.0000000001,
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}±{{$1}}"
                         }
-                    },
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate",
+                        "min": 0,
+                        "step": 0.01,
+                        "default": 17532,
 
-                    "defaults": {
-                        "Fuzzy": [0.5, 0.3],
-                        "Exact": [0.5, 0]
-                    }
-                },
-                "cost": {
-                    "kind": "number",
-                    "displayName": "Cost",
-                    "min": 0,
-                    "step": 1
-                }
-            },
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }, {
+                        "kind": "choice",
+                        "partName": "Approx",
+                        "default": [0.75, 0.25],
+                        "choices": [
+                            "extremely unlikely",
+                            "very low probability",
+                            "highly improbable",
+                            "little chance",
+                            "very unlikely",
+                            "unlikely",
+                            "likely",
+                            "quite probable",
+                            "very good chance",
+                            "very probable",
+                            "highly probable",
+                            "very high probability",
+                            "extremely probable"
+                        ],
+                        "values": [
+                            [0.01,  0.01],
+                            [0.05,  0.05],
+                            [0.075, 0.075],
+                            [0.1,   0.1],
+                            [0.125, 0.125],
+                            [0.25,  0.25],
+                            [0.75,  0.25],
+                            [0.8,   0.2],
+                            [0.825, 0.175],
+                            [0.875, 0.175],
+                            [0.925, 0.075],
+                            [0.95,  0.05],
+                            [0.99,  0.01]
+                        ],
 
-            "propertyMirrors": {
-                "probability": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "p="
-                },
-                "cost": {
-                    "position": "bottom",
-                    "prefix": "c="
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }]
                 }
             }
         },
 
-        "basicEventSet": {
+        "houseEvent": {
+            "nodeDisplayName": "House Event",
             "inherits": "basicEvent",
 
-            "name": "Basic Event Set",
-            "image": "basic_event_set.svg",
-            "help": "Set of basic events with identical properties",
-            "cardinality": 1,
+            "image": "house_event.svg",
+            "help": "A basic event that is expected to occur in specific situations, such as maintenance-related shutdown activities.",
 
-            "propertyMenuEntries": {
-                "cardinality": {
-                    "kind": "number",
-                    "displayName": "Cardinality",
-                    "min": 1,
-                    "step": 1
-                }
-            },
-
-            "propertyMirrors": {
-                "cardinality": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "#"
+            "properties": {
+                "name": {
+                    "default": "House Event"
                 }
             }
         },
 
         "intermediateEvent": {
+            "nodeDisplayName": "Intermediate Event",
             "inherits": "event",
 
-            "name": "Intermediate Event",
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["staticGate", "variationPoint"],
+
             "image": "intermediate_event.svg",
-            "help": "Failure resulting from a combination of previous events"
-        },
+            "help": "An error event resulting from a combination of previous events.",
 
-        "intermediateEventSet": {
-            "inherits": "intermediateEvent",
-
-            "name": "Intermediate Event Set",
-            "image": "intermediate_event_set.svg",
-            "help": "Set of intermediate events",
-            "cardinality": 1,
-
-            "propertyMenuEntries": {
-                "cardinality": {
-                    "kind": "number",
-                    "displayName": "Cardinality",
-                    "min": 1,
-                    "step": 1
-                }
-            },
-
-            "propertyMirrors": {
-                "cardinality": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "#"
+            "properties": {
+                "name": {
+                    "default": "Intermediate Event"
                 }
             }
         },
 
-        "andGate": {
+        "topEvent": {
+            "nodeDisplayName": "Top Event",
+            "inherits": "intermediateEvent",
+
+            "numberOfIncomingConnections": 0,
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["basicEvent", "undevelopedEvent", "houseEvent", "staticGate", "variationPoint"],
+
+            "image": "top_event.svg",
+            "help": "The system failure event.",
+
+            "deletable": false,
+            "excludeFromShapesMenu": true,
+
+            "properties": {
+                "name": {
+                    "default": "Top Event"
+                },
+                "missionTime": {
+                    "kind": "numeric",
+                    "displayName": "Mission in h",
+                    "min": 0,
+                    "step": 1,
+                    "default": 17532
+                },
+                "decompositions": {
+                    "kind": "numeric",
+                    "displayName": "Decompose",
+                    "min": 1,
+                    "step": 1,
+                    "default": 1
+                },
+
+                "optional": null,
+                "cost": null
+            }
+        },
+
+        "undevelopedEvent": {
+            "nodeDisplayName": "Undeveloped Event",
+            "inherits": "event",
+
+            "image": "undeveloped_event.svg",
+            "help": "An event with unknown details or insignificant impact.",
+
+            "properties": {
+                "name": {
+                    "default": "Undeveloped Event"
+                }
+            }
+        },
+
+        "eventSet": {
+            "nodeDisplayName": "eventSet",
+            "inherits": "event",
+
+            "properties": {
+                "name": {
+                    "default": "Event Set"
+                },
+                "cardinality": {
+                    "kind": "numeric",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1,
+                    "default": 1,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "#{{$0}}"
+                    }
+                }
+            }
+        },
+
+        "basicEventSet": {
+            "nodeDisplayName": "Basic Event Set",
+            "inherits": "eventSet",
+
+            "image": "basic_event_set.svg",
+            "help": "A set of basic events with identical properties.",
+
+            "properties": {
+                "name": {
+                    "default": "Basic Event Set"
+                },
+                "probability": {
+                    "kind": "compound",
+                    "displayName": "Probability",
+                    "default": [0, [0.5, 0]],
+
+                    "parts": [{
+                        "kind": "epsilon",
+                        "partName": "Point",
+                        "default": [0.5, 0],
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "epsilonStep": 0.0000000001,
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}±{{$1}}"
+                        }
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate",
+                        "min": 0,
+                        "step": 0.01,
+                        "default": 17532,
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }, {
+                        "kind": "choice",
+                        "partName": "Approx",
+                        "default": [0.75, 0.25],
+                        "choices": [
+                            "extremely unlikely",
+                            "very low probability",
+                            "highly improbable",
+                            "little chance",
+                            "very unlikely",
+                            "unlikely",
+                            "likely",
+                            "quite probable",
+                            "very good chance",
+                            "very probable",
+                            "highly probable",
+                            "very high probability",
+                            "extremely probable"
+                        ],
+                        "values": [
+                            [0.01,  0.01],
+                            [0.05,  0.05],
+                            [0.075, 0.075],
+                            [0.1,   0.1],
+                            [0.125, 0.125],
+                            [0.25,  0.25],
+                            [0.75,  0.25],
+                            [0.8,   0.2],
+                            [0.825, 0.175],
+                            [0.875, 0.175],
+                            [0.925, 0.075],
+                            [0.95,  0.05],
+                            [0.99,  0.01]
+                        ],
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }]
+                }
+            }
+        },
+
+        "intermediateEventSet": {
+            "nodeDisplayName": "Intermediate Event Set",
+            "inherits": "eventSet",
+
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["staticGate", "variationPoint"],
+
+            "image": "intermediate_event_set.svg",
+            "help": "A set of intermediate events with identical child trees.",
+
+            "properties": {
+                "name": {
+                    "default": "Intermediate Event Set"
+                }
+            }
+        },
+
+        "gate": {
+            "nodeDisplayName": "Gate",
+            "inherits": "node"
+        },
+
+        "staticGate": {
+            "nodeDisplayName": "Static Gate",
             "inherits": "gate",
 
-            "name": "AND Gate",
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["event", "gate", "variationPoint"]
+        },
+
+        "andGate": {
+            "nodeDisplayName": "AND Gate",
+            "inherits": "staticGate",
+
             "image": "and_gate.svg",
-            "help": "Output event occurs if all input events occur"
+            "help": "The output event occurs if all input events occur."
         },
 
         "orGate": {
-            "inherits": "gate",
+            "nodeDisplayName": "OR Gate",
+            "inherits": "staticGate",
 
-            "name": "OR Gate",
             "image": "or_gate.svg",
-            "help": "Output event occurs if one or more input events occur",
+            "help": "The output event occurs if one or more input events occur.",
 
             "connector": {
                 "offset": {
@@ -223,205 +425,194 @@
         },
 
         "xorGate": {
-            "inherits": "gate",
+            "nodeDisplayName": "XOR Gate",
+            "inherits": "orGate",
 
-            "name": "XOR Gate",
             "image": "xor_gate.svg",
-            "help": "Output event occurs if exactly one of the input events occur"
+            "help": "The output event occurs if exactly one of the input events occur."
         },
 
         "votingOrGate": {
-            "inherits": "gate",
+            "nodeDisplayName": "Voting OR Gate",
+            "inherits": "orGate",
 
-            "name": "Voting OR Gate",
             "image": "voting_or_gate.svg",
-            "help": "Output event occurs if the given number of input events occur",
-            "k": 1,
+            "help": "The output event occurs if the given number of input events occur.",
 
-            "propertyMenuEntries": {
+            "properties": {
                 "k": {
-                    "kind": "number",
+                    "kind": "numeric",
                     "displayName": "k",
                     "min": 1,
-                    "step": 1
-                }
-            },
-            "propertyMirrors": {
-                "k": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "k="
+                    "step": 1,
+                    "default": 1,
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "k={{$0}}"
+                    }
                 }
             }
         },
 
-        "undevelopedEvent": {
-            "inherits": "event",
+        "dynamicGate": {
+            "nodeDisplayName": "Dynamic Gate",
+            "inherits": "gate"
+        },
 
-            "name": "Undeveloped Event",
+        "transferIn": {
+            "nodeDisplayName": "Transfer In",
+            "inherits": "dynamicGate",
+
             "numberOfOutgoingConnections": 0,
-            "image": "undeveloped_event.svg",
-            "help": "Event with no information available or insignificant impact",
 
-            "optional": null,
+            "image": "transfer_in.svg",
+            "help": "Includes the top event of another tree at this point in the tree.",
 
-            "propertyMenuEntries": {
-                "optional": null
+            "properties": {
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer",
+                    "default": -1,
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "◄ {{$0}}"
+                    }
+                },
+                "transferMaxCost": {
+                    "kind": "numeric",
+                    "displayName": "Max Cost",
+                    "min": 0,
+                    "step": 1,
+                    "default": 1,
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "max(c)={{$0}}"
+                    }
+                }
+            }
+        },
+
+        "variationPoint": {
+            "nodeDisplayName": "Variation Point",
+            "inherits": "node",
+
+            "properties": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name",
+                    "default": "Variation Point",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "{{$0}}"
+                    }
+                }
             },
 
-            "propertyMirrors": {
-                "optional": null
+            "connector": {
+                "dashstyle": "4 2"
             }
         },
 
         "featureVariation": {
+            "nodeDisplayName": "Feature Variation",
             "inherits": "variationPoint",
 
-            "name": "Feature Variation",
-            "allowConnectionTo": ["event", "variationPoint", "transferIn"],
-            "image": "feature_variation.svg",
-            "help": "Placeholder for one of the input events",
+            "allowConnectionTo": ["event", "variationPoint", "dynamicGate"],
 
-            "connector": {
-                "dashstyle": "4 2"
+            "image": "feature_variation.svg",
+            "help": "Expresses the feature choice for one of the child trees.",
+
+            "properties": {
+                "name": {
+                    "default": "Feature Variation"
+                }
             },
 
-            "changedChildProperties": {
-                "optional": null
+            "childProperties": {
+                "optional": {
+                    "hidden": true,
+                    "value":  false
+                }
             }
         },
 
         "redundancyVariation": {
+            "nodeDisplayName": "Redundancy Variation",
             "inherits": "variationPoint",
 
-            "name": "Redundancy Variation",
-            "allowConnectionTo": ["intermediateEventSet", "basicEventSet"],
             "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["eventSet"],
+
             "image": "redundancy_variation.svg",
-            "help": "Placeholder for a voting OR gate over a chosen number of the input events",
+            "help": "Expresses different possible configurations of a Voting OR gate at this point of the tree.",
 
-            "kFormula": "N-1",
-            "nRange": [1, 2],
-
-            "propertyMenuEntries": {
+            "properties": {
+                "name": {
+                    "default": "Redundancy Variation"
+                },
                 "kFormula": {
                     "kind": "text",
-                    "displayName": "K-Formula"
+                    "displayName": "K-Formula",
+                    "default": "N-1",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "k: {{$0}}"
+                    }
                 },
                 "nRange": {
                     "kind": "range",
                     "displayName": "N-Range",
                     "min": 1,
-                    "step": 1
+                    "step": 1,
+                    "default": [1, 2],
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "N: {{$0}}-{{$1}}"
+                    }
                 }
             },
 
-            "propertyMirrors": {
-                "kFormula": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "k: "
+            "childProperties": {
+                "optional": {
+                    "hidden": true,
+                    "value":  false
                 },
-                "nRange": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "N: "
+                "cardinality": {
+                    "hidden": true,
+                    "value": 1
                 }
-            },
-
-            "changedChildProperties": {
-                "optional": null
-            }
-        },
-
-        "houseEvent": {
-            "inherits": "basicEvent",
-            "name": "House Event",
-            "numberOfOutgoingConnections": 0,
-            "image": "house_event.svg",
-            "help": "An event that is expected to occur and typically does not denote a failure"
-        },
-
-        "transferIn": {
-            "inherits": "node",
-            "name": "Transfer In",
-            "image": "transfer_in.svg",
-            "help": "Connects the output of a related FuzzTree, e.g. a subsystem, to this one",
-
-            "numberOfIncomingConnections": 1,
-            "numberOfOutgoingConnections": 0,
-
-            "transfer": -1,
-            "transferMaxCost": 1,
-
-            "propertyMenuEntries": {
-                "transfer": {
-                    "kind": "transfer",
-                    "displayName": "Transfer"
-                },
-                "transferMaxCost": {
-                    "kind": "number",
-                    "displayName": "Max Cost",
-                    "min": 0,
-                    "step": 1
-                }
-            },
-
-            "propertyMirrors": {
-                "transfer": {
-                    "position": "bottom",
-                    "style": ["bold", "large"],
-                    "prefix": "◄ "
-                },
-                "transferMaxCost": {
-                    "position": "bottom",
-                    "style": ["italic"],
-                    "prefix": "max(c)="
-                }
-            }
-        },
-
-        "topEvent": {
-            "inherits": "event",
-            "name": "Top Event",
-            "image": "top_event.svg",
-            "excludeFromShapesMenu": true,
-            "numberOfIncomingConnections": 0,
-            "numberOfOutgoingConnections": 1,
-            "deletable": false,
-
-            "optional": null,
-            "decompositions": 1,
-
-            "propertyMenuEntries": {
-                "optional": null,
-
-                "decompositions": {
-                    "kind": "number",
-                    "displayName": "Decompose",
-                    "min": 1,
-                    "step": 1
-                }
-            },
-
-            "propertyMirrors": {
-                "optional": null
             }
         }
     },
 
     "propertiesDisplayOrder": [
         "name",
-        "cost",
+        "missionTime",
+        "decompositions",
         "probability",
         "optional",
+        "cost",
         "cardinality",
         "nRange",
         "k",
         "kFormula",
-        "decompositions",
         "transfer",
-        "transferMaxCost"
+        "transferMaxCost",
+        "description",
+        "width",
+        "height"
     ],
 
     "shapeMenuNodeDisplayOrder": [
@@ -429,16 +620,19 @@
         "basicEventSet",
         "intermediateEvent",
         "intermediateEventSet",
+        "topEvent",
+        "houseEvent",
+        "undevelopedEvent",
+
         "andGate",
         "orGate",
         "xorGate",
         "votingOrGate",
+        "transferIn",
+
         "featureVariation",
         "redundancyVariation",
-        "houseEvent",
-        "undevelopedEvent",
-        "transferIn",
-        "topEvent"
+        "stickyNote"
     ],
 
     "defaults": {

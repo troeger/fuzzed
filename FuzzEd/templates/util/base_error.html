@@ -1,22 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<title>{% block title %}{% endblock %}</title>
-<style type="text/css">
-    @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap.min.css");
-    @import url("{{ STATIC_URL }}lib/bootstrap/css/bootstrap-responsive.min.css");
-    @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
-    @import url("{{ STATIC_URL }}css/util.css");
-</style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}{% endblock %}
+    </title>
+    <style type="text/css">
+        @import url("{{ STATIC_URL }}css/bootstrap/bootstrap-2.3.2.min.css");
+        @import url("{{ STATIC_URL }}css/bootstrap/bootstrap-responsive-2.3.2.min.css");
+        @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-3.2.1.min.css");
+        @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
+        @import url("{{ STATIC_URL }}css/util.css");
+        @import url("{{ STATIC_URL }}css/print.css") print;
+    </style>
 </head>
 
 <body>
     <div class="container">
         <div class="hero-unit">
             {% block content %}{% endblock %}
-
         </div>
         {% include "util/footer.html" %}
+    </div>
 </body>
 </html>

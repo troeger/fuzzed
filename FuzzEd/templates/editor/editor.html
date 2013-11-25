@@ -4,53 +4,126 @@
     {{ block.super }} - {{ graph.name }}
 {% endblock %}
 
-{% block style %}
-    {{ block.super }}
-    @import url("{{ STATIC_URL }}css/editor/editor.css");
-    @import url("{{ STATIC_URL }}css/editor/menus.css");
-
-    @import url("{{ STATIC_URL }}css/jquery.ui.custom.css");
-    @import url("{{ STATIC_URL }}css/slick.grid.css");
-    @import url("{{ STATIC_URL }}css/slick.grid.theme.css");
-{% endblock %}
-
 {% block script %}
 {{ block.super }}
 <script type="text/javascript" language="javascript">
     // start editor
-    require(['{{ graph.kind }}/editor', 'bootstrap' /* needed for dropdown menu */], function(Editor) {
+    require(['{{ graph.kind }}/editor', 'bootstrap', 'exception'], function(Editor) {
         jQuery(document).ready(function() {
-            new Editor({{ graph.pk }});
+            try {
+                var editor = new Editor({{ graph.pk }});
+            } catch (exception) {
+                var exceptions = jQuery('#FuzzEdExceptions');
+
+                exceptions.modal({
+                    keyboard: false,
+                    backdrop: 'static'
+                }).show();
+                exceptions.find('#FuzzEdErrorMessage')
+                    .html('<p><strong>' + exception.toString() + '</strong></p>');
+
+                if (exception instanceof Error && exception.stack) {
+                    jQuery('#FuzzEdStacktrace').show()
+                        .children('pre')
+                        .text(exception.stack);
+                }
+            }
         });
     });
 </script>
 {% endblock %}
 
-{% block navigation_fields %}
-<li>
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-            <i class="icon-cog icon-white"></i> Actions <b class="caret"></b>
+{% block nav_center %}
+<ul class="nav navbar-nav" style="float: left;">
+    <li id="FuzzEdProgressIndicatorSingle" style="display: none;">
+        <a><i class="icon-progress"></i>&nbsp;<span></span></a>
+    </li>
+    <li id="FuzzEdProgressIndicatorDropdown" class="dropdown" style="display: none;">
+        <a data-toggle="dropdown" href="#">
+            <i class="icon-progress"></i>
+            <span>Working…</span>
+            <span class="badge"></span>
+            <i class="icon-caret-down"></i>
         </a>
-        <ul id="FuzzEdNavbarActions" class="dropdown-menu">
-                <li>
-                    <a href="{% url 'graph_download' graph.pk %}?format=xml">
-                        Save as XML <i class="icon-download"></i>
-                    </a>
-                </li>
-            <li>
-                <a href="{% url 'graph_download' graph.pk %}?format=json">
-                    Save as JSON <i class="icon-download"></i>
-                </a>
-            </li>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            {# multiple progress indicators will be inserted here #}
         </ul>
     </li>
+</ul>
+{% endblock %}
+
+{% block menu_right %}
+<li><a href="/"><i class="icon-home icon-white"></i> Dashboard </a></li>
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-download icon-white"></i> Export <b class="caret"></b>
+    </a>
+    <ul id="FuzzEdNavbarActions" class="dropdown-menu">
+        {% if graph.kind != 'rbd'%}
+            <li><a href="{% url 'graph_download' graph.pk %}?format=xml">as XML File</a></li>
+            <li><a href="{% url 'graph_download' graph.pk %}?format=tex">as LaTex Document</a></li>
+            <li><a href="#" id="FuzzEdActionExportPDF">as PDF Document</a></li>
+            <li><a href="#" id="FuzzEdActionExportEPS">as EPS Image</a></li>
+        {% endif %}
+        <li><a href="{% url 'graph_download' graph.pk %}?format=json">as JSON File</a></li>
+    </ul>
 </li>
+{% if graph.kind != 'rbd'%}
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-cog icon-white"></i> Compute <b class="caret"></b>
+    </a>
+    <ul id="FuzzEdNavbarActions" class="dropdown-menu">
+<!--        <li><a href="#" id="FuzzEdActionCutSets">Cut sets</a></li>-->
+        <li><a href="#" id="FuzzEdActionAnalytical">Analytical results</a></li>
+    </ul>
+</li>
+{% endif %}
+<li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-eye-open icon-white"></i> View <b class="caret"></b>
+    </a>
+    <ul id="FuzzEdNavbarActions" class="dropdown-menu">
+        <li><a href="#" id="FuzzEdActionGridToggle">Toogle grid</a></li>
+    </ul>
+</li>
+
 {% endblock %}
 
 {% block content %}
+    <div id="FuzzEdExceptions" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="header" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="icon-warning-sign"></i> Error...</h3>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        ...occured while trying to load your graph. It says:
+                        <div id="FuzzEdErrorMessage"></div>
+                        You might want to try one of these things:
+                        <ul>
+                            <li>Reload the graph</li>
+                            <li>Delete your model and build it from scratch</li>
+                            <li>Contact us via our <a href="http://fuzztrees.uservoice.com">feedback page</a></li>
+                        </ul>
+                        <div id="FuzzEdStacktrace">
+                            <p>
+                                <strong>Stacktrace (for techies)</strong>
+                            </p>
+                            <pre class="pre-scrollable"></pre>
+                        </div>
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <a href='/' class="btn btn-danger" aria-hidden="true">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
     {% include "editor/editor_splash.html" %}
-
     <div id="FuzzEdContent">
         {% include "editor/editor_canvas.html" %}
         {% include "editor/editor_shapes.html" %}

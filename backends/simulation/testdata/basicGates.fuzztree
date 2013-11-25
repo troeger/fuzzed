@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FuzzTree xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="net.fuzztree" id="15022013" name="Basic Gate Test">
+  <topEvent name="Result" missionTime="1">
+    <children xsi:type="ft:FeatureVariationPoint" id="100" name="Test Cases">
+      <children xsi:type="ft:IntermediateEvent" id="1" name="Basic Event A alone">
+        <children xsi:type="ft:BasicEvent" name="A">
+          <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.2" b2="0.3" c="0.4"/>
+        </children>
+      </children>
+      <children xsi:type="ft:IntermediateEvent" id="2" name="Basic Event B alone">
+        <children xsi:type="ft:BasicEvent" name="B">
+          <probability xsi:type="ft:TriangularFuzzyInterval" a="0.3" b1="0.4" b2="0.4" c="0.6"/>
+        </children>
+      </children>
+      <children xsi:type="ft:IntermediateEvent" id="3" name="Basic Event C alone">
+        <children xsi:type="ft:BasicEvent" name="C">
+          <probability xsi:type="ft:TriangularFuzzyInterval" a="0.2" b1="0.4" b2="0.5" c="0.6"/>
+        </children>
+      </children>
+      <children xsi:type="ft:IntermediateEvent" id="10" name="AND with two inputs">
+        <children xsi:type="ft:And">
+          <children xsi:type="ft:BasicEvent" name="A">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.2" b2="0.3" c="0.4"/>
+          </children>
+          <children xsi:type="ft:BasicEvent" name="B">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.3" b1="0.4" b2="0.4" c="0.6"/>
+          </children>
+        </children>
+      </children>
+      <children xsi:type="ft:IntermediateEvent" id="11" name="AND with BasicEventSet (n=4)">
+        <children xsi:type="ft:And">
+          <children xsi:type="ft:BasicEventSet" name="A-Set" quantity="4">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.2" b2="0.3" c="0.4"/>
+          </children>
+        </children>
+      </children>
+      <children xsi:type="ft:IntermediateEvent" id="20" name="OR with two inputs">
+        <children xsi:type="ft:Or">
+          <children xsi:type="ft:BasicEvent" name="A">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.2" b2="0.3" c="0.4"/>
+          </children>
+          <children xsi:type="ft:BasicEvent" name="B">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.3" b1="0.4" b2="0.4" c="0.6"/>
+          </children>
+        </children>
+      </children>
+      <children xsi:type="ft:IntermediateEvent" id="21" name="OR with BasicEventSet (n=3)">
+        <children xsi:type="ft:Or">
+          <children xsi:type="ft:BasicEventSet" name="A-Set" quantity="3">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.2" b2="0.3" c="0.4"/>
+          </children>
+        </children>
+      </children>
+      <children xsi:type="ft:IntermediateEvent" id="30" name="XOR with two inputs">
+        <children xsi:type="ft:Xor" name="">
+          <children xsi:type="ft:BasicEvent" name="A">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.2" b2="0.3" c="0.4"/>
+          </children>
+          <children xsi:type="ft:BasicEvent" name="B">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.3" b1="0.4" b2="0.4" c="0.6"/>
+          </children>
+        </children> 
+      </children>
+      <children xsi:type="ft:IntermediateEvent" id="31" name="XOR with 3 inputs">
+        <children xsi:type="ft:Xor">
+          <children xsi:type="ft:BasicEvent" name="A" id ="32">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.2" b2="0.3" c="0.4"/>
+          </children>
+          <children xsi:type="ft:BasicEvent" name="B" id ="33">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.3" b1="0.4" b2="0.4" c="0.6"/>
+          </children>
+          <children xsi:type="ft:BasicEvent" name="C" id ="34">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.2" b1="0.4" b2="0.5" c="0.6"/>
+          </children>
+        </children>
+      </children>
+      <children xsi:type="ft:IntermediateEvent" id="40" name="Voting OR with 3 inputs">
+        <children xsi:type="ft:VotingOr" k="2">
+          <children xsi:type="ft:BasicEvent" name="A" id ="41">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.1" b1="0.2" b2="0.3" c="0.4"/>
+          </children>
+          <children xsi:type="ft:BasicEvent" name="B" id ="42">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.3" b1="0.4" b2="0.4" c="0.6"/>
+          </children>
+          <children xsi:type="ft:BasicEvent" name="C" id ="43">
+            <probability xsi:type="ft:TriangularFuzzyInterval" a="0.2" b1="0.4" b2="0.5" c="0.6"/>
+          </children>
+        </children>
+      </children>
+    </children>
+  </topEvent>
+</ft:FuzzTree>

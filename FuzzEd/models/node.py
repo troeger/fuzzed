@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 import logging
@@ -11,7 +11,7 @@ import xml_fuzztree
 import xml_faulttree
 from graph import Graph
 
-import json, notations, sys, time
+import json, notations, sys, datetime, time
 
 def new_client_id():
     return str(int(time.mktime(time.gmtime())))
@@ -45,7 +45,11 @@ faulttree_classes = {
     'orGate':               xml_faulttree.Or,
     'xorGate':              xml_faulttree.Xor,
     'votingOrGate':         xml_faulttree.VotingOr,
-    'transferIn':           xml_faulttree.TransferIn
+    'transferIn':           xml_faulttree.TransferIn,
+    'fdepGate':             xml_faulttree.FDEP,
+    'priorityAndGate':      xml_faulttree.PriorityAnd,
+    'seqGate':              xml_faulttree.Sequence,
+    'spareGate':            xml_faulttree.Spare
 }
 
 class Node(models.Model):
@@ -85,7 +89,11 @@ class Node(models.Model):
             return unicode('%s%s' % (prefix, name))
 
         except ObjectDoesNotExist:
-            return unicode('%s%s_%s' % (prefix, self.pk, notations.by_kind[self.graph.kind]['nodes'][self.kind]['name']))
+            try:
+                name = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']['name']['default']
+                return unicode('%s%s_%s' % (prefix, self.pk, name))
+            except KeyError:
+                return self.kind
 
     def to_json(self):
         """
@@ -107,16 +115,15 @@ class Node(models.Model):
         Returns:
          {dict} the node as dictionary
         """
-        serialized = dict([prop.to_tuple() for prop in self.properties.filter(deleted=False)])
-
-        serialized['id']       = self.client_id
-        serialized['kind']     = self.kind
-        serialized['x']        = self.x
-        serialized['y']        = self.y
-        serialized['outgoing'] = [edge.client_id for edge in self.outgoing.filter(deleted=False)]
-        serialized['incoming'] = [edge.client_id for edge in self.incoming.filter(deleted=False)]
-
-        return serialized
+        return {
+            'properties': {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)},
+            'id':         self.client_id,
+            'kind':       self.kind,
+            'x':          self.x,
+            'y':          self.y,
+            'outgoing':   [edge.client_id for edge in self.outgoing.filter(deleted=False)],
+            'incoming':   [edge.client_id for edge in self.incoming.filter(deleted=False)]
+        }
 
     def to_bool_term(self):
         edges = self.outgoing.filter(deleted=False).all()
@@ -139,6 +146,119 @@ class Node(models.Model):
 
         raise ValueError('Node %s has unsupported kind' % self)
 
+    def children(self):
+        from edge import Edge
+        return [edge.target for edge in Edge.objects.filter(source=self)]
+
+    def children_left2right(self):
+        return sorted(self.children(), key=lambda child: child.x)        
+
+    def parents(self):
+        from edge import Edge
+        return [edge.target for edge in Edge.objects.filter(target=self)]
+
+    def get_all_mirror_properties(self, hiddenProps=[]):
+        """
+        Returns a sorted set of all node properties and their values, according to the notation rendering rules.
+        """
+        result = []
+        # Only consider properties that have to be displayed in the mirror 
+        displayOrder = notations.by_kind[self.graph.kind]['propertiesDisplayOrder']
+        propdetails = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']
+        for prop in displayOrder:
+            if propdetails.has_key(prop) and prop not in hiddenProps:   # the displayOrder list is static, the property does not have to be part of this node
+                val = self.get_property(prop, None)
+                if isinstance(propdetails[prop],dict):          # Some properties do not have a config dict in notations, such as optional=None
+                    kind = propdetails[prop]['kind']
+                else:
+                    logger.debug("Property %s in %s has no config dictionary"%(prop, self.kind))
+                    kind="text"
+                if val != None:
+                    if kind == "range":
+                        format = propdetails[prop]['mirror']['format']
+                        format = format.replace(u"\xb1","$\\pm$")    # Special unicodes used in format strings, such as \xb1
+                        val = format.replace("{{$0}}",str(val[0])).replace("{{$1}}",str(val[1]))
+                    elif kind == "compound":
+                        active_part = val[0]    # Compounds are unions, the first number tells us the active part defintion
+                        partkind = propdetails[prop]['parts'][active_part]['kind']
+                        format =   propdetails[prop]['parts'][active_part]['mirror']['format']
+                        format = format.replace(u"\xb1","$\\pm$")    # Special unicodes used in format strings, such as \xb1
+                        if partkind == 'epsilon': 
+                            val = format.replace("{{$0}}",str(val[1][0])).replace("{{$1}}",str(val[1][1]))
+                        elif partkind == 'choice':
+                            val = format.replace("{{$0}}",str(val[1][0]))
+                    elif propdetails[prop].has_key('mirror'):
+                        if propdetails[prop]['mirror'].has_key('format'):
+                            val = propdetails[prop]['mirror']['format'].replace("{{$0}}",str(val))
+                        else:
+                            val = str(val)
+                    else:
+                        # Property has no special type and no mirror definition, so it shouldn't be shown
+                        # One example is the name of the top event
+                        continue
+                    result.append(val)
+        return result
+
+
+    def to_tikz(self, x_offset=0, y_offset=0, parent_kind=None):
+        """
+        Serializes this node and all its children into a TiKZ representation.
+        A positive x offset shifts the resulting tree accordingly to the right.
+        Negative offsets are allowed.
+
+        We are intentionally do not use the TiKZ tree rendering capabilities, since this
+        would ignore all user formatting of the tree from the editor.
+
+        TikZ starts the coordinate system in the upper left corner, while we start in the lower left corner.
+        This demands some coordinate mangling on the Y axis.
+
+        Returns:
+         {str} the node and its children in LaTex representation
+        """
+        nodekind = self.kind.lower()
+        # Optional nodes are dashed
+        if self.get_property("optional", False):
+            nodeStyle = "shapeStyleDashed"
+        else:
+            nodeStyle = "shapeStyle"     
+        # If this is a child node, we need to check if the parent wants to hide some child property
+        hiddenProps = []
+        if parent_kind:
+            nodeConfig = notations.by_kind[self.graph.kind]['nodes'][parent_kind]
+            if nodeConfig.has_key('childProperties'):
+                for childPropName in nodeConfig['childProperties']:
+                    for childPropSettingName, childPropSettingVal in nodeConfig['childProperties'][childPropName].iteritems():
+                        if childPropSettingName == "hidden" and childPropSettingVal == True:
+                            hiddenProps.append(childPropName)
+        # Create Tikz snippet for tree node, we start with the TiKZ node for the graph icon
+        # Y coordinates are stretched a little bit, for optics
+        result = "\\node [shape=%s, %s] at (%u, -%f) (%u) {};\n"%(self.kind, nodeStyle, self.x+x_offset, (self.y+y_offset)*1.2, self.pk)
+        # Determine the mirror text based on all properties
+        # Text width is exactly the double width of the icons
+        mirrorText = ""
+        for index,propvalue in enumerate(self.get_all_mirror_properties(hiddenProps)):
+            if type(propvalue) == type('string'):
+                propvalue = propvalue.replace("#","\\#")    # consider special LaTex character in mirror text
+            if index==0:
+                # Make the first property bigger, since it is supposed to be the name
+                propvalue = "\\baselineskip=0.8\\baselineskip\\textbf{{\\footnotesize %s}}"%propvalue  
+            else:
+                propvalue = "{\\it\\scriptsize %s}"%propvalue                                
+            mirrorText += "%s\\\\"%propvalue
+        # Create child nodes and their edges
+        for edge in self.outgoing.filter(deleted=False):
+            # Add child node rendering
+            result += edge.target.to_tikz(x_offset, y_offset, self.kind)
+            # Add connector from this node to the added child, consider if dashed line is needed
+            if notations.by_kind[self.graph.kind]['nodes'][self.kind]['connector'].has_key('dashstyle'):
+                result += "\path[fork edge, dashed] (%s.south) edge (%u.north);\n"%(self.pk, edge.target.pk)
+            else:
+                result += "\path[fork edge] (%s.south) edge (%u.north);\n"%(self.pk, edge.target.pk)
+        # Add the mirror text as separate text node, which makes formatting more precise
+        if mirrorText != "":
+            result += "\\node [mirrorStyle] at (%u.south) (text%u) {%s};\n"%(self.pk, self.pk, mirrorText)
+        return result
+
     def to_xml(self, xmltype=None):
         """
         Method: to_xml
@@ -156,7 +276,7 @@ class Node(models.Model):
             xmltype = self.graph.kind
 
         properties = {
-            'id':   self.id,
+            'id':   self.client_id,
             'name': self.get_property('name', '-')
         }
 
@@ -176,16 +296,24 @@ class Node(models.Model):
             # determine fuzzy or crisp probability, set it accordingly
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
                 probability = self.get_property('probability', None)
-                if isinstance(probability, list):
-                    point = probability[0]
-                    alpha = probability[1]
+                # Probability is a 2-tuple, were the first value is a type indicator and the second the value
+                if probability[0] == 1:
+                    # Failure rate
+                    properties['probability'] = xml_fuzztree.FailureRate(value_=probability[1])
+                elif probability[0] in [0,2]:
+                    # Point value with uncertainty range, type 0 (direct) or 2 (fuzzy terms)
+                    if isinstance(probability[1], int):
+                        point = probability[1]
+                        alpha = 0
+                    else:
+                        point = probability[1][0]
+                        alpha = probability[1][1]
                     if alpha == 0:
                         properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
                     else:
-                        properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(   a=point - alpha, b1=point,
-                                                                                           b2=point, c=point + alpha)
-                elif isinstance(probability, (long, int, float)):
-                    properties['probability'] = xml_fuzztree.CrispProbability(value_=probability)
+                        properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(
+                            a=point - alpha, b1=point, b2=point, c=point + alpha
+                        )
                 else:
                     raise ValueError('Cannot handle probability value: "%s"' % probability)
                 # nodes that have a probability also have costs in FuzzTrees
@@ -211,12 +339,28 @@ class Node(models.Model):
 
             # determine fuzzy or crisp probability, set it accordingly
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
-                properties['probability'] = xml_faulttree.CrispProbability(value_=self.get_property('probability', None))
+                probability_property = self.get_property('probability', None)
+                properties['probability'] = xml_faulttree.CrispProbability(value_=probability_property[1])
+
+            if self.kind == 'fdepGate':
+                properties['triggeredEvents'] = [parent.client_id for parent in self.parents()]
+                children = self.children()
+                assert(len(children)==1)            # Frontend restriction, comes from notations.json
+                properties['trigger'] = children[0].client_id  
+
+            if self.kind == 'spareGate':
+                children_sorted = self.children_left2right()
+                assert(len(children_sorted)>0)      #TODO: This will kill the XML generation if the graph is incompletly drawn. Do we want that?
+                properties['primaryID'] = children_sorted[0].client_id
+                properties['dormancyFactor'] = self.get_property('dormancyFactor')
+
+            if self.kind in ['seqGate','priorityAndGate']:
+                properties['eventSequence'] = [child.client_id for child in self.children_left2right()]
 
             xml_node = faulttree_classes[self.kind](**properties)
 
         # serialize children
-        logger.debug('[XML] Added node "%s" with properties %s' % (self.kind, properties))
+        logger.debug('Added node "%s" with properties %s' % (self.kind, properties))
         for edge in self.outgoing.filter(deleted=False):
             xml_node.children.append(edge.target.to_xml(xmltype))
 
@@ -227,10 +371,16 @@ class Node(models.Model):
             return self.properties.get(key=key).value
         except ObjectDoesNotExist:
             try:
-                logger.debug('[XML] Node has no property "%s", trying to use default from notation' % key)
-                return notations.by_kind[self.graph.kind]['nodes'][self.kind][key]
+                prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]                
+                if prop is None:
+                    logger.warning("Notation configuration has empty default for node property "+key)
+                    result = default
+                else:
+                    result = prop['default']
+                logger.debug('Node has no property "%s", using default "%s"' % (key, str(result)))
+                return result
             except KeyError:
-                logger.debug('[XML] No default given in notation, assuming "%s" instead' % default)
+                logger.debug('No default given in notation, using given default "%s" instead' % default)
                 return default
 
     def get_attr(self, key):
@@ -272,14 +422,8 @@ class Node(models.Model):
             prop.value = value
             prop.save()
 
-# the handler will ensure that the kind of the node is present in its containing graph notation
-@receiver(pre_save, sender=Node)
-def validate(sender, instance, raw, **kwargs):
-    # raw is true if fixture loading happens, where the graph does not exist so far
-    if not raw:
-        graph = instance.graph
-        if not instance.kind in notations.by_kind[graph.kind]['nodes']:
-            raise ValueError('Graph %s does not support nodes of type %s' % (graph, instance.kind))
-
-# ensures that the validate handler is not exported
-__all__ = ['Node']
+@receiver(post_save, sender=Node)
+def graph_modify(sender, instance, **kwargs):
+    logger.debug("Updating graph modification date.")
+    instance.graph.modified = datetime.datetime.now()
+    instance.graph.save()

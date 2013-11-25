@@ -1,0 +1,146 @@
+/**
+ *  File: menus.less
+ *      This file contains all styles that apply to editor menus.
+ */
+
+.menu {
+    position: fixed;
+    min-height: 50px;
+    min-width: 100px;
+    padding: 42px 7px 7px 7px;
+
+    z-index: 0;
+
+    border: 1px solid @theme-border;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+
+    .box-shadow(1px 1px 3px @theme-border);
+
+    background-color: @theme-base;
+
+    &:after {
+        content: attr(header);
+
+        position: absolute;
+        top: -1px;
+        left: 0;
+        width: 100%;
+        padding: 5px 15px;
+
+        color: @navbar-color;
+        font-size: 14px;
+        font-weight: bolder;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+
+        .box-sizing(border-box);
+
+        border-top: 1px solid @theme-border;
+        border-bottom: 1px solid @theme-border;
+        .border-top-radius(4px);
+
+        background-color: @navbar-bg;
+    }
+
+    .menu-controls {
+        position: absolute;
+        top: 6px;
+        right: 12px;
+        z-index: 1;
+        color: @navbar-link-color;
+        cursor: pointer;
+
+        span {
+            &:hover {
+                color: @navbar-link-hover-color;
+            }
+        }
+    }
+}
+
+/*
+ *  Shapes Menu
+ */
+#FuzzEdShapes {
+    top: 60px;
+    left: 20px;
+
+    td {
+        text-align: center;
+        width: 90px;
+        vertical-align: top;
+
+        span {
+            display: block;
+            margin-bottom: 10px;
+
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+            text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+        }
+        
+       #stickyNote {
+            width:35px;
+            height:35px;
+            border: 1px solid black;
+            margin-left:auto;
+            margin-right:auto;
+            margin-bottom:6px;
+       }
+   }
+}
+
+/*
+ *  Properties Menu
+ */
+#FuzzEdProperties {
+    display: none;
+    top: 60px;
+    min-width: 280px;
+
+    input[type="checkbox"] {
+        margin: 9px 0 0 2px;
+    }
+
+    div.progress {
+        width: 160px;
+        margin: 6px 0 0 0;
+    }
+
+    button.fuzzed-property-open {
+        margin-top: 5px;
+    }
+}
+
+/*
+ *  Cutsets Menu
+ */
+#FuzzEdCutsetsMenu {
+    display: none;
+    top: 60px;
+    left: 240px;
+    min-width: 200px;
+}
+
+/*
+ *  Probability Menu
+ */
+#FuzzEdProbabilityMenu {
+    display:    none;
+    top:        60px;
+    left:       240px;
+    min-width:  400px;
+    min-height: 100px;
+
+    .content {
+        width:  100%;
+        height: 100%;
+        min-width:  400px;
+        min-height: 100px;
+    }
+}

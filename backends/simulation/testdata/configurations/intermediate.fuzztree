@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FuzzTree id="1" name="Intermediate Tree Test" xmlns:ft="net.fuzztree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <topEvent id="2" name="topEvent" missionTime="1">
+  <children xsi:type="ft:IntermediateEvent" id="4">
+    <children xsi:type="ft:And" id="3" name="AND">
+      <children xsi:type="ft:IntermediateEventSet" id="5" quantity="3">
+        <children xsi:type="ft:BasicEvent" id="111" name="BE 2" costs="5">
+            <probability xsi:type="ft:CrispProbability" value="0.2"/>
+            
+            <children id="7" xsi:type="ft:FDEP" trigger="5" triggeredEvents="6">
+              <children id="5"  xsi:type="ft:BasicEvent">
+                <probability value="0.001" xsi:type="ft:CrispProbability"/>
+              </children>
+            </children>
+
+          </children>
+      </children>
+    </children>
+  </children>
+  </topEvent>
+</ft:FuzzTree>

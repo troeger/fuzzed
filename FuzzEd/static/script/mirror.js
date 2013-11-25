@@ -1,4 +1,4 @@
-define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
+define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, Canvas, Class) {
     /**
      * Package: Base
      */
@@ -15,15 +15,16 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
          * Group: Members
          *
          * Properties:
+         *   {Property}   property     - The mirrored property object
          *   {DOMElement} container    - This is the mirror's container element that holds the actual content.
-         *   {String}     prefix       - A constant string that is always prepended to the show content (default: '').
-         *   {String}     suffix       - A constant string that is always appended to the show content (default: '').
+         *   {String}     format       - A template string used to format the mirror value. Django template language
+         *                               syntax (default: {{0}}).
          *
          *   {DOMElement} _containment - The DOM element that the mirror is attached to - i.e. <Node::container>.
          */
+        property:     undefined,
         container:    undefined,
-        prefix:       undefined,
-        suffix:       undefined,
+        format:       undefined,
 
         _containment: undefined,
 
@@ -36,10 +37,12 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
          * {Array[String]} style (possible values in array: 'bold', 'italic', 'large').
          *
          * Parameters:
+         *   {Property}   property    - The mirrored property object
          *   {DOMElement} containment - The DOM element that will contain the mirror's DOM elements.
          *   {Objects}    properties  - Object with mirror configuration options. See description above for details.
          */
-        init: function(containment, properties) {
+        init: function(property, containment, properties) {
+            this.property     = property;
             this._containment = containment;
             this.container    = jQuery('<span>').addClass(Config.Classes.MIRROR)
                 // The label is double the grid/node's width to allow for large textual content. Since the mirror is
@@ -49,8 +52,7 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
                 .css('width', Canvas.gridSize * 2 - Config.Grid.STROKE_WIDTH * 4)
                 .css('margin-left', -(Canvas.gridSize / 2) + Config.Grid.STROKE_WIDTH);
 
-            this.prefix = properties.prefix || '';
-            this.suffix = properties.suffix || '';
+            this.format = properties.format || '{{$0}}';
 
             // style the mirror's visualization - i.e. bold, italic or larger text
             _.each(properties.style, function(style) {
@@ -65,7 +67,9 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
             else if (properties.position === 'top')
                 this._containment.prepend(this.container);
             else
-                throw '[VALUE ERROR] unknown mirror position: ' + properties.position;
+                throw ValueError('unknown mirror position: ' + properties.position);
+
+            this._setupEvents();
         },
 
         /**
@@ -82,17 +86,26 @@ define(['config', 'canvas', 'class'], function(Config, Canvas, Class) {
          * Returns:
          *   This {Mirror} instance for chaining.
          */
-        show: function(text) {
-            if (typeof text === 'undefined' || text === null) {
-                this.container.css('display', 'none');
-            } else {
-                // remove 'display: none' from element to show it again
-                // '.show()' won't work because this sets display to 'inline', but we need 'block'
-                this.container.css('display', '');
-                this.container.html(this.prefix + text + this.suffix);
-            }
+        show: function(value) {
+            if (!_.isArray(value)) value = [value];
+            // convert the array into an object, where the keys are the index of the array
+            // and the value are the values of the array at the corresponding index
+            var enumerated = _.object(_.map(_.range(value.length), function(num){return '$' + num;}), value);
+            this.container.text(_.template(this.format, enumerated));
+
+            this.container.toggle(!(this.property.hidden || typeof value === 'undefined' || value === null));
 
             return this;
+        },
+
+        _setupEvents: function() {
+            jQuery(this.property).on(Config.Events.PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+                this.show(text);
+            }.bind(this));
+
+            jQuery(this.property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
+                this.container.toggle(!hidden);
+            }.bind(this));
         }
     });
 });

@@ -6,41 +6,28 @@
 
 {% block script %}
 {{ block.super }}
-<script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
 <script type="text/javascript" language="javascript">
-    require.config({
-        baseUrl: '{{ STATIC_URL }}script/',
-        waitSeconds: 5,
-        paths: {
-            'jquery':    'require-jquery',
-            'bootstrap': '../lib/bootstrap/js/bootstrap-2.0.4.min'
-
-        }
-    });
-
     require(['bootstrap'], function() {
         var graph_to_delete = null;
 
-        function delete_clicked(event) {
+        var delete_clicked = function(event) {
             event.stopPropagation();
 
             graph_to_delete = jQuery(this).closest('form');
-            var dialog      = jQuery('#delete_dialog')
+            var dialog      = jQuery('#delete_dialog');
             var name        = dialog.find('#delete_name');
 
-            name.html(graph_to_delete.closest('tr').find('strong.graph_name').html())
+            name.html(graph_to_delete.closest('tr').find('strong.graph_name').html());
             dialog.modal().show();
-        }
+        };
 
-        function delete_confirmed(event) {
-            console.log(graph_to_delete);
-            
+        var delete_confirmed = function(event) {
             graph_to_delete.find('input.delete_flag')
                            .attr('name',  'delete')
                            .attr('value', 'delete');
             graph_to_delete.submit();
             graph_to_delete = null;
-        }
+        };
 
         jQuery(document).ready(function() {
             jQuery('button.require-dialog').click(delete_clicked);
@@ -50,7 +37,9 @@
 </script>
 {% endblock %}
 
-{%block navigation_home %}hidden{% endblock %}
+{% block menu_right %}
+<li><a href="/settings"><i class="icon-user icon-white"></i> Account </a></li>
+{% endblock %}
 
 {% block content %}
 <div class="page-header">
@@ -62,15 +51,15 @@
 <form action="/dashboard/new/" method="post">
     {% csrf_token %}
     <div class="btn-group pull-right">
-        <button type="submit" name="kind" value="faulttree" class="btn">
+        <button type="submit" name="kind" value="faulttree" class="btn btn-default">
             <i class="icon-file"></i>
             New FaultTree
         </button>
-        <button type="submit" name="kind" value="fuzztree" class="btn">
+        <button type="submit" name="kind" value="fuzztree" class="btn btn-default">
             <i class="icon-file"></i>
             New FuzzTree
         </button>
-        <button type="submit" name="kind" value="rbd" class="btn">
+        <button type="submit" name="kind" value="rbd" class="btn btn-default">
             <i class="icon-file"></i>
             New RBD
         </button>
@@ -106,25 +95,25 @@
                     <td>
                         <strong class="graph_name">{{ graph }}</strong>
                     </td>
-                    <td><span class="label">{{ name }}</span></td>
+                    <td><span class="label label-info">{{ name }}</span></td>
                     <td>{{ graph.created }}</td>
                     <td style="text-align: right;">
                         <form action="/dashboard/{{ graph.pk }}/" method="POST">
                             {% csrf_token %}
                             <input type="hidden" class="delete_flag">
-                            <button type="submit" name="edit" value="edit" class="btn">
+                            <button type="submit" name="edit" value="edit" class="btn btn-default btn-small">
                                 <i class="icon-wrench"></i>
                                 Settings
                             </button>
-                            <button type="submit" name="copy" value="copy" class="btn">
+                            <button type="submit" name="copy" value="copy" class="btn btn-default btn-small">
                                 <i class="icon-plus-sign"></i>
                                 Copy
                             </button>
-                            <button type="submit" name="snapshot" value="snapshot" class="btn">
+                            <button type="submit" name="snapshot" value="snapshot" class="btn btn-default btn-small">
                                 <i class="icon-camera"></i>
                                 Snapshot
                             </button>
-                            <button type="button" class="btn btn-danger require-dialog">
+                            <button type="button" class="btn btn-danger btn-small require-dialog">
                                 <i class="icon-white icon-trash"></i>
                                 Delete
                             </button>
@@ -137,24 +126,26 @@
 </section>
 
 <!-- hidden modal dialog for graph deletion confirmation -->
-<div class="modal hide fade" id="delete_dialog" role="dialog" aria-labelledby="header" aria-hidden="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="header">Confirmation</h3>
-    </div>
-    
-    <div class="modal-body">
-        <p>Are you sure you want to delete <strong id="delete_name"></strong>?</p>
-    </div>
-
-    <div class="modal-footer">
-        <button type="button" class="btn btn-danger" id="confirm_delete">
-            <i class="icon-white icon-trash"></i>
-            Delete
-        </button>
-        <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">
-            Cancel
-        </button>
+<div class="modal fade" id="delete_dialog" role="dialog" aria-labelledby="header" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="header">Confirmation</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="delete_name"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirm_delete">
+                    <i class="icon-white icon-trash"></i>
+                    Delete
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">
+                    Cancel
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

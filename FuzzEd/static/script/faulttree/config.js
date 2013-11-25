@@ -1,4 +1,4 @@
-define(['config'], function(Config) {
+define(['config', 'jquery'], function(Config) {
     /**
      *  Package Faulttree
      */
@@ -22,7 +22,9 @@ define(['config'], function(Config) {
          */
         Events: {
             EDITOR_CALCULATE_CUTSETS:               'editor-calculate-cutsets',
-            EDITOR_CALCULATE_TOP_EVENT_PROBABILITY: 'editor-calculate-topevent-probability'
+            EDITOR_CALCULATE_TOP_EVENT_PROBABILITY: 'editor-calculate-topevent-probability',
+            EDITOR_GRAPH_EXPORT_PDF:                'editor-export-pdf',
+            EDITOR_GRAPH_EXPORT_EPS:                'editor-export-eps'
         },
 
         /**
@@ -32,12 +34,10 @@ define(['config'], function(Config) {
          *  Constants:
          *    {String} CUTSETS_MENU          - The container element of the cutsets menu.
          *    {String} PROBABILITY_MENU      - The container element of the probability menu.
-         *    {String} NAVBAR_ACTION_CUTSETS - The navbar actions button for cutsets calculation.
          */
         IDs: {
             CUTSETS_MENU:          'FuzzEdCutsetsMenu',
-            PROBABILITY_MENU:      'FuzzEdProbabilityMenu',
-            NAVBAR_ACTION_CUTSETS: 'FuzzEdNavbarActionCutsets'
+            PROBABILITY_MENU:      'FuzzEdProbabilityMenu'
         },
 
         /**
