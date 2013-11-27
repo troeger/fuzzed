@@ -385,7 +385,7 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		}
 		else if (typeName == *TRANSFERIN)
 		{
-			throw new FatalException("TransferIn Gate not yet implemented.", 0, id);
+			throw FatalException(std::string("TransferIn Gate not yet implemented."), 0, id);
 
 			// m_issues.insert("TransferIn Gate not yet implemented.", 0, id);
 			continue;
