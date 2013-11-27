@@ -227,7 +227,7 @@ void SimulationProxy::simulateAllConfigurations(
 
 	simulationResults::SimulationResults simResults;
 
-	std::vector<Issue> issues;
+	std::set<Issue> issues;
 	FuzzTreeTransform ftTransform(file, issues); // TODO correct stream
 	if (!ftTransform.isValid())
 	{
