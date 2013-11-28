@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
-from FuzzEd.models import Graph, notations, commands
+from FuzzEd.models import Graph, Project, notations, commands
 import FuzzEd.settings
 
 GREETINGS = [
@@ -76,7 +76,7 @@ def projects(request):
     """
     projects = (request.user.projects.filter(deleted=False) | request.user.own_projects.filter(deleted=False)).order_by('-created')
         
-    parameters = {'projects':[ project.__dict__ for project in projects]}
+    parameters = {'projects':[ project.to_dict for project in projects]}
             
     return render(request, 'project_menu/projects.html', parameters)
     
@@ -100,8 +100,34 @@ def project_new(request):
         commands.AddProject.create_from(POST.get('name'), request.user)
         return redirect('projects')
         
-    return render(request, 'project_menu/project_new.html')    
+    return render(request, 'project_menu/project_new.html')
     
+@login_required
+def project_edit(request, project_id):
+    """
+    Function: project_edit
+    
+    This handler function is responsible for allowing the user to edit the properties of an already existing project.
+    Therefore the system renders a edit dialog to the user where changes can be made and saved or the project can be
+    deleted.
+    
+    Parameters:
+     {HttpResponse} request    - a django request object
+     {int}          project_id - the project to be edited
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    project = get_object_or_404(Project, pk=project_id, owner=request.user)
+    POST  = request.POST
+
+    # deletion requested? do it and go back to project overview
+    if POST.get('delete'):
+       commands.DeleteProject.create_from(project_id).do()
+       messages.add_message(request, messages.SUCCESS, 'Project deleted.')
+       return redirect('projects')
+        
+
 @login_required
 def dashboard(request):
     """

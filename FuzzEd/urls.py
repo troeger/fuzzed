@@ -26,6 +26,7 @@ urlpatterns = patterns('',
     url(r'^snapshot/(?P<graph_id>\d+)$', 'FuzzEd.views.snapshot', name='snapshot'),
     url(r'^projects/$', 'FuzzEd.views.projects', name='projects'),
     url(r'^project/new/$', 'FuzzEd.views.project_new', name='project_new'),
+    url(r'^project/(?P<project_id>\d+)/$', 'FuzzEd.views.project_edit', name='project_edit'),
     
     
     

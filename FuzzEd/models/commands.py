@@ -480,6 +480,59 @@ class DeleteGraph(Command):
         self.graph.deleted = False
         self.graph.save()
 
+class DeleteProject(Command):
+    """
+    Class: DeleteProject
+    
+    Extends: Command
+
+    Command that is issued when a project is deleted.
+
+    Fields:
+     {<Project>} project  - the project that shall be deleted
+    """
+    project = models.ForeignKey(Project, related_name='+')
+
+    @classmethod
+    def create_from(cls, project_id):
+        """
+        Method [static]: create_from
+        
+        Convenience factory method for issuing a delete project command from parameters as received from API calls.
+
+        Parameters:
+         {str} project_id  - the id of the project to be deleted
+
+        Returns:
+         {<DeleteProject>}  - the delete project command instance
+        """
+        return cls(project=Project.objects.get(pk=int(project_id)))
+
+    def do(self):
+        """
+        Method: do
+        
+        Deletes the project by setting its deletion flag
+
+        Returns:
+         {None}
+        """
+        self.project.deleted = True
+        self.project.save()
+        self.save()
+
+    def undo(self):
+        """
+        Method: undo
+        
+        Restores the project by removing its deletion flag
+
+        Returns:
+         {None}
+        """
+        self.project.deleted = False
+        self.project.save()
+
 class DeleteNode(Command):
     """
     Class: DeleteNode
