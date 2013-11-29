@@ -62,7 +62,7 @@ class Graph(models.Model):
         Serializes the graph into a JSON object.
 
         Returns:
-         {dict} the graph in JSON representation
+         {string} the graph in JSON representation
         """
         return json.dumps(self.to_dict())
 

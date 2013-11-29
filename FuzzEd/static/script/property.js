@@ -62,6 +62,13 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             return this;
         },
 
+        toDict: function() {
+            // any ideas how to make this a one-liner?
+            var obj = {};
+            obj[this.name] = { 'value': this.value };
+            return obj;
+        },
+
         setHidden: function(newHidden) {
             this.hidden = newHidden;
 
@@ -212,6 +219,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             this._triggerChange(newValue, this);
 
             return this;
+        },
+
+        toDict: function() {
+            var obj = {};
+            obj[this.name] = { 'value': [this.value, this.parts[this.value].value] };
+            return obj;
         },
 
         validate: function(value, validationResult) {

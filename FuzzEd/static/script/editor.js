@@ -481,64 +481,17 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             // reset _clipboard
             this._clipboard = '';
-            var nodes = new Array;
 
             // save selected nodes to nodes
+            var nodes = new Array;
             jQuery(selectedNodes).each(function(index, element) {
-                var wholeNode = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
-                // Copying the Top Event is not allowed
-                if (wholeNode.id == 0) return;
-                var node = _.pick(wholeNode, 'kind', 'incoming', 'outgoing', 'x', 'y')
-                node.properties = new Object()
-                // list of current properties in fault- and fuzztrees. not very nice - how can we automagically gather them?
-                props = ['cardinality', 'name', 'probability', 'k', 'dormancyFactor', 'transfer', 'cost', 'optional', 'kFormula', 'nRange']
-                _.each(props, function(prop) {
-                    if (typeof wholeNode.properties[prop] !== 'undefined') {
-                        // we just need the values, the rest is jquery-stuff (?)
-                        node.properties[prop] = _.pick(wholeNode.properties[prop], 'value');
-
-                        if (prop === 'probability') {
-
-                            /*
-                            [✔] make it work
-                            [ ] make it fast/nice
-                            */
-
-                            var prob_value = new Array(2); // shortcut to node.properties.probability.value
-                            var old_prob = wholeNode.properties.probability; // shortcut to wholeNode.properties.probability
-
-                            // set probability type
-                            // 0 -> point, 1 -> rate, 2 -> approx
-                            prob_value[0] = old_prob.value;
-                            // set value
-                            if (prob_value[0] != 1) {
-                                // case 1: it's a point (0) or approx (2), which are saved as an array
-                                //prob_value[1] = _.pick(old_prob.parts[old_prob.value].value, '0', '1');
-                                prob_value[1] = [old_prob.parts[old_prob.value].value[0], old_prob.parts[old_prob.value].value[1]];
-                            } else {
-                                // case 2: it's a rate (1), which is saved as a single value
-                                prob_value[1] = old_prob.parts[old_prob.value].value;
-                            }
-                            // applying the above shortcut
-                            node.properties.probability.value = prob_value;
-                        }
-                    }
-                }.bind(this));
-                console.log(node);
-                //this.graph.addNode(node.kind, node);
-                nodes.push(node);
+                var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
+                nodes.push(node.toDict());
             }.bind(this));
 
-            //jQuery(selectedEdges).each(function())
             this._clipboard = JSON.stringify(nodes);
-            console.log('Clipboard: '+this._clipboard);
-
-            // save selected edges to _clipboard
-            /*jQuery(selectedEdges).each(function(index, element) {
-                var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
-                jsPlumb.detach(edge);
-                //
-            }.bind(this));*/
+            console.log(nodes);
+            console.log(this._clipboard);
         },
 
         /**
@@ -558,7 +511,6 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             var nodes = JSON.parse(this._clipboard);
 
             _.each(nodes, function(node) {
-
                 node.id = this.graph.getPasteId();
                 node.x++; node.y++;
                 console.log(node);

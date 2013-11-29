@@ -875,6 +875,26 @@ function(Property, Mirror, Canvas, Class) {
             return children;
         },
 
+         /**
+         * Method: toDict
+         *
+         * Returns:
+         *   A dict representation of the node according to models/node.py:to_dict().
+         */
+        toDict: function() {
+            return {
+                'properties':   _.reduce(_.map(this.properties, function(prop) { return prop.toDict() }), function(memo, prop) {
+                    return _.extend(memo, prop);
+                }, {}),
+                'id':           this.id,
+                'kind':         this.kind,
+                'x':            this.x,
+                'y':            this.y,
+                'outgoing':     this.outgoing,
+                'incoming':     this.incoming
+            };
+        },
+
         /**
          * Group: DOM Manipulation
          */
