@@ -486,7 +486,9 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             var nodes = new Array;
             jQuery(selectedNodes).each(function(index, element) {
                 var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
-                nodes.push(node.toDict());
+                if (node.copyable) {
+                    nodes.push(node.toDict());
+                }
             }.bind(this));
 
             this._clipboard = JSON.stringify(nodes);
@@ -510,12 +512,15 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             var nodes = JSON.parse(this._clipboard);
 
+            _.invoke(this.graph.nodes, 'deselect');
+
             _.each(nodes, function(node) {
                 node.id = this.graph.getPasteId();
                 node.x++; node.y++;
                 console.log(node);
 
-                this.graph.addNode(node.kind, node);
+                this.graph.addNode(node.kind, node)
+                           .select();
             }.bind(this));
 
             //var nodes = JSON.parse(this._clipboard);
