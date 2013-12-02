@@ -323,12 +323,15 @@ class Node(models.Model):
         self.save()
 
         # Add properties
-        if xml_node.name and self.allows_property('name'):
+        if hasattr(xml_node,'name') and self.allows_property('name'):
             logger.debug("Setting name to "+xml_node.name)
             self.set_attr('name', xml_node.name)
-        if xmltype == "faulttree":
-            if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
-                self.set_attr('probability', [0, xml_node.probability.value_])
+        if hasattr(xml_node,'optional') and self.allows_property('optional'):
+            logger.debug("Setting optionality flag to "+str(xml_node.optional))
+            self.set_attr('optional', xml_node.optional)
+#        if hasattr(xml_node,'probability') and self.allows_property('probability'):
+#            #TODO: Consider also fuzzy probabilities and rates
+#               self.set_attr('probability', [0, xml_node.probability.value_])
 
         # Create edge to parent, if needed
         if parent:
@@ -380,21 +383,18 @@ class Node(models.Model):
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
                 probability = self.get_property('probability', None)
                 # Probability is a 2-tuple, were the first value is a type indicator and the second the value
-                if probability[0] == 1:
+                if probability[0] == 0:
+                    # Crisp probability
+                    point = probability[1][0]
+                    properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
+                elif probability[0] == 1:
                     # Failure rate
                     properties['probability'] = xml_fuzztree.FailureRate(value_=probability[1])
-                elif probability[0] in [0,2]:
-                    # Point value with uncertainty range, type 0 (direct) or 2 (fuzzy terms)
-                    if isinstance(probability[1], int):
-                        point = probability[1]
-                        alpha = 0
-                    else:
-                        point = probability[1][0]
-                        alpha = probability[1][1]
-                    if alpha == 0:
-                        properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
-                    else:
-                        properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(
+                elif probability[0] == 2:
+                    # Fuzzy probability
+                    point = probability[1][0]
+                    alpha = probability[1][1]
+                    properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(
                             a=point - alpha, b1=point, b2=point, c=point + alpha
                         )
                 else:
@@ -455,11 +455,12 @@ class Node(models.Model):
             particular node types in the JSON. If we do not follow this understanding, they get
             very 'exceptional'. The JSON renderer is not checking this, but the XML import must be picky.
         '''
-        if name == 'name':
-            is_ok = self.kind not in ['andGate', 'orGate', 'xorGate']
-        if not is_ok:
+        propdetails = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']
+        if name not in propdetails.keys():
             logger.debug('%s is not allowed in %s'%(str(name), str(self.kind)))
-        return is_ok
+            return False
+        else:
+            return True
 
     def get_property(self, key, default=None):
         try:
