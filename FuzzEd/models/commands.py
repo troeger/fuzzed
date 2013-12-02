@@ -57,6 +57,7 @@ class AddProject(Command):
     Command that is issued when an a new project was created.
         
     """
+    project = models.ForeignKey(Project, related_name='+')
     
     @classmethod
     def create_from(cls, name, owner):
@@ -70,32 +71,20 @@ class AddProject(Command):
         {str}  name     - name of the project
         {User} owner    - the user that owns this project
         """
-        project = Project(name=name, owner=owner)
+        project = Project(name=name, owner=owner, deleted=True)
         project.save()
          
-        return
+        return cls(project=project)
    
     def do(self):
-        """
-        Method: do
-        
-        In the context of projects there is no do necessary
-        
-        Returns:
-         {None}
-        """
-        return
+        self.project.deleted = False
+        self.project.save()
+        self.save()
 
     def undo(self):
-        """
-        Method: do
-        
-        In the context of projects there is no undo necessary
-        
-        Returns:
-         {None}
-        """
-        return
+        self.project.deleted = True
+        self.project.save()
+        self.save()
     
 class AddEdge(Command):
     """

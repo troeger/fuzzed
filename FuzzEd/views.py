@@ -97,7 +97,7 @@ def project_new(request):
   
     if request.method == 'POST':
         POST = request.POST
-        commands.AddProject.create_from(POST.get('name'), request.user)
+        commands.AddProject.create_from(name=POST.get('name'), owner=request.user).do()
         return redirect('projects')
         
     return render(request, 'project_menu/project_new.html')

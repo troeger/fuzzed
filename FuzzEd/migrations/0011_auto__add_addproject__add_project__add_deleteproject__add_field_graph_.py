@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
@@ -14,6 +13,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('undoable', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('insert_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('project', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['FuzzEd.Project'])),
         ))
         db.send_create_signal('FuzzEd', ['AddProject'])
 
@@ -36,22 +36,29 @@ class Migration(SchemaMigration):
         ))
         db.create_unique(m2m_table_name, ['project_id', 'user_id'])
         
+        # Adding model 'DeleteProject'
+        db.create_table(u'FuzzEd_deleteproject', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('undoable', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('insert_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('project', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['FuzzEd.Project'])),
+        ))
+        db.send_create_signal('FuzzEd', ['DeleteProject'])
+        
         # create sample project for each user
         users = orm['auth.User'].objects.all()
         
         for user in users:
                 sample_project = orm.Project(name='sample_project', owner=user)
                 sample_project.save()
-                
-        # Adding field 'Graph.project' + assign any project_id to this field because of foreign key constraint
         
+        # Adding field 'Graph.project' + assign any project_id to this field because of foreign key constraint
         project_id = orm['FuzzEd.project'].objects.all().first().id
         
         db.add_column(u'FuzzEd_graph', 'project',
                       self.gf('django.db.models.fields.related.ForeignKey')(default=project_id, related_name='graphs', to=orm['FuzzEd.Project']),
                       keep_default=False)
-                                    
-        
+
 
     def backwards(self, orm):
         # Deleting model 'AddProject'
@@ -62,6 +69,9 @@ class Migration(SchemaMigration):
 
         # Removing M2M table for field users on 'Project'
         db.delete_table(db.shorten_name(u'FuzzEd_project_users'))
+
+        # Deleting model 'DeleteProject'
+        db.delete_table(u'FuzzEd_deleteproject')
 
         # Deleting field 'Graph.project'
         db.delete_column(u'FuzzEd_graph', 'project_id')
@@ -93,6 +103,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'AddProject'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'project': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Project']"}),
             'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'FuzzEd.changenode': {
@@ -121,6 +132,13 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'node': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Node']"}),
+            'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'FuzzEd.deleteproject': {
+            'Meta': {'object_name': 'DeleteProject'},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'project': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Project']"}),
             'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'FuzzEd.edge': {
@@ -153,7 +171,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
             'result': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'null': 'True'}),
-            'secret': ('django.db.models.fields.CharField', [], {'default': "'27b3775c-fa43-4b00-a5ae-dd62415eeb4e'", 'max_length': '64'})
+            'secret': ('django.db.models.fields.CharField', [], {'default': "'1488bf93-bba0-480a-98db-3ed8790a1853'", 'max_length': '64'})
         },
         'FuzzEd.node': {
             'Meta': {'object_name': 'Node'},
