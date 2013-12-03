@@ -179,21 +179,21 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			{
 				if (config.isIncluded(id))
 				{
-					for (int i = from; i <= to; ++i)
+					for (int N = from; N <= to; ++N)
 					{
-						const int numVotes = formula(i);
-						if (numVotes <= 0)
+						const int k = formula(N);
+						if (k <= 0)
 						{
 							m_issues.insert(Issue(
 								std::string("Ignoring invalid redundancy configuration with k=") + 
-								util::toString(numVotes) + 
+								util::toString(k) + 
 								std::string(" N=") + 
-								util::toString(i),
+								util::toString(N),
 								0, id));
 							continue;
 						}
 						FuzzTreeConfiguration copied = config;
-						copied.setRedundancyNumber(id, numVotes, i);
+						copied.setRedundancyNumber(id, k, N);
 						newConfigs.emplace_back(copied);
 					}
 				}

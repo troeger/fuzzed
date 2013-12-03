@@ -15,7 +15,7 @@ configurations::Configuration serializedConfiguration(const FuzzTreeConfiguratio
 	{
 		conf.choice().push_back(
 			configurations::IntegerToChoiceMap(
-			configurations::RedundancyChoice(std::get<0>(redundancyChoice.second)),
+			configurations::RedundancyChoice(std::get<1>(redundancyChoice.second)),
 			redundancyChoice.first));
 	}
 
