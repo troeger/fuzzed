@@ -34,6 +34,7 @@ def web():
     put('dist/'+package, '/var/www/fuzztrees.net/')
     run('tar xvfz /var/www/fuzztrees.net/'+package+" -C /var/www/fuzztrees.net/")
     print "Setting directory softlink"
+    run('rm -f /var/www/fuzztrees.net/www')
     run('ln -fs /var/www/fuzztrees.net/FuzzEd-'+version+' /var/www/fuzztrees.net/www')
     #print "Storing backup of database, in case something goes wrong"
     #sudo('su - postgres; pg_dump fuzztrees > /tmp/fuzztrees_backup.sql')
