@@ -424,6 +424,5 @@ class Node(models.Model):
 
 @receiver(post_save, sender=Node)
 def graph_modify(sender, instance, **kwargs):
-    logger.debug("Updating graph modification date.")
     instance.graph.modified = datetime.datetime.now()
     instance.graph.save()
