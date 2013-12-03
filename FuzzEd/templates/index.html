@@ -1,5 +1,9 @@
 {% extends "util/base.html" %}
 
+{% block meta %}
+<meta name="description" content="FuzzEd gives you the fastest way for creating system dependability models in the cloud. The online editor supports fault trees modeling, fault tree analysis (FTA), reliability block diagram (RBD) modeling, top event probability computation, and the novel FuzzTree modeling concept. Non-commercial usage is always free of charge.">
+{% endblock %}
+
 {% block script %}
 {{ block.super }}
 <script type="text/javascript">
@@ -17,7 +21,7 @@
     <h4 class="alert-heading">
         <a href="http://en.wikipedia.org/wiki/Software_release_life_cycle#Beta">Public Beta</a>
     </h4>
-    Feel free to try out everything. However, please excuse sudden outages as the site is still under development.<br>
+    Feel free to try out everything. However, please excuse sudden outages as the online editor and the analysis engines are still under development.<br>
     If you have any <a href="http://fuzztrees.uservoice.com">feedback</a>, we would be happy to hear it.
 </div>
 
@@ -28,7 +32,7 @@
                 <br><small>Fault Trees and RBDs.</small>
             </h4>
             <p>
-                FuzzEd gives you that fastest way for creating system 
+                FuzzEd gives you the fastest way for creating system 
                 dependability models in the cloud. Share your models and ideas with other experts, but only if you want to.
                 <br/> 
             </p>
@@ -48,11 +52,11 @@
 
         <div class="col-4">
             <h4>Freedom of Research,<br/>Privacy of Data.
-                <br><small>Licensing options available.</small>
+                <br><small>Options available.</small>
             </h4>
             <p>
                 FuzzEd is intended for both academic and commercial usage. We do (and always will) provide a free basic account for non-commercial use.<br/>
-                If you are interested in licensing this product for internal use behind your firewall, just <a href="mail:peter.troeger@hpi.uni-potsdam.de">talk to us</a>. 
+                If you are interested in running this service inside your company, just <a href="mail:peter.troeger@hpi.uni-potsdam.de">talk to us</a>. 
             </p>
         </div>
     </div>
