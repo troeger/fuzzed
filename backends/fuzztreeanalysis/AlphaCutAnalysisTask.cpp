@@ -2,6 +2,8 @@
 #include "FuzzTreeTypes.h"
 #include "Probability.h"
 #include "Interval.h"
+#include "xmlutil.h"
+#include "FatalException.h"
 
 #include <math.h>
 #include <algorithm>
@@ -11,7 +13,7 @@
 
 using namespace fuzztree;
 using std::vector;
-using std::runtime_error;
+using std::string;
 
 namespace
 {
@@ -20,8 +22,8 @@ namespace
 }
 
 
-AlphaCutAnalysisTask::AlphaCutAnalysisTask(const TopEvent* topEvent, const double alpha)
-	: m_tree(topEvent), m_alpha(alpha)
+AlphaCutAnalysisTask::AlphaCutAnalysisTask(const TopEvent* topEvent, const double alpha, std::ofstream& logfile)
+	: m_tree(topEvent), m_alpha(alpha), m_logFile(logfile)
 {}
 
 std::future<AlphaCutAnalysisResult> AlphaCutAnalysisTask::run()
@@ -31,6 +33,8 @@ std::future<AlphaCutAnalysisResult> AlphaCutAnalysisTask::run()
 
 AlphaCutAnalysisResult AlphaCutAnalysisTask::analyze()
 {
+	if (m_tree->children().size() == 0)
+		return NumericInterval(1.0, 1.0); // trees without children are completely reliable
 	return analyzeRecursive(m_tree->children().front());
 }
 
@@ -59,11 +63,18 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		}
 		else if (probType == *FAILURERATE)
 		{
-			return probability::getAlphaCutBounds(static_cast<const fuzztree::FailureRate&>(prob), m_tree->missionTime());
+			unsigned int mt = DEFAULT_MISSION_TIME; // TODO
+			if (m_tree->missionTime().present())
+				mt = m_tree->missionTime().get();
+
+			return probability::getAlphaCutBounds(static_cast<const fuzztree::FailureRate&>(prob), mt);
 		}
 		else
 		{
-			assert(false);
+			const string error = string("Unexpected probability type: ") + probType.name();
+			m_logFile << error << std::endl;
+			
+			throw FatalException(error, 0, node.id());
 			return NumericInterval();
 		}
 	}
@@ -71,7 +82,11 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	{
 		// the java code handled this, so the event sets were not expanded by the configuration
 		// the C++ configuration code already expands event sets
-		assert(false);
+
+		const string error = string("Unexpected Event Set (they should have been removed by configuration): ") + typeName.name();
+		m_logFile << error << std::endl;
+		
+		throw FatalException(error, 0, node.id());
 	}
 	else if (typeName == *HOUSEEVENT)
 	{
@@ -80,12 +95,19 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	}
 	else if (typeName == *UNDEVELOPEDEVENT)
 	{
-		throw runtime_error(UNDEVELOPED_ERROR);
+		m_logFile << "Found Undeveloped Event, ID: " << node.id() << std::endl;
+
+		throw FatalException(UNDEVELOPED_ERROR, 0, node.id());
 		return NumericInterval();
 	}
 	else if (typeName == *INTERMEDIATEEVENT)
 	{
-		assert(node.children().size() == 1);
+		if (node.children().size() != 1)
+		{
+			m_logFile << "Intermediate Event size != 1, ID: , size: " << node.id() << std::endl;
+			if (node.children().size() == 0)
+				return NumericInterval(1.0, 1.0);
+		}
 		return analyzeRecursive(node.children().front());
 	}
 	
@@ -123,8 +145,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		// Calculate results of children first.
 		const unsigned int n = node.children().size();
 
-		vector<interval_t> lowerBounds(n);
-		vector<interval_t> upperBounds(n);
+		vector<interval_t> lowerBounds;
+		vector<interval_t> upperBounds;
 		for (const auto& c : node.children())
 		{
 			const auto res = analyzeRecursive(c);
@@ -141,7 +163,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		vector<interval_t> combinations(numberOfCombinations);
 		for (unsigned int i = 0; i < numberOfCombinations; ++i)
 		{
-			vector<interval_t> perm(n);
+			vector<interval_t> perm;
 			for (unsigned int j = 0; j < n; j++)
 				perm.emplace_back((i >> j)&1 ? upperBounds[j] : lowerBounds[j]);
 
@@ -159,8 +181,8 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		const int k = votingOr.k();
 		const int n = votingOr.children().size();
 
-		vector<interval_t> lowerBounds(n);
-		vector<interval_t> upperBounds(n);
+		vector<interval_t> lowerBounds;
+		vector<interval_t> upperBounds;
 
 		for (const auto& c : node.children())
 		{
@@ -175,7 +197,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	}
 	else
 	{
-		throw runtime_error(UNKNOWN_TYPE);
+		throw FatalException(UNKNOWN_TYPE);
 		return NumericInterval();
 	}
 
@@ -203,7 +225,7 @@ double AlphaCutAnalysisTask::calculateKOutOfN(const vector<interval_t>& values, 
 {
 	assert(values.size() == n);
 	
-	vector<double> p(k+1);
+	vector<double> p;
 	p.emplace_back(1.0);
 
 	for (unsigned int i = 1; i <= k; i++)

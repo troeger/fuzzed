@@ -1,42 +1,49 @@
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-option(VARIADIC_TEMPLATES OFF) # switch on to use Visitor pattern. Work in progress.
+####################################################################################################
+# Overwriting the default compiler is a bad thing:
+# http://www.cmake.org/Wiki/CMake_FAQ
+# It must be done before the project definition.
+#
+# We only need this for Mac's, were Codesynthesis
+# cannot deal with the default CLang compiler.
+# A manual switch to g++ is therefore needed by calling:
+# cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 .
+####################################################################################################
 
+###################
+# Generic settings
+###################
+project(FuzzedBackend)
+cmake_minimum_required(VERSION 2.8.7)
+
+# Load some additional CMake find... scripts 
+SET (CMAKE_MODULE_PATH              "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+# Store all binary output in /lib
+SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+
+# Get some symbold for GDB
+SET (CMAKE_BUILD_TYPE Debug)
+
+############################################################################
+# Platform-specific compilation behavior
+############################################################################
 if(APPLE)
-	message("This is Apple, expecting GCC-4.9 and library installations.")
-	# Mac OS X specific code
-	set(CMAKE_CXX_FLAGS "-std=c++11")
-	set(CMAKE_C_COMPILER "gcc-4.9")
-	set(CMAKE_CXX_COMPILER "gcc-4.9")
-	set(CMAKE_INCLUDE_PATH "/usr/local/include/")
-	set(XSD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../tools/xsdcompile/include/)
-	set(XSD_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/../tools/xsdcompile/bin/xsd)
-	set(BUILD_PUGIXML ON)
+	# Homebrew on Mac OS X has no Codesynthesis XSD available, so we use our own copy
+	set(XSD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/xsd_apple/libxsd/)
+	set(XSD_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/xsd_apple/bin/xsd)
 elseif(WIN32)
-	 message("This is Windows.")
-	 set(BUILD_PUGIXML ON)
 	 set(Boost_USE_STATIC_LIBS ON)
+	 add_definitions(-DOMP_PARALLELIZATION=1)
 elseif(UNIX)
-	 message("This is Linux.")
 	 set(USE_INTEL_COMPILER OFF) 
-	 set(BUILD_PUGIXML ON)
+	 add_definitions(-DOMP_PARALLELIZATION=1)
 endif() 
 
-project(FuzztreeBackends)
-cmake_minimum_required(VERSION 2.8.7)
-set(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
-
-# All libraries should end up in the same directory
-set(FT_LIB_DIR "${PROJECT_SOURCE_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${FT_LIB_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${FT_LIB_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${FT_LIB_DIR})
-set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY ${FT_LIB_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
-set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_RELEASE ${FT_LIB_DIR})
-set(CMAKE_EXECUTABLE_OUTPUT_DIRECTORY_DEBUG ${FT_LIB_DIR})
+############################################################################
+# Compiler-specific compilation behavior
+############################################################################
 
 if (CMAKE_COMPILER_IS_GNUCC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpthread -std=c++0x -fPIC -fexceptions -Wno-deprecated-declarations -fpermissive")
@@ -49,7 +56,7 @@ elseif (MSVC)
 	add_definitions(/D_CRT_SECURE_NO_WARNINGS /DNOMINMAX /DWIN32_LEAN_AND_MEAN)
 	set(TPN_WIN32 "${TPN_WIN32} /EHsc")
 else()
-	message("Unsupported compiler") # TODO see if we can support clang too
+	message(WARNING "Untested compiler") # TODO see if we can support clang too
 endif()
 
 ################# BOOST #################
@@ -63,7 +70,7 @@ set(BOOST_INCLUDEDIR ${BOOST_ROOT}/Include)
 set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
 
 set(Boost_DIR ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
-find_package(Boost 1.48 COMPONENTS # TODO find out which version is really required. Maybe 1.50 would suffice too.
+find_package(Boost 1.48 COMPONENTS
 	date_time
 	system
 	filesystem
@@ -94,31 +101,24 @@ endif(XSD_FOUND)
 ############### PUGI ####################
 #########################################
 
-if(BUILD_PUGIXML)
-	add_subdirectory(thirdParty/pugixml)
-	message("Building pugixml")
-	if(WIN32)
-		set(PUGIXML_LIB "${FT_LIB_DIR}/pugixml.lib")
-	else(WIN32)#TODO
-		set(PUGIXML_LIB "${FT_LIB_DIR}/libpugixml.a")
-	endif(WIN32)
-	set(PUGIXML_INCLUDE_DIR thirdParty/pugixml/src)
-else()
-	find_package(pugixml REQUIRED)
-	message(STATUS "Found Pugixml lib: ${PUGIXML_LIB}")
-endif()
+add_subdirectory(thirdParty/pugixml)
+message("Building pugixml")
+set(PUGIXML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/pugixml/src")
 
 ################# Directories ###########
 #########################################
+
+#TODO: From here on, the common subproject and general stuff gets intermixed
+#      Try to make 'common' a self-hosted compilation unit as the others
 
 include_directories(
 	${XERCESC_INCLUDE_DIR}
 	${XSD_INCLUDE_DIR}
 	${PUGIXML_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
-	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
 	${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration
 	${CMAKE_CURRENT_SOURCE_DIR}/common
+	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
 )
 
 set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
@@ -126,15 +126,18 @@ set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
 ############### XSD COMPILER ############
 #########################################
 
-set(XSD_GENERATED_FILES
+set(XSD_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../FuzzEd/static/xsd")
+
+set(XSD_GENERATED_TREE_FILES
 	${COMMON_DIR}/fuzztree.h
 	${COMMON_DIR}/faulttree.h
 	${COMMON_DIR}/fuzztree.cpp
 	${COMMON_DIR}/faulttree.cpp)
 
-set(FAULTTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/faulttree.xsd")
-set(FUZZTREE_XSD "${CMAKE_CURRENT_SOURCE_DIR}/xml/fuzztree.xsd")
-set(SCHEMAS ${FAULTTREE_XSD} ${FUZZTREE_XSD})
+set(FAULTTREE_XSD "${XSD_FILE_PATH}/faulttree.xsd")
+set(FUZZTREE_XSD  "${XSD_FILE_PATH}/fuzztree.xsd")
+
+########### FAULT TREE MODEL ############
 
 set(XSD_TO_FAULTTREE_ARGS
 	--include-with-brackets #include with <> instead of ""
@@ -162,113 +165,137 @@ set(XSD_TO_FUZZTREE_ARGS
 	--generate-forward
 	--hxx-suffix .h
 	--cxx-suffix .cpp
- 
 )
 
-if (VARIADIC_TEMPLATES)
-	# the following options, which generate a tree visitor, need C++0x support for variadic templates
-	# GCC >= 4.7 and Intel 13.0 support it, but not VS2012...
+########### RESULT XML ##################
 
-	set(TREE_CUSTOMIZATION_ARGS
-		--custom-type Node=FaultTreeVisitable<Node_base>/Node_base
-		--custom-type TopEvent=FaultTreeVisitable<TopEvent_base>/TopEvent_base
-		--custom-type BasicEvent=FaultTreeVisitable<BasicEvent_base>/BasicEvent_base
-		--custom-type HouseEvent=FaultTreeVisitable<HouseEvent_base>/HouseEvent_base
-		--custom-type UndevelopedEvent=FaultTreeVisitable<UndevelopedEvent_base>/UndevelopedEvent_base
-		--custom-type IntermediateEvent=FaultTreeVisitable<IntermediateEvent_base>/IntermediateEvent_base
-		--custom-type ChildNode=FaultTreeVisitable<ChildNode_base>/ChildNode_base
-		--custom-type Gate=FaultTreeVisitable<Gate_base>/Gate_base
-		--custom-type And=FaultTreeVisitable<And_base>/And_base
-		--custom-type Or=FaultTreeVisitable<Or_base>/Or_base
-		--custom-type Xor=FaultTreeVisitable<Xor_base>/Xor_base
-		--custom-type VotingOr=FaultTreeVisitable<VotingOr_base>/VotingOr_base
-		--custom-type DynamicGate=FaultTreeVisitable<DynamicGate_base>/DynamicGate_base
-		--custom-type Spare=FaultTreeVisitable<Spare_base>/Spare_base
-		--custom-type FDEP=FaultTreeVisitable<FDEP_base>/FDEP_base
-		--custom-type Sequence=FaultTreeVisitable<Sequence_base>/Sequence_base
-		--custom-type PriorityAnd=FaultTreeVisitable<PriorityAnd_base>/PriorityAnd_base
-	--fwd-prologue "#include <Visitable.h>"
-	)
+set(XSD_GENERATED_RESULT_FILES
+	${COMMON_DIR}/analysisResult.h
+	${COMMON_DIR}/simulationResult.h
+	${COMMON_DIR}/configurationResult.h
+	${COMMON_DIR}/commonTypes.h
+	${COMMON_DIR}/configurations.h
+	${COMMON_DIR}/analysisResult.cpp
+	${COMMON_DIR}/simulationResult.cpp
+	${COMMON_DIR}/configurationResult.cpp
+	${COMMON_DIR}/commonTypes.cpp
+	${COMMON_DIR}/configurations.cpp)
 
-	set(FUZZTREE_CUSTOMIZATION_ARGS
-		--custom-type Node=FuzzTreeVisitable<Node_base>/Node_base
-		--custom-type TopEvent=FuzzTreeVisitable<TopEvent_base>/TopEvent_base
-		--custom-type BasicEvent=FuzzTreeVisitable<BasicEvent_base>/BasicEvent_base
-		--custom-type HouseEvent=FuzzTreeVisitable<HouseEvent_base>/HouseEvent_base
-		--custom-type UndevelopedEvent=FuzzTreeVisitable<UndevelopedEvent_base>/UndevelopedEvent_base
-		--custom-type IntermediateEvent=FuzzTreeVisitable<IntermediateEvent_base>/IntermediateEvent_base
-		--custom-type ChildNode=FuzzTreeVisitable<ChildNode_base>/ChildNode_base
-		--custom-type Gate=FuzzTreeVisitable<Gate_base>/Gate_base
-		--custom-type And=FuzzTreeVisitable<And_base>/And_base
-		--custom-type Or=FuzzTreeVisitable<Or_base>/Or_base
-		--custom-type Xor=FuzzTreeVisitable<Xor_base>/Xor_base
-		--custom-type VotingOr=FuzzTreeVisitable<VotingOr_base>/VotingOr_base
-		--custom-type DynamicGate=FuzzTreeVisitable<DynamicGate_base>/DynamicGate_base
-		--custom-type Spare=FuzzTreeVisitable<Spare_base>/Spare_base
-		--custom-type FDEP=FuzzTreeVisitable<FDEP_base>/FDEP_base
-		--custom-type Sequence=FuzzTreeVisitable<Sequence_base>/Sequence_base
-		--custom-type PriorityAnd=FuzzTreeVisitable<PriorityAnd_base>/PriorityAnd_base
-		--custom-type RedundancyVariationPoint=FuzzTreeVisitable<RedundancyVariationPoint_base>/RedundancyVariationPoint_base
-		--custom-type FeatureVariationPoint=FuzzTreeVisitable<FeatureVariationPoint_base>/FeatureVariationPoint_base
-		--custom-type VariationPoint=FuzzTreeVisitable<VariationPoint_base>/VariationPoint_base
-		--custom-type IntermediateEventSet=FuzzTreeVisitable<IntermediateEventSet_base>/IntermediateEventSet_base
-		--custom-type BasicEventSet=FuzzTreeVisitable<BasicEventSet_base>/BasicEventSet_base
-	--fwd-prologue "#include <Visitable.h>"
-	)
+set(ANALYSIS_RESULT_XSD			"${XSD_FILE_PATH}/analysisResult.xsd")
+set(SIMULATION_RESULT_XSD		"${XSD_FILE_PATH}/simulationResult.xsd")
+set(CONFIGURATION_RESULT_XSD	"${XSD_FILE_PATH}/configurationResult.xsd")
+set(COMMON_TYPES_XSD			"${XSD_FILE_PATH}/commonTypes.xsd")
+set(CONFIGURATION_XSD			"${XSD_FILE_PATH}/configurations.xsd")
 
-endif(VARIADIC_TEMPLATES)
+set(XSD_RESULT_ARGS
+	--include-with-brackets #include with <> instead of ""
+	--generate-polymorphic  #needed for xsi:type
+	--polymorphic-type-all
+	--type-naming ucc
+	--function-naming lcc
+	--generate-serialization
+	--hxx-suffix .h
+	--cxx-suffix .cpp
+)
 
-add_custom_command(OUTPUT ${XSD_GENERATED_FILES}
+########### CODE GENERATION ################
+
+add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FILES}
+	
+	COMMAND ${XSD_EXECUTABLE}
+		cxx-tree 
+			${XSD_RESULT_ARGS} 
+			--output-dir ${COMMON_DIR}
+			${COMMON_TYPES_XSD}
+
+	COMMAND ${XSD_EXECUTABLE} 
+		cxx-tree
+			${XSD_RESULT_ARGS}
+			--output-dir ${COMMON_DIR}
+			${CONFIGURATION_XSD}
+
+	COMMAND ${XSD_EXECUTABLE}
+		cxx-tree 
+			${XSD_RESULT_ARGS} 
+			--output-dir ${COMMON_DIR}
+			--root-element "analysisResults"
+			${ANALYSIS_RESULT_XSD}
+
+	COMMAND ${XSD_EXECUTABLE} 
+		cxx-tree
+			${XSD_RESULT_ARGS}
+			--output-dir ${COMMON_DIR}
+			--root-element "configurationResults"
+			${CONFIGURATION_RESULT_XSD}
+
+	COMMAND ${XSD_EXECUTABLE} 
+		cxx-tree
+			${XSD_RESULT_ARGS}
+			--output-dir ${COMMON_DIR}
+			--root-element "simulationResults"
+			${SIMULATION_RESULT_XSD}
+
 	COMMAND ${XSD_EXECUTABLE}
 		cxx-tree 
 			${XSD_TO_FAULTTREE_ARGS} 
 			${TREE_CUSTOMIZATION_ARGS}
 			--output-dir ${COMMON_DIR}
 			${FAULTTREE_XSD}
+
 	COMMAND ${XSD_EXECUTABLE} 
 		cxx-tree
 			${XSD_TO_FUZZTREE_ARGS}
 			${FUZZTREE_CUSTOMIZATION_ARGS}
 			--output-dir ${COMMON_DIR}
-		${FUZZTREE_XSD}
+			${FUZZTREE_XSD}
+
 	COMMENT "Generating C++ / XML mapping files"
 	VERBATIM)
-
-add_definitions(-DFUZZTREEXSD="${FUZZTREE_XSD}")
-add_definitions(-DFAULTTREEXSD="${FAULTTREE_XSD}")
 
 ############### COMMON ##################
 #########################################
 
 set(COMMON_SOURCES
 	${COMMON_DIR}/util.cpp
+	${COMMON_DIR}/xmlutil.cpp
 	${COMMON_DIR}/FaultTreeTypes.cpp
 	${COMMON_DIR}/FuzzTreeTypes.cpp
 	${COMMON_DIR}/FaultTreeTypes.cpp
 	${COMMON_DIR}/FuzzTreeTypes.cpp
 	${COMMON_DIR}/faulttree.cpp
 	${COMMON_DIR}/fuzztree.cpp
+	${COMMON_DIR}/analysisResult.cpp
+	${COMMON_DIR}/simulationResult.cpp
+	${COMMON_DIR}/configurationResult.cpp
+	${COMMON_DIR}/commonTypes.cpp
+	${COMMON_DIR}/configurations.cpp
+	${COMMON_DIR}/CommandLineParser.cpp
+	${COMMON_DIR}/FaultTreeToFuzzTree.cpp
+	${COMMON_DIR}/Issue.cpp
+	${COMMON_DIR}/FatalException.cpp
 )
 
 set(COMMON_HEADERS
 	${COMMON_DIR}/platform.h
 	${COMMON_DIR}/util.h
+	${COMMON_DIR}/xmlutil.h
 	${COMMON_DIR}/FaultTreeTypes.h
 	${COMMON_DIR}/FuzzTreeTypes.h
 	${COMMON_DIR}/faulttree.h
 	${COMMON_DIR}/fuzztree.h
+	${COMMON_DIR}/analysisResult.h
+	${COMMON_DIR}/simulationResult.h
+	${COMMON_DIR}/configurationResult.h
+	${COMMON_DIR}/commonTypes.h
+	${COMMON_DIR}/configurations.h
+	${COMMON_DIR}/CommandLineParser.h
+	${COMMON_DIR}/FaultTreeToFuzzTree.h
+	${COMMON_DIR}/Issue.h
+	${COMMON_DIR}/FatalException.h
 )
 
-set(COMMON_LINKED_LIBS
-	${XERCESC_LIBRARIES}
-	${Boost_LIBRARIES}
-	${PUGIXML_LIB})
-message("${COMMON_LINKED_LIBS}")
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
-target_link_libraries(common_model ${COMMON_LINKED_LIBS})
-set(COMMON_LINKED_LIBS
-	${COMMON_LINKED_LIBS}
-	common_model)
+target_link_libraries(common_model ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB})
 
 ############### UNIT TESTS ##############
 #########################################

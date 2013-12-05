@@ -23,6 +23,8 @@ namespace fuzztreeType
 	const type_info* HOUSEEVENT			= &typeid(fuzztree::HouseEvent);
 	const type_info* UNDEVELOPEDEVENT	= &typeid(fuzztree::UndevelopedEvent);
 
+	const type_info* TRANSFERIN	= &typeid(fuzztree::TransferIn);
+
 // 	const type_info* FDEP	= &typeid(fuzztree::FDEP);
 // 	const type_info* SPARE	= &typeid(fuzztree::Spare);
 // 	const type_info* PAND	= &typeid(fuzztree::PriorityAnd);

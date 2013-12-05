@@ -1,6 +1,8 @@
-import json, logging
+import json, logging, time, os, tempfile, subprocess
 from xml.dom import minidom
-from django.test import TestCase
+from subprocess import Popen
+from django.test import LiveServerTestCase
+from django.test.utils import override_settings
 from django.test.client import Client
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
@@ -20,7 +22,7 @@ from FuzzEd.models.node import Node
 # This disables all the debug output. Sometimes it may be helpful.
 logging.disable(logging.CRITICAL)
 
-class FuzzTreesTestCase(TestCase):
+class FuzzTreesTestCase(LiveServerTestCase):
     def setUp(self):
         self.c=Client()
         self.c.login(username='testadmin', password='testadmin') # added by 'fab fixture_save'
@@ -37,21 +39,29 @@ class FuzzTreesTestCase(TestCase):
     def ajaxDelete(self, url):
         return self.c.delete( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
 
+    def requestJob(self, url):
+        """ Helper function for requesting a job. """ 
+        response=self.ajaxGet(url)
+        self.assertNotEqual(response.status_code, 500) # the backend daemon is not started
+        self.assertEqual(response.status_code, 201)    # test if we got a created job
+        assert('Location' in response)
+        jobUrl = response['Location']
+        code = 202
+        print "Waiting for result from "+jobUrl,
+        while (code == 202):
+            response=self.ajaxGet(jobUrl)
+            code = response.status_code 
+            print ".",
+        self.assertEqual(response.status_code, 200)
+        return response.content
+
     def requestAnalysis(self, graph_id):
         """ Helper function for requesting an analysis run. 
             Returns the analysis result as dictionary as received by the frontend.
         """
-        response=self.ajaxGet('/api/graphs/%u/analysis/topEventProbability'%graph_id)
-        self.assertNotEqual(response.status_code, 500) # you forgot to start the analysis server
-        self.assertEqual(response.status_code, 201)    # you got the wrong graph ID
-        jobUrl = response['Location']
-        self.assertEqual(jobUrl.startswith('http://testserver/api/jobs/'), True) # check job creation
-        code = 202
-        while (code == 202):
-            response=self.ajaxGet(jobUrl)
-            code = response.status_code 
-        self.assertEqual(response.status_code, 200)
-        return json.loads(response.content)
+        url=self.ajaxGet('/api/graphs/%u/analysis/topEventProbability'%graph_id)
+        data = self.requestJob(url)
+        return json.loads(data)
 
 class BasicApiTestCase(FuzzTreesTestCase):
     fixtures = ['basic.json']
@@ -129,10 +139,25 @@ class BasicApiTestCase(FuzzTreesTestCase):
         self.assertEqual(response.status_code, 201)
         #TODO: Check if really created 
 
-class AnalysisTestCase(FuzzTreesTestCase):
+class BackendTestCase(FuzzTreesTestCase):
     fixtures = ['analysis.json']
 
-    def testStandardFixtureAnalysis(self):
+    def setUp(self):
+        # Start up backend daemon in testing mode, 
+        # so that it connects to the testing database and uses port 8081 of the live test server
+        print "Starting backend daemon"
+        os.chdir("backends")
+        self.backend = Popen(["python","daemon.py","--testing"])
+        time.sleep(2)
+        os.chdir("..")
+        super(BackendTestCase, self).setUp()
+
+    def tearDown(self):
+        print "\nShutting down backend daemon"
+        self.backend.terminate()
+        super(BackendTestCase, self).tearDown()
+
+    def _testStandardFixtureAnalysis(self):
         result=self.requestAnalysis(4)
         self.assertEqual(bool(result['validResult']),True)
         self.assertEqual(result['errors'],{})
@@ -145,5 +170,19 @@ class AnalysisTestCase(FuzzTreesTestCase):
         # This tree can lead to a k=0 redundancy configuration, which is not allowed
         self.assertEqual(result['validResult'],False)
 
+    def testPdfExport(self):
+        result = self.requestJob('/api/graphs/1/exports/pdf')
+        assert(len(result)>0)
+        tmp = tempfile.NamedTemporaryFile()
+        tmp.write(result)
+        output = subprocess.check_output(['file', tmp.name])
+        assert('PDF' in output)
 
-
+    def testEpsExport(self):
+        result = self.requestJob('/api/graphs/1/exports/eps')
+        assert(len(result)>0)
+        tmp = tempfile.NamedTemporaryFile()
+        tmp.write(result)
+        output = subprocess.check_output(['file', tmp.name])
+        print output
+        assert('EPS' in output)

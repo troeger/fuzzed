@@ -28,6 +28,8 @@ namespace fuzztreeType
 	extern const type_info* HOUSEEVENT;
 	extern const type_info* UNDEVELOPEDEVENT;
 
+	extern const type_info* TRANSFERIN;
+
 // 	const type_info* FDEP	= &typeid(fuzztree::FDEP);
 // 	const type_info* SPARE	= &typeid(fuzztree::Spare);
 // 	const type_info* PAND	= &typeid(fuzztree::PriorityAnd);

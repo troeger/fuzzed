@@ -34,17 +34,22 @@
 {% endblock %}
 
 {% block nav_center %}
-<p class="navbar-text" style="float: left;">
-    <img id="FuzzEdProgressIndicator" src="{{ STATIC_URL }}img/ajax-loader.gif">
-    <span id="FuzzEdSaveIndicator">
-        <i class="icon-ok icon-white"></i>
-        Saved
-    </span>
-    <span id="FuzzEdErrorIndicator">
-        <i class="icon-warning-sign icon-white"></i>
-        Not saved!
-    </span>
-</p>
+<ul class="nav navbar-nav" style="float: left;">
+    <li id="FuzzEdProgressIndicatorSingle" style="display: none;">
+        <a><i class="icon-progress"></i>&nbsp;<span></span></a>
+    </li>
+    <li id="FuzzEdProgressIndicatorDropdown" class="dropdown" style="display: none;">
+        <a data-toggle="dropdown" href="#">
+            <i class="icon-progress"></i>
+            <span>Working…</span>
+            <span class="badge"></span>
+            <i class="icon-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+            {# multiple progress indicators will be inserted here #}
+        </ul>
+    </li>
+</ul>
 {% endblock %}
 
 {% block menu_right %}
@@ -56,11 +61,11 @@
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
         {% if graph.kind != 'rbd'%}
             <li><a href="{% url 'graph_download' graph.pk %}?format=xml">as XML File</a></li>
+            <li><a href="{% url 'graph_download' graph.pk %}?format=tex">as LaTex Document</a></li>
+            <li><a href="#" id="FuzzEdActionExportPDF">as PDF Document</a></li>
+            <li><a href="#" id="FuzzEdActionExportEPS">as EPS Image</a></li>
         {% endif %}
         <li><a href="{% url 'graph_download' graph.pk %}?format=json">as JSON File</a></li>
-        <li><a href="{% url 'graph_download' graph.pk %}?format=tex">as LaTex Document</a></li>
-        <li><a href="{% url 'graph_download' graph.pk %}?format=eps">as EPS Image</a></li>
-        <li><a href="{% url 'graph_download' graph.pk %}?format=pdf">as PDF Document</a></li>
     </ul>
 </li>
 {% if graph.kind != 'rbd'%}

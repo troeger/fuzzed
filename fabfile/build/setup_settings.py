@@ -11,7 +11,8 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 DATABASES = {
     'default': {
         'ENGINE':   'django.db.backends.%(db_type)s', 
-        'NAME':     '%(db_name)s',                        
+        'NAME':     '%(db_name)s',  
+        'TEST_NAME':'%(db_test_name)s',                      
         'USER':     '%(db_user)s',                              
         'PASSWORD': '%(db_password)s',                       
         'HOST':     '%(db_host)s',                                       
@@ -108,7 +109,7 @@ AUTHENTICATION_BACKENDS = (
 )
 '''
 
-import ConfigParser, os
+import ConfigParser, os, socket
 
 def configOptions(confFile, sectionPrefixes):
     ''' Parse settings.ini and deliver content.
@@ -159,10 +160,9 @@ def createDjangoSettings(confFile, forDevelopment):
     conf_lines = []
     # Read ip address from Vagrant-generated file
     ip = None
-    if os.path.exists('.vagrantip'):
-        with open('.vagrantip') as f:
-            ip = f.read().rstrip()
-            print 'Using Vagrant IP: ' + ip
+    if socket.getfqdn() == 'precise64':
+        ip = "192.168.33.10"
+        print 'Using Vagrant IP: ' + ip
     if forDevelopment:
         prefixes = ['all', 'development']
     else:
@@ -171,6 +171,8 @@ def createDjangoSettings(confFile, forDevelopment):
         if key.isupper():
             if key == 'OPENID_RETURN' and ip:
                 value = "'http://%s:8000/login/?openidreturn'" % ip
+            if key == 'SERVER' and ip:
+                value = "'http://%s:8000'" % ip
             # Add the configuration from the INI file directly
             conf_lines.append('%s=%s'%(key, value))
         else:

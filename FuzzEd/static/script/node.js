@@ -97,6 +97,7 @@ function(Property, Mirror, Canvas, Class) {
                 ._moveContainerToPixel(Canvas.toPixel(this.x, this.y))
                 ._setupConnectionHandle()
                 ._setupEndpoints()
+				.__setupZIndex()
                 // Interaction
                 ._setupDragging()
                 ._setupMouse()
@@ -127,7 +128,7 @@ function(Property, Mirror, Canvas, Class) {
                 .removeAttr('id')
                 // add new classes for the actual node
                 .addClass(this.config.Classes.NODE_IMAGE);
-
+				
             this._badge = jQuery('<span class="badge"></span>')
                 .hide();
 
@@ -141,11 +142,44 @@ function(Property, Mirror, Canvas, Class) {
                 .css('position', 'absolute')
                 .data(this.config.Keys.NODE, this)
                 .append(this._nodeImageContainer);
-
+			
             this.container.appendTo(Canvas.container);
 
             return this;
         },
+		
+        /**
+         * Method: __setupZIndex
+         *
+         * This method implements special treatment of z-Index for sticky notes.
+		 * Sticky notes are normally displayed behind all other nodes, as well as node connections with a z-Index value of "-1"
+		 * If a sticky note gets selected it will be brought in front of all other nodes/connections with a z-Index value of "101"
+		 * If a sticky note gets unselected it will be brought in the background again
+		 *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+		__setupZIndex: function(){
+			if (this.kind != 'stickyNote')
+				return this;
+			
+			jQuery(this.container).css('z-index', '-1');
+			
+			var sticky = this;
+				
+			jQuery(document).on(this.config.Events.NODE_SELECTED, function(event, ui){
+				// bring only the sticky note in front that is selected
+				if (jQuery(sticky.container).hasClass('ui-selected'))
+					jQuery(sticky.container).css('z-index', '101');
+			});
+			
+			jQuery(document).on(this.config.Events.NODE_UNSELECTED, function(event, ui){
+				jQuery(sticky.container).css('z-index', '-1')
+			});	
+			
+			
+			return this;
+		},
 
         /**
          * Method: _setupNodeImage
@@ -384,7 +418,10 @@ function(Property, Mirror, Canvas, Class) {
 
                 drag: function(event, ui) {
                     // enlarge canvas
-					Canvas.enlarge({x: ui.offset.left, y: ui.offset.top, height: ui.helper.height(), width: ui.helper.width() });
+					Canvas.enlarge({
+                        x: ui.offset.left + ui.helper.width(),
+                        y: ui.offset.top  + ui.helper.height()
+                    });
 
                     // determine by how many pixels we moved from our original position (see: start callback)
                     var xOffset = ui.position.left - initialPositions[this.id].left;
@@ -544,11 +581,9 @@ function(Property, Mirror, Canvas, Class) {
 			jQuery(resizable).on('resize',function(event, ui) {
                 // enlarge canvas if resizable is resized out of the canvas
 				Canvas.enlarge({
-					x: ui.helper.offset().left, 
-					y: ui.helper.offset().top, 
-					height: ui.helper.height(), 
-					width: ui.helper.width()
-				});
+                    x: ui.helper.offset().left + ui.helper.width(),
+                    y: ui.helper.offset().top  + ui.helper.height()
+                });
 				
 				// scroll canvas if resizable is resized out of the visible part of the canvas
 				var scrollable = jQuery('body');

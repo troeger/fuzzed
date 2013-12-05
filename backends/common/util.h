@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <set>
 #include <algorithm>
@@ -21,7 +22,7 @@ using namespace std;
 
 inline void exit_error(std::string s)
 {
-	std::cout << s << std::endl; 
+	std::cerr << s << std::endl; 
 	exit(-1);
 }
 
@@ -51,6 +52,7 @@ namespace util
 	string toString(const int& i);
 	string toString(const double& d, const int& prec = 10);
 	string toString(const long double& d, const int& prec = 10);
+	string toString(std::istream& istream);
 
 
 	bool beginsWith(const string& subject, const string& prefix);
@@ -78,6 +80,8 @@ namespace util
 	int countFiles(const string& path, const string& extension = "");
 
 	void clearDirectory(const string& dir); // remove all files from dir
+
+	bool isWritable(const string& path);
 
 	/************************************************************************/
 	/* Maths                                                                */

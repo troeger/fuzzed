@@ -16,8 +16,12 @@ namespace faultTreeType
 	const type_info* HOUSEEVENT			= &typeid(faulttree::HouseEvent);
 	const type_info* UNDEVELOPEDEVENT	= &typeid(faulttree::UndevelopedEvent);
 
+	const type_info* BASICEVENTSET	= &typeid(faulttree::BasicEventSet);
+
 	const type_info* FDEP	= &typeid(faulttree::FDEP);
 	const type_info* SPARE	= &typeid(faulttree::Spare);
 	const type_info* PAND	= &typeid(faulttree::PriorityAnd);
 	const type_info* SEQ	= &typeid(faulttree::Sequence);
+
+	const type_info* TRANSFERIN	= &typeid(faulttree::TransferIn);
 }

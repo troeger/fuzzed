@@ -10,7 +10,7 @@ using namespace pugi;
 
 bool XMLImport::validateAndLoad()
 {
-	cout << "loading " << m_file.generic_string() << endl;
+	//cout << "loading " << m_file.generic_string() << endl;
 	try
 	{
 		if (fs::exists(m_file) && fs::is_regular_file(m_file))
@@ -27,7 +27,7 @@ bool XMLImport::validateAndLoad()
 	}
 	catch (exception& e)
 	{
-		cout << e.what();
+		cerr << e.what();
 		return false;
 	}
 	return false;

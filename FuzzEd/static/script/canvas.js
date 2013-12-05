@@ -43,16 +43,21 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
         /**
          * Section: Visual
          */
-        enlarge: function(to) {
+        enlarge: function(to, precise) {
             var canvasWidth  = this.container.width();
             var canvasHeight = this.container.height();
             var doubleGrid   = this.gridSize << 1;
-			
-            while (to.x + to.width  > canvasWidth - doubleGrid) {
-                canvasWidth *= 2;
-            }
-            while (to.y + to.height > canvasHeight - doubleGrid) {
-                canvasHeight *= 2;
+
+            if (precise) {
+                canvasWidth  = _.max(to.x, canvasWidth);
+                canvasHeight = _.max(to.y, canvasHeight);
+            } else {
+                while (to.x  > canvasWidth - doubleGrid) {
+                    canvasWidth *= 2;
+                }
+                while (to.y > canvasHeight - doubleGrid) {
+                    canvasHeight *= 2;
+                }
             }
 
             this.container.width(canvasWidth);
@@ -192,8 +197,11 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
 
             this.container.selectable({
                 filter: '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
-				unselected: function() {
+				unselected: function(event, ui) {
 					jQuery(document).trigger(Config.Events.NODE_UNSELECTED);
+				},
+				selected: function(event,ui){
+					jQuery(document).trigger(Config.Events.NODE_SELECTED);
 				},
                 stop: function() {
                     // tell other (e.g. <PropertyMenu>) that selection is done and react to the new selection
