@@ -522,15 +522,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         }
     });
 	
-	var InlineTextField = Text.extend({
-		
-		init: function(node, definition) {
-			this._super(node, definition);
-			var paragraph = jQuery('<p align="center">').html(_.escape(this.value));
-
-			this.menuEntry.inputs.after(paragraph);
-		},
-		
+	var InlineTextField = Text.extend({		
         menuEntryClass: function() {
             return PropertyMenuEntry.InlineTextArea;
         },

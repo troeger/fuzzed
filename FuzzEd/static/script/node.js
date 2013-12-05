@@ -610,7 +610,7 @@ function(Property, Mirror, Canvas, Class) {
 				if (event.clientY <= scrollOffset)
 					scrollable.scrollTop(downScrolled - Canvas.gridSize);
 				
-			});
+			}.bind(this));
 			
 			return this;
 		},

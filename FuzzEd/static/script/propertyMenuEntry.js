@@ -18,6 +18,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         return aString.charAt(0).toUpperCase() + aString.slice(1);
     };
 	
+	var escape = function(aString) {
+		return _.escape(aString).replace(/\n/g, '<br>');
+	};
+	
     /**
      *  Class: Entry
      *      Abstract base class for an entry in the property menu of a node. It's associated with a <Property> object
@@ -841,7 +845,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         },
 		
-        appendTo: function(on) {
+        appendTo: function() {
 			this._setupCallbacks();
             return this;
         },
@@ -852,22 +856,25 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 			 this.inputs.toggle(false);
 			 // show paragraph and set value
 			 this.inputs.siblings('p').html(
-				 _.escape(this.inputs.val())
+				 escape(this.inputs.val())
 			 ).toggle(true);
 		},
 		
         remove: function() {},
 		
         _setupContainer: function() {
-            this.container = this.inputs
+			this.property.node._nodeImage.append(
+				jQuery('<p align="center">').html(escape(this.property.value))
+			);
+			this.container = this.property.node.container;
 			
-            return this;
+			return this;
         },
 		
         _setupVisualRepresentation: function() {
             this._setupInput();
 			this._setupContainer();
-            this.property.node.container.find('.' + Config.Classes.EDITABLE).append(this.inputs);
+			this.container.find('.' + Config.Classes.EDITABLE).append(this.inputs);
 
             return this;
         },
