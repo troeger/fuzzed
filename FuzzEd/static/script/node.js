@@ -511,18 +511,17 @@ function(Property, Mirror, Canvas, Class) {
          * Returns:
          *   This {<Node>} instance for chaining.
 		 */
-		_setupResizable: function(){
-			
-			if(!this.resizable) return this;
+		_setupResizable: function() {
+			if (!this.resizable) return this;
 			// adapt size of container div to inner resizable div
-			this.container.width("auto").height("auto");
+			this.container.width('auto').height('auto');
 			
 			var properties = this.properties;
 			
 			var height = properties.height.value;
 			var width  = properties.width.value;
 		
-			var resizable = this.container.find('.'+ this.config.Classes.RESIZABLE).resizable();
+			var resizable = this.container.find('.' + this.config.Classes.RESIZABLE).resizable();
 			// setup resizable with width/height values stored in the backend
 			jQuery(resizable).height(height).width(width);
 			
@@ -530,7 +529,6 @@ function(Property, Mirror, Canvas, Class) {
 			
 			// if resizable gets resized update width/height attribute		
 			jQuery(resizable).on('resizestop',function() {
-				
 				var newWidth = jQuery(this).width();
 				var newHeight= jQuery(this).height();
 			
@@ -545,7 +543,12 @@ function(Property, Mirror, Canvas, Class) {
 			
 			jQuery(resizable).on('resize',function(event, ui) {
                 // enlarge canvas if resizable is resized out of the canvas
-				Canvas.enlarge({x: ui.helper.offset().left, y: ui.helper.offset().top, height: ui.helper.height(), width: ui.helper.width()});
+				Canvas.enlarge({
+					x: ui.helper.offset().left, 
+					y: ui.helper.offset().top, 
+					height: ui.helper.height(), 
+					width: ui.helper.width()
+				});
 				
 				// scroll canvas if resizable is resized out of the visible part of the canvas
 				var scrollable = jQuery('body');
@@ -553,20 +556,24 @@ function(Property, Mirror, Canvas, Class) {
 				var screenWidth  = jQuery(window).width();
 				var screenHeight = jQuery(window).height();
 				
-				var rightScrolled= scrollable.scrollLeft();
-				var downScrolled = scrollable.scrollTop(); 
+				var rightScrolled = scrollable.scrollLeft();
+				var downScrolled  = scrollable.scrollTop(); 
 				
-				var scrollOffset = 10;
+				var scrollOffset = this.config.Resizable.SCROLL_OFFSET;
 				
 				// resize to the right	-> scroll right			
-				if( event.clientX > screenWidth - scrollOffset) scrollable.scrollLeft(rightScrolled + Canvas.gridSize);
+				if (event.clientX > screenWidth - scrollOffset)
+					scrollable.scrollLeft(rightScrolled + Canvas.gridSize);
 				// resize to the left	-> scroll left
-				if( event.clientX <= scrollOffset ) scrollable.scrollLeft(rightScrolled - Canvas.gridSize);
+				if (event.clientX <= scrollOffset)
+					scrollable.scrollLeft(rightScrolled - Canvas.gridSize);
 				
 				// resize downwards -> scroll downwards
-				if( event.clientY > screenHeight - scrollOffset) scrollable.scrollTop(downScrolled + Canvas.gridSize);
+				if (event.clientY > screenHeight - scrollOffset)
+					scrollable.scrollTop(downScrolled + Canvas.gridSize);
 				// resize upwards  -> scroll upwards
-				if( event.clientY <= scrollOffset ) scrollable.scrollTop(downScrolled - Canvas.gridSize);
+				if (event.clientY <= scrollOffset)
+					scrollable.scrollTop(downScrolled - Canvas.gridSize);
 				
 			});
 			
@@ -583,22 +590,22 @@ function(Property, Mirror, Canvas, Class) {
          * Returns:
          *   This {<Node>} instance for chaining.
 		 */
-		_setupEditable: function(){
-			if(!this.editable) return this;
+		_setupEditable: function() {
+			if (!this.editable) return this;
 			
 			var container = this.container
-			var editable = container.find('.'+ this.config.Classes.EDITABLE);
+			var editable  = container.find('.'+ this.config.Classes.EDITABLE);
 			
-			var textarea =  editable.find("textarea");				
-			var paragraph = editable.find("p");
+			var textarea  = editable.find('textarea');				
+			var paragraph = editable.find('p');
 						
-			editable.on("dblclick", function(event){
+			editable.on('dblclick', function(event) {
 				paragraph.toggle(false);
 				textarea.toggle(true).focus();
 			});
 			
-			jQuery(document).on('node_unselected', function(event){
-				if (textarea.length) textarea.blur();
+			jQuery(document).on('node_unselected', function(event) {
+				textarea.blur();
 			});
 				
 			return this;

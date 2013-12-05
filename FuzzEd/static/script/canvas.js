@@ -179,10 +179,8 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
             // make canvas droppable for shapes from the shape menu
             this.container.droppable({
                 accept: function(draggable) {
-        			if (jQuery(draggable).parent().attr('class') === Config.Classes.DRAGGABLE_WRAP_DIV){
-            			return true;
-						}
-    				},
+        			return jQuery(draggable).parent().hasClass(Config.Classes.DRAGGABLE_WRAP_DIV);
+ 			   	},
                 tolerance: 'fit',
                 drop:      function(uiEvent, uiObject) {
                     var kind     = uiObject.draggable.attr('id');

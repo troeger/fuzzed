@@ -521,7 +521,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 		
 		init: function(node, definition) {
 			this._super(node, definition);
-			var paragraph = jQuery('<p align="left">').html(PropertyMenuEntry.escapeHTML(this.value));
+			var paragraph = jQuery('<p align="left">').html(_.escape(this.value));
 			this.menuEntry.inputs.after(paragraph);
 		},
 		

@@ -340,6 +340,17 @@ define(['underscore'], function() {
             STROKE_SELECTED:           SELECTED_COLOR,
             STROKE_DISABLED:           DISABLED_COLOR
         },
+		
+		/**
+		 *	Group: Resizable
+		 *		Configuration of resizable nodes
+		 *
+		 *	Constants:
+		 *		{Integer} SCROLL_OFFSET		- determines scrolling border for resizing
+		 */
+		Resizable: {
+			SCROLL_OFFSET: 10
+		},
 
         /**
          *  Group: Splash

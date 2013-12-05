@@ -378,10 +378,4 @@ def login(request):
             new_user.save()
 
             linkOpenID(new_user, user.openid_claim)
-            mail_managers('New user', str(new_user), fail_silently=True)
-
-            return redirect('/login/?openid_identifier=%s' % 
-                            urllib.quote_plus(request.session['openid_identifier'])) 
-
-        auth.login(request, user)
-    return redirect('dashboard')
+            mail_managers('New user', str(new_user), fail_silently=Tr
