@@ -37,7 +37,7 @@ class Project(models.Model):
        {dict} the project as dictionary
       """
       return {
-          'id':       self.pk,
+          'pk':       self.pk,
           'name':     self.name,
           'created':  self.created
       }

@@ -76,7 +76,7 @@ def projects(request):
     """
     projects = (request.user.projects.filter(deleted=False) | request.user.own_projects.filter(deleted=False)).order_by('-created')
         
-    parameters = {'projects':[ project.to_dict for project in projects]}
+    parameters = {'projects':[ project.to_dict() for project in projects]}
             
     return render(request, 'project_menu/projects.html', parameters)
     
@@ -123,9 +123,21 @@ def project_edit(request, project_id):
 
     # deletion requested? do it and go back to project overview
     if POST.get('delete'):
-       commands.DeleteProject.create_from(project_id).do()
-       messages.add_message(request, messages.SUCCESS, 'Project deleted.')
-       return redirect('projects')
+        commands.DeleteProject.create_from(project_id).do()
+        messages.add_message(request, messages.SUCCESS, 'Project deleted.')
+        return redirect('projects')
+       
+    # please show the edit page to the user on get requests
+    elif POST.get('edit') or request.method == 'GET':
+        parameters = {'project': project.to_dict()}
+        return render(request, 'project_menu/project_edit.html', parameters)
+        
+    elif POST.get('save') or request.method == 'GET':
+        parameters = {'project': project.to_dict()}
+        return render(request, 'project_menu/project_edit.html', parameters)    
+    
+    # something was not quite right here
+    raise HttpResponseBadRequest()
         
 
 @login_required

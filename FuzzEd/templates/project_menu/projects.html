@@ -79,7 +79,7 @@
                       </td>
                       <td>{{ project.created }}</td>
                       <td style="text-align: right;">
-                          <form action="/project/{{ project.id }}/" method="POST">
+                          <form action="/project/{{ project.pk }}/" method="POST">
                               {% csrf_token %}
                               <input type="hidden" class="delete_flag">
                               <button type="submit" name="edit" value="edit" class="btn btn-default btn-small">
