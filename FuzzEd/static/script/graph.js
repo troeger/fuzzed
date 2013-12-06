@@ -286,7 +286,7 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
             _.each(layoutedNodes, function(n) {
                 var node = this.getNodeById(n.id);
                 // +1 because the returned coords are 0-based and we need 1-based
-                node.moveToGrid({x: n.x + centerX + 1, y: n.y + 1});
+                node.moveToGrid({x: n.x + centerX + 1, y: n.y + 1}, true);
             }.bind(this));
 
             return this;

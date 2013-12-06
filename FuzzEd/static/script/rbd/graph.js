@@ -97,7 +97,9 @@ function(Graph, RbdNode, RbdConfig, RbdNotation) {
             _.each(layoutedNodes, function(n) {
                 var node = this.getNodeById(n.id);
                 // +1 because the returned coords are 0-based and we need 1-based
-                node.moveToGrid({x: n.y + offsetX + 1, y: n.x + 1});
+                //TODO: layouting RBDs can't be animated for the moment because they are no real trees which means
+                //      that the animated will be triggered multiple times on some nodes which causes strange effects
+                node.moveToGrid({x: n.y + offsetX + 1, y: n.x + 1}, false);
             }.bind(this));
 
             return this;
