@@ -48,21 +48,29 @@ i {
         margin: 0 3px -3px 0px;
     }
     // Custon icon for the cluster auto-layout function
-    //TODO: placeholder
     &.icon-layout-cluster {
-        background-image: url(/static/img/layout.png);
-        width: 16px;
-        height: 16px;
+        background-image: url(/static/img/layout_cluster.svg);
+        background-size: contain;
+        background-repeat: no-repeat;
+        width: 24px;
+        height: 24px;
         display: inline-block !important;
-        margin: 0 3px -3px 0px;
+        margin: -6px;
+        &:hover {
+            background-image: url(/static/img/layout_cluster_hover.svg);
+        }
     }
     // Custon icon for the tree auto-layout function
-    //TODO: placeholder
     &.icon-layout-tree {
-        background-image: url(/static/img/layout.png);
-        width: 16px;
-        height: 16px;
+        background-image: url(/static/img/layout_tree.svg);
+        background-size: contain;
+        background-repeat: no-repeat;
+        width: 24px;
+        height: 24px;
         display: inline-block !important;
-        margin: 0 3px -3px 0px;
+        margin: -6px;
+        &:hover {
+            background-image: url(/static/img/layout_tree_hover.svg);
+        }
     }
 }

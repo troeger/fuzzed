@@ -4079,18 +4079,28 @@ i.icon-progress {
   margin: 0 3px -3px 0px;
 }
 i.icon-layout-cluster {
-  background-image: url(/static/img/layout.png);
-  width: 16px;
-  height: 16px;
+  background-image: url(/static/img/layout_cluster.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 24px;
+  height: 24px;
   display: inline-block !important;
-  margin: 0 3px -3px 0px;
+  margin: -6px;
+}
+i.icon-layout-cluster:hover {
+  background-image: url(/static/img/layout_cluster_hover.svg);
 }
 i.icon-layout-tree {
-  background-image: url(/static/img/layout.png);
-  width: 16px;
-  height: 16px;
+  background-image: url(/static/img/layout_tree.svg);
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 24px;
+  height: 24px;
   display: inline-block !important;
-  margin: 0 3px -3px 0px;
+  margin: -6px;
+}
+i.icon-layout-tree:hover {
+  background-image: url(/static/img/layout_tree_hover.svg);
 }
 /**
  *  File: jquery-ui-custom.less
