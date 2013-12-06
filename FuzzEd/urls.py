@@ -1,10 +1,14 @@
 from django.conf.urls import patterns, include, url
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns, static
+from django.http import HttpResponse
 
 from FuzzEd.models import Job
+from FuzzEd import settings
 
 from django.contrib import admin
 admin.autodiscover()
+
+re_uuid = "[0-F]{8}-[0-F]{4}-[0-F]{4}-[0-F]{4}-[0-F]{12}"
 
 urlpatterns = patterns('',
     # admin
@@ -21,6 +25,7 @@ urlpatterns = patterns('',
     url(r'^dashboard/(?P<graph_id>\d+)/$', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
     url(r'^editor/(?P<graph_id>\d+)$', 'FuzzEd.views.editor', name='editor'),
     url(r'^snapshot/(?P<graph_id>\d+)$', 'FuzzEd.views.snapshot', name='snapshot'),
+    url(r'^robots\.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /admin/\nDisallow: /dashboard/\nDisallow: /editor/\n", mimetype="text/plain")),
 
     # API
     # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API
@@ -30,6 +35,12 @@ urlpatterns = patterns('',
     url(r'^api/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.graph', name='graph'),
     url(r'^api/graphs/(?P<graph_id>\d+)/transfers$', 'FuzzEd.api.graph_transfers', name='graph_transfers'),
     url(r'^api/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.graph_download', name='graph_download'),
+
+    # exports (graph downloads that return a job location instead of the direct result)
+    url(r'^api/graphs/(?P<graph_id>\d+)/exports/pdf$', 
+        'FuzzEd.api.job_create', {'job_kind': Job.PDF_RENDERING_JOB}, name='export_pdf'),
+    url(r'^api/graphs/(?P<graph_id>\d+)/exports/eps$', 
+        'FuzzEd.api.job_create', {'job_kind': Job.EPS_RENDERING_JOB}, name='export_eps'),
 
     # node
     url(r'^api/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.nodes', name='nodes'),
@@ -57,5 +68,7 @@ urlpatterns = patterns('',
 
     # jobs
     url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.job_status', name='job_status'),
+    url(r'^api/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.job_exitcode', name='job_exitcode'),
+    url(r'^api/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.job_files', name='job_files'),
 )
 urlpatterns += staticfiles_urlpatterns()

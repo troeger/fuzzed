@@ -8,14 +8,12 @@ set(FT_INCLUDE_DIR
 option(USE_TIMENET ON)
 
 set(SIM_COMMON_SOURCES
-  ${CMAKE_CURRENT_SOURCE_DIR}/util/FaultTreeImport.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/util/XMLImport.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/util/Condition.cpp
 )
 
 set(SIM_COMMON_HEADERS
   ${CMAKE_CURRENT_SOURCE_DIR}/util/Types.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/util/FaultTreeImport.h
   ${CMAKE_CURRENT_SOURCE_DIR}/util/XMLImport.h
   ${CMAKE_CURRENT_SOURCE_DIR}/util/Constants.h
   ${CMAKE_CURRENT_SOURCE_DIR}/util/Condition.h

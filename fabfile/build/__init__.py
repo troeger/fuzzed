@@ -8,6 +8,16 @@ from FuzzEd import util
 # from FuzzEd import __version__, util, settings
 
 
+XSD_PY_FILE_MAP = {
+    'analysisResult':      'xml_analysis',
+    'fuzztree':            'xml_fuzztree',
+    'faulttree':           'xml_faulttree',
+    'commonTypes':         'xml_common',
+    'configurations':      'xml_configurations',
+    'configurationResult': 'xml_conf_result'
+}
+
+
 def svg2pgf_shape(filename):
     '''
         Convert given SVG file to TiKZ code.
@@ -169,20 +179,30 @@ def notations():
 def build_xmlschema_wrappers():
     print 'Building XML schema wrappers ...'
 
-    IS_WINDOWS = os.name == 'nt'
+    IS_WINDOWS     = os.name == 'nt'
     FILE_EXTENSION = '.py' if IS_WINDOWS else ''
-    FILE_PREFIX = 'file:///' + os.getcwd() + '/' if IS_WINDOWS else '' 
+    FILE_PREFIX    = ('file:///' + os.getcwd() + '/' if IS_WINDOWS else '') + 'FuzzEd/static/xsd/'
+    BASE_PATH      = 'FuzzEd/models'
 
     # Remove old binding files and generate new ones
-    for file_name in ['xml_faulttree.py', 'xml_fuzztree.py', 'xml_analysis.py']:
-        path_name = 'FuzzEd/models/%s' % file_name
+    for binding in XSD_PY_FILE_MAP.values():
+        path = '%s/%s.py' % (BASE_PATH, binding,)
+        if os.path.exists(path):
+            os.remove(path)
 
-        if os.path.exists(path_name):
-            os.remove(path_name)
-    if os.system('pyxbgen%s --binding-root=FuzzEd/models/ -u %sFuzzEd/static/xsd/analysis.xsd '
-                 '-m xml_analysis -u %sFuzzEd/static/xsd/fuzztree.xsd -m xml_fuzztree -u %sFuzzEd/static/xsd/faulttree.xsd -m xml_faulttree'
-                 % (FILE_EXTENSION, FILE_PREFIX, FILE_PREFIX, FILE_PREFIX,)) != 0:
-        raise Exception('Execution of pyxbgen failed.\nTry "sudo setup.py test" for installing all dependencies.')
+    BINDINGS = ' '.join(['-u %(path)s%(xsd)s.xsd -m %(py)s' % {
+        'path': FILE_PREFIX,
+        'xsd':  xsd,
+        'py':   py
+    } for xsd, py in XSD_PY_FILE_MAP.items()])
+
+    # generate new bindings
+    if os.system('pyxbgen%(extension)s --binding-root=%(root)s %(bindings)s' % {
+        'extension': FILE_EXTENSION,
+        'root':      BASE_PATH,
+        'bindings':  BINDINGS
+    }) != 0:
+        raise Exception('Execution of pyxbgen failed.')
 
 @task
 def xmlschemas():
@@ -202,14 +222,15 @@ def naturaldocs():
         raise Exception('Execution of NaturalDocs compiler failed.')
 
 @task 
-def configs():
+def configs(target='development'):
     '''Builds the configuration files for sub projects out of settings.ini'''
+    assert(target in ['development','vagrant','production'])
     print 'Building configs...'
     f=open('FuzzEd/settings.py','w')
-    f.write(createDjangoSettings('settings.ini', ['development']))
+    f.write(createDjangoSettings('settings.ini', [target]))
     f.close()
     f=open('backends/daemon.ini','w')
-    f.write(createBackendSettings('settings.ini', ['development', 'backend_']))
+    f.write(createBackendSettings('settings.ini', [target, 'backend_']))
     f.close()
 
 def build_analysis_server_java():
@@ -227,7 +248,7 @@ def build_analysis_server_java():
     os.chdir(current)
 
 @task
-def backend_servers():
+def backends():
     '''Builds configuration and analysis server with CMAKE / C++11 compiler.'''
     print 'Building backend servers ...'
     current = os.getcwd()
@@ -235,19 +256,25 @@ def backend_servers():
     if os.path.isfile("CMakeCache.txt"):
         os.system("rm CMakeCache.txt")
     if platform.system() == "Darwin":
-        os.system("cmake . ")
+        os.system("cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 .")
     else:
-        os.system("cmake . -DCMAKE_CXX_COMPILER=/usr/bin/gcc-4.7")
+        os.system("cmake .")
     os.system('make all')
     os.chdir(current)
+
+@task
+def css():
+    '''Builds the CSS files for the project with lessc.'''
+    os.system('lessc FuzzEd/static/less/theme/white/theme.less FuzzEd/static/css/theme/white.css')
 
 @task()
 def all():
     '''Builds all.'''
+    css()
     shapes()
     xmlschemas()
     naturaldocs()
     notations()
     configs()
-    #backend_servers()    
+    backends()    
 

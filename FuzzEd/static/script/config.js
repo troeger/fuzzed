@@ -81,7 +81,8 @@ define(['underscore'], function() {
             EDGES_URL:                 '/edges',
             TRANSFERS_URL:             '/transfers',
             CUTSETS_URL:               '/cutsets',
-            TOP_EVENT_PROBABILITY_URL: '/topEventProbability'
+            TOP_EVENT_PROBABILITY_URL: '/topEventProbability',
+            GRAPH_EXPORT_URL:          '/exports'
         },
 
         /**
@@ -94,6 +95,9 @@ define(['underscore'], function() {
          *    {String} SELECTING               - Class assigned to elements that are currently being selected
          *                                       (using jQuery UI Selectable).
          *    {String} DISABLED                - Class assigned to disabled (grayed-out) elements.
+         *
+         *    {STRING} CANVAS_NOT_EDITABLE     - Class assigned to the canvas in order to hide any interactive elements
+         *                                       while highlighting nodes in any kinds of analytical summary
          *
          *    {String} JSPLUMB_ENDPOINT        - Class assigned to endpoints by jsPlumb.
          *    {String} JSPLUMB_ENDPOINT_HOVER  - Class assigned to hovered endpoints by jsPlumb.
@@ -118,12 +122,23 @@ define(['underscore'], function() {
          *    {String} NO_PRINT                - Class assigned to elements that should not be printed.
          *
          *    {String} PROPERTY_WARNING        - Class for property input fields if they are erroneous.
+         *    {String} PROPERTY_OPEN_BUTTON    - Class for transfer property 'open' buttons.
+         *
+         *    {String} ICON_SUCCESS            - Class for the icon that indicates a successful action.
+         *    {String} ICON_ERROR              - Class for the icon that indicates an erroneous action.
+         *    {String} ICON_PROGRESS           - Class for the icon that indicates an action in progress.
+         *
+         *    {String} DRAGGABLE_WRAP_DIV	   - Class for div in shapes menu that contains thumbnail
+		 *    {String} RESIZABLE               - Class indicating that a node is resizable
+		 *    {String} EDITABLE                - Class indicating that a node is inline editable
          */
         Classes: {
             HIGHLIGHTED:             'highlighted',
             SELECTED:                'ui-selected',
             SELECTING:               'ui-selecting',
             DISABLED:                'disabled',
+
+            CANVAS_NOT_EDITABLE:     'fuzzed-canvas-not-editable',
 
             GRID_HIDDEN:             'fuzzed-grid-hidden',
 
@@ -146,8 +161,16 @@ define(['underscore'], function() {
 
             NO_PRINT:                'no-print',
 
-            PROPERTY_WARNING:        'has-error',
-            PROPERTY_OPEN_BUTTON:    'fuzzed-property-open'
+            PROPERTY_WARNING:        'error',
+            PROPERTY_OPEN_BUTTON:    'fuzzed-property-open',
+
+            ICON_SUCCESS:            'icon-ok',
+            ICON_ERROR:              'icon-warning-sign',
+            ICON_PROGRESS:           'icon-progress',
+
+			DRAGGABLE_WRAP_DIV: 	 'draggableDiv',
+			RESIZABLE:			 	 'resizable',
+			EDITABLE:			 	 'editable'
         },
 
         /**
@@ -188,7 +211,10 @@ define(['underscore'], function() {
          *    {String} PROPERTY_HIDDEN_CHANGED   - Event triggered when a property's hidden state changed.
          *    {String} PROPERTY_READONLY_CHANGED - Event triggered when a property's readonly state changed.
          *    {String} PROPERTY_SYNCHRONIZED     - Event triggered when a property synced itself with the backend.
-         */
+         *
+         *    {String} NODE_UNSELECTED           - Event triggered when a node on the canvas is unselected
+		 *    {String} NODE_SELECTED             - Event triggered when a node on the canvas is selected		
+		 */
         Events: {
             CANVAS_SELECTION_STOPPED:  'canvas-selection-stopped',
             CANVAS_SHAPE_DROPPED:      'canvas-shape-dropped',
@@ -205,7 +231,10 @@ define(['underscore'], function() {
             PROPERTY_CHANGED:          'property-changed',
             PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',
             PROPERTY_READONLY_CHANGED: 'property-readonly-changed',
-            PROPERTY_SYNCHRONIZED:     'property-synchronized'
+            PROPERTY_SYNCHRONIZED:     'property-synchronized',
+			
+			NODE_UNSELECTED:		   'node_unselected',
+			NODE_SELECTED:             'node_selected'
         },
 
         /**
@@ -230,32 +259,32 @@ define(['underscore'], function() {
          *    IDs of certain DOM-elements.
          *
          *  Constants:
-         *    {String} ALERT_CONTAINER           - The DOM element containing the alerts messages.
-         *    {String} CANVAS                    - The DOM element containing the canvas.
-         *    {String} CONTENT                   - The container element for the content (without navbar).
-         *    {String} PROPERTIES_MENU           - The container for the properties menu.
-         *    {String} SHAPES_MENU               - The container for the shapes menu.
-         *    {String} SPLASH                    - The splash screen element.
-         *    {String} ACTION_GRID_TOGGLE        - The list element that contains the grid toggle menu entry.
-         *    {String} ACTION_CUTSETS            - The list element that contains the cut set analysis menu entry.
-         *    {String} ACTION_ANALYTICAL        - The list element that contains the analytical analysis menu entry.                  
-         *    {String} PROGRESS_INDICATOR        - The animated progress indicator gif.
-         *    {String} SAVE_INDICATOR            - The navbar entry indicating the save state.
-         *    {String} ERROR_INDICATOR           - The navbar entry indicating the error state.
+         *    {String} ALERT_CONTAINER             - The DOM element containing the alerts messages.
+         *    {String} CANVAS                      - The DOM element containing the canvas.
+         *    {String} CONTENT                     - The container element for the content (without navbar).
+         *    {String} PROPERTIES_MENU             - The container for the properties menu.
+         *    {String} SHAPES_MENU                 - The container for the shapes menu.
+         *    {String} SPLASH                      - The splash screen element.
+         *    {String} ACTION_GRID_TOGGLE          - The list element that contains the grid toggle menu entry.
+         *    {String} ACTION_CUTSETS              - The list element that contains the cut set analysis menu entry.
+         *    {String} ACTION_ANALYTICAL           - The list element that contains the analytical analysis menu entry.
+         *    {String} PROGRESS_INDICATOR_SINGLE   - The nav entry containing the progress indicator for single active jobs.
+         *    {String} PROGRESS_INDICATOR_DROPDOWN - The nav entry containing the dropdown for multiple active jobs.
          */
         IDs: {
-            ALERT_CONTAINER:           'FuzzEdAlertContainer',
-            CANVAS:                    'FuzzEdCanvas',
-            CONTENT:                   'FuzzEdContent',
-            PROPERTIES_MENU:           'FuzzEdProperties',
-            SHAPES_MENU:               'FuzzEdShapes',
-            SPLASH:                    'FuzzEdSplash',
-            ACTION_GRID_TOGGLE:        'FuzzEdActionGridToggle',
-            ACTION_CUTSETS:            'FuzzEdActionCutsets',
-            ACTION_ANALYTICAL:         'FuzzEdActionAnalytical',            
-            PROGRESS_INDICATOR:        'FuzzEdProgressIndicator',
-            SAVE_INDICATOR:            'FuzzEdSaveIndicator',            
-            ERROR_INDICATOR:           'FuzzEdErrorIndicator'
+            ALERT_CONTAINER:             'FuzzEdAlertContainer',
+            CANVAS:                      'FuzzEdCanvas',
+            CONTENT:                     'FuzzEdContent',
+            PROPERTIES_MENU:             'FuzzEdProperties',
+            SHAPES_MENU:                 'FuzzEdShapes',
+            SPLASH:                      'FuzzEdSplash',
+            ACTION_GRID_TOGGLE:          'FuzzEdActionGridToggle',
+            ACTION_CUTSETS:              'FuzzEdActionCutsets',
+            ACTION_ANALYTICAL:           'FuzzEdActionAnalytical',
+            ACTION_EXPORT_PDF:           'FuzzEdActionExportPDF',
+            ACTION_EXPORT_EPS:           'FuzzEdActionExportEPS',
+            PROGRESS_INDICATOR_SINGLE:   'FuzzEdProgressIndicatorSingle',
+            PROGRESS_INDICATOR_DROPDOWN: 'FuzzEdProgressIndicatorDropdown'
         },
 
         /**
@@ -335,6 +364,45 @@ define(['underscore'], function() {
             STROKE_HIGHLIGHTED:        HIGHLIGHTED_COLOR,
             STROKE_SELECTED:           SELECTED_COLOR,
             STROKE_DISABLED:           DISABLED_COLOR
+        },
+
+        /**
+         *  Group: ProgressIndicator
+         *    Configurations for the progress indicator in the navbar.
+         *
+         *  Constants:
+         *    {Number} SUCCESS_FLASH_DELAY       - Delay in ms before hiding the progress indicator of a successful action.
+         *    {Number} ERROR_FLASH_DELAY         - Delay in ms before hiding the progress indicator of an erroneous action.
+         *    {Number} PROGRESS_APPEARANCE_DELAY - Delay in ms before showing a progress indicator.
+         *
+         *    {String} DEFAULT_PROGRESS_MESSAGE  - The default status message for active actions.
+         *    {String} DEFAULT_SUCCESS_MESSAGE   - The default status message for successful actions.
+         *    {String} DEFAULT_ERROR_MESSAGE     - The default status message for erroneous actions.
+         *    {String} DEFAULT_NOT_FOUND_MESSAGE - The default status message for actions resulting in a 404.
+         *    {String} DEFAULT_CANCELED_MESSAGE  - The default status message when canceling jobs.
+         *
+         *    {String} EXPORT_PROGRESS_MESSAGE   - The message displayed when exporting the graph. The file name will be appended.
+         *    {String} EXPORT_SUCCESS_MESSAGE    - The message displayed when the graph has been successfully exported.
+         *    {String} EXPORT_ERROR_MESSAGE      - The message displayed when there was an error while exporting the graph.
+         *
+         *    {String} CALCULATING_MESSAGE       - The message displayed for calculation jobs.
+         */
+        ProgressIndicator: {
+            SUCCESS_FLASH_DELAY:       600,
+            ERROR_FLASH_DELAY:         5000,
+            PROGRESS_APPEARANCE_DELAY: 500,
+
+            DEFAULT_PROGRESS_MESSAGE:  'Working…',
+            DEFAULT_SUCCESS_MESSAGE:   'Done',
+            DEFAULT_ERROR_MESSAGE:     'Error',
+            DEFAULT_NOT_FOUND_MESSAGE: 'Not found',
+            DEFAULT_CANCELED_MESSAGE:  'Canceled',
+
+            EXPORT_PROGRESS_MESSAGE:   'Exporting graph as ', // file name will be appended
+            EXPORT_SUCCESS_MESSAGE:    'Done',
+            EXPORT_ERROR_MESSAGE:      'Failed to export as ', // file name will be appended
+
+            CALCULATING_MESSAGE:       'Calculating...'
         },
 
         /**

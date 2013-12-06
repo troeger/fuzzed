@@ -1,5 +1,5 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'],
-function(Class, Menus, Canvas, Backend, Alerts) {
+define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progressIndicator', 'jquery-classlist'],
+function(Class, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base
      */
@@ -15,13 +15,13 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *  Group: Members
          *
          *  Properties:
-         *    {Object}         config                       - Graph-specific <Config> object.
-         *    {Graph}          graph                        - <Graph> instance to be edited.
-         *    {PropertiesMenu} properties                   - The <Menu::PropertiesMenu> instance used by this editor
+         *    {Object}          config                      - Graph-specific <Config> object.
+         *    {Graph}           graph                       - <Graph> instance to be edited.
+         *    {PropertiesMenu}  properties                  - The <Menu::PropertiesMenu> instance used by this editor
          *                                                    for changing the properties of nodes of the edited graph.
-         *    {ShapesMenu}     shapes                       - The <Menu::ShapeMenu> instance use by this editor to show
+         *    {ShapesMenu}      shapes                      - The <Menu::ShapeMenu> instance use by this editor to show
          *                                                    the available shapes for the kind of the edited graph.
-         *    {Backend}        _backend                     - The instance of the <Backend> that is used to communicate
+         *    {Backend}         _backend                    - The instance of the <Backend> that is used to communicate
          *                                                    graph changes to the server.
          *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
          *    {jQuery Selector} _nodeOffsetPrintStylesheet  - The dynamically generated and maintained stylesheet
@@ -57,6 +57,10 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             this.config   = this.getConfig();
             this._backend = new Backend(graphId);
+
+            // remember certain UI elements
+            this._progressIndicator = jQuery('#' + this.config.IDs.PROGRESS_INDICATOR);
+            this._progressMessage = jQuery('#' + this.config.IDs.PROGRESS_MESSAGE);
 
             // run a few sub initializer
             this._setupJsPlumb()
@@ -141,7 +145,10 @@ function(Class, Menus, Canvas, Backend, Alerts) {
                 Canvas.disableInteraction();
             }
 
-            this._setupKeyBindings(readOnly);
+            // enable user interaction
+            this._setupMouse()
+                ._setupKeyBindings(readOnly);
+
             // fade out the splash screen
             jQuery('#' + this.config.IDs.SPLASH).fadeOut(this.config.Splash.FADE_TIME, function() {
                 jQuery(this).remove();
@@ -228,12 +235,35 @@ function(Class, Menus, Canvas, Backend, Alerts) {
         },
 
         /**
+         *  Method: _setupMouse
+         *    Sets up callbacks that fire when the user interacts with the editor using his mouse. So far this is only
+         *    concerns resizing the window.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
+        _setupMouse: function() {
+            jQuery(window).resize(function() {
+                var content = jQuery('#' + this.config.IDs.CONTENT);
+
+                Canvas.enlarge({
+                    x: content.width(),
+                    y: content.height()
+                }, true);
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
          *  Method: _setupKeyBindings
          *    Setup the global key bindings
          *
          *  Keys:
-         *    ESCAPE - Clear selection.
-         *    DELETE - Delete all selected elements (nodes/edges).
+         *    ESCAPE             - Clear selection.
+         *    DELETE             - Delete all selected elements (nodes/edges).
+         *    UP/RIGHT/DOWN/LEFT - Move the node in the according direction
+         *    CTRL/CMD + A       - Select all nodes and edges
          *
          *  Returns:
          *    This editor instance for chaining.
@@ -310,10 +340,12 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,   this._updatePrintOffsets.bind(this));
             jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED, this._updatePrintOffsets.bind(this));
 
-            jQuery(document).ajaxStart(this._showProgressIndicator.bind(this));
-            jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
-            jQuery(document).ajaxSuccess(this._flashSaveIndicator.bind(this));
-            jQuery(document).ajaxError(this._flashErrorIndicator.bind(this));
+            // show status of global AJAX events in navbar
+            jQuery(document).ajaxSend(Progress.showAjaxProgress);
+            jQuery(document).ajaxSuccess(Progress.flashAjaxSuccessMessage);
+            jQuery(document).ajaxError(Progress.flashAjaxErrorMessage);
+
+            //
 
             return this;
         },
@@ -338,7 +370,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *    This Editor instance for chaining
          */
         _arrowKeyPressed: function(event, xDirection, yDirection) {
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             jQuery(selectedNodes).each(function(index, element) {
@@ -366,7 +398,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          */
         _deletePressed: function(event) {
             // prevent that node is being deleted when we edit an input field
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
@@ -423,7 +455,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *   This Editor instance for chaining.
          */
         _selectAllPressed: function(event) {
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             event.preventDefault();
 
@@ -448,74 +480,6 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             return this;
         },
 
-        /**
-         *  Group: Progress Indication
-         */
-
-        /**
-         *  Method _showProgressIndicator
-         *    Display the progress indicator.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _showProgressIndicator: function() {
-            // show indicator only if it takes longer then 500 ms
-            this._progressIndicatorTimeout = setTimeout(function() {
-                jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
-            }.bind(this), 500);
-
-            return this;
-        },
-
-        /**
-         *  Method _hideProgressIndicator
-         *    Hides the progress indicator.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _hideProgressIndicator: function() {
-            // prevent indicator from showing before 500 ms are passed
-            clearTimeout(this._progressIndicatorTimeout);
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
-
-            return this;
-        },
-
-        /**
-         *  Method: _flashSaveIndicator
-         *    Flash the save indicator to show that the current graph is saved in the backend.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _flashSaveIndicator: function() {
-            var indicator = jQuery('#' + this.config.IDs.SAVE_INDICATOR);
-            // only flash if not already visible
-            if (indicator.is(':hidden')) {
-                indicator.fadeIn(200).delay(600).fadeOut(200);
-            }
-
-            return this;
-        },
-
-        /**
-         *  Method _flashErrorIndicator
-         *    Flash the error indicator to show that the current graph has not been saved to the backend.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _flashErrorIndicator: function() {
-            var indicator = jQuery('#' + this.config.IDs.ERROR_INDICATOR);
-            // only flash if not already visible
-            if (indicator.is(':hidden')) {
-                indicator.fadeIn(200).delay(5000).fadeOut(200);
-            }
-
-            return this;
-        },
 
         /**
          *  Group: Print Offset Calculation

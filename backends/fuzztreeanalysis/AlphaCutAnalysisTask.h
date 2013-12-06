@@ -4,12 +4,14 @@
 #include <future>
 #include <vector>
 
+#include <fstream>
+
 typedef NumericInterval AlphaCutAnalysisResult;
 
 class AlphaCutAnalysisTask
 {
 public:
-	AlphaCutAnalysisTask(const fuzztree::TopEvent* topEvent, const double alpha);
+	AlphaCutAnalysisTask(const fuzztree::TopEvent* topEvent, const double alpha, std::ofstream& logfile);
 	~AlphaCutAnalysisTask();
 
 	std::future<AlphaCutAnalysisResult> run();
@@ -26,4 +28,6 @@ protected:
 
 	const double m_alpha;
 	const fuzztree::TopEvent* m_tree;
+
+	std::ofstream& m_logFile;
 };

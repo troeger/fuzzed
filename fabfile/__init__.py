@@ -1,8 +1,8 @@
 from fabric.api import task
 import sys, os, subprocess, json
-
 sys.path.append('..')                        # Some of the sub-tasks import stuff from FuzzEd
-import bootstrap, build, clean, package, run # Import sub-tasks
+import bootstrap, build, clean, package, deploy, run # Import sub-tasks
+
 
 @task
 def fixture_save(fname=None):

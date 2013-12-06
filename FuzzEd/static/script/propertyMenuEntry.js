@@ -10,6 +10,29 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
     var NUMBER_REGEX = /^[+\-]?(?:0|[1-9]\d*)(?:[.,]\d*)?(?:[eE][+\-]?\d+)?$/;
 
     /**
+     *  Function: capitalize
+     *      Helper function for capitalizing the first letter of a string.
+     */
+    var capitalize = function(aString) {
+        return aString.charAt(0).toUpperCase() + aString.slice(1);
+    };
+	
+	/**
+	 *  Function: escapeHTML
+	 *      Helper function for escaping HTML characters + newlines are replaced with HTML < /br> tag
+	 */
+	var escapeHTML = function(text){
+			return text
+				.replace(/&/g, "&amp;")
+      			.replace(/&/g, "&amp;")
+      		  	.replace(/</g, "&lt;")
+      		  	.replace(/>/g, "&gt;")
+      		  	.replace(/"/g, "&quot;")
+      		  	.replace(/'/g, "&#039;")
+				.replace(/\n/g, '<br />');
+			};
+	
+    /**
      *  Class: Entry
      *      Abstract base class for an entry in the property menu of a node. It's associated with a <Property> object
      *      and handles the synchronization with it.
@@ -660,10 +683,12 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
             if (_.isNaN(lower) || _.isNaN(upper)) return this;
 
+            var inputs = this.inputs.filter('input');
+
             var target = jQuery(event.target);
-            if (target.is(this.inputs.eq(0)) && lower > upper) {
+            if (target.is(inputs.eq(0)) && lower > upper) {
                 this._value([lower, lower]);
-            } else if (target.is(this.inputs.eq(1)) && upper < lower) {
+            } else if (target.is(inputs.eq(1)) && upper < lower) {
                 this._value([upper, upper]);
             }
 
@@ -720,8 +745,9 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         },
 
         _value: function(newValue) {
-            var lower = this.inputs.eq(0);
-            var upper = this.inputs.eq(1);
+            var input = this.inputs.filter('input');
+            var lower = input.eq(0);
+            var upper = input.eq(1);
 
             if (typeof newValue === 'undefined') {
                 var lowerVal = (!NUMBER_REGEX.test(lower.val()))
@@ -758,12 +784,14 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             // early out, nothing to fix here
             if (pMin.gt(center) || pMax.lt(center) || pMax.lt(epsilon) || epsilon < 0) return this;
 
-            if (target.is(this.inputs.eq(0))) {
-                var epsBounded = Math.min(Math.abs(pMin.toFloat() - center), epsilon, pMax.toFloat() - center);
-                this._value([center, epsBounded]);
+            var epsBounded = Math.min(Math.abs(pMin.toFloat() - center), epsilon, pMax.toFloat() - center);
+            var cenBounded = Math.max(pMin.plus(epsilon), Math.min(center, pMax.minus(epsilon).toFloat()));
 
+            if (epsilon == epsBounded && cenBounded == center) return this;
+
+            if (target.is(this.inputs.eq(0))) {
+                this._value([center, epsBounded]);
             } else if (target.is(this.inputs.eq(1))) {
-                var cenBounded = Math.max(pMin.plus(epsilon), Math.min(center, pMax.minus(epsilon).toFloat()));
                 this._value([cenBounded, epsilon]);
             }
 
@@ -805,7 +833,67 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         }
     });
+	
+	/**
+	 * Class: InlineTextArea
+	 *     TextArea for editing inside a shape on the canvas.
+	 *     So far only used for editing inside a sticky note.
+	 */
+	
+    var InlineTextArea = Entry.extend({
+        changeEvents: function() {
+            return ['keyup', 'cut', 'paste'];
+        },
+		
+        blurEvents: function() {
+            return ['blur'];
+        },
+		
+        _setupInput: function() {
+            this.inputs = jQuery('<textarea type="text" class="form-control">').attr('id', this.id);
+			//hide textarea at the beginning
+			this.inputs.toggle(false);
+            return this;
+        },
+		
+        appendTo: function(on) {
+			this._setupCallbacks();
+            return this;
+        },
+		
+        blurred: function(event, ui) {
+			 this._super(event, ui);
+			 // hide textarea
+			 this.inputs.toggle(false);
+			 // show paragraph and set value
+			 this.inputs.siblings('p').html(escapeHTML(this.inputs.val())).toggle(true);
+		},
+		
+        remove: function() {
+		},
+		
+        _setupContainer: function() {
+            this.container = this.inputs
+			
+            return this;
+        },
+		
+        _setupVisualRepresentation: function() {
+            this._setupInput();
+			this._setupContainer();
+            this.property.node.container.find('.' + Config.Classes.EDITABLE).append(this.inputs);
 
+            return this;
+        },
+
+        _value: function(newValue) {
+            if (typeof newValue === 'undefined') return this.inputs.val();
+            this.inputs.val(newValue);
+
+            return this;
+        }
+    });
+	
     /**
      *  TransferEntry
      *      Allows to link to other entities in the database. Looks like a normal <ChoiceEntry>,
@@ -968,13 +1056,15 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
     });
 
     return {
-        'BoolEntry':     BoolEntry,
-        'ChoiceEntry':   ChoiceEntry,
-        'CompoundEntry': CompoundEntry,
-        'EpsilonEntry':  EpsilonEntry,
-        'NumericEntry':  NumericEntry,
-        'RangeEntry':    RangeEntry,
-        'TextEntry':     TextEntry,
-        'TransferEntry': TransferEntry
+        'BoolEntry':     	BoolEntry,
+        'ChoiceEntry':   	ChoiceEntry,
+        'CompoundEntry': 	CompoundEntry,
+        'EpsilonEntry':  	EpsilonEntry,
+        'NumericEntry':  	NumericEntry,
+        'RangeEntry':    	RangeEntry,
+        'TextEntry':     	TextEntry,
+		'InlineTextArea':   InlineTextArea, 
+        'TransferEntry': 	TransferEntry,
+		'escapeHTML'   :    escapeHTML
     }
 });
