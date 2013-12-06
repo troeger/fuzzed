@@ -275,11 +275,18 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          */
         _layoutWithAlgorithm: function(algorithm) {
             var layoutedNodes = algorithm(this._getNodeHierarchy());
+
+            // center the top node on the currently visible canvas (if there's enough space)
+            var centerX = Math.floor((jQuery('#' + this.config.IDs.CANVAS).width() / this.config.Grid.SIZE) / 2);
+            // returned coordinates can be negative, so add that offset
             var minX = _.min(layoutedNodes, function(n) {return n.x}).x;
+            centerX -= Math.min(centerX + minX, 0);
+
             // apply positions
             _.each(layoutedNodes, function(n) {
                 var node = this.getNodeById(n.id);
-                node.moveToGrid({x: n.x - minX + 1, y: n.y + 1});
+                // +1 because the returned coords are 0-based and we need 1-based
+                node.moveToGrid({x: n.x + centerX + 1, y: n.y + 1});
             }.bind(this));
 
             return this;

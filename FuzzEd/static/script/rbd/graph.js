@@ -86,10 +86,18 @@ function(Graph, RbdNode, RbdConfig, RbdNotation) {
          *    This <Graph> instance for chaining.
          */
         _layoutWithAlgorithm: function(algorithm) {
+            var layoutedNodes = algorithm(this._getNodeHierarchy());
+
+            var maxY = _.max(layoutedNodes, function(n) {return n.y}).y;
+            // try to center the graph on the canvas (if there's enough space)
+            var centerX = Math.floor((jQuery('#' + this.config.IDs.CANVAS).width() / this.config.Grid.SIZE) / 2);
+            var offsetX = Math.max(centerX - (maxY / 2), 0);
+
             // apply positions
-            _.each(algorithm(this._getNodeHierarchy()), function(n) {
+            _.each(layoutedNodes, function(n) {
                 var node = this.getNodeById(n.id);
-                node.moveToGrid({x: n.y + 1, y: n.x + 1});
+                // +1 because the returned coords are 0-based and we need 1-based
+                node.moveToGrid({x: n.y + offsetX + 1, y: n.x + 1});
             }.bind(this));
 
             return this;
