@@ -165,7 +165,7 @@ class AddGraph(Command):
     graph = models.ForeignKey(Graph, related_name='+')
 
     @classmethod
-    def create_from(cls, kind, name, owner, add_default_nodes=True):
+    def create_from(cls, kind, name, owner, project, add_default_nodes=True):
         """
         Method [static]: create_from
         
@@ -180,7 +180,7 @@ class AddGraph(Command):
         Returns:
          {<AddGraph>} the add graph command instance
         """
-        graph = Graph(kind=kind, name=name, owner=owner, deleted=True)
+        graph = Graph(kind=kind, name=name, owner=owner, project=project, deleted=True)
         graph.save()
         if add_default_nodes:
             # pre-initialize the graph with default nodes

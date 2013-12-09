@@ -19,16 +19,17 @@ urlpatterns = patterns('',
     url(r'^login/$', 'FuzzEd.views.login', name='login'),
     url(r'^about/$', 'FuzzEd.views.about', name='about'),    
     url(r'^settings/$', 'FuzzEd.views.settings', name='settings'),    
-    url(r'^dashboard/$', 'FuzzEd.views.dashboard', name='dashboard'),
-    url(r'^dashboard/new/$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
+    #url(r'^dashboard/$', 'FuzzEd.views.dashboard', name='dashboard'),
+    #url(r'^dashboard/new/$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
     url(r'^dashboard/(?P<graph_id>\d+)/$', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
     url(r'^editor/(?P<graph_id>\d+)$', 'FuzzEd.views.editor', name='editor'),
     url(r'^snapshot/(?P<graph_id>\d+)$', 'FuzzEd.views.snapshot', name='snapshot'),
+    
     url(r'^projects/$', 'FuzzEd.views.projects', name='projects'),
-    url(r'^project/new/$', 'FuzzEd.views.project_new', name='project_new'),
-    url(r'^project/(?P<project_id>\d+)/$', 'FuzzEd.views.project_edit', name='project_edit'),
-    
-    
+    url(r'^projects/new/$', 'FuzzEd.views.project_new', name='project_new'),
+    url(r'^projects/(?P<project_id>\d+)/$', 'FuzzEd.views.project_edit', name='project_edit'),
+    url(r'^projects/(?P<project_id>\d+)/dashboard/$', 'FuzzEd.views.dashboard', name='dashboard'),
+    url(r'^projects/(?P<project_id>\d+)/dashboard/new/$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
     
     # API
     # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API

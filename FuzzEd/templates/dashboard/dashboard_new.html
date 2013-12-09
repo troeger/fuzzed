@@ -14,7 +14,7 @@
     </h1>
 </div>
 
-<form method="POST" action="/dashboard/new/" class="form-horizontal">
+<form method="POST" action="projects/{{ project_id }}/dashboard/new/" class="form-horizontal">
     {% csrf_token %}
     <fieldset>
         <div class="form-group">

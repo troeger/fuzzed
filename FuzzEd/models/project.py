@@ -41,5 +41,16 @@ class Project(models.Model):
           'name':     self.name,
           'created':  self.created
       }
+      
+  def is_authorized(self, user):
+      """
+      Method: is_authorized
+          
+      A user is athorized to browse a project if he is the owner or member of the project
+      
+      Returns:    
+        {bool} 
+      """  
+      return (self.owner == user) or (self.users.all().filter(id = user.id).exists())
   
   

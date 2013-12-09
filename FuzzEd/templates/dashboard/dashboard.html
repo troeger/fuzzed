@@ -48,7 +48,7 @@
     </h1>
 </div>
 
-<form action="/dashboard/new/" method="post">
+<form action="projects/{{ project_id }}/dashboard/new/" method="post">
     {% csrf_token %}
     <div class="btn-group pull-right">
         <button type="submit" name="kind" value="faulttree" class="btn btn-default">

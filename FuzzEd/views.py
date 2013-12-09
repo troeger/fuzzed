@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
+from django.http import Http404
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
 from FuzzEd.models import Graph, Project, notations, commands
@@ -131,17 +132,20 @@ def project_edit(request, project_id):
     elif POST.get('edit') or request.method == 'GET':
         parameters = {'project': project.to_dict()}
         return render(request, 'project_menu/project_edit.html', parameters)
-        
+    
+    # the owner made changes to the project's field, better save it (if we can)    
     elif POST.get('save') or request.method == 'GET':
-        parameters = {'project': project.to_dict()}
-        return render(request, 'project_menu/project_edit.html', parameters)    
+        project.name = POST.get('name', '')
+        project.save()
+        messages.add_message(request, messages.SUCCESS, 'Project saved.')
+        return redirect('projects')
     
     # something was not quite right here
     raise HttpResponseBadRequest()
         
 
 @login_required
-def dashboard(request):
+def dashboard(request, project_id):
     """
     Function: dashboard
     
@@ -155,13 +159,18 @@ def dashboard(request):
     Returns:
      {HttpResponse} a django response object
     """
-    graphs = request.user.graphs.filter(deleted=False).order_by('-created')
+    project = get_object_or_404(Project, pk=project_id)
+    
+    if not (project.is_authorized(request.user)):
+        raise Http404
+    
+    graphs = project.graphs.filter(deleted=False).order_by('-created')
     parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs]}
 
     return render(request, 'dashboard/dashboard.html', parameters)
 
 @login_required
-def dashboard_new(request):
+def dashboard_new(request, project_id):
     """
     Function: dashboard_new
     
@@ -174,12 +183,17 @@ def dashboard_new(request):
     Returns:
      {HttpResponse} a django response object
     """
+    project = get_object_or_404(Project, pk=project_id)
+    
+    if not (project.is_authorized(request.user)):
+        raise Http404
+        
     POST = request.POST
 
     # save the graph
     if POST.get('save') and POST.get('kind') and POST.get('name'):
-        commands.AddGraph.create_from(kind=POST['kind'], name=POST['name'], owner=request.user).do()
-        return redirect('dashboard')
+        commands.AddGraph.create_from(kind=POST['kind'], name=POST['name'], owner=request.user, project=project).do()
+        return redirect('dashboard', project_id = project_id)
 
     # render the create diagram if fuzztree
     elif POST.get('kind') in notations.by_kind:
@@ -465,4 +479,4 @@ def login(request):
                             urllib.quote_plus(request.session['openid_identifier'])) 
 
         auth.login(request, user)
-    return redirect('dashboard')
+    return redirect('projects')
