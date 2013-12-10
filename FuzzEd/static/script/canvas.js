@@ -1,5 +1,4 @@
-define(['class', 'config', 'jquery.svgdom', 'jquery.ui/jquery.ui.droppable', 'jquery.ui/jquery.ui.selectable'],
-function(Class, Config) {
+define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Config) {
     /**
      * Package: Base
      */
@@ -44,16 +43,21 @@ function(Class, Config) {
         /**
          * Section: Visual
          */
-        enlarge: function(to) {
+        enlarge: function(to, precise) {
             var canvasWidth  = this.container.width();
             var canvasHeight = this.container.height();
             var doubleGrid   = this.gridSize << 1;
 
-            while (to.x > canvasWidth - doubleGrid) {
-                canvasWidth *= 2;
-            }
-            while (to.y > canvasHeight - doubleGrid) {
-                canvasHeight *= 2;
+            if (precise) {
+                canvasWidth  = _.max(to.x, canvasWidth);
+                canvasHeight = _.max(to.y, canvasHeight);
+            } else {
+                while (to.x  > canvasWidth - doubleGrid) {
+                    canvasWidth *= 2;
+                }
+                while (to.y > canvasHeight - doubleGrid) {
+                    canvasHeight *= 2;
+                }
             }
 
             this.container.width(canvasWidth);
@@ -179,7 +183,11 @@ function(Class, Config) {
         _setupCanvas: function() {
             // make canvas droppable for shapes from the shape menu
             this.container.droppable({
-                accept:    'svg',
+                accept: function(draggable) {
+        			if (jQuery(draggable).parent().attr('class') === Config.Classes.DRAGGABLE_WRAP_DIV){
+            			return true;
+						}
+    				},
                 tolerance: 'fit',
                 drop:      function(uiEvent, uiObject) {
                     var kind     = uiObject.draggable.attr('id');
@@ -191,32 +199,12 @@ function(Class, Config) {
 
             this.container.selectable({
                 filter: '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR,
-                selecting: function(event, ui) {
-                    // highlight nodes...
-                    var selection = jQuery(ui.selecting);
-                    if (selection.hasClass(Config.Classes.NODE)) {
-                        selection.data(Config.Keys.NODE).select();
-                    }
-
-                    // ... and edges that are part of the new selection
-                    if (selection.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        var edgeId = selection.attr(Config.Attributes.CONNECTION_ID);
-                        jQuery(document).trigger(Config.Events.CANVAS_EDGE_SELECTED, edgeId);
-                    }
-                },
-                unselecting: function(event, ui) {
-                    // unhighlight nodes...
-                    var unselection = jQuery(ui.unselecting);
-                    if (unselection.hasClass(Config.Classes.NODE)) {
-                        unselection.data(Config.Keys.NODE).deselect();
-                    }
-
-                    // ... and edges when the selection is cleared
-                    if (unselection.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
-                        var edgeId = unselection.attr(Config.Attributes.CONNECTION_ID);
-                        jQuery(document).trigger(Config.Events.CANVAS_EDGE_UNSELECTED, edgeId);
-                    }
-                },
+				unselected: function(event, ui) {
+					jQuery(document).trigger(Config.Events.NODE_UNSELECTED);
+				},
+				selected: function(event,ui){
+					jQuery(document).trigger(Config.Events.NODE_SELECTED);
+				},
                 stop: function() {
                     // tell other (e.g. <PropertyMenu>) that selection is done and react to the new selection
                     jQuery(document).trigger(Config.Events.CANVAS_SELECTION_STOPPED);

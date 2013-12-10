@@ -1,4 +1,4 @@
-define(['faulttree/config'], function(FaulttreeConfig) {
+define(['faulttree/config', 'jquery'], function(FaulttreeConfig) {
     /**
      *  Package Fuzztree
      */
@@ -15,11 +15,11 @@ define(['faulttree/config'], function(FaulttreeConfig) {
          *    Names of certain CSS classes.
          *
          *  Constants:
-         *    {String} NODE_OPTIONAL           - Class assigned to optional nodes.
+         *    {String}      OPTIONAL           - Class assigned to optional nodes.
          *    {String} NODE_OPTIONAL_INDICATOR - Class of the optional indicator above a node's image.
          */
         Classes: {
-            NODE_OPTIONAL:           'fuzzed-node-optional',
+            OPTIONAL:                'optional',
             NODE_OPTIONAL_INDICATOR: 'fuzzed-node-optional-indicator'
         },
 

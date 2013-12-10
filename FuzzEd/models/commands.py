@@ -297,7 +297,7 @@ class ChangeNode(Command):
          {None}
         """
         for change in self.changes:
-            self.node.set_attr(change.old_value)
+            self.node.set_attr(change.key, change.old_value)
         self.node.save()
         self.save()
 

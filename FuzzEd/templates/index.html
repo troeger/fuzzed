@@ -1,85 +1,69 @@
 {% extends "util/base.html" %}
 
-{% block script %}
-<script src="{{ STATIC_URL }}lib/requirejs/require-jquery.js" type="text/javascript" language="javascript"></script>
-<script type="text/javascript">
-    require.config({
-        baseUrl: '{{ STATIC_URL }}',
-        waitSeconds: 5,
-        paths: {
-            'openid-selector': 'lib/openid-selector/js'
-        },
-        // define dependencies for libs that are not AMD compatible
-        shim: {
-            'openid-selector/openid-jquery': {
-                deps: ['jquery'],
-                exports: 'openid'
-            },
-            'openid-selector/openid-en': ['openid-selector/openid-jquery']
-        }
-    });
+{% block meta %}
+<meta name="description" content="FuzzEd gives you the fastest way for creating system dependability models in the cloud. The online editor supports fault trees modeling, fault tree analysis (FTA), reliability block diagram (RBD) modeling, top event probability computation, and the novel FuzzTree modeling concept. Non-commercial usage is always free of charge.">
+{% endblock %}
 
+{% block script %}
+{{ block.super }}
+<script type="text/javascript">
     require(['openid-selector/openid-jquery', 'openid-selector/openid-en'], function() {
         $(document).ready(function() {
-            openid.img_path="{{ STATIC_URL }}lib/openid-selector/images/";
+            openid.img_path = "{{ STATIC_URL }}lib/openid-selector/images/";
             openid.init('openid_identifier');
         });
     });
 </script>
 {% endblock %}
 
-{%block navigation_home %}hidden{% endblock %}
-{%block navigation_settings %}hidden{% endblock %}
-{%block navigation_logout %}hidden{% endblock %}
-
 {% block content %}
-<div class="page-header">
-    <h1>
-        Welcome to FuzzEd
-        <small>The Reliability Diagram Editor</small>
-    <img style="float:right" alt="Designed for Chrome" src="{{ STATIC_URL }}img/chrome_logo.gif"/>
-    </h1>
-</div>
-
 <div class="alert alert-block">
-    <h4 class="alert-heading"><a href="http://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha">Public Alpha</a></h4>
-    Feel free to try out everything. However, please excuse sudden service outages as the site is still under development.<br>
-    If you have any <a href="http://fuzztrees.uservoice.com">feedback</a> we would be happy to hear it. 
+    <h4 class="alert-heading">
+        <a href="http://en.wikipedia.org/wiki/Software_release_life_cycle#Beta">Public Beta</a>
+    </h4>
+    Feel free to try out everything. However, please excuse sudden outages as the online editor and the analysis engines are still under development.<br>
+    If you have any <a href="http://fuzztrees.uservoice.com">feedback</a>, we would be happy to hear it.
 </div>
 
 <section>
     <div class="row">
-        <div class="span4">
-            <h3>Dependability Modeling <br/><small>Fault Trees and RBDs</small></h3>
+        <div class="col-4">
+            <h4>Dependability Analysis<br/>in the Cloud.
+                <br><small>Fault Trees and RBDs.</small>
+            </h4>
             <p>
-                If you need a quick way for drawing and analyzing system 
-                availability characteristics, this one is for you. 
-                We already offer a free basic account so that you can just start.
+                FuzzEd gives you the fastest way for creating system 
+                dependability models in the cloud. Share your models and ideas with other experts, but only if you want to.
+                <br/> 
             </p>
         </div>
 
-        <div class="span4">
-            <h3>Uncertainties in Modeling <br/><small>Introducing FuzzTrees</small></h3>
+        <div class="col-4">
+            <h4>Make The Uncertainties<br/>Explicit.
+                <br><small>Introducing FuzzTrees.</small>
+            </h4>
             <p>
-                Our novel concept for fault tree modeling allows you to express
-                configurable and uncertain parts of the system. 
-                We are working on an analysis engine that will tell you which 
-                configuration options give the best cost-dependability ratio.
+                Our novel concept for fault tree modeling with uncertainties allows you to express
+                configurable and currently underspecified parts of the system.<br/> 
+                Our analysis engine tells you which configuration options 
+                will give the best cost-dependability ratio.
             </p>
         </div>
 
-        <div class="span4">
-            <h3>Collaboration and Teaching </br><small>Share your Graphs</small></h3>
+        <div class="col-4">
+            <h4>Freedom of Research,<br/>Privacy of Data.
+                <br><small>Options available.</small>
+            </h4>
             <p>
-                Graphs are planned to be easily sharable between users to support academic
-                teaching and professional collaboration projects. 
+                FuzzEd is intended for both academic and commercial usage. We do (and always will) provide a free basic account for non-commercial use.<br/>
+                If you are interested in running this service inside your company, just <a href="mail:peter.troeger@hpi.uni-potsdam.de">talk to us</a>. 
             </p>
         </div>
     </div>
 </section>
 
 <section>
-    <h6>Please use one of these authentication providers.</h6>
+    <h5>Please use one of these authentication providers</h5>
 
     <form action="/login/" method="get" id="openid_form">
         <input type="hidden" name="action" value="verify" />
@@ -94,7 +78,8 @@
             <noscript>
                 <p>
                     OpenID is service that allows you to log-on to many different websites using a single identity.
-                    Find out <a href="http://openid.net/what/">more about OpenID</a> and <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.
+                    Find out <a href="http://openid.net/what/">more about OpenID</a> and
+                    <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.
                 </p>
             </noscript>
         </fieldset>

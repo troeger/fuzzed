@@ -1,4 +1,4 @@
-import FuzzEd
+import settings
 
 def footer(request):
-    return {'fuzzed_version': FuzzEd.__version__}
+    return {'version': settings.VERSION}  # if this fails, run fab build.configs

@@ -1,16 +1,16 @@
 import urllib, datetime
 
+from django.core.mail import mail_managers
+
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-
-from django.core.mail import mail_managers
 
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
-from openid2rp.django.auth import linkOpenID, preAuthenticate, AX
+from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
 from FuzzEd.models import Graph, notations, commands
 import FuzzEd.settings
 
@@ -316,7 +316,11 @@ def login(request):
         open_id = GET['openid_identifier']
         request.session['openid_identifier'] = open_id
 
-        return preAuthenticate(open_id, FuzzEd.settings.OPENID_RETURN)
+        try:
+           return preAuthenticate(open_id, FuzzEd.settings.OPENID_RETURN)
+        except IncorrectClaimError:
+           messages.add_message(request, messages.ERROR, 'This OpenID claim is not valid.')
+           return redirect('index')
 
     elif 'openidreturn' in GET:
         user = auth.authenticate(openidrequest=request)
@@ -330,13 +334,13 @@ def login(request):
 
             # not known to the backend so far, create it transparently
             if 'nickname' in user_sreg:
-                user_name = unicode(user_sreg['nickname'],'utf-8')[:29]
+                user_name = unicode(user_sreg['nickname'], 'utf-8')[:29]
 
             if 'email' in user_sreg:         
-                email = unicode(user_sreg['email'],'utf-8')[:29]
+                email = unicode(user_sreg['email'], 'utf-8')[:29]
 
             if AX.email in user_ax:
-                email = unicode(user_ax[AX.email],'utf-8')[:29]
+                email = unicode(user_ax[AX.email], 'utf-8')[:29]
 
             # no username given, register user with his e-mail address as username
             if not user_name and email:
@@ -345,8 +349,8 @@ def login(request):
                 # This leads to a problem when user come from "www" or without "www"
                 # In this case, the new username already exists in the database
                 try:
-                    olduser = User.objects.get(username=email)
-                    new_user = User(username=email+"2", email=email)
+                    old_user = User.objects.get(username=email)
+                    new_user = User(username=email + '2', email=email)
                 except:
                     new_user = User(username=email, email=email)
 
@@ -365,13 +369,12 @@ def login(request):
                 new_user = User(username=user_name)
 
             if AX.first in user_ax:
-                new_user.first_name = unicode(user_ax[AX.first],'utf-8')[:29]
+                new_user.first_name = unicode(user_ax[AX.first], 'utf-8')[:29]
 
             if AX.last in user_ax:
-                new_user.last_name=unicode(user_ax[AX.last],'utf-8')[:29]
+                new_user.last_name=unicode(user_ax[AX.last], 'utf-8')[:29]
 
             new_user.is_active = True
-
             new_user.save()
 
             linkOpenID(new_user, user.openid_claim)
@@ -380,5 +383,5 @@ def login(request):
             return redirect('/login/?openid_identifier=%s' % 
                             urllib.quote_plus(request.session['openid_identifier'])) 
 
-    auth.login(request, user)
+        auth.login(request, user)
     return redirect('dashboard')

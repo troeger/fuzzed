@@ -1,0 +1,30 @@
+.jsplumb-endpoint
+{
+    .opacity(0);
+
+    .highlighted {
+        .opacity(1);
+    }
+}
+
+.jsplumb-connector {
+    &.highlighted {
+        z-index: 100; /* above selection, below mirror */
+
+        path {
+            stroke: @theme-highlight;
+        }
+    }
+
+    &.ui-selected {
+        z-index: 50;
+    }
+
+    &.ui-selected, &.ui-selecting {
+        &, &.highlighted {
+            path {
+                stroke: @theme-selection;
+            }
+        }
+    }
+}

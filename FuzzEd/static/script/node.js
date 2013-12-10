@@ -1,5 +1,5 @@
-define(['properties', 'mirror', 'canvas', 'class', 'jsplumb', 'jquery.svg'],
-function(Properties, Mirror, Canvas, Class) {
+define(['property', 'mirror', 'canvas', 'class', 'jquery', 'jsplumb'],
+function(Property, Mirror, Canvas, Class) {
     /**
      *  Class: {Abstract} Node
      *
@@ -19,6 +19,7 @@ function(Properties, Mirror, Canvas, Class) {
          *                                       defaults to <Node::getConfig()>.
          *    {DOMElement} container           - The DOM element that contains all other visual DOM elements of the node
          *                                       such as its image, mirrors, ...
+         *    {<Graph>}    graph               - The Graph this node belongs to.
          *    {int}        id                  - A client-side generated id - i.e. UNIX-timestamp - to uniquely identify
          *                                       the node in the frontend. It does NOT correlate with database ids in the
          *                                       backend. Introduced to save round-trips and to later allow for an
@@ -27,11 +28,6 @@ function(Properties, Mirror, Canvas, Class) {
          *                                       target of the edge).
          *    {Array[<Edge>]} outgoingEdges    - An enumeration of all edges linking FROM this node (this node is the
          *                                       source of the edge).
-         *    {bool}       _disabled           - Boolean flag indicating whether this node may be a target for a
-         *                                       currently drawn edge. True disables connection and therefore fades out
-         *                                       the node.
-         *    {bool}       _highlighted        - Boolean flag that is true when the node needs to be highlighted on hover.
-         *    {bool}       _selected           - Boolean flag that is true when the node is selected - i.e. clicked.
          *    {DOMElement} _nodeImage          - DOM element that contains the actual image/svg of the node.
          *    {DOMElement} _badge              - DOM element that contains the badge that can be used to display additional
          *                                       information on a node.
@@ -42,13 +38,11 @@ function(Properties, Mirror, Canvas, Class) {
          */
         config:        undefined,
         container:     undefined,
+        graph:         undefined,
         id:            undefined,
         incomingEdges: undefined,
         outgoingEdges: undefined,
 
-        _disabled:           false,
-        _highlighted:        false,
-        _selected:           false,
         _nodeImage:          undefined,
         _badge:              undefined,
         _nodeImageContainer: undefined,
@@ -61,12 +55,12 @@ function(Properties, Mirror, Canvas, Class) {
         /**
          * Constructor: init
          *
-         * The constructor of the abstract node class. It will merge the state of the properties, assign a client-side
+         * The constructor of the abstract node class. It will merge the state of the definition, assign a client-side
          * id, setup the visual representation and enable interaction via mouse and keyboard. Calling the constructor
          * as-is, will result in an exception.
          *
          * Parameters:
-         *   {Object}     properties             - An object containing default values for the node's properties. E.g.:
+         *   {Object}     definition             - An object containing default values for the node's definition. E.g.:
          *                                         {x: 1, y: 20, name: 'foo'}. The values will be merged into the node
          *                                         recursively, creating deep copies of complex structures like arrays
          *                                         or other objects. Mainly required for restoring the state of a node
@@ -78,9 +72,10 @@ function(Properties, Mirror, Canvas, Class) {
          * Returns:
          *   This {<Node>} instance.
          */
-        init: function(properties, propertiesDisplayOrder) {
+        init: function(definition, propertiesDisplayOrder) {
+
             // merge all presets of the configuration and data from the backend into this object
-            jQuery.extend(true, this, properties);
+            jQuery.extend(true, this, definition);
 
             // logic
             if (typeof this.id === 'undefined') {
@@ -102,13 +97,16 @@ function(Properties, Mirror, Canvas, Class) {
                 ._moveContainerToPixel(Canvas.toPixel(this.x, this.y))
                 ._setupConnectionHandle()
                 ._setupEndpoints()
+				.__setupZIndex()
                 // Interaction
                 ._setupDragging()
                 ._setupMouse()
                 ._setupSelection()
-                // Property displays
-                ._setupMirrors(this.propertyMirrors, propertiesDisplayOrder)
-                ._setupPropertyMenuEntries(this.propertyMenuEntries, propertiesDisplayOrder);
+                ._setupProperties(propertiesDisplayOrder)
+				._setupEditable()
+				._setupResizable()
+                // Events
+                ._registerEventHandlers();
         },
 
         /**
@@ -130,11 +128,7 @@ function(Properties, Mirror, Canvas, Class) {
                 .removeAttr('id')
                 // add new classes for the actual node
                 .addClass(this.config.Classes.NODE_IMAGE);
-
-            // links to primitive shapes and groups of the SVG for later manipulation (highlighting, ...)
-            this._nodeImage.primitives = this._nodeImage.find('rect, circle, path');
-            this._nodeImage.groups     = this._nodeImage.find('g');
-
+				
             this._badge = jQuery('<span class="badge"></span>')
                 .hide();
 
@@ -148,11 +142,44 @@ function(Properties, Mirror, Canvas, Class) {
                 .css('position', 'absolute')
                 .data(this.config.Keys.NODE, this)
                 .append(this._nodeImageContainer);
-
+			
             this.container.appendTo(Canvas.container);
 
             return this;
         },
+		
+        /**
+         * Method: __setupZIndex
+         *
+         * This method implements special treatment of z-Index for sticky notes.
+		 * Sticky notes are normally displayed behind all other nodes, as well as node connections with a z-Index value of "-1"
+		 * If a sticky note gets selected it will be brought in front of all other nodes/connections with a z-Index value of "101"
+		 * If a sticky note gets unselected it will be brought in the background again
+		 *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+		__setupZIndex: function(){
+			if (this.kind != 'stickyNote')
+				return this;
+			
+			jQuery(this.container).css('z-index', '-1');
+			
+			var sticky = this;
+				
+			jQuery(document).on(this.config.Events.NODE_SELECTED, function(event, ui){
+				// bring only the sticky note in front that is selected
+				if (jQuery(sticky.container).hasClass('ui-selected'))
+					jQuery(sticky.container).css('z-index', '101');
+			});
+			
+			jQuery(document).on(this.config.Events.NODE_UNSELECTED, function(event, ui){
+				jQuery(sticky.container).css('z-index', '-1')
+			});	
+			
+			
+			return this;
+		},
 
         /**
          * Method: _setupNodeImage
@@ -176,10 +203,11 @@ function(Properties, Mirror, Canvas, Class) {
             this._nodeImage.attr('height', this._nodeImage.height() * scaleFactor);
 
             var newTransform = 'scale(' + scaleFactor + ')';
-            if (this._nodeImage.groups.attr('transform')) {
-                newTransform += ' ' + this._nodeImage.groups.attr('transform');
+            var groups = this._nodeImage.find('g');
+            if (groups.attr('transform')) {
+                newTransform += ' ' + groups.attr('transform');
             }
-            this._nodeImage.groups.attr('transform', newTransform);
+            groups.attr('transform', newTransform);
 
             // XXX: In Webkit browsers the container div does not resize properly. This should fix it.
             this.container.width(this._nodeImage.width());
@@ -204,7 +232,7 @@ function(Properties, Mirror, Canvas, Class) {
          */
         _setupConnectionHandle: function() {
             if (this.numberOfOutgoingConnections != 0) {
-                this._connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
+                this._connectionHandle = jQuery('<i class="icon-plus icon-justify"></i>')
                     .addClass(this.config.Classes.NODE_HALO_CONNECT + ' ' + this.config.Classes.NO_PRINT)
                     .css({
                         'top':  this._nodeImage.yCenter + this._nodeImage.outerHeight(true) / 2,
@@ -373,13 +401,13 @@ function(Properties, Mirror, Canvas, Class) {
                     // XXX: add dragged node to selection
                     // This uses the jQuery.ui.selectable internal functions.
                     // We need to trigger them manually because jQuery.ui.draggable doesn't propagate these events.
-                    if (!this.container.hasClass(this.config.Classes.JQUERY_UI_SELECTED)) {
+                    if (!this.container.hasClass(this.config.Classes.SELECTED)) {
                         Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
                         Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
                     }
 
                     // capture the original positions of all (multi) selected nodes and save them
-                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).each(function(index, node) {
+                    jQuery('.' + this.config.Classes.SELECTED).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
@@ -390,29 +418,26 @@ function(Properties, Mirror, Canvas, Class) {
 
                 drag: function(event, ui) {
                     // enlarge canvas
-                    Canvas.enlarge({x: ui.offset.left, y: ui.offset.top});
+					Canvas.enlarge({
+                        x: ui.offset.left + ui.helper.width(),
+                        y: ui.offset.top  + ui.helper.height()
+                    });
 
                     // determine by how many pixels we moved from our original position (see: start callback)
                     var xOffset = ui.position.left - initialPositions[this.id].left;
                     var yOffset = ui.position.top  - initialPositions[this.id].top;
 
                     // tell all selected nodes to move as well, except this node; the user already dragged it
-                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).not(this.container).each(function(index, node) {
+                    jQuery('.' + this.config.Classes.SELECTED).not(this.container).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
 
-                        var x = initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter;
-                        var y = initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter;
-
                         // move the other selectee by the dragging offset, do NOT report to the backend yet
                         nodeInstance._moveContainerToPixel({
-                            'x': Math.max(x, Canvas.gridSize),
-                            'y': Math.max(y, Canvas.gridSize)
+                            'x': initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
+                            'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
                         });
-
-                        // ask jsPlumb to repaint the selectee in order to redraw its connections
-                        jsPlumb.repaint(nodeInstance.container);
                     }.bind(this));
                 }.bind(this),
 
@@ -422,24 +447,20 @@ function(Properties, Mirror, Canvas, Class) {
                     var xOffset = ui.position.left - initialPositions[this.id].left;
                     var yOffset = ui.position.top  - initialPositions[this.id].top;
 
-                    jQuery('.' + this.config.Classes.JQUERY_UI_SELECTED).each(function(index, node) {
+                    jQuery('.' + this.config.Classes.SELECTED).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
 
-                        var x = initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter;
-                        var y = initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter;
-
                         // ... and report to the backend this time because dragging ended
                         nodeInstance.moveTo({
-                            'x': Math.max(x, Canvas.gridSize),
-                            'y': Math.max(y, Canvas.gridSize)
+                            'x': initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
+                            'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
                         });
                     }.bind(this));
 
                     // forget the initial position of the nodes to allow new dragging
                     initialPositions = {};
-
                     jQuery(document).trigger(this.config.Events.NODE_DRAG_STOPPED);
                 }.bind(this)
             });
@@ -492,59 +513,171 @@ function(Properties, Mirror, Canvas, Class) {
         },
 
         /**
-         * Method: _setupMirrors
-         *
-         * This helper method is called in the constructor and creates <Mirrors> for the node. Mirrors are create if
-         * and only if they appear in the propertyDisplayOrder collection.
+         * Method: _setupProperties
          *
          * Parameters:
-         *   {Object}     propertyMirrors      - The mirror definition objects as found in notations file
-         *                                       (e.g. notations/faulttree.json)
-         *   {Array[str]} propertyDisplayOrder - An array of property name string in the order descending order of their
-         *                                       appearance as mirrors.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-        _setupMirrors: function(propertyMirrors, propertiesDisplayOrder) {
-            this.propertyMirrors = {};
-            if (typeof propertyMirrors === 'undefined') return this;
-
-            _.each(propertiesDisplayOrder, function(property) {
-                var mirrorDefinition = propertyMirrors[property];
-
-                if (typeof mirrorDefinition === 'undefined' || mirrorDefinition === null) return;
-                this.propertyMirrors[property] = new Mirror(this.container, mirrorDefinition);
-            }.bind(this));
-
-            return this;
-        },
-
-        /**
-         * Method: _setuPropertyMenuEntries
-         *
-         * Parameters:
-         *   {Object}     propertyMenuEntries    - An object containing
          *   {Array[str]} propertiesDisplayOrder - bar.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
-        _setupPropertyMenuEntries: function(propertyMenuEntries, propertiesDisplayOrder) {
-            this.propertyMenuEntries = {};
-            if (typeof propertyMenuEntries === 'undefined') return this.propertyMenuEntries;
+        _setupProperties: function(propertiesDisplayOrder) {
+            _.each(propertiesDisplayOrder, function(propertyName) {
+                var property = this.properties[propertyName];
 
-            _.each(propertiesDisplayOrder, function(property) {
-                var menuEntry = propertyMenuEntries[property];
-                if (typeof menuEntry === 'undefined' || menuEntry === null) return;
+                if (typeof property === 'undefined') {
+                    return;
+                } else if (property === null) {
+                    delete this.properties[propertyName];
+                    return;
+                }
 
-                var mirror = this.propertyMirrors[property];
-
-                menuEntry.property = property;
-                this.propertyMenuEntries[property] = Properties.newFrom(this, mirror, menuEntry);
+                property.name = propertyName;
+                this.properties[propertyName] = Property.from(this, property);
             }.bind(this));
 
             return this;
+        },
+		
+		/*
+		 * Method: _setupResizable
+		 *
+		 * This initialization method is called in the constructor and is responsible for setting up the resizing of a node.
+		 * Until now the resizing functionality is intended only for use in resizing sticky notes on the canvas.
+		 *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+		 */
+		_setupResizable: function(){
+			
+			if(!this.resizable) return this;
+			// adapt size of container div to inner resizable div
+			this.container.width("auto").height("auto");
+			
+			var properties = this.properties;
+			
+			var height = properties.height.value;
+			var width  = properties.width.value;
+		
+			var resizable = this.container.find('.'+ this.config.Classes.RESIZABLE).resizable();
+			// setup resizable with width/height values stored in the backend
+			jQuery(resizable).height(height).width(width);
+			
+			var _nodeImage = this._nodeImage;
+			
+			// if resizable gets resized update width/height attribute		
+			jQuery(resizable).on('resizestop',function() {
+				
+				var newWidth = jQuery(this).width();
+				var newHeight= jQuery(this).height();
+			
+				properties.width.setValue(newWidth);
+				properties.height.setValue(newHeight);
+				
+				// update central point after resizing
+	            _nodeImage.xCenter = jQuery(this).outerWidth() / 2;
+	            _nodeImage.yCenter = jQuery(this).outerHeight() / 2;
+			});
+			
+			
+			jQuery(resizable).on('resize',function(event, ui) {
+                // enlarge canvas if resizable is resized out of the canvas
+				Canvas.enlarge({
+                    x: ui.helper.offset().left + ui.helper.width(),
+                    y: ui.helper.offset().top  + ui.helper.height()
+                });
+				
+				// scroll canvas if resizable is resized out of the visible part of the canvas
+				var scrollable = jQuery('body');
+								
+				var screenWidth  = jQuery(window).width();
+				var screenHeight = jQuery(window).height();
+				
+				var rightScrolled= scrollable.scrollLeft();
+				var downScrolled = scrollable.scrollTop(); 
+				
+				var scrollOffset = 10;
+				
+				// resize to the right	-> scroll right			
+				if( event.clientX > screenWidth - scrollOffset) scrollable.scrollLeft(rightScrolled + Canvas.gridSize);
+				// resize to the left	-> scroll left
+				if( event.clientX <= scrollOffset ) scrollable.scrollLeft(rightScrolled - Canvas.gridSize);
+				
+				// resize downwards -> scroll downwards
+				if( event.clientY > screenHeight - scrollOffset) scrollable.scrollTop(downScrolled + Canvas.gridSize);
+				// resize upwards  -> scroll upwards
+				if( event.clientY <= scrollOffset ) scrollable.scrollTop(downScrolled - Canvas.gridSize);
+				
+			});
+			
+			return this;
+		},
+		
+		/*
+		 * Method: _setupEditable
+		 *
+		 * This initialization method is called in the constructor and is responsible for setting up the editing of a node.
+		 * Until now the editing functionality is intended only for editing sticky notes on the canvas.
+		 * If the sticky note is clicked ,the html paragraph inside the sticky note will be hidden and the textarea will be displayed.
+		 *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+		 */
+		_setupEditable: function(){
+			if(!this.editable) return this;
+			
+			var container = this.container
+			var editable = container.find('.'+ this.config.Classes.EDITABLE);
+			
+			var textarea =  editable.find("textarea");				
+			var paragraph = editable.find("p");
+						
+			editable.on("dblclick", function(event){
+				paragraph.toggle(false);
+				textarea.toggle(true).focus();
+			});
+			
+			jQuery(document).on('node_unselected', function(event){
+				if (textarea.length) textarea.blur();
+			});
+				
+			return this;
+		}, 
+
+        /**
+         *  Group: Event Handling
+         */
+
+        /**
+         *  Method: _registerEventHandlers
+         *      Register a listener for edge add and delete events so that we can check the edge count
+         *      and hide the connection handle in case we are 'full'.
+         *
+         *  Returns:
+         *      This Node instance for chaining.
+         */
+        _registerEventHandlers: function() {
+            jQuery(document).on(this.config.Events.GRAPH_EDGE_ADDED,   this._checkEdgeCapacity.bind(this));
+            jQuery(document).on(this.config.Events.GRAPH_EDGE_DELETED, this._checkEdgeCapacity.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _checkEdgeCapacity
+         *      Check if we reached the max. number of outgoing edges allowed and hide the connection handle
+         *      in this case.
+         */
+        _checkEdgeCapacity: function() {
+            // no need to hide the connection handle if there is none or if we allow infinite connections
+            if (typeof this._connectionHandle === 'undefined' || this.numberOfOutgoingConnections == -1) return;
+
+            if (this.outgoingEdges.length >= this.numberOfOutgoingConnections) {
+                // full
+                this._connectionHandle.hide();
+            } else {
+                this._connectionHandle.show();
+            }
         },
 
         /**
@@ -616,7 +749,7 @@ function(Properties, Mirror, Canvas, Class) {
          */
         allowsConnectionsTo: function(otherNode) {
             // no connections to same node
-            if (this == otherNode) return false;
+            if (this === otherNode) return false;
 
             // otherNode must be in the 'allowConnectionTo' list defined in the notations
             var allowed = _.any(this.allowConnectionTo, function(nodeClass) {
@@ -647,6 +780,61 @@ function(Properties, Mirror, Canvas, Class) {
         },
 
         /**
+         * Method: setChildProperties
+         *
+         * This method will evaluate and set the properties of the passed child according to the value specified in the
+         * childProperties key of the notation file.
+         *
+         * Parameters:
+         *   {<Node>} other - the child of the current node.
+         *
+         * Returns:
+         *   {this} node instance for chaining.
+         */
+        setChildProperties: function(otherNode) {
+            _.each(this.childProperties, function(childValues, propertyName) {
+                var property = otherNode.properties[propertyName];
+                if (typeof property === 'undefined' || property === null) return;
+
+                _.each(childValues, function(value, key) {
+                    if (key === 'hidden') {
+                        property.setHidden(value);
+                    } else if (key === 'value') {
+                        property.setValue(value);
+                    }
+                });
+            });
+
+            return this;
+        },
+
+        /**
+         * Method: restoreChildProperties
+         *
+         * This method will reset the passed child's properties from their parent enforced ones to their previous state.
+         *
+         * Parameters:
+         *   {<Node>} other - the child of the current node.
+         *
+         * Returns:
+         *   {this} node instance for chaining.
+         */
+        restoreChildProperties: function(otherNode) {
+            _.each(this.childProperties, function(childValue, propertyName) {
+                var property = otherNode.properties[propertyName];
+                if (typeof property === 'undefined' || property === null) return;
+
+                _.each(childValue, function(value, key) {
+                    if (key === 'hidden') {
+                        property.setHidden(!value);
+                    }
+                });
+            });
+
+            return this;
+        },
+
+        /**
          * Group: Accessors
          */
 
@@ -673,10 +861,10 @@ function(Properties, Mirror, Canvas, Class) {
          * accessed by the base class.
          *
          * Throws:
-         *   [ABSTRACT] Subclass Responsibility
+         *   SubclassResponsibility
          */
         getConfig: function() {
-            throw '[ABSTRACT] Subclass Responsibility';
+            throw new SubclassResponsibility();
         },
 
         /**
@@ -698,6 +886,26 @@ function(Properties, Mirror, Canvas, Class) {
          */
 
         /**
+         * Method: moveBy
+         *   Moves the node's visual representation by the given offset and reports to backend. The center of the
+         *   node's image is the anchor point for the translation.
+         *
+         * Parameters:
+         *   {Object} offset - Object of the form of {x: ..., y: ...} containing the pixel offset to move the node by.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        moveBy: function(offset) {
+            var position = this.container.position();
+
+            return this.moveTo({
+                x: position.left + this._nodeImage.xCenter + offset.x,
+                y: position.top  + this._nodeImage.yCenter + offset.y
+            });
+        },
+
+        /**
          * Method: moveTo
          *   Moves the node's visual representation to the given coordinates and reports to backend. The center of the
          *   node's image is the anchor point for the translation.
@@ -710,16 +918,16 @@ function(Properties, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          *
          * Triggers:
-         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::PROPERTY_CHANGED>
          */
         moveTo: function(position) {
             var gridPos = Canvas.toGrid(position);
-            this.x = gridPos.x;
-            this.y = gridPos.y;
+            this.x = Math.max(gridPos.x, 0);
+            this.y = Math.max(gridPos.y, 0);
 
             this._moveContainerToPixel(position);
             // call home
-            jQuery(document).trigger(this.config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+            jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },
@@ -756,10 +964,12 @@ function(Properties, Mirror, Canvas, Class) {
          */
         _moveContainerToPixel: function(position) {
             this.container.css({
-                left: position.x - this._nodeImage.xCenter,
-                top:  position.y - this._nodeImage.yCenter
+                left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
+                top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
             });
             Canvas.enlarge(position);
+            // ask jsPlumb to repaint the selectee in order to redraw its connections
+            jsPlumb.repaint(this.container);
 
             return this;
         },
@@ -770,99 +980,74 @@ function(Properties, Mirror, Canvas, Class) {
 
         /**
          * Method: disable
-         *
-         * Disables the node visually (fade out) to make it appear to be not interactive for the user. Sets the node's
-         * <Node::_disabled> flag to true.
+         *   Disables the node visually (fade out) to make it appear to be not interactive for the user.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         disable: function() {
-            this._disabled = true;
-            return this._visualDisable();
+            this.container.addClass(this.config.Classes.DISABLED);
+
+            return this;
         },
 
         /**
          * Method: enable
-         *
-         * This method node re-enables the node visually and makes appear interactive to the user. Should usually be
-         * called subsequently to <Node::disabled()>. Modifies the node's <Node::_disabled> flag to false. The method
-         * takes other visual states like highlighted and selected into account.
+         *   This method node re-enables the node visually and makes appear interactive to the user.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         enable: function() {
-            this._disabled = false;
+            this.container.removeClass(this.config.Classes.DISABLED);
 
-            if (this._selected) {
-                return this._visualSelect();
-            } else if (this._highlighted) {
-                return this._visualHighlight();
-            } else {
-                return this._visualReset();
-            }
+            return this;
         },
 
         /**
          * Method: select
-         *
-         * Marks the node as selected - meaning: it will set the <Node::_selected> member to true and change the node's
-         * visual appearance (<Node::_visualSelect()>). A node can only be selected if it is not already disabled.
+         *   Marks the node as selected by adding the corresponding CSS class.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         select: function() {
-            // don't allow selection of disabled nodes
-            if (this._disabled) return this;
+            this.container.addClass(this.config.Classes.SELECTED);
 
-            this._selected = true;
-            return this._visualSelect();
+            return this;
         },
 
         /**
          * Method: deselect
-         *
-         * This method deselects the node - meaning: sets the <Node::_selected> flag to false and reset it visual
-         * appearance as long is it not also selected.
+         *   This method deselects the node by removing the corresponding CSS class to it.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         deselect: function() {
-            this._selected = false;
+            this.container.removeClass(this.config.Classes.SELECTED);
 
-            if (this._highlighted) {
-                return this._visualHighlight();
-            } else {
-                return this._visualReset();
-            }
+            return this;
         },
 
         /**
          * Method: highlight
-         *
-         * This method highlights the node visually as long as the node is not already disabled or selected. It is for
-         * instance called when the user hovers over a node. Modifies the node's <Node::_highlighted> flag to true.
+         *   This method highlights the node visually as long as the node is not already disabled or selected. It is for
+         *   instance called when the user hovers over a node.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         highlight: function() {
-            this._highlighted = true;
-            // don't highlight selected or disabled nodes (visually)
-            if (this._selected || this._disabled) return this;
+            this.container.addClass(this.config.Classes.HIGHLIGHTED);
 
-            return this._visualHighlight();
+            return this;
         },
 
         /**
          * Method: unhighlight
-         *
-         * Unhighlights the node' visual appearance. The method is for instance calls when the user leaves a hovered
-         * node. Modifies the node's <Node::_highlighted> flag to false. Unhighlighting is only possible if the node is
-         * not also selected or disabled.
+         *   Unhighlights the node' visual appearance. The method is for instance calls when the user leaves a hovered
+         *   node.
          *
          * P.S.: The weird word unhighlighting is an adoption of the jQueryUI dev team speak, all credits to them :)!
          *
@@ -870,11 +1055,9 @@ function(Properties, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         unhighlight: function() {
-            this._highlighted = false;
-            // don't highlight selected or disabled nodes (visually)
-            if (this._selected || this._disabled) return this;
+            this.container.removeClass(this.config.Classes.HIGHLIGHTED);
 
-            return this._visualReset();
+            return this;
         },
 
         /**
@@ -912,73 +1095,6 @@ function(Properties, Mirror, Canvas, Class) {
                 .text('')
                 .removeClass()
                 .hide();
-
-            return this;
-        },
-
-        /**
-         * Method: _visualDisable
-         *
-         * Does the dirty work for visually disabling a node - changes the stroke of all SVG primitives (e.g. path,
-         * circle, ...) to the color specified in the <Config>.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-        _visualDisable: function() {
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_DISABLED);
-            this._nodeImage.css('opacity', this.config.Dragging.OPACITY);
-
-            return this;
-        },
-
-        /**
-         * Method: _visualHighlight
-         *
-         * Does the dirty work for visually changing the appearance of a highlighted node. Removes at first all already
-         * applied styles by calling <Node::_visualReset()> and then changes the stroke color of all SVG primitives of
-         * the node's image to the color specified in the <Config>.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-        _visualHighlight: function() {
-            this._visualReset();
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_HIGHLIGHTED);
-
-            return this;
-        },
-
-        /**
-         * Small helper method to reset all applied visual changes of the _visual*** method group. Therefore, removes
-         * added CSS classes and sets the node's stroke to its initial color.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-        _visualReset: function() {
-            this.container.removeClass(this.config.Classes.NODE_SELECTED);
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_NORMAL);
-            this._nodeImage.css('opacity', 1);
-
-            return this;
-        },
-
-        /**
-         * Method: _visualSelect
-         *
-         * Does the dirty work for visually selecting a node. At first it reset any previously assigned style by
-         * calling <Node::_visualReset()>. Then it paints all strokes of the SVG primitives of the node's image using
-         * the color specified in the <Config>.
-         *
-         * Returns:
-         *   This {<Node>} instance for chaining.
-         */
-        _visualSelect: function() {
-            this._visualReset();
-
-            this.container.addClass(this.config.Classes.NODE_SELECTED);
-            this._nodeImage.primitives.css('stroke', this.config.Node.STROKE_SELECTED);
 
             return this;
         }

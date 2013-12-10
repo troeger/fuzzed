@@ -1,0 +1,29 @@
+Building with CMake
+===================
+
+1. Install CMake (Version >= 2.8): http://www.cmake.org/cmake/resources/software.html
+2. cmake-gui .
+3. Select a custom build directory (e.g. "build_cmake") for "Where to build the binaries"
+4. Repeatedly press "Configure" until all dependencies are resolved.
+   To view more CMake cache entries, check the "Advanced" checkbox.
+   Dependencies which are not included in the repository already:
+	- Xerces-C++: http://xerces.apache.org/xerces-c/install-3.html
+	- Boost libraries (Version >= 1.5)
+		- regex
+		- date_time
+		- system
+		- filesystem
+		- program_options
+		- exception
+	- Codesynthesis XSD: http://www.codesynthesis.com/products/xsd/download.xhtml
+	- OpenMP
+5. Press "Generate" to generate Makefiles or IDE Projects
+6. After first generating, you need to build the targets "generateFuzzTreeModel" and "generateFaultTreeModel"
+
+Options
+=======
+
+- BUILD_BEANSTALKPP: build the beanstalk client lib automatically. This is needed only once per platform.
+- BUILD_SIMULATION_EXECUTABLE: build command line tool for Fuzztree simulation.
+- BUILD_TESTS: build test project. This requires a Googletest installation.
+- USE_TIMENET: use TimeNET for simulations. TimeNET binaries will be found in /simulation/thirdParty/TimeNET_EDSPN.
