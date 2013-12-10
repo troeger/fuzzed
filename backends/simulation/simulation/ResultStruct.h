@@ -12,4 +12,6 @@ struct SimulationResultStruct
 	unsigned int nRounds;
 	unsigned int nFailures;
 	double duration;
+
+	const bool isValid() { return nRounds > 0; }
 };

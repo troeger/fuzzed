@@ -13,11 +13,6 @@
   <xsd:import schemaLocation="configurations.xsd"
               namespace="http://www.fuzztrees.net/configurations"/>
 
-  <xsd:complexType name="Issue">
-      <xsd:attribute name="issueId" type="xsd:int" use="required"/>
-      <xsd:attribute name="elementId" type="xsd:int" use="required"/>
-  </xsd:complexType>
-
   <xsd:complexType name="Result">
     <xsd:sequence>
       <xsd:element minOccurs="0" maxOccurs="1" name="configuration" type="configurations:Configuration"/>
@@ -32,13 +27,14 @@
     <xsd:attribute name="availability" type="xsd:double"/>
     <xsd:attribute name="duration" type="xsd:double"/>
     <xsd:attribute name="mttf" type="xsd:double"/>
+    <xsd:attribute name="validResult" type="xsd:boolean" use="required"/>
   </xsd:complexType>           
 
   <xsd:element name="simulationResults">
     <xsd:complexType>
         <xsd:sequence>
           <xsd:element minOccurs="0" maxOccurs="unbounded" name="result" type="Result"/>
-          <xsd:element minOccurs="0" maxOccurs="unbounded" name="issue" type="Issue"/>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="issue" type="common:Issue"/>
         </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
