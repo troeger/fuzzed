@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	std::vector<Issue> issues; // issues at fuzztree level
+	std::set<Issue> issues; // issues at fuzztree level
 	FuzzTreeTransform tf(instream, issues);
 	instream.close();
 
