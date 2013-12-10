@@ -10,6 +10,7 @@ from FuzzEd import util
 
 XSD_PY_FILE_MAP = {
     'analysisResult':      'xml_analysis',
+    'simulationResult':    'xml_simulation',
     'fuzztree':            'xml_fuzztree',
     'faulttree':           'xml_faulttree',
     'commonTypes':         'xml_common',
