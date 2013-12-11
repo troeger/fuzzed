@@ -25,9 +25,9 @@ enum ErrorType
 class FuzzTreeTransform
 {
 public:
-	FuzzTreeTransform(const std::string& fuzzTreeXML, std::vector<Issue>& errors);
-	FuzzTreeTransform(std::istream& fuzzTreeXML, std::vector<Issue>& errors);
-	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, std::vector<Issue>& errors);
+	FuzzTreeTransform(const std::string& fuzzTreeXML, std::set<Issue>& errors);
+	FuzzTreeTransform(std::istream& fuzzTreeXML, std::set<Issue>& errors);
+	FuzzTreeTransform(std::auto_ptr<fuzztree::FuzzTree> ft, std::set<Issue>& errors);
 
 	~FuzzTreeTransform();
 
@@ -88,5 +88,5 @@ private:
 	int m_count;
 	bool m_bValid;
 
-	std::vector<Issue>& m_issues;
+	std::set<Issue>& m_issues;
 };

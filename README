@@ -1,50 +1,27 @@
 FuzzEd
 ======
 
-People who contributed to this project so far:
-
-Markus Götz, Frank Schlegel, Stefan Richter, Franz Becker, Lena Herscheid, Christian Kieschnick
-
 Installation of development machine
 ===================================
 
-A development machine needs sudo, gcc, Python 2.7 + header files, pip, and Fabric (from PyPI) as minimum starting point. 
-You can install them directly, or use Vagrant to create a Virtual Machine with them from our Vagrantfile.
+The recommend development mode is with Vagrant. The Vagrantfile installs all relevant development libraries in the virtual machine.
 
-Running Vagrant for a dev VM (optional)
-----------------------------------------
-1. Install Vagrant from http://downloads.vagrantup.com/, recommended version: 1.2.7 
-2. Install VirtualBox from https://www.virtualbox.org/wiki/Downloads, recommended version: 4.2.16
-3. Run vagrant up
-4. Once the provisioning script has run through, you can run vagrant ssh
-5. cd /home/fuzztrees
-6. fab -l
+Inside the Vagrant VM, you can find all sources at /home/fuzztrees. Try "fab -l" then.
 
-Edit the Vagrantfile in order to get graphical mode: uncomment
-#config.vm.boot_mode = :gui
+If you prefer to develop on your native machine, it needs:
+- sudo, gcc, 
+- Python 2.7 + header files
+- pip, Fabric (from PyPI) 
 
-Install all software dependencies, create the database
-------------------------------------------------------
-> fab bootstrap_dev
+Based on this, you can "fab bootstrap.dev" install all additional dependencies. This is the script as used by the Vagrantfile.
 
 Developing for FuzzEd
 =====================
 
-Compile static stuff 
---------------------
-> fab build.all
-
-Synchronize local database with current model
----------------------------------------------
-> ./manage.py syncdb --migrate
-
-Run development web server
---------------------------
-> fab run.server
-
-Run backend services
---------------------
-> fab run.backend
+Compile static stuff:                              > fab build.all
+Synchronize local database with current model:     > ./manage.py syncdb --migrate
+Run development web server (inside VM or on host): > fab run.server
+Run backend services (inside VM or on host):       > fab run.backend
 
 Writing tests for FuzzEd
 ========================
@@ -62,4 +39,25 @@ editing of the test database with the editor, which can than be saved again.
 
 Run all tests stored in tests.py.
 
+Deploying FuzzEd
+================
+
+Please note that the machine were the packaging (and implicit build) takes place must be the same as the production machine. The smartest approach therefore is to develop in Vagrant with some distribution, and use then the same distro on the production host.
+
+> fab package.web
+> fab package.backend
+> fab deploy.web
+> fab.deploy.backend
+
+Acknowledgements
+================
+People who contributed to this project so far:
+
+Markus Götz    (core architecture, frontend)
+Frank Schlegel (core architecture, frontend)
+Stefan Richter (frontend)
+Franz Becker   (analysis)
+Lena Herscheid (analysis, simulation)
+Felix Kubicek  (frontend)
+Christian Kieschnick (frontend)
 

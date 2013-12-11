@@ -222,14 +222,15 @@ def naturaldocs():
         raise Exception('Execution of NaturalDocs compiler failed.')
 
 @task 
-def configs():
+def configs(target='development'):
     '''Builds the configuration files for sub projects out of settings.ini'''
+    assert(target in ['development','vagrant','production'])
     print 'Building configs...'
     f=open('FuzzEd/settings.py','w')
-    f.write(createDjangoSettings('settings.ini', ['development']))
+    f.write(createDjangoSettings('settings.ini', [target]))
     f.close()
     f=open('backends/daemon.ini','w')
-    f.write(createBackendSettings('settings.ini', ['development', 'backend_']))
+    f.write(createBackendSettings('settings.ini', [target, 'backend_']))
     f.close()
 
 def build_analysis_server_java():

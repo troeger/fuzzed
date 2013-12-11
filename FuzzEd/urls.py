@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns, static
+from django.http import HttpResponse
 
 from FuzzEd.models import Job
 from FuzzEd import settings
@@ -24,6 +25,7 @@ urlpatterns = patterns('',
     url(r'^dashboard/(?P<graph_id>\d+)/$', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
     url(r'^editor/(?P<graph_id>\d+)$', 'FuzzEd.views.editor', name='editor'),
     url(r'^snapshot/(?P<graph_id>\d+)$', 'FuzzEd.views.snapshot', name='snapshot'),
+    url(r'^robots\.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /admin/\nDisallow: /dashboard/\nDisallow: /editor/\n", mimetype="text/plain")),
 
     # API
     # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API

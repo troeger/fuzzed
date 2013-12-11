@@ -555,11 +555,11 @@ def job_files(request, job_secret):
             logger.debug("Storing result data for job %d"%job.pk)
             # Retrieve binary file and store it
             assert(len(request.FILES.values())==1)
-            job.result = request.FILES.values()[0]
+            job.result = request.FILES.values()[0].read()
             job.exit_code = 0       # This saves as a roundtrip. Having files means everything is ok.
             job.save()
             if not job.requires_download():
-                logger.debug(''.join(job.result.readlines()))
+                logger.debug(''.join(job.result))
             return HttpResponse()        
 
 @csrf_exempt

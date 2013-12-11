@@ -4,7 +4,7 @@ syntax: glob
 .DS_Store
 .vagrant
 .idea
-FuzzEd/static/css/theme/white.css
+build/
 FuzzEd/models/xml_analysis.py
 FuzzEd/models/xml_faulttree.py
 FuzzEd/models/xml_fuzztree.py

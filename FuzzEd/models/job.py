@@ -8,7 +8,7 @@ from south.modelsinspector import add_introspection_rules
 from FuzzEd.models import xml_analysis
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
-import uuid, json
+import uuid, json, xmlrpclib
 
 from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice, TransferInChoice
 
@@ -46,7 +46,7 @@ class Job(models.Model):
     secret         = models.CharField(max_length=64, default=gen_uuid)       # Unique secret for this job
     kind           = models.CharField(max_length=127, choices=JOB_TYPES)
     created        = models.DateTimeField(auto_now_add=True, editable=False)
-    result         = models.FileField(upload_to='jobs', null=True)           # Result file for this job
+    result         = models.BinaryField(null=True)                           # Result file for this job
     exit_code      = models.IntegerField(null=True)                          # Exit code for this job, NULL if pending
 
     def input_data(self):
@@ -66,16 +66,16 @@ class Job(models.Model):
         return self.kind in [Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB]
 
     def result_rendering(self):
-        ''' Returns the job result as something that the frontend understands.'''
-        json_result = {}
-        errors = {}
-        warnings = {}
+            ''' Returns the job result as something that the frontend understands.'''
+            json_result = {}
+            errors = {}
+            warnings = {}
 
-        try:
+        #try:
             assert(self.kind == Job.TOP_EVENT_JOB)
             assert(self.result)
 
-            result_data = ''.join(self.result.readlines())
+            result_data = str(self.result)
             doc = xml_analysis.CreateFromDocument(result_data)
 
             # Check global issues that are independent from the particular configuration
@@ -171,17 +171,15 @@ class Job(models.Model):
 
             return return_data
 
-        except Exception as e:
-            mail_managers('Error on analysis result XML->JSON conversion', '%s\n\n%s' % (str(result_data), str(e),))
-            raise HttpResponseServerErrorAnswer("We have an internal problem rendering your analysis result. Sorry! The developers are informed.")
+        #except Exception as e:
+        #    mail_managers('Error on analysis result XML->JSON conversion', '%s\n\n%s' % (str(result_data), str(e),))
+        #    raise HttpResponseServerErrorAnswer("We have an internal problem rendering your analysis result. Sorry! The developers are informed.")
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
-    ''' Informs notification listeners using the PostgresSQL NOTIFY / LISTEN tools.
-        Standard Postgres semantics apply, so if a listener does not pull a messages, than
-        it is queued by the database.
-        The payload contains the job URL prefix with a secret, which allows the listener to 
-        perform according actions
+    ''' Informs notification listeners.
+        The payload contains the job URL prefix with a secret, 
+        which allows the listener to perform according actions.
     '''
     if created:
         # The only way to determine our own hostname + port number at runtime in Django
@@ -193,9 +191,14 @@ def job_post_save(sender, instance, created, **kwargs):
         # by the test suite run accordingly
 
         #TODO: job_files_url = reverse('job_files', kwargs={'job_secret': instance.secret})
-        job_files_url = '%s/api/jobs/%s/' % (settings.SERVER, instance.secret,)
+        job_files_url = '%s/api/jobs/%s' % (settings.SERVER, instance.secret,)
 
-        cursor = connection.cursor()
-        cursor.execute("NOTIFY %s, '%s';" % (instance.kind, job_files_url,))
-        #print "Notification to: "+str(cursor.db.connection.dsn)
-        transaction.commit_unless_managed()
+        try:
+            # The proxy is instantiated here, since the connection should go away when finished
+            s = xmlrpclib.ServerProxy(settings.BACKEND_DAEMON)
+            logger.debug("Triggering %s job on url %s"%(instance.kind, job_files_url))
+            s.start_job(instance.kind, job_files_url)
+        except Exception as e:
+            mail_managers("Exception on backend call - "+settings.BACKEND_DAEMON,str(e))
+            raise HttpResponseServerErrorAnswer("Sorry, we seem to have a problem with the analysis backend. The admins are informed, thanks for the patience.")
+

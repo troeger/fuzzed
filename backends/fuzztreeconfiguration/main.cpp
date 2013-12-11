@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 			"errors.txt");	
 	}
 
-	std::vector<Issue> issues;
+	std::set<Issue> issues;
 	try
 	{
 		// do the actual transformation, write all files to dirPath
