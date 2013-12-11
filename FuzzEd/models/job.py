@@ -125,54 +125,54 @@ class Job(models.Model):
                         else:
                             warnings[issue.elementId]=issue.message
 
-            # If valid, analyze given results
-                if isValid:
-                    #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
-                    json_result['decompositionNumber'] = str(results[0].decompositionNumber)
-                    json_result['timestamp']           = results[0].timestamp
+            #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
+            if hasattr(results[0], 'decompositionNumber'):
+                json_result['decompositionNumber'] = str(results[0].decompositionNumber)
+            if hasattr(results[0], 'timestamp'):
+                json_result['timestamp'] = results[0].timestamp
 
-                    json_configs = []
-                    for result in results:
-                        # get the cost from the xml
-                        current_config = {}
-                        if hasattr(result.configuration, 'costs'):
-                            current_config['costs'] = result.configuration.costs
+            # gather information about the configurations
+            # TODO: If results are marked as invalid, show only the configurations
+            json_configs = []
+            for result in results:
+                # get the cost from the xml
+                current_config = {}
+                if hasattr(result.configuration, 'costs'):
+                    current_config['costs'] = result.configuration.costs
 
-                        # fetch the alphacuts
-                        json_alphacuts = {}
-                        for alpha_cut in result.probability.alphaCuts:
-                            json_alphacuts[alpha_cut.key] = [
-                                alpha_cut.value_.lowerBound,
-                                alpha_cut.value_.upperBound
-                            ]
-                        current_config['alphaCuts'] = json_alphacuts
+                # fetch the alphacuts
+                json_alphacuts = {}
+                if hasattr(result, 'probability'):
+                    for alpha_cut in result.probability.alphaCuts:
+                        json_alphacuts[alpha_cut.key] = [
+                            alpha_cut.value_.lowerBound,
+                            alpha_cut.value_.upperBound
+                        ]
+                    current_config['alphaCuts'] = json_alphacuts
 
-                        # tell something about the choices
-                        json_choices = {}
-                        if hasattr(result.configuration, 'choice'):
-                            for choice in result.configuration.choice:
-                                element     = choice.value_
-                                json_choice = {}
+                # tell something about the choices
+                json_choices = {}
+                if hasattr(result.configuration, 'choice'):
+                    for choice in result.configuration.choice:
+                        element     = choice.value_
+                        json_choice = {}
 
-                                if isinstance(element, FeatureChoice):
-                                    json_choice['type']      = 'FeatureChoice'
-                                    json_choice['featureId'] = element.featureId
-                                elif isinstance(element, InclusionChoice):
-                                    json_choice['type']     = 'InclusionChoice'
-                                    json_choice['included'] = element.included
-                                elif isinstance(element, RedundancyChoice):
-                                    json_choice['type'] = 'RedundancyChoice'
-                                    json_choice['n']    = int(element.n)
-                                else:
-                                    raise ValueError('Unknown choice %s' % element)
-                                json_choices[choice.key] = json_choice
-                        current_config['choices'] = json_choices
+                        if isinstance(element, FeatureChoice):
+                            json_choice['type']      = 'FeatureChoice'
+                            json_choice['featureId'] = element.featureId
+                        elif isinstance(element, InclusionChoice):
+                            json_choice['type']     = 'InclusionChoice'
+                            json_choice['included'] = element.included
+                        elif isinstance(element, RedundancyChoice):
+                            json_choice['type'] = 'RedundancyChoice'
+                            json_choice['n']    = int(element.n)
+                        else:
+                            raise ValueError('Unknown choice %s' % element)
+                        json_choices[choice.key] = json_choice
+                current_config['choices'] = json_choices
 
-                        json_configs.append(current_config)
-                    json_result['configurations'] = json_configs
-
-
-
+                json_configs.append(current_config)
+            json_result['configurations'] = json_configs
 
             json_result['errors']         = errors
             json_result['warnings']       = warnings

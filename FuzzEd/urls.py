@@ -64,7 +64,7 @@ urlpatterns = patterns('',
     url(r'^api/graphs/(?P<graph_id>\d+)/analysis/cutsets$', 
         'FuzzEd.api.job_create', {'job_kind': Job.CUTSETS_JOB}, name='analyze_cutsets'),
     url(r'^api/graphs/(?P<graph_id>\d+)/analysis/topEventProbability$',
-        'FuzzEd.api.job_create', {'job_kind': Job.SIMULATION_JOB}, name='analyze_top_event_probability'),
+        'FuzzEd.api.job_create', {'job_kind': Job.TOP_EVENT_JOB}, name='analyze_top_event_probability'),
 
     # simulation
     url(r'^api/graphs/(?P<graph_id>\d+)/simulation/topEventProbability$',
