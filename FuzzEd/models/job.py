@@ -8,7 +8,7 @@ from south.modelsinspector import add_introspection_rules
 from FuzzEd.models import xml_analysis, xml_simulation
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
-import uuid, json, xmlrpclib
+import uuid, json, xmlrpclib, math
 
 from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice, TransferInChoice
 
@@ -143,17 +143,19 @@ class Job(models.Model):
                 if hasattr(result.configuration, 'costs'):
                     current_config['costs'] = result.configuration.costs
                 else:
-                    current_config['costs'] = "N/A"
+                    current_config['costs'] = None
                 # TODO: Compute these values
                 if (self.kind == Job.TOP_EVENT_JOB):
-                    current_config['min'] = 0.0
-                    current_config['peak'] = 0.0
-                    current_config['max'] = 0.0
-                    current_config['ratio'] = 0.0
+                    current_config['min'] = None
+                    current_config['peak'] = None
+                    current_config['max'] = None
+                    current_config['ratio'] = None
                 elif (self.kind == Job.SIMULATION_JOB):
-                    current_config['reliability'] = 0.0
-                    current_config['mttf'] = 0.0
-                    current_config['ratio'] = 0.0
+                    reliability = float(result.reliability)
+                    current_config['reliability'] = None if math.isnan(reliability) else reliability
+                    mttf = float(result.mttf)
+                    current_config['mttf'] = None if math.isnan(mttf) else mttf
+                    current_config['ratio'] = None
 
                 # fetch the alphacuts
 #                json_alphacuts = {}
