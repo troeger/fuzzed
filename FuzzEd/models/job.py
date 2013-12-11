@@ -134,21 +134,44 @@ class Job(models.Model):
             # gather information about the configurations
             # TODO: If results are marked as invalid, show only the configurations
             json_configs = []
-            for result in results:
+            for confignum, result in enumerate(results):
                 # get the cost from the xml
                 current_config = {}
+
+                current_config['num'] = confignum
+
                 if hasattr(result.configuration, 'costs'):
                     current_config['costs'] = result.configuration.costs
+                else:
+                    current_config['costs'] = "N/A"
+                # TODO: Compute these values
+                if (self.kind == Job.TOP_EVENT_JOB):
+                    current_config['min'] = 0.0
+                    current_config['peak'] = 0.0
+                    current_config['max'] = 0.0
+                    current_config['ratio'] = 0.0
+                elif (self.kind == Job.SIMULATION_JOB):
+                    current_config['reliability'] = 0.0
+                    current_config['mttf'] = 0.0
+                    current_config['ratio'] = 0.0
 
                 # fetch the alphacuts
-                json_alphacuts = {}
+#                json_alphacuts = {}
+#                if hasattr(result, 'probability'):
+#                    for alpha_cut in result.probability.alphaCuts:
+#                        json_alphacuts[alpha_cut.key] = [
+#                            alpha_cut.value_.lowerBound,
+#                            alpha_cut.value_.upperBound
+#                        ]
+#                    current_config['alphaCuts'] = json_alphacuts
+
+                # prepare graph rendering data for this configuration
+                json_points = []
                 if hasattr(result, 'probability'):
                     for alpha_cut in result.probability.alphaCuts:
-                        json_alphacuts[alpha_cut.key] = [
-                            alpha_cut.value_.lowerBound,
-                            alpha_cut.value_.upperBound
-                        ]
-                    current_config['alphaCuts'] = json_alphacuts
+                        json_points.append([alpha_cut.value_.lowerBound, alpha_cut.key])
+                        json_points.append([alpha_cut.value_.upperBound, alpha_cut.key])
+                current_config['points'] = json_points
 
                 # tell something about the choices
                 json_choices = {}
