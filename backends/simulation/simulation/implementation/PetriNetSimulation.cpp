@@ -219,11 +219,9 @@ PetriNetSimulation::PetriNetSimulation(
 	unsigned int simulationSteps,	// the number of logical simulation steps performed in each round
 	unsigned int numRounds,
 	double convergenceThresh,
-	bool simulateUntilFailure,
-	unsigned int numAdaptiveRounds /*= 0*/)
+	bool simulateUntilFailure)
 	: Simulation(inPath, simulationTime, simulationSteps, numRounds),
 	m_simulateUntilFailure(simulateUntilFailure),
-	m_numAdaptiveRounds(numAdaptiveRounds),
 	m_convergenceThresh(convergenceThresh)
 {
 	assert(!m_netFile.empty());

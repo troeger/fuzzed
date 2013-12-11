@@ -43,7 +43,6 @@ SimulationProxy::SimulationProxy(int argc, char** arguments) :
 	m_convergenceThresh(0.0),
 	m_simulationTime(0),
 	m_bSimulateUntilFailure(true),
-	m_numAdaptiveRounds(0),
 	m_timeNetProperties(nullptr)
 {
 	try
@@ -66,14 +65,11 @@ SimulationProxy::SimulationProxy(unsigned int numRounds, double convergenceThres
 	m_convergenceThresh(convergenceThreshold),
 	m_simulationTime(maxTime),
 	m_bSimulateUntilFailure(true),
-	m_numAdaptiveRounds(0),
 	m_timeNetProperties(nullptr)
 {}
 
 SimulationResultStruct SimulationProxy::runSimulationInternal(
 	const boost::filesystem::path& petriNetFile,
-	const boost::filesystem::path& outPath,
-	const boost::filesystem::path& workingDir,
 	SimulationImpl implementationType,
 	void* additionalArguments) 
 {
@@ -96,8 +92,7 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 				m_missionTime, 
 				m_numRounds,
 				m_convergenceThresh,
-				m_bSimulateUntilFailure,
-				m_numAdaptiveRounds);
+				m_bSimulateUntilFailure);
 
 			break;
 		}
@@ -133,36 +128,6 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 	return res;
 }
 
-void SimulationProxy::simulateFile(const fs::path& p, SimulationImpl impl)
-{	
-	auto ext = p.generic_string();
-	ext = ext.substr(ext.find_last_of("."), ext.length());
-
-	std::string outFile = p.generic_string();
-	std::string workingDir = p.generic_string();
-	util::replaceFileExtensionInPlace(outFile, ".xml");
-	util::replaceFileExtensionInPlace(workingDir, "");
-	
-	if (ext == fuzzTree::FUZZ_TREE_EXT)
-		simulateAllConfigurations(p, outFile, workingDir, impl);
-
-	else if (ext == faultTree::FAULT_TREE_EXT)
-	{
-		ifstream file(p.generic_string(), ios::in | ios::binary);
-		if (!file.is_open())
-		{
-			std::cerr << "Could not open file: " << p.generic_string() << std::endl;
-		}
-
-		const auto simTree = faulttree::faultTree(file, xml_schema::Flags::dont_validate);
-		std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
-		
-		string pnFile = p.generic_string();
-		util::replaceFileExtensionInPlace(pnFile, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
-		simulateFaultTree(ft, p, outFile, workingDir, impl);
-	}
-}
-
 bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
 {
 	return
@@ -174,9 +139,8 @@ bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
 
 SimulationResultStruct SimulationProxy::simulateFaultTree(
 	std::shared_ptr<TopLevelEvent> ft,
-	const boost::filesystem::path& input,
-	const boost::filesystem::path& output,
 	const boost::filesystem::path& workingDir,
+	std::ofstream* logfile,
 	SimulationImpl impl)
 {
 	std::shared_ptr<PNDocument> doc;
@@ -207,19 +171,25 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 	if (impl == STRUCTUREFORMULA_ONLY)
 		return SimulationResultStruct();
 
-	std::string petriNetFile = workingDir.generic_string() + "petrinet";
-	util::replaceFileExtensionInPlace(petriNetFile, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
+	const std::string petriNetFile = 
+		workingDir.generic_string() + "petrinet" + 
+		std::string((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
 
 	if (!doc->save(petriNetFile))
-		throw FatalException(std::string("Could not save petri net file: ") + petriNetFile);
+	{
+		std::string err = std::string("Could not save petri net file: ") + petriNetFile;
+		*logfile << err;
+		throw FatalException(err);
+	}
 
-	return runSimulationInternal(petriNetFile, output, workingDir, impl, m_timeNetProperties);
+	return runSimulationInternal(petriNetFile, impl, m_timeNetProperties);
 }
 
 void SimulationProxy::simulateAllConfigurations(
 	const fs::path& inputFile,
 	const fs::path& outputFile,
 	const fs::path& workingDir,
+	const fs::path& logFile,
 	SimulationImpl impl)
 {
 	const auto inFile = inputFile.generic_string();
@@ -227,10 +197,7 @@ void SimulationProxy::simulateAllConfigurations(
 	if (!file.is_open())
 		throw runtime_error("Could not open file");
 
-	auto logFileStream = new std::ofstream(
-		workingDir.generic_string() +
-		util::slash +
-		"errors.txt");
+	auto logFileStream = new std::ofstream(logFile.generic_string());
 
 	simulationResults::SimulationResults simResults;
 
@@ -245,7 +212,7 @@ void SimulationProxy::simulateAllConfigurations(
 			if (ft)
 			{ // in this case there is only a faulttree, so no configuration information will be serialized
 
-				SimulationResultStruct res = simulateFaultTree(ft, inputFile, outputFile, workingDir, impl);
+				SimulationResultStruct res = simulateFaultTree(ft, workingDir, logFileStream, impl);
 				simulationResults::Result r(
 					ft->getId(),
 					util::timeStamp(),
@@ -258,7 +225,7 @@ void SimulationProxy::simulateAllConfigurations(
 				r.availability(res.meanAvailability);
 				r.duration(res.duration);
 				r.mttf(res.mttf);
-
+				
 				simResults.result().push_back(r);
 			}
 			else
@@ -272,7 +239,7 @@ void SimulationProxy::simulateAllConfigurations(
 			{
 				std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
 				{
-					auto res = simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
+					auto res = simulateFaultTree(simTree, workingDir, logFileStream, impl);
 
 					// debug output
 					// 			simTree->print(cout, 0);
@@ -290,7 +257,6 @@ void SimulationProxy::simulateAllConfigurations(
 					r.availability(res.meanAvailability);
 					r.duration(res.duration);
 					r.mttf(res.mttf);
-
 					r.configuration(serializedConfiguration(ft.first));
 
 					simResults.result().push_back(r);
@@ -315,26 +281,16 @@ void SimulationProxy::simulateAllConfigurations(
 
 void SimulationProxy::parseCommandline_default(int numArguments, char** arguments)
 {
-	// TODO: command line options
 	m_numRounds = DEFAULT_SIMULATION_ROUNDS;
 	m_simulationTime = DEFAULT_SIMULATION_TIME;
 	
 	CommandLineParser parser;
 	parser.parseCommandline(numArguments, arguments);
 
-	// this is seriously broken
-// 	const auto additionalArgs = parser.getAdditionalArguments();
-// 	const int numAdditionalArgs = additionalArgs.size();
-// 	if (numAdditionalArgs > 0) 
-// 	{
-// 		m_numRounds = atoi(additionalArgs[0].c_str());
-// 		if (numAdditionalArgs > 1)
-// 			m_simulationTime = atoi(additionalArgs[1].c_str());
-// 	}
-	
 	simulateAllConfigurations(
 		parser.getInputFilePath(),
 		parser.getOutputFilePath(),
 		parser.getWorkingDirectory(),
+		parser.getLogFilePath(),
 		DEFAULT);
 }
