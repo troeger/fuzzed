@@ -138,7 +138,7 @@ class Job(models.Model):
                 # get the cost from the xml
                 current_config = {}
 
-                current_config['num'] = confignum
+                current_config['id'] = '#%s' % confignum
 
                 if hasattr(result.configuration, 'costs'):
                     current_config['costs'] = result.configuration.costs
@@ -167,11 +167,11 @@ class Job(models.Model):
 
                 # prepare graph rendering data for this configuration
                 json_points = []
-                if hasattr(result, 'probability'):
+                if hasattr(result, 'probability') and self.kind == Job.TOP_EVENT_JOB:
                     for alpha_cut in result.probability.alphaCuts:
                         json_points.append([alpha_cut.value_.lowerBound, alpha_cut.key])
                         json_points.append([alpha_cut.value_.upperBound, alpha_cut.key])
-                current_config['points'] = json_points
+                    current_config['points'] = json_points
 
                 # tell something about the choices
                 json_choices = {}
