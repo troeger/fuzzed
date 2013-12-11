@@ -228,7 +228,7 @@ void SimulationProxy::simulateAllConfigurations(
 	simulationResults::SimulationResults simResults;
 
 	std::set<Issue> issues;
-	FuzzTreeTransform ftTransform(file, issues); // TODO correct stream
+	FuzzTreeTransform ftTransform(file, issues);
 	if (!ftTransform.isValid())
 	{
 		const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
@@ -243,49 +243,58 @@ void SimulationProxy::simulateAllConfigurations(
 				ft->getCost(),
 				res.reliability,
 				res.nFailures,
-				res.nRounds);
-
-			r.availability(res.meanAvailability);
-			r.duration(res.duration);
-			r.mttf(res.mttf);
-		}
-		else
-			std::cerr << "Could handle fault tree file: " << inFile << endl;
-			
-		return;
-	}
-
-	for (const auto& ft : ftTransform.transform())
-	{
-		std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
-		{
-			auto res = simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
-
-			// debug output
-// 			simTree->print(cout, 0);
-// 			fuzztree::fuzzTree(cout, ft.second);
-
-			simulationResults::Result r(
-				simTree->getId(),
-				util::timeStamp(),
-				simTree->getCost(),
-				res.reliability,
-				res.nFailures,
-				res.nRounds);
+				res.nRounds,
+				res.isValid());
 
 			r.availability(res.meanAvailability);
 			r.duration(res.duration);
 			r.mttf(res.mttf);
 
-			r.configuration(serializedConfiguration(ft.first));
 			simResults.result().push_back(r);
 		}
+		else
+		{
+			issues.insert(Issue::fatalIssue("Could not read fault tree. Problem during transformation."));
+		}
 	}
-	xml_schema::NamespaceInfomap map;
-	map["simulationResults"].name = "sr";
-	
+	else
+	{
+		for (const auto& ft : ftTransform.transform())
+		{
+			std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
+			{
+				auto res = simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
+
+				// debug output
+				// 			simTree->print(cout, 0);
+				// 			fuzztree::fuzzTree(cout, ft.second);
+
+				simulationResults::Result r(
+					simTree->getId(),
+					util::timeStamp(),
+					simTree->getCost(),
+					res.reliability,
+					res.nFailures,
+					res.nRounds,
+					res.isValid());
+
+				r.availability(res.meanAvailability);
+				r.duration(res.duration);
+				r.mttf(res.mttf);
+
+				r.configuration(serializedConfiguration(ft.first));
+
+				simResults.result().push_back(r);
+			}
+		}
+	}
+
+	// Log errors
+	for (const Issue& issue : issues)
+		simResults.issue().push_back(issue.serialized());
+
 	std::ofstream output(outputFile.generic_string());
-	simulationResults::simulationResults(output, simResults, map, "UTF-8");
+	simulationResults::simulationResults(output, simResults);
 }
 
 void SimulationProxy::parseCommandline_default(int numArguments, char** arguments)
