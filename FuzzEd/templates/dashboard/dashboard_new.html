@@ -14,7 +14,7 @@
     </h1>
 </div>
 
-<form method="POST" action="projects/{{ project_id }}/dashboard/new/" class="form-horizontal">
+<form method="POST" action="{% url 'dashboard_new' project.pk %}" class="form-horizontal">
     {% csrf_token %}
     <fieldset>
         <div class="form-group">
@@ -34,7 +34,7 @@
         <div class="form-group">
             <div class="col-push-2 col-lg-10">
                 <button type="submit" name="save" value="save" class="btn btn-primary">Create</button>
-                <a class="btn btn-default" href="/dashboard/">Cancel</a>
+                <a class="btn btn-default" href="{% url 'dashboard' project.pk %}">Cancel</a>
             </div>
         </div>
 

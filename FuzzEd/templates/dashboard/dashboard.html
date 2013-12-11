@@ -48,7 +48,7 @@
     </h1>
 </div>
 
-<form action="projects/{{ project_id }}/dashboard/new/" method="post">
+<form action="{% url 'dashboard_new' project.pk %}" method="post">
     {% csrf_token %}
     <div class="btn-group pull-right">
         <button type="submit" name="kind" value="faulttree" class="btn btn-default">
@@ -98,7 +98,7 @@
                     <td><span class="label label-info">{{ name }}</span></td>
                     <td>{{ graph.created }}</td>
                     <td style="text-align: right;">
-                        <form action="/dashboard/{{ graph.pk }}/" method="POST">
+                        <form action="/graphs/{{ graph.pk }}/" method="POST">
                             {% csrf_token %}
                             <input type="hidden" class="delete_flag">
                             <button type="submit" name="edit" value="edit" class="btn btn-default btn-small">

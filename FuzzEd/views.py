@@ -165,7 +165,7 @@ def dashboard(request, project_id):
         raise Http404
     
     graphs = project.graphs.filter(deleted=False).order_by('-created')
-    parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs]}
+    parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs], 'project': project.to_dict()}
 
     return render(request, 'dashboard/dashboard.html', parameters)
 
@@ -200,7 +200,8 @@ def dashboard_new(request, project_id):
         kind = POST['kind']
         parameters = {
             'kind': kind,
-            'name': notations.by_kind[kind]['name']
+            'name': notations.by_kind[kind]['name'],
+            'project' : project.to_dict()
         }
         return render(request, 'dashboard/dashboard_new.html', parameters)
 
@@ -224,6 +225,8 @@ def dashboard_edit(request, graph_id):
      {HttpResponse} a django response object
     """
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
+    project = graph.project
+    
     POST  = request.POST
 
     # the owner made changes to the graph's field, better save it (if we can)
@@ -231,19 +234,19 @@ def dashboard_edit(request, graph_id):
         graph.name = POST.get('name', '')
         graph.save()
         messages.add_message(request, messages.SUCCESS, 'Graph saved.')
-        return redirect('dashboard')
+        return redirect('dashboard', project_id = project.id)
 
     # deletion requested? do it and go back to dashboard
     elif POST.get('delete'):
         commands.DeleteGraph.create_from(graph_id).do()
         messages.add_message(request, messages.SUCCESS, 'Graph deleted.')
-        return redirect('dashboard')
+        return redirect('dashboard', project_id = project.id)
 
     # copy requested
     elif POST.get('copy'):
         old_graph = Graph.objects.get(pk=graph_id)
         duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
-                                                          owner=request.user,  add_default_nodes=False)
+                                                          owner=request.user,  add_default_nodes=False, project=project)
         duplicate_command.do()
         new_graph = duplicate_command.graph
 
@@ -251,12 +254,12 @@ def dashboard_edit(request, graph_id):
         new_graph.save()
 
         messages.add_message(request, messages.SUCCESS, 'Graph duplicated.')
-        return redirect('dashboard')
+        return redirect('dashboard', project_id = project.id)
 
     elif POST.get('snapshot'):
         old_graph = Graph.objects.get(pk=graph_id)
         duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
-                                                          owner=request.user, add_default_nodes=False)
+                                                          owner=request.user, add_default_nodes=False, project=project)
         duplicate_command.do()
         new_graph = duplicate_command.graph
 
@@ -265,7 +268,7 @@ def dashboard_edit(request, graph_id):
         new_graph.save()
 
         messages.add_message(request, messages.SUCCESS, 'Created snapshot.')
-        return redirect('dashboard')
+        return redirect('dashboard', project_id=project.id)
 
 
     # please show the edit page to the user on get requests
@@ -333,7 +336,8 @@ def editor(request, graph_id):
         graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     if graph.read_only:
         return HttpResponseBadRequest()
-
+    
+    project  = graph.project     
     notation = notations.by_kind[graph.kind]
     nodes    = notation['nodes']
 
@@ -341,7 +345,8 @@ def editor(request, graph_id):
         'graph':          graph,
         'graph_notation': notation,
         'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
-        'greetings':      GREETINGS
+        'greetings':      GREETINGS, 
+        'project' :       project.to_dict()
     }
 
     return render(request, 'editor/editor.html', parameters)
