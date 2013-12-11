@@ -520,6 +520,17 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
         },
 
         /**
+         * Method: _fullUrlForSimulation
+         *   Calculates the AJAX backend URL for this simulation resources for this graph (see: <Backend::_graphId>).
+         *
+         * Returns:
+         *   The analysis URL as {String}.
+         */
+        _fullUrlForSimulation: function() {
+            return this._fullUrlForGraph() + Config.Backend.SIMULATION_URL;
+        },
+
+        /**
          * Method: _fullUrlForGraph
          *   Calculates the AJAX backend URL for this graph (see: <Backend::_graphId>).
          *
@@ -613,7 +624,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *   The simulation probability URL as {String}.
          */
         _fullUrlForSimulatedProbability: function() {
-            return this._fullUrlForAnalysis() + Config.Backend.SIMULATED_PROBABILITY_URL;
+            return this._fullUrlForSimulation() + Config.Backend.SIMULATED_PROBABILITY_URL;
         },
 
         /**

@@ -63,6 +63,7 @@ define(['underscore'], function() {
          *
          *  Constants:
          *    {String} ANALYSIS_URL               - Part of the sub-URL that is common for all analysis calls.
+         *    {String} SIMULATION_URL             - Part of the sub-URL that is common for all simulation calls.
          *    {String} BASE_URL                   - Part of the sub-URL that is common for all API calls.
          *    {String} EDITOR_URL                 - Part of the sub-URL that is common for all editor API calls.
          *    {String} GRAPHS_URL                 - Part of the sub-URL used to perform graph-specific API calls.
@@ -76,6 +77,7 @@ define(['underscore'], function() {
          */
         Backend: {
             ANALYSIS_URL:               '/analysis',
+            SIMULATION_URL:             '/simulation',
             BASE_URL:                   '/api',
             EDITOR_URL:                 '/editor',
             GRAPHS_URL:                 '/graphs',
@@ -84,7 +86,7 @@ define(['underscore'], function() {
             TRANSFERS_URL:              '/transfers',
             CUTSETS_URL:                '/cutsets',
             ANALYTICAL_PROBABILITY_URL: '/topEventProbability',
-            SIMULATED_PROBABILITY_URL:  '/', //TODO
+            SIMULATED_PROBABILITY_URL:  '/topEventProbability',
             GRAPH_EXPORT_URL:           '/exports'
         },
 
