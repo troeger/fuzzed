@@ -379,9 +379,9 @@ def login(request):
 
             linkOpenID(new_user, user.openid_claim)
             mail_managers('New user', str(new_user), fail_silently=True)
-
-            return redirect('/login/?openid_identifier=%s' % 
-                            urllib.quote_plus(request.session['openid_identifier'])) 
-
+            
+            return redirect('/login/?openid_identifier=%s' % urllib.quote_plus(request.session['openid_identifier'])) 
+            
         auth.login(request, user)
     return redirect('dashboard')
+            
