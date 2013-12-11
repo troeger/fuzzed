@@ -294,9 +294,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 var configID = '';
 
                 _.each(data.configurations, function(config, index) {
-                    //TODO: better naming?
-                    configID = '#' + (index + 1);
-                    var displayData = this._convertToDisplayFormat(config);
+                    configID = config['id'];
 
                     // remember the nodes and edges involved in this config for later highlighting
                     this._collectNodesAndEdgesForConfiguration(configID, config['choices']);
@@ -309,13 +307,27 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         }
                     }.bind(this));
 
-                    chartData[configID] = displayData['series'];
-                    // add the name to the statistics for displaying it in a table cell later
-                    displayData['statistics']['id'] = configID;
-                    tableData.push(displayData['statistics']);
+                    // collect chart data if given
+                    if (typeof config['points'] !== 'undefined') {
+                        chartData[configID] = config['points'];
+                    }
+
+                    // collect table rows
+                    // they are basically the configs without the points and choices
+                    var tableEntry = config;
+                    // delete keys we no longer need
+                    tableEntry['points'] = undefined;
+                    tableEntry['choices'] = undefined;
+                    tableData.push(tableEntry);
+
                 }.bind(this));
 
-                this._displayResultWithHighcharts(chartData, data['decompositionNumber']);
+                // remove progress bar
+                this._chartContainer.empty();
+                // only display chart if points were given
+                if (_.size(chartData) != 0) {
+                    this._displayResultWithHighcharts(chartData, data['decompositionNumber']);
+                }
                 this._displayResultWithSlickGrid(tableData);
 
                 this._setupResizing();
@@ -366,21 +378,6 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         /**
          *  Group: Conversion
          */
-
-        /**
-         *  Methods: _convertToDisplayFormat
-         *    _Abstract_, converts a data series of a configuration from API JSON to the Highcharts format incl. statistics.
-         *
-         *  Parameters:
-         *    {JSON} configuration - The configuration object received from the backend.
-         *
-         *  Returns:
-         *    An object containing an array-of-arrays representation of the input that can be used by Highcharts to
-         *    plot the data as specified by <_getDataColumns>.
-         */
-        _convertToDisplayFormat: function(configuration) {
-            throw new SubclassResponsibility();
-        },
 
         /**
          *  Method: _collectNodesAndEdgesForConfiguration
@@ -471,14 +468,13 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *    Display the job's result in the menu's body using Highcharts.
          *
          *  Parameters:
-         *    {Array} data                - A set of one or more data series to display in the Highchart.
-         *    {int}   decompositionNumber - [optional] Number of decompositions of the result. Used for calculating
-         *                                  the tick of the y-axis.
+         *    {Array} data  - A set of one or more data series to display in the Highchart.
+         *    {int}   yTick - [optional] The tick of the y-axis (number of lines).
          */
-        _displayResultWithHighcharts: function(data, decompositionNumber) {
+        _displayResultWithHighcharts: function(data, yTick) {
             if (data.length == 0) return;
 
-            decompositionNumber = decompositionNumber || 5;
+            yTick = yTick || 5;
 
             var series = [];
 
@@ -523,7 +519,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         text: null
                     },
                     tickInterval: 1.0,
-                    minorTickInterval: 1.0 / decompositionNumber
+                    minorTickInterval: 1.0 / yTick
                 },
 
                 tooltip: {
@@ -766,12 +762,12 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             }
 
             return [
-                { id: 'id',              name: 'Config',     field: 'id',              sortable: true },
-                { id: 'min',             name: 'Min',        field: 'min',             sortable: true, formatter: shorten },
-                { id: 'peak',            name: 'Peak',       field: 'peak',            sortable: true, formatter: shorten },
-                { id: 'max',             name: 'Max',        field: 'max',             sortable: true, formatter: shorten },
-                { id: 'costs',           name: 'Costs',      field: 'costs',           sortable: true },
-                { id: 'ineffectiveness', name: 'Peak/Costs', field: 'ineffectiveness', sortable: true, minWidth: 150}
+                { id: 'id',     name: 'Config',     field: 'id',     sortable: true },
+                { id: 'min',    name: 'Min',        field: 'min',    sortable: true, formatter: shorten },
+                { id: 'peak',   name: 'Peak',       field: 'peak',   sortable: true, formatter: shorten },
+                { id: 'max',    name: 'Max',        field: 'max',    sortable: true, formatter: shorten },
+                { id: 'costs',  name: 'Costs',      field: 'costs',  sortable: true },
+                { id: 'ratio',  name: 'Peak/Costs', field: 'ratio',  sortable: true, minWidth: 150}
             ];
         },
 
@@ -798,48 +794,6 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
         _progressMessage: function() {
             return 'Calculating probability...';
-        },
-
-        /**
-         *  Methods: _convertToDisplayFormat
-         *    Converts a data series of a configuration from API JSON to the Highcharts format incl. statistics.
-         *
-         *  Parameters:
-         *    {JSON} configuration - The configuration object received from the backend, containing 'alphacuts'
-         *                           (e.g., "{"0.0": [0.2, 0.5], "1.0": [0.4, 0.4]}") and 'costs'.
-         *
-         *  Returns:
-         *    An object containing an array-of-arrays representation of the input that can be used by Highcharts to
-         *    plot the data ('series'), and the 'min', 'max' and 'peak' probabilities in a 'statistics' field.
-         */
-        _convertToDisplayFormat: function(configuration) {
-            var dataPoints = [];
-            var max = 0.0; var min = 1.0; var peak = 0.0; var peakY = 0.0;
-            _.each(configuration['alphaCuts'], function(values, key) {
-                var y = parseFloat(key);
-                _.each(values, function(x) {
-                    dataPoints.push([x, y]);
-                    // track statistics
-                    if (x < min) min = x;
-                    if (x > max) max = x;
-                    if (peakY < y) {peakY = y; peak = x}
-                });
-            });
-
-            var series = _.sortBy(dataPoints, function(point) {
-                return point[0];
-            });
-
-            return {
-                series: series,
-                statistics: {
-                    min:             min,
-                    max:             max,
-                    peak:            peak,
-                    ineffectiveness: configuration['costs'] ? peak / configuration['costs'] : '-',
-                    costs:           configuration['costs']
-                }
-            };
         }
     });
 
@@ -883,20 +837,18 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 return Highcharts.numberFormat(value, 5);
             }
 
-            //TODO: adapt to JSON format
             return [
-                { id: 'id',              name: 'Config',     field: 'id',              sortable: true },
-                { id: 'min',             name: 'Min',        field: 'min',             sortable: true, formatter: shorten },
-                { id: 'peak',            name: 'Peak',       field: 'peak',            sortable: true, formatter: shorten },
-                { id: 'max',             name: 'Max',        field: 'max',             sortable: true, formatter: shorten },
-                { id: 'costs',           name: 'Costs',      field: 'costs',           sortable: true },
-                { id: 'ineffectiveness', name: 'Peak/Costs', field: 'ineffectiveness', sortable: true, minWidth: 150}
+                { id: 'id',          name: 'Config',      field: 'id',          sortable: true },
+                { id: 'mttf',        name: 'MTTF',        field: 'mttf',        sortable: true },
+                { id: 'reliability', name: 'Reliability', field: 'reliability', sortable: true },
+                { id: 'costs',       name: 'Costs',       field: 'costs',       sortable: true },
+                { id: 'ratio',       name: 'Ratio',       field: 'ratio',       sortable: true, minWidth: 150}
             ];
         },
 
         /**
          *  Method: _chartTooltipFormatter
-         *    Function used to format the toolip that appears when hovering over a data point in the chart.
+         *    Function used to format the tooltip that appears when hovering over a data point in the chart.
          *    The scope object ('this') contains the x and y value of the corresponding point.
          *
          *  Returns:
@@ -918,49 +870,6 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
         _progressMessage: function() {
             return 'Simulating probability...';
-        },
-
-        /**
-         *  Methods: _convertToDisplayFormat
-         *    Converts a data series of a configuration from API JSON to the Highcharts format incl. statistics.
-         *
-         *  Parameters:
-         *    {JSON} configuration - The configuration object received from the backend, containing 'alphacuts'
-         *                           (e.g., "{"0.0": [0.2, 0.5], "1.0": [0.4, 0.4]}") and 'costs'.
-         *
-         *  Returns:
-         *    An object containing an array-of-arrays representation of the input that can be used by Highcharts to
-         *    plot the data ('series'), and the 'min', 'max' and 'peak' probabilities in a 'statistics' field.
-         */
-        _convertToDisplayFormat: function(configuration) {
-            //TODO: adapt to simulation results
-            var dataPoints = [];
-            var max = 0.0; var min = 1.0; var peak = 0.0; var peakY = 0.0;
-            _.each(configuration['alphaCuts'], function(values, key) {
-                var y = parseFloat(key);
-                _.each(values, function(x) {
-                    dataPoints.push([x, y]);
-                    // track statistics
-                    if (x < min) min = x;
-                    if (x > max) max = x;
-                    if (peakY < y) {peakY = y; peak = x}
-                });
-            });
-
-            var series = _.sortBy(dataPoints, function(point) {
-                return point[0];
-            });
-
-            return {
-                series: series,
-                statistics: {
-                    min:             min,
-                    max:             max,
-                    peak:            peak,
-                    ineffectiveness: configuration['costs'] ? peak / configuration['costs'] : '-',
-                    costs:           configuration['costs']
-                }
-            };
         }
     });
 
