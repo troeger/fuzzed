@@ -29,7 +29,7 @@ bool PetriNetSimulation::run()
 	// cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads..." << std::endl;
 
 	// for checking local convergence, thread-local
-	long double privateLast = 10000.0L;
+	double privateLast = 10000.0;
 	bool privateConvergence = false;
 	bool privateBreak = false;
 
@@ -114,8 +114,8 @@ bool PetriNetSimulation::run()
 			sumFailureTime_fail += res.failureTime;
 		}
 
-		const long double current = (count == 0) ? 0 : ((long double)numFailures/(long double)count);
-		const long double diff = std::abs(privateLast - current);
+		const double current = (count == 0) ? 0 : ((double)numFailures/(double)count);
+		const double diff = std::abs(privateLast - current);
 
 		if ((current > 0.0L) && (current < 1.0L) && (diff < m_convergenceThresh))
 		{
@@ -182,10 +182,10 @@ bool PetriNetSimulation::run()
 	
 	const auto elapsedTime = std::chrono::system_clock::now() - startTime;
 
-	long double unreliability		= (long double)numFailures			/(long double)count;
-	long double avgFailureTime_all	= (long double)sumFailureTime_all	/(long double)count;
-	long double avgFailureTime_fail = (long double)sumFailureTime_fail	/(long double)numFailures;
-	long double meanAvailability	= avgFailureTime_fail				/(long double)m_numSimulationSteps;
+	double unreliability		= (double)numFailures			/(double)count;
+	double avgFailureTime_all	= (double)sumFailureTime_all	/(double)count;
+	double avgFailureTime_fail = (double)sumFailureTime_fail	/(double)numFailures;
+	double meanAvailability	= avgFailureTime_fail				/(double)m_numSimulationSteps;
 	
 	SimulationResultStruct res;
 	res.reliability			= 1.0 - unreliability;

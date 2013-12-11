@@ -7,7 +7,7 @@ public:
 	typedef std::tuple<int /*not failed*/, int /*failed*/, int /*failure transition*/> PNSpec;
 	typedef std::pair<int /*placeID*/,int /*spareActivationTransition*/> PNSpareSpec;
 
-	BasicEvent(const std::string& ID, long double failureRate, const std::string& name = "", const int cost = 1);
+	BasicEvent(const std::string& ID, double failureRate, const std::string& name = "", const int cost = 1);
 	
 	virtual FaultTreeNode::Ptr clone() const override; // virtual deep copying
 
