@@ -4221,16 +4221,29 @@ i.icon-progress {
   min-width: 200px;
 }
 /*
- *  Probability Menu
+ *  Probability Menus
  */
-#FuzzEdProbabilityMenu {
+#FuzzEdAnalyticalProbabilityMenu {
   display: none;
   top: 60px;
   left: 240px;
   min-width: 400px;
   min-height: 100px;
 }
-#FuzzEdProbabilityMenu .content {
+#FuzzEdAnalyticalProbabilityMenu .content {
+  width: 100%;
+  height: 100%;
+  min-width: 400px;
+  min-height: 100px;
+}
+#FuzzEdSimulatedProbabilityMenu {
+  display: none;
+  top: 60px;
+  left: 240px;
+  min-width: 400px;
+  min-height: 100px;
+}
+#FuzzEdSimulatedProbabilityMenu .content {
   width: 100%;
   height: 100%;
   min-width: 400px;
