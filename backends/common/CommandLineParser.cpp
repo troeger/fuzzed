@@ -35,12 +35,14 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 	}
 
 	// Positional options without leading letter identifiers
-	// #1: input file. usually FuzzTree XML
-	// #2: output path. for result documents
+	// #1: input file, usually FuzzTree XML
+	// #2: output path for result documents
+	// #3: working directory for temporary files
+	// #4: path to logfile
 
 	else if (numArguments < 4)
 	{
-		std::cerr << "Faulty command line options. Use [program_name] [inputfile] [outputfile] [workingdirectory]" << std::endl;
+		std::cerr << "Faulty command line options. Use [program_name] [inputfile] [outputfile] [workingdirectory] [logfile, optional]" << std::endl;
 		exit(-1);
 	}
 	std::string outFile, inFile, workingDirectory, logFile;
