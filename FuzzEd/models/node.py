@@ -17,40 +17,71 @@ def new_client_id():
     return str(int(time.mktime(time.gmtime())))
 
 fuzztree_classes = {
-    'topEvent':             xml_fuzztree.TopEvent,
-    'basicEvent':           xml_fuzztree.BasicEvent,
-    'basicEventSet':        xml_fuzztree.BasicEventSet,
-    'intermediateEvent':    xml_fuzztree.IntermediateEvent,
-    'intermediateEventSet': xml_fuzztree.IntermediateEventSet,
-    'houseEvent':           xml_fuzztree.HouseEvent,
-    'undevelopedEvent':     xml_fuzztree.UndevelopedEvent,
-    'andGate':              xml_fuzztree.And,
-    'orGate':               xml_fuzztree.Or,
-    'xorGate':              xml_fuzztree.Xor,
-    'votingOrGate':         xml_fuzztree.VotingOr,
-    'featureVariation':     xml_fuzztree.FeatureVariationPoint,
-    'redundancyVariation':  xml_fuzztree.RedundancyVariationPoint,
-    'transferIn':           xml_fuzztree.TransferIn
+    'topEvent':                                 xml_fuzztree.TopEvent,
+    'basicEvent':                               xml_fuzztree.BasicEvent,
+    'basicEventSet':                            xml_fuzztree.BasicEventSet,
+    'intermediateEvent':                        xml_fuzztree.IntermediateEvent,
+    'intermediateEventSet':                     xml_fuzztree.IntermediateEventSet,
+    'houseEvent':                               xml_fuzztree.HouseEvent,
+    'undevelopedEvent':                         xml_fuzztree.UndevelopedEvent,
+    'andGate':                                  xml_fuzztree.And,
+    'orGate':                                   xml_fuzztree.Or,
+    'xorGate':                                  xml_fuzztree.Xor,
+    'votingOrGate':                             xml_fuzztree.VotingOr,
+    'featureVariation':                         xml_fuzztree.FeatureVariationPoint,
+    'redundancyVariation':                      xml_fuzztree.RedundancyVariationPoint,
+    'transferIn':                               xml_fuzztree.TransferIn,
+    xml_fuzztree.TopEvent_:                     'topEvent',
+    xml_fuzztree.BasicEvent_:                   'basicEvent',
+    xml_fuzztree.BasicEventSet_:                'basicEventSet',
+    xml_fuzztree.IntermediateEvent_:            'intermediateEvent',
+    xml_fuzztree.IntermediateEventSet_:         'intermediateEventSet',
+    xml_fuzztree.HouseEvent_:                   'houseEvent',
+    xml_fuzztree.UndevelopedEvent_:             'undevelopedEvent',
+    xml_fuzztree.And_:                          'andGate',
+    xml_fuzztree.Or_:                           'orGate',
+    xml_fuzztree.Xor_:                          'xorGate',
+    xml_fuzztree.VotingOr_:                     'votingOrGate',
+    xml_fuzztree.FeatureVariationPoint_:        'featureVariation',
+    xml_fuzztree.RedundancyVariationPoint_:     'redundancyVariation',
+    xml_fuzztree.TransferIn_:                   'transferIn'
 }
 
 faulttree_classes = {
-    'topEvent':             xml_faulttree.TopEvent,
-    'basicEvent':           xml_faulttree.BasicEvent,
-    'basicEventSet':        xml_faulttree.BasicEventSet,
-    'intermediateEvent':    xml_faulttree.IntermediateEvent,
-    'intermediateEventSet': xml_faulttree.IntermediateEventSet,    
-    'houseEvent':           xml_faulttree.HouseEvent,
-    'undevelopedEvent':     xml_faulttree.UndevelopedEvent,
-    'andGate':              xml_faulttree.And,
-    'orGate':               xml_faulttree.Or,
-    'xorGate':              xml_faulttree.Xor,
-    'votingOrGate':         xml_faulttree.VotingOr,
-    'transferIn':           xml_faulttree.TransferIn,
-    'fdepGate':             xml_faulttree.FDEP,
-    'priorityAndGate':      xml_faulttree.PriorityAnd,
-    'seqGate':              xml_faulttree.Sequence,
-    'spareGate':            xml_faulttree.Spare
+    'topEvent':               xml_faulttree.TopEvent,
+    'basicEvent':             xml_faulttree.BasicEvent,
+    'basicEventSet':          xml_faulttree.BasicEventSet,
+    'intermediateEvent':      xml_faulttree.IntermediateEvent,
+    'intermediateEventSet':   xml_faulttree.IntermediateEventSet,    
+    'houseEvent':             xml_faulttree.HouseEvent,
+    'undevelopedEvent':       xml_faulttree.UndevelopedEvent,
+    'andGate':                xml_faulttree.And,
+    'orGate':                 xml_faulttree.Or,
+    'xorGate':                xml_faulttree.Xor,
+    'votingOrGate':           xml_faulttree.VotingOr,
+    'transferIn':             xml_faulttree.TransferIn,
+    'fdepGate':               xml_faulttree.FDEP,
+    'priorityAndGate':        xml_faulttree.PriorityAnd,
+    'seqGate':                xml_faulttree.Sequence,
+    'spareGate':              xml_faulttree.Spare,
+   xml_faulttree.TopEvent_:              'topEvent',
+   xml_faulttree.BasicEvent_:            'basicEvent',
+   xml_faulttree.BasicEventSet_:         'basicEventSet',
+   xml_faulttree.IntermediateEvent_:     'intermediateEvent',
+   xml_faulttree.IntermediateEventSet_:  'intermediateEventSet',
+   xml_faulttree.HouseEvent_:            'houseEvent',
+   xml_faulttree.UndevelopedEvent_:      'undevelopedEvent',
+   xml_faulttree.And_:                   'andGate',
+   xml_faulttree.Or_:                    'orGate',
+   xml_faulttree.Xor_:                   'xorGate',
+   xml_faulttree.VotingOr_:              'votingOrGate',
+   xml_faulttree.TransferIn_:            'transferIn',
+   xml_faulttree.FDEP_:                  'fdepGate',
+   xml_faulttree.PriorityAnd_:           'priorityAndGate',
+   xml_faulttree.Sequence_:              'seqGate',
+   xml_faulttree.Spare_:                 'spareGate'
 }
+
 
 class Node(models.Model):
     """
@@ -259,11 +290,64 @@ class Node(models.Model):
             result += "\\node [mirrorStyle] at (%u.south) (text%u) {%s};\n"%(self.pk, self.pk, mirrorText)
         return result
 
+    def load_xml(self, xml_node, parent=None, xmltype=None):
+        """
+        Method load_xml
+
+        Deserialize this node and it's children from the given PyXB XML tree, given by its root node.
+        The (self) Node object is expected to already have a valid graph attribute.
+        """
+        from edge import Edge
+
+
+        # If the target XML type is not given, we take the graph type
+        if not xmltype:
+            xmltype = self.graph.kind
+
+        assert (xmltype in ["faulttree", "fuzztree"])
+
+        # All XML nodes got a client id
+        self.client_id = xml_node.id
+        self.x = xml_node.x
+        self.y = xml_node.y
+
+        # Finding the right kind string is not possible by lookup, since the type(xml_node) result
+        # is different from the used type on generation (TopEvent vs. TopEvent_)
+        if xmltype == "faulttree":
+            classes = faulttree_classes
+        elif xmltype == "fuzztree":
+            classes = fuzztree_classes
+
+        self.kind = classes[type(xml_node)]
+        logger.debug("Adding %s node with id %s"%(self.kind, self.client_id))
+        self.save()
+
+        # Add properties
+        if hasattr(xml_node,'name') and self.allows_property('name'):
+            logger.debug("Setting name to "+xml_node.name)
+            self.set_attr('name', xml_node.name)
+        if hasattr(xml_node,'optional') and self.allows_property('optional'):
+            logger.debug("Setting optionality flag to "+str(xml_node.optional))
+            self.set_attr('optional', xml_node.optional)
+#        if hasattr(xml_node,'probability') and self.allows_property('probability'):
+#            #TODO: Consider also fuzzy probabilities and rates
+#               self.set_attr('probability', [0, xml_node.probability.value_])
+
+        # Create edge to parent, if needed
+        if parent:
+            e = Edge(source=parent, target=self, graph=self.graph, client_id=new_client_id())
+            e.save()
+
+        # Dive into the children
+        for child in xml_node.children:
+            n=Node(graph=self.graph)
+            n.load_xml(child, self)
+
     def to_xml(self, xmltype=None):
         """
         Method: to_xml
         
-        Serializes this node into an XML representation according to the schema file for the graph type. Please note
+        Serializes this node into an PyXB XML tree. Please note
         the backend node ID is used instead of client_id, since the latter one is not globally unique and may be too
         long for some XML processors.
         
@@ -277,7 +361,9 @@ class Node(models.Model):
 
         properties = {
             'id':   self.client_id,
-            'name': self.get_property('name', '-')
+            'name': self.get_property('name', '-'),
+            'x':    self.x,
+            'y':    self.y
         }
 
         if self.kind == 'transferIn':
@@ -297,21 +383,18 @@ class Node(models.Model):
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
                 probability = self.get_property('probability', None)
                 # Probability is a 2-tuple, were the first value is a type indicator and the second the value
-                if probability[0] == 1:
+                if probability[0] == 0:
+                    # Crisp probability
+                    point = probability[1][0]
+                    properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
+                elif probability[0] == 1:
                     # Failure rate
                     properties['probability'] = xml_fuzztree.FailureRate(value_=probability[1])
-                elif probability[0] in [0,2]:
-                    # Point value with uncertainty range, type 0 (direct) or 2 (fuzzy terms)
-                    if isinstance(probability[1], int):
-                        point = probability[1]
-                        alpha = 0
-                    else:
-                        point = probability[1][0]
-                        alpha = probability[1][1]
-                    if alpha == 0:
-                        properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
-                    else:
-                        properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(
+                elif probability[0] == 2:
+                    # Fuzzy probability
+                    point = probability[1][0]
+                    alpha = probability[1][1]
+                    properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(
                             a=point - alpha, b1=point, b2=point, c=point + alpha
                         )
                 else:
@@ -365,6 +448,19 @@ class Node(models.Model):
             xml_node.children.append(edge.target.to_xml(xmltype))
 
         return xml_node
+
+    def allows_property(self, name):
+        ''' This method allows to check if the given property is supported for this node.
+            The basic idea here is that property.js has some understanding of what is expected for 
+            particular node types in the JSON. If we do not follow this understanding, they get
+            very 'exceptional'. The JSON renderer is not checking this, but the XML import must be picky.
+        '''
+        propdetails = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']
+        if name not in propdetails.keys():
+            logger.debug('%s is not allowed in %s'%(str(name), str(self.kind)))
+            return False
+        else:
+            return True
 
     def get_property(self, key, default=None):
         try:
