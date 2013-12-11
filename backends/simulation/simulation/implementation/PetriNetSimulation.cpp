@@ -204,10 +204,8 @@ bool PetriNetSimulation::run()
 #endif
 
 #ifndef MEASURE_SPEEDUP
-	tidyUp();
-#endif
-
-#ifdef MEASURE_SPEEDUP
+	// tidyUp();
+#else
 	cout << res.duration << endl;
 #endif
 

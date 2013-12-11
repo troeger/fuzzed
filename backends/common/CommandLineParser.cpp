@@ -46,14 +46,14 @@ void CommandLineParser::parseCommandline(int numArguments, char** arguments)
 	std::string outFile, inFile, workingDirectory, logFile;
 	inFile				= arguments[1];
 	outFile				= arguments[2];
-	workingDirectory	= arguments[3];
+	workingDirectory	= arguments[3] + util::slash;
 
 	m_outFilePath	= fs::path(outFile.c_str());
 	m_inFilePath	= fs::path(inFile.c_str());
 	m_workingDir	= fs::path(workingDirectory.c_str());
 
 	if (!util::isWritable(outFile))
-	{ // TODO: find out write permissions. not featured by Boost 1.48.
+	{
 		std::cerr << "Cannot write to file: " << outFile << std::endl;
 		exit(-1);
 	}

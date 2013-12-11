@@ -117,7 +117,7 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 #else
 		sim->run();
 		if (implementationType == DEFAULT)
-			res = ((PetriNetSimulation*)sim)->result();
+			res = (static_cast<PetriNetSimulation*>(sim))->result();
 #endif
 	}
 	catch (exception& e)
@@ -207,10 +207,12 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 	if (impl == STRUCTUREFORMULA_ONLY)
 		return SimulationResultStruct();
 
-	std::string petriNetFile = workingDir.generic_string() + util::fileNameFromPath(input.generic_string());
+	std::string petriNetFile = workingDir.generic_string() + "petrinet";
 	util::replaceFileExtensionInPlace(petriNetFile, (impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
 
-	doc->save(petriNetFile);
+	if (!doc->save(petriNetFile))
+		throw FatalException(std::string("Could not save petri net file: ") + petriNetFile);
+
 	return runSimulationInternal(petriNetFile, output, workingDir, impl, m_timeNetProperties);
 }
 
@@ -225,54 +227,29 @@ void SimulationProxy::simulateAllConfigurations(
 	if (!file.is_open())
 		throw runtime_error("Could not open file");
 
+	auto logFileStream = new std::ofstream(
+		workingDir.generic_string() +
+		util::slash +
+		"errors.txt");
+
 	simulationResults::SimulationResults simResults;
 
-	std::set<Issue> issues;
-	FuzzTreeTransform ftTransform(file, issues);
-	if (!ftTransform.isValid())
+	try
 	{
-		const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
-		std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
-		if (ft)
-		{ // in this case there is only a faulttree, so no configuration information will be serialized
-		
-			SimulationResultStruct res = simulateFaultTree(ft, inputFile, outputFile, workingDir, impl);
-			simulationResults::Result r(
-				ft->getId(),
-				util::timeStamp(),
-				ft->getCost(),
-				res.reliability,
-				res.nFailures,
-				res.nRounds,
-				res.isValid());
-
-			r.availability(res.meanAvailability);
-			r.duration(res.duration);
-			r.mttf(res.mttf);
-
-			simResults.result().push_back(r);
-		}
-		else
+		std::set<Issue> issues;
+		FuzzTreeTransform ftTransform(file, issues);
+		if (!ftTransform.isValid())
 		{
-			issues.insert(Issue::fatalIssue("Could not read fault tree. Problem during transformation."));
-		}
-	}
-	else
-	{
-		for (const auto& ft : ftTransform.transform())
-		{
-			std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
-			{
-				auto res = simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
+			const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
+			std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
+			if (ft)
+			{ // in this case there is only a faulttree, so no configuration information will be serialized
 
-				// debug output
-				// 			simTree->print(cout, 0);
-				// 			fuzztree::fuzzTree(cout, ft.second);
-
+				SimulationResultStruct res = simulateFaultTree(ft, inputFile, outputFile, workingDir, impl);
 				simulationResults::Result r(
-					simTree->getId(),
+					ft->getId(),
 					util::timeStamp(),
-					simTree->getCost(),
+					ft->getCost(),
 					res.reliability,
 					res.nFailures,
 					res.nRounds,
@@ -282,19 +259,58 @@ void SimulationProxy::simulateAllConfigurations(
 				r.duration(res.duration);
 				r.mttf(res.mttf);
 
-				r.configuration(serializedConfiguration(ft.first));
-
 				simResults.result().push_back(r);
 			}
+			else
+			{
+				issues.insert(Issue::fatalIssue("Could not read fault tree. Problem during transformation."));
+			}
 		}
+		else
+		{
+			for (const auto& ft : ftTransform.transform())
+			{
+				std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
+				{
+					auto res = simulateFaultTree(simTree, inputFile, outputFile, workingDir, impl);
+
+					// debug output
+					// 			simTree->print(cout, 0);
+					// 			fuzztree::fuzzTree(cout, ft.second);
+
+					simulationResults::Result r(
+						simTree->getId(),
+						util::timeStamp(),
+						simTree->getCost(),
+						res.reliability,
+						res.nFailures,
+						res.nRounds,
+						res.isValid());
+
+					r.availability(res.meanAvailability);
+					r.duration(res.duration);
+					r.mttf(res.mttf);
+
+					r.configuration(serializedConfiguration(ft.first));
+
+					simResults.result().push_back(r);
+				}
+			}
+		}
+		// Log errors
+		for (const Issue& issue : issues)
+			simResults.issue().push_back(issue.serialized());
+
+		std::ofstream output(outputFile.generic_string());
+		simulationResults::simulationResults(output, simResults);
+		output.close();
 	}
-
-	// Log errors
-	for (const Issue& issue : issues)
-		simResults.issue().push_back(issue.serialized());
-
-	std::ofstream output(outputFile.generic_string());
-	simulationResults::simulationResults(output, simResults);
+	catch (std::exception& e)
+	{
+		*logFileStream << e.what() << std::endl;
+	}
+	
+	
 }
 
 void SimulationProxy::parseCommandline_default(int numArguments, char** arguments)
@@ -306,14 +322,15 @@ void SimulationProxy::parseCommandline_default(int numArguments, char** argument
 	CommandLineParser parser;
 	parser.parseCommandline(numArguments, arguments);
 
-	const auto additionalArgs = parser.getAdditionalArguments();
-	const int numAdditionalArgs = additionalArgs.size();
-	if (numAdditionalArgs > 0) 
-	{
-		m_numRounds = atoi(additionalArgs[0].c_str());
-		if (numAdditionalArgs > 1)
-			m_simulationTime = atoi(additionalArgs[1].c_str());
-	}
+	// this is seriously broken
+// 	const auto additionalArgs = parser.getAdditionalArguments();
+// 	const int numAdditionalArgs = additionalArgs.size();
+// 	if (numAdditionalArgs > 0) 
+// 	{
+// 		m_numRounds = atoi(additionalArgs[0].c_str());
+// 		if (numAdditionalArgs > 1)
+// 			m_simulationTime = atoi(additionalArgs[1].c_str());
+// 	}
 	
 	simulateAllConfigurations(
 		parser.getInputFilePath(),
