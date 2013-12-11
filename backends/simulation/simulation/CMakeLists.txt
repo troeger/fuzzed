@@ -5,7 +5,6 @@ set(SOURCES
    ${SIM_COMMON_SOURCES}
 
    main.cpp
-   SimulationExtern.cpp
    SimulationProxy.cpp
 
    implementation/PetriNetSimulation.cpp
@@ -25,7 +24,6 @@ set(HEADERS
    ${HEADERS}
    ${SIM_COMMON_HEADERS}
 
-   SimulationExtern.h
    SimulationProxy.h
    ResultStruct.h
    Config.h
