@@ -115,7 +115,13 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         }
     });
 
-    var ProbabilityMenu = Menus.Menu.extend({
+    /**
+     *  Class: AnalysisResultMenu
+     *    _Abstract_ base class for menus that display the results of a analysis performed by the backend.
+     *    It contains a chart (currently implemented with Highcharts) and a table area (using SlickGrid).
+     *    Subclasses are responsible for providing data formatters and data conversion functions.
+     */
+    var AnalysisResultMenu = Menus.Menu.extend({
         /**
          *  Group: Members
          *
@@ -330,49 +336,60 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         /**
+         *  Group: Accessors
+         */
+
+        /**
+         *  Method: _getDataColumns
+         *    _Abstract_, returns the format of columns that should be displayed with SlickGrid.
+         *
+         *  Returns:
+         *    An array of column descriptions. See https://github.com/mleibman/SlickGrid/wiki/Column-Options.
+         */
+        _getDataColumns: function() {
+            throw new SubclassResponsibility();
+        },
+
+        /**
+         *  Method: _chartTooltipFormatter
+         *    _Abstract_, function used to format the toolip that appears when hovering over a data point in the chart.
+         *    The scope object ('this') contains the x and y value of the corresponding point.
+         *
+         *  Returns:
+         *    A string that is displayed inside the tooltip. It may contain HTML tags.
+         */
+        _chartTooltipFormatter: function() {
+            throw new SubclassResponsibility();
+        },
+
+        /**
+         *  Method: _progressMessage
+         *    _Abstract_, returns the message that should be displayed while the backend is calculating the result.
+         *
+         *  Returns:
+         *    A string with the message. May contain HTML tags.
+         */
+        _progressMessage: function() {
+            throw new SubclassResponsibility();
+        },
+
+        /**
          *  Group: Conversion
          */
 
         /**
          *  Methods: _convertToDisplayFormat
-         *    Converts a data series of a configuration from API JSON to the Highcharts format incl. statistics.
+         *    _Abstract_, converts a data series of a configuration from API JSON to the Highcharts format incl. statistics.
          *
          *  Parameters:
-         *    {JSON} configuration - The configuration object received from the backend, containing 'alphacuts'
-         *                           (e.g., "{"0.0": [0.2, 0.5], "1.0": [0.4, 0.4]}") and 'costs'.
+         *    {JSON} configuration - The configuration object received from the backend.
          *
          *  Returns:
          *    An object containing an array-of-arrays representation of the input that can be used by Highcharts to
-         *    plot the data ('series'), and the 'min', 'max' and 'peak' probabilities in a 'statistics' field.
+         *    plot the data as specified by <_getDataColumns>.
          */
         _convertToDisplayFormat: function(configuration) {
-            var dataPoints = [];
-            var max = 0.0; var min = 1.0; var peak = 0.0; var peakY = 0.0;
-            _.each(configuration['alphaCuts'], function(values, key) {
-                var y = parseFloat(key);
-                _.each(values, function(x) {
-                    dataPoints.push([x, y]);
-                    // track statistics
-                    if (x < min) min = x;
-                    if (x > max) max = x;
-                    if (peakY < y) {peakY = y; peak = x}
-                });
-            });
-
-            var series = _.sortBy(dataPoints, function(point) {
-                return point[0];
-            });
-
-            return {
-                series: series,
-                statistics: {
-                    min:             min,
-                    max:             max,
-                    peak:            peak,
-                    ineffectiveness: configuration['costs'] ? peak / configuration['costs'] : '-',
-                    costs:           configuration['costs']
-                }
-            };
+            throw new SubclassResponsibility();
         },
 
         /**
@@ -449,7 +466,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
             var progressBar = jQuery(
                 '<div style="text-align: center;">' +
-                    '<p>Calculating probability...</p>' +
+                    '<p>' + this._progressMessage() + '</p>' +
                     '<div class="progress progress-striped active">' +
                         '<div class="progress-bar" role="progressbar" style="width: 100%;"></div>' +
                     '</div>' +
@@ -520,11 +537,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 },
 
                 tooltip: {
-                    formatter: function() {
-                        return '<b>' + this.series.name + '</b><br/>' +
-                               '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
-                               '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
-                    }
+                    formatter: this._chartTooltipFormatter
                 },
 
                 plotOptions: {
@@ -563,18 +576,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *    {JSON} data - A set of one or more data series to display in the SlickGrid.
          */
         _displayResultWithSlickGrid: function(data) {
-            function shorten(row, cell, value) {
-                return Highcharts.numberFormat(value, 5);
-            }
-
-            var columns = [
-                { id: 'id',              name: 'Config',             field: 'id',              sortable: true },
-                { id: 'min',             name: 'Min',           field: 'min',             sortable: true, formatter: shorten },
-                { id: 'peak',            name: 'Peak',              field: 'peak',            sortable: true, formatter: shorten },
-                { id: 'max',             name: 'Max',           field: 'max',             sortable: true, formatter: shorten },
-                { id: 'costs',           name: 'Costs',             field: 'costs',           sortable: true },
-                { id: 'ineffectiveness', name: 'Peak/Costs', field: 'ineffectiveness', sortable: true, minWidth: 150}
-            ];
+            var columns = this._getDataColumns();
 
             var options = {
                 enableCellNavigation:       true,
@@ -733,6 +735,105 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         }
     });
 
+
+    /**
+     *  Class: ProbabilityMenu
+     *    The menu responsible for displaying the results of the 'analytical' analysis.
+     */
+    var ProbabilityMenu = AnalysisResultMenu.extend({
+
+        /**
+         *  Method: _getDataColumns
+         *    _Abstract_, returns the format of columns that should be displayed with SlickGrid.
+         *
+         *  Returns:
+         *    An array of column descriptions. See https://github.com/mleibman/SlickGrid/wiki/Column-Options.
+         */
+        _getDataColumns: function() {
+            function shorten(row, cell, value) {
+                return Highcharts.numberFormat(value, 5);
+            }
+
+            return [
+                { id: 'id',              name: 'Config',     field: 'id',              sortable: true },
+                { id: 'min',             name: 'Min',        field: 'min',             sortable: true, formatter: shorten },
+                { id: 'peak',            name: 'Peak',       field: 'peak',            sortable: true, formatter: shorten },
+                { id: 'max',             name: 'Max',        field: 'max',             sortable: true, formatter: shorten },
+                { id: 'costs',           name: 'Costs',      field: 'costs',           sortable: true },
+                { id: 'ineffectiveness', name: 'Peak/Costs', field: 'ineffectiveness', sortable: true, minWidth: 150}
+            ];
+        },
+
+        /**
+         *  Method: _chartTooltipFormatter
+         *    Function used to format the toolip that appears when hovering over a data point in the chart.
+         *    The scope object ('this') contains the x and y value of the corresponding point.
+         *
+         *  Returns:
+         *    A string that is displayed inside the tooltip. It may contain HTML tags.
+         */
+        _chartTooltipFormatter: function() {
+            return '<b>' + this.series.name + '</b><br/>' +
+                   '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
+                   '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
+        },
+
+        /**
+         *  Method: _progressMessage
+         *    Returns the message that should be displayed while the backend is calculating the result.
+         *
+         *  Returns:
+         *    A string with the message.
+         */
+        _progressMessage: function() {
+            return 'Calculating probability...';
+        },
+
+        /**
+         *  Methods: _convertToDisplayFormat
+         *    Converts a data series of a configuration from API JSON to the Highcharts format incl. statistics.
+         *
+         *  Parameters:
+         *    {JSON} configuration - The configuration object received from the backend, containing 'alphacuts'
+         *                           (e.g., "{"0.0": [0.2, 0.5], "1.0": [0.4, 0.4]}") and 'costs'.
+         *
+         *  Returns:
+         *    An object containing an array-of-arrays representation of the input that can be used by Highcharts to
+         *    plot the data ('series'), and the 'min', 'max' and 'peak' probabilities in a 'statistics' field.
+         */
+        _convertToDisplayFormat: function(configuration) {
+            var dataPoints = [];
+            var max = 0.0; var min = 1.0; var peak = 0.0; var peakY = 0.0;
+            _.each(configuration['alphaCuts'], function(values, key) {
+                var y = parseFloat(key);
+                _.each(values, function(x) {
+                    dataPoints.push([x, y]);
+                    // track statistics
+                    if (x < min) min = x;
+                    if (x > max) max = x;
+                    if (peakY < y) {peakY = y; peak = x}
+                });
+            });
+
+            var series = _.sortBy(dataPoints, function(point) {
+                return point[0];
+            });
+
+            return {
+                series: series,
+                statistics: {
+                    min:             min,
+                    max:             max,
+                    peak:            peak,
+                    ineffectiveness: configuration['costs'] ? peak / configuration['costs'] : '-',
+                    costs:           configuration['costs']
+                }
+            };
+        }
+
+    });
+
+
     /**
      *  Class: FaulttreeEditor
      *
@@ -748,7 +849,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *  Properties:
          *    {<CutsetsMenu>}     cutsetsMenu     - The <CutsetsMenu> instance used to display the calculated minimal
          *                                          cutsets.
-         *    {<ProbabilityMenu>} probabilityMenu - The <ProbabilityMenu> instance used to display the probability of
+         *    {<AnalysisResultMenu>} probabilityMenu - The <AnalysisResultMenu> instance used to display the probability of
          *                                          the top event.
          */
         cutsetsMenu:     undefined,
