@@ -309,7 +309,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
                     // collect chart data if given
                     if (typeof config['points'] !== 'undefined') {
-                        chartData[configID] = config['points'];
+                        chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
                     }
 
                     // collect table rows
