@@ -89,10 +89,10 @@ int main(int argc, char** argv)
 	FuzzTreeTransform tf(instream, issues);
 	instream.close();
 
+	analysisResults::AnalysisResults analysisResults;
+
 	try
-	{
-		analysisResults::AnalysisResults analysisResults;
-		
+	{	
 		// please keep this here for debugging
 // 		std::istreambuf_iterator<char> eos;
 // 		std::string s(std::istreambuf_iterator<char>(instream), eos);
@@ -144,31 +144,31 @@ int main(int argc, char** argv)
 				analysisResults.result().push_back(r);
 			}
 		}
-
-		// Log errors
-		for (const Issue& issue : issues)
-		{
-			analysisResults.issue().push_back(issue.serialized());
-			*logFileStream << issue.getMessage() << std::endl;
-		}
-
-		std::ofstream output(outFile);
-		analysisResults::analysisResults(output, analysisResults);
 	}
 
 	// This should not happen.
+	catch (const FatalException& e)
+	{
+		issues.insert(e.getIssue());
+	}
 	catch (const std::exception& e)
 	{
 		*logFileStream << "Exception while trying to analyze " << inFile << e.what() << std::endl;
-		fuzztree::fuzzTree(*logFileStream, *(tf.getFuzzTree()));
-		
-		return -1;
 	}
 	catch (...)
 	{
 		*logFileStream << "Exception while trying to analyze " << inFile << std::endl;
-		return -1;
 	}
+
+	// Log errors
+	for (const Issue& issue : issues)
+	{
+		analysisResults.issue().push_back(issue.serialized());
+		*logFileStream << issue.getMessage() << std::endl;
+	}
+
+	std::ofstream output(outFile);
+	analysisResults::analysisResults(output, analysisResults);
 	
 	logFileStream->close();
 	delete logFileStream;

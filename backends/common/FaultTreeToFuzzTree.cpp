@@ -7,6 +7,7 @@
 
 #include "util.h"
 #include "xmlutil.h"
+#include "FatalException.h"
 
 std::shared_ptr<fuzztree::TopEvent> faultTreeToFuzzTree(const faulttree::TopEvent& faultTree, std::vector<Issue>& issues)
 {
@@ -22,6 +23,12 @@ std::shared_ptr<fuzztree::TopEvent> faultTreeToFuzzTree(const faulttree::TopEven
 	return top;
 }
 
+
+static bool isDynamicGate(const type_info& typeName) 
+{
+	using namespace faultTreeType;
+	return typeName == *FDEP || typeName == *SPARE || typeName == *PAND || typeName == *SEQ;
+}
 
 void faultTreeToFuzzTreeRecursive(fuzztree::Node& node, const faulttree::Node& templateNode, std::vector<Issue>& issues)
 {
@@ -115,6 +122,7 @@ void faultTreeToFuzzTreeRecursive(fuzztree::Node& node, const faulttree::Node& t
 		else if (typeName == *XOR)				node.children().push_back(fuzztree::Xor(id));
 		else if (typeName == *VOTINGOR)			node.children().push_back(fuzztree::VotingOr(id, static_cast<const faulttree::VotingOr&>(child).k()));
 		
+		else if (isDynamicGate(typeName)) throw FatalException(std::string("Sequence-dependent gates cannot be analyzed. Encountered node type: ") + typeName.name(), 0, id);
 
 		faultTreeToFuzzTreeRecursive(node.children().back(), child, issues);
 	}
