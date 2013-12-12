@@ -546,6 +546,7 @@ def job_files(request, job_secret):
         logger.debug("Delivering data for job %d"%job.pk)
         response = HttpResponse()
         response.content, response['Content-Type'] = job.input_data()
+        logger.debug(response.content)
         return response
     elif request.method == 'POST':
         if job.done():
