@@ -17,8 +17,7 @@
 analysisResults::Result analyze(
 	const fuzztree::TopEvent* const topEvent,
 	std::ofstream* logFileStream,
-	analysisResults::AnalysisResults &analysisResults,
-	const std::string modelId,
+	const std::string& modelId,
 	const int decompositionNumber) 
 {
 	try
@@ -115,7 +114,7 @@ int main(int argc, char** argv)
 				topEvent->decompositionNumber().get() : 
 				DEFAULT_DECOMPOSITION_NUMBER;
 
-			analysisResults::Result r = analyze(topEvent.get(), logFileStream, analysisResults, modelId, decompositionNumber);
+			analysisResults::Result r = analyze(topEvent.get(), logFileStream, modelId, decompositionNumber);
 			for (const auto& i : treeIssues)
 				r.issue().push_back(i.serialized());
 			
@@ -140,7 +139,7 @@ int main(int argc, char** argv)
 			{
 				auto topEvent = fuzztree::TopEvent(t.second.topEvent());
 
-				analysisResults::Result r = analyze(&topEvent, logFileStream, analysisResults, modelId, decompositionNumber); 
+				analysisResults::Result r = analyze(&topEvent, logFileStream, modelId, decompositionNumber); 
 				r.configuration(serializedConfiguration(t.first));
 				analysisResults.result().push_back(r);
 			}
