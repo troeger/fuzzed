@@ -122,7 +122,10 @@ void faultTreeToFuzzTreeRecursive(fuzztree::Node& node, const faulttree::Node& t
 		else if (typeName == *XOR)				node.children().push_back(fuzztree::Xor(id));
 		else if (typeName == *VOTINGOR)			node.children().push_back(fuzztree::VotingOr(id, static_cast<const faulttree::VotingOr&>(child).k()));
 		
-		else if (isDynamicGate(typeName)) throw FatalException(std::string("Sequence-dependent gates cannot be analyzed. Encountered node type: ") + typeName.name(), 0, id);
+		else if (isDynamicGate(typeName))
+		{
+			throw FatalException(std::string("Sequence-dependent gates cannot be analyzed. Encountered node type: ") + typeName.name(), 0, id);
+		}
 
 		faultTreeToFuzzTreeRecursive(node.children().back(), child, issues);
 	}
