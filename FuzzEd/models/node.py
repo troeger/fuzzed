@@ -287,6 +287,10 @@ class Node(models.Model):
         if self.kind in {'basicEventSet', 'intermediateEventSet'}:
             properties['quantity'] = self.get_property('cardinality')
 
+        if self.kind == 'topEvent':
+            properties['missionTime'] = self.get_property('missionTime')
+            properties['decompositionNumber'] = self.get_property('decompositions')
+
         # Special treatment for some of the FuzzTree node types
         if xmltype == 'fuzztree':
             # for any node that may be optional, set the according property
