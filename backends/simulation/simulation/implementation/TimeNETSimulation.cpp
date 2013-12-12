@@ -56,7 +56,6 @@ TimeNETSimulation::TimeNETSimulation(std::shared_ptr<FaultTreeNode> faultTree,
 
 bool TimeNETSimulation::run()
 {
-	int ret;
 #ifdef TNETDIR
 #define RELIABILITY_DISTRIBUTION
 #ifdef RELIABILITY_DISTRIBUTION
@@ -95,7 +94,7 @@ bool TimeNETSimulation::run()
 #endif // TNETDIR
 
 	cout << "TimeNET not configured through CMake. Please check the USE_TIMENET option." << endl;
-	return -1;
+	return false;
 }
 
 TimeNETSimulation::~TimeNETSimulation()
