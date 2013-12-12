@@ -5,6 +5,7 @@ from django.core.mail import mail_managers
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
@@ -42,7 +43,7 @@ def index(request):
         auth.logout(request)
 
     if request.user.is_authenticated():
-        return redirect('dashboard')
+        return redirect('projects')
 
     return render(request, 'index.html', {'pwlogin': ('pwlogin' in request.GET)})
 
@@ -164,8 +165,15 @@ def dashboard(request, project_id):
     if not (project.is_authorized(request.user)):
         raise Http404
     
+    # projects in which the actual user is owner or member and that were recently modified are proposed to the user
+    proposal_limit =5
+    project_proposals = Project.objects.filter(Q(deleted=False),Q(users = request.user)|Q(owner = request.user)).exclude(id=project.id).order_by('-modified')[:proposal_limit]
+    
     graphs = project.graphs.filter(deleted=False).order_by('-created')
-    parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs], 'project': project.to_dict()}
+    parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs],
+                  'project': project.to_dict(),
+                  'proposals': [ project.to_dict() for project in project_proposals]
+                 }
 
     return render(request, 'dashboard/dashboard.html', parameters)
 
@@ -374,6 +382,7 @@ def snapshot(request, graph_id):
     if not graph.read_only:
         return HttpResponseBadRequest()
 
+    project  = graph.project    
     notation = notations.by_kind[graph.kind]
     nodes    = notation['nodes']
 
@@ -381,7 +390,8 @@ def snapshot(request, graph_id):
         'graph':          graph,
         'graph_notation': notation,
         'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
-        'greetings':      GREETINGS
+        'greetings':      GREETINGS,
+        'project':        project.to_dict()
     }
 
     return render(request, 'editor/editor.html', parameters)

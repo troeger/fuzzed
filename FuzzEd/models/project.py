@@ -23,7 +23,7 @@ class Project(models.Model):
   name      = models.CharField(max_length=255)
   owner     = models.ForeignKey(User, related_name='own_projects')
   users     = models.ManyToManyField(User, related_name='projects')
-  
+  modified  = models.DateTimeField(auto_now=True)
   created   = models.DateTimeField(auto_now_add=True, editable=False)
   deleted   = models.BooleanField(default=False)
   

@@ -37,15 +37,28 @@
 </script>
 {% endblock %}
 
+
+
 {% block menu_right %}
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects<b class="caret"></b></a>
+  <ul class="dropdown-menu">
+    <li role="presentation" class="dropdown-header">Recently Modified</li>
+    {% for project in proposals %} 
+          <li><a href="{% url 'dashboard' project.pk %}">{{ project.name }}</a></li>
+    {% endfor %}
+    <li class="divider"></li>
+    <li><a href="{% url 'projects' %}">Project Overview</a></li>
+  </ul>
+</li>
 <li><a href="/settings"><i class="icon-user icon-white"></i> Account </a></li>
 {% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h1>
-        Dashboard
-    </h1>
+    <h2>
+      {{ project.name }}
+    </h2>
 </div>
 
 <form action="{% url 'dashboard_new' project.pk %}" method="post">
