@@ -143,7 +143,7 @@ class Job(models.Model):
 
                 # prepare graph rendering data for this configuration
                 json_points = []
-                if hasattr(result, 'probability') and self.kind == Job.TOP_EVENT_JOB:
+                if hasattr(result, 'probability') and self.kind == Job.TOP_EVENT_JOB and result.probability is not None:
                     for alpha_cut in result.probability.alphaCuts:
                         json_points.append([alpha_cut.value_.lowerBound, alpha_cut.key])
                         json_points.append([alpha_cut.value_.upperBound, alpha_cut.key])
