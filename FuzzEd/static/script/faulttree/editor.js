@@ -737,7 +737,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
         _setupContainer: function() {
             return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Analytical Probability of Top Event">\
+                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (analytical)">\
                     <div class="menu-controls">\
                         <span class="menu-minimize"></span>\
                         <span class="menu-close"></span>\
@@ -767,7 +767,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 { id: 'peak',   name: 'Peak',       field: 'peak',   sortable: true, formatter: shorten },
                 { id: 'max',    name: 'Max',        field: 'max',    sortable: true, formatter: shorten },
                 { id: 'costs',  name: 'Costs',      field: 'costs',  sortable: true },
-                { id: 'ratio',  name: 'Peak/Costs', field: 'ratio',  sortable: true, minWidth: 150}
+                { id: 'ratio',  name: 'Risk',       field: 'ratio',  sortable: true, minWidth: 150}
             ];
         },
 
@@ -793,7 +793,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *    A string with the message.
          */
         _progressMessage: function() {
-            return 'Calculating probability...';
+            return 'Running probability analysis...';
         }
     });
 
@@ -813,7 +813,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
         _setupContainer: function() {
             return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU + '" class="menu" header="Simulated Probability of Top Event">\
+                '<div id="' + FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (simulation)">\
                     <div class="menu-controls">\
                         <span class="menu-minimize"></span>\
                         <span class="menu-close"></span>\
@@ -841,8 +841,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 { id: 'id',          name: 'Config',      field: 'id',          sortable: true },
                 { id: 'mttf',        name: 'MTTF',        field: 'mttf',        sortable: true },
                 { id: 'reliability', name: 'Reliability', field: 'reliability', sortable: true },
+                { id: 'rounds',      name: 'Rounds',      field: 'rounds',      sortable: true },
+                { id: 'failures',    name: 'Failures',    field: 'failures',    sortable: true },
                 { id: 'costs',       name: 'Costs',       field: 'costs',       sortable: true },
-                { id: 'ratio',       name: 'Ratio',       field: 'ratio',       sortable: true, minWidth: 150}
+                { id: 'ratio',       name: 'Risk',        field: 'ratio',       sortable: true, minWidth: 150}
             ];
         },
 
@@ -869,7 +871,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *    A string with the message.
          */
         _progressMessage: function() {
-            return 'Simulating probability...';
+            return 'Running simulation...';
         }
     });
 

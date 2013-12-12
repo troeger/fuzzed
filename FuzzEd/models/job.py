@@ -155,13 +155,17 @@ class Job(models.Model):
                     #TODO: Not clear if multiple values for alpha cut = 1 are anyway a mistake
                     current_config['peak'] = [x for x,y in json_points if float(y)==float(1)][0]
                     current_config['max'] = max(json_points, key=lambda json_points: json_points[0])[0]
-                    current_config['ratio'] = float(current_config['peak'] / current_config['costs']) if current_config['costs'] else None
+                    current_config['ratio'] = float(current_config['peak'] * current_config['costs']) if current_config['costs'] else None
                 elif (self.kind == Job.SIMULATION_JOB):
                     reliability = float(result.reliability)
                     current_config['reliability'] = None if math.isnan(reliability) else reliability
                     mttf = float(result.mttf)
                     current_config['mttf'] = None if math.isnan(mttf) else mttf
-                    current_config['ratio'] = float(current_config['reliability'] / current_config['costs']) if current_config['costs'] else None
+                    rounds = int(result.nSimulatedRounds)
+                    current_config['rounds'] = None if math.isnan(rounds) else rounds
+                    failures = int(result.nFailures)
+                    current_config['failures'] = None if math.isnan(failures) else failures
+                    current_config['ratio'] = float(1-reliability * current_config['costs']) if current_config['costs'] else None
 
                 # fetch the alphacuts
 #                json_alphacuts = {}
