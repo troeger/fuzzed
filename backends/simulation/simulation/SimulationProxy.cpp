@@ -73,7 +73,7 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 	SimulationImpl implementationType,
 	void* additionalArguments) 
 {
-	Simulation* sim;
+	Simulation* sim = nullptr;
 	SimulationResultStruct res;
 	switch (implementationType)
 	{
@@ -98,6 +98,7 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 		}
 	default:
 		assert(false);
+		return res;
 	}
 	
 	try
