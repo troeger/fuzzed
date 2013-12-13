@@ -40,24 +40,12 @@ namespace fs = boost::filesystem;
 
 SimulationProxy::SimulationProxy(int argc, char** arguments) :
 	m_numRounds(0),
-	m_convergenceThresh(0.0),
+	m_convergenceThresh(0.000005),
 	m_simulationTime(0),
 	m_bSimulateUntilFailure(true),
 	m_timeNetProperties(nullptr)
 {
-	try
-	{
-		// parseCommandline(argc, arguments);
-		parseCommandline_default(argc, arguments);
-	}
-	catch (const exception& e)
-	{
-		std::cerr << "Exception when invoking simulation: " << e.what();
-	}
-	catch (...)
-	{
-		std::cerr << "Unknown exception when invoking simulation";
-	}
+	parseCommandline_default(argc, arguments);
 }
 
 SimulationProxy::SimulationProxy(unsigned int numRounds, double convergenceThreshold, unsigned int maxTime) : 
