@@ -39,22 +39,13 @@ namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
 SimulationProxy::SimulationProxy(int argc, char** arguments) :
-	m_numRounds(0),
+	m_numRounds(DEFAULT_SIMULATION_ROUNDS),
 	m_convergenceThresh(0.000005),
-	m_simulationTime(0),
-	m_bSimulateUntilFailure(true),
+	m_simulationTime(DEFAULT_SIMULATION_TIME),
 	m_timeNetProperties(nullptr)
 {
 	parseCommandline_default(argc, arguments);
 }
-
-SimulationProxy::SimulationProxy(unsigned int numRounds, double convergenceThreshold, unsigned int maxTime) : 
-	m_numRounds(numRounds),
-	m_convergenceThresh(convergenceThreshold),
-	m_simulationTime(maxTime),
-	m_bSimulateUntilFailure(true),
-	m_timeNetProperties(nullptr)
-{}
 
 SimulationResultStruct SimulationProxy::runSimulationInternal(
 	const boost::filesystem::path& petriNetFile,
@@ -80,7 +71,7 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 				m_missionTime, 
 				m_numRounds,
 				m_convergenceThresh,
-				m_bSimulateUntilFailure);
+				true);
 
 			break;
 		}
@@ -127,7 +118,7 @@ bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
 }
 
 SimulationResultStruct SimulationProxy::simulateFaultTree(
-	std::shared_ptr<TopLevelEvent> ft,
+	const std::shared_ptr<TopLevelEvent> ft,
 	const boost::filesystem::path& workingDir,
 	std::ofstream* logfile,
 	SimulationImpl impl)
@@ -186,8 +177,7 @@ void SimulationProxy::simulateAllConfigurations(
 	if (!file.is_open())
 		throw runtime_error("Could not open file");
 
-	auto logFileStream = new std::ofstream(logFile.generic_string());
-
+	std::ofstream* logFileStream = new std::ofstream(logFile.generic_string());
 	simulationResults::SimulationResults simResults;
 
 	try
@@ -197,11 +187,13 @@ void SimulationProxy::simulateAllConfigurations(
 		if (!ftTransform.isValid())
 		{
 			const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
-			std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
+			const std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
 			if (ft)
 			{ // in this case there is only a faulttree, so no configuration information will be serialized
 
-				SimulationResultStruct res = simulateFaultTree(ft, workingDir, logFileStream, impl);
+				const SimulationResultStruct res = 
+					simulateFaultTree(ft, workingDir, logFileStream, impl);
+
 				simulationResults::Result r(
 					ft->getId(),
 					util::timeStamp(),
@@ -228,7 +220,8 @@ void SimulationProxy::simulateAllConfigurations(
 			{
 				std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
 				{
-					auto res = simulateFaultTree(simTree, workingDir, logFileStream, impl);
+					const SimulationResultStruct res = 
+						simulateFaultTree(simTree, workingDir, logFileStream, impl);
 
 					// debug output
 					// 			simTree->print(cout, 0);
@@ -264,15 +257,10 @@ void SimulationProxy::simulateAllConfigurations(
 	{
 		*logFileStream << e.what() << std::endl;
 	}
-	
-	
 }
 
 void SimulationProxy::parseCommandline_default(int numArguments, char** arguments)
-{
-	m_numRounds = DEFAULT_SIMULATION_ROUNDS;
-	m_simulationTime = DEFAULT_SIMULATION_TIME;
-	
+{	
 	CommandLineParser parser;
 	parser.parseCommandline(numArguments, arguments);
 
@@ -281,5 +269,5 @@ void SimulationProxy::parseCommandline_default(int numArguments, char** argument
 		parser.getOutputFilePath(),
 		parser.getWorkingDirectory(),
 		parser.getLogFilePath(),
-		DEFAULT);
+		DEFAULT /*Simulation Implementation: custom*/);
 }

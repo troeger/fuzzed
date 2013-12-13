@@ -43,13 +43,6 @@ class SimulationProxy
 public:
 	// constructor for command line tool
 	SimulationProxy(int numArguments, char** arguments);
-
-	// constructor for library calls
-	SimulationProxy(
-		unsigned int numRounds,
-		double convergenceThreshold,
-		unsigned int maxTime);
-
 	void parseCommandline_default(int numArguments, char** arguments);
 
 protected:
@@ -61,7 +54,8 @@ protected:
 		const boost::filesystem::path& logFile,
 		SimulationImpl impl);
 
-	SimulationResultStruct simulateFaultTree(std::shared_ptr<TopLevelEvent> ft,
+	SimulationResultStruct simulateFaultTree(
+		const std::shared_ptr<TopLevelEvent> ft,
 		const boost::filesystem::path& workingDir,
 		std::ofstream* logFile,
 		SimulationImpl impl);
@@ -76,10 +70,6 @@ protected:
 	unsigned int m_numRounds;
 	double m_convergenceThresh;
 
-	bool m_bSimulateUntilFailure;
-
-	boost::program_options::options_description m_options;
-	
 	static bool acceptFileExtension(const boost::filesystem::path& p);
 
 	TimeNETProperties* m_timeNetProperties; // ownership usually transferred to Simulation. Do NOT call delete on it. -.-
