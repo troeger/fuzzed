@@ -414,12 +414,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          */
         _escapePressed: function(event) {
             event.preventDefault();
-            //XXX: deselect everything
-            // This uses the jQuery.ui.selectable internal functions.
-            // We need to trigger them manually in order to simulate a click on the canvas.
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
-
+            this._deselectAll();
             return this;
         },
 
@@ -482,8 +477,8 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             // reset _clipboard
             this._clipboard = '';
 
-            // save selected nodes to nodes
-            var nodes = new Array;
+            // put nodes as dicts into nodes
+            var nodes = [];
             jQuery(selectedNodes).each(function(index, element) {
                 var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
                 if (node.copyable) {
@@ -491,9 +486,29 @@ function(Class, Menus, Canvas, Backend, Alerts) {
                 }
             }.bind(this));
 
-            this._clipboard = JSON.stringify(nodes);
-            console.log(nodes);
+            var edges = [];
+            jQuery(selectedEdges).each(function(index, element) {
+                var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
+                var sourceNode = edge.source.data(this.config.Keys.NODE);
+                var targetNode = edge.target.data(this.config.Keys.NODE);
+                // to do: create Edge class with toDict() method
+                var edgeDict = {
+                    'source':  sourceNode.id,
+                    'target':  targetNode.id
+                };
+                edges.push(edgeDict);
+            }.bind(this));
+
+            var clipboardDict = {
+                'nodes':  nodes,
+                'edges':  edges
+            };
+
+            this._clipboard = JSON.stringify(clipboardDict);
+            console.log(clipboardDict);
             console.log(this._clipboard);
+
+            return this;
         },
 
         /**
@@ -510,24 +525,70 @@ function(Class, Menus, Canvas, Backend, Alerts) {
         _pastePressed: function(event) {
             if (jQuery(event.target).is('input')) return this;
 
-            var nodes = JSON.parse(this._clipboard);
+            event.preventDefault();
+            this._deselectAll(); // why doesn't this work?
 
-            _.invoke(this.graph.nodes, 'deselect');
+            var clipboardDict = JSON.parse(this._clipboard);
+            var nodes = clipboardDict.nodes;
+            var edges = clipboardDict.edges;
+            var ids = []; // array of arrays with format: [old_id, new_id]
+
+            //_.invoke(this.graph.nodes, 'deselect');
+
+
 
             _.each(nodes, function(node) {
-                node.id = this.graph.getPasteId();
+                var pasteId = this.graph.createId();
+                ids.push([node.id, pasteId]);
+                node.id = pasteId;
                 node.x++; node.y++;
-                console.log(node);
-
                 this.graph.addNode(node.kind, node)
                            .select();
+            }.bind(this));
+
+            _.each(edges, function(edge) {
+                _.each(ids, function(id) {
+                    if(edge.source == id[0]) { // edge[1] is the destination, (still) represented by its old id
+                        edge.source = id[1];
+                    }
+                    if(edge.target == id[0]) {
+                        edge.target = id[1];
+                    }
+                }.bind(this));
+            }.bind(this));
+
+            _.each(edges, function(edge) {
+                var newEdge = jsPlumb.connect({
+                    source: this.graph.getNodeById(edge.source).container,
+                    target: this.graph.getNodeById(edge.target).container
+                });
+                this.graph.addEdge(newEdge);
             }.bind(this));
 
             //var nodes = JSON.parse(this._clipboard);
             //console.log(nodes);
 
 
+            return this;
+        },
 
+        /**
+         * Method: _deselectAll
+         *
+         *   Deselects all the nodes and edges in the current graph.
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+
+        _deselectAll: function() {
+            //XXX: deselect everything
+            // This uses the jQuery.ui.selectable internal functions.
+            // We need to trigger them manually in order to simulate a click on the canvas.
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
+
+            return this;
         },
 
         /**

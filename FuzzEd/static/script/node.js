@@ -79,8 +79,7 @@ function(Property, Mirror, Canvas, Class) {
 
             // logic
             if (typeof this.id === 'undefined') {
-                // make sure the 0 is not reassigned; it's reserved for the top event
-                this.id = new Date().getTime() + 1;
+                this.id = this.graph.createId();
             }
             this.config = this.getConfig();
 

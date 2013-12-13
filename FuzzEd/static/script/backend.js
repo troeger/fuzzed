@@ -119,13 +119,15 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
             var data = {
                 id:          edgeId,
                 source:      sourceNodeId,
-                destination: targetNodeId
+                target: targetNodeId
             };
 
             var xhr = jQuery.ajax({
                 url:      this._fullUrlForEdges(),
                 type:     'POST',
                 dataType: 'json',
+
+                async:     false,
 
                 data:     data,
                 success:  success  || jQuery.noop,
@@ -175,6 +177,8 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
                 url:      this._fullUrlForNodes(),
                 type:     'POST',
                 dataType: 'json',
+
+                async:      false,
 
                 data:     data,
                 success:  success  || jQuery.noop,

@@ -29,9 +29,9 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
         nodes:        {},
         name:         undefined,
         readOnly:     undefined,
+        seed:         undefined,
 
         _nodeClasses: {},
-        _smallestId:    undefined,
 
         /**
          *  Group: Initialization
@@ -47,6 +47,7 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
         init: function(json) {
             this.id     = json.id;
             this.name   = json.name;
+            this.seed   = json.seed;
             this.config = this.getConfig();
 
             this._loadFromJson(json)
@@ -68,15 +69,10 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
 
             var maxX = 0;
             var maxY = 0;
-            // We look for the smallest ID in the current graph (see also: <Graph::getPasteId>
-            this._smallestId = new Date().getTime();
 
             // parse the json nodes and convert them to node objects
             _.each(json.nodes, function(jsonNode) {
                 node = this.addNode(jsonNode.kind, jsonNode);
-
-                // We want to skip the Top Event, whose ID is 0
-                if (node.id != 0) this._smallestId = Math.min(this._smallestId, node.id);
             }.bind(this));
 
             // connect the nodes again
@@ -87,8 +83,6 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
                 });
                 edge._fuzzedId = jsonEdge.id;
                 this.addEdge(edge);
-
-                this._smallestId = Math.min(this._smallestId, edge._fuzzedId);
             }.bind(this));
 
             return this;
@@ -142,7 +136,7 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
          */
         addEdge: function(edge) {
             if (typeof edge._fuzzedId === 'undefined') {
-                edge._fuzzedId = new Date().getTime() + 1;
+                edge._fuzzedId = this.createId();
             }
 
             // store the ID in an attribute so we can retrieve it later from the DOM element
@@ -367,21 +361,18 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
             throw new SubclassResponsibility();
         },
 
-
         /**
-         *  Method: getPasteId
-         *    Background: Pasted items need special IDs. Because a node without an ID gets the current timestamp and
-         *    pasting multiple objects at once would cause ID collisions, this method generates unused IDs by
-         *    counting back from the smallest ID/timestamp in the graph.
+         *  Method: createId
+         *    Returns a new unique id for nodes or edges.
          *
          *  Returns:
-         *    {number} unused ID
+         *    {Number} The next free node or edge id
          *
          *  See also:
          *    <Editor::_pastePressed>
          */
-        getPasteId: function() {
-            return --this._smallestId;
+        createId: function() {
+            return ++this.seed;
         },
 
 
