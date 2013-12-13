@@ -17,7 +17,6 @@ set(SOURCES
    petrinet/ImmediateTransition.cpp
    petrinet/PNMLImport.cpp
    petrinet/PetriNet.cpp
-   petrinet/SequentialConstraint.cpp
 )
 
 set(HEADERS
@@ -39,8 +38,6 @@ set(HEADERS
    petrinet/ImmediateTransition.h
    petrinet/PNMLImport.h
    petrinet/PetriNet.h
-   petrinet/SequentialConstraint.h
-   petrinet/PetriNetConstraint.h
 )
 
 if (USE_TIMENET)

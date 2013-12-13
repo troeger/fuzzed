@@ -10,7 +10,6 @@
 #endif
 
 #include "Condition.h"
-#include "petrinet/SequentialConstraint.h"
 
 /************************************************************************/
 /* Abstract Class for XML documents representing Petri Nets             */
