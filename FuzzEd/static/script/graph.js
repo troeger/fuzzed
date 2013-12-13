@@ -72,17 +72,12 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
 
             // parse the json nodes and convert them to node objects
             _.each(json.nodes, function(jsonNode) {
-                node = this.addNode(jsonNode.kind, jsonNode);
+                this.addNode(jsonNode.kind, jsonNode);
             }.bind(this));
 
             // connect the nodes again
             _.each(json.edges, function(jsonEdge) {
-                var edge = jsPlumb.connect({
-                    source: this.getNodeById(jsonEdge.source).container,
-                    target: this.getNodeById(jsonEdge.target).container
-                });
-                edge._fuzzedId = jsonEdge.id;
-                this.addEdge(edge);
+                this.addEdge(jsonEdge);
             }.bind(this));
 
             return this;
@@ -103,11 +98,11 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
          */
         _registerEventHandlers: function() {
             jsPlumb.bind('jsPlumbConnection', function(edge) {
-                this.addEdge(edge.connection);
+                this._addEdge(edge.connection);
             }.bind(this));
 
             jsPlumb.bind('jsPlumbConnectionDetached', function(edge) {
-                this.deleteEdge(edge.connection);
+                this._deleteEdge(edge.connection);
             }.bind(this));
 
             jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
@@ -122,11 +117,35 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
 
         /**
          *  Method: addEdge
-         *    Adds a given edge to this graph. It will also assign a unique _fuzzedId to it and store it by this
-         *    ID in the <edges> member.
+         *    Adds a given edge to this graph by "jsPlumb.connecting" source and target node as if it was done manually.
+         *    Only used if an edge needs to be added programmatically and not manually. Manual creation of an edge (i.e.
+         *    connect-dragging nodes in the editor) is done by jsPlumbConnection event, which calls _addEdge directly.
          *
          *  Parameters:
-         *    {jsPlumb::Connection} edge - Edge to be added to the graph.
+         *    {JSON} jsonEdge - JSON representation of the edge to be added to the graph.
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
+         *
+         *  See also:
+         *    <Graph::_registerEventHandlers>
+         */
+        addEdge: function(jsonEdge) {
+            jsPlumb.connect({
+                source: this.getNodeById(jsonEdge.source).container,
+                target: this.getNodeById(jsonEdge.target).container
+            });
+
+            return this;
+        },
+
+        /**
+         *  Method: _addEdge
+         *    Actual register of a new edge in the graph object and call home via backend.
+         *
+         *  Parameters:
+         *    {jsPlumb::Connection} jsPlumbEdge - Edge to be added to the graph object. jsPlumbEdge has to be already
+         *      "jsPlumb.connected". If you want to add an edge programmatically, use <Graph::addEdge> instead.
          *
          *  Triggers:
          *    <Config::Events::GRAPH_EDGE_ADDED>
@@ -134,29 +153,28 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
          *  Returns:
          *    This <Graph> instance for chaining.
          */
-        addEdge: function(edge) {
-            if (typeof edge._fuzzedId === 'undefined') {
-                edge._fuzzedId = this.createId();
-            }
+        _addEdge: function(jsPlumbEdge) {
+            jsPlumbEdge._fuzzedId = (typeof jsPlumbEdge._fuzzedId === 'undefined') ? this.createId() : jsPlumbEdge.id;
 
             // store the ID in an attribute so we can retrieve it later from the DOM element
-            jQuery(edge.canvas).attr(this.config.Attributes.CONNECTION_ID, edge._fuzzedId);
+            jQuery(jsPlumbEdge.canvas).data(this.config.Attributes.CONNECTION_ID, jsPlumbEdge._fuzzedId);
 
-            var sourceNode = edge.source.data(this.config.Keys.NODE);
-            var targetNode = edge.target.data(this.config.Keys.NODE);
+            var sourceNode = jsPlumbEdge.source.data(this.config.Keys.NODE);
+            var targetNode = jsPlumbEdge.target.data(this.config.Keys.NODE);
 
             sourceNode.setChildProperties(targetNode);
 
-            this.edges[edge._fuzzedId] = edge;
+            // register edge in graph object
+            this.edges[jsPlumbEdge._fuzzedId] = jsPlumbEdge;
 
-            sourceNode.outgoingEdges.push(edge);
-            targetNode.incomingEdges.push(edge);
+            // correct target and source node incoming and outgoing edges
+            sourceNode.outgoingEdges.push(jsPlumbEdge);
+            targetNode.incomingEdges.push(jsPlumbEdge);
 
+            // call home
             jQuery(document).trigger(
                 this.config.Events.GRAPH_EDGE_ADDED,
-                [edge._fuzzedId,
-                sourceNode.id,
-                targetNode.id]
+                [jsPlumbEdge._fuzzedId, sourceNode.id, targetNode.id]
             );
 
             return this;
@@ -164,10 +182,32 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
 
         /**
          *  Method: deleteEdge
-         *    Deletes the given edges from the graph if present.
+         *    Deletes a given edge from this graph. Calls jsPlumb.detach, which calls _deleteEdge. Functionality is
+         *    splitted into deleteEdge and _deleteEdge as in addEdge.
          *
          *  Parameters:
-         *    {jsPlumb::Connection} edge - Edge to be removed from this graph.
+         *    {jsPlumbEdge} jsPlumbEdge - jsPlumbEdge to be deleted from the graph. (Some day this will be the edge model
+         *      object.)
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
+         *
+         *  See also:
+         *    <Graph::_registerEventHandlers>
+         */
+        deleteEdge: function(jsPlumbEdge) {
+            jsPlumb.detach(jsPlumbEdge);
+
+            return this;
+        },
+
+
+        /**
+         *  Method: _deleteEdge
+         *    Deletes the given edge from the graph.
+         *
+         *  Parameters:
+         *    {jsPlumb::Connection} edge - Edge to be deleted from this graph.
          *
          *  Triggers:
          *    <Config::Events::GRAPH_EDGE_DELETED>
@@ -175,20 +215,20 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
          *  Returns:
          *    This <Graph> instance for chaining.
          */
-        deleteEdge: function(edge) {
-            var id         = edge._fuzzedId;
-            var sourceNode = edge.source.data(this.config.Keys.NODE);
-            var targetNode = edge.target.data(this.config.Keys.NODE);
+        _deleteEdge: function(jsPlumbEdge) {
+            var id         = jsPlumbEdge._fuzzedId;
+            var sourceNode = jsPlumbEdge.source.data(this.config.Keys.NODE);
+            var targetNode = jsPlumbEdge.target.data(this.config.Keys.NODE);
 
             sourceNode.restoreChildProperties(targetNode);
 
-            sourceNode.outgoingEdges = _.without(sourceNode.outgoingEdges, edge);
-            targetNode.incomingEdges = _.without(targetNode.incomingEdges, edge);
+            // correct target and source node incoming and outgoing edges
+            sourceNode.outgoingEdges = _.without(sourceNode.outgoingEdges, jsPlumbEdge);
+            targetNode.incomingEdges = _.without(targetNode.incomingEdges, jsPlumbEdge);
 
+            // call home
             jQuery(document).trigger(this.config.Events.GRAPH_EDGE_DELETED, id);
             delete this.edges[id];
-
-            return this;
         },
 
         /**

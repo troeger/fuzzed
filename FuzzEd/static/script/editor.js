@@ -391,8 +391,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             // delete selected edges
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
-                jsPlumb.detach(edge);
+                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Attributes.CONNECTION_ID));
                 this.graph.deleteEdge(edge);
             }.bind(this));
 
@@ -562,7 +561,6 @@ function(Class, Menus, Canvas, Backend, Alerts) {
                     source: this.graph.getNodeById(edge.source).container,
                     target: this.graph.getNodeById(edge.target).container
                 });
-                this.graph.addEdge(newEdge);
             }.bind(this));
 
             //var nodes = JSON.parse(this._clipboard);
