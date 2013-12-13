@@ -242,9 +242,9 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	for (TimedTransition* tt : pn->m_inactiveTimedTransitions)
 	{
 		if (tt->tryUpdateStartupTime(tick))
-		{
+		{ // tt is enabled and the firing time was updated (race with enabling memory)
 			toRemove.emplace_back(tt);
-			pn->updateFiringTime(tt);
+			pn->updateFiringTime(tt); // inserts tt's firing time in the event queue
 		}
 	}
 	for (TimedTransition* tt : toRemove)
@@ -265,7 +265,7 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 	{
 		result.valid = true;
 		result.failed = false;
-		return result; // TODO check this earlier
+		return result; // TODO check this earlier, the initial state of the petri net is invalid
 	}
 
 	auto elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();

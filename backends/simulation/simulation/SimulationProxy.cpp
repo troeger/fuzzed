@@ -108,15 +108,6 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 	return res;
 }
 
-bool SimulationProxy::acceptFileExtension(const boost::filesystem::path& p)
-{
-	return
-		p.extension() == PNML::PNML_EXT ||
-		p.extension() == fuzzTree::FUZZ_TREE_EXT ||
-		p.extension() == faultTree::FAULT_TREE_EXT ||
-		p.extension() == timeNET::TN_EXT;
-}
-
 SimulationResultStruct SimulationProxy::simulateFaultTree(
 	const std::shared_ptr<TopLevelEvent> ft,
 	const boost::filesystem::path& workingDir,
@@ -126,7 +117,7 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 	std::shared_ptr<PNDocument> doc;
 
 	m_missionTime = ft->getMissionTime();
-	if (m_missionTime <= 1) // TODO: print simulation warning here!
+	if (m_missionTime <= 1)
 		std::cout 
 			<< "Warning: Components are assumed to fail one at the time."
 			<< "For a very short mission time, possible failures may never occur." 
@@ -138,6 +129,9 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 		doc = std::shared_ptr<PNMLDocument>(new PNMLDocument());
 		ft->serializePTNet(doc);
 		break;
+
+	// TimeNET and printing just structure formulas need a different type of document
+	// since the structure formula is only printed as a TimeNET expression
 	case TIMENET:
 		m_timeNetProperties->maxExecutionTime = m_simulationTime;
 		m_timeNetProperties->transientSimTime = m_missionTime;
@@ -145,11 +139,8 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 		auto TNdoc = std::shared_ptr<TNDocument>(new TNDocument());
 		ft->serializeTimeNet(TNdoc);
 		doc = TNdoc;
-		break;
-	}
-
-	if (impl == STRUCTUREFORMULA_ONLY)
 		return SimulationResultStruct();
+	}
 
 	const std::string petriNetFile = 
 		workingDir.generic_string() + "petrinet" + 

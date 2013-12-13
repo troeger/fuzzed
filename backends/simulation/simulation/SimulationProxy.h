@@ -70,7 +70,5 @@ protected:
 	unsigned int m_numRounds;
 	double m_convergenceThresh;
 
-	static bool acceptFileExtension(const boost::filesystem::path& p);
-
 	TimeNETProperties* m_timeNetProperties; // ownership usually transferred to Simulation. Do NOT call delete on it. -.-
 };
