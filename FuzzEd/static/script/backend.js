@@ -46,22 +46,27 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *   <Config::Events::GRAPH_NODE_ADDED>
          *   <Config::Events::GRAPH_NODE_DELETED>
          *   <Config::Events::GRAPH_EDGE_DELETED>
+         *   <Config::Events::EDITOR_GRAPH_EXPORT_PDF>
+         *   <Config::Events::EDITOR_GRAPH_EXPORT_EPS>
          *   <Config::Events::EDITOR_CALCULATE_CUTSETS>
+         *   <Config::Events::EDITOR_CALCULATE_ANALYTICAL_PROBABILITY>
+         *   <Config::Events::EDITOR_CALCULATE_SIMULATED_PROBABILITY>
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
         activate: function() {
             jQuery(document)
-                .on(Config.Events.PROPERTY_CHANGED,    this.nodePropertyChanged.bind(this))
-                .on(Config.Events.GRAPH_NODE_ADDED,         this.graphNodeAdded.bind(this))
-                .on(Config.Events.GRAPH_NODE_DELETED,       this.graphNodeDeleted.bind(this))
-                .on(Config.Events.GRAPH_EDGE_ADDED,         this.graphEdgeAdded.bind(this))
-                .on(Config.Events.GRAPH_EDGE_DELETED,       this.graphEdgeDeleted.bind(this))
-                .on(Config.Events.EDITOR_GRAPH_EXPORT_PDF,  this.graphExport.bind(this))
-                .on(Config.Events.EDITOR_GRAPH_EXPORT_EPS,  this.graphExport.bind(this))
-                .on(Config.Events.EDITOR_CALCULATE_CUTSETS, this.calculateCutsets.bind(this))
-                .on(Config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY, this.calculateTopEventProbability.bind(this));
+                .on(Config.Events.PROPERTY_CHANGED,                        this.nodePropertyChanged.bind(this))
+                .on(Config.Events.GRAPH_NODE_ADDED,                        this.graphNodeAdded.bind(this))
+                .on(Config.Events.GRAPH_NODE_DELETED,                      this.graphNodeDeleted.bind(this))
+                .on(Config.Events.GRAPH_EDGE_ADDED,                        this.graphEdgeAdded.bind(this))
+                .on(Config.Events.GRAPH_EDGE_DELETED,                      this.graphEdgeDeleted.bind(this))
+                .on(Config.Events.EDITOR_GRAPH_EXPORT_PDF,                 this.graphExport.bind(this))
+                .on(Config.Events.EDITOR_GRAPH_EXPORT_EPS,                 this.graphExport.bind(this))
+                .on(Config.Events.EDITOR_CALCULATE_CUTSETS,                this.calculateCutsets.bind(this))
+                .on(Config.Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY, this.calculateAnalyticalProbability.bind(this))
+                .on(Config.Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY,  this.calculateSimulatedProbability.bind(this));
             return this;
         },
 
@@ -76,7 +81,11 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *   <Config::Events::GRAPH_NODE_ADDED>
          *   <Config::Events::GRAPH_NODE_DELETED>
          *   <Config::Events::GRAPH_EDGE_DELETED>
+         *   <Config::Events::EDITOR_GRAPH_EXPORT_PDF>
+         *   <Config::Events::EDITOR_GRAPH_EXPORT_EPS>
          *   <Config::Events::EDITOR_CALCULATE_CUTSETS>
+         *   <Config::Events::EDITOR_CALCULATE_ANALYTICAL_PROBABILITY>
+         *   <Config::Events::EDITOR_CALCULATE_SIMULATED_PROBABILITY>
          *
          * Returns:
          *   This {<Backend>} instance for chaining.
@@ -91,7 +100,8 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
                 .off(Config.Events.EDITOR_GRAPH_EXPORT_PDF)   
                 .off(Config.Events.EDITOR_GRAPH_EXPORT_EPS)                
                 .off(Config.Events.EDITOR_CALCULATE_CUTSETS)
-                .off(Config.Events.EDITOR_CALCULATE_TOP_EVENT_PROBABILITY);
+                .off(Config.Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY)
+                .off(Config.Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY);
             return this;
         },
 
@@ -371,8 +381,8 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
         },
 
         /**
-         *  Method: calculateTopEventProbability
-         *    Tell the backend to calculate the probability of the top event. This is an asynchronous request, i.e. the
+         *  Method: calculateAnalyticalProbability
+         *    Tell the backend to calculate the analytical probability of the top event. This is an asynchronous request, i.e. the
          *    success callback will get a <Job> object it can use to receive the final result.
          *
          *  Parameters:
@@ -381,9 +391,44 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *    {Function} error    - [optional] Callback that gets called in case of an error.
          *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
-        calculateTopEventProbability: function(event, success, error, complete) {
+        calculateAnalyticalProbability: function(event, success, error, complete) {
             jQuery.ajax({
-                url:    this._fullUrlForTopEventProbability(),
+                url:    this._fullUrlForAnalyticalProbability(),
+                // don't show progress
+                global: false,
+
+                statusCode: {
+                    201: function(data, status, req) {
+                        var jobUrl = req.getResponseHeader('location');
+                        if (typeof success !== 'undefined') {
+                            success(new Job(jobUrl));
+                        }
+                    }
+                },
+
+                error: function(jqXHR, errorStatus, errorThrown) {
+                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
+                complete: complete || jQuery.noop
+            });
+        },
+
+        /**
+         *  Method: calculateSimulatedProbability
+         *    Tell the backend to calculate the simulated probability of the top event. This is an asynchronous request, i.e. the
+         *    success callback will get a <Job> object it can use to receive the final result.
+         *
+         *  Parameters:
+         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job submission
+         *                          was successful.
+         *    {Function} error    - [optional] Callback that gets called in case of an error.
+         *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
+         */
+        calculateSimulatedProbability: function(event, success, error, complete) {
+            jQuery.ajax({
+                url:    this._fullUrlForSimulatedProbability(),
                 // don't show progress
                 global: false,
 
@@ -475,6 +520,17 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
         },
 
         /**
+         * Method: _fullUrlForSimulation
+         *   Calculates the AJAX backend URL for this simulation resources for this graph (see: <Backend::_graphId>).
+         *
+         * Returns:
+         *   The analysis URL as {String}.
+         */
+        _fullUrlForSimulation: function() {
+            return this._fullUrlForGraph() + Config.Backend.SIMULATION_URL;
+        },
+
+        /**
          * Method: _fullUrlForGraph
          *   Calculates the AJAX backend URL for this graph (see: <Backend::_graphId>).
          *
@@ -537,7 +593,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
 
         /**
          * Method: _fullUrlForCutsets
-         *   Calculates the AJAX backend URL calculating the cutsets of a graph. Cutsets are only available in Fault- and
+         *   Calculates the AJAX backend URL for calculating the cutsets of a graph. Cutsets are only available in Fault- and
          * Fuzztrees.
          *
          * Returns:
@@ -547,8 +603,28 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
             return this._fullUrlForAnalysis() + Config.Backend.CUTSETS_URL;
         },
 
-        _fullUrlForTopEventProbability: function() {
-            return this._fullUrlForAnalysis() + Config.Backend.TOP_EVENT_PROBABILITY_URL;
+        /**
+         * Method: _fullUrlForAnalyticalProbability
+         *   Calculates the AJAX backend URL for calculating the analytical probability of a graph. This feature is only
+         *   available in Fault- and Fuzztrees.
+         *
+         * Returns:
+         *   The analytical probability URL as {String}.
+         */
+        _fullUrlForAnalyticalProbability: function() {
+            return this._fullUrlForAnalysis() + Config.Backend.ANALYTICAL_PROBABILITY_URL;
+        },
+
+        /**
+         * Method: _fullUrlForSimulatedProbability
+         *   Calculates the AJAX backend URL for calculating the simulated probability of a graph. This feature is only
+         *   available in Fault- and Fuzztrees.
+         *
+         * Returns:
+         *   The simulation probability URL as {String}.
+         */
+        _fullUrlForSimulatedProbability: function() {
+            return this._fullUrlForSimulation() + Config.Backend.SIMULATED_PROBABILITY_URL;
         },
 
         /**

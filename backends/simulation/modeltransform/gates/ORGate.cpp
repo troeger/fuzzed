@@ -66,12 +66,12 @@ std::string ORGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) const
 
 void ORGate::initActivationFunc()
 {
-	m_activationFunc = [](NodeValueMap childValues) -> long double 
+	m_activationFunc = [](NodeValueMap childValues) -> double 
 	{
-		long double result = 1.0;
+		double result = 1.0;
 		for (const auto& p : childValues)
 			result *= 1.0 - p.second;
 
-		return 1.0L - result;
+		return 1.0 - result;
 	};
 }

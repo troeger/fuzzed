@@ -76,7 +76,7 @@ TNDocument::TNDocument()
 	: PNDocument()
 {}
 
-int TNDocument::addTimedTransition(long double rate, const std::string& /*= ""*/)
+int TNDocument::addTimedTransition(double rate, const std::string& /*= ""*/)
 {
 	const string id = TRANSITION_IDENTIFIER + util::toString((int)m_transitions.size());
 	m_transitions[id] = TN_TransitionSpec((boost::format(EXPTRANSITIONTEMPLATE) % id % (1.0/rate) % 1).str());

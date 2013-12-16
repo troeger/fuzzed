@@ -33,14 +33,6 @@ std::string util::toString(const double& d, const int& prec /*= 5*/)
 	return oss.str();
 }
 
-std::string util::toString(const long double& d, const int& prec /*= 5*/)
-{
-	std::ostringstream oss;
-	oss << std::fixed << std::setprecision(prec);
-	oss << d;
-	return oss.str();
-}
-
 string util::toString(istream& istream)
 {
 	int pos = istream.tellg();
@@ -85,16 +77,16 @@ string util::timeStamp()
 	return strm.str();
 }
 
-long double util::kOutOfN(long double rate, int k, int N)
+double util::kOutOfN(double rate, int k, int N)
 {
 	if (k > N)
 		return rate;
 	
-	long double sum = 0.0L;
+	double sum = 0.0L;
 	for (int i : counting_range(k, N))
 	{
 		double binom = math::binomial_coefficient<double>(N, i);
-		sum += binom * std::pow(rate, i) * std::pow(1.0L - rate, N-i);
+		sum += binom * std::pow(rate, i) * std::pow(1.0 - rate, N-i);
 	}
 	return sum;
 }

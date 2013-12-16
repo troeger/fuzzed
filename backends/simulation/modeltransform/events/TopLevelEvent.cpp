@@ -4,7 +4,7 @@
 #include "gates/Gate.h"
 
 TopLevelEvent::TopLevelEvent(const std::string& ID /*= 0*/, const unsigned int& missionTime)
-	: Event(ID, 0.0L)
+	: Event(ID, 0.0)
 	, m_missionTime(missionTime)
 {}
 

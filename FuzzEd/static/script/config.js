@@ -62,27 +62,32 @@ define(['underscore'], function() {
          *    Backend-specific constants.
          *
          *  Constants:
-         *    {String} ANALYSIS_URL              - Part of the sub-URL that is common for all analysis calls.
-         *    {String} BASE_URL                  - Part of the sub-URL that is common for all API calls.
-         *    {String} EDITOR_URL                - Part of the sub-URL that is common for all editor API calls.
-         *    {String} GRAPHS_URL                - Part of the sub-URL used to perform graph-specific API calls.
-         *    {String} NODES_URL                 - Part of the sub-URL used to perform node-specific API calls.
-         *    {String} EDGES_URL                 - Part of the sub-URL used to perform edge-specific API calls.
-         *    {String} TRANSFERS_URL             - Part of the sub-URL used to perform transferable specific API calls.
-         *    {String} CUTSETS_URL               - Part of the sub-URL used to perform cutset-specific API calls.
-         *    {String} TOP_EVENT_PROBABILITY_URL - Part of the sub-URL used to top event calculation API calls.
+         *    {String} ANALYSIS_URL               - Part of the sub-URL that is common for all analysis calls.
+         *    {String} SIMULATION_URL             - Part of the sub-URL that is common for all simulation calls.
+         *    {String} BASE_URL                   - Part of the sub-URL that is common for all API calls.
+         *    {String} EDITOR_URL                 - Part of the sub-URL that is common for all editor API calls.
+         *    {String} GRAPHS_URL                 - Part of the sub-URL used to perform graph-specific API calls.
+         *    {String} NODES_URL                  - Part of the sub-URL used to perform node-specific API calls.
+         *    {String} EDGES_URL                  - Part of the sub-URL used to perform edge-specific API calls.
+         *    {String} TRANSFERS_URL              - Part of the sub-URL used to perform transferable specific API calls.
+         *    {String} CUTSETS_URL                - Part of the sub-URL used to perform cutset-specific API calls.
+         *    {String} ANALYTICAL_PROBABILITY_URL - Part of the sub-URL used for top event analytical probability API calls.
+         *    {String} SIMULATED_PROBABILITY_URL  - Part of the sub-URL used for top event simulated probability API calls.
+         *    {String} GRAPH_EXPORT_URL           - Part of the sub-URL used for graph export API calls.
          */
         Backend: {
-            ANALYSIS_URL:              '/analysis',
-            BASE_URL:                  '/api',
-            EDITOR_URL:                '/editor',
-            GRAPHS_URL:                '/graphs',
-            NODES_URL:                 '/nodes',
-            EDGES_URL:                 '/edges',
-            TRANSFERS_URL:             '/transfers',
-            CUTSETS_URL:               '/cutsets',
-            TOP_EVENT_PROBABILITY_URL: '/topEventProbability',
-            GRAPH_EXPORT_URL:          '/exports'
+            ANALYSIS_URL:               '/analysis',
+            SIMULATION_URL:             '/simulation',
+            BASE_URL:                   '/api',
+            EDITOR_URL:                 '/editor',
+            GRAPHS_URL:                 '/graphs',
+            NODES_URL:                  '/nodes',
+            EDGES_URL:                  '/edges',
+            TRANSFERS_URL:              '/transfers',
+            CUTSETS_URL:                '/cutsets',
+            ANALYTICAL_PROBABILITY_URL: '/topEventProbability',
+            SIMULATED_PROBABILITY_URL:  '/topEventProbability',
+            GRAPH_EXPORT_URL:           '/exports'
         },
 
         /**
@@ -266,8 +271,6 @@ define(['underscore'], function() {
          *    {String} SHAPES_MENU                 - The container for the shapes menu.
          *    {String} SPLASH                      - The splash screen element.
          *    {String} ACTION_GRID_TOGGLE          - The list element that contains the grid toggle menu entry.
-         *    {String} ACTION_CUTSETS              - The list element that contains the cut set analysis menu entry.
-         *    {String} ACTION_ANALYTICAL           - The list element that contains the analytical analysis menu entry.
          *    {String} PROGRESS_INDICATOR_SINGLE   - The nav entry containing the progress indicator for single active jobs.
          *    {String} PROGRESS_INDICATOR_DROPDOWN - The nav entry containing the dropdown for multiple active jobs.
          */
@@ -279,8 +282,6 @@ define(['underscore'], function() {
             SHAPES_MENU:                 'FuzzEdShapes',
             SPLASH:                      'FuzzEdSplash',
             ACTION_GRID_TOGGLE:          'FuzzEdActionGridToggle',
-            ACTION_CUTSETS:              'FuzzEdActionCutsets',
-            ACTION_ANALYTICAL:           'FuzzEdActionAnalytical',
             ACTION_EXPORT_PDF:           'FuzzEdActionExportPDF',
             ACTION_EXPORT_EPS:           'FuzzEdActionExportEPS',
             PROGRESS_INDICATOR_SINGLE:   'FuzzEdProgressIndicatorSingle',

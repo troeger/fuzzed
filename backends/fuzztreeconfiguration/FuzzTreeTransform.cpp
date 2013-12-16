@@ -215,7 +215,6 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 				if (featureNode->children().size() == 0)
 				{
 					throw FatalException(std::string("FeatureVP without children found: ") + id, 0, id);
-					return WRONG_CHILD_NUM;
 				}
 
 				vector<FuzzTreeConfiguration> newConfigs;
@@ -329,7 +328,6 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 				throw FatalException(
 					std::string("Redundancy VP with invalid number of children found: ") + util::toString(numChildren),
 					0, id);
-				return WRONG_CHILD_NUM;
 			}
 			const auto& firstChild = currentChild.children().front();
 			const type_info& childTypeName = typeid(firstChild);
@@ -593,23 +591,6 @@ void FuzzTreeTransform::copyNode(
 	{
 		throw FatalException(std::string("Unexpected Node Type encountered: ") + typeName.name(), 0, id);
 	}
-}
-
-void FuzzTreeTransform::generateConfigurationsFile(const std::string& outputXML)
-{
-	vector<FuzzTreeConfiguration> results;
-	generateConfigurations(results);
-
-	configurationResults::ConfigurationResults configResults;
-	for (const FuzzTreeConfiguration& c : results)
-	{
-		configurationResults::Result r;
-		r.configuration(serializedConfiguration(c));
-		configResults.result().push_back(r);
-	}
-
-	std::ofstream output(outputXML);
-	configurationResults::configurationResults(output, configResults);
 }
 
 xml_schema::Properties FuzzTreeTransform::validationProperties()

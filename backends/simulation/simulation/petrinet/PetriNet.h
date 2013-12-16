@@ -3,7 +3,6 @@
 #include "ImmediateTransition.h"
 #include "TimedTransition.h"
 #include "Place.h"
-#include "SequentialConstraint.h"
 
 #include <set>
 #include <map>
@@ -32,8 +31,7 @@ public:
 		const vector<ImmediateTransition>& immediateTransitions, 
 		const vector<TimedTransition>& timedTransitions, 
 		const map<string, Place>& places,
-		const ArcList& arcDict,
-		const vector<SequentialConstraint>& constraints);
+		const ArcList& arcDict);
 
 	PetriNet(const PetriNet& otherNet);
 	PetriNet& operator=(const PetriNet& rhs);
@@ -74,8 +72,6 @@ protected:
 	void setup();
 
 	void applyToAllTransitions(std::function<void (Transition& t)> func);
-
-	vector<SequentialConstraint> m_constraints;
 
 	vector<ImmediateTransition> m_immediateTransitions; 
 	vector<TimedTransition> m_timedTransitions;

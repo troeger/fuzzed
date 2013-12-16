@@ -86,10 +86,7 @@ PetriNet* PNMLImport::loadPNML(const string& fileName) noexcept
 		if (!userDescription.empty())
 			cout << "DESCRIPTION:  " << userDescription << endl;
 
-		vector<SequentialConstraint> constraints;
-		import.loadConstraints(constraints);
-
-		return new PetriNet(immediateTransitions, timedTransitions, placeDict, arcList, constraints);
+		return new PetriNet(immediateTransitions, timedTransitions, placeDict, arcList);
 	}
 	catch (const exception& e)
 	{
@@ -179,7 +176,7 @@ void PNMLImport::loadTransitions(
 		else
 		{ // immediateTransition
 			const double rate = parseDoubleValue(child, RATE_TAG, 1.0);
-			const int prio = parseIntegerValue(child, PRIORITY_TAG, 1.0);
+			const int prio = parseIntegerValue(child, PRIORITY_TAG, 1);
 			immediateTransitions.emplace_back(ID, rate, prio);
 		}
 	}
@@ -196,21 +193,3 @@ void PNMLImport::loadUserDescription(string& description)
 
 PNMLImport::~PNMLImport()
 {}
-
-void PNMLImport::loadConstraints(vector<SequentialConstraint>& constraints)
-{
-	for (const xml_node& child : m_rootNode.children(TOOL_SPECIFIC_TAG))
-	{
-		for (const xml_node& constraintChild : child.children(SEQUENCE_CONSTRAINT))
-		{
-			vector<string> sequence;
-			const string seqString = constraintChild.attribute(SEQUENCE_LIST).as_string();
-			util::tokenizeString(seqString, sequence);
-#ifdef STATIC_SEQUENCE
-			constraints.emplace_back(SequentialConstraint(sequence, STATIC_TRANSITIION_SEQ));
-#else
-			constraints.emplace_back(SequentialConstraint(sequence, DYNAMIC_PLACE_SEQ));
-#endif
-		}
-	}
-}
