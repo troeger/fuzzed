@@ -248,15 +248,18 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         _setupResizing: function() {
             this.container.resizable({
                 minHeight: this.container.height(), // use current height as minimum
+                maxHeight: this.container.height(),
                 resize: function(event, ui) {
-                    // fit all available space with chart
-                    this._chartContainer.height(this.container.height() - this._gridContainer.outerHeight());
+                    if (this._chart != null) {
+                        // fit all available space with chart
+                        this._chartContainer.height(this.container.height() - this._gridContainer.outerHeight());
 
-                    this._chart.setSize(
-                        this._chartContainer.width(),
-                        this._chartContainer.height(),
-                        false
-                    );
+                        this._chart.setSize(
+                            this._chartContainer.width(),
+                            this._chartContainer.height(),
+                            false
+                        );
+                    }
 
                     this._gridContainer.width(this._chartContainer.width());
                     this._grid.resizeCanvas();
