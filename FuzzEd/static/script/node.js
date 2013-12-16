@@ -453,7 +453,7 @@ function(Property, Mirror, Canvas, Class) {
                         if (typeof nodeInstance === 'undefined') return;
 
                         // ... and report to the backend this time because dragging ended
-                        nodeInstance.moveTo({
+                        nodeInstance.moveToPixel({
                             'x': initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
                             'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
                         });
@@ -884,6 +884,28 @@ function(Property, Mirror, Canvas, Class) {
         },
 
         /**
+         *  Method: _hierarchy
+         *    Recursively computes a dictionary representation of this node's hierarchy.
+         *
+         *  Returns:
+         *    A dictionary representation of this node's hierarchy. Each entry represents a node with its ID and a list
+         *    of children.
+         *
+         *  Note:
+         *    This only works with graphs for the moment! Cycles will produce infinite loops.
+         */
+        _hierarchy: function() {
+            var result = {id: this.id};
+
+            var children = this.getChildren();
+            if (children.length != 0) {
+                result.children = _.map(children, function(node) {return node._hierarchy();});
+            }
+
+            return result;
+        },
+
+        /**
          * Group: DOM Manipulation
          */
 
@@ -901,20 +923,21 @@ function(Property, Mirror, Canvas, Class) {
         moveBy: function(offset) {
             var position = this.container.position();
 
-            return this.moveTo({
+            return this.moveToPixel({
                 x: position.left + this._nodeImage.xCenter + offset.x,
                 y: position.top  + this._nodeImage.yCenter + offset.y
             });
         },
 
         /**
-         * Method: moveTo
+         * Method: moveToPixel
          *   Moves the node's visual representation to the given coordinates and reports to backend. The center of the
          *   node's image is the anchor point for the translation.
          *
          * Parameters:
          *   {Object} position      - Object in the form of {x: ..., y: ...} containing the pixel coordinates to move
          *                            the node to.
+         *   {boolean} animated     - [optional] If true, the node repositioning is animated.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
@@ -922,12 +945,39 @@ function(Property, Mirror, Canvas, Class) {
          * Triggers:
          *   <Config::Events::PROPERTY_CHANGED>
          */
-        moveTo: function(position) {
+        moveToPixel: function(position, animated) {
             var gridPos = Canvas.toGrid(position);
             this.x = Math.max(gridPos.x, 0);
             this.y = Math.max(gridPos.y, 0);
 
-            this._moveContainerToPixel(position);
+            this._moveContainerToPixel(position, animated);
+            // call home
+            jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+
+            return this;
+        },
+
+        /**
+         * Method: moveToGrid
+         *   Moves the node's visual representation to the given grid coordinates and reports to backend.
+         *
+         * Parameters:
+         *   {Object} position  - Object in the form of {x: ..., y: ...} containing the grid coordinates to move the node to.
+         *   {boolean} animated - [optional] If true, the node repositioning is animated.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         *
+         * Triggers:
+         *   <Config::Events::PROPERTY_CHANGED>
+         */
+        moveToGrid: function(gridPos, animated) {
+            this.x = Math.floor(Math.max(gridPos.x, 1));
+            this.y = Math.floor(Math.max(gridPos.y, 1));
+
+            var pixelPos = Canvas.toPixel(this.x, this.y);
+            this._moveContainerToPixel(pixelPos, animated);
+
             // call home
             jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
@@ -958,20 +1008,34 @@ function(Property, Mirror, Canvas, Class) {
          * <Canvas> offset or the grid into account. The node's image center is the anchor point for the translation.
          *
          * Parameters:
-         *   {Object} position - Object of the form {x: ..., y: ...}, where x and y point to integer pixel values where
-         *                       the node's container shall be moved to
+         *   {Object}  position - Object of the form {x: ..., y: ...}, where x and y point to integer pixel values where
+         *                        the node's container shall be moved to.
+         *   {boolean} animated - [optional] If true, the node repositioning is animated.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
-        _moveContainerToPixel: function(position) {
-            this.container.css({
-                left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
-                top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
-            });
-            Canvas.enlarge(position);
-            // ask jsPlumb to repaint the selectee in order to redraw its connections
-            jsPlumb.repaint(this.container);
+        _moveContainerToPixel: function(position, animated) {
+            if (animated) {
+                jsPlumb.animate(this.container, {
+                    left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
+                    top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
+                }, {
+                    duration: 200,
+                    queue: false,
+                    done: function() {
+                        Canvas.enlarge(position);
+                    }
+                });
+            } else {
+                this.container.css({
+                    left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
+                    top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
+                });
+                Canvas.enlarge(position);
+                // ask jsPlumb to repaint the selectee in order to redraw its connections
+                jsPlumb.repaint(this.container);
+            }
 
             return this;
         },
