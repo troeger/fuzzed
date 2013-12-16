@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <cassert>
+#include <limits.h>
 #include "util.h"
 
 #ifdef OMP_PARALLELIZATION
@@ -26,13 +27,9 @@ double RandomNumberGenerator::randomNumberInInterval(double L, double H)
 
 double RandomNumberGenerator::randomNumberExponential(double rate)
 {
-	exponential_distribution<double> dist(rate);
-	return dist(m_generator);
-}
+	if (rate <= 0.0) return std::numeric_limits<double>::max(); // this is undefined.
 
-double RandomNumberGenerator::randomNumberWeibull(double rate, double k)
-{
-	weibull_distribution<double> dist(rate, k);
+	exponential_distribution<double> dist(rate);
 	return dist(m_generator);
 }
 

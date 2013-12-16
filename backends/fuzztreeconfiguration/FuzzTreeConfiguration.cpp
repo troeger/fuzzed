@@ -12,10 +12,9 @@ FuzzTreeConfiguration::FuzzTreeConfiguration(const FuzzTreeConfiguration& other)
 	m_featureNodes(other.m_featureNodes),
 	m_redundancyNodes(other.m_redundancyNodes),
 	m_optionalNodes(other.m_optionalNodes),
-	m_costs(other.m_costs)
-{
-
-}
+	m_costs(other.m_costs),
+	m_bValid(true)
+{}
 
 void FuzzTreeConfiguration::operator=(const FuzzTreeConfiguration &other)
 {
@@ -24,6 +23,7 @@ void FuzzTreeConfiguration::operator=(const FuzzTreeConfiguration &other)
 	m_redundancyNodes = other.m_redundancyNodes;
 	m_optionalNodes = other.m_optionalNodes;
 	m_costs = other.m_costs;
+	m_bValid = true;
 }
 
 

@@ -6,7 +6,7 @@
 #include <stdexcept>
 using std::runtime_error;
 
-BasicEvent::BasicEvent(const std::string& ID, long double failureRate, const std::string& name/* = ""*/, int cost /*=1*/)
+BasicEvent::BasicEvent(const std::string& ID, double failureRate, const std::string& name/* = ""*/, int cost /*=1*/)
 	: Event(ID, failureRate, name),
 	m_serializedPlaceID(-1)
 {

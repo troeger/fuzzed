@@ -81,12 +81,12 @@ std::string VotingORGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) co
 
 void VotingORGate::initActivationFunc()
 {
-	m_activationFunc = [=](NodeValueMap childValues) -> long double 
+	m_activationFunc = [=](NodeValueMap childValues) -> double 
 	{
 		assert(childValues.size() > 0);
 
 		// What to do if the children have different values?
-		const long double rate = childValues.begin()->second;
+		const double rate = childValues.begin()->second;
 		return util::kOutOfN(rate, m_numVotes, childValues.size());
 	};
 }

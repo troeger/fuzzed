@@ -7,7 +7,7 @@ StaticGate::StaticGate(const std::string& ID, const std::string& name)
 	: Gate(ID, name)
 {}
 
-long double StaticGate::computeUnreliability() const
+double StaticGate::computeUnreliability() const
 {
 	NodeValueMap unreliabilities;
 	for (const FaultTreeNode::Ptr childNode : m_children)

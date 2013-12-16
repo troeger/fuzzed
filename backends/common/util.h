@@ -15,7 +15,7 @@ using namespace std;
 
 #define MAX_INT std::numeric_limits<int>::max()
 #define MAX_DOUBLE std::numeric_limits<double>::max()
-#define MAX_LONG_DOUBLE std::numeric_limits<long double>::max()
+#define MAX_LONG_DOUBLE std::numeric_limits<double>::max()
 #define MAX_FLOAT std::numeric_limits<float>::max()
 
 #define EXIT_ERROR(s) ( exit_error(s) )
@@ -51,7 +51,6 @@ namespace util
 
 	string toString(const int& i);
 	string toString(const double& d, const int& prec = 10);
-	string toString(const long double& d, const int& prec = 10);
 	string toString(std::istream& istream);
 
 
@@ -86,7 +85,7 @@ namespace util
 	/************************************************************************/
 	/* Maths                                                                */
 	/************************************************************************/
-	long double kOutOfN(long double rate, int k, int N);
+	double kOutOfN(double rate, int k, int N);
 
 	double rateFromProbability(double prob, int missionTime);
 	double probabilityFromRate(double rate, int missionTime);

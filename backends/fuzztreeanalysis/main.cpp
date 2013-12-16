@@ -14,48 +14,37 @@
 #include "analysisResult.h"
 
 
-analysisResults::Result analyze(
+void analyze(
+	analysisResults::Result& r,
 	const fuzztree::TopEvent* const topEvent,
 	std::ofstream* logFileStream,
-	analysisResults::AnalysisResults &analysisResults,
-	const std::string modelId,
-	const int decompositionNumber) 
+	unsigned int decompositionNumber) 
 {
 	try
 	{
 		InstanceAnalysisTask* analysis = new InstanceAnalysisTask(topEvent, decompositionNumber, *logFileStream);
 		const auto result = analysis->compute();
 
-		analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
 		r.probability(serialize(result));
-
-		return r;
 	}
 	catch (const FatalException& e)
 	{
-		analysisResults::Result r(modelId, util::timeStamp(), false, decompositionNumber);
+		r.validResult(false);
 		r.issue().push_back(e.getIssue().serialized());
-		return r;
 	}
 	catch (const std::exception& e)
 	{
-		// assert(false);
-		// TODO make sure only our exceptions are thrown
-		analysisResults::Result r(modelId, util::timeStamp(), false, decompositionNumber);
+		r.validResult(false);
 		commonTypes::Issue i;
 		i.message(e.what());
-		r.issue().push_back(i);
-		return r;	
+		r.issue().push_back(i);	
 	}
 	catch (...)
 	{
-		// assert(false);
-		// TODO make sure only our exceptions are thrown
-		analysisResults::Result r(modelId, util::timeStamp(), false, decompositionNumber);
+		r.validResult(false);
 		commonTypes::Issue i;
 		i.message("Unknown Error");
 		r.issue().push_back(i);
-		return r;	
 	}
 }
 
@@ -90,10 +79,10 @@ int main(int argc, char** argv)
 	FuzzTreeTransform tf(instream, issues);
 	instream.close();
 
+	analysisResults::AnalysisResults analysisResults;
+
 	try
-	{
-		analysisResults::AnalysisResults analysisResults;
-		
+	{	
 		// please keep this here for debugging
 // 		std::istreambuf_iterator<char> eos;
 // 		std::string s(std::istreambuf_iterator<char>(instream), eos);
@@ -107,15 +96,23 @@ int main(int argc, char** argv)
 			is.close();
 
 			std::vector<Issue> treeIssues;
-			const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent(), treeIssues);
+			const unsigned int decompositionNumber = 
+				faultTree->topEvent().decompositionNumber().present() ? 
+				faultTree->topEvent().decompositionNumber().get() : 
+				DEFAULT_DECOMPOSITION_NUMBER;
 			const auto modelId = faultTree->id();
 
-			const unsigned int decompositionNumber = 
-				topEvent->decompositionNumber().present() ? 
-				topEvent->decompositionNumber().get() : 
-				DEFAULT_DECOMPOSITION_NUMBER;
-
-			analysisResults::Result r = analyze(topEvent.get(), logFileStream, analysisResults, modelId, decompositionNumber);
+			analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+			try
+			{
+				const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent(), treeIssues);	
+				analyze(r, topEvent.get(), logFileStream, decompositionNumber);
+			}
+			catch (const FatalException& e)
+			{
+				r.issue().push_back(e.getIssue().serialized());
+				r.validResult(false);
+			}
 			for (const auto& i : treeIssues)
 				r.issue().push_back(i.serialized());
 			
@@ -139,37 +136,41 @@ int main(int argc, char** argv)
 			for (const auto& t : tf.transform())
 			{
 				auto topEvent = fuzztree::TopEvent(t.second.topEvent());
-
-				analysisResults::Result r = analyze(&topEvent, logFileStream, analysisResults, modelId, decompositionNumber); 
+				analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+				try
+				{
+					analyze(r, &topEvent, logFileStream, decompositionNumber);
+				}
+				catch (const FatalException& e)
+				{
+					r.issue().push_back(e.getIssue().serialized());
+					r.validResult(false);
+				}
+				 
 				r.configuration(serializedConfiguration(t.first));
 				analysisResults.result().push_back(r);
 			}
 		}
-
-		// Log errors
-		for (const Issue& issue : issues)
-		{
-			analysisResults.issue().push_back(issue.serialized());
-			*logFileStream << issue.getMessage() << std::endl;
-		}
-
-		std::ofstream output(outFile);
-		analysisResults::analysisResults(output, analysisResults);
 	}
 
-	// This should not happen.
-	catch (const std::exception& e)
+	catch (const std::exception& e)// This should not happen.
 	{
 		*logFileStream << "Exception while trying to analyze " << inFile << e.what() << std::endl;
-		fuzztree::fuzzTree(*logFileStream, *(tf.getFuzzTree()));
-		
-		return -1;
 	}
 	catch (...)
 	{
 		*logFileStream << "Exception while trying to analyze " << inFile << std::endl;
-		return -1;
 	}
+
+	// Log errors
+	for (const Issue& issue : issues)
+	{
+		analysisResults.issue().push_back(issue.serialized());
+		*logFileStream << issue.getMessage() << std::endl;
+	}
+
+	std::ofstream output(outFile);
+	analysisResults::analysisResults(output, analysisResults);
 	
 	logFileStream->close();
 	delete logFileStream;

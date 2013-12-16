@@ -18,20 +18,9 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         return aString.charAt(0).toUpperCase() + aString.slice(1);
     };
 	
-	/**
-	 *  Function: escapeHTML
-	 *      Helper function for escaping HTML characters + newlines are replaced with HTML < /br> tag
-	 */
-	var escapeHTML = function(text){
-			return text
-				.replace(/&/g, "&amp;")
-      			.replace(/&/g, "&amp;")
-      		  	.replace(/</g, "&lt;")
-      		  	.replace(/>/g, "&gt;")
-      		  	.replace(/"/g, "&quot;")
-      		  	.replace(/'/g, "&#039;")
-				.replace(/\n/g, '<br />');
-			};
+	var escape = function(aString) {
+		return _.escape(aString).replace(/\n/g, '<br>');
+	};
 	
     /**
      *  Class: Entry
@@ -856,7 +845,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         },
 		
-        appendTo: function(on) {
+        appendTo: function() {
 			this._setupCallbacks();
             return this;
         },
@@ -866,22 +855,26 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 			 // hide textarea
 			 this.inputs.toggle(false);
 			 // show paragraph and set value
-			 this.inputs.siblings('p').html(escapeHTML(this.inputs.val())).toggle(true);
+			 this.inputs.siblings('p').html(
+				 escape(this.inputs.val())
+			 ).toggle(true);
 		},
 		
-        remove: function() {
-		},
+        remove: function() {},
 		
         _setupContainer: function() {
-            this.container = this.inputs
+			this.property.node._nodeImage.append(
+				jQuery('<p align="center">').html(escape(this.property.value))
+			);
+			this.container = this.property.node.container;
 			
-            return this;
+			return this;
         },
 		
         _setupVisualRepresentation: function() {
             this._setupInput();
 			this._setupContainer();
-            this.property.node.container.find('.' + Config.Classes.EDITABLE).append(this.inputs);
+			this.container.find('.' + Config.Classes.EDITABLE).append(this.inputs);
 
             return this;
         },
@@ -1065,6 +1058,5 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         'TextEntry':     	TextEntry,
 		'InlineTextArea':   InlineTextArea, 
         'TransferEntry': 	TransferEntry,
-		'escapeHTML'   :    escapeHTML
     }
 });
