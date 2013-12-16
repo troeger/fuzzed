@@ -12,15 +12,16 @@
 
 THIS=/etc/init.d/fuzzed-backend
 SCRIPTDIR=/usr/local/fuzzed/FuzzEdBackend/
+PIDFILE=/var/run/fuzzed.pid
 
 set -e
 
 case "$1" in
   start)
-        start-stop-daemon --start --background --name fuzzed-backend --exec /usr/bin/python --chdir $SCRIPTDIR --  daemon.py
+        start-stop-daemon --start --pidfile $PIDFILE --make-pidfile --background --exec /usr/bin/python --chdir $SCRIPTDIR --  daemon.py
         ;;
   stop)
-        start-stop-daemon --stop --name fuzzed-backend
+        start-stop-daemon --stop --pidfile $PIDFILE --make-pidfile --retry=TERM/30/KILL/5
         ;;
   *)
         echo "Usage: $THIS {start|stop}" >&2
