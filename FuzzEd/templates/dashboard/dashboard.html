@@ -28,10 +28,21 @@
             graph_to_delete.submit();
             graph_to_delete = null;
         };
+        
+        var kind_selected = function(event) {
+          
+          var hidden_input = jQuery('#kind');
+          var form         = jQuery('#kind_form');
+          var submit_value = jQuery(this).attr('id')
+          
+          hidden_input.val(submit_value);
+          form.submit()
+        };
 
         jQuery(document).ready(function() {
             jQuery('button.require-dialog').click(delete_clicked);
             jQuery('#confirm_delete').click(delete_confirmed);
+            jQuery('#kind_form').find('a').click(kind_selected);
         });
     });
 </script>
@@ -57,26 +68,26 @@
 {% block content %}
 <div class="page-header">
     <h2>
+      <i class="icon-folder-open"></i>
       {{ project.name }}
     </h2>
 </div>
 
-<form action="{% url 'dashboard_new' project.pk %}" method="post">
-    {% csrf_token %}
-    <div class="btn-group pull-right">
-        <button type="submit" name="kind" value="faulttree" class="btn btn-default">
-            <i class="icon-file"></i>
-            New FaultTree
-        </button>
-        <button type="submit" name="kind" value="fuzztree" class="btn btn-default">
-            <i class="icon-file"></i>
-            New FuzzTree
-        </button>
-        <button type="submit" name="kind" value="rbd" class="btn btn-default">
-            <i class="icon-file"></i>
-            New RBD
-        </button>
-    </div>
+<form id="kind_form" action="{% url 'dashboard_new' project.pk %}" method="post">
+  {% csrf_token %}
+  <div class="btn-group pull-right">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        <i class="icon-file"></i>
+        New Graph
+        <span class="caret"></span>
+    </button>
+      <ul class="dropdown-menu" role="menu">
+       <li><a id="faulttree"> New FaultTree </a></li>
+       <li><a id="fuzztree" > New FuzzTree  </a></li>
+       <li><a id="rbd"      > New RBD       </a></li>
+      </ul>
+  </div>
+  <input id="kind" type="hidden" name="kind" >
 </form>
 
 <section>

@@ -129,17 +129,17 @@ def project_edit(request, project_id):
         messages.add_message(request, messages.SUCCESS, 'Project deleted.')
         return redirect('projects')
        
-    # please show the edit page to the user on get requests
-    elif POST.get('edit') or request.method == 'GET':
-        parameters = {'project': project.to_dict()}
-        return render(request, 'project_menu/project_edit.html', parameters)
-    
     # the owner made changes to the project's field, better save it (if we can)    
-    elif POST.get('save') or request.method == 'GET':
+    elif POST.get('save'):
         project.name = POST.get('name', '')
         project.save()
         messages.add_message(request, messages.SUCCESS, 'Project saved.')
         return redirect('projects')
+    
+    # please show the edit page to the user on get requests
+    elif POST.get('edit') or request.method == 'GET':
+        parameters = {'project': project.to_dict()}
+        return render(request, 'project_menu/project_edit.html', parameters)
     
     # something was not quite right here
     raise HttpResponseBadRequest()
@@ -193,6 +193,7 @@ def dashboard_new(request, project_id):
     """
     project = get_object_or_404(Project, pk=project_id)
     
+    # user can only create a graph if he is owner or member of the respective project
     if not (project.is_authorized(request.user)):
         raise Http404
         

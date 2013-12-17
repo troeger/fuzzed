@@ -14,7 +14,7 @@
     </h1>
 </div>
 
-<form method="POST" action="/projects/new/" class="form-horizontal">
+<form method="POST" action="{% url 'project_new' %}" class="form-horizontal">
     {% csrf_token %}
     <fieldset>
         <div class="form-group">
@@ -27,7 +27,7 @@
         <div class="form-group">
             <div class="col-push-2 col-lg-10">
                 <button type="submit" name="save" value="save" class="btn btn-primary">Create</button>
-                <a class="btn btn-default" href="/projects/">Cancel</a>
+                <a class="btn btn-default" href="{% url 'projects' %}">Cancel</a>
             </div>
         </div>
     </fieldset>

@@ -52,7 +52,7 @@
       {% csrf_token %}
       <div class="btn-group pull-right">
           <button type="submit" name="kind" value="faulttree" class="btn btn-default">
-              <i class="icon-file"></i>
+              <i class="icon-folder-close"></i>
               New Project
           </button>
       </div>
@@ -63,7 +63,7 @@
       <table class="table">
           <thead>
               <tr>
-                  <th>#</th>
+                  <th></th>
                   <th>Name</th>
                   <th>Created</th>
                   <th></th>
@@ -73,7 +73,7 @@
           <tbody>
               {% for project in projects %} 
                   <tr onclick="document.location = '/projects/{{ project.pk }}/dashboard';">
-                      <td>{{ forloop.counter }}</td>
+                      <td><i class="icon-folder-close icon-large"></i></td>
                       <td>
                           <strong class="project_name">{{ project.name }}</strong>
                       </td>
