@@ -12,6 +12,7 @@ class Project(models.Model):
   Fields:
    {str}            name     - the name of the project
    {User}           owner    - a link to the owner of the project
+   {User}           users    - a link to the members of the project
    {const datetime} created  - timestamp of the moment of project creation (default: now)
    {bool}           deleted  - flag indicating whether this project was deleted or not. Simplifies restoration of the
                                project if needed by toggling this member (default: False)
