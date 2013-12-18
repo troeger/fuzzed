@@ -33,12 +33,17 @@ if(APPLE)
 	# Homebrew on Mac OS X has no Codesynthesis XSD available, so we use our own copy
 	set(XSD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/xsd_apple/libxsd/)
 	set(XSD_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/xsd_apple/bin/xsd)
+	set(USE_OMP OFF)
 elseif(WIN32)
 	 set(Boost_USE_STATIC_LIBS ON)
-	 add_definitions(-DOMP_PARALLELIZATION=1)
+	 set(USE_OMP ON)
 elseif(UNIX)
 	 set(USE_INTEL_COMPILER OFF) 
-	 add_definitions(-DOMP_PARALLELIZATION=1)
+	 set(USE_OMP ON)
+endif()
+
+if (USE_OMP)
+	add_definitions(-DOMP_PARALLELIZATION=1)
 endif() 
 
 ############################################################################
