@@ -5,7 +5,6 @@ set(SOURCES
    ${SIM_COMMON_SOURCES}
 
    main.cpp
-   SimulationExtern.cpp
    SimulationProxy.cpp
 
    implementation/PetriNetSimulation.cpp
@@ -18,14 +17,12 @@ set(SOURCES
    petrinet/ImmediateTransition.cpp
    petrinet/PNMLImport.cpp
    petrinet/PetriNet.cpp
-   petrinet/SequentialConstraint.cpp
 )
 
 set(HEADERS
    ${HEADERS}
    ${SIM_COMMON_HEADERS}
 
-   SimulationExtern.h
    SimulationProxy.h
    ResultStruct.h
    Config.h
@@ -41,8 +38,6 @@ set(HEADERS
    petrinet/ImmediateTransition.h
    petrinet/PNMLImport.h
    petrinet/PetriNet.h
-   petrinet/SequentialConstraint.h
-   petrinet/PetriNetConstraint.h
 )
 
 if (USE_TIMENET)

@@ -1,4 +1,4 @@
-define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
+define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
     /**
      *  Package: Base
      */
@@ -29,7 +29,6 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
         nodes:        {},
         name:         undefined,
         readOnly:     undefined,
-        seed:         undefined,
 
         _nodeClasses: {},
 
@@ -47,11 +46,11 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
         init: function(json) {
             this.id     = json.id;
             this.name   = json.name;
-            this.seed   = json.seed;
             this.config = this.getConfig();
 
             this._loadFromJson(json)
-                ._registerEventHandlers();
+                ._registerEventHandlers()
+                ._setupAutoLayout();
         },
 
         /**
@@ -106,6 +105,27 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
             }.bind(this));
 
             jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _setupAutoLayout
+         *    Sets up the toolbar entries for the layouting functions supported by this graph.
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
+         */
+        _setupAutoLayout: function() {
+            var toolsContainer = jQuery('#' + this.config.IDs.NAVBAR_TOOLS);
+            _.each(this._getLayoutAlgorithms(), function(algorithm) {
+                jQuery('<a><i class="' + algorithm.iconClass + '"></i></a>')
+                    .attr('title', algorithm.tooltip)
+                    .on('click', function(){
+                        this._layoutWithAlgorithm(algorithm.algorithm);
+                    }.bind(this))
+                    .appendTo(toolsContainer);
+            }.bind(this));
 
             return this;
         },
@@ -285,6 +305,31 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
             return this;
         },
 
+        /**
+         *  Method: _layoutWithAlgorithm
+         *    Layouts the nodes of this graph with the given layouting algorithm.
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
+         */
+        _layoutWithAlgorithm: function(algorithm) {
+            var layoutedNodes = algorithm(this._getNodeHierarchy());
+
+            // center the top node on the currently visible canvas (if there's enough space)
+            var centerX = Math.floor((jQuery('#' + this.config.IDs.CANVAS).width() / this.config.Grid.SIZE) / 2);
+            // returned coordinates can be negative, so add that offset
+            var minX = _.min(layoutedNodes, function(n) {return n.x}).x;
+            centerX -= Math.min(centerX + minX, 0);
+
+            // apply positions
+            _.each(layoutedNodes, function(n) {
+                var node = this.getNodeById(n.id);
+                // +1 because the returned coords are 0-based and we need 1-based
+                node.moveToGrid({x: n.x + centerX + 1, y: n.y + 1}, true);
+            }.bind(this));
+
+            return this;
+        },
 
         /**
          *  Group: Accessors
@@ -413,6 +458,57 @@ define(['canvas', 'class', 'jquery'], function(Canvas, Class) {
          */
         createId: function() {
             return ++this.seed;
+        },
+
+        /**
+         *  Method: _getLayoutAlgorithms
+         *    Returns the layouting algorithms supported by this graph.
+         *    This is the default implementation. Subclasses may override this behavior.
+         *
+         *  Returns:
+         *    An array containing algorithm descriptions. Those descriptions should contain the algorithm itself
+         *    (taken from d3.js), a class for the toolbar icon and a tooltip text.
+         */
+        _getLayoutAlgorithms: function() {
+            var clusterLayout = d3.layout.cluster()
+                .nodeSize([1, 2]) // leave some space for the mirror
+                .separation(function(a, b) {
+                    // sibling nodes are tidier
+                    return a.parent == b.parent ? 2 : 3;
+                });
+
+            var treeLayout =  d3.layout.tree()
+                .nodeSize([1, 2]) // leave some space for the mirror
+                .separation(function(a, b) {
+                    // sibling nodes are tidier
+                    return a.parent == b.parent ? 2 : 3;
+                });
+
+
+
+            return [
+                {
+                    algorithm: clusterLayout,
+                    iconClass: this.config.Classes.ICON_LAYOUT_CLUSTER,
+                    tooltip:   this.config.Tooltips.LAYOUT_CLUSTER
+                }, {
+                    algorithm: treeLayout,
+                    iconClass: this.config.Classes.ICON_LAYOUT_TREE,
+                    tooltip:   this.config.Tooltips.LAYOUT_TREE
+                }
+            ];
+        },
+
+        /**
+         *  Method: _getNodeHierarchy
+         *    Returns a dictionary representation of the node hierarchy of this graph.
+         *
+         *  Returns:
+         *    A dictionary representation of the node hierarchy of this graph. Each entry represents a node with
+         *    its ID and a list of children.
+         */
+        _getNodeHierarchy: function() {
+            return this.getNodeById(0)._hierarchy();
         },
 
 

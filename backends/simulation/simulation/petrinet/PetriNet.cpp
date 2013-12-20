@@ -6,13 +6,11 @@ PetriNet::PetriNet(
 	const vector<ImmediateTransition>& immediateTransitions, 
 	const vector<TimedTransition>& timedTransitions, 
 	const map<string, Place>& places,
-	const ArcList& arcDict,
-	const vector<SequentialConstraint>& constraints) :
+	const ArcList& arcDict) :
 	m_immediateTransitions(immediateTransitions),
 	m_timedTransitions(timedTransitions),
 	m_placeDict(places),
 	m_arcs(arcDict),
-	m_constraints(constraints),
 	m_topLevelPlace(nullptr),
 	m_finalFiringTime(MAX_INT),
 	m_avgFiringTime(MAX_INT)
@@ -25,7 +23,6 @@ PetriNet::PetriNet(const PetriNet& otherNet) :
 	m_timedTransitions(otherNet.m_timedTransitions),
 	m_placeDict(otherNet.m_placeDict),
 	m_arcs(otherNet.m_arcs),
-	m_constraints(otherNet.m_constraints),
 	m_finalFiringTime(MAX_INT)
 {
 	setup();
@@ -83,7 +80,6 @@ PetriNet& PetriNet::operator=(const PetriNet& otherNet)
 	m_timedTransitions		= otherNet.m_timedTransitions;
 	m_placeDict				= otherNet.m_placeDict;
 	m_arcs					= otherNet.m_arcs;
-	m_constraints			= otherNet.m_constraints;
 
 	m_activeTimedTransitions = TransitionTimeMapping();
 	m_inactiveTimedTransitions = set<TimedTransition*>();

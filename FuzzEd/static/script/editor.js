@@ -147,7 +147,10 @@ function(Class, Menus, Canvas, Backend, Alerts) {
                 Canvas.disableInteraction();
             }
 
-            this._setupKeyBindings(readOnly);
+            // enable user interaction
+            this._setupMouse()
+                ._setupKeyBindings(readOnly);
+
             // fade out the splash screen
             jQuery('#' + this.config.IDs.SPLASH).fadeOut(this.config.Splash.FADE_TIME, function() {
                 jQuery(this).remove();
@@ -234,12 +237,35 @@ function(Class, Menus, Canvas, Backend, Alerts) {
         },
 
         /**
+         *  Method: _setupMouse
+         *    Sets up callbacks that fire when the user interacts with the editor using his mouse. So far this is only
+         *    concerns resizing the window.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
+        _setupMouse: function() {
+            jQuery(window).resize(function() {
+                var content = jQuery('#' + this.config.IDs.CONTENT);
+
+                Canvas.enlarge({
+                    x: content.width(),
+                    y: content.height()
+                }, true);
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
          *  Method: _setupKeyBindings
          *    Setup the global key bindings
          *
          *  Keys:
-         *    ESCAPE - Clear selection.
-         *    DELETE - Delete all selected elements (nodes/edges).
+         *    ESCAPE             - Clear selection.
+         *    DELETE             - Delete all selected elements (nodes/edges).
+         *    UP/RIGHT/DOWN/LEFT - Move the node in the according direction
+         *    CTRL/CMD + A       - Select all nodes and edges
          *
          *  Returns:
          *    This editor instance for chaining.
@@ -326,6 +352,8 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
             jQuery(document).ajaxSuccess(this._flashSaveIndicator.bind(this));
             jQuery(document).ajaxError(this._flashErrorIndicator.bind(this));
+
+            //
 
             return this;
         },

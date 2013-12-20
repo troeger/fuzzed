@@ -22,7 +22,7 @@ using namespace std;
 
 FuzzTreeTransform::FuzzTreeTransform(
 	const string& fuzzTreeXML, 
-	std::vector<Issue>& errors) :
+	std::set<Issue>& errors) :
 	m_count(0),
 	m_bValid(true),
 	m_issues(errors)
@@ -44,7 +44,7 @@ FuzzTreeTransform::FuzzTreeTransform(
 
 FuzzTreeTransform::FuzzTreeTransform(
 	std::istream& fuzzTreeXML,
-	std::vector<Issue>& errors) :
+	std::set<Issue>& errors) :
 	m_count(0),
 	m_bValid(true),
 	m_issues(errors)
@@ -74,7 +74,7 @@ FuzzTreeTransform::FuzzTreeTransform(
 
 FuzzTreeTransform::FuzzTreeTransform(
 	std::auto_ptr<fuzztree::FuzzTree> ft,
-	std::vector<Issue>& errors) :
+	std::set<Issue>& errors) :
 	m_fuzzTree(ft),
 	m_count(0),
 	m_bValid(true),
@@ -156,11 +156,11 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			const int to = redundancyNode->end();
 			if (from < 0 || to < 0 || from > to)
 			{
-				m_issues.emplace_back(
+				m_issues.insert(Issue(
 					std::string("Invalid Redundancy VP attributes, to: ") + 
 					util::toString(to) + 
 					", from: " + 
-					util::toString(from), 0, id);
+					util::toString(from), 0, id));
 				
 				return INVALID_ATTRIBUTE;
 			}
@@ -179,21 +179,21 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			{
 				if (config.isIncluded(id))
 				{
-					for (int i = from; i <= to; ++i)
+					for (int N = from; N <= to; ++N)
 					{
-						const int numVotes = formula(i);
-						if (numVotes <= 0)
+						const int k = formula(N);
+						if (k <= 0)
 						{
-							m_issues.emplace_back(
+							m_issues.insert(Issue(
 								std::string("Ignoring invalid redundancy configuration with k=") + 
-								util::toString(numVotes) + 
+								util::toString(k) + 
 								std::string(" N=") + 
-								util::toString(i),
-								0, id);
+								util::toString(N),
+								0, id));
 							continue;
 						}
 						FuzzTreeConfiguration copied = config;
-						copied.setRedundancyNumber(id, numVotes, i);
+						copied.setRedundancyNumber(id, k, N);
 						newConfigs.emplace_back(copied);
 					}
 				}
@@ -212,14 +212,9 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 			if (childType == *FEATUREVP)
 			{ // exactly one subtree. Generate N * #Features configurations.
 				const FeatureVariationPoint* featureNode = static_cast<const FeatureVariationPoint*>(&child);
-				vector<FuzzTreeConfiguration::id_type> childIds;
-				for (const auto& featuredChild : featureNode->children())
-					childIds.emplace_back(featuredChild.id());
-
-				if (childIds.empty())
+				if (featureNode->children().size() == 0)
 				{
-					m_issues.emplace_back(std::string("FeatureVP without children found: ") + id, 0, id);
-					return WRONG_CHILD_NUM;
+					throw FatalException(std::string("FeatureVP without children found: ") + id, 0, id);
 				}
 
 				vector<FuzzTreeConfiguration> newConfigs;
@@ -227,14 +222,15 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 				{
 					if (config.isIncluded(id))
 					{
-						for (const auto& i : childIds)
+						for (const auto& featuredChild : featureNode->children())
 						{
 							FuzzTreeConfiguration copied = config;
-							copied.setFeatureNumber(id, i);
+							copied.setFeatureNumber(id, featuredChild.id());
 							for (const auto& other : featureNode->children())
-								if (other.id() != i) 
+							{
+								if (other.id() != featuredChild.id()) 
 									copied.setNotIncludedRecursive(other);
-							
+							}
 							newConfigs.emplace_back(copied);
 						}
 					}
@@ -248,10 +244,33 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 					configurations.assign(newConfigs.begin(), newConfigs.end());
 				}
 			}
-			else if (isLeaf(childType))
-			{
-				continue; // end recursion
+			else if (
+				childType == *BASICEVENT || 
+				childType == *BASICEVENTSET)
+			{ // handle costs, TODO intermediateEvents!
+				const auto inclusionVP = static_cast<const fuzztree::BasicEvent*>(&child);
+				assert(inclusionVP); // BasicEventSets inherit from BasicEvents
+				if (!inclusionVP->costs().present())
+					continue;
+
+				int costs = inclusionVP->costs().get();
+
+				// multiply costs...
+				if (childType == *BASICEVENTSET)
+				{
+					const auto bes = static_cast<const fuzztree::BasicEventSet*>(inclusionVP);
+					costs *= bes->quantity().present() ? 
+						bes->quantity().get() : 1;
+				}
+
+				for (FuzzTreeConfiguration& config : configurations)
+				{
+					if (config.isIncluded(id))
+						config.setCost(costs + config.getCost());
+				}
 			}
+
+			if (isLeaf(childType)) continue; // end recursion
 		}
 		generateConfigurationsRecursive(&child, configurations);
 	}
@@ -303,10 +322,12 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		
 		if (typeName == *REDUNDANCYVP)
 		{ // TODO: probably this always ends up with a leaf node
-			if (currentChild.children().size() > 1)
+			int numChildren = currentChild.children().size();
+			if (numChildren != 1)
 			{
-				m_issues.emplace_back(std::string("Redundancy VP with multiple children found: ") + id, 0, id);
-				return WRONG_CHILD_NUM;
+				throw FatalException(
+					std::string("Redundancy VP with invalid number of children found: ") + util::toString(numChildren),
+					0, id);
 			}
 			const auto& firstChild = currentChild.children().front();
 			const type_info& childTypeName = typeid(firstChild);
@@ -329,7 +350,7 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 			}
 			else
 			{
-				m_issues.emplace_back(std::string("Unrecognized Child Type: ") + typeName.name(), 0, id);
+				m_issues.insert(Issue(std::string("Unrecognized Child Type: ") + typeName.name(), 0, id));
 				return WRONG_CHILD_TYPE;
 			}
 			node->children().push_back(votingOrGate);
@@ -362,7 +383,9 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		}
 		else if (typeName == *TRANSFERIN)
 		{
-			m_issues.emplace_back("TransferIn Gate not yet implemented.", 0, id);
+			throw FatalException(std::string("TransferIn Gate not yet implemented."), 0, id);
+
+			// m_issues.insert("TransferIn Gate not yet implemented.", 0, id);
 			continue;
 		}
 
@@ -395,7 +418,7 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 
 	if (numChildren <= 0)
 	{
-		m_issues.emplace_back("Invalid number of Children in BasicEventSet", 0 , eventSet->id());
+		m_issues.insert(Issue("Invalid number of Children in BasicEventSet", 0 , eventSet->id()));
 		return INVALID_ATTRIBUTE;
 	}
 	const auto& prob = eventSet->probability();
@@ -428,7 +451,7 @@ ErrorType FuzzTreeTransform::expandIntermediateEventSet(
 	const auto eventSetId = eventSet->id();
 	if (eventSet->children().size() == 0)
 	{
-		m_issues.emplace_back(Issue::fatalIssue("Intermediate Event Set has no children.", 0, eventSetId));
+		m_issues.insert(Issue::fatalIssue("Intermediate Event Set has no children.", 0, eventSetId));
 		return WRONG_CHILD_NUM;
 	}
 	// barharhar
@@ -441,7 +464,7 @@ ErrorType FuzzTreeTransform::expandIntermediateEventSet(
 
 	if (numChildren <= 0)
 	{
-		m_issues.emplace_back("Invalid number of Children in IntermediateEventSet", 0 , eventSetId);
+		m_issues.insert(Issue("Invalid number of Children in IntermediateEventSet", 0 , eventSetId));
 		return INVALID_ATTRIBUTE;
 	}
 
@@ -512,7 +535,7 @@ std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>>
 	{
 		if (!m_fuzzTree.get())
 		{
-			m_issues.emplace_back("Invalid FuzzTree.");
+			m_issues.insert(Issue("Invalid FuzzTree."));
 			return results;
 		}
 
@@ -529,15 +552,15 @@ std::vector<std::pair<FuzzTreeConfiguration, fuzztree::FuzzTree>>
 	}
 	catch (xsd::cxx::exception& e)
 	{
-		m_issues.emplace_back(Issue::fatalIssue(e.what()));
+		m_issues.insert(Issue::fatalIssue(e.what()));
 	}
 	catch (std::exception& e)
 	{
-		m_issues.emplace_back(Issue::fatalIssue(e.what()));
+		m_issues.insert(Issue::fatalIssue(e.what()));
 	}
 	catch (...)
 	{
-		m_issues.emplace_back(Issue::fatalIssue("Unknown Error during FuzzTree Transformation"));
+		m_issues.insert(Issue::fatalIssue("Unknown Error during FuzzTree Transformation"));
 	}
 
 	return results;
@@ -550,34 +573,24 @@ void FuzzTreeTransform::copyNode(
 	const fuzztree::ChildNode& currentChild)
 {
 	using namespace fuzztreeType;
-	if (typeName == *AND)					node->children().push_back(fuzztree::And(id));
-	else if (typeName == *OR)				node->children().push_back(fuzztree::Or(id));
-	else if (typeName == *VOTINGOR)			node->children().push_back(fuzztree::VotingOr(id, (static_cast<const fuzztree::VotingOr&>(currentChild)).k()));
-	else if (typeName == *XOR)				node->children().push_back(fuzztree::Xor(id));
-	else if (typeName == *INTERMEDIATEEVENT)node->children().push_back(fuzztree::IntermediateEvent(id));
-	else if (typeName == *BASICEVENT)		node->children().push_back(fuzztree::BasicEvent(static_cast<const fuzztree::BasicEvent&>(currentChild)));
-	else if (typeName == *UNDEVELOPEDEVENT)	node->children().push_back(fuzztree::UndevelopedEvent(id));
+	if (typeName == *AND)					
+		node->children().push_back(fuzztree::And(id));
+	else if (typeName == *OR)				
+		node->children().push_back(fuzztree::Or(id));
+	else if (typeName == *VOTINGOR)			
+		node->children().push_back(fuzztree::VotingOr(id, (static_cast<const fuzztree::VotingOr&>(currentChild)).k()));
+	else if (typeName == *XOR)				
+		node->children().push_back(fuzztree::Xor(id));
+	else if (typeName == *INTERMEDIATEEVENT)
+		node->children().push_back(fuzztree::IntermediateEvent(id));
+	else if (typeName == *BASICEVENT)		
+		node->children().push_back(fuzztree::BasicEvent(static_cast<const fuzztree::BasicEvent&>(currentChild)));
+	else if (typeName == *UNDEVELOPEDEVENT)	
+		node->children().push_back(fuzztree::UndevelopedEvent(id));
 	else
 	{
 		throw FatalException(std::string("Unexpected Node Type encountered: ") + typeName.name(), 0, id);
 	}
-}
-
-void FuzzTreeTransform::generateConfigurationsFile(const std::string& outputXML)
-{
-	vector<FuzzTreeConfiguration> results;
-	generateConfigurations(results);
-
-	configurationResults::ConfigurationResults configResults;
-	for (const FuzzTreeConfiguration& c : results)
-	{
-		configurationResults::Result r;
-		r.configuration(serializedConfiguration(c));
-		configResults.result().push_back(r);
-	}
-
-	std::ofstream output(outputXML);
-	configurationResults::configurationResults(output, configResults);
 }
 
 xml_schema::Properties FuzzTreeTransform::validationProperties()

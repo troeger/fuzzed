@@ -43,16 +43,21 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
         /**
          * Section: Visual
          */
-        enlarge: function(to) {
+        enlarge: function(to, precise) {
             var canvasWidth  = this.container.width();
             var canvasHeight = this.container.height();
             var doubleGrid   = this.gridSize << 1;
-			
-            while (to.x + to.width  > canvasWidth - doubleGrid) {
-                canvasWidth *= 2;
-            }
-            while (to.y + to.height > canvasHeight - doubleGrid) {
-                canvasHeight *= 2;
+
+            if (precise) {
+                canvasWidth  = _.max(to.x, canvasWidth);
+                canvasHeight = _.max(to.y, canvasHeight);
+            } else {
+                while (to.x  > canvasWidth - doubleGrid) {
+                    canvasWidth *= 2;
+                }
+                while (to.y > canvasHeight - doubleGrid) {
+                    canvasHeight *= 2;
+                }
             }
 
             this.container.width(canvasWidth);
@@ -179,10 +184,8 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
             // make canvas droppable for shapes from the shape menu
             this.container.droppable({
                 accept: function(draggable) {
-        			if (jQuery(draggable).parent().attr('class') === Config.Classes.DRAGGABLE_WRAP_DIV){
-            			return true;
-						}
-    				},
+        			return jQuery(draggable).parent().hasClass(Config.Classes.DRAGGABLE_WRAP_DIV);
+ 			   	},
                 tolerance: 'fit',
                 drop:      function(uiEvent, uiObject) {
                     var kind     = uiObject.draggable.attr('id');

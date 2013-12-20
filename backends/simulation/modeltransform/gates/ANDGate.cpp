@@ -66,9 +66,9 @@ std::string ANDGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) const
 
 void ANDGate::initActivationFunc()
 {
-	m_activationFunc = [](NodeValueMap childValues) -> long double 
+	m_activationFunc = [](NodeValueMap childValues) -> double 
 	{
-		long double result = 1.0;
+		double result = 1.0;
 		for (const auto& p : childValues)
 			result *= p.second;
 

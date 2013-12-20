@@ -417,7 +417,10 @@ function(Property, Mirror, Canvas, Class) {
 
                 drag: function(event, ui) {
                     // enlarge canvas
-					Canvas.enlarge({x: ui.offset.left, y: ui.offset.top, height: ui.helper.height(), width: ui.helper.width() });
+					Canvas.enlarge({
+                        x: ui.offset.left + ui.helper.width(),
+                        y: ui.offset.top  + ui.helper.height()
+                    });
 
                     // determine by how many pixels we moved from our original position (see: start callback)
                     var xOffset = ui.position.left - initialPositions[this.id].left;
@@ -449,7 +452,7 @@ function(Property, Mirror, Canvas, Class) {
                         if (typeof nodeInstance === 'undefined') return;
 
                         // ... and report to the backend this time because dragging ended
-                        nodeInstance.moveTo({
+                        nodeInstance.moveToPixel({
                             'x': initialPositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
                             'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
                         });
@@ -544,18 +547,17 @@ function(Property, Mirror, Canvas, Class) {
          * Returns:
          *   This {<Node>} instance for chaining.
 		 */
-		_setupResizable: function(){
-			
-			if(!this.resizable) return this;
+		_setupResizable: function() {
+			if (!this.resizable) return this;
 			// adapt size of container div to inner resizable div
-			this.container.width("auto").height("auto");
+			this.container.width('auto').height('auto');
 			
 			var properties = this.properties;
 			
 			var height = properties.height.value;
 			var width  = properties.width.value;
 		
-			var resizable = this.container.find('.'+ this.config.Classes.RESIZABLE).resizable();
+			var resizable = this.container.find('.' + this.config.Classes.RESIZABLE).resizable();
 			// setup resizable with width/height values stored in the backend
 			jQuery(resizable).height(height).width(width);
 			
@@ -563,7 +565,6 @@ function(Property, Mirror, Canvas, Class) {
 			
 			// if resizable gets resized update width/height attribute		
 			jQuery(resizable).on('resizestop',function() {
-				
 				var newWidth = jQuery(this).width();
 				var newHeight= jQuery(this).height();
 			
@@ -578,7 +579,10 @@ function(Property, Mirror, Canvas, Class) {
 			
 			jQuery(resizable).on('resize',function(event, ui) {
                 // enlarge canvas if resizable is resized out of the canvas
-				Canvas.enlarge({x: ui.helper.offset().left, y: ui.helper.offset().top, height: ui.helper.height(), width: ui.helper.width()});
+				Canvas.enlarge({
+                    x: ui.helper.offset().left + ui.helper.width(),
+                    y: ui.helper.offset().top  + ui.helper.height()
+                });
 				
 				// scroll canvas if resizable is resized out of the visible part of the canvas
 				var scrollable = jQuery('body');
@@ -586,22 +590,26 @@ function(Property, Mirror, Canvas, Class) {
 				var screenWidth  = jQuery(window).width();
 				var screenHeight = jQuery(window).height();
 				
-				var rightScrolled= scrollable.scrollLeft();
-				var downScrolled = scrollable.scrollTop(); 
+				var rightScrolled = scrollable.scrollLeft();
+				var downScrolled  = scrollable.scrollTop(); 
 				
-				var scrollOffset = 10;
+				var scrollOffset = this.config.Resizable.SCROLL_OFFSET;
 				
 				// resize to the right	-> scroll right			
-				if( event.clientX > screenWidth - scrollOffset) scrollable.scrollLeft(rightScrolled + Canvas.gridSize);
+				if (event.clientX > screenWidth - scrollOffset)
+					scrollable.scrollLeft(rightScrolled + Canvas.gridSize);
 				// resize to the left	-> scroll left
-				if( event.clientX <= scrollOffset ) scrollable.scrollLeft(rightScrolled - Canvas.gridSize);
+				if (event.clientX <= scrollOffset)
+					scrollable.scrollLeft(rightScrolled - Canvas.gridSize);
 				
 				// resize downwards -> scroll downwards
-				if( event.clientY > screenHeight - scrollOffset) scrollable.scrollTop(downScrolled + Canvas.gridSize);
+				if (event.clientY > screenHeight - scrollOffset)
+					scrollable.scrollTop(downScrolled + Canvas.gridSize);
 				// resize upwards  -> scroll upwards
-				if( event.clientY <= scrollOffset ) scrollable.scrollTop(downScrolled - Canvas.gridSize);
+				if (event.clientY <= scrollOffset)
+					scrollable.scrollTop(downScrolled - Canvas.gridSize);
 				
-			});
+			}.bind(this));
 			
 			return this;
 		},
@@ -616,22 +624,22 @@ function(Property, Mirror, Canvas, Class) {
          * Returns:
          *   This {<Node>} instance for chaining.
 		 */
-		_setupEditable: function(){
-			if(!this.editable) return this;
+		_setupEditable: function() {
+			if (!this.editable) return this;
 			
 			var container = this.container
-			var editable = container.find('.'+ this.config.Classes.EDITABLE);
+			var editable  = container.find('.'+ this.config.Classes.EDITABLE);
 			
-			var textarea =  editable.find("textarea");				
-			var paragraph = editable.find("p");
+			var textarea  = editable.find('textarea');				
+			var paragraph = editable.find('p');
 						
-			editable.on("dblclick", function(event){
+			editable.on('dblclick', function(event) {
 				paragraph.toggle(false);
 				textarea.toggle(true).focus();
 			});
 			
-			jQuery(document).on('node_unselected', function(event){
-				if (textarea.length) textarea.blur();
+			jQuery(document).on('node_unselected', function(event) {
+				textarea.blur();
 			});
 				
 			return this;
@@ -895,6 +903,28 @@ function(Property, Mirror, Canvas, Class) {
         },
 
         /**
+         *  Method: _hierarchy
+         *    Recursively computes a dictionary representation of this node's hierarchy.
+         *
+         *  Returns:
+         *    A dictionary representation of this node's hierarchy. Each entry represents a node with its ID and a list
+         *    of children.
+         *
+         *  Note:
+         *    This only works with graphs for the moment! Cycles will produce infinite loops.
+         */
+        _hierarchy: function() {
+            var result = {id: this.id};
+
+            var children = this.getChildren();
+            if (children.length != 0) {
+                result.children = _.map(children, function(node) {return node._hierarchy();});
+            }
+
+            return result;
+        },
+
+        /**
          * Group: DOM Manipulation
          */
 
@@ -912,20 +942,21 @@ function(Property, Mirror, Canvas, Class) {
         moveBy: function(offset) {
             var position = this.container.position();
 
-            return this.moveTo({
+            return this.moveToPixel({
                 x: position.left + this._nodeImage.xCenter + offset.x,
                 y: position.top  + this._nodeImage.yCenter + offset.y
             });
         },
 
         /**
-         * Method: moveTo
+         * Method: moveToPixel
          *   Moves the node's visual representation to the given coordinates and reports to backend. The center of the
          *   node's image is the anchor point for the translation.
          *
          * Parameters:
          *   {Object} position      - Object in the form of {x: ..., y: ...} containing the pixel coordinates to move
          *                            the node to.
+         *   {boolean} animated     - [optional] If true, the node repositioning is animated.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
@@ -933,12 +964,39 @@ function(Property, Mirror, Canvas, Class) {
          * Triggers:
          *   <Config::Events::PROPERTY_CHANGED>
          */
-        moveTo: function(position) {
+        moveToPixel: function(position, animated) {
             var gridPos = Canvas.toGrid(position);
             this.x = Math.max(gridPos.x, 0);
             this.y = Math.max(gridPos.y, 0);
 
-            this._moveContainerToPixel(position);
+            this._moveContainerToPixel(position, animated);
+            // call home
+            jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+
+            return this;
+        },
+
+        /**
+         * Method: moveToGrid
+         *   Moves the node's visual representation to the given grid coordinates and reports to backend.
+         *
+         * Parameters:
+         *   {Object} position  - Object in the form of {x: ..., y: ...} containing the grid coordinates to move the node to.
+         *   {boolean} animated - [optional] If true, the node repositioning is animated.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         *
+         * Triggers:
+         *   <Config::Events::PROPERTY_CHANGED>
+         */
+        moveToGrid: function(gridPos, animated) {
+            this.x = Math.floor(Math.max(gridPos.x, 1));
+            this.y = Math.floor(Math.max(gridPos.y, 1));
+
+            var pixelPos = Canvas.toPixel(this.x, this.y);
+            this._moveContainerToPixel(pixelPos, animated);
+
             // call home
             jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
@@ -969,20 +1027,34 @@ function(Property, Mirror, Canvas, Class) {
          * <Canvas> offset or the grid into account. The node's image center is the anchor point for the translation.
          *
          * Parameters:
-         *   {Object} position - Object of the form {x: ..., y: ...}, where x and y point to integer pixel values where
-         *                       the node's container shall be moved to
+         *   {Object}  position - Object of the form {x: ..., y: ...}, where x and y point to integer pixel values where
+         *                        the node's container shall be moved to.
+         *   {boolean} animated - [optional] If true, the node repositioning is animated.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
-        _moveContainerToPixel: function(position) {
-            this.container.css({
-                left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
-                top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
-            });
-            Canvas.enlarge(position);
-            // ask jsPlumb to repaint the selectee in order to redraw its connections
-            jsPlumb.repaint(this.container);
+        _moveContainerToPixel: function(position, animated) {
+            if (animated) {
+                jsPlumb.animate(this.container, {
+                    left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
+                    top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
+                }, {
+                    duration: 200,
+                    queue: false,
+                    done: function() {
+                        Canvas.enlarge(position);
+                    }
+                });
+            } else {
+                this.container.css({
+                    left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
+                    top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
+                });
+                Canvas.enlarge(position);
+                // ask jsPlumb to repaint the selectee in order to redraw its connections
+                jsPlumb.repaint(this.container);
+            }
 
             return this;
         },

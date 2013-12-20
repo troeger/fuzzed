@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:svg="http://www.w3.org/2000/svg">
 <head>
+    {% block meta %}{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
         {% block title %}FuzzEd{% endblock %}
@@ -39,6 +40,7 @@
                 'jsplumb':    '../lib/jsplumb/jsplumb-1.4.1.min',
                 'slickgrid':  '../lib/slickgrid/slick.grid-2.0.2',
                 'underscore': '../lib/underscore/underscore-1.4.4.min',
+                'd3':         '../lib/d3/d3-3.3.11.min',
                 // fuzzed specifics
                 'notations':  '../notations'
             },

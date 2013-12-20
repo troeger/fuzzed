@@ -179,7 +179,7 @@ class PipFastFood(FastFood):
         elif version and version.startswith('>='):
             super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q '%s>=%s'"%(self.get_mapping(name), version[2:]))
         else:
-            super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q "+self.get_mapping(name))
+            super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q --upgrade "+self.get_mapping(name))
         super(PipFastFood, self).post_install()
 
     def supported(self):

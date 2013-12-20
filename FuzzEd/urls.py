@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns, static
+from django.http import HttpResponse
 
 from FuzzEd.models import Job
 from FuzzEd import settings
@@ -24,6 +25,7 @@ urlpatterns = patterns('',
     url(r'^dashboard/(?P<graph_id>\d+)/$', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
     url(r'^editor/(?P<graph_id>\d+)$', 'FuzzEd.views.editor', name='editor'),
     url(r'^snapshot/(?P<graph_id>\d+)$', 'FuzzEd.views.snapshot', name='snapshot'),
+    url(r'^robots\.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /admin/\nDisallow: /dashboard/\nDisallow: /editor/\n", mimetype="text/plain")),
 
     # API
     # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API
@@ -63,6 +65,10 @@ urlpatterns = patterns('',
         'FuzzEd.api.job_create', {'job_kind': Job.CUTSETS_JOB}, name='analyze_cutsets'),
     url(r'^api/graphs/(?P<graph_id>\d+)/analysis/topEventProbability$',
         'FuzzEd.api.job_create', {'job_kind': Job.TOP_EVENT_JOB}, name='analyze_top_event_probability'),
+
+    # simulation
+    url(r'^api/graphs/(?P<graph_id>\d+)/simulation/topEventProbability$',
+        'FuzzEd.api.job_create', {'job_kind': Job.SIMULATION_JOB}, name='simulation_top_event_probability'),
 
     # jobs
     url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.job_status', name='job_status'),

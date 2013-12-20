@@ -74,8 +74,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 			const string error = string("Unexpected probability type: ") + probType.name();
 			m_logFile << error << std::endl;
 			
-			throw FatalException(error);
-			return NumericInterval();
+			throw FatalException(error, 0, node.id());
 		}
 	}
 	else if (typeName == *BASICEVENTSET || typeName == *INTERMEDIATEEVENTSET)
@@ -86,7 +85,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		const string error = string("Unexpected Event Set (they should have been removed by configuration): ") + typeName.name();
 		m_logFile << error << std::endl;
 		
-		throw FatalException(error);
+		throw FatalException(error, 0, node.id());
 	}
 	else if (typeName == *HOUSEEVENT)
 	{
@@ -97,8 +96,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	{
 		m_logFile << "Found Undeveloped Event, ID: " << node.id() << std::endl;
 
-		throw FatalException(UNDEVELOPED_ERROR);
-		return NumericInterval();
+		throw FatalException(UNDEVELOPED_ERROR, 0, node.id());
 	}
 	else if (typeName == *INTERMEDIATEEVENT)
 	{
@@ -198,7 +196,6 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	else
 	{
 		throw FatalException(UNKNOWN_TYPE);
-		return NumericInterval();
 	}
 
 

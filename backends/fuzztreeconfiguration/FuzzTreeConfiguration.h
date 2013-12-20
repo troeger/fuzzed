@@ -13,6 +13,8 @@ public:
 	typedef std::string id_type;
 
 	FuzzTreeConfiguration();
+	FuzzTreeConfiguration(const FuzzTreeConfiguration& other);
+	void operator=(const FuzzTreeConfiguration &other);
 	~FuzzTreeConfiguration();
 
 	void setOptionalEnabled(const id_type& ID, bool enabled);
@@ -20,6 +22,8 @@ public:
 	void setFeatureNumber(const id_type& ID, const id_type& configuredChild);
 
 	void setNotIncludedRecursive(const fuzztree::Node& ID);
+
+	static const int computeCostRecursive(const fuzztree::Node& ID);
 
 	const bool& isOptionalEnabled(const id_type& ID) const;
 	const bool isIncluded(const id_type& ID) const;
@@ -30,11 +34,11 @@ public:
 	void setCost(int cost);
 	const int getCost() const;
 
-	// TODO: provide iterators here
 	const std::map<id_type, bool>&					getOptionalNodes() const;
 	const std::map<id_type, std::tuple<int,int>>&	getRedundancyNodes() const;
 	const std::map<id_type, id_type>&				getFeaturedNodes() const;
 
+	void markInvalid();
 
 protected:
 	std::set<id_type>										m_notIncluded;
@@ -43,4 +47,6 @@ protected:
 	std::map<id_type, id_type>								m_featureNodes;
 
 	int m_costs;
+
+	bool m_bValid;
 };

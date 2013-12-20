@@ -295,9 +295,14 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             var center  = value[0];
             var epsilon = value[1];
 
+            // doing a big decimal conversion here due to JavaScripts awesome floating point handling xoxo
+            var decimalCenter  = new Decimal(center);
+            var decimalEpsilon = new Decimal(epsilon);
+
             if (typeof center  !== 'number' || window.isNaN(center)) {
                 validationResult.kind    = TypeError;
                 validationResult.message = 'center must be numeric';
+                return false;
             } else if (typeof epsilon !== 'number' || window.isNaN(epsilon)) {
                 validationResult.kind    = TypeError;
                 validationResult.message = 'epsilon must be numeric';
@@ -306,7 +311,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
                 validationResult.kind    = ValueError;
                 validationResult.message = 'epsilon must not be negative';
                 return false;
-            } else if (this.min.gt(center - epsilon) || this.max.lt(center + epsilon)) {
+            } else if (this.min.gt(decimalCenter.minus(decimalEpsilon)) || this.max.lt(decimalCenter.minus(decimalEpsilon))) {
                 validationResult.kind    = ValueError;
                 validationResult.message = 'value out of bounds';
                 return false;
@@ -530,14 +535,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         }
     });
 	
-	var InlineTextField = Text.extend({
-		
-		init: function(node, definition) {
-			this._super(node, definition);
-			var paragraph = jQuery('<p align="center">').html(PropertyMenuEntry.escapeHTML(this.value));
-			this.menuEntry.inputs.after(paragraph);
-		},
-		
+	var InlineTextField = Text.extend({		
         menuEntryClass: function() {
             return PropertyMenuEntry.InlineTextArea;
         },
