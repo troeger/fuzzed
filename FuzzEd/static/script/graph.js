@@ -29,6 +29,7 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
         nodes:        {},
         name:         undefined,
         readOnly:     undefined,
+        seed:         undefined,
 
         _nodeClasses: {},
 
@@ -46,6 +47,7 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
         init: function(json) {
             this.id     = json.id;
             this.name   = json.name;
+            this.seed   = json.seed;
             this.config = this.getConfig();
 
             this._loadFromJson(json)
@@ -76,7 +78,13 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
 
             // connect the nodes again
             _.each(json.edges, function(jsonEdge) {
-                this.addEdge(jsonEdge);
+                var jsPlumbEdge = jsPlumb.connect({
+                    source: this.getNodeById(jsonEdge.source).container,
+                    target: this.getNodeById(jsonEdge.target).container
+                });
+                jsPlumbEdge._fuzzedId = jsonEdge.id;
+
+                this._addEdge(jsPlumbEdge);
             }.bind(this));
 
             return this;
@@ -137,8 +145,8 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
 
         /**
          *  Method: addEdge
-         *    Adds a given edge to this graph by "jsPlumb.connecting" source and target node as if it was done manually.
-         *    Only used if an edge needs to be added programmatically and not manually. Manual creation of an edge (i.e.
+         *    Adds a given edge to this graph by "jsPlumb.connect"ing source and target node as if it was done manually.
+         *    Only use this method if an edge needs to be added programmatically and not manually. Manual creation of an edge (i.e.
          *    connect-dragging nodes in the editor) is done by jsPlumbConnection event, which calls _addEdge directly.
          *
          *  Parameters:
@@ -174,10 +182,10 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          *    This <Graph> instance for chaining.
          */
         _addEdge: function(jsPlumbEdge) {
-            jsPlumbEdge._fuzzedId = (typeof jsPlumbEdge._fuzzedId === 'undefined') ? this.createId() : jsPlumbEdge.id;
+            jsPlumbEdge._fuzzedId = (typeof jsPlumbEdge._fuzzedId === 'undefined') ? this.createId() : jsPlumbEdge._fuzzedId;
 
             // store the ID in an attribute so we can retrieve it later from the DOM element
-            jQuery(jsPlumbEdge.canvas).data(this.config.Attributes.CONNECTION_ID, jsPlumbEdge._fuzzedId);
+            jQuery(jsPlumbEdge.canvas).data(this.config.Keys.CONNECTION_ID, jsPlumbEdge._fuzzedId);
 
             var sourceNode = jsPlumbEdge.source.data(this.config.Keys.NODE);
             var targetNode = jsPlumbEdge.target.data(this.config.Keys.NODE);
@@ -237,6 +245,7 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          */
         _deleteEdge: function(jsPlumbEdge) {
             var id         = jsPlumbEdge._fuzzedId;
+
             var sourceNode = jsPlumbEdge.source.data(this.config.Keys.NODE);
             var targetNode = jsPlumbEdge.target.data(this.config.Keys.NODE);
 

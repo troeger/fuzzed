@@ -293,7 +293,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
                 } else if (event.which === 'V'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
                     this._pastePressed(event);
                 } else if (event.which === 'X'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
-                    alert('Something was cutted.');
+                    this._cutPressed(event);
                 }
             }.bind(this));
 
@@ -419,7 +419,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             // delete selected edges
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Attributes.CONNECTION_ID));
+                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
                 this.graph.deleteEdge(edge);
             }.bind(this));
 
@@ -501,9 +501,6 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             event.preventDefault();
 
-            // reset _clipboard
-            this._clipboard = '';
-
             // put nodes as dicts into nodes
             var nodes = [];
             jQuery(selectedNodes).each(function(index, element) {
@@ -515,15 +512,17 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             var edges = [];
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
-                var sourceNode = edge.source.data(this.config.Keys.NODE);
-                var targetNode = edge.target.data(this.config.Keys.NODE);
-                // to do: create Edge class with toDict() method
-                var edgeDict = {
-                    'source':  sourceNode.id,
-                    'target':  targetNode.id
-                };
-                edges.push(edgeDict);
+                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
+                if (typeof edge !== 'undefined') {
+                    var sourceNode = edge.source.data(this.config.Keys.NODE);
+                    var targetNode = edge.target.data(this.config.Keys.NODE);
+                    // to do: create Edge class with toDict() method
+                    var edgeDict = {
+                        'source':  sourceNode.id,
+                        'target':  targetNode.id
+                    };
+                    edges.push(edgeDict);
+                }
             }.bind(this));
 
             var clipboardDict = {
@@ -531,9 +530,10 @@ function(Class, Menus, Canvas, Backend, Alerts) {
                 'edges':  edges
             };
 
-            this._clipboard = JSON.stringify(clipboardDict);
-            console.log(clipboardDict);
-            console.log(this._clipboard);
+            // to avoid empty copyings
+            if(nodes.length > 0 || edges.length > 0) {
+                this._clipboard = JSON.stringify(clipboardDict);
+            }
 
             return this;
         },
@@ -553,7 +553,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             if (jQuery(event.target).is('input')) return this;
 
             event.preventDefault();
-            this._deselectAll(); // why doesn't this work?
+            this._escapePressed(event); // why doesn't this work?
 
             var clipboardDict = JSON.parse(this._clipboard);
             var nodes = clipboardDict.nodes;
@@ -585,14 +585,29 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             }.bind(this));
 
             _.each(edges, function(edge) {
-                var newEdge = jsPlumb.connect({
-                    source: this.graph.getNodeById(edge.source).container,
-                    target: this.graph.getNodeById(edge.target).container
-                });
+                this.graph.addEdge(edge);
             }.bind(this));
 
-            //var nodes = JSON.parse(this._clipboard);
-            //console.log(nodes);
+            return this;
+        },
+
+        /**
+         * Method: _cutPressed
+         *
+         *   Event callback for handling a cut (CTRL/CMD + X) key press. Will delete and copy selected nodes.
+         *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _cutPressed: function(event) {
+            if (jQuery(event.target).is('input')) return this;
+
+            event.preventDefault();
+            this._copyPressed(event);
+            this._deletePressed(event);
 
 
             return this;
