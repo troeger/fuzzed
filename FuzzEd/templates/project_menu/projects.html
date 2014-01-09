@@ -72,14 +72,14 @@
 
           <tbody>
               {% for project in projects %} 
-                  <tr onclick="document.location = '/projects/{{ project.pk }}/dashboard';">
+                  <tr onclick="document.location = '{% url 'dashboard' project.pk %}';">
                       <td><i class="icon-folder-close icon-large"></i></td>
                       <td>
                           <strong class="project_name">{{ project.name }}</strong>
                       </td>
                       <td>{{ project.created }}</td>
                       <td style="text-align: right;">
-                          <form action="/projects/{{ project.pk }}/" method="POST">
+                          <form action="{% url 'project_edit' project.pk %}" method="POST">
                               {% csrf_token %}
                               <input type="hidden" class="delete_flag">
                               <button type="submit" name="edit" value="edit" class="btn btn-default btn-small">
