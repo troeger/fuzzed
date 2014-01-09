@@ -1,4 +1,4 @@
-define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], function (Class, Config, Job, Alerts, Progress) {
+define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery'], function (Class, Config, Job, Alerts, Progress) {
 
     /**
      * Class: Backend
