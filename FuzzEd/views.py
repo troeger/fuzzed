@@ -88,7 +88,7 @@ def project_new(request):
     Function: project_new
     
     This handler is responsible for rendering a dialog to the user to create a new project. It is also responsible for
-    processing a save request of such a 'new project' request and forwards the user to the projects site after doing so.
+    processing a save request of such a 'new project' request and forwards the user to the project overview site after doing so.
     
     Parameters:
      {HttpRequest} request - a django request object
@@ -150,8 +150,8 @@ def dashboard(request, project_id):
     """
     Function: dashboard
     
-    This view handler renders the dashboard of the user. It lists all the graphs of the user that are not marked as
-    deleted ordered descending by its creation date. Also, a user is able to create new graphs and edit or delete
+    This view handler renders the dashboard in the context of a certain project. It lists all the graphs belonging to the project that are not marked as
+    deleted ordered descending by its creation date. Also, a user is able to add new graphs to the project, as well as to edit or delete
     existing graphs from here.
     
     Parameters:
@@ -178,7 +178,7 @@ def dashboard(request, project_id):
     return render(request, 'dashboard/dashboard.html', parameters)
 
 @login_required
-def dashboard_new(request, project_id):
+def dashboard_new(request, project_id, kind):
     """
     Function: dashboard_new
     
@@ -200,13 +200,12 @@ def dashboard_new(request, project_id):
     POST = request.POST
 
     # save the graph
-    if POST.get('save') and POST.get('kind') and POST.get('name'):
-        commands.AddGraph.create_from(kind=POST['kind'], name=POST['name'], owner=request.user, project=project).do()
+    if POST.get('save') and POST.get('name'):
+        commands.AddGraph.create_from(kind=kind, name=POST['name'], owner=request.user, project=project).do()
         return redirect('dashboard', project_id = project_id)
 
     # render the create diagram if fuzztree
-    elif POST.get('kind') in notations.by_kind:
-        kind = POST['kind']
+    elif kind in notations.by_kind:
         parameters = {
             'kind': kind,
             'name': notations.by_kind[kind]['name'],

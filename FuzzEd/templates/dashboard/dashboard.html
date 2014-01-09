@@ -29,26 +29,13 @@
             graph_to_delete = null;
         };
         
-        var kind_selected = function(event) {
-          
-          var hidden_input = jQuery('#kind');
-          var form         = jQuery('#kind_form');
-          var submit_value = jQuery(this).attr('id')
-          
-          hidden_input.val(submit_value);
-          form.submit()
-        };
-
         jQuery(document).ready(function() {
             jQuery('button.require-dialog').click(delete_clicked);
             jQuery('#confirm_delete').click(delete_confirmed);
-            jQuery('#kind_form').find('a').click(kind_selected);
         });
     });
 </script>
 {% endblock %}
-
-
 
 {% block menu_right %}
 <li class="dropdown">
@@ -73,22 +60,18 @@
     </h2>
 </div>
 
-<form id="kind_form" action="{% url 'dashboard_new' project.pk %}" method="post">
-  {% csrf_token %}
-  <div class="btn-group pull-right">
+<div class="btn-group pull-right">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
         <i class="icon-file"></i>
         New Graph
         <span class="caret"></span>
     </button>
-      <ul class="dropdown-menu" role="menu">
-       <li><a id="faulttree"> New FaultTree </a></li>
-       <li><a id="fuzztree" > New FuzzTree  </a></li>
-       <li><a id="rbd"      > New RBD       </a></li>
-      </ul>
-  </div>
-  <input id="kind" type="hidden" name="kind" >
-</form>
+    <ul class="dropdown-menu" role="menu">
+       <li><a href="{% url 'dashboard_new' project.pk 'faulttree' %}"> New FaultTree </a></li>
+       <li><a href="{% url 'dashboard_new' project.pk 'fuzztree'  %}"> New FuzzTree  </a></li>
+       <li><a href="{% url 'dashboard_new' project.pk 'rbd'       %}"> New RBD       </a></li>
+    </ul>
+</div>
 
 <section>
     <table class="table">

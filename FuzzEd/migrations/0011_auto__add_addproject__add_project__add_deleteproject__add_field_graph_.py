@@ -52,8 +52,11 @@ class Migration(SchemaMigration):
                 sample_project = orm.Project(name='sample_project', owner=user)
                 sample_project.save()
         
-        # Adding field 'Graph.project' + assign any project_id to this field because of foreign key constraint
-        project_id = orm['FuzzEd.project'].objects.all().first().id
+        # Adding field 'Graph.project' + assign any project_id to this field because of foreign key constraint 
+        project_id = None
+        
+        if (orm['FuzzEd.project'].objects.all()):
+                project_id = orm['FuzzEd.project'].objects.all().first().id
         
         db.add_column(u'FuzzEd_graph', 'project',
                       self.gf('django.db.models.fields.related.ForeignKey')(default=project_id, related_name='graphs', to=orm['FuzzEd.Project']),

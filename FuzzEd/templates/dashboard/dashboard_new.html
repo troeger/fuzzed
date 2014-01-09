@@ -14,7 +14,7 @@
     </h1>
 </div>
 
-<form method="POST" action="{% url 'dashboard_new' project.pk %}" class="form-horizontal">
+<form method="POST" action="{% url 'dashboard_new' project.pk kind %}" class="form-horizontal">
     {% csrf_token %}
     <fieldset>
         <div class="form-group">
@@ -37,8 +37,6 @@
                 <a class="btn btn-default" href="{% url 'dashboard' project.pk %}">Cancel</a>
             </div>
         </div>
-
-        <input type="hidden" name="kind" value="{{ kind }}">
     </fieldset>
 </form>
 {% endblock %}

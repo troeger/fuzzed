@@ -23,14 +23,12 @@ urlpatterns = patterns('',
     url(r'^graphs/(?P<graph_id>\d+)/$', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
     url(r'^editor/(?P<graph_id>\d+)$', 'FuzzEd.views.editor', name='editor'),
     url(r'^snapshot/(?P<graph_id>\d+)$', 'FuzzEd.views.snapshot', name='snapshot'),
-    
-    #url(r'^dashboard/$', 'FuzzEd.views.dashboard', name='dashboard'),
-    #url(r'^dashboard/new/$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
+        
     url(r'^projects/$', 'FuzzEd.views.projects', name='projects'),
     url(r'^projects/new/$', 'FuzzEd.views.project_new', name='project_new'),
     url(r'^projects/(?P<project_id>\d+)/$', 'FuzzEd.views.project_edit', name='project_edit'),
     url(r'^projects/(?P<project_id>\d+)/dashboard/$', 'FuzzEd.views.dashboard', name='dashboard'),
-    url(r'^projects/(?P<project_id>\d+)/dashboard/new/$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
+    url(r'^projects/(?P<project_id>\d+)/dashboard/new/(?P<kind>\w{1,50})$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
     
     
     # API
