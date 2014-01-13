@@ -43,50 +43,32 @@ class SimulationProxy
 public:
 	// constructor for command line tool
 	SimulationProxy(int numArguments, char** arguments);
+	void parseCommandline_default(int numArguments, char** arguments);
 
-	// constructor for library calls
-	SimulationProxy(
-		unsigned int numRounds,
-		double convergenceThreshold,
-		unsigned int maxTime);
-
-	// triggers a faulttree simulation on a fuzztree or faulttree file
-	void simulateFile(const boost::filesystem::path& p, SimulationImpl impl);
-
+protected:
 	// simulates all configurations from one file
 	void simulateAllConfigurations(
 		const boost::filesystem::path& input,
 		const boost::filesystem::path& output,
 		const boost::filesystem::path& workingDir,
+		const boost::filesystem::path& logFile,
 		SimulationImpl impl);
 
-	SimulationResultStruct simulateFaultTree(std::shared_ptr<TopLevelEvent> ft,
-		const boost::filesystem::path& input,
-		const boost::filesystem::path& output,
+	SimulationResultStruct simulateFaultTree(
+		const std::shared_ptr<TopLevelEvent> ft,
 		const boost::filesystem::path& workingDir,
+		std::ofstream* logFile,
 		SimulationImpl impl);
 
-	void parseCommandline_default(int numArguments, char** arguments);
-
-protected:
 	SimulationResultStruct runSimulationInternal(
 		const boost::filesystem::path& inPath,
-		const boost::filesystem::path& outPath,
-		const boost::filesystem::path& workingDir,
 		SimulationImpl implementationType,
 		void* additionalArguments = NULL);
 	
 	unsigned int m_missionTime;
 	unsigned int m_simulationTime;
 	unsigned int m_numRounds;
-	unsigned int m_numAdaptiveRounds;
 	double m_convergenceThresh;
-
-	bool m_bSimulateUntilFailure;
-
-	boost::program_options::options_description m_options;
-	
-	static bool acceptFileExtension(const boost::filesystem::path& p);
 
 	TimeNETProperties* m_timeNetProperties; // ownership usually transferred to Simulation. Do NOT call delete on it. -.-
 };

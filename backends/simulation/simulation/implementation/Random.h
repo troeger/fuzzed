@@ -20,8 +20,6 @@ public:
 	double randomNumberExponential(double rate);
 	unsigned int randomFiringTime(double rate);
 
-	double randomNumberWeibull(double rate, double k);
-	
 	static void generateExponentialRandomNumbers(const std::string& fileName, double rate, int count);
 
 	// this is a weird per-thread singleton pattern.

@@ -285,7 +285,6 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         },
 
         _setupThumbnails: function() {
-            
 			var thumbnails = this.container.find('.' + Config.Classes.DRAGGABLE_WRAP_DIV).children();
 
             // make shapes in the menu draggable

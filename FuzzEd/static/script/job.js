@@ -1,4 +1,4 @@
-define(['class', 'config', 'progressIndicator', 'jquery'], function(Class, Config, Progress) {
+define(['class', 'config', 'progress_indicator', 'jquery'], function(Class, Config, Progress) {
     /**
      * Package: Base
      */

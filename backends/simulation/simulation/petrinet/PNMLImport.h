@@ -4,7 +4,6 @@
 #include "XMLImport.h"
 #include "ImmediateTransition.h"
 #include "TimedTransition.h"
-#include "SequentialConstraint.h"
 #include "PetriNet.h"
 #include "platform.h"
 
@@ -35,8 +34,6 @@ private:
 	void loadArcs(ArcList& arcDict);
 
 	void loadUserDescription(std::string& description);
-
-	void loadConstraints(std::vector<SequentialConstraint>& constraints);
 
 	virtual bool loadRootNode() override;
 };

@@ -15,7 +15,7 @@ TimedTransition::TimedTransition(const TimedTransition& other)
 
 bool TimedTransition::stochasticallyEnabled(unsigned int tick) const
 {
-	return m_r <= tick; // TODO <= or <??
+	return m_r <= tick;
 }
 
 TimedTransition& TimedTransition::operator=(const TimedTransition &other)

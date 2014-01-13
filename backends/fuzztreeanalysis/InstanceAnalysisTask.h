@@ -19,8 +19,13 @@ public:
 		std::ofstream& logfile);
 
 	InstanceAnalysisResult compute();
-
+	
 protected:
+	InstanceAnalysisResult computeDecomposedResult();
+	InstanceAnalysisResult computeSingleResult();
+
+	static const bool isFuzzy(const fuzztree::Node* tree);
+
 	const fuzztree::TopEvent* m_tree;
 	unsigned int m_decompositionNumber;
 

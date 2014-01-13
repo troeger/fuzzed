@@ -1,4 +1,4 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progressIndicator', 'jquery-classlist'],
+define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist'],
 function(Class, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base

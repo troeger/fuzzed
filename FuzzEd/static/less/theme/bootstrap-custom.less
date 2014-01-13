@@ -38,13 +38,39 @@
     }
 }
 
-// Custom icon showing a progress spinner
 i {
+    // Custom icon showing a progress spinner
     &.icon-progress {
         background-image: url(/static/img/ajax-loader.gif);
         width: 16px;
         height: 16px;
         display: inline-block !important;
         margin: 0 3px -3px 0px;
+    }
+    // Custon icon for the cluster auto-layout function
+    &.icon-layout-cluster {
+        background-image: url(/static/img/layout_cluster.svg);
+        background-size: contain;
+        background-repeat: no-repeat;
+        width: 24px;
+        height: 24px;
+        display: inline-block !important;
+        margin: -6px;
+        &:hover {
+            background-image: url(/static/img/layout_cluster_hover.svg);
+        }
+    }
+    // Custon icon for the tree auto-layout function
+    &.icon-layout-tree {
+        background-image: url(/static/img/layout_tree.svg);
+        background-size: contain;
+        background-repeat: no-repeat;
+        width: 24px;
+        height: 24px;
+        display: inline-block !important;
+        margin: -6px;
+        &:hover {
+            background-image: url(/static/img/layout_tree_hover.svg);
+        }
     }
 }

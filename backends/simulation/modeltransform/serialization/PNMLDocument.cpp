@@ -18,7 +18,7 @@ PNMLDocument::PNMLDocument()
 PNMLDocument::~PNMLDocument() // nothing yet
 {}
 
-int PNMLDocument::addTimedTransition(long double rate, const string& label /*= ""*/)
+int PNMLDocument::addTimedTransition(double rate, const string& label /*= ""*/)
 {
 	xml_node transitionNode = m_root.append_child(TRANSITION_TAG);
 

@@ -75,14 +75,6 @@ std::string treeHelpers::toString(const double& d, const int& prec /*= 5*/)
 	return oss.str();
 }
 
-std::string treeHelpers::toString(const long double& d, const int& prec /*= 5*/)
-{
-	std::ostringstream oss;
-	oss << std::fixed << std::setprecision(prec);
-	oss << d;
-	return oss.str();
-}
-
 std::string treeHelpers::toString(const int& d)
 {
 	std::ostringstream oss;

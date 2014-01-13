@@ -1,4 +1,4 @@
-define(['class', 'config', 'decimal', 'propertyMenuEntry', 'mirror', 'alerts', 'jquery', 'underscore'],
+define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'alerts', 'jquery', 'underscore'],
 function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
     /**
      * Package: Base
@@ -536,14 +536,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         }
     });
 	
-	var InlineTextField = Text.extend({
-		
-		init: function(node, definition) {
-			this._super(node, definition);
-			var paragraph = jQuery('<p align="center">').html(PropertyMenuEntry.escapeHTML(this.value));
-			this.menuEntry.inputs.after(paragraph);
-		},
-		
+	var InlineTextField = Text.extend({		
         menuEntryClass: function() {
             return PropertyMenuEntry.InlineTextArea;
         },
