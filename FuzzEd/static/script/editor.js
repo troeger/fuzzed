@@ -1,5 +1,5 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts', 'jquery-classlist'],
-function(Class, Menus, Canvas, Backend, Alerts) {
+define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist'],
+function(Class, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base
      */
@@ -15,13 +15,13 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *  Group: Members
          *
          *  Properties:
-         *    {Object}         config                       - Graph-specific <Config> object.
-         *    {Graph}          graph                        - <Graph> instance to be edited.
-         *    {PropertiesMenu} properties                   - The <Menu::PropertiesMenu> instance used by this editor
+         *    {Object}          config                      - Graph-specific <Config> object.
+         *    {Graph}           graph                       - <Graph> instance to be edited.
+         *    {PropertiesMenu}  properties                  - The <Menu::PropertiesMenu> instance used by this editor
          *                                                    for changing the properties of nodes of the edited graph.
-         *    {ShapesMenu}     shapes                       - The <Menu::ShapeMenu> instance use by this editor to show
+         *    {ShapesMenu}      shapes                      - The <Menu::ShapeMenu> instance use by this editor to show
          *                                                    the available shapes for the kind of the edited graph.
-         *    {Backend}        _backend                     - The instance of the <Backend> that is used to communicate
+         *    {Backend}         _backend                    - The instance of the <Backend> that is used to communicate
          *                                                    graph changes to the server.
          *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
          *    {jQuery Selector} _nodeOffsetPrintStylesheet  - The dynamically generated and maintained stylesheet
@@ -274,7 +274,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             if (readOnly) return this;
 
             jQuery(document).keydown(function(event) {
-                if (event.which === jQuery.ui.keyCode.ESCAPE) {
+                if (event.which == jQuery.ui.keyCode.ESCAPE) {
                     this._escapePressed(event);
                 } else if (event.which === jQuery.ui.keyCode.DELETE) {
                     this._deletePressed(event);
@@ -348,10 +348,10 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,   this._updatePrintOffsets.bind(this));
             jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED, this._updatePrintOffsets.bind(this));
 
-            jQuery(document).ajaxStart(this._showProgressIndicator.bind(this));
-            jQuery(document).ajaxStop(this._hideProgressIndicator.bind(this));
-            jQuery(document).ajaxSuccess(this._flashSaveIndicator.bind(this));
-            jQuery(document).ajaxError(this._flashErrorIndicator.bind(this));
+            // show status of global AJAX events in navbar
+            jQuery(document).ajaxSend(Progress.showAjaxProgress);
+            jQuery(document).ajaxSuccess(Progress.flashAjaxSuccessMessage);
+            jQuery(document).ajaxError(Progress.flashAjaxErrorMessage);
 
             //
 
@@ -378,7 +378,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *    This Editor instance for chaining
          */
         _arrowKeyPressed: function(event, xDirection, yDirection) {
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             jQuery(selectedNodes).each(function(index, element) {
@@ -406,7 +406,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          */
         _deletePressed: function(event) {
             // prevent that node is being deleted when we edit an input field
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
@@ -457,7 +457,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *   This Editor instance for chaining.
          */
         _selectAllPressed: function(event) {
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             event.preventDefault();
 
@@ -532,7 +532,14 @@ function(Class, Menus, Canvas, Backend, Alerts) {
 
             // to avoid empty copyings
             if(nodes.length > 0 || edges.length > 0) {
-                this._clipboard = JSON.stringify(clipboardDict);
+                var clipboard = JSON.stringify(clipboardDict);
+
+                if (typeof window.Storage !== 'undefined') {
+                    localStorage['clipboard_' + this.graph.kind] = clipboard;
+                } else {
+                    this._clipboard = clipboard;
+                }
+
             }
 
             return this;
@@ -555,7 +562,14 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             event.preventDefault();
             this._deselectAll(event);
 
-            var clipboardDict = JSON.parse(this._clipboard);
+            var clipboardDict = {};
+
+            if (typeof window.Storage !== 'undefined' && localStorage['clipboard_' + this.graph.kind] !== 'undefined') {
+                clipboardDict = JSON.parse(localStorage['clipboard_' + this.graph.kind]);
+            } else {
+                clipboardDict = JSON.parse(this._clipboard);
+            }
+
             var nodes = clipboardDict.nodes;
             var edges = clipboardDict.edges;
             var ids = []; // array of arrays with format: [old_id, new_id]

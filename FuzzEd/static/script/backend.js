@@ -1,4 +1,4 @@
-define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery', 'jquery-ajaxq'], function (Class, Config, Job, Alerts, Progress) {
+define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jquery-ajaxq'], function (Class, Config, Job, Alerts, Progress) {
 
     /**
      * Class: Backend
@@ -129,7 +129,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery', 'jque
             var data = {
                 id:          edgeId,
                 source:      sourceNodeId,
-                target: targetNodeId
+                target:      targetNodeId
             };
 
             var xhr = jQuery.ajaxq('queue', {

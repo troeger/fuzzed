@@ -66,6 +66,7 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          *    This <Graph> instance for chaining.
          */
         _loadFromJson: function(json) {
+            this.kind     = json.type;
             this.readOnly = json.readOnly;
 
             var maxX = 0;
