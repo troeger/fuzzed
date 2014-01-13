@@ -274,7 +274,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             if (readOnly) return this;
 
             jQuery(document).keydown(function(event) {
-                if (event.which == jQuery.ui.keyCode.ESCAPE) {
+                if (event.which === jQuery.ui.keyCode.ESCAPE) {
                     this._escapePressed(event);
                 } else if (event.which === jQuery.ui.keyCode.DELETE) {
                     this._deletePressed(event);
@@ -441,7 +441,7 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          */
         _escapePressed: function(event) {
             event.preventDefault();
-            this._deselectAll();
+            this._deselectAll(event);
             return this;
         },
 
@@ -553,16 +553,12 @@ function(Class, Menus, Canvas, Backend, Alerts) {
             if (jQuery(event.target).is('input')) return this;
 
             event.preventDefault();
-            this._escapePressed(event); // why doesn't this work?
+            this._deselectAll(event);
 
             var clipboardDict = JSON.parse(this._clipboard);
             var nodes = clipboardDict.nodes;
             var edges = clipboardDict.edges;
             var ids = []; // array of arrays with format: [old_id, new_id]
-
-            //_.invoke(this.graph.nodes, 'deselect');
-
-
 
             _.each(nodes, function(node) {
                 var pasteId = this.graph.createId();
@@ -622,12 +618,20 @@ function(Class, Menus, Canvas, Backend, Alerts) {
          *   This Editor instance for chaining.
          */
 
-        _deselectAll: function() {
+        _deselectAll: function(event) {
             //XXX: deselect everything
             // This uses the jQuery.ui.selectable internal functions.
             // We need to trigger them manually in order to simulate a click on the canvas.
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
+            // Since a deselect-click only works without metaKey or ctrlKey pressed,
+            // we need to deactivate them manually.
+
+            var hackEvent = jQuery.extend({}, event, {
+                metaKey: false,
+                ctrlKey: false
+            });
+
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(hackEvent);
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(hackEvent);
 
             return this;
         },

@@ -78,6 +78,8 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
 
             // connect the nodes again
             _.each(json.edges, function(jsonEdge) {
+                // jsPlumb.connect is at this point used in a special manner, because the jsPlumbConnection will not
+                // be triggered, since we register the event later.
                 var jsPlumbEdge = jsPlumb.connect({
                     source: this.getNodeById(jsonEdge.source).container,
                     target: this.getNodeById(jsonEdge.target).container
