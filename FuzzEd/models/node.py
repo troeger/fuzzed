@@ -526,3 +526,6 @@ class Node(models.Model):
 def graph_modify(sender, instance, **kwargs):
     instance.graph.modified = datetime.datetime.now()
     instance.graph.save()
+    # updating project modification date
+    instance.graph.project.modified = instance.graph.modified
+    instance.graph.project.save()
