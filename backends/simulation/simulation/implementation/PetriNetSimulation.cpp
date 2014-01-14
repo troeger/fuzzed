@@ -232,11 +232,14 @@ PetriNetSimulation::PetriNetSimulation(
 // returns false, if a sequence constraint was violated
 bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 {
+	assert(tick <= m_numSimulationSteps);
 	tryTimedTransitions(pn, tick);
 	
 	// propagate all failures upwards in the correct time step
 	bool immediateCanFire = true;
-	while (immediateCanFire)
+
+	int tries = 0;
+	while (immediateCanFire && ++tries < m_numSimulationSteps)
 	{
 		tryImmediateTransitions(pn, tick, immediateCanFire);
 	}
