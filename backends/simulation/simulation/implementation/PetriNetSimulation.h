@@ -15,8 +15,8 @@ public:
 		unsigned int simulationSteps,		// the number of logical simulation steps performed in each round
 		unsigned int numRounds,				// the number of simulation rounds performed in parallel
 		double convergenceThresh,			// simulation stops after 
-		bool simulateUntilFailure = true,	// if true, the simulation stops only with a SimulationException. necessary for MTTF computations
-		unsigned int numAdaptiveRounds = 0);			// number of rounds performed to adapt OpenMP parallelization
+		bool simulateUntilFailure = true	// if true, the simulation stops only with a SimulationException. necessary for MTTF computations
+	);
 
 	virtual bool run() override;
 
@@ -39,7 +39,6 @@ protected:
 	void tidyUp() override;
 
 	const bool m_simulateUntilFailure;
-	const int m_numAdaptiveRounds;
 	double m_convergenceThresh;
 
 	SimulationResultStruct m_result;

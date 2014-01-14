@@ -14023,7 +14023,7 @@ Series.prototype = {
 
 			} else {
 
-				// moveTo or lineTo
+				// moveToPixel or lineTo
 				segmentPath.push(i ? L : M);
 
 				// step line?
@@ -14937,7 +14937,7 @@ var SplineSeries = extendClass(Series, {
 		}
 		*/
 
-		// moveTo or lineTo
+		// moveToPixel or lineTo
 		if (!i) {
 			ret = [M, plotX, plotY];
 		} else { // curve from last point to this

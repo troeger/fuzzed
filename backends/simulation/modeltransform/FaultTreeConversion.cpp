@@ -57,6 +57,28 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 			// BasicEvents can have FDEP children...
 			// continue;
 		}
+		else if (typeName == *BASICEVENTSET)
+		{
+			const auto& bes = static_cast<const faulttree::BasicEventSet&>(child);
+			const auto& prob = bes.probability();
+			const type_info& probName = typeid(prob);
+			const int quantity = bes.quantity().present() ? bes.quantity().get() : 1; // TODO: in fault trees, the quantity should not be optional
+
+			double failureRate = 0.f;
+			if (probName == *CRISPPROB)
+				failureRate = util::rateFromProbability(static_cast<const faulttree::CrispProbability&>(prob).value(), missionTime);
+			else
+			{
+				assert(dynamic_cast<const faulttree::FailureRate*>(&prob));
+				failureRate = static_cast<const faulttree::FailureRate&>(prob).value();
+			}
+
+			for (int i = 0; i<quantity; ++i)
+			{
+				node->addChild(make_shared<BasicEvent>(id, failureRate));
+			}
+			continue; // TODO these might also be triggered by FDEP
+		}
 		else if (typeName == *HOUSEEVENT)
 		{ // TODO find out if this is legitimate
 			current = make_shared<BasicEvent>(id, 0);

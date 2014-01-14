@@ -10,7 +10,6 @@
 #endif
 
 #include "Condition.h"
-#include "petrinet/SequentialConstraint.h"
 
 /************************************************************************/
 /* Abstract Class for XML documents representing Petri Nets             */
@@ -23,7 +22,7 @@ public:
 	virtual ~PNDocument();
 
 	// add PetriNet component to the XML document, returning IDs
-	virtual int addTimedTransition(long double rate, const std::string& label = "") = 0;
+	virtual int addTimedTransition(double rate, const std::string& label = "") = 0;
 	virtual int addImmediateTransition(unsigned int priority = 1, const std::string& label = "") = 0;
 	virtual int addPlace(int initialMarking, int capacity,  const std::string& label = "", PlaceSemantics semantics = DEFAULT_PLACE) = 0;
 	virtual int addTopLevelPlace(const std::string& label) = 0;

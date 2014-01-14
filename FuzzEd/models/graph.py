@@ -5,8 +5,8 @@ from django.dispatch import receiver
 
 import pyxb.utils.domutils
 try:
-    from xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlFuzzTreeNamespace
-    from xml_faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace
+    from xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlFuzzTreeNamespace, CreateFromDocument as fuzzTreeFromXml 
+    from xml_faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace, CreateFromDocument as faultTreeFromXml
     from node_rendering import tikz_shapes 
 except:
     print "ERROR: Perform a build process first."
@@ -163,6 +163,21 @@ class Graph(models.Model):
 
         dom = tree.toDOM(bds)
         return dom.toprettyxml()
+
+    def from_xml(self, xml):
+        from node import Node
+        ''' Fill this graph with the information gathered from the XML.'''
+        if self.kind == "fuzztree":
+            tree = fuzzTreeFromXml(xml)
+        elif self.kind == "faulttree":
+            tree = faultTreeFromXml(xml)
+        else:
+            raise ValueError('No XML support for this graph type.')
+
+        self.name = tree.name
+        self.save()
+        top=Node(graph=self)
+        top.load_xml(tree.topEvent)
 
     def copy_values(self, other):
         # copy all nodes and their properties

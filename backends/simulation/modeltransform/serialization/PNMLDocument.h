@@ -8,7 +8,7 @@ public:
 	
 	virtual ~PNMLDocument();
 
-	virtual int addTimedTransition(long double rate, const std::string& label = "") override;
+	virtual int addTimedTransition(double rate, const std::string& label = "") override;
 	virtual int addImmediateTransition(unsigned int priority = 1, const std::string& label = "") override;
 
 	virtual int addPlace(

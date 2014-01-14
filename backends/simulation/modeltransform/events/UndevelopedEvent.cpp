@@ -14,7 +14,7 @@ int UndevelopedEvent::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	return placeID;
 }
 
-UndevelopedEvent::UndevelopedEvent(const std::string& ID, long double failureRate, const string& name /*= ""*/) 
+UndevelopedEvent::UndevelopedEvent(const std::string& ID, double failureRate, const string& name /*= ""*/) 
 	: Event(ID, failureRate, name)
 {}
 

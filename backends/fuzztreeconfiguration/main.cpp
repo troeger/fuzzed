@@ -8,8 +8,11 @@
 #include <fstream>
 
 #include "util.h"
+#include "xmlutil.h"
 #include "CommandLineParser.h"
 #include "FatalException.h"
+
+#include "configurationResult.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -20,48 +23,72 @@ int main(int argc, char **argv)
 	parser.parseCommandline(argc, argv);
 	const auto inFile	= parser.getInputFilePath().generic_string();
 	const auto outFile	= parser.getOutputFilePath().generic_string();
-	const auto logFile = parser.getLogFilePath().generic_string();
+	const auto logFile	= parser.getLogFilePath().generic_string();
 
 	std::ofstream* logFileStream = new std::ofstream(logFile);
-	*logFileStream << "Analysis errors for " << inFile << std::endl;
+	*logFileStream << "Configuration errors for " << inFile << std::endl;
 	if (!logFileStream->good())
 	{// create default log file
-		logFileStream = new std::ofstream(
-			parser.getWorkingDirectory().generic_string() +
-			util::slash +
-			"errors.txt");	
+		logFileStream = new std::ofstream(logFile);	
 	}
 
-	std::vector<Issue> issues;
+	std::ifstream instream(inFile);
+	if (!instream.good())
+	{
+		*logFileStream << "Invalid input file: " << inFile << std::endl;
+		return -1;
+	}
+
+	std::set<Issue> issues; // issues at fuzztree level
+	FuzzTreeTransform tf(instream, issues);
+	instream.close();
+
 	try
 	{
-		// do the actual transformation, write all files to dirPath
-		std::ifstream instream(inFile);
-		if (!instream.good())
-		{
-			std::cerr << "Invalid input file: " << inFile << std::endl;
-			return -1;
+		configurationResults::ConfigurationResults configurationResults;
+
+		if (!tf.isValid())
+		{ // only fuzztrees should be configured 
+			issues.insert(Issue::fatalIssue("Could not configure the model. Did you try to configure a fault tree?"));
 		}
-		FuzzTreeTransform transform(instream, issues);
-		if (!transform.isValid())
-		{
-			std::cerr << "Could not compute configurations." << std::endl;
-			return -1;
+		else
+		{ // handle fuzztree
+			const auto modelId = tf.getFuzzTree()->id();
+			for (const auto& t : tf.transform())
+			{
+				configurationResults::Result r(modelId, util::timeStamp(), true); 
+				r.configuration(serializedConfiguration(t.first));
+				configurationResults.result().push_back(r);
+			}
 		}
 
-		const auto fileName = util::fileNameFromPath(inFile);
+		// Log errors
+		for (const Issue& issue : issues)
+		{
+			configurationResults.issue().push_back(issue.serialized());
+			*logFileStream << issue.getMessage() << std::endl;
+		}
 
-		transform.generateConfigurationsFile(outFile);
-		return 0;
+		std::ofstream output(outFile);
+		configurationResults::configurationResults(output, configurationResults);
 	}
+
+	// This should not happen.
 	catch (const std::exception& e)
 	{
-		std::cerr << "Exception while trying to configure " << inFile << e.what() << std::endl;
+		*logFileStream << "Exception while trying to configure " << inFile << e.what() << std::endl;
+		fuzztree::fuzzTree(*logFileStream, *(tf.getFuzzTree()));
+
 		return -1;
 	}
 	catch (...)
 	{
-		std::cerr << "Exception while trying to configure " << inFile << std::endl;
+		*logFileStream << "Exception while trying to configure " << inFile << std::endl;
 		return -1;
 	}
+
+	logFileStream->close();
+	delete logFileStream;
+
+	return 0;
 }

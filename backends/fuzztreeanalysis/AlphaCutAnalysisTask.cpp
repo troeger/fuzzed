@@ -75,7 +75,6 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 			m_logFile << error << std::endl;
 			
 			throw FatalException(error, 0, node.id());
-			return NumericInterval();
 		}
 	}
 	else if (typeName == *BASICEVENTSET || typeName == *INTERMEDIATEEVENTSET)
@@ -98,7 +97,6 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		m_logFile << "Found Undeveloped Event, ID: " << node.id() << std::endl;
 
 		throw FatalException(UNDEVELOPED_ERROR, 0, node.id());
-		return NumericInterval();
 	}
 	else if (typeName == *INTERMEDIATEEVENT)
 	{
@@ -198,7 +196,6 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	else
 	{
 		throw FatalException(UNKNOWN_TYPE);
-		return NumericInterval();
 	}
 
 

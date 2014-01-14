@@ -25,7 +25,7 @@ public:
 	TNDocument();
 	virtual ~TNDocument();
 
-	virtual int addTimedTransition(long double rate, const std::string& label = "") override;
+	virtual int addTimedTransition(double rate, const std::string& label = "") override;
 	// add a transition whose exponential delay depends on a definition
 	virtual int addParametrisedTransition(const std::string& dependencyTerm); 
 

@@ -29,7 +29,7 @@ bool PetriNetSimulation::run()
 	// cout <<  "----- Starting " << m_numRounds << " simulation rounds in " << omp_get_max_threads() << " threads..." << std::endl;
 
 	// for checking local convergence, thread-local
-	long double privateLast = 10000.0L;
+	double privateLast = 10000.0;
 	bool privateConvergence = false;
 	bool privateBreak = false;
 
@@ -114,8 +114,8 @@ bool PetriNetSimulation::run()
 			sumFailureTime_fail += res.failureTime;
 		}
 
-		const long double current = (count == 0) ? 0 : ((long double)numFailures/(long double)count);
-		const long double diff = std::abs(privateLast - current);
+		const double current = (count == 0) ? 0 : ((double)numFailures/(double)count);
+		const double diff = std::abs(privateLast - current);
 
 		if ((current > 0.0L) && (current < 1.0L) && (diff < m_convergenceThresh))
 		{
@@ -182,10 +182,10 @@ bool PetriNetSimulation::run()
 	
 	const auto elapsedTime = std::chrono::system_clock::now() - startTime;
 
-	long double unreliability		= (long double)numFailures			/(long double)count;
-	long double avgFailureTime_all	= (long double)sumFailureTime_all	/(long double)count;
-	long double avgFailureTime_fail = (long double)sumFailureTime_fail	/(long double)numFailures;
-	long double meanAvailability	= avgFailureTime_fail				/(long double)m_numSimulationSteps;
+	double unreliability		= (double)numFailures			/(double)count;
+	double avgFailureTime_all	= (double)sumFailureTime_all	/(double)count;
+	double avgFailureTime_fail = (double)sumFailureTime_fail	/(double)numFailures;
+	double meanAvailability	= avgFailureTime_fail				/(double)m_numSimulationSteps;
 	
 	SimulationResultStruct res;
 	res.reliability			= 1.0 - unreliability;
@@ -204,10 +204,8 @@ bool PetriNetSimulation::run()
 #endif
 
 #ifndef MEASURE_SPEEDUP
-	tidyUp();
-#endif
-
-#ifdef MEASURE_SPEEDUP
+	// tidyUp();
+#else
 	cout << res.duration << endl;
 #endif
 
@@ -221,11 +219,9 @@ PetriNetSimulation::PetriNetSimulation(
 	unsigned int simulationSteps,	// the number of logical simulation steps performed in each round
 	unsigned int numRounds,
 	double convergenceThresh,
-	bool simulateUntilFailure,
-	unsigned int numAdaptiveRounds /*= 0*/)
+	bool simulateUntilFailure)
 	: Simulation(inPath, simulationTime, simulationSteps, numRounds),
 	m_simulateUntilFailure(simulateUntilFailure),
-	m_numAdaptiveRounds(numAdaptiveRounds),
 	m_convergenceThresh(convergenceThresh)
 {
 	assert(!m_netFile.empty());
@@ -246,9 +242,9 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	for (TimedTransition* tt : pn->m_inactiveTimedTransitions)
 	{
 		if (tt->tryUpdateStartupTime(tick))
-		{
+		{ // tt is enabled and the firing time was updated (race with enabling memory)
 			toRemove.emplace_back(tt);
-			pn->updateFiringTime(tt);
+			pn->updateFiringTime(tt); // inserts tt's firing time in the event queue
 		}
 	}
 	for (TimedTransition* tt : toRemove)
@@ -269,7 +265,7 @@ SimulationRoundResult PetriNetSimulation::runOneRound(PetriNet* net)
 	{
 		result.valid = true;
 		result.failed = false;
-		return result; // TODO check this earlier
+		return result; // TODO check this earlier, the initial state of the petri net is invalid
 	}
 
 	auto elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now()-start).count();
