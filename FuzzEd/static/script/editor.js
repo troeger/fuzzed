@@ -485,7 +485,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         /**
          * Method: _copyPressed
          *
-         *   Event callback for handling a copy (CTRL/CMD + C) key press. Will copy selected nodes by serializing and saving them to _clipboard.
+         *   Event callback for handling a copy (CTRL/CMD + C) key press. Will copy selected nodes by serializing and
+         *   saving them to html5 Local Storage or the _clipboard var.
          *
          * Parameters:
          *   {jQuery::Event} event - the issued select all keypress event
@@ -494,12 +495,12 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *   This Editor instance for chaining.
          */
         _copyPressed: function(event) {
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
+
+            event.preventDefault();
 
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
-
-            event.preventDefault();
 
             // put nodes as dicts into nodes
             var nodes = [];
@@ -513,16 +514,12 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             var edges = [];
             jQuery(selectedEdges).each(function(index, element) {
                 var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
-                if (typeof edge !== 'undefined') {
-                    var sourceNode = edge.source.data(this.config.Keys.NODE);
-                    var targetNode = edge.target.data(this.config.Keys.NODE);
-                    // to do: create Edge class with toDict() method
-                    var edgeDict = {
-                        'source':  sourceNode.id,
-                        'target':  targetNode.id
-                    };
-                    edges.push(edgeDict);
-                }
+
+                //TODO: create Edge class with toDict() method
+                edges.push({
+                    'source':  edge.source.data(this.config.Keys.NODE).id,
+                    'target':  edge.target.data(this.config.Keys.NODE).id
+                });
             }.bind(this));
 
             var clipboardDict = {
@@ -531,7 +528,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             };
 
             // to avoid empty copyings
-            if(nodes.length > 0 || edges.length > 0) {
+            if (nodes.length > 0 || edges.length > 0) {
                 var clipboard = JSON.stringify(clipboardDict);
 
                 if (typeof window.Storage !== 'undefined') {
@@ -539,7 +536,6 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 } else {
                     this._clipboard = clipboard;
                 }
-
             }
 
             return this;
@@ -548,7 +544,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         /**
          * Method: _pastePressed
          *
-         *   Event callback for handling a paste (CTRL/CMD + V) key press. Will paste previously copied nodes from _clipboard.
+         *   Event callback for handling a paste (CTRL/CMD + V) key press. Will paste previously copied nodes from
+         *   html5 Local Storage or the _clipboard var.
          *
          * Parameters:
          *   {jQuery::Event} event - the issued select all keypress event
@@ -557,7 +554,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *   This Editor instance for chaining.
          */
         _pastePressed: function(event) {
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             event.preventDefault();
             this._deselectAll(event);
@@ -572,31 +569,26 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             var nodes = clipboardDict.nodes;
             var edges = clipboardDict.edges;
-            var ids = []; // array of arrays with format: [old_id, new_id]
+            var ids   = {};
 
             _.each(nodes, function(node) {
-                var pasteId = this.graph.createId();
-                ids.push([node.id, pasteId]);
+                var pasteId  = this.graph.createId();
+                ids[node.id] = pasteId;
                 node.id = pasteId;
-                node.x++; node.y++;
-                this.graph.addNode(node.kind, node)
-                           .select();
+                //TODO: bounding box related position
+                ++node.x; ++node.y;
+                this.graph.addNode(node.kind, node).select();
             }.bind(this));
 
             _.each(edges, function(edge) {
-                _.each(ids, function(id) {
-                    if(edge.source == id[0]) { // edge[1] is the destination, (still) represented by its old id
-                        edge.source = id[1];
-                    }
-                    if(edge.target == id[0]) {
-                        edge.target = id[1];
-                    }
-                }.bind(this));
+                edge.source = ids[edge.source] || edge.source;
+                edge.target = ids[edge.target] || edge.target;
+                jQuery(this.graph.addEdge(edge).canvas).addClass(this.config.Classes.SELECTED);
             }.bind(this));
 
-            _.each(edges, function(edge) {
-                this.graph.addEdge(edge);
-            }.bind(this));
+            //XXX: trigger selection stop event manually here
+            //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
 
             return this;
         },
@@ -613,12 +605,11 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *   This Editor instance for chaining.
          */
         _cutPressed: function(event) {
-            if (jQuery(event.target).is('input')) return this;
+            if (jQuery(event.target).is('input, textarea')) return this;
 
             event.preventDefault();
             this._copyPressed(event);
             this._deletePressed(event);
-
 
             return this;
         },

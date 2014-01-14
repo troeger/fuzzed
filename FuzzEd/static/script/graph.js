@@ -156,18 +156,16 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          *    {JSON} jsonEdge - JSON representation of the edge to be added to the graph.
          *
          *  Returns:
-         *    This <Graph> instance for chaining.
+         *    The added jsPlumb Connection.
          *
          *  See also:
          *    <Graph::_registerEventHandlers>
          */
         addEdge: function(jsonEdge) {
-            jsPlumb.connect({
+            return jsPlumb.connect({
                 source: this.getNodeById(jsonEdge.source).container,
                 target: this.getNodeById(jsonEdge.target).container
             });
-
-            return this;
         },
 
         /**
@@ -275,7 +273,7 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          *    <Config::Events::GRAPH_NODE_ADDED>
          *
          *  Returns:
-         *    This <Graph> instance for chaining.
+         *    The added node.
          */
         addNode: function(kind, properties) {
             properties.readOnly = this.readOnly;
