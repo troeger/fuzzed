@@ -278,6 +278,7 @@ set(COMMON_SOURCES
 	${COMMON_DIR}/FaultTreeToFuzzTree.cpp
 	${COMMON_DIR}/Issue.cpp
 	${COMMON_DIR}/FatalException.cpp
+	${COMMON_DIR}/DeadlockMonitor.cpp
 )
 
 set(COMMON_HEADERS
@@ -297,6 +298,7 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/FaultTreeToFuzzTree.h
 	${COMMON_DIR}/Issue.h
 	${COMMON_DIR}/FatalException.h
+	${COMMON_DIR}/DeadlockMonitor.h
 )
 
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})

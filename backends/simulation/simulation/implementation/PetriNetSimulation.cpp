@@ -232,7 +232,6 @@ PetriNetSimulation::PetriNetSimulation(
 // returns false, if a sequence constraint was violated
 bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 {
-	assert(tick <= m_numSimulationSteps);
 	tryTimedTransitions(pn, tick);
 	
 	// propagate all failures upwards in the correct time step
