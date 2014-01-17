@@ -85,7 +85,8 @@ define(['underscore'], function() {
             CUTSETS_URL:                '/cutsets',
             ANALYTICAL_PROBABILITY_URL: '/topEventProbability',
             SIMULATED_PROBABILITY_URL:  '/topEventProbability',
-            GRAPH_EXPORT_URL:           '/exports'
+            GRAPH_EXPORT_URL:           '/exports',
+            AJAX_QUEUE:                 'queue'
         },
 
         /**
