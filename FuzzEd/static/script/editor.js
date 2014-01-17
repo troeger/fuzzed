@@ -483,6 +483,45 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
+         * Method: _updateClipboard
+         *
+         *   Saves the given clipboardDict either to html5 Local Storage or at least to the Graph's _clipboard var as
+         *   JSON string.
+         *
+         * Parameters:
+         *   {JSON} clipboardDict - JSON dict to be stored
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _updateClipboard: function(clipboardDict) {
+            var clipboardString = JSON.stringify(clipboardDict);
+            if (typeof window.Storage !== 'undefined') {
+                localStorage['clipboard_' + this.graph.kind] = clipboardString;
+            } else { // fallback
+                this._clipboard = clipboardString;
+            }
+
+            return this;
+        },
+
+        /**
+         * Method: _getClipboard
+         *
+         *   Returns the current clipboard either from html5 Local Storage or from the Graph's _clipboard var as JSON.
+         *
+         * Returns:
+         *   The clipboard contents as JSON object.
+         */
+        _getClipboard: function() {
+            if (typeof window.Storage !== 'undefined' && localStorage['clipboard_' + this.graph.kind] !== 'undefined') {
+                return JSON.parse(localStorage['clipboard_' + this.graph.kind]);
+            } else {
+                return JSON.parse(this._clipboard);
+            }
+        },
+
+        /**
          * Method: _copyPressed
          *
          *   Event callback for handling a copy (CTRL/CMD + C) key press. Will copy selected nodes by serializing and
@@ -522,20 +561,15 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 });
             }.bind(this));
 
-            var clipboardDict = {
-                'nodes':  nodes,
-                'edges':  edges
+            var clipboard = {
+                'pasteCount': 0,
+                'nodes': nodes,
+                'edges': edges
             };
 
             // to avoid empty copyings
             if (nodes.length > 0 || edges.length > 0) {
-                var clipboard = JSON.stringify(clipboardDict);
-
-                if (typeof window.Storage !== 'undefined') {
-                    localStorage['clipboard_' + this.graph.kind] = clipboard;
-                } else {
-                    this._clipboard = clipboard;
-                }
+                this._updateClipboard(clipboard);
             }
 
             return this;
@@ -559,24 +593,21 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             event.preventDefault();
             this._deselectAll(event);
 
-            var clipboardDict = {};
+            var clipboard = this._getClipboard();
+            var pasteCount = ++clipboard.pasteCount;
+            this._updateClipboard(clipboard);
 
-            if (typeof window.Storage !== 'undefined' && localStorage['clipboard_' + this.graph.kind] !== 'undefined') {
-                clipboardDict = JSON.parse(localStorage['clipboard_' + this.graph.kind]);
-            } else {
-                clipboardDict = JSON.parse(this._clipboard);
-            }
-
-            var nodes = clipboardDict.nodes;
-            var edges = clipboardDict.edges;
-            var ids   = {};
+            var nodes      = clipboard.nodes;
+            var edges      = clipboard.edges;
+            var ids        = {};
 
             _.each(nodes, function(node) {
                 var pasteId  = this.graph.createId();
                 ids[node.id] = pasteId;
                 node.id = pasteId;
                 //TODO: bounding box related position
-                ++node.x; ++node.y;
+                node.x += pasteCount;
+                node.y += pasteCount;
                 this.graph.addNode(node.kind, node).select();
             }.bind(this));
 
@@ -610,6 +641,11 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             event.preventDefault();
             this._copyPressed(event);
             this._deletePressed(event);
+
+            // set the just copied clipboard's pasteCount to -1, so that it will paste right in place of the original.
+            var clipboard = this._getClipboard();
+            --clipboard['pasteCount'];
+            this._updateClipboard(clipboard);
 
             return this;
         },
