@@ -547,7 +547,7 @@ function(Property, Mirror, Canvas, Class) {
             return this;
         },
 		
-		/*
+		/**
 		 * Method: _setupResizable
 		 *
 		 * This initialization method is called in the constructor and is responsible for setting up the resizing of a node.
@@ -623,7 +623,7 @@ function(Property, Mirror, Canvas, Class) {
 			return this;
 		},
 		
-		/*
+		/**
 		 * Method: _setupEditable
 		 *
 		 * This initialization method is called in the constructor and is responsible for setting up the editing of a node.

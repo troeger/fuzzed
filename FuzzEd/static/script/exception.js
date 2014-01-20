@@ -11,7 +11,7 @@
  * If you want to introduce another exception, follow the here laid out pattern. Create a new Error object in the
  * constructor of the sub-prototype, set its message and stack value to your own object in order to get a meaningful
  * stacktrace and overwrite the error name. It is NOT(!) possible to pass the name directly to the Error object's
- * arguments since they are disregarded.
+ * arguments since they are discarded for whatever reason.
  */
 
 

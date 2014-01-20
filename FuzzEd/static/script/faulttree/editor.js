@@ -6,7 +6,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
     /**
      *  Class: CutsetsMenu
-     *∂DOW
+     *
      *  A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
      *  cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
      *
@@ -228,6 +228,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             this._chart = null; this._grid = null;
             this._configNodeMap = {};
             this._redundancyNodeMap = {};
+
+            return this;
         },
 
         /**

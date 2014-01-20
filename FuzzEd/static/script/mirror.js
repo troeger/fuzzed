@@ -29,6 +29,10 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
         _containment: undefined,
 
         /**
+         * Group: Initilization
+         */
+
+        /**
          * Constructor: init
          *
          * This method constructs a new mirror object. It embeds its visualization in the passed containment DOM
@@ -73,6 +77,27 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
         },
 
         /**
+         * Method: _setupEvents
+         *
+         * Sets up the mirror's event handling. The handlers will respectively change the mirror's text when the
+         * property has changed its value or hide/show the mirror when toggling the associated properties visibility.
+         *
+         * Returns:
+         *   This {Mirror} instance for chaining.
+         */
+        _setupEvents: function() {
+            jQuery(this.property).on(Config.Events.PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+                this.show(text);
+            }.bind(this));
+
+            jQuery(this.property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
+                this.container.toggle(!hidden);
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
          * Method: show
          *
          * This method allows to change the text of the mirror to the one specified in the method's only parameter. If
@@ -90,22 +115,12 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
             if (!_.isArray(value)) value = [value];
             // convert the array into an object, where the keys are the index of the array
             // and the value are the values of the array at the corresponding index
-            var enumerated = _.object(_.map(_.range(value.length), function(num){return '$' + num;}), value);
+            var enumerated = _.object(_.map(_.range(value.length), function(num) {return '$' + num; }), value);
             this.container.text(_.template(this.format, enumerated));
 
             this.container.toggle(!(this.property.hidden || typeof value === 'undefined' || value === null));
 
             return this;
-        },
-
-        _setupEvents: function() {
-            jQuery(this.property).on(Config.Events.PROPERTY_CHANGED, function(event, newValue, text, issuer) {
-                this.show(text);
-            }.bind(this));
-
-            jQuery(this.property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
-                this.container.toggle(!hidden);
-            }.bind(this));
         }
     });
 });

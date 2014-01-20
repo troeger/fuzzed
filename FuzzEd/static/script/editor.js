@@ -480,7 +480,6 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             return this;
         },
 
-
         /**
          *  Group: Print Offset Calculation
          */

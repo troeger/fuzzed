@@ -6,11 +6,9 @@ define(['config', 'jquery', 'underscore'], function(Config) {
 
     var _progressList = {};
 
-
     /**
      *  Section: API
      */
-
     function showProgress(progressID, message) {
         if (_progressList[progressID]) return; //TODO: What happens with repeating requests?
 
@@ -130,7 +128,6 @@ define(['config', 'jquery', 'underscore'], function(Config) {
             _progressIndicatorSingle.show();
         }
     }
-
 
     return {
         'showProgress': showProgress,

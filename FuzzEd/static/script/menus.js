@@ -207,7 +207,7 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
          *
          * Maximized the menu on clicking its minimized representation in the navigation bar. Will calculate the
          * position where the menu will be maximized to first (including a 20 pixel offset of the canvas borders) and
-         * then animate it over parts of a seconds moving there. This method will also remove the button from the bar.
+         * then animate it moving there. This method will also remove the button from the bar.
          *
          * Returns:
          *   This {Menu} instance for chaining.
@@ -235,8 +235,14 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         },
 
         /**
+         * Method: minimize
          *
-         * @returns {Menu}
+         * Minimizes the menu from its current position to the navigation bar. A button will appear in the menu bar
+         * instead. The minimization is animated in width and height over the period of about half a second. A
+         * minimized menu will not reappear until maximized again by clicking on the navigation bar button.
+         *
+         * Returns:
+         *   This {Menu} instance for chaining.
          */
         minimize: function() {
             if (this._isMinimized()) return this;
@@ -266,24 +272,56 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
                     this.container.css('height', '');
                 }.bind(this)
             });
+
             return this;
         }
     });
 
     /**
      * Class: ShapeMenu
+     *
+     * Concrete implementation of a menu. This menu class manages the shapes menu and is instantiated in the editor. A
+     * shapes menu represents the repository of shapes that a user can create on its own. The thumbnail of a shape can
+     * be dragged from the menu and released on the canvas in order to create a new node.
+     *
+     * Extends: <Base::Menu>
      */
     var ShapeMenu = Menu.extend({
+        /**
+         * Group: Initialization
+         */
+
+        /**
+         * Constructor: init
+         *
+         * Overrides the default implementation of menu in order to also locate the shape thumbnails.
+         */
         init: function() {
             this._super();
             this._setupThumbnails();
         },
 
-        /* Section: Internal */
+        /**
+         * Method: _setupContainer
+         *
+         * Implements the abstract _setupContainer method of <Base::Menu>. Locates the shapes menu container that is
+         * pre-created in the Django template and returns it.
+         *
+         * Returns:
+         *   jQuery set including the shapes menu's container.
+         */
         _setupContainer: function() {
             return jQuery('#' + Config.IDs.SHAPES_MENU);
         },
 
+        /**
+         * Method: _setupThumbnails
+         *
+         * Locates the thumbnails (pre-rendered in the Django template) and makes them draggable.
+         *
+         * Returns:
+         *  This {ShapeMenu} instance for chaining.
+         */
         _setupThumbnails: function() {
 			var thumbnails = this.container.find('.' + Config.Classes.DRAGGABLE_WRAP_DIV).children();
 
@@ -296,39 +334,148 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
                 revert:   'invalid',
                 zIndex:   200
             });
-		}
 
+            return this;
+		}
     });
 
     /**
      * Class: PropertiesMenu
+     *
+     * Concrete implementation of the abstract menu class. Models the properties menu that displays the modifiable or
+     * user-readable properties of a node. Will only display the properties of exactly one node. Multi-selected nodes
+     * are hidden.
+     *
+     * Extends: <Base::Menu>
      */
     var PropertiesMenu = Menu.extend({
+        /**
+         * Group: Members
+         *
+         * {Array[String]} _displayOrder - Array containing the names of displayable properties ordered by appearance in
+         *                                 the menu.
+         * {DOMElement}    _form         - The form containing all the visual form inputs of the
+         *                                 {Base::PropertyMenuEntries::Entries}.
+         * {Node}          _node         - The node instance which properties are being currently displayed.
+         */
         _displayOrder: undefined,
         _form:         undefined,
         _node:         undefined,
 
+        /**
+         * Group: Initialization
+         */
+
+        /**
+         * Constructor: init
+         *
+         * Overrides menu's constructor. Saves the display order attributed and locates the pre-rendered form.
+         * Additionally, sets up the selection event handlers.
+         */
         init: function(displayOrder) {
             this._super();
+
             this._displayOrder = displayOrder;
-            this._form = this.container.find('.form-horizontal');
+            this._form         = this.container.find('.form-horizontal');
 
             this._setupSelection();
         },
 
-        maximize: function(eventObject) {
-            this._super(eventObject);
-            this.show();
+        /**
+         * Method: _setupContainer
+         *
+         * Concrete implementation of the abstract base method. Locates and returns the property menu container that is
+         * pre-rendered into the editors template.
+         *
+         * Returns:
+         *   jQuery set containing the property menu container.
+         */
+        _setupContainer: function() {
+            return jQuery('#' + Config.IDs.PROPERTIES_MENU);
+        },
+
+        /**
+         * Method: _setupSelection
+         *
+         * Registers on the selection stop event in order to display the selected node's properties.
+         *
+         * On:
+         *   <Config::Events::CANVAS_SELECTION_STOPPED>
+         *
+         * Returns:
+         *   This {PropertyMenu} instance for chaining.
+         */
+        _setupSelection: function() {
+            jQuery(document).on(Config.Events.CANVAS_SELECTION_STOPPED, this.show.bind(this));
+
             return this;
         },
 
-        /* Section: Visibility */
+        /**
+         * Group: Visibility
+         */
+
+        /**
+         * Method: hide
+         *
+         * Overrides the base hide method of <Base::Menu>. Additionally, removes the visual representations of the
+         * properties from the form and resets the current node.
+         *
+         * Returns:
+         *   This {PropertyMenu} for chaining.
+         */
         hide: function() {
             this._removeEntries();
             this._node = undefined;
             return this._super();
         },
 
+        /**
+         * Method: _removeEntries
+         *
+         * If a node is currently selected, issues all the visual representation of the properties to remove themselves
+         * from their container, the form.
+         *
+         * Returns:
+         *   This {PropertyMenu} instance for chaining.
+         */
+        _removeEntries: function() {
+            if (!this._node) return this;
+
+            _.each(this._node.properties, function(property) {
+                property.menuEntry.remove();
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
+         * Method: maximize
+         *
+         * Overrides the base implementation of maximize. Triggers the show method again in order to recalculate the
+         * current selection and consequently the property menu's visibility.
+         *
+         * Returns:
+         *   This {PropertyMenu} instance for chaining.
+         */
+        maximize: function(eventObject) {
+            this._super(eventObject);
+            this.show();
+
+            return this;
+        },
+
+        /**
+         * Method: show
+         *
+         * Overrides the base implementation of <Base::Menu>. First, removes all currently displayed entries (even when
+         * being the same). Then, calculates the current node selection. If and only if, the is exactly one node in the
+         * the selection and the menu is not minimized, the node's properties are displayed using _show. Otherwise, the
+         * property menu is hidden.
+         *
+         * Returns:
+         *   This {PropertyMenu} instance for chaining.
+         */
         show: function() {
             var selected = jQuery('.' + Config.Classes.SELECTED + '.' + Config.Classes.NODE);
             this._removeEntries();
@@ -342,26 +489,16 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
             return this.hide();
         },
 
-        _removeEntries: function() {
-            if (!this._node) return this;
-
-            _.each(this._node.properties, function(property) {
-                property.menuEntry.remove();
-            }.bind(this));
-
-            return this;
-        },
-
-        _setupContainer: function() {
-            return jQuery('#' + Config.IDs.PROPERTIES_MENU);
-        },
-
-        _setupSelection: function() {
-            jQuery(document).on(Config.Events.CANVAS_SELECTION_STOPPED, this.show.bind(this));
-
-            return this;
-        },
-
+        /**
+         * Method: _show
+         *
+         * Internal implementation of the property menu's show mechanism. Grabs the selected node instance first.
+         * Determines whether there are properties to be displayed - i.e. properties present and not hidden - and then
+         * issues the properties to display themselves on the form and to change their visibility to show.
+         *
+         * Returns:
+         *   This {PropertyMenu} instance for chaining.
+         */
         _show: function(selected) {
             this._node = selected.data(Config.Keys.NODE);
 
@@ -393,6 +530,14 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
             return this;
         },
 
+        /**
+         * Method: _allHidden
+         *
+         * Determines if all properties of the node are hidden preventing the menu to be displayed
+         *
+         * Returns:
+         *   {Boolean} indicating hidden state of the properties.
+         */
         _allHidden: function() {
             return !this._node || _.all(this._node.properties, function(property) { return property.hidden; });
         }
