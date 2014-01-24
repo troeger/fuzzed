@@ -597,17 +597,17 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             var pasteCount = ++clipboard.pasteCount;
             this._updateClipboard(clipboard);
 
-            var nodes      = clipboard.nodes;
-            var edges      = clipboard.edges;
-            var ids        = {};
+            var nodes       = clipboard.nodes;
+            var edges       = clipboard.edges;
+            var ids         = {};
+            var boundingBox = this._boundingBoxForNodes(nodes);
 
             _.each(nodes, function(node) {
                 var pasteId  = this.graph.createId();
                 ids[node.id] = pasteId;
                 node.id = pasteId;
-                //TODO: bounding box related position
-                node.x += pasteCount;
-                node.y += pasteCount;
+                node.x += pasteCount * (boundingBox.width + 1);
+                node.y += pasteCount * (boundingBox.height + 1);
                 this.graph.addNode(node.kind, node).select();
             }.bind(this));
 
@@ -675,6 +675,35 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(hackEvent);
 
             return this;
+        },
+
+        /**
+         * Method: _boundingBoxForNodes
+         *
+         *   Returns the (smallest) bounding box for the given nodes by accessing their x and y coordinates and finding
+         *   mins and maxes.
+         *
+         * Returns:
+         *   A dictionary containing 'width' and 'height' of the calculated bounding box.
+         */
+
+        _boundingBoxForNodes: function(nodes) {
+            var topMostNode     = { 'y': Number.MAX_VALUE };
+            var leftMostNode    = { 'x': Number.MAX_VALUE };
+            var bottomMostNode  = { 'y': 0 };
+            var rightMostNode   = { 'x': 0 };
+
+            _.each(nodes, function(node) {
+                if (node.y < topMostNode.y)     { topMostNode = node }
+                if (node.x < leftMostNode.x)    { leftMostNode = node; }
+                if (node.y > bottomMostNode.y)  { bottomMostNode = node; }
+                if (node.x > rightMostNode.x)   { rightMostNode = node; }
+            }.bind(this));
+
+            return {
+                'width':  rightMostNode.x - leftMostNode.x,
+                'height': bottomMostNode.y - topMostNode.y
+            }
         },
 
         /**
