@@ -18,8 +18,27 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
     };
-	
+
+    /**
+     * Class: {Abstract} Property
+     *
+     * Abstract base implementation of a node property. A property models a key-value-attribute. It contains e.g. the
+     * name, cost, probability... of a node. It is only used as a data object and DOES NOT take care of its visual
+     * representation.
+     *
+     * In line with that, properties may have a <Mirror> that will reflect the properties current value below a node.
+     * Additionally a property has a reference to his <PropertyMenuEntry> which will allow the modification of the
+     * property value by the user through a visual element (think: text input, checkbox...).
+     *
+     * Properties can be declared readonly or hidden, which will accordingly prevent the modification of visual display.
+     *
+     */
     var Property = Class.extend({
+        /**
+         * Group: Members
+         *
+         *
+         */
         node:           undefined,
         value:          undefined,
         displayName:    '',

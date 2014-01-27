@@ -11,35 +11,45 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Function: capitalize
-     *      Helper function for capitalizing the first letter of a string.
+     *    Helper function for capitalizing the first letter of a string.
+     *
+     *  Returns:
+     *    {String} capitalized - Capitalized copy of the string.
      */
     var capitalize = function(aString) {
         return aString.charAt(0).toUpperCase() + aString.slice(1);
     };
-	
+
+    /**
+     *  Function: escape
+     *    HTML escapes the provided text to only contain break tags instead of linebreaks.
+     *
+     *  Returns:
+     *    {String} escaped - The HTML escaped version of the string.
+     */
 	var escape = function(aString) {
 		return _.escape(aString).replace(/\n/g, '<br>');
 	};
 	
     /**
-     *  Class: Entry
-     *      Abstract base class for an entry in the property menu of a node. It's associated with a <Property> object
-     *      and handles the synchronization with it.
+     *  Class: {Abstract} Entry
+     *    Abstract base class for an entry in the property menu of a node. It's associated with a <Property> object and
+     *    handles the synchronization with it.
      */
     var Entry = Class.extend({
         /**
          *  Group: Members
          *
          *  Properties:
-         *      {String} id                   - Form element ID for value retrieval.
-         *      {<Property>} property         - The associated <Property> object.
-         *      {jQuery Selector} container   - The container element in the property dialog.
-         *      {jQuery Selector} inputs      - A selector containing all relevant form elements.
+         *    {String} id                   - Form element ID for value retrieval.
+         *    {<Property>} property         - The associated <Property> object.
+         *    {jQuery Selector} container   - The container element in the property dialog.
+         *    {jQuery Selector} inputs      - A selector containing all relevant form elements.
          *
-         *      {boolean} _editing            - A flag that marks this entry as currently beeing edited.
-         *      {Object} _preEditValue        - The last valid value stored before editing this entry.
-         *      {jQuery Selector} _editTarget - A selector containing the one form element that is currently being edited.
-         *      {Timeout} _timer              - The Timeout object used to prevent updates from firing immediately.
+         *    {boolean} _editing            - A flag that marks this entry as currently beeing edited.
+         *    {Object} _preEditValue        - The last valid value stored before editing this entry.
+         *    {jQuery Selector} _editTarget - A selector containing the one form element that is currently being edited.
+         *    {Timeout} _timer              - The Timeout object used to prevent updates from firing immediately.
          */
         id:            undefined,
         property:      undefined,
@@ -53,13 +63,14 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Constructor: init
-         *      Entry initialization.
+         *    Initializes the menu entry. Sets up the node's visual representation, event handler and state during the
+         *    process.
          *
          *  Parameters:
-         *      {<Property>} property - The associated <Property> object.
+         *    {<Property>} property - The associated <Property> object.
          */
         init: function(property) {
-            this.id = _.uniqueId('property');
+            this.id       = _.uniqueId('property');
             this.property = property;
 
             this._setupVisualRepresentation()
@@ -72,10 +83,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: blurEvents
-         *      Return the blur ('stop editing') events this Entry should react on.
+         *    States the blur (think: 'stop editing') events this Entry should react on.
          *
          *  Returns:
-         *      An array of event names.
+         *    {Array[String]} - Array of "blur" events.
          */
         blurEvents: function() {
             return ['blur', 'remove'];
@@ -83,15 +94,15 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: blurred
-         *      Callback method that gets fired when one of the blur events specified in <blurEvents> was fired.
-         *      Cares about validation and propagating the new value of the Entry to the associated <Property>.
-         *      If the new value is not valid it will restore the old (valid) value.
+         *    Callback method that gets fired when one of the blur events specified in <blurEvents> was fired. Takes
+         *    care of validation and propagating the new value of the Entry to the associated <Property>. If the new
+         *    value is not valid for the property, its old value will be restored.
          *
          *  Parameters:
-         *      See jQuery event handling.
+         *    See jQuery event handling.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         blurred: function(event, ui) {
             if (!this._editing) {
@@ -117,10 +128,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: changeEvents
-         *      Return the change ('currently editing') events this Entry should react on.
+         *    Return the change ('currently editing') events this Entry should react on.
          *
          *  Returns:
-         *      An array of event names.
+         *    {Array[String]} - Array of change event names.
          */
         changeEvents: function() {
             return [];
@@ -128,17 +139,16 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: changed
-         *      Callback method that gets fired when one of the change events specified in <changeEvents> was fired.
-         *      Cares about validation and propagating the new value of the Entry to the associated <Property>.
-         *      If the new value is not valid it will display an appropriate error message.
-         *      Valid values will be propagated to the <Property> after a short timeout to prevent propagation
-         *      while changing the value too often.
+         *    Callback method that gets fired when one of the change events specified in <changeEvents> was fired. Takes
+         *    care of validation and propagating the new value of the Entry to the associated <Property>. If the new
+         *    value is not valid it will display an appropriate error message.  Valid values will be propagated to the
+         *    <Property> after a short timeout to prevent propagation while changing the value too often.
          *
          *  Parameters:
-         *      See jQuery event handling.
+         *    See jQuery event handling.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         changed: function(event, ui) {
             if (!this._editing) {
@@ -162,11 +172,11 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: _abortChange
-         *      Abort the currently running value propagation timeout to prevent the propagation of the value to
-         *      the <Property>.
+         *    Abort the currently running value propagation timeout to prevent the propagation of the value to the
+         *    <Property>.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         _abortChange: function() {
             window.clearTimeout(this._timer);
@@ -176,12 +186,12 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: _sendChange
-         *      Propagate the currently set value to the <Property> object after a short timeout
-         *      (to prevent over-propagation). If there is already a timeout running it will cancel that timeout
-         *      and start a new one.
+         *    Propagate the currently set value to the <Property> object after a short timeout (to prevent
+         *    in-to-deep-propagation). If there is already a timeout running it will cancel that timeout and start a
+         *    new one.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         _sendChange: function() {
             // discard old timeout
@@ -202,10 +212,12 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: fix
-         *      Fix the currently set value to a value that is allowed for this Entry.
+         *    This method allows for "fixing" the value in the menu entries visual input before passing it to the
+         *    properties validate method. This allows for example neat user interface convenience features like raising
+         *    the upper boundary of an interval input when the lower boundary gets larger.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         fix: function(event, ui) {
             return this;
@@ -218,13 +230,13 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: appendTo
-         *      Adds this Entry to the container in the properties menu.
+         *    Adds this Entry to the container in the properties menu.
          *
          *  Parameters:
-         *      {jQuery Selector} on - The element this Entry should be appended to.
+         *    {jQuery Selector} on - The element this Entry should be appended to.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         appendTo: function(on) {
             on.append(this.container);
@@ -235,13 +247,13 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: insertAfter
-         *      Adds this Entry after another element to the properties menu.
+         *    Adds this Entry after another element to the properties menu.
          *
          *  Parameters:
-         *      {jQuery Selector} element - The element this Entry should be inserted after.
+         *    {jQuery Selector} element - The element this Entry should be inserted after.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         insertAfter: function(element) {
             element.after(this.container);
@@ -252,10 +264,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: remove
-         *      Removes this Entry to the container in the properties menu.
+         *    Removes this Entry to the container in the properties menu.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         remove: function() {
             this.container.remove();
@@ -265,14 +277,14 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: setReadonly
-         *      Set the readonly state of this menu entry. Readonly entries can not be edited but (in case of text
-         *      fields) be marked and copied from.
+         *    Marks the menu entry as readonly. Cannot be modified but any longer. However, visualization and copying
+         *    of the value is still legal.
          *
          *  Parameters:
-         *      {boolean} readonly - The new readonly state to set for this entry.
+         *    {Boolean} readonly - The new readonly state to set for this entry.
          *
          *  Returns:
-         *      This Entry instance for chaining.
+         *    {Entry} - This Entry instance for chaining.
          */
         setReadonly: function(readonly) {
             this.inputs
@@ -284,13 +296,13 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: setHidden
-         *      Set the hidden state of this menu entry. Hidden entries do not appear in the menu.
+         *    Sets the hidden state of this menu entry. Hidden entries do not appear in the property menu.
          *
          *  Parameters:
-         *      {boolean} hidden - The new hidden state to set for this entry.
+         *    {Boolean} hidden - The new hidden state to set for this entry.
          *
          *  Returns:
-         *      This Entry instance for chaining.
+         *    {Entry} - This Entry instance for chaining.
          */
         setHidden: function(hidden) {
             this.container.toggle(!hidden);
@@ -300,10 +312,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: warn
-         *      Highlight the corresponding form elements (error state) and show a popup containing an error message.
+         *    Highlight the corresponding form elements (error state) and show a popup containing an error message.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         warn: function(text) {
             if (this.container.hasClass(Config.Classes.PROPERTY_WARNING) &&
@@ -320,10 +332,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: unwarn
-         *      Restores normal state of all form elements and hides warning popups.
+         *    Restores the normal state of all form elements and hides warning popups.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         unwarn: function() {
             this.container.removeClass(Config.Classes.PROPERTY_WARNING).tooltip('hide');
@@ -338,10 +350,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: _setupVisualRepresentation
-         *      Setup all visuals (container and inputs).
+         *    Sets up all visuals (container and inputs).
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         _setupVisualRepresentation: function() {
             this._setupContainer()
@@ -356,10 +368,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: _setupContainer
-         *      Setup the container element.
+         *    Sets up the container element.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         _setupContainer: function() {
             this.container = jQuery(
@@ -373,11 +385,12 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         },
 
         /**
-         *  Method: _setupInput
-         *      Setup all needed input (form) elements.
+         *  Method: {Abstract} _setupInput
+         *    Sets up all needed input (form) elements. Could be e.g. a text input, checkbox, ... Must be implemented
+         *    by a subclass.
          *
-         *  Returns:
-         *      This Entry for chaining.
+         *  Throws:
+         *    SubclassResponsibility
          */
         _setupInput: function() {
             throw SubclassResponsibility();
@@ -385,10 +398,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: _setupCallbacks
-         *      Setup the callbacks for change and blur events on input elements.
+         *    Sets up the callbacks for change and blur events on input elements.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         _setupCallbacks: function() {
             _.each(this.blurEvents(), function(event) {
@@ -404,10 +417,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: _setupEvents
-         *      Register for changes of the associated <Property> object.
+         *    Register for changes of the associated <Property> object.
          *
          *  Returns:
-         *      This Entry for chaining.
+         *    {Entry} - This Entry for chaining.
          */
         _setupEvents: function() {
             jQuery(this.property).on(Config.Events.PROPERTY_CHANGED, function(event, newValue, text, issuer) {
@@ -435,8 +448,8 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *  Method: _value
          *      Method used for retrieving the current property value from the inputs.
          *
-         *  Returns:
-         *      The currently set value.
+         *  Throws:
+         *    SubclassResponsibility
          */
         _value: function(newValue) {
             throw SubclassResponsibility();
@@ -445,17 +458,38 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Class: BoolEntry
-     *      Simple checkbox entry that reflects a <Bool> <Property>.
+     *    Concrete <Entry> implementation that represents a bool property. Visual representation used is a checkbox.
      */
     var BoolEntry = Entry.extend({
+        /**
+         * Method: blurEvents
+         *   Override, checkboxes do not fire blur events.
+         *
+         * Returns:
+         *   {Array[String]} - List of change event names.
+         */
         blurEvents: function() { return ['change']; },
 
+        /**
+         * Method: setReadonly
+         *   Override due to the fact that checkbox require different HTML attribute to be set.
+         *
+         * Returns:
+         *   {BoolEntry} - This BoolEntry for chaining.
+         */
         setReadonly: function(readonly) {
             this.inputs.attr('disabled', readonly ? 'disabled' : null);
 
             return this._super(readonly);
         },
 
+        /**
+         * Method: _setupInput
+         *   Concrete implementation of the method. Returns HTML markup for a checkbox.
+         *
+         * Returns:
+         *   {BoolEntry} - This BoolEntry instance for chaining.
+         */
         _setupInput: function() {
             this.inputs = jQuery('<input type="checkbox">')
                 .attr('id', this.id);
@@ -463,6 +497,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         },
 
+        /**
+         * Method: _value
+         *   Concrete implementation of _value. Returns the checked attribute state of the checkbox as value.
+         */
         _value: function(newValue) {
             if (typeof newValue === 'undefined') return this.inputs.is(':checked');
             this.inputs.attr('checked', newValue ? 'checked' : null);
@@ -473,7 +511,8 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Class: ChoiceEntry
-     *      An Entry allowing to select a value from a list of values defined by a <Choice> <Property>.
+     *    An Entry allowing to select a value from a list of values defined by a <Choice> <Property>. Visualized using
+     *    an HTML select.
      */
     var ChoiceEntry = Entry.extend({
         blurEvents: function() {
@@ -503,13 +542,13 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: _indexForValue
-         *      Reverse search of a index belonging to a given value.
+         *    Reverse search of a index belonging to a given value.
          *
          *  Parameters:
-         *      {Object} value - The value of an entry.
+         *    {Object} value - The value of an entry.
          *
          *   Returns:
-         *      The index of the given value. Returns -1 in case it was not found.
+         *    The index of the given value. Returns -1 in case it was not found.
          */
         _indexForValue: function(value) {
             for (var i = this.property.values.length -1; i >= 0; i--) {
