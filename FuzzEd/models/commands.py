@@ -179,7 +179,7 @@ class AddNode(Command):
     node = models.ForeignKey(Node, related_name='+')
 
     @classmethod
-    def create_from(cls, graph_id, node_id, kind, x, y):
+    def create_from(cls, graph_id, node_id, kind, x, y, properties):
         """
         Method [static]: create_from
 
@@ -192,6 +192,7 @@ class AddNode(Command):
          {str} kind      - the node's identification string
          {str} x         - x coordinate of the added node
          {str} y         - y coordinate of the added node
+         dict(str, str) properties - dictionary with the initial node properties 
                       
         Returns:
          {<AddNode>} - the add node command instance
@@ -199,6 +200,8 @@ class AddNode(Command):
         graph = Graph.objects.get(pk=int(graph_id))
         node  = Node(graph=graph, client_id=int(node_id), kind=kind, x=int(x), y=int(y), deleted=True)
         node.save()
+        for k, v in properties.iteritems():
+            node.set_attr(k, v)
         
         return cls(node=node)
 
