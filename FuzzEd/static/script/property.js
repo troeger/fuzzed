@@ -63,7 +63,6 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         },
 
         toDict: function() {
-            // any ideas how to make this a one-liner?
             var obj = {};
             obj[this.name] = { 'value': this.value };
             return obj;

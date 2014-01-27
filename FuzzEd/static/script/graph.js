@@ -280,7 +280,14 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
             properties.graph    = this;
 
             var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
-            jQuery(document).trigger(this.config.Events.GRAPH_NODE_ADDED, [node.id, kind, node.x, node.y]);
+
+            jQuery(document).trigger(this.config.Events.GRAPH_NODE_ADDED, [
+                node.id,
+                kind,
+                node.x,
+                node.y,
+                properties.properties
+            ]);
             this.nodes[node.id] = node;
 
             return node;

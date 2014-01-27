@@ -173,12 +173,13 @@ define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jqu
          *   {function} complete - [optional] Callback that is invoked when the ajax request completes successful or
          *                         erroneous.
          */
-        graphNodeAdded: function(event, nodeId, kind, x, y, success, error, complete) {
+        graphNodeAdded: function(event, nodeId, kind, x, y, properties, success, error, complete) {
             var data = {
-                id:   nodeId,
-                kind: kind,
-                x:    x,
-                y:    y
+                id:         nodeId,
+                kind:       kind,
+                x:          x,
+                y:          y,
+                properties: JSON.stringify(properties)
             };
 
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {

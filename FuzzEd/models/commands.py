@@ -148,6 +148,8 @@ class AddGraph(Command):
             notation = notations.by_kind[kind]
             if 'defaults' in notation:
                 for index, node in enumerate(notation['defaults']['nodes']):
+                    node.update({'properties': {}})
+
                     # use index as node ID
                     # this is unique since all other IDs are time stamps
                     command = AddNode.create_from(graph_id=graph.pk, node_id=index, **node)
