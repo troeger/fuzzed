@@ -203,7 +203,7 @@ class AddNode(Command):
         node  = Node(graph=graph, client_id=int(node_id), kind=kind, x=int(x), y=int(y), deleted=True)
         node.save()
         for k, v in properties.iteritems():
-            node.set_attr(k, v)
+            node.set_attr(k, v['value'])
         
         return cls(node=node)
 

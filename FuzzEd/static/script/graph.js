@@ -286,7 +286,7 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
                 kind,
                 node.x,
                 node.y,
-                properties.properties
+                node.toDict().properties
             ]);
             this.nodes[node.id] = node;
 
