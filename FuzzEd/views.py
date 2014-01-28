@@ -5,13 +5,15 @@ from django.core.mail import mail_managers
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
+from django.http import Http404
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
-from FuzzEd.models import Graph, notations, commands
+from FuzzEd.models import Graph, Project, notations, commands
 import FuzzEd.settings
 
 GREETINGS = [
@@ -41,7 +43,7 @@ def index(request):
         auth.logout(request)
 
     if request.user.is_authenticated():
-        return redirect('dashboard')
+        return redirect('projects')
 
     return render(request, 'index.html', {'pwlogin': ('pwlogin' in request.GET)})
 
@@ -58,14 +60,98 @@ def about(request):
      {HttpResponse} a django response object
     """
     return render(request, 'util/about.html')
+    
+@login_required
+def projects(request):
+    """
+    Function: projects
+    
+    This view handler renders a project overview containing all projects which are not marked as deleted, as well as in
+    which the actual user is the owner or a project member. The resulting list of projects is ordered descending by its
+    creation date. Also, a user is able to create a new project, as well as to delete a certain project if he is the owner.
+    
+    Parameters:
+     {HttpRequest} request - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    projects = (request.user.projects.filter(deleted=False) | request.user.own_projects.filter(deleted=False)).order_by('-created')
+        
+    parameters = {'projects':[ project.to_dict() for project in projects]}
+            
+    return render(request, 'project_menu/projects.html', parameters)
+    
+@login_required
+def project_new(request):
+    """
+    Function: project_new
+    
+    This handler is responsible for rendering a dialog to the user to create a new project. It is also responsible for
+    processing a save request of such a 'new project' request and forwards the user to the project overview site after doing so.
+    
+    Parameters:
+     {HttpRequest} request - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+  
+    if request.method == 'POST':
+        POST = request.POST
+        commands.AddProject.create_from(name=POST.get('name'), owner=request.user).do()
+        return redirect('projects')
+        
+    return render(request, 'project_menu/project_new.html')
+    
+@login_required
+def project_edit(request, project_id):
+    """
+    Function: project_edit
+    
+    This handler function is responsible for allowing the user to edit the properties of an already existing project.
+    Therefore the system renders a edit dialog to the user where changes can be made and saved or the project can be
+    deleted.
+    
+    Parameters:
+     {HttpResponse} request    - a django request object
+     {int}          project_id - the project to be edited
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    project = get_object_or_404(Project, pk=project_id, owner=request.user)
+    POST  = request.POST
+
+    # deletion requested? do it and go back to project overview
+    if POST.get('delete'):
+        commands.DeleteProject.create_from(project_id).do()
+        messages.add_message(request, messages.SUCCESS, 'Project deleted.')
+        return redirect('projects')
+       
+    # the owner made changes to the project's field, better save it (if we can)    
+    elif POST.get('save'):
+        project.name = POST.get('name', '')
+        project.save()
+        messages.add_message(request, messages.SUCCESS, 'Project saved.')
+        return redirect('projects')
+    
+    # please show the edit page to the user on get requests
+    elif POST.get('edit') or request.method == 'GET':
+        parameters = {'project': project.to_dict()}
+        return render(request, 'project_menu/project_edit.html', parameters)
+    
+    # something was not quite right here
+    raise HttpResponseBadRequest()
+        
 
 @login_required
-def dashboard(request):
+def dashboard(request, project_id):
     """
     Function: dashboard
     
-    This view handler renders the dashboard of the user. It lists all the graphs of the user that are not marked as
-    deleted ordered descending by its creation date. Also, a user is able to create new graphs and edit or delete
+    This view handler renders the dashboard in the context of a certain project. It lists all the graphs belonging to the project that are not marked as
+    deleted ordered descending by its creation date. Also, a user is able to add new graphs to the project, as well as to edit or delete
     existing graphs from here.
     
     Parameters:
@@ -74,13 +160,25 @@ def dashboard(request):
     Returns:
      {HttpResponse} a django response object
     """
-    graphs = request.user.graphs.filter(deleted=False).order_by('-created')
-    parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs]}
+    project = get_object_or_404(Project, pk=project_id)
+    
+    if not (project.is_authorized(request.user)):
+        raise Http404
+    
+    # projects in which the actual user is owner or member and that were recently modified are proposed to the user
+    proposal_limit =5
+    project_proposals = Project.objects.filter(Q(deleted=False),Q(users = request.user)|Q(owner = request.user)).exclude(id=project.id).order_by('-modified')[:proposal_limit]
+    
+    graphs = project.graphs.filter(deleted=False).order_by('-created')
+    parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs],
+                  'project': project.to_dict(),
+                  'proposals': [ project.to_dict() for project in project_proposals]
+                 }
 
     return render(request, 'dashboard/dashboard.html', parameters)
 
 @login_required
-def dashboard_new(request):
+def dashboard_new(request, project_id, kind):
     """
     Function: dashboard_new
     
@@ -93,19 +191,25 @@ def dashboard_new(request):
     Returns:
      {HttpResponse} a django response object
     """
+    project = get_object_or_404(Project, pk=project_id)
+    
+    # user can only create a graph if he is owner or member of the respective project
+    if not (project.is_authorized(request.user)):
+        raise Http404
+        
     POST = request.POST
 
     # save the graph
-    if POST.get('save') and POST.get('kind') and POST.get('name'):
-        commands.AddGraph.create_from(kind=POST['kind'], name=POST['name'], owner=request.user).do()
-        return redirect('dashboard')
+    if POST.get('save') and POST.get('name'):
+        commands.AddGraph.create_from(kind=kind, name=POST['name'], owner=request.user, project=project).do()
+        return redirect('dashboard', project_id = project_id)
 
     # render the create diagram if fuzztree
-    elif POST.get('kind') in notations.by_kind:
-        kind = POST['kind']
+    elif kind in notations.by_kind:
         parameters = {
             'kind': kind,
-            'name': notations.by_kind[kind]['name']
+            'name': notations.by_kind[kind]['name'],
+            'project' : project.to_dict()
         }
         return render(request, 'dashboard/dashboard_new.html', parameters)
 
@@ -129,6 +233,8 @@ def dashboard_edit(request, graph_id):
      {HttpResponse} a django response object
     """
     graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
+    project = graph.project
+    
     POST  = request.POST
 
     # the owner made changes to the graph's field, better save it (if we can)
@@ -136,19 +242,19 @@ def dashboard_edit(request, graph_id):
         graph.name = POST.get('name', '')
         graph.save()
         messages.add_message(request, messages.SUCCESS, 'Graph saved.')
-        return redirect('dashboard')
+        return redirect('dashboard', project_id = project.id)
 
     # deletion requested? do it and go back to dashboard
     elif POST.get('delete'):
         commands.DeleteGraph.create_from(graph_id).do()
         messages.add_message(request, messages.SUCCESS, 'Graph deleted.')
-        return redirect('dashboard')
+        return redirect('dashboard', project_id = project.id)
 
     # copy requested
     elif POST.get('copy'):
         old_graph = Graph.objects.get(pk=graph_id)
         duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
-                                                          owner=request.user,  add_default_nodes=False)
+                                                          owner=request.user,  add_default_nodes=False, project=project)
         duplicate_command.do()
         new_graph = duplicate_command.graph
 
@@ -156,12 +262,12 @@ def dashboard_edit(request, graph_id):
         new_graph.save()
 
         messages.add_message(request, messages.SUCCESS, 'Graph duplicated.')
-        return redirect('dashboard')
+        return redirect('dashboard', project_id = project.id)
 
     elif POST.get('snapshot'):
         old_graph = Graph.objects.get(pk=graph_id)
         duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
-                                                          owner=request.user, add_default_nodes=False)
+                                                          owner=request.user, add_default_nodes=False, project=project)
         duplicate_command.do()
         new_graph = duplicate_command.graph
 
@@ -170,7 +276,7 @@ def dashboard_edit(request, graph_id):
         new_graph.save()
 
         messages.add_message(request, messages.SUCCESS, 'Created snapshot.')
-        return redirect('dashboard')
+        return redirect('dashboard', project_id=project.id)
 
 
     # please show the edit page to the user on get requests
@@ -238,7 +344,8 @@ def editor(request, graph_id):
         graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
     if graph.read_only:
         return HttpResponseBadRequest()
-
+    
+    project  = graph.project     
     notation = notations.by_kind[graph.kind]
     nodes    = notation['nodes']
 
@@ -246,7 +353,8 @@ def editor(request, graph_id):
         'graph':          graph,
         'graph_notation': notation,
         'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
-        'greetings':      GREETINGS
+        'greetings':      GREETINGS, 
+        'project' :       project.to_dict()
     }
 
     return render(request, 'editor/editor.html', parameters)
@@ -274,6 +382,7 @@ def snapshot(request, graph_id):
     if not graph.read_only:
         return HttpResponseBadRequest()
 
+    project  = graph.project    
     notation = notations.by_kind[graph.kind]
     nodes    = notation['nodes']
 
@@ -281,7 +390,8 @@ def snapshot(request, graph_id):
         'graph':          graph,
         'graph_notation': notation,
         'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
-        'greetings':      GREETINGS
+        'greetings':      GREETINGS,
+        'project':        project.to_dict()
     }
 
     return render(request, 'editor/editor.html', parameters)
@@ -383,5 +493,5 @@ def login(request):
             return redirect('/login/?openid_identifier=%s' % urllib.quote_plus(request.session['openid_identifier'])) 
             
         auth.login(request, user)
-    return redirect('dashboard')
-            
+    return redirect('projects')
+

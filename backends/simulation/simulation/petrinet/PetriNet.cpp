@@ -190,7 +190,8 @@ void PetriNet::generateRandomFiringTimes()
 		// save the activated transitions separately
 		if (tt.enoughTokens())
 		{
-			while (CONTAINS(m_activeTimedTransitions, time))
+			int retries = 5;
+			while (CONTAINS(m_activeTimedTransitions, time) && --retries > 0)
 				time = gen->randomFiringTime(tt.getRate());
 
 			m_activeTimedTransitions.insert(make_pair(time, &tt));

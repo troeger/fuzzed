@@ -4,6 +4,7 @@ from FuzzEd.lib.jsonfield import JSONField
 from edge import Edge
 from graph import Graph
 from node import Node
+from project import Project
 
 import notations
 
@@ -46,7 +47,45 @@ class Command(models.Model):
          {None}
         """
         raise NotImplementedError('[Abstract Method] Implement in subclass')
+        
+class AddProject(Command):
+    """
+    Class: AddProject
+    
+    Extends: Command
+        
+    Command that is issued when an a new project was created.
+        
+    """
+    project = models.ForeignKey(Project, related_name='+')
+    
+    @classmethod
+    def create_from(cls, name, owner):
+        """
+        Method [static]: create_from
+        
+        Convenience factory method for issuing an add project command from parameters as received from API calls.
+        NOTE: A project object is created and saved when invoking this method.
+         
+        Parameters:
+        {str}  name     - name of the project
+        {User} owner    - the user that owns this project
+        """
+        project = Project(name=name, owner=owner, deleted=True)
+        project.save()
+         
+        return cls(project=project)
+   
+    def do(self):
+        self.project.deleted = False
+        self.project.save()
+        self.save()
 
+    def undo(self):
+        self.project.deleted = True
+        self.project.save()
+        self.save()
+    
 class AddEdge(Command):
     """
     Class: AddEdge
@@ -126,7 +165,7 @@ class AddGraph(Command):
     graph = models.ForeignKey(Graph, related_name='+')
 
     @classmethod
-    def create_from(cls, kind, name, owner, add_default_nodes=True):
+    def create_from(cls, kind, name, owner, project, add_default_nodes=True):
         """
         Method [static]: create_from
         
@@ -141,7 +180,7 @@ class AddGraph(Command):
         Returns:
          {<AddGraph>} the add graph command instance
         """
-        graph = Graph(kind=kind, name=name, owner=owner, deleted=True)
+        graph = Graph(kind=kind, name=name, owner=owner, project=project, deleted=True)
         graph.save()
         if add_default_nodes:
             # pre-initialize the graph with default nodes
@@ -434,6 +473,59 @@ class DeleteGraph(Command):
         """
         self.graph.deleted = False
         self.graph.save()
+
+class DeleteProject(Command):
+    """
+    Class: DeleteProject
+    
+    Extends: Command
+
+    Command that is issued when a project is deleted.
+
+    Fields:
+     {<Project>} project  - the project that shall be deleted
+    """
+    project = models.ForeignKey(Project, related_name='+')
+
+    @classmethod
+    def create_from(cls, project_id):
+        """
+        Method [static]: create_from
+        
+        Convenience factory method for issuing a delete project command from parameters as received from API calls.
+
+        Parameters:
+         {str} project_id  - the id of the project to be deleted
+
+        Returns:
+         {<DeleteProject>}  - the delete project command instance
+        """
+        return cls(project=Project.objects.get(pk=int(project_id)))
+
+    def do(self):
+        """
+        Method: do
+        
+        Deletes the project by setting its deletion flag
+
+        Returns:
+         {None}
+        """
+        self.project.deleted = True
+        self.project.save()
+        self.save()
+
+    def undo(self):
+        """
+        Method: undo
+        
+        Restores the project by removing its deletion flag
+
+        Returns:
+         {None}
+        """
+        self.project.deleted = False
+        self.project.save()
 
 class DeleteNode(Command):
     """
