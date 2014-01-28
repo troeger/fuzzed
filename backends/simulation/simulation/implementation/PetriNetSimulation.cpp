@@ -102,7 +102,9 @@ bool PetriNetSimulation::run()
 		pn.generateRandomFiringTimes();
 		SimulationRoundResult res;
 		res.valid = false;
-		while (!res.valid) 
+
+		unsigned int repeated = 0;
+		while (!res.valid && ++repeated < m_numRounds) 
 			res = runOneRound(&pn);
 		
 		sumFailureTime_all += res.failureTime;
@@ -154,7 +156,7 @@ bool PetriNetSimulation::run()
 				
 				SimulationRoundResult res;
 				res.valid = false;
-				while (!res.valid) 
+				while (!res.valid && ++repeated < m_numRounds) 
 					res = runOneRound(&threadLocalPN);
 
 				localSumFailureTime_all += res.failureTime;
@@ -184,8 +186,8 @@ bool PetriNetSimulation::run()
 
 	double unreliability		= (double)numFailures			/(double)count;
 	double avgFailureTime_all	= (double)sumFailureTime_all	/(double)count;
-	double avgFailureTime_fail = (double)sumFailureTime_fail	/(double)numFailures;
-	double meanAvailability	= avgFailureTime_fail				/(double)m_numSimulationSteps;
+	double avgFailureTime_fail	= (double)sumFailureTime_fail	/(double)numFailures;
+	double meanAvailability		= avgFailureTime_fail			/(double)m_numSimulationSteps;
 	
 	SimulationResultStruct res;
 	res.reliability			= 1.0 - unreliability;
@@ -234,7 +236,9 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	
 	// propagate all failures upwards in the correct time step
 	bool immediateCanFire = true;
-	while (immediateCanFire)
+
+	int tries = 0;
+	while (immediateCanFire && ++tries < m_numSimulationSteps)
 	{
 		tryImmediateTransitions(pn, tick, immediateCanFire);
 	}
