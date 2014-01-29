@@ -304,6 +304,9 @@ def settings(request):
     Returns:
      {HttpResponse} a django response object
     """
+    comes_from = request.META["HTTP_REFERER"]
+    if 'settings' not in comes_from:
+        request.session['comes_from']=comes_from
     POST = request.POST
 
     if POST.get('save'):
@@ -319,7 +322,7 @@ def settings(request):
         user.save()
 
         messages.add_message(request, messages.SUCCESS, 'Settings saved.')
-        return redirect('dashboard')
+        return redirect(request.session['comes_from'])
 
     return render(request, 'util/settings.html')
 
