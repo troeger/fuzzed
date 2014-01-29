@@ -104,7 +104,7 @@ class Node(models.Model):
 
     # Nodes that are created by the server (e.g. default nodes in the notation) should receive ids starting at
     # -sys.maxint and autoincrement from there on. The whole negative number range is reserved for the server. IDs from
-    # the client MUST be zero or greater (usually UNIX timestamp in milliseconds from JS)
+    # the client MUST be zero or greater
     client_id = models.BigIntegerField(default=-sys.maxint)
     kind      = models.CharField(max_length=127, choices=notations.node_choices)
     graph     = models.ForeignKey(Graph, null=False, related_name='nodes')

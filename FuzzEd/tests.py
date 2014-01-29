@@ -135,7 +135,7 @@ class BasicApiTestCase(FuzzTreesTestCase):
         # Delete edge before re-creating it
         response=self.ajaxDelete('/api/graphs/1/edges/77')
         self.assertEqual(response.status_code, 204)
-        response=self.ajaxPost('/api/graphs/1/edges', {'id': 4714, 'source':4711, 'destination':222} )
+        response=self.ajaxPost('/api/graphs/1/edges', {'id': 4714, 'source':4711, 'target':222} )
         self.assertEqual(response.status_code, 201)
         #TODO: Check if really created 
 
