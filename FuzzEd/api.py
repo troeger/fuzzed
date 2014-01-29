@@ -206,7 +206,7 @@ def nodes(request, graph_id):
     """
     Function: nodes
     
-    This function creates a new node in the graph with the provided it. In order to be able to create the node four data
+    This function creates a new node in the graph with the provided id. In order to be able to create the node four data
     items about the node are needed: its kind, its position (x and y coordinate) and an id as assigned by the client
     (calculated by the client to prevent waiting for round-trip). The response contains the JSON serialized
     representation of the newly created node and its new location URI.
@@ -235,7 +235,7 @@ def nodes(request, graph_id):
         assert(kind in notations.by_kind[graph.kind]['nodes'])
 
         command = commands.AddNode.create_from(graph_id=graph_id, node_id=POST['id'],
-                                               kind=kind, x=POST['x'], y=POST['y'])
+                                               kind=kind, x=POST['x'], y=POST['y'], properties=json.loads(POST['properties']))
         command.do()
         node = command.node
 
@@ -320,12 +320,12 @@ def edges(request, graph_id):
     Function: edges
     
     This API handler creates a new edge in the graph with the given id. The edge links the two nodes 'source' and
-    'destination' with each other that are provided in the POST body. Additionally, a request to this URL MUST provide
+    'target' with each other that are provided in the POST body. Additionally, a request to this URL MUST provide
     an id for this edge that was assigned by the client (no wait for round-trip). The response contains the JSON
     serialized representation of the new edge and it location URI.
     
     Request:            POST - /api/graphs/<GRAPH_ID>/edges
-    Request Parameters: client_id = <INT>, source = <INT>, destination = <INT>
+    Request Parameters: client_id = <INT>, source = <INT>, target = <INT>
     Response:           201 - <EDGE_AS_JSON>, Location = <EDGE_URI>
     
     Parameters:
@@ -345,7 +345,7 @@ def edges(request, graph_id):
             raise HttpResponseForbiddenAnswer('Trying to create an edge in a read-only graph')
 
         command = commands.AddEdge.create_from(graph_id=graph_id, client_id=POST['id'],
-                                               from_id=POST['source'], to_id=POST['destination'])
+                                               from_id=POST['source'], to_id=POST['target'])
         command.do()
 
         edge = command.edge
@@ -358,7 +358,7 @@ def edges(request, graph_id):
     except (ValueError, KeyError):
         raise HttpResponseBadRequestAnswer()
 
-    # either the graph, the source or the destination node are not in the database
+    # either the graph, the source or the target node are not in the database
     except ObjectDoesNotExist:
         raise HttpResponseNotFoundAnswer("Invalid graph or node ID")
 

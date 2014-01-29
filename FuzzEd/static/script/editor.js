@@ -39,6 +39,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         _nodeOffsetPrintStylesheet:    undefined,
         _nodeOffsetStylesheetTemplate: undefined,
 
+        _clipboard:                    '',
+
         /**
          *  Group: Initialization
          */
@@ -286,6 +288,12 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                     this._arrowKeyPressed(event, -1, 0);
                 } else if (event.which === 'A'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
                     this._selectAllPressed(event);
+                } else if (event.which === 'C'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
+                    this._copyPressed(event);
+                } else if (event.which === 'V'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
+                    this._pastePressed(event);
+                } else if (event.which === 'X'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
+                    this._cutPressed(event);
                 }
             }.bind(this));
 
@@ -411,8 +419,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             // delete selected edges
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = this.graph.getEdgeById(jQuery(element).attr(this.config.Attributes.CONNECTION_ID));
-                jsPlumb.detach(edge);
+                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
                 this.graph.deleteEdge(edge);
             }.bind(this));
 
@@ -434,12 +441,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _escapePressed: function(event) {
             event.preventDefault();
-            //XXX: deselect everything
-            // This uses the jQuery.ui.selectable internal functions.
-            // We need to trigger them manually in order to simulate a click on the canvas.
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
-
+            this._deselectAll(event);
             return this;
         },
 
@@ -480,6 +482,298 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             return this;
         },
 
+        /**
+         * Method: _updateClipboard
+         *
+         *   Saves the given clipboardDict either to html5 Local Storage or at least to the Graph's _clipboard var as
+         *   JSON string.
+         *
+         * Parameters:
+         *   {JSON} clipboardDict - JSON dict to be stored
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _updateClipboard: function(clipboardDict) {
+            var clipboardString = JSON.stringify(clipboardDict);
+            if (typeof window.Storage !== 'undefined') {
+                localStorage['clipboard_' + this.graph.kind] = clipboardString;
+            } else { // fallback
+                this._clipboard = clipboardString;
+            }
+
+            return this;
+        },
+
+        /**
+         * Method: _getClipboard
+         *
+         *   Returns the current clipboard either from html5 Local Storage or from the Graph's _clipboard var as JSON.
+         *
+         * Returns:
+         *   The clipboard contents as JSON object.
+         */
+        _getClipboard: function() {
+            if (typeof window.Storage !== 'undefined' && localStorage['clipboard_' + this.graph.kind] !== 'undefined') {
+                return JSON.parse(localStorage['clipboard_' + this.graph.kind]);
+            } else {
+                return JSON.parse(this._clipboard);
+            }
+        },
+
+        /**
+         * Method: _copyPressed
+         *
+         *   Event callback for handling a copy (CTRL/CMD + C) key press. Will copy selected nodes by serializing and
+         *   saving them to html5 Local Storage or the _clipboard var.
+         *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _copyPressed: function(event) {
+            if (jQuery(event.target).is('input, textarea')) return this;
+
+            event.preventDefault();
+
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+
+            // put nodes as dicts into nodes
+            var nodes = [];
+            jQuery(selectedNodes).each(function(index, element) {
+                var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
+                if (node.copyable) {
+                    nodes.push(node.toDict());
+                }
+            }.bind(this));
+
+            var edges = [];
+            jQuery(selectedEdges).each(function(index, element) {
+                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
+
+                //TODO: create Edge class with toDict() method
+                edges.push({
+                    'source':  edge.source.data(this.config.Keys.NODE).id,
+                    'target':  edge.target.data(this.config.Keys.NODE).id
+                });
+            }.bind(this));
+
+            var clipboard = {
+                'pasteCount': 0,
+                'nodes': nodes,
+                'edges': edges
+            };
+
+            // to avoid empty copyings
+            if (nodes.length > 0 || edges.length > 0) {
+                this._updateClipboard(clipboard);
+            }
+
+            return this;
+        },
+
+        /**
+         * Method: _pastePressed
+         *
+         *   Event callback for handling a paste (CTRL/CMD + V) key press. Will paste previously copied nodes from
+         *   html5 Local Storage or the _clipboard var.
+         *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _pastePressed: function(event) {
+            if (jQuery(event.target).is('input, textarea')) return this;
+
+            event.preventDefault();
+            this._deselectAll(event);
+
+            var clipboard = this._getClipboard();
+            var pasteCount = ++clipboard.pasteCount;
+            this._updateClipboard(clipboard);
+
+            var nodes       = clipboard.nodes;
+            var edges       = clipboard.edges;
+            var ids         = {};
+            var boundingBox = this._boundingBoxForNodes(nodes);
+
+            _.each(nodes, function(node) {
+                var pasteId  = this.graph.createId();
+                ids[node.id] = pasteId;
+                node.id = pasteId;
+                node.x += pasteCount * (boundingBox.width + 1);
+                node.y += pasteCount * (boundingBox.height + 1);
+                this.graph.addNode(node.kind, node).select();
+            }.bind(this));
+
+            _.each(edges, function(edge) {
+                edge.source = ids[edge.source] || edge.source;
+                edge.target = ids[edge.target] || edge.target;
+                jQuery(this.graph.addEdge(edge).canvas).addClass(this.config.Classes.SELECTED);
+            }.bind(this));
+
+            //XXX: trigger selection stop event manually here
+            //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
+
+            return this;
+        },
+
+        /**
+         * Method: _cutPressed
+         *
+         *   Event callback for handling a cut (CTRL/CMD + X) key press. Will delete and copy selected nodes.
+         *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _cutPressed: function(event) {
+            if (jQuery(event.target).is('input, textarea')) return this;
+
+            event.preventDefault();
+            this._copyPressed(event);
+            this._deletePressed(event);
+
+            // set the just copied clipboard's pasteCount to -1, so that it will paste right in place of the original.
+            var clipboard = this._getClipboard();
+            --clipboard['pasteCount'];
+            this._updateClipboard(clipboard);
+
+            return this;
+        },
+
+        /**
+         * Method: _deselectAll
+         *
+         *   Deselects all the nodes and edges in the current graph.
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+
+        _deselectAll: function(event) {
+            //XXX: deselect everything
+            // This uses the jQuery.ui.selectable internal functions.
+            // We need to trigger them manually in order to simulate a click on the canvas.
+            // Since a deselect-click only works without metaKey or ctrlKey pressed,
+            // we need to deactivate them manually.
+
+            var hackEvent = jQuery.extend({}, event, {
+                metaKey: false,
+                ctrlKey: false
+            });
+
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(hackEvent);
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(hackEvent);
+
+            return this;
+        },
+
+        /**
+         * Method: _boundingBoxForNodes
+         *
+         *   Returns the (smallest) bounding box for the given nodes by accessing their x and y coordinates and finding
+         *   mins and maxes.
+         *
+         * Returns:
+         *   A dictionary containing 'width' and 'height' of the calculated bounding box.
+         */
+
+        _boundingBoxForNodes: function(nodes) {
+            var topMostNode     = { 'y': Number.MAX_VALUE };
+            var leftMostNode    = { 'x': Number.MAX_VALUE };
+            var bottomMostNode  = { 'y': 0 };
+            var rightMostNode   = { 'x': 0 };
+
+            _.each(nodes, function(node) {
+                if (node.y < topMostNode.y)     { topMostNode = node }
+                if (node.x < leftMostNode.x)    { leftMostNode = node; }
+                if (node.y > bottomMostNode.y)  { bottomMostNode = node; }
+                if (node.x > rightMostNode.x)   { rightMostNode = node; }
+            }.bind(this));
+
+            return {
+                'width':  rightMostNode.x - leftMostNode.x,
+                'height': bottomMostNode.y - topMostNode.y
+            }
+        },
+
+        /**
+         *  Group: Progress Indication
+         */
+
+        /**
+         *  Method _showProgressIndicator
+         *    Display the progress indicator.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _showProgressIndicator: function() {
+            // show indicator only if it takes longer then 500 ms
+            this._progressIndicatorTimeout = setTimeout(function() {
+                jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
+            }.bind(this), 500);
+
+            return this;
+        },
+
+        /**
+         *  Method _hideProgressIndicator
+         *    Hides the progress indicator.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _hideProgressIndicator: function() {
+            // prevent indicator from showing before 500 ms are passed
+            clearTimeout(this._progressIndicatorTimeout);
+            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
+
+            return this;
+        },
+
+        /**
+         *  Method: _flashSaveIndicator
+         *    Flash the save indicator to show that the current graph is saved in the backend.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _flashSaveIndicator: function() {
+            var indicator = jQuery('#' + this.config.IDs.SAVE_INDICATOR);
+            // only flash if not already visible
+            if (indicator.is(':hidden')) {
+                indicator.fadeIn(200).delay(600).fadeOut(200);
+            }
+
+            return this;
+        },
+
+        /**
+         *  Method _flashErrorIndicator
+         *    Flash the error indicator to show that the current graph has not been saved to the backend.
+         *
+         *  Returns:
+         *    This Editor instance for chaining.
+         */
+        _flashErrorIndicator: function() {
+            var indicator = jQuery('#' + this.config.IDs.ERROR_INDICATOR);
+            // only flash if not already visible
+            if (indicator.is(':hidden')) {
+                indicator.fadeIn(200).delay(5000).fadeOut(200);
+            }
+
+            return this;
+        },
 
         /**
          *  Group: Print Offset Calculation

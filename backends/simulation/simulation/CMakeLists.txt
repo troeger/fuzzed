@@ -44,7 +44,7 @@ if (USE_TIMENET)
 	find_package(TimeNET REQUIRED)
 endif (USE_TIMENET)
 
-if (NOT APPLE)
+if (USE_OMP)
 	find_package(OpenMP REQUIRED)
 	if (OPENMP_FOUND)
 		message("OPENMP FOUND")

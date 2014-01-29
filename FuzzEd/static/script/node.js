@@ -79,8 +79,7 @@ function(Property, Mirror, Canvas, Class) {
 
             // logic
             if (typeof this.id === 'undefined') {
-                // make sure the 0 is not reassigned; it's reserved for the top event
-                this.id = new Date().getTime() + 1;
+                this.id = this.graph.createId();
             }
             this.config = this.getConfig();
 
@@ -881,6 +880,26 @@ function(Property, Mirror, Canvas, Class) {
                 children.push(edge.target.data(this.config.Keys.NODE));
             }.bind(this));
             return children;
+        },
+
+         /**
+         * Method: toDict
+         *
+         * Returns:
+         *   A dict representation of the node according to models/node.py:to_dict().
+         */
+        toDict: function() {
+            return {
+                'properties':   _.reduce(_.map(this.properties, function(prop) { return prop.toDict() }), function(memo, prop) {
+                    return _.extend(memo, prop);
+                }, {}),
+                'id':           this.id,
+                'kind':         this.kind,
+                'x':            this.x,
+                'y':            this.y,
+                'outgoing':     this.outgoing,
+                'incoming':     this.incoming
+            };
         },
 
         /**
