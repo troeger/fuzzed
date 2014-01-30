@@ -1,4 +1,4 @@
-define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'highcharts', 'jquery-ui', 'slickgrid'],
+define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'highcharts', 'jquery-ui', 'slickgrid', 'datatables'],
 function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
     /**
      *  Package: Faulttree
@@ -293,7 +293,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
             if (_.size(data.configurations) > 0) {
                 var chartData = {};
+                // tableData variable now useless
                 var tableData = [];
+                // introducing tableDefinition for passing column definitions to DataTables
+                var tableDefinitions = []; 
                 var configID = '';
 
                 _.each(data.configurations, function(config, index) {
@@ -324,6 +327,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                     tableData.push(tableEntry);
 
                 }.bind(this));
+                
+                tableDefinitions["columns"] = data.columns;
 
                 // remove progress bar
                 this._chartContainer.empty();
@@ -331,7 +336,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 if (_.size(chartData) != 0) {
                     this._displayResultWithHighcharts(chartData, data['decompositionNumber']);
                 }
-                this._displayResultWithSlickGrid(tableData);
+                //this._displayResultWithSlickGrid(tableData);
+                this._displayResultWithDataTables(tableDefinitions);
 
                 this._setupResizing();
             } else {
@@ -556,81 +562,24 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 series: series
             });
         },
-
+        
+        
+        
         /**
-         *  Method: _displayResultWithSlickGrid
-         *    Display the job's result in the menu's body using SlickGrid.
+         *      TEST  
+         *        METHOD      
          *
-         *  Parameters:
-         *    {JSON} data - A set of one or more data series to display in the SlickGrid.
          */
-        _displayResultWithSlickGrid: function(data) {
-            var columns = this._getDataColumns();
-
-            var options = {
-                enableCellNavigation:       true,
-                enableColumnReorder:        false,
-                multiColumnSort:            true,
-                autoHeight:                 true,
-                forceFitColumns:            true
-            };
-
-            // little workaround for constraining the height of the grid
-            var maxHeight = this._editor.getConfig().Menus.PROBABILITY_MENU_MAX_GRID_HEIGHT;
-            if ((data.length + 1) * 25 > maxHeight) {
-                options.autoHeight = false;
-                this._gridContainer.height(maxHeight);
-            }
-
-            // clear container
-            this._gridContainer.empty();
-
-            // create new grid
-            this._grid = new Slick.Grid(this._gridContainer, data, columns, options);
-
-            // make rows selectable
-            this._grid.setSelectionModel(new Slick.RowSelectionModel());
-
-            // highlight the corresponding nodes if a row of the grid is selected
-            this._grid.onSelectedRowsChanged.subscribe(function(e, args) {
-                this._unhighlightConfiguration();
-
-                // only highlight the configuration if only one config is selected
-                if (args.rows.length == 1) {
-                    var configID = args.grid.getDataItem(args.rows[0])['id'];
-                    this._highlightConfiguration(configID);
-                }
-            }.bind(this));
-
-            // highlight rows on mouse over
-            this._grid.onMouseEnter.subscribe(function(e, args) {
-                var row = args.grid.getCellFromEvent(e)['row'];
-                args.grid.setSelectedRows([row]);
-            });
-            // unhighlight cells on mouse out
-            this._grid.onMouseLeave.subscribe(function(e, args) {
-                args.grid.setSelectedRows([]);
-            });
-
-            // enable sorting of the grid
-            this._grid.onSort.subscribe(function(e, args) {
-                var cols = args.sortCols;
-
-                data.sort(function (dataRow1, dataRow2) {
-                    for (var i = 0, l = cols.length; i < l; i++) {
-                        var field = cols[i].sortCol.field;
-                        var sign = cols[i].sortAsc ? 1 : -1;
-                        var value1 = dataRow1[field], value2 = dataRow2[field];
-                        var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-                        if (result != 0) {
-                            return result;
-                        }
-                    }
-                    return 0;
-                });
-
-                this._grid.invalidate();
-            }.bind(this));
+        _displayResultWithDataTables: function(data) {
+             //jQuery("#example").dataTable();
+             
+             $('#example').dataTable( {
+                 "bProcessing": true,
+                 "bFilter":     false,
+                 "bServerSide": true,
+                 "sAjaxSource": "/api/jobs_status_test",
+                 "aoColumns":   data["columns"]
+             });    
         },
 
         /**
@@ -746,8 +695,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         <span class="menu-close"></span>\
                     </div>\
                     <div class="chart"></div>\
-                    <div class="grid" style="width: 450px; padding-top: 5px;"></div>\
-                </div>'
+                        <div>\
+                            <table id="example"></table>\
+                        </div>\
+                    </div>'
             )
             .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
         },

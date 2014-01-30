@@ -531,6 +531,39 @@ def job_status(request, job_id):
     else:       
         logger.debug("Job is pending, keep the front end waiting.")
         return HttpResponse(status=202)
+ 
+# hard-coded json response for DataTables plugin        
+@login_required
+@csrf_exempt
+@require_http_methods(['GET'])
+def job_status_test(request):
+    ''' Returns the status information for the given job.
+        202 is delivered if the job is pending, otherwise the result is immediately returned.
+    '''
+    
+    # get values transmitted by DataTables plugin (http://datatables.net/usage/server-side)
+    GET = request.GET
+   
+    sEcho = int(GET['sEcho'])  # needs to be send back to the website (as integer)
+    displayStart =  GET['iDisplayStart']  # starting point in the current data set (from 0 to n-1)
+    displayLength = GET['iDisplayLength'] # number of records that shall be returned to the frontend (table)
+    
+    
+    # number of total records in the database
+    totalRecords = 30
+    
+    response_data = {
+        "sEcho" : sEcho,
+        "iTotalRecords" : totalRecords,
+        "iTotalDisplayRecords": totalRecords,
+        "aaData": [{"ratio": 0.96, "min": 0.96, "max": 0.96, "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 2}}, "costs": 1, "peak": 0.96, "id": "#0", "points": [[0.96, 1.0], [0.96, 1.0]]}, {"ratio": 0.896, "min": 0.896, "max": 0.896, "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 3}}, "costs": 1, "peak": 0.896, "id": "#1", "points": [[0.896, 1.0], [0.896, 1.0]]}, {"ratio": 0.8192, "min": 0.8192, "max": 0.8192, "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 4}}, "costs": 1, "peak": 0.8192, "id": "#2", "points": [[0.8192, 1.0], [0.8192, 1.0]]}, {"ratio": 0.73728, "min": 0.73728, "max": 0.73728, "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 5}}, "costs": 1, "peak": 0.73728, "id": "#3", "points": [[0.73728, 1.0], [0.73728, 1.0]]}, {"ratio": 0.65536, "min": 0.65536, "max": 0.65536, "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 6}}, "costs": 1, "peak": 0.65536, "id": "#4", "points": [[0.65536, 1.0], [0.65536, 1.0]]}, {"ratio": 0.5767168, "min": 0.5767168, "max": 0.5767168, "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 7}}, "costs": 1, "peak": 0.5767168, "id": "#5", "points": [[0.5767168, 1.0], [0.5767168, 1.0]]}, {"ratio": 0.50331648, "min": 0.50331648, "max": 0.50331648, "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 8}}, "costs": 1, "peak": 0.50331648, "id": "#6", "points": [[0.50331648, 1.0], [0.50331648, 1.0]]}, {"ratio": 0.436207616, "min": 0.436207616, "max": 0.436207616, "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 9}}, "costs": 1, "peak": 0.436207616, "id": "#7", "points": [[0.436207616, 1.0], [0.436207616, 1.0]]}, {"ratio": 0.3758096384, "min": 0.3758096384, "max": 0.3758096384, "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 10}}, "costs": 1, "peak": 0.3758096384, "id": "#8", "points": [[0.3758096384, 1.0], [0.3758096384, 1.0]]}, {"ratio": 0.3221225472, "min": 0.3221225472, "max": 0.3221225472, "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 11}}, "costs": 1, "peak": 0.3221225472, "id": "#9", "points": [[0.3221225472, 1.0], [0.3221225472, 1.0]]}]
+    }
+    print json.dumps(response_data)
+    
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+
+
 
 @csrf_exempt
 @require_http_methods(['GET', 'POST'])

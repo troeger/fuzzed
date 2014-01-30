@@ -77,6 +77,10 @@ urlpatterns = patterns('',
         'FuzzEd.api.job_create', {'job_kind': Job.SIMULATION_JOB}, name='simulation_top_event_probability'),
 
     # jobs
+    
+    # test-url for "DataTables" plugin
+    url(r'^api/jobs_status_test$', 'FuzzEd.api.job_status_test', name='job_status_test'),
+    
     url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.job_status', name='job_status'),
     url(r'^api/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.job_exitcode', name='job_exitcode'),
     url(r'^api/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.job_files', name='job_files'),

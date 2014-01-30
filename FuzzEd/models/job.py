@@ -199,6 +199,17 @@ class Job(models.Model):
                 current_config['choices'] = json_choices
 
                 json_configs.append(current_config)
+            
+            #line is added for test reasons
+            json_result['columns'] = [
+                                        { 'mData': 'id',     'sTitle': 'Config' },
+                                        { 'mData': 'min',    'sTitle': 'Min'    },
+                                        { 'mData': 'peak',   'sTitle': 'Peak'   },
+                                        { 'mData': 'max',    'sTitle': 'Max'    },
+                                        { 'mData': 'costs',  'sTitle': 'Costs'  },
+                                        { 'mData': 'ratio',  'sTitle': 'Risk'   }
+                                     ]
+                        
             json_result['configurations'] = json_configs
 
             json_result['errors']         = errors
