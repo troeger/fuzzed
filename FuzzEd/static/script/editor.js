@@ -218,8 +218,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 this._deleteSelection();
             }.bind(this));
 
-            jQuery("#"+this.config.IDs.ACTION_SELECTALL).click(function() {
-                this._selectAll();
+            jQuery("#"+this.config.IDs.ACTION_SELECTALL).click(function(event) {
+                this._selectAll(event);
             }.bind(this));
 
             return this;
@@ -413,10 +413,13 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *
          *   Will select all nodes and edges.
          *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
          * Returns:
          *   This Editor instance for chaining.
          */
-        _selectAll: function() {
+        _selectAll: function(event) {
             //XXX: trigger selection start event manually here
             //XXX: hack to emulate a new selection process
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
@@ -447,23 +450,21 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          * Returns:
          *   This Editor instance for chaining.
          */
-
         _deselectAll: function(event) {
+            if (typeof event === 'undefined') {
+                event = window.event;
+            }
+
+            //XXX: Since a deselect-click only works without metaKey or ctrlKey pressed,
+            // we need to deactivate them manually.
+            var hackEvent = jQuery.extend({}, event, {
+                metaKey: false,
+                ctrlKey: false
+            });
+
             //XXX: deselect everything
             // This uses the jQuery.ui.selectable internal functions.
             // We need to trigger them manually in order to simulate a click on the canvas.
-
-            if (typeof event !== 'undefined') {
-                //XXX: Since a deselect-click only works without metaKey or ctrlKey pressed,
-                // we need to deactivate them manually.
-                var hackEvent = jQuery.extend({}, event, {
-                    metaKey: false,
-                    ctrlKey: false
-                });
-            } else {
-                var hackEvent = event;
-            }
-
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(hackEvent);
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(hackEvent);
 
@@ -525,7 +526,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _paste: function() {
             // deselect the original nodes and edges
-            this._deselectAll(event);
+            this._deselectAll();
 
             // fetch clipboard from local storage or variable and increase pasteCount
             var clipboard = this._getClipboard();
@@ -736,7 +737,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         _selectAllPressed: function(event) {
             if (jQuery(event.target).is('input, textarea')) return this;
             event.preventDefault();
-            this._selectAll();
+            this._selectAll(event);
             return this;
         },
 
