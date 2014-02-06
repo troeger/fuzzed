@@ -499,8 +499,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
                 //TODO: create Edge class with toDict() method
                 edges.push({
-                    'source':  edge.source.data(this.config.Keys.NODE).id,
-                    'target':  edge.target.data(this.config.Keys.NODE).id
+                    'source':  jQuery(edge.source).data(this.config.Keys.NODE).id,
+                    'target':  jQuery(edge.target).data(this.config.Keys.NODE).id
                 });
             }.bind(this));
 
