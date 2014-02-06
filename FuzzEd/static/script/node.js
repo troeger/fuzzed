@@ -877,7 +877,7 @@ function(Property, Mirror, Canvas, Class) {
         getChildren: function() {
             var children = [];
             _.each(this.outgoingEdges, function(edge) {
-                children.push(edge.target.data(this.config.Keys.NODE));
+                children.push(jQuery(edge.target).data(this.config.Keys.NODE));
             }.bind(this));
             return children;
         },
@@ -1036,7 +1036,7 @@ function(Property, Mirror, Canvas, Class) {
          */
         _moveContainerToPixel: function(position, animated) {
             if (animated) {
-                jsPlumb.animate(this.container, {
+                jsPlumb.animate(this.container.attr('id'), {
                     left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
                     top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
                 }, {

@@ -107,11 +107,11 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          *    This <Graph> instance for chaining.
          */
         _registerEventHandlers: function() {
-            jsPlumb.bind('jsPlumbConnection', function(edge) {
+            jsPlumb.bind('connection', function(edge) {
                 this._addEdge(edge.connection);
             }.bind(this));
 
-            jsPlumb.bind('jsPlumbConnectionDetached', function(edge) {
+            jsPlumb.bind('connectionDetached', function(edge) {
                 this._deleteEdge(edge.connection);
             }.bind(this));
 
