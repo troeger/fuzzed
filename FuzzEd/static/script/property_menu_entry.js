@@ -5,7 +5,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Constants:
-     *      {RegEx} NUMBER_REGEX     - RegEx for matching all kind of number representations with strings.
+     *    {RegEx} NUMBER_REGEX - RegEx for matching all kind of number representations with strings.
      */
     var NUMBER_REGEX = /^[+\-]?(?:0|[1-9]\d*)(?:[.,]\d*)?(?:[eE][+\-]?\d+)?$/;
 
@@ -41,15 +41,15 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *  Group: Members
          *
          *  Properties:
-         *    {String} id                   - Form element ID for value retrieval.
-         *    {<Property>} property         - The associated <Property> object.
-         *    {jQuery Selector} container   - The container element in the property dialog.
-         *    {jQuery Selector} inputs      - A selector containing all relevant form elements.
+         *    {String}     id                 - Form element ID for value retrieval.
+         *    {<Property>} property           - The associated <Property> object.
+         *    {DOMElement} container          - The container element in the property dialog.
+         *    {DOMElement} inputs             - A selector containing all relevant form elements.
          *
-         *    {boolean} _editing            - A flag that marks this entry as currently beeing edited.
-         *    {Object} _preEditValue        - The last valid value stored before editing this entry.
-         *    {jQuery Selector} _editTarget - A selector containing the one form element that is currently being edited.
-         *    {Timeout} _timer              - The Timeout object used to prevent updates from firing immediately.
+         *    {Boolean}         _editing      - A flag that marks this entry as currently beeing edited.
+         *    {Object}          _preEditValue - The last valid value stored before editing this entry.
+         *    {DOMElement} _editTarget        - A selector containing the one form element that is being edited.
+         *    {Timeout}         _timer        - The Timeout object used to prevent updates from firing immediately.
          */
         id:            undefined,
         property:      undefined,
@@ -102,7 +102,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    See jQuery event handling.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - For chaining.
          */
         blurred: function(event, ui) {
             if (!this._editing) {
@@ -148,7 +148,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    See jQuery event handling.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         changed: function(event, ui) {
             if (!this._editing) {
@@ -176,7 +176,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    <Property>.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         _abortChange: function() {
             window.clearTimeout(this._timer);
@@ -191,7 +191,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    new one.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         _sendChange: function() {
             // discard old timeout
@@ -217,7 +217,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    the upper boundary of an interval input when the lower boundary gets larger.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         fix: function(event, ui) {
             return this;
@@ -236,7 +236,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    {jQuery Selector} on - The element this Entry should be appended to.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         appendTo: function(on) {
             on.append(this.container);
@@ -253,7 +253,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    {jQuery Selector} element - The element this Entry should be inserted after.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         insertAfter: function(element) {
             element.after(this.container);
@@ -267,7 +267,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    Removes this Entry to the container in the properties menu.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         remove: function() {
             this.container.remove();
@@ -284,7 +284,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    {Boolean} readonly - The new readonly state to set for this entry.
          *
          *  Returns:
-         *    {Entry} - This Entry instance for chaining.
+         *    {Entry} this - This Entry instance for chaining.
          */
         setReadonly: function(readonly) {
             this.inputs
@@ -302,7 +302,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    {Boolean} hidden - The new hidden state to set for this entry.
          *
          *  Returns:
-         *    {Entry} - This Entry instance for chaining.
+         *    {Entry} this - This Entry instance for chaining.
          */
         setHidden: function(hidden) {
             this.container.toggle(!hidden);
@@ -315,7 +315,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    Highlight the corresponding form elements (error state) and show a popup containing an error message.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         warn: function(text) {
             if (this.container.hasClass(Config.Classes.PROPERTY_WARNING) &&
@@ -335,7 +335,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    Restores the normal state of all form elements and hides warning popups.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         unwarn: function() {
             this.container.removeClass(Config.Classes.PROPERTY_WARNING).tooltip('hide');
@@ -353,7 +353,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    Sets up all visuals (container and inputs).
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         _setupVisualRepresentation: function() {
             this._setupContainer()
@@ -371,7 +371,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    Sets up the container element.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         _setupContainer: function() {
             this.container = jQuery(
@@ -401,7 +401,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    Sets up the callbacks for change and blur events on input elements.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         _setupCallbacks: function() {
             _.each(this.blurEvents(), function(event) {
@@ -420,7 +420,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    Register for changes of the associated <Property> object.
          *
          *  Returns:
-         *    {Entry} - This Entry for chaining.
+         *    {Entry} this - This Entry for chaining.
          */
         _setupEvents: function() {
             jQuery(this.property).on(Config.Events.PROPERTY_CHANGED, function(event, newValue, text, issuer) {
@@ -475,7 +475,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *   Override due to the fact that checkbox require different HTML attribute to be set.
          *
          * Returns:
-         *   {BoolEntry} - This BoolEntry for chaining.
+         *   {BoolEntry}this  - This BoolEntry for chaining.
          */
         setReadonly: function(readonly) {
             this.inputs.attr('disabled', readonly ? 'disabled' : null);
@@ -488,7 +488,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *   Concrete implementation of the method. Returns HTML markup for a checkbox.
          *
          * Returns:
-         *   {BoolEntry} - This BoolEntry instance for chaining.
+         *   {BoolEntry} this - This BoolEntry instance for chaining.
          */
         _setupInput: function() {
             this.inputs = jQuery('<input type="checkbox">')
@@ -500,6 +500,11 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         /**
          * Method: _value
          *   Concrete implementation of _value. Returns the checked attribute state of the checkbox as value.
+         *
+         * Returns:
+         *   {BoolEntry} this    - For chaining when used as setter.
+         *   {Boolean}   checked - The entries value when used as a getter.
+         *
          */
         _value: function(newValue) {
             if (typeof newValue === 'undefined') return this.inputs.is(':checked');
@@ -511,20 +516,48 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Class: ChoiceEntry
-     *    An Entry allowing to select a value from a list of values defined by a <Choice> <Property>. Visualized using
-     *    an HTML select.
+     *    An Entry allowing to select a value from a list of values defined by a <Property::Choice>. Visualized by an
+     *    HTML select element.
      */
     var ChoiceEntry = Entry.extend({
+        /**
+         * Method: blurEvents
+         *   Overrides standard collection of blur events. Additionally contains the change event that is specific for
+         *   select elements
+         *
+         * Returns:
+         *   {Array[String]} changeEvents - The blur events.
+         */
         blurEvents: function() {
             return ['blur', 'change', 'remove'];
         },
 
+        /**
+         * Method: setReadonly
+         *   Overrides standard readonly setter. Select elements need to set the HTML disabled attribute in order to be
+         *   readonly. Setting the readonly attribute is not sufficient.
+         *
+         * Parameters:
+         *   {Boolean} readonly - the readonly state as boolean.
+         *
+         * Returns:
+         *   {ChoiceEntry} this - For chaining.
+         */
         setReadonly: function(readonly) {
             this.inputs.attr('disabled', readonly ? 'disabled' : null);
 
             return this._super(readonly);
         },
 
+        /**
+         * Method: _setupInput
+         *   The choice input element is represented by an HTML select element. This method constructs it and stores it
+         *   in the _input member. The preselected option of the select is either given in the notation as default
+         *   value or is none.
+         *
+         * Returns:
+         *   {ChoiceEntry} this - For chaining.
+         */
         _setupInput: function() {
             var value    = this.property.value;
             this.inputs  = jQuery('<select class="form-control input-small">').attr('id', this.id);
@@ -538,6 +571,8 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
                     .attr('selected', choice === selected ? 'selected' : null)
                 )
             }.bind(this));
+
+            return this;
         },
 
         /**
@@ -548,7 +583,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *    {Object} value - The value of an entry.
          *
          *   Returns:
-         *    The index of the given value. Returns -1 in case it was not found.
+         *   {Number} found - The index of the given value. Returns -1 in case it was not found.
          */
         _indexForValue: function(value) {
             for (var i = this.property.values.length -1; i >= 0; i--) {
@@ -560,6 +595,18 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return -1;
         },
 
+        /**
+         * Method: _value
+         *   Concrete implementation of the _value method. Returns the value of the currently selected option of the
+         *   select element if the method's parameter is unset. Otherwise the passed will be set. The lookup of the
+         *   value is done as in <_indexForValue>.
+         *
+         * Parameters:
+         *   {String} newValue - [optional] optional new value of the choice entry.
+         *
+         * Returns:
+         *   {ChocieEntry} this - For chaining.
+         */
         _value: function(newValue) {
             if (typeof newValue === 'undefined') {
                 return this.property.values[this.inputs.val()];
@@ -572,9 +619,9 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Class: CompoundEntry
-     *      A container entry containing multiple other Entries. This is the graphical equivalent to a <Compound>
-     *      <Property>. The active child Property can be chosen with radio buttons. The CompoundEntry ensures
-     *      the consistency of updates with the backend.
+     *    A container entry containing multiple other Entries. This is the graphical equivalent to a <Compound>
+     *    <Property>. The active child Property can be chosen with radio buttons. The CompoundEntry ensures
+     *    the consistency of updates with the backend.
      */
     var CompoundEntry = Entry.extend({
         blurEvents: function() {
@@ -657,18 +704,43 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Class: NumericEntry
-     *      Input field for a <Numeric> <Property>. It ensures that only number-typed values are allowed and
-     *      provides convenience functions like stepping with spinners.
+     *    Input field for a <Property::Numeric>. It ensures that only number-typed values are allowed and provides
+     *    convenience functions like stepping with spinners. It is concrete implementation of <PropertyMenuEntry>.
      */
     var NumericEntry = Entry.extend({
+        /**
+         * Method: blurEvents
+         *   Overrides the standard list of blur events. Additionally contains change in order to support HTML 5
+         *   spinners.
+         *
+         * Returns:
+         *   {Array[String]} blurEvents - The blur events.
+         */
         blurEvents: function() {
             return ['blur', 'change', 'remove'];
         },
 
+        /**
+         * Method: changeEvents
+         *   Overrides the standard list of change events. Number input fields behave like normal text fields and
+         *   therefore need to support changes on key presses, cuts and pasts.
+         *
+         * Returns:
+         *   {Array[String]} changeEvent - the change events.
+         */
         changeEvents: function() {
             return ['keyup', 'cut', 'paste'];
         },
 
+        /**
+         * Method: _setupInput
+         *   Concrete implementation of the _setupInput method. Returns a HTML 5 number input field. The method sets
+         *   the respective attributes for min/max/step of the number field. If a browser does not support HTML 5 it
+         *   will be interpreted as a text input instead.
+         *
+         * Returns:
+         *   {NumberEntry} this - For chaining.
+         */
         _setupInput: function() {
             this.inputs = jQuery('<input type="number" class="form-control input-small">')
                 .attr('id',   this.id)
@@ -679,6 +751,17 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         },
 
+        /**
+         * Method: _value
+         *   Concrete implementation of this method. Functions as getter and setter. If no new value is set, the
+         *   current number of the entry is returned. Elsewise, the value is set unchecked.
+         *
+         * Parameters:
+         *   {Float} newValue - [optional] if set the new value of the number entry.
+         *
+         * Returns:
+         *   {NumberEntry} this - For chaining.
+         */
         _value: function(newValue) {
             if (typeof newValue === 'undefined') {
                 var val = this.inputs.val();
@@ -693,17 +776,50 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Class: RangeEntry
-     *      Entry for modifying values of a <Range> <Property> consisting of two numbers.
+     *    Entry for modifying values of a <Property::Range> consisting of two numbers inputs that bound the number
+     *    range. This class is a concrete implementation of an <Entry>.
      */
     var RangeEntry = Entry.extend({
+        /**
+         * Method: blurEvents
+         *   Overrides the default blur events. Since range entries consist of two number entries we need the exact
+         *   same blur events here - meaning change is added due to HTML 5.
+         *
+         * Returns:
+         *   {Array[String]} blurEvents - the blur events.
+         */
         blurEvents: function() {
             return ['blur', 'change', 'remove'];
         },
 
+        /**
+         * Method: changeEvents
+         *   Overrides the default change events. Same goes here as in blur events. We need the number input events
+         *   here additionally. Therefore, keyup, cut and paste are added.
+         *
+         * Returns:
+         *   {Array[String]} change Events - the change events.
+         */
         changeEvents: function() {
             return ['keyup', 'cut', 'paste'];
         },
 
+        /**
+         * Method: fix
+         *   Override of the empty default fix implementation. The behaviour here implements a usability convenience
+         *   feature. Given that both inputs contain numbers, the value of the not modified value is always adjusted in
+         *   a way that the two number frame a legal range, with the left value being the lower and right value to be
+         *   the upper bound. Example: The left value contains the number 12 and the right as well. Now, the left value
+         *   is increased by one. The value range is not legal anymore, being [13, 12]. So the right value is
+         *   automatically adjusted to [13, 13].
+         *
+         * Parameters:
+         *   {jQuery::Event} event - jQuery event object (see their documentation for specifics)
+         *   {DOMElement}    ui    - jQuery DOM element set that refer to the event handling element.
+         *
+         * Returns:
+         *   {RangeEntry} this - For chaining.
+         */
         fix: function(event, ui) {
             var val = this._value();
             var lower = val[0];
@@ -723,6 +839,14 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         },
 
+        /**
+         * Method: _setupVisualRepresentation
+         *   Overrides the standard setup for visual representation container. The two number fields need a wrapping
+         *   inline container.
+         *
+         * Returns:
+         *   {RangeEntry} this - For chaining.
+         */
         _setupVisualRepresentation: function() {
             this._setupContainer()
                 ._setupInput();
@@ -737,6 +861,14 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         },
 
+        /**
+         * Method:_setupInput
+         *   Creates two numeric input fields as inline form fields as input. Also renders statically a small hyphen
+         *   between them.
+         *
+         * Returns:
+         *   {RangeEntry} this - For chaining.
+         */
         _setupInput: function() {
             var value = this.property.value;
             var min   = this.property.min;
@@ -753,16 +885,16 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
         /**
          *  Method: _setupMiniNumeric
-         *      Constructs and returns a number field with the given attributes.
+         *    Constructs and returns a number field with the given attributes.
          *
          *  Parameters:
-         *      {Number} min   - The minimum number that should be allowed.
-         *      {Number} max   - The maximum number that should be allowed.
-         *      {Number} step  - The step width the value should fit in.
-         *      {Number} value - The currently set value.
+         *    {Number} min   - The minimum number that should be allowed.
+         *    {Number} max   - The maximum number that should be allowed.
+         *    {Number} step  - The step width the value should fit in.
+         *    {Number} value - The currently set value.
          *
          *  Returns:
-         *      A jQuery object containing the newly constructed number input.
+         *    {DOMElement} input - The newly constructed mini number input.
          */
         _setupMiniNumeric: function(min, max, step, value) {
             return jQuery('<input type="number" class="form-control input-small">')
@@ -772,6 +904,18 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
                 .val(value);
         },
 
+        /**
+         * Method: _value
+         *   Concrete implementation of the _value getter/setter. If now new value is passed as parameter, the method
+         *   functions as a getter and returns the current value as two-tuple/array of numbers. However, if a value is
+         *   given, the method works as a setter. The value is set in the numeric input in order of the tuple.
+         *
+         * Parameters:
+         *   {Array[Number]} newValue - [optional] the value to be set, if present.
+         *
+         * Returns:
+         *   {RangeEntry} this - For chaining.
+         */
         _value: function(newValue) {
             var input = this.inputs.filter('input');
             var lower = input.eq(0);
@@ -793,10 +937,25 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Class: EpsilonEntry
-     *      Similar to <RangeEntry>, but the with different semantic: The second number specifies an epsilon range
-     *      around the first number.
+     *    Is a subclass of <RangeEntry> and also models an interval. However, the semantic is changed. The second
+     *    number specifies an epsilon range around the first number and thereby creating the interval.
      */
     var EpsilonEntry = RangeEntry.extend({
+        /**
+         * Method: fix
+         *   Overrides <RangeEntries> fix' method. The behaviour is altered in a manner that the epsilon range may
+         *   never leave the possible minimum and maximum of the whole interval. Example: min/max of the whole interval
+         *   is 0/1. You epsilon center is 0.75 and your epsilon value is 0.25. You now increase the center to 0.85,
+         *   leaving the epsilon range to [0.6, 1.1]. The upper value exceeds the boundaries of the whole interval. So,
+         *   the epsilon value is reduced down to 0.15, leaving its range as [0.7, 1].
+         *
+         * Parameters:
+         *   {jQuery::Event} event - jQuery event object, refer to their documentation for specifics
+         *   {DOMElement}    ui    - The dom element that had the event handler registered.
+         *
+         * Returns:
+         *   {EpsilonEntry} this - For chaining.
+         */
         fix: function(event, ui) {
             var val     = this._value();
             var center  = val[0];
@@ -826,6 +985,13 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
             return this;
         },
 
+        /**
+         * Method: _setupInput
+         *   Overrides the parents behaviour by exchanging the label between the two input fields with a '±' sign.
+         *
+         * Returns:
+         *   {EpsilonEntry} this - For chaining.
+         */
         _setupInput: function() {
             var value = this.property.value;
             var min   = this.property.min;
@@ -842,18 +1008,44 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 
     /**
      *  Class: TextEntry
-     *      Simple input field for a <Text> <Property>.
+     *    Simple input field for a <Property::Text> and concrete implementation of <Entry>.
      */
     var TextEntry = Entry.extend({
+        /**
+         * Method: changeEvents
+         *   Overrides the default change events. Needs keyup, cut and paste events additionally.
+         *
+         * Returns:
+         *   {Array[String]} changeEvents - The change events.
+         */
         changeEvents: function() {
             return ['keyup', 'cut', 'paste'];
         },
 
+        /**
+         * Method: _setupInput
+         *   Creates the input element for a text entry - a text input box.
+         *
+         * Returns:
+         *   {TextEntry} this - For chaining.
+         */
         _setupInput: function() {
             this.inputs = jQuery('<input type="text" class="form-control input-small">').attr('id', this.id);
             return this;
         },
 
+        /**
+         * Method: _value
+         *   Getter/setter for the menu entry. If the optional parameter is not given, it works as a getter, returning
+         *   the inputs value as string. Otherwise, sets the passed value unchecked.
+         *
+         * Parameters:
+         *   {String} newValue - [optional] If present, the new value of the entry.
+         *
+         * Returns:
+         *   {TextEntry} this  - For chaining reasons, if used as setter.
+         *   {String}    value - The value, if used as getter.
+         */
         _value: function(newValue) {
             if (typeof newValue === 'undefined') return this.inputs.val();
             this.inputs.val(newValue);
@@ -864,11 +1056,18 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
 	
 	/**
 	 * Class: InlineTextArea
-	 *     TextArea for editing inside a shape on the canvas.
+     *   Special kind of text area property, that does NOT appear inside the properties
+	 *   TextArea for editing inside a shape on the canvas.
 	 *     So far only used for editing inside a sticky note.
 	 */
-	
     var InlineTextArea = Entry.extend({
+        /**
+         * Method: changeEvents
+         *   Overrides
+         *
+         * Returns:
+         *   {Array[String]} changeEvents - The change events.
+         */
         changeEvents: function() {
             return ['keyup', 'cut', 'paste'];
         },
