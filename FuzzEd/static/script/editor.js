@@ -276,7 +276,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             jQuery(document).keydown(function(event) {
                 if (event.which == jQuery.ui.keyCode.ESCAPE) {
                     this._escapePressed(event);
-                } else if (event.which === jQuery.ui.keyCode.DELETE) {
+                } else if (event.which === jQuery.ui.keyCode.DELETE || event.which === jQuery.ui.keyCode.BACKSPACE) {
                     this._deletePressed(event);
                 } else if (event.which === jQuery.ui.keyCode.UP) {
                     this._arrowKeyPressed(event, 0, -1);
