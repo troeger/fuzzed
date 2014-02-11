@@ -107,11 +107,11 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          *    This <Graph> instance for chaining.
          */
         _registerEventHandlers: function() {
-            jsPlumb.bind('jsPlumbConnection', function(edge) {
+            jsPlumb.bind('connection', function(edge) {
                 this._addEdge(edge.connection);
             }.bind(this));
 
-            jsPlumb.bind('jsPlumbConnectionDetached', function(edge) {
+            jsPlumb.bind('connectionDetached', function(edge) {
                 this._deleteEdge(edge.connection);
             }.bind(this));
 
@@ -188,8 +188,8 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
             // store the ID in an attribute so we can retrieve it later from the DOM element
             jQuery(jsPlumbEdge.canvas).data(this.config.Keys.CONNECTION_ID, jsPlumbEdge._fuzzedId);
 
-            var sourceNode = jsPlumbEdge.source.data(this.config.Keys.NODE);
-            var targetNode = jsPlumbEdge.target.data(this.config.Keys.NODE);
+            var sourceNode = jQuery(jsPlumbEdge.source).data(this.config.Keys.NODE);
+            var targetNode = jQuery(jsPlumbEdge.target).data(this.config.Keys.NODE);
 
             sourceNode.setChildProperties(targetNode);
 
@@ -247,8 +247,8 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
         _deleteEdge: function(jsPlumbEdge) {
             var id         = jsPlumbEdge._fuzzedId;
 
-            var sourceNode = jsPlumbEdge.source.data(this.config.Keys.NODE);
-            var targetNode = jsPlumbEdge.target.data(this.config.Keys.NODE);
+            var sourceNode = jQuery(jsPlumbEdge.source).data(this.config.Keys.NODE);
+            var targetNode = jQuery(jsPlumbEdge.target).data(this.config.Keys.NODE);
 
             sourceNode.restoreChildProperties(targetNode);
 

@@ -202,6 +202,26 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 Canvas.toggleGrid();
             }.bind(this));
 
+            jQuery("#"+this.config.IDs.ACTION_CUT).click(function() {
+                this._cutSelection();
+            }.bind(this));
+
+            jQuery("#"+this.config.IDs.ACTION_COPY).click(function() {
+                this._copySelection();
+            }.bind(this));
+
+            jQuery("#"+this.config.IDs.ACTION_PASTE).click(function() {
+                this._paste();
+            }.bind(this));
+
+            jQuery("#"+this.config.IDs.ACTION_DELETE).click(function() {
+                this._deleteSelection();
+            }.bind(this));
+
+            jQuery("#"+this.config.IDs.ACTION_SELECTALL).click(function(event) {
+                this._selectAll(event);
+            }.bind(this));
+
             return this;
         },
 
@@ -359,59 +379,21 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Group: Keyboard Interaction
+         *  Group: Graph Editing
          */
 
         /**
-         *  Method: _arrowKeyPressed
+         *  Method: _deleteSelection
          *
-         *    Event callback for handling presses of arrow keys. Will move the selected nodes in the given direction by
-         *    and offset equal to the canvas' grid size. The movement is not done when an input field is currently in
-         *    focus.
+         *    Will remove the selected nodes and edges.
          *
-         *  Parameters:
-         *    {jQuery::Event} event      - the issued delete keypress event
-         *    {Number}        xDirection - signum of the arrow key's x direction movement (e.g. -1 for left)
-         *    {Number}        yDirection - signum of the arrow key's y direction movement (e.g.  1 for down)
-         *
-         *  Return:
+         *  Returns:
          *    This Editor instance for chaining
          */
-        _arrowKeyPressed: function(event, xDirection, yDirection) {
-            if (jQuery(event.target).is('input, textarea')) return this;
-
-            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
-            jQuery(selectedNodes).each(function(index, element) {
-                var node = jQuery(element).data(this.config.Keys.NODE);
-                node.moveBy({
-                    x: xDirection * Canvas.gridSize,
-                    y: yDirection * Canvas.gridSize
-                });
-            }.bind(this));
-
-            return this;
-        },
-
-        /**
-         *  Method: _deletePressed
-         *
-         *    Event callback for handling delete key presses. Will remove the selected nodes and edges as long as no
-         *    input field is currently focused (allows e.g. character removal in properties).
-         *
-         *  Parameters:
-         *    {jQuery::Event} event - the issued delete keypress event
-         *
-         *  Return:
-         *    This Editor instance for chaining
-         */
-        _deletePressed: function(event) {
-            // prevent that node is being deleted when we edit an input field
-            if (jQuery(event.target).is('input, textarea')) return this;
-
+        _deleteSelection: function() {
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
 
-            event.preventDefault();
             // delete selected nodes
             jQuery(selectedNodes).each(function(index, element) {
                 this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
@@ -424,31 +406,12 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             }.bind(this));
 
             this.properties.hide();
-
-            return this;
         },
 
         /**
-         *  Method: _escapePressed
+         * Method: _selectAll
          *
-         *    Event callback for handling escape key presses. Will deselect any selected nodes and edges.
-         *
-         *  Parameters:
-         *    {jQuery::Event} event - the issued escape keypress event
-         *
-         *  Returns:
-         *    This Editor instance for chaining
-         */
-        _escapePressed: function(event) {
-            event.preventDefault();
-            this._deselectAll(event);
-            return this;
-        },
-
-        /**
-         * Method: _selectAllPressed
-         *
-         *   Event callback for handling a select all (CTRL/CMD + A) key presses. Will select all nodes and edges.
+         *   Will select all nodes and edges.
          *
          * Parameters:
          *   {jQuery::Event} event - the issued select all keypress event
@@ -456,11 +419,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          * Returns:
          *   This Editor instance for chaining.
          */
-        _selectAllPressed: function(event) {
-            if (jQuery(event.target).is('input, textarea')) return this;
-
-            event.preventDefault();
-
+        _selectAll: function(event) {
             //XXX: trigger selection start event manually here
             //XXX: hack to emulate a new selection process
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
@@ -478,9 +437,178 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             //XXX: trigger selection stop event manually here
             //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
+        },
+
+        /**
+         * Method: _deselectAll
+         *
+         *   Deselects all the nodes and edges in the current graph.
+         *
+         * Parameters:
+         *   {jQuery::Event} event - (optional) the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _deselectAll: function(event) {
+            if (typeof event === 'undefined') {
+                event = window.event;
+            }
+
+            //XXX: Since a deselect-click only works without metaKey or ctrlKey pressed,
+            // we need to deactivate them manually.
+            var hackEvent = jQuery.extend({}, event, {
+                metaKey: false,
+                ctrlKey: false
+            });
+
+            //XXX: deselect everything
+            // This uses the jQuery.ui.selectable internal functions.
+            // We need to trigger them manually in order to simulate a click on the canvas.
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(hackEvent);
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(hackEvent);
 
             return this;
         },
+
+        /**
+         * Method: _copySelection
+         *
+         *   Will copy selected nodes by serializing and saving them to html5 Local Storage or the _clipboard var using
+         *   _updateClipboard().
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _copySelection: function() {
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+
+            // put nodes as dicts into nodes
+            var nodes = [];
+            jQuery(selectedNodes).each(function(index, element) {
+                var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
+                if (node.copyable) {
+                    nodes.push(node.toDict());
+                }
+            }.bind(this));
+
+            var edges = [];
+            jQuery(selectedEdges).each(function(index, element) {
+                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
+
+                //TODO: create Edge class with toDict() method
+                edges.push({
+                    'source':  jQuery(edge.source).data(this.config.Keys.NODE).id,
+                    'target':  jQuery(edge.target).data(this.config.Keys.NODE).id
+                });
+            }.bind(this));
+
+            var clipboard = {
+                'pasteCount': 0,
+                'nodes': nodes,
+                'edges': edges
+            };
+
+            // to avoid empty copyings
+            if (nodes.length > 0 || edges.length > 0) {
+                this._updateClipboard(clipboard);
+            }
+        },
+
+        /**
+         * Method: _paste
+         *
+         *   Will paste previously copied nodes from html5 Local Storage or the _clipboard var by using _getClipboard().
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _paste: function() {
+            // deselect the original nodes and edges
+            this._deselectAll();
+
+            // fetch clipboard from local storage or variable and increase pasteCount
+            var clipboard = this._getClipboard();
+            var pasteCount = ++clipboard.pasteCount;
+            this._updateClipboard(clipboard);
+
+            var nodes       = clipboard.nodes;
+            var edges       = clipboard.edges;
+            var ids         = {}; // stores to every old id the newly generated id to connect the nodes again
+            var boundingBox = this._boundingBoxForNodes(nodes); // used along with pasteCount to place the copy nicely
+
+            _.each(nodes, function(node) {
+                var pasteId  = this.graph.createId();
+                ids[node.id] = pasteId;
+                node.id = pasteId;
+                node.x += pasteCount * (boundingBox.width + 1);
+                node.y += pasteCount * (boundingBox.height + 1);
+                this.graph.addNode(node.kind, node).select();
+            }.bind(this));
+
+            _.each(edges, function(edge) {
+                edge.source = ids[edge.source] || edge.source;
+                edge.target = ids[edge.target] || edge.target;
+                jQuery(this.graph.addEdge(edge).canvas).addClass(this.config.Classes.SELECTED);
+            }.bind(this));
+
+            //XXX: trigger selection stop event manually here
+            //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
+            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
+        },
+
+        /**
+         * Method: _cutSelection
+         *
+         *   Will delete and copy selected nodes by using _updateClipboard().
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _cutSelection: function() {
+            this._copySelection();
+            this._deleteSelection();
+
+            // set the just copied clipboard's pasteCount to -1, so that it will paste right in place of the original.
+            var clipboard = this._getClipboard();
+            --clipboard['pasteCount'];
+            this._updateClipboard(clipboard);
+        },
+
+        /**
+         * Method: _boundingBoxForNodes
+         *
+         *   Returns the (smallest) bounding box for the given nodes by accessing their x and y coordinates and finding
+         *   mins and maxes. Used by _paste() to place the copy nicely.
+         *
+         * Returns:
+         *   A dictionary containing 'width' and 'height' of the calculated bounding box.
+         */
+
+        _boundingBoxForNodes: function(nodes) {
+            var topMostNode     = { 'y': Number.MAX_VALUE };
+            var leftMostNode    = { 'x': Number.MAX_VALUE };
+            var bottomMostNode  = { 'y': 0 };
+            var rightMostNode   = { 'x': 0 };
+
+            _.each(nodes, function(node) {
+                if (node.y < topMostNode.y)     { topMostNode = node }
+                if (node.x < leftMostNode.x)    { leftMostNode = node; }
+                if (node.y > bottomMostNode.y)  { bottomMostNode = node; }
+                if (node.x > rightMostNode.x)   { rightMostNode = node; }
+            }.bind(this));
+
+            return {
+                'width':  rightMostNode.x - leftMostNode.x,
+                'height': bottomMostNode.y - topMostNode.y
+            }
+        },
+
+
+        /**
+         *  Group: Clipboard Handling
+         */
 
         /**
          * Method: _updateClipboard
@@ -522,10 +650,102 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
+         *  Group: Keyboard Interaction
+         */
+
+        /**
+         *  Method: _arrowKeyPressed
+         *
+         *    Event callback for handling presses of arrow keys. Will move the selected nodes in the given direction by
+         *    and offset equal to the canvas' grid size. The movement is not done when an input field is currently in
+         *    focus.
+         *
+         *  Parameters:
+         *    {jQuery::Event} event      - the issued delete keypress event
+         *    {Number}        xDirection - signum of the arrow key's x direction movement (e.g. -1 for left)
+         *    {Number}        yDirection - signum of the arrow key's y direction movement (e.g.  1 for down)
+         *
+         *  Return:
+         *    This Editor instance for chaining
+         */
+        _arrowKeyPressed: function(event, xDirection, yDirection) {
+            if (jQuery(event.target).is('input, textarea')) return this;
+
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            jQuery(selectedNodes).each(function(index, element) {
+                var node = jQuery(element).data(this.config.Keys.NODE);
+                node.moveBy({
+                    x: xDirection * Canvas.gridSize,
+                    y: yDirection * Canvas.gridSize
+                });
+            }.bind(this));
+
+            return this;
+        },
+
+        /**
+         *  Method: _deletePressed
+         *
+         *    Event callback for handling delete key presses. Will remove the selected nodes and edges by calling
+         *    _deleteSelection as long as no input field is currently focused (allows e.g. character removal in
+         *    properties).
+         *
+         *  Parameters:
+         *    {jQuery::Event} event - the issued delete keypress event
+         *
+         *  Return:
+         *    This Editor instance for chaining
+         */
+        _deletePressed: function(event) {
+            // prevent that node is being deleted when we edit an input field
+            if (jQuery(event.target).is('input, textarea')) return this;
+            event.preventDefault();
+            this._deleteSelection();
+            return this;
+        },
+
+        /**
+         *  Method: _escapePressed
+         *
+         *    Event callback for handling escape key presses. Will deselect any selected nodes and edges by calling
+         *    _deselectAll().
+         *
+         *  Parameters:
+         *    {jQuery::Event} event - the issued escape keypress event
+         *
+         *  Returns:
+         *    This Editor instance for chaining
+         */
+        _escapePressed: function(event) {
+            event.preventDefault();
+            this._deselectAll(event);
+            return this;
+        },
+
+        /**
+         * Method: _selectAllPressed
+         *
+         *   Event callback for handling a select all (CTRL/CMD + A) key presses. Will select all nodes and edges by
+         *   calling _selectAll().
+         *
+         * Parameters:
+         *   {jQuery::Event} event - the issued select all keypress event
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _selectAllPressed: function(event) {
+            if (jQuery(event.target).is('input, textarea')) return this;
+            event.preventDefault();
+            this._selectAll(event);
+            return this;
+        },
+
+        /**
          * Method: _copyPressed
          *
          *   Event callback for handling a copy (CTRL/CMD + C) key press. Will copy selected nodes by serializing and
-         *   saving them to html5 Local Storage or the _clipboard var.
+         *   saving them to html5 Local Storage or the _clipboard var by calling _copySelection().
          *
          * Parameters:
          *   {jQuery::Event} event - the issued select all keypress event
@@ -535,43 +755,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _copyPressed: function(event) {
             if (jQuery(event.target).is('input, textarea')) return this;
-
             event.preventDefault();
-
-            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
-            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
-
-            // put nodes as dicts into nodes
-            var nodes = [];
-            jQuery(selectedNodes).each(function(index, element) {
-                var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
-                if (node.copyable) {
-                    nodes.push(node.toDict());
-                }
-            }.bind(this));
-
-            var edges = [];
-            jQuery(selectedEdges).each(function(index, element) {
-                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
-
-                //TODO: create Edge class with toDict() method
-                edges.push({
-                    'source':  edge.source.data(this.config.Keys.NODE).id,
-                    'target':  edge.target.data(this.config.Keys.NODE).id
-                });
-            }.bind(this));
-
-            var clipboard = {
-                'pasteCount': 0,
-                'nodes': nodes,
-                'edges': edges
-            };
-
-            // to avoid empty copyings
-            if (nodes.length > 0 || edges.length > 0) {
-                this._updateClipboard(clipboard);
-            }
-
+            this._copySelection();
             return this;
         },
 
@@ -579,7 +764,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          * Method: _pastePressed
          *
          *   Event callback for handling a paste (CTRL/CMD + V) key press. Will paste previously copied nodes from
-         *   html5 Local Storage or the _clipboard var.
+         *   html5 Local Storage or the _clipboard var by calling _paste().
          *
          * Parameters:
          *   {jQuery::Event} event - the issued select all keypress event
@@ -589,45 +774,16 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _pastePressed: function(event) {
             if (jQuery(event.target).is('input, textarea')) return this;
-
             event.preventDefault();
-            this._deselectAll(event);
-
-            var clipboard = this._getClipboard();
-            var pasteCount = ++clipboard.pasteCount;
-            this._updateClipboard(clipboard);
-
-            var nodes       = clipboard.nodes;
-            var edges       = clipboard.edges;
-            var ids         = {};
-            var boundingBox = this._boundingBoxForNodes(nodes);
-
-            _.each(nodes, function(node) {
-                var pasteId  = this.graph.createId();
-                ids[node.id] = pasteId;
-                node.id = pasteId;
-                node.x += pasteCount * (boundingBox.width + 1);
-                node.y += pasteCount * (boundingBox.height + 1);
-                this.graph.addNode(node.kind, node).select();
-            }.bind(this));
-
-            _.each(edges, function(edge) {
-                edge.source = ids[edge.source] || edge.source;
-                edge.target = ids[edge.target] || edge.target;
-                jQuery(this.graph.addEdge(edge).canvas).addClass(this.config.Classes.SELECTED);
-            }.bind(this));
-
-            //XXX: trigger selection stop event manually here
-            //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
-
+            this._paste();
             return this;
         },
 
         /**
          * Method: _cutPressed
          *
-         *   Event callback for handling a cut (CTRL/CMD + X) key press. Will delete and copy selected nodes.
+         *   Event callback for handling a cut (CTRL/CMD + X) key press. Will delete and copy selected nodes by calling
+         *   _cutSelection().
          *
          * Parameters:
          *   {jQuery::Event} event - the issued select all keypress event
@@ -637,73 +793,9 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _cutPressed: function(event) {
             if (jQuery(event.target).is('input, textarea')) return this;
-
             event.preventDefault();
-            this._copyPressed(event);
-            this._deletePressed(event);
-
-            // set the just copied clipboard's pasteCount to -1, so that it will paste right in place of the original.
-            var clipboard = this._getClipboard();
-            --clipboard['pasteCount'];
-            this._updateClipboard(clipboard);
-
+            this._cutSelection();
             return this;
-        },
-
-        /**
-         * Method: _deselectAll
-         *
-         *   Deselects all the nodes and edges in the current graph.
-         *
-         * Returns:
-         *   This Editor instance for chaining.
-         */
-
-        _deselectAll: function(event) {
-            //XXX: deselect everything
-            // This uses the jQuery.ui.selectable internal functions.
-            // We need to trigger them manually in order to simulate a click on the canvas.
-            // Since a deselect-click only works without metaKey or ctrlKey pressed,
-            // we need to deactivate them manually.
-
-            var hackEvent = jQuery.extend({}, event, {
-                metaKey: false,
-                ctrlKey: false
-            });
-
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(hackEvent);
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(hackEvent);
-
-            return this;
-        },
-
-        /**
-         * Method: _boundingBoxForNodes
-         *
-         *   Returns the (smallest) bounding box for the given nodes by accessing their x and y coordinates and finding
-         *   mins and maxes.
-         *
-         * Returns:
-         *   A dictionary containing 'width' and 'height' of the calculated bounding box.
-         */
-
-        _boundingBoxForNodes: function(nodes) {
-            var topMostNode     = { 'y': Number.MAX_VALUE };
-            var leftMostNode    = { 'x': Number.MAX_VALUE };
-            var bottomMostNode  = { 'y': 0 };
-            var rightMostNode   = { 'x': 0 };
-
-            _.each(nodes, function(node) {
-                if (node.y < topMostNode.y)     { topMostNode = node }
-                if (node.x < leftMostNode.x)    { leftMostNode = node; }
-                if (node.y > bottomMostNode.y)  { bottomMostNode = node; }
-                if (node.x > rightMostNode.x)   { rightMostNode = node; }
-            }.bind(this));
-
-            return {
-                'width':  rightMostNode.x - leftMostNode.x,
-                'height': bottomMostNode.y - topMostNode.y
-            }
         },
 
         /**
