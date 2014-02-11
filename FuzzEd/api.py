@@ -22,7 +22,7 @@ from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, \
                               HttpResponseForbiddenAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, \
                               HttpResponseServerErrorAnswer
-from FuzzEd.models import Graph, Node, notations, commands, Job
+from FuzzEd.models import Graph, Node, notations, commands, Job, Notification
 
 import logging, json
 logger = logging.getLogger('FuzzEd')
@@ -577,3 +577,17 @@ def job_exitcode(request, job_secret):
     job.exit_code = request.POST['exit_code']
     job.save()
     return HttpResponse()        
+
+@csrf_exempt
+@require_http_methods(['POST'])
+def noti_dismiss(request, noti_id):
+    """
+    Function: noti_dismiss
+
+    API call being used when the user dismisses the notification box on the start (project overview)
+    page.
+    """
+    noti = get_object_or_404(Notification, pk=noti_id)
+    noti.users.remove(request.user)
+    noti.save()
+    return HttpResponse(status=200)
