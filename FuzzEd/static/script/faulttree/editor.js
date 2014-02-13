@@ -246,13 +246,19 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         _setupResizing: function() {
+            var gridContainer = jQuery('#grid_container');
+            
             this.container.resizable({
                 minHeight: this.container.height(), // use current height as minimum
                 maxHeight: this.container.height(),
                 resize: function(event, ui) {
                     if (this._chart != null) {
                         // fit all available space with chart
-                        this._chartContainer.height(this.container.height() - this._gridContainer.outerHeight());
+                        
+                        console.log('container-height: ' + this.container.height());
+                        console.log('grid-height: ' + gridContainer.height());
+                        
+                        this._chartContainer.height(this.container.height() - gridContainer.outerHeight());
 
                         this._chart.setSize(
                             this._chartContainer.width(),
@@ -261,8 +267,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         );
                     }
 
-                    this._gridContainer.width(this._chartContainer.width());
-                    this._grid.resizeCanvas();
+                    //this._gridContainer.width(this._chartContainer.width());
+                    //this._grid.resizeCanvas();
                 }.bind(this)
             });
         },
@@ -571,24 +577,32 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *
          */
         _displayResultWithDataTables: function(data) {
-             
-            var _this = this; 
-             
-            var results_table = jQuery('#example').dataTable({
-                                     "bProcessing": true,
-                                     "bFilter":     false,
-                                     "bServerSide": true,
-                                     "sAjaxSource": "/api/jobs_status_test",
-                                     "aoColumns":   data["columns"],
-                                     "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                                         jQuery(nRow).on("click", function(){
-                                             var configID = aData['id']
-                                             _this._highlightConfiguration(configID);
-                                     })
-                                     }
-                                  });
             
-            //$('#example tbody').on( 'click', 'tr', function () {alert('hello')} );    
+            // clear container
+            this._gridContainer.empty();
+            
+            var _this = this;  
+            this._grid = jQuery('#grid').dataTable({
+                            "bProcessing":   true,
+                            "bFilter":       false,
+                            "bServerSide":   true,
+                            "sAjaxSource":   "/api/jobs_status_test",
+                            "aoColumns":     data["columns"],
+                            "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                                                jQuery(nRow).on("mouseover", function(){
+                                                    var configID = aData['id']
+                                                    _this._highlightConfiguration(configID);
+                                                    })
+                                             }
+                            });
+                                
+            this._grid.on( 'mouseleave', 'tr', function () {
+                _this._unhighlightConfiguration();
+            });
+            
+            //this._grid.css("width", "100%");
+            
+            //this._gridContainer.append(this._grid);    
         },
         
         /**
@@ -625,7 +639,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             // make rows selectable
             this._grid.setSelectionModel(new Slick.RowSelectionModel());
 
-            // highlight the corresponding nodes if a row of the grid is selected
+            // this._unhighlightConfiguration(); the corresponding nodes if a row of the grid is selected
             this._grid.onSelectedRowsChanged.subscribe(function(e, args) {
                 this._unhighlightConfiguration();
 
@@ -780,9 +794,9 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         <span class="menu-close"></span>\
                     </div>\
                     <div class="chart"></div>\
-                        <div>\
-                            <table id="example"></table>\
-                        </div>\
+                    <div id="grid_container">\
+                        <table id="grid"></table>\
+                    </div>\
                     </div>'
             )
             .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
