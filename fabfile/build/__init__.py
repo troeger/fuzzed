@@ -18,7 +18,6 @@ XSD_PY_FILE_MAP = {
     'configurationResult': 'xml_conf_result'
 }
 
-
 def svg2pgf_shape(filename):
     '''
         Convert given SVG file to TiKZ code.
@@ -138,6 +137,59 @@ def inherit(node_name, node, nodes, node_cache):
 
     return resolved
 
+def generate_graphml_keys(notations):
+    graphml_keys = {}
+
+    for notation in notations:
+        notation_kind = notation['kind']
+        all_keys      = [generate_key('kind', 'string', 'node')]
+        properties    = set()
+
+        for node_kind, node in notation['nodes'].items():
+            for property_name, propertie in node.get('properties', {}).items():
+                if property_name in properties:
+                    continue
+                else:
+                    properties.add(property_name)
+
+                property_default = propertie.get('default', '')
+                property_kind    = propertie['kind']
+                key              = None
+                keys             = None
+
+                if property_kind in {'compound', 'text', 'textfield'}:
+                    key  = generate_key(property_name, 'string', property_default if propertie != 'name' else 'Node')
+                elif property_kind == 'bool':
+                    key  = generate_key(property_name, 'boolean', 'true' if property_default else 'false')
+                elif property_kind == 'choice':
+                    index = propertie['values'].index(property_default)
+                    property_default = property_default[index]
+                    key = generate_key(property_name, 'string', property_default)
+                elif property_kind == 'epsilon':
+                    keys = [
+                        generate_key(property_name,             'double', property_default[0]),
+                        generate_key(property_name + 'Epsilon', 'double', property_default[1])
+                    ]
+                elif property_kind in {'numeric', 'range'}:
+                    kind = 'long' if propertie.get('step', 1) == 1 else 'double'
+                    key  = generate_key(property_name, kind, property_default)
+                elif property_kind == 'transfer':
+                    key  = generate_key(property_name, 'string', '')
+
+                if key is not None:
+                    all_keys.append(key)
+                else:
+                    all_keys.extend(keys)
+
+        graphml_keys[notation_kind] = '\n'.join(all_keys)
+
+    return graphml_keys
+
+def generate_key(name, kind, default):
+    return \
+        '<key id="%s" for="node" attr.name="%s" attr.type="%s">\n' \
+        '   <default>%s</default>\n' \
+        '</key>' % (name, name, kind, default,)
 
 @task
 def shapes():
@@ -175,6 +227,8 @@ def notations():
     pprint.pprint(generate_choices(notations), out)
     out.write('\nnode_choices = ')
     pprint.pprint(generate_node_choices(notations), out)
+    out.write('\ngraphml_keys = ')
+    pprint.pprint(generate_graphml_keys(notations), out)
     out.write('\n# END OF GENERATED CONTENT')
 
 def build_xmlschema_wrappers():
