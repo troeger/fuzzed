@@ -4,6 +4,8 @@ set(SOURCES
    ${SOURCES}
    FaultTreeNode.cpp
    FaultTreeConversion.cpp
+
+   GraphParser.cpp
    
    events/Event.cpp
    events/BasicEvent.cpp
@@ -32,6 +34,8 @@ set(HEADERS
    FaultTreeIncludes.h
    FaultTreeConversion.h
    
+   GraphParser.h
+
    events/Event.h
    events/BasicEvent.h
    events/TopLevelEvent.h
