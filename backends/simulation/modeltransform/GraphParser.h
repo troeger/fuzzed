@@ -11,7 +11,7 @@ struct FTNode
 {
 	std::string kind;
 	std::string probability;
-	int k;
+	long k;
 	long cardinality;
 	double dormancyFactor; 
 };

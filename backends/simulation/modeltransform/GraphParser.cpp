@@ -92,6 +92,18 @@ void GraphParser::scanTree(BoostGraphType& g, int i, FaultTreeNode::Ptr ft)
 		ft->addChild(ag);
 		ft = ag;
 	}
+	else if (kind == "Or")
+	{
+		const FaultTreeNode::Ptr ag(new ORGate(ID));
+		ft->addChild(ag);
+		ft = ag;
+	}
+	else if (kind == "VotingOr")
+	{
+		const FaultTreeNode::Ptr ag(new VotingORGate(ID, get(&FTNode::k, g, i)));
+		ft->addChild(ag);
+		ft = ag;
+	}
 
 	for (auto op = out_edges(i, g); op.first != op.second; ++op.first)
 	{
