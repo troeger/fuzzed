@@ -99,17 +99,19 @@ void GraphParser::scanTree(BoostGraphType& g, int i, FaultTreeNode::Ptr ft)
 
 	}
 	else if (kind == "BasicEventSet")
-	{
-
+	{// TODO: assert that parent is a gate
+		const long cardinality = get(&FTNode::cardinality, g, i);
+		const double probability = parseProbability(get(&FTNode::probability, g, i));
+		for (long i = 0; i < cardinality; ++i)
+		{
+			ft->addChild(FaultTreeNode::Ptr(new BasicEvent(ID + util::toString(i), probability)));
+		}
 	}
 	else if (kind == "UndevelopedEvent")
-	{
-
-	}
+		throw std::runtime_error("Cannot simulate trees with undeveloped events!");
+	
 	else if (kind == "HouseEvent")
-	{
-
-	}
+		newNode = FaultTreeNode::Ptr(new BasicEvent(ID, 0.0));
 	
 	if (newNode)
 		ft->addChild(newNode);
