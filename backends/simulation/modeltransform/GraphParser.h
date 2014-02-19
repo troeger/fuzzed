@@ -4,6 +4,8 @@
 #include <string>
 
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graphml.hpp>
+
 #include "FaultTreeNode.h"
 
 // Vertex properties
@@ -27,9 +29,10 @@ private:
 	GraphParser(const std::string& fileName);
 	FaultTreeNode::Ptr parse();
 
-	void scanTree(BoostGraphType& graph, int index, FaultTreeNode::Ptr ftn);
+	static void loadPropertySpecs(boost::dynamic_properties& dp, BoostGraphType& g);
+	static void scanTree(BoostGraphType& graph, int index, FaultTreeNode::Ptr ftn);
 
-	double parseProbability(const std::string crypticGraphMLRubbish);
+	static double parseProbability(const std::string crypticGraphMLRubbish);
 
 	std::ifstream m_file;
 };

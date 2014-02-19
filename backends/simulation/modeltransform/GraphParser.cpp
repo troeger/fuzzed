@@ -1,8 +1,5 @@
 #include "GraphParser.h"
 #include <cassert>
-#include <boost/graph/property_iter_range.hpp>
-#include <boost/graph/graphml.hpp>
-
 #include "FaultTreeIncludes.h"
 #include "util.h"
 
@@ -18,6 +15,11 @@ FaultTreeNode::Ptr GraphParser::fromGraphML(const std::string& fileName, std::of
 	{
 		if (logfile)
 			*logfile << e.what();
+	}
+	catch (...)
+	{
+		if (logfile)
+			*logfile << "Unknown error during simulation";
 	}
 }
 
@@ -35,17 +37,8 @@ FaultTreeNode::Ptr GraphParser::parse()
 	BoostGraphType g;
 	dynamic_properties dp ;
 	
-	const std::string vk = "kind";
-	const std::string prob = "probability";
-	const std::string k = "k";
-	const std::string df = "dormancyFactor";
-	const std::string card = "cardinality";
-	dp.property(vk,		get(&FTNode::kind,			g));
-	dp.property(prob,	get(&FTNode::probability,	g));
-	dp.property(k,		get(&FTNode::k,				g));
-	dp.property(df,		get(&FTNode::dormancyFactor,g));
-	dp.property(card,	get(&FTNode::cardinality,	g));
-	
+	loadPropertySpecs(dp, g);
+
 	read_graphml(m_file, g, dp);
 	write_graphml(std::cout, g, dp);
 
@@ -56,13 +49,8 @@ FaultTreeNode::Ptr GraphParser::parse()
 		const auto kind = get(&FTNode::kind, g, i);
 		const auto ID = get(vertex_index, g, i);
 
-		std::cout 
-			<< kind << " "
-			<< get(&FTNode::probability, g, i) << " "
-			<< "index " << ID << std::endl;
-
 		if (kind == "TopEvent")
-		{ // recursively build tree
+		{ // recursively build tree, starting from Top Event
 			ft.reset(new TopLevelEvent(util::toString((int)ID)));
 			scanTree(g, i, ft);
 			break;
@@ -78,40 +66,62 @@ void GraphParser::scanTree(BoostGraphType& g, int i, FaultTreeNode::Ptr ft)
 	using namespace boost;
 
 	const auto kind = get(&FTNode::kind, g, i);
-	const std::string ID = "foo";//get(vertex_name, g, i);
+	const std::string ID = "foo";//TODO: get(vertex_name, g, i);
 
+	FaultTreeNode::Ptr newNode;
 	if (kind == "BasicEvent")
-	{
-		const FaultTreeNode::Ptr be(new BasicEvent(ID, parseProbability(get(&FTNode::probability, g, i))));
-		ft->addChild(be);
-		return; // FDEP?!
-	} 
+		newNode = FaultTreeNode::Ptr(new BasicEvent(ID, parseProbability(get(&FTNode::probability, g, i))));
+
 	else if (kind == "And")
-	{
-		const FaultTreeNode::Ptr ag(new ANDGate(ID));
-		ft->addChild(ag);
-		ft = ag;
-	}
+		newNode = FaultTreeNode::Ptr(new ANDGate(ID));
+		
 	else if (kind == "Or")
-	{
-		const FaultTreeNode::Ptr ag(new ORGate(ID));
-		ft->addChild(ag);
-		ft = ag;
-	}
+		newNode = FaultTreeNode::Ptr(new ORGate(ID));
+
 	else if (kind == "VotingOr")
+		newNode = FaultTreeNode::Ptr(new VotingORGate(ID, get(&FTNode::k, g, i)));
+	
+	else if (kind == "FDEP")
 	{
-		const FaultTreeNode::Ptr ag(new VotingORGate(ID, get(&FTNode::k, g, i)));
-		ft->addChild(ag);
-		ft = ag;
+		// const FaultTreeNode::Ptr ag(new FDEPGate(ID, trigger, dependentEvents));
 	}
+	else if (kind == "Spare")
+	{
+		const std::string primary = ""; // TODO
+		newNode = FaultTreeNode::Ptr(new SpareGate(ID, primary, get(&FTNode::dormancyFactor, g, i)));
+	}
+	else if (kind == "PAND")
+	{
+
+	}
+	else if (kind == "ImmediateEvent")
+	{
+
+	}
+	else if (kind == "BasicEventSet")
+	{
+
+	}
+	else if (kind == "UndevelopedEvent")
+	{
+
+	}
+	else if (kind == "HouseEvent")
+	{
+
+	}
+	
+	if (newNode)
+		ft->addChild(newNode);
+	else
+		newNode = ft; // Top or Intermediate Events
 
 	for (auto op = out_edges(i, g); op.first != op.second; ++op.first)
 	{
 		const auto ei = *op.first;
-		std::cout << "---" << ei << std::endl;
-
+		
 		const auto targetIndex = target(ei, g);
-		scanTree(g, targetIndex, ft);
+		scanTree(g, targetIndex, newNode);
 	}
 }
 
@@ -120,6 +130,21 @@ double GraphParser::parseProbability(const std::string crypticGraphMLRubbish)
 	std::istringstream i(crypticGraphMLRubbish);
 	double x;
 	if (!(i >> x))
-		return 0;
+		return 0.0;
 	return x;
+}
+
+void GraphParser::loadPropertySpecs(boost::dynamic_properties &dp, BoostGraphType& g)
+{
+	static const std::string vk = "kind";
+	static const std::string prob = "probability";
+	static const std::string k = "k";
+	static const std::string df = "dormancyFactor";
+	static const std::string card = "cardinality";
+
+	dp.property(vk,		get(&FTNode::kind,			g));
+	dp.property(prob,	get(&FTNode::probability,	g));
+	dp.property(k,		get(&FTNode::k,				g));
+	dp.property(df,		get(&FTNode::dormancyFactor,g));
+	dp.property(card,	get(&FTNode::cardinality,	g));
 }
