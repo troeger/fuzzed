@@ -29,9 +29,14 @@
             project_to_delete = null;
         };
 
+        var dismiss_notification = function(event) {
+            jQuery.post('/api/notifications/{{ notification.pk }}/dismiss');
+        };
+
         jQuery(document).ready(function() {
             jQuery('button.require-dialog').click(delete_clicked);
             jQuery('#confirm_delete').click(delete_confirmed);
+            jQuery('#notification{{ notification.pk }}').bind('closed.bs.alert', dismiss_notification);
         });
     });
 </script>
@@ -42,6 +47,16 @@
 {% endblock %}
 
 {% block content %}
+
+
+{% if notification %}
+<div id="notification{{ notification.pk }}" class="panel panel-default">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <h3 class="panel-title">{{ notification.title }}</h3>
+      <p>{{ notification.text }}</p>
+</div>
+{% endif %}
+
   <div class="page-header">
       <h2>
       <a style="text-decoration: none; color:black" href="{% url 'projects' %}" class="icon-home"></a>

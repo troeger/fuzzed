@@ -28,6 +28,9 @@ class Project(models.Model):
   created   = models.DateTimeField(auto_now_add=True, editable=False)
   deleted   = models.BooleanField(default=False)
   
+  def __unicode__(self):
+    return unicode(self.name)
+
   def to_dict(self):
       """
       Method: to_dict
