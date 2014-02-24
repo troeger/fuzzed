@@ -160,7 +160,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             this._super();
             this._editor = editor;
             this._chartContainer = this.container.find('.chart');
-            this._gridContainer  = this.container.find('.grid');
+            this._gridContainer  = this.container.find('#gridContainer');
         },
 
         /**
@@ -246,19 +246,22 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         _setupResizing: function() {
-            var gridContainer = jQuery('#grid_container');
+            var gridContainer = jQuery('#table_container');
+            
+            console.log('container-width: ' + this.container.width())
             
             this.container.resizable({
-                minHeight: this.container.height(), // use current height as minimum
+                minHeight: this.container.outerHeight(), // use current height as minimum
+                minWidth : this.container.outerWidth(),
                 resize: function(event, ui) {
                     if (this._chart != null) {
                         // fit all available space with chart
                         
-                        console.log('container-height: ' + this.container.height());
-                        console.log('grid-height: ' + gridContainer.height());
+                        //console.log('container-height: ' + this.container.height());
+                        //console.log('grid-height: ' + gridContainer.height());
                         
                         this._chartContainer.height(this.container.height() - gridContainer.prop('scrollHeight'));
-
+                        
                         this._chart.setSize(
                             this._chartContainer.width(),
                             this._chartContainer.height(),
@@ -341,10 +344,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 if (_.size(chartData) != 0) {
                     this._displayResultWithHighcharts(chartData, data['decompositionNumber']);
                 }
-                //this._displayResultWithSlickGrid(tableData);
+               
                 this._displayResultWithDataTables(tableDefinitions);
-
-                this._setupResizing();
+                
+                //this._setupResizing();
             } else {
                 // close menu again if there are no results
                 this.hide();
@@ -580,8 +583,9 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             // clear container
             this._gridContainer.empty();
             
-            var _this = this;  
-            this._grid = jQuery('#grid').dataTable({
+            var _this = this;
+              
+            this._grid = jQuery('#results_table').dataTable({
                             "bProcessing":   true,
                             "bFilter":       false,
                             "bServerSide":   true,
@@ -592,16 +596,17 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                                                     var configID = aData['id']
                                                     _this._highlightConfiguration(configID);
                                                     })
-                                             }
+                                             },
+                            "fnInitComplete": function(oSettings, json) {
+                                  _this._setupResizing();
+                                  
+                                }
                             });
                                 
             this._grid.on( 'mouseleave', 'tr', function () {
                 _this._unhighlightConfiguration();
             });
             
-            //this._grid.css("width", "100%");
-            
-            //this._gridContainer.append(this._grid);    
         },
         
         /**
@@ -793,9 +798,9 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         <span class="menu-close"></span>\
                     </div>\
                     <div class="chart"></div>\
-                    <div id="grid_container">\
-                        <table id="grid"></table>\
-                    </div>\
+                       <div id="table_container" style="width:100%">\
+                            <table id="results_table" class="table table-hover" style="width:100% !important"></table>\
+                       </div>\
                     </div>'
             )
             .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
