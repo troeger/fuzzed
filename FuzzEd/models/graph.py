@@ -100,6 +100,7 @@ class Graph(models.Model):
 
     def to_bool_term(self):
         root = self.nodes.get(kind__exact = 'topEvent')
+        return root.to_bool_term()
 
     def to_graphml(self):
         missionTime = self.top_node().get_property('missionTime')
