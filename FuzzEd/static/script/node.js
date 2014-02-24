@@ -231,7 +231,7 @@ function(Property, Mirror, Canvas, Class) {
          */
         _setupConnectionHandle: function() {
             if (this.numberOfOutgoingConnections != 0) {
-                this._connectionHandle = jQuery('<i class="icon-plus icon-justify"></i>')
+                this._connectionHandle = jQuery('<i class="fa fa-plus"></i>')
                     .addClass(this.config.Classes.NODE_HALO_CONNECT + ' ' + this.config.Classes.NO_PRINT)
                     .css({
                         'top':  this._nodeImage.yCenter + this._nodeImage.outerHeight(true) / 2,

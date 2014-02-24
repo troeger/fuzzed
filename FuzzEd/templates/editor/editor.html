@@ -36,14 +36,14 @@
 {% block nav_center %}
 <ul class="nav navbar-nav" style="float: left;">
     <li id="FuzzEdProgressIndicatorSingle" style="display: none;">
-        <a><i class="icon-progress"></i>&nbsp;<span></span></a>
+        <a><i class="fa fa-progress"></i>&nbsp;<span></span></a>
     </li>
     <li id="FuzzEdProgressIndicatorDropdown" class="dropdown" style="display: none;">
         <a data-toggle="dropdown" href="#">
-            <i class="icon-progress"></i>
+            <i class="fa fa-progress"></i>
             <span>Working…</span>
             <span class="badge"></span>
-            <i class="icon-caret-down"></i>
+            <i class="fa fa-caret-down"></i>
         </a>
         <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
             {# multiple progress indicators will be inserted here #}
@@ -54,22 +54,32 @@
 
 {% block menu_right %}
 <li id="FuzzEdNavbarTools"></li>
-<li><a href="{% url 'dashboard' project.pk %}"><i class="icon-folder-open icon-white"></i> {{ project.name }} </a></li>
+<li><a href="{% url 'dashboard' project.pk %}"><i class="fa fa-folder-open"></i> {{ project.name }} </a></li>
 <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        <i class="icon-download icon-white"></i> Edit <b class="caret"></b>
+        <i class="fa fa-pencil"></i> Edit <b class="caret"></b>
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
-            <li><a href="#" id="FuzzEdActionCut">Cut</a></li>
-            <li><a href="#" id="FuzzEdActionCopy">Copy</a></li>
-            <li><a href="#" id="FuzzEdActionPaste">Paste</a></li>
-            <li><a href="#" id="FuzzEdActionDelete">Delete</a></li>
-            <li><a href="#" id="FuzzEdActionSelectAll">Select All</a></li>
+            <li><a href="#" id="FuzzEdActionCut">
+                <i class=" fa fa-cut"></i> Cut <span class="pull-right">Ctrl+X</span>
+            </a></li>
+            <li><a href="#" id="FuzzEdActionCopy">
+                <i class="fa fa-copy"></i> Copy <span class="pull-right">Ctrl+C</span>
+            </a></li>
+            <li><a href="#" id="FuzzEdActionPaste">
+                <i class="fa fa-paste"></i> Paste <span class="pull-right">Ctrl+V</span>
+            </a></li>
+            <li><a href="#" id="FuzzEdActionDelete">
+                <i class="fa fa-times"></i> Delete <span class="pull-right">DEL</span>
+            </a></li>
+            <li><a href="#" id="FuzzEdActionSelectAll">
+                <i class="fa fa-file-text"></i> Select All <span class="pull-right">Ctrl+A</span>
+            </a></li>
     </ul>
 </li>
 <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        <i class="icon-download icon-white"></i> Export <b class="caret"></b>
+        <i class="fa fa-download"></i> Export <b class="caret"></b>
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
         {% if graph.kind != 'rbd'%}
@@ -84,7 +94,7 @@
 {% if graph.kind != 'rbd'%}
 <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        <i class="icon-cog icon-white"></i> Compute <b class="caret"></b>
+        <i class="fa fa-cog"></i> Compute <b class="caret"></b>
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
 <!--        <li><a href="#" id="FuzzEdActionCutSets">Cut sets</a></li>-->
@@ -95,7 +105,7 @@
 {% endif %}
 <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        <i class="icon-eye-open icon-white"></i> View <b class="caret"></b>
+        <i class="fa fa-eye-open"></i> View <b class="caret"></b>
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
         <li><a href="#" id="FuzzEdActionGridToggle">Toogle grid</a></li>
@@ -109,7 +119,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3><i class="icon-warning-sign"></i> Error...</h3>
+                    <h3><i class="fa fa-warning-sign"></i> Error...</h3>
                 </div>
                 <div class="modal-body">
                     <p>

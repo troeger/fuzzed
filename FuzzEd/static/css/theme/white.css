@@ -219,7 +219,7 @@ table {
   img {
     max-width: 100% !important;
   }
-  @page {
+  @page  {
     margin: 2cm .5cm;
   }
   p,
@@ -499,8 +499,10 @@ dd {
 .dl-horizontal dd:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .dl-horizontal dd:after {
   clear: both;
@@ -509,8 +511,10 @@ dd {
 .dl-horizontal dd:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .dl-horizontal dd:after {
   clear: both;
@@ -621,8 +625,10 @@ pre code {
 .container:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .container:after {
   clear: both;
@@ -631,8 +637,10 @@ pre code {
 .container:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .container:after {
   clear: both;
@@ -641,8 +649,10 @@ pre code {
 .row:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .row:after {
   clear: both;
@@ -651,8 +661,10 @@ pre code {
 .row:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .row:after {
   clear: both;
@@ -1155,6 +1167,7 @@ input[type="checkbox"] {
   margin: 4px 0 0;
   margin-top: 1px \9;
   /* IE8-9 */
+
   line-height: normal;
 }
 input[type="file"] {
@@ -1459,8 +1472,10 @@ select.input-small {
 .form-horizontal .form-group:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .form-horizontal .form-group:after {
   clear: both;
@@ -1469,8 +1484,10 @@ select.input-small {
 .form-horizontal .form-group:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .form-horizontal .form-group:after {
   clear: both;
@@ -1807,7 +1824,7 @@ input[type="button"].btn-block {
   z-index: 1000;
   display: none;
   float: left;
-  min-width: 160px;
+  min-width: 200px;
   padding: 5px 0;
   margin: 2px 0 0;
   list-style: none;
@@ -1849,6 +1866,9 @@ input[type="button"].btn-block {
   background-image: linear-gradient(to bottom, #e5f2ff 0%, #cce5ff 100%);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffe5f2ff', endColorstr='#ffcce5ff', GradientType=0);
+}
+.dropdown-menu > li > a > span {
+    color: #999999;
 }
 .dropdown-menu > .active > a,
 .dropdown-menu > .active > a:hover,
@@ -2110,8 +2130,10 @@ button.close {
 .nav:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .nav:after {
   clear: both;
@@ -2120,8 +2142,10 @@ button.close {
 .nav:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .nav:after {
   clear: both;
@@ -2266,8 +2290,10 @@ button.close {
 .tabbable:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .tabbable:after {
   clear: both;
@@ -2276,8 +2302,10 @@ button.close {
 .tabbable:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .tabbable:after {
   clear: both;
@@ -2316,8 +2344,10 @@ button.close {
 .navbar:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .navbar:after {
   clear: both;
@@ -2326,8 +2356,10 @@ button.close {
 .navbar:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .navbar:after {
   clear: both;
@@ -2619,8 +2651,10 @@ button.close {
 .btn-toolbar:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .btn-toolbar:after {
   clear: both;
@@ -2629,8 +2663,10 @@ button.close {
 .btn-toolbar:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .btn-toolbar:after {
   clear: both;
@@ -2839,8 +2875,10 @@ button.close {
 .pager:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .pager:after {
   clear: both;
@@ -2849,8 +2887,10 @@ button.close {
 .pager:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .pager:after {
   clear: both;
@@ -2978,8 +3018,10 @@ button.close {
 .modal-footer:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .modal-footer:after {
   clear: both;
@@ -2988,8 +3030,10 @@ button.close {
 .modal-footer:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .modal-footer:after {
   clear: both;
@@ -3788,8 +3832,10 @@ a.list-group-item.active > .badge,
 .clearfix:after {
   content: " ";
   /* 1 */
+
   display: table;
   /* 2 */
+
 }
 .clearfix:after {
   clear: both;
@@ -4120,6 +4166,7 @@ i.icon-layout-tree:hover {
 .jsplumb-connector.highlighted {
   z-index: 100;
   /* above selection, below mirror */
+
 }
 .jsplumb-connector.highlighted path {
   stroke: #007fff;
@@ -4281,6 +4328,7 @@ i.icon-layout-tree:hover {
   text-align: center;
   z-index: 100;
   /* above connection */
+
 }
 .fuzzed-node.highlighted path,
 .fuzzed-node.highlighted rect,
@@ -4346,12 +4394,14 @@ i.icon-layout-tree:hover {
 }
 .fuzzed-node .fuzzed-node-halo-connect {
   /* XXX: this is a temporary solution */
+
   background-color: #007fff;
   color: white;
   position: absolute;
   visibility: hidden;
   z-index: 150;
   /* above image, TODO: let halo care about that */
+
   cursor: move;
   -webkit-border-radius: 8px;
   -moz-border-radius: 8px;
@@ -4377,6 +4427,7 @@ i.icon-layout-tree:hover {
   margin-bottom: -3px;
   z-index: 110;
   /* above connection */
+
 }
 .fuzzed-node .fuzzed-mirror.fuzzed-mirror-italic {
   font-style: italic;
@@ -4520,6 +4571,7 @@ i.icon-layout-tree:hover {
   left: 35%;
   z-index: 9999;
   /*above all*/
+
 }
 #FuzzEdAlertContainer .alert {
   margin-bottom: 10px;

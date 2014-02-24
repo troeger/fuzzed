@@ -46,25 +46,25 @@
           <li><a href="{% url 'dashboard' project.pk %}">{{ project.name }}</a></li>
     {% endfor %}
     <li class="divider"></li>
-    <li><a href="{% url 'projects' %}"><i class="icon-home icon-white"></i> Project Overview</a></li>
+    <li><a href="{% url 'projects' %}"><i class="fa fa-home"></i> Project Overview</a></li>
   </ul>
 </li>
-<li><a href="/settings"><i class="icon-user icon-white"></i> Account </a></li>
+<li><a href="/settings"><i class="fa fa-user"></i> Account </a></li>
 {% endblock %}
 
 {% block content %}
 <div class="page-header">
     <h2>
-      <a style="text-decoration: none; color:black" href="{% url 'projects' %}" class="icon-home"></a>
-      <i class="icon-arrow-right"></i>
-      <i class="icon-folder-open"></i>
+      <a style="text-decoration: none; color:black" href="{% url 'projects' %}" class="fa fa-home"></a>
+      <i class="fa fa-arrow-right"></i>
+      <i class="fa fa-folder-open"></i>
       {{ project.name }}
     </h2>
 </div>
 
 <div class="btn-group pull-right">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-        <i class="icon-file"></i>
+        <i class="fa fa-file"></i>
         New Graph
         <span class="caret"></span>
     </button>
@@ -98,7 +98,7 @@
                     <td>{{ forloop.counter }}</td>
                     <td>
                         {% if graph.read_only %}
-                            <i class="icon-lock"></i>
+                            <i class="fa fa-lock"></i>
                         {% endif %}
                     </td>
                     <td>
@@ -111,19 +111,19 @@
                             {% csrf_token %}
                             <input type="hidden" class="delete_flag">
                             <button type="submit" name="edit" value="edit" class="btn btn-default btn-small">
-                                <i class="icon-wrench"></i>
+                                <i class="fa fa-wrench"></i>
                                 Settings
                             </button>
                             <button type="submit" name="copy" value="copy" class="btn btn-default btn-small">
-                                <i class="icon-plus-sign"></i>
+                                <i class="fa fa-plus-circle"></i>
                                 Copy
                             </button>
                             <button type="submit" name="snapshot" value="snapshot" class="btn btn-default btn-small">
-                                <i class="icon-camera"></i>
+                                <i class="fa fa-camera"></i>
                                 Snapshot
                             </button>
                             <button type="button" class="btn btn-danger btn-small require-dialog">
-                                <i class="icon-white icon-trash"></i>
+                                <i class="fa fa-trash"></i>
                                 Delete
                             </button>
                         </form>
@@ -147,7 +147,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" id="confirm_delete">
-                    <i class="icon-white icon-trash"></i>
+                    <i class="fa fa-trash"></i>
                     Delete
                 </button>
                 <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">
