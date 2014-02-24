@@ -250,7 +250,6 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             
             this.container.resizable({
                 minHeight: this.container.height(), // use current height as minimum
-                maxHeight: this.container.height(),
                 resize: function(event, ui) {
                     if (this._chart != null) {
                         // fit all available space with chart
@@ -258,7 +257,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         console.log('container-height: ' + this.container.height());
                         console.log('grid-height: ' + gridContainer.height());
                         
-                        this._chartContainer.height(this.container.height() - gridContainer.outerHeight());
+                        this._chartContainer.height(this.container.height() - gridContainer.prop('scrollHeight'));
 
                         this._chart.setSize(
                             this._chartContainer.width(),
