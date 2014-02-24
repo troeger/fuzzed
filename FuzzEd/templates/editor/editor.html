@@ -78,6 +78,7 @@
             <li><a href="#" id="FuzzEdActionExportPDF">as PDF Document</a></li>
             <li><a href="#" id="FuzzEdActionExportEPS">as EPS Image</a></li>
         {% endif %}
+        <li><a href="{% url 'graph_download' graph.pk %}?format=graphml">as GraphML File</a></li>
         <li><a href="{% url 'graph_download' graph.pk %}?format=json">as JSON File</a></li>
     </ul>
 </li>

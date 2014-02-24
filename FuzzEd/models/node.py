@@ -126,17 +126,6 @@ class Node(models.Model):
             except KeyError:
                 return self.kind
 
-    def to_json(self):
-        """
-        Method: to_json
-        
-        Serializes the values of this node into JSON notation.
-
-        Returns:
-         {str} the node in JSON representation
-        """
-        return json.dumps(self.to_dict())
-
     def to_dict(self):
         """
         Method: to_dict
@@ -155,6 +144,63 @@ class Node(models.Model):
             'outgoing':   [edge.client_id for edge in self.outgoing.filter(deleted=False)],
             'incoming':   [edge.client_id for edge in self.incoming.filter(deleted=False)]
         }
+
+    def to_graphml(self):
+        """
+        Method: to_graphml
+
+        Serializes this node instance into its graphml representation. Recursively serializes also its attributes.
+
+        Returns:
+         {str} this node instance as graphml
+        """
+
+        return ''.join([
+            '        <node id="%s">\n'
+            '            <data key="kind">%s</data>\n'
+            '            <data key="x">%d</data>\n'
+            '            <data key="y">%d</data>\n' % (self.client_id, self.kind, self.x, self.y,)] +
+                         self.properties_to_graphml() +
+           ['        </node>\n'
+        ])
+
+    def properties_to_graphml(self):
+        properties_notation = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties']
+        graphml = []
+        properties = self.properties.filter(deleted=False)
+
+        for property in properties:
+            key, value = property.key, property.value
+            if key == 'missionTime': continue
+
+            property_notation = properties_notation[property.key]
+            property_kind     = property_notation['kind']
+
+            if property_kind == 'compound':
+                part_kind = property_notation['parts'][value[0]]['partName']
+                graphml.append(self.graphml_data_key(key + 'Kind', part_kind))
+                graphml.append(self.graphml_data_key(key,          value[1]))
+            elif property_kind == 'epsilon':
+                graphml.append(self.graphml_data_key(key,             value[0]))
+                graphml.append(self.graphml_data_key(key + 'Epsilon', value[1]))
+            else:
+                graphml.append(self.graphml_data_key(key, value))
+
+        return graphml
+
+    def graphml_data_key(self, key, value):
+        return '            <data key="%s">%s</data>\n' % (key, value,)
+
+    def to_json(self):
+        """
+        Method: to_json
+
+        Serializes the values of this node into JSON notation.
+
+        Returns:
+         {str} the node in JSON representation
+        """
+        return json.dumps(self.to_dict())
 
     def to_bool_term(self):
         edges = self.outgoing.filter(deleted=False).all()
@@ -471,9 +517,9 @@ class Node(models.Model):
             return self.properties.get(key=key).value
         except ObjectDoesNotExist:
             try:
-                prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]                
+                prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
                 if prop is None:
-                    logger.warning("Notation configuration has empty default for node property "+key)
+                    logger.warning('Notation configuration has empty default for node property ' + key)
                     result = default
                 else:
                     result = prop['default']

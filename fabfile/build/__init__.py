@@ -142,8 +142,13 @@ def generate_graphml_keys(notations):
 
     for notation in notations:
         notation_kind = notation['kind']
-        all_keys      = [generate_key('kind', 'string', 'node')]
         properties    = set()
+        all_keys      = [
+            generate_key('id', 'string', '0'),
+            generate_key('kind', 'string', 'node'),
+            generate_key('x', 'long', '0'),
+            generate_key('y', 'long', '0')
+        ]
 
         for node_kind, node in notation['nodes'].items():
             for property_name, propertie in node.get('properties', {}).items():
@@ -199,9 +204,9 @@ def generate_graphml_keys(notations):
 
 def generate_key(name, kind, default, for_what='node'):
     return \
-        '<key id="%s" for="%s" attr.name="%s" attr.type="%s">\n' \
-        '   <default>%s</default>\n' \
-        '</key>' % (name, for_what, name, kind, default,)
+        '        <key id="%s" for="%s" attr.name="%s" attr.type="%s">\n' \
+        '            <default>%s</default>\n' \
+        '        </key>' % (name, for_what, name, kind, default,)
 
 @task
 def shapes():

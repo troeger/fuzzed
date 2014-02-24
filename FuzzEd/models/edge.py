@@ -31,17 +31,6 @@ class Edge(models.Model):
         prefix = '[DELETED] ' if self.deleted else ''
         return  unicode('%s%s -> %s' % (prefix, str(self.source), str(self.target)))
 
-    def to_json(self):
-        """
-        Method: to_json
-        
-        Serializes the values of the edge into a python dictionary that is JSON conform.
-
-        Returns:
-         {dict} the edge as dictionary
-        """
-        return json.dumps(self.to_dict())
-
     def to_dict(self):
         """
         Method: to_dict
@@ -57,3 +46,25 @@ class Edge(models.Model):
             'source': self.source.client_id,
             'target': self.target.client_id
         }
+
+    def to_graphml(self):
+        """
+        Method: to_graphml
+
+        Serializes this edge instance to its graphml representation
+
+        Returns:
+         {str} the edge in graphml
+        """
+        return '       <edge source="%s" target="%s" />\n' % (self.source.client_id, self.target.client_id,)
+
+    def to_json(self):
+        """
+        Method: to_json
+
+        Serializes the values of the edge into a python dictionary that is JSON conform.
+
+        Returns:
+         {dict} the edge as dictionary
+        """
+        return json.dumps(self.to_dict())
