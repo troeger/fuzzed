@@ -29,22 +29,38 @@
             project_to_delete = null;
         };
 
+        var dismiss_notification = function(event) {
+            jQuery.post('/api/notifications/{{ notification.pk }}/dismiss');
+        };
+
         jQuery(document).ready(function() {
             jQuery('button.require-dialog').click(delete_clicked);
             jQuery('#confirm_delete').click(delete_confirmed);
+            jQuery('#notification{{ notification.pk }}').bind('closed.bs.alert', dismiss_notification);
         });
     });
 </script>
 {% endblock %}
 
 {% block menu_right %}
-<li><a href="/settings"><i class="icon-user icon-white"></i> Account </a></li>
+<li><a href="/settings"><i class="fa fa-user"></i> Account </a></li>
 {% endblock %}
 
 {% block content %}
+
+
+{% if notification %}
+<div id="notification{{ notification.pk }}" class="panel panel-default">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <h3 class="panel-title">{{ notification.title }}</h3>
+      <p>{{ notification.text }}</p>
+</div>
+{% endif %}
+
   <div class="page-header">
       <h2>
-        Project Overview
+      <a style="text-decoration: none; color:black" href="{% url 'projects' %}" class="fa fa-home"></a>
+        Projects
       </h2>
   </div>
   
@@ -52,7 +68,7 @@
       {% csrf_token %}
       <div class="btn-group pull-right">
           <button type="submit" name="kind" value="faulttree" class="btn btn-default">
-              <i class="icon-folder-close"></i>
+              <i class="fa fa-folder-close"></i>
               New Project
           </button>
       </div>
@@ -73,7 +89,7 @@
           <tbody>
               {% for project in projects %} 
                   <tr onclick="document.location = '{% url 'dashboard' project.pk %}';">
-                      <td><i class="icon-folder-close icon-large"></i></td>
+                      <td><i class="fa fa-folder fa-lg"></i></td>
                       <td>
                           <strong class="project_name">{{ project.name }}</strong>
                       </td>
@@ -83,11 +99,11 @@
                               {% csrf_token %}
                               <input type="hidden" class="delete_flag">
                               <button type="submit" name="edit" value="edit" class="btn btn-default btn-small">
-                                  <i class="icon-wrench"></i>
+                                  <i class="fa fa-wrench"></i>
                                   Settings
                               </button>
                               <button type="button" class="btn btn-danger btn-small require-dialog">
-                                  <i class="icon-white icon-trash"></i>
+                                  <i class="fa fa-trash"></i>
                                   Delete
                               </button>
                           </form>
@@ -111,7 +127,7 @@
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn btn-danger" id="confirm_delete">
-                      <i class="icon-white icon-trash"></i>
+                      <i class="fa fa-trash"></i>
                       Delete
                   </button>
                   <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">
