@@ -798,10 +798,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         <span class="menu-close"></span>\
                     </div>\
                     <div class="chart"></div>\
-                       <div id="table_container" style="width:100%">\
-                            <table id="results_table" class="table table-hover" style="width:100% !important"></table>\
-                       </div>\
-                    </div>'
+                    <div id="table_container" class="content">\
+                         <table id="results_table" class="table table-hover content"></table>\
+                    </div>\
+                </div>'
             )
             .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
         },
