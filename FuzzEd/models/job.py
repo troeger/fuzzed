@@ -76,8 +76,11 @@ class Job(models.Model):
 
             assert(self.result)
             result_data = str(self.result)
+            logger.debug("Rendering result data for frontend:")
+            logger.debug(result_data)
             topId = self.graph.top_node().client_id
 
+            # Parse analysis result XML file
             if (self.kind == Job.TOP_EVENT_JOB):
                 doc = xml_analysis.CreateFromDocument(result_data)
             elif (self.kind == Job.SIMULATION_JOB):
@@ -85,9 +88,10 @@ class Job(models.Model):
             else:
                 assert(False)
 
-            # Check global issues that are independent from the particular configuration
-            # Since the frontend always wants an elementID, we stitch them
-            # to the TOP event for the moment (check issue #181)
+            # Check global (problem) issues that are independent from the particular configuration
+            # and were sent as part of the analysis result
+            # Since the frontend always wants error messages as part of a graph element, 
+            # we attach them to the TOP event for the moment (check issue #181)
             # TODO: This will break for RBD analysis, since there is no top event
             if hasattr(doc, 'issue'):
                 graphErrors = []
@@ -106,7 +110,8 @@ class Job(models.Model):
 
             results = doc.result
 
-            # There is no frontend support for some (not all) valid configuration results in the analysis result
+            # There is no frontend support for the situation that some (not all) configurations are valid,
+            # instead, it has only global validity support
             # We therefore compute our own valid flag
             if len(results)==0:
                 isValid = False
@@ -116,7 +121,7 @@ class Job(models.Model):
                         isValid = False
                         break
 
-            # Fetch issues hidden in maybe existing results
+            # Fetch issues hidden inside the analysis results
             for result in results:
                 if hasattr(result, 'issue'):
                     for issue in result.issue:
@@ -127,11 +132,13 @@ class Job(models.Model):
 
             #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
             if hasattr(results[0], 'decompositionNumber'):
-                json_result['decompositionNumber'] = str(results[0].decompositionNumber)
+                decomp_number = int(results[0].decompositionNumber)
+            else:
+                decomp_number = 1
             if hasattr(results[0], 'timestamp'):
                 json_result['timestamp'] = results[0].timestamp
 
-            # gather information about the configurations
+            # collect information about the identified configurations
             # TODO: If results are marked as invalid, show only the configurations
             json_configs = []
             for confignum, result in enumerate(results):
@@ -141,20 +148,39 @@ class Job(models.Model):
                 current_config['id'] = '#%s' % confignum
                 current_config['costs'] = result.configuration.costs if hasattr(result.configuration, 'costs') else None
 
-                # prepare graph rendering data for this configuration
-                json_points = []
+                # Generate frontend rendering data for this particular configuration.
+                # JSON points is the diagram data that the frontend just draws without interpretation.
+                # The X axis represents the unreliability value (== probability of failure), the Y axis the membership
+                # function probability value for the given unreliability value.
+                # Membership functions are triangles, cut in horizontal stripes. The analysis delivers the result function
+                # as points on a triangle. One alphacut is represented as the points were the upper border of the alphacut
+                # stripe is crossing the membership triangle. The lowest alphacut (0) has its upper border directly on the
+                # X axis. The last alphacut has its upper border crossing the tip of the triangle. The two points were
+                # the alphacut border touches the triangle ara called "[lower, upper]", the number of the alphacut is the "key".
+                # For this reason, "lower" and "upper" are used as X coordinates, while the key is used as "Y" coordinate.
+                points = []
                 if hasattr(result, 'probability') and self.kind == Job.TOP_EVENT_JOB and result.probability is not None:
+                    # This was an analysis job that resulted in fuzzy probability values, one per alpha-cut
+                    # Crisp probabilities are just a special case of this
+                    logging.debug("Probability: "+str(result.probability))
+                    alphacut_count = len(result.probability.alphaCuts)  # we don't believe the delivered decomp_number
                     for alpha_cut in result.probability.alphaCuts:
-                        json_points.append([alpha_cut.value_.lowerBound, alpha_cut.key])
-                        json_points.append([alpha_cut.value_.upperBound, alpha_cut.key])
-                    current_config['points'] = json_points
+                        y_val = alpha_cut.key+1 / alphacut_count        # Alphacut indexes start at zero
+                        assert(0 <= y_val <= 1)
+                        points.append([alpha_cut.value_.lowerBound, y_val])
+                        # If it is a crisp probability, then the triangle collapses to a single dot at mu(1),
+                        # but a line being drawn looks nicer
+                        if alpha_cut.value_.upperBound != alpha_cut.value_.lowerBound:      
+                            points.append([alpha_cut.value_.upperBound, y_val])
+                        else:
+                            points.append([alpha_cut.value_.lowerBound, 0])
+                    current_config['points'] = points
 
-                if (self.kind == Job.TOP_EVENT_JOB and len(json_points) > 0):
-                    print min(json_points, key=lambda json_points: json_points[0])
-                    current_config['min'] = min(json_points, key=lambda json_points: json_points[0])[0]
-                    #TODO: Not clear if multiple values for alpha cut = 1 are anyway a mistake
-                    current_config['peak'] = [x for x,y in json_points if float(y)==float(1)][0]
-                    current_config['max'] = max(json_points, key=lambda json_points: json_points[0])[0]
+                # Compute some additional statistics for the front-end, based on the gathered probabilities
+                if (self.kind == Job.TOP_EVENT_JOB and len(points) > 0):
+                    current_config['min']  = min(points, key=lambda point: point[0])[0]          # left triangle border position
+                    current_config['max']  = max(points, key=lambda point: point[0])[0]          # right triangle border position
+                    current_config['peak'] = max(points, key=lambda point: point[1])[0]          # triangle tip position
                     current_config['ratio'] = float(current_config['peak'] * current_config['costs']) if current_config['costs'] else None
                 elif (self.kind == Job.SIMULATION_JOB):
                     reliability = float(result.reliability)
@@ -204,6 +230,8 @@ class Job(models.Model):
             json_result['errors']         = errors
             json_result['warnings']       = warnings
             json_result['validResult']    = str(isValid)
+            json_result['decompositionNumber'] = str(decomp_number)
+
             return_data                   = json.dumps(json_result)
             logger.debug('Returning result JSON to frontend:\n' + return_data)
 
