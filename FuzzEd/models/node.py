@@ -248,7 +248,7 @@ class Node(models.Model):
                 if isinstance(propdetails[prop],dict):          # Some properties do not have a config dict in notations, such as optional=None
                     kind = propdetails[prop]['kind']
                 else:
-                    logger.debug("Property %s in %s has no config dictionary"%(prop, self.kind))
+                    logger.debug("Property '%s' in %s has no config dictionary"%(prop, self.kind))
                     kind="text"
                 if val != None:
                     if kind == "range":
@@ -259,15 +259,20 @@ class Node(models.Model):
                         active_part = val[0]    # Compounds are unions, the first number tells us the active part defintion
                         partkind = propdetails[prop]['parts'][active_part]['kind']
                         format =   propdetails[prop]['parts'][active_part]['mirror']['format']
-                        format = format.replace(u"\xb1","$\\pm$")    # Special unicodes used in format strings, such as \xb1
+                        logger.debug("Property '%s' with kind '%s' has part_kind '%s' with format '%s' for value '%s'"%(prop, kind, partkind, format, str(val)))
+                        format = format.replace(u"\xb1","$\\pm$")    # Special unicodes used in format strings must be replaced by their Latex counterpart
+                        format = format.replace(u"\u03bb","$\\lambda$")                        
                         if partkind == 'epsilon': 
                             val = format.replace("{{$0}}",str(val[1][0])).replace("{{$1}}",str(val[1][1]))
                         elif partkind == 'choice':
                             val = format.replace("{{$0}}",str(val[1][0]))
+                        elif partkind == 'numeric':
+                            val = format.replace("{{$0}}",str(val[1]))                            
                     elif propdetails[prop].has_key('mirror'):
                         if propdetails[prop]['mirror'].has_key('format'):
                             val = propdetails[prop]['mirror']['format'].replace("{{$0}}",str(val))
                         else:
+                            logger.debug("Property '%s' has no specified mirror format"%prop)
                             val = str(val)
                     else:
                         # Property has no special type and no mirror definition, so it shouldn't be shown
