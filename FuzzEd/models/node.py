@@ -389,6 +389,42 @@ class Node(models.Model):
             n=Node(graph=self.graph)
             n.load_xml(child, self)
 
+    def get_xml_probability(self):
+        """
+        Returns an XML wrapper object for the probability value being stored in frontend encoding.
+        """
+        probability = self.get_property('probability', None)
+        logger.debug(probability)
+        # Probability is a 2-tuple, were the first value is a type indicator and the second the value
+        if probability[0] == 0:
+            # Crisp probability
+            if self.graph.kind == "faulttree":
+                point = probability[1]
+                return xml_faulttree.CrispProbability(value_=point)
+            elif self.graph.kind == "fuzztree":
+                point = probability[1][0]
+                return xml_fuzztree.CrispProbability(value_=point)               
+            else:
+                raise ValueError('Cannot handle crisp probability value for this graph type')
+        elif probability[0] == 1:
+            # Failure rate
+            if self.graph.kind == "faulttree":
+                return xml_faulttree.FailureRate(value_=probability[1])
+            elif self.graph.kind == "fuzztree":
+                return xml_fuzztree.FailureRate(value_=probability[1])
+            else:
+                raise ValueError('Cannot handle failure rate value for this graph type')                
+        elif probability[0] == 2:
+            # Fuzzy probability
+            point = probability[1][0]
+            alpha = probability[1][1]
+            if self.graph.kind == "fuzztree":
+                return xml_fuzztree.TriangularFuzzyInterval(a=point - alpha, b1=point, b2=point, c=point + alpha)
+            else:
+                raise ValueError('Cannot handle fuzzy probability value for this graph type')                
+        else:
+            raise ValueError('Cannot handle probability value: "%s"' % probability)
+
     def to_xml(self, xmltype=None):
         """
         Method: to_xml
@@ -431,24 +467,7 @@ class Node(models.Model):
 
             # determine fuzzy or crisp probability, set it accordingly
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
-                probability = self.get_property('probability', None)
-                # Probability is a 2-tuple, were the first value is a type indicator and the second the value
-                if probability[0] == 0:
-                    # Crisp probability
-                    point = probability[1][0]
-                    properties['probability'] = xml_fuzztree.CrispProbability(value_=point)
-                elif probability[0] == 1:
-                    # Failure rate
-                    properties['probability'] = xml_fuzztree.FailureRate(value_=probability[1])
-                elif probability[0] == 2:
-                    # Fuzzy probability
-                    point = probability[1][0]
-                    alpha = probability[1][1]
-                    properties['probability'] = xml_fuzztree.TriangularFuzzyInterval(
-                            a=point - alpha, b1=point, b2=point, c=point + alpha
-                        )
-                else:
-                    raise ValueError('Cannot handle probability value: "%s"' % probability)
+                properties['probability'] = self.get_xml_probability()
                 # nodes that have a probability also have costs in FuzzTrees
                 properties['costs'] = self.get_property('cost', 0)
 
@@ -472,8 +491,7 @@ class Node(models.Model):
 
             # determine fuzzy or crisp probability, set it accordingly
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
-                probability_property = self.get_property('probability', None)
-                properties['probability'] = xml_faulttree.CrispProbability(value_=probability_property[1])
+                properties['probability'] = self.get_xml_probability()
 
             if self.kind == 'fdepGate':
                 properties['triggeredEvents'] = [parent.client_id for parent in self.parents()]

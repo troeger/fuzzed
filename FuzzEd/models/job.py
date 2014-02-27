@@ -77,7 +77,6 @@ class Job(models.Model):
             assert(self.result)
             result_data = str(self.result)
             logger.debug("Rendering result data for frontend:")
-            logger.debug(result_data)
             topId = self.graph.top_node().client_id
 
             # Parse analysis result XML file
