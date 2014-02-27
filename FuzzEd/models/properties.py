@@ -29,17 +29,6 @@ class Property(models.Model):
     def __unicode__(self):
         return '%s%s: %s' % ('[DELETED] ' if self.deleted else '', self.key, self.value)
 
-    def to_tuple(self):
-        """
-        Method: to_tuple
-        
-        Converts the property instance to a native tuple.
-
-        Returns:
-         {tuple(str, str)} the property as tuple
-        """
-        return (self.key, self.value)
-
     def to_dict(self):
         """
         Method: to_dict
@@ -50,3 +39,14 @@ class Property(models.Model):
          {dict} the property as dictionary
         """
         return {self.key: self.value}
+
+    def to_tuple(self):
+        """
+        Method: to_tuple
+
+        Converts the property instance to a native tuple.
+
+        Returns:
+         {tuple(str, str)} the property as tuple
+        """
+        return (self.key, self.value)

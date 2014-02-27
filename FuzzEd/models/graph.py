@@ -102,6 +102,28 @@ class Graph(models.Model):
         root = self.nodes.get(kind__exact = 'topEvent')
         return root.to_bool_term()
 
+    def to_graphml(self):
+        missionTime = self.top_node().get_property('missionTime')
+        missionData = '        <data key="missionTime">%d</data>\n' % (missionTime,) if self.kind in {'faulttree', 'fuzztree'} else ''
+
+        return ''.join([
+            '<?xml version="1.0" encoding="utf-8"?>\n'
+            '<graphml xmlns="http://graphml.graphdrawing.org/xmlns"\n'
+            '         xmlns="http://graphml.graphdrawing.org/xmlns"\n'
+            '         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns\n'
+            '           http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"\n'
+            '>\n'
+            '    <graph id="graph" edgedefault="directed">\n',
+                 notations.graphml_keys[self.kind],
+                 '\n',
+                 missionData] +
+                 [node.to_graphml() for node in self.nodes.filter(deleted=False)] +
+                 [edge.to_graphml() for edge in self.edges.filter(deleted=False)] +
+
+           ['    <graph>\n'
+            '<graphml>\n'
+        ])
+
     def to_tikz(self):
         """
         Method: to_tikz

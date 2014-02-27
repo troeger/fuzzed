@@ -144,6 +144,9 @@ def graph_download(request, graph_id):
     if export_format == 'xml':
         response.content = graph.to_xml()
         response['Content-Type'] = 'application/xml'
+    elif export_format == 'graphml':
+        response.content = graph.to_graphml()
+        response['Content=Type'] = 'application/xml'
     elif export_format == 'json':
         response.content = graph.to_json()
         response['Content-Type'] = 'application/javascript'

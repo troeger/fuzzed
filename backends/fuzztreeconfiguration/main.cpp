@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	*logFileStream << "Configuration errors for " << inFile << std::endl;
 	if (!logFileStream->good())
 	{// create default log file
-		logFileStream = new std::ofstream(logFile);	
+		logFileStream = new std::ofstream(logFile);	// TODO: wtf this is the same line as above? retry?
 	}
 
 	std::ifstream instream(inFile);
