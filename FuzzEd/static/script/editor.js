@@ -222,6 +222,16 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 this._selectAll(event);
             }.bind(this));
 
+            jQuery("#"+this.config.IDs.ACTION_LAYOUT_CLUSTER).click(function() {
+                algorithm = this.graph._getClusterLayoutAlgorithm();
+                this.graph._layoutWithAlgorithm(algorithm);
+            }.bind(this));
+
+            jQuery("#"+this.config.IDs.ACTION_LAYOUT_TREE).click(function() {
+                algorithm = this.graph._getTreeLayoutAlgorithm();
+                this.graph._layoutWithAlgorithm(algorithm);
+            }.bind(this));
+
             return this;
         },
 

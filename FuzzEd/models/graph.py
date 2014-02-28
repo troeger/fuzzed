@@ -57,6 +57,7 @@ class Graph(models.Model):
         Returns:
          {Node} instance
         """
+        assert(self.kind in {'faulttree', 'fuzztree'})
         return self.nodes.all().get(kind='topEvent')
 
     def to_json(self):
@@ -103,8 +104,10 @@ class Graph(models.Model):
         return root.to_bool_term()
 
     def to_graphml(self):
-        missionTime = self.top_node().get_property('missionTime')
-        missionData = '        <data key="missionTime">%d</data>\n' % (missionTime,) if self.kind in {'faulttree', 'fuzztree'} else ''
+        if self.kind in {'faulttree', 'fuzztree'}:
+            missionData = '        <data key="missionTime">%d</data>\n' % (self.top_node().get_property('missionTime'),) 
+        else:
+            missionData = ''        
 
         return ''.join([
             '<?xml version="1.0" encoding="utf-8"?>\n'
