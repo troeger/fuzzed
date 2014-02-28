@@ -222,15 +222,13 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 this._selectAll(event);
             }.bind(this));
 
-            jQuery("#"+this.config.IDs.ACTION_LAYOUT_CLUSTER).click(function() {
-                algorithm = this.graph._getClusterLayoutAlgorithm();
-                this.graph._layoutWithAlgorithm(algorithm);
-            }.bind(this));
-
-            jQuery("#"+this.config.IDs.ACTION_LAYOUT_TREE).click(function() {
-                algorithm = this.graph._getTreeLayoutAlgorithm();
-                this.graph._layoutWithAlgorithm(algorithm);
-            }.bind(this));
+            // set the shortcut hints from "Ctrl+" to "⌘" when on Mac
+            if (navigator.platform == "MacIntel" || navigator.platform == "MacPPC") {
+                jQuery("#"+this.config.IDs.ACTION_CUT+" span").text("⌘X");
+                jQuery("#"+this.config.IDs.ACTION_COPY+" span").text("⌘C");
+                jQuery("#"+this.config.IDs.ACTION_PASTE+" span").text("⌘P");
+                jQuery("#"+this.config.IDs.ACTION_SELECTALL+" span").text("⌘A");
+            }
 
             return this;
         },
