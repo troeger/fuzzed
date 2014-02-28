@@ -52,7 +52,7 @@
 {% if notification %}
 <div id="notification{{ notification.pk }}" class="panel panel-default">
       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-      <h3 class="panel-title">{{ notification.title }}</h3>
+      <h3 class="panel-title">{{ notification.title }}</h3><br/>
       <p>{{ notification.text }}</p>
 </div>
 {% endif %}
