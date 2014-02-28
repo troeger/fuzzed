@@ -68,6 +68,7 @@ def install_analysis_stuff():
     # Install native packages, dependent on OS
     if platform.system() != 'Darwin':
         fastfood.system.install("libboost1.48-all-dev")
+        fastfood.system.install("g++")        
     else:
         # Perform latest GCC installation on Homebrew
         print "Installing latest GCC"

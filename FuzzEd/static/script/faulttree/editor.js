@@ -740,7 +740,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
         _setupContainer: function() {
             return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (analytical)">\
+                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Analysis Results">\
                     <div class="menu-controls">\
                         <span class="menu-minimize"></span>\
                         <span class="menu-close"></span>\
@@ -816,7 +816,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
         _setupContainer: function() {
             return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (simulation)">\
+                '<div id="' + FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU + '" class="menu" header="Simulation Results">\
                     <div class="menu-controls">\
                         <span class="menu-minimize"></span>\
                         <span class="menu-close"></span>\

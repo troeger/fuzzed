@@ -38,14 +38,10 @@ function(Graph, RbdNode, RbdConfig, RbdNotation) {
         },
 
         /**
-         *  Method: _getLayoutAlgorithms
-         *    Returns the layouting algorithms supported by this graph.
-         *
-         *  Returns:
-         *    An array containing algorithm descriptions. Those descriptions should contain the algorithm itself
-         *    (taken from d3.js), a class for the toolbar icon and a tooltip text.
+         *  Method: _getClusterLayoutAlgorithm
+         *    Returns the cluster layouting algorithm supported by this graph.
          */
-        _getLayoutAlgorithms: function() {
+        _getClusterLayoutAlgorithm: function() {
             var clusterLayout = d3.layout.cluster()
                 .nodeSize([2, 2]) // leave some space for the mirror
                 .separation(function(a, b) {
@@ -53,6 +49,15 @@ function(Graph, RbdNode, RbdConfig, RbdNotation) {
                     return a.parent == b.parent ? 1 : 2;
                 });
 
+            return clusterLayout;
+        },
+
+
+        /**
+         *  Method: _getTreeLayoutAlgorithm
+         *    Returns the tree cluster layouting algorithm supported by this graph.
+         */
+        _getTreeLayoutAlgorithm: function() {
             var treeLayout =  d3.layout.tree()
                 .nodeSize([2, 2]) // leave some space for the mirror
                 .separation(function(a, b) {
@@ -60,18 +65,9 @@ function(Graph, RbdNode, RbdConfig, RbdNotation) {
                     return a.parent == b.parent ? 1 : 2;
                 });
 
-            return [
-                {
-                    algorithm: clusterLayout,
-                    iconClass: this.config.Classes.ICON_LAYOUT_CLUSTER,
-                    tooltip:   this.config.Tooltips.LAYOUT_CLUSTER
-                }, {
-                    algorithm: treeLayout,
-                    iconClass: this.config.Classes.ICON_LAYOUT_TREE,
-                    tooltip:   this.config.Tooltips.LAYOUT_TREE
-                }
-            ];
+            return treeLayout;
         },
+
 
         /**
          *  Group: Graph manipulation

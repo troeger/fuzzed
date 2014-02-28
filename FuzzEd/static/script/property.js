@@ -1,4 +1,4 @@
-define(['class', 'config', 'decimal', 'propertyMenuEntry', 'mirror', 'alerts', 'jquery', 'underscore'],
+define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'alerts', 'jquery', 'underscore'],
 function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
     var isNumber = function(number) {
@@ -60,6 +60,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             }
 
             return this;
+        },
+
+        toDict: function() {
+            var obj = {};
+            obj[this.name] = { 'value': this.value };
+            return obj;
         },
 
         setHidden: function(newHidden) {
@@ -212,6 +218,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             this._triggerChange(newValue, this);
 
             return this;
+        },
+
+        toDict: function() {
+            var obj = {};
+            obj[this.name] = { 'value': [this.value, this.parts[this.value].value] };
+            return obj;
         },
 
         validate: function(value, validationResult) {

@@ -50,11 +50,9 @@ define(['underscore'], function() {
          *
          *  Constants:
          *    {String} HEADER        - Used in menu containers to specify their button title (when minimized).
-         *    {String} CONNECTION_ID - Used to retrieve the Connection object from the corresponding DOM element.
          */
         Attributes: {
-            HEADER:        'header',
-            CONNECTION_ID: 'fuzzed-id'
+            HEADER:        'header'
         },
 
         /**
@@ -87,7 +85,8 @@ define(['underscore'], function() {
             CUTSETS_URL:                '/cutsets',
             ANALYTICAL_PROBABILITY_URL: '/topEventProbability',
             SIMULATED_PROBABILITY_URL:  '/topEventProbability',
-            GRAPH_EXPORT_URL:           '/exports'
+            GRAPH_EXPORT_URL:           '/exports',
+            AJAX_QUEUE:                 'queue'
         },
 
         /**
@@ -132,8 +131,6 @@ define(['underscore'], function() {
          *    {String} ICON_SUCCESS            - Class for the icon that indicates a successful action.
          *    {String} ICON_ERROR              - Class for the icon that indicates an erroneous action.
          *    {String} ICON_PROGRESS           - Class for the icon that indicates an action in progress.
-         *    {String} ICON_LAYOUT_CLUSTER     - Class for the icon for auto-layouting the graph with cluster algorithm.
-         *    {String} ICON_LAYOUT_TREE        - Class for the icon for auto-layouting the graph with tree algorithm.
          *
          *    {String} DRAGGABLE_WRAP_DIV	   - Class for div in shapes menu that contains thumbnail
 		 *    {String} RESIZABLE               - Class indicating that a node is resizable
@@ -174,8 +171,6 @@ define(['underscore'], function() {
             ICON_SUCCESS:            'icon-ok',
             ICON_ERROR:              'icon-warning-sign',
             ICON_PROGRESS:           'icon-progress',
-            ICON_LAYOUT_CLUSTER:     'icon-layout-cluster',
-            ICON_LAYOUT_TREE:        'icon-layout-tree',
 
 			DRAGGABLE_WRAP_DIV: 	 'draggableDiv',
 			RESIZABLE:			 	 'resizable',
@@ -277,7 +272,6 @@ define(['underscore'], function() {
          *    {String} ACTION_GRID_TOGGLE          - The list element that contains the grid toggle menu entry.
          *    {String} PROGRESS_INDICATOR_SINGLE   - The nav entry containing the progress indicator for single active jobs.
          *    {String} PROGRESS_INDICATOR_DROPDOWN - The nav entry containing the dropdown for multiple active jobs.
-         *    {String} NAVBAR_TOOLS                - The nav entry containing editor tools (copy/past, layouting, ...).
          */
         IDs: {
             ALERT_CONTAINER:             'FuzzEdAlertContainer',
@@ -287,11 +281,17 @@ define(['underscore'], function() {
             SHAPES_MENU:                 'FuzzEdShapes',
             SPLASH:                      'FuzzEdSplash',
             ACTION_GRID_TOGGLE:          'FuzzEdActionGridToggle',
+            ACTION_CUT:                  'FuzzEdActionCut',
+            ACTION_COPY:                 'FuzzEdActionCopy',
+            ACTION_PASTE:                'FuzzEdActionPaste',
+            ACTION_DELETE:               'FuzzEdActionDelete',
+            ACTION_SELECTALL:            'FuzzEdActionSelectAll',
             ACTION_EXPORT_PDF:           'FuzzEdActionExportPDF',
             ACTION_EXPORT_EPS:           'FuzzEdActionExportEPS',
+            ACTION_LAYOUT_CLUSTER:       'FuzzEdActionLayoutCluster',
+            ACTION_LAYOUT_TREE:          'FuzzEdActionLayoutTree',
             PROGRESS_INDICATOR_SINGLE:   'FuzzEdProgressIndicatorSingle',
-            PROGRESS_INDICATOR_DROPDOWN: 'FuzzEdProgressIndicatorDropdown',
-            NAVBAR_TOOLS:                'FuzzEdNavbarTools'
+            PROGRESS_INDICATOR_DROPDOWN: 'FuzzEdProgressIndicatorDropdown'
         },
 
         /**
@@ -335,10 +335,13 @@ define(['underscore'], function() {
          *    {String} NODE       - Data key used to get the node object from a associated DOM element.
          *    {String} SELECTABLE - Data key used to store the jQuery UI Selectable object with the canvas
          *                          (needed for some hacks).
+         *    {String} CONNECTION_ID - Used to retrieve the Connection object from the corresponding DOM element.
+         *                             (former Attribute)
          */
         Keys: {
-            NODE:       'node',
-            SELECTABLE: 'ui-selectable'
+            NODE:           'node',
+            SELECTABLE:     'ui-selectable',
+            CONNECTION_ID:  'fuzzed-id'
         },
 
         /**
@@ -432,19 +435,7 @@ define(['underscore'], function() {
          */
         Splash: {
             FADE_TIME: 1000
-        },
-
-        /**
-         *  Group: Tooltips
-         *    Tooltip texts.
-         *
-         *  Constants:
-         *    {String} LAYOUT_CLUSTER - Tooltip for the cluster layout button.
-         *    {String} LAYOUT_TREE    - Tooltip for the tree layout button.
-         */
-        Tooltips: {
-            LAYOUT_CLUSTER: 'Auto-layout using cluster layout',
-            LAYOUT_TREE:    'Auto-layout using tree layout'
         }
+
     };
 });

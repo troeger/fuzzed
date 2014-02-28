@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
+from django.db.models.aggregates import Max
 
 import pyxb.utils.domutils
 try:
@@ -11,6 +10,9 @@ try:
 except:
     print "ERROR: Perform a build process first."
     exit(-1)
+
+from project import Project
+from node_rendering import tikz_shapes
 
 import json, notations
 
@@ -26,6 +28,7 @@ class Graph(models.Model):
                                  element of the set of available notations (See also: <notations>)
      {str}            name     - the name of the graph
      {User}           owner    - a link to the owner of the graph
+     {Project}        project  - the project corresponding to the graph
      {const datetime} created  - timestamp of the moment of graph creation (default: now)
      {bool}           deleted  - flag indicating whether this graph was deleted or not. Simplifies restoration of the
                                  graph if needed by toggling this member (default: False)
@@ -36,7 +39,8 @@ class Graph(models.Model):
     kind      = models.CharField(max_length=127, choices=notations.choices)
     name      = models.CharField(max_length=255)
     owner     = models.ForeignKey(User, related_name='graphs')
-    created   = models.DateTimeField(auto_now_add=True)
+    project   = models.ForeignKey(Project, related_name='graphs')
+    created   = models.DateTimeField(auto_now_add=True, editable=False)
     modified  = models.DateTimeField(auto_now=True)
     deleted   = models.BooleanField(default=False)
     read_only = models.BooleanField(default=False)
@@ -53,6 +57,7 @@ class Graph(models.Model):
         Returns:
          {Node} instance
         """
+        assert(self.kind in {'faulttree', 'fuzztree'})
         return self.nodes.all().get(kind='topEvent')
 
     def to_json(self):
@@ -81,8 +86,12 @@ class Graph(models.Model):
         nodes    = [node.to_dict() for node in node_set]
         edges    = [edge.to_dict() for edge in edge_set]
 
+        node_seed = self.nodes.aggregate(Max('client_id'))['client_id__max']
+        edge_seed = self.edges.aggregate(Max('client_id'))['client_id__max']
+
         return {
             'id':       self.pk,
+            'seed':     max(node_seed, edge_seed),
             'name':     self.name,
             'type':     self.kind,
             'readOnly': self.read_only,
@@ -93,6 +102,30 @@ class Graph(models.Model):
     def to_bool_term(self):
         root = self.nodes.get(kind__exact = 'topEvent')
         return root.to_bool_term()
+
+    def to_graphml(self):
+        if self.kind in {'faulttree', 'fuzztree'}:
+            missionData = '        <data key="missionTime">%d</data>\n' % (self.top_node().get_property('missionTime'),) 
+        else:
+            missionData = ''        
+
+        return ''.join([
+            '<?xml version="1.0" encoding="utf-8"?>\n'
+            '<graphml xmlns="http://graphml.graphdrawing.org/xmlns"\n'
+            '         xmlns="http://graphml.graphdrawing.org/xmlns"\n'
+            '         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns\n'
+            '           http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"\n'
+            '>\n'
+            '    <graph id="graph" edgedefault="directed">\n',
+                 notations.graphml_keys[self.kind],
+                 '\n',
+                 missionData] +
+                 [node.to_graphml() for node in self.nodes.filter(deleted=False)] +
+                 [edge.to_graphml() for edge in self.edges.filter(deleted=False)] +
+
+           ['    <graph>\n'
+            '<graphml>\n'
+        ])
 
     def to_tikz(self):
         """

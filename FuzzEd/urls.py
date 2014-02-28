@@ -20,16 +20,22 @@ urlpatterns = patterns('',
     url(r'^login/$', 'FuzzEd.views.login', name='login'),
     url(r'^about/$', 'FuzzEd.views.about', name='about'),    
     url(r'^settings/$', 'FuzzEd.views.settings', name='settings'),    
-    url(r'^dashboard/$', 'FuzzEd.views.dashboard', name='dashboard'),
-    url(r'^dashboard/new/$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
-    url(r'^dashboard/(?P<graph_id>\d+)/$', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
+    
+    url(r'^graphs/(?P<graph_id>\d+)/$', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
     url(r'^editor/(?P<graph_id>\d+)$', 'FuzzEd.views.editor', name='editor'),
     url(r'^snapshot/(?P<graph_id>\d+)$', 'FuzzEd.views.snapshot', name='snapshot'),
+        
+    url(r'^projects/$', 'FuzzEd.views.projects', name='projects'),
+    url(r'^projects/new/$', 'FuzzEd.views.project_new', name='project_new'),
+    url(r'^projects/(?P<project_id>\d+)/$', 'FuzzEd.views.project_edit', name='project_edit'),
+    url(r'^projects/(?P<project_id>\d+)/dashboard/$', 'FuzzEd.views.dashboard', name='dashboard'),
+    url(r'^projects/(?P<project_id>\d+)/dashboard/new/(?P<kind>\w{1,50})$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
+    
     url(r'^robots\.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /admin/\nDisallow: /dashboard/\nDisallow: /editor/\n", mimetype="text/plain")),
-
+    
     # API
     # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API
-
+  
     # graph
     url(r'^api/graphs$','FuzzEd.api.graphs', name='graphs'),
     url(r'^api/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.graph', name='graph'),
@@ -74,5 +80,9 @@ urlpatterns = patterns('',
     url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.job_status', name='job_status'),
     url(r'^api/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.job_exitcode', name='job_exitcode'),
     url(r'^api/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.job_files', name='job_files'),
+
+    # user notifications
+    url(r'^api/notifications/(?P<noti_id>\d+)/dismiss$','FuzzEd.api.noti_dismiss', name='noti_dismiss'),
+
 )
 urlpatterns += staticfiles_urlpatterns()

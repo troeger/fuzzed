@@ -10,6 +10,7 @@ sudo apt-get -y install python python-dev python-pip perl
 sudo pip install fabric
 echo ...done.
 echo Bootstrapping Dev Environment...
+echo "cd /home/fuzztrees" >> /home/vagrant/.bashrc
 cd /home/fuzztrees
 fab bootstrap.dev
 echo ...done.

@@ -34,6 +34,7 @@
 #include <set>
 #include <iostream>
 #include <fstream>
+#include "DeadlockMonitor.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -90,7 +91,11 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 			sim->run();
 		}
 #else
-		sim->run();
+		std::function<void()> fun = [&]() { sim->run(); };
+		DeadlockMonitor monitor(&fun);
+		monitor.executeWithin(10000);
+
+		//sim->run();
 		if (implementationType == DEFAULT)
 			res = (static_cast<PetriNetSimulation*>(sim))->result();
 #endif

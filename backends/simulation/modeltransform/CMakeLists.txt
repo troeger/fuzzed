@@ -4,7 +4,7 @@ set(SOURCES
    ${SOURCES}
    FaultTreeNode.cpp
    FaultTreeConversion.cpp
-   
+
    events/Event.cpp
    events/BasicEvent.cpp
    events/TopLevelEvent.cpp
@@ -31,7 +31,7 @@ set(HEADERS
    FaultTreeNode.h
    FaultTreeIncludes.h
    FaultTreeConversion.h
-   
+
    events/Event.h
    events/BasicEvent.h
    events/TopLevelEvent.h

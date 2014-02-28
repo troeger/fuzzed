@@ -80,7 +80,6 @@ int main(int argc, char** argv)
 	instream.close();
 
 	analysisResults::AnalysisResults analysisResults;
-
 	try
 	{	
 		// please keep this here for debugging

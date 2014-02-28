@@ -35,7 +35,7 @@ define(['rbd/config', 'node'], function(Config, AbstractNode) {
             if (this.numberOfOutgoingConnections != 0) {
                 var leftOffset = -this.config.JSPlumb.STROKE_WIDTH + (this.connector.offset.right || 0);
 
-                this._connectionHandle = jQuery('<i class="icon-plus icon-white"></i>')
+                this._connectionHandle = jQuery('<i class="fa fa-plus"></i>')
                     .addClass(this.config.Classes.NODE_HALO_CONNECT)
                     .css({
                         'top':  this._nodeImageContainer.position().top  + this._nodeImage.outerHeight(true) / 2,

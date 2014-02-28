@@ -135,26 +135,6 @@ void util::replaceFileExtensionInPlace(string& subject, const string& newExtensi
 	subject.replace(pos, subject.length()-pos, newExtension);
 }
 
-string util::nestedIDString(int n, ...)
-{
-	std::stringstream result;
-
-	va_list args;
-	va_start(args, n);
-
-	int id = va_arg(args, int);
-	result <<  id;
-	for (int i = 1; i < n; ++i)
-	{
-		id = va_arg(args, int);
-		result <<  ".";
-		result << id;
-	}
-	va_end(args);
-
-	return result.str();
-}
-
 int util::countFiles(const string& path, const string& ext /*= ""*/)
 {
 	return std::count_if(

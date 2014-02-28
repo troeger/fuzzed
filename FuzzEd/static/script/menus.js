@@ -107,11 +107,11 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
             var controls = this.container.find('.' + Config.Classes.MENU_CONTROLS);
 
             controls.find('.' + Config.Classes.MENU_MINIMIZE)
-                .addClass('icon-white icon-minus-sign')
+                .addClass('fa fa-minus-circle')
                 .click(this.minimize.bind(this));
 
             controls.find('.' + Config.Classes.MENU_CLOSE)
-                .addClass('icon-white icon-remove-sign')
+                .addClass('fa fa-times-circle')
                 .click(this.hide.bind(this));
 
             return controls;

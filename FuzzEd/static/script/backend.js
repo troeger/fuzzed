@@ -1,4 +1,4 @@
-define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], function (Class, Config, Job, Alerts, Progress) {
+define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jquery-ajaxq'], function (Class, Config, Job, Alerts, Progress) {
 
     /**
      * Class: Backend
@@ -129,10 +129,10 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
             var data = {
                 id:          edgeId,
                 source:      sourceNodeId,
-                destination: targetNodeId
+                target:      targetNodeId
             };
 
-            var xhr = jQuery.ajax({
+            var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForEdges(),
                 type:     'POST',
                 dataType: 'json',
@@ -173,15 +173,16 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *   {function} complete - [optional] Callback that is invoked when the ajax request completes successful or
          *                         erroneous.
          */
-        graphNodeAdded: function(event, nodeId, kind, x, y, success, error, complete) {
+        graphNodeAdded: function(event, nodeId, kind, x, y, properties, success, error, complete) {
             var data = {
-                id:   nodeId,
-                kind: kind,
-                x:    x,
-                y:    y
+                id:         nodeId,
+                kind:       kind,
+                x:          x,
+                y:          y,
+                properties: JSON.stringify(properties)
             };
 
-            var xhr = jQuery.ajax({
+            var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNodes(),
                 type:     'POST',
                 dataType: 'json',
@@ -219,7 +220,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *                         AJAX call.
          */
         graphEdgeDeleted: function(event, edgeId, success, error, complete) {
-            var xhr = jQuery.ajax({
+            var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForEdge(edgeId),
                 type:     'DELETE',
                 dataType: 'json',
@@ -256,7 +257,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *   {function} complete - [optional] Callback that is invoked in both cases, successful and errornous requests.
          */
         graphNodeDeleted: function(event, nodeId, success, error, complete) {
-            var xhr = jQuery.ajax({
+            var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNode(nodeId),
                 type:     'DELETE',
                 dataType: 'json',
@@ -296,7 +297,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *                           or erroneous.
          */
         nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
-            var xhr = jQuery.ajax({
+            var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNode(nodeId),
                 type:     'POST',
                 data:{
@@ -336,7 +337,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *   {function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
         getGraph: function(success, error, complete) {
-            jQuery.ajax({
+            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForGraph(),
                 dataType: 'json',
                 // don't show progress
@@ -362,7 +363,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *   {function} complete - [optional] Callback that gets invoked in both; successful or erroneous request.
          */
         calculateCutsets: function(event, success, error, complete) {
-            jQuery.ajax({
+            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForCutsets(),
                 dataType: 'json',
                 // don't show progress
@@ -392,7 +393,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
         calculateAnalyticalProbability: function(event, success, error, complete) {
-            jQuery.ajax({
+            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:    this._fullUrlForAnalyticalProbability(),
                 // don't show progress
                 global: false,
@@ -427,7 +428,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
          *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
         calculateSimulatedProbability: function(event, success, error, complete) {
-            jQuery.ajax({
+            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:    this._fullUrlForSimulatedProbability(),
                 // don't show progress
                 global: false,
@@ -471,7 +472,7 @@ define(['class', 'config', 'job', 'alerts', 'progressIndicator', 'jquery'], func
             var progressSuccessMessage = Config.ProgressIndicator.EXPORT_SUCCESS_MESSAGE;
             var progressErrorMessage = Config.ProgressIndicator.EXPORT_ERROR_MESSAGE + fileType;
 
-            jQuery.ajax({
+            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:    this._fullUrlForExport(event),
                 // don't show progress
                 global: false,

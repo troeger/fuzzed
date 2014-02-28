@@ -12,6 +12,7 @@
             "deletable": true,
             "resizable": false,
             "editable": false,
+            "copyable": true,
 
             "connector": {
                 "offset": {
@@ -168,6 +169,7 @@
 
             "excludeFromShapesMenu": true,
             "deletable": false,
+            "copyable": false,
 
             "properties": {
                 "name": {
