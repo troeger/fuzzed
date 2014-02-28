@@ -111,7 +111,7 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
                 .click(this.minimize.bind(this));
 
             controls.find('.' + Config.Classes.MENU_CLOSE)
-                .addClass('fa fa-remove-circle')
+                .addClass('fa fa-times-circle')
                 .click(this.hide.bind(this));
 
             return controls;
