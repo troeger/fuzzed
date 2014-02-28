@@ -265,7 +265,12 @@ class Node(models.Model):
                         if partkind == 'epsilon': 
                             val = format.replace("{{$0}}",str(val[1][0])).replace("{{$1}}",str(val[1][1]))
                         elif partkind == 'choice':
-                            val = format.replace("{{$0}}",str(val[1][0]))
+                            choices = propdetails[prop]['parts'][active_part]['choices']
+                            choice_values = propdetails[prop]['parts'][active_part]['values']
+                            for choice_name, choice_vals in zip(choices, choice_values):
+                                if val[1][0] == choice_vals[0] and val[1][1] == choice_vals[1]:
+                                    val = format.replace("{{$0}}",choice_name)
+                                    break
                         elif partkind == 'numeric':
                             val = format.replace("{{$0}}",str(val[1]))                            
                     elif propdetails[prop].has_key('mirror'):
