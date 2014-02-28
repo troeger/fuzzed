@@ -4435,11 +4435,6 @@ i.icon-layout-tree:hover {
 #FuzzEdStacktrace {
   display: none;
 }
-#FuzzEdNavbarTools a {
-  display: inline-block;
-  padding-left: 0px;
-  cursor: pointer;
-}
 /**
  *  File: util.less
  *      This file contains all styles that are not directly related to any specific component of the webapp.

@@ -740,7 +740,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
         _setupContainer: function() {
             return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (analytical)">\
+                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Analysis Results">\
                     <div class="menu-controls">\
                         <span class="menu-minimize"></span>\
                         <span class="menu-close"></span>\
@@ -816,7 +816,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
         _setupContainer: function() {
             return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (simulation)">\
+                '<div id="' + FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU + '" class="menu" header="Simulation Results">\
                     <div class="menu-controls">\
                         <span class="menu-minimize"></span>\
                         <span class="menu-close"></span>\
@@ -950,6 +950,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 ._setupAnalyticalProbabilityAction()
                 ._setupSimulatedProbabilityAction()
                 ._setupExportPDFAction()
+                ._setupAutoLayout()
                 ._setupExportEPSAction();
 
             return this._super(readOnly);
@@ -1050,6 +1051,28 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
             return this;
         },
+
+        /**
+         *  Method: _setupAutoLayout
+         *    Registers the click handler for the "auto-layout" menu entries.
+         *
+         *  Returns:
+         *    This editor instance for chaining.
+         */
+        _setupAutoLayout: function() {
+            jQuery("#"+this.config.IDs.ACTION_LAYOUT_CLUSTER).click(function() {
+                algorithm = this.graph._getClusterLayoutAlgorithm();
+                this.graph._layoutWithAlgorithm(algorithm);
+            }.bind(this));
+
+            jQuery("#"+this.config.IDs.ACTION_LAYOUT_TREE).click(function() {
+                algorithm = this.graph._getTreeLayoutAlgorithm();
+                this.graph._layoutWithAlgorithm(algorithm);
+            }.bind(this));
+
+            return this;
+        },
+
 
         /**
          *  Method: _downloadFileFromURL
