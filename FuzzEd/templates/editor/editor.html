@@ -76,8 +76,10 @@
             </a></li>
             <li class="divider"></li>
             {% if graph.kind != 'rbd'%}
-                <li><a href="#" id="FuzzEdActionLayoutCluster">Auto-layout (cluster algorithm)</a></li>
-                <li><a href="#" id="FuzzEdActionLayoutTree">Auto-layout (tree algorithm)</a></li>
+                <li><a href="#" id="FuzzEdActionLayoutCluster">
+                    <i class="fa fa-magic"></i> Auto-layout (cluster algorithm)</a></li>
+                <li><a href="#" id="FuzzEdActionLayoutTree">
+                    <i class="fa fa-magic"></i> Auto-layout (tree algorithm)</a></li>
             {% endif %}
 
     </ul>
@@ -88,11 +90,15 @@
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
         {% if graph.kind != 'rbd'%}
-            <li><a href="{% url 'graph_download' graph.pk %}?format=tex">as LaTex Document</a></li>
-            <li><a href="#" id="FuzzEdActionExportPDF">as PDF Document</a></li>
-            <li><a href="#" id="FuzzEdActionExportEPS">as EPS Image</a></li>
+            <li><a href="{% url 'graph_download' graph.pk %}?format=tex">
+                <i class="fa fa-file-text-o"></i> LaTex</a></li>
+            <li><a href="#" id="FuzzEdActionExportPDF">
+                <i class="fa fa-picture-o"></i> PDF Image</a></li>
+            <li><a href="#" id="FuzzEdActionExportEPS">
+                <i class="fa fa-picture-o"></i> EPS Image</a></li>
         {% endif %}
-        <li><a href="{% url 'graph_download' graph.pk %}?format=graphml">as GraphML File</a></li>
+        <li><a href="{% url 'graph_download' graph.pk %}?format=graphml">
+            <i class="fa fa-file-text-o"></i> GraphML</a></li>
     </ul>
 </li>
 {% if graph.kind != 'rbd'%}
@@ -102,8 +108,10 @@
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
 <!--        <li><a href="#" id="FuzzEdActionCutSets">Cut sets</a></li>-->
-        <li><a href="#" id="FuzzEdActionAnalytical">Analytical Probability</a></li>
-        <li><a href="#" id="FuzzEdActionSimulated">Simulated Probability</a></li>
+        <li><a href="#" id="FuzzEdActionAnalytical">
+            <i class="fa fa-bar-chart-o"></i> Analytical Probability</a></li>
+        <li><a href="#" id="FuzzEdActionSimulated">
+            <i class="fa fa-table"></i> Simulated Probability</a></li>
     </ul>
 </li>
 {% endif %}
@@ -112,7 +120,8 @@
         <i class="fa fa-eye"></i> View <b class="caret"></b>
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
-        <li><a href="#" id="FuzzEdActionGridToggle">Toogle grid</a></li>
+        <li><a href="#" id="FuzzEdActionGridToggle">
+            <i class="fa fa-square-o"></i> Toogle grid</a></li>
     </ul>
 </li>
 
