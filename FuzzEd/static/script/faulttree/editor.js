@@ -431,6 +431,9 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 }
             }
 
+
+
+            
             this._configNodeMap[configID] = nodes.concat(this._configNodeMap[configID] || []);
             this._configEdgeMap[configID] = edges.concat(this._configEdgeMap[configID] || []);
 
