@@ -33,6 +33,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         graph:                         undefined,
         properties:                    undefined,
         shapes:                        undefined,
+        layout:                        undefined,
 
         _backend:                      undefined,
         _currentMinNodeOffsets:        {'top': 0, 'left': 0},
@@ -58,7 +59,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 throw new TypeError('numeric graph ID', typeof graphId);
 
             this.config   = this.getConfig();
-            this._backend = new Backend(graphId);
+            this._backend = Backend.establish(graphId);
 
             // remember certain UI elements
             this._progressIndicator = jQuery('#' + this.config.IDs.PROGRESS_INDICATOR);
@@ -136,9 +137,11 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _loadGraphCompleted: function(readOnly) {
             // create manager objects for the bars
-            this.properties = new Menus.PropertiesMenu(this.graph.getNotation().propertiesDisplayOrder);
-            this.shapes     = new Menus.ShapeMenu();
+            this.properties = Menus.PropertiesMenu;
+            this.shapes     = Menus.ShapeMenu;
+            this.layout     = Menus.LayoutMenu;
             this._backend.activate();
+            this.properties.displayOrder(this.graph.getNotation().propertiesDisplayOrder);
 
             if (readOnly) {
                 Alerts.showInfoAlert('Remember:', 'this diagram is read-only');
@@ -198,36 +201,44 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *    This {<Node>} instance for chaining.
          */
         _setupMenuActions: function() {
-            jQuery("#"+this.config.IDs.ACTION_GRID_TOGGLE).click(function() {
+            jQuery('#' + this.config.IDs.ACTION_GRID_TOGGLE).click(function() {
                 Canvas.toggleGrid();
             }.bind(this));
 
-            jQuery("#"+this.config.IDs.ACTION_CUT).click(function() {
+            jQuery('#' + this.config.IDs.ACTION_CUT).click(function() {
                 this._cutSelection();
             }.bind(this));
 
-            jQuery("#"+this.config.IDs.ACTION_COPY).click(function() {
+            jQuery('#' + this.config.IDs.ACTION_COPY).click(function() {
                 this._copySelection();
             }.bind(this));
 
-            jQuery("#"+this.config.IDs.ACTION_PASTE).click(function() {
+            jQuery('#' + this.config.IDs.ACTION_PASTE).click(function() {
                 this._paste();
             }.bind(this));
 
-            jQuery("#"+this.config.IDs.ACTION_DELETE).click(function() {
+            jQuery('#' + this.config.IDs.ACTION_DELETE).click(function() {
                 this._deleteSelection();
             }.bind(this));
 
-            jQuery("#"+this.config.IDs.ACTION_SELECTALL).click(function(event) {
+            jQuery('#' + this.config.IDs.ACTION_SELECTALL).click(function(event) {
                 this._selectAll(event);
             }.bind(this));
 
-            // set the shortcut hints from "Ctrl+" to "⌘" when on Mac
-            if (navigator.platform == "MacIntel" || navigator.platform == "MacPPC") {
-                jQuery("#"+this.config.IDs.ACTION_CUT+" span").text("⌘X");
-                jQuery("#"+this.config.IDs.ACTION_COPY+" span").text("⌘C");
-                jQuery("#"+this.config.IDs.ACTION_PASTE+" span").text("⌘P");
-                jQuery("#"+this.config.IDs.ACTION_SELECTALL+" span").text("⌘A");
+            jQuery('#' + this.config.IDs.ACTION_LAYOUT_CLUSTER).click(function() {
+                this.graph._layoutWithAlgorithm(this.graph._getClusterLayoutAlgorithm());
+            }.bind(this));
+
+            jQuery('#' + this.config.IDs.ACTION_LAYOUT_TREE).click(function() {
+                this.graph._layoutWithAlgorithm(this.graph._getTreeLayoutAlgorithm());
+            }.bind(this));
+
+            // set the shortcut hints from 'Ctrl+' to '⌘' when on Mac
+            if (navigator.platform == 'MacIntel' || navigator.platform == 'MacPPC') {
+                jQuery('#' + this.config.IDs.ACTION_CUT + ' span').text('⌘X');
+                jQuery('#' + this.config.IDs.ACTION_COPY + ' span').text('⌘C');
+                jQuery('#' + this.config.IDs.ACTION_PASTE + ' span').text('⌘P');
+                jQuery('#' + this.config.IDs.ACTION_SELECTALL + ' span').text('⌘A');
             }
 
             return this;
@@ -380,8 +391,6 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             jQuery(document).ajaxSend(Progress.showAjaxProgress);
             jQuery(document).ajaxSuccess(Progress.flashAjaxSuccessMessage);
             jQuery(document).ajaxError(Progress.flashAjaxErrorMessage);
-
-            //
 
             return this;
         },
