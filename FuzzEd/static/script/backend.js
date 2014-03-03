@@ -1,4 +1,5 @@
-define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jquery-ajaxq'], function (Class, Config, Job, Alerts, Progress) {
+define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jquery-ajaxq'],
+function (Class, Config, Job, Alerts, Progress) {
 
     /**
      * Class: Backend
@@ -9,7 +10,7 @@ define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jqu
      * discouraged in all cases. There should be always only Backend instance at the same time in existence to avoid
      * data duplication in the backend.
      */
-    return Class.extend({
+    var Backend = Class.extend({
         /**
          * Group: Members
          *
@@ -649,4 +650,15 @@ define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jqu
             return this._fullUrlForGraph() + Config.Backend.GRAPH_EXPORT_URL + '/'+exportType;
         }
     });
+
+    var registeredBackends = {};
+
+    return {
+        establish: function(graphId) {
+            if (typeof registeredBackends[graphId] === 'undefined') {
+                registeredBackends[graphId] = new Backend(graphId);
+            }
+            return registeredBackends[graphId];
+        }
+    }
 });

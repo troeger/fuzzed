@@ -1,4 +1,5 @@
-define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
+define(['canvas', 'class', 'config', 'menus', 'jquery', 'd3'],
+function(Canvas, Class, Config, Menus) {
     /**
      *  Package: Base
      */
@@ -307,20 +308,39 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          *    This <Graph> instance for chaining.
          */
         _layoutWithAlgorithm: function(algorithm) {
+            jQuery(document).trigger(Config.Events.GRAPH_LAYOUT);
             var layoutedNodes = algorithm(this._getNodeHierarchy());
 
             // center the top node on the currently visible canvas (if there's enough space)
             var centerX = Math.floor((jQuery('#' + this.config.IDs.CANVAS).width() / this.config.Grid.SIZE) / 2);
             // returned coordinates can be negative, so add that offset
-            var minX = _.min(layoutedNodes, function(n) {return n.x}).x;
+            var minX = _.min(layoutedNodes, function(n) { return n.x }).x;
             centerX -= Math.min(centerX + minX, 0);
 
-            // apply positions
+            // remember the node's positions before the layout attempt
+            var oldPositions = _.map(layoutedNodes, function(n) {
+                var node = this.getNodeById(n.id);
+                return {x: node.x, y: node.y};
+            }.bind(this));
+
+            // apply layouted positions temporarily, without saving
             _.each(layoutedNodes, function(n) {
                 var node = this.getNodeById(n.id);
                 // +1 because the returned coords are 0-based and we need 1-based
                 node.moveToGrid({x: n.x + centerX + 1, y: n.y + 1}, true);
             }.bind(this));
+
+            // ask the user to keep the layout
+            jQuery.when(Menus.LayoutMenu.keep())
+                .fail(function() {
+                    _.each(layoutedNodes, function(n, index) {
+                        var node = this.getNodeById(n.id);
+                        node.moveToGrid(oldPositions[index], true);
+                    }.bind(this));
+                }.bind(this))
+                .always(function() {
+                    jQuery(document).trigger(Config.Events.GRAPH_LAYOUTED);
+                });
 
             return this;
         },
@@ -461,14 +481,12 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          *
          */
         _getClusterLayoutAlgorithm: function() {
-            var clusterLayout = d3.layout.cluster()
+            return d3.layout.cluster()
                 .nodeSize([1, 2]) // leave some space for the mirror
                 .separation(function(a, b) {
                     // sibling nodes are tidier
                     return a.parent == b.parent ? 2 : 3;
                 });
-
-            return clusterLayout;
         },
 
         /**
@@ -478,16 +496,13 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          *
          */
         _getTreeLayoutAlgorithm: function() {
-            var treeLayout =  d3.layout.tree()
+            return d3.layout.tree()
                 .nodeSize([1, 2]) // leave some space for the mirror
                 .separation(function(a, b) {
                     // sibling nodes are tidier
                     return a.parent == b.parent ? 2 : 3;
                 });
-
-            return treeLayout;
         },
-
 
         /**
          *  Method: _getNodeHierarchy

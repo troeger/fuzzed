@@ -229,6 +229,8 @@ define(['underscore'], function() {
             GRAPH_NODE_DELETED:        'graph-node-deleted',
             GRAPH_EDGE_ADDED:          'graph-edge-added',
             GRAPH_EDGE_DELETED:        'graph-edge-deleted',
+            GRAPH_LAYOUT:              'graph-layout',
+            GRAPH_LAYOUTED:            'graph-layouted',
 
             NODE_DRAG_STOPPED:         'node-drag-stopped',
 
@@ -268,6 +270,7 @@ define(['underscore'], function() {
          *    {String} CONTENT                     - The container element for the content (without navbar).
          *    {String} PROPERTIES_MENU             - The container for the properties menu.
          *    {String} SHAPES_MENU                 - The container for the shapes menu.
+         *    {String} LAYOUT_MENU                 - The container of the layout question dialog.
          *    {String} SPLASH                      - The splash screen element.
          *    {String} ACTION_GRID_TOGGLE          - The list element that contains the grid toggle menu entry.
          *    {String} PROGRESS_INDICATOR_SINGLE   - The nav entry containing the progress indicator for single active jobs.
@@ -279,6 +282,7 @@ define(['underscore'], function() {
             CONTENT:                     'FuzzEdContent',
             PROPERTIES_MENU:             'FuzzEdProperties',
             SHAPES_MENU:                 'FuzzEdShapes',
+            LAYOUT_MENU:                 'FuzzEdLayoutMenu',
             SPLASH:                      'FuzzEdSplash',
             ACTION_GRID_TOGGLE:          'FuzzEdActionGridToggle',
             ACTION_CUT:                  'FuzzEdActionCut',
