@@ -10,6 +10,7 @@
             "allowConnectionTo": [],
 
             "deletable": true,
+            "copyable": true,
 
             "connector": {
                 "offset": {
@@ -222,6 +223,7 @@
             "help": "The system failure event.",
 
             "deletable": false,
+            "copyable": false,
             "excludeFromShapesMenu": true,
 
             "properties": {

@@ -24,10 +24,15 @@ class UserProfile(models.Model):
         app_label = 'FuzzEd'
 
 # handler that automatically creates a new user profile when also a new django user is created
+# This breaks on fresh database creation, since the signal is triggered when no UserProfile
+# table was created so far. For this reason, we silently ignore all errors here.
 @receiver(post_save, sender=auth.User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.get_or_create(user=instance)
+        try:
+            UserProfile.objects.get_or_create(user=instance)
+        except:
+            pass
 
 # ensures that only the UserProfile is visible when importing this module
 __all__ = ['UserProfile']

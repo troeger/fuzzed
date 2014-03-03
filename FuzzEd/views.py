@@ -13,7 +13,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import Http404
 
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
-from FuzzEd.models import Graph, Project, notations, commands
+from FuzzEd.models import Graph, Project, Notification, notations, commands
 import FuzzEd.settings
 
 GREETINGS = [
@@ -77,8 +77,15 @@ def projects(request):
      {HttpResponse} a django response object
     """
     projects = (request.user.projects.filter(deleted=False) | request.user.own_projects.filter(deleted=False)).order_by('-created')
-        
+
     parameters = {'projects':[ project.to_dict() for project in projects]}
+
+    # provide notification box on the projects overview page, if something is available for this user
+    try:
+        notification = request.user.notification_set.latest('modified')
+        parameters['notification'] = notification
+    except:
+        pass
             
     return render(request, 'project_menu/projects.html', parameters)
     
@@ -304,6 +311,9 @@ def settings(request):
     Returns:
      {HttpResponse} a django response object
     """
+    comes_from = request.META["HTTP_REFERER"]
+    if 'settings' not in comes_from:
+        request.session['comes_from']=comes_from
     POST = request.POST
 
     if POST.get('save'):
@@ -319,7 +329,7 @@ def settings(request):
         user.save()
 
         messages.add_message(request, messages.SUCCESS, 'Settings saved.')
-        return redirect('dashboard')
+        return redirect(request.session['comes_from'])
 
     return render(request, 'util/settings.html')
 
@@ -395,7 +405,6 @@ def snapshot(request, graph_id):
     }
 
     return render(request, 'editor/editor.html', parameters)
-
 
 @require_http_methods(['GET', 'POST'])
 def login(request):

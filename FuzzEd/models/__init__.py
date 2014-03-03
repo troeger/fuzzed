@@ -10,3 +10,4 @@ from result import Result
 from configuration import Configuration
 from node_configuration import NodeConfiguration
 #from machine import Machine
+from notification import Notification

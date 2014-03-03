@@ -187,6 +187,8 @@ class AddGraph(Command):
             notation = notations.by_kind[kind]
             if 'defaults' in notation:
                 for index, node in enumerate(notation['defaults']['nodes']):
+                    node.update({'properties': {}})
+
                     # use index as node ID
                     # this is unique since all other IDs are time stamps
                     command = AddNode.create_from(graph_id=graph.pk, node_id=index, **node)
@@ -218,7 +220,7 @@ class AddNode(Command):
     node = models.ForeignKey(Node, related_name='+')
 
     @classmethod
-    def create_from(cls, graph_id, node_id, kind, x, y):
+    def create_from(cls, graph_id, node_id, kind, x, y, properties):
         """
         Method [static]: create_from
 
@@ -231,6 +233,7 @@ class AddNode(Command):
          {str} kind      - the node's identification string
          {str} x         - x coordinate of the added node
          {str} y         - y coordinate of the added node
+         dict(str, str) properties - dictionary with the initial node properties 
                       
         Returns:
          {<AddNode>} - the add node command instance
@@ -238,6 +241,8 @@ class AddNode(Command):
         graph = Graph.objects.get(pk=int(graph_id))
         node  = Node(graph=graph, client_id=int(node_id), kind=kind, x=int(x), y=int(y), deleted=True)
         node.save()
+        for k, v in properties.iteritems():
+            node.set_attr(k, v['value'])
         
         return cls(node=node)
 

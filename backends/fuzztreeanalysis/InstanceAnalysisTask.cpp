@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <map>
 #include <future>
-
+#include <iostream>
 
 using std::map;
 using std::future;
@@ -68,7 +68,7 @@ const bool InstanceAnalysisTask::isFuzzy(const fuzztree::Node* node)
 
 	for (const auto& child : node->children())
 	{
-		fuzzy &= isFuzzy(&child);
+		fuzzy |= isFuzzy(&child);
 	}
 	return fuzzy;
 }
@@ -78,7 +78,7 @@ InstanceAnalysisResult InstanceAnalysisTask::computeSingleResult()
 	future<AlphaCutAnalysisResult> alphaCutResult;
 	DecomposedFuzzyInterval resultInterval;
 
-	AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, 1, m_logFile);
+	AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, 0, m_logFile);
 	alphaCutResult = task->run();
 
 	resultInterval[task->getAlpha()] = alphaCutResult.get();

@@ -49,7 +49,7 @@ class Migration(SchemaMigration):
         users = orm['auth.User'].objects.all()
         
         for user in users:
-                sample_project = orm.Project(name='sample_project', owner=user)
+                sample_project = orm.Project(name='My Graphs', owner=user)
                 sample_project.save()
         
         # Adding field 'Graph.project' + assign any project_id to this field because of foreign key constraint 
