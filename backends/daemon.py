@@ -32,7 +32,7 @@ class WorkerThread(threading.Thread):
 
     def sendFiles(self, url, files):
 	logger.debug("Sending data to %s: %s"%(url, str(files)))
-        r = requests.post(url, files=files, allow_redirects=False)
+        r = requests.post(url, files=files, allow_redirects=False, verify=False)
 	if r.text:
 		logger.debug("Data sent, response was: "+str(r.text))
 
@@ -40,7 +40,7 @@ class WorkerThread(threading.Thread):
         url = self.joburl+'/exitcode'
 	logger.debug("Sending exit code %s to %s"%(str(exit_code), url))
         results = {'exit_code' : exit_code}
-        r = requests.post(url, data=results)
+        r = requests.post(url, data=results, verify=False)
         logger.debug("Error report sent, response was: "+str(r.text))
 
     def run(self):
