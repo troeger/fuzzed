@@ -454,6 +454,9 @@ def login(request):
             # not known to the backend so far, create it transparently
             if 'nickname' in user_sreg:
                 user_name = unicode(user_sreg['nickname'], 'utf-8')[:29]
+            else:
+                now = datetime.datetime.now()
+                user_name = 'Anonymous %d%d%d%d' % (now.hour, now.minute, now.second, now.microsecond)
 
             if 'email' in user_sreg:         
                 email = unicode(user_sreg['email'], 'utf-8')[:29]
@@ -461,43 +464,32 @@ def login(request):
             if AX.email in user_ax:
                 email = unicode(user_ax[AX.email], 'utf-8')[:29]
 
-            # no username given, register user with his e-mail address as username
-            if not user_name and email:
-                # Google is using different claim IDs for the same user, if he comes
-                # from different originating domains
-                # This leads to a problem when user come from "www" or without "www"
-                # In this case, the new username already exists in the database
-                try:
-                    old_user = User.objects.get(username=email)
-                    new_user = User(username=email + '2', email=email)
-                except:
-                    new_user = User(username=email, email=email)
-
-            # both, username and e-mail were not given, use a timestamp as username
-            elif not user_name and not email:
-                now = datetime.datetime.now()
-                user_name = 'Anonymous %d%d%d%d' % (now.hour, now.minute, now.second, now.microsecond)
+            # Google is using different claim IDs for the same user, if he comes
+            # from different originating domains
+            # This leads to a problem when user come from "www" or without "www"
+            # We solve this by trusting the given email address as unique identifier
+            if email:
+                new_user, created = User.objects.get_or_create(email=email, defaults={'email':email, 'username':user_name})
+            else:
                 new_user = User(username=user_name)
+                created = True
 
-            # username and e-mail were given; great - register as is
-            elif user_name and email:
-                new_user = User(username=user_name, email=email)
+            if created:
+                # Assign additional information to newly created User object
+                if AX.first in user_ax:
+                    new_user.first_name = unicode(user_ax[AX.first], 'utf-8')[:29]
 
-            # username given but no e-mail - at least we know how to call him
-            elif user_name and not email:
-                new_user = User(username=user_name)
+                if AX.last in user_ax:
+                    new_user.last_name=unicode(user_ax[AX.last], 'utf-8')[:29]
 
-            if AX.first in user_ax:
-                new_user.first_name = unicode(user_ax[AX.first], 'utf-8')[:29]
+                mail_managers('New user', str(new_user), fail_silently=True)
+                new_user.is_active = True
+            else:
+                mail_managers('New OpenID claim for user', str(new_user), fail_silently=True)
 
-            if AX.last in user_ax:
-                new_user.last_name=unicode(user_ax[AX.last], 'utf-8')[:29]
-
-            new_user.is_active = True
             new_user.save()
 
-            linkOpenID(new_user, user.openid_claim)
-            mail_managers('New user', str(new_user), fail_silently=True)
+            linkOpenID(new_user, user.openid_claim) # especially relevant when user object was fetched, and not created
             
             return redirect('/login/?openid_identifier=%s' % urllib.quote_plus(request.session['openid_identifier'])) 
             
