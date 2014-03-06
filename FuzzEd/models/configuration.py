@@ -10,13 +10,13 @@ class Configuration(models.Model):
   Class: Project
   
   Fields:
-   {Graph} graph            
-   {int}   cost                        
-                    
+   {Graph} graph       -        
+   {int}   cost        -                    
   """
   
   class Meta:
       app_label = 'FuzzEd'
   
-  graph = models.ForeignKey(Graph)
-  costs = models.IntegerField()
+  graph        = models.ForeignKey(Graph, related_name='configurations')
+  costs        = models.IntegerField()  
+    

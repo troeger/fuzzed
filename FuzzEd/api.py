@@ -22,7 +22,7 @@ from FuzzEd.decorators import require_ajax
 from FuzzEd.middleware import HttpResponse, HttpResponseNoResponse, HttpResponseBadRequestAnswer, \
                               HttpResponseForbiddenAnswer, HttpResponseCreated, HttpResponseNotFoundAnswer, \
                               HttpResponseServerErrorAnswer
-from FuzzEd.models import Graph, Node, notations, commands, Job
+from FuzzEd.models import Result, Graph, Node, notations, commands, Job
 
 import logging, json
 logger = logging.getLogger('FuzzEd')
@@ -590,6 +590,10 @@ def job_files(request, job_secret):
             # Retrieve binary file and store it
             assert(len(request.FILES.values())==1)
             job.result = request.FILES.values()[0].read()
+            
+            # parse job result
+            job.parseResult(job.result)
+            
             job.exit_code = 0       # This saves as a roundtrip. Having files means everything is ok.
             job.save()
             if not job.requires_download():

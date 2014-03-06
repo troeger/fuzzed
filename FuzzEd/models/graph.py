@@ -37,14 +37,15 @@ class Graph(models.Model):
     class Meta:
         app_label = 'FuzzEd'
 
-    kind      = models.CharField(max_length=127, choices=notations.choices)
-    name      = models.CharField(max_length=255)
-    owner     = models.ForeignKey(User, related_name='graphs')
-    project   = models.ForeignKey(Project, related_name='graphs')
-    created   = models.DateTimeField(auto_now_add=True, editable=False)
-    modified  = models.DateTimeField(auto_now=True)
-    deleted   = models.BooleanField(default=False)
-    read_only = models.BooleanField(default=False)
+    kind           = models.CharField(max_length=127, choices=notations.choices)
+    name           = models.CharField(max_length=255)
+    owner          = models.ForeignKey(User, related_name='graphs')
+    project        = models.ForeignKey(Project, related_name='graphs')
+    created        = models.DateTimeField(auto_now_add=True, editable=False)
+    modified       = models.DateTimeField(auto_now=True)
+    deleted        = models.BooleanField(default=False)
+    read_only      = models.BooleanField(default=False)
+    graph_issues   = models.TextField() 
 
     def __unicode__(self):
         return unicode('%s%s' % ('[DELETED] ' if self.deleted else '', self.name))

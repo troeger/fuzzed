@@ -5,12 +5,13 @@ from django.core.urlresolvers import reverse
 from django.core.mail import mail_managers
 from graph import Graph
 from south.modelsinspector import add_introspection_rules
-from FuzzEd.models import xml_analysis, xml_simulation
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 import uuid, json, xmlrpclib, math
 
 from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice, TransferInChoice
+from FuzzEd.models import xml_analysis, xml_simulation
+
 
 import logging
 logger = logging.getLogger('FuzzEd')
@@ -223,7 +224,65 @@ class Job(models.Model):
         #except Exception as e:
         #    mail_managers('Error on analysis result XML->JSON conversion', '%s\n\n%s' % (str(result_data), str(e),))
         #    raise HttpResponseServerErrorAnswer("We have an internal problem rendering your analysis result. Sorry! The developers are informed.")
-
+    
+    def parseResult(self, data):
+        logger.debug('!!!begin_parseResult!!!\n\n')
+        
+        type   = kind
+        graph_issues = {'errors':{}, 'warnings':{} }
+        prob   = {}
+            
+        
+        assert(data)
+        result_data = str(data)
+        topId = graph.top_node().client_id
+        
+        if (kind == Job.TOP_EVENT_JOB):
+            doc = xml_analysis.CreateFromDocument(result_data)
+        elif (kind == Job.SIMULATION_JOB):
+            doc = xml_simulation.CreateFromDocument(result_data)
+        else:
+            assert(False)
+        
+        ## Check global issues that are independent from the particular configuration
+        ## Since the frontend always wants an elementID, we stitch them
+        ## to the TOP event for the moment (check issue #181)
+        ## TODO: This will break for RBD analysis, since there is no top event
+        if hasattr(doc, 'issue'):
+            graphErrors = []
+            graphWarnings = []
+            for issue in doc.issue:
+                if issue.message and len(issue.message)>0:
+                    if issue.isFatal:
+                        graphErrors.append(issue.message)
+                    else:
+                        graphWarnings.append(issue.message)
+            if len(graphErrors) > 0:
+                graph_issues['errors'][topId] = graphErrors
+            if len(graphWarnings) > 0:
+                graph_issues['warnings'][topId] = graphWarnings
+                 
+                 
+        results = doc.result
+            
+        #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
+        if hasattr(results[0], 'decompositionNumber'):
+            decomposition = str(results[0].decompositionNumber)
+        
+        
+        #TODO: Save all configurations
+        #for result in results:
+        
+        
+        
+        
+        logger.debug('graph_issues:  ' + str(graph_issues))
+        logger.debug('decomposition: ' + str(decomposition))
+        logger.debug('prob:          ' + str(prob))
+        
+        logger.debug('!!!end_parseResult!!!\n\n')
+        return
+    
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
     ''' Informs notification listeners.
