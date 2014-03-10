@@ -14,7 +14,7 @@ Peter Troeger <peter@troeger.eu>
 #      Ab auf Github und PyPI
 
 from abc import ABCMeta, abstractmethod
-import platform, os, subprocess, time
+import platform, os, subprocess, time, sys
 
 class FastFood():
     ''' Abstract base class for the FastFood functionality. It provides a set of generic functions
@@ -52,8 +52,10 @@ class FastFood():
                     stderr = ''.join(p.stderr.readlines()).strip()
                     if stdout:
                         print stdout
+                        sys.stdout.flush()
                     if stderr:
                         print '\033[1;31m'+stderr+'\033[1;m'.strip()
+                        sys.stderr.flush()
             return p.returncode
         except OSError as e:
             print "Error while running "+str(args)+": "+str(e)
@@ -129,8 +131,7 @@ class FastFood():
             The two characters are followed by an arbitrary set of characters that expresses a version number in
             the particular package manager.
 
-            If the version is not given, the packager manager decides which one to install. 
-            Typically, this would be the most recent one.
+            If the version is not given, the packager manager decides if and what is installed. 
         '''
 
 class HomebrewFastFood(FastFood):
@@ -179,7 +180,7 @@ class PipFastFood(FastFood):
         elif version and version.startswith('>='):
             super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q '%s>=%s'"%(self.get_mapping(name), version[2:]))
         else:
-            super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q --upgrade "+self.get_mapping(name))
+            super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q "+self.get_mapping(name))
         super(PipFastFood, self).post_install()
 
     def supported(self):

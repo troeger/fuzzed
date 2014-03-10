@@ -1,3 +1,11 @@
+"""
+    This is the central internal FuzzEd API, used by different API's in the layer above to provide functionality.
+    For these functions, access security is assumed to be given, since this should be handled by higher API layers.
+    Ressource ownership security is supposed to be handled here.
+
+    [Note: According refactoring is work in progress.]
+"""
+
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import reverse
@@ -113,30 +121,27 @@ def graph(request, graph_id):
 
     return HttpResponse(graph.to_json(), 'application/javascript')
 
-@login_required
-@csrf_exempt
-@require_GET
-def graph_download(request, graph_id):
+def graph_download(user, graph_id, export_format):
     """
     Function: graph_download
-        Downloads the graph represented in the specified format
+        Provides a download response of the graph in the given format, or an HTTP error if 
+        the rendering job for the export format is not ready so far.
 
-    Request:            GET - /api/graphs/<GRAPH_ID>/graph_download
-    Request Parameters: [optional] format - Specifies the download format. Default is 'xml'.
-    Response:           TODO
+        It is sufficient to prepare the HTTP response already here, since link is independent
+        from the the kind of API being used for access
 
     Parameters:
-     {HTTPRequest} request   - the django request object
-     {int}         graph_id  - the id of the graph to be downloaded
+     user          - The requesting user's object in the model
+     graph_id      - the id of the graph to be downloaded
+     export_format - The demanded export format
 
     Returns:
      {HTTPResponse} a django response object
     """
-    if request.user.is_staff:
+    if user.is_staff:
         graph = get_object_or_404(Graph, pk=graph_id)
     else:
-        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)        
-    export_format = request.GET.get('format', 'xml')
+        graph = get_object_or_404(Graph, pk=graph_id, owner=user, deleted=False)        
 
     response = HttpResponse()
     response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
@@ -155,6 +160,8 @@ def graph_download(request, graph_id):
         response['Content-Type'] = 'application/text'
     elif export_format in ('pdf', 'eps'):
         try:
+            # Take the latest file that was successfully created
+            # This is based on the assumption that nobody calls this function before the job is done
             job = graph.jobs.filter(kind=export_format).latest('created')
             if not job.done():
                 raise HttpResponseNotFoundAnswer()
@@ -478,62 +485,52 @@ def redos(request, graph_id):
         #TODO Perform top command on redo stack
         return HttpResponseNoResponse()
 
-@login_required
-@csrf_exempt
-@require_http_methods(['GET'])
-def job_create(request, graph_id, job_kind):
+def job_create(user, graph_id, job_kind):
     """
-    Starts a job of the given kind for the given graph.
-    It is intended to return immediately with job information for the frontend.
+        Starts a job of the given kind for the given graph.
+        It is intended to return immediately with job object.
     """
-    if request.user.is_staff:
+    print user
+    if user.is_staff:
         graph = get_object_or_404(Graph, pk=graph_id)
     else:
-        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+        graph = get_object_or_404(Graph, pk=graph_id, owner=user, deleted=False)
 
     job = Job(graph=graph, kind=job_kind, graph_modified=graph.modified)
     job.save()
 
     # return URL for job status information
     logger.debug('Created new %s job with ID %d for graph %d' % (job.kind, job.pk, graph.pk))
-    response = HttpResponse(status=201)
-    response['Location'] = reverse('job_status', args=[job.pk])
-    return response
+    return job
  
-@login_required
-@csrf_exempt
-@require_http_methods(['GET'])
-def job_status(request, job_id):
-    ''' Returns the status information for the given job.
-        202 is delivered if the job is pending, otherwise the result is immediately returned.
+def job_status(user, job_id):
+    ''' Returns the status information for the given job, and the job object if available.
+        This API helper wraps functionality that is common to all frontend API versions of
+        this call.
+        0 - Job is done, deliver the result.
+        1 - Job is done, but you can't deliver the result due to an error.
+        2 - Job is not done, try again later.
+        3 - Job does not exist, go away.
     '''
     try:
         job = Job.objects.get(pk=job_id)
         # Prevent cross-checking of jobs by different users
-        assert(job.graph.owner == request.user or request.user.is_staff)
-
+        assert(job.graph.owner == user or user.is_staff)
     except:
-        # Inform the frontend nicely that the job no longer exists.
-        # TODO: Add reason for cancellation to body as plain text
-        raise HttpResponseNotFoundAnswer()
+        # The job does not exist, or it shouldn't exist for this user.        
+        return 3, None
 
     if job.done():
-        # response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
         if job.exit_code == 0:
-            logger.debug("Job is done, delivering result")
-            if job.requires_download():
-                # Return the URL to the file created by the job
-                return HttpResponse(reverse('FuzzEd.api.graph_download', args=(job.graph.pk,)))
-            else:
-                # Serve directly
-                return HttpResponse(job.result_rendering())
+            logger.debug("Job is done.")
+            return 0, job
         else:
-            logger.debug("Job is done with non-zero exit code, delivering according HTTP error")
+            logger.debug("Job is done, but with non-zero exit code.")
             mail_managers('Analysis of job %s ended with non-zero exit code.'%job.pk, job.graph.to_xml() )
-            raise HttpResponseServerErrorAnswer("We have an internal problem analyzing this graph. Sorry! The developers are informed.")
+            return 1, job
     else:       
-        logger.debug("Job is pending, keep the front end waiting.")
-        return HttpResponse(status=202)
+        logger.debug("Job is pending.")
+        return 2, job
 
 @csrf_exempt
 @require_http_methods(['GET', 'POST'])

@@ -6,6 +6,9 @@ from FuzzEd.models import Job
 from FuzzEd import settings
 
 from django.contrib import admin
+
+import api_oauth
+
 admin.autodiscover()
 
 re_uuid = "[0-F]{8}-[0-F]{4}-[0-F]{4}-[0-F]{4}-[0-F]{12}"
@@ -33,20 +36,20 @@ urlpatterns = patterns('',
     
     url(r'^robots\.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /admin/\nDisallow: /dashboard/\nDisallow: /editor/\n", mimetype="text/plain")),
     
-    # API
+    # Frontend API
     # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API
   
     # graph
     url(r'^api/graphs$','FuzzEd.api.graphs', name='graphs'),
     url(r'^api/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.graph', name='graph'),
     url(r'^api/graphs/(?P<graph_id>\d+)/transfers$', 'FuzzEd.api.graph_transfers', name='graph_transfers'),
-    url(r'^api/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.graph_download', name='graph_download'),
+    url(r'^api/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api_frontend.graph_download', name='frontend_graph_download'),
 
     # exports (graph downloads that return a job location instead of the direct result)
     url(r'^api/graphs/(?P<graph_id>\d+)/exports/pdf$', 
-        'FuzzEd.api.job_create', {'job_kind': Job.PDF_RENDERING_JOB}, name='export_pdf'),
+        'FuzzEd.api_frontend.job_create', {'job_kind': Job.PDF_RENDERING_JOB}, name='export_pdf'),
     url(r'^api/graphs/(?P<graph_id>\d+)/exports/eps$', 
-        'FuzzEd.api.job_create', {'job_kind': Job.EPS_RENDERING_JOB}, name='export_eps'),
+        'FuzzEd.api_frontend.job_create', {'job_kind': Job.EPS_RENDERING_JOB}, name='export_eps'),
 
     # node
     url(r'^api/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.nodes', name='nodes'),
@@ -68,21 +71,26 @@ urlpatterns = patterns('',
 
     # analysis
     url(r'^api/graphs/(?P<graph_id>\d+)/analysis/cutsets$', 
-        'FuzzEd.api.job_create', {'job_kind': Job.CUTSETS_JOB}, name='analyze_cutsets'),
+        'FuzzEd.api_frontend.job_create', {'job_kind': Job.CUTSETS_JOB}, name='analyze_cutsets'),
     url(r'^api/graphs/(?P<graph_id>\d+)/analysis/topEventProbability$',
-        'FuzzEd.api.job_create', {'job_kind': Job.TOP_EVENT_JOB}, name='analyze_top_event_probability'),
+        'FuzzEd.api_frontend.job_create', {'job_kind': Job.TOP_EVENT_JOB}, name='analyze_top_event_probability'),
 
     # simulation
     url(r'^api/graphs/(?P<graph_id>\d+)/simulation/topEventProbability$',
-        'FuzzEd.api.job_create', {'job_kind': Job.SIMULATION_JOB}, name='simulation_top_event_probability'),
+        'FuzzEd.api_frontend.job_create', {'job_kind': Job.SIMULATION_JOB}, name='simulation_top_event_probability'),
 
     # jobs
-    url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.job_status', name='job_status'),
+    url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api_frontend.job_status', name='frontend_job_status'),
     url(r'^api/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.job_exitcode', name='job_exitcode'),
     url(r'^api/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.job_files', name='job_files'),
 
     # user notifications
     url(r'^api/notifications/(?P<noti_id>\d+)/dismiss$','FuzzEd.api.noti_dismiss', name='noti_dismiss'),
 
+    ## Application API
+    ## All these calls are protected by OAuth, and not the session mechanisms
+
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    url(r'^api/graphs/(?P<graph_id>\d+)/pdf$', api_oauth.GraphPdf.as_view()),
 )
 urlpatterns += staticfiles_urlpatterns()
