@@ -46,7 +46,7 @@ def index(request):
         auth.logout(request)
 
     if request.user.is_authenticated():
-        if 'next' in request.GET:
+        if 'next' in request.GET and len(request.GET['next']) > 0:
             return redirect(request.GET['next'])
         else:
             return redirect('projects')

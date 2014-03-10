@@ -87,10 +87,15 @@ def install_less_stuff():
         fastfood.js.install("less")
         fastfood.system.run("sudo ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
 
+def install_oauth_client():
+    print "Installing OAuth client library"
+    fastfood.python.install('requests_oauthlib')
+
 @task 
 def dev():
     '''Installs all software needed to make the machine a development machine.'''
     install_django_stuff()
+    install_oauth_client()
     install_xml_stuff()
     install_backend_stuff()
     install_db_stuff()
