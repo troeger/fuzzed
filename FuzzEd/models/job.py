@@ -265,5 +265,5 @@ def job_post_save(sender, instance, created, **kwargs):
             s.start_job(instance.kind, job_files_url)
         except Exception as e:
             mail_managers("Exception on backend call - "+settings.BACKEND_DAEMON,str(e))
-            raise HttpResponseServerErrorAnswer("Sorry, we seem to have a problem with the analysis backend. The admins are informed, thanks for the patience.")
+            raise HttpResponseServerErrorAnswer("Sorry, we seem to have a problem with our FuzzEd backend. The admins are informed, thanks for the patience.")
 

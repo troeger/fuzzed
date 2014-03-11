@@ -89,8 +89,11 @@ urlpatterns = patterns('',
 
     ## Application API
     ## All these calls are protected by OAuth, and not the session mechanisms
-
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-    url(r'^api/graphs/(?P<graph_id>\d+)/pdf$', api_oauth.GraphPdf.as_view()),
+
+    url(r'^api/graphs/(?P<graph_id>\d+)/pdf$', api_oauth.GraphPdfExportView.as_view()),
+    url(r'^api/graphs/(?P<graph_id>\d+)/eps$', api_oauth.GraphEpsExportView.as_view()),
+    url(r'^api/graphs/(?P<graph_id>\d+)/tex$', api_oauth.GraphTexExportView.as_view()),
+    url(r'^api/graphs/(?P<graph_id>\d+)/graphml$', api_oauth.GraphGraphmlExportView.as_view()),
 )
 urlpatterns += staticfiles_urlpatterns()
