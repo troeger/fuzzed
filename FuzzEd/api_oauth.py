@@ -8,8 +8,55 @@
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from oauth2_provider.views.generic import ProtectedResourceView
 
+from tastypie.resources import ModelResource
+from tastypie.authentication import SessionAuthentication   # rely on Django session user information, filled by oauth2_provider
+from tastypie.serializers import Serializer
+from tastypie import fields
+from FuzzEd.models import Project, Graph
+
 import time
 import api
+
+class ProjectResource(ModelResource):
+    class Meta:
+        queryset = Project.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        list_allowed_methods = ['get']
+        detail_allowed_methods = ['get']
+        excludes = ['deleted', 'owner']
+
+    graphs = fields.ToManyField('FuzzEd.api_oauth.GraphResource', 'graphs')
+
+    def get_object_list(self, request):
+        return super(ProjectResource, self).get_object_list(request).filter(owner=request.user)
+
+class GraphSerializer(Serializer):
+    formats = ['json', 'tex', 'graphml']
+    content_types = {
+        'json': 'application/json',
+        'tex': 'application/text',
+        'graphml': 'application/xml'
+    }
+
+    def to_tex(self, data, options=None):
+        return data.obj.to_tikz()
+
+    def to_graphml(self, data, options=None):
+        return data.obj.to_graphml()
+
+class GraphResource(ModelResource):
+    class Meta:
+        queryset = Graph.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        list_allowed_methods = ['get']
+        detail_allowed_methods = ['get']
+        serializer = GraphSerializer()
+        excludes = ['deleted', 'owner', 'read_only']
+
+    project = fields.ToOneField(ProjectResource, 'project')
+
+    def get_object_list(self, request):
+        return super(GraphResource, self).get_object_list(request).filter(owner=request.user)
 
 class GraphDirectExportView(ProtectedResourceView):
     """ Base class for API views that export a graph directly, without rendering job. """

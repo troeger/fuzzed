@@ -31,7 +31,7 @@ class Command(BaseCommand):
         session = OAuth2Session(client_id, client=client)
         token = session.fetch_token(server+token_url, client_id=client_id, client_secret=client_secret)
         # Version 1 of using the gathered token, implicitely
-        response = session.get(server+'/api/graphs/1/tex')
+        response = session.get(server+'/api/v1/graph/1/?format=tex')
         print response.content
         # Version 2, save the token somewhere and reuse it
         #session2 = OAuth2Session(client_id, token=token)

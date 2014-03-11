@@ -7,7 +7,11 @@ from FuzzEd import settings
 
 from django.contrib import admin
 
+from tastypie.api import Api
 import api_oauth
+v1_api = Api(api_name='v1')
+v1_api.register(api_oauth.ProjectResource())
+v1_api.register(api_oauth.GraphResource())
 
 admin.autodiscover()
 
@@ -90,6 +94,7 @@ urlpatterns = patterns('',
     ## Application API
     ## All these calls are protected by OAuth, and not the session mechanisms
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    url(r'^api/', include(v1_api.urls)),
 
     url(r'^api/graphs/(?P<graph_id>\d+)/pdf$', api_oauth.GraphPdfExportView.as_view()),
     url(r'^api/graphs/(?P<graph_id>\d+)/eps$', api_oauth.GraphEpsExportView.as_view()),
