@@ -1,0 +1,124 @@
+{
+    "kind": "dfd",
+    "name": "Data Flow Diagram",
+    "nodes": {
+        "node": {
+            "nodeDisplayName": "Node",
+            "numberOfIncomingConnections": -1,
+            "numberOfOutgoingConnections": -1,
+
+            "allowConnectionTo": [],
+
+            "connector": {
+                "offset": {
+                    "top":    0,
+                    "bottom": 0
+                }
+            },
+
+            "properties": {
+                "name" : {
+                    "kind": "text",
+                    "default": "Node",
+                    "displayName": "Name",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"]
+                    }
+                }
+            }
+        },
+
+        "process": {
+            "nodeDisplayName": "Process",
+            "help": "This is a process! weeh",
+            "inherits": "node",
+            "image": "process.svg",
+
+            "allowConnectionTo": ["node"],
+
+            "properties": {
+                "name": {
+                    "default": "Process"
+                }
+            }
+        },
+
+        "storage": {
+            "nodeDisplayName": "Storage",
+            "help": "A Storage yoh",
+            "inherits": "node",
+            "image": "storage.svg",
+
+            "allowConnectionTo": ["process"],
+
+            "properties": {
+                "name": {
+                    "default": "Storage"
+                }
+            }
+        },
+
+        "external": {
+            "nodeDisplayName": "External Entity",
+            "help": "EE",
+            "inherits": "node",
+            "image": "external.svg",
+
+            "allowConnectionTo": ["process"],
+
+            "properties": {
+                "name": {
+                    "default": "Storage"
+                }
+            }
+        },
+        
+        "stickyNote": {
+            "nodeDisplayName": "Sticky Note",
+            "inherits": "node",
+            "numberOfOutgoingConnections": 0,
+            "image": "sticky_note.html",
+            "resizable": true,
+            "editable": true,
+            
+            "properties": {
+              "name" : {
+                  "hidden": true
+              },
+        
+              "description": {
+                  "kind": "textfield",
+                  "default": "Sample Text",
+                  "hidden": true
+              },
+              
+              "height": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              },
+              
+              "width": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              }              
+            }
+        }
+    },
+
+    "propertiesDisplayOrder": [
+        "name"
+    ],
+
+    "shapeMenuNodeDisplayOrder": [
+        "process",
+        "storage",
+        "external",
+        "stickyNote"
+    ]
+}
