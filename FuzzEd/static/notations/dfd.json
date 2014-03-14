@@ -70,7 +70,7 @@
 
             "properties": {
                 "name": {
-                    "default": "Storage"
+                    "default": "External Entity"
                 }
             }
         },
