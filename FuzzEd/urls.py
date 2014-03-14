@@ -91,14 +91,22 @@ urlpatterns = patterns('',
     # user notifications
     url(r'^api/notifications/(?P<noti_id>\d+)/dismiss$','FuzzEd.api.noti_dismiss', name='noti_dismiss'),
 
-    ## Application API
-    ## All these calls are protected by OAuth, and not the session mechanisms
-    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    ## Application API, protected by API key
     url(r'^api/', include(v1_api.urls)),
 
     url(r'^api/graphs/(?P<graph_id>\d+)/pdf$', api_oauth.GraphPdfExportView.as_view()),
     url(r'^api/graphs/(?P<graph_id>\d+)/eps$', api_oauth.GraphEpsExportView.as_view()),
     url(r'^api/graphs/(?P<graph_id>\d+)/tex$', api_oauth.GraphTexExportView.as_view()),
     url(r'^api/graphs/(?P<graph_id>\d+)/graphml$', api_oauth.GraphGraphmlExportView.as_view()),
+
+    # For getting OAuth2 authentication support, enable this
+    # Please note that the application and token registration views are not tailored so far
+    # Example client code lives in ./manage.py oauth, but only deals with trusted client authentication
+    # based on the client secret
+    # For end-user applications, we want to have full redirect support for the client, which smells
+    # more like a separate web application
+    # url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+
+
 )
 urlpatterns += staticfiles_urlpatterns()
