@@ -45,6 +45,13 @@
         </div>
 
         <div class="form-group">
+            <label class="col-lg-2 control-label" for="email">API Key</label>
+            <div class="col-lg-10">
+                <p>{{user.api_key.key}}&nbsp;&nbsp;&nbsp;<button type="submit" name="generate" value="generate" class="btn btn-default">Generate</button></p>
+            </div>
+        </div>
+
+        <div class="form-group">
             <div class="col-push-2 col-lg-10">
                 <div class="checkbox">
                     <label for="newsletter">
@@ -60,7 +67,7 @@
         <div class="form-group">
             <div class="col-push-2 col-lg-10">
                 <button type="submit" name="save" value="save" class="btn btn-primary">Save</button>
-                <button class="btn btn-default" onclick="history.go(-1); return false;">Cancel</button>
+                <button type="submit" name="cancel" value="cancel" class="btn btn-default">Cancel</button>
             </div>
         </div>
     </fieldset>

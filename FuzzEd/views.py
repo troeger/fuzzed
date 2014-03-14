@@ -312,9 +312,9 @@ def settings(request):
     """
     Function: settings
     
-    This view handler shows user its settings page. However, if the user is doing some changes to its profile and posts
-    the changes to this handler, it will change the underlying user object and redirect afterwards to the dashboard.
-    
+    The view for the settings page. The code remembers the last page (e.g. project overview or project details) and goes
+    backe to it afterwards.
+   
     Parameters:
      {HttpRequest} request - a django request object
     
@@ -339,6 +339,16 @@ def settings(request):
         user.save()
 
         messages.add_message(request, messages.SUCCESS, 'Settings saved.')
+        return redirect(request.session['comes_from'])
+    elif POST.get('generate'):
+        from tastypie.models import ApiKey         
+        user = request.user
+        # User may be new, without any previous API key
+        key = ApiKey.objects.get_or_create(user=user, defaults={'user': user})
+        # Save new API key
+        user.api_key.key = user.api_key.generate_key()
+        user.api_key.save()
+    elif POST.get('cancel'):
         return redirect(request.session['comes_from'])
 
     return render(request, 'util/settings.html')
