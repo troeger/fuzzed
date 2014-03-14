@@ -224,10 +224,10 @@ function(Canvas, Class, Config, Menus) {
          */
         _deleteEdge: function(jsPlumbEdge) {
             var id         = jsPlumbEdge._fuzzedId;
-
             var sourceNode = jQuery(jsPlumbEdge.source).data(this.config.Keys.NODE);
             var targetNode = jQuery(jsPlumbEdge.target).data(this.config.Keys.NODE);
 
+            if (typeof targetNode === 'undefined') return;
             sourceNode.restoreChildProperties(targetNode);
 
             // correct target and source node incoming and outgoing edges

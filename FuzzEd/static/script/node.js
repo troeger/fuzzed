@@ -690,8 +690,8 @@ function(Property, Mirror, Canvas, Class) {
          *
          * This method returns the position of the anchors for the connectors. The format is taken from jsPlumb and is
          * defined as a four-tuple: [x, y, edge_x, edge_y]. The values for x and y define the relative offset of the
-         * connector from the left upper corner of the container. Edge_x and edgy_y determine the direction connected
-         * edges point from the connector.
+         * connector from the left upper corner of the container. Edge_x and edgy_y determine the direction of connected
+         * edges pointing from or to the connector.
          *
          * Returns:
          *   {Object} with 'in' and 'out' keys containing jsPlumb four-tuple connector definitions.
@@ -715,7 +715,7 @@ function(Property, Mirror, Canvas, Class) {
         _connectorOffset: function() {
             // XXX: We need to use the offset of the image container because FF has difficulties to calculate the
             //      offsets of inline SVG elements directly.
-            var topOffset = this._nodeImageContainer.offset().top - this.container.offset().top;
+            var topOffset    = this._nodeImageContainer.offset().top - this.container.offset().top;
             var bottomOffset = topOffset + this._nodeImage.height() + this.connector.offset.bottom;
 
             return {

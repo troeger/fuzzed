@@ -9,5 +9,9 @@ define(['config', 'jquery'], function(Config) {
      *
      *  Extends: <Base::Config>
      */
-    return Config;
+    return jQuery.extend(true, Config, {
+        JSPlumb: {
+            CONNECTOR_STYLE: 'StateMachine'
+        }
+    });
 });
