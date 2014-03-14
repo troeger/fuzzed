@@ -1,4 +1,4 @@
-define(['config', 'class', 'jquery'], function(Config, Class) {
+define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
 
     /**
      * Class: Menu
