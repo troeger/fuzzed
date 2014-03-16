@@ -267,7 +267,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 },
                 HoverClass:      this.config.Classes.HIGHLIGHTED,
                 Connector:       [this.config.JSPlumb.CONNECTOR_STYLE, this.config.JSPlumb.CONNECTOR_OPTIONS],
-                ConnectionsDetachable: false
+                ConnectionsDetachable: false,
+                ConnectionOverlays: this.config.JSPlumb.CONNECTION_OVERLAYS
             });
 
             jsPlumb.connectorClass = this.config.Classes.JSPLUMB_CONNECTOR;

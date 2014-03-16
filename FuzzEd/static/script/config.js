@@ -325,6 +325,7 @@ define(['underscore'], function() {
 
             CONNECTOR_STYLE:    'Flowchart',
             CONNECTOR_OPTIONS:  {stub: 10 /* min. distance in px before connector bends */},
+            CONNECTION_OVERLAYS: undefined,
 
             ENDPOINT_RADIUS:    7,
             ENDPOINT_FILL:      HIGHLIGHTED_COLOR,
