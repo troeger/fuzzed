@@ -210,6 +210,8 @@ function(Property, Mirror, Canvas, Class) {
 
             // XXX: In Webkit browsers the container div does not resize properly. This should fix it.
             this.container.width(this._nodeImage.width());
+            this.container.height(this._nodeImage.height());
+
 
             // cache center of the image
             // XXX: We need to use the node image's container's position because Firefox fails otherwise
