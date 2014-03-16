@@ -1,7 +1,6 @@
 <?xml version="1.0" ?><svg height="36" id="storage" label="Storage" version="1.1" width="36" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
     <g>
     	<rect style="fill:#ffffff; stroke-width:0;" height="20.0" width="33.6" x="0.7" y="7.7"/>
-        <path d="M 0.7,7.7 34.3,7.7" style="stroke:#000000; stroke-width:1.4;"/>
-        <path d="M 0.7,27.3 34.3,27.3" style="fill-opacity: 0; stroke:#000000; stroke-width:1.4;"/>
+        <path d="M 0.7,7.7 L 34.3,7.7 M 0.7,27.3 L 34.3,27.3" style="stroke:#000000; stroke-width:1.4;"/>
     </g>
 </svg>
