@@ -13,9 +13,9 @@ from tastypie.authentication import ApiKeyAuthentication
 from tastypie.serializers import Serializer
 from tastypie import fields
 from FuzzEd.models import Project, Graph
+import FuzzEd.api
 
 import time
-import api
 
 class ProjectResource(ModelResource):
     class Meta:

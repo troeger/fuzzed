@@ -8,10 +8,10 @@ from FuzzEd import settings
 from django.contrib import admin
 
 from tastypie.api import Api
-import api_oauth
+import api_ext
 v1_api = Api(api_name='v1')
-v1_api.register(api_oauth.ProjectResource())
-v1_api.register(api_oauth.GraphResource())
+v1_api.register(api_ext.ProjectResource())
+v1_api.register(api_ext.GraphResource())
 
 admin.autodiscover()
 
@@ -93,11 +93,6 @@ urlpatterns = patterns('',
 
     ## Application API, protected by API key
     url(r'^api/', include(v1_api.urls)),
-
-    url(r'^api/graphs/(?P<graph_id>\d+)/pdf$', api_oauth.GraphPdfExportView.as_view()),
-    url(r'^api/graphs/(?P<graph_id>\d+)/eps$', api_oauth.GraphEpsExportView.as_view()),
-    url(r'^api/graphs/(?P<graph_id>\d+)/tex$', api_oauth.GraphTexExportView.as_view()),
-    url(r'^api/graphs/(?P<graph_id>\d+)/graphml$', api_oauth.GraphGraphmlExportView.as_view()),
 
     # For getting OAuth2 authentication support, enable this
     # Please note that the application and token registration views are not tailored so far

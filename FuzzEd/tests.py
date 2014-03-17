@@ -35,7 +35,7 @@ class FuzzEdTestCase(LiveServerTestCase):
         return self.c.get(url)
 
     def getWithAPIKey(self, url):
-        return self.c.get(url, **{'Authorization':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
+        return self.c.get(url, **{'HTTP_AUTHORIZATION':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
 
     def ajaxGet(self, url):
         return self.c.get( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
@@ -100,6 +100,13 @@ class ViewsTestCase(SimpleFixtureTestCase):
 class ExternalAPITestCase(SimpleFixtureTestCase):
     def setUp(self):
         self.setUpAnonymous()        
+
+    def testMissingAPIKey(self):
+        response=self.get('/api/v1/?format=json')
+        self.assertEqual(response.status_code, 200)     # the only call the should work without API key
+        response=self.get('/api/v1/project/?format=json')
+        self.assertEqual(response.status_code, 401)
+
     def testRootResource(self):
         ''' Root view of external API should provide graph and project resource URLs'''
         response=self.get('/api/v1/?format=json')
@@ -107,12 +114,6 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         data = json.loads(response.content)
         assert('graph' in data)
         assert('project' in data)
-
-    def testMissingAPIKey(self):
-        response=self.get('/api/v1/?format=json')
-        self.assertEqual(response.status_code, 200)     # the only call the should work without API key
-        response=self.get('/api/v1/project/?format=json')
-        self.assertEqual(response.status_code, 401)
 
     def testProjectResource(self):
         response=self.getWithAPIKey('/api/v1/project/?format=json')
