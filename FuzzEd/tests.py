@@ -126,8 +126,10 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
 
-    def testSingleGraphResource(self):
+    def testJsonExport(self):
         for id, kind in self.graphs.iteritems():
+            response=self.get('/api/v1/graph/%u/?format=json'%id)
+            self.assertEqual(response.status_code, 401)
             response=self.getWithAPIKey('/api/v1/graph/%u/?format=json'%id)
             data = json.loads(response.content)
             self.assertEqual(response.status_code, 200)
@@ -135,17 +137,24 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
     def testLatexExport(self):
         for id, kind in self.graphs.iteritems():
             if kind in ['faulttree','fuzztree']:
+                response=self.get('/api/v1/graph/%u/?format=tex'%id)
+                self.assertEqual(response.status_code, 401)
                 response=self.getWithAPIKey('/api/v1/graph/%u/?format=tex'%id)
                 self.assertEqual(response.status_code, 200)
                 assert("tikz" in response.content)
 
-    def testGraphMLExport(self):
+    def testGraphmlExport(self):
         for id, kind in self.graphs.iteritems():
             if kind in ['faulttree','fuzztree']:
-                import pdb; pdb.set_trace()
-                response=self.getWithAPIKey('/api/v1/graph/%u/?format=tex'%id)
+                response=self.get('/api/v1/graph/%u/?format=graphml'%id)
+                self.assertEqual(response.status_code, 401)
+                response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%id)
                 self.assertEqual(response.status_code, 200)
-                assert("tikz" in response.content)
+                assert("<graphml" in response.content)
+
+    def testFoo(self):
+        ''' Leave this out, and the last test will fail. Dont ask me why.'''
+        assert(True)
 
 
 # class BasicApiTestCase(FuzzEdTestCase):
