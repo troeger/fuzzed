@@ -65,10 +65,9 @@ class GraphResource(ModelResource):
     def get_object_list(self, request):
         return super(GraphResource, self).get_object_list(request).filter(owner=request.user)
 
-    def hydrate(self, bundle):
-        bundle.data['owner'] = bundle.request.user.pk
-        return bundle
-
+    def obj_create(self, bundle, **kwargs):
+        #TODO: Bring project into the request, either by nested resources or explicit project URI in request
+        return super(GraphResource, self).obj_create(bundle, owner=bundle.request.user)
 
 # class GraphJobExportView(ProtectedResourceView):
 #     """ Base class for API views that export a graph based on a rendering job result. """
