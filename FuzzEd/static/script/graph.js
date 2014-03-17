@@ -259,6 +259,7 @@ function(Canvas, Class, Config, Menus) {
 
             var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
 
+            this.nodes[node.id] = node;
             jQuery(document).trigger(this.config.Events.GRAPH_NODE_ADDED, [
                 node.id,
                 kind,
@@ -266,7 +267,6 @@ function(Canvas, Class, Config, Menus) {
                 node.y,
                 node.toDict().properties
             ]);
-            this.nodes[node.id] = node;
 
             return node;
         },
