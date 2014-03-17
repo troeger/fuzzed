@@ -25,7 +25,7 @@ class ProjectResource(ModelResource):
         detail_allowed_methods = ['get']
         excludes = ['deleted', 'owner']
 
-    graphs = fields.ToManyField('FuzzEd.api_oauth.GraphResource', 'graphs')
+    graphs = fields.ToManyField('FuzzEd.api_ext.GraphResource', 'graphs')
 
     def get_object_list(self, request):
         return super(ProjectResource, self).get_object_list(request).filter(owner=request.user)

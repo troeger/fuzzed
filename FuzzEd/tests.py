@@ -18,8 +18,8 @@ from FuzzEd.models.node import Node
 # - Run the tests with 'fab run_tests'.
 # - Edit your fixture file by loading it into the local database with 'fab fixture_load:<filename.json>'
 
-# This disables all the debug output. Sometimes it may be helpful.
-#logging.disable(logging.CRITICAL)
+# This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
+logging.disable(logging.CRITICAL)
 
 class FuzzEdTestCase(LiveServerTestCase):
     def setUpAnonymous(self):
@@ -131,6 +131,21 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
             response=self.getWithAPIKey('/api/v1/graph/%u/?format=json'%id)
             data = json.loads(response.content)
             self.assertEqual(response.status_code, 200)
+
+    def testLatexExport(self):
+        for id, kind in self.graphs.iteritems():
+            if kind in ['faulttree','fuzztree']:
+                response=self.getWithAPIKey('/api/v1/graph/%u/?format=tex'%id)
+                self.assertEqual(response.status_code, 200)
+                assert("tikz" in response.content)
+
+    def testGraphMLExport(self):
+        for id, kind in self.graphs.iteritems():
+            if kind in ['faulttree','fuzztree']:
+                import pdb; pdb.set_trace()
+                response=self.getWithAPIKey('/api/v1/graph/%u/?format=tex'%id)
+                self.assertEqual(response.status_code, 200)
+                assert("tikz" in response.content)
 
 
 # class BasicApiTestCase(FuzzEdTestCase):
