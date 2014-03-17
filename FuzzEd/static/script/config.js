@@ -233,6 +233,7 @@ define(['underscore'], function() {
             GRAPH_LAYOUTED:            'graph-layouted',
 
             NODE_DRAG_STOPPED:         'node-drag-stopped',
+            NODES_MOVED:               'nodes-moved',
 
             PROPERTY_CHANGED:          'property-changed',
             PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',
@@ -325,6 +326,7 @@ define(['underscore'], function() {
 
             CONNECTOR_STYLE:    'Flowchart',
             CONNECTOR_OPTIONS:  {stub: 10 /* min. distance in px before connector bends */},
+            CONNECTION_OVERLAYS: undefined,
 
             ENDPOINT_RADIUS:    7,
             ENDPOINT_FILL:      HIGHLIGHTED_COLOR,

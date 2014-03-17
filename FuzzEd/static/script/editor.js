@@ -263,11 +263,14 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 }],
                 PaintStyle: {
                     strokeStyle: this.config.JSPlumb.STROKE_COLOR,
-                    lineWidth:   this.config.JSPlumb.STROKE_WIDTH
+                    lineWidth:   this.config.JSPlumb.STROKE_WIDTH,
+                    outlineColor:this.config.JSPlumb.OUTLINE_COLOR,
+                    outlineWidth:this.config.JSPlumb.OUTLINE_WIDTH
                 },
                 HoverClass:      this.config.Classes.HIGHLIGHTED,
                 Connector:       [this.config.JSPlumb.CONNECTOR_STYLE, this.config.JSPlumb.CONNECTOR_OPTIONS],
-                ConnectionsDetachable: false
+                ConnectionsDetachable: false,
+                ConnectionOverlays: this.config.JSPlumb.CONNECTION_OVERLAYS
             });
 
             jsPlumb.connectorClass = this.config.Classes.JSPLUMB_CONNECTOR;
@@ -696,6 +699,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                     y: yDirection * Canvas.gridSize
                 });
             }.bind(this));
+
+            jQuery(document).trigger(this.config.Events.NODES_MOVED);
 
             return this;
         },
