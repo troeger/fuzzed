@@ -1,4 +1,4 @@
-define(['dfd/config', 'node', 'jsplumb'], function(Config, AbstractNode) {
+define(['dfd/config', 'node', 'canvas', 'jquery', 'jsplumb'], function(Config, AbstractNode, Canvas) {
     /**
      * Package: DFD
      */
