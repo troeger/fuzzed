@@ -1,5 +1,6 @@
 $script = <<SCRIPT
 echo Provisioning Machine...
+echo "cd /home/fuzztrees" >> .bashrc
 sudo apt-get update
 sudo apt-get -y install python-software-properties
 sudo add-apt-repository -y ppa:george-edison55/gcc4.7-precise
