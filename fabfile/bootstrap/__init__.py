@@ -32,6 +32,7 @@ def install_backend_stuff():
         fastfood.python.install(package)        
 
 def install_db_stuff():
+    fastfood.system.install("psycopg2")
     if os.system("pg_isready -q") != 0:
         # Install native packages, dependent on OS
         print "Installing Postgres"
@@ -77,7 +78,7 @@ def install_analysis_stuff():
         fastfood.system.install("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
 
 def install_less_stuff():
-    fastfood.system.install("npm", if_fails="npm")
+    fastfood.system.install("npm", if_fails="npm -v")
     if platform.system() != 'Darwin':
         fastfood.system.install("nodejs")
     # Installing less via npm: no brew on Darwin, too old in Linux apt
@@ -102,8 +103,11 @@ def dev():
     install_analysis_stuff()
     install_less_stuff()    
 
-    print "Performing complete build to get loadable Django project code"
-    fastfood.system.run("fab build.all")
+    print "Performing relevant builds for loadable Django project, skipping backend ..."
+    fastfood.system.run("fab build.configs")
+    fastfood.system.run("fab build.css")
+    fastfood.system.run("fab build.notations")
+    fastfood.system.run("fab build.xmlschemas")
     print "Initializing and syncing local database ..."
     fastfood.system.run('./manage.py syncdb --noinput --no-initial-data --migrate')
     
