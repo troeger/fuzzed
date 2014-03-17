@@ -32,24 +32,25 @@ def install_backend_stuff():
         fastfood.python.install(package)        
 
 def install_db_stuff():
-    # Install native packages, dependent on OS
-    print "Installing Postgres"
-    if platform.system() != 'Darwin':
-        fastfood.system.install("postgresql")
-        fastfood.system.install("python-psycopg2")
-    else:
-        fastfood.system.install("postgres")        
-    # Postgres installation, including database creation
-    print "Configuring and starting PostgreSQL ..."
-    fastfood.system.run('cp fabfile/bootstrap/sql.txt /tmp/')
-    if platform.system() == "Darwin":
-        fastfood.system.run('initdb /usr/local/var/postgres -E utf8', print_output=False)                                 # Initialize system database
-        fastfood.system.run('ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents', print_output=False)       # Enable autostart  
-        fastfood.system.run('launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist', print_output=False)   # Start it now
-        fastfood.system.run('/usr/local/bin/psql -f /tmp/sql.txt postgres', print_output=False)
-    else:
-        fastfood.system.run('sudo su - postgres -c \"rm -f /tmp/sql.txt \"', print_output=False)    
-        fastfood.system.run('sudo su - postgres -c \"psql -f /tmp/sql.txt postgres\"', print_output=False)    
+    if os.system("pg_isready -q") != 0:
+        # Install native packages, dependent on OS
+        print "Installing Postgres"
+        if platform.system() != 'Darwin':
+            fastfood.system.install("postgresql")
+            fastfood.system.install("python-psycopg2")
+        else:
+            fastfood.system.install("postgres")        
+        # Postgres installation, including database creation
+        print "Configuring and starting PostgreSQL ..."
+        fastfood.system.run('cp fabfile/bootstrap/sql.txt /tmp/')
+        if platform.system() == "Darwin":
+            fastfood.system.run('initdb /usr/local/var/postgres -E utf8', print_output=False)                                 # Initialize system database
+            fastfood.system.run('ln -sfv /usr/local/opt/postgresql/*.plist ~/Library/LaunchAgents', print_output=False)       # Enable autostart  
+            fastfood.system.run('launchctl load ~/Library/LaunchAgents/homebrew.mxcl.postgresql.plist', print_output=False)   # Start it now
+            fastfood.system.run('/usr/local/bin/psql -f /tmp/sql.txt postgres', print_output=False)
+        else:
+            fastfood.system.run('sudo su - postgres -c \"rm -f /tmp/sql.txt \"', print_output=False)    
+            fastfood.system.run('sudo su - postgres -c \"psql -f /tmp/sql.txt postgres\"', print_output=False)    
 
 def install_rendering_stuff():
     # Install native packages, dependent on OS
@@ -63,12 +64,12 @@ def install_rendering_stuff():
 
 def install_analysis_stuff():
     # Install native packages, independent from OS
-    fastfood.system.install("cmake")        
+    fastfood.system.install("cmake", if_fails="cmake --version")        
 
     # Install native packages, dependent on OS
     if platform.system() != 'Darwin':
         fastfood.system.install("libboost1.48-all-dev")
-        fastfood.system.install("g++")        
+        fastfood.system.install("g++", if_fails="g++")        
     else:
         # Perform latest GCC installation on Homebrew
         print "Installing latest GCC"
@@ -76,16 +77,14 @@ def install_analysis_stuff():
         fastfood.system.install("gcc49") # if you mess around with this, you also need to fix the CMAKE configuration
 
 def install_less_stuff():
-    fastfood.system.install("npm")
+    fastfood.system.install("npm", if_fails="npm")
     if platform.system() != 'Darwin':
         fastfood.system.install("nodejs")
     # Installing less via npm: no brew on Darwin, too old in Linux apt
-    print "Checking for lessc"
-    if not fastfood.system.which('lessc'):
-        print "Installing lessc"
-        # Install less from NPM
-        fastfood.js.install("less")
-        fastfood.system.run("sudo ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
+    print "Installing lessc"
+    # Install less from NPM
+    fastfood.js.install("less", if_fails="lessc -v")
+    fastfood.system.run("sudo ln -s /usr/local/share/npm/bin/lessc /usr/local/bin/lessc")
 
 def install_oauth_client():
     print "Installing OAuth client library"
