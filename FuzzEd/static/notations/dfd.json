@@ -26,6 +26,18 @@
                         "position": "bottom",
                         "style": ["bold", "large"]
                     }
+                },
+                "zones" : {
+                    "kind": "text",
+                    "default": "[]",
+                    "displayName": "Zones",
+                    "hidden": true
+                },
+                "out_labels" : {
+                    "kind": "text",
+                    "default": "[]",
+                    "displayName": "Labels",
+                    "hidden": true
                 }
             }
         },
@@ -112,7 +124,12 @@
     },
 
     "propertiesDisplayOrder": [
-        "name"
+        "name",
+        "zones",
+        "out_labels",
+        "description",
+        "width",
+        "height"
     ],
 
     "shapeMenuNodeDisplayOrder": [
