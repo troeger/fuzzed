@@ -14,7 +14,10 @@ define(['config', 'jquery'], function(Config) {
             CONNECTOR_STYLE:        'Bezier',
             CONNECTOR_OPTIONS:      { curviness: 10},
             
-            CONNECTION_OVERLAYS:    [[ "Arrow", { width:10, length:10, location:1, id:"arrow" } ]]
+            CONNECTION_OVERLAYS:    [[ "Arrow", { width:10, length:10, location:1, id:"arrow" } ]],
+        
+            OUTLINE_COLOR:          'white',
+            OUTLINE_WIDTH:          2,
         }
     });
 });

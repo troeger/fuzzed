@@ -233,6 +233,7 @@ define(['underscore'], function() {
             GRAPH_LAYOUTED:            'graph-layouted',
 
             NODE_DRAG_STOPPED:         'node-drag-stopped',
+            NODES_MOVED:               'nodes-moved',
 
             PROPERTY_CHANGED:          'property-changed',
             PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',

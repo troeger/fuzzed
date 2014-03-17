@@ -440,6 +440,7 @@ function(Property, Mirror, Canvas, Class) {
                             'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
                         });
                     }.bind(this));
+                    jQuery(document).trigger(this.config.Events.NODES_MOVED);
                 }.bind(this),
 
                 // stop dragging callback
