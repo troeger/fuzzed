@@ -31,6 +31,10 @@ class ProjectResource(ModelResource):
         return super(ProjectResource, self).get_object_list(request).filter(owner=request.user)
 
 class GraphSerializer(Serializer):
+    """
+        Our custom serializer / deserializer for graph formats we support.
+        The XML format is GraphML, anything else is not supported.
+    """
     formats = ['json', 'tex', 'graphml']
     content_types = {
         'json': 'application/json',
@@ -44,11 +48,14 @@ class GraphSerializer(Serializer):
     def to_graphml(self, data, options=None):
         return data.obj.to_graphml()
 
+    def from_graphml(self, content):
+        return Graph.from_graphml(content).to_dict()
+
 class GraphResource(ModelResource):
     class Meta:
         queryset = Graph.objects.filter(deleted=False)
         authentication = ApiKeyAuthentication()
-        list_allowed_methods = ['get']
+        list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get']
         serializer = GraphSerializer()
         excludes = ['deleted', 'owner', 'read_only']
@@ -58,13 +65,10 @@ class GraphResource(ModelResource):
     def get_object_list(self, request):
         return super(GraphResource, self).get_object_list(request).filter(owner=request.user)
 
-# class GraphDirectExportView(ProtectedResourceView):
-#     """ Base class for API views that export a graph directly, without rendering job. """
-#     export_format = None
-#     def get(self, request, *args, **kwargs):
-#         assert('graph_id' in kwargs)
-#         graph_id = int(kwargs['graph_id'])
-#         return api.graph_download(request.user, graph_id, self.export_format)
+    def hydrate(self, bundle):
+        bundle.data['owner'] = bundle.request.user.pk
+        return bundle
+
 
 # class GraphJobExportView(ProtectedResourceView):
 #     """ Base class for API views that export a graph based on a rendering job result. """
@@ -81,16 +85,4 @@ class GraphResource(ModelResource):
 #             return api.graph_download(request.user, graph_id, self.export_format)
 #         else:
 #             raise HttpResponseServerErrorAnswer("Internal error, could not create file. Try the web frontend.")
-
-# class GraphEpsExportView(GraphJobExportView):
-#     export_format = 'eps'
-
-# class GraphPdfExportView(GraphJobExportView):
-#     export_format = 'pdf'
-
-# class GraphTexExportView(GraphDirectExportView):
-#     export_format = 'tex'
-
-# class GraphGraphmlExportView(GraphDirectExportView):
-#     export_format = 'graphml'
 

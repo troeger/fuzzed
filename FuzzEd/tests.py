@@ -37,6 +37,9 @@ class FuzzEdTestCase(LiveServerTestCase):
     def getWithAPIKey(self, url):
         return self.c.get(url, **{'HTTP_AUTHORIZATION':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
 
+    def postWithAPIKey(self, url, data, content_type):
+        return self.c.post(url, data, content_type, **{'HTTP_AUTHORIZATION':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
+
     def ajaxGet(self, url):
         return self.c.get( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
 
@@ -78,6 +81,7 @@ class SimpleFixtureTestCase(FuzzEdTestCase):
     fixtures = ['simple.json']
     project_id = 1
     graphs = {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'}
+    faulttree = 1
 
 
 class ViewsTestCase(SimpleFixtureTestCase):
@@ -146,11 +150,21 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
     def testGraphmlExport(self):
         for id, kind in self.graphs.iteritems():
             if kind in ['faulttree','fuzztree']:
+                # Should only be possible with API key authentication
                 response=self.get('/api/v1/graph/%u/?format=graphml'%id)
                 self.assertEqual(response.status_code, 401)
                 response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%id)
                 self.assertEqual(response.status_code, 200)
                 assert("<graphml" in response.content)
+
+    def testGraphmlImport(self):
+        for id, kind in self.graphs.iteritems():
+                # First export GraphML, then import the same
+                response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%id)
+                self.assertEqual(response.status_code, 200)
+                graphml = response.content
+                response=self.postWithAPIKey('/api/v1/graph/?format=graphml', graphml, 'application/xml')
+                self.assertEqual(response.status_code, 201)
 
     def testFoo(self):
         ''' Leave this out, and the last test will fail. Dont ask me why.'''

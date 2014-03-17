@@ -10,6 +10,7 @@ try:
 except:
     print "ERROR: Perform a build process first."
     exit(-1)
+from defusedxml.ElementTree import fromstring as parseXml
 
 from project import Project
 from node_rendering import tikz_shapes
@@ -112,10 +113,9 @@ class Graph(models.Model):
         return ''.join([
             '<?xml version="1.0" encoding="utf-8"?>\n'
             '<graphml xmlns="http://graphml.graphdrawing.org/xmlns"\n'
-            '         xmlns="http://graphml.graphdrawing.org/xmlns"\n'
+            '         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
             '         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns\n'
-            '           http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"\n'
-            '>\n'
+            '                             http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">\n'
             '    <graph id="graph" edgedefault="directed">\n',
                  notations.graphml_keys[self.kind],
                  '\n',
@@ -123,8 +123,8 @@ class Graph(models.Model):
                  [node.to_graphml() for node in self.nodes.filter(deleted=False)] +
                  [edge.to_graphml() for edge in self.edges.filter(deleted=False)] +
 
-           ['    <graph>\n'
-            '<graphml>\n'
+           ['    </graph>\n'
+            '</graphml>\n'
         ])
 
     def to_tikz(self):
@@ -206,6 +206,15 @@ class Graph(models.Model):
         self.save()
         top=Node(graph=self)
         top.load_xml(tree.topEvent)
+
+    @staticmethod
+    def from_graphml(graphml):
+        ''' Parses the given GraphML with the DefusedXML library, for better security.
+            Returns the DICT version of the generated Graph object, which is needed for Tastypie.
+        '''
+        g = Graph()
+        dom = parseXml(graphml)
+        return g
 
     def copy_values(self, other):
         # copy all nodes and their properties
