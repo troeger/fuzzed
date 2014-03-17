@@ -76,6 +76,7 @@ class FuzzEdTestCase(LiveServerTestCase):
 class SimpleFixtureTestCase(FuzzEdTestCase):
     ''' This is a base class that wraps all information about the 'simple' fixture. '''
     fixtures = ['simple.json']
+    project_id = 1
     graphs = {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'}
 
 
@@ -102,25 +103,34 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         self.setUpAnonymous()        
 
     def testMissingAPIKey(self):
-        response=self.get('/api/v1/?format=json')
-        self.assertEqual(response.status_code, 200)     # the only call the should work without API key
         response=self.get('/api/v1/project/?format=json')
         self.assertEqual(response.status_code, 401)
 
     def testRootResource(self):
-        ''' Root view of external API should provide graph and project resource URLs'''
+        ''' Root view of external API should provide graph and project resource base URLs, even without API key.'''
         response=self.get('/api/v1/?format=json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         assert('graph' in data)
         assert('project' in data)
 
-    def testProjectResource(self):
+    def testProjectListResource(self):
         response=self.getWithAPIKey('/api/v1/project/?format=json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
         assert('objects' in data)
         assert('graphs' in data['objects'][0])
+
+    def testSingleProjectResource(self):
+        response=self.getWithAPIKey('/api/v1/project/%u/?format=json'%self.project_id)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+
+    def testSingleGraphResource(self):
+        for id, kind in self.graphs.iteritems():
+            response=self.getWithAPIKey('/api/v1/graph/%u/?format=json'%id)
+            data = json.loads(response.content)
+            self.assertEqual(response.status_code, 200)
 
 
 # class BasicApiTestCase(FuzzEdTestCase):
