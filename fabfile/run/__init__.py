@@ -40,4 +40,4 @@ def server():
 @task
 def tests():
     '''Runs all the tests.'''
-    os.system('./manage.py test FuzzEd')
+    os.system('./manage.py test FuzzEd.tests')

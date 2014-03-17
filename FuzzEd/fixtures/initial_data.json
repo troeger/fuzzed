@@ -1,13 +1,29 @@
 [
-    {
-        "model": "auth.user",
-        "pk": 1,
-        "fields": {
-            "username" : "admin",
-            "password" : "pbkdf2_sha256$10000$10000$mAedDC259RWNsD/MElFRcfS5yKEJR/nLkIpc+8h2d1k=",
-            "is_active" : true,
-            "is_superuser" : true,
-            "is_staff": true
-        }
+{
+    "pk": 2, 
+    "model": "auth.user", 
+    "fields": {
+        "username": "testadmin", 
+        "first_name": "", 
+        "last_name": "", 
+        "is_active": true, 
+        "is_superuser": false, 
+        "is_staff": true, 
+        "last_login": "2014-03-17T08:26:19.316", 
+        "groups": [], 
+        "user_permissions": [], 
+        "password": "pbkdf2_sha256$12000$Nty0SJCLJacc$cO6UJmioRTunFkt/5gBOnbXFbTPy7tHFOgb/1fJuYuw=", 
+        "email": "", 
+        "date_joined": "2014-03-17T08:24:35"
     }
+},
+{
+    "pk": 1, 
+    "model": "tastypie.apikey", 
+    "fields": {
+        "user": 2, 
+        "key": "f1cc367bc09fc95720e6c8a4225ae2b912fff91b", 
+        "created": "2014-03-17T08:26:26.242"
+    }
+}
 ]
