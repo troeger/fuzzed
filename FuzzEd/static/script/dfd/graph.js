@@ -49,19 +49,26 @@ function(Graph, DfdNode, DfdConfig, DfdNotation, Canvas) {
 
             jQuery(document).on(this.config.Events.NODES_MOVED,  this._redraw_communication_zones.bind(this));
             jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED,  this._delete_node_from_zones.bind(this));
+            jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,  this._add_node_to_zones.bind(this));
+
             return this._super()
         },
 
         _initialize_zones: function() {
             _.each(this.nodes, function(node){
-                var zone_ids = JSON.parse(node.properties['zones'].value);
+                this._add_node_to_zones(undefined, node.id);
+            }, this);
+        },
+
+        _add_node_to_zones: function(event, nodeId) {
+            var node = this.getNodeById(nodeId);
+            var zone_ids = JSON.parse(node.properties['zones'].value);
                 _.each(zone_ids, function(zone_id){
                     if(this.zones[zone_id] === undefined)
                         this.zones[zone_id] = [node.id];
                     else
                         this.zones[zone_id].push(node.id);
                 }, this);
-            }, this);
             this._redraw_communication_zones();
         },
 

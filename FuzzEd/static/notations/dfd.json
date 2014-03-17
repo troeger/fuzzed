@@ -8,6 +8,7 @@
             "numberOfOutgoingConnections": -1,
 
             "allowConnectionTo": [],
+            "copyable": true,
 
             "connector": {
                 "offset": {
