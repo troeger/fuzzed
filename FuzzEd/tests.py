@@ -125,6 +125,11 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         assert('objects' in data)
         assert('graphs' in data['objects'][0])
 
+    def testGraphListResource(self):
+        response=self.getWithAPIKey('/api/v1/graph/?format=json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+
     def testSingleProjectResource(self):
         response=self.getWithAPIKey('/api/v1/project/%u/?format=json'%self.project_id)
         self.assertEqual(response.status_code, 200)
@@ -159,12 +164,15 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
 
     def testGraphmlImport(self):
         for id, kind in self.graphs.iteritems():
-                # First export GraphML, then import the same
+                # First export GraphML
                 response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%id)
                 self.assertEqual(response.status_code, 200)
                 graphml = response.content
-                response=self.postWithAPIKey('/api/v1/graph/?format=graphml', graphml, 'application/xml')
+                # Now import the same GraphML
+                response=self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%self.project_id, graphml, 'application/xml')
+                print response['Location']
                 self.assertEqual(response.status_code, 201)
+                #TODO: Check if the model object is available
 
     def testFoo(self):
         ''' Leave this out, and the last test will fail. Dont ask me why.'''
