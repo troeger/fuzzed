@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
+from FuzzEd.lib.jsonfield import JSONField
 from node import Node
 from configuration import Configuration
 
@@ -12,7 +13,7 @@ class NodeConfiguration(models.Model):
   
   Fields:
    {Node}          node            
-   {str}           setting                        
+   {JSON}          setting                        
    {Configuration} configuration                
   """
   
@@ -20,5 +21,5 @@ class NodeConfiguration(models.Model):
       app_label = 'FuzzEd'
   
   node          = models.ForeignKey(Node)
-  setting       = models.TextField()
+  setting       = JSONField()
   configuration = models.ForeignKey(Configuration, related_name='node_configurations')

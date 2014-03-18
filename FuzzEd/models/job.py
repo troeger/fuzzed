@@ -4,6 +4,9 @@ from django.dispatch import receiver
 from django.core.urlresolvers import reverse
 from django.core.mail import mail_managers
 from graph import Graph
+from result import Result
+from configuration import Configuration
+from node_configuration import NodeConfiguration
 from south.modelsinspector import add_introspection_rules
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
@@ -228,18 +231,15 @@ class Job(models.Model):
     def parseResult(self, data):
         logger.debug('!!!begin_parseResult!!!\n\n')
         
-        type   = kind
-        graph_issues = {'errors':{}, 'warnings':{} }
-        prob   = {}
-            
+        type   = self.kind            
         
         assert(data)
         result_data = str(data)
-        topId = graph.top_node().client_id
+        topId = str(self.graph.top_node().client_id)
         
-        if (kind == Job.TOP_EVENT_JOB):
+        if  (type == Job.TOP_EVENT_JOB):
             doc = xml_analysis.CreateFromDocument(result_data)
-        elif (kind == Job.SIMULATION_JOB):
+        elif(type == Job.SIMULATION_JOB):
             doc = xml_simulation.CreateFromDocument(result_data)
         else:
             assert(False)
@@ -248,6 +248,7 @@ class Job(models.Model):
         ## Since the frontend always wants an elementID, we stitch them
         ## to the TOP event for the moment (check issue #181)
         ## TODO: This will break for RBD analysis, since there is no top event
+        graph_issues = {'errors':{}, 'warnings':{} }
         if hasattr(doc, 'issue'):
             graphErrors = []
             graphWarnings = []
@@ -262,24 +263,82 @@ class Job(models.Model):
             if len(graphWarnings) > 0:
                 graph_issues['warnings'][topId] = graphWarnings
                  
-                 
+        
         results = doc.result
-            
+        
         #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
+        decomposition = None
         if hasattr(results[0], 'decompositionNumber'):
             decomposition = str(results[0].decompositionNumber)
         
-        
-        #TODO: Save all configurations
-        #for result in results:
-        
-        
-        
+        # Go through all results
+        for result in results:
+            
+            current_result = Result()
+            current_result.decomposition = decomposition                          
+             
+            # Fetch issues hidden in maybe existing results
+            node_issues = {'errors':{}, 'warnings':{} }
+            if hasattr(result, 'issue'):
+                for issue in result.issue:
+                    if issue.isFatal:
+                        node_issues['errors'][issue.elementId]=issue.message
+                    else:
+                        node_issues['warnings'][issue.elementId]=issue.message
+                        
+            # Fetch probability used for graph rendering
+            probability = []
+            if hasattr(result, 'probability') and type == Job.TOP_EVENT_JOB and result.probability is not None:
+                for alpha_cut in result.probability.alphaCuts:
+                    probability.append([alpha_cut.value_.lowerBound, alpha_cut.key])
+                    probability.append([alpha_cut.value_.upperBound, alpha_cut.key])
+            
+            
+            # Fetch configuration if present (only FuzzTree has got configurations)
+            configuration = None
+            if hasattr(result, 'configuration'):
+                costs = result.configuration.costs if hasattr(result.configuration, 'costs') else None
+                
+                if hasattr(result.configuration, 'choice'):
+                    choices = []
+                    for choice in result.configuration.choice:
+                        element = choice.value_
+                        setting = {}
+            
+                        if isinstance(element, FeatureChoice):
+                            setting['type']      = 'FeatureChoice'
+                            setting['featureId'] = element.featureId
+                        elif isinstance(element, InclusionChoice):
+                            setting['type']     = 'InclusionChoice'
+                            setting['included'] = element.included
+                        elif isinstance(element, RedundancyChoice):
+                            setting['type'] = 'RedundancyChoice'
+                            setting['n']    = int(element.n)
+                        else:
+                            raise ValueError('Unknown choice %s' % element)
+                
+                        logger.debug('setting: ' + str(setting))
+                    logger.debug('costs: ' + str(costs))    
+                    # configuration.node_configurations = choices
+                 
+            # Fetch rounds and failures if simulation job
+            rounds   = None
+            failures = None 
+            if (type == Job.SIMULATION_JOB):
+                read_rounds = int(result.nSimulatedRounds)
+                rounds = None if math.isnan(read_rounds) else read_rounds
+                read_failures = int(result.nFailures)
+                failures = None if math.isnan(read_failures) else read_failures
+                
+            
+            logger.debug('node_issues: ' + str(node_issues))    
+            logger.debug('prob: ' + str(probability))
+            logger.debug('failures: ' + str(failures))
+            logger.debug('rounds: ' + str(rounds))
+            logger.debug('type: ' + str(type))
+            logger.debug('decomposition: ' + str(decomposition) + '\n\n\n')
         
         logger.debug('graph_issues:  ' + str(graph_issues))
-        logger.debug('decomposition: ' + str(decomposition))
-        logger.debug('prob:          ' + str(prob))
-        
         logger.debug('!!!end_parseResult!!!\n\n')
         return
     
