@@ -8,13 +8,12 @@ from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from tastypie.resources import ModelResource
 from tastypie.authentication import ApiKeyAuthentication   
 from tastypie.authorization import Authorization
-from tastypie.exceptions import Unauthorized
+from tastypie.exceptions import Unauthorized, UnsupportedFormat
 from tastypie.serializers import Serializer
 from tastypie import fields
 from FuzzEd.models import Project, Graph
 
 import time
-
 
 class ProjectResource(ModelResource):
     graphs = fields.ToManyField('FuzzEd.api_ext.GraphResource', 'graphs')
@@ -54,7 +53,10 @@ class GraphSerializer(Serializer):
         return Graph.from_graphml(content).to_dict()
 
 class GraphAuthorization(Authorization):
-    #TODO: Consider project ownership here for create requests
+    '''
+        Tastypie authorization class. The main task of this class 
+        is to restrict the accessible objects.
+    '''
     def read_list(self, object_list, bundle):
         ''' User is only allowed to get the graphs he owns.'''
         return object_list.filter(owner=bundle.request.user)
@@ -82,10 +84,10 @@ class GraphAuthorization(Authorization):
         return bundle.obj.owner == bundle.request.user
 
     def delete_list(self, object_list, bundle):
-        raise Unauthorized("Sorry, no deletes.")
+        return object_list.filter(owner=bundle.request.user)
 
     def delete_detail(self, object_list, bundle):
-        raise Unauthorized("Sorry, no deletes.")    
+        return bundle.obj.owner == bundle.request.user
 
 
 class GraphResource(ModelResource):
@@ -99,14 +101,16 @@ class GraphResource(ModelResource):
 
     project = fields.ToOneField(ProjectResource, 'project')
 
-    def get_object_list(self, request):
-        return super(GraphResource, self).get_object_list(request).filter(owner=request.user)
-
     def hydrate(self, bundle):
+        # Make sure that owners are assigned correctly
         bundle.obj.owner=bundle.request.user
-        #TODO: Make sure that users can only save to their own projects
-        bundle.obj.project=Project.objects.get(pk=bundle.request.GET['project'])
-        return bundle
+        # Get the user-specified project, and make sure that it is his
+        try:
+            project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
+            bundle.obj.project=project
+            return bundle
+        except:
+            raise Unauthorized("You can't use this project for your new graph.")        
 
 # class GraphJobExportView(ProtectedResourceView):
 #     """ Base class for API views that export a graph based on a rendering job result. """

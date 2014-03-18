@@ -6,6 +6,7 @@ from django.test.utils import override_settings
 from django.test.client import Client
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
+from tastypie.exceptions import Unauthorized, UnsupportedFormat
 
 # This is the test suite.
 #
@@ -170,49 +171,47 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
                 graphml = response.content
                 # Now import the same GraphML
                 response=self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%self.project_id, graphml, 'application/xml')
-                print response['Location']
                 self.assertEqual(response.status_code, 201)
-                #TODO: Check if the model object is available
+                # Check if the claimed graph really was created
+                newid = int(response['Location'][-2])
+                assert(Graph.objects.get(pk=newid))
+
+    def testInvalidGraphImportProject(self):
+        with self.assertRaises(Unauthorized):
+            self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', "<graphml></graphml>", 'application/xml')
+
+    def testInvalidGraphImportFormat(self):
+        for wrong_format in ['json','tex','xml']:
+            with self.assertRaises(UnsupportedFormat):
+                self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u'%(wrong_format,self.project_id), "<graphml></graphml>", 'application/text')
 
     def testFoo(self):
         ''' Leave this out, and the last test will fail. Dont ask me why.'''
         assert(True)
 
+class BasicApiTestCase(SimpleFixtureTestCase):
+    def setUp(self):
+        self.setUpLogin()        
 
-# class BasicApiTestCase(FuzzEdTestCase):
-#     fixtures = ['basic.json']
-#     """ This fixture tree looks like this, with pk and client_id per node:
-#         graph(1)
-#             topEvent (1, -2147483647)
-#                 andGate (2, 4711)
-#                     basicEvent (3, 12345)
-#                     orGate (4, 222)
-#                         basicEvent (5, 88)
-#                         basicEvent (6, 99)
+    def testGetGraph(self):
+        for id, kind in self.graphs.iteritems():
+            response=self.ajaxGet('/api/graphs/%u'%self.faulttree)
+            self.assertEqual(response.status_code, 200)
+        response=self.ajaxGet('/api/graphs/9999')
+        self.assertEqual(response.status_code, 404)
 
-#         The following edges are defined, with pk and client_id:
-#             1 / 65: 1->2
-#             2 / 66: 2->3
-#             3 / 77: 2->4
-#             4 / 88: 4->5
-#             5 / 99: 4->6
-#     """
+    def testCreateNode(self):
+        newnode = {'y'         : '3', 
+                   'x'         : '7', 
+                   'kind'      : 'basicEvent', 
+                   'id'        : '1383517229910', 
+                   'properties': '{}'}
 
-#     def testGetGraph(self):
-#         response=self.ajaxGet('/api/graphs/1')
-#         self.assertEqual(response.status_code, 200)
-#         response=self.ajaxGet('/api/graphs/9999')
-#         self.assertEqual(response.status_code, 404)
-
-#     def testCreateNode(self):
-#         oldncount=Graph.objects.get(pk=1).nodes.count()
-#         response=self.ajaxPost('/api/graphs/1/nodes', {'kind': 'orGate', 'id':4712, 'x':10, 'y':7})
-#         self.assertEqual(response.status_code, 201)
-#         self.assertEqual(response['Location'].startswith('http://'), True)
-#         self.assertEqual(oldncount+1, Graph.objects.get(pk=1).nodes.count() )
-#         # Check invalid type
-#         response=self.ajaxPost('/api/graphs/1/nodes', {'kind': 'foobar', 'id':4712, 'x':10, 'y':7})
-#         self.assertEqual(response.status_code, 400)
+        oldncount=Graph.objects.get(pk=self.faulttree).nodes.count()
+        response=self.ajaxPost('/api/graphs/%u/nodes'%self.faulttree, newnode)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response['Location'].startswith('http://'), True)
+        self.assertEqual(oldncount+1, Graph.objects.get(pk=self.faulttree).nodes.count() )
 
 #     def testDeleteNode(self):
 #         response=self.ajaxDelete('/api/graphs/1/nodes/88')
