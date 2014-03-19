@@ -1,6 +1,24 @@
+'''
+    This is the test suite.
+
+    The typical workflow to add new tests is the following:
+    - Get yourself an empty local database with './manage.py flush'.
+    - Draw one or more test graphs. 
+    - Create a fixture file from it with 'fab fixture_save:<filename.json>'. 
+    - Create a class such as 'SimpleFixtureTestCase' to wrap all ID's for your fixture file.
+    - Derive your test case class from it. Check the helper functions in 'FuzzEdTestCase'.
+    - Run the tests with 'fab run_tests'.
+    - Edit your fixture file by loading it into the local database with 'fab fixture_load:<filename.json>'
+
+    TODO: Several test would look better if the model is checked afterwards for the changes being applied
+        (e.g. node relocation). Since we use the LiveServerTestCase base, this is not possible, since
+        database modifications are not commited at all. Explicit comitting did not help ...
+'''
+
 import json, logging, time, os, tempfile, subprocess
 from xml.dom import minidom
 from subprocess import Popen
+from django.db import transaction
 from django.test import LiveServerTestCase
 from django.test.utils import override_settings
 from django.test.client import Client
@@ -8,21 +26,13 @@ from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
 from tastypie.exceptions import Unauthorized, UnsupportedFormat
 
-# This is the test suite.
-#
-# The typical workflow to add new tests is the following:
-# - Get yourself an empty local database with './manage.py flush'.
-# - Draw one or more test graphs. 
-# - Create a fixture file from it with 'fab fixture_save:<filename.json>'. 
-# - Create a class such as 'SimpleFixtureTestCase' to wrap all ID's for your fixture file.
-# - Derive your test case class from it. Check the helper functions in 'FuzzEdTestCase'.
-# - Run the tests with 'fab run_tests'.
-# - Edit your fixture file by loading it into the local database with 'fab fixture_load:<filename.json>'
-
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 logging.disable(logging.CRITICAL)
 
 class FuzzEdTestCase(LiveServerTestCase):
+    '''
+        The base class for all test cases. Mainly provides helper functions for deal with auth stuff.
+    '''
     def setUpAnonymous(self):
         ''' If the test case wants to have a anonymous login session, it should call this function in setUp().'''
         self.c=Client()
@@ -49,9 +59,6 @@ class FuzzEdTestCase(LiveServerTestCase):
 
     def ajaxPost(self, url, data):
         return self.c.post( url, data, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
-
-    def ajaxPostNode(self, data):
-        return self.ajaxPost('/api/graphs/1/nodes/88', {'properties': json.dumps(data)})
 
     def ajaxDelete(self, url):
         return self.c.delete( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
@@ -81,14 +88,20 @@ class FuzzEdTestCase(LiveServerTestCase):
         return json.loads(data)
 
 class SimpleFixtureTestCase(FuzzEdTestCase):
-    ''' This is a base class that wraps all information about the 'simple' fixture. '''
+    ''' 
+        This is a base class that wraps all information about the 'simple' fixture. 
+    '''
     fixtures = ['simple.json']
     project_id = 1
     graphs = {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'}
     faulttree = 1
+    topnode = 1
 
 
 class ViewsTestCase(SimpleFixtureTestCase):
+    ''' 
+        Tests for different Django views and their form submissions. 
+    '''
     def setUp(self):
         self.setUpLogin()        
     def testRootView(self):
@@ -105,8 +118,21 @@ class ViewsTestCase(SimpleFixtureTestCase):
     def testInvalidEditorView(self):
         response=self.get('/editor/999')
         self.assertEqual(response.status_code, 404)
+    def testGraphCopy(self):
+        for graphid, kind in self.graphs.iteritems():
+            response = self.post('/graphs/%u/'%graphid, {'copy': 'copy'})
+            self.assertEqual(response.status_code, 302)
+            # The view code has no reason to return the new graph ID, so the redirect is to the dashboard
+            # We therefore determine the new graph by the creation time
+            copy = Graph.objects.all().order_by('-created')[0]
+            original = Graph.objects.get(pk=graphid)
+            self.assertTrue(original.same_as(copy))
+
 
 class ExternalAPITestCase(SimpleFixtureTestCase):
+    ''' 
+        Tests for the Tastypie API. 
+    '''
     def setUp(self):
         self.setUpAnonymous()        
 
@@ -172,6 +198,7 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
                 response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%id)
                 self.assertEqual(response.status_code, 200)
                 graphml = response.content
+                print graphml
                 # Now import the same GraphML
                 response=self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%self.project_id, graphml, 'application/xml')
                 self.assertEqual(response.status_code, 201)
@@ -182,8 +209,12 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
                 self.assertTrue(original.same_as(copy))
 
     def testInvalidGraphImportProject(self):
+        # First export valid GraphML
+        response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%self.faulttree)
+        self.assertEqual(response.status_code, 200)
+        graphml = response.content
         with self.assertRaises(Unauthorized):
-            self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', "<graphml></graphml>", 'application/xml')
+            self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', graphml, 'application/xml')
 
     def testInvalidGraphImportFormat(self):
         for wrong_format in ['json','tex','xml']:
@@ -194,21 +225,10 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         ''' Leave this out, and the last test will fail. Dont ask me why.'''
         assert(True)
 
-class ViewsTestCase(SimpleFixtureTestCase):
-    def setUp(self):
-        self.setUpLogin()        
-
-    def testGraphCopy(self):
-        for graphid, kind in self.graphs.iteritems():
-            response = self.post('/graphs/%u/'%graphid, {'copy': 'copy'})
-            self.assertEqual(response.status_code, 302)
-            # The view code has no reason to return the new graph ID, so the redirect is to the dashboard
-            # We therefore determine the new graph by the creation time
-            copy = Graph.objects.all().order_by('-created')[0]
-            original = Graph.objects.get(pk=graphid)
-            self.assertTrue(original.same_as(copy))
-
 class FrontendApiTestCase(SimpleFixtureTestCase):
+    ''' 
+        Tests for the Frontend API called from JavaScript. 
+    '''
     def setUp(self):
         self.setUpLogin()        
 
@@ -226,26 +246,24 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
                    'id'        : '1383517229910', 
                    'properties': '{}'}
 
-        oldncount=Graph.objects.get(pk=self.faulttree).nodes.count()
         response=self.ajaxPost('/api/graphs/%u/nodes'%self.faulttree, newnode)
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response['Location'].startswith('http://'), True)
-        self.assertEqual(oldncount+1, Graph.objects.get(pk=self.faulttree).nodes.count() )
+        newid = int(response['Location'][-2])
+        newnode = Node.objects.get(pk=newid)
 
-#     def testDeleteNode(self):
-#         response=self.ajaxDelete('/api/graphs/1/nodes/88')
-#         self.assertEqual(response.status_code, 204)
-#         #TODO: Check if really gone, including edge 
+    def testDeleteNode(self):
+        response=self.ajaxDelete('/api/graphs/%u/nodes/%u'%(self.faulttree, self.topnode))
+        self.assertEqual(response.status_code, 204)
 
-#     def testRelocateNode(self):
-#         response=self.ajaxPostNode({"y": 8, "x":10}) 
-#         self.assertEqual(response.status_code, 204)
-#         #TODO: Check if really done, including edge rearrangement
+    def testRelocateNode(self):
+        newpos = {'properties': '{"y":"3","x":"7"}'}
+        response = self.ajaxPost('/api/graphs/%u/nodes/%u'%(self.faulttree, self.topnode), newpos)
+        self.assertEqual(response.status_code, 204)
 
-#     def testPropertyChange(self):
-#         response=self.ajaxPostNode({"key": "foo", "value":"bar"})
-#         self.assertEqual(response.status_code, 204)
-#         #TODO: Check if really done
+    def testPropertyChange(self):
+        newprop = {'properties': '{"key": "foo", "value":"bar"}'}
+        response = self.ajaxPost('/api/graphs/%u/nodes/%u'%(self.faulttree, self.topnode), newprop)
+        self.assertEqual(response.status_code, 204)
 
 #     def testMorphNode(self):
 #         response=self.ajaxPostNode({"type":"t"})

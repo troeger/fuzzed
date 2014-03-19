@@ -108,6 +108,7 @@ class Graph(models.Model):
         return root.to_bool_term()
 
     def to_graphml(self):
+        graphKindData = '        <data key="kind">%s</data>\n' % (self.kind) 
         if self.kind in {'faulttree', 'fuzztree'}:
             missionData = '        <data key="missionTime">%d</data>\n' % (self.top_node().get_property('missionTime'),) 
         else:
@@ -122,6 +123,7 @@ class Graph(models.Model):
             '    <graph id="graph" edgedefault="directed">\n',
                  notations.graphml_keys[self.kind],
                  '\n',
+                 graphKindData,
                  missionData] +
                  [node.to_graphml() for node in self.nodes.filter(deleted=False)] +
                  [edge.to_graphml() for edge in self.edges.filter(deleted=False)] +
@@ -210,14 +212,33 @@ class Graph(models.Model):
         top=Node(graph=self)
         top.load_xml(tree.topEvent)
 
-    @staticmethod
-    def from_graphml(graphml):
-        ''' Parses the given GraphML with the DefusedXML library, for better security.
-            Returns the DICT version of the generated Graph object, which is needed for Tastypie.
+    def from_graphml(self, graphml):
+        ''' 
+            Parses the given GraphML with the DefusedXML library, for better security.
         '''
-        g = Graph()
+        graph_properties = {}       # Can only be saved after the TOP node was created
+
         dom = parseXml(graphml)
-        return g
+        graph = dom.find('{http://graphml.graphdrawing.org/xmlns}graph')
+        if not graph:
+            raise Exception('Could not find <graph> element in the input data.')
+        if graph.get('edgedefault') != 'directed':
+            raise Exception('Only GraphML documents with directed edges are supported.')
+        # Determine graph type, in order to check for the right format rules
+        graph_kind_element = graph.find("{http://graphml.graphdrawing.org/xmlns}data[@key='kind']")
+        if graph_kind_element == None:
+            raise Exception('Missing <data> element for graph kind declaration.')
+        graph_kind = graph_kind_element.text
+        if graph_kind not in notations.graphml_node_data:
+            raise Exception('Invalid graph kind declaration.')
+        # Parse remaining graph properties, they will be stored as TOP node property
+        # They live as properties on the TOP node (check GraphML export)
+        for data in graph.findall('{http://graphml.graphdrawing.org/xmlns}data'):
+            name = data.get('key')
+            if name not in notations.graphml_graph_data[graph_kind]:
+                raise Exception("Invalid graph data element '%s'"%name)
+            graph_properties[name] = data.text 
+        print graph_properties
 
     def copy_values(self, other):
         # copy all nodes and their properties

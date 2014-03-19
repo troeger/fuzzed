@@ -54,8 +54,9 @@ class GraphSerializer(Serializer):
         return data.obj.to_graphml()
 
     def from_graphml(self, content):
-        #TODO: Perform some real importing
-        return Graph.from_graphml(content).to_dict()
+        g = Graph()
+        g.from_graphml(content)
+        return g.to_dict()
 
 class GraphAuthorization(Authorization):
     '''
