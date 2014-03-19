@@ -1,6 +1,6 @@
 from django.db import models
 from FuzzEd.lib.jsonfield import JSONField
-import simplejson as json
+import  json
 
 from node import Node
 

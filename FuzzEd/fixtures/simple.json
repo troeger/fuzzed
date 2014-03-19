@@ -6,7 +6,7 @@
             "name": "Test Project", 
             "created": "2014-03-17T07:50:45.835", 
             "deleted": false, 
-            "modified": "2014-03-17T08:04:43.660", 
+            "modified": "2014-03-19T22:29:35.236", 
             "owner": 2, 
             "users": []
         }
@@ -20,7 +20,7 @@
             "name": "Fault Tree", 
             "created": "2014-03-17T07:50:53.299", 
             "deleted": false, 
-            "modified": "2014-03-17T08:03:01.397", 
+            "modified": "2014-03-19T22:29:35.233", 
             "project": 1, 
             "owner": 2
         }
@@ -34,7 +34,7 @@
             "name": "FuzzTree", 
             "created": "2014-03-17T07:50:59.914", 
             "deleted": false, 
-            "modified": "2014-03-17T08:04:15.919", 
+            "modified": "2014-03-19T22:29:24.337", 
             "project": 1, 
             "owner": 2
         }
@@ -48,7 +48,49 @@
             "name": "RBD", 
             "created": "2014-03-17T07:51:08.587", 
             "deleted": false, 
-            "modified": "2014-03-17T08:04:43.658", 
+            "modified": "2014-03-19T22:29:03.009", 
+            "project": 1, 
+            "owner": 2
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "faulttree", 
+            "name": "Reliability Diagram", 
+            "created": "2013-11-03T22:53:11.563", 
+            "deleted": true, 
+            "modified": "2014-03-17T18:18:53.637", 
+            "project": 1, 
+            "owner": 2
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "faulttree", 
+            "name": "Reliability Diagram", 
+            "created": "2013-11-03T23:02:41.621", 
+            "deleted": true, 
+            "modified": "2014-03-17T18:18:53.642", 
+            "project": 1, 
+            "owner": 2
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "faulttree", 
+            "name": "Reliability Diagram", 
+            "created": "2013-11-03T23:03:02.242", 
+            "deleted": true, 
+            "modified": "2014-03-19T22:27:42.886", 
             "project": 1, 
             "owner": 2
         }
@@ -439,7 +481,7 @@
             "node": 6, 
             "deleted": false, 
             "key": "probability", 
-            "value": "[0, 0]"
+            "value": "[0, 0.5]"
         }
     }, 
     {
@@ -479,7 +521,7 @@
             "node": 9, 
             "deleted": false, 
             "key": "probability", 
-            "value": "[0, 0]"
+            "value": "[0, 0.3]"
         }
     }, 
     {
@@ -499,7 +541,7 @@
             "node": 10, 
             "deleted": false, 
             "key": "probability", 
-            "value": "[0, 0]"
+            "value": "[1, 10000]"
         }
     }, 
     {
@@ -539,7 +581,7 @@
             "node": 12, 
             "deleted": false, 
             "key": "probability", 
-            "value": "[0, [0.5, 0]]"
+            "value": "[0, [0.5, 0.03]]"
         }
     }, 
     {
@@ -579,7 +621,7 @@
             "node": 14, 
             "deleted": false, 
             "key": "probability", 
-            "value": "[0, [0.5, 0]]"
+            "value": "[1, 20000]"
         }
     }, 
     {
@@ -619,7 +661,7 @@
             "node": 15, 
             "deleted": false, 
             "key": "probability", 
-            "value": "[0, [0.5, 0]]"
+            "value": "[2, [0.925, 0.075]]"
         }
     }, 
     {
@@ -639,7 +681,7 @@
             "node": 16, 
             "deleted": false, 
             "key": "probability", 
-            "value": "[0, 0]"
+            "value": "[0, 0.7]"
         }
     }, 
     {
@@ -659,7 +701,37 @@
             "node": 17, 
             "deleted": false, 
             "key": "probability", 
-            "value": "[0, 0]"
+            "value": "[1, 15000]"
+        }
+    }, 
+    {
+        "pk": 25, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 2, 
+            "deleted": false, 
+            "key": "missionTime", 
+            "value": 17700
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 2, 
+            "deleted": false, 
+            "key": "decompositions", 
+            "value": 10
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 1, 
+            "deleted": false, 
+            "key": "missionTime", 
+            "value": 16600
         }
     }, 
     {

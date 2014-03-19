@@ -54,9 +54,12 @@ class GraphSerializer(Serializer):
         return data.obj.to_graphml()
 
     def from_graphml(self, content):
-        g = Graph()
-        g.from_graphml(content)
-        return g.to_dict()
+        ''' 
+           Tastypie serialization demands a dictionary of (graph) model
+           attribute values here. We return a dummy to support the 
+           format officially, and solve the rest in hydrate().
+        '''
+        return {}
 
 class GraphAuthorization(Authorization):
     '''
@@ -115,14 +118,16 @@ class GraphResource(ModelResource):
         # Make sure that owners are assigned correctly
         bundle.obj.owner=bundle.request.user
         # Get the user-specified project, and make sure that it is his.
-        # This is not an authorization problem for the resource itself, so it
-        # must be handled here.
+        # This is not an authorization problem for the (graph) resource itself, 
+        # so it must be handled here and not in the auth class.
         try:
             project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
             bundle.obj.project=project
-            return bundle
         except:
-            raise Unauthorized("You can't use this project for your new graph.")        
+            raise Unauthorized("You can't use this project for your new graph.") 
+        # Fill the graph with the GraphML data
+        bundle.obj.from_graphml(bundle.request.body)     
+        return bundle  
 
 # class GraphJobExportView(ProtectedResourceView):
 #     """ Base class for API views that export a graph based on a rendering job result. """

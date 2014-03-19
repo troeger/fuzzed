@@ -198,8 +198,8 @@ class Graph(models.Model):
         return dom.toprettyxml()
 
     def from_xml(self, xml):
-        from node import Node
         ''' Fill this graph with the information gathered from the XML.'''
+        from node import Node
         if self.kind == "fuzztree":
             tree = fuzzTreeFromXml(xml)
         elif self.kind == "faulttree":
@@ -216,11 +216,12 @@ class Graph(models.Model):
         ''' 
             Parses the given GraphML with the DefusedXML library, for better security.
         '''
+        from node import Node, new_client_id
+        from edge import Edge
         graph_properties = {}       # Can only be saved after the TOP node was created
-
         dom = parseXml(graphml)
         graph = dom.find('{http://graphml.graphdrawing.org/xmlns}graph')
-        if not graph:
+        if graph == None:
             raise Exception('Could not find <graph> element in the input data.')
         if graph.get('edgedefault') != 'directed':
             raise Exception('Only GraphML documents with directed edges are supported.')
@@ -232,13 +233,36 @@ class Graph(models.Model):
         if graph_kind not in notations.graphml_node_data:
             raise Exception('Invalid graph kind declaration.')
         # Parse remaining graph properties, they will be stored as TOP node property
-        # They live as properties on the TOP node (check GraphML export)
+        # when the according node is available
         for data in graph.findall('{http://graphml.graphdrawing.org/xmlns}data'):
             name = data.get('key')
             if name not in notations.graphml_graph_data[graph_kind]:
                 raise Exception("Invalid graph data element '%s'"%name)
             graph_properties[name] = data.text 
-        print graph_properties
+        # Save graph object to get a valid, which is needed in the node refs
+        self.save()
+        # go through all GraphML nodes and create them as model nodes for this graph
+        id_map={}           # GraphML node ID's to node model PK's
+        for gml_node in graph.iter('{http://graphml.graphdrawing.org/xmlns}node'):
+            gml_node_id = gml_node.get('id')
+            node = Node(graph=self, client_id=int(gml_node_id))
+            node.save()     # get a valid pk
+            id_map[gml_node_id] = node.pk
+            # Scan all data elements for the node
+            for gml_node_data in gml_node.iter('{http://graphml.graphdrawing.org/xmlns}data'):
+                name = gml_node_data.get('key')
+                value = gml_node_data.text
+                if name not in notations.graphml_node_data[graph_kind]:
+                    raise Exception("Invalid graph node element '%s'"%name)
+                # set according node properties
+                node.set_attr(name, value)
+
+        # go through all GraphML edges and create them as model edges for this graph
+        for gml_edge in graph.iter('{http://graphml.graphdrawing.org/xmlns}edge'):
+            source = Node.objects.get(pk=id_map[gml_edge.get('source')])
+            target = Node.objects.get(pk=id_map[gml_edge.get('target')])
+            edge = Edge(graph=self, source=source, target=target, client_id=new_client_id())
+            edge.save()
 
     def copy_values(self, other):
         # copy all nodes and their properties
@@ -279,15 +303,15 @@ class Graph(models.Model):
             instances would need to be mapped between original and copy.
         '''
         for my_node in self.nodes.all():
-            logger.debug("Searching match for node %u at (%u, %u)"%(my_node.pk, my_node.x, my_node.y))
+            logger.debug("Searching match for node %u"%(my_node.pk))
             found_match = False
             for their_node in graph.nodes.all():
-                logger.debug("Comparing with node %u at (%u, %u)"%(their_node.pk, their_node.x, their_node.y))
+                logger.debug("Comparing with node %u"%(their_node.pk))
                 if my_node.same_as(their_node):
                     found_match = True
                     break
             if not found_match:
-                logger.warning("Couldn't find a match for node %s at (%u, %u)"%(str(my_node), my_node.x, my_node.y))
+                logger.debug("Couldn't find a match for node %s"%(str(my_node)))
                 return False
 
         return True

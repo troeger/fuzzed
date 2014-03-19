@@ -27,7 +27,7 @@ from FuzzEd.models.node import Node
 from tastypie.exceptions import Unauthorized, UnsupportedFormat
 
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
-logging.disable(logging.CRITICAL)
+#logging.disable(logging.CRITICAL)
 
 class FuzzEdTestCase(LiveServerTestCase):
     '''
@@ -91,7 +91,7 @@ class SimpleFixtureTestCase(FuzzEdTestCase):
     ''' 
         This is a base class that wraps all information about the 'simple' fixture. 
     '''
-    fixtures = ['simple.json']
+    fixtures = ['simple.json', 'initial_data.json']
     project_id = 1
     graphs = {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'}
     faulttree = 1

@@ -176,15 +176,16 @@ class Node(models.Model):
             property_notation = properties_notation[property.key]
             property_kind     = property_notation['kind']
 
-            if property_kind == 'compound':
-                part_kind = property_notation['parts'][value[0]]['partName']
-                graphml.append(self.graphml_data_key(key + 'Kind', part_kind))
-                graphml.append(self.graphml_data_key(key,          value[1]))
-            elif property_kind == 'epsilon':
-                graphml.append(self.graphml_data_key(key,             value[0]))
-                graphml.append(self.graphml_data_key(key + 'Epsilon', value[1]))
-            else:
-                graphml.append(self.graphml_data_key(key, value))
+            # if property_kind == 'compound':
+            #     part_kind = property_notation['parts'][value[0]]['partName']
+            #     graphml.append(self.graphml_data_key(key + 'Kind', part_kind))
+            #     graphml.append(self.graphml_data_key(key,          value[1]))
+            # elif property_kind == 'epsilon':
+            #     graphml.append(self.graphml_data_key(key,             value[0]))
+            #     graphml.append(self.graphml_data_key(key + 'Epsilon', value[1]))
+            # else:
+            #     graphml.append(self.graphml_data_key(key, value))
+            graphml.append(self.graphml_data_key(key, value))
 
         return graphml
 
@@ -592,7 +593,7 @@ class Node(models.Model):
         if hasattr(self, key):
             setattr(self, key, value)
         else:
-            prop, created = self.properties.get_or_create(key=key)
+            prop, created = self.properties.get_or_create(key=key, defaults={'node': self})
             prop.value = value
             prop.save()
 
