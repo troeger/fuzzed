@@ -15,6 +15,9 @@ from defusedxml.ElementTree import fromstring as parseXml
 from project import Project
 from node_rendering import tikz_shapes
 
+import logging
+logger = logging.getLogger('FuzzEd')
+
 import json, notations
 
 class Graph(models.Model):
@@ -246,4 +249,27 @@ class Graph(models.Model):
 
         self.read_only = other.read_only
         self.save()
+
+    def same_as(self, graph):
+        ''' 
+            Checks if this graph is equal to the given one in terms of nodes and their properties. 
+            This is a very expensive operation that is only intended for testing purposes.
+            Comparing the edges is not easily possible, since the source / target ID's in the edge
+            instances would need to be mapped between original and copy.
+        '''
+        for my_node in self.nodes.all():
+            logger.debug("Searching match for node %u at (%u, %u)"%(my_node.pk, my_node.x, my_node.y))
+            found_match = False
+            for their_node in graph.nodes.all():
+                logger.debug("Comparing with node %u at (%u, %u)"%(their_node.pk, their_node.x, their_node.y))
+                if my_node.same_as(their_node):
+                    found_match = True
+                    break
+            if not found_match:
+                logger.warning("Couldn't find a match for node %s at (%u, %u)"%(str(my_node), my_node.x, my_node.y))
+                return False
+
+        return True
+
+
 

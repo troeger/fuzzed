@@ -68,3 +68,4 @@ class Edge(models.Model):
          {dict} the edge as dictionary
         """
         return json.dumps(self.to_dict())
+

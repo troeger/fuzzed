@@ -16,6 +16,9 @@ from FuzzEd.models import Project, Graph
 import time
 
 class ProjectResource(ModelResource):
+    '''
+        An API resource for projects.
+    '''
     graphs = fields.ToManyField('FuzzEd.api_ext.GraphResource', 'graphs')
 
     class Meta:
@@ -26,7 +29,6 @@ class ProjectResource(ModelResource):
         excludes = ['deleted', 'owner']
         nested = 'graph'
 
-
     def get_object_list(self, request):
         return super(ProjectResource, self).get_object_list(request).filter(owner=request.user)
 
@@ -34,6 +36,9 @@ class GraphSerializer(Serializer):
     """
         Our custom serializer / deserializer for graph formats we support.
         The XML format is GraphML, anything else is not supported.
+        The non-implemented deserialization of Tex / JSON input leads to a Tastypie exception,
+        which is translated to 401 for the client. There is no explicit way in Tastypie to
+        differentiate between supported serialization / deserialization formats.
     """
     formats = ['json', 'tex', 'graphml']
     content_types = {
@@ -55,7 +60,8 @@ class GraphSerializer(Serializer):
 class GraphAuthorization(Authorization):
     '''
         Tastypie authorization class. The main task of this class 
-        is to restrict the accessible objects.
+        is to restrict the accessible objects to the ones that the currently
+        logged-in user is allowed to use.
     '''
     def read_list(self, object_list, bundle):
         ''' User is only allowed to get the graphs he owns.'''
@@ -91,6 +97,9 @@ class GraphAuthorization(Authorization):
 
 
 class GraphResource(ModelResource):
+    '''
+        An API resource for graphs.
+    '''
     class Meta:
         queryset = Graph.objects.filter(deleted=False)
         authentication = ApiKeyAuthentication()
@@ -104,7 +113,9 @@ class GraphResource(ModelResource):
     def hydrate(self, bundle):
         # Make sure that owners are assigned correctly
         bundle.obj.owner=bundle.request.user
-        # Get the user-specified project, and make sure that it is his
+        # Get the user-specified project, and make sure that it is his.
+        # This is not an authorization problem for the resource itself, so it
+        # must be handled here.
         try:
             project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
             bundle.obj.project=project

@@ -35,6 +35,9 @@ class FuzzEdTestCase(LiveServerTestCase):
     def get(self, url):
         return self.c.get(url)
 
+    def post(self, url, data):
+        return self.c.post(url, data)
+
     def getWithAPIKey(self, url):
         return self.c.get(url, **{'HTTP_AUTHORIZATION':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
 
@@ -174,7 +177,9 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
                 self.assertEqual(response.status_code, 201)
                 # Check if the claimed graph really was created
                 newid = int(response['Location'][-2])
-                assert(Graph.objects.get(pk=newid))
+                original = Graph.objects.get(pk=id)
+                copy = Graph.objects.get(pk=newid)
+                self.assertTrue(original.same_as(copy))
 
     def testInvalidGraphImportProject(self):
         with self.assertRaises(Unauthorized):
@@ -189,7 +194,21 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         ''' Leave this out, and the last test will fail. Dont ask me why.'''
         assert(True)
 
-class BasicApiTestCase(SimpleFixtureTestCase):
+class ViewsTestCase(SimpleFixtureTestCase):
+    def setUp(self):
+        self.setUpLogin()        
+
+    def testGraphCopy(self):
+        for graphid, kind in self.graphs.iteritems():
+            response = self.post('/graphs/%u/'%graphid, {'copy': 'copy'})
+            self.assertEqual(response.status_code, 302)
+            # The view code has no reason to return the new graph ID, so the redirect is to the dashboard
+            # We therefore determine the new graph by the creation time
+            copy = Graph.objects.all().order_by('-created')[0]
+            original = Graph.objects.get(pk=graphid)
+            self.assertTrue(original.same_as(copy))
+
+class FrontendApiTestCase(SimpleFixtureTestCase):
     def setUp(self):
         self.setUpLogin()        
 

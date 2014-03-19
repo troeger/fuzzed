@@ -17,12 +17,16 @@ from django.views.decorators.cache import never_cache
 
 # We expect these imports to go away main the main logic finally lives in common.py
 from django.shortcuts import get_object_or_404
-from FuzzEd.models import Graph, notations, commands
+from FuzzEd.models import Graph, notations, commands, Node
 from FuzzEd.middleware import *
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.core.mail import mail_managers
+
+import logging
+logger = logging.getLogger('FuzzEd')
+
 
 import json, common
 

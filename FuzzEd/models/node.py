@@ -596,6 +596,22 @@ class Node(models.Model):
             prop.value = value
             prop.save()
 
+    def same_as(self, node):
+        ''' 
+            Checks if this node is equal to the given one in terms of properties. 
+            This is a very expensive operation that is only intended for testing purposes.
+        '''
+        for my_property in self.properties.all():
+            found_match = False
+            for their_property in node.properties.all():
+                if my_property.same_as(their_property):
+                    found_match = True
+                    break
+            if not found_match:
+                logger.debug("Could not find match for property %u: %s"%(my_property.pk, my_property.value))
+                return False
+        return True
+
 @receiver(post_save, sender=Node)
 def graph_modify(sender, instance, **kwargs):
     instance.graph.modified = datetime.datetime.now()
