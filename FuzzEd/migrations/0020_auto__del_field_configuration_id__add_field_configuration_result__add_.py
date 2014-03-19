@@ -8,16 +8,22 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'Configuration.node_issues'
-        db.add_column(u'FuzzEd_configuration', 'node_issues',
-                      self.gf('django.db.models.fields.TextField')(default=''),
-                      keep_default=False)
+        # Deleting field 'Configuration.id'
+        db.delete_column(u'FuzzEd_configuration', u'id')
 
         # Adding field 'Configuration.result'
         db.add_column(u'FuzzEd_configuration', 'result',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='configurations', to=orm['FuzzEd.Result']),
+                      self.gf('django.db.models.fields.related.OneToOneField')(default=0, related_name='configuration', unique=True, primary_key=True, to=orm['FuzzEd.Result']),
                       keep_default=False)
 
+        # Adding field 'Graph.graph_issues'
+        db.add_column(u'FuzzEd_graph', 'graph_issues',
+                      self.gf('FuzzEd.lib.jsonfield.fields.JSONField')(default=''),
+                      keep_default=False)
+
+
+        # Changing field 'NodeConfiguration.setting'
+        db.alter_column(u'FuzzEd_nodeconfiguration', 'setting', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')())
         # Deleting field 'Result.prob_sortable'
         db.delete_column(u'FuzzEd_result', 'prob_sortable')
 
@@ -32,7 +38,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'Result.type'
         db.add_column(u'FuzzEd_result', 'type',
-                      self.gf('django.db.models.fields.CharField')(default='X', max_length=1),
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=1),
                       keep_default=False)
 
         # Adding field 'Result.prob_sort'
@@ -40,19 +46,30 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.IntegerField')(default=0),
                       keep_default=False)
 
-        # Adding field 'Result.graph_issues'
-        db.add_column(u'FuzzEd_result', 'graph_issues',
-                      self.gf('django.db.models.fields.TextField')(default=''),
+        # Adding field 'Result.node_issues'
+        db.add_column(u'FuzzEd_result', 'node_issues',
+                      self.gf('FuzzEd.lib.jsonfield.fields.JSONField')(default=''),
                       keep_default=False)
 
 
+        # Changing field 'Result.prob'
+        db.alter_column(u'FuzzEd_result', 'prob', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')())
+
     def backwards(self, orm):
-        # Deleting field 'Configuration.node_issues'
-        db.delete_column(u'FuzzEd_configuration', 'node_issues')
+        # Adding field 'Configuration.id'
+        db.add_column(u'FuzzEd_configuration', u'id',
+                      self.gf('django.db.models.fields.AutoField')(default=0, primary_key=True),
+                      keep_default=False)
 
         # Deleting field 'Configuration.result'
         db.delete_column(u'FuzzEd_configuration', 'result_id')
 
+        # Deleting field 'Graph.graph_issues'
+        db.delete_column(u'FuzzEd_graph', 'graph_issues')
+
+
+        # Changing field 'NodeConfiguration.setting'
+        db.alter_column(u'FuzzEd_nodeconfiguration', 'setting', self.gf('django.db.models.fields.TextField')())
         # Adding field 'Result.prob_sortable'
         db.add_column(u'FuzzEd_result', 'prob_sortable',
                       self.gf('django.db.models.fields.IntegerField')(default=0),
@@ -60,7 +77,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'Result.analysis_type'
         db.add_column(u'FuzzEd_result', 'analysis_type',
-                      self.gf('django.db.models.fields.CharField')(default='X', max_length=1),
+                      self.gf('django.db.models.fields.CharField')(default='', max_length=1),
                       keep_default=False)
 
         # Adding field 'Result.configuration'
@@ -79,9 +96,12 @@ class Migration(SchemaMigration):
         # Deleting field 'Result.prob_sort'
         db.delete_column(u'FuzzEd_result', 'prob_sort')
 
-        # Deleting field 'Result.graph_issues'
-        db.delete_column(u'FuzzEd_result', 'graph_issues')
+        # Deleting field 'Result.node_issues'
+        db.delete_column(u'FuzzEd_result', 'node_issues')
 
+
+        # Changing field 'Result.prob'
+        db.alter_column(u'FuzzEd_result', 'prob', self.gf('django.db.models.fields.TextField')())
 
     models = {
         'FuzzEd.addedge': {
@@ -122,10 +142,8 @@ class Migration(SchemaMigration):
         'FuzzEd.configuration': {
             'Meta': {'object_name': 'Configuration'},
             'costs': ('django.db.models.fields.IntegerField', [], {}),
-            'graph': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['FuzzEd.Graph']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'node_issues': ('django.db.models.fields.TextField', [], {}),
-            'result': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'configurations'", 'to': "orm['FuzzEd.Result']"})
+            'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'configurations'", 'to': "orm['FuzzEd.Graph']"}),
+            'result': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'configuration'", 'unique': 'True', 'primary_key': 'True', 'to': "orm['FuzzEd.Result']"})
         },
         'FuzzEd.deleteedge': {
             'Meta': {'object_name': 'DeleteEdge'},
@@ -168,6 +186,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Graph'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'graph_issues': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
@@ -185,7 +204,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
             'result': ('django.db.models.fields.BinaryField', [], {'null': 'True'}),
-            'secret': ('django.db.models.fields.CharField', [], {'default': "'24983e0b-b616-476d-a3f0-79f2d6309bef'", 'max_length': '64'})
+            'secret': ('django.db.models.fields.CharField', [], {'default': "'6ca89c7e-bcb8-4b76-8041-9f9b74caf56b'", 'max_length': '64'})
         },
         'FuzzEd.node': {
             'Meta': {'object_name': 'Node'},
@@ -202,7 +221,16 @@ class Migration(SchemaMigration):
             'configuration': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'node_configurations'", 'to': "orm['FuzzEd.Configuration']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'node': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['FuzzEd.Node']"}),
-            'setting': ('django.db.models.fields.TextField', [], {})
+            'setting': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {})
+        },
+        'FuzzEd.notification': {
+            'Meta': {'object_name': 'Notification'},
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'text': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'users': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['auth.User']", 'symmetrical': 'False'})
         },
         'FuzzEd.project': {
             'Meta': {'object_name': 'Project'},
@@ -244,9 +272,9 @@ class Migration(SchemaMigration):
             'decomposition': ('django.db.models.fields.IntegerField', [], {}),
             'failures': ('django.db.models.fields.IntegerField', [], {}),
             'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'results'", 'to': "orm['FuzzEd.Graph']"}),
-            'graph_issues': ('django.db.models.fields.TextField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'prob': ('django.db.models.fields.TextField', [], {}),
+            'node_issues': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {}),
+            'prob': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {}),
             'prob_sort': ('django.db.models.fields.IntegerField', [], {}),
             'rounds': ('django.db.models.fields.IntegerField', [], {}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'})
