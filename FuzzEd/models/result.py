@@ -41,3 +41,16 @@ class Result(models.Model):
   failures      = models.IntegerField()
   
   
+  def __init__ (self, configuration, graph, type, prob, prob_sort, decomposition, issues, rounds, failures):
+      super(Result, self).__init__()
+
+      self.configuration = configuration
+      self.graph         = graph
+      self.type          = type
+      self.prob          = prob
+      self.prob_sort     = prob_sort
+      self.decomposition = decomposition
+      self.node_issues   = issues
+      self.rounds        = rounds
+      self.failures      = failures
+  

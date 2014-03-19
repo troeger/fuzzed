@@ -11,12 +11,18 @@ class Configuration(models.Model):
   
   Fields:
    {Graph} graph       -        
-   {int}   cost        -                    
+   {int}   costs       -                    
   """
   
   class Meta:
       app_label = 'FuzzEd'
   
   graph        = models.ForeignKey(Graph, related_name='configurations')
-  costs        = models.IntegerField()  
+  costs        = models.IntegerField()
+  
+  def __init__ (self, graph, costs):
+      super(Configuration, self).__init__()
+      
+      self.graph = graph
+      self.costs = costs  
     

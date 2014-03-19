@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.core.urlresolvers import reverse
 from django.core.mail import mail_managers
 from graph import Graph
+from node import Node
 from result import Result
 from configuration import Configuration
 from node_configuration import NodeConfiguration
@@ -230,17 +231,17 @@ class Job(models.Model):
     
     def parseResult(self, data):
         logger.debug('!!!begin_parseResult!!!\n\n')
-        
-        type   = self.kind            
-        
+                
         assert(data)
         result_data = str(data)
         topId = str(self.graph.top_node().client_id)
         
-        if  (type == Job.TOP_EVENT_JOB):
+        if  (self.kind == Job.TOP_EVENT_JOB):
             doc = xml_analysis.CreateFromDocument(result_data)
-        elif(type == Job.SIMULATION_JOB):
+            # delete all previous results of type analysis 
+        elif(self.kind == Job.SIMULATION_JOB):
             doc = xml_simulation.CreateFromDocument(result_data)
+            # delete all prevoious results of type simulation
         else:
             assert(False)
         
@@ -262,8 +263,10 @@ class Job(models.Model):
                 graph_issues['errors'][topId] = graphErrors
             if len(graphWarnings) > 0:
                 graph_issues['warnings'][topId] = graphWarnings
-                 
         
+        self.graph.graph_issues = graph_issues        
+        
+                
         results = doc.result
         
         #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
@@ -273,9 +276,6 @@ class Job(models.Model):
         
         # Go through all results
         for result in results:
-            
-            current_result = Result()
-            current_result.decomposition = decomposition                          
              
             # Fetch issues hidden in maybe existing results
             node_issues = {'errors':{}, 'warnings':{} }
@@ -288,23 +288,27 @@ class Job(models.Model):
                         
             # Fetch probability used for graph rendering
             probability = []
-            if hasattr(result, 'probability') and type == Job.TOP_EVENT_JOB and result.probability is not None:
+            if hasattr(result, 'probability') and self.kind == Job.TOP_EVENT_JOB and result.probability is not None:
                 for alpha_cut in result.probability.alphaCuts:
                     probability.append([alpha_cut.value_.lowerBound, alpha_cut.key])
                     probability.append([alpha_cut.value_.upperBound, alpha_cut.key])
             
+            #probability_sort =
+            
             
             # Fetch configuration if present (only FuzzTree has got configurations)
             configuration = None
-            if hasattr(result, 'configuration'):
+            if hasattr(result, 'configuration'):                
                 costs = result.configuration.costs if hasattr(result.configuration, 'costs') else None
                 
+                choices = []
                 if hasattr(result.configuration, 'choice'):
-                    choices = []
                     for choice in result.configuration.choice:
+                        node_id = choice.key
+                        node    = Node.objects.get(client_id = node_id)
+                        
                         element = choice.value_
                         setting = {}
-            
                         if isinstance(element, FeatureChoice):
                             setting['type']      = 'FeatureChoice'
                             setting['featureId'] = element.featureId
@@ -316,26 +320,32 @@ class Job(models.Model):
                             setting['n']    = int(element.n)
                         else:
                             raise ValueError('Unknown choice %s' % element)
-                
-                        logger.debug('setting: ' + str(setting))
-                    logger.debug('costs: ' + str(costs))    
-                    # configuration.node_configurations = choices
+                        
+                        node_configuration = NodeConfiguration(node=node, setting=setting)
+                        choices.append(node_configuration)
+                        
+                        logger.debug('node_configuration: ' + str(node_configuration.__dict__))
+                        
+                    logger.debug('costs: ' + str(costs))
+                    configuration = Configuration(self.graph, costs)
+                    configuration.node_configurations = choices
                  
             # Fetch rounds and failures if simulation job
             rounds   = None
             failures = None 
-            if (type == Job.SIMULATION_JOB):
+            if (self.kind == Job.SIMULATION_JOB):
                 read_rounds = int(result.nSimulatedRounds)
                 rounds = None if math.isnan(read_rounds) else read_rounds
                 read_failures = int(result.nFailures)
                 failures = None if math.isnan(read_failures) else read_failures
-                
-            
+             
+            #result = Result(configuration, self.graph, self.kind, probability, probability_sort, decomposition, node_issues, rounds, failures)
+                    
             logger.debug('node_issues: ' + str(node_issues))    
             logger.debug('prob: ' + str(probability))
             logger.debug('failures: ' + str(failures))
             logger.debug('rounds: ' + str(rounds))
-            logger.debug('type: ' + str(type))
+            logger.debug('type: ' + str(self.kind))
             logger.debug('decomposition: ' + str(decomposition) + '\n\n\n')
         
         logger.debug('graph_issues:  ' + str(graph_issues))
