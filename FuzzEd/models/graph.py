@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
+from django.db.models.aggregates import Max
 
 import pyxb.utils.domutils
 try:
@@ -90,8 +89,12 @@ class Graph(models.Model):
         nodes    = [node.to_dict() for node in node_set]
         edges    = [edge.to_dict() for edge in edge_set]
 
+        node_seed = self.nodes.aggregate(Max('client_id'))['client_id__max']
+        edge_seed = self.edges.aggregate(Max('client_id'))['client_id__max']
+
         return {
             'id':       self.pk,
+            'seed':     max(node_seed, edge_seed),
             'name':     self.name,
             'type':     self.kind,
             'readOnly': self.read_only,

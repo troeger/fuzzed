@@ -50,11 +50,9 @@ define(['underscore'], function() {
          *
          *  Constants:
          *    {String} HEADER        - Used in menu containers to specify their button title (when minimized).
-         *    {String} CONNECTION_ID - Used to retrieve the Connection object from the corresponding DOM element.
          */
         Attributes: {
-            HEADER:        'header',
-            CONNECTION_ID: 'fuzzed-id'
+            HEADER:        'header'
         },
 
         /**
@@ -87,7 +85,8 @@ define(['underscore'], function() {
             CUTSETS_URL:                '/cutsets',
             ANALYTICAL_PROBABILITY_URL: '/topEventProbability',
             SIMULATED_PROBABILITY_URL:  '/topEventProbability',
-            GRAPH_EXPORT_URL:           '/exports'
+            GRAPH_EXPORT_URL:           '/exports',
+            AJAX_QUEUE:                 'queue'
         },
 
         /**
@@ -287,6 +286,11 @@ define(['underscore'], function() {
             SHAPES_MENU:                 'FuzzEdShapes',
             SPLASH:                      'FuzzEdSplash',
             ACTION_GRID_TOGGLE:          'FuzzEdActionGridToggle',
+            ACTION_CUT:                  'FuzzEdActionCut',
+            ACTION_COPY:                 'FuzzEdActionCopy',
+            ACTION_PASTE:                'FuzzEdActionPaste',
+            ACTION_DELETE:               'FuzzEdActionDelete',
+            ACTION_SELECTALL:            'FuzzEdActionSelectAll',
             ACTION_EXPORT_PDF:           'FuzzEdActionExportPDF',
             ACTION_EXPORT_EPS:           'FuzzEdActionExportEPS',
             PROGRESS_INDICATOR_SINGLE:   'FuzzEdProgressIndicatorSingle',
@@ -335,10 +339,13 @@ define(['underscore'], function() {
          *    {String} NODE       - Data key used to get the node object from a associated DOM element.
          *    {String} SELECTABLE - Data key used to store the jQuery UI Selectable object with the canvas
          *                          (needed for some hacks).
+         *    {String} CONNECTION_ID - Used to retrieve the Connection object from the corresponding DOM element.
+         *                             (former Attribute)
          */
         Keys: {
-            NODE:       'node',
-            SELECTABLE: 'ui-selectable'
+            NODE:           'node',
+            SELECTABLE:     'ui-selectable',
+            CONNECTION_ID:  'fuzzed-id'
         },
 
         /**
