@@ -4,7 +4,6 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from graph import Graph
-from configuration import Configuration
 from FuzzEd.models import xml_analysis, xml_simulation
 from FuzzEd.lib.jsonfield import JSONField
 
@@ -31,7 +30,6 @@ class Result(models.Model):
   ANALYSIS_TYPES = [('S','Simulation'),('A','Analysis')]
   
   graph         = models.ForeignKey(Graph, related_name='results')
-  configuration = models.OneToOneField(Configuration, primary_key=True, related_name='result')
   type          = models.CharField(max_length=1, choices= ANALYSIS_TYPES)
   prob          = JSONField()
   prob_sort     = models.IntegerField() 
