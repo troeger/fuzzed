@@ -81,58 +81,30 @@ def job_create(request, graph_id, job_kind):
 @login_required
 @csrf_exempt
 @require_ajax
-@require_http_methods(['GET', 'POST'])
+@require_http_methods(['GET'])
 @transaction.commit_on_success
 @never_cache
 def graphs(request):
     """
     Function: graphs
     
-    This API handler is responsible for all graphes of the user. It operates in two modes: receiving a GET request will
-    return a JSON encoded list of all the graphs of the user. A POST request instead, will create a new graph (requires
-    the below stated parameters) and returns its ID and URI.
+    This API handler is responsible for all graphs of the user. 
     
     Request:            GET - /api/graphs
     Request Parameters: None
     Response:           200 - <GRAPHS_AS_JSON>
                                
-    Request:            POST - /api/graphs
-    Request Parameters: kind = <GRAPH_KIND>, name = <GRAPH_NAME>
-    Response:           201 - Location = <GRAPH_URI>, ID = <GRAPH_ID>
-    
     Parameters:
      {HTTPRequest} request  - django request object
                               
     Returns:
      {HTTPResponse} a django response object
     """
-    # the user is asking for all of its graphs
-    if request.method == 'GET':
-        graphs      = Graph.objects.filter(owner=request.user, deleted=False)
-        json_graphs = {
-            'graphs': [graph.to_dict() for graph in graphs]
-        }
-
-        return HttpResponse(json.dumps(json_graphs), 'application/javascript')
-
-    # the request was a post, we are asked to create a new graph
-    try:
-        # create a graph created command 
-        post = request.POST
-        command = commands.AddGraph.create_from(kind=post['kind'], name=post['name'], owner=request.user)
-        command.do()
-
-        # prepare the response
-        graph_id             = command.graph.pk
-        response             = HttpResponseCreated()
-        response['Location'] = reverse('graph', args=[graph_id])
-        response['ID']       = graph_id
-
-        return response
-
-    # something was not right with the request parameters
-    except (ValueError, KeyError):
-        raise HttpResponseBadRequestAnswer()
+    graphs      = Graph.objects.filter(owner=request.user, deleted=False)
+    json_graphs = {
+        'graphs': [graph.to_dict() for graph in graphs]
+    }
+    return HttpResponse(json.dumps(json_graphs), 'application/javascript')
 
 @login_required
 @csrf_exempt

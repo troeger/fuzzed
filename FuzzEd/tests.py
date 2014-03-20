@@ -92,11 +92,13 @@ class SimpleFixtureTestCase(FuzzEdTestCase):
         This is a base class that wraps all information about the 'simple' fixture. 
     '''
     fixtures = ['simple.json', 'initial_data.json']
-    project_id = 1
     graphs = {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'}
-    faulttree = 1
-    topnode = 1
-
+    # A couple of specific PK's from the model
+    pkProject = 1
+    pkFaultTree = 1
+    clientIdEdge = 4
+    clientIdAndGate = 1
+    clientIdBasicEvent = 2
 
 class ViewsTestCase(SimpleFixtureTestCase):
     ''' 
@@ -161,7 +163,7 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         data = json.loads(response.content)
 
     def testSingleProjectResource(self):
-        response=self.getWithAPIKey('/api/v1/project/%u/?format=json'%self.project_id)
+        response=self.getWithAPIKey('/api/v1/project/%u/?format=json'%self.pkProject)
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
 
@@ -199,7 +201,7 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
                 self.assertEqual(response.status_code, 200)
                 graphml = response.content
                 # Now import the same GraphML
-                response=self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%self.project_id, graphml, 'application/xml')
+                response=self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%self.pkProject, graphml, 'application/xml')
                 self.assertEqual(response.status_code, 201)
                 # Check if the claimed graph really was created
                 newid = int(response['Location'][-2])
@@ -209,7 +211,7 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
 
     def testInvalidGraphImportProject(self):
         # First export valid GraphML
-        response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%self.faulttree)
+        response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%self.pkFaultTree)
         self.assertEqual(response.status_code, 200)
         graphml = response.content
         with self.assertRaises(Unauthorized):
@@ -218,7 +220,7 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
     def testInvalidGraphImportFormat(self):
         for wrong_format in ['json','tex','xml']:
             with self.assertRaises(UnsupportedFormat):
-                self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u'%(wrong_format,self.project_id), "<graphml></graphml>", 'application/text')
+                self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u'%(wrong_format,self.pkProject), "<graphml></graphml>", 'application/text')
 
     def testFoo(self):
         ''' Leave this out, and the last test will fail. Dont ask me why.'''
@@ -233,7 +235,7 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
     def testGetGraph(self):
         for id, kind in self.graphs.iteritems():
-            response=self.ajaxGet('/api/graphs/%u'%self.faulttree)
+            response=self.ajaxGet('/api/graphs/%u'%self.pkFaultTree)
             self.assertEqual(response.status_code, 200)
         response=self.ajaxGet('/api/graphs/9999')
         self.assertEqual(response.status_code, 404)
@@ -245,50 +247,32 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
                    'id'        : '1383517229910', 
                    'properties': '{}'}
 
-        response=self.ajaxPost('/api/graphs/%u/nodes'%self.faulttree, newnode)
+        response=self.ajaxPost('/api/graphs/%u/nodes'%self.pkFaultTree, newnode)
         self.assertEqual(response.status_code, 201)
         newid = int(response['Location'][-2])
         newnode = Node.objects.get(pk=newid)
 
     def testDeleteNode(self):
-        response=self.ajaxDelete('/api/graphs/%u/nodes/%u'%(self.faulttree, self.topnode))
+        response=self.ajaxDelete('/api/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent))
         self.assertEqual(response.status_code, 204)
 
     def testRelocateNode(self):
         newpos = {'properties': '{"y":"3","x":"7"}'}
-        response = self.ajaxPost('/api/graphs/%u/nodes/%u'%(self.faulttree, self.topnode), newpos)
+        response = self.ajaxPost('/api/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent), newpos)
         self.assertEqual(response.status_code, 204)
 
     def testPropertyChange(self):
         newprop = {'properties': '{"key": "foo", "value":"bar"}'}
-        response = self.ajaxPost('/api/graphs/%u/nodes/%u'%(self.faulttree, self.topnode), newprop)
+        response = self.ajaxPost('/api/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent), newprop)
         self.assertEqual(response.status_code, 204)
 
-#     def testMorphNode(self):
-#         response=self.ajaxPostNode({"type":"t"})
-#         self.assertEqual(response.status_code, 204)
-#         #TODO: Check if really done
+    def testDeleteEdge(self):
+        response=self.ajaxDelete('/api/graphs/%u/edges/%u'%(self.pkFaultTree, self.clientIdEdge))
+        self.assertEqual(response.status_code, 204)
 
-#     def testCreateGraph(self):
-#         response=self.ajaxPost('/api/graphs', {"kind": "fuzztree", "name":"Second graph"})
-#         self.assertEqual(response.status_code, 201)
-#         self.assertEqual(response['Location'].startswith('http://'), True)
-#         # test invalid type
-#         response=self.ajaxPost('/api/graphs', {"kind": "foo", "name":"Third graph"})
-#         self.assertEqual(response.status_code, 400)
-
-#     def testDeleteEdge(self):
-#         response=self.ajaxDelete('/api/graphs/1/edges/66')
-#         self.assertEqual(response.status_code, 204)
-#         #TODO: Check if really gone 
-
-#     def testCreateEdge(self):
-#         # Delete edge before re-creating it
-#         response=self.ajaxDelete('/api/graphs/1/edges/77')
-#         self.assertEqual(response.status_code, 204)
-#         response=self.ajaxPost('/api/graphs/1/edges', {'id': 4714, 'source':4711, 'target':222} )
-#         self.assertEqual(response.status_code, 201)
-#         #TODO: Check if really created 
+    def testCreateEdge(self):
+        response=self.ajaxPost('/api/graphs/%u/edges'%self.pkFaultTree, {'id': 4714, 'source':self.clientIdAndGate, 'target':self.clientIdBasicEvent} )
+        self.assertEqual(response.status_code, 201)
 
 # class BackendTestCase(FuzzEdTestCase):
 #     fixtures = ['analysis.json']
