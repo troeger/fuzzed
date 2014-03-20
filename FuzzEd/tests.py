@@ -15,7 +15,7 @@
         database modifications are not commited at all. Explicit comitting did not help ...
 '''
 
-import json, logging, time, os, tempfile, subprocess
+import json, logging, time, os, tempfile, subprocess, unittest
 from xml.dom import minidom
 from subprocess import Popen
 from django.db import transaction
@@ -27,7 +27,7 @@ from FuzzEd.models.node import Node
 from tastypie.exceptions import Unauthorized, UnsupportedFormat
 
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
-logging.disable(logging.CRITICAL)
+#logging.disable(logging.CRITICAL)
 
 class FuzzEdTestCase(LiveServerTestCase):
     '''
@@ -274,50 +274,47 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         response=self.ajaxPost('/api/graphs/%u/edges'%self.pkFaultTree, {'id': 4714, 'source':self.clientIdAndGate, 'target':self.clientIdBasicEvent} )
         self.assertEqual(response.status_code, 201)
 
-# class BackendTestCase(FuzzEdTestCase):
-#     fixtures = ['analysis.json']
+class BackendTestCase(SimpleFixtureTestCase):
+    ''' 
+        Tests for backend functionality. 
+    '''
 
-#     def setUp(self):
-#         # Start up backend daemon in testing mode, 
-#         # so that it connects to the testing database and uses port 8081 of the live test server
-#         print "Starting backend daemon"
-#         os.chdir("backends")
-#         self.backend = Popen(["python","daemon.py","--testing"])
-#         time.sleep(2)
-#         os.chdir("..")
-#         super(BackendTestCase, self).setUp()
+    def setUp(self):
+        # Start up backend daemon in testing mode so that it uses port 8081 of the live test server
+        print "Starting backend daemon"
+        os.chdir("backends")
+        self.backend = Popen(["python","daemon.py","--testing"])
+        time.sleep(2)
+        os.chdir("..")
+        self.setUpLogin()        
 
-#     def tearDown(self):
-#         print "\nShutting down backend daemon"
-#         self.backend.terminate()
-#         super(BackendTestCase, self).tearDown()
+    def tearDown(self):
+        print "\nShutting down backend daemon"
+        self.backend.terminate()
 
-#     def _testStandardFixtureAnalysis(self):
-#         result=self.requestAnalysis(4)
-#         self.assertEqual(bool(result['validResult']),True)
-#         self.assertEqual(result['errors'],{})
-#         self.assertEqual(result['warnings'],{})
-#         self.assertEqual(result['configurations'][0]['alphaCuts']['1.0'],[0.5, 0.5])
-#         self.assertEqual(result['configurations'][1]['alphaCuts']['1.0'],[0.4, 0.4])
+    @unittest.skip("")
+    def testStandardFixtureAnalysis(self):
+        result=self.requestAnalysis(4)
+        self.assertEqual(bool(result['validResult']),True)
+        self.assertEqual(result['errors'],{})
+        self.assertEqual(result['warnings'],{})
+        self.assertEqual(result['configurations'][0]['alphaCuts']['1.0'],[0.5, 0.5])
+        self.assertEqual(result['configurations'][1]['alphaCuts']['1.0'],[0.4, 0.4])
 
-#     def testIssue150(self):
-#         result=self.requestAnalysis(4)
-#         # This tree can lead to a k=0 redundancy configuration, which is not allowed
-#         self.assertEqual(result['validResult'],False)
+    @unittest.skip("")
+    def testIssue150(self):
+        result=self.requestAnalysis(4)
+        # This tree can lead to a k=0 redundancy configuration, which is not allowed
+        self.assertEqual(result['validResult'],False)
 
-#     def testPdfExport(self):
-#         result = self.requestJob('/api/graphs/1/exports/pdf')
-#         assert(len(result)>0)
-#         tmp = tempfile.NamedTemporaryFile()
-#         tmp.write(result)
-#         output = subprocess.check_output(['file', tmp.name])
-#         assert('PDF' in output)
+    def testFrontendAPIPdfExport(self):
+        pdfLink = self.requestJob('/api/graphs/%u/exports/pdf'%self.pkFaultTree)
+        # The result of a PDF rendering job is the download link
+        pdfResponse = self.get(pdfLink)
+        self.assertEqual('application/pdf', pdfResponse['CONTENT-TYPE'])
 
-#     def testEpsExport(self):
-#         result = self.requestJob('/api/graphs/1/exports/eps')
-#         assert(len(result)>0)
-#         tmp = tempfile.NamedTemporaryFile()
-#         tmp.write(result)
-#         output = subprocess.check_output(['file', tmp.name])
-#         print output
-#         assert('EPS' in output)
+    def testFrontendAPIEpsExport(self):
+        epsLink = self.requestJob('/api/graphs/%u/exports/eps'%self.pkFaultTree)
+        # The result of a EPS rendering job is the download link
+        epsResponse = self.get(epsLink)
+        self.assertEqual('application/postscript', epsResponse['CONTENT-TYPE'])

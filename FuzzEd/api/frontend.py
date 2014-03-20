@@ -17,7 +17,7 @@ from django.views.decorators.cache import never_cache
 
 # We expect these imports to go away main the main logic finally lives in common.py
 from django.shortcuts import get_object_or_404
-from FuzzEd.models import Graph, notations, commands, Node
+from FuzzEd.models import Graph, notations, commands, Node, Job
 from FuzzEd.middleware import *
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models import Q
@@ -25,6 +25,7 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import mail_managers
 
 import logging
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')
 
 
@@ -54,7 +55,7 @@ def job_status(request, job_id):
     if status == 0:		# done, valid result
         if job.requires_download():
             # Return the URL to the file created by the job
-            return HttpResponse(reverse('frontend_graph_download', args=[job.graph.pk]))
+            return HttpResponse(job.get_absolute_url())
         else:
             # Serve directly
             return HttpResponse(job.result_rendering())

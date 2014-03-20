@@ -62,6 +62,11 @@ class Job(models.Model):
     def done(self):
         return self.exit_code is not None
 
+    def get_absolute_url(self):
+        ''' Determine URL for the job result, when available for download. '''
+        assert(self.requires_download())
+        return reverse('frontend_graph_download', args=[self.graph.pk]) + "?format="+self.kind
+
     def requires_download(self):
         ''' Indicates if the result should be delivered directly to the frontend
             as file, or if it must be preprocessed with self.result_rendering().'''
