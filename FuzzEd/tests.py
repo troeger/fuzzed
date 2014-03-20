@@ -27,7 +27,7 @@ from FuzzEd.models.node import Node
 from tastypie.exceptions import Unauthorized, UnsupportedFormat
 
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
-#logging.disable(logging.CRITICAL)
+logging.disable(logging.CRITICAL)
 
 class FuzzEdTestCase(LiveServerTestCase):
     '''
@@ -198,7 +198,6 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
                 response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%id)
                 self.assertEqual(response.status_code, 200)
                 graphml = response.content
-                print graphml
                 # Now import the same GraphML
                 response=self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%self.project_id, graphml, 'application/xml')
                 self.assertEqual(response.status_code, 201)

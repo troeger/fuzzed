@@ -218,7 +218,6 @@ class Graph(models.Model):
         '''
         from node import Node, new_client_id
         from edge import Edge
-        graph_properties = {}       # Can only be saved after the TOP node was created
         dom = parseXml(graphml)
         graph = dom.find('{http://graphml.graphdrawing.org/xmlns}graph')
         if graph == None:
@@ -232,13 +231,8 @@ class Graph(models.Model):
         graph_kind = graph_kind_element.text
         if graph_kind not in notations.graphml_node_data:
             raise Exception('Invalid graph kind declaration.')
-        # Parse remaining graph properties, they will be stored as TOP node property
-        # when the according node is available
-        for data in graph.findall('{http://graphml.graphdrawing.org/xmlns}data'):
-            name = data.get('key')
-            if name not in notations.graphml_graph_data[graph_kind]:
-                raise Exception("Invalid graph data element '%s'"%name)
-            graph_properties[name] = data.text 
+        else:
+            self.kind = graph_kind
         # Save graph object to get a valid, which is needed in the node refs
         self.save()
         # go through all GraphML nodes and create them as model nodes for this graph
@@ -255,7 +249,21 @@ class Graph(models.Model):
                 if name not in notations.graphml_node_data[graph_kind]:
                     raise Exception("Invalid graph node element '%s'"%name)
                 # set according node properties
-                node.set_attr(name, value)
+                if name == 'kind':
+                    node.kind = value
+                    node.save()
+                else:
+                    node.set_attr(name, value)
+            logger.debug("New node: "+str(node.to_dict()))
+        # Graph properties belong to the TOP node
+        # GraphML files without graph <data> properties may refer to a graph type that has no
+        # TOP node concept
+        for data in graph.findall('{http://graphml.graphdrawing.org/xmlns}data'):
+            name = data.get('key')
+            if name != 'kind':          # already handled above
+                if name not in notations.graphml_graph_data[graph_kind]:
+                    raise Exception("Invalid graph data element '%s'"%name)
+                self.top_node().set_attr(name, data.text)   # Fetch TOP node here, not existent in RBD's
 
         # go through all GraphML edges and create them as model edges for this graph
         for gml_edge in graph.iter('{http://graphml.graphdrawing.org/xmlns}edge'):
@@ -302,11 +310,9 @@ class Graph(models.Model):
             Comparing the edges is not easily possible, since the source / target ID's in the edge
             instances would need to be mapped between original and copy.
         '''
-        for my_node in self.nodes.all():
-            logger.debug("Searching match for node %u"%(my_node.pk))
+        for my_node in self.nodes.all().filter(deleted=False):
             found_match = False
-            for their_node in graph.nodes.all():
-                logger.debug("Comparing with node %u"%(their_node.pk))
+            for their_node in graph.nodes.all().filter(deleted=False):
                 if my_node.same_as(their_node):
                     found_match = True
                     break

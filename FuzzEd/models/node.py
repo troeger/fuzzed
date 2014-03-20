@@ -602,14 +602,14 @@ class Node(models.Model):
             Checks if this node is equal to the given one in terms of properties. 
             This is a very expensive operation that is only intended for testing purposes.
         '''
-        for my_property in self.properties.all():
+        for my_property in self.properties.all().filter(deleted=False):
             found_match = False
-            for their_property in node.properties.all():
+            for their_property in node.properties.all().filter(deleted=False):
                 if my_property.same_as(their_property):
                     found_match = True
                     break
             if not found_match:
-                logger.debug("Could not find match for property %u: %s"%(my_property.pk, my_property.value))
+                logger.debug("Could not find match for property %s in %s"%(my_property.value, str(self)))
                 return False
         return True
 

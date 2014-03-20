@@ -56,7 +56,7 @@ class Property(models.Model):
         ''' 
             Checks if this property is equal to the given one. 
         '''
-        if self.deleted != prop.deleted or self.key != prop.key:
+        if self.key != prop.key:
             return False
         return (str(self.value) == str(prop.value))
 
