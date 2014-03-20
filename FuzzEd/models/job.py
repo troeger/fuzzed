@@ -172,13 +172,19 @@ class Job(models.Model):
                         y_val = alpha_cut.key+1 / alphacut_count        # Alphacut indexes start at zero
                         assert(0 <= y_val <= 1)
                         points.append([alpha_cut.value_.lowerBound, y_val])
-                        # If it is a crisp probability, then the triangle collapses to a single dot at mu(1),
-                        # but a line being drawn looks nicer
                         if alpha_cut.value_.upperBound != alpha_cut.value_.lowerBound:      
                             points.append([alpha_cut.value_.upperBound, y_val])
                         else:
-                            points.append([alpha_cut.value_.lowerBound, 0])
-                    current_config['points'] = points
+                             # For real triangles, there must be only one point when lower and upper are the same,
+                             # since this is the tip of the triangle.
+                             # If this is a crisp probability, then there is only the point above added.
+                             # In this case, add another fake point to draw a strisaght line.
+                             # points.append([alpha_cut.value_.lowerBound, 0])
+                             pass
+                    # Points is now a wild collection of coordinates, were double values for the same X coordinate
+                    # may occur. We sort it (since the JS code likes that) and leave only the largest Y values
+                    # per X value
+                    current_config['points'] = sorted(points)
 
                 # Compute some additional statistics for the front-end, based on the gathered probabilities
                 if (self.kind == Job.TOP_EVENT_JOB and len(points) > 0):

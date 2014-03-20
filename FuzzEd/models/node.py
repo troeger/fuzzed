@@ -405,7 +405,7 @@ class Node(models.Model):
         Returns an XML wrapper object for the probability value being stored in frontend encoding.
         """
         probability = self.get_property('probability', None)
-        logger.debug(probability)
+        logger.debug("Determining XML representation for probability "+str(probability))
         # Probability is a 2-tuple, were the first value is a type indicator and the second the value
         if probability[0] == 0:
             # Crisp probability
@@ -414,7 +414,8 @@ class Node(models.Model):
                 return xml_faulttree.CrispProbability(value_=point)
             elif self.graph.kind == "fuzztree":
                 point = probability[1][0]
-                return xml_fuzztree.CrispProbability(value_=point)               
+                alpha = probability[1][1]
+                return xml_fuzztree.TriangularFuzzyInterval(a=point - alpha, b1=point, b2=point, c=point + alpha)
             else:
                 raise ValueError('Cannot handle crisp probability value for this graph type')
         elif probability[0] == 1:

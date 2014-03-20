@@ -6,6 +6,7 @@
 """
 
 from django.shortcuts import get_object_or_404
+from django.core.mail import mail_managers
 from FuzzEd.models import Graph, Job
 from FuzzEd.middleware import *
 
