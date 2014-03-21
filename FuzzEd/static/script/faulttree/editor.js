@@ -1064,7 +1064,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         _downloadFileFromURL: function(url, format) {
             //TODO: maybe we can use more sophisticated methods here to get the file to download directly instead
             //      of opening in the same window
-            window.location = url + '?format=' + format;
+            window.location = url;
         }
     });
 });
