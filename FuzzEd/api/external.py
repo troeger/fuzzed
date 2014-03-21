@@ -19,7 +19,7 @@ class ProjectResource(ModelResource):
     '''
         An API resource for projects.
     '''
-    graphs = fields.ToManyField('FuzzEd.api_ext.GraphResource', 'graphs')
+    graphs = fields.ToManyField('FuzzEd.api.external.GraphResource', 'graphs')
 
     class Meta:
         queryset = Project.objects.filter(deleted=False)
