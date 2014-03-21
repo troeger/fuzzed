@@ -17,7 +17,7 @@ from django.views.decorators.cache import never_cache
 
 # We expect these imports to go away main the main logic finally lives in common.py
 from django.shortcuts import get_object_or_404
-from FuzzEd.models import Graph, notations, commands, Node, Job
+from FuzzEd.models import Graph, notations, commands, Node, Job, Notification
 from FuzzEd.middleware import *
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models import Q
@@ -91,7 +91,6 @@ def graphs(request):
     
     This API handler is responsible for all graphs of the user. 
     
-    Request:            GET - /api/graphs
     Request Parameters: None
     Response:           200 - <GRAPHS_AS_JSON>
                                
@@ -119,7 +118,6 @@ def graph(request, graph_id):
     The function provides the JSON serialized version of the graph with the provided id given that the graph is owned
     by the requesting user and it is not marked as deleted.
     
-    Request:            GET - /api/graphs/<GRAPH_ID>
     Request Parameters: None
     Response:           200 - <GRAPH_AS_JSON>
     
@@ -147,7 +145,6 @@ def graph_transfers(request, graph_id):
 
     Returns a list of transfers for the given graph
 
-    Request:            GET - /api/graphs/<GRAPH_ID>/transfers
     Request Parameters: graph_id = <INT>
     Response:           200 - <TRANSFERS_AS_JSON>
 
@@ -185,7 +182,6 @@ def nodes(request, graph_id):
     (calculated by the client to prevent waiting for round-trip). The response contains the JSON serialized
     representation of the newly created node and its new location URI.
     
-    Request:            POST - /api/graphs/<GRAPH_ID>/nodes
     Request Parameters: client_id = <INT>, kind = <NODE_TYPE>, x = <INT>, y = <INT>
     Response:           201 - <NODE_AS_JSON>, Location = <NODE_URI>
     
@@ -241,11 +237,11 @@ def node(request, graph_id, node_id):
         API handler for all actions on one specific node. This includes changing attributes of a node
         or deleting it.
 
-        Request:            POST - /api/graphs/<GRAPH_ID>/nodes/<NODE_ID>
+        Request:            POST 
         Request Parameters: any key-value pairs of attributes that should be changed
         Response:           204 - JSON representation of the node
 
-        Request:            DELETE - /api/graphs/<GRAPH_ID>/nodes/<NODE_ID>
+        Request:            DELETE 
         Request Parameters: none
         Response:           204
 
@@ -298,7 +294,6 @@ def edges(request, graph_id):
     an id for this edge that was assigned by the client (no wait for round-trip). The response contains the JSON
     serialized representation of the new edge and it location URI.
     
-    Request:            POST - /api/graphs/<GRAPH_ID>/edges
     Request Parameters: client_id = <INT>, source = <INT>, target = <INT>
     Response:           201 - <EDGE_AS_JSON>, Location = <EDGE_URI>
     
@@ -354,7 +349,6 @@ def edge(request, graph_id, edge_id):
     the previously assigned client side id and NOT the database id. The response to this request does not contain any
     body.
     
-    Request:            DELETE - /api/graphs/<GRAPH_ID>/edge/<EDGE_ID>
     Request Parameters: None
     Response:           204
     
@@ -407,11 +401,11 @@ def undos(request, graph_id):
     #
     """
     Fetch undo command stack from backend
-    API Request:  GET /api/graphs/[graphID]/undos, no body
+    API Request:  GET 
     API Response: JSON body with command array of undo stack
 
     Tell the backend that an undo has been issued in the model
-    API Request:  POST /api/graphs/[graphID]/undos, no body
+    API Request:  POST 
     API Response: no body, status code 204
     """
     if request.method == 'GET':
@@ -435,11 +429,11 @@ def redos(request, graph_id):
     #
     """
     Fetch redo command stack from backend
-    API Request:  GET /api/graphs/[graphID]/redos, no body
+    API Request:  GET 
     API Response: JSON body with command array of redo stack
 
     Tell the backend that an redo has been issued in the model
-    API Request:  POST /api/graphs/[graphID]/redos, no body
+    API Request:  POST 
     API Response: no body, status code 204
     """
     if request.method == 'GET':

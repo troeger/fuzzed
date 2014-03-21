@@ -24,6 +24,8 @@ from django.test.utils import override_settings
 from django.test.client import Client
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
+from FuzzEd.models.notification import Notification
+from django.contrib.auth.models import User
 from tastypie.exceptions import Unauthorized, UnsupportedFormat
 
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
@@ -57,7 +59,7 @@ class FuzzEdTestCase(LiveServerTestCase):
     def ajaxGet(self, url):
         return self.c.get( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
 
-    def ajaxPost(self, url, data):
+    def ajaxPost(self, url, data={}):
         return self.c.post( url, data, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
 
     def ajaxDelete(self, url):
@@ -78,14 +80,6 @@ class FuzzEdTestCase(LiveServerTestCase):
             print ".",
         self.assertEqual(response.status_code, 200)
         return response.content
-
-    def requestAnalysis(self, graph_id):
-        """ Helper function for requesting an analysis run. 
-            Returns the analysis result as dictionary as received by the frontend.
-        """
-        url=self.ajaxGet('/api/graphs/%u/analysis/topEventProbability'%graph_id)
-        data = self.requestJob(url)
-        return json.loads(data)
 
 class SimpleFixtureTestCase(FuzzEdTestCase):
     ''' 
@@ -230,14 +224,17 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
     ''' 
         Tests for the Frontend API called from JavaScript. 
     '''
+
+    baseUrl = '/front'
+
     def setUp(self):
         self.setUpLogin()        
 
     def testGetGraph(self):
         for id, kind in self.graphs.iteritems():
-            response=self.ajaxGet('/api/graphs/%u'%self.pkFaultTree)
+            response=self.ajaxGet(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
             self.assertEqual(response.status_code, 200)
-        response=self.ajaxGet('/api/graphs/9999')
+        response=self.ajaxGet(self.baseUrl+'/graphs/9999')
         self.assertEqual(response.status_code, 404)
 
     def testCreateNode(self):
@@ -247,37 +244,63 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
                    'id'        : '1383517229910', 
                    'properties': '{}'}
 
-        response=self.ajaxPost('/api/graphs/%u/nodes'%self.pkFaultTree, newnode)
+        response=self.ajaxPost(self.baseUrl+'/graphs/%u/nodes'%self.pkFaultTree, newnode)
         self.assertEqual(response.status_code, 201)
         newid = int(response['Location'][-2])
         newnode = Node.objects.get(pk=newid)
 
     def testDeleteNode(self):
-        response=self.ajaxDelete('/api/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent))
+        response=self.ajaxDelete(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent))
         self.assertEqual(response.status_code, 204)
 
     def testRelocateNode(self):
         newpos = {'properties': '{"y":"3","x":"7"}'}
-        response = self.ajaxPost('/api/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent), newpos)
+        response = self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent), newpos)
         self.assertEqual(response.status_code, 204)
 
     def testPropertyChange(self):
         newprop = {'properties': '{"key": "foo", "value":"bar"}'}
-        response = self.ajaxPost('/api/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent), newprop)
+        response = self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent), newprop)
         self.assertEqual(response.status_code, 204)
 
     def testDeleteEdge(self):
-        response=self.ajaxDelete('/api/graphs/%u/edges/%u'%(self.pkFaultTree, self.clientIdEdge))
+        response=self.ajaxDelete(self.baseUrl+'/graphs/%u/edges/%u'%(self.pkFaultTree, self.clientIdEdge))
         self.assertEqual(response.status_code, 204)
 
     def testCreateEdge(self):
-        response=self.ajaxPost('/api/graphs/%u/edges'%self.pkFaultTree, {'id': 4714, 'source':self.clientIdAndGate, 'target':self.clientIdBasicEvent} )
+        response=self.ajaxPost(self.baseUrl+'/graphs/%u/edges'%self.pkFaultTree, {'id': 4714, 'source':self.clientIdAndGate, 'target':self.clientIdBasicEvent} )
         self.assertEqual(response.status_code, 201)
 
-class BackendTestCase(SimpleFixtureTestCase):
+    def testNotificationDismiss(self):
+        # Create notification entry in the database
+        u = User.objects.get(username='testadmin')
+        n = Notification(title="Test notification")
+        n.save()
+        n.users.add(u)
+        n.save()
+        # Now check the dismiss call
+        response=self.ajaxPost(self.baseUrl+'/notifications/%u/dismiss'%n.pk)
+        self.assertEqual(response.status_code, 200)
+
+class AnalysisFixtureTestCase(FuzzEdTestCase):
     ''' 
-        Tests for backend functionality. 
+        This is a base class that wraps all information about the 'analysis' fixture. 
     '''
+    fixtures = ['analysis.json', 'initial_data.json']
+    # A couple of specific PK's from the model
+    graphs = [7,8]
+    rate_faulttree = 7
+    prdc_fuzztree = 8
+    # The decomposition number configured in the PRDC tree
+    prdc_configurations = 8
+    prdc_peaks = [0.31482,0.12796,0.25103,0.04677,0.36558,0.19255,0.30651,0.11738]
+
+class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
+    ''' 
+        Tests for backend functionality, as being triggered from frontend calls. 
+    '''
+
+    baseUrl = '/front'
 
     def setUp(self):
         # Start up backend daemon in testing mode so that it uses port 8081 of the live test server
@@ -292,29 +315,34 @@ class BackendTestCase(SimpleFixtureTestCase):
         print "\nShutting down backend daemon"
         self.backend.terminate()
 
-    @unittest.skip("")
-    def testStandardFixtureAnalysis(self):
-        result=self.requestAnalysis(4)
+    def testRateFaulttree(self):
+        response = self.requestJob(self.baseUrl+'/graphs/%u/analysis/topEventProbability'%self.rate_faulttree)
+        result = json.loads(response)
         self.assertEqual(bool(result['validResult']),True)
         self.assertEqual(result['errors'],{})
         self.assertEqual(result['warnings'],{})
-        self.assertEqual(result['configurations'][0]['alphaCuts']['1.0'],[0.5, 0.5])
-        self.assertEqual(result['configurations'][1]['alphaCuts']['1.0'],[0.4, 0.4])
+        self.assertEqual(result['configurations'][0]['peak'], 1.0)
 
-    @unittest.skip("")
-    def testIssue150(self):
-        result=self.requestAnalysis(4)
-        # This tree can lead to a k=0 redundancy configuration, which is not allowed
-        self.assertEqual(result['validResult'],False)
+    def testPRDCFuzztree(self):
+        response = self.requestJob(self.baseUrl+'/graphs/%u/analysis/topEventProbability'%self.prdc_fuzztree)
+        result = json.loads(response)
+        self.assertEqual(bool(result['validResult']),True)
+        self.assertEqual(result['errors'],{})
+        self.assertEqual(result['warnings'],{})
+        self.assertEqual(len(result['configurations']), self.prdc_configurations)
+        for conf in result['configurations']:
+            assert(round(conf['peak'],5) in self.prdc_peaks)
 
     def testFrontendAPIPdfExport(self):
-        pdfLink = self.requestJob('/api/graphs/%u/exports/pdf'%self.pkFaultTree)
-        # The result of a PDF rendering job is the download link
-        pdfResponse = self.get(pdfLink)
-        self.assertEqual('application/pdf', pdfResponse['CONTENT-TYPE'])
+        for graph in self.graphs:
+            pdfLink = self.requestJob(self.baseUrl+'/graphs/%u/exports/pdf'%graph)
+            # The result of a PDF rendering job is the download link
+            pdfResponse = self.get(pdfLink)
+            self.assertEqual('application/pdf', pdfResponse['CONTENT-TYPE'])
 
     def testFrontendAPIEpsExport(self):
-        epsLink = self.requestJob('/api/graphs/%u/exports/eps'%self.pkFaultTree)
-        # The result of a EPS rendering job is the download link
-        epsResponse = self.get(epsLink)
-        self.assertEqual('application/postscript', epsResponse['CONTENT-TYPE'])
+        for graph in self.graphs:
+            epsLink = self.requestJob(self.baseUrl+'/graphs/%u/exports/eps'%graph)
+            # The result of a EPS rendering job is the download link
+            epsResponse = self.get(epsLink)
+            self.assertEqual('application/postscript', epsResponse['CONTENT-TYPE'])

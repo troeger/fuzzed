@@ -266,14 +266,15 @@ def job_post_save(sender, instance, created, **kwargs):
         # We therefore take the static approach with a setting here, which is overriden
         # by the test suite run accordingly
 
-        #TODO: job_files_url = reverse('job_files', kwargs={'job_secret': instance.secret})
-        job_files_url = '%s/api/jobs/%s' % (settings.SERVER, instance.secret,)
+        #TODO: job_files_url = 
+        job_files_url    = settings.SERVER + reverse('job_files', kwargs={'job_secret': instance.secret})
+        job_exitcode_url = settings.SERVER + reverse('job_exitcode', kwargs={'job_secret': instance.secret})
 
         try:
             # The proxy is instantiated here, since the connection should go away when finished
             s = xmlrpclib.ServerProxy(settings.BACKEND_DAEMON)
             logger.debug("Triggering %s job on url %s"%(instance.kind, job_files_url))
-            s.start_job(instance.kind, job_files_url)
+            s.start_job(instance.kind, job_files_url, job_exitcode_url)
         except Exception as e:
             mail_managers("Exception on backend call - "+settings.BACKEND_DAEMON,str(e))
             raise HttpResponseServerErrorAnswer("Sorry, we seem to have a problem with our FuzzEd backend. The admins are informed, thanks for the patience.")

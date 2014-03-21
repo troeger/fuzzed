@@ -44,52 +44,52 @@ urlpatterns = patterns('',
     # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API
   
     # graph
-    url(r'^api/graphs$','FuzzEd.api.frontend.graphs', name='graphs'),
-    url(r'^api/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.frontend.graph', name='graph'),
-    url(r'^api/graphs/(?P<graph_id>\d+)/transfers$', 'FuzzEd.api.frontend.graph_transfers', name='graph_transfers'),
-    url(r'^api/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.frontend.graph_download', name='frontend_graph_download'),
+    url(r'^front/graphs$','FuzzEd.api.frontend.graphs', name='graphs'),
+    url(r'^front/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.frontend.graph', name='graph'),
+    url(r'^front/graphs/(?P<graph_id>\d+)/transfers$', 'FuzzEd.api.frontend.graph_transfers', name='graph_transfers'),
+    url(r'^front/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.frontend.graph_download', name='frontend_graph_download'),
 
     # exports (graph downloads that return a job location instead of the direct result)
-    url(r'^api/graphs/(?P<graph_id>\d+)/exports/pdf$', 
+    url(r'^front/graphs/(?P<graph_id>\d+)/exports/pdf$', 
         'FuzzEd.api.frontend.job_create', {'job_kind': Job.PDF_RENDERING_JOB}, name='export_pdf'),
-    url(r'^api/graphs/(?P<graph_id>\d+)/exports/eps$', 
+    url(r'^front/graphs/(?P<graph_id>\d+)/exports/eps$', 
         'FuzzEd.api.frontend.job_create', {'job_kind': Job.EPS_RENDERING_JOB}, name='export_eps'),
 
     # node
-    url(r'^api/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.frontend.nodes', name='nodes'),
-    url(r'^api/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$', 'FuzzEd.api.frontend.node', name='node'),
+    url(r'^front/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.frontend.nodes', name='nodes'),
+    url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$', 'FuzzEd.api.frontend.node', name='node'),
 
     # properties
-    url(r'^api/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties$',
+    url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties$',
         'FuzzEd.api.frontend.properties', name='properties'),
-    url(r'^api/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties/(?P<key>)$',
+    url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties/(?P<key>)$',
         'FuzzEd.api.frontend.property', name='property'),
 
     # edges
-    url(r'^api/graphs/(?P<graph_id>\d+)/edges$','FuzzEd.api.frontend.edges', name='edges'),
-    url(r'^api/graphs/(?P<graph_id>\d+)/edges/(?P<edge_id>\d+)$','FuzzEd.api.frontend.edge', name='edge'),
+    url(r'^front/graphs/(?P<graph_id>\d+)/edges$','FuzzEd.api.frontend.edges', name='edges'),
+    url(r'^front/graphs/(?P<graph_id>\d+)/edges/(?P<edge_id>\d+)$','FuzzEd.api.frontend.edge', name='edge'),
 
     # undo/redo
-    url(r'^api/graphs/(?P<graph_id>\d+)/redos$','FuzzEd.api.frontend.redos', name='redos'),
-    url(r'^api/graphs/(?P<graph_id>\d+)/undos$','FuzzEd.api.frontend.undos', name='undos'),
+    url(r'^front/graphs/(?P<graph_id>\d+)/redos$','FuzzEd.api.frontend.redos', name='redos'),
+    url(r'^front/graphs/(?P<graph_id>\d+)/undos$','FuzzEd.api.frontend.undos', name='undos'),
 
     # analysis
-    url(r'^api/graphs/(?P<graph_id>\d+)/analysis/cutsets$', 
+    url(r'^front/graphs/(?P<graph_id>\d+)/analysis/cutsets$', 
         'FuzzEd.api.frontend.job_create', {'job_kind': Job.CUTSETS_JOB}, name='analyze_cutsets'),
-    url(r'^api/graphs/(?P<graph_id>\d+)/analysis/topEventProbability$',
+    url(r'^front/graphs/(?P<graph_id>\d+)/analysis/topEventProbability$',
         'FuzzEd.api.frontend.job_create', {'job_kind': Job.TOP_EVENT_JOB}, name='analyze_top_event_probability'),
 
     # simulation
-    url(r'^api/graphs/(?P<graph_id>\d+)/simulation/topEventProbability$',
+    url(r'^front/graphs/(?P<graph_id>\d+)/simulation/topEventProbability$',
         'FuzzEd.api.frontend.job_create', {'job_kind': Job.SIMULATION_JOB}, name='simulation_top_event_probability'),
 
     # jobs
-    url(r'^api/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.frontend.job_status', name='frontend_job_status'),
-    url(r'^api/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.frontend.job_exitcode', name='job_exitcode'),
-    url(r'^api/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.frontend.job_files', name='job_files'),
+    url(r'^front/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.frontend.job_status', name='frontend_job_status'),
+    url(r'^front/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.frontend.job_exitcode', name='job_exitcode'),
+    url(r'^front/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.frontend.job_files', name='job_files'),
 
     # user notifications
-    url(r'^api/notifications/(?P<noti_id>\d+)/dismiss$','FuzzEd.api.frontend.noti_dismiss', name='noti_dismiss'),
+    url(r'^front/notifications/(?P<noti_id>\d+)/dismiss$','FuzzEd.api.frontend.noti_dismiss', name='noti_dismiss'),
 
     ## Application API, protected by API key
     url(r'^api/', include(v1_api.urls)),

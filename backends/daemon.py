@@ -25,36 +25,37 @@ useTestServer = False
 
 class WorkerThread(threading.Thread):
     jobtype = ""
-    joburl = ""
+    joburl_status = ""
+    joburl_files = ""
 
-    def __init__(self, jobtype, joburl):
+    def __init__(self, jobtype, joburl_files, joburl_exitcode):
         self.jobtype = jobtype
-        self.joburl = joburl
+        self.joburl_exitcode = joburl_exitcode
+        self.joburl_files = joburl_files
         threading.Thread.__init__(self)
 
     def sendFiles(self, url, files):
-	logger.debug("Sending data to %s: %s"%(url, str(files)))
+        logger.debug("Sending data to %s: %s"%(url, str(files)))
         r = requests.post(url, files=files, allow_redirects=False, verify=False)
-	if r.text:
-		logger.debug("Data sent, response was: "+str(r.text))
+        if r.text:
+            logger.debug("Data sent, response was: "+str(r.text))
 
     def report_problem(self, exit_code):
-        url = self.joburl+'/exitcode'
-	logger.debug("Sending exit code %s to %s"%(str(exit_code), url))
+        logger.debug("Sending exit code %s to %s"%(str(exit_code), self.joburl_exitcode))
         results = {'exit_code' : exit_code}
-        r = requests.post(url, data=results, verify=False)
+        r = requests.post(self.joburl_exitcode, data=results, verify=False)
         logger.debug("Error report sent, response was: "+str(r.text))
 
     def run(self):
         try:
-            logger.info("Working for job URL: "+self.joburl)        
+            logger.info("Working for job URL: "+self.joburl_files)        
 
             # Create tmp directories
             tmpdir = tempfile.mkdtemp()
             tmpfile = tempfile.NamedTemporaryFile(dir=tmpdir, delete=False)
 
             # Fetch input data and store it
-            input_data = urllib2.urlopen(self.joburl+'/files')
+            input_data = urllib2.urlopen(self.joburl_files)
             tmpfile.write(input_data.read())
             tmpfile.close()
 
@@ -80,7 +81,7 @@ class WorkerThread(threading.Thread):
                     results = {fname: open(tmpdir+"/"+fname, "rb") for fname in os.listdir(tmpdir) if fname.endswith(suffix)}
                 else:
                     results = {output_file: open(tmpdir+os.sep+output_file, "rb")}
-                self.sendFiles(self.joburl+'/files', results)
+                self.sendFiles(self.joburl_files, results)
             else:
                 logger.error("Error on execution: Exit code "+str(exit_code))  
                 logger.error("Saving input file for later reference: /tmp/lastinput.xml")
@@ -100,18 +101,20 @@ class JobServer(SimpleXMLRPCServer):
         SimpleXMLRPCServer.__init__(self, (options['backend_daemon_host'], int(options['backend_daemon_port'])))
         self.register_function(self.handle_request, 'start_job')
 
-    def handle_request(self, jobtype, joburl):
-        logger.debug("Received %s job at %s"%(jobtype, joburl))
+    def handle_request(self, jobtype, joburl_files, joburl_exitcode):
+        logger.debug("Received %s job at %s"%(jobtype, joburl_files))
         if useTestServer:
-            parts = joburl.split('/',3)
-            joburl = "http://localhost:8081/"+parts[3]      # LifeTestServer URL from Django docs
-            logger.debug("Patching job URL for test server support to "+joburl)
+            logger.debug("Patching job URL for test server support")
+            parts = joburl_files.split('/',3)
+            joburl_files = "http://localhost:8081/"+parts[3]      # LifeTestServer URL from Django docs
+            parts = joburl_exitcode.split('/',3)
+            joburl_exitcode = "http://localhost:8081/"+parts[3]      # LifeTestServer URL from Django docs
         if jobtype not in backends.keys():
             logger.error("Unknown job type "+jobtype)
             return False
         else:
             # Start worker thread for this task
-            worker = WorkerThread(jobtype, joburl)
+            worker = WorkerThread(jobtype, joburl_files, joburl_exitcode)
             worker.start()
             return True
 
