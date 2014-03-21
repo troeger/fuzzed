@@ -1,3 +1,12 @@
+'''
+    Definition of our own error classes.
+
+    django.http responses are regular returns, transaction.commit_on_success will therefore  
+    always commit changes even if we return erroneous responses (400, 404, ...). We can
+    bypass this behaviour by throwing exception that send correct HTTP status to the user 
+    but abort the transaction.    
+'''
+
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, HttpResponseNotModified, \
     HttpResponseBadRequest, HttpResponseNotFound, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponseGone, \
     HttpResponseServerError

@@ -30,7 +30,9 @@
         };
 
         var dismiss_notification = function(event) {
-            jQuery.post('/api/notifications/{{ notification.pk }}/dismiss');
+            {% if notification %}
+            jQuery.post('{% url 'noti_dismiss' notification.pk %}');
+            {% endif %}
         };
 
         jQuery(document).ready(function() {

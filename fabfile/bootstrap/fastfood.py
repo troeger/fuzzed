@@ -14,7 +14,7 @@ Peter Troeger <peter@troeger.eu>
 #      Ab auf Github und PyPI
 
 from abc import ABCMeta, abstractmethod
-import platform, os, subprocess, time
+import platform, os, subprocess, time, sys
 
 class FastFood():
     ''' Abstract base class for the FastFood functionality. It provides a set of generic functions
@@ -52,8 +52,10 @@ class FastFood():
                     stderr = ''.join(p.stderr.readlines()).strip()
                     if stdout:
                         print stdout
+                        sys.stdout.flush()
                     if stderr:
                         print '\033[1;31m'+stderr+'\033[1;m'.strip()
+                        sys.stderr.flush()
             return p.returncode
         except OSError as e:
             print "Error while running "+str(args)+": "+str(e)
@@ -115,7 +117,7 @@ class FastFood():
         find_package_managers()
 
     @abstractmethod
-    def install(self, name, version=None):
+    def install(self, name, version=None, if_fails=None):
         ''' Installs a package, returns nothing. 
             The name is resolved from a registered mapping, if available.
             Otherwise it is used directly. If the package is already installed in the given version,
@@ -129,12 +131,17 @@ class FastFood():
             The two characters are followed by an arbitrary set of characters that expresses a version number in
             the particular package manager.
 
-            If the version is not given, the packager manager decides which one to install. 
-            Typically, this would be the most recent one.
+            If the version is not given, the packager manager decides if and what is installed. 
+
+            The optional if_fails defines a shell command / program. If this command ends with a non-zero exit code,
+            than the installation should take place. If the parameter is ommited, than the installation always takes place.
         '''
 
 class HomebrewFastFood(FastFood):
-    def install(self, name, version=None):
+    def install(self, name, version=None, if_fails=None):
+        if if_fails != None:
+            if os.system(if_fails) == 0:
+                return
         super(HomebrewFastFood, self).pre_install()
         #TODO: Add version support
         assert(version==None)
@@ -155,7 +162,10 @@ _homebrew = HomebrewFastFood()
 
 
 class AptFastFood(FastFood):
-    def install(self, name, version=None):
+    def install(self, name, version=None, if_fails=None):
+        if if_fails != None:
+            if os.system(if_fails) == 0:
+                return
         super(AptFastFood, self).pre_install()
         #TODO: Add version support
         assert(version==None)
@@ -172,14 +182,17 @@ _apt = AptFastFood()
 
 
 class PipFastFood(FastFood):
-    def install(self, name, version=None):
+    def install(self, name, version=None, if_fails=None):
+        if if_fails != None:
+            if os.system(if_fails) == 0:
+                return
         super(PipFastFood, self).pre_install()
         if version and version.startswith('=='):
             super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q '%s==%s'"%(self.get_mapping(name), version[2:]))
         elif version and version.startswith('>='):
             super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q '%s>=%s'"%(self.get_mapping(name), version[2:]))
         else:
-            super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q --upgrade "+self.get_mapping(name))
+            super(PipFastFood, self).run("sudo pip --default-timeout=100 install -q "+self.get_mapping(name))
         super(PipFastFood, self).post_install()
 
     def supported(self):
@@ -192,7 +205,10 @@ _pip = PipFastFood()
 
 
 class EasyInstallFastFood(FastFood):
-    def install(self, name, version=None):
+    def install(self, name, version=None, if_fails=None):
+        if if_fails != None:
+            if os.system(if_fails) == 0:
+                return
         super(EasyInstallFastFood, self).pre_install()
         if version and version.startswith('=='):
             super(EasyInstallFastFood, self).run("sudo easy_install '%s==%s'"%(self.get_mapping(name), version[2:]))
@@ -212,7 +228,10 @@ _easy_install = EasyInstallFastFood()
 
 
 class NpmFastFood(FastFood):
-    def install(self, name, version=None):
+    def install(self, name, version=None, if_fails=None):
+        if if_fails != None:
+            if os.system(if_fails) == 0:
+                return
         super(NpmFastFood, self).pre_install()        
         #TODO: Add version support
         assert(version==None)
@@ -229,7 +248,7 @@ _npm = NpmFastFood()
 
 
 class MissingFastFood(FastFood):
-    def install(self, name, version=None):
+    def install(self, name, version=None, if_fails=None):
         raise Exception("Installation of package '%s' not possible, couldn't find any suitable package manager."%name)
 
     def supported(self):
