@@ -1,6 +1,11 @@
 {
     "kind": "dfd",
     "name": "Data Flow Diagram",
+    "edges": {
+        "mirror": {
+            "style": ["italic"]
+        }
+    },
     "nodes": {
         "node": {
             "nodeDisplayName": "Node",
