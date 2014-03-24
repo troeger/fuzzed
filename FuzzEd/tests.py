@@ -51,10 +51,10 @@ class FuzzEdTestCase(LiveServerTestCase):
         return self.c.post(url, data)
 
     def getWithAPIKey(self, url):
-        return self.c.get(url, **{'HTTP_AUTHORIZATION':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
+        return self.c.get(url, **{'HTTP_AUTHORIZATION':'ApiKey f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
 
     def postWithAPIKey(self, url, data, content_type):
-        return self.c.post(url, data, content_type, **{'HTTP_AUTHORIZATION':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
+        return self.c.post(url, data, content_type, **{'HTTP_AUTHORIZATION':'ApiKey f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
 
     def ajaxGet(self, url):
         return self.c.get( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
@@ -134,6 +134,11 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
 
     def testMissingAPIKey(self):
         response=self.get('/api/v1/project/?format=json')
+        self.assertEqual(response.status_code, 401)
+
+    def testOriginalAPIKeyFormat(self):
+        ''' We have our own APIKey format, so the original Tastypie version should no longer work.'''
+        response = self.c.get('/api/v1/project/?format=json', **{'HTTP_AUTHORIZATION':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
         self.assertEqual(response.status_code, 401)
 
     def testRootResource(self):
