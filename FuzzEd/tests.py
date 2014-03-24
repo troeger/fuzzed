@@ -124,6 +124,20 @@ class ViewsTestCase(SimpleFixtureTestCase):
             original = Graph.objects.get(pk=graphid)
             self.assertTrue(original.same_as(copy))
 
+class GraphMLFilesTestCase(SimpleFixtureTestCase):
+    ''' 
+        Testing different GraphML file imports. 
+    '''
+    def setUp(self):
+        self.setUpAnonymous()       
+
+    def testImportFiles(self):
+        files = [f for f in os.listdir('FuzzEd/fixtures') if f.endswith(".graphml")]
+        for f in files:
+            text=open('FuzzEd/fixtures/'+f).read()
+            # Now import the same GraphML
+            response=self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%self.pkProject, text, 'application/xml')
+            self.assertEqual(response.status_code, 201)
 
 class ExternalAPITestCase(SimpleFixtureTestCase):
     ''' 
