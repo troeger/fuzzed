@@ -235,6 +235,12 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
             with self.assertRaises(UnsupportedFormat):
                 self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u'%(wrong_format,self.pkProject), "<graphml></graphml>", 'application/text')
 
+    def testInvalidContentType(self):
+        for format in ['application/text', 'application/x-www-form-urlencoded']:
+            response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%(self.pkProject), "<graphml></graphml>", format)
+            self.assertEqual(response.status_code, 415)
+
+
     def testFoo(self):
         ''' Leave this out, and the last test will fail. Dont ask me why.'''
         assert(True)
