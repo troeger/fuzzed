@@ -102,6 +102,7 @@ urlpatterns = patterns('',
     # more like a separate web application
     # url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 
+    url(r'^docs/', include('djiki.urls')),
 
 )
 urlpatterns += staticfiles_urlpatterns()

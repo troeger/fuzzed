@@ -14,7 +14,7 @@ def install_django_stuff():
 
     # Install Python packages, independent from OS
     print "Installing other Python packages..."
-    for package in ["south", "openid2rp", "django-require", "django-oauth-toolkit", "django-cors-headers", "django-tastypie", "defusedxml"]:
+    for package in ["south", "openid2rp", "django-require", "django-oauth-toolkit", "django-cors-headers", "django-tastypie", "defusedxml", "djiki"]:
         print "Installing "+package
         fastfood.python.install(package)        
 
