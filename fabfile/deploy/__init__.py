@@ -30,6 +30,8 @@ def web():
     # TODO: Perform bootstrap.web stuff
     # TODO: Configure web server
     # Put release package
+    print "Performing database backup"
+    run('su -c "pg_dump -c -f /tmp/dbackup.sql fuzztrees" postgres')    
     print "Uploading "+package
     put('dist/'+package, '/var/www/fuzztrees.net/')
     run('tar xvfz /var/www/fuzztrees.net/'+package+" -C /var/www/fuzztrees.net/")

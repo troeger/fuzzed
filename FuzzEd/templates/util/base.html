@@ -10,7 +10,7 @@
         {% block style %}
         @import url("{{ STATIC_URL }}css/jquery-ui/jquery-ui-1.10.3.min.css");
         @import url("{{ STATIC_URL }}css/theme/white.css");
-        @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-3.2.1.min.css");
+        @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-4.0.3.min.css");
         @import url("{{ STATIC_URL }}css/slickgrid/slick.grid-2.0.2.css");
         @import url("{{ STATIC_URL }}css/datatables/dataTables.bootstrap.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
@@ -127,9 +127,9 @@
 
             <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
+                <span class="fa fa-bar"></span>
+                <span class="fa fa-bar"></span>
+                <span class="fa fa-bar"></span>
             </button>
 
             <!-- Used to clear the float on small devices to get the collaps menu right -->
@@ -140,7 +140,7 @@
                 <ul class="nav navbar-nav pull-right">
                     {% block menu_right %}{% endblock %}
                     {%  if user.is_authenticated %}
-                    <li><a href="/?logout"><i class="icon-off icon-white"></i> Logout </a></li>
+                    <li><a href="/?logout"><i class="fa fa-power-off"></i> Logout </a></li>
                     {% endif %}
                 </ul>
             </div>

@@ -16,6 +16,9 @@ from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClai
 from FuzzEd.models import Graph, Project, Notification, notations, commands
 import FuzzEd.settings
 
+import logging
+logger = logging.getLogger('FuzzEd')
+
 GREETINGS = [
     'Loading the FuzzEd User Experience',
     'Trying to find your Data... it was here somewhere',
@@ -43,9 +46,16 @@ def index(request):
         auth.logout(request)
 
     if request.user.is_authenticated():
-        return redirect('projects')
+        if 'next' in request.GET and len(request.GET['next']) > 0:
+            return redirect(request.GET['next'])
+        else:
+            return redirect('projects')
 
-    return render(request, 'index.html', {'pwlogin': ('pwlogin' in request.GET)})
+    if 'next' in request.GET:
+        # Makes this a hidden form parameter for the OpenID auth form submission
+        return render(request, 'index.html', {'next': request.GET['next'], 'pwlogin': ('pwlogin' in request.GET)})
+    else:
+        return render(request, 'index.html', {'pwlogin': ('pwlogin' in request.GET)})
 
 def about(request):
     """
@@ -302,9 +312,9 @@ def settings(request):
     """
     Function: settings
     
-    This view handler shows user its settings page. However, if the user is doing some changes to its profile and posts
-    the changes to this handler, it will change the underlying user object and redirect afterwards to the dashboard.
-    
+    The view for the settings page. The code remembers the last page (e.g. project overview or project details) and goes
+    backe to it afterwards.
+   
     Parameters:
      {HttpRequest} request - a django request object
     
@@ -329,6 +339,16 @@ def settings(request):
         user.save()
 
         messages.add_message(request, messages.SUCCESS, 'Settings saved.')
+        return redirect(request.session['comes_from'])
+    elif POST.get('generate'):
+        from tastypie.models import ApiKey         
+        user = request.user
+        # User may be new, without any previous API key
+        key = ApiKey.objects.get_or_create(user=user, defaults={'user': user})
+        # Save new API key
+        user.api_key.key = user.api_key.generate_key()
+        user.api_key.save()
+    elif POST.get('cancel'):
         return redirect(request.session['comes_from'])
 
     return render(request, 'util/settings.html')
@@ -406,13 +426,16 @@ def snapshot(request, graph_id):
 
     return render(request, 'editor/editor.html', parameters)
 
-@require_http_methods(['GET', 'POST'])
+@require_http_methods(['GET','POST'])
 def login(request):
     """
     Function: login
     
     View handler for loging in a user using OpenID. If the user is not yet know to the system a new profile is created
     for him using his or her personal information as provided by the OpenID provider.
+
+    The login view always redirects to the index view - and not directly to the project view - in order to keep
+    the 'next' parameter handling in one place. Otherwise, the project view would need to consider the parameter too.
     
     Parameters:
      {HttpRequest} request - a django request object
@@ -420,26 +443,41 @@ def login(request):
     Returns:
      {HttpResponse} a django response object
     """
-    GET  = request.GET
+    GET = request.GET
     POST = request.POST
 
-    # user data was transmitted, try login the user one
+    # Consider the 'next' redirection
+    if 'next' in request.GET:
+        #TODO: Security issue ?
+        redirect_params = '?next='+request.GET['next']
+    else:
+        redirect_params = ''
+
+    # Ordinary password login. Since this is normally disabled in favour of OpenID login, all such users
+    # got garbage passwords. This means that this code can remain in here as last ressort fallback for
+    # the admin users that have real passwords.
     if 'loginname' in POST and 'loginpw' in POST:
         user = auth.authenticate(username=POST['loginname'], password=POST['loginpw'])
         # user found? sign-on
         if user is not None and user.is_active:
             auth.login(request, user)
+        return redirect('/projects/'+redirect_params)
 
-    elif 'openid_identifier' in GET:
+    elif 'openid_identifier' in POST:
         # first stage of OpenID authentication
-        open_id = GET['openid_identifier']
+        open_id = POST['openid_identifier']
         request.session['openid_identifier'] = open_id
 
         try:
-           return preAuthenticate(open_id, FuzzEd.settings.OPENID_RETURN)
+            openidreturn = FuzzEd.settings.OPENID_RETURN
+            if 'next' in request.POST:
+                #TODO: Potential security problem
+                openidreturn += '&next='+request.POST['next']
+            logger.debug("OpenID return URL is "+openidreturn)
+            return preAuthenticate(open_id, openidreturn)
         except IncorrectClaimError:
-           messages.add_message(request, messages.ERROR, 'This OpenID claim is not valid.')
-           return redirect('index')
+            messages.add_message(request, messages.ERROR, 'This OpenID claim is not valid.')
+            return redirect('/'+redirect_params)
 
     elif 'openidreturn' in GET:
         user = auth.authenticate(openidrequest=request)
@@ -454,6 +492,9 @@ def login(request):
             # not known to the backend so far, create it transparently
             if 'nickname' in user_sreg:
                 user_name = unicode(user_sreg['nickname'], 'utf-8')[:29]
+            else:
+                now = datetime.datetime.now()
+                user_name = 'Anonymous %d%d%d%d' % (now.hour, now.minute, now.second, now.microsecond)
 
             if 'email' in user_sreg:         
                 email = unicode(user_sreg['email'], 'utf-8')[:29]
@@ -461,46 +502,35 @@ def login(request):
             if AX.email in user_ax:
                 email = unicode(user_ax[AX.email], 'utf-8')[:29]
 
-            # no username given, register user with his e-mail address as username
-            if not user_name and email:
-                # Google is using different claim IDs for the same user, if he comes
-                # from different originating domains
-                # This leads to a problem when user come from "www" or without "www"
-                # In this case, the new username already exists in the database
-                try:
-                    old_user = User.objects.get(username=email)
-                    new_user = User(username=email + '2', email=email)
-                except:
-                    new_user = User(username=email, email=email)
-
-            # both, username and e-mail were not given, use a timestamp as username
-            elif not user_name and not email:
-                now = datetime.datetime.now()
-                user_name = 'Anonymous %d%d%d%d' % (now.hour, now.minute, now.second, now.microsecond)
+            # Google is using different claim IDs for the same user, if he comes
+            # from different originating domains
+            # This leads to a problem when user come from "www" or without "www"
+            # We solve this by trusting the given email address as unique identifier
+            if email:
+                new_user, created = User.objects.get_or_create(email=email, defaults={'email':email, 'username':user_name})
+            else:
                 new_user = User(username=user_name)
+                created = True
 
-            # username and e-mail were given; great - register as is
-            elif user_name and email:
-                new_user = User(username=user_name, email=email)
+            if created:
+                # Assign additional information to newly created User object
+                if AX.first in user_ax:
+                    new_user.first_name = unicode(user_ax[AX.first], 'utf-8')[:29]
 
-            # username given but no e-mail - at least we know how to call him
-            elif user_name and not email:
-                new_user = User(username=user_name)
+                if AX.last in user_ax:
+                    new_user.last_name=unicode(user_ax[AX.last], 'utf-8')[:29]
 
-            if AX.first in user_ax:
-                new_user.first_name = unicode(user_ax[AX.first], 'utf-8')[:29]
+                mail_managers('New user', str(new_user), fail_silently=True)
+                new_user.is_active = True
+            else:
+                mail_managers('New OpenID claim for user', str(new_user), fail_silently=True)
 
-            if AX.last in user_ax:
-                new_user.last_name=unicode(user_ax[AX.last], 'utf-8')[:29]
-
-            new_user.is_active = True
             new_user.save()
 
-            linkOpenID(new_user, user.openid_claim)
-            mail_managers('New user', str(new_user), fail_silently=True)
+            linkOpenID(new_user, user.openid_claim) # especially relevant when user object was fetched, and not created
             
             return redirect('/login/?openid_identifier=%s' % urllib.quote_plus(request.session['openid_identifier'])) 
             
         auth.login(request, user)
-    return redirect('projects')
+    return redirect('/'+redirect_params)
 

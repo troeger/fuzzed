@@ -539,7 +539,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
      */
     var CompoundEntry = Entry.extend({
         blurEvents: function() {
-            return ['click', 'remove'];
+            return ['click'];
         },
 
         appendTo: function(on) {

@@ -10,11 +10,15 @@ try:
 except:
     print "ERROR: Perform a build process first."
     exit(-1)
+from defusedxml.ElementTree import fromstring as parseXml
 
 from project import Project
 from node_rendering import tikz_shapes
 from FuzzEd.lib.jsonfield import JSONField
 
+
+import logging
+logger = logging.getLogger('FuzzEd')
 
 import json, notations
 
@@ -61,6 +65,7 @@ class Graph(models.Model):
         Returns:
          {Node} instance
         """
+        assert(self.kind in {'faulttree', 'fuzztree'})
         return self.nodes.all().get(kind='topEvent')
 
     def to_json(self):
@@ -105,6 +110,31 @@ class Graph(models.Model):
     def to_bool_term(self):
         root = self.nodes.get(kind__exact = 'topEvent')
         return root.to_bool_term()
+
+    def to_graphml(self):
+        graphKindData = '        <data key="kind">%s</data>\n' % (self.kind) 
+        if self.kind in {'faulttree', 'fuzztree'}:
+            missionData = '        <data key="missionTime">%d</data>\n' % (self.top_node().get_property('missionTime'),) 
+        else:
+            missionData = ''        
+
+        return ''.join([
+            '<?xml version="1.0" encoding="utf-8"?>\n'
+            '<graphml xmlns="http://graphml.graphdrawing.org/xmlns"\n'
+            '         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n'
+            '         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns\n'
+            '                             http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">\n'
+            '    <graph id="graph" edgedefault="directed">\n',
+                 notations.graphml_keys[self.kind],
+                 '\n',
+                 graphKindData,
+                 missionData] +
+                 [node.to_graphml() for node in self.nodes.filter(deleted=False)] +
+                 [edge.to_graphml() for edge in self.edges.filter(deleted=False)] +
+
+           ['    </graph>\n'
+            '</graphml>\n'
+        ])
 
     def to_tikz(self):
         """
@@ -172,8 +202,8 @@ class Graph(models.Model):
         return dom.toprettyxml()
 
     def from_xml(self, xml):
-        from node import Node
         ''' Fill this graph with the information gathered from the XML.'''
+        from node import Node
         if self.kind == "fuzztree":
             tree = fuzzTreeFromXml(xml)
         elif self.kind == "faulttree":
@@ -185,6 +215,66 @@ class Graph(models.Model):
         self.save()
         top=Node(graph=self)
         top.load_xml(tree.topEvent)
+
+    def from_graphml(self, graphml):
+        ''' 
+            Parses the given GraphML with the DefusedXML library, for better security.
+        '''
+        from node import Node, new_client_id
+        from edge import Edge
+        dom = parseXml(graphml)
+        graph = dom.find('{http://graphml.graphdrawing.org/xmlns}graph')
+        if graph == None:
+            raise Exception('Could not find <graph> element in the input data.')
+        if graph.get('edgedefault') != 'directed':
+            raise Exception('Only GraphML documents with directed edges are supported.')
+        # Determine graph type, in order to check for the right format rules
+        graph_kind_element = graph.find("{http://graphml.graphdrawing.org/xmlns}data[@key='kind']")
+        if graph_kind_element == None:
+            raise Exception('Missing <data> element for graph kind declaration.')
+        graph_kind = graph_kind_element.text
+        if graph_kind not in notations.graphml_node_data:
+            raise Exception('Invalid graph kind declaration.')
+        else:
+            self.kind = graph_kind
+        # Save graph object to get a valid, which is needed in the node refs
+        self.save()
+        # go through all GraphML nodes and create them as model nodes for this graph
+        id_map={}           # GraphML node ID's to node model PK's
+        for gml_node in graph.iter('{http://graphml.graphdrawing.org/xmlns}node'):
+            gml_node_id = gml_node.get('id')
+            node = Node(graph=self, client_id=int(gml_node_id))
+            node.save()     # get a valid pk
+            id_map[gml_node_id] = node.pk
+            # Scan all data elements for the node
+            for gml_node_data in gml_node.iter('{http://graphml.graphdrawing.org/xmlns}data'):
+                name = gml_node_data.get('key')
+                value = gml_node_data.text
+                if name not in notations.graphml_node_data[graph_kind]:
+                    raise Exception("Invalid graph node element '%s'"%name)
+                # set according node properties
+                if name == 'kind':
+                    node.kind = value
+                    node.save()
+                else:
+                    node.set_attr(name, value)
+            logger.debug("New node: "+str(node.to_dict()))
+        # Graph properties belong to the TOP node
+        # GraphML files without graph <data> properties may refer to a graph type that has no
+        # TOP node concept
+        for data in graph.findall('{http://graphml.graphdrawing.org/xmlns}data'):
+            name = data.get('key')
+            if name != 'kind':          # already handled above
+                if name not in notations.graphml_graph_data[graph_kind]:
+                    raise Exception("Invalid graph data element '%s'"%name)
+                self.top_node().set_attr(name, data.text)   # Fetch TOP node here, not existent in RBD's
+
+        # go through all GraphML edges and create them as model edges for this graph
+        for gml_edge in graph.iter('{http://graphml.graphdrawing.org/xmlns}edge'):
+            source = Node.objects.get(pk=id_map[gml_edge.get('source')])
+            target = Node.objects.get(pk=id_map[gml_edge.get('target')])
+            edge = Edge(graph=self, source=source, target=target, client_id=new_client_id())
+            edge.save()
 
     def copy_values(self, other):
         # copy all nodes and their properties
@@ -216,4 +306,25 @@ class Graph(models.Model):
 
         self.read_only = other.read_only
         self.save()
+
+    def same_as(self, graph):
+        ''' 
+            Checks if this graph is equal to the given one in terms of nodes and their properties. 
+            This is a very expensive operation that is only intended for testing purposes.
+            Comparing the edges is not easily possible, since the source / target ID's in the edge
+            instances would need to be mapped between original and copy.
+        '''
+        for my_node in self.nodes.all().filter(deleted=False):
+            found_match = False
+            for their_node in graph.nodes.all().filter(deleted=False):
+                if my_node.same_as(their_node):
+                    found_match = True
+                    break
+            if not found_match:
+                logger.debug("Couldn't find a match for node %s"%(str(my_node)))
+                return False
+
+        return True
+
+
 

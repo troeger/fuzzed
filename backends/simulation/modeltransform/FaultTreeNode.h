@@ -5,7 +5,6 @@
 #include <string>
 #include <memory>
 
-#include "pugixml.hpp"
 #include "serialization/TNDocument.h"
 
 class FaultTreeNode

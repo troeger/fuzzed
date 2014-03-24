@@ -76,6 +76,7 @@ set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
 
 set(Boost_DIR ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
 find_package(Boost 1.48 COMPONENTS
+	graph
 	date_time
 	system
 	filesystem

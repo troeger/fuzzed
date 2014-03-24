@@ -231,7 +231,7 @@ function(Property, Mirror, Canvas, Class) {
          */
         _setupConnectionHandle: function() {
             if (this.numberOfOutgoingConnections != 0) {
-                this._connectionHandle = jQuery('<i class="icon-plus icon-justify"></i>')
+                this._connectionHandle = jQuery('<i class="fa fa-plus"></i>')
                     .addClass(this.config.Classes.NODE_HALO_CONNECT + ' ' + this.config.Classes.NO_PRINT)
                     .css({
                         'top':  this._nodeImage.yCenter + this._nodeImage.outerHeight(true) / 2,
@@ -889,16 +889,18 @@ function(Property, Mirror, Canvas, Class) {
          *   A dict representation of the node according to models/node.py:to_dict().
          */
         toDict: function() {
+            var properties = _.map(this.properties, function(prop) { return prop.toDict() });
+
             return {
-                'properties':   _.reduce(_.map(this.properties, function(prop) { return prop.toDict() }), function(memo, prop) {
+                properties: _.reduce(properties, function(memo, prop) {
                     return _.extend(memo, prop);
                 }, {}),
-                'id':           this.id,
-                'kind':         this.kind,
-                'x':            this.x,
-                'y':            this.y,
-                'outgoing':     this.outgoing,
-                'incoming':     this.incoming
+                id:       this.id,
+                kind:     this.kind,
+                x:        this.x,
+                y:        this.y,
+                outgoing: this.outgoing,
+                incoming: this.incoming
             };
         },
 
@@ -1035,21 +1037,23 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          */
         _moveContainerToPixel: function(position, animated) {
+            var halfGrid = Canvas.gridSize / 2;
+            var x        = Math.max(position.x - this._nodeImage.xCenter, halfGrid);
+            var y        = Math.max(position.y - this._nodeImage.yCenter, halfGrid);
+
             if (animated) {
                 jsPlumb.animate(this.container.attr('id'), {
-                    left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
-                    top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
+                    left: x,
+                    top:  y
                 }, {
                     duration: 200,
-                    queue: false,
-                    done: function() {
-                        Canvas.enlarge(position);
-                    }
+                    queue:    false,
+                    done:     function() { Canvas.enlarge(position); }
                 });
             } else {
                 this.container.css({
-                    left: Math.max(position.x - this._nodeImage.xCenter, Canvas.gridSize/2),
-                    top:  Math.max(position.y - this._nodeImage.yCenter, Canvas.gridSize/2)
+                    left: x,
+                    top:  y
                 });
                 Canvas.enlarge(position);
                 // ask jsPlumb to repaint the selectee in order to redraw its connections

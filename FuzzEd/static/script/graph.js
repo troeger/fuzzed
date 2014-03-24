@@ -1,4 +1,5 @@
-define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
+define(['canvas', 'class', 'config', 'menus', 'jquery', 'd3'],
+function(Canvas, Class, Config, Menus) {
     /**
      *  Package: Base
      */
@@ -52,7 +53,6 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
 
             this._loadFromJson(json)
                 ._registerEventHandlers()
-                ._setupAutoLayout();
         },
 
         /**
@@ -119,28 +119,6 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
 
             return this;
         },
-
-        /**
-         *  Method: _setupAutoLayout
-         *    Sets up the toolbar entries for the layouting functions supported by this graph.
-         *
-         *  Returns:
-         *    This <Graph> instance for chaining.
-         */
-        _setupAutoLayout: function() {
-            var toolsContainer = jQuery('#' + this.config.IDs.NAVBAR_TOOLS);
-            _.each(this._getLayoutAlgorithms(), function(algorithm) {
-                jQuery('<a><i class="' + algorithm.iconClass + '"></i></a>')
-                    .attr('title', algorithm.tooltip)
-                    .on('click', function(){
-                        this._layoutWithAlgorithm(algorithm.algorithm);
-                    }.bind(this))
-                    .appendTo(toolsContainer);
-            }.bind(this));
-
-            return this;
-        },
-
 
         /**
          *  Group: Graph manipulation
@@ -330,20 +308,39 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
          *    This <Graph> instance for chaining.
          */
         _layoutWithAlgorithm: function(algorithm) {
+            jQuery(document).trigger(Config.Events.GRAPH_LAYOUT);
             var layoutedNodes = algorithm(this._getNodeHierarchy());
 
             // center the top node on the currently visible canvas (if there's enough space)
             var centerX = Math.floor((jQuery('#' + this.config.IDs.CANVAS).width() / this.config.Grid.SIZE) / 2);
             // returned coordinates can be negative, so add that offset
-            var minX = _.min(layoutedNodes, function(n) {return n.x}).x;
+            var minX = _.min(layoutedNodes, function(n) { return n.x }).x;
             centerX -= Math.min(centerX + minX, 0);
 
-            // apply positions
+            // remember the node's positions before the layout attempt
+            var oldPositions = _.map(layoutedNodes, function(n) {
+                var node = this.getNodeById(n.id);
+                return {x: node.x, y: node.y};
+            }.bind(this));
+
+            // apply layouted positions temporarily, without saving
             _.each(layoutedNodes, function(n) {
                 var node = this.getNodeById(n.id);
                 // +1 because the returned coords are 0-based and we need 1-based
                 node.moveToGrid({x: n.x + centerX + 1, y: n.y + 1}, true);
             }.bind(this));
+
+            // ask the user to keep the layout
+            jQuery.when(Menus.LayoutMenu.keep())
+                .fail(function() {
+                    _.each(layoutedNodes, function(n, index) {
+                        var node = this.getNodeById(n.id);
+                        node.moveToGrid(oldPositions[index], true);
+                    }.bind(this));
+                }.bind(this))
+                .always(function() {
+                    jQuery(document).trigger(Config.Events.GRAPH_LAYOUTED);
+                });
 
             return this;
         },
@@ -478,42 +475,33 @@ define(['canvas', 'class', 'jquery', 'd3'], function(Canvas, Class) {
         },
 
         /**
-         *  Method: _getLayoutAlgorithms
-         *    Returns the layouting algorithms supported by this graph.
+         *  Method: _getClusterLayoutAlgorithm
+         *    Returns the cluster layouting algorithm supported by this graph.
          *    This is the default implementation. Subclasses may override this behavior.
          *
-         *  Returns:
-         *    An array containing algorithm descriptions. Those descriptions should contain the algorithm itself
-         *    (taken from d3.js), a class for the toolbar icon and a tooltip text.
          */
-        _getLayoutAlgorithms: function() {
-            var clusterLayout = d3.layout.cluster()
+        _getClusterLayoutAlgorithm: function() {
+            return d3.layout.cluster()
                 .nodeSize([1, 2]) // leave some space for the mirror
                 .separation(function(a, b) {
                     // sibling nodes are tidier
                     return a.parent == b.parent ? 2 : 3;
                 });
+        },
 
-            var treeLayout =  d3.layout.tree()
+        /**
+         *  Method: _getTreeLayoutAlgorithm
+         *    Returns the tree layouting algorithm supported by this graph.
+         *    This is the default implementation. Subclasses may override this behavior.
+         *
+         */
+        _getTreeLayoutAlgorithm: function() {
+            return d3.layout.tree()
                 .nodeSize([1, 2]) // leave some space for the mirror
                 .separation(function(a, b) {
                     // sibling nodes are tidier
                     return a.parent == b.parent ? 2 : 3;
                 });
-
-
-
-            return [
-                {
-                    algorithm: clusterLayout,
-                    iconClass: this.config.Classes.ICON_LAYOUT_CLUSTER,
-                    tooltip:   this.config.Tooltips.LAYOUT_CLUSTER
-                }, {
-                    algorithm: treeLayout,
-                    iconClass: this.config.Classes.ICON_LAYOUT_TREE,
-                    tooltip:   this.config.Tooltips.LAYOUT_TREE
-                }
-            ];
         },
 
         /**

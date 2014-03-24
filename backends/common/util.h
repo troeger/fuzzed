@@ -47,8 +47,6 @@ namespace util
 	static const std::string slash="/";
 #endif
 
-	string nestedIDString(int n, ...);
-
 	string toString(const int& i);
 	string toString(const double& d, const int& prec = 10);
 	string toString(std::istream& istream);

@@ -107,11 +107,11 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
             var controls = this.container.find('.' + Config.Classes.MENU_CONTROLS);
 
             controls.find('.' + Config.Classes.MENU_MINIMIZE)
-                .addClass('icon-white icon-minus-sign')
+                .addClass('fa fa-minus-circle')
                 .click(this.minimize.bind(this));
 
             controls.find('.' + Config.Classes.MENU_CLOSE)
-                .addClass('icon-white icon-remove-sign')
+                .addClass('fa fa-times-circle')
                 .click(this.hide.bind(this));
 
             return controls;
@@ -137,7 +137,7 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
     /**
      * Class: ShapeMenu
      */
-    var ShapeMenu = Menu.extend({
+    var ShapeMenu = new (Menu.extend({
         init: function() {
             this._super();
             this._setupThumbnails();
@@ -162,12 +162,12 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
             });
 		}
 
-    });
+    }));
 
     /**
      * Class: PropertiesMenu
      */
-    var PropertiesMenu = Menu.extend({
+    var PropertiesMenu = new (Menu.extend({
         _displayOrder: undefined,
         _form:         undefined,
         _node:         undefined,
@@ -183,6 +183,13 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         maximize: function(eventObject) {
             this._super(eventObject);
             this.show();
+            return this;
+        },
+
+        displayOrder: function(newOrder) {
+            if (typeof newOrder === 'undefined') return this._displayOrder;
+
+            this._displayOrder = newOrder;
             return this;
         },
 
@@ -260,10 +267,78 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         _allHidden: function() {
             return !this._node || _.all(this._node.properties, function(property) { return property.hidden; });
         }
-    });
+    }));
+
+    var LayoutMenu = new (Menu.extend({
+        _keep: undefined,
+        _undo: undefined,
+
+        init: function() {
+            this._super();
+            this._setupButtons()
+                ._setupLayoutRequested()
+                .hide();
+        },
+
+        keep: function() {
+            var deferred = jQuery.Deferred();
+
+            // User has accepted to keep the layout by explicitly clicking the button
+            this._keep.click(function() {
+                deferred.resolve();
+            }.bind(this));
+
+            // User has accepted implicitly by continuing to edit the graph
+            jQuery(document).one([
+                Config.Events.CANVAS_SHAPE_DROPPED,
+                Config.Events.GRAPH_NODE_ADDED,
+                Config.Events.GRAPH_NODE_DELETED,
+                Config.Events.GRAPH_EDGE_ADDED,
+                Config.Events.GRAPH_EDGE_DELETED,
+                Config.Events.GRAPH_LAYOUT,
+                Config.Events.PROPERTY_CHANGED
+            ].join(' '), function() {
+                deferred.resolve();
+            }.bind(this));
+
+            // User requested an undo
+            this._undo.click(function() {
+                deferred.reject();
+            }.bind(this));
+
+            return deferred.promise();
+        },
+
+        show: function() {
+            var viewport = jQuery(window);
+            this.container.css({
+                top: viewport.height() / 2 - this.container.height() / 2,
+                left: viewport.width() / 2 - this.container.width() / 2
+            });
+            return this._super();
+        },
+
+        _setupButtons: function() {
+            this._keep = this.container.find('button.btn-primary').add(this._controls.find('.menu-close'));
+            this._undo = this.container.find('button.btn-danger');
+
+            return this;
+        },
+
+        _setupLayoutRequested: function() {
+            jQuery(document).on(Config.Events.GRAPH_LAYOUT, this.show.bind(this));
+            jQuery(document).on(Config.Events.GRAPH_LAYOUTED, this.hide.bind(this));
+            return this;
+        },
+
+        _setupContainer: function() {
+            return jQuery('#' + Config.IDs.LAYOUT_MENU);
+        }
+    }));
 
     return {
         Menu:           Menu,
+        LayoutMenu:     LayoutMenu,
         ShapeMenu:      ShapeMenu,
         PropertiesMenu: PropertiesMenu
     }
