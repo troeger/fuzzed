@@ -227,13 +227,23 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%self.pkFaultTree)
         self.assertEqual(response.status_code, 200)
         graphml = response.content
-        with self.assertRaises(Unauthorized):
-            self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', graphml, 'application/xml')
+        # Now send request with wrong project ID
+        result = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', graphml, 'application/xml')
+        self.assertEqual(response.status_code, 403)
+
+    def testMissingGraphImportProject(self):
+        # First export valid GraphML
+        response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%self.pkFaultTree)
+        self.assertEqual(response.status_code, 200)
+        graphml = response.content
+        # Now send request with wrong project ID
+        result = self.postWithAPIKey('/api/v1/graph/?format=graphml', graphml, 'application/xml')
+        self.assertEqual(response.status_code, 400)
 
     def testInvalidGraphImportFormat(self):
         for wrong_format in ['json','tex','xml']:
-            with self.assertRaises(UnsupportedFormat):
-                self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u'%(wrong_format,self.pkProject), "<graphml></graphml>", 'application/text')
+            response = self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u'%(wrong_format,self.pkProject), "<graphml></graphml>", 'application/text')
+            self.assertEqual(response.status_code, 400)
 
     def testInvalidContentType(self):
         for format in ['application/text', 'application/x-www-form-urlencoded']:
