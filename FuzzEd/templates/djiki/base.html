@@ -1,14 +1,17 @@
+{% extends "util/base.html" %}
+{% load i18n djiki_tags %}
+
+{% block content %}
 {% block page %}
 <div class="djiki">
 	<div class="actions container_12">
-		<div class="grid_12">
-		{% block djiki_actions %}{% endblock %}
-		</div>
-		<div class="clear"></div>
-	</div>
-	<div class="main container_12">
+		<a href="{% url 'djiki-page-edit' page.title|urlize_title %}" class="btn btn-default btn-small" style="float:right">
+			<i class="fa fa-edit"></i>&nbsp;Edit</a>
+
 		{% block djiki_main %}{% endblock %}
 		<div class="clear"></div>
 	</div>
 </div>
 {% endblock %}
+{% endblock %}
+
