@@ -35,7 +35,7 @@ class Result(models.Model):
   type          = models.CharField(max_length=1, choices= ANALYSIS_TYPES)
   prob          = JSONField()
   prob_sort     = models.IntegerField() 
-  decomposition = models.IntegerField()
+  decomposition = models.IntegerField(null=True, blank=True)
   node_issues   = JSONField()
   rounds        = models.IntegerField(null=True, blank=True)
   failures      = models.IntegerField(null=True, blank=True)

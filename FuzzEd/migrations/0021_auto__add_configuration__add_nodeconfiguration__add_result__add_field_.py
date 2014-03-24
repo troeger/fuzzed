@@ -8,13 +8,36 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Configuration.id'
-        db.delete_column(u'FuzzEd_configuration', u'id')
+        # Adding model 'Configuration'
+        db.create_table(u'FuzzEd_configuration', (
+            ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='configurations', to=orm['FuzzEd.Graph'])),
+            ('result', self.gf('django.db.models.fields.related.OneToOneField')(related_name='configuration', unique=True, primary_key=True, to=orm['FuzzEd.Result'])),
+            ('costs', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal('FuzzEd', ['Configuration'])
 
-        # Adding field 'Configuration.result'
-        db.add_column(u'FuzzEd_configuration', 'result',
-                      self.gf('django.db.models.fields.related.OneToOneField')(default=0, related_name='configuration', unique=True, primary_key=True, to=orm['FuzzEd.Result']),
-                      keep_default=False)
+        # Adding model 'NodeConfiguration'
+        db.create_table(u'FuzzEd_nodeconfiguration', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('node', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['FuzzEd.Node'])),
+            ('setting', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')()),
+            ('configuration', self.gf('django.db.models.fields.related.ForeignKey')(related_name='node_configurations', to=orm['FuzzEd.Configuration'])),
+        ))
+        db.send_create_signal('FuzzEd', ['NodeConfiguration'])
+
+        # Adding model 'Result'
+        db.create_table(u'FuzzEd_result', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='results', to=orm['FuzzEd.Graph'])),
+            ('type', self.gf('django.db.models.fields.CharField')(max_length=1)),
+            ('prob', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')()),
+            ('prob_sort', self.gf('django.db.models.fields.IntegerField')()),
+            ('decomposition', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('node_issues', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')()),
+            ('rounds', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('failures', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+        ))
+        db.send_create_signal('FuzzEd', ['Result'])
 
         # Adding field 'Graph.graph_issues'
         db.add_column(u'FuzzEd_graph', 'graph_issues',
@@ -22,98 +45,19 @@ class Migration(SchemaMigration):
                       keep_default=False)
 
 
-        # Changing field 'NodeConfiguration.setting'
-        db.alter_column(u'FuzzEd_nodeconfiguration', 'setting', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')())
-        # Deleting field 'Result.prob_sortable'
-        db.delete_column(u'FuzzEd_result', 'prob_sortable')
-
-        # Deleting field 'Result.analysis_type'
-        db.delete_column(u'FuzzEd_result', 'analysis_type')
-
-        # Deleting field 'Result.configuration'
-        db.delete_column(u'FuzzEd_result', 'configuration_id')
-
-        # Deleting field 'Result.issues'
-        db.delete_column(u'FuzzEd_result', 'issues')
-
-        # Adding field 'Result.type'
-        db.add_column(u'FuzzEd_result', 'type',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=1),
-                      keep_default=False)
-
-        # Adding field 'Result.prob_sort'
-        db.add_column(u'FuzzEd_result', 'prob_sort',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
-        # Adding field 'Result.node_issues'
-        db.add_column(u'FuzzEd_result', 'node_issues',
-                      self.gf('FuzzEd.lib.jsonfield.fields.JSONField')(default=''),
-                      keep_default=False)
-
-
-        # Changing field 'Result.prob'
-        db.alter_column(u'FuzzEd_result', 'prob', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')())
-
-        # Changing field 'Result.rounds'
-        db.alter_column(u'FuzzEd_result', 'rounds', self.gf('django.db.models.fields.IntegerField')(null=True))
-
-        # Changing field 'Result.failures'
-        db.alter_column(u'FuzzEd_result', 'failures', self.gf('django.db.models.fields.IntegerField')(null=True))
-
     def backwards(self, orm):
-        # Adding field 'Configuration.id'
-        db.add_column(u'FuzzEd_configuration', u'id',
-                      self.gf('django.db.models.fields.AutoField')(default=0, primary_key=True),
-                      keep_default=False)
+        # Deleting model 'Configuration'
+        db.delete_table(u'FuzzEd_configuration')
 
-        # Deleting field 'Configuration.result'
-        db.delete_column(u'FuzzEd_configuration', 'result_id')
+        # Deleting model 'NodeConfiguration'
+        db.delete_table(u'FuzzEd_nodeconfiguration')
+
+        # Deleting model 'Result'
+        db.delete_table(u'FuzzEd_result')
 
         # Deleting field 'Graph.graph_issues'
         db.delete_column(u'FuzzEd_graph', 'graph_issues')
 
-
-        # Changing field 'NodeConfiguration.setting'
-        db.alter_column(u'FuzzEd_nodeconfiguration', 'setting', self.gf('django.db.models.fields.TextField')())
-        # Adding field 'Result.prob_sortable'
-        db.add_column(u'FuzzEd_result', 'prob_sortable',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
-        # Adding field 'Result.analysis_type'
-        db.add_column(u'FuzzEd_result', 'analysis_type',
-                      self.gf('django.db.models.fields.CharField')(default='', max_length=1),
-                      keep_default=False)
-
-        # Adding field 'Result.configuration'
-        db.add_column(u'FuzzEd_result', 'configuration',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='result', to=orm['FuzzEd.Configuration']),
-                      keep_default=False)
-
-        # Adding field 'Result.issues'
-        db.add_column(u'FuzzEd_result', 'issues',
-                      self.gf('django.db.models.fields.TextField')(default=''),
-                      keep_default=False)
-
-        # Deleting field 'Result.type'
-        db.delete_column(u'FuzzEd_result', 'type')
-
-        # Deleting field 'Result.prob_sort'
-        db.delete_column(u'FuzzEd_result', 'prob_sort')
-
-        # Deleting field 'Result.node_issues'
-        db.delete_column(u'FuzzEd_result', 'node_issues')
-
-
-        # Changing field 'Result.prob'
-        db.alter_column(u'FuzzEd_result', 'prob', self.gf('django.db.models.fields.TextField')())
-
-        # Changing field 'Result.rounds'
-        db.alter_column(u'FuzzEd_result', 'rounds', self.gf('django.db.models.fields.IntegerField')(default=0))
-
-        # Changing field 'Result.failures'
-        db.alter_column(u'FuzzEd_result', 'failures', self.gf('django.db.models.fields.IntegerField')(default=0))
 
     models = {
         'FuzzEd.addedge': {
@@ -216,7 +160,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
             'result': ('django.db.models.fields.BinaryField', [], {'null': 'True'}),
-            'secret': ('django.db.models.fields.CharField', [], {'default': "'c66d9eb2-0eaf-46d7-a5f8-053cb5674521'", 'max_length': '64'})
+            'secret': ('django.db.models.fields.CharField', [], {'default': "'2c144dcc-0ac2-4259-bd83-827507456ff6'", 'max_length': '64'})
         },
         'FuzzEd.node': {
             'Meta': {'object_name': 'Node'},
@@ -281,7 +225,7 @@ class Migration(SchemaMigration):
         },
         'FuzzEd.result': {
             'Meta': {'object_name': 'Result'},
-            'decomposition': ('django.db.models.fields.IntegerField', [], {}),
+            'decomposition': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'failures': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'results'", 'to': "orm['FuzzEd.Graph']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

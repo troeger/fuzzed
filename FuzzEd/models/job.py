@@ -358,9 +358,9 @@ class Job(models.Model):
             current_result.rounds        = rounds
             current_result.failures      = failures
             current_result.save()
-            
+                        
             # Fetch configuration if present (only FuzzTree has got configurations)
-            if hasattr(result, 'configuration'):                
+            if hasattr(result, 'configuration') and result.configuration is not None:                
                 costs = result.configuration.costs if hasattr(result.configuration, 'costs') else None
                 
                 configuration = Configuration()

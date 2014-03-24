@@ -598,6 +598,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                             "bServerSide":   true,
                             "sAjaxSource":   "/api/jobs_status_test",
                             "aoColumns":     data["columns"],
+                            "bLengthChange": false,
+                            "iDisplayLength": 10,
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                                                 jQuery(nRow).on("mouseover", function(){
                                                     var configID = aData['id']
@@ -607,7 +609,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                             "fnInitComplete": function(oSettings, json) {
                                   _this._setupResizing();
                                   
-                                }
+                                }    
                             });
                                 
             this._grid.on( 'mouseleave', 'tr', function () {
