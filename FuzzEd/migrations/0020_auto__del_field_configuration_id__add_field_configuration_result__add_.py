@@ -55,6 +55,12 @@ class Migration(SchemaMigration):
         # Changing field 'Result.prob'
         db.alter_column(u'FuzzEd_result', 'prob', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')())
 
+        # Changing field 'Result.rounds'
+        db.alter_column(u'FuzzEd_result', 'rounds', self.gf('django.db.models.fields.IntegerField')(null=True))
+
+        # Changing field 'Result.failures'
+        db.alter_column(u'FuzzEd_result', 'failures', self.gf('django.db.models.fields.IntegerField')(null=True))
+
     def backwards(self, orm):
         # Adding field 'Configuration.id'
         db.add_column(u'FuzzEd_configuration', u'id',
@@ -102,6 +108,12 @@ class Migration(SchemaMigration):
 
         # Changing field 'Result.prob'
         db.alter_column(u'FuzzEd_result', 'prob', self.gf('django.db.models.fields.TextField')())
+
+        # Changing field 'Result.rounds'
+        db.alter_column(u'FuzzEd_result', 'rounds', self.gf('django.db.models.fields.IntegerField')(default=0))
+
+        # Changing field 'Result.failures'
+        db.alter_column(u'FuzzEd_result', 'failures', self.gf('django.db.models.fields.IntegerField')(default=0))
 
     models = {
         'FuzzEd.addedge': {
@@ -204,7 +216,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
             'result': ('django.db.models.fields.BinaryField', [], {'null': 'True'}),
-            'secret': ('django.db.models.fields.CharField', [], {'default': "'6ca89c7e-bcb8-4b76-8041-9f9b74caf56b'", 'max_length': '64'})
+            'secret': ('django.db.models.fields.CharField', [], {'default': "'c66d9eb2-0eaf-46d7-a5f8-053cb5674521'", 'max_length': '64'})
         },
         'FuzzEd.node': {
             'Meta': {'object_name': 'Node'},
@@ -270,13 +282,13 @@ class Migration(SchemaMigration):
         'FuzzEd.result': {
             'Meta': {'object_name': 'Result'},
             'decomposition': ('django.db.models.fields.IntegerField', [], {}),
-            'failures': ('django.db.models.fields.IntegerField', [], {}),
+            'failures': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'results'", 'to': "orm['FuzzEd.Graph']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'node_issues': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {}),
             'prob': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {}),
             'prob_sort': ('django.db.models.fields.IntegerField', [], {}),
-            'rounds': ('django.db.models.fields.IntegerField', [], {}),
+            'rounds': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'})
         },
         'FuzzEd.userprofile': {

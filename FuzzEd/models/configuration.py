@@ -22,9 +22,10 @@ class Configuration(models.Model):
   result = models.OneToOneField(Result, primary_key=True, related_name='configuration')
   costs  = models.IntegerField()
   
-  def __init__ (self, graph, costs):
+  def __init__ (self, graph, result, costs):
       super(Configuration, self).__init__()
       
-      self.graph = graph
-      self.costs = costs  
+      self.graph  = graph
+      self.result = result
+      self.costs  = costs  
     

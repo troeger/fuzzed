@@ -27,7 +27,7 @@ class Result(models.Model):
   class Meta:
       app_label = 'FuzzEd'
   
-  ANALYSIS_TYPES = [('S','Simulation'),('A','Analysis')]
+  ANALYSIS_TYPES = [('S','simulation'),('T','topevent')]
   
   graph         = models.ForeignKey(Graph, related_name='results')
   type          = models.CharField(max_length=1, choices= ANALYSIS_TYPES)
@@ -35,14 +35,13 @@ class Result(models.Model):
   prob_sort     = models.IntegerField() 
   decomposition = models.IntegerField()
   node_issues   = JSONField()
-  rounds        = models.IntegerField()
-  failures      = models.IntegerField()
+  rounds        = models.IntegerField(null=True, blank=True)
+  failures      = models.IntegerField(null=True, blank=True)
   
   
-  def __init__ (self, configuration, graph, type, prob, prob_sort, decomposition, issues, rounds, failures):
+  def __init__ (self, graph, type, prob, prob_sort, decomposition, issues, rounds, failures):
       super(Result, self).__init__()
 
-      self.configuration = configuration
       self.graph         = graph
       self.type          = type
       self.prob          = prob
