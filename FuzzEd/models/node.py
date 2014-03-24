@@ -176,15 +176,16 @@ class Node(models.Model):
             property_notation = properties_notation[property.key]
             property_kind     = property_notation['kind']
 
-            if property_kind == 'compound':
-                part_kind = property_notation['parts'][value[0]]['partName']
-                graphml.append(self.graphml_data_key(key + 'Kind', part_kind))
-                graphml.append(self.graphml_data_key(key,          value[1]))
-            elif property_kind == 'epsilon':
-                graphml.append(self.graphml_data_key(key,             value[0]))
-                graphml.append(self.graphml_data_key(key + 'Epsilon', value[1]))
-            else:
-                graphml.append(self.graphml_data_key(key, value))
+            # if property_kind == 'compound':
+            #     part_kind = property_notation['parts'][value[0]]['partName']
+            #     graphml.append(self.graphml_data_key(key + 'Kind', part_kind))
+            #     graphml.append(self.graphml_data_key(key,          value[1]))
+            # elif property_kind == 'epsilon':
+            #     graphml.append(self.graphml_data_key(key,             value[0]))
+            #     graphml.append(self.graphml_data_key(key + 'Epsilon', value[1]))
+            # else:
+            #     graphml.append(self.graphml_data_key(key, value))
+            graphml.append(self.graphml_data_key(key, value))
 
         return graphml
 
@@ -404,7 +405,7 @@ class Node(models.Model):
         Returns an XML wrapper object for the probability value being stored in frontend encoding.
         """
         probability = self.get_property('probability', None)
-        logger.debug(probability)
+        logger.debug("Determining XML representation for probability "+str(probability))
         # Probability is a 2-tuple, were the first value is a type indicator and the second the value
         if probability[0] == 0:
             # Crisp probability
@@ -413,7 +414,8 @@ class Node(models.Model):
                 return xml_faulttree.CrispProbability(value_=point)
             elif self.graph.kind == "fuzztree":
                 point = probability[1][0]
-                return xml_fuzztree.CrispProbability(value_=point)               
+                alpha = probability[1][1]
+                return xml_fuzztree.TriangularFuzzyInterval(a=point - alpha, b1=point, b2=point, c=point + alpha)
             else:
                 raise ValueError('Cannot handle crisp probability value for this graph type')
         elif probability[0] == 1:
@@ -592,9 +594,25 @@ class Node(models.Model):
         if hasattr(self, key):
             setattr(self, key, value)
         else:
-            prop, created = self.properties.get_or_create(key=key)
+            prop, created = self.properties.get_or_create(key=key, defaults={'node': self})
             prop.value = value
             prop.save()
+
+    def same_as(self, node):
+        ''' 
+            Checks if this node is equal to the given one in terms of properties. 
+            This is a very expensive operation that is only intended for testing purposes.
+        '''
+        for my_property in self.properties.all().filter(deleted=False):
+            found_match = False
+            for their_property in node.properties.all().filter(deleted=False):
+                if my_property.same_as(their_property):
+                    found_match = True
+                    break
+            if not found_match:
+                logger.debug("Could not find match for property %s in %s"%(my_property.value, str(self)))
+                return False
+        return True
 
 @receiver(post_save, sender=Node)
 def graph_modify(sender, instance, **kwargs):

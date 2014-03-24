@@ -62,6 +62,11 @@ class Job(models.Model):
     def done(self):
         return self.exit_code is not None
 
+    def get_absolute_url(self):
+        ''' Determine URL for the job result, when available for download. '''
+        assert(self.requires_download())
+        return reverse('frontend_graph_download', args=[self.graph.pk]) + "?format="+self.kind
+
     def requires_download(self):
         ''' Indicates if the result should be delivered directly to the frontend
             as file, or if it must be preprocessed with self.result_rendering().'''
@@ -167,13 +172,19 @@ class Job(models.Model):
                         y_val = alpha_cut.key+1 / alphacut_count        # Alphacut indexes start at zero
                         assert(0 <= y_val <= 1)
                         points.append([alpha_cut.value_.lowerBound, y_val])
-                        # If it is a crisp probability, then the triangle collapses to a single dot at mu(1),
-                        # but a line being drawn looks nicer
                         if alpha_cut.value_.upperBound != alpha_cut.value_.lowerBound:      
                             points.append([alpha_cut.value_.upperBound, y_val])
                         else:
-                            points.append([alpha_cut.value_.lowerBound, 0])
-                    current_config['points'] = points
+                             # For real triangles, there must be only one point when lower and upper are the same,
+                             # since this is the tip of the triangle.
+                             # If this is a crisp probability, then there is only the point above added.
+                             # In this case, add another fake point to draw a strisaght line.
+                             # points.append([alpha_cut.value_.lowerBound, 0])
+                             pass
+                    # Points is now a wild collection of coordinates, were double values for the same X coordinate
+                    # may occur. We sort it (since the JS code likes that) and leave only the largest Y values
+                    # per X value
+                    current_config['points'] = sorted(points)
 
                 # Compute some additional statistics for the front-end, based on the gathered probabilities
                 if (self.kind == Job.TOP_EVENT_JOB and len(points) > 0):
@@ -255,15 +266,16 @@ def job_post_save(sender, instance, created, **kwargs):
         # We therefore take the static approach with a setting here, which is overriden
         # by the test suite run accordingly
 
-        #TODO: job_files_url = reverse('job_files', kwargs={'job_secret': instance.secret})
-        job_files_url = '%s/api/jobs/%s' % (settings.SERVER, instance.secret,)
+        #TODO: job_files_url = 
+        job_files_url    = settings.SERVER + reverse('job_files', kwargs={'job_secret': instance.secret})
+        job_exitcode_url = settings.SERVER + reverse('job_exitcode', kwargs={'job_secret': instance.secret})
 
         try:
             # The proxy is instantiated here, since the connection should go away when finished
             s = xmlrpclib.ServerProxy(settings.BACKEND_DAEMON)
             logger.debug("Triggering %s job on url %s"%(instance.kind, job_files_url))
-            s.start_job(instance.kind, job_files_url)
+            s.start_job(instance.kind, job_files_url, job_exitcode_url)
         except Exception as e:
             mail_managers("Exception on backend call - "+settings.BACKEND_DAEMON,str(e))
-            raise HttpResponseServerErrorAnswer("Sorry, we seem to have a problem with the analysis backend. The admins are informed, thanks for the patience.")
+            raise HttpResponseServerErrorAnswer("Sorry, we seem to have a problem with our FuzzEd backend. The admins are informed, thanks for the patience.")
 

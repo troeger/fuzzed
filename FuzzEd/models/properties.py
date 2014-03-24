@@ -1,5 +1,6 @@
 from django.db import models
 from FuzzEd.lib.jsonfield import JSONField
+import  json
 
 from node import Node
 from edge import Edge
@@ -52,3 +53,13 @@ class Property(models.Model):
          {tuple(str, str)} the property as tuple
         """
         return (self.key, self.value)
+
+    def same_as(self, prop):
+        ''' 
+            Checks if this property is equal to the given one. 
+        '''
+        if self.key != prop.key:
+            return False
+        return (str(self.value) == str(prop.value))
+
+

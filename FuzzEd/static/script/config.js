@@ -76,7 +76,7 @@ define(['underscore'], function() {
         Backend: {
             ANALYSIS_URL:               '/analysis',
             SIMULATION_URL:             '/simulation',
-            BASE_URL:                   '/api',
+            BASE_URL:                   '/front',
             EDITOR_URL:                 '/editor',
             GRAPHS_URL:                 '/graphs',
             NODES_URL:                  '/nodes',

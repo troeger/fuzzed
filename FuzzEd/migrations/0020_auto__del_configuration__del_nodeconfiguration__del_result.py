@@ -17,14 +17,6 @@ class Migration(SchemaMigration):
         # Deleting model 'Result'
         db.delete_table(u'FuzzEd_result')
 
-        # Adding field 'Property.edge'
-        db.add_column(u'FuzzEd_property', 'edge',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='properties', null=True, blank=True, to=orm['FuzzEd.Edge']),
-                      keep_default=False)
-
-
-        # Changing field 'Property.node'
-        db.alter_column(u'FuzzEd_property', 'node_id', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['FuzzEd.Node']))
 
     def backwards(self, orm):
         # Adding model 'Configuration'
@@ -59,12 +51,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('FuzzEd', ['Result'])
 
-        # Deleting field 'Property.edge'
-        db.delete_column(u'FuzzEd_property', 'edge_id')
-
-
-        # Changing field 'Property.node'
-        db.alter_column(u'FuzzEd_property', 'node_id', self.gf('django.db.models.fields.related.ForeignKey')(default=None, to=orm['FuzzEd.Node']))
 
     models = {
         'FuzzEd.addedge': {
@@ -160,7 +146,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
             'result': ('django.db.models.fields.BinaryField', [], {'null': 'True'}),
-            'secret': ('django.db.models.fields.CharField', [], {'default': "'8d9c846c-a77d-4b8c-8b28-f78c0a9526e1'", 'max_length': '64'})
+            'secret': ('django.db.models.fields.CharField', [], {'default': "'2fc8f207-e55a-4226-9134-9edade2d16dc'", 'max_length': '64'})
         },
         'FuzzEd.node': {
             'Meta': {'object_name': 'Node'},
@@ -194,10 +180,9 @@ class Migration(SchemaMigration):
         'FuzzEd.property': {
             'Meta': {'object_name': 'Property'},
             'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'edge': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'properties'", 'null': 'True', 'blank': 'True', 'to': "orm['FuzzEd.Edge']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'node': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'properties'", 'null': 'True', 'blank': 'True', 'to': "orm['FuzzEd.Node']"}),
+            'node': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'properties'", 'to': "orm['FuzzEd.Node']"}),
             'value': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {})
         },
         'FuzzEd.propertychange': {

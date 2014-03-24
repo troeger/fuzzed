@@ -65,7 +65,8 @@
 <section>
     <h5>Please use one of these authentication providers</h5>
 
-    <form action="/login/" method="get" id="openid_form">
+    <form action="/login/" method="post" id="openid_form">
+        {% csrf_token %}
         <input type="hidden" name="action" value="verify" />
         <fieldset>
             <div id="openid_choice">
@@ -83,6 +84,7 @@
                 </p>
             </noscript>
         </fieldset>
+        <input type="hidden" name="next" value="{{ next }}" />
     </form>
 
     {% if pwlogin %}
