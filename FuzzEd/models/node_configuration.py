@@ -24,10 +24,3 @@ class NodeConfiguration(models.Model):
   setting       = JSONField()
   configuration = models.ForeignKey(Configuration, related_name='node_configurations')
   
-  
-  def __init__ (self, node, setting):
-      super(NodeConfiguration, self).__init__()
-      
-      self.node    = node
-      self.setting = setting
-      

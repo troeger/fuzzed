@@ -21,11 +21,3 @@ class Configuration(models.Model):
   graph  = models.ForeignKey(Graph, related_name='configurations')
   result = models.OneToOneField(Result, primary_key=True, related_name='configuration')
   costs  = models.IntegerField()
-  
-  def __init__ (self, graph, result, costs):
-      super(Configuration, self).__init__()
-      
-      self.graph  = graph
-      self.result = result
-      self.costs  = costs  
-    

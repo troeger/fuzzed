@@ -264,21 +264,18 @@ class Job(models.Model):
         
         if  (self.kind == Job.TOP_EVENT_JOB):
             doc = xml_analysis.CreateFromDocument(result_data)
-            
             # delete all previous results of type analysis
-            #self.graph.results.filter(type=Job.TOP_EVENT_JOB).delete()
-            
+            self.graph.results.filter(type='t').delete()
              
         elif(self.kind == Job.SIMULATION_JOB):
             doc = xml_simulation.CreateFromDocument(result_data)
-            
             # delete all prevoious results of type simulation
-            #self.graph.results.filter(type=Job.SIMULATION_JOB).delete()
+            self.graph.results.filter(type='s').delete()
             
             
         else:
             assert(False)
-        
+            
         ## Check global issues that are independent from the particular configuration
         ## Since the frontend always wants an elementID, we stitch them
         ## to the TOP event for the moment (check issue #181)
@@ -339,14 +336,27 @@ class Job(models.Model):
                 failures = None if math.isnan(read_failures) else read_failures
             
             # Create result object 
-            current_result = Result(self.graph, 't', probability, probability_sort, decomposition, node_issues, rounds, failures) #self.kind
+            current_result = Result() #self.kind
+            current_result.graph         = self.graph
+            current_result.type          = 't'
+            current_result.prob          = probability
+            current_result.prob_sort     = probability_sort
+            current_result.decomposition = decomposition
+            current_result.node_issues   = node_issues
+            current_result.rounds        = rounds
+            current_result.failures      = failures
             current_result.save()
             
             # Fetch configuration if present (only FuzzTree has got configurations)
             if hasattr(result, 'configuration'):                
                 costs = result.configuration.costs if hasattr(result.configuration, 'costs') else None
                 
-                choices = []
+                configuration = Configuration()
+                configuration.graph = self.graph
+                configuration.result = current_result
+                configuration.costs = costs
+                configuration.save()
+                
                 if hasattr(result.configuration, 'choice'):
                     for choice in result.configuration.choice:
                         node_id = choice.key
@@ -366,20 +376,19 @@ class Job(models.Model):
                         else:
                             raise ValueError('Unknown choice %s' % element)
                         
-                        node_configuration = NodeConfiguration(node=node, setting=setting)
-                        choices.append(node_configuration)
-                        
+                        node_configuration = NodeConfiguration()
+                        node_configuration.configuration = configuration
+                        node_configuration.node = node
+                        node_configuration.setting = setting
+                        node_configuration.save()
                         logger.debug('node_configuration: ' + str(node_configuration.__dict__))
                         
-                    configuration = Configuration(self.graph, current_result, costs)
-                    configuration.node_configurations = choices
                     logger.debug('configuration: ' + str(configuration.__dict__))
                     
             logger.debug('result: ' + str(result.__dict__) + '\n\n\n')
         
         logger.debug('graph_issues:  ' + str(graph_issues))
         logger.debug('!!!end_parseResult!!!\n\n')
-        return
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
