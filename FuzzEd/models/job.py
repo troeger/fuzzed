@@ -240,7 +240,14 @@ class Job(models.Model):
 
                 json_configs.append(current_config)
             json_result['configurations'] = json_configs
-
+            
+            json_result['columns'] = [  { 'mData': 'id',     'sTitle': 'Config' },
+                                        { 'mData': 'min',    'sTitle': 'Min'    },
+                                        { 'mData': 'peak',   'sTitle': 'Peak'   },
+                                        { 'mData': 'max',    'sTitle': 'Max'    },
+                                        { 'mData': 'costs',  'sTitle': 'Costs'  },
+                                        { 'mData': 'ratio',  'sTitle': 'Risk'   }]
+                                        
             json_result['errors']         = errors
             json_result['warnings']       = warnings
             json_result['validResult']    = str(isValid)
@@ -260,17 +267,18 @@ class Job(models.Model):
                 
         assert(data)
         result_data = str(data)
-        topId = str(self.graph.top_node().client_id)
         
         if  (self.kind == Job.TOP_EVENT_JOB):
-            doc = xml_analysis.CreateFromDocument(result_data)
+            doc  = xml_analysis.CreateFromDocument(result_data)
+            type = Result.TOP_EVENT_JOB
             # delete all previous results of type analysis
-            self.graph.results.filter(type='t').delete()
+            self.graph.results.filter(type=type).delete()
              
         elif(self.kind == Job.SIMULATION_JOB):
-            doc = xml_simulation.CreateFromDocument(result_data)
+            doc  = xml_simulation.CreateFromDocument(result_data)
+            type = Result.SIMULATION_JOB
             # delete all prevoious results of type simulation
-            self.graph.results.filter(type='s').delete()
+            self.graph.results.filter(type=type).delete()
             
             
         else:
@@ -280,6 +288,8 @@ class Job(models.Model):
         ## Since the frontend always wants an elementID, we stitch them
         ## to the TOP event for the moment (check issue #181)
         ## TODO: This will break for RBD analysis, since there is no top event
+        topId = self.graph.top_node().client_id
+        
         graph_issues = {'errors':{}, 'warnings':{} }
         if hasattr(doc, 'issue'):
             graphErrors = []
@@ -295,7 +305,8 @@ class Job(models.Model):
             if len(graphWarnings) > 0:
                 graph_issues['warnings'][topId] = graphWarnings
         
-        self.graph.graph_issues = graph_issues        
+        self.graph.graph_issues = graph_issues
+        self.graph.save()       
         
                 
         results = doc.result
@@ -324,6 +335,7 @@ class Job(models.Model):
                     probability.append([alpha_cut.value_.lowerBound, alpha_cut.key])
                     probability.append([alpha_cut.value_.upperBound, alpha_cut.key])
             
+            #logger.debug(probability.type)
             probability_sort = 0
                  
             # Fetch rounds and failures if simulation job
@@ -338,7 +350,7 @@ class Job(models.Model):
             # Create result object 
             current_result = Result() #self.kind
             current_result.graph         = self.graph
-            current_result.type          = 't'
+            current_result.type          = type
             current_result.prob          = probability
             current_result.prob_sort     = probability_sort
             current_result.decomposition = decomposition
@@ -385,10 +397,10 @@ class Job(models.Model):
                         
                     logger.debug('configuration: ' + str(configuration.__dict__))
                     
-            logger.debug('result: ' + str(result.__dict__) + '\n\n\n')
+            logger.debug('result: ' + str(result.__dict__))
         
-        logger.debug('graph_issues:  ' + str(graph_issues))
-        logger.debug('!!!end_parseResult!!!\n\n')
+        logger.debug('graph_issues:  ' + str(graph_issues) + '\n\n')
+        logger.debug('!!!end_parseResult!!!\n\n\n')
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):

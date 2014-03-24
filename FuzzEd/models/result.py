@@ -26,8 +26,10 @@ class Result(models.Model):
   
   class Meta:
       app_label = 'FuzzEd'
-  
-  ANALYSIS_TYPES = [('S','simulation'),('T','topevent')]
+
+  TOP_EVENT_JOB     = 'T'
+  SIMULATION_JOB    = 'S'
+  ANALYSIS_TYPES = [(SIMULATION_JOB, 'simulation'), (TOP_EVENT_JOB, 'topevent')]
   
   graph         = models.ForeignKey(Graph, related_name='results')
   type          = models.CharField(max_length=1, choices= ANALYSIS_TYPES)
