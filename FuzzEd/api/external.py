@@ -17,6 +17,9 @@ from FuzzEd.models import Project, Graph
 
 import time
 
+import logging
+logger = logging.getLogger('FuzzEd')
+
 class OurApiKeyAuthentication(ApiKeyAuthentication):
     ''' Our own version does not demand the user name to be part of the auth header. '''
     def extract_credentials(self, request):
@@ -24,13 +27,16 @@ class OurApiKeyAuthentication(ApiKeyAuthentication):
             (auth_type, api_key) = request.META['HTTP_AUTHORIZATION'].split(' ')
 
             if auth_type.lower() != 'apikey':
+                logger.debug("Incorrect authorization header: "+str(request.META['HTTP_AUTHORIZATION']))
                 raise ValueError("Incorrect authorization header.")
             try:
                 key = ApiKey.objects.get(key=api_key.strip())
             except:
+                logger.debug("Incorrect API key in header: "+str(request.META['HTTP_AUTHORIZATION']))
                 raise ValueError("Incorrect API key.")
             return key.user.username, api_key    
         else:
+            logger.debug("Missing authorization header: "+str(request.META))
             raise ValueError("Missing authorization header.")
 
 class ProjectResource(ModelResource):
