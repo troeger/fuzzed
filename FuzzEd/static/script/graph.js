@@ -1,5 +1,5 @@
-define(['canvas', 'class', 'config', 'menus', 'jquery', 'd3'],
-function(Canvas, Class, Config, Menus) {
+define(['canvas', 'class', 'config', 'edge', 'menus', 'jquery', 'd3'],
+function(Canvas, Class, Config, Edge, Menus) {
     /**
      *  Package: Base
      */
@@ -83,7 +83,8 @@ function(Canvas, Class, Config, Menus) {
                 var target     = this.getNodeById(jsonEdge.target);
                 var properties = jsonEdge.properties;
                 properties.id  = jsonEdge.id;
-                var edge = new Edge(source, target, this, properties);
+                var edge = new Edge(this, source, target, properties);
+                this.edges[edge.id] = edge;
             }.bind(this));
 
             return this;
@@ -175,8 +176,7 @@ function(Canvas, Class, Config, Menus) {
          *    splitted into deleteEdge and _deleteEdge as in addEdge.
          *
          *  Parameters:
-         *    {jsPlumbEdge} jsPlumbEdge - jsPlumbEdge to be deleted from the graph. (Some day this will be the edge model
-         *      object.)
+         *    {edge} Edge - Edge to be deleted from the graph.
          *
          *  Returns:
          *    This <Graph> instance for chaining.
@@ -184,8 +184,8 @@ function(Canvas, Class, Config, Menus) {
          *  See also:
          *    <Graph::_registerEventHandlers>
          */
-        deleteEdge: function(jsPlumbEdge) {
-            jsPlumb.detach(jsPlumbEdge);
+        deleteEdge: function(edge) {
+            jsPlumb.detach(edge._jsPlumbEdge);
 
             return this;
         },

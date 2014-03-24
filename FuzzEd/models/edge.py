@@ -41,6 +41,7 @@ class Edge(models.Model):
          {dict} the edge as dictionary
         """
         return {
+            'properties': {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)},
             'id':     self.client_id,
             'graph':  self.graph.pk,
             'source': self.source.client_id,

@@ -20,8 +20,8 @@ function(Class, Config) {
 
             if (arguments.length === 2) {
                 // case 1: create Edge instance for existing jsPlumbConnection (e.g. as event handler)
-                this.source = sourceOrJsPlumbEdge.source;
-                this.target = sourceOrJsPlumbEdge.target;
+                this.source = jQuery(sourceOrJsPlumbEdge.source).data(Config.Keys.NODE);
+                this.target = jQuery(sourceOrJsPlumbEdge.target).data(Config.Keys.NODE);
                 this.properties = {};
                 this._initFromJsPlumbEdge(sourceOrJsPlumbEdge);
 
@@ -36,7 +36,7 @@ function(Class, Config) {
             this.target = target;
 
             // having properties implies already having an id
-            this.id = typeof properties.id !== 'undefined' ? this.graph.createId() : properties.id;
+            this.id = typeof properties.id === 'undefined' ? this.graph.createId() : properties.id;
             this.properties = properties;
 
             var jsPlumbEdge = jsPlumb.connect({
@@ -44,30 +44,29 @@ function(Class, Config) {
                 target:    target.container,
                 fireEvent: false
             });
+            jsPlumbEdge._fuzzedId = this.id;
             this._initFromJsPlumbEdge(jsPlumbEdge);
         },
 
         _initFromJsPlumbEdge: function(jsPlumbEdge) {
             this._jsPlumbEdge = jsPlumbEdge;
 
-            jsPlumbEdge._fuzzedId = (typeof jsPlumbEdge._fuzzedId === 'undefined') ? this.createId() : jsPlumbEdge._fuzzedId;
+            jsPlumbEdge._fuzzedId = (typeof jsPlumbEdge._fuzzedId === 'undefined') ? this.graph.createId() : jsPlumbEdge._fuzzedId;
+            this.id = jsPlumbEdge._fuzzedId;
 
             // store the ID in an attribute so we can retrieve it later from the DOM element
-            jQuery(jsPlumbEdge.canvas).data(this.config.Keys.CONNECTION_ID, jsPlumbEdge._fuzzedId);
+            jQuery(jsPlumbEdge.canvas).data(Config.Keys.CONNECTION_ID, jsPlumbEdge._fuzzedId);
 
-            var sourceNode = jQuery(jsPlumbEdge.source).data(this.config.Keys.NODE);
-            var targetNode = jQuery(jsPlumbEdge.target).data(this.config.Keys.NODE);
-
-            sourceNode.setChildProperties(targetNode);
+            this.source.setChildProperties(this.target);
 
             // correct target and source node incoming and outgoing edges
-            sourceNode.outgoingEdges.push(jsPlumbEdge);
-            targetNode.incomingEdges.push(jsPlumbEdge);
+            this.source.outgoingEdges.push(this);
+            this.target.incomingEdges.push(this);
 
             // call home
             jQuery(document).trigger(
-                this.config.Events.GRAPH_EDGE_ADDED,
-                [jsPlumbEdge._fuzzedId, sourceNode.id, targetNode.id]
+                Config.Events.GRAPH_EDGE_ADDED,
+                [this.id, this.source.id, this.target.id]
             );
 
             return this;
