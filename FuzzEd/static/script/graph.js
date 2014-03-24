@@ -79,15 +79,11 @@ function(Canvas, Class, Config, Menus) {
 
             // connect the nodes again
             _.each(json.edges, function(jsonEdge) {
-                // jsPlumb.connect is at this point used in a special manner, because the jsPlumbConnection will not
-                // be triggered, since we register the event later.
-                var jsPlumbEdge = jsPlumb.connect({
-                    source: this.getNodeById(jsonEdge.source).container,
-                    target: this.getNodeById(jsonEdge.target).container
-                });
-                jsPlumbEdge._fuzzedId = jsonEdge.id;
-
-                this._addEdge(jsPlumbEdge);
+                var source     = this.getNodeById(jsonEdge.source);
+                var target     = this.getNodeById(jsonEdge.target);
+                var properties = jsonEdge.properties;
+                properties.id  = jsonEdge.id;
+                var edge = new Edge(source, target, this, properties);
             }.bind(this));
 
             return this;
@@ -127,23 +123,29 @@ function(Canvas, Class, Config, Menus) {
         /**
          *  Method: addEdge
          *    Adds a given edge to this graph by "jsPlumb.connect"ing source and target node as if it was done manually.
-         *    Only use this method if an edge needs to be added programmatically and not manually. Manual creation of an edge (i.e.
-         *    connect-dragging nodes in the editor) is done by jsPlumbConnection event, which calls _addEdge directly.
+         *    Only use this method if an edge needs to be added programmatically and not manually. Manual creation of an
+         *    edge (i.e. connect-dragging nodes in the editor) is done by jsPlumbConnection event, which calls _addEdge
+         *    directly.
          *
          *  Parameters:
          *    {JSON} jsonEdge - JSON representation of the edge to be added to the graph.
          *
          *  Returns:
-         *    The added jsPlumb Connection.
+         *    The newly created Edge instance.
          *
          *  See also:
          *    <Graph::_registerEventHandlers>
          */
         addEdge: function(jsonEdge) {
-            return jsPlumb.connect({
-                source: this.getNodeById(jsonEdge.source).container,
-                target: this.getNodeById(jsonEdge.target).container
-            });
+            var sourceNode = this.getNodeById(jsonEdge.source);
+            var targetNode = this.getNodeById(jsonEdge.target);
+            var properties = jsonEdge.properties;
+            properties.id  = jsonEdge.id;
+
+            var edge = new Edge(this, sourceNode, targetNode, properties);
+            this.edges[edge.id] = edge;
+
+            return edge;
         },
 
         /**
@@ -158,33 +160,13 @@ function(Canvas, Class, Config, Menus) {
          *    <Config::Events::GRAPH_EDGE_ADDED>
          *
          *  Returns:
-         *    This <Graph> instance for chaining.
+         *    The newly created Edge instance.
          */
         _addEdge: function(jsPlumbEdge) {
-            jsPlumbEdge._fuzzedId = (typeof jsPlumbEdge._fuzzedId === 'undefined') ? this.createId() : jsPlumbEdge._fuzzedId;
+            var edge = new Edge(this, jsPlumbEdge);
+            this.edges[edge.id] = edge;
 
-            // store the ID in an attribute so we can retrieve it later from the DOM element
-            jQuery(jsPlumbEdge.canvas).data(this.config.Keys.CONNECTION_ID, jsPlumbEdge._fuzzedId);
-
-            var sourceNode = jQuery(jsPlumbEdge.source).data(this.config.Keys.NODE);
-            var targetNode = jQuery(jsPlumbEdge.target).data(this.config.Keys.NODE);
-
-            sourceNode.setChildProperties(targetNode);
-
-            // register edge in graph object
-            this.edges[jsPlumbEdge._fuzzedId] = jsPlumbEdge;
-
-            // correct target and source node incoming and outgoing edges
-            sourceNode.outgoingEdges.push(jsPlumbEdge);
-            targetNode.incomingEdges.push(jsPlumbEdge);
-
-            // call home
-            jQuery(document).trigger(
-                this.config.Events.GRAPH_EDGE_ADDED,
-                [jsPlumbEdge._fuzzedId, sourceNode.id, targetNode.id]
-            );
-
-            return this;
+            return edge;
         },
 
         /**

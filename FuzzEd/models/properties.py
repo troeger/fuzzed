@@ -2,6 +2,7 @@ from django.db import models
 from FuzzEd.lib.jsonfield import JSONField
 
 from node import Node
+from edge import Edge
 
 class Property(models.Model):
     """
@@ -23,7 +24,8 @@ class Property(models.Model):
 
     key     = models.CharField(max_length=255)
     value   = JSONField()
-    node    = models.ForeignKey(Node, related_name='properties')
+    node    = models.ForeignKey(Node, related_name='properties', blank=True, null=True, default=None)
+    edge    = models.ForeignKey(Edge, related_name='properties', blank=True, null=True, default=None)
     deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
