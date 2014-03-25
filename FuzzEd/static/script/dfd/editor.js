@@ -40,6 +40,12 @@ define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(E
             return DfdGraph;
         },
 
+        _setupJsPlumb: function() {
+            this._super();
+            jsPlumb.connectorClass += " outlined";
+            return this;
+        },
+
         _setupKeyBindings: function(readOnly) {
             this._super(readOnly)
             if (readOnly) return this;

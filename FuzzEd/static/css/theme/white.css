@@ -4132,6 +4132,10 @@ i.icon-layout-tree:hover {
 .jsplumb-connector.ui-selected.highlighted path,
 .jsplumb-connector.ui-selecting.highlighted path {
   stroke: #f2b138;
+  fill: #f2b138;
+}
+.jsplumb-connector.outlined path:first-child {
+  stroke: #ffffff;
 }
 /**
  *  File: editor.less

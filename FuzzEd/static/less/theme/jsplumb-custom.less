@@ -24,7 +24,12 @@
         &, &.highlighted {
             path {
                 stroke: @theme-selection;
+                fill: @theme-selection;
             }
         }
+    }
+
+    &.outlined path:first-child {
+      stroke: #ffffff;
     }
 }
