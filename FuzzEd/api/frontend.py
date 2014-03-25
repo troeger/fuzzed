@@ -1,5 +1,5 @@
 """
-	This is the API for the web frontend. 
+    This is the API for the web frontend. 
     Access restrictions are managed by Django session handling.
 
     Only frontend-specific functionality should be implemented in here, mainly everything that revolves
@@ -35,12 +35,48 @@ import json, common
 @csrf_exempt
 @require_GET
 def graph_download(request, graph_id):
-	'''
+    '''
         Provides a download response of the graph in the given format in the GET parameter, 
         or an HTTP error if the rendering job for the export format is not ready so far.
     '''
-	export_format = request.GET.get('format', 'xml')
-	return common.graph_download(request.user, graph_id, export_format)
+    export_format = request.GET.get('format', 'xml')
+    if request.user.is_staff:
+        graph = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)        
+
+    response = HttpResponse()
+    response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
+
+    if export_format == 'xml':
+        response.content = graph.to_xml()
+        response['Content-Type'] = 'application/xml'
+    elif export_format == 'graphml':
+        response.content = graph.to_graphml()
+        response['Content=Type'] = 'application/xml'
+    elif export_format == 'json':
+        response.content = graph.to_json()
+        response['Content-Type'] = 'application/javascript'
+    elif export_format == 'tex':
+        response.content = graph.to_tikz()
+        response['Content-Type'] = 'application/text'
+    elif export_format in ('pdf', 'eps'):
+        try:
+            # Take the latest file that was successfully created
+            # This is based on the assumption that nobody calls this function before the job is done
+            job = graph.jobs.filter(kind=export_format).latest('created')
+            if not job.done():
+                raise HttpResponseNotFoundAnswer()
+            response.content = job.result()
+            response['Content-Type'] = 'application/pdf' if export_format == 'pdf' else 'application/postscript'
+        except ObjectDoesNotExist:
+            raise HttpResponseNotFoundAnswer()
+    else:
+        raise HttpResponseNotFoundAnswer()
+    return response
+
+
+    return common.graph_download(request.user, graph_id, export_format)
 
 @login_required
 @csrf_exempt
@@ -50,21 +86,24 @@ def job_status(request, job_id):
         202 is delivered if the job is pending, otherwise the result is immediately returned.
         The result may be the actual text data, or a download link to a binary file.
     '''
-    status, job = common.job_status(request.user, job_id)
-
-    if status == 0:		# done, valid result
-        if job.requires_download():
-            # Return the URL to the file created by the job
-            return HttpResponse(job.get_absolute_url())
-        else:
-            # Serve directly
-            return HttpResponse(job.result_rendering())
-    elif status == 1:   # done and error
-        raise HttpResponseServerErrorAnswer("We have an internal problem analyzing this graph. Sorry! The developers are informed.")
-    elif status == 2:   # Pending             
-        return HttpResponseAccepted()
-    elif status == 3:   # Does not exists
+    try:
+        job = Job.objects.get(pk=job_id)
+        # Prevent cross-checking of jobs by different users
+        assert(job.graph.owner == request.user or request.user.is_staff)
+    except:
+        # The job does not exist, or it shouldn't exist for this user.        
         raise HttpResponseNotFoundAnswer()
+
+    if job.done():
+        if job.exit_code == 0:
+            logger.debug("Job is done.")
+            return HttpResponse(job.result())
+        else:
+            logger.debug("Job is done, but with non-zero exit code.")
+            mail_managers('Analysis of job %s ended with non-zero exit code.'%job.pk, job.graph.to_xml() )
+            raise HttpResponseServerErrorAnswer("We have an internal problem analyzing this graph. Sorry! The developers are informed.")
+    else:       
+        return HttpResponseAccepted()
         
 # hard-coded json response for DataTables plugin        
 @login_required
@@ -101,8 +140,8 @@ def job_status_test(request):
 @require_GET
 def job_create(request, graph_id, job_kind):
     '''
-	    Starts a job of the given kind for the given graph.
-    	It is intended to return immediately with job information for the frontend.
+        Starts a job of the given kind for the given graph.
+        It is intended to return immediately with job information for the frontend.
     '''
     job = common.job_create(request.user, graph_id, job_kind)
     response = HttpResponse(status=201)
@@ -478,9 +517,7 @@ def redos(request, graph_id):
 def job_files(request, job_secret):
     ''' Allows to retrieve a job input file (GET), or to upload job result files (POST).
         This method is expected to only be used by our backend daemon script, 
-        which gets the shared secret as part of the PostgreSQL notification message.
-        This reduces the security down to the ability of connecting to the PostgreSQL database,
-        otherwise the job URL cannot be determined.
+        which gets the shared secret as part of the job URL.
     '''
     job = get_object_or_404(Job, secret=job_secret)
     if request.method == 'GET':
@@ -501,8 +538,6 @@ def job_files(request, job_secret):
             job.parseResult(job.result)
             job.exit_code = 0       # This saves as a roundtrip. Having files means everything is ok.
             job.save()
-            if not job.requires_download():
-                logger.debug(''.join(job.result))
             return HttpResponse()
             
 @csrf_exempt
