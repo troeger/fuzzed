@@ -24,14 +24,22 @@ class Result(models.Model):
   class Meta:
       app_label = 'FuzzEd'
 
-  TOP_EVENT_JOB     = 'T'
-  SIMULATION_JOB    = 'S'
+  ANALYSIS_RESULT   = 'T'
+  SIMULATION_RESULT = 'S'
+  PDF_RESULT        = 'P'
+  EPS_RESULT        = 'E'
   GRAPH_ISSUES      = 'G'
-  ANALYSIS_TYPES = [(GRAPH_ISSUES, 'graphissues'), (SIMULATION_JOB, 'simulation'), (TOP_EVENT_JOB, 'topevent')]
+  RESULT_TYPES = [ (GRAPH_ISSUES, 'graphissues'), 
+                   (SIMULATION_RESULT, 'simulation'), 
+                   (ANALYSIS_RESULT, 'topevent'),
+                   (PDF_RESULT, 'pdf'),
+                   (EPS_RESULT, 'eps')]
   
   graph         = models.ForeignKey(Graph, related_name='results')
+  job           = models.ForeignKey('Job', related_name='results')
   configuration = models.ForeignKey('Configuration', related_name='results', null=True, blank=True)
-  kind          = models.CharField(max_length=1, choices= ANALYSIS_TYPES)
+  kind          = models.CharField(max_length=1, choices= RESULT_TYPES)
   value         = JSONField(blank=True, null=True)
   value_sort    = models.IntegerField(blank=True, null=True) 
+  binary_value  = models.BinaryField(blank=True, null=True)
   issues        = JSONField(blank=True, null=True)

@@ -52,7 +52,6 @@ class Job(models.Model):
     secret         = models.CharField(max_length=64, default=gen_uuid)       # Unique secret for this job
     kind           = models.CharField(max_length=127, choices=JOB_TYPES)
     created        = models.DateTimeField(auto_now_add=True, editable=False)
-    result         = models.BinaryField(null=True)                           # Result file for this job
     exit_code      = models.IntegerField(null=True)                          # Exit code for this job, NULL if pending
 
     def input_data(self):
@@ -266,29 +265,26 @@ class Job(models.Model):
         logger.debug('!!!begin_parseResult!!!\n\n')
                 
         assert(data)
+        assert(self.kind in [Job.TOP_EVENT_JOB, Job.SIMULATION_JOB])
+
         result_data = str(data)
         
         if  (self.kind == Job.TOP_EVENT_JOB):
             doc  = xml_analysis.CreateFromDocument(result_data)
-            type = Result.TOP_EVENT_JOB
-            # delete all previous results of type analysis
-            self.graph.results.filter(type=type).delete()
+            result_kind = Result.ANALYSIS_RESULT
              
         elif(self.kind == Job.SIMULATION_JOB):
             doc  = xml_simulation.CreateFromDocument(result_data)
-            type = Result.SIMULATION_JOB
-            # delete all previous results of type simulation
-            self.graph.results.filter(type=type).delete()
+            result_kind = Result.SIMULATION_RESULT
             
-        else:
-            assert(False)
+        # delete all previous results of this kind
+        self.graph.results.filter(kind=result_kind).delete()
             
         ## Check global issues that are independent from the particular configuration
         ## Since the frontend always wants an elementID, we stitch them
         ## to the TOP event for the moment (check issue #181)
         ## TODO: This will break for RBD analysis, since there is no top event
         topId = self.graph.top_node().client_id
-        
         graph_issues = {'errors':{}, 'warnings':{} }
         if hasattr(doc, 'issue'):
             graphErrors = []
@@ -304,85 +300,72 @@ class Job(models.Model):
             if len(graphWarnings) > 0:
                 graph_issues['warnings'][topId] = graphWarnings
         
-        self.graph.graph_issues = graph_issues
-        self.graph.save()       
-        
+        logger.debug("Graph issues: "+str(graph_issues))
+        graph_issues = Result(graph=self.graph, job=self, kind=Result.GRAPH_ISSUES, issues=json.dumps(graph_issues))
+        graph_issues.save()        
                 
         results = doc.result
-        
         #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
-        decomposition = None
-        if hasattr(results[0], 'decompositionNumber'):
-            decomposition = results[0].decompositionNumber
+        # For the moment, we assume that nobody needs that information later for rendering
+        #decomposition = None
+        #if hasattr(results[0], 'decompositionNumber'):
+        #    decomposition = results[0].decompositionNumber
         
         # Go through all results
-        for result in results:
+        for xmlresult in results:
              
+            current_result = Result(graph=self.graph, kind=result_kind, job=self) 
+
             # Fetch issues hidden in maybe existing results
             node_issues = {'errors':{}, 'warnings':{} }
-            if hasattr(result, 'issue'):
-                for issue in result.issue:
+            if hasattr(xmlresult, 'issue'):
+                for issue in xmlresult.issue:
                     if issue.isFatal:
                         node_issues['errors'][issue.elementId]=issue.message
                     else:
                         node_issues['warnings'][issue.elementId]=issue.message
+                current_result.issues = json.dumps(node_issues)
+                logger.debug("Issues: "+str(node_issues))
                         
             # Fetch probability used for graph rendering
             probability = []
             probability_sort = 0
             
-            if (hasattr(result, 'probability') and self.kind == Job.TOP_EVENT_JOB and result.probability is not None):
-                for alpha_cut in result.probability.alphaCuts:
+            if (hasattr(xmlresult, 'probability') and self.kind == Job.TOP_EVENT_JOB and xmlresult.probability is not None):
+                for alpha_cut in xmlresult.probability.alphaCuts:
                     probability.append([alpha_cut.value_.lowerBound, alpha_cut.key])
                     probability.append([alpha_cut.value_.upperBound, alpha_cut.key])
                     
-                probability_sort = max(probability, key=lambda point: point[1])[0]  # Use peak value for probability_sort    
-            
-            #elif self.kind == Job.SIMULATION_JOB
-            
-            
-            logger.debug('probablity: '      + str(probability))
-            logger.debug('probablity_sort: ' + str(probability_sort))
-            
+                probability_sort = round(max(probability, key=lambda point: point[1])[0]*1000)  # Use peak value for probability_sort    
+                current_result.value = json.dumps(probability)
+                current_result.value_sort = probability_sort               
+                logger.debug('probability: '      + str(probability))
+                logger.debug('probability_sort: ' + str(probability_sort))
                  
             # Fetch rounds and failures if simulation job
             rounds   = None
             failures = None 
             if (self.kind == Job.SIMULATION_JOB):
-                read_reliability = float(result.reliability)
-                reliability = None if math.isnan(read_reliability) else read_reliability
-                                
-                read_rounds = int(result.nSimulatedRounds)
-                rounds = None if math.isnan(read_rounds) else read_rounds
-                read_failures = int(result.nFailures)
-                failures = None if math.isnan(read_failures) else read_failures
+                reliability = None if math.isnan(read_reliability) else float(xmlresult.reliability)
+                rounds      = None if math.isnan(read_rounds) else int(xmlresult.nSimulatedRounds)
+                failures    = None if math.isnan(read_failures) else int(xmlresult.nFailures)
+                data = {'reliability': reliability, 'rounds': rounds, 'failures': failures}
+                current_result.value = json.dumps(data)
+                current_result.value_sort = reliability               
+                logger.debug('Simulation result: '+str(data))
             
-            # Create result object 
-            current_result = Result() #self.kind
-            current_result.graph         = self.graph
-            current_result.type          = type
-            current_result.prob          = probability
-            current_result.prob_sort     = probability_sort
-            current_result.decomposition = decomposition
-            current_result.node_issues   = node_issues
-            current_result.rounds        = rounds
-            current_result.failures      = failures
-            current_result.save()
-                        
             # Fetch configuration if present (only FuzzTree has got configurations)
-            if hasattr(result, 'configuration') and result.configuration is not None:                
-                costs = result.configuration.costs if hasattr(result.configuration, 'costs') else None
+            if hasattr(xmlresult, 'configuration') and xmlresult.configuration is not None:                
+                costs = xmlresult.configuration.costs if hasattr(xmlresult.configuration, 'costs') else None
                 
-                configuration = Configuration()
-                configuration.graph = self.graph
-                configuration.result = current_result
-                configuration.costs = costs
+                configuration = Configuration(graph = self.graph, costs=costs)
                 configuration.save()
+                current_result.configuration = configuration
                 
-                if hasattr(result.configuration, 'choice'):
-                    for choice in result.configuration.choice:
-                        node_id = choice.key
-                        node    = Node.objects.get(client_id = node_id, graph=self.graph)
+                if hasattr(xmlresult.configuration, 'choice'):
+                    for choice in xmlresult.configuration.choice:
+                        client_id = choice.key
+                        node    = Node.objects.get(client_id = client_id, graph=self.graph)
                         
                         element = choice.value_
                         setting = {}
@@ -398,18 +381,13 @@ class Job(models.Model):
                         else:
                             raise ValueError('Unknown choice %s' % element)
                         
-                        node_configuration = NodeConfiguration()
-                        node_configuration.configuration = configuration
-                        node_configuration.node = node
-                        node_configuration.setting = setting
+                        node_configuration = NodeConfiguration(configuration=configuration,
+                                                               node=node, setting=setting)
                         node_configuration.save()
-                        logger.debug('node_configuration: ' + str(node_configuration.__dict__))
-                        
-                    logger.debug('configuration: ' + str(configuration.__dict__))
-                    
-            logger.debug('result: ' + str(result.__dict__))
+                      
+                   
+            current_result.save()
         
-        logger.debug('graph_issues:  ' + str(graph_issues) + '\n\n')
         logger.debug('!!!end_parseResult!!!\n\n\n')
 
 @receiver(post_save, sender=Job)
