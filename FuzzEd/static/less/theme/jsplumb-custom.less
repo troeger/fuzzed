@@ -24,6 +24,13 @@
         &, &.highlighted {
             path {
                 stroke: @theme-selection;
+            }
+        }
+    }
+
+    &.ui-selected, &.ui-selecting {
+        &, &.highlighted {
+            path:last-child {
                 fill: @theme-selection;
             }
         }
