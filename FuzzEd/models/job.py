@@ -277,9 +277,8 @@ class Job(models.Model):
         elif(self.kind == Job.SIMULATION_JOB):
             doc  = xml_simulation.CreateFromDocument(result_data)
             type = Result.SIMULATION_JOB
-            # delete all prevoious results of type simulation
+            # delete all previous results of type simulation
             self.graph.results.filter(type=type).delete()
-            
             
         else:
             assert(False)
@@ -314,7 +313,7 @@ class Job(models.Model):
         #TODO:  This will move to a higher XML hierarchy level in an upcoming schema update
         decomposition = None
         if hasattr(results[0], 'decompositionNumber'):
-            decomposition = str(results[0].decompositionNumber)
+            decomposition = results[0].decompositionNumber
         
         # Go through all results
         for result in results:
@@ -335,8 +334,13 @@ class Job(models.Model):
                     probability.append([alpha_cut.value_.lowerBound, alpha_cut.key])
                     probability.append([alpha_cut.value_.upperBound, alpha_cut.key])
             
-            #logger.debug(probability.type)
+            
+                        
             probability_sort = 0
+            
+            logger.debug('probablity: ' + str(probability))
+            logger.debug('probablity_sort: ' + str(probability_sort))
+            
                  
             # Fetch rounds and failures if simulation job
             rounds   = None
