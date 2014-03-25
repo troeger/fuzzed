@@ -329,16 +329,19 @@ class Job(models.Model):
                         
             # Fetch probability used for graph rendering
             probability = []
-            if hasattr(result, 'probability') and self.kind == Job.TOP_EVENT_JOB and result.probability is not None:
+            probability_sort = 0
+            
+            if (hasattr(result, 'probability') and self.kind == Job.TOP_EVENT_JOB and result.probability is not None):
                 for alpha_cut in result.probability.alphaCuts:
                     probability.append([alpha_cut.value_.lowerBound, alpha_cut.key])
                     probability.append([alpha_cut.value_.upperBound, alpha_cut.key])
+                    
+                probability_sort = max(probability, key=lambda point: point[1])[0]  # Use peak value for probability_sort    
+            
+            #elif self.kind == Job.SIMULATION_JOB
             
             
-                        
-            probability_sort = 0
-            
-            logger.debug('probablity: ' + str(probability))
+            logger.debug('probablity: '      + str(probability))
             logger.debug('probablity_sort: ' + str(probability_sort))
             
                  
@@ -346,6 +349,9 @@ class Job(models.Model):
             rounds   = None
             failures = None 
             if (self.kind == Job.SIMULATION_JOB):
+                read_reliability = float(result.reliability)
+                reliability = None if math.isnan(read_reliability) else read_reliability
+                                
                 read_rounds = int(result.nSimulatedRounds)
                 rounds = None if math.isnan(read_rounds) else read_rounds
                 read_failures = int(result.nFailures)
