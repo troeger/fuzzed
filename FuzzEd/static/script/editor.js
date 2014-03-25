@@ -421,7 +421,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             // delete selected edges
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
+                var edge = jQuery(element).data(this.config.Keys.CONNECTION_EDGE);
                 this.graph.deleteEdge(edge);
             }.bind(this));
 
@@ -515,7 +515,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             var edges = [];
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
+                var edge = jQuery(element).data(this.config.Keys.CONNECTION_EDGE);
 
                 //TODO: create Edge class with toDict() method
                 edges.push({

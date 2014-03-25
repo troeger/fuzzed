@@ -55,7 +55,7 @@ function(Class, Config) {
             this.id = jsPlumbEdge._fuzzedId;
 
             // store the ID in an attribute so we can retrieve it later from the DOM element
-            jQuery(jsPlumbEdge.canvas).data(Config.Keys.CONNECTION_ID, jsPlumbEdge._fuzzedId);
+            jQuery(jsPlumbEdge.canvas).data(Config.Keys.CONNECTION_EDGE, this);
 
             this.source.setChildProperties(this.target);
 
