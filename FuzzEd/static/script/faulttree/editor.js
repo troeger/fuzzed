@@ -596,7 +596,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                             "bProcessing":   true,
                             "bFilter":       false,
                             "bServerSide":   true,
-                            "sAjaxSource":   "/api/jobs_status_test",
+                            "sAjaxSource":   "/front/jobs/job_status_test",
                             "aoColumns":     data["columns"],
                             "bLengthChange": false,
                             "iDisplayLength": 10,

@@ -84,6 +84,7 @@ urlpatterns = patterns('',
         'FuzzEd.api.frontend.job_create', {'job_kind': Job.SIMULATION_JOB}, name='simulation_top_event_probability'),
 
     # jobs
+    url(r'^front/jobs/job_status_test$', 'FuzzEd.api.frontend.job_status_test', name='frontend_job_status_test'),
     url(r'^front/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.frontend.job_status', name='frontend_job_status'),
     url(r'^front/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.frontend.job_exitcode', name='job_exitcode'),
     url(r'^front/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.frontend.job_files', name='job_files'),
