@@ -74,6 +74,14 @@
             <li><a href="#" id="FuzzEdActionSelectAll">
                 <i class="fa fa-file-text"></i> Select All <span class="pull-right">Ctrl+A</span>
             </a></li>
+            {% if graph.kind == 'dfd'%}
+                <li><a href="#" id="FuzzEdActionGroup">
+                    <i class="fa fa-link"></i> Group <span class="pull-right">Ctrl+A</span>
+                </a></li>
+                <li><a href="#" id="FuzzEdActionUngroup">
+                    <i class="fa fa-unlink"></i> Ungroup <span class="pull-right">Ctrl+A</span>
+                </a></li>
+            {% endif %}
             <li class="divider"></li>
             <li><a href="#" id="FuzzEdActionLayoutCluster">
                 <i class="fa fa-magic"></i> Auto-layout (cluster algorithm)</a></li>

@@ -18,6 +18,12 @@ define(['config', 'jquery'], function(Config) {
         
             OUTLINE_COLOR:          'white',
             OUTLINE_WIDTH:          2,
+        },
+
+        IDs: {
+            ACTION_GROUP:           'FuzzEdActionGroup',
+            ACTION_UNGROUP:         'FuzzEdActionUngroup',
         }
+
     });
 });

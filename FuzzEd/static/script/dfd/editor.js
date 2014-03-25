@@ -46,6 +46,28 @@ define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(E
             return this;
         },
 
+
+        _setupMenuActions: function() {
+            this._super();
+
+            jQuery('#' + this.config.IDs.ACTION_GROUP).click(function() {
+                this._groupSelection();
+            }.bind(this));
+
+            jQuery('#' + this.config.IDs.ACTION_UNGROUP).click(function() {
+                this._ungroupSelection();
+            }.bind(this));
+
+            // set the shortcut hints from 'Ctrl+' to '⌘' when on Mac
+            if (navigator.platform == 'MacIntel' || navigator.platform == 'MacPPC') {
+                jQuery('#' + this.config.IDs.ACTION_GROUP + ' span').text('⌘G');
+                jQuery('#' + this.config.IDs.ACTION_UNGROUP + ' span').text('⌘U');
+            }
+
+
+            return this;
+        },
+
         _setupKeyBindings: function(readOnly) {
             this._super(readOnly)
             if (readOnly) return this;
