@@ -51,7 +51,6 @@ class Graph(models.Model):
     modified       = models.DateTimeField(auto_now=True)
     deleted        = models.BooleanField(default=False)
     read_only      = models.BooleanField(default=False)
-    graph_issues   = JSONField() 
 
     def __unicode__(self):
         return unicode('%s%s' % ('[DELETED] ' if self.deleted else '', self.name))

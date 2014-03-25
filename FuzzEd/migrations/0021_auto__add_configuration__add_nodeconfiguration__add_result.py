@@ -10,8 +10,8 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         # Adding model 'Configuration'
         db.create_table(u'FuzzEd_configuration', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='configurations', to=orm['FuzzEd.Graph'])),
-            ('result', self.gf('django.db.models.fields.related.OneToOneField')(related_name='configuration', unique=True, primary_key=True, to=orm['FuzzEd.Result'])),
             ('costs', self.gf('django.db.models.fields.IntegerField')()),
         ))
         db.send_create_signal('FuzzEd', ['Configuration'])
@@ -29,20 +29,13 @@ class Migration(SchemaMigration):
         db.create_table(u'FuzzEd_result', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='results', to=orm['FuzzEd.Graph'])),
-            ('type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('prob', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')()),
-            ('prob_sort', self.gf('django.db.models.fields.IntegerField')()),
-            ('decomposition', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('node_issues', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')()),
-            ('rounds', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('failures', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('configuration', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='results', null=True, to=orm['FuzzEd.Configuration'])),
+            ('kind', self.gf('django.db.models.fields.CharField')(max_length=1)),
+            ('value', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')(null=True, blank=True)),
+            ('value_sort', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('issues', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')(null=True, blank=True)),
         ))
         db.send_create_signal('FuzzEd', ['Result'])
-
-        # Adding field 'Graph.graph_issues'
-        db.add_column(u'FuzzEd_graph', 'graph_issues',
-                      self.gf('FuzzEd.lib.jsonfield.fields.JSONField')(default=''),
-                      keep_default=False)
 
 
     def backwards(self, orm):
@@ -54,9 +47,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'Result'
         db.delete_table(u'FuzzEd_result')
-
-        # Deleting field 'Graph.graph_issues'
-        db.delete_column(u'FuzzEd_graph', 'graph_issues')
 
 
     models = {
@@ -99,7 +89,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Configuration'},
             'costs': ('django.db.models.fields.IntegerField', [], {}),
             'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'configurations'", 'to': "orm['FuzzEd.Graph']"}),
-            'result': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'configuration'", 'unique': 'True', 'primary_key': 'True', 'to': "orm['FuzzEd.Result']"})
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'FuzzEd.deleteedge': {
             'Meta': {'object_name': 'DeleteEdge'},
@@ -142,7 +132,6 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Graph'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'graph_issues': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
@@ -160,7 +149,7 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
             'result': ('django.db.models.fields.BinaryField', [], {'null': 'True'}),
-            'secret': ('django.db.models.fields.CharField', [], {'default': "'2c144dcc-0ac2-4259-bd83-827507456ff6'", 'max_length': '64'})
+            'secret': ('django.db.models.fields.CharField', [], {'default': "'bdd861db-023c-4b38-bcc7-6878009b1130'", 'max_length': '64'})
         },
         'FuzzEd.node': {
             'Meta': {'object_name': 'Node'},
@@ -225,15 +214,13 @@ class Migration(SchemaMigration):
         },
         'FuzzEd.result': {
             'Meta': {'object_name': 'Result'},
-            'decomposition': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'failures': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'configuration': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'results'", 'null': 'True', 'to': "orm['FuzzEd.Configuration']"}),
             'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'results'", 'to': "orm['FuzzEd.Graph']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'node_issues': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {}),
-            'prob': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {}),
-            'prob_sort': ('django.db.models.fields.IntegerField', [], {}),
-            'rounds': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'type': ('django.db.models.fields.CharField', [], {'max_length': '1'})
+            'issues': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {'null': 'True', 'blank': 'True'}),
+            'kind': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
+            'value': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {'null': 'True', 'blank': 'True'}),
+            'value_sort': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
         },
         'FuzzEd.userprofile': {
             'Meta': {'object_name': 'UserProfile'},

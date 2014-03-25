@@ -4,7 +4,6 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from graph import Graph
-from result import Result
 
 class Configuration(models.Model):
   """
@@ -19,5 +18,4 @@ class Configuration(models.Model):
       app_label = 'FuzzEd'
   
   graph  = models.ForeignKey(Graph, related_name='configurations')
-  result = models.OneToOneField(Result, primary_key=True, related_name='configuration')
   costs  = models.IntegerField()

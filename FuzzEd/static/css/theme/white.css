@@ -4257,7 +4257,7 @@ i.icon-layout-tree:hover {
 #FuzzEdAnalyticalProbabilityMenu .content {
   width: 100% !important;
 }
-#FuzzEdAnalyticalProbabilityMenu #table_container .row {
+#FuzzEdAnalyticalProbabilityMenu .table_container .row {
   margin: 0px;
 }
 #FuzzEdSimulatedProbabilityMenu {

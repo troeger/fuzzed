@@ -4,7 +4,7 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from graph import Graph
-from FuzzEd.models import xml_analysis, xml_simulation
+from FuzzEd.models import xml_analysis, xml_simulation, Configuration
 from FuzzEd.lib.jsonfield import JSONField
 
 class Result(models.Model):
@@ -14,14 +14,11 @@ class Result(models.Model):
   Fields:
    {Configuration}   configuration  -
    {Graph}           graph          -
-   {str}             type           -
-   {JSON}            prob           -
-   {int}             prob_sort      - 
-   {int}             decomposition  -
+   {str}             kind           -
+   {JSON}            value          -
+   {int}             value_sort     - 
    {JSON}            node_issues    -
-   {int}             rounds         -
-   {int}             failures       -
-                               
+                             
   """
   
   class Meta:
@@ -29,13 +26,12 @@ class Result(models.Model):
 
   TOP_EVENT_JOB     = 'T'
   SIMULATION_JOB    = 'S'
-  ANALYSIS_TYPES = [(SIMULATION_JOB, 'simulation'), (TOP_EVENT_JOB, 'topevent')]
+  GRAPH_ISSUES      = 'G'
+  ANALYSIS_TYPES = [(GRAPH_ISSUES, 'graphissues'), (SIMULATION_JOB, 'simulation'), (TOP_EVENT_JOB, 'topevent')]
   
   graph         = models.ForeignKey(Graph, related_name='results')
-  type          = models.CharField(max_length=1, choices= ANALYSIS_TYPES)
-  prob          = JSONField()
-  prob_sort     = models.IntegerField() 
-  decomposition = models.IntegerField(null=True, blank=True)
-  node_issues   = JSONField()
-  rounds        = models.IntegerField(null=True, blank=True)
-  failures      = models.IntegerField(null=True, blank=True)
+  configuration = models.ForeignKey('Configuration', related_name='results', null=True, blank=True)
+  kind          = models.CharField(max_length=1, choices= ANALYSIS_TYPES)
+  value         = JSONField(blank=True, null=True)
+  value_sort    = models.IntegerField(blank=True, null=True) 
+  issues        = JSONField(blank=True, null=True)
