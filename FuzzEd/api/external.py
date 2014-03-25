@@ -4,16 +4,40 @@
 """
 
 #from oauth2_provider.views.generic import ProtectedResourceView        see urls.py for further explanation
+from django.contrib.auth.models import User
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from tastypie.resources import ModelResource
 from tastypie.authentication import ApiKeyAuthentication   
 from tastypie.authorization import Authorization
 from tastypie.exceptions import Unauthorized, UnsupportedFormat
 from tastypie.serializers import Serializer
+from tastypie.models import ApiKey
 from tastypie import fields
 from FuzzEd.models import Project, Graph
 
 import time
+
+import logging
+logger = logging.getLogger('FuzzEd')
+
+class OurApiKeyAuthentication(ApiKeyAuthentication):
+    ''' Our own version does not demand the user name to be part of the auth header. '''
+    def extract_credentials(self, request):
+        if request.META.get('HTTP_AUTHORIZATION') and request.META['HTTP_AUTHORIZATION'].lower().startswith('apikey '):
+            (auth_type, api_key) = request.META['HTTP_AUTHORIZATION'].split(' ')
+
+            if auth_type.lower() != 'apikey':
+                logger.debug("Incorrect authorization header: "+str(request.META['HTTP_AUTHORIZATION']))
+                raise ValueError("Incorrect authorization header.")
+            try:
+                key = ApiKey.objects.get(key=api_key.strip())
+            except:
+                logger.debug("Incorrect API key in header: "+str(request.META['HTTP_AUTHORIZATION']))
+                raise ValueError("Incorrect API key.")
+            return key.user.username, api_key    
+        else:
+            logger.debug("Missing authorization header: "+str(request.META))
+            raise ValueError("Missing authorization header.")
 
 class ProjectResource(ModelResource):
     '''
@@ -23,7 +47,7 @@ class ProjectResource(ModelResource):
 
     class Meta:
         queryset = Project.objects.filter(deleted=False)
-        authentication = ApiKeyAuthentication()
+        authentication = OurApiKeyAuthentication()
         list_allowed_methods = ['get']
         detail_allowed_methods = ['get']
         excludes = ['deleted', 'owner']
@@ -106,7 +130,7 @@ class GraphResource(ModelResource):
     '''
     class Meta:
         queryset = Graph.objects.filter(deleted=False)
-        authentication = ApiKeyAuthentication()
+        authentication = OurApiKeyAuthentication()
         authorization = GraphAuthorization()
         allowed_methods = ['get', 'post']
         serializer = GraphSerializer()
