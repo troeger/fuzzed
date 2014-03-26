@@ -96,7 +96,7 @@ def job_status(request, job_id):
     if job.done():
         if job.exit_code == 0:
             logger.debug("Job is done.")
-            return HttpResponse(job.result())
+            return HttpResponse(job.result(request.GET))
         else:
             logger.debug("Job is done, but with non-zero exit code.")
             mail_managers('Analysis of job %s ended with non-zero exit code.'%job.pk, job.graph.to_xml() )

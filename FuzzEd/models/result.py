@@ -12,6 +12,12 @@ import json
 class Result(models.Model):
     """
       Class: Project
+
+      Each instance represents a particular backend result.
+      On analysis / simulation, both graph-related and configuration-related
+      issues are detected. In order to separate them, there is a dedicated
+      'Result' kind for graph-related issues. Result objects are created by
+      the Job class when the backend computation results return.
       
       Fields:
        {Configuration}   configuration  -
@@ -59,25 +65,4 @@ class Result(models.Model):
         elif self.kind == Result.EPS_RESULT:
             kind = 'eps'
         return reverse('frontend_graph_download', args=[self.graph.pk]) + "?format="+kind
-
-    def to_json(self, start=0, length=None, sort=None):
-        ''' 
-            Returns a non-binary result as frontend-compliant JSON.
-            Starts at the given record number and returns the given number
-            of elements, according to the given sorting criteria.
-        '''
-
-        assert(not self.is_binary())
-
-        json_result = {}
-        json_result['columns'] = [  { 'mData': 'id',     'sTitle': 'Config' },
-                                    { 'mData': 'min',    'sTitle': 'Min'    },
-                                    { 'mData': 'peak',   'sTitle': 'Peak'   },
-                                    { 'mData': 'max',    'sTitle': 'Max'    },
-                                    { 'mData': 'costs',  'sTitle': 'Costs'  },
-                                    { 'mData': 'ratio',  'sTitle': 'Risk'   }]
-        json_result['errors'] = self.issues['errors']
-        json_result['warnings'] = self.issues['warnings']
-
-        return json.dumps(json_result)
 

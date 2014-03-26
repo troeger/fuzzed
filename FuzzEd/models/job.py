@@ -65,11 +65,53 @@ class Job(models.Model):
     def done(self):
         return self.exit_code is not None
 
-    def result(self):
-        ''' Returns the result of this job so that it can directly go into a HTTTP Response.'''
+    def columns(self):
+        '''
+            Returns the table column keys and names for this job's result. 
+        '''
+        if self.kind == self.TOP_EVENT_JOB:
+            return [  { 'mData': 'id',     'sTitle': 'Config' },
+                      { 'mData': 'min',    'sTitle': 'Min'    },
+                      { 'mData': 'peak',   'sTitle': 'Peak'   },
+                      { 'mData': 'max',    'sTitle': 'Max'    },
+                      { 'mData': 'costs',  'sTitle': 'Costs'  },
+                      { 'mData': 'ratio',  'sTitle': 'Risk'   } ]
+        elif self.kind == self.SIMULATION_JOB:
+            return [  { 'mData': 'reliability', 'sTitle': 'Reliability'},
+                      { 'mData': 'rounds', 'sTitle': 'Simulation Rounds'},
+                      { 'mData': 'failures', 'sTitle': 'Failures'} ]
+
+
+    def result(self, params=None):
+        ''' 
+            Returns the result of this job so that it can directly go into a HTTTP Response.
+            The function takes an optional QueryDict parameter with GET variables from the original
+            request, in case the result rendering needs information from there.
+        '''
         if self.kind in (Job.CUTSETS_JOB, Job.TOP_EVENT_JOB, Job.SIMULATION_JOB):
-            # TODO: Get all configuration results + graph issues and stitch them together
-            pass
+            # Echo entry demanded by datatables JS code
+            result = {'sEcho': params.get('sEcho')}        
+            #TODO: Consider this 
+            displayStart = params.get('iDisplayStart', 0)
+            displayLength = params.get('iDisplayLength', 0)
+            # Fetch graph issues, add them
+            graph_issues = self.results.get(kind=Result.GRAPH_ISSUES).issues
+            result['errors'] = graph_issues['errors']
+            result['warnings'] = graph_issues['warnings']
+            # Get results
+            stored_results = self.results.filter(kind=(Result.ANALYSIS_RESULT if self.kind==Job.TOP_EVENT_JOB else Result.SIMULATION_RESULT))
+            # Fetch column layout, add it
+            result['columns'] = self.columns()
+            # Fetch table rows from stored result objects -> one per configuration
+            result['aaData'] = []
+            for r in stored_results:
+                result['aaData'].append(r.value)
+            result['iTotalRecords'] = len(stored_results)
+            result['iTotalDisplayRecords'] = len(stored_results)
+            encoded = json.dumps(result)
+            logger.debug("Result data sent to client: "+encoded)
+            return encoded
+
         elif self.kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB):
             logger.debug("Delivering binary result as download.")
             return self.results.first().to_url()
@@ -78,9 +120,6 @@ class Job(models.Model):
         ''' 
             This method parses an incoming backend result and stores it in the database.
         '''
-
-        logger.debug('!!!begin_parseResult!!!\n\n')
-
         # Determine result kind                
         if (self.kind == Job.PDF_RENDERING_JOB):
             doc = None
@@ -159,6 +198,7 @@ class Job(models.Model):
             # Fetch probability used for graph rendering
             probability = []
             probability_sort = 0
+            current_result.value = {}
             
             if (hasattr(xmlresult, 'probability') and self.kind == Job.TOP_EVENT_JOB and xmlresult.probability is not None):
                 for alpha_cut in xmlresult.probability.alphaCuts:
@@ -166,20 +206,18 @@ class Job(models.Model):
                     probability.append([alpha_cut.value_.upperBound, alpha_cut.key])
                     
                 probability_sort = round(max(probability, key=lambda point: point[1])[0]*1000)  # Use peak value for probability_sort    
-                current_result.value = json.dumps(probability)
+                current_result.value['points'] = json.dumps(probability)
                 current_result.value_sort = probability_sort               
                 logger.debug('probability: '      + str(probability))
                 logger.debug('probability_sort: ' + str(probability_sort))
                  
             # Fetch rounds and failures if simulation job
-            rounds   = None
-            failures = None 
             if (self.kind == Job.SIMULATION_JOB):
                 reliability = None if math.isnan(float(xmlresult.reliability)) else float(xmlresult.reliability)
                 rounds      = None if math.isnan(int(xmlresult.reliability)) else int(xmlresult.nSimulatedRounds)
                 failures    = None if math.isnan(int(xmlresult.reliability)) else int(xmlresult.nFailures)
                 data = {'reliability': reliability, 'rounds': rounds, 'failures': failures}
-                current_result.value = json.dumps(data)
+                current_result.value['points'] = json.dumps(data)
                 current_result.value_sort = reliability               
                 logger.debug('Simulation result: '+str(data))
             
@@ -217,8 +255,6 @@ class Job(models.Model):
                    
             current_result.save()
         
-        logger.debug('!!!end_parseResult!!!\n\n\n')
-
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
     ''' Informs notification listeners.
