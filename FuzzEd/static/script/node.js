@@ -661,8 +661,8 @@ function(Property, Mirror, Canvas, Class) {
          *      This Node instance for chaining.
          */
         _registerEventHandlers: function() {
-            jQuery(document).on(this.config.Events.GRAPH_EDGE_ADDED,   this._checkEdgeCapacity.bind(this));
-            jQuery(document).on(this.config.Events.GRAPH_EDGE_DELETED, this._checkEdgeCapacity.bind(this));
+            jQuery(document).on(this.config.Events.EDGE_ADDED,   this._checkEdgeCapacity.bind(this));
+            jQuery(document).on(this.config.Events.EDGE_DELETED, this._checkEdgeCapacity.bind(this));
 
             return this;
         },
@@ -1014,15 +1014,27 @@ function(Property, Mirror, Canvas, Class) {
          * Removes the whole visual representation including endpoints from the canvas.
          *
          * Returns:
-         *   This {<Node>} instance for chaining.
+         *   {boolean} Successful deletion.
          */
         remove: function() {
+            if (!this.deletable) return false;
+
+            // Remove all incoming and outgoing edges
+            _.each(_.union(this.incomingEdges, this.outgoingEdges), function(edge) {
+                this.graph.deleteEdge(edge);
+            }.bind(this));
+
+            // Tell jsPlumb to remove node endpoints
             _.each(jsPlumb.getEndpoints(this.container), function(endpoint) {
                 jsPlumb.deleteEndpoint(endpoint);
             });
+
+            // Call home
+            jQuery(document).trigger(this.config.Events.NODE_DELETED, this.id);
+
             this.container.remove();
 
-            return this;
+            return true;
         },
 
         /**

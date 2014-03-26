@@ -44,9 +44,10 @@ function (Class, Config, Job, Alerts, Progress) {
          *
          * On:
          *   <Config::Events::PROPERTY_CHANGED>
-         *   <Config::Events::GRAPH_NODE_ADDED>
-         *   <Config::Events::GRAPH_NODE_DELETED>
-         *   <Config::Events::GRAPH_EDGE_DELETED>
+         *   <Config::Events::NODE_ADDED>
+         *   <Config::Events::NODE_DELETED>
+         *   <Config::Events::EDGE_ADDED>
+         *   <Config::Events::EDGE_DELETED>
          *   <Config::Events::EDITOR_GRAPH_EXPORT_PDF>
          *   <Config::Events::EDITOR_GRAPH_EXPORT_EPS>
          *   <Config::Events::EDITOR_CALCULATE_CUTSETS>
@@ -59,10 +60,10 @@ function (Class, Config, Job, Alerts, Progress) {
         activate: function() {
             jQuery(document)
                 .on(Config.Events.PROPERTY_CHANGED,                        this.nodePropertyChanged.bind(this))
-                .on(Config.Events.GRAPH_NODE_ADDED,                        this.graphNodeAdded.bind(this))
-                .on(Config.Events.GRAPH_NODE_DELETED,                      this.graphNodeDeleted.bind(this))
-                .on(Config.Events.GRAPH_EDGE_ADDED,                        this.graphEdgeAdded.bind(this))
-                .on(Config.Events.GRAPH_EDGE_DELETED,                      this.graphEdgeDeleted.bind(this))
+                .on(Config.Events.NODE_ADDED,                              this.nodeAdded.bind(this))
+                .on(Config.Events.NODE_DELETED,                            this.nodeDeleted.bind(this))
+                .on(Config.Events.EDGE_ADDED,                        this.graphEdgeAdded.bind(this))
+                .on(Config.Events.EDGE_DELETED,                      this.graphEdgeDeleted.bind(this))
                 .on(Config.Events.EDITOR_GRAPH_EXPORT_PDF,                 this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_GRAPH_EXPORT_EPS,                 this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_CUTSETS,                this.calculateCutsets.bind(this))
@@ -79,9 +80,10 @@ function (Class, Config, Job, Alerts, Progress) {
          *
          * Off:
          *   <Config::Events::PROPERTY_CHANGED>
-         *   <Config::Events::GRAPH_NODE_ADDED>
-         *   <Config::Events::GRAPH_NODE_DELETED>
-         *   <Config::Events::GRAPH_EDGE_DELETED>
+         *   <Config::Events::NODE_ADDED>
+         *   <Config::Events::NODE_DELETED>
+         *   <Config::Events::EDGE_ADDED>
+         *   <Config::Events::EDGE_DELETED>
          *   <Config::Events::EDITOR_GRAPH_EXPORT_PDF>
          *   <Config::Events::EDITOR_GRAPH_EXPORT_EPS>
          *   <Config::Events::EDITOR_CALCULATE_CUTSETS>
@@ -94,10 +96,10 @@ function (Class, Config, Job, Alerts, Progress) {
         deactivate: function() {
             jQuery(document)
                 .off(Config.Events.PROPERTY_CHANGED)
-                .off(Config.Events.GRAPH_NODE_ADDED)
-                .off(Config.Events.GRAPH_NODE_DELETED)
-                .off(Config.Events.GRAPH_EDGE_ADDED)
-                .off(Config.Events.GRAPH_EDGE_DELETED)
+                .off(Config.Events.NODE_ADDED)
+                .off(Config.Events.NODE_DELETED)
+                .off(Config.Events.EDGE_ADDED)
+                .off(Config.Events.EDGE_DELETED)
                 .off(Config.Events.EDITOR_GRAPH_EXPORT_PDF)   
                 .off(Config.Events.EDITOR_GRAPH_EXPORT_EPS)                
                 .off(Config.Events.EDITOR_CALCULATE_CUTSETS)
@@ -159,7 +161,7 @@ function (Class, Config, Job, Alerts, Progress) {
         },
 
         /**
-         * Method: graphNodeAdded
+         * Method: nodeAdded
          *
          * Adds a new node to the backend of this graph.
          *
@@ -174,7 +176,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {function} complete - [optional] Callback that is invoked when the ajax request completes successful or
          *                         erroneous.
          */
-        graphNodeAdded: function(event, nodeId, kind, x, y, properties, success, error, complete) {
+        nodeAdded: function(event, nodeId, kind, x, y, properties, success, error, complete) {
             var data = {
                 id:         nodeId,
                 kind:       kind,
@@ -246,7 +248,7 @@ function (Class, Config, Job, Alerts, Progress) {
         },
 
         /**
-         * Method: graphNodeDeleted
+         * Method: nodeDeleted
          *
          * Deletes a given node in the backend.
          *
@@ -257,7 +259,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {function} error    - [optional] Callback that gets called in case of an ajax-error.
          *   {function} complete - [optional] Callback that is invoked in both cases, successful and errornous requests.
          */
-        graphNodeDeleted: function(event, nodeId, success, error, complete) {
+        nodeDeleted: function(event, nodeId, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNode(nodeId),
                 type:     'DELETE',

@@ -291,10 +291,10 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
             // User has accepted implicitly by continuing to edit the graph
             jQuery(document).one([
                 Config.Events.CANVAS_SHAPE_DROPPED,
-                Config.Events.GRAPH_NODE_ADDED,
-                Config.Events.GRAPH_NODE_DELETED,
-                Config.Events.GRAPH_EDGE_ADDED,
-                Config.Events.GRAPH_EDGE_DELETED,
+                Config.Events.NODE_ADDED,
+                Config.Events.NODE_DELETED,
+                Config.Events.EDGE_ADDED,
+                Config.Events.EDGE_DELETED,
                 Config.Events.GRAPH_LAYOUT,
                 Config.Events.PROPERTY_CHANGED
             ].join(' '), function() {

@@ -108,10 +108,6 @@ function(Canvas, Class, Config, Edge, Menus) {
                 this._addEdge(edge.connection);
             }.bind(this));
 
-            jsPlumb.bind('connectionDetached', function(edge) {
-                this._deleteEdge(edge.connection);
-            }.bind(this));
-
             jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
 
             return this;
@@ -158,7 +154,7 @@ function(Canvas, Class, Config, Edge, Menus) {
          *      "jsPlumb.connected". If you want to add an edge programmatically, use <Graph::addEdge> instead.
          *
          *  Triggers:
-         *    <Config::Events::GRAPH_EDGE_ADDED>
+         *    <Config::Events::EDGE_ADDED>
          *
          *  Returns:
          *    The newly created Edge instance.
@@ -176,7 +172,7 @@ function(Canvas, Class, Config, Edge, Menus) {
          *    splitted into deleteEdge and _deleteEdge as in addEdge.
          *
          *  Parameters:
-         *    {edge} Edge - Edge to be deleted from the graph.
+         *    {Edge} edge - Edge to be deleted from the graph.
          *
          *  Returns:
          *    This <Graph> instance for chaining.
@@ -185,40 +181,11 @@ function(Canvas, Class, Config, Edge, Menus) {
          *    <Graph::_registerEventHandlers>
          */
         deleteEdge: function(edge) {
-            jsPlumb.detach(edge._jsPlumbEdge);
+            if (edge.remove()) {
+                delete this.edges[edge.id];
+            }
 
             return this;
-        },
-
-
-        /**
-         *  Method: _deleteEdge
-         *    Deletes the given edge from the graph.
-         *
-         *  Parameters:
-         *    {jsPlumb::Connection} edge - Edge to be deleted from this graph.
-         *
-         *  Triggers:
-         *    <Config::Events::GRAPH_EDGE_DELETED>
-         *
-         *  Returns:
-         *    This <Graph> instance for chaining.
-         */
-        _deleteEdge: function(jsPlumbEdge) {
-            var id         = jsPlumbEdge._fuzzedId;
-            var sourceNode = jQuery(jsPlumbEdge.source).data(this.config.Keys.NODE);
-            var targetNode = jQuery(jsPlumbEdge.target).data(this.config.Keys.NODE);
-
-            if (typeof targetNode === 'undefined') return;
-            sourceNode.restoreChildProperties(targetNode);
-
-            // correct target and source node incoming and outgoing edges
-            sourceNode.outgoingEdges = _.without(sourceNode.outgoingEdges, jsPlumbEdge);
-            targetNode.incomingEdges = _.without(targetNode.incomingEdges, jsPlumbEdge);
-
-            // call home
-            jQuery(document).trigger(this.config.Events.GRAPH_EDGE_DELETED, id);
-            delete this.edges[id];
         },
 
         /**
@@ -230,7 +197,7 @@ function(Canvas, Class, Config, Edge, Menus) {
          *    {Object} properties - [optional] Properties that should be merged into the new node.
          *
          *  Triggers:
-         *    <Config::Events::GRAPH_NODE_ADDED>
+         *    <Config::Events::NODE_ADDED>
          *
          *  Returns:
          *    The added node.
@@ -242,7 +209,7 @@ function(Canvas, Class, Config, Edge, Menus) {
             var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
 
             this.nodes[node.id] = node;
-            jQuery(document).trigger(this.config.Events.GRAPH_NODE_ADDED, [
+            jQuery(document).trigger(this.config.Events.NODE_ADDED, [
                 node.id,
                 kind,
                 node.x,
@@ -260,24 +227,13 @@ function(Canvas, Class, Config, Edge, Menus) {
          *  Parameters:
          *    {int} nodeId - ID of the <Node> that should be removed from this graph.
          *
-         *  Triggers:
-         *    <Config::Events::GRAPH_NODE_DELETED>
-         *
          *  Returns:
          *    This <Graph> instance for chaining.
          */
-        deleteNode: function(nodeId) {
-            var node = this.nodes[nodeId];
-            if (node.deletable === false) return this;
-
-            _.each(_.union(node.incomingEdges, node.outgoingEdges), function(edge) {
-                this.deleteEdge(edge);
-            }.bind(this));
-
-            node.remove();
-            delete this.nodes[nodeId];
-
-            jQuery(document).trigger(this.config.Events.GRAPH_NODE_DELETED, nodeId);
+        deleteNode: function(node) {
+            if (node.remove()) {
+                delete this.nodes[node.id];
+            }
 
             return this;
         },

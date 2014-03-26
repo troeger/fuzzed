@@ -54,7 +54,7 @@ function(Class, Config) {
             jsPlumbEdge._fuzzedId = (typeof jsPlumbEdge._fuzzedId === 'undefined') ? this.graph.createId() : jsPlumbEdge._fuzzedId;
             this.id = jsPlumbEdge._fuzzedId;
 
-            // store the ID in an attribute so we can retrieve it later from the DOM element
+            // store the edge instance in an attribute so we can retrieve it later from the DOM element
             jQuery(jsPlumbEdge.canvas).data(Config.Keys.CONNECTION_EDGE, this);
 
             this.source.setChildProperties(this.target);
@@ -65,11 +65,41 @@ function(Class, Config) {
 
             // call home
             jQuery(document).trigger(
-                Config.Events.GRAPH_EDGE_ADDED,
+                Config.Events.EDGE_ADDED,
                 [this.id, this.source.id, this.target.id]
             );
 
             return this;
+        },
+
+        select: function() {
+            jQuery(this._jsPlumbEdge.canvas).addClass(Config.Classes.SELECTED);
+        },
+
+        remove: function() {
+            // To cover both the case that the jsPlumbEdge was already detached and that it wasn't we detach it again
+            jsPlumb.detach(this._jsPlumbEdge);
+
+            if (typeof this.target === 'undefined') return false;
+            this.source.restoreChildProperties(this.target);
+
+            // correct target and source node incoming and outgoing edges
+            this.source.outgoingEdges = _.without(this.source.outgoingEdges, this);
+            this.target.incomingEdges = _.without(this.target.incomingEdges, this);
+
+            // call home
+            jQuery(document).trigger(Config.Events.EDGE_DELETED, this.id);
+
+            return true;
+        },
+
+        toDict: function() {
+            return {
+                id:           this.id,
+                sourceNodeId: this.source.id,
+                targetNodeId: this.target.id,
+                properties:   this.properties //TODO: make it right
+            }
         }
     });
 });

@@ -47,9 +47,9 @@ function(Graph, DfdNode, DfdConfig, DfdNotation, Canvas) {
         _registerEventHandlers: function() {
             this._initialize_zones();
 
-            jQuery(document).on(this.config.Events.NODES_MOVED,  this._redraw_communication_zones.bind(this));
-            jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED,  this._delete_node_from_zones.bind(this));
-            jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,  this._add_node_to_zones.bind(this));
+            jQuery(document).on(this.config.Events.NODES_MOVED,   this._redraw_communication_zones.bind(this));
+            jQuery(document).on(this.config.Events.NODE_DELETED,  this._delete_node_from_zones.bind(this));
+            jQuery(document).on(this.config.Events.NODE_ADDED,    this._add_node_to_zones.bind(this));
 
             return this._super()
         },
