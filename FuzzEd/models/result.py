@@ -60,8 +60,12 @@ class Result(models.Model):
             kind = 'eps'
         return reverse('frontend_graph_download', args=[self.graph.pk]) + "?format="+kind
 
-    def to_json(self):
-        ''' Returns a non-binary result as frontend-compliant JSON.'''
+    def to_json(self, start=0, length=None, sort=None):
+        ''' 
+            Returns a non-binary result as frontend-compliant JSON.
+            Starts at the given record number and returns the given number
+            of elements, according to the given sorting criteria.
+        '''
 
         assert(not self.is_binary())
 

@@ -25,7 +25,6 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import mail_managers
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')
 
 

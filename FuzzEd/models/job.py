@@ -175,9 +175,9 @@ class Job(models.Model):
             rounds   = None
             failures = None 
             if (self.kind == Job.SIMULATION_JOB):
-                reliability = None if math.isnan(read_reliability) else float(xmlresult.reliability)
-                rounds      = None if math.isnan(read_rounds) else int(xmlresult.nSimulatedRounds)
-                failures    = None if math.isnan(read_failures) else int(xmlresult.nFailures)
+                reliability = None if math.isnan(float(xmlresult.reliability)) else float(xmlresult.reliability)
+                rounds      = None if math.isnan(int(xmlresult.reliability)) else int(xmlresult.nSimulatedRounds)
+                failures    = None if math.isnan(int(xmlresult.reliability)) else int(xmlresult.nFailures)
                 data = {'reliability': reliability, 'rounds': rounds, 'failures': failures}
                 current_result.value = json.dumps(data)
                 current_result.value_sort = reliability               

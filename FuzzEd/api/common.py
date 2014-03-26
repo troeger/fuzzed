@@ -11,7 +11,6 @@ from FuzzEd.models import Graph, Job
 from FuzzEd.middleware import *
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')
 
 def graph_download(user, graph_id, export_format):
