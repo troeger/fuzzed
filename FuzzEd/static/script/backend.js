@@ -62,8 +62,8 @@ function (Class, Config, Job, Alerts, Progress) {
                 .on(Config.Events.PROPERTY_CHANGED,                        this.nodePropertyChanged.bind(this))
                 .on(Config.Events.NODE_ADDED,                              this.nodeAdded.bind(this))
                 .on(Config.Events.NODE_DELETED,                            this.nodeDeleted.bind(this))
-                .on(Config.Events.EDGE_ADDED,                        this.graphEdgeAdded.bind(this))
-                .on(Config.Events.EDGE_DELETED,                      this.graphEdgeDeleted.bind(this))
+                .on(Config.Events.EDGE_ADDED,                              this.edgeAdded.bind(this))
+                .on(Config.Events.EDGE_DELETED,                            this.edgeDeleted.bind(this))
                 .on(Config.Events.EDITOR_GRAPH_EXPORT_PDF,                 this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_GRAPH_EXPORT_EPS,                 this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_CUTSETS,                this.calculateCutsets.bind(this))
@@ -113,7 +113,7 @@ function (Class, Config, Job, Alerts, Progress) {
          */
 
         /**
-         * Method: graphEdgeAdded
+         * Method: edgeAdded
          *
          * Adds a new edge from a given source node to a given target node.
          *
@@ -128,7 +128,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {function} complete     - [optional] Callback that is invoked in both cases - a successful or an erroneous
          *                             AJAX request.
          */
-        graphEdgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
+        edgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
             var data = {
                 id:          edgeId,
                 source:      sourceNodeId,
@@ -211,7 +211,7 @@ function (Class, Config, Job, Alerts, Progress) {
         },
 
         /**
-         * Method: graphEdgeDeleted
+         * Method: edgeDeleted
          *   Deletes a given edge in the backend.
          *
          * Parameters:
@@ -222,7 +222,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {function} complete - [optional] Callback that gets invoked in both cases - a successful and an errornous
          *                         AJAX call.
          */
-        graphEdgeDeleted: function(event, edgeId, success, error, complete) {
+        edgeDeleted: function(event, edgeId, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForEdge(edgeId),
                 type:     'DELETE',
