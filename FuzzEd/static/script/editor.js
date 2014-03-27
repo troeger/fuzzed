@@ -421,7 +421,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             // delete selected edges
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = jQuery(element).data(this.config.Keys.CONNECTION_EDGE);
+                var edge = jQuery(element).data(this.config.Keys.EDGE);
                 this.graph.deleteEdge(edge);
             }.bind(this));
 
@@ -515,7 +515,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             var edges = [];
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = jQuery(element).data(this.config.Keys.CONNECTION_EDGE);
+                var edge = jQuery(element).data(this.config.Keys.EDGE);
                 edges.push(edge.toDict());
             }.bind(this));
 
@@ -553,13 +553,13 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             var ids         = {}; // stores to every old id the newly generated id to connect the nodes again
             var boundingBox = this._boundingBoxForNodes(nodes); // used along with pasteCount to place the copy nicely
 
-            _.each(nodes, function(node) {
+            _.each(nodes, function(jsonNode) {
                 var pasteId  = this.graph.createId();
-                ids[node.id] = pasteId;
-                node.id = pasteId;
-                node.x += pasteCount * (boundingBox.width + 1);
-                node.y += pasteCount * (boundingBox.height + 1);
-                this.graph.addNode(node.kind, node).select();
+                ids[jsonNode.id] = pasteId;
+                jsonNode.id = pasteId;
+                jsonNode.x += pasteCount * (boundingBox.width + 1);
+                jsonNode.y += pasteCount * (boundingBox.height + 1);
+                this.graph.addNode(jsonNode).select();
             }.bind(this));
 
             _.each(edges, function(edge) {

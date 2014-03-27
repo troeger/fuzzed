@@ -2,8 +2,12 @@
     "kind": "dfd",
     "name": "Data Flow Diagram",
     "edges": {
-        "mirror": {
-            "style": ["italic"]
+        "properties": {
+            "name": {
+                "kind": "text",
+                "default": "Edge",
+                "displayName": "Name"
+            }
         }
     },
     "nodes": {

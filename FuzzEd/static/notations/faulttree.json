@@ -1,6 +1,9 @@
 {
     "kind": "faulttree",
     "name": "Fault Tree",
+    "edges": {
+        "properties": {}
+    },
     "nodes": {
         "node": {
             "nodeDisplayName": "Node",

@@ -6,7 +6,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
     };
 	
     var Property = Class.extend({
-        node:           undefined,
+        owner:           undefined,
         value:          undefined,
         displayName:    '',
         mirror:         undefined,
@@ -15,9 +15,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         readonly:       false,
         partInCompound: undefined,
 
-        init: function(node, definition) {
+        init: function(owner, definition) {
             jQuery.extend(this, definition);
-            this.node = node;
+            this.owner = owner;
             this._sanitize()
                 ._setupMirror()
                 ._setupMenuEntry();
@@ -56,7 +56,13 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
                 // compound parts need another format for backend propagation
                 var value = typeof this.partInCompound === 'undefined' ? newValue : [this.partInCompound, newValue];
                 properties[this.name] = value;
-                jQuery(document).trigger(Config.Events.PROPERTY_CHANGED, [this.node.id, properties]);
+
+                //TODO: THIS IS NOT NICE AND IS ONLY USED TEMPORARILY !!!!11
+                if (this.owner._jsPlumbEdge === undefined) {
+                    jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.owner.id, properties]);
+                } else {
+                    jQuery(document).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
+                }
             }
 
             return this;
@@ -96,7 +102,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         _setupMirror: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
-            this.mirror = new Mirror(this, this.node.container, this.mirror);
+            this.mirror = new Mirror(this, this.owner.container, this.mirror);
 
             return this;
         },
@@ -108,7 +114,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         },
 
         _triggerChange: function(value, issuer) {
-            jQuery(this).trigger(Config.Events.PROPERTY_CHANGED, [value, value, issuer]);
+            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
         }
     });
 
@@ -140,9 +146,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             return PropertyMenuEntry.ChoiceEntry;
         },
 
-        init: function(node, definition) {
+        init: function(owner, definition) {
             definition.values = typeof definition.values === 'undefined' ? definition.choices : definition.values;
-            this._super(node, definition);
+            this._super(owner, definition);
         },
 
         validate: function(value, validationResult) {
@@ -176,7 +182,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
                 }
             }
 
-            jQuery(this).trigger(Config.Events.PROPERTY_CHANGED, [value, this.choices[i], issuer]);
+            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, this.choices[i], issuer]);
         }
     });
 
@@ -265,7 +271,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
                     partInCompound: index,
                     value: index === this.value ? value : undefined
                 });
-                parsedParts[index] = from(this.node, partDef);
+                parsedParts[index] = from(this.owner, partDef);
             }.bind(this));
 
             this.parts = parsedParts;
@@ -551,9 +557,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         transferGraphs: undefined,
 
-        init: function(node, definition) {
+        init: function(owner, definition) {
             jQuery.extend(this, definition);
-            this.node = node;
+            this.owner = owner;
             this._sanitize()
                 ._setupMirror()
                 ._setupMenuEntry()
@@ -586,9 +592,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         _triggerChange: function(value, issuer) {
             var unlinked = value === this.UNLINK_VALUE;
 
-            if (!unlinked) this.node.hideBadge();
+            if (!unlinked) this.owner.hideBadge();
 
-            jQuery(this).trigger(Config.Events.PROPERTY_CHANGED, [
+            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [
                 value,
                 unlinked ? this.UNLINK_TEXT : this.transferGraphs[value],
                 issuer]
@@ -597,7 +603,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         fetchTransferGraphs: function() {
             jQuery.ajax({
-                url:      this.GRAPHS_URL + this.node.graph.id + Config.Backend.TRANSFERS_URL,
+                url:      this.GRAPHS_URL + this.owner.graph.id + Config.Backend.TRANSFERS_URL,
                 type:     'GET',
                 dataType: 'json',
                 // don't show progress
@@ -615,7 +621,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             }, {});
 
             if (this.value === this.UNLINK_VALUE)
-                this.node.showBadge('!', 'important');
+                this.owner.showBadge('!', 'important');
 
             jQuery(this).trigger(Config.Events.PROPERTY_SYNCHRONIZED);
             this._triggerChange(this.value, this);
@@ -633,17 +639,17 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         }
     });
 
-    var from = function(node, definition) {
+    var from = function(owner, definition) {
         switch (definition.kind) {
-            case 'bool':     return new Bool(node, definition);
-            case 'choice':   return new Choice(node, definition);
-            case 'compound': return new Compound(node, definition);
-            case 'epsilon':  return new Epsilon(node, definition);
-            case 'numeric':  return new Numeric(node, definition);
-            case 'range':    return new Range(node, definition);
-            case 'text':     return new Text(node, definition);
-			case 'textfield':return new InlineTextField(node, definition);
-            case 'transfer': return new Transfer(node, definition);
+            case 'bool':     return new Bool(owner, definition);
+            case 'choice':   return new Choice(owner, definition);
+            case 'compound': return new Compound(owner, definition);
+            case 'epsilon':  return new Epsilon(owner, definition);
+            case 'numeric':  return new Numeric(owner, definition);
+            case 'range':    return new Range(owner, definition);
+            case 'text':     return new Text(owner, definition);
+			case 'textfield':return new InlineTextField(owner, definition);
+            case 'transfer': return new Transfer(owner, definition);
 
             default: throw ValueError('unknown property kind ' + definition.kind);
         }

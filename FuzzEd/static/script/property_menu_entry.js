@@ -410,7 +410,7 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *      This Entry for chaining.
          */
         _setupEvents: function() {
-            jQuery(this.property).on(Config.Events.PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+            jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 // ignore changes issued by us in order to prevent race conditions with the user
                 if (issuer === this) return;
                 this._value(newValue);

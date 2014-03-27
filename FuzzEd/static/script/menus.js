@@ -170,7 +170,7 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
     var PropertiesMenu = new (Menu.extend({
         _displayOrder: undefined,
         _form:         undefined,
-        _node:         undefined,
+        _selectee:     undefined,
 
         init: function(displayOrder) {
             this._super();
@@ -196,12 +196,12 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
         /* Section: Visibility */
         hide: function() {
             this._removeEntries();
-            this._node = undefined;
+            this._selectee = undefined;
             return this._super();
         },
 
         show: function() {
-            var selected = jQuery('.' + Config.Classes.SELECTED + '.' + Config.Classes.NODE);
+            var selected = jQuery('.' + Config.Classes.SELECTED);
             this._removeEntries();
 
             // display the properties menu only if there is exactly one node selected
@@ -214,9 +214,9 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
         },
 
         _removeEntries: function() {
-            if (!this._node) return this;
+            if (!this._selectee) return this;
 
-            _.each(this._node.properties, function(property) {
+            _.each(this._selectee.properties, function(property) {
                 property.menuEntry.remove();
             }.bind(this));
 
@@ -234,16 +234,16 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
         },
 
         _show: function(selected) {
-            this._node = selected.data(Config.Keys.NODE);
+            this._selectee = selected.data(selected.hasClass(Config.Classes.NODE) ? Config.Keys.NODE : Config.Keys.EDGE);
 
             // this node does not have any properties to display, go home!
-            if (_.isEmpty(this._node.properties)) {
+            if (_.isEmpty(this._selectee.properties)) {
                 this.hide();
                 return this;
             }
 
             _.each(this._displayOrder, function(propertyName) {
-                var property = this._node.properties[propertyName];
+                var property = this._selectee.properties[propertyName];
                 // has the node such a property? display it!
                 if (typeof property !== 'undefined' && property !== null) {
                     property.menuEntry.appendTo(this._form);
@@ -259,13 +259,13 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
                 var offset =  - this.container.outerWidth(true) - Config.Menus.PROPERTIES_MENU_OFFSET;
                 this.container.css('left', jQuery('body').outerWidth(true) + offset);
             }
-            this.container.toggle(!_.all(this._node.properties, function(property) { return property.hidden; }));
+            this.container.toggle(!_.all(this._selectee.properties, function(property) { return property.hidden; }));
 
             return this;
         },
 
         _allHidden: function() {
-            return !this._node || _.all(this._node.properties, function(property) { return property.hidden; });
+            return !this._selectee || _.all(this._selectee.properties, function(property) { return property.hidden; });
         }
     }));
 
@@ -296,7 +296,7 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
                 Config.Events.EDGE_ADDED,
                 Config.Events.EDGE_DELETED,
                 Config.Events.GRAPH_LAYOUT,
-                Config.Events.PROPERTY_CHANGED
+                Config.Events.NODE_PROPERTY_CHANGED
             ].join(' '), function() {
                 deferred.resolve();
             }.bind(this));

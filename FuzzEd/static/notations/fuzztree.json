@@ -1,6 +1,9 @@
 {
     "kind": "fuzztree",
     "name": "Fuzz Tree",
+    "edges": {
+        "properties": {}
+    },
     "nodes": {
         "node": {
             "nodeDisplayName": "Node",

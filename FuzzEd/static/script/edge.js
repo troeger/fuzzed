@@ -1,5 +1,5 @@
-define(['class', 'config', 'jquery', 'jsplumb'],
-function(Class, Config) {
+define(['class', 'config', 'property', 'jquery', 'jsplumb'],
+function(Class, Config, Property) {
     /**
      *  Class: {Abstract} Edge
      *
@@ -15,19 +15,18 @@ function(Class, Config) {
 
         _jsPlumbEdge: undefined,
 
-        init: function(graph, sourceOrJsPlumbEdge, target, properties) {
-            this.graph = graph;
-
-            if (arguments.length === 2) {
+        init: function(definition, sourceOrJsPlumbEdge, targetOrProperties, properties) {
+            if (typeof properties === 'undefined') {
                 // case 1: create Edge instance for existing jsPlumbConnection (e.g. as event handler)
+                properties  = jQuery.extend(true, {}, definition, targetOrProperties);
                 this.source = jQuery(sourceOrJsPlumbEdge.source).data(Config.Keys.NODE);
                 this.target = jQuery(sourceOrJsPlumbEdge.target).data(Config.Keys.NODE);
-                this.properties = {};
-                this._initFromJsPlumbEdge(sourceOrJsPlumbEdge);
+                this._initFromJsPlumbEdge(sourceOrJsPlumbEdge, properties);
 
             } else {
                 // case 2: create Edge instance and create corresponding jsPlumbConnection (programmatic creation)
-                this._init(sourceOrJsPlumbEdge, target, properties);
+                properties = jQuery.extend(true, {}, definition, properties);
+                this._init(sourceOrJsPlumbEdge, targetOrProperties, properties);
             }
         },
 
@@ -35,41 +34,37 @@ function(Class, Config) {
             this.source = source;
             this.target = target;
 
-            // having properties implies already having an id
-            this.id = typeof properties.id === 'undefined' ? this.graph.createId() : properties.id;
-            this.properties = properties;
-
             var jsPlumbEdge = jsPlumb.connect({
                 source:    source.container,
                 target:    target.container,
                 fireEvent: false
             });
             jsPlumbEdge._fuzzedId = this.id;
-            this._initFromJsPlumbEdge(jsPlumbEdge);
+            this._initFromJsPlumbEdge(jsPlumbEdge, properties);
         },
 
-        _initFromJsPlumbEdge: function(jsPlumbEdge) {
+        _initFromJsPlumbEdge: function(jsPlumbEdge, properties) {
             this._jsPlumbEdge = jsPlumbEdge;
+            this._jsPlumbEdge._fuzzedId = this.id;
 
-            jsPlumbEdge._fuzzedId = (typeof jsPlumbEdge._fuzzedId === 'undefined') ? this.graph.createId() : jsPlumbEdge._fuzzedId;
-            this.id = jsPlumbEdge._fuzzedId;
+            this.graph      = properties.graph;
+            this.id         = typeof properties.id === 'undefined' ? this.graph.createId() : properties.id;
+            this.properties = jQuery.extend(true, {}, properties);
+            delete this.properties.id;
+            delete this.properties.graph;
 
             // store the edge instance in an attribute so we can retrieve it later from the DOM element
-            jQuery(jsPlumbEdge.canvas).data(Config.Keys.CONNECTION_EDGE, this);
-
+            jQuery(jsPlumbEdge.canvas).data(Config.Keys.EDGE, this);
             this.source.setChildProperties(this.target);
 
             // correct target and source node incoming and outgoing edges
             this.source.outgoingEdges.push(this);
             this.target.incomingEdges.push(this);
 
-            // call home
-            jQuery(document).trigger(
-                Config.Events.EDGE_ADDED,
-                [this.id, this.source.id, this.target.id]
-            );
+            this._setupProperties();
 
-            return this;
+            // call home
+            jQuery(document).trigger(Config.Events.EDGE_ADDED, [this.id, this.source.id, this.target.id]);
         },
 
         select: function() {
@@ -100,6 +95,33 @@ function(Class, Config) {
                 targetNodeId: this.target.id,
                 properties:   this.properties //TODO: make it right
             }
+        },
+
+        /**
+         * Method: _setupProperties
+         *
+         * Parameters:
+         *   {Array[str]} propertiesDisplayOrder - bar.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        _setupProperties: function() {
+            _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {
+                var property = this.properties[propertyName];
+
+                if (typeof property === 'undefined') {
+                    return;
+                } else if (property === null) {
+                    delete this.properties[propertyName];
+                    return;
+                }
+
+                property.name = propertyName;
+                this.properties[propertyName] = Property.from(this, property);
+            }.bind(this));
+
+            return this;
         }
     });
 });

@@ -213,7 +213,9 @@ define(['underscore'], function() {
 		 *    {String} NODE_SELECTED             - Event triggered when a node on the canvas is selected
          *    {String} NODE_UNSELECTED           - Event triggered when a node on the canvas is unselected
          *
-         *    {String} PROPERTY_CHANGED          - Event triggered when a property of a node changed.
+         *    {String} NODE_PROPERTY_CHANGED     - Event triggered when a property of a node changed.
+         *    {String} EDGE_PROPERTY_CHANGED     - Event triggered when a property of an edge changed.
+         *
          *    {String} PROPERTY_HIDDEN_CHANGED   - Event triggered when a property's hidden state changed.
          *    {String} PROPERTY_READONLY_CHANGED - Event triggered when a property's readonly state changed.
          *    {String} PROPERTY_SYNCHRONIZED     - Event triggered when a property synced itself with the backend.
@@ -237,7 +239,9 @@ define(['underscore'], function() {
 			NODE_SELECTED:             'node_selected',
 			NODE_UNSELECTED:		   'node_unselected',
 
-            PROPERTY_CHANGED:          'property-changed',
+            NODE_PROPERTY_CHANGED:     'node-property-changed',
+            EDGE_PROPERTY_CHANGED:     'edge-property-changed',
+
             PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',
             PROPERTY_READONLY_CHANGED: 'property-readonly-changed',
             PROPERTY_SYNCHRONIZED:     'property-synchronized'
@@ -337,16 +341,16 @@ define(['underscore'], function() {
          *    Certain keys used with jQuery.data().
          *
          *  Constants:
+         *    {String} EDGE       - Used to retrieve the Connection object from the corresponding DOM element.
+         *                          (former Attribute).
          *    {String} NODE       - Data key used to get the node object from a associated DOM element.
          *    {String} SELECTABLE - Data key used to store the jQuery UI Selectable object with the canvas
          *                          (needed for some hacks).
-         *    {String} CONNECTION_EDGE - Used to retrieve the Connection object from the corresponding DOM element.
-         *                             (former Attribute)
          */
         Keys: {
-            NODE:           'node',
-            SELECTABLE:     'ui-selectable',
-            CONNECTION_EDGE:  'fuzzed-edge'
+            EDGE:       'edge',
+            NODE:       'node',
+            SELECTABLE: 'ui-selectable'
         },
 
         /**

@@ -72,7 +72,7 @@ function(Property, Mirror, Canvas, Class) {
          * Returns:
          *   This {<Node>} instance.
          */
-        init: function(definition, propertiesDisplayOrder) {
+        init: function(definition) {
 
             // merge all presets of the configuration and data from the backend into this object
             jQuery.extend(true, this, definition);
@@ -101,7 +101,7 @@ function(Property, Mirror, Canvas, Class) {
                 ._setupDragging()
                 ._setupMouse()
                 ._setupSelection()
-                ._setupProperties(propertiesDisplayOrder)
+                ._setupProperties()
 				._setupEditable()
 				._setupResizable()
                 // Events
@@ -517,14 +517,11 @@ function(Property, Mirror, Canvas, Class) {
         /**
          * Method: _setupProperties
          *
-         * Parameters:
-         *   {Array[str]} propertiesDisplayOrder - bar.
-         *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
-        _setupProperties: function(propertiesDisplayOrder) {
-            _.each(propertiesDisplayOrder, function(propertyName) {
+        _setupProperties: function() {
+            _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {
                 var property = this.properties[propertyName];
 
                 if (typeof property === 'undefined') {
@@ -967,7 +964,7 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          *
          * Triggers:
-         *   <Config::Events::PROPERTY_CHANGED>
+         *   <Config::Events::NODE_PROPERTY_CHANGED>
          */
         moveToPixel: function(position, animated) {
             var gridPos = Canvas.toGrid(position);
@@ -976,7 +973,7 @@ function(Property, Mirror, Canvas, Class) {
 
             this._moveContainerToPixel(position, animated);
             // call home
-            jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+            jQuery(document).trigger(this.config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },
@@ -993,7 +990,7 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          *
          * Triggers:
-         *   <Config::Events::PROPERTY_CHANGED>
+         *   <Config::Events::NODE_PROPERTY_CHANGED>
          */
         moveToGrid: function(gridPos, animated) {
             this.x = Math.floor(Math.max(gridPos.x, 1));
@@ -1003,7 +1000,7 @@ function(Property, Mirror, Canvas, Class) {
             this._moveContainerToPixel(pixelPos, animated);
 
             // call home
-            jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+            jQuery(document).trigger(this.config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },

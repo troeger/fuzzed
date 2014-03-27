@@ -1,6 +1,9 @@
 {
     "kind": "rbd",
     "name": "Reliability Block Diagram",
+    "edges": {
+        "properties": {}
+    },
     "nodes": {
         "node": {
             "nodeDisplayName": "Node",

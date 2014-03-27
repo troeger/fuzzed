@@ -338,55 +338,56 @@ def edges(request, graph_id):
 @login_required
 @csrf_exempt
 @require_ajax
-@require_http_methods(['DELETE'])
+@require_http_methods(['DELETE', 'POST'])
 @transaction.commit_on_success
 @never_cache
 def edge(request, graph_id, edge_id):
     """
     Function: edge
-    
+
     This API handler deletes the edge from the graph using the both provided ids. The id of the edge hereby refers to
     the previously assigned client side id and NOT the database id. The response to this request does not contain any
     body.
-    
+
     Request Parameters: None
     Response:           204
-    
+
     Parameters:
      {HTTPRequest} request   - the django request object
      {int}         graph_id  - the id of the graph where the edge shall be deleted
      {int}         edge_id   - the id of the edge to be deleted
-    
+
     Returns:
      {HTTPResponse} a django response object
     """
+
     try:
         if request.user.is_staff:
             graph = get_object_or_404(Graph, pk=graph_id)
         else:
-            graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)            
+            graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+
         if graph.read_only:
-            raise HttpResponseForbiddenAnswer('Trying to delete an edge in a read-only graph')
+            raise HttpResponseForbiddenAnswer('Trying to modify an edge in a read-only graph')
 
-        commands.DeleteEdge.create_from(graph_id=graph_id, edge_id=edge_id).do()
-        return HttpResponse(status=204)
+        if request.method == 'POST':
+            parameters = json.loads(request.POST.get('properties', {}))
+            commands.ChangeEdge.create_from(graph_id, edge_id, parameters).do()
 
-    except ValueError:
-        raise HttpResponseBadRequestAnswer()
+            # return the updated node object
+            return HttpResponse(status=204)
+        if request.method == 'DELETE':
+            commands.DeleteEdge.create_from(graph_id=graph_id, edge_id=edge_id).do()
+            return HttpResponse(status=204)
+
+    # except ValueError:
+    #     raise HttpResponseBadRequestAnswer()
 
     except ObjectDoesNotExist:
         raise HttpResponseNotFoundAnswer("Invalid edge ID")
 
     except MultipleObjectsReturned:
         raise HttpResponseServerErrorAnswer()
-
-# TODO: PROVIDE ALL PROPERTIES OF A NODE (/nodes/<id>/properties)
-def properties(**kwargs):
-    pass
-
-# TODO: PROVIDE THE VALUE OF A PROPERTY WITH GIVEN KEY (/nodes/<id>/properties/<key>)
-def property(**kwargs):
-    pass
 
 @login_required
 @csrf_exempt

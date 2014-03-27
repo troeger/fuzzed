@@ -74,17 +74,12 @@ function(Canvas, Class, Config, Edge, Menus) {
 
             // parse the json nodes and convert them to node objects
             _.each(json.nodes, function(jsonNode) {
-                this.addNode(jsonNode.kind, jsonNode);
+                this.addNode(jsonNode);
             }.bind(this));
 
             // connect the nodes again
             _.each(json.edges, function(jsonEdge) {
-                var source     = this.getNodeById(jsonEdge.source);
-                var target     = this.getNodeById(jsonEdge.target);
-                var properties = jsonEdge.properties;
-                properties.id  = jsonEdge.id;
-                var edge = new Edge(this, source, target, properties);
-                this.edges[edge.id] = edge;
+                this.addEdge(jsonEdge);
             }.bind(this));
 
             return this;
@@ -138,8 +133,9 @@ function(Canvas, Class, Config, Edge, Menus) {
             var targetNode = this.getNodeById(jsonEdge.target);
             var properties = jsonEdge.properties;
             properties.id  = jsonEdge.id;
+            properties.graph = this;
 
-            var edge = new Edge(this, sourceNode, targetNode, properties);
+            var edge = new Edge(this.getNotation().edges.properties, sourceNode, targetNode, properties);
             this.edges[edge.id] = edge;
 
             return edge;
@@ -160,7 +156,7 @@ function(Canvas, Class, Config, Edge, Menus) {
          *    The newly created Edge instance.
          */
         _addEdge: function(jsPlumbEdge) {
-            var edge = new Edge(this, jsPlumbEdge);
+            var edge = new Edge(this.getNotation().edges.properties, jsPlumbEdge, {graph: this});
             this.edges[edge.id] = edge;
 
             return edge;
@@ -193,8 +189,7 @@ function(Canvas, Class, Config, Edge, Menus) {
          *    Adds a given node to this graph.
          *
          *  Parameters:
-         *    {str}    kind       - The kind of the node, e.g., 'basicEvent'.
-         *    {Object} properties - [optional] Properties that should be merged into the new node.
+         *    {Object} definition - Properties that should be merged into the new node.
          *
          *  Triggers:
          *    <Config::Events::NODE_ADDED>
@@ -202,16 +197,16 @@ function(Canvas, Class, Config, Edge, Menus) {
          *  Returns:
          *    The added node.
          */
-        addNode: function(kind, properties) {
-            properties.readOnly = this.readOnly;
-            properties.graph    = this;
+        addNode: function(definition) {
+            definition.readOnly = this.readOnly;
+            definition.graph    = this;
 
-            var node = new (this.nodeClassFor(kind))(properties, this.getNotation().propertiesDisplayOrder);
+            var node = new (this.nodeClassFor(definition.kind))(definition);
 
             this.nodes[node.id] = node;
             jQuery(document).trigger(this.config.Events.NODE_ADDED, [
                 node.id,
-                kind,
+                node.kind,
                 node.x,
                 node.y,
                 node.toDict().properties
@@ -483,8 +478,8 @@ function(Canvas, Class, Config, Edge, Menus) {
 
             var graph    = this;
             var newClass = BaseClass.extend({
-                init: function(properties, propertiesDisplayOrder) {
-                    this._super(jQuery.extend(true, {}, definition, properties), propertiesDisplayOrder);
+                init: function(properties) {
+                    this._super(jQuery.extend(true, {}, definition, properties));
                     _.each(this.allowConnectionTo, function(value, index) {
                         if (typeof value !== 'string') return;
                         this.allowConnectionTo[index] = graph.nodeClassFor(value);
@@ -516,7 +511,8 @@ function(Canvas, Class, Config, Edge, Menus) {
          *                               dropped shape ({'x': ..., 'y': ...}).
          */
         _shapeDropped: function(event, kind, position) {
-            this.addNode(kind, Canvas.toGrid(position))
+            var node = jQuery.extend(Canvas.toGrid(position), {'kind': kind});
+            this.addNode(node)
                 .container.click(); // emulate a click in order to select the new node
         }
     });

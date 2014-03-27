@@ -43,7 +43,7 @@ function (Class, Config, Job, Alerts, Progress) {
          * listed below.
          *
          * On:
-         *   <Config::Events::PROPERTY_CHANGED>
+         *   <Config::Events::NODE_PROPERTY_CHANGED>
          *   <Config::Events::NODE_ADDED>
          *   <Config::Events::NODE_DELETED>
          *   <Config::Events::EDGE_ADDED>
@@ -59,7 +59,8 @@ function (Class, Config, Job, Alerts, Progress) {
          */
         activate: function() {
             jQuery(document)
-                .on(Config.Events.PROPERTY_CHANGED,                        this.nodePropertyChanged.bind(this))
+                .on(Config.Events.NODE_PROPERTY_CHANGED,                   this.nodePropertyChanged.bind(this))
+                .on(Config.Events.EDGE_PROPERTY_CHANGED,                   this.edgePropertyChanged.bind(this))
                 .on(Config.Events.NODE_ADDED,                              this.nodeAdded.bind(this))
                 .on(Config.Events.NODE_DELETED,                            this.nodeDeleted.bind(this))
                 .on(Config.Events.EDGE_ADDED,                              this.edgeAdded.bind(this))
@@ -79,7 +80,7 @@ function (Class, Config, Job, Alerts, Progress) {
          * all handlers for custom synchronization events.
          *
          * Off:
-         *   <Config::Events::PROPERTY_CHANGED>
+         *   <Config::Events::NODE_PROPERTY_CHANGED>
          *   <Config::Events::NODE_ADDED>
          *   <Config::Events::NODE_DELETED>
          *   <Config::Events::EDGE_ADDED>
@@ -95,7 +96,7 @@ function (Class, Config, Job, Alerts, Progress) {
          */
         deactivate: function() {
             jQuery(document)
-                .off(Config.Events.PROPERTY_CHANGED)
+                .off(Config.Events.NODE_PROPERTY_CHANGED)
                 .off(Config.Events.NODE_ADDED)
                 .off(Config.Events.NODE_DELETED)
                 .off(Config.Events.EDGE_ADDED)
@@ -302,6 +303,49 @@ function (Class, Config, Job, Alerts, Progress) {
         nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNode(nodeId),
+                type:     'POST',
+                data:{
+                    properties: JSON.stringify(properties)
+                },
+                dataType: 'json',
+
+                success:  success  || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Node could not be changed:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
+            });
+
+            return this;
+        },
+
+        /**
+         * Method: edgePropertyChanged
+         *
+         * Changes the properties of a given edge.
+         *
+         * Parameters:
+         *   {Event}    event      - jQuery event object of the custom trigger.
+         *   {Number}   edgeId     - The edge that shall be moved.
+         *   {Object}   properties - The edge's properties that should be changed. Keys stand for property names and
+         *                           their assigned values is the new state.
+         *   {function} success    - [optional] Callback that is called when the move was successfully saved.
+         *   {function} error      - [optional] Callback that gets called in case of an AJAX error.
+         *   {function} complete   - [optional] Callback that is always invoked no matter if AJAX request was successful
+         *                           or erroneous.
+         */
+        edgePropertyChanged: function(event, edgeId, properties, success, error, complete) {
+            var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+                url:      this._fullUrlForEdge(edgeId),
                 type:     'POST',
                 data:{
                     properties: JSON.stringify(properties)
