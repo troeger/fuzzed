@@ -40,8 +40,10 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
             // initial creation of the overlay
             this._jsPlumbConnection.addOverlay(["Label", {
-                label:  property.value || property.defaultValue,
-                id:     Config.JSPlumb.LABEL_OVERLAY_ID
+                label:    property.value || property.defaultValue,
+                id:       Config.JSPlumb.LABEL_OVERLAY_ID,
+                location: 0.4   // temporary work around to shift edge labels a bit from the center, so that they don't
+                                //   overlap each other as soon as there are two edges between two nodes
             }]);
 
             //TODO: implement usage of properties (e.g. style)
