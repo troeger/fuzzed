@@ -315,10 +315,13 @@ define(['underscore'], function() {
          *
          *    {String} CONNECTOR_STYLE          - Connector style (see jsPlumb documentation).
          *    {Object} CONNECTOR_OPTIONS        - Additional, connector style-specific options.
+         *    {Object} CONNECTION_OVERLAYS      - Default Overlays to attach to every Connection
          *
          *    {Number} ENDPOINT_RADIUS          - The radius of the endpoints of connections (drag handlers).
          *    {String} ENDPOINT_FILL            - The fill color of endpoints.
          *    {String} ENDPOINT_STYLE           - The style of the endpoints (see jsPlumb documentation).
+         *
+         *    {String} LABEL_OVERLAY_ID         - The jsPlumb-internally used ID of the overlay, that label.js accesses
          */
         JSPlumb: {
             STROKE_COLOR:             DEFAULT_COLOR,
@@ -327,8 +330,8 @@ define(['underscore'], function() {
             STROKE_COLOR_DISABLED:    DISABLED_COLOR,
             STROKE_WIDTH:             2,
 
-            CONNECTOR_STYLE:    'Flowchart',
-            CONNECTOR_OPTIONS:  {stub: 10 /* min. distance in px before connector bends */},
+            CONNECTOR_STYLE:     'Flowchart',
+            CONNECTOR_OPTIONS:   {stub: 10 /* min. distance in px before connector bends */},
             CONNECTION_OVERLAYS: undefined,
 
             ENDPOINT_RADIUS:    7,

@@ -98,6 +98,13 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
             return this;
         },
 
+        /**
+         *  Method: _setupEvents
+         *      Register for changes of the associated <Property> object.
+         *
+         *  Returns:
+         *      This {Mirror} instance for chaining.
+         */
         _setupEvents: function() {
             jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 this.show(text);
@@ -106,6 +113,8 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
             jQuery(this.property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
                 this.container.toggle(!hidden);
             }.bind(this));
+
+            return this;
         }
     });
 });
