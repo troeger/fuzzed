@@ -364,13 +364,13 @@ class ChangeEdge(Command):
         NOTE: if the property does not yet exist it being created and saved.
 
         Parameters:
-         {str} graph_id   - the id of the graph that contains the node's property changed
-         {str] edge_id    - the client id(!) of the node's property changed
+         {str} graph_id   - the id of the graph that contains the edge's property changed
+         {str] edge_id    - the client id(!) of the edge's property changed
          {str} key        - the name of the property that changed
          {str} new_value  - the value the property has been changed to
 
         Returns:
-         {<ChangeNode>}  - the property changed command instance
+         {<ChangeEdge>}   - the property changed command instance
         """
         edge    = Edge.objects.get(client_id=edge_id, graph__pk=graph_id)
         command = cls(edge=edge)
@@ -440,14 +440,14 @@ class PropertyChange(models.Model):
 
 class EdgePropertyChange(models.Model):
     """
-    Class: PropertyChange
+    Class: EdgePropertyChange
 
     Extends: models.Model
 
-    Small inline container class to model arbitrary number of property changes.
+    Small inline container class to model arbitrary number of edge's property changes.
 
     Attributes:
-     {<ChangeNode>} command   - the command this property change belongs to
+     {<ChangeEdge>} command   - the command this property change belongs to
      {str}          old_value - the value of the property before the change
      {str}          new_value - the updated value
     """
