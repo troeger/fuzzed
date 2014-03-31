@@ -4142,6 +4142,11 @@ i.icon-layout-tree:hover {
 .jsplumb-connector.outlined path:first-child {
   stroke: #ffffff;
 }
+._jsPlumb_overlay {
+    background: white;
+    padding: 0 3px;
+    z-index: 51;
+}
 /**
  *  File: editor.less
  *      This file contains all styles related to the Editor view.

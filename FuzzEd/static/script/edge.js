@@ -12,8 +12,7 @@ function(Class, Config, Property) {
         target:     undefined,
         properties: undefined,
         graph:      undefined,
-
-        _jsPlumbEdge: undefined,
+        jsPlumbEdge: undefined,
 
         init: function(definition, sourceOrJsPlumbEdge, targetOrProperties, properties) {
             if (typeof properties === 'undefined') {
@@ -44,8 +43,8 @@ function(Class, Config, Property) {
         },
 
         _initFromJsPlumbEdge: function(jsPlumbEdge, properties) {
-            this._jsPlumbEdge = jsPlumbEdge;
-            this._jsPlumbEdge._fuzzedId = this.id;
+            this.jsPlumbEdge = jsPlumbEdge;
+            this.jsPlumbEdge._fuzzedId = this.id;
 
             this.graph      = properties.graph;
             this.id         = typeof properties.id === 'undefined' ? this.graph.createId() : properties.id;
@@ -68,12 +67,12 @@ function(Class, Config, Property) {
         },
 
         select: function() {
-            jQuery(this._jsPlumbEdge.canvas).addClass(Config.Classes.SELECTED);
+            jQuery(this.jsPlumbEdge.canvas).addClass(Config.Classes.SELECTED);
         },
 
         remove: function() {
             // To cover both the case that the jsPlumbEdge was already detached and that it wasn't we detach it again
-            jsPlumb.detach(this._jsPlumbEdge);
+            jsPlumb.detach(this.jsPlumbEdge);
 
             if (typeof this.target === 'undefined') return false;
             this.source.restoreChildProperties(this.target);

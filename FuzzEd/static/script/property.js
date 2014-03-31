@@ -1,15 +1,16 @@
-define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'alerts', 'jquery', 'underscore'],
-function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
+define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'label', 'alerts', 'jquery', 'underscore'],
+function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
     };
 	
     var Property = Class.extend({
-        owner:           undefined,
+        owner:          undefined,
         value:          undefined,
         displayName:    '',
         mirror:         undefined,
+        label:          undefined,
         menuEntry:      undefined,
         hidden:         false,
         readonly:       false,
@@ -20,6 +21,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             this.owner = owner;
             this._sanitize()
                 ._setupMirror()
+                ._setupLabel()
                 ._setupMenuEntry();
 
             this._triggerChange(this.value, this);
@@ -58,7 +60,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
                 properties[this.name] = value;
 
                 //TODO: THIS IS NOT NICE AND IS ONLY USED TEMPORARILY !!!!11
-                if (this.owner._jsPlumbEdge === undefined) {
+                if (this.owner.jsPlumbEdge === undefined) {
                     jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.owner.id, properties]);
                 } else {
                     jQuery(document).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
@@ -107,6 +109,13 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             return this;
         },
 
+        _setupLabel: function() {
+            if (typeof this.label === 'undefined' || this.label === null) return this;
+            this.label = new Label(this, this.owner.jsPlumbEdge, this.label);
+
+            return this;
+        },
+
         _setupMenuEntry: function() {
             this.menuEntry = new (this.menuEntryClass())(this);
 
@@ -114,6 +123,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         },
 
         _triggerChange: function(value, issuer) {
+            //TODO: THIS IS NOT NICE AND IS ONLY USED TEMPORARILY !!!!11
+            if (this.owner.jsPlumbEdge === undefined) {
+                jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
+            } else {
+                jQuery(this).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [value, value, issuer]);
+            }
             jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
         }
     });

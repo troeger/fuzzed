@@ -333,7 +333,9 @@ define(['underscore'], function() {
 
             ENDPOINT_RADIUS:    7,
             ENDPOINT_FILL:      HIGHLIGHTED_COLOR,
-            ENDPOINT_STYLE:     'Blank'
+            ENDPOINT_STYLE:     'Blank',
+
+            LABEL_OVERLAY_ID: 'label'
         },
 
         /**

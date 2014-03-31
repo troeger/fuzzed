@@ -5,8 +5,12 @@
         "properties": {
             "name": {
                 "kind": "text",
-                "default": "Edge",
-                "displayName": "Name"
+                "default": "",
+                "displayName": "Name",
+
+                "label": {
+                    "style": []
+                }
             }
         }
     },
