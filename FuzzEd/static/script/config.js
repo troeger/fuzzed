@@ -239,8 +239,12 @@ define(['underscore'], function() {
 			NODE_SELECTED:             'node_selected',
 			NODE_UNSELECTED:		   'node_unselected',
 
-            NODE_PROPERTY_CHANGED:     'node-property-changed',
-            EDGE_PROPERTY_CHANGED:     'edge-property-changed',
+            EDGE_PROPERTY_CHANGED:      'edge-property-changed',
+            NODE_PROPERTY_CHANGED:      'node-property-changed',
+            NODEGROUP_PROPERTY_CHANGED: 'nodegroup-property-changed',
+
+            NODEGROUP_ADDED:           'nodegroup-added',
+            NODEGROUP_DELETED:         'nodegroup-deleted',
 
             PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',
             PROPERTY_READONLY_CHANGED: 'property-readonly-changed',

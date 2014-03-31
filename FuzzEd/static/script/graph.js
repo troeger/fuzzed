@@ -28,6 +28,7 @@ function(Canvas, Class, Config, Edge, Menus) {
         id:           undefined,
         edges:        {},
         nodes:        {},
+        nodeGroups:   {},
         name:         undefined,
         readOnly:     undefined,
         seed:         undefined,
@@ -81,6 +82,11 @@ function(Canvas, Class, Config, Edge, Menus) {
             _.each(json.edges, function(jsonEdge) {
                 this.addEdge(jsonEdge);
             }.bind(this));
+
+            // create nodeGroups
+            /*_.each(json.nodeGroups, function(jsonNodeGroup) {
+                this.addNodeGroup(jsonNodeGroup);
+            });*/
 
             return this;
         },
@@ -136,27 +142,6 @@ function(Canvas, Class, Config, Edge, Menus) {
             properties.graph = this;
 
             var edge = new Edge(this.getNotation().edges.properties, sourceNode, targetNode, properties);
-            this.edges[edge.id] = edge;
-
-            return edge;
-        },
-
-        /**
-         *  Method: _addEdge
-         *    Actual register of a new edge in the graph object and call home via backend.
-         *
-         *  Parameters:
-         *    {jsPlumb::Connection} jsPlumbEdge - Edge to be added to the graph object. jsPlumbEdge has to be already
-         *      "jsPlumb.connected". If you want to add an edge programmatically, use <Graph::addEdge> instead.
-         *
-         *  Triggers:
-         *    <Config::Events::EDGE_ADDED>
-         *
-         *  Returns:
-         *    The newly created Edge instance.
-         */
-        _addEdge: function(jsPlumbEdge) {
-            var edge = new Edge(this.getNotation().edges.properties, jsPlumbEdge, {graph: this});
             this.edges[edge.id] = edge;
 
             return edge;
@@ -228,6 +213,40 @@ function(Canvas, Class, Config, Edge, Menus) {
         deleteNode: function(node) {
             if (node.remove()) {
                 delete this.nodes[node.id];
+            }
+
+            return this;
+        },
+
+        /**
+         *  Method: addNodeGroup
+         *
+         *  Blah
+         */
+        addNodeGroup: function(jsonNodeGroup) {
+            var nodes = [];
+            _.each(jsonNodeGroup.nodeIds, function(nodeId) {
+                nodes.push(this.getNodeById(nodeId));
+            });
+
+            var properties = jsonNodeGroup.properties;
+            properties.id  = jsonNodeGroup.id;
+            properties.graph = this;
+
+            var nodeGroup = new NodeGroup(this.getNotation().nodeGroups.properties, nodes, properties);
+            this.nodeGroups[nodeGroup.id] = nodeGroup;
+
+            return nodeGroup;
+        },
+
+        /**
+         *  Method: deleteNodeGroup
+         *
+         *  Blah
+         */
+        deleteNodeGroup: function(nodeGroup) {
+            if (nodeGroup.remove()) {
+                delete this.nodeGroups[nodeGroup.id];
             }
 
             return this;

@@ -109,18 +109,34 @@ define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(E
             nodes = jQuery(selectedNodes);
             if(nodes.length > 1)
             {
-                nodes = _.map(nodes, function(node){return jQuery(node).data(this.config.Keys.NODE);}.bind(this));
-                this.graph.create_communication_zone(nodes);
+                var jsonNodeGroup = {
+                    nodes: _.map(nodes, function(node){return jQuery(node).data(this.config.Keys.NODE).id;}.bind(this))
+                };
+                this.graph.addNodeGroup(jsonNodeGroup);
             }
         },
 
         _ungroupSelection: function() {
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
 
-            nodes = jQuery(selectedNodes);
-            nodes = _.map(nodes, function(node){return jQuery(node).data(this.config.Keys.NODE);}.bind(this));
-            this.graph.delete_communication_zone(nodes);
-            
+            var nodeIds = _.map(jQuery(selectedNodes), function(node){
+                return jQuery(node).data(this.config.Keys.NODE).id;
+            }.bind(this));
+
+            var nodeGroup = undefined;
+
+            // find the correct node group, whose node ids match the selected ids
+            _.each(this.graph.nodeGroups, function(ng) {
+                var ngIds = ng.nodeIds();
+                if (jQuery(ngIds).not(nodeIds).length == 0 && jQuery(nodeIds).not(ngIds).length == 0) {
+                    nodeGroup = ng;
+                }
+            });
+
+            if (typeof nodeGroup === undefined) return false;
+
+            this.graph.deleteNodeGroup(nodeGroup);
+            return true;
         }
     });
 });
