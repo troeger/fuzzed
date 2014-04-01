@@ -123,6 +123,15 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
                 stack:         'svg',
                 cursor:        Config.Dragging.CURSOR,
                 scroll:        false,
+                stop: function( event, ui ) {
+                    if ( ui.offset.top < 0 ) {
+                        var mouse_top  = event.clientY;
+                        var scroll_top = document.documentElement.scrollTop;
+                       
+                        jQuery(this).offset({'top': mouse_top + scroll_top});
+                    }
+                    //console.log(ui.offset);      
+                },
                 snap:          'body',
                 snapMode:      'inner',
                 snapTolerance: Config.Dragging.SNAP_TOLERANCE
