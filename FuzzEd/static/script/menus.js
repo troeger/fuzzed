@@ -234,7 +234,13 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
         },
 
         _show: function(selected) {
-            this._selectee = selected.data(selected.hasClass(Config.Classes.NODE) ? Config.Keys.NODE : Config.Keys.EDGE);
+            if (selected.hasClass(Config.Classes.NODE)) {
+                this._selectee = selected.data(Config.Keys.NODE);
+            } else if (selected.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
+                this._selectee = selected.data(Config.Keys.EDGE);
+            } else { // if (selected.hasClass(Config.Keys.NODEGROUP
+                this._selectee = selected.data(Config.Keys.NODEGROUP);
+            }
 
             // this node does not have any properties to display, go home!
             if (_.isEmpty(this._selectee.properties)) {

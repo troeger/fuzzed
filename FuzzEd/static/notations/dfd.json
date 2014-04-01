@@ -146,7 +146,7 @@
 
                 "mirror": {
                     "position": "top",
-                    "style": ["bold", "large"]
+                    "style": [ ]
                 }
             }
         }

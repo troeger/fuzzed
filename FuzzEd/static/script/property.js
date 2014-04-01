@@ -1,5 +1,5 @@
-define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'label', 'alerts', 'jquery', 'underscore'],
-function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
+define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'svg_mirror', 'label', 'alerts', 'jquery', 'underscore'],
+function(Class, Config, Decimal, PropertyMenuEntry, Mirror, SVGMirror, Label, Alerts) {
 
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
@@ -59,12 +59,15 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
                 var value = typeof this.partInCompound === 'undefined' ? newValue : [this.partInCompound, newValue];
                 properties[this.name] = value;
 
-                //TODO: THIS IS NOT NICE AND IS ONLY USED TEMPORARILY !!!!11
-                if (this.owner.jsPlumbEdge === undefined) {
+                //TODO: THIS IS NOT NICE AND IS ONLY USED TEMPORARILY !!!!11 (we need something fancy like introspection)
+                if (this.owner.jsPlumbEdge !== undefined) {
+                    jQuery(document).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
+                } else if (this.owner.inherits === "node") {
                     jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.owner.id, properties]);
                 } else {
-                    jQuery(document).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
+                    jQuery(document).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [this.owner.id, properties]);
                 }
+
             }
 
             return this;
@@ -104,7 +107,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         _setupMirror: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
-            this.mirror = new Mirror(this, this.owner.container, this.mirror);
+            //TODO: THIS IS NOT NICE AND IS ONLY USED TEMPORARILY !!!!11 (we need something fancy like introspection)
+            if (this.owner.inherits === "node") {
+                this.mirror = new Mirror(this, this.owner.container, this.mirror);
+            } else {
+                this.mirror = new SVGMirror(this, this.owner.container, this.mirror);
+            }
 
             return this;
         },

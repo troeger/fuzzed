@@ -1,5 +1,5 @@
-define(['property', 'mirror', 'canvas', 'class', 'jquery', 'jsplumb'],
-function(Property, Mirror, Canvas, Class) {
+define(['property', 'mirror', 'canvas', 'class', 'config', 'jquery', 'jsplumb'],
+function(Property, Mirror, Canvas, Class, Config) {
     /**
      *  Class: {Abstract} Node
      *
@@ -106,6 +106,15 @@ function(Property, Mirror, Canvas, Class) {
 				._setupResizable()
                 // Events
                 ._registerEventHandlers();
+
+            // call home
+            jQuery(document).trigger(Config.Events.NODE_ADDED, [
+                this.id,
+                this.kind,
+                this.x,
+                this.y,
+                this.toDict().properties
+            ]);
         },
 
         /**

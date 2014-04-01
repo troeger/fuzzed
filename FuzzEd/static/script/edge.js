@@ -99,11 +99,8 @@ function(Class, Config, Property) {
         /**
          * Method: _setupProperties
          *
-         * Parameters:
-         *   {Array[str]} propertiesDisplayOrder - bar.
-         *
          * Returns:
-         *   This {<Node>} instance for chaining.
+         *   This {<Edge>} instance for chaining.
          */
         _setupProperties: function() {
             _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {

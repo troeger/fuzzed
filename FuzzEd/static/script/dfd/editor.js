@@ -110,7 +110,7 @@ define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(E
             if(nodes.length > 1)
             {
                 var jsonNodeGroup = {
-                    nodes: _.map(nodes, function(node){return jQuery(node).data(this.config.Keys.NODE).id;}.bind(this))
+                    nodeIds: _.map(nodes, function(node){return jQuery(node).data(this.config.Keys.NODE).id;}.bind(this))
                 };
                 this.graph.addNodeGroup(jsonNodeGroup);
             }
@@ -133,7 +133,7 @@ define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(E
                 }
             });
 
-            if (typeof nodeGroup === undefined) return false;
+            if (typeof nodeGroup === 'undefined') return false;
 
             this.graph.deleteNodeGroup(nodeGroup);
             return true;

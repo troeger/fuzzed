@@ -81,6 +81,7 @@ define(['underscore'], function() {
             GRAPHS_URL:                 '/graphs',
             NODES_URL:                  '/nodes',
             EDGES_URL:                  '/edges',
+            NODEGROUPS_URL:             '/nodegroups',
             TRANSFERS_URL:              '/transfers',
             CUTSETS_URL:                '/cutsets',
             ANALYTICAL_PROBABILITY_URL: '/topEventProbability',
@@ -162,6 +163,8 @@ define(['underscore'], function() {
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
             NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
+
+            NODEGROUP:               'fuzzed-nodegroup',
 
             NO_PRINT:                'no-print',
 
@@ -359,6 +362,7 @@ define(['underscore'], function() {
         Keys: {
             EDGE:       'edge',
             NODE:       'node',
+            NODEGROUP:  'nodegroup',
             SELECTABLE: 'ui-selectable'
         },
 

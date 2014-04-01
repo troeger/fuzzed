@@ -1,5 +1,5 @@
-define(['canvas', 'class', 'config', 'edge', 'menus', 'jquery', 'd3'],
-function(Canvas, Class, Config, Edge, Menus) {
+define(['canvas', 'class', 'config', 'edge', 'node_group', 'menus', 'jquery', 'd3'],
+function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
     /**
      *  Package: Base
      */
@@ -109,7 +109,8 @@ function(Canvas, Class, Config, Edge, Menus) {
                 this._addEdge(edge.connection);
             }.bind(this));
 
-            jQuery(document).on(this.config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
+            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED,      this._shapeDropped.bind(this));
+            jQuery(document).on(Config.Events.NODE_DELETED,              this._updateNodeGroupDeleted.bind(this));
 
             return this;
         },
@@ -137,11 +138,32 @@ function(Canvas, Class, Config, Edge, Menus) {
         addEdge: function(jsonEdge) {
             var sourceNode = this.getNodeById(jsonEdge.source);
             var targetNode = this.getNodeById(jsonEdge.target);
-            var properties = jsonEdge.properties;
+            var properties = jsonEdge.properties || {};
             properties.id  = jsonEdge.id;
             properties.graph = this;
 
             var edge = new Edge(this.getNotation().edges.properties, sourceNode, targetNode, properties);
+            this.edges[edge.id] = edge;
+
+            return edge;
+        },
+
+        /**
+         *  Method: _addEdge
+         *    Actual register of a new edge in the graph object and call home via backend.
+         *
+         *  Parameters:
+         *    {jsPlumb::Connection} jsPlumbEdge - Edge to be added to the graph object. jsPlumbEdge has to be already
+         *      "jsPlumb.connected". If you want to add an edge programmatically, use <Graph::addEdge> instead.
+         *
+         *  Triggers:
+         *    <Config::Events::EDGE_ADDED>
+         *
+         *  Returns:
+         *    The newly created Edge instance.
+         */
+        _addEdge: function(jsPlumbEdge) {
+            var edge = new Edge(this.getNotation().edges.properties, jsPlumbEdge, {graph: this});
             this.edges[edge.id] = edge;
 
             return edge;
@@ -187,15 +209,7 @@ function(Canvas, Class, Config, Edge, Menus) {
             definition.graph    = this;
 
             var node = new (this.nodeClassFor(definition.kind))(definition);
-
             this.nodes[node.id] = node;
-            jQuery(document).trigger(this.config.Events.NODE_ADDED, [
-                node.id,
-                node.kind,
-                node.x,
-                node.y,
-                node.toDict().properties
-            ]);
 
             return node;
         },
@@ -224,12 +238,12 @@ function(Canvas, Class, Config, Edge, Menus) {
          *  Blah
          */
         addNodeGroup: function(jsonNodeGroup) {
-            var nodes = [];
+            var nodes = {};
             _.each(jsonNodeGroup.nodeIds, function(nodeId) {
-                nodes.push(this.getNodeById(nodeId));
-            });
+                nodes[nodeId] = this.getNodeById(nodeId);
+            }.bind(this));
 
-            var properties = jsonNodeGroup.properties;
+            var properties = jsonNodeGroup.properties || {};
             properties.id  = jsonNodeGroup.id;
             properties.graph = this;
 
@@ -250,6 +264,18 @@ function(Canvas, Class, Config, Edge, Menus) {
             }
 
             return this;
+        },
+
+        _updateNodeGroupDeleted: function(event, nodeId) {
+            var node = this.getNodeById(nodeId);
+            _.each(this.nodeGroups, function(ng) {
+                delete this.nodeGroups[ng.id].nodes[nodeId];
+                if (_.size(ng.nodes) < 2) {
+                    this.deleteNodeGroup(ng);
+                } else {
+                    ng.redraw();
+                }
+            }.bind(this));
         },
 
         /**

@@ -411,18 +411,26 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *    This Editor instance for chaining
          */
         _deleteSelection: function() {
-            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
-            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+            var selectedNodes =      '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges =      '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+            var selectedNodeGroups = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODEGROUP;
 
             // delete selected nodes
             jQuery(selectedNodes).each(function(index, element) {
-                this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE));
+                var node = jQuery(element).data(this.config.Keys.NODE);
+                this.graph.deleteNode(node);
             }.bind(this));
 
             // delete selected edges
             jQuery(selectedEdges).each(function(index, element) {
                 var edge = jQuery(element).data(this.config.Keys.EDGE);
                 this.graph.deleteEdge(edge);
+            }.bind(this));
+
+            // delete selected node groups
+            jQuery(selectedNodeGroups).each(function(index, element) {
+                var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                this.graph.deleteNodeGroup(nodeGroup);
             }.bind(this));
 
             this.properties.hide();
@@ -446,8 +454,9 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             var NODES           = '.' + this.config.Classes.NODE;
             var NODES_AND_EDGES = NODES + ', .' + this.config.Classes.JSPLUMB_CONNECTOR;
+            var NODES_AND_EDGES_AND_NODEGROUPS = NODES_AND_EDGES + ', .' + this.config.Classes.NODEGROUP;
 
-            jQuery(NODES_AND_EDGES).each(function(index, domElement) {
+            jQuery(NODES_AND_EDGES_AND_NODEGROUPS).each(function(index, domElement) {
                 var element = jQuery(domElement);
 
                 element.addClass(this.config.Classes.SELECTING)
