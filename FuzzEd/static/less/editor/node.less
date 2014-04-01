@@ -137,6 +137,15 @@
     }
 }
 
+.fuzzed-nodegroup {
+  stroke: #4682b4;
+
+    // selected/selecting state
+    &.ui-selected, &.ui-selecting {
+         stroke: @theme-selection !important;
+    }
+}
+
 #FuzzEdCanvas.fuzzed-canvas-not-editable .fuzzed-node.highlighted .fuzzed-node-halo-connect {
     visibility: hidden;
 }
