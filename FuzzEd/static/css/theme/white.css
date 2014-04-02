@@ -4530,6 +4530,8 @@ i.icon-layout-tree:hover {
 .fuzzed-nodegroup .fuzzed-mirror {
   position: absolute;
   color: #4682b4;
+  background: transparent;
+  margin-top: -18px;
 }
 #FuzzEdCanvas.fuzzed-canvas-not-editable .fuzzed-node.highlighted .fuzzed-node-halo-connect {
   visibility: hidden;
