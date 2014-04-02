@@ -1,5 +1,5 @@
-define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'svg_mirror', 'label', 'alerts', 'jquery', 'underscore'],
-function(Class, Config, Decimal, PropertyMenuEntry, Mirror, SVGMirror, Label, Alerts) {
+define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'label', 'alerts', 'jquery', 'underscore'],
+function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
@@ -59,13 +59,22 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, SVGMirror, Label, Al
                 var value = typeof this.partInCompound === 'undefined' ? newValue : [this.partInCompound, newValue];
                 properties[this.name] = value;
 
-                //TODO: THIS IS NOT NICE AND IS ONLY USED TEMPORARILY !!!!11 (we need something fancy like introspection)
-                if (this.owner.jsPlumbEdge !== undefined) {
+                //TODO: IS THIS REALLY THE RIGHT WAY TO DO IT?
+                // (we cannot put the require as dependency of this module, as there is some kind of cyclic dependency
+                // stopping Node.js to work properly
+
+                var Edge =      require("edge");
+                var Node =      require("node");
+                var NodeGroup = require("node_group");
+
+                if (this.owner instanceof Edge) {
                     jQuery(document).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
-                } else if (this.owner.inherits === "node") {
+                } else if (this.owner instanceof Node) {
                     jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.owner.id, properties]);
-                } else {
+                } else if (this.owner instanceof NodeGroup) {
                     jQuery(document).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [this.owner.id, properties]);
+                } else {
+                    throw new TypeError ("unknown owner class")
                 }
 
             }
@@ -107,12 +116,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, SVGMirror, Label, Al
 
         _setupMirror: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
-            //TODO: THIS IS NOT NICE AND IS ONLY USED TEMPORARILY !!!!11 (we need something fancy like introspection)
-            if (this.owner.inherits === "node") {
-                this.mirror = new Mirror(this, this.owner.container, this.mirror);
-            } else {
-                this.mirror = new SVGMirror(this, this.owner.container, this.mirror);
-            }
+
+            this.mirror = new Mirror(this, this.owner.container, this.mirror);
 
             return this;
         },
@@ -131,13 +136,21 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, SVGMirror, Label, Al
         },
 
         _triggerChange: function(value, issuer) {
-            //TODO: THIS IS NOT NICE AND IS ONLY USED TEMPORARILY !!!!11
-            if (this.owner.jsPlumbEdge === undefined) {
+            //TODO: IS THIS REALLY THE RIGHT WAY TO DO IT?
+            // (we cannot put the following required modules as dependency of this module, as there is some kind of
+            // cyclic dependency stopping Node.js to work properly
+
+            var Edge =      require("edge");
+            var Node =      require("node");
+            var NodeGroup = require("node_group");
+
+            if (this.owner instanceof Node) {
                 jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
-            } else {
+            } else if (this.owner instanceof Edge) {
                 jQuery(this).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [value, value, issuer]);
+            } else if (this.owner instanceof NodeGroup) {
+                jQuery(this).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [value, value, issuer]);
             }
-            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
         }
     });
 

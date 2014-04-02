@@ -4335,75 +4335,116 @@ i.icon-layout-tree:hover {
  *  File: node.less
  *      This file contains all styles that apply to graph nodes.
  */
-.fuzzed-node {
+.fuzzed-node,
+.fuzzed-nodegroup {
   text-align: center;
   z-index: 100;
   /* above connection */
 
 }
 .fuzzed-node.highlighted path,
+.fuzzed-nodegroup.highlighted path,
 .fuzzed-node.highlighted rect,
-.fuzzed-node.highlighted circle {
+.fuzzed-nodegroup.highlighted rect,
+.fuzzed-node.highlighted circle,
+.fuzzed-nodegroup.highlighted circle {
   stroke: #007fff !important;
 }
-.fuzzed-node.highlighted .sticky_note {
+.fuzzed-node.highlighted .sticky_note,
+.fuzzed-nodegroup.highlighted .sticky_note {
   border: solid 2px #007fff !important;
 }
 .fuzzed-node.ui-selected path,
+.fuzzed-nodegroup.ui-selected path,
 .fuzzed-node.ui-selecting path,
+.fuzzed-nodegroup.ui-selecting path,
 .fuzzed-node.ui-selected.highlighted path,
+.fuzzed-nodegroup.ui-selected.highlighted path,
 .fuzzed-node.ui-selecting.highlighted path,
+.fuzzed-nodegroup.ui-selecting.highlighted path,
 .fuzzed-node.ui-selected rect,
+.fuzzed-nodegroup.ui-selected rect,
 .fuzzed-node.ui-selecting rect,
+.fuzzed-nodegroup.ui-selecting rect,
 .fuzzed-node.ui-selected.highlighted rect,
+.fuzzed-nodegroup.ui-selected.highlighted rect,
 .fuzzed-node.ui-selecting.highlighted rect,
+.fuzzed-nodegroup.ui-selecting.highlighted rect,
 .fuzzed-node.ui-selected circle,
+.fuzzed-nodegroup.ui-selected circle,
 .fuzzed-node.ui-selecting circle,
+.fuzzed-nodegroup.ui-selecting circle,
 .fuzzed-node.ui-selected.highlighted circle,
-.fuzzed-node.ui-selecting.highlighted circle {
+.fuzzed-nodegroup.ui-selected.highlighted circle,
+.fuzzed-node.ui-selecting.highlighted circle,
+.fuzzed-nodegroup.ui-selecting.highlighted circle {
   stroke: #f2b138 !important;
 }
 .fuzzed-node.ui-selected .sticky_note,
+.fuzzed-nodegroup.ui-selected .sticky_note,
 .fuzzed-node.ui-selecting .sticky_note,
+.fuzzed-nodegroup.ui-selecting .sticky_note,
 .fuzzed-node.ui-selected.highlighted .sticky_note,
-.fuzzed-node.ui-selecting.highlighted .sticky_note {
+.fuzzed-nodegroup.ui-selected.highlighted .sticky_note,
+.fuzzed-node.ui-selecting.highlighted .sticky_note,
+.fuzzed-nodegroup.ui-selecting.highlighted .sticky_note {
   border: solid 2px #f2b138 !important;
 }
 .fuzzed-node.disabled path,
+.fuzzed-nodegroup.disabled path,
 .fuzzed-node.disabled.ui-selected path,
+.fuzzed-nodegroup.disabled.ui-selected path,
 .fuzzed-node.disabled.highlighted path,
+.fuzzed-nodegroup.disabled.highlighted path,
 .fuzzed-node.disabled.ui-selected.highlighted path,
+.fuzzed-nodegroup.disabled.ui-selected.highlighted path,
 .fuzzed-node.disabled rect,
+.fuzzed-nodegroup.disabled rect,
 .fuzzed-node.disabled.ui-selected rect,
+.fuzzed-nodegroup.disabled.ui-selected rect,
 .fuzzed-node.disabled.highlighted rect,
+.fuzzed-nodegroup.disabled.highlighted rect,
 .fuzzed-node.disabled.ui-selected.highlighted rect,
+.fuzzed-nodegroup.disabled.ui-selected.highlighted rect,
 .fuzzed-node.disabled circle,
+.fuzzed-nodegroup.disabled circle,
 .fuzzed-node.disabled.ui-selected circle,
+.fuzzed-nodegroup.disabled.ui-selected circle,
 .fuzzed-node.disabled.highlighted circle,
-.fuzzed-node.disabled.ui-selected.highlighted circle {
+.fuzzed-nodegroup.disabled.highlighted circle,
+.fuzzed-node.disabled.ui-selected.highlighted circle,
+.fuzzed-nodegroup.disabled.ui-selected.highlighted circle {
   stroke: #cccccc !important;
 }
-.fuzzed-node.disabled svg {
+.fuzzed-node.disabled svg,
+.fuzzed-nodegroup.disabled svg {
   opacity: 0.5;
 }
 .fuzzed-node.optional path,
+.fuzzed-nodegroup.optional path,
 .fuzzed-node.optional rect,
-.fuzzed-node.optional circle {
+.fuzzed-nodegroup.optional rect,
+.fuzzed-node.optional circle,
+.fuzzed-nodegroup.optional circle {
   stroke-dasharray: 4.8 2;
 }
-.fuzzed-node .badge {
+.fuzzed-node .badge,
+.fuzzed-nodegroup .badge {
   position: absolute;
   top: 0;
   right: 0;
   margin: -7px -7px 0 0;
 }
-.fuzzed-node .badge.badge-info {
+.fuzzed-node .badge.badge-info,
+.fuzzed-nodegroup .badge.badge-info {
   background-color: #007fff;
 }
-.fuzzed-node .badge.badge-important {
+.fuzzed-node .badge.badge-important,
+.fuzzed-nodegroup .badge.badge-important {
   background-color: #d9534f;
 }
-.fuzzed-node .fuzzed-node-halo-connect {
+.fuzzed-node .fuzzed-node-halo-connect,
+.fuzzed-nodegroup .fuzzed-node-halo-connect {
   /* XXX: this is a temporary solution */
 
   background-color: #007fff;
@@ -4424,13 +4465,16 @@ i.icon-layout-tree:hover {
   padding: 1px 3px 0 3px;
   margin: -10px -8px 0 -8px;
 }
-.fuzzed-node.ui-selected .fuzzed-node-halo-connect {
+.fuzzed-node.ui-selected .fuzzed-node-halo-connect,
+.fuzzed-nodegroup.ui-selected .fuzzed-node-halo-connect {
   background-color: #f2b138;
 }
-.fuzzed-node.highlighted .fuzzed-node-halo-connect {
+.fuzzed-node.highlighted .fuzzed-node-halo-connect,
+.fuzzed-nodegroup.highlighted .fuzzed-node-halo-connect {
   visibility: visible;
 }
-.fuzzed-node .fuzzed-mirror {
+.fuzzed-node .fuzzed-mirror,
+.fuzzed-nodegroup .fuzzed-mirror {
   background-color: white;
   display: block;
   font-size: 11px;
@@ -4440,16 +4484,20 @@ i.icon-layout-tree:hover {
   /* above connection */
 
 }
-.fuzzed-node .fuzzed-mirror.fuzzed-mirror-italic {
+.fuzzed-node .fuzzed-mirror.fuzzed-mirror-italic,
+.fuzzed-nodegroup .fuzzed-mirror.fuzzed-mirror-italic {
   font-style: italic;
 }
-.fuzzed-node .fuzzed-mirror.fuzzed-mirror-bold {
+.fuzzed-node .fuzzed-mirror.fuzzed-mirror-bold,
+.fuzzed-nodegroup .fuzzed-mirror.fuzzed-mirror-bold {
   font-weight: bold;
 }
-.fuzzed-node .fuzzed-mirror.fuzzed-mirror-large {
+.fuzzed-node .fuzzed-mirror.fuzzed-mirror-large,
+.fuzzed-nodegroup .fuzzed-mirror.fuzzed-mirror-large {
   font-size: 13px;
 }
-.fuzzed-node .sticky_note {
+.fuzzed-node .sticky_note,
+.fuzzed-nodegroup .sticky_note {
   background-color: #f0f07f;
   padding: 5px;
   overflow: hidden;
@@ -4458,21 +4506,30 @@ i.icon-layout-tree:hover {
   height: 160px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-.fuzzed-node .sticky_note textarea {
+.fuzzed-node .sticky_note textarea,
+.fuzzed-nodegroup .sticky_note textarea {
   background-color: #f0f07f;
   width: 100%;
   height: 100%;
   padding: 4px;
 }
-.fuzzed-node .sticky_note p {
+.fuzzed-node .sticky_note p,
+.fuzzed-nodegroup .sticky_note p {
   padding: 4px;
 }
 .fuzzed-nodegroup {
+  z-index: -42;
+}
+.fuzzed-nodegroup svg path {
   stroke: #4682b4;
 }
-.fuzzed-nodegroup.ui-selected,
-.fuzzed-nodegroup.ui-selecting {
+.fuzzed-nodegroup svg path.ui-selected,
+.fuzzed-nodegroup svg path.ui-selecting {
   stroke: #f2b138 !important;
+}
+.fuzzed-nodegroup .fuzzed-mirror {
+  position: absolute;
+  color: #4682b4;
 }
 #FuzzEdCanvas.fuzzed-canvas-not-editable .fuzzed-node.highlighted .fuzzed-node-halo-connect {
   visibility: hidden;

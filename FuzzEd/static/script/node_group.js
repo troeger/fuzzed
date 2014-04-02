@@ -38,7 +38,6 @@ function(Property, Class, Canvas, Config) {
 
             this.redraw()
                 ._registerEventHandlers()
-                ._setupSelection()
                 ._setupProperties();
 
             // call home
@@ -53,28 +52,6 @@ function(Property, Class, Canvas, Config) {
          */
         _registerEventHandlers: function() {
             jQuery(document).on(Config.Events.NODES_MOVED,  this.redraw.bind(this));
-
-            return this;
-        },
-
-        /**
-         * Method: _setupSelection
-         *
-         * This initialization method is called in the constructor and sets up multi-select functionality for node groups.
-         *
-         * Returns:
-         *   This {<NodeGroup>} instance for chaining.
-         */
-        _setupSelection: function() {
-            if (this.readOnly) return this;
-
-            //XXX: select a node on click
-            // This uses the jQuery.ui.selectable internal functions.
-            // We need to trigger them manually because only jQuery.ui.draggable gets the mouseDown events on nodes.
-            this.container.click(function(event) {
-                Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
-                Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
-            }.bind(this));
 
             return this;
         },
@@ -108,26 +85,38 @@ function(Property, Class, Canvas, Config) {
         },
 
         redraw: function() {
+            //TODO: -> Config
+            var dom_id = 'zone'+this.id;
+
+            if (this.container === undefined) {
+                this.container = jQuery("<div>")
+                    .attr('id', dom_id)
+                    .addClass(Config.Classes.NODEGROUP)
+                    .css('position', 'absolute')
+                    .data(Config.Keys.NODEGROUP, this);
+            } else {
+                this.container = jQuery('#'+dom_id)
+            }
+
+            this.container.appendTo(Canvas.container);
+
             var lineFunction = d3.svg.line()
                 .x(function(d) { return d[0]; })
                 .y(function(d) { return d[1]; })
                 //.interpolate("linear");
                 .interpolate("basis-closed");
 
-            var dom_id = 'zone'+this.id;
-            var hull = d3.select('#'+dom_id);
+            var hull = d3.select('#'+dom_id+' svg path');
+            var svg  = d3.select('#'+dom_id+' svg');
 
             if(hull.empty())
             {
-                svg = d3.select(Canvas.container.selector)
-                    .append("svg")
-                    .style('position', 'absolute');
+                svg = d3.select('#'+dom_id).append('svg');
 
                 hull = svg.append('path')
-                    .attr('id', dom_id)
                     .style('fill','none')
                     .style('stroke-dasharray', '10,10')
-                    .style('stroke-width','2px');
+                    .style('stroke-width','3px');
             }
 
             var outer_circle = function(c, r) {
@@ -146,7 +135,7 @@ function(Property, Class, Canvas, Config) {
                 var center = {x: node.container.position().left + node.container.width() / 2,
                               y: node.container.position().top + node.container.height() / 2};
                 return outer_circle(center, 50);
-              }.bind(this));
+            }.bind(this));
 
             var _dist = function(a, b)
             {
@@ -157,15 +146,25 @@ function(Property, Class, Canvas, Config) {
             vertices = d3.geom.hull(vertices);
             hull.attr('d', lineFunction(vertices));
 
-            this.container = jQuery('#'+dom_id).addClass(Config.Classes.NODEGROUP)
-                                               .data(Config.Keys.NODEGROUP, this);
+            // ## WARNING: This is a pretty nasty hack for guys like me who have no clue of svg paths; feel free to do
+            // ## this nicely, I'm seriously interested!
+
+            var bbox = jQuery('#'+dom_id+' svg path')[0].getBBox();
+
+            this.container.css('width', bbox.width);
+            this.container.css('height', bbox.height);
+            this.container.css('left', bbox.x);
+            this.container.css('top', bbox.y);
+
+            jQuery('#'+dom_id+' svg path').attr("transform", "translate(-"+bbox.x+",-"+bbox.y+")");
+
+            // ## /hack
 
             return this;
         },
 
         remove: function() {
             //TODO: put selector into Config
-            jQuery('#zone'+this.id).parent().remove();
             jQuery('#zone'+this.id).remove();
 
             // don't listen anymore

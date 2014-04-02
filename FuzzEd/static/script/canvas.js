@@ -197,7 +197,9 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
 
             this.container.selectable({
                 tolerance: 'fit',
-                filter: '.' + Config.Classes.NODE + ', .' + Config.Classes.JSPLUMB_CONNECTOR + ', .' + Config.Classes.NODEGROUP,
+                filter: '.' + Config.Classes.NODE
+                    + ', .' + Config.Classes.JSPLUMB_CONNECTOR
+                    + ', .' + Config.Classes.NODEGROUP + ' svg path',
 				unselected: function() {
 					jQuery(document).trigger(Config.Events.NODE_UNSELECTED);
 				},

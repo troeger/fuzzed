@@ -117,6 +117,9 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
             jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 this.show(text);
             }.bind(this));
+            jQuery(this.property).on(Config.Events.NODEGROUP_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+                this.show(text);
+            }.bind(this));
 
             jQuery(this.property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
                 this.container.toggle(!hidden);

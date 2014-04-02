@@ -267,6 +267,9 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                     outlineColor:this.config.JSPlumb.OUTLINE_COLOR,
                     outlineWidth:this.config.JSPlumb.OUTLINE_WIDTH
                 },
+                HoverPaintStyle: {
+                    strokeStyle: this.config.JSPlumb.STROKE_COLOR_HIGHLIGHTED
+                },
                 HoverClass:      this.config.Classes.HIGHLIGHTED,
                 Connector:       [this.config.JSPlumb.CONNECTOR_STYLE, this.config.JSPlumb.CONNECTOR_OPTIONS],
                 ConnectionsDetachable: false,
@@ -413,7 +416,6 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         _deleteSelection: function() {
             var selectedNodes =      '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             var selectedEdges =      '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
-            var selectedNodeGroups = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODEGROUP;
 
             // delete selected nodes
             jQuery(selectedNodes).each(function(index, element) {
@@ -427,10 +429,15 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 this.graph.deleteEdge(edge);
             }.bind(this));
 
-            // delete selected node groups
-            jQuery(selectedNodeGroups).each(function(index, element) {
+            // delete selected node groups (NASTY)
+
+            var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
+
+            jQuery(allNodeGroups).each(function(index, element) {
                 var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
-                this.graph.deleteNodeGroup(nodeGroup);
+                if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
+                    this.graph.deleteNodeGroup(nodeGroup);
+                }
             }.bind(this));
 
             this.properties.hide();
@@ -447,7 +454,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          * Returns:
          *   This Editor instance for chaining.
          */
-        _selectAll: function(event) {
+        _selectAll__old: function(event) {
             //XXX: trigger selection start event manually here
             //XXX: hack to emulate a new selection process
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
@@ -466,6 +473,12 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             //XXX: trigger selection stop event manually here
             //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
+        },
+
+        _selectAll: function(event) {
+            jQuery('.'+this.config.Classes.SELECTEE)
+                .addClass(this.config.Classes.SELECTING)
+                .addClass(this.config.Classes.SELECTED);
         },
 
         /**

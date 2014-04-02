@@ -141,12 +141,12 @@
         "properties": {
             "name" : {
                 "kind": "text",
-                "default": "Node Group",
+                "default": "",
                 "displayName": "Name",
 
                 "mirror": {
                     "position": "top",
-                    "style": [ ]
+                    "style": [ "italic", "large" ]
                 }
             }
         }
