@@ -52,6 +52,7 @@ function(Property, Class, Canvas, Config) {
          */
         _registerEventHandlers: function() {
             jQuery(document).on(Config.Events.NODES_MOVED,  this.redraw.bind(this));
+            jQuery(document).on(Config.Events.NODE_PROPERTY_CHANGED,  this.redraw.bind(this));
 
             return this;
         },
