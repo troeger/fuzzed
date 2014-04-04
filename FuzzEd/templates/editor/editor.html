@@ -85,8 +85,10 @@
             <li class="divider"></li>
             <li><a href="#" id="FuzzEdActionLayoutCluster">
                 <i class="fa fa-magic"></i> Auto-layout (cluster algorithm)</a></li>
+            {% if graph.kind != 'dfd'%}
             <li><a href="#" id="FuzzEdActionLayoutTree">
                 <i class="fa fa-magic"></i> Auto-layout (tree algorithm)</a></li>
+            {% endif %}
 
     </ul>
 </li>
