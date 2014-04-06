@@ -46,21 +46,23 @@ class Migration(SchemaMigration):
         db.send_create_signal('FuzzEd', ['DeleteProject'])
         
         # create sample project for each user
-        users = orm['auth.User'].objects.all()
+        if not db.dry_run:
+            users = orm['auth.User'].objects.all()
         
-        for user in users:
+            for user in users:
                 sample_project = orm.Project(name='My Graphs', owner=user)
                 sample_project.save()
         
-        # Adding field 'Graph.project' + assign any project_id to this field because of foreign key constraint 
-        project_id = None
-        
-        if (orm['FuzzEd.project'].objects.all()):
-                project_id = orm['FuzzEd.project'].objects.all().first().id
-        
-        db.add_column(u'FuzzEd_graph', 'project',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=project_id, related_name='graphs', to=orm['FuzzEd.Project']),
-                      keep_default=False)
+            # Adding field 'Graph.project' + assign any project_id to this field because of foreign key constraint 
+            project_id = None
+            
+            if (orm['FuzzEd.project'].objects.all()):
+                    project_id = orm['FuzzEd.project'].objects.all().first().id
+
+        if not db.dry_run:        
+            db.add_column(u'FuzzEd_graph', 'project',
+                          self.gf('django.db.models.fields.related.ForeignKey')(default=project_id, related_name='graphs', to=orm['FuzzEd.Project']),
+                          keep_default=False)
 
 
     def backwards(self, orm):

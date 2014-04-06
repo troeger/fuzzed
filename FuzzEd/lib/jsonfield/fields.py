@@ -74,7 +74,7 @@ class JSONFieldBase(six.with_metaclass(SubfieldBase, models.Field)):
                     try:
                         return json.loads(value, **self.load_kwargs)
                     except ValueError:
-                        raise ValidationError(_("Enter valid JSON"))
+                        raise ValidationError(_("Value error for JSON input: "+value))
 
         return value
 
