@@ -18,7 +18,6 @@
 import json, logging, time, os, tempfile, subprocess, unittest
 from xml.dom import minidom
 from subprocess import Popen
-from django.db import transaction
 from django.test import LiveServerTestCase
 from django.test.utils import override_settings
 from django.test.client import Client
