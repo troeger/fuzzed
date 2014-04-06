@@ -51,10 +51,10 @@ class FuzzEdTestCase(LiveServerTestCase):
         return self.c.post(url, data)
 
     def getWithAPIKey(self, url):
-        return self.c.get(url, **{'HTTP_AUTHORIZATION':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
+        return self.c.get(url, **{'HTTP_AUTHORIZATION':'ApiKey f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
 
     def postWithAPIKey(self, url, data, content_type):
-        return self.c.post(url, data, content_type, **{'HTTP_AUTHORIZATION':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
+        return self.c.post(url, data, content_type, **{'HTTP_AUTHORIZATION':'ApiKey f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
 
     def ajaxGet(self, url):
         return self.c.get( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
@@ -124,6 +124,20 @@ class ViewsTestCase(SimpleFixtureTestCase):
             original = Graph.objects.get(pk=graphid)
             self.assertTrue(original.same_as(copy))
 
+class GraphMLFilesTestCase(SimpleFixtureTestCase):
+    ''' 
+        Testing different GraphML file imports. 
+    '''
+    def setUp(self):
+        self.setUpAnonymous()       
+
+    def testImportFiles(self):
+        files = [f for f in os.listdir('FuzzEd/fixtures') if f.endswith(".graphml")]
+        for f in files:
+            text=open('FuzzEd/fixtures/'+f).read()
+            # Now import the same GraphML
+            response=self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%self.pkProject, text, 'application/xml')
+            self.assertEqual(response.status_code, 201)
 
 class ExternalAPITestCase(SimpleFixtureTestCase):
     ''' 
@@ -134,6 +148,11 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
 
     def testMissingAPIKey(self):
         response=self.get('/api/v1/project/?format=json')
+        self.assertEqual(response.status_code, 401)
+
+    def testOriginalAPIKeyFormat(self):
+        ''' We have our own APIKey format, so the original Tastypie version should no longer work.'''
+        response = self.c.get('/api/v1/project/?format=json', **{'HTTP_AUTHORIZATION':'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
         self.assertEqual(response.status_code, 401)
 
     def testRootResource(self):
@@ -208,13 +227,29 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%self.pkFaultTree)
         self.assertEqual(response.status_code, 200)
         graphml = response.content
-        with self.assertRaises(Unauthorized):
-            self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', graphml, 'application/xml')
+        # Now send request with wrong project ID
+        result = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', graphml, 'application/xml')
+        self.assertEqual(response.status_code, 403)
+
+    def testMissingGraphImportProject(self):
+        # First export valid GraphML
+        response=self.getWithAPIKey('/api/v1/graph/%u/?format=graphml'%self.pkFaultTree)
+        self.assertEqual(response.status_code, 200)
+        graphml = response.content
+        # Now send request with wrong project ID
+        result = self.postWithAPIKey('/api/v1/graph/?format=graphml', graphml, 'application/xml')
+        self.assertEqual(response.status_code, 400)
 
     def testInvalidGraphImportFormat(self):
         for wrong_format in ['json','tex','xml']:
-            with self.assertRaises(UnsupportedFormat):
-                self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u'%(wrong_format,self.pkProject), "<graphml></graphml>", 'application/text')
+            response = self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u'%(wrong_format,self.pkProject), "<graphml></graphml>", 'application/text')
+            self.assertEqual(response.status_code, 400)
+
+    def testInvalidContentType(self):
+        for format in ['application/text', 'application/x-www-form-urlencoded']:
+            response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%(self.pkProject), "<graphml></graphml>", format)
+            self.assertEqual(response.status_code, 415)
+
 
     def testFoo(self):
         ''' Leave this out, and the last test will fail. Dont ask me why.'''
