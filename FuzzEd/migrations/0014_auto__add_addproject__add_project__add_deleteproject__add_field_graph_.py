@@ -57,12 +57,14 @@ class Migration(SchemaMigration):
             project_id = None
             
             if (orm['FuzzEd.project'].objects.all()):
-                    project_id = orm['FuzzEd.project'].objects.all().first().id
-
-        if not db.dry_run:        
-            db.add_column(u'FuzzEd_graph', 'project',
-                          self.gf('django.db.models.fields.related.ForeignKey')(default=project_id, related_name='graphs', to=orm['FuzzEd.Project']),
-                          keep_default=False)
+                project_id = orm['FuzzEd.project'].objects.all().first().id                    
+                db.add_column(u'FuzzEd_graph', 'project',
+                              self.gf('django.db.models.fields.related.ForeignKey')(default=project_id, related_name='graphs', to=orm['FuzzEd.Project']),
+                              keep_default=False)
+            else:
+                db.add_column(u'FuzzEd_graph', 'project',
+                              self.gf('django.db.models.fields.related.ForeignKey')(null=True, blank=True, related_name='graphs', to=orm['FuzzEd.Project']),
+                              keep_default=False)
 
 
     def backwards(self, orm):
