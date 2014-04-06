@@ -7,3 +7,4 @@ from properties import Property
 from commands import Command
 from user import UserProfile
 from notification import Notification
+from node_group import NodeGroup

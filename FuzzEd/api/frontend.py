@@ -1,5 +1,5 @@
 """
-	This is the API for the web frontend. 
+    This is the API for the web frontend. 
     Access restrictions are managed by Django session handling.
 
     Only frontend-specific functionality should be implemented in here, mainly everything that revolves
@@ -17,7 +17,7 @@ from django.views.decorators.cache import never_cache
 
 # We expect these imports to go away main the main logic finally lives in common.py
 from django.shortcuts import get_object_or_404
-from FuzzEd.models import Graph, notations, commands, Node, Job, Notification
+from FuzzEd.models import Graph, notations, commands, Node, Job, Notification, NodeGroup
 from FuzzEd.middleware import *
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models import Q
@@ -25,7 +25,6 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import mail_managers
 
 import logging
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')
 
 
@@ -35,12 +34,12 @@ import json, common
 @csrf_exempt
 @require_GET
 def graph_download(request, graph_id):
-	'''
+    '''
         Provides a download response of the graph in the given format in the GET parameter, 
         or an HTTP error if the rendering job for the export format is not ready so far.
     '''
-	export_format = request.GET.get('format', 'xml')
-	return common.graph_download(request.user, graph_id, export_format)
+    export_format = request.GET.get('format', 'xml')
+    return common.graph_download(request.user, graph_id, export_format)
 
 @login_required
 @csrf_exempt
@@ -52,7 +51,7 @@ def job_status(request, job_id):
     '''
     status, job = common.job_status(request.user, job_id)
 
-    if status == 0:		# done, valid result
+    if status == 0:     # done, valid result
         if job.requires_download():
             # Return the URL to the file created by the job
             return HttpResponse(job.get_absolute_url())
@@ -71,8 +70,8 @@ def job_status(request, job_id):
 @require_GET
 def job_create(request, graph_id, job_kind):
     '''
-	    Starts a job of the given kind for the given graph.
-    	It is intended to return immediately with job information for the frontend.
+        Starts a job of the given kind for the given graph.
+        It is intended to return immediately with job information for the frontend.
     '''
     job = common.job_create(request.user, graph_id, job_kind)
     response = HttpResponse(status=201)
@@ -225,6 +224,35 @@ def nodes(request, graph_id):
     except MultipleObjectsReturned:
         raise HttpResponseServerErrorAnswer()
 
+
+@login_required
+@csrf_exempt
+@require_ajax
+@require_POST
+@transaction.commit_on_success
+@never_cache
+def nodegroups(request, graph_id):        
+
+    if request.user.is_staff:
+        graph = get_object_or_404(Graph, pk=graph_id)
+    else:
+        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+    if graph.read_only:
+        raise HttpResponseForbiddenAnswer('Trying to create a node in a read-only graph')
+
+    nodeids = json.loads(request.POST['nodeIds'])
+    client_id = request.POST['id']
+    group = NodeGroup(client_id = client_id, graph=graph)
+    group.save()        # Prepare ManyToMany relationship
+    for nodeid in nodeids:
+        node = Node.objects.get(pk = nodeid, deleted = False)
+        group.nodes.add(node)
+    group.save()    
+
+    response = HttpResponse(group.to_json(), 'application/javascript', status=201)
+    response['Location'] = reverse('nodegroup', args=[graph_id, group.client_id])
+    return response
+
 @login_required
 @csrf_exempt
 @require_ajax
@@ -278,6 +306,32 @@ def node(request, graph_id, node_id):
     except Exception as exception:
         logger.error('Exception: ' + str(exception))
         raise exception
+
+
+
+
+@login_required
+@csrf_exempt
+@require_ajax
+@transaction.commit_on_success
+@never_cache
+def nodegroup(request, graph_id, group_id):
+    try:
+        group = get_object_or_404(NodeGroup, client_id=group_id, graph__pk=graph_id)
+
+        if group.graph.read_only:
+            raise HttpResponseForbiddenAnswer('Trying to modify a node in a read-only graph')
+
+        if request.method == 'DELETE':
+            group.deleted = True
+            group.save()
+            return HttpResponse(status=204)
+
+    except Exception as exception:
+        logger.error('Exception: ' + str(exception))
+        raise exception
+
+
 
 @login_required
 @csrf_exempt

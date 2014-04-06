@@ -84,9 +84,9 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             }.bind(this));
 
             // create nodeGroups
-            /*_.each(json.nodeGroups, function(jsonNodeGroup) {
+            _.each(json.nodeGroups, function(jsonNodeGroup) {
                 this.addNodeGroup(jsonNodeGroup);
-            });*/
+            }.bind(this));
 
             return this;
         },

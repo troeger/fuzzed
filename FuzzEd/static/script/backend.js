@@ -61,13 +61,13 @@ function (Class, Config, Job, Alerts, Progress) {
             jQuery(document)
                 .on(Config.Events.NODE_PROPERTY_CHANGED,                   this.nodePropertyChanged.bind(this))
                 .on(Config.Events.EDGE_PROPERTY_CHANGED,                   this.edgePropertyChanged.bind(this))
-                //.on(Config.Events.NODEGROUP_PROPERTY_CHANGED,              this.nodeGroupPropertyChanged.bind(this))
+                .on(Config.Events.NODEGROUP_PROPERTY_CHANGED,              this.nodeGroupPropertyChanged.bind(this))
                 .on(Config.Events.NODE_ADDED,                              this.nodeAdded.bind(this))
                 .on(Config.Events.NODE_DELETED,                            this.nodeDeleted.bind(this))
                 .on(Config.Events.EDGE_ADDED,                              this.edgeAdded.bind(this))
                 .on(Config.Events.EDGE_DELETED,                            this.edgeDeleted.bind(this))
-                //.on(Config.Events.NODEGROUP_ADDED,                         this.nodeGroupAdded.bind(this))
-                //.on(Config.Events.NODEGROUP_DELETED,                       this.nodeGroupDeleted.bind(this))
+                .on(Config.Events.NODEGROUP_ADDED,                         this.nodeGroupAdded.bind(this))
+                .on(Config.Events.NODEGROUP_DELETED,                       this.nodeGroupDeleted.bind(this))
                 .on(Config.Events.EDITOR_GRAPH_EXPORT_PDF,                 this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_GRAPH_EXPORT_EPS,                 this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_CUTSETS,                this.calculateCutsets.bind(this))
@@ -246,7 +246,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
                     var message = errorThrown || 'Could not connect to backend.';
-                    Alerts.showErrorAlert('Node could not be created:', message, Config.Alerts.TIMEOUT);
+                    Alerts.showErrorAlert('Node group could not be created:', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
                 complete: complete || jQuery.noop,
