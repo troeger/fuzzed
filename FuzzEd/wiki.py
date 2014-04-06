@@ -1,8 +1,5 @@
-try:
-	from wikimarkup import parse, registerInternalLinkHook
-except Exception as e:
-	print "Please install py-wikimarkup first (https://github.com/dcramer/py-wikimarkup/)"
-	raise e
+from django.core.urlresolvers import reverse
+from FuzzEd.lib.wikimarkup import parse, registerInternalLinkHook
 
 # Our markup renderer implementation, simply relaying to wikimarkup
 def render(src):
@@ -32,6 +29,10 @@ class FuzzEdWikiAccess(object):
 
 ''' Support internal Wiki links.'''
 def internalLinkHook(parser_env, namespace, body):
-	return '<a href="heise.de">Heise</a>'
+	try:
+		target = reverse('djiki-page-view',args=[body])
+	except NoReverseMatch:
+		target = reverse('djiki-page-edit',args=[body])
+	return '<a href="%s">%s</a>'%(target, body)
 
 registerInternalLinkHook(None, internalLinkHook)
