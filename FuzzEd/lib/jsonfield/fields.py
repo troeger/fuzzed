@@ -74,7 +74,7 @@ class JSONFieldBase(six.with_metaclass(SubfieldBase, models.Field)):
                     try:
                         return json.loads(value, **self.load_kwargs)
                     except ValueError:
-                        raise ValidationError(_("Value error for JSON input: "+value))
+                        raise ValidationError(_("Enter valid JSON"))
 
         return value
 
@@ -108,6 +108,9 @@ class JSONFieldBase(six.with_metaclass(SubfieldBase, models.Field)):
             kwargs["form_class"] = self.form_class
 
         field = super(JSONFieldBase, self).formfield(**kwargs)
+
+        if isinstance(field, JSONFormFieldBase):
+            field.load_kwargs = self.load_kwargs
 
         if not field.help_text:
             field.help_text = "Enter valid JSON"
@@ -143,10 +146,6 @@ class JSONField(JSONFieldBase, models.TextField):
     """JSONField is a generic textfield that serializes/unserializes JSON objects"""
     form_class = JSONFormField
 
-    def __init__(self, *args, **kwargs):
-        super(JSONField, self).__init__(*args, **kwargs)
-        self.form_class.load_kwargs = self.load_kwargs
-
     def dumps_for_display(self, value):
         kwargs = { "indent": 2 }
         kwargs.update(self.dump_kwargs)
@@ -162,6 +161,6 @@ class JSONCharField(JSONFieldBase, models.CharField):
 
 try:
     from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ["^FuzzEd\.lib\.jsonfield\.fields\.(JSONField|JSONCharField)"])
+    add_introspection_rules([], ["^jsonfield\.fields\.(JSONField|JSONCharField)"])
 except ImportError:
     pass
