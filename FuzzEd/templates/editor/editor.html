@@ -97,7 +97,7 @@
         <i class="fa fa-download"></i> Export <b class="caret"></b>
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
-        {% if graph.kind != 'rbd'%}
+        {% if graph.kind != 'rbd' and graph.kind != 'dfd' %}
             <li><a href="{% url 'frontend_graph_download' graph.pk %}?format=tex">
                 <i class="fa fa-file-text-o"></i> LaTex</a></li>
             <li><a href="#" id="FuzzEdActionExportPDF">
@@ -109,7 +109,7 @@
             <i class="fa fa-file-text-o"></i> GraphML</a></li>
     </ul>
 </li>
-{% if graph.kind != 'rbd'%}
+{% if graph.kind != 'rbd' and graph.kind != 'dfd' %}
 <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-cog"></i> Compute <b class="caret"></b>
