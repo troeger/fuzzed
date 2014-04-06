@@ -12,7 +12,8 @@ class NodeGroup(models.Model):
     deleted   = models.BooleanField(default=False)
 
     def to_dict(self):
-    	return {'nodeIds': [node.pk for node in self.nodes.all()]}
+    	return {'id'      : self.client_id,
+                'nodeIds' : [node.pk for node in self.nodes.all()]}
 
     def to_json(self):
     	return json.dumps(self.to_dict())

@@ -792,7 +792,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The node group's URL as {String}.
          */
         _fullUrlForNodeGroup: function(nodeGroupId) {
-            return this._fullUrlForNodes() + '/' + nodeGroupId;
+            return this._fullUrlForNodeGroups() + '/' + nodeGroupId;
         },
 
         /**
