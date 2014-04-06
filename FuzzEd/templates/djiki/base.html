@@ -1,0 +1,14 @@
+{% extends "util/base.html" %}
+{% load i18n djiki_tags %}
+
+{% block content %}
+{% block page %}
+<div class="djiki">
+	<div class="actions container_12">
+		{% block djiki_main %}{% endblock %}
+		<div class="clear"></div>
+	</div>
+</div>
+{% endblock %}
+{% endblock %}
+
