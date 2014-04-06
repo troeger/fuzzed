@@ -43,10 +43,11 @@ function (Class, Config, Job, Alerts, Progress) {
          * listed below.
          *
          * On:
-         *   <Config::Events::PROPERTY_CHANGED>
-         *   <Config::Events::GRAPH_NODE_ADDED>
-         *   <Config::Events::GRAPH_NODE_DELETED>
-         *   <Config::Events::GRAPH_EDGE_DELETED>
+         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::NODE_ADDED>
+         *   <Config::Events::NODE_DELETED>
+         *   <Config::Events::EDGE_ADDED>
+         *   <Config::Events::EDGE_DELETED>
          *   <Config::Events::EDITOR_GRAPH_EXPORT_PDF>
          *   <Config::Events::EDITOR_GRAPH_EXPORT_EPS>
          *   <Config::Events::EDITOR_CALCULATE_CUTSETS>
@@ -58,11 +59,15 @@ function (Class, Config, Job, Alerts, Progress) {
          */
         activate: function() {
             jQuery(document)
-                .on(Config.Events.PROPERTY_CHANGED,                        this.nodePropertyChanged.bind(this))
-                .on(Config.Events.GRAPH_NODE_ADDED,                        this.graphNodeAdded.bind(this))
-                .on(Config.Events.GRAPH_NODE_DELETED,                      this.graphNodeDeleted.bind(this))
-                .on(Config.Events.GRAPH_EDGE_ADDED,                        this.graphEdgeAdded.bind(this))
-                .on(Config.Events.GRAPH_EDGE_DELETED,                      this.graphEdgeDeleted.bind(this))
+                .on(Config.Events.NODE_PROPERTY_CHANGED,                   this.nodePropertyChanged.bind(this))
+                .on(Config.Events.EDGE_PROPERTY_CHANGED,                   this.edgePropertyChanged.bind(this))
+                .on(Config.Events.NODEGROUP_PROPERTY_CHANGED,              this.nodeGroupPropertyChanged.bind(this))
+                .on(Config.Events.NODE_ADDED,                              this.nodeAdded.bind(this))
+                .on(Config.Events.NODE_DELETED,                            this.nodeDeleted.bind(this))
+                .on(Config.Events.EDGE_ADDED,                              this.edgeAdded.bind(this))
+                .on(Config.Events.EDGE_DELETED,                            this.edgeDeleted.bind(this))
+                .on(Config.Events.NODEGROUP_ADDED,                         this.nodeGroupAdded.bind(this))
+                .on(Config.Events.NODEGROUP_DELETED,                       this.nodeGroupDeleted.bind(this))
                 .on(Config.Events.EDITOR_GRAPH_EXPORT_PDF,                 this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_GRAPH_EXPORT_EPS,                 this.graphExport.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_CUTSETS,                this.calculateCutsets.bind(this))
@@ -78,10 +83,11 @@ function (Class, Config, Job, Alerts, Progress) {
          * all handlers for custom synchronization events.
          *
          * Off:
-         *   <Config::Events::PROPERTY_CHANGED>
-         *   <Config::Events::GRAPH_NODE_ADDED>
-         *   <Config::Events::GRAPH_NODE_DELETED>
-         *   <Config::Events::GRAPH_EDGE_DELETED>
+         *   <Config::Events::NODE_PROPERTY_CHANGED>
+         *   <Config::Events::NODE_ADDED>
+         *   <Config::Events::NODE_DELETED>
+         *   <Config::Events::EDGE_ADDED>
+         *   <Config::Events::EDGE_DELETED>
          *   <Config::Events::EDITOR_GRAPH_EXPORT_PDF>
          *   <Config::Events::EDITOR_GRAPH_EXPORT_EPS>
          *   <Config::Events::EDITOR_CALCULATE_CUTSETS>
@@ -93,11 +99,11 @@ function (Class, Config, Job, Alerts, Progress) {
          */
         deactivate: function() {
             jQuery(document)
-                .off(Config.Events.PROPERTY_CHANGED)
-                .off(Config.Events.GRAPH_NODE_ADDED)
-                .off(Config.Events.GRAPH_NODE_DELETED)
-                .off(Config.Events.GRAPH_EDGE_ADDED)
-                .off(Config.Events.GRAPH_EDGE_DELETED)
+                .off(Config.Events.NODE_PROPERTY_CHANGED)
+                .off(Config.Events.NODE_ADDED)
+                .off(Config.Events.NODE_DELETED)
+                .off(Config.Events.EDGE_ADDED)
+                .off(Config.Events.EDGE_DELETED)
                 .off(Config.Events.EDITOR_GRAPH_EXPORT_PDF)   
                 .off(Config.Events.EDITOR_GRAPH_EXPORT_EPS)                
                 .off(Config.Events.EDITOR_CALCULATE_CUTSETS)
@@ -111,7 +117,7 @@ function (Class, Config, Job, Alerts, Progress) {
          */
 
         /**
-         * Method: graphEdgeAdded
+         * Method: edgeAdded
          *
          * Adds a new edge from a given source node to a given target node.
          *
@@ -126,7 +132,8 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {function} complete     - [optional] Callback that is invoked in both cases - a successful or an erroneous
          *                             AJAX request.
          */
-        graphEdgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
+        //TODO: send properties
+        edgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
             var data = {
                 id:          edgeId,
                 source:      sourceNodeId,
@@ -159,22 +166,23 @@ function (Class, Config, Job, Alerts, Progress) {
         },
 
         /**
-         * Method: graphNodeAdded
+         * Method: nodeAdded
          *
          * Adds a new node to the backend of this graph.
          *
          * Parameters:
-         *   {Event}    event    - jQuery event object of the custom trigger.
-         *   {Number}   nodeId   - The node ID.
-         *   {String}   kind     - The node kind.
-         *   {Number}   x        - The grid x coordinate where the node was added.
-         *   {Number}   y        - The grid y coordinate where the node was added.
-         *   {function} success  - [optional] Will be called on successful node creation transmission to server.
-         *   {function} error    - [optional] Callback that gets called in case of an ajax-error.
-         *   {function} complete - [optional] Callback that is invoked when the ajax request completes successful or
+         *   {Event}    event      - jQuery event object of the custom trigger.
+         *   {Number}   nodeId     - The node ID.
+         *   {String}   kind       - The node kind.
+         *   {Number}   x          - The grid x coordinate where the node was added.
+         *   {Number}   y          - The grid y coordinate where the node was added.
+         *   {Object}   properties - The new node's properties
+         *   {function} success    - [optional] Will be called on successful node creation transmission to server.
+         *   {function} error      - [optional] Callback that gets called in case of an ajax-error.
+         *   {function} complete   - [optional] Callback that is invoked when the ajax request completes successful or
          *                         erroneous.
          */
-        graphNodeAdded: function(event, nodeId, kind, x, y, properties, success, error, complete) {
+        nodeAdded: function(event, nodeId, kind, x, y, properties, success, error, complete) {
             var data = {
                 id:         nodeId,
                 kind:       kind,
@@ -209,7 +217,53 @@ function (Class, Config, Job, Alerts, Progress) {
         },
 
         /**
-         * Method: graphEdgeDeleted
+         * Method: nodeGroupAdded
+         *
+         * Adds a new node group to the backend of this graph.
+         *
+         * Parameters:
+         *   {Event}    event       - jQuery event object of the custom trigger.
+         *   {Number}   nodeGroupId - The nodeGroup ID.
+         *   {String}   nodeIds     - The member nodes' ids.
+         *   {function} success     - [optional] Will be called on successful node creation transmission to server.
+         *   {function} error       - [optional] Callback that gets called in case of an ajax-error.
+         *   {function} complete    - [optional] Callback that is invoked when the ajax request completes successful or
+         *                         erroneous.
+         */
+        //TODO: send properties
+        nodeGroupAdded: function(event, nodeGroupId, nodeIds, success, error, complete) {
+            var data = {
+                id:         nodeGroupId,
+                nodeIds:    JSON.stringify(nodeIds)
+            };
+
+            var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+                url:      this._fullUrlForNodeGroups(),
+                type:     'POST',
+                dataType: 'json',
+
+                data:     data,
+                success:  success  || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Node group could not be created:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
+            });
+
+            return this;
+        },
+
+        /**
+         * Method: edgeDeleted
          *   Deletes a given edge in the backend.
          *
          * Parameters:
@@ -220,7 +274,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {function} complete - [optional] Callback that gets invoked in both cases - a successful and an errornous
          *                         AJAX call.
          */
-        graphEdgeDeleted: function(event, edgeId, success, error, complete) {
+        edgeDeleted: function(event, edgeId, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForEdge(edgeId),
                 type:     'DELETE',
@@ -246,20 +300,57 @@ function (Class, Config, Job, Alerts, Progress) {
         },
 
         /**
-         * Method: graphNodeDeleted
+         * Method: nodeDeleted
          *
          * Deletes a given node in the backend.
          *
          * Parameters:
          *   {Event}    event    - jQuery event object of the custom trigger.
          *   {Number}   nodeId   - The ID of the node that should be deleted.
-         *   {function} succes   - [optional] Callback that is being called on successful deletion on backend.
+         *   {function} success  - [optional] Callback that is being called on successful deletion on backend.
          *   {function} error    - [optional] Callback that gets called in case of an ajax-error.
          *   {function} complete - [optional] Callback that is invoked in both cases, successful and errornous requests.
          */
-        graphNodeDeleted: function(event, nodeId, success, error, complete) {
+        nodeDeleted: function(event, nodeId, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNode(nodeId),
+                type:     'DELETE',
+                dataType: 'json',
+
+                success:  success  || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Node could not be deleted:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
+            });
+
+            return this;
+        },
+
+        /**
+         * Method: nodeGroupDeleted
+         *
+         * Deletes a given node group in the backend.
+         *
+         * Parameters:
+         *   {Event}    event         - jQuery event object of the custom trigger.
+         *   {Number}   nodeGroupId   - The ID of the node that should be deleted.
+         *   {function} success       - [optional] Callback that is being called on successful deletion on backend.
+         *   {function} error         - [optional] Callback that gets called in case of an ajax-error.
+         *   {function} complete      - [optional] Callback that is invoked in both cases, successful and errornous requests.
+         */
+        nodeGroupDeleted: function(event, nodeGroupId, success, error, complete) {
+            var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+                url:      this._fullUrlForNodeGroup(nodeGroupId),
                 type:     'DELETE',
                 dataType: 'json',
 
@@ -300,6 +391,92 @@ function (Class, Config, Job, Alerts, Progress) {
         nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNode(nodeId),
+                type:     'POST',
+                data:{
+                    properties: JSON.stringify(properties)
+                },
+                dataType: 'json',
+
+                success:  success  || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Node could not be changed:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
+            });
+
+            return this;
+        },
+
+        /**
+         * Method: edgePropertyChanged
+         *
+         * Changes the properties of a given edge.
+         *
+         * Parameters:
+         *   {Event}    event      - jQuery event object of the custom trigger.
+         *   {Number}   edgeId     - The edge that shall be moved.
+         *   {Object}   properties - The edge's properties that should be changed. Keys stand for property names and
+         *                           their assigned values is the new state.
+         *   {function} success    - [optional] Callback that is called when the move was successfully saved.
+         *   {function} error      - [optional] Callback that gets called in case of an AJAX error.
+         *   {function} complete   - [optional] Callback that is always invoked no matter if AJAX request was successful
+         *                           or erroneous.
+         */
+        edgePropertyChanged: function(event, edgeId, properties, success, error, complete) {
+            var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+                url:      this._fullUrlForEdge(edgeId),
+                type:     'POST',
+                data:{
+                    properties: JSON.stringify(properties)
+                },
+                dataType: 'json',
+
+                success:  success  || jQuery.noop,
+                error:    function(jqXHR, errorStatus, errorThrown) {
+                    var message = jqXHR.responseText || errorThrown || 'Could not connect to backend.';
+                    Alerts.showErrorAlert('Node could not be changed:', message, Config.Alerts.TIMEOUT);
+                    (error || jQuery.noop).apply(arguments);
+                },
+                complete: complete || jQuery.noop,
+
+                beforeSend: function(xhr) {
+                    // set messages for progress indicator
+                    xhr.progressMessage        = 'Saving…';
+                    xhr.progressSuccessMessage = 'Saved';
+                    xhr.progressErrorMessage   = 'Not saved!';
+                }
+            });
+
+            return this;
+        },
+
+        /**
+         * Method: nodeGroupPropertyChanged
+         *
+         * Changes the properties of a given node group.
+         *
+         * Parameters:
+         *   {Event}    event       - jQuery event object of the custom trigger.
+         *   {Number}   nodeGroupId - The edge that shall be moved.
+         *   {Object}   properties  - The node group's properties that should be changed. Keys stand for property names
+         *                            and their assigned values is the new state.
+         *   {function} success     - [optional] Callback that is called when the move was successfully saved.
+         *   {function} error       - [optional] Callback that gets called in case of an AJAX error.
+         *   {function} complete    - [optional] Callback that is always invoked no matter if AJAX request was successful
+         *                           or erroneous.
+         */
+        nodeGroupPropertyChanged: function(event, nodeGroupId, properties, success, error, complete) {
+            var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+                url:      this._fullUrlForNodeGroup(nodeGroupId),
                 type:     'POST',
                 data:{
                     properties: JSON.stringify(properties)
@@ -556,7 +733,7 @@ function (Class, Config, Job, Alerts, Progress) {
 
         /**
          * Method: _fullUrlForNode
-         *   Calculates the AJAX backend URL for on particular node of the graph. Allows to fetch, modify or delete it.
+         *   Calculates the AJAX backend URL for one particular node of the graph. Allows to fetch, modify or delete it.
          *
          * Parameters:
          *   {Number} nodeId - The id of the node.
@@ -591,6 +768,31 @@ function (Class, Config, Job, Alerts, Progress) {
          */
         _fullUrlForEdge: function(edgeId) {
             return this._fullUrlForEdges() + '/' + edgeId;
+        },
+
+        /**
+         * Method: _fullUrlForNodeGroups
+         *   Calculates the AJAX backend URL for the graph's node groups. Allows to fetch all of them or to create a new one.
+         *
+         * Returns:
+         *   The graph's node groups URL as {String}.
+         */
+        _fullUrlForNodeGroups: function() {
+            return this._fullUrlForGraph() + Config.Backend.NODEGROUPS_URL;
+        },
+
+        /**
+         * Method: _fullUrlForNodeGroup
+         *   Calculates the AJAX backend URL for one particular node group of the graph. Allows to fetch, modify or delete it.
+         *
+         * Parameters:
+         *   {Number} nodeGroupId - The id of the node group.
+         *
+         * Returns:
+         *   The node group's URL as {String}.
+         */
+        _fullUrlForNodeGroup: function(nodeGroupId) {
+            return this._fullUrlForNodeGroups() + '/' + nodeGroupId;
         },
 
         /**

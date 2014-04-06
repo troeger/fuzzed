@@ -59,11 +59,15 @@ urlpatterns = patterns('',
     url(r'^front/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.frontend.nodes', name='nodes'),
     url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$', 'FuzzEd.api.frontend.node', name='node'),
 
+    # node groups
+    url(r'^front/graphs/(?P<graph_id>\d+)/nodegroups$', 'FuzzEd.api.frontend.nodegroups', name='nodegroups'),
+    url(r'^front/graphs/(?P<graph_id>\d+)/nodegroups/(?P<group_id>\d+)$', 'FuzzEd.api.frontend.nodegroup', name='nodegroup'),
+
     # properties
-    url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties$',
-        'FuzzEd.api.frontend.properties', name='properties'),
-    url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties/(?P<key>)$',
-        'FuzzEd.api.frontend.property', name='property'),
+    # url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties$',
+    #     'FuzzEd.api.frontend.properties', name='properties'),
+    # url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties/(?P<key>)$',
+    #     'FuzzEd.api.frontend.property', name='property'),
 
     # edges
     url(r'^front/graphs/(?P<graph_id>\d+)/edges$','FuzzEd.api.frontend.edges', name='edges'),

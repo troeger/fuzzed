@@ -74,11 +74,21 @@
             <li><a href="#" id="FuzzEdActionSelectAll">
                 <i class="fa fa-file-text"></i> Select All <span class="pull-right">Ctrl+A</span>
             </a></li>
+            {% if graph.kind == 'dfd'%}
+                <li><a href="#" id="FuzzEdActionGroup">
+                    <i class="fa fa-link"></i> Group <span class="pull-right">Ctrl+A</span>
+                </a></li>
+                <li><a href="#" id="FuzzEdActionUngroup">
+                    <i class="fa fa-unlink"></i> Ungroup <span class="pull-right">Ctrl+A</span>
+                </a></li>
+            {% endif %}
             <li class="divider"></li>
             <li><a href="#" id="FuzzEdActionLayoutCluster">
                 <i class="fa fa-magic"></i> Auto-layout (cluster algorithm)</a></li>
+            {% if graph.kind != 'dfd'%}
             <li><a href="#" id="FuzzEdActionLayoutTree">
                 <i class="fa fa-magic"></i> Auto-layout (tree algorithm)</a></li>
+            {% endif %}
 
     </ul>
 </li>
@@ -87,7 +97,7 @@
         <i class="fa fa-download"></i> Export <b class="caret"></b>
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
-        {% if graph.kind != 'rbd'%}
+        {% if graph.kind != 'rbd' and graph.kind != 'dfd' %}
             <li><a href="{% url 'frontend_graph_download' graph.pk %}?format=tex">
                 <i class="fa fa-file-text-o"></i> LaTex</a></li>
             <li><a href="#" id="FuzzEdActionExportPDF">
@@ -99,7 +109,7 @@
             <i class="fa fa-file-text-o"></i> GraphML</a></li>
     </ul>
 </li>
-{% if graph.kind != 'rbd'%}
+{% if graph.kind != 'rbd' and graph.kind != 'dfd' %}
 <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-cog"></i> Compute <b class="caret"></b>

@@ -1,4 +1,4 @@
-define(['config', 'class', 'jquery'], function(Config, Class) {
+define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
 
     /**
      * Class: Menu
@@ -170,7 +170,7 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
     var PropertiesMenu = new (Menu.extend({
         _displayOrder: undefined,
         _form:         undefined,
-        _node:         undefined,
+        _selectee:     undefined,
 
         init: function(displayOrder) {
             this._super();
@@ -196,12 +196,12 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         /* Section: Visibility */
         hide: function() {
             this._removeEntries();
-            this._node = undefined;
+            this._selectee = undefined;
             return this._super();
         },
 
         show: function() {
-            var selected = jQuery('.' + Config.Classes.SELECTED + '.' + Config.Classes.NODE);
+            var selected = jQuery('.' + Config.Classes.SELECTED);
             this._removeEntries();
 
             // display the properties menu only if there is exactly one node selected
@@ -214,9 +214,9 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         },
 
         _removeEntries: function() {
-            if (!this._node) return this;
+            if (!this._selectee) return this;
 
-            _.each(this._node.properties, function(property) {
+            _.each(this._selectee.properties, function(property) {
                 property.menuEntry.remove();
             }.bind(this));
 
@@ -234,16 +234,23 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         },
 
         _show: function(selected) {
-            this._node = selected.data(Config.Keys.NODE);
+            if (selected.hasClass(Config.Classes.NODE)) {
+                this._selectee = selected.data(Config.Keys.NODE);
+            } else if (selected.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
+                this._selectee = selected.data(Config.Keys.EDGE);
+            } else { // if (selected.hasClass(Config.Keys.NODEGROUP
+                //TODO: do this right
+                this._selectee = selected.parent().parent().data(Config.Keys.NODEGROUP);
+            }
 
             // this node does not have any properties to display, go home!
-            if (_.isEmpty(this._node.properties)) {
+            if (_.isEmpty(this._selectee.properties)) {
                 this.hide();
                 return this;
             }
 
             _.each(this._displayOrder, function(propertyName) {
-                var property = this._node.properties[propertyName];
+                var property = this._selectee.properties[propertyName];
                 // has the node such a property? display it!
                 if (typeof property !== 'undefined' && property !== null) {
                     property.menuEntry.appendTo(this._form);
@@ -259,13 +266,13 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
                 var offset =  - this.container.outerWidth(true) - Config.Menus.PROPERTIES_MENU_OFFSET;
                 this.container.css('left', jQuery('body').outerWidth(true) + offset);
             }
-            this.container.toggle(!_.all(this._node.properties, function(property) { return property.hidden; }));
+            this.container.toggle(!_.all(this._selectee.properties, function(property) { return property.hidden; }));
 
             return this;
         },
 
         _allHidden: function() {
-            return !this._node || _.all(this._node.properties, function(property) { return property.hidden; });
+            return !this._selectee || _.all(this._selectee.properties, function(property) { return property.hidden; });
         }
     }));
 
@@ -291,12 +298,12 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
             // User has accepted implicitly by continuing to edit the graph
             jQuery(document).one([
                 Config.Events.CANVAS_SHAPE_DROPPED,
-                Config.Events.GRAPH_NODE_ADDED,
-                Config.Events.GRAPH_NODE_DELETED,
-                Config.Events.GRAPH_EDGE_ADDED,
-                Config.Events.GRAPH_EDGE_DELETED,
+                Config.Events.NODE_ADDED,
+                Config.Events.NODE_DELETED,
+                Config.Events.EDGE_ADDED,
+                Config.Events.EDGE_DELETED,
                 Config.Events.GRAPH_LAYOUT,
-                Config.Events.PROPERTY_CHANGED
+                Config.Events.NODE_PROPERTY_CHANGED
             ].join(' '), function() {
                 deferred.resolve();
             }.bind(this));

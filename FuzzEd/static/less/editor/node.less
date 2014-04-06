@@ -3,7 +3,7 @@
  *      This file contains all styles that apply to graph nodes.
  */
 
-.fuzzed-node {
+.fuzzed-node, .fuzzed-nodegroup {
     text-align: center;
     z-index: 100; /* above connection */
 
@@ -134,6 +134,24 @@
         p {
             padding: 4px;
         }
+    }
+}
+
+.fuzzed-nodegroup {
+    z-index: -42; // under everything else
+    svg path {
+        stroke: #4682b4;
+
+        // selected/selecting state
+        &.ui-selected, &.ui-selecting {
+             stroke: @theme-selection !important;
+        }
+    }
+    .fuzzed-mirror {
+        position: absolute;
+        color: #4682b4;
+        background: transparent;
+        margin-top: -18px;
     }
 }
 

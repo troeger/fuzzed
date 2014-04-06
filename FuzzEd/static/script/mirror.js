@@ -44,13 +44,7 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
         init: function(property, containment, properties) {
             this.property     = property;
             this._containment = containment;
-            this.container    = jQuery('<span>').addClass(Config.Classes.MIRROR)
-                // The label is double the grid/node's width to allow for large textual content. Since the mirror is
-                // already partially centered (see CSS), we only need to offset the container by a quarter of its size.
-                // In order to not cover the grid lines behind the mirror box, we need to down size the box by the
-                // grid's stroke.
-                .css('width', Canvas.gridSize * 2 - Config.Grid.STROKE_WIDTH * 4)
-                .css('margin-left', -(Canvas.gridSize / 2) + Config.Grid.STROKE_WIDTH);
+            this._setupVisualRepresentation();
 
             this.format = properties.format || '{{$0}}';
 
@@ -61,15 +55,29 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
                 if (style === 'large')  this.container.addClass(Config.Classes.MIRROR_LARGE);
             }.bind(this));
 
+            this._appendContainerToContainment(properties.position);
+
+            this._setupEvents();
+        },
+
+        _setupVisualRepresentation: function() {
+            this.container    = jQuery('<span>').addClass(Config.Classes.MIRROR)
+                // The label is double the grid/node's width to allow for large textual content. Since the mirror is
+                // already partially centered (see CSS), we only need to offset the container by a quarter of its size.
+                // In order to not cover the grid lines behind the mirror box, we need to down size the box by the
+                // grid's stroke.
+                .css('width', Canvas.gridSize * 2 - Config.Grid.STROKE_WIDTH * 4)
+                .css('margin-left', -(Canvas.gridSize / 2) + Config.Grid.STROKE_WIDTH);
+        },
+
+        _appendContainerToContainment: function(position) {
             // add the mirror to the containment at specified position (bottom [default] or top)
-            if (typeof properties.position === 'undefined' || properties.position === 'bottom')
+            if (typeof position === 'undefined' || position === 'bottom')
                 this._containment.append(this.container);
-            else if (properties.position === 'top')
+            else if (position === 'top')
                 this._containment.prepend(this.container);
             else
                 throw ValueError('unknown mirror position: ' + properties.position);
-
-            this._setupEvents();
         },
 
         /**
@@ -98,14 +106,26 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
             return this;
         },
 
+        /**
+         *  Method: _setupEvents
+         *      Register for changes of the associated <Property> object.
+         *
+         *  Returns:
+         *      This {Mirror} instance for chaining.
+         */
         _setupEvents: function() {
-            jQuery(this.property).on(Config.Events.PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+            jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+                this.show(text);
+            }.bind(this));
+            jQuery(this.property).on(Config.Events.NODEGROUP_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 this.show(text);
             }.bind(this));
 
             jQuery(this.property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
                 this.container.toggle(!hidden);
             }.bind(this));
+
+            return this;
         }
     });
 });

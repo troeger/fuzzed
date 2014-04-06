@@ -79,28 +79,31 @@ class Graph(models.Model):
         """
         Method: to_dict
         
-        Encodes the whole graph as dictionary having five top level items: its id, name, type and two lists containing
-        all edges and nodes in the graph
-        
+        Encodes the whole graph as dictionary.
+
         Returns:
          {dict} the graph as dictionary
         """
-        node_set = self.nodes.filter(deleted=False)
-        edge_set = self.edges.filter(deleted=False)
-        nodes    = [node.to_dict() for node in node_set]
-        edges    = [edge.to_dict() for edge in edge_set]
+        node_set  = self.nodes.filter(deleted=False)
+        edge_set  = self.edges.filter(deleted=False)
+        group_set = self.groups.filter(deleted=False)
+        nodes     = [node.to_dict() for node in node_set]
+        edges     = [edge.to_dict() for edge in edge_set]
+        groups    = [group.to_dict() for group in group_set]
 
-        node_seed = self.nodes.aggregate(Max('client_id'))['client_id__max']
-        edge_seed = self.edges.aggregate(Max('client_id'))['client_id__max']
+        node_seed  = self.nodes.aggregate(Max('client_id'))['client_id__max']
+        edge_seed  = self.edges.aggregate(Max('client_id'))['client_id__max']
+        group_seed = self.groups.aggregate(Max('client_id'))['client_id__max']
 
         return {
             'id':       self.pk,
-            'seed':     max(node_seed, edge_seed),
+            'seed':     max(node_seed, edge_seed, group_seed),
             'name':     self.name,
             'type':     self.kind,
             'readOnly': self.read_only,
             'nodes':    nodes,
-            'edges':    edges
+            'edges':    edges,
+            'nodeGroups':   groups
         }
 
     def to_bool_term(self):

@@ -1,4 +1,4 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist'],
+define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist', 'jsplumb'],
 function(Class, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base
@@ -263,11 +263,17 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 }],
                 PaintStyle: {
                     strokeStyle: this.config.JSPlumb.STROKE_COLOR,
-                    lineWidth:   this.config.JSPlumb.STROKE_WIDTH
+                    lineWidth:   this.config.JSPlumb.STROKE_WIDTH,
+                    outlineColor:this.config.JSPlumb.OUTLINE_COLOR,
+                    outlineWidth:this.config.JSPlumb.OUTLINE_WIDTH
+                },
+                HoverPaintStyle: {
+                    strokeStyle: this.config.JSPlumb.STROKE_COLOR_HIGHLIGHTED
                 },
                 HoverClass:      this.config.Classes.HIGHLIGHTED,
                 Connector:       [this.config.JSPlumb.CONNECTOR_STYLE, this.config.JSPlumb.CONNECTOR_OPTIONS],
-                ConnectionsDetachable: false
+                ConnectionsDetachable: false,
+                ConnectionOverlays: this.config.JSPlumb.CONNECTION_OVERLAYS
             });
 
             jsPlumb.connectorClass = this.config.Classes.JSPLUMB_CONNECTOR;
@@ -375,8 +381,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *
          *  On:
          *    <Config::Events::NODE_DRAG_STOPPED>
-         *    <Config::Events::GRAPH_NODE_ADDED>
-         *    <Config::Events::GRAPH_NODE_DELETED>
+         *    <Config::Events::NODE_ADDED>
+         *    <Config::Events::NODE_DELETED>
          *
          *  Returns:
          *    This Editor instance for chaining.
@@ -384,8 +390,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         _setupEventCallbacks: function() {
             // events that trigger a re-calculation of the print offsets
             jQuery(document).on(this.config.Events.NODE_DRAG_STOPPED,  this._updatePrintOffsets.bind(this));
-            jQuery(document).on(this.config.Events.GRAPH_NODE_ADDED,   this._updatePrintOffsets.bind(this));
-            jQuery(document).on(this.config.Events.GRAPH_NODE_DELETED, this._updatePrintOffsets.bind(this));
+            jQuery(document).on(this.config.Events.NODE_ADDED,         this._updatePrintOffsets.bind(this));
+            jQuery(document).on(this.config.Events.NODE_DELETED,       this._updatePrintOffsets.bind(this));
 
             // show status of global AJAX events in navbar
             jQuery(document).ajaxSend(Progress.showAjaxProgress);
@@ -408,18 +414,30 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *    This Editor instance for chaining
          */
         _deleteSelection: function() {
-            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
-            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+            var selectedNodes =      '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedEdges =      '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
 
             // delete selected nodes
             jQuery(selectedNodes).each(function(index, element) {
-                this.graph.deleteNode(jQuery(element).data(this.config.Keys.NODE).id);
+                var node = jQuery(element).data(this.config.Keys.NODE);
+                this.graph.deleteNode(node);
             }.bind(this));
 
             // delete selected edges
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
+                var edge = jQuery(element).data(this.config.Keys.EDGE);
                 this.graph.deleteEdge(edge);
+            }.bind(this));
+
+            // delete selected node groups (NASTY)
+
+            var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
+
+            jQuery(allNodeGroups).each(function(index, element) {
+                var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
+                    this.graph.deleteNodeGroup(nodeGroup);
+                }
             }.bind(this));
 
             this.properties.hide();
@@ -436,15 +454,16 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          * Returns:
          *   This Editor instance for chaining.
          */
-        _selectAll: function(event) {
+        _selectAll__old: function(event) {
             //XXX: trigger selection start event manually here
             //XXX: hack to emulate a new selection process
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
 
             var NODES           = '.' + this.config.Classes.NODE;
             var NODES_AND_EDGES = NODES + ', .' + this.config.Classes.JSPLUMB_CONNECTOR;
+            var NODES_AND_EDGES_AND_NODEGROUPS = NODES_AND_EDGES + ', .' + this.config.Classes.NODEGROUP;
 
-            jQuery(NODES_AND_EDGES).each(function(index, domElement) {
+            jQuery(NODES_AND_EDGES_AND_NODEGROUPS).each(function(index, domElement) {
                 var element = jQuery(domElement);
 
                 element.addClass(this.config.Classes.SELECTING)
@@ -454,6 +473,12 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             //XXX: trigger selection stop event manually here
             //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
+        },
+
+        _selectAll: function(event) {
+            jQuery('.'+this.config.Classes.SELECTEE)
+                .addClass(this.config.Classes.SELECTING)
+                .addClass(this.config.Classes.SELECTED);
         },
 
         /**
@@ -512,13 +537,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             var edges = [];
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = this.graph.getEdgeById(jQuery(element).data(this.config.Keys.CONNECTION_ID));
-
-                //TODO: create Edge class with toDict() method
-                edges.push({
-                    'source':  jQuery(edge.source).data(this.config.Keys.NODE).id,
-                    'target':  jQuery(edge.target).data(this.config.Keys.NODE).id
-                });
+                var edge = jQuery(element).data(this.config.Keys.EDGE);
+                edges.push(edge.toDict());
             }.bind(this));
 
             var clipboard = {
@@ -555,19 +575,20 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             var ids         = {}; // stores to every old id the newly generated id to connect the nodes again
             var boundingBox = this._boundingBoxForNodes(nodes); // used along with pasteCount to place the copy nicely
 
-            _.each(nodes, function(node) {
+            _.each(nodes, function(jsonNode) {
                 var pasteId  = this.graph.createId();
-                ids[node.id] = pasteId;
-                node.id = pasteId;
-                node.x += pasteCount * (boundingBox.width + 1);
-                node.y += pasteCount * (boundingBox.height + 1);
-                this.graph.addNode(node.kind, node).select();
+                ids[jsonNode.id] = pasteId;
+                jsonNode.id = pasteId;
+                jsonNode.x += pasteCount * (boundingBox.width + 1);
+                jsonNode.y += pasteCount * (boundingBox.height + 1);
+                this.graph.addNode(jsonNode).select();
             }.bind(this));
 
             _.each(edges, function(edge) {
-                edge.source = ids[edge.source] || edge.source;
-                edge.target = ids[edge.target] || edge.target;
-                jQuery(this.graph.addEdge(edge).canvas).addClass(this.config.Classes.SELECTED);
+                edge.id = undefined;
+                edge.source = ids[edge.sourceNodeId] || edge.sourceNodeId;
+                edge.target = ids[edge.targetNodeId] || edge.targetNodeId;
+                this.graph.addEdge(edge).select();
             }.bind(this));
 
             //XXX: trigger selection stop event manually here
@@ -696,6 +717,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                     y: yDirection * Canvas.gridSize
                 });
             }.bind(this));
+
+            jQuery(document).trigger(this.config.Events.NODES_MOVED);
 
             return this;
         },

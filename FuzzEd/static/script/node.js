@@ -1,5 +1,5 @@
-define(['property', 'mirror', 'canvas', 'class', 'jquery', 'jsplumb'],
-function(Property, Mirror, Canvas, Class) {
+define(['property', 'mirror', 'canvas', 'class', 'config', 'jquery', 'jsplumb'],
+function(Property, Mirror, Canvas, Class, Config) {
     /**
      *  Class: {Abstract} Node
      *
@@ -72,7 +72,7 @@ function(Property, Mirror, Canvas, Class) {
          * Returns:
          *   This {<Node>} instance.
          */
-        init: function(definition, propertiesDisplayOrder) {
+        init: function(definition) {
 
             // merge all presets of the configuration and data from the backend into this object
             jQuery.extend(true, this, definition);
@@ -101,11 +101,20 @@ function(Property, Mirror, Canvas, Class) {
                 ._setupDragging()
                 ._setupMouse()
                 ._setupSelection()
-                ._setupProperties(propertiesDisplayOrder)
+                ._setupProperties()
 				._setupEditable()
 				._setupResizable()
                 // Events
                 ._registerEventHandlers();
+
+            // call home
+            jQuery(document).trigger(Config.Events.NODE_ADDED, [
+                this.id,
+                this.kind,
+                this.x,
+                this.y,
+                this.toDict().properties
+            ]);
         },
 
         /**
@@ -210,6 +219,8 @@ function(Property, Mirror, Canvas, Class) {
 
             // XXX: In Webkit browsers the container div does not resize properly. This should fix it.
             this.container.width(this._nodeImage.width());
+            this.container.height(this._nodeImage.height());
+
 
             // cache center of the image
             // XXX: We need to use the node image's container's position because Firefox fails otherwise
@@ -438,6 +449,7 @@ function(Property, Mirror, Canvas, Class) {
                             'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
                         });
                     }.bind(this));
+                    jQuery(document).trigger(this.config.Events.NODES_MOVED);
                 }.bind(this),
 
                 // stop dragging callback
@@ -514,14 +526,11 @@ function(Property, Mirror, Canvas, Class) {
         /**
          * Method: _setupProperties
          *
-         * Parameters:
-         *   {Array[str]} propertiesDisplayOrder - bar.
-         *
          * Returns:
          *   This {<Node>} instance for chaining.
          */
-        _setupProperties: function(propertiesDisplayOrder) {
-            _.each(propertiesDisplayOrder, function(propertyName) {
+        _setupProperties: function() {
+            _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {
                 var property = this.properties[propertyName];
 
                 if (typeof property === 'undefined') {
@@ -658,8 +667,8 @@ function(Property, Mirror, Canvas, Class) {
          *      This Node instance for chaining.
          */
         _registerEventHandlers: function() {
-            jQuery(document).on(this.config.Events.GRAPH_EDGE_ADDED,   this._checkEdgeCapacity.bind(this));
-            jQuery(document).on(this.config.Events.GRAPH_EDGE_DELETED, this._checkEdgeCapacity.bind(this));
+            jQuery(document).on(this.config.Events.EDGE_ADDED,   this._checkEdgeCapacity.bind(this));
+            jQuery(document).on(this.config.Events.EDGE_DELETED, this._checkEdgeCapacity.bind(this));
 
             return this;
         },
@@ -690,8 +699,8 @@ function(Property, Mirror, Canvas, Class) {
          *
          * This method returns the position of the anchors for the connectors. The format is taken from jsPlumb and is
          * defined as a four-tuple: [x, y, edge_x, edge_y]. The values for x and y define the relative offset of the
-         * connector from the left upper corner of the container. Edge_x and edgy_y determine the direction connected
-         * edges point from the connector.
+         * connector from the left upper corner of the container. Edge_x and edgy_y determine the direction of connected
+         * edges pointing from or to the connector.
          *
          * Returns:
          *   {Object} with 'in' and 'out' keys containing jsPlumb four-tuple connector definitions.
@@ -715,7 +724,7 @@ function(Property, Mirror, Canvas, Class) {
         _connectorOffset: function() {
             // XXX: We need to use the offset of the image container because FF has difficulties to calculate the
             //      offsets of inline SVG elements directly.
-            var topOffset = this._nodeImageContainer.offset().top - this.container.offset().top;
+            var topOffset    = this._nodeImageContainer.offset().top - this.container.offset().top;
             var bottomOffset = topOffset + this._nodeImage.height() + this.connector.offset.bottom;
 
             return {
@@ -964,7 +973,7 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          *
          * Triggers:
-         *   <Config::Events::PROPERTY_CHANGED>
+         *   <Config::Events::NODE_PROPERTY_CHANGED>
          */
         moveToPixel: function(position, animated) {
             var gridPos = Canvas.toGrid(position);
@@ -973,7 +982,7 @@ function(Property, Mirror, Canvas, Class) {
 
             this._moveContainerToPixel(position, animated);
             // call home
-            jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+            jQuery(document).trigger(this.config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },
@@ -990,7 +999,7 @@ function(Property, Mirror, Canvas, Class) {
          *   This {<Node>} instance for chaining.
          *
          * Triggers:
-         *   <Config::Events::PROPERTY_CHANGED>
+         *   <Config::Events::NODE_PROPERTY_CHANGED>
          */
         moveToGrid: function(gridPos, animated) {
             this.x = Math.floor(Math.max(gridPos.x, 1));
@@ -1000,7 +1009,7 @@ function(Property, Mirror, Canvas, Class) {
             this._moveContainerToPixel(pixelPos, animated);
 
             // call home
-            jQuery(document).trigger(this.config.Events.PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+            jQuery(document).trigger(this.config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },
@@ -1011,15 +1020,27 @@ function(Property, Mirror, Canvas, Class) {
          * Removes the whole visual representation including endpoints from the canvas.
          *
          * Returns:
-         *   This {<Node>} instance for chaining.
+         *   {boolean} Successful deletion.
          */
         remove: function() {
+            if (!this.deletable) return false;
+
+            // Remove all incoming and outgoing edges
+            _.each(_.union(this.incomingEdges, this.outgoingEdges), function(edge) {
+                this.graph.deleteEdge(edge);
+            }.bind(this));
+
+            // Tell jsPlumb to remove node endpoints
             _.each(jsPlumb.getEndpoints(this.container), function(endpoint) {
                 jsPlumb.deleteEndpoint(endpoint);
             });
+
+            // Call home
+            jQuery(document).trigger(this.config.Events.NODE_DELETED, this.id);
+
             this.container.remove();
 
-            return this;
+            return true;
         },
 
         /**

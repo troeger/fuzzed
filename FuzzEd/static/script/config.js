@@ -81,6 +81,7 @@ define(['underscore'], function() {
             GRAPHS_URL:                 '/graphs',
             NODES_URL:                  '/nodes',
             EDGES_URL:                  '/edges',
+            NODEGROUPS_URL:             '/nodegroups',
             TRANSFERS_URL:              '/transfers',
             CUTSETS_URL:                '/cutsets',
             ANALYTICAL_PROBABILITY_URL: '/topEventProbability',
@@ -140,6 +141,7 @@ define(['underscore'], function() {
             HIGHLIGHTED:             'highlighted',
             SELECTED:                'ui-selected',
             SELECTING:               'ui-selecting',
+            SELECTEE:                'ui-selectee',
             DISABLED:                'disabled',
 
             CANVAS_NOT_EDITABLE:     'fuzzed-canvas-not-editable',
@@ -162,6 +164,8 @@ define(['underscore'], function() {
             NODE_IMAGE:              'fuzzed-node-image',
             NODE_DROP_ACTIVE:        'fuzzed-node-drop-active',
             NODE_HALO_CONNECT:       'fuzzed-node-halo-connect',
+
+            NODEGROUP:               'fuzzed-nodegroup',
 
             NO_PRINT:                'no-print',
 
@@ -204,20 +208,21 @@ define(['underscore'], function() {
          *    {String} CANVAS_EDGE_SELECTED      - Event triggered when an edge got selected.
          *    {String} CANVAS_EDGE_UNSELECTED    - Event triggered when an edge got unselected.
          *
-         *    {String} GRAPH_NODE_ADDED          - Event triggered when a node was added to the graph.
-         *    {String} GRAPH_NODE_DELETED        - Event triggered when a node was deleted from the graph.
-         *    {String} GRAPH_EDGE_ADDED          - Event triggered when an edge was added to the graph.
-         *    {String} GRAPH_EDGE_DELETED        - Event triggered when an edge was deleted from the graph.
+         *    {String} EDGE_ADDED          - Event triggered when an edge was added to the graph.
+         *    {String} EDGE_DELETED        - Event triggered when an edge was deleted from the graph.
          *
+         *    {String} NODE_ADDED                - Event triggered when a node was added to the graph.
+         *    {String} NODE_DELETED              - Event triggered when a node was deleted from the graph.
          *    {String} NODE_DRAG_STOPPED         - Event triggered when a dragged node is dropped again.
+		 *    {String} NODE_SELECTED             - Event triggered when a node on the canvas is selected
+         *    {String} NODE_UNSELECTED           - Event triggered when a node on the canvas is unselected
          *
-         *    {String} PROPERTY_CHANGED          - Event triggered when a property of a node changed.
+         *    {String} NODE_PROPERTY_CHANGED     - Event triggered when a property of a node changed.
+         *    {String} EDGE_PROPERTY_CHANGED     - Event triggered when a property of an edge changed.
+         *
          *    {String} PROPERTY_HIDDEN_CHANGED   - Event triggered when a property's hidden state changed.
          *    {String} PROPERTY_READONLY_CHANGED - Event triggered when a property's readonly state changed.
          *    {String} PROPERTY_SYNCHRONIZED     - Event triggered when a property synced itself with the backend.
-         *
-         *    {String} NODE_UNSELECTED           - Event triggered when a node on the canvas is unselected
-		 *    {String} NODE_SELECTED             - Event triggered when a node on the canvas is selected		
 		 */
         Events: {
             CANVAS_SELECTION_STOPPED:  'canvas-selection-stopped',
@@ -225,22 +230,29 @@ define(['underscore'], function() {
             CANVAS_EDGE_SELECTED:      'canvas-edge-selected',
             CANVAS_EDGE_UNSELECTED:    'canvas-edge-unselected',
 
-            GRAPH_NODE_ADDED:          'graph-node-added',
-            GRAPH_NODE_DELETED:        'graph-node-deleted',
-            GRAPH_EDGE_ADDED:          'graph-edge-added',
-            GRAPH_EDGE_DELETED:        'graph-edge-deleted',
+            EDGE_ADDED:                'edge-added',
+            EDGE_DELETED:              'edge-deleted',
+
             GRAPH_LAYOUT:              'graph-layout',
             GRAPH_LAYOUTED:            'graph-layouted',
 
+            NODES_MOVED:               'nodes-moved',
+            NODE_ADDED:                'node-added',
+            NODE_DELETED:              'node-deleted',
             NODE_DRAG_STOPPED:         'node-drag-stopped',
+			NODE_SELECTED:             'node_selected',
+			NODE_UNSELECTED:		   'node_unselected',
 
-            PROPERTY_CHANGED:          'property-changed',
+            EDGE_PROPERTY_CHANGED:      'edge-property-changed',
+            NODE_PROPERTY_CHANGED:      'node-property-changed',
+            NODEGROUP_PROPERTY_CHANGED: 'nodegroup-property-changed',
+
+            NODEGROUP_ADDED:           'nodegroup-added',
+            NODEGROUP_DELETED:         'nodegroup-deleted',
+
             PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',
             PROPERTY_READONLY_CHANGED: 'property-readonly-changed',
-            PROPERTY_SYNCHRONIZED:     'property-synchronized',
-			
-			NODE_UNSELECTED:		   'node_unselected',
-			NODE_SELECTED:             'node_selected'
+            PROPERTY_SYNCHRONIZED:     'property-synchronized'
         },
 
         /**
@@ -311,10 +323,13 @@ define(['underscore'], function() {
          *
          *    {String} CONNECTOR_STYLE          - Connector style (see jsPlumb documentation).
          *    {Object} CONNECTOR_OPTIONS        - Additional, connector style-specific options.
+         *    {Object} CONNECTION_OVERLAYS      - Default Overlays to attach to every Connection
          *
          *    {Number} ENDPOINT_RADIUS          - The radius of the endpoints of connections (drag handlers).
          *    {String} ENDPOINT_FILL            - The fill color of endpoints.
          *    {String} ENDPOINT_STYLE           - The style of the endpoints (see jsPlumb documentation).
+         *
+         *    {String} LABEL_OVERLAY_ID         - The jsPlumb-internally used ID of the overlay, that label.js accesses
          */
         JSPlumb: {
             STROKE_COLOR:             DEFAULT_COLOR,
@@ -323,12 +338,15 @@ define(['underscore'], function() {
             STROKE_COLOR_DISABLED:    DISABLED_COLOR,
             STROKE_WIDTH:             2,
 
-            CONNECTOR_STYLE:    'Flowchart',
-            CONNECTOR_OPTIONS:  {stub: 10 /* min. distance in px before connector bends */},
+            CONNECTOR_STYLE:     'Flowchart',
+            CONNECTOR_OPTIONS:   {stub: 10 /* min. distance in px before connector bends */},
+            CONNECTION_OVERLAYS: undefined,
 
             ENDPOINT_RADIUS:    7,
             ENDPOINT_FILL:      HIGHLIGHTED_COLOR,
-            ENDPOINT_STYLE:     'Blank'
+            ENDPOINT_STYLE:     'Blank',
+
+            LABEL_OVERLAY_ID: 'label'
         },
 
         /**
@@ -336,16 +354,17 @@ define(['underscore'], function() {
          *    Certain keys used with jQuery.data().
          *
          *  Constants:
+         *    {String} EDGE       - Used to retrieve the Connection object from the corresponding DOM element.
+         *                          (former Attribute).
          *    {String} NODE       - Data key used to get the node object from a associated DOM element.
          *    {String} SELECTABLE - Data key used to store the jQuery UI Selectable object with the canvas
          *                          (needed for some hacks).
-         *    {String} CONNECTION_ID - Used to retrieve the Connection object from the corresponding DOM element.
-         *                             (former Attribute)
          */
         Keys: {
-            NODE:           'node',
-            SELECTABLE:     'ui-selectable',
-            CONNECTION_ID:  'fuzzed-id'
+            EDGE:       'edge',
+            NODE:       'node',
+            NODEGROUP:  'nodegroup',
+            SELECTABLE: 'ui-selectable'
         },
 
         /**
