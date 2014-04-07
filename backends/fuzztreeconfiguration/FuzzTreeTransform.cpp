@@ -57,7 +57,7 @@ FuzzTreeTransform::FuzzTreeTransform(
 			throw FatalException("Invalid FuzzTree");
 		}
 	}
-	catch (const xml_schema::Exception& e)
+	catch (const xml_schema::Exception&)
 	{
 		m_bValid = false;
 
