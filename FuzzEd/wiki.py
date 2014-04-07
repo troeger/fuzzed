@@ -17,11 +17,11 @@ class FuzzEdWikiAccess(object):
 			Page creation works magically for admins with /docs/<name>/edit,
 			which should be improved in the future.
 		'''
-		return request.user.is_authenticated() and request.user.is_superuser
+		return request.user.is_staff()
 
 	def can_edit(self, request, target):
 		''' Keep spammers away. '''
-		return request.user.is_authenticated() 
+		return request.user.is_staff() 
 
 	def can_view_history(self, request, target):
 		''' Views are currently broken. '''

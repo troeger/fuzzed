@@ -108,7 +108,7 @@
         <div class="container">
             <a class="navbar-brand" anchor="#">
                 {% if graph %}
-                    FuzzEd <small><b>{{ project.name }}/</b>{{ graph }}</small>
+                    <a class="navbar-brand" href="{% url 'dashboard' project.pk %}">{{ project.name }} / {{ graph }}</a>
                 {% else %}
                     FuzzEd 
                 {% endif %}
@@ -130,9 +130,6 @@
             <div class="nav-collapse collapse navbar-responsive-collapse">
                 <ul class="nav navbar-nav pull-right">
                     {% block menu_right %}{% endblock %}
-                    {%  if user.is_authenticated %}
-                    <li><a href="/?logout"><i class="fa fa-power-off"></i> Logout </a></li>
-                    {% endif %}
                 </ul>
             </div>
         </div>

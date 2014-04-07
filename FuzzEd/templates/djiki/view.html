@@ -2,7 +2,7 @@
 {% load i18n djiki_tags %}
 {% block djiki_main %}
 <div class="page content grid_12">
-{% if user.is_authenticated %}
+{% if user.is_staff %}
 <a href="{% url 'djiki-page-edit' page.title|urlize_title %}" class="btn btn-default btn-small" style="float:right">
 	<i class="fa fa-edit"></i>&nbsp;Edit this page
 </a>

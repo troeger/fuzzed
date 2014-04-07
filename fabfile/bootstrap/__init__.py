@@ -1,6 +1,6 @@
 from fabric.api import task
 import fastfood
-import platform, os, urllib
+import platform, os, urllib, shutil
 
 def install_apache():
     assert(platform.system() != 'Darwin')
