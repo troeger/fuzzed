@@ -107,8 +107,8 @@
     <div class="navbar navbar-fixed-top no-print">
         <div class="container">
             <a class="navbar-brand" anchor="#">
-                {% if graph %}
-                    <a class="navbar-brand" href="{% url 'dashboard' project.pk %}">{{ project.name }} / {{ graph }}</a>
+                {% if graph and project %}
+                    <a class="navbar-brand" href="{% url 'dashboard' project.pk %}"><small>{{ project.name }}</small> -</a><a class="navbar-brand" href="#">{{ graph }}</a>
                 {% else %}
                     FuzzEd 
                 {% endif %}
