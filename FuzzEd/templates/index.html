@@ -17,15 +17,11 @@
 </script>
 {% endblock %}
 
-{% block menu_right %}
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-fw fa-external-link-square"></i>Go to<b class="caret"></b></a>
-  <ul class="dropdown-menu">
-    <li><a href="/docs/welcome"><i class="fa fa-fw fa-book"></i> Documentation </a></li>
-    <li><a href="http://fuzzed.uservoice.com/"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
-  </ul>
-</li>
+{% block goto_menu %}
+<li><a href="/docs/welcome"><i class="fa fa-fw fa-book"></i> Documentation </a></li>
+<li><a href="http://fuzzed.uservoice.com/"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
 {% endblock %}
+
 
 {% block content %}
 <div class="alert alert-block">
