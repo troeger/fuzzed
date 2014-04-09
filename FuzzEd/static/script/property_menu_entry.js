@@ -864,10 +864,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         remove: function() {},
 		
         _setupContainer: function() {
-			this.property.node._nodeImage.append(
+			this.property.owner._nodeImage.append(
 				jQuery('<p align="center">').html(escape(this.property.value))
 			);
-			this.container = this.property.node.container;
+			this.container = this.property.owner.container;
 			
 			return this;
         },
