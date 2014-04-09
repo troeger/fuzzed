@@ -19,13 +19,11 @@ import json, logging, time, os, tempfile, subprocess, unittest
 from xml.dom import minidom
 from subprocess import Popen
 from django.test import LiveServerTestCase
-from django.test.utils import override_settings
 from django.test.client import Client
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
 from FuzzEd.models.notification import Notification
 from django.contrib.auth.models import User
-from tastypie.exceptions import Unauthorized, UnsupportedFormat
 
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
@@ -36,11 +34,11 @@ class FuzzEdTestCase(LiveServerTestCase):
     '''
     def setUpAnonymous(self):
         ''' If the test case wants to have a anonymous login session, it should call this function in setUp().'''
-        self.c=Client()
+        self.c = Client()
 
     def setUpLogin(self):
         ''' If the test case wants to have a functional login session, it should call this function in setUp().'''
-        self.c=Client()
+        self.c = Client()
         self.c.login(username='testadmin', password='testadmin') 
 
     def get(self, url):
