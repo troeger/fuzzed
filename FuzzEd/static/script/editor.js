@@ -631,10 +631,10 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             var rightMostNode   = { 'x': 0 };
 
             _.each(nodes, function(node) {
-                if (node.y < topMostNode.y)     { topMostNode = node }
-                if (node.x < leftMostNode.x)    { leftMostNode = node; }
-                if (node.y > bottomMostNode.y)  { bottomMostNode = node; }
-                if (node.x > rightMostNode.x)   { rightMostNode = node; }
+                if (node.y < topMostNode.y)    { topMostNode    = node }
+                if (node.x < leftMostNode.x)   { leftMostNode   = node; }
+                if (node.y > bottomMostNode.y) { bottomMostNode = node; }
+                if (node.x > rightMostNode.x)  { rightMostNode  = node; }
             }.bind(this));
 
             return {

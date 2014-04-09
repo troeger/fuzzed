@@ -886,7 +886,7 @@ function(Property, Mirror, Canvas, Class, Config) {
         getChildren: function() {
             var children = [];
             _.each(this.outgoingEdges, function(edge) {
-                children.push(jQuery(edge.target).data(this.config.Keys.NODE));
+                children.push(edge.target);
             }.bind(this));
             return children;
         },
