@@ -16,8 +16,8 @@
 '''
 
 import json, logging, time, os, tempfile, subprocess, unittest
-from xml.dom import minidom
 from subprocess import Popen
+from xml.dom.minidom import parse
 from django.test import LiveServerTestCase
 from django.test.client import Client
 from FuzzEd.models.graph import Graph
@@ -313,6 +313,21 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         # Now check the dismiss call
         response=self.ajaxPost(self.baseUrl+'/notifications/%u/dismiss'%n.pk)
         self.assertEqual(response.status_code, 200)
+
+class AnalysisInputFilesTestCase(FuzzEdTestCase):
+    '''
+        These are tests based on the analysis engine input files in fixture/analysis.
+        They only test if the analysis engine crashes on them.
+        The may later be translated to real tests with some expected output.
+    '''
+    def testFiles(self):
+        for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
+            for f in files:
+                fname = root+os.sep+f
+                print "Testing "+fname
+                retcode = subprocess.call('backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp'%(fname), shell=True)
+                self.assertEqual(retcode, 0)
+                dom = parse('/tmp/output.xml')
 
 class AnalysisFixtureTestCase(FuzzEdTestCase):
     ''' 
