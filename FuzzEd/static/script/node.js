@@ -262,7 +262,7 @@ function(Property, Mirror, Canvas, Class, Config) {
          * This initialization method does the setup work for endpoints. Endpoints are virtual entities that function as
          * source as well as target of edges dragged from/to them. They define how many edges and coming from which
          * node type may be connected to this node. This method serves as a dispatcher to the sub-methods
-         * <Node::_setupIncomingEndpoint> and <Node::_setupOutoingEndpoint>.
+         * <Node::_setupIncomingEndpoint> and <Node::_setupOutgoingEndpoint>.
          *
          * Returns:
          *   This {<Node>} instance for chaining.
