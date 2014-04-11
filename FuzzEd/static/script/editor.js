@@ -454,31 +454,20 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          * Returns:
          *   This Editor instance for chaining.
          */
-        _selectAll__old: function(event) {
+
+        _selectAll: function(event) {
+
             //XXX: trigger selection start event manually here
             //XXX: hack to emulate a new selection process
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
 
-            var NODES           = '.' + this.config.Classes.NODE;
-            var NODES_AND_EDGES = NODES + ', .' + this.config.Classes.JSPLUMB_CONNECTOR;
-            var NODES_AND_EDGES_AND_NODEGROUPS = NODES_AND_EDGES + ', .' + this.config.Classes.NODEGROUP;
-
-            jQuery(NODES_AND_EDGES_AND_NODEGROUPS).each(function(index, domElement) {
-                var element = jQuery(domElement);
-
-                element.addClass(this.config.Classes.SELECTING)
-                       .addClass(this.config.Classes.SELECTED);
-            }.bind(this));
+            jQuery('.'+this.config.Classes.SELECTEE)
+                .addClass(this.config.Classes.SELECTING)
+                .addClass(this.config.Classes.SELECTED);
 
             //XXX: trigger selection stop event manually here
             //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
-        },
-
-        _selectAll: function(event) {
-            jQuery('.'+this.config.Classes.SELECTEE)
-                .addClass(this.config.Classes.SELECTING)
-                .addClass(this.config.Classes.SELECTED);
         },
 
         /**
