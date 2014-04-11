@@ -138,10 +138,20 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
         addEdge: function(jsonEdge) {
             var sourceNode = this.getNodeById(jsonEdge.source);
             var targetNode = this.getNodeById(jsonEdge.target);
+
+            // check if source's max number of outgoing connections is already reached
+            if (sourceNode.numberOfOutgoingConnections != -1) { // -1 means infinite connections possible
+                if (sourceNode.outgoingEdges.length >= sourceNode.numberOfOutgoingConnections) return false;
+            }
+
+            // check if target's max number of incoming connections is already reached
+            if (targetNode.numberOfIncomingConnections != -1) { // -1 means infinite connections possible
+                if (targetNode.incomingEdges.length >= targetNode.numberOfIncomingConnections) return false;
+            }
+
             var properties = jsonEdge.properties || {};
             properties.id  = jsonEdge.id;
             properties.graph = this;
-
             var edge = new Edge(this.getNotation().edges.properties, sourceNode, targetNode, properties);
             this.edges[edge.id] = edge;
 

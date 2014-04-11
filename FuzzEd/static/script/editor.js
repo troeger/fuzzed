@@ -581,14 +581,18 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 jsonNode.id = pasteId;
                 jsonNode.x += pasteCount * (boundingBox.width + 1);
                 jsonNode.y += pasteCount * (boundingBox.height + 1);
-                this.graph.addNode(jsonNode).select();
+
+                var node = this.graph.addNode(jsonNode);
+                if (node) node.select();
             }.bind(this));
 
             _.each(edges, function(edge) {
                 edge.id = undefined;
                 edge.source = ids[edge.sourceNodeId] || edge.sourceNodeId;
                 edge.target = ids[edge.targetNodeId] || edge.targetNodeId;
-                this.graph.addEdge(edge).select();
+
+                var edge = this.graph.addEdge(edge);
+                if (edge) edge.select();
             }.bind(this));
 
             //XXX: trigger selection stop event manually here
