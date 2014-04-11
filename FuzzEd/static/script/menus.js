@@ -302,6 +302,8 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
                 Config.Events.NODE_DELETED,
                 Config.Events.EDGE_ADDED,
                 Config.Events.EDGE_DELETED,
+                Config.Events.NODEGROUP_ADDED,
+                Config.Events.NODEGROUP_DELETED,
                 Config.Events.GRAPH_LAYOUT,
                 Config.Events.NODE_PROPERTY_CHANGED
             ].join(' '), function() {

@@ -126,18 +126,19 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {Number}   edgeId       - ID of the edge.
          *   {Number}   sourceNodeId - Source node of the new edge.
          *   {Number}   targetNodeId - Target node of the new edge.
+         *   {Object}   properties   - The new edges's properties
          *   {function} success      - [optional] Will be called when the request was successful. Provides e.g. the ID
          *                             of the new edge.
          *   {function} error        - [optional] Callback that gets called in case of an ajax-error.
          *   {function} complete     - [optional] Callback that is invoked in both cases - a successful or an erroneous
          *                             AJAX request.
          */
-        //TODO: send properties
-        edgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
+        edgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, properties, success, error, complete) {
             var data = {
                 id:          edgeId,
                 source:      sourceNodeId,
-                target:      targetNodeId
+                target:      targetNodeId,
+                properties:  JSON.stringify(properties)
             };
 
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
@@ -225,16 +226,17 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {Event}    event       - jQuery event object of the custom trigger.
          *   {Number}   nodeGroupId - The nodeGroup ID.
          *   {String}   nodeIds     - The member nodes' ids.
+         *   {Object}   properties  - The new nodeGroup's properties
          *   {function} success     - [optional] Will be called on successful node creation transmission to server.
          *   {function} error       - [optional] Callback that gets called in case of an ajax-error.
          *   {function} complete    - [optional] Callback that is invoked when the ajax request completes successful or
          *                         erroneous.
          */
-        //TODO: send properties
-        nodeGroupAdded: function(event, nodeGroupId, nodeIds, success, error, complete) {
+        nodeGroupAdded: function(event, nodeGroupId, nodeIds, properties, success, error, complete) {
             var data = {
                 id:         nodeGroupId,
-                nodeIds:    JSON.stringify(nodeIds)
+                nodeIds:    JSON.stringify(nodeIds),
+                properties: JSON.stringify(properties)
             };
 
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {

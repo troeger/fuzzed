@@ -514,6 +514,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         _copySelection: function() {
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+            var selectedNodeGroups = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODEGROUP;
 
             // put nodes as dicts into nodes
             var nodes = [];
@@ -575,12 +576,12 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 if (node) node.select();
             }.bind(this));
 
-            _.each(edges, function(edge) {
-                edge.id = undefined;
-                edge.source = ids[edge.sourceNodeId] || edge.sourceNodeId;
-                edge.target = ids[edge.targetNodeId] || edge.targetNodeId;
+            _.each(edges, function(jsonEdge) {
+                jsonEdge.id = undefined;
+                jsonEdge.source = ids[jsonEdge.sourceNodeId] || jsonEdge.sourceNodeId;
+                jsonEdge.target = ids[jsonEdge.targetNodeId] || jsonEdge.targetNodeId;
 
-                var edge = this.graph.addEdge(edge);
+                var edge = this.graph.addEdge(jsonEdge);
                 if (edge) edge.select();
             }.bind(this));
 

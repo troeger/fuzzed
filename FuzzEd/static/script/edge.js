@@ -63,7 +63,12 @@ function(Class, Config, Property) {
             this._setupProperties();
 
             // call home
-            jQuery(document).trigger(Config.Events.EDGE_ADDED, [this.id, this.source.id, this.target.id]);
+            jQuery(document).trigger(Config.Events.EDGE_ADDED, [
+                this.id,
+                this.source.id,
+                this.target.id,
+                this.toDict().properties
+            ]);
         },
 
         select: function() {
@@ -88,11 +93,15 @@ function(Class, Config, Property) {
         },
 
         toDict: function() {
+            var properties = _.map(this.properties, function(prop) { return prop.toDict() });
+
             return {
                 id:           this.id,
                 sourceNodeId: this.source.id,
                 targetNodeId: this.target.id,
-                properties:   this.properties //TODO: make it right
+                properties:   _.reduce(properties, function(memo, prop) {
+                                    return _.extend(memo, prop);
+                              })
             }
         },
 

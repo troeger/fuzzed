@@ -41,7 +41,11 @@ function(Property, Class, Canvas, Config) {
                 ._setupProperties();
 
             // call home
-            jQuery(document).trigger(Config.Events.NODEGROUP_ADDED, [this.id, this.nodeIds()]);
+            jQuery(document).trigger(Config.Events.NODEGROUP_ADDED, [
+                this.id,
+                this.nodeIds(),
+                this.toDict().properties
+            ]);
         },
 
         /**
@@ -175,6 +179,18 @@ function(Property, Class, Canvas, Config) {
             jQuery(document).trigger(Config.Events.NODEGROUP_DELETED, [this.id]);
 
             return true;
+        },
+
+        toDict: function() {
+            var properties = _.map(this.properties, function(prop) { return prop.toDict() });
+
+            return {
+                id:           this.id,
+                nodesIds:     this.nodeIds(),
+                properties:   _.reduce(properties, function(memo, prop) {
+                                    return _.extend(memo, prop);
+                              })
+            }
         }
     });
 });
