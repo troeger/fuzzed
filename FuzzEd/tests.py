@@ -16,17 +16,14 @@
 '''
 
 import json, logging, time, os, tempfile, subprocess, unittest
-from xml.dom import minidom
 from subprocess import Popen
-from django.db import transaction
+from xml.dom.minidom import parse
 from django.test import LiveServerTestCase
-from django.test.utils import override_settings
 from django.test.client import Client
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
 from FuzzEd.models.notification import Notification
 from django.contrib.auth.models import User
-from tastypie.exceptions import Unauthorized, UnsupportedFormat
 
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
@@ -37,11 +34,11 @@ class FuzzEdTestCase(LiveServerTestCase):
     '''
     def setUpAnonymous(self):
         ''' If the test case wants to have a anonymous login session, it should call this function in setUp().'''
-        self.c=Client()
+        self.c = Client()
 
     def setUpLogin(self):
         ''' If the test case wants to have a functional login session, it should call this function in setUp().'''
-        self.c=Client()
+        self.c = Client()
         self.c.login(username='testadmin', password='testadmin') 
 
     def get(self, url):
@@ -228,7 +225,7 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 200)
         graphml = response.content
         # Now send request with wrong project ID
-        result = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', graphml, 'application/xml')
+        response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', graphml, 'application/xml')
         self.assertEqual(response.status_code, 403)
 
     def testMissingGraphImportProject(self):
@@ -237,18 +234,18 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 200)
         graphml = response.content
         # Now send request with wrong project ID
-        result = self.postWithAPIKey('/api/v1/graph/?format=graphml', graphml, 'application/xml')
-        self.assertEqual(response.status_code, 400)
+        response = self.postWithAPIKey('/api/v1/graph/?format=graphml', graphml, 'application/xml')
+        self.assertEqual(response.status_code, 403)
 
     def testInvalidGraphImportFormat(self):
         for wrong_format in ['json','tex','xml']:
             response = self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u'%(wrong_format,self.pkProject), "<graphml></graphml>", 'application/text')
-            self.assertEqual(response.status_code, 400)
+            self.assertEqual(response.status_code, 413)
 
     def testInvalidContentType(self):
         for format in ['application/text', 'application/x-www-form-urlencoded']:
             response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u'%(self.pkProject), "<graphml></graphml>", format)
-            self.assertEqual(response.status_code, 415)
+            self.assertEqual(response.status_code, 413)
 
 
     def testFoo(self):
@@ -316,6 +313,30 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         # Now check the dismiss call
         response=self.ajaxPost(self.baseUrl+'/notifications/%u/dismiss'%n.pk)
         self.assertEqual(response.status_code, 200)
+
+class AnalysisInputFilesTestCase(FuzzEdTestCase):
+    '''
+        These are tests based on the analysis engine input files in fixture/analysis.
+        They only test if the analysis engine crashes on them.
+        The may later be translated to real tests with some expected output.
+    '''
+    def testFileAnalysis(self):
+        for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
+            for f in files:
+                fname = root+os.sep+f
+                print "Testing "+fname
+                retcode = subprocess.call('backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp'%(fname), shell=True)
+                self.assertEqual(retcode, 0, fname+ " failed")
+                dom = parse('/tmp/output.xml')
+
+    def testFileSimulation(self):
+        for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
+            for f in files:
+                fname = root+os.sep+f
+                print "Testing "+fname
+                retcode = subprocess.call('backends/lib/ftsimulation %s /tmp/output.xml /tmp'%(fname), shell=True)
+                self.assertEqual(retcode, 0, fname+ " failed")
+                dom = parse('/tmp/output.xml')
 
 class AnalysisFixtureTestCase(FuzzEdTestCase):
     ''' 

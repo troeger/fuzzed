@@ -12,7 +12,6 @@ from FuzzEd.decorators import require_ajax
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.core.urlresolvers import reverse
 from FuzzEd.middleware import HttpResponse, HttpResponseAccepted
-from django.db import transaction
 from django.views.decorators.cache import never_cache
 
 # We expect these imports to go away main the main logic finally lives in common.py
@@ -82,7 +81,6 @@ def job_create(request, graph_id, job_kind):
 @csrf_exempt
 @require_ajax
 @require_http_methods(['GET'])
-@transaction.commit_on_success
 @never_cache
 def graphs(request):
     """
@@ -170,7 +168,6 @@ def graph_transfers(request, graph_id):
 @csrf_exempt
 @require_ajax
 @require_POST
-@transaction.commit_on_success
 @never_cache
 def nodes(request, graph_id):
     """
@@ -229,7 +226,6 @@ def nodes(request, graph_id):
 @csrf_exempt
 @require_ajax
 @require_POST
-@transaction.commit_on_success
 @never_cache
 def nodegroups(request, graph_id):        
 
@@ -257,7 +253,6 @@ def nodegroups(request, graph_id):
 @csrf_exempt
 @require_ajax
 @require_http_methods(['DELETE', 'POST'])
-@transaction.commit_on_success
 @never_cache
 def node(request, graph_id, node_id):
     """
@@ -313,7 +308,6 @@ def node(request, graph_id, node_id):
 @login_required
 @csrf_exempt
 @require_ajax
-@transaction.commit_on_success
 @never_cache
 def nodegroup(request, graph_id, group_id):
     try:
@@ -337,7 +331,6 @@ def nodegroup(request, graph_id, group_id):
 @csrf_exempt
 @require_ajax
 @require_POST
-@transaction.commit_on_success
 @never_cache
 def edges(request, graph_id):
     """
@@ -393,7 +386,6 @@ def edges(request, graph_id):
 @csrf_exempt
 @require_ajax
 @require_http_methods(['DELETE', 'POST'])
-@transaction.commit_on_success
 @never_cache
 def edge(request, graph_id, edge_id):
     """
@@ -447,7 +439,6 @@ def edge(request, graph_id, edge_id):
 @csrf_exempt
 @require_ajax
 @require_http_methods(['GET', 'POST'])
-@transaction.commit_on_success
 @never_cache
 def undos(request, graph_id):
     #
@@ -475,7 +466,6 @@ def undos(request, graph_id):
 @csrf_exempt
 @require_ajax
 @require_http_methods(['GET', 'POST'])
-@transaction.commit_on_success
 @never_cache
 def redos(request, graph_id):
     #

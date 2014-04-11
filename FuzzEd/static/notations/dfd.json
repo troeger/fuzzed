@@ -106,6 +106,7 @@
             "nodeDisplayName": "Sticky Note",
             "inherits": "node",
             "numberOfOutgoingConnections": 0,
+            "numberOfIncomingConnections": 0,
             "image": "sticky_note.html",
             "resizable": true,
             "editable": true,

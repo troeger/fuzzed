@@ -148,6 +148,7 @@ class Graph(models.Model):
 \\documentclass{article}
 \\usepackage[landscape, top=1in, bottom=1in, left=1in, right=1in]{geometry}
 \\usepackage{helvet}
+\\usepackage{adjustbox}
 \\renewcommand{\\familydefault}{\\sfdefault}
 \\usepackage{tikz}
 \\usetikzlibrary{positioning, trees, svg.path} 
@@ -158,7 +159,11 @@ class Graph(models.Model):
 \\begin{document}
 \\pagestyle{empty}
         """     
-        result += tikz_shapes + "\n\\begin{figure}\n\\begin{tikzpicture}[auto, trim left]"
+        result += tikz_shapes + """
+\\begin{figure}
+\\begin{adjustbox}{max size={\\textwidth}{\\textheight}}
+\\begin{tikzpicture}[auto, trim left]
+        """
         # Find most left node and takes it's x coordinate as start offset
         # This basically shifts the whole tree to the left border
         minx = self.nodes.aggregate(min_x = models.Min('x'))['min_x']
@@ -168,7 +173,12 @@ class Graph(models.Model):
         top_event = self.nodes.get(kind='topEvent')
         result += top_event.to_tikz(x_offset = -minx, y_offset = top_event.y)
 #        result += top_event.to_tikz_tree()
-        result += "\\end{tikzpicture}\n\\end{figure}\n\\end{document}"
+        result += """
+\\end{tikzpicture}
+\\end{adjustbox}
+\\end{figure}
+\\end{document}
+        """
         return result
 
     def to_xml(self, xmltype=None):

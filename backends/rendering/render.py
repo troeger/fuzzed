@@ -11,6 +11,11 @@ working_dir = sys.argv[4]
 input_fname = sys.argv[2]
 output_fname = sys.argv[3]
 
+# Only needed for Ubuntu 12.10, all others have it as part of the installation
+shutil.copy("rendering/adjustbox.sty", working_dir)
+shutil.copy("rendering/collectbox.sty", working_dir)
+shutil.copy("rendering/adjgrfx.sty", working_dir)
+
 # Latex cannot operate well on files in another directory, so we go there directly
 # This is anyway epxected to be the temporary job execution directory created by the daemon
 olddir = os.getcwd()

@@ -105,11 +105,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         },
 
         _sanitize: function() {
-            var validationResult = {};
-            if (!this.validate(this.value, validationResult)) {
-                var ErrorClass = validationResult.kind || Error;
-                throw new ErrorClass(validationResult.message);
-            }
+            //var validationResult = {};
+            //if (!this.validate(this.value, validationResult)) {
+            //    var ErrorClass = validationResult.kind || Error;
+            //    throw new ErrorClass(validationResult.message);
+            //}
 
             return this;
         },

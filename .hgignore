@@ -1,5 +1,8 @@
 syntax: glob
+fuzztrees.sqlite
+backends/backend_simulation.log
 *.pyc
+*.git*
 *.orig
 .DS_Store
 .vagrant

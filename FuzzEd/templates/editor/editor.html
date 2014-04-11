@@ -53,7 +53,6 @@
 {% endblock %}
 
 {% block menu_right %}
-<li><a href="{% url 'dashboard' project.pk %}"><i class="fa fa-folder-open"></i> {{ project.name }} </a></li>
 <li class="dropdown">
     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-pencil"></i> Edit <b class="caret"></b>
@@ -132,7 +131,15 @@
             <i class="fa fa-square-o"></i> Toogle grid</a></li>
     </ul>
 </li>
+{% endblock %}
 
+{% block goto_menu %}
+<li><a href="{% url 'dashboard' project.pk %}"><i class="fa fa-fw fa-folder-open"></i> {{ project.name }} </a></li>
+<li class="divider"></li>
+<li><a href="/settings"><i class="fa fa-fw fa-user"></i> Account settings</a></li>
+<li><a href="/docs/editor" target="_blank"><i class="fa fa-fw fa-book"></i> Documentation </a></li>
+<li><a href="http://fuzzed.uservoice.com/"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
+<li><a href="/?logout"><i class="fa fa-fw fa-power-off"></i> Logout </a></li>
 {% endblock %}
 
 {% block content %}

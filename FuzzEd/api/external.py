@@ -9,10 +9,17 @@ from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from tastypie.resources import ModelResource
 from tastypie.authentication import ApiKeyAuthentication   
 from tastypie.authorization import Authorization
-from tastypie.exceptions import Unauthorized, UnsupportedFormat
+from tastypie.exceptions import UnsupportedFormat, BadRequest, ImmediateHttpResponse
+from django.core.exceptions import ValidationError
 from tastypie.serializers import Serializer
 from tastypie.models import ApiKey
 from tastypie import fields
+from tastypie.http import HttpForbidden
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
+from django.utils.cache import patch_cache_control, patch_vary_headers
+
 from FuzzEd.models import Project, Graph
 
 import time
@@ -148,10 +155,76 @@ class GraphResource(ModelResource):
             project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
             bundle.obj.project=project
         except:
-            raise Unauthorized("You can't use this project for your new graph.") 
+            raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))            
         # Fill the graph with the GraphML data
         bundle.obj.from_graphml(bundle.request.body)     
         return bundle  
+
+    def wrap_view(self, view):
+        """
+        Wraps views to return custom error codes instead of generic 500's
+        """
+        @csrf_exempt
+        def wrapper(request, *args, **kwargs):
+            ''' This is a straight copy from the Tastypie sources,
+                extended with the 415 generation code. 
+            '''
+            try:
+                callback = getattr(self, view)
+                response = callback(request, *args, **kwargs)
+
+                # Our response can vary based on a number of factors, use
+                # the cache class to determine what we should ``Vary`` on so
+                # caches won't return the wrong (cached) version.
+                varies = getattr(self._meta.cache, "varies", [])
+
+                if varies:
+                    patch_vary_headers(response, varies)
+
+                if self._meta.cache.cacheable(request, response):
+                    if self._meta.cache.cache_control():
+                        # If the request is cacheable and we have a
+                        # ``Cache-Control`` available then patch the header.
+                        patch_cache_control(response, **self._meta.cache.cache_control())
+
+                if request.is_ajax() and not response.has_header("Cache-Control"):
+                    # IE excessively caches XMLHttpRequests, so we're disabling
+                    # the browser cache here.
+                    # See http://www.enhanceie.com/ie/bugs.asp for details.
+                    patch_cache_control(response, no_cache=True)
+
+                return response
+            except UnsupportedFormat as e:
+                response = HttpResponse()
+                response.status_code = 413
+                return response               
+            except (BadRequest, fields.ApiFieldError) as e:
+                data = {"error": e.args[0] if getattr(e, 'args') else ''}
+                return self.error_response(request, data, response_class=http.HttpBadRequest)
+            except ValidationError as e:
+                data = {"error": e.messages}
+                return self.error_response(request, data, response_class=http.HttpBadRequest)
+            except Exception as e:
+                if hasattr(e, 'response'):
+                    return e.response
+
+                # A real, non-expected exception.
+                # Handle the case where the full traceback is more helpful
+                # than the serialized error.
+                if settings.DEBUG and getattr(settings, 'TASTYPIE_FULL_DEBUG', False):
+                    raise
+
+                # Re-raise the error to get a proper traceback when the error
+                # happend during a test case
+                if request.META.get('SERVER_NAME') == 'testserver':
+                    raise
+
+                # Rather than re-raising, we're going to things similar to
+                # what Django does. The difference is returning a serialized
+                # error message.
+                return self._handle_500(request, e)
+
+        return wrapper
 
 # class GraphJobExportView(ProtectedResourceView):
 #     """ Base class for API views that export a graph based on a rendering job result. """
