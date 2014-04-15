@@ -241,8 +241,13 @@ def nodegroups(request, graph_id):
     group = NodeGroup(client_id = client_id, graph=graph)
     group.save()        # Prepare ManyToMany relationship
     for nodeid in nodeids:
-        node = Node.objects.get(pk = nodeid, deleted = False)
-        group.nodes.add(node)
+        try:
+            # The client may refer to nodes that are already gone,
+            # we simply ignore them
+            node = Node.objects.get(pk = nodeid, deleted = False)
+            group.nodes.add(node)
+        except:
+            pass
     group.save()    
 
     response = HttpResponse(group.to_json(), 'application/javascript', status=201)
