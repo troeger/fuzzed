@@ -406,3 +406,21 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
             # The result of a EPS rendering job is the download link
             epsResponse = self.get(epsLink)
             self.assertEqual('application/postscript', epsResponse['CONTENT-TYPE'])
+
+class UnicodeTestCase(FuzzEdTestCase):
+    fixtures = ['unicode.json', 'initial_data.json']
+    graphs = {1: 'faulttree'}
+    # A couple of specific PK's from the model
+    pkProject = 1
+    pkFaultTree = 1
+
+    def setUp(self):
+        self.setUpLogin()        
+
+    def testTikzSerialize(self):
+        g=Graph.objects.get(pk=self.pkFaultTree)
+        assert(len(g.to_tikz()) > 0)
+
+
+
+
