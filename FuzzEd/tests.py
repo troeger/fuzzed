@@ -262,6 +262,10 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
     def setUp(self):
         self.setUpLogin()        
 
+    def testAjaxRequestCheck(self):
+        response=self.get(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
+        self.assertEqual(response.status_code, 400)
+
     def testGetGraph(self):
         for id, kind in self.graphs.iteritems():
             response=self.ajaxGet(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
