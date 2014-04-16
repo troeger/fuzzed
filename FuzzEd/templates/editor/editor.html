@@ -28,6 +28,14 @@
                         .text(exception.stack);
                 }
             }
+            
+            jQuery(document).mousedown(function(){
+                
+                var dropdown_link = jQuery('.dropdown.open').find("a")
+                // close open bootstrap dropdown
+                jQuery('.dropdown.open').removeClass('open');
+                dropdown_link.blur();
+            });
         });
     });
 </script>

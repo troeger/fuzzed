@@ -124,13 +124,14 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
                 cursor:        Config.Dragging.CURSOR,
                 scroll:        false,
                 stop: function( event, ui ) {
+                    // hotfix for firefox browser because of broken dragging
+                    // if top offset of dragged element becomes negative than set this offset to the actual mouse position
                     if ( ui.offset.top < 0 ) {
                         var mouse_top  = event.clientY;
                         var scroll_top = document.documentElement.scrollTop;
                        
                         jQuery(this).offset({'top': mouse_top + scroll_top});
                     }
-                    //console.log(ui.offset);      
                 },
                 snap:          'body',
                 snapMode:      'inner',
