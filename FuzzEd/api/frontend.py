@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from FuzzEd.decorators import require_ajax
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.core.urlresolvers import reverse
-from FuzzEd.middleware import HttpResponse, HttpResponseAccepted
+from FuzzEd.middleware import HttpResponse, HttpResponseAccepted, HttpResponseRedirect
 from django.views.decorators.cache import never_cache
 
 # We expect these imports to go away main the main logic finally lives in common.py
@@ -29,16 +29,20 @@ logger = logging.getLogger('FuzzEd')
 
 import json, common
 
-@login_required
-@csrf_exempt
-@require_GET
+#@login_required
+#@csrf_exempt
+#@require_GET
+#def graph_download(request, graph_id):
+#    '''
+#        Provides a download response of the graph in the given format in the GET parameter, 
+#        or an HTTP error if the rendering job for the export format is not ready so far.
+#    '''
+#    export_format = request.GET.get('format', 'xml')
+#    return common.graph_download(request.user, graph_id, export_format)
+
 def graph_download(request, graph_id):
-    '''
-        Provides a download response of the graph in the given format in the GET parameter, 
-        or an HTTP error if the rendering job for the export format is not ready so far.
-    '''
     export_format = request.GET.get('format', 'xml')
-    return common.graph_download(request.user, graph_id, export_format)
+    return HttpResponseRedirect('/api/v1/graph/%s/?format=%s'%(graph_id, export_format))
 
 @login_required
 @csrf_exempt

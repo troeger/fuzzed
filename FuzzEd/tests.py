@@ -262,6 +262,8 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
     def setUp(self):
         self.setUpLogin()        
 
+    #TODO: Test that session authentication is checked in the API implementation
+
     def testAjaxRequestCheck(self):
         response=self.get(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
         self.assertEqual(response.status_code, 400)
@@ -272,6 +274,18 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
             self.assertEqual(response.status_code, 200)
         response=self.ajaxGet(self.baseUrl+'/graphs/9999')
         self.assertEqual(response.status_code, 404)
+
+    def testGraphDownload(self):
+        for id, kind in self.graphs.iteritems():
+            # Default export format is XML (unclear if any frontend code actually demands this)
+            response=self.ajaxGet(self.baseUrl+'/graphs/%u/graph_download'%self.pkFaultTree)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("<?xml", response.content)
+            for format, test_str in [('graphml','<graphml'), ('json','{'), ('xml','<?xml'), ('tex','\\begin')]:
+                response=self.ajaxGet(self.baseUrl+'/graphs/%u/graph_download?format=%s'%(self.pkFaultTree, format))
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(test_str, response.content)
+
 
     def testCreateNode(self):
         newnode = {'y'         : '3', 
@@ -330,15 +344,6 @@ class AnalysisInputFilesTestCase(FuzzEdTestCase):
                 fname = root+os.sep+f
                 print "Testing "+fname
                 retcode = subprocess.call('backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp'%(fname), shell=True)
-                self.assertEqual(retcode, 0, fname+ " failed")
-                dom = parse('/tmp/output.xml')
-
-    def testFileSimulation(self):
-        for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
-            for f in files:
-                fname = root+os.sep+f
-                print "Testing "+fname
-                retcode = subprocess.call('backends/lib/ftsimulation %s /tmp/output.xml /tmp'%(fname), shell=True)
                 self.assertEqual(retcode, 0, fname+ " failed")
                 dom = parse('/tmp/output.xml')
 

@@ -7,7 +7,7 @@
 from django.contrib.auth.models import User
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from tastypie.resources import ModelResource
-from tastypie.authentication import ApiKeyAuthentication   
+from tastypie.authentication import ApiKeyAuthentication, MultiAuthentication, SessionAuthentication   
 from tastypie.authorization import Authorization
 from tastypie.exceptions import UnsupportedFormat, BadRequest, ImmediateHttpResponse
 from django.core.exceptions import ValidationError
@@ -137,7 +137,7 @@ class GraphResource(ModelResource):
     '''
     class Meta:
         queryset = Graph.objects.filter(deleted=False)
-        authentication = OurApiKeyAuthentication()
+        authentication = MultiAuthentication(SessionAuthentication(), OurApiKeyAuthentication())
         authorization = GraphAuthorization()
         allowed_methods = ['get', 'post']
         serializer = GraphSerializer()
