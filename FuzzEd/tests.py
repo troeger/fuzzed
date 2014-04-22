@@ -270,8 +270,12 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
     def testGetGraph(self):
         for id, kind in self.graphs.iteritems():
-            response=self.ajaxGet(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
+            url = self.baseUrl+'/graphs/%u'%self.pkFaultTree
+            response=self.ajaxGet(url)
             self.assertEqual(response.status_code, 200)
+            result = json.loads(response.content)
+            for key in ['id','seed','name','type','readOnly','nodes','edges','nodeGroups']:
+                self.assertIn('name', result)
         response=self.ajaxGet(self.baseUrl+'/graphs/9999')
         self.assertEqual(response.status_code, 404)
 

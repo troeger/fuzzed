@@ -44,7 +44,7 @@ urlpatterns = patterns('',
     # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API
   
     # graph
-    url(r'^front/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.frontend.graph', name='graph'),
+ #  url(r'^front/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.frontend.graph', name='graph'),
     url(r'^front/graphs/(?P<graph_id>\d+)/transfers$', 'FuzzEd.api.frontend.graph_transfers', name='graph_transfers'),
 #   url(r'^front/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.frontend.graph_download', name='frontend_graph_download'),
 

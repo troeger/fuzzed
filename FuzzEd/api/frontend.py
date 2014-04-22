@@ -65,34 +65,34 @@ def job_create(request, graph_id, job_kind):
     response['Location'] = reverse('frontend_job_status', args=[job.pk])
     return response
 
-@login_required
-@csrf_exempt
-@require_ajax
-@require_GET
-@never_cache
-def graph(request, graph_id):
-    """
-    Function: graph
+# @login_required
+# @csrf_exempt
+# @require_ajax
+# @require_GET
+# @never_cache
+# def graph(request, graph_id):
+#     """
+#     Function: graph
     
-    The function provides the JSON serialized version of the graph with the provided id given that the graph is owned
-    by the requesting user and it is not marked as deleted.
+#     The function provides the JSON serialized version of the graph with the provided id given that the graph is owned
+#     by the requesting user and it is not marked as deleted.
     
-    Request Parameters: None
-    Response:           200 - <GRAPH_AS_JSON>
+#     Request Parameters: None
+#     Response:           200 - <GRAPH_AS_JSON>
     
-    Parameters:
-     {HTTPRequest} request   - the django request object
-     {int}         graph_id  - the id of the graph to be fetched
+#     Parameters:
+#      {HTTPRequest} request   - the django request object
+#      {int}         graph_id  - the id of the graph to be fetched
     
-    Returns:
-     {HTTPResponse} a django response object
-    """
-    if request.user.is_staff:
-        graph = get_object_or_404(Graph, pk=graph_id)
-    else:
-        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
+#     Returns:
+#      {HTTPResponse} a django response object
+#     """
+#     if request.user.is_staff:
+#         graph = get_object_or_404(Graph, pk=graph_id)
+#     else:
+#         graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
 
-    return HttpResponse(graph.to_json(), 'application/javascript')
+#     return HttpResponse(graph.to_json(), 'application/javascript')
 
 @login_required
 @csrf_exempt

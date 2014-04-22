@@ -81,6 +81,9 @@ class GraphSerializer(Serializer):
     def to_tex(self, data, options=None):
         return data.obj.to_tikz()
 
+    def to_json(self, data, options=None):
+        return data.obj.to_json()
+
     def to_graphml(self, data, options=None):
         return data.obj.to_graphml()
 
@@ -151,6 +154,9 @@ class GraphResource(ModelResource):
             url(r'^front/graphs/(?P<pk>\d+)/graph_download/$', 
                 self.wrap_view('dispatch_detail'), 
                 name = 'frontend_graph_download'),
+            url(r'^front/graphs/(?P<pk>\d+)$', 
+                self.wrap_view('dispatch_detail'), 
+                name = 'graph'),
         ]
 
     def hydrate(self, bundle):
