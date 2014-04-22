@@ -148,9 +148,12 @@ class GraphResource(ModelResource):
     def prepend_urls(self):
         from django.conf.urls import url
         return [
-            url(r'^front/graphs/(?P<pk>\d+)/graph_download/\?format=(?P<format>\w+)$', 
+            url(r'^front/graphs/(?P<pk>\d+)/graph_download/$', 
                 self.wrap_view('dispatch_detail'), 
                 name = 'frontend_graph_download'),
+            url(r"^front/graphs/(?P<pk>\d+)\.(?P<format>\w+)$",
+                self.wrap_view('dispatch_detail'), 
+                name="frontend_graph_download_file"),
         ]
 
     def hydrate(self, bundle):
@@ -200,6 +203,15 @@ class GraphResource(ModelResource):
                     # the browser cache here.
                     # See http://www.enhanceie.com/ie/bugs.asp for details.
                     patch_cache_control(response, no_cache=True)
+
+                # Detect result content type and create some meaningfull disposition name
+                if 'format' in request.GET:
+                    if request.GET['format'] == 'graphml':
+                        response['Content-Disposition'] = 'attachment; filename=graph.xml'
+                    elif request.GET['format'] == 'tex':
+                        response['Content-Disposition'] = 'attachment; filename=graph.tex'
+                    elif request.GET['format'] == 'json':
+                        response['Content-Disposition'] = 'attachment; filename=graph.json'
 
                 return response
             except UnsupportedFormat as e:

@@ -28,21 +28,6 @@ logger = logging.getLogger('FuzzEd')
 
 import json, common
 
-#@login_required
-#@csrf_exempt
-#@require_GET
-#def graph_download(request, graph_id):
-#    '''
-#        Provides a download response of the graph in the given format in the GET parameter, 
-#        or an HTTP error if the rendering job for the export format is not ready so far.
-#    '''
-#    export_format = request.GET.get('format', 'xml')
-#    return common.graph_download(request.user, graph_id, export_format)
-
-def graph_download(request, graph_id):
-    export_format = request.GET.get('format', 'xml')
-    return HttpResponseRedirect('/api/v1/graph/%s/?format=%s'%(graph_id, export_format))
-
 @login_required
 @csrf_exempt
 @require_GET

@@ -97,14 +97,14 @@
     </a>
     <ul id="FuzzEdNavbarActions" class="dropdown-menu">
         {% if graph.kind != 'rbd' and graph.kind != 'dfd' %}
-            <li><a href="{% url 'frontend_graph_download' api_name='v1' pk=graph.pk format='tex' %}">
+            <li><a href="{% url 'frontend_graph_download' api_name='v1' pk=graph.pk %}?format=tex">
                 <i class="fa fa-file-text-o"></i> LaTex</a></li>
             <li><a href="#" id="FuzzEdActionExportPDF">
                 <i class="fa fa-picture-o"></i> PDF Image</a></li>
             <li><a href="#" id="FuzzEdActionExportEPS">
                 <i class="fa fa-picture-o"></i> EPS Image</a></li>
         {% endif %}
-        <li><a href="{% url 'frontend_graph_download' api_name='v1' pk=graph.pk format='graphml' %}">
+        <li><a href="{% url 'frontend_graph_download' api_name='v1' pk=graph.pk %}?format=graphml">
             <i class="fa fa-file-text-o"></i> GraphML</a></li>
     </ul>
 </li>
