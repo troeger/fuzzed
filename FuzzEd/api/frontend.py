@@ -68,32 +68,6 @@ def job_create(request, graph_id, job_kind):
 @login_required
 @csrf_exempt
 @require_ajax
-@require_http_methods(['GET'])
-@never_cache
-def graphs(request):
-    """
-    Function: graphs
-    
-    This API handler is responsible for all graphs of the user. 
-    
-    Request Parameters: None
-    Response:           200 - <GRAPHS_AS_JSON>
-                               
-    Parameters:
-     {HTTPRequest} request  - django request object
-                              
-    Returns:
-     {HTTPResponse} a django response object
-    """
-    graphs      = Graph.objects.filter(owner=request.user, deleted=False)
-    json_graphs = {
-        'graphs': [graph.to_dict() for graph in graphs]
-    }
-    return HttpResponse(json.dumps(json_graphs), 'application/javascript')
-
-@login_required
-@csrf_exempt
-@require_ajax
 @require_GET
 @never_cache
 def graph(request, graph_id):
