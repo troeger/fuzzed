@@ -257,7 +257,7 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         Tests for the Frontend API called from JavaScript. 
     '''
 
-    baseUrl = '/front'
+    baseUrl = '/api/v1/front'
 
     def setUp(self):
         self.setUpLogin()        

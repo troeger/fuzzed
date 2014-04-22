@@ -47,7 +47,7 @@ urlpatterns = patterns('',
     url(r'^front/graphs$','FuzzEd.api.frontend.graphs', name='graphs'),
     url(r'^front/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.frontend.graph', name='graph'),
     url(r'^front/graphs/(?P<graph_id>\d+)/transfers$', 'FuzzEd.api.frontend.graph_transfers', name='graph_transfers'),
-    url(r'^front/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.frontend.graph_download', name='frontend_graph_download'),
+#   url(r'^front/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.frontend.graph_download', name='frontend_graph_download'),
 
     # exports (graph downloads that return a job location instead of the direct result)
     url(r'^front/graphs/(?P<graph_id>\d+)/exports/pdf$', 
@@ -110,3 +110,12 @@ urlpatterns = patterns('',
 
 )
 urlpatterns += staticfiles_urlpatterns()
+
+# Some debugging code that shows the final complete list of all configured URL's
+#import urls
+#def show_urls(urllist, depth=0):
+#    for entry in urllist:
+#        print "  " * depth, entry.regex.pattern
+#        if hasattr(entry, 'url_patterns'):
+#            show_urls(entry.url_patterns, depth + 1)
+#show_urls(urls.urlpatterns)

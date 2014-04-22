@@ -145,6 +145,14 @@ class GraphResource(ModelResource):
 
     project = fields.ToOneField(ProjectResource, 'project')
 
+    def prepend_urls(self):
+        from django.conf.urls import url
+        return [
+            url(r'^front/graphs/(?P<pk>\d+)/graph_download/\?format=(?P<format>\w+)$', 
+                self.wrap_view('dispatch_detail'), 
+                name = 'frontend_graph_download'),
+        ]
+
     def hydrate(self, bundle):
         # Make sure that owners are assigned correctly
         bundle.obj.owner=bundle.request.user

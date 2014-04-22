@@ -26,7 +26,6 @@ from django.core.mail import mail_managers
 import logging
 logger = logging.getLogger('FuzzEd')
 
-
 import json, common
 
 #@login_required
