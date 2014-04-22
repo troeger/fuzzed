@@ -528,7 +528,9 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             var edges = [];
             jQuery(selectedEdges).each(function(index, element) {
                 var edge = jQuery(element).data(this.config.Keys.EDGE);
-                edges.push(edge.toDict());
+                if (edge.copyable) {
+                    edges.push(edge.toDict());
+                }
             }.bind(this));
 
             var clipboard = {

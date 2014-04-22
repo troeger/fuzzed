@@ -152,7 +152,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             var properties = jsonEdge.properties || {};
             properties.id  = jsonEdge.id;
             properties.graph = this;
-            var edge = new Edge(this.getNotation().edges.properties, sourceNode, targetNode, properties);
+            var edge = new Edge(this.getNotation().edges, sourceNode, targetNode, properties);
             this.edges[edge.id] = edge;
 
             return edge;
@@ -173,7 +173,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
          *    The newly created Edge instance.
          */
         _addEdge: function(jsPlumbEdge) {
-            var edge = new Edge(this.getNotation().edges.properties, jsPlumbEdge, {graph: this});
+            var edge = new Edge(this.getNotation().edges, jsPlumbEdge, {graph: this});
             this.edges[edge.id] = edge;
 
             return edge;
@@ -257,7 +257,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             properties.id  = jsonNodeGroup.id;
             properties.graph = this;
 
-            var nodeGroup = new NodeGroup(this.getNotation().nodeGroups.properties, nodes, properties);
+            var nodeGroup = new NodeGroup(this.getNotation().nodeGroups, nodes, properties);
             this.nodeGroups[nodeGroup.id] = nodeGroup;
 
             return nodeGroup;

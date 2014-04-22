@@ -28,8 +28,10 @@ function(Property, Class, Canvas, Config) {
          *
          */
         init: function(definition, nodes, properties) {
+            jQuery.extend(this, definition);
+
             this.nodes      = nodes;
-            this.properties = jQuery.extend(true, {}, definition, properties);
+            this.properties = jQuery.extend(true, {}, definition.properties, properties);
             this.graph      = properties.graph;
             this.id         = typeof properties.id === 'undefined' ? this.graph.createId() : properties.id;
 
@@ -169,6 +171,8 @@ function(Property, Class, Canvas, Config) {
         },
 
         remove: function() {
+            if (!this.deletable) return false;
+
             //TODO: put selector into Config
             jQuery('#zone'+this.id).remove();
 

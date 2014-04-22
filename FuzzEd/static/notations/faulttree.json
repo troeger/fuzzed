@@ -2,6 +2,9 @@
     "kind": "faulttree",
     "name": "Fault Tree",
     "edges": {
+        "copyable": true,
+        "deletable": true,
+
         "properties": {}
     },
     "nodes": {

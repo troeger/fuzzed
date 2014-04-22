@@ -15,16 +15,18 @@ function(Class, Config, Property) {
         jsPlumbEdge: undefined,
 
         init: function(definition, sourceOrJsPlumbEdge, targetOrProperties, properties) {
+            jQuery.extend(this, definition);
+
             if (typeof properties === 'undefined') {
                 // case 1: create Edge instance for existing jsPlumbConnection (e.g. as event handler)
-                properties  = jQuery.extend(true, {}, definition, targetOrProperties);
+                properties  = jQuery.extend(true, {}, definition.properties, targetOrProperties);
                 this.source = jQuery(sourceOrJsPlumbEdge.source).data(Config.Keys.NODE);
                 this.target = jQuery(sourceOrJsPlumbEdge.target).data(Config.Keys.NODE);
                 this._initFromJsPlumbEdge(sourceOrJsPlumbEdge, properties);
 
             } else {
                 // case 2: create Edge instance and create corresponding jsPlumbConnection (programmatic creation)
-                properties = jQuery.extend(true, {}, definition, properties);
+                properties = jQuery.extend(true, {}, definition.properties, properties);
                 this._init(sourceOrJsPlumbEdge, targetOrProperties, properties);
             }
         },
@@ -76,6 +78,8 @@ function(Class, Config, Property) {
         },
 
         remove: function() {
+            if (!this.deletable) return false;
+
             // To cover both the case that the jsPlumbEdge was already detached and that it wasn't we detach it again
             jsPlumb.detach(this.jsPlumbEdge);
 

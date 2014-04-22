@@ -2,6 +2,9 @@
     "kind": "dfd",
     "name": "Data Flow Diagram",
     "edges": {
+        "copyable": true,
+        "deletable": true,
+
         "properties": {
             "name": {
                 "kind": "text",
@@ -127,6 +130,9 @@
         }
     },
     "nodeGroups": {
+        "copyable": true,
+        "deletable": true,
+
         "properties": {
             "name" : {
                 "kind": "text",
