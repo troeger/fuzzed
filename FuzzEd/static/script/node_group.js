@@ -170,6 +170,10 @@ function(Property, Class, Canvas, Config) {
             return this;
         },
 
+        select: function() {
+            jQuery(this.container).addClass(Config.Classes.SELECTED);
+        },
+
         remove: function() {
             if (!this.deletable) return false;
 
@@ -190,7 +194,7 @@ function(Property, Class, Canvas, Config) {
 
             return {
                 id:           this.id,
-                nodesIds:     this.nodeIds(),
+                nodeIds:     this.nodeIds(),
                 properties:   _.reduce(properties, function(memo, prop) {
                                     return _.extend(memo, prop);
                               })

@@ -429,8 +429,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 this.graph.deleteEdge(edge);
             }.bind(this));
 
-            // delete selected node groups (NASTY)
-
+            // delete selected node groups (NASTY!!!)
             var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
 
             jQuery(allNodeGroups).each(function(index, element) {
@@ -514,7 +513,6 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         _copySelection: function() {
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
             var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
-            var selectedNodeGroups = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODEGROUP;
 
             // put nodes as dicts into nodes
             var nodes = [];
@@ -533,10 +531,23 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 }
             }.bind(this));
 
+            var nodegroups = [];
+            // find selected node groups (NASTY!!!)
+            var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
+
+            jQuery(allNodeGroups).each(function(index, element) {
+                var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
+                    nodegroups.push(nodeGroup.toDict());
+                }
+            }.bind(this));
+
             var clipboard = {
+                //TODO: put keys in config
                 'pasteCount': 0,
-                'nodes': nodes,
-                'edges': edges
+                'nodes':      nodes,
+                'edges':      edges,
+                'nodeGroups': nodegroups
             };
 
             // to avoid empty copyings
@@ -564,6 +575,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             var nodes       = clipboard.nodes;
             var edges       = clipboard.edges;
+            var nodeGroups  = clipboard.nodeGroups;
             var ids         = {}; // stores to every old id the newly generated id to connect the nodes again
             var boundingBox = this._boundingBoxForNodes(nodes); // used along with pasteCount to place the copy nicely
 
@@ -585,6 +597,17 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
                 var edge = this.graph.addEdge(jsonEdge);
                 if (edge) edge.select();
+            }.bind(this));
+
+            _.each(nodeGroups, function(jsonNodeGroup) {
+                jsonNodeGroup.id = undefined;
+                // map old ids to new ids
+                jsonNodeGroup.nodeIds = _.map(jsonNodeGroup.nodeIds, function(nodeId) {
+                    return ids[nodeId] || nodeId;
+                });
+
+                var nodeGroup = this.graph.addNodeGroup(jsonNodeGroup);
+                //if (nodeGroup) nodeGroup.select();
             }.bind(this));
 
             //XXX: trigger selection stop event manually here
