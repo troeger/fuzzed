@@ -277,12 +277,10 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
     def testGraphDownload(self):
         for id, kind in self.graphs.iteritems():
-            # Default export format is XML (unclear if any frontend code actually demands this)
-            response=self.ajaxGet(self.baseUrl+'/graphs/%u/graph_download'%self.pkFaultTree)
-            self.assertEqual(response.status_code, 200)
-            self.assertIn("<?xml", response.content)
-            for format, test_str in [('graphml','<graphml'), ('json','{'), ('xml','<?xml'), ('tex','\\begin')]:
-                response=self.ajaxGet(self.baseUrl+'/graphs/%u/graph_download?format=%s'%(self.pkFaultTree, format))
+            for format, test_str in [('graphml','<graphml'), ('json','{'), ('tex','\\begin')]:
+                url = self.baseUrl+'/graphs/%u/graph_download/?format=%s'%(self.pkFaultTree, format)
+                print url
+                response=self.ajaxGet(url)
                 self.assertEqual(response.status_code, 200)
                 self.assertIn(test_str, response.content)
 

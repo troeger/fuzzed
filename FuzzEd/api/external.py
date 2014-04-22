@@ -151,9 +151,6 @@ class GraphResource(ModelResource):
             url(r'^front/graphs/(?P<pk>\d+)/graph_download/$', 
                 self.wrap_view('dispatch_detail'), 
                 name = 'frontend_graph_download'),
-            url(r"^front/graphs/(?P<pk>\d+)\.(?P<format>\w+)$",
-                self.wrap_view('dispatch_detail'), 
-                name="frontend_graph_download_file"),
         ]
 
     def hydrate(self, bundle):
