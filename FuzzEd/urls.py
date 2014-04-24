@@ -29,6 +29,7 @@ urlpatterns = patterns('',
     url(r'^settings/$', 'FuzzEd.views.settings', name='settings'),    
     
     url(r'^graphs/(?P<graph_id>\d+)/$', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
+    url(r'^graphs/edit/$', 'FuzzEd.views.dashboard_edit_multiple', name='dashboard_edit_multiple'),
     url(r'^editor/(?P<graph_id>\d+)$', 'FuzzEd.views.editor', name='editor'),
     url(r'^snapshot/(?P<graph_id>\d+)$', 'FuzzEd.views.snapshot', name='snapshot'),
         

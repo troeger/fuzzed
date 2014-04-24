@@ -29,9 +29,19 @@
             graph_to_delete = null;
         };
         
+        var toggle_toolbar = function(event){
+          if(jQuery(".graph_select:checked").length > 0){
+            jQuery("#dashboard_toolbar").fadeIn();
+          }
+          else{
+            jQuery("#dashboard_toolbar").fadeOut();
+          }
+        };
+          
         jQuery(document).ready(function() {
             jQuery('button.require-dialog').click(delete_clicked);
             jQuery('#confirm_delete').click(delete_confirmed);
+            jQuery('.graph_select').click(toggle_toolbar);
         });
     });
 </script>
@@ -58,6 +68,29 @@
     </h2>
 </div>
 
+<div id="dashboard_toolbar" class="btn-toolbar pull-left" style="display: none;">              
+   <div class="btn-group">   
+      <button type="submit" name="copy" value="copy" class="btn btn-default btn-small">
+          <i class="fa fa-plus-circle"></i>
+          Copy
+      </button>
+      <button type="submit" name="snapshot" value="snapshot" class="btn btn-default btn-small">
+          <i class="fa fa-camera"></i>
+          Snapshot
+      </button>
+      <button type="button" class="btn btn-danger btn-small require-dialog">
+          <i class="fa fa-trash"></i>
+          Delete
+      </button>
+   </div>
+   <div class="btn-group">
+     <button type="button" class="btn btn-small">
+         <i class="fa fa-trash"></i>
+         Share
+     </button>
+   </div>
+</div>
+
 <div class="btn-group pull-right">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-file"></i>
@@ -73,10 +106,11 @@
 </div>
 
 <section>
-    <table class="table">
+    <table class="table" class="img-rounded">
         <thead>
             <tr>
-                <th>#</th>
+                <!-- <th>#</th> -->
+                <th></th>
                 <th></th>
                 <th>Graph</th>
                 <th>Kind</th>
@@ -87,44 +121,46 @@
 
         <tbody>
             {% for name, graph in graphs %} 
-                    {% if graph.read_only %}
-                        <tr onclick="document.location = '/snapshot/{{ graph.pk }}';">
-                    {% else %}
-                        <tr onclick="document.location = '/editor/{{ graph.pk }}';">
-                    {% endif %}                
-                    <td>{{ forloop.counter }}</td>
+                    
+                   <tr id="{{ graph.pk }}">               
+                    <!--<td>{{ forloop.counter }}</td> -->
+                    
+                    <td>
+                      <div class="checkbox">
+                        <input type="checkbox" class="graph_select" value="">
+                      </div>
+                    </td>
+                    
                     <td>
                         {% if graph.read_only %}
                             <i class="fa fa-lock"></i>
                         {% endif %}
                     </td>
+                    
                     <td>
+                        {% if graph.read_only %}
+                          <a href="{% url 'snapshot' graph.pk %}">
+                        {% else %}
+                          <a href="{% url 'editor'   graph.pk %}">
+                        {% endif %}  
                         <strong class="graph_name">{{ graph }}</strong>
+                        </a>
                     </td>
+                    
                     <td><span class="label label-info">{{ name }}</span></td>
+                    
                     <td>{{ graph.created }}</td>
+                    
                     <td style="text-align: right;">
                         <form action="/graphs/{{ graph.pk }}/" method="POST">
                             {% csrf_token %}
-                            <input type="hidden" class="delete_flag">
                             <button type="submit" name="edit" value="edit" class="btn btn-default btn-small">
                                 <i class="fa fa-wrench"></i>
                                 Settings
                             </button>
-                            <button type="submit" name="copy" value="copy" class="btn btn-default btn-small">
-                                <i class="fa fa-plus-circle"></i>
-                                Copy
-                            </button>
-                            <button type="submit" name="snapshot" value="snapshot" class="btn btn-default btn-small">
-                                <i class="fa fa-camera"></i>
-                                Snapshot
-                            </button>
-                            <button type="button" class="btn btn-danger btn-small require-dialog">
-                                <i class="fa fa-trash"></i>
-                                Delete
-                            </button>
                         </form>
                     </td>
+                    
                 </tr>
             {% endfor %}
         </tbody>

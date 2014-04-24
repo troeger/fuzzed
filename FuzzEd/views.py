@@ -253,7 +253,7 @@ def dashboard_edit(request, graph_id):
     project = graph.project
     
     POST  = request.POST
-
+    
     # the owner made changes to the graph's field, better save it (if we can)
     if POST.get('save'):
         graph.name = POST.get('name', '')
@@ -306,6 +306,10 @@ def dashboard_edit(request, graph_id):
 
     # something was not quite right here
     raise HttpResponseBadRequest()
+    
+@login_required
+def dashboard_edit_multiple(request):
+    print "!!! dashboard_edit_multiple !!!"
 
 @login_required
 def settings(request):
