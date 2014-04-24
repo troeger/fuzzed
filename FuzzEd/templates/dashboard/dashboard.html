@@ -8,40 +8,43 @@
 {{ block.super }}
 <script type="text/javascript" language="javascript">
     require(['bootstrap'], function() {
-        var graph_to_delete = null;
 
         var delete_clicked = function(event) {
             event.stopPropagation();
 
-            graph_to_delete = jQuery(this).closest('form');
             var dialog      = jQuery('#delete_dialog');
-            var name        = dialog.find('#delete_name');
-
-            name.html(graph_to_delete.closest('tr').find('strong.graph_name').html());
             dialog.modal().show();
         };
 
         var delete_confirmed = function(event) {
-            graph_to_delete.find('input.delete_flag')
-                           .attr('name',  'delete')
-                           .attr('value', 'delete');
-            graph_to_delete.submit();
-            graph_to_delete = null;
+            
+            var form = jQuery('#graph_selection');
+            var delete_flag =jQuery('#delete_flag')
+            
+            delete_flag.attr('name',  'delete')
+                       .attr('value', 'delete');
+                                  
+            form.submit();
+            // delete flag gets cleard on http submit
         };
         
-        var toggle_toolbar = function(event){
-          if(jQuery(".graph_select:checked").length > 0){
-            jQuery("#dashboard_toolbar").fadeIn();
+        var row_clicked = function(event){
+          // highlight or unhiglight row if checkbox was clicked
+          jQuery(this).closest('tr').toggleClass("active");
+          
+          // hide/unhide graph toolbar
+          if(jQuery('.graph_select:checked').length > 0){
+            jQuery('#dashboard_toolbar').fadeIn();
           }
           else{
-            jQuery("#dashboard_toolbar").fadeOut();
+            jQuery('#dashboard_toolbar').fadeOut();
           }
         };
           
         jQuery(document).ready(function() {
             jQuery('button.require-dialog').click(delete_clicked);
             jQuery('#confirm_delete').click(delete_confirmed);
-            jQuery('.graph_select').click(toggle_toolbar);
+            jQuery('.graph_select').click(row_clicked);
         });
     });
 </script>
@@ -68,29 +71,6 @@
     </h2>
 </div>
 
-<div id="dashboard_toolbar" class="btn-toolbar pull-left" style="display: none;">              
-   <div class="btn-group">   
-      <button type="submit" name="copy" value="copy" class="btn btn-default btn-small">
-          <i class="fa fa-plus-circle"></i>
-          Copy
-      </button>
-      <button type="submit" name="snapshot" value="snapshot" class="btn btn-default btn-small">
-          <i class="fa fa-camera"></i>
-          Snapshot
-      </button>
-      <button type="button" class="btn btn-danger btn-small require-dialog">
-          <i class="fa fa-trash"></i>
-          Delete
-      </button>
-   </div>
-   <div class="btn-group">
-     <button type="button" class="btn btn-small">
-         <i class="fa fa-trash"></i>
-         Share
-     </button>
-   </div>
-</div>
-
 <div class="btn-group pull-right">
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-file"></i>
@@ -106,65 +86,87 @@
 </div>
 
 <section>
-    <table class="table" class="img-rounded">
-        <thead>
-            <tr>
-                <!-- <th>#</th> -->
-                <th></th>
-                <th></th>
-                <th>Graph</th>
-                <th>Kind</th>
-                <th>Created</th>
-                <th></th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for name, graph in graphs %} 
-                    
-                   <tr id="{{ graph.pk }}">               
-                    <!--<td>{{ forloop.counter }}</td> -->
-                    
-                    <td>
-                      <div class="checkbox">
-                        <input type="checkbox" class="graph_select" value="">
-                      </div>
-                    </td>
-                    
-                    <td>
-                        {% if graph.read_only %}
-                            <i class="fa fa-lock"></i>
-                        {% endif %}
-                    </td>
-                    
-                    <td>
-                        {% if graph.read_only %}
-                          <a href="{% url 'snapshot' graph.pk %}">
-                        {% else %}
-                          <a href="{% url 'editor'   graph.pk %}">
-                        {% endif %}  
-                        <strong class="graph_name">{{ graph }}</strong>
-                        </a>
-                    </td>
-                    
-                    <td><span class="label label-info">{{ name }}</span></td>
-                    
-                    <td>{{ graph.created }}</td>
-                    
-                    <td style="text-align: right;">
-                        <form action="/graphs/{{ graph.pk }}/" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" name="edit" value="edit" class="btn btn-default btn-small">
-                                <i class="fa fa-wrench"></i>
-                                Settings
-                            </button>
-                        </form>
-                    </td>
-                    
+    <form id="graph_selection" action="{% url 'dashboard_edit' project.pk %}" method="POST">
+        {% csrf_token %}
+        <div id="dashboard_toolbar" class="btn-toolbar pull-left">              
+           <div class="btn-group">   
+              <button type="submit" name="copy" value="copy" class="btn btn-default btn-small">
+                  <i class="fa fa-plus-circle"></i>
+                  Copy
+              </button>
+              <button type="submit" name="snapshot" value="snapshot" class="btn btn-default btn-small">
+                  <i class="fa fa-camera"></i>
+                  Snapshot
+              </button>
+              <button type="button" name class="btn btn-danger btn-small require-dialog">
+                  <i class="fa fa-trash"></i>
+                  Delete
+                  <input type="hidden" id="delete_flag">
+              </button>
+           </div>
+           <div class="btn-group">
+              <button type="button" class="btn btn-small">
+                  <i class="fa fa-trash"></i>
+                  Share
+              </button>
+           </div>
+        </div>
+       
+        <table class="table" class="img-rounded">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Graph</th>
+                    <th>Kind</th>
+                    <th>Created</th>
+                    <th></th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+        
+            <tbody>
+                {% for name, graph in graphs %} 
+
+                       <tr id="{{ graph.pk }}" class="info">               
+                                             
+                        <td>
+                          <div class="checkbox">
+                            <input type="checkbox" name="graph_id[]" value="{{ graph.pk }}"  class="graph_select">
+                          </div>
+                        </td>
+                        
+                        <td>
+                            {% if graph.read_only %}
+                                <i class="fa fa-lock"></i>
+                            {% endif %}
+                        </td>
+                        
+                        <td>
+                            {% if graph.read_only %}
+                              <a href="{% url 'snapshot' graph.pk %}">
+                            {% else %}
+                              <a href="{% url 'editor'   graph.pk %}">
+                            {% endif %}  
+                            <strong class="graph_name">{{ graph }}</strong>
+                            </a>
+                        </td>
+                        
+                        <td><span class="label label-info">{{ name }}</span></td>
+                        
+                        <td>{{ graph.created }}</td>
+                        
+                        <td style="text-align: right;">
+                                <button type="submit" name="edit" value="{{ graph.pk }}" class="btn btn-default btn-small">
+                                    <i class="fa fa-wrench"></i>
+                                    Settings
+                                </button>
+                        </td>
+                        
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
 </section>
 
 <!-- hidden modal dialog for graph deletion confirmation -->

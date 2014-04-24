@@ -28,8 +28,6 @@ urlpatterns = patterns('',
     url(r'^about/$', 'FuzzEd.views.about', name='about'),    
     url(r'^settings/$', 'FuzzEd.views.settings', name='settings'),    
     
-    url(r'^graphs/(?P<graph_id>\d+)/$', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
-    url(r'^graphs/edit/$', 'FuzzEd.views.dashboard_edit_multiple', name='dashboard_edit_multiple'),
     url(r'^editor/(?P<graph_id>\d+)$', 'FuzzEd.views.editor', name='editor'),
     url(r'^snapshot/(?P<graph_id>\d+)$', 'FuzzEd.views.snapshot', name='snapshot'),
         
@@ -38,6 +36,7 @@ urlpatterns = patterns('',
     url(r'^projects/(?P<project_id>\d+)/$', 'FuzzEd.views.project_edit', name='project_edit'),
     url(r'^projects/(?P<project_id>\d+)/dashboard/$', 'FuzzEd.views.dashboard', name='dashboard'),
     url(r'^projects/(?P<project_id>\d+)/dashboard/new/(?P<kind>\w{1,50})$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
+    url(r'^projects/(?P<project_id>\d+)/dashboard/edit/', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
     
     url(r'^robots\.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /admin/\nDisallow: /dashboard/\nDisallow: /editor/\n", mimetype="text/plain")),
     

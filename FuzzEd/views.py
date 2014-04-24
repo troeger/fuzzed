@@ -234,7 +234,7 @@ def dashboard_new(request, project_id, kind):
     return HttpResponseBadRequest()
 
 @login_required
-def dashboard_edit(request, graph_id):
+def dashboard_edit(request, project_id):
     """
     Function: dashboard_edit
     
@@ -249,68 +249,76 @@ def dashboard_edit(request, graph_id):
     Returns:
      {HttpResponse} a django response object
     """
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
-    project = graph.project
+    project = get_object_or_404(Project, pk=project_id)
     
-    POST  = request.POST
+    POST = request.POST  
+    
+    selected_graphs = POST.getlist('graph_id[]')
+    graphs = [ get_object_or_404(Graph, pk=graph_id, owner=request.user) for graph_id in selected_graphs]
+        
+     
     
     # the owner made changes to the graph's field, better save it (if we can)
     if POST.get('save'):
+        graph_id = POST.get('save')
+        graph = get_object_or_404(Graph, pk=graph_id, owner = request.user)
+        
         graph.name = POST.get('name', '')
         graph.save()
         messages.add_message(request, messages.SUCCESS, 'Graph saved.')
         return redirect('dashboard', project_id = project.id)
-
-    # deletion requested? do it and go back to dashboard
-    elif POST.get('delete'):
-        commands.DeleteGraph.create_from(graph_id).do()
-        messages.add_message(request, messages.SUCCESS, 'Graph deleted.')
-        return redirect('dashboard', project_id = project.id)
-
-    # copy requested
-    elif POST.get('copy'):
-        old_graph = Graph.objects.get(pk=graph_id)
-        duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
-                                                          owner=request.user,  add_default_nodes=False, project=project)
-        duplicate_command.do()
-        new_graph = duplicate_command.graph
-
-        new_graph.copy_values(old_graph)
-        new_graph.save()
-
-        messages.add_message(request, messages.SUCCESS, 'Graph duplicated.')
-        return redirect('dashboard', project_id = project.id)
-
-    elif POST.get('snapshot'):
-        old_graph = Graph.objects.get(pk=graph_id)
-        duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
-                                                          owner=request.user, add_default_nodes=False, project=project)
-        duplicate_command.do()
-        new_graph = duplicate_command.graph
-
-        new_graph.copy_values(old_graph)
-        new_graph.read_only = True
-        new_graph.save()
-
-        messages.add_message(request, messages.SUCCESS, 'Created snapshot.')
-        return redirect('dashboard', project_id=project.id)
-
-
+        
     # please show the edit page to the user on get requests
     elif POST.get('edit') or request.method == 'GET':
+        graph_id = POST.get('edit')
+        graph = get_object_or_404(Graph, pk=graph_id, owner = request.user)
+        
         parameters = {
             'graph': graph,
-            'kind':  notations.by_kind[graph.kind]['name']
+            'kind':  notations.by_kind[graph.kind]['name'],
+            'project': project
         }
         return render(request, 'dashboard/dashboard_edit.html', parameters)
 
+    # copy requested
+    elif POST.get('copy'):
+        for old_graph in graphs:
+            duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
+                                                          owner=request.user,  add_default_nodes=False, project=project)
+            duplicate_command.do()
+            
+            new_graph = duplicate_command.graph
+            new_graph.copy_values(old_graph)
+            new_graph.save()
+
+        messages.add_message(request, messages.SUCCESS, 'Duplication successful.')
+        return redirect('dashboard', project_id = project.id)
+
+    elif POST.get('snapshot'):
+        for old_graph in graphs:
+            duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
+                                                          owner=request.user, add_default_nodes=False, project=project)
+            duplicate_command.do()
+            
+            new_graph = duplicate_command.graph
+            new_graph.copy_values(old_graph)
+            new_graph.read_only = True
+            new_graph.save()
+
+        messages.add_message(request, messages.SUCCESS, 'Snapshot creation sucessful.')
+        return redirect('dashboard', project_id=project.id)
+    
+    # deletion requested? do it and go back to dashboard
+    elif POST.get('delete'):
+        for graph in graphs:
+            commands.DeleteGraph.create_from(graph.pk).do()
+        
+        messages.add_message(request, messages.SUCCESS, 'Deletion sucessful.')
+        return redirect('dashboard', project_id = project.id)
+    
     # something was not quite right here
     raise HttpResponseBadRequest()
-    
-@login_required
-def dashboard_edit_multiple(request):
-    print "!!! dashboard_edit_multiple !!!"
-
+        
 @login_required
 def settings(request):
     """
