@@ -15,6 +15,7 @@ v1_api.register(external.ExternalGraphResource())
 front_api = Api(api_name='front')
 front_api.register(frontend.FrontendProjectResource())
 front_api.register(frontend.FrontendGraphResource())
+front_api.register(frontend.FrontendEdgeResource())
 
 admin.autodiscover()
 
@@ -72,8 +73,8 @@ urlpatterns = patterns('',
     #     'FuzzEd.api.frontend.property', name='property'),
 
     # edges
-    url(r'^front/graphs/(?P<graph_id>\d+)/edges$','FuzzEd.api.frontend.edges', name='edges'),
-    url(r'^front/graphs/(?P<graph_id>\d+)/edges/(?P<edge_id>\d+)$','FuzzEd.api.frontend.edge', name='edge'),
+#    url(r'^front/graphs/(?P<graph_id>\d+)/edges$','FuzzEd.api.frontend.edges', name='edges'),
+#    url(r'^front/graphs/(?P<graph_id>\d+)/edges/(?P<edge_id>\d+)$','FuzzEd.api.frontend.edge', name='edge'),
 
     # undo/redo
     url(r'^front/graphs/(?P<graph_id>\d+)/redos$','FuzzEd.api.frontend.redos', name='redos'),
@@ -113,10 +114,10 @@ urlpatterns = patterns('',
 urlpatterns += staticfiles_urlpatterns()
 
 # Some debugging code that shows the final complete list of all configured URL's
-#import urls
-#def show_urls(urllist, depth=0):
-#    for entry in urllist:
-#        print "  " * depth, entry.regex.pattern
-#        if hasattr(entry, 'url_patterns'):
-#            show_urls(entry.url_patterns, depth + 1)
-#show_urls(urls.urlpatterns)
+import urls
+def show_urls(urllist, depth=0):
+    for entry in urllist:
+        print "  " * depth, entry.regex.pattern
+        if hasattr(entry, 'url_patterns'):
+            show_urls(entry.url_patterns, depth + 1)
+show_urls(urls.urlpatterns)

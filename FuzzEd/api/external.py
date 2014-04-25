@@ -1,6 +1,6 @@
 #from oauth2_provider.views.generic import ProtectedResourceView        see urls.py for further explanation
 
-from FuzzEd.models import Graph
+from FuzzEd.models import Graph, Project
 
 import logging, common
 logger = logging.getLogger('FuzzEd')
@@ -18,7 +18,14 @@ class ExternalGraphSerializer(common.GraphSerializer):
     pass
 
 class ExternalProjectResource(common.ProjectResource):
-    pass
+    class Meta:
+        queryset = Project.objects.filter(deleted=False)
+        authentication = common.OurApiKeyAuthentication()
+        list_allowed_methods = ['get']
+        detail_allowed_methods = ['get']
+        excludes = ['deleted', 'owner']
+        nested = 'graph'
+
 
 # class GraphJobExportView(ProtectedResourceView):
 #     """ Base class for API views that export a graph based on a rendering job result. """

@@ -1,3 +1,4 @@
+from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from FuzzEd.decorators import require_ajax
@@ -8,7 +9,7 @@ from django.views.decorators.cache import never_cache
 
 # We expect these imports to go away main the main logic finally lives in common.py
 from django.shortcuts import get_object_or_404
-from FuzzEd.models import Graph, notations, commands, Node, Job, Notification, NodeGroup
+from FuzzEd.models import Graph, notations, commands, Node, Job, Notification, NodeGroup, Graph, Project, Edge
 from FuzzEd.middleware import *
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models import Q
@@ -39,7 +40,6 @@ class FrontendGraphResource(common.GraphResource):
         excludes = ['deleted', 'owner', 'read_only']
 
     def prepend_urls(self):
-        from django.conf.urls import url
         return [
             url(r'^graphs/(?P<pk>\d+)/graph_download/$', 
                 self.wrap_view('dispatch_detail'), 
@@ -50,7 +50,31 @@ class FrontendGraphResource(common.GraphResource):
         ]
 
 class FrontendProjectResource(common.ProjectResource):
-    pass
+    class Meta:
+        queryset = Project.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        list_allowed_methods = ['get']
+        detail_allowed_methods = ['get']
+        excludes = ['deleted', 'owner']
+        nested = 'graph'
+
+class FrontendEdgeResource(common.EdgeResource):
+    class Meta:
+        queryset = Edge.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        authorization = common.EdgeAuthorization()
+        list_allowed_methods = ['post']
+        detail_allowed_methods = ['post']
+
+    def prepend_urls(self):
+        return [
+            url(r'^graphs/(?P<graph_id>\d+)/edges/(?P<pk>\d+)$', 
+                self.wrap_view('dispatch_detail'), 
+                name = 'edge'),
+            url(r'^graphs/(?P<graph_id>\d+)/edges$', 
+                self.wrap_view('create_detail'), 
+                name = 'edges'),
+        ]
 
 @login_required
 @csrf_exempt

@@ -264,6 +264,7 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
     #TODO: Test that session authentication is checked in the API implementation
     #TODO: Test that the user can only access his graphs, and not the ones of other users
+    #TODO: Test that read-only graphs cannot be edited
 
     def testAjaxRequestCheck(self):
         response=self.get(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
