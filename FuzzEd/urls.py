@@ -8,10 +8,13 @@ from FuzzEd import settings
 from django.contrib import admin
 
 from tastypie.api import Api
-from FuzzEd.api import external
+from FuzzEd.api import external, frontend
 v1_api = Api(api_name='v1')
-v1_api.register(external.ProjectResource())
-v1_api.register(external.GraphResource())
+v1_api.register(external.ExternalProjectResource())
+v1_api.register(external.ExternalGraphResource())
+front_api = Api(api_name='front')
+front_api.register(frontend.FrontendProjectResource())
+front_api.register(frontend.FrontendGraphResource())
 
 admin.autodiscover()
 
@@ -94,8 +97,7 @@ urlpatterns = patterns('',
     # user notifications
     url(r'^front/notifications/(?P<noti_id>\d+)/dismiss$','FuzzEd.api.frontend.noti_dismiss', name='noti_dismiss'),
 
-    ## Application API, protected by API key
-    url(r'^api/', include(v1_api.urls)),
+    url(r'^api/', include(v1_api.urls + front_api.urls)),
 
     # For getting OAuth2 authentication support, enable this
     # Please note that the application and token registration views are not tailored so far

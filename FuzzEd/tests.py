@@ -257,12 +257,13 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         Tests for the Frontend API called from JavaScript. 
     '''
 
-    baseUrl = '/api/v1/front'
+    baseUrl = '/api/front'
 
     def setUp(self):
         self.setUpLogin()        
 
     #TODO: Test that session authentication is checked in the API implementation
+    #TODO: Test that the user can only access his graphs, and not the ones of other users
 
     def testAjaxRequestCheck(self):
         response=self.get(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
