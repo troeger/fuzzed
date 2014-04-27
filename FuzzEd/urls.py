@@ -10,12 +10,12 @@ from django.contrib import admin
 from tastypie.api import Api
 from FuzzEd.api import external, frontend
 v1_api = Api(api_name='v1')
-v1_api.register(external.ExternalProjectResource())
-v1_api.register(external.ExternalGraphResource())
+v1_api.register(external.ProjectResource())
+v1_api.register(external.GraphResource())
 front_api = Api(api_name='front')
-front_api.register(frontend.FrontendProjectResource())
-front_api.register(frontend.FrontendGraphResource())
-front_api.register(frontend.FrontendEdgeResource())
+front_api.register(frontend.ProjectResource())
+front_api.register(frontend.GraphResource())
+front_api.register(frontend.EdgeResource())
 
 admin.autodiscover()
 
@@ -120,4 +120,4 @@ def show_urls(urllist, depth=0):
         print "  " * depth, entry.regex.pattern
         if hasattr(entry, 'url_patterns'):
             show_urls(entry.url_patterns, depth + 1)
-show_urls(urls.urlpatterns)
+#show_urls(urls.urlpatterns)

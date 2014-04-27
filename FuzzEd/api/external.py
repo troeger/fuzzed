@@ -5,7 +5,7 @@ from FuzzEd.models import Graph, Project
 import logging, common
 logger = logging.getLogger('FuzzEd')
 
-class ExternalGraphResource(common.GraphResource):
+class GraphResource(common.GraphResource):
     class Meta:
         queryset = Graph.objects.filter(deleted=False)
         authentication = common.OurApiKeyAuthentication()
@@ -14,10 +14,10 @@ class ExternalGraphResource(common.GraphResource):
         serializer = common.GraphSerializer()
         excludes = ['deleted', 'owner', 'read_only']
 
-class ExternalGraphSerializer(common.GraphSerializer):
+class GraphSerializer(common.GraphSerializer):
     pass
 
-class ExternalProjectResource(common.ProjectResource):
+class ProjectResource(common.ProjectResource):
     class Meta:
         queryset = Project.objects.filter(deleted=False)
         authentication = common.OurApiKeyAuthentication()

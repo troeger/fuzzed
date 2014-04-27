@@ -58,7 +58,8 @@ class EdgeResource(ModelResource):
     '''
         An API resource for edges.
     '''
-    pass
+    def hydrate(self, bundle):
+        print bundle
 
 class EdgeAuthorization(Authorization):
     def read_list(self, object_list, bundle):
