@@ -119,20 +119,10 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         _setupDragging: function() {
             this.container.draggable({
-                containment:   'body',
+                containment:   'document',
                 stack:         'svg',
                 cursor:        Config.Dragging.CURSOR,
                 scroll:        false,
-                stop: function( event, ui ) {
-                    // hotfix for firefox browser because of broken dragging
-                    // if top offset of dragged element becomes negative than set this offset to the actual mouse position
-                    if ( ui.offset.top < 0 ) {
-                        var mouse_top  = event.clientY;
-                        var scroll_top = document.documentElement.scrollTop;
-                       
-                        jQuery(this).offset({'top': mouse_top + scroll_top});
-                    }
-                },
                 snap:          'body',
                 snapMode:      'inner',
                 snapTolerance: Config.Dragging.SNAP_TOLERANCE
