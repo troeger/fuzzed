@@ -1,0 +1,3 @@
+1155a1156,1157
+>         if (this.options.containment) this._setContainment();
+> 
