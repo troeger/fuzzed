@@ -17,12 +17,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.cache import patch_cache_control, patch_vary_headers
 
-from FuzzEd.models import Project, Graph
+from FuzzEd.models import Project, Graph, Edge, Node
 
-import time
-
-
-import logging
+import time, logging, ast
 logger = logging.getLogger('FuzzEd')
 
 class OurApiKeyAuthentication(ApiKeyAuthentication):
@@ -54,28 +51,36 @@ class ProjectResource(ModelResource):
         return super(ProjectResource, self).get_object_list(request).filter(owner=request.user)
 
 
-class EdgeResource(ModelResource):
+class NodeGroupResource(ModelResource):
     '''
-        An API resource for edges.
+        An API resource for node groups.
     '''
-    def hydrate(self, bundle):
-        print bundle
+    pass
 
-class EdgeAuthorization(Authorization):
+class JobResource(ModelResource):
+    '''
+        An API resource for jobs.
+    '''
+    pass
+
+class GraphOwnerAuthorization(Authorization):
+    '''
+        A tastypie authorization class that checks if the 'graph' attribute
+        links to a graph that is owned by the requesting user.
+    '''
     def read_list(self, object_list, bundle):
-        ''' User is only allowed to get the edges for the graphs he owns.'''
         return object_list.filter(graph__owner=bundle.request.user)
 
     def read_detail(self, object_list, bundle):
-        ''' User is only allowed to get the edge of the graph if he owns it.'''
         return bundle.obj.graph.owner == bundle.request.user
 
     def create_list(self, object_list, bundle):
-        # Assuming they're auto-assigned to ``user``.
+        # Assuming they're auto-assigned to graphs that are owned by the requester
         return object_list
 
     def create_detail(self, object_list, bundle):
-        return bundle.obj.graph.owner == bundle.request.user
+        graph = Graph.objects.get(pk=bundle.data['graph'], deleted=False)
+        return graph.owner == bundle.request.user and not graph.read_only
 
     def update_list(self, object_list, bundle):
         allowed = []
@@ -93,7 +98,6 @@ class EdgeAuthorization(Authorization):
 
     def delete_detail(self, object_list, bundle):
         return bundle.obj.graph.owner == bundle.request.user
-
 
 class GraphResource(ModelResource):
     '''
@@ -190,6 +194,37 @@ class GraphResource(ModelResource):
                 return self._handle_500(request, e)
 
         return wrapper
+
+class NodeResource(ModelResource):
+    '''
+        An API resource for nodes.
+    '''
+    graph = fields.ToOneField(GraphResource, 'graph')
+
+class EdgeResource(ModelResource):
+    '''
+        An API resource for edges.
+    '''
+    graph = fields.ToOneField(GraphResource, 'graph')
+    source = fields.ToOneField(NodeResource, 'source')
+    target = fields.ToOneField(NodeResource, 'target')
+
+class EdgeSerializer(Serializer):
+    formats = ['json']
+    content_types = {
+        'json': 'application/json'
+    }
+
+    def from_json(self, content):
+        # JSON parser does not like the input due to the usage of single quotes, so we use ast
+        data = ast.literal_eval(content)
+        # The JS code creates it's own client_id for new edges
+        # Nodes a referenced by client_id's, but not the graph
+        client_id = data['id']
+        graph_pk = Graph.objects.get(pk=data['graph'], deleted=False).pk # fetch to make sure it is not deleted
+        source_pk = Node.objects.get(client_id=data['source'], graph=data['graph'], deleted=False).pk
+        target_pk = Node.objects.get(client_id=data['target'], graph=data['graph'], deleted=False).pk        
+        return {'client_id': client_id, 'graph': graph_pk, 'source': source_pk, 'target': target_pk}
 
 class GraphSerializer(Serializer):
     """

@@ -16,6 +16,7 @@ front_api = Api(api_name='front')
 front_api.register(frontend.ProjectResource())
 front_api.register(frontend.GraphResource())
 front_api.register(frontend.EdgeResource())
+front_api.register(frontend.NodeResource())
 
 admin.autodiscover()
 
@@ -44,9 +45,6 @@ urlpatterns = patterns('',
     
     url(r'^robots\.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /admin/\nDisallow: /dashboard/\nDisallow: /editor/\n", mimetype="text/plain")),
     
-    # Frontend API
-    # URL design as in: https://github.com/tinkerpop/rexster/wiki/Basic-REST-API
-  
     # graph
  #  url(r'^front/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.frontend.graph', name='graph'),
     url(r'^front/graphs/(?P<graph_id>\d+)/transfers$', 'FuzzEd.api.frontend.graph_transfers', name='graph_transfers'),
@@ -59,12 +57,12 @@ urlpatterns = patterns('',
         'FuzzEd.api.frontend.job_create', {'job_kind': Job.EPS_RENDERING_JOB}, name='export_eps'),
 
     # node
-    url(r'^front/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.frontend.nodes', name='nodes'),
-    url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$', 'FuzzEd.api.frontend.node', name='node'),
+#    url(r'^front/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.frontend.nodes', name='nodes'),
+ #   url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$', 'FuzzEd.api.frontend.node', name='node'),
 
     # node groups
-    url(r'^front/graphs/(?P<graph_id>\d+)/nodegroups$', 'FuzzEd.api.frontend.nodegroups', name='nodegroups'),
-    url(r'^front/graphs/(?P<graph_id>\d+)/nodegroups/(?P<group_id>\d+)$', 'FuzzEd.api.frontend.nodegroup', name='nodegroup'),
+#    url(r'^front/graphs/(?P<graph_id>\d+)/nodegroups$', 'FuzzEd.api.frontend.nodegroups', name='nodegroups'),
+#    url(r'^front/graphs/(?P<graph_id>\d+)/nodegroups/(?P<group_id>\d+)$', 'FuzzEd.api.frontend.nodegroup', name='nodegroup'),
 
     # properties
     # url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties$',
@@ -75,10 +73,6 @@ urlpatterns = patterns('',
     # edges
 #    url(r'^front/graphs/(?P<graph_id>\d+)/edges$','FuzzEd.api.frontend.edges', name='edges'),
 #    url(r'^front/graphs/(?P<graph_id>\d+)/edges/(?P<edge_id>\d+)$','FuzzEd.api.frontend.edge', name='edge'),
-
-    # undo/redo
-    url(r'^front/graphs/(?P<graph_id>\d+)/redos$','FuzzEd.api.frontend.redos', name='redos'),
-    url(r'^front/graphs/(?P<graph_id>\d+)/undos$','FuzzEd.api.frontend.undos', name='undos'),
 
     # analysis
     url(r'^front/graphs/(?P<graph_id>\d+)/analysis/cutsets$', 
@@ -91,7 +85,7 @@ urlpatterns = patterns('',
         'FuzzEd.api.frontend.job_create', {'job_kind': Job.SIMULATION_JOB}, name='simulation_top_event_probability'),
 
     # jobs
-    url(r'^front/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.frontend.job_status', name='frontend_job_status'),
+    #url(r'^front/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.frontend.job_status', name='frontend_job_status'),
     url(r'^front/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.frontend.job_exitcode', name='job_exitcode'),
     url(r'^front/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.frontend.job_files', name='job_files'),
 

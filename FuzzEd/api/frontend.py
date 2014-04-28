@@ -47,6 +47,15 @@ class GraphResource(common.GraphResource):
             url(r'^graphs/(?P<pk>\d+)$', 
                 self.wrap_view('dispatch_detail'), 
                 name = 'graph'),
+            url(r'^graphs/(?P<pk>\d+)/analysis/cutsets$', 
+                self.wrap_view('dispatch_detail'), 
+                name = 'analyze_cutsets'),
+            url(r'^graphs/(?P<pk>\d+)/analysis/topEventProbability$', 
+                self.wrap_view('dispatch_detail'), 
+                name = 'analyze_top_event_probability'),
+            url(r'^graphs/(?P<pk>\d+)/simulation/topEventProbability$', 
+                self.wrap_view('dispatch_detail'), 
+                name = 'simulation_top_event_probability'),
         ]
 
 class ProjectResource(common.ProjectResource):
@@ -62,18 +71,73 @@ class EdgeResource(common.EdgeResource):
     class Meta:
         queryset = Edge.objects.filter(deleted=False)
         authentication = SessionAuthentication()
-        #authorization = common.EdgeAuthorization()
+        serializer = common.EdgeSerializer()
+        authorization = common.GraphOwnerAuthorization()
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post']
+        excludes = ['deleted', 'id']
+
+    def prepend_urls(self):
+        return [
+            url(r'^edges/(?P<pk>\d+)$', 
+                self.wrap_view('dispatch_detail'), 
+                name = 'edge'),
+            url(r'^edges$', 
+                self.wrap_view('dispatch_list'), 
+                name = 'edges'),
+        ]
+
+class NodeResource(common.NodeResource):
+    class Meta:
+        queryset = Node.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        authorization = common.GraphOwnerAuthorization()
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post']
+        excludes = ['deleted', 'id']        
+
+    def prepend_urls(self):
+        return [
+            url(r'^graphs/(?P<graph_id>\d+)/nodes/(?P<pk>\d+)$', 
+                self.wrap_view('dispatch_detail'), 
+                name = 'node'),
+            url(r'^graphs/(?P<graph_id>\d+)/nodes$', 
+                self.wrap_view('dispatch_detail'), 
+                name = 'nodes'),
+        ]
+
+class NodeGroupResource(common.NodeGroupResource):
+    class Meta:
+        queryset = NodeGroup.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        authorization = common.GraphOwnerAuthorization()
         list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get', 'post']
 
     def prepend_urls(self):
         return [
-            url(r'^graphs/(?P<graph_id>\d+)/edges/(?P<pk>\d+)$', 
+            url(r'^graphs/(?P<graph_id>\d+)/nodegroups/(?P<pk>\d+)$', 
                 self.wrap_view('dispatch_detail'), 
-                name = 'edge'),
-            url(r'^graphs/(?P<graph_id>\d+)/edges$', 
+                name = 'nodegroup'),
+            url(r'^graphs/(?P<graph_id>\d+)/nodegroups$', 
                 self.wrap_view('dispatch_detail'), 
-                name = 'edges'),
+                name = 'nodegroups'),
+        ]
+
+
+class JobResource(common.JobResource):
+    class Meta:
+        queryset = Job.objects
+        authentication = SessionAuthentication()
+        authorization = common.GraphOwnerAuthorization()
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post']
+
+    def prepend_urls(self):
+        return [
+            url(r'^jobs/(?P<pk>\d+)$', 
+                self.wrap_view('dispatch_detail'), 
+                name = 'frontend_job_status'),
         ]
 
 @login_required
@@ -421,58 +485,6 @@ def edge(request, graph_id, edge_id):
     except MultipleObjectsReturned:
         raise HttpResponseServerErrorAnswer()
 
-@login_required
-@csrf_exempt
-@require_ajax
-@require_http_methods(['GET', 'POST'])
-@never_cache
-def undos(request, graph_id):
-    #
-    # TODO: IS NOT WORKING YET
-    # TODO: UPDATE DOC STRING
-    #
-    """
-    Fetch undo command stack from backend
-    API Request:  GET 
-    API Response: JSON body with command array of undo stack
-
-    Tell the backend that an undo has been issued in the model
-    API Request:  POST 
-    API Response: no body, status code 204
-    """
-    if request.method == 'GET':
-        #TODO: Fetch undo stack for the graph
-        return HttpResponseNoResponse()
-        
-    else:
-        #TODO: Perform top command on undo stack
-        return HttpResponseNoResponse()
-
-@login_required
-@csrf_exempt
-@require_ajax
-@require_http_methods(['GET', 'POST'])
-@never_cache
-def redos(request, graph_id):
-    #
-    # TODO: IS NOT WORKING YET
-    # TODO: UPDATE DOC STRING
-    #
-    """
-    Fetch redo command stack from backend
-    API Request:  GET 
-    API Response: JSON body with command array of redo stack
-
-    Tell the backend that an redo has been issued in the model
-    API Request:  POST 
-    API Response: no body, status code 204
-    """
-    if request.method == 'GET':
-        #TODO Fetch redo stack for the graph
-        return HttpResponseNoResponse()
-    else:
-        #TODO Perform top command on redo stack
-        return HttpResponseNoResponse()
 
 @csrf_exempt
 @require_http_methods(['GET', 'POST'])
