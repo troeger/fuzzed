@@ -58,7 +58,15 @@ int main(int argc, char** argv)
 			try
 			{
 				const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent(), treeIssues);	
-				// TODO: analyze(r, topEvent.get(), logFileStream);
+				MinCutAnalysisTask mt(topEvent.get(), *logFileStream);
+				for (const auto& res : mt.analyze())
+				{
+					std::string mincut;
+					for (const auto& s : res)
+						mincut += s;
+
+					r.nodeid().push_back(mincut);
+				}
 			}
 			catch (const FatalException& e)
 			{
@@ -85,13 +93,23 @@ int main(int argc, char** argv)
 				mincutResults::Result r(modelId, util::timeStamp(), true);
 				try
 				{
-					// TODO: analyze(r, &topEvent, logFileStream);
+					MinCutAnalysisTask mt(&topEvent, *logFileStream);
+					for (const auto& res : mt.analyze())
+					{
+						std::string mincut;
+						for (const auto& s : res)
+							mincut += s;
+
+						r.nodeid().push_back(mincut);
+					}
 				}
 				catch (const FatalException& e)
 				{
 					r.issue().push_back(e.getIssue().serialized());
 					r.validResult(false);
 				}
+
+				r.configuration(serializedConfiguration(t.first));
 				mincutResults.result().push_back(r);
 			}
 		}

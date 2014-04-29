@@ -20,7 +20,7 @@ namespace
 }
 
 
-MinCutAnalysisTask::MinCutAnalysisTask(const TopEvent* topEvent, std::ofstream& logfile)
+MinCutAnalysisTask::MinCutAnalysisTask(const TopEvent* const topEvent, std::ofstream& logfile)
 	: m_tree(topEvent), m_logFile(logfile)
 {}
 
@@ -86,7 +86,7 @@ void MinCutAnalysisTask::analyzeRecursive(IntermediateMOCUSResult& results, cons
 	}
 }
 
-static MinCutAnalysisResult minimizeResult(const IntermediateMOCUSResult& res)
+static MinCutAnalysisResult MinCutAnalysisTask::minimizeResult(const IntermediateMOCUSResult& res)
 {
 	return MinCutAnalysisResult();
 }
