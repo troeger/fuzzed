@@ -311,6 +311,7 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/Issue.h
 	${COMMON_DIR}/FatalException.h
 	${COMMON_DIR}/DeadlockMonitor.h
+	${COMMON_DIR}/Dynamic2dArray.h
 )
 
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})

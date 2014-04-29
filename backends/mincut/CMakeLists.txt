@@ -7,7 +7,6 @@ set(SOURCES
 
 set(HEADERS
   MinCutAnalysisTask.h
-  MinCut.h
 )
 
 add_executable(ftmincuts ${SOURCES} ${HEADERS})

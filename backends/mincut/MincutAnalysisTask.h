@@ -1,5 +1,6 @@
 #pragma once
 #include "fuzztree.h"
+#include "Dynamic2dArray.h"
 #include <future>
 #include <vector>
 
@@ -7,7 +8,8 @@
 
 typedef std::vector<std::string> MinCut;
 typedef std::vector<MinCut> MinCutAnalysisResult;
-typedef std::vector<std::vector<fuzztree::ChildNode*>> IntermediateMOCUSResult;
+//typedef std::vector<std::vector<const fuzztree::Node*>> IntermediateMOCUSResult;
+typedef Dynamic2dArray<const fuzztree::Node*> IntermediateMOCUSResult;
 
 class MinCutAnalysisTask
 {
@@ -18,11 +20,11 @@ public:
 	MinCutAnalysisResult analyze();
 
 protected:
-	void analyzeRecursive(IntermediateMOCUSResult&, const fuzztree::ChildNode&);
+	void analyzeRecursive(IntermediateMOCUSResult&, const fuzztree::ChildNode&, unsigned int r, unsigned int c);
 
 	static MinCutAnalysisResult minimizeResult(const IntermediateMOCUSResult&);
 
-	const fuzztree::TopEvent* m_tree;
+	const fuzztree::TopEvent* const m_tree;
 
 	std::ofstream& m_logFile;
 };
