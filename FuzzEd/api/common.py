@@ -205,7 +205,7 @@ class EdgeResource(ModelResource):
     '''
         An API resource for edges.
     '''
-    graph = fields.ToOneField(GraphResource, 'graph')
+    #graph = fields.ToOneField(GraphResource, 'graph')
     source = fields.ToOneField(NodeResource, 'source')
     target = fields.ToOneField(NodeResource, 'target')
 
@@ -216,14 +216,15 @@ class EdgeSerializer(Serializer):
     }
 
     def from_json(self, content):
+        import pdb; pdb.set_trace()
         # JSON parser does not like the input due to the usage of single quotes, so we use ast
         data = ast.literal_eval(content)
         # The JS code creates it's own client_id for new edges
         # Nodes a referenced by client_id's, but not the graph
         client_id = data['id']
-        graph_pk = Graph.objects.get(pk=data['graph'], deleted=False).pk # fetch to make sure it is not deleted
-        source_pk = Node.objects.get(client_id=data['source'], graph=data['graph'], deleted=False).pk
-        target_pk = Node.objects.get(client_id=data['target'], graph=data['graph'], deleted=False).pk        
+        graph_pk = Graph.objects.get(pk=data['graph'], deleted=False) # fetch to make sure it is not deleted
+        source_pk = Node.objects.get(client_id=data['source'], graph=data['graph'], deleted=False)
+        target_pk = Node.objects.get(client_id=data['target'], graph=data['graph'], deleted=False)        
         return {'client_id': client_id, 'graph': graph_pk, 'source': source_pk, 'target': target_pk}
 
 class GraphSerializer(Serializer):
