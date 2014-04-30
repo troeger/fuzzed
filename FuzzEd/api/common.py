@@ -4,7 +4,7 @@ from FuzzEd.models import Graph, Job
 from django.contrib.auth.models import User
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from tastypie.resources import ModelResource
-from tastypie.authentication import ApiKeyAuthentication   
+from tastypie.authentication import ApiKeyAuthentication
 from tastypie.authorization import Authorization
 from tastypie.exceptions import UnsupportedFormat, BadRequest, ImmediateHttpResponse
 from django.core.exceptions import ValidationError
@@ -36,7 +36,7 @@ class OurApiKeyAuthentication(ApiKeyAuthentication):
             except:
                 logger.debug("Incorrect API key in header: "+str(request.META['HTTP_AUTHORIZATION']))
                 raise ValueError("Incorrect API key.")
-            return key.user.username, api_key    
+            return key.user.username, api_key
         else:
             logger.debug("Missing authorization header: "+str(request.META))
             raise ValueError("Missing authorization header.")
@@ -79,8 +79,8 @@ class GraphOwnerAuthorization(Authorization):
         return object_list
 
     def create_detail(self, object_list, bundle):
-        graph = Graph.objects.get(pk=bundle.data['graph'], deleted=False)
-        return graph.owner == bundle.request.user and not graph.read_only
+        #graph = Graph.objects.get(pk=bundle.data['graph'], deleted=False)
+        return bundle.data['graph'].owner == bundle.request.user and not bundle.data['graph'].read_only
 
     def update_list(self, object_list, bundle):
         allowed = []
@@ -99,11 +99,58 @@ class GraphOwnerAuthorization(Authorization):
     def delete_detail(self, object_list, bundle):
         return bundle.obj.graph.owner == bundle.request.user
 
+class NodeResource(ModelResource):
+    '''
+        An API resource for nodes.
+    '''
+    graph = fields.ToOneField('GraphResource', 'graph')
+
+class EdgeResource(ModelResource):
+    """
+        An API resource for edges.
+    """
+    graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
+    source = fields.ToOneField(NodeResource, 'source')
+    target = fields.ToOneField(NodeResource, 'target')
+
+    def obj_create(self, bundle, **kwargs):
+        """
+         This is the only override that allows us to access 'kwargs', which contains the
+         graph_id from the original request.
+        """
+        bundle.data['client_id'] = bundle.data['edge_client_id']
+        bundle.data['graph']  = kwargs['graph']
+        bundle.data['source'] = Node.objects.get(client_id=bundle.data['source_client_id'], graph=kwargs['graph'], deleted=False)
+        bundle.data['target'] = Node.objects.get(client_id=bundle.data['target_client_id'], graph=kwargs['graph'], deleted=False)
+        bundle.obj = self._meta.object_class()
+        bundle = self.full_hydrate(bundle)
+        return self.save(bundle)
+
+        return super(EdgeResource, self).obj_create(bundle, **kwargs)
+
+class EdgeSerializer(Serializer):
+    formats = ['json']
+    content_types = {
+        'json': 'application/json'
+    }
+
+    def from_json(self, content):
+        # JSON parser does not like the input due to the usage of single quotes, so we use ast
+        data = ast.literal_eval(content)
+        # The JS code creates it's own client_id for new edges
+        # Nodes a referenced by client_id's, but not the graph
+        client_id = data['id']
+        #        source = Node.objects.get(client_id=data['source'], graph=data['graph'], deleted=False)
+        #        target = Node.objects.get(client_id=data['target'], graph=data['graph'], deleted=False)
+        return dict(edge_client_id=client_id, source_client_id=data['source'], target_client_id=data['target'])
+
 class GraphResource(ModelResource):
     '''
         An abstract base class for graph API resources.
     '''
     project = fields.ToOneField(ProjectResource, 'project')
+    nodes = fields.ToManyField(NodeResource, 'nodes')
+    edges = fields.ToManyField(EdgeResource, 'edges')
 
     def hydrate(self, bundle):
         # Make sure that owners are assigned correctly
@@ -115,10 +162,10 @@ class GraphResource(ModelResource):
             project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
             bundle.obj.project=project
         except:
-            raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))            
-        # Fill the graph with the GraphML data
-        bundle.obj.from_graphml(bundle.request.body)     
-        return bundle  
+            raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))
+            # Fill the graph with the GraphML data
+        bundle.obj.from_graphml(bundle.request.body)
+        return bundle
 
     def wrap_view(self, view):
         """
@@ -166,7 +213,7 @@ class GraphResource(ModelResource):
             except UnsupportedFormat as e:
                 response = HttpResponse()
                 response.status_code = 413
-                return response               
+                return response
             except (BadRequest, fields.ApiFieldError) as e:
                 data = {"error": e.args[0] if getattr(e, 'args') else ''}
                 return self.error_response(request, data, response_class=http.HttpBadRequest)
@@ -194,38 +241,6 @@ class GraphResource(ModelResource):
                 return self._handle_500(request, e)
 
         return wrapper
-
-class NodeResource(ModelResource):
-    '''
-        An API resource for nodes.
-    '''
-    graph = fields.ToOneField(GraphResource, 'graph')
-
-class EdgeResource(ModelResource):
-    '''
-        An API resource for edges.
-    '''
-    #graph = fields.ToOneField(GraphResource, 'graph')
-    source = fields.ToOneField(NodeResource, 'source')
-    target = fields.ToOneField(NodeResource, 'target')
-
-class EdgeSerializer(Serializer):
-    formats = ['json']
-    content_types = {
-        'json': 'application/json'
-    }
-
-    def from_json(self, content):
-        import pdb; pdb.set_trace()
-        # JSON parser does not like the input due to the usage of single quotes, so we use ast
-        data = ast.literal_eval(content)
-        # The JS code creates it's own client_id for new edges
-        # Nodes a referenced by client_id's, but not the graph
-        client_id = data['id']
-        graph_pk = Graph.objects.get(pk=data['graph'], deleted=False) # fetch to make sure it is not deleted
-        source_pk = Node.objects.get(client_id=data['source'], graph=data['graph'], deleted=False)
-        target_pk = Node.objects.get(client_id=data['target'], graph=data['graph'], deleted=False)        
-        return {'client_id': client_id, 'graph': graph_pk, 'source': source_pk, 'target': target_pk}
 
 class GraphSerializer(Serializer):
     """
@@ -367,7 +382,7 @@ def job_create(user, graph_id, job_kind):
     # return URL for job status information
     logger.debug('Created new %s job with ID %d for graph %d' % (job.kind, job.pk, graph.pk))
     return job
- 
+
 def job_status(user, job_id):
     ''' Returns the status information for the given job, and the job object if available.
         This API helper wraps functionality that is common to all frontend API versions of
@@ -393,7 +408,7 @@ def job_status(user, job_id):
             logger.debug("Job is done, but with non-zero exit code.")
             mail_managers('Analysis of job %s ended with non-zero exit code.'%job.pk, job.graph.to_xml() )
             return 1, job
-    else:       
+    else:
         logger.debug("Job is pending.")
         return 2, job
 

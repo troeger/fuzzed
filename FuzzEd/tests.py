@@ -57,7 +57,10 @@ class FuzzEdTestCase(LiveServerTestCase):
         return self.c.get( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
 
     def ajaxPost(self, url, data, content_type):
-        return self.c.post(url, data, content_type, **{'HTTP_X_REQUESTED_WITH':'XMLHttpRequest'})
+        """
+        :rtype : django.http.response.HttpResponse
+        """
+        return self.c.post( url, data, content_type, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 
     def ajaxDelete(self, url):
         return self.c.delete( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
@@ -264,7 +267,6 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
     #TODO: Test that session authentication is checked in the API implementation
     #TODO: Test that the user can only access his graphs, and not the ones of other users
-    #TODO: Test that read-only graphs cannot be edited
 
     def testAjaxRequestCheck(self):
         response=self.get(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
@@ -322,11 +324,9 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 204)
 
     def testCreateEdge(self):
-        # get edge for testing
-        response=self.ajaxGet(self.baseUrl+'/edges/'+str(self.clientIdEdge))
-        print response
-        url = self.baseUrl+'/edges'
-        response=self.ajaxPost(url, {'id': 4714, 'graph': self.pkFaultTree, 'source':self.clientIdAndGate, 'target':self.clientIdBasicEvent}, 'application/json' )
+        response=self.ajaxPost(self.baseUrl+'/graphs/%u/edges/'%self.pkFaultTree,
+                               {'id': 4714, 'source':self.clientIdAndGate, 'target':self.clientIdBasicEvent},
+                               'application/json')
         self.assertEqual(response.status_code, 201)
 
     def testNotificationDismiss(self):

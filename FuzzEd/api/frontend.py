@@ -22,6 +22,16 @@ logger = logging.getLogger('FuzzEd')
 import json, common
 from tastypie.authentication import SessionAuthentication   
 
+class EdgeResource(common.EdgeResource):
+    class Meta:
+        queryset = Edge.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        serializer = common.EdgeSerializer()
+        authorization = common.GraphOwnerAuthorization()
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post']
+        excludes = ['deleted', 'id']
+
 class GraphSerializer(common.GraphSerializer):
     '''
         The frontend gets its own JSON format for the graph information,
@@ -56,7 +66,28 @@ class GraphResource(common.GraphResource):
             url(r'^graphs/(?P<pk>\d+)/simulation/topEventProbability$', 
                 self.wrap_view('dispatch_detail'), 
                 name = 'simulation_top_event_probability'),
+            url(r'^graphs/(?P<pk>\d+)/edges/$',
+                self.wrap_view('dispatch_edges'),
+                name="edges"),
+            url(r'^graphs/(?P<pk>\d+)/nodes/$',
+                self.wrap_view('dispatch_nodes'),
+                name="edges"),
         ]
+
+    def dispatch_edges(self, request, **kwargs):
+        #TODO: Add some error handling if the provided graph pk is invalid
+        bundle = self.build_bundle(data={'pk': kwargs['pk']}, request=request)
+        obj = self.cached_obj_get(bundle=bundle, **self.remove_api_resource_names(kwargs))
+        edge_resource = EdgeResource()
+        return edge_resource.dispatch_list(request, graph=obj)
+
+    def dispatch_nodes(self, request, **kwargs):
+        #TODO: Add some error handling if the provided graph pk is invalid
+        bundle = self.build_bundle(data={'pk': kwargs['pk']}, request=request)
+        obj = self.cached_obj_get(bundle=bundle, **self.remove_api_resource_names(kwargs))
+        node_resource = NodeResource()
+        return node_resource.dispatch_list(request, graph=obj)
+
 
 class ProjectResource(common.ProjectResource):
     class Meta:
@@ -66,26 +97,6 @@ class ProjectResource(common.ProjectResource):
         detail_allowed_methods = ['get']
         excludes = ['deleted', 'owner']
         nested = 'graph'
-
-class EdgeResource(common.EdgeResource):
-    class Meta:
-        queryset = Edge.objects.filter(deleted=False)
-        authentication = SessionAuthentication()
-        serializer = common.EdgeSerializer()
-        authorization = common.GraphOwnerAuthorization()
-        list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post']
-        excludes = ['deleted', 'id']
-
-    def prepend_urls(self):
-        return [
-            url(r'^edges/(?P<pk>\d+)$', 
-                self.wrap_view('dispatch_detail'), 
-                name = 'edge'),
-            url(r'^edges$', 
-                self.wrap_view('dispatch_list'), 
-                name = 'edges'),
-        ]
 
 class NodeResource(common.NodeResource):
     class Meta:
