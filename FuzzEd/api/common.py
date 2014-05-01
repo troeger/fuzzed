@@ -23,7 +23,9 @@ import time, logging, ast
 logger = logging.getLogger('FuzzEd')
 
 class OurApiKeyAuthentication(ApiKeyAuthentication):
-    ''' Our own version does not demand the user name to be part of the auth header. '''
+    '''
+        Our own authenticator version does not demand the user name to be part of the auth header.
+    '''
     def extract_credentials(self, request):
         if request.META.get('HTTP_AUTHORIZATION') and request.META['HTTP_AUTHORIZATION'].lower().startswith('apikey '):
             (auth_type, api_key) = request.META['HTTP_AUTHORIZATION'].split(' ')
@@ -40,28 +42,6 @@ class OurApiKeyAuthentication(ApiKeyAuthentication):
         else:
             logger.debug("Missing authorization header: "+str(request.META))
             raise ValueError("Missing authorization header.")
-
-class ProjectResource(ModelResource):
-    '''
-        An API resource for projects.
-    '''
-    graphs = fields.ToManyField('FuzzEd.api.external.GraphResource', 'graphs')
-
-    def get_object_list(self, request):
-        return super(ProjectResource, self).get_object_list(request).filter(owner=request.user)
-
-
-class NodeGroupResource(ModelResource):
-    '''
-        An API resource for node groups.
-    '''
-    pass
-
-class JobResource(ModelResource):
-    '''
-        An API resource for jobs.
-    '''
-    pass
 
 class GraphOwnerAuthorization(Authorization):
     '''
@@ -99,11 +79,13 @@ class GraphOwnerAuthorization(Authorization):
     def delete_detail(self, object_list, bundle):
         return bundle.obj.graph.owner == bundle.request.user
 
+### Resources ###
+
 class NodeResource(ModelResource):
     '''
         An API resource for nodes.
     '''
-    graph = fields.ToOneField('GraphResource', 'graph')
+    graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
 
 class EdgeResource(ModelResource):
     """
@@ -127,6 +109,29 @@ class EdgeResource(ModelResource):
         return self.save(bundle)
 
         return super(EdgeResource, self).obj_create(bundle, **kwargs)
+
+
+class ProjectResource(ModelResource):
+    '''
+        An API resource for projects.
+    '''
+    graphs = fields.ToManyField('FuzzEd.api.external.GraphResource', 'graphs')
+
+    def get_object_list(self, request):
+        return super(ProjectResource, self).get_object_list(request).filter(owner=request.user)
+
+
+class NodeGroupResource(ModelResource):
+    '''
+        An API resource for node groups.
+    '''
+    pass
+
+class JobResource(ModelResource):
+    '''
+        An API resource for jobs.
+    '''
+    pass
 
 class EdgeSerializer(Serializer):
     formats = ['json']

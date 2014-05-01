@@ -300,7 +300,9 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
                    'id'        : '1383517229910', 
                    'properties': '{}'}
 
-        response=self.ajaxPost(self.baseUrl+'/graphs/%u/nodes'%self.pkFaultTree, newnode)
+        response=self.ajaxPost(self.baseUrl+'/graphs/%u/nodes'%self.pkFaultTree,
+                               newnode,
+                               'application/json')
         self.assertEqual(response.status_code, 201)
         newid = int(response['Location'][-2])
         newnode = Node.objects.get(pk=newid)
@@ -311,12 +313,16 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
     def testRelocateNode(self):
         newpos = {'properties': '{"y":"3","x":"7"}'}
-        response = self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent), newpos)
+        response = self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent),
+                                 newpos,
+                                 "application/json")
         self.assertEqual(response.status_code, 204)
 
     def testPropertyChange(self):
         newprop = {'properties': '{"key": "foo", "value":"bar"}'}
-        response = self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent), newprop)
+        response = self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent),
+                                 newprop,
+                                 "application/json")
         self.assertEqual(response.status_code, 204)
 
     def testDeleteEdge(self):
@@ -337,7 +343,7 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         n.users.add(u)
         n.save()
         # Now check the dismiss call
-        response=self.ajaxPost(self.baseUrl+'/notifications/%u/dismiss'%n.pk)
+        response=self.ajaxPost(self.baseUrl+'/notifications/%u/dismiss'%n.pk, {}, "application/json")
         self.assertEqual(response.status_code, 200)
 
 class AnalysisInputFilesTestCase(FuzzEdTestCase):
