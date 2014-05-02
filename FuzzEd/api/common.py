@@ -6,6 +6,7 @@ from django import http
 from django.conf.urls import url
 from django.shortcuts import get_object_or_404
 from django.core.mail import mail_managers
+from django.core.urlresolvers import reverse
 from tastypie.resources import ModelResource, convert_post_to_patch
 from tastypie.authentication import ApiKeyAuthentication, SessionAuthentication
 from tastypie.authorization import Authorization
@@ -118,6 +119,15 @@ class NodeResource(ModelResource):
         excludes = ['deleted', 'id']
 
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
+
+    def get_resource_uri(self, bundle_or_obj=None, url_name='api_dispatch_list'):
+        """
+            Since we change the API URL format to nested resources, we need also to
+            change the location determination for a given resource object.
+        """
+        node_client_id = bundle_or_obj.obj.client_id
+        graph_pk = bundle_or_obj.obj.graph.pk
+        return reverse('node', kwargs={'api_name':'front', 'pk':graph_pk, 'client_id':node_client_id})
 
     def obj_create(self, bundle, **kwargs):
         """
