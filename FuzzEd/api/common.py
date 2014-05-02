@@ -24,9 +24,9 @@ from FuzzEd.models import Project, Graph, Edge, Node
 logger = logging.getLogger('FuzzEd')
 
 class OurApiKeyAuthentication(ApiKeyAuthentication):
-    '''
+    """
         Our own authenticator version does not demand the user name to be part of the auth header.
-    '''
+    """
     def extract_credentials(self, request):
         if request.META.get('HTTP_AUTHORIZATION') and request.META['HTTP_AUTHORIZATION'].lower().startswith('apikey '):
             (auth_type, api_key) = request.META['HTTP_AUTHORIZATION'].split(' ')
@@ -45,10 +45,10 @@ class OurApiKeyAuthentication(ApiKeyAuthentication):
             raise ValueError("Missing authorization header.")
 
 class GraphOwnerAuthorization(Authorization):
-    '''
+    """
         A tastypie authorization class that checks if the 'graph' attribute
         links to a graph that is owned by the requesting user.
-    '''
+    """
     def read_list(self, object_list, bundle):
         return object_list.filter(graph__owner=bundle.request.user)
 
@@ -109,7 +109,7 @@ class NodeResource(ModelResource):
         authorization = GraphOwnerAuthorization()
         serializer = NodeSerializer()
         list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post', 'patch']
         excludes = ['deleted', 'id']
 
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
@@ -119,7 +119,7 @@ class NodeResource(ModelResource):
          This is the only override that allows us to access 'kwargs', which contains the
          graph_id from the original request.
         """
-        bundle.data['graph']  = kwargs['graph']
+        bundle.data['graph']  = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
         return self.save(bundle)
@@ -171,9 +171,10 @@ class EdgeResource(ModelResource):
          graph_id from the original request.
         """
         bundle.data['client_id'] = bundle.data['edge_client_id']
-        bundle.data['graph']  = kwargs['graph']
-        bundle.data['source'] = Node.objects.get(client_id=bundle.data['source_client_id'], graph=kwargs['graph'], deleted=False)
-        bundle.data['target'] = Node.objects.get(client_id=bundle.data['target_client_id'], graph=kwargs['graph'], deleted=False)
+        graph  = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
+        bundle.data['graph'] = graph
+        bundle.data['source'] = Node.objects.get(client_id=bundle.data['source_client_id'], graph=graph, deleted=False)
+        bundle.data['target'] = Node.objects.get(client_id=bundle.data['target_client_id'], graph=graph, deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
         return self.save(bundle)

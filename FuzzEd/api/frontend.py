@@ -66,23 +66,30 @@ class GraphResource(common.GraphResource):
                 name="edges"),
             url(r'^graphs/(?P<pk>\d+)/nodes/$',
                 self.wrap_view('dispatch_nodes'),
-                name="edges"),
+                name="nodes"),
+            url(r'^graphs/(?P<pk>\d+)/edges/(?P<edge_client_id>\d+)$',
+                self.wrap_view('dispatch_edge'),
+                name="edge"),
+            url(r'^graphs/(?P<pk>\d+)/nodes/(?P<node_client_id>\d+)$',
+                self.wrap_view('dispatch_node'),
+                name="node"),
         ]
 
     def dispatch_edges(self, request, **kwargs):
-        #TODO: Add some error handling if the provided graph pk is invalid
-        bundle = self.build_bundle(data={'pk': kwargs['pk']}, request=request)
-        obj = self.cached_obj_get(bundle=bundle, **self.remove_api_resource_names(kwargs))
         edge_resource = EdgeResource()
-        return edge_resource.dispatch_list(request, graph=obj)
+        return edge_resource.dispatch_list(request, graph_id=kwargs['pk'])
 
     def dispatch_nodes(self, request, **kwargs):
-        #TODO: Add some error handling if the provided graph pk is invalid
-        bundle = self.build_bundle(data={'pk': kwargs['pk']}, request=request)
-        obj = self.cached_obj_get(bundle=bundle, **self.remove_api_resource_names(kwargs))
         node_resource = NodeResource()
-        return node_resource.dispatch_list(request, graph=obj)
+        return node_resource.dispatch_list(request, graph_id=kwargs['pk'])
 
+    def dispatch_edge(self, request, **kwargs):
+        edge_resource = EdgeResource()
+        return edge_resource.dispatch_detail(request, graph_id=kwargs['pk'], edge_client_id=kwargs['edge_client_id'])
+
+    def dispatch_node(self, request, **kwargs):
+        node_resource = NodeResource()
+        return node_resource.dispatch_detail(request, graph_id=kwargs['pk'], node_client_id=kwargs['node_client_id'])
 
 class ProjectResource(common.ProjectResource):
     class Meta:

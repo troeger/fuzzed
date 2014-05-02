@@ -62,6 +62,12 @@ class FuzzEdTestCase(LiveServerTestCase):
         """
         return self.c.post( url, data, content_type, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 
+    def ajaxPatch(self, url, data, content_type):
+        """
+        :rtype : django.http.response.HttpResponse
+        """
+        return self.c.patch( url, data, content_type, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
+
     def ajaxDelete(self, url):
         return self.c.delete( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
 
@@ -320,7 +326,7 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
     def testPropertyChange(self):
         newprop = {'properties': '{"key": "foo", "value":"bar"}'}
-        response = self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent),
+        response = self.ajaxPatch(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent),
                                  newprop,
                                  "application/json")
         self.assertEqual(response.status_code, 204)
