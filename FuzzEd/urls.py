@@ -17,6 +17,7 @@ front_api.register(frontend.ProjectResource())
 front_api.register(frontend.GraphResource())
 front_api.register(frontend.EdgeResource())
 front_api.register(frontend.NodeResource())
+front_api.register(frontend.NotificationResource())
 
 admin.autodiscover()
 
@@ -88,9 +89,6 @@ urlpatterns = patterns('',
     #url(r'^front/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.frontend.job_status', name='frontend_job_status'),
     url(r'^front/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.frontend.job_exitcode', name='job_exitcode'),
     url(r'^front/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.frontend.job_files', name='job_files'),
-
-    # user notifications
-    url(r'^front/notifications/(?P<noti_id>\d+)/dismiss$','FuzzEd.api.frontend.noti_dismiss', name='noti_dismiss'),
 
     url(r'^api/', include(v1_api.urls + front_api.urls)),
 

@@ -1,24 +1,40 @@
+import json
+import logging
+
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.core.urlresolvers import reverse
 from django.views.decorators.cache import never_cache
-
-from FuzzEd.decorators import require_ajax
-
-
-# We expect these imports to go away main the main logic finally lives in common.py
-from FuzzEd.models import notations, commands, Node, Job, Notification, NodeGroup, Graph, Project
-from FuzzEd.middleware import *
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from tastypie import fields
+from tastypie.authentication import SessionAuthentication
+from tastypie.resources import ModelResource
 
-import logging
+from FuzzEd.decorators import require_ajax
+from FuzzEd.models import Node, Job, Notification, NodeGroup, Graph
+from FuzzEd.middleware import *
+import common
+
 logger = logging.getLogger('FuzzEd')
 
-import json, common
-from tastypie.authentication import SessionAuthentication   
+class NotificationResource(ModelResource):
+    """
+        An API resource for notifications.
+    """
+
+    class Meta:
+        queryset = Notification.objects.all()
+        authentication = SessionAuthentication()
+        detail_allowed_methods = ['delete']
+
+    def obj_delete(self, bundle, **kwargs):
+        noti = self.obj_get(bundle=bundle, **kwargs)
+        noti.users.remove(bundle.request.user)
+        noti.save()
 
 class NodeResource(common.NodeResource):
     pass
@@ -221,17 +237,4 @@ def job_exitcode(request, job_secret):
     job.save()
     return HttpResponse()        
 
-@csrf_exempt
-@require_http_methods(['POST'])
-def noti_dismiss(request, noti_id):
-    """
-    Function: noti_dismiss
-
-    API call being used when the user dismisses the notification box on the start (project overview)
-    page.
-    """
-    noti = get_object_or_404(Notification, pk=noti_id)
-    noti.users.remove(request.user)
-    noti.save()
-    return HttpResponse(status=200)
 

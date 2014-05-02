@@ -7,7 +7,7 @@ from django.conf.urls import url
 from django.shortcuts import get_object_or_404
 from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
-from tastypie.resources import ModelResource, convert_post_to_patch
+from tastypie.resources import ModelResource
 from tastypie.authentication import ApiKeyAuthentication, SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.exceptions import UnsupportedFormat, BadRequest, ImmediateHttpResponse

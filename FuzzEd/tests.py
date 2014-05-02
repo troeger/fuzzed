@@ -346,8 +346,8 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         n.users.add(u)
         n.save()
         # Now check the dismiss call
-        response=self.ajaxPost(self.baseUrl+'/notifications/%u/dismiss'%n.pk, {}, "application/json")
-        self.assertEqual(response.status_code, 200)
+        response=self.ajaxDelete(self.baseUrl+'/notification/%u/'%n.pk)
+        self.assertEqual(response.status_code, 204)
 
 class AnalysisInputFilesTestCase(FuzzEdTestCase):
     '''
