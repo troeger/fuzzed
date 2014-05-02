@@ -274,10 +274,6 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
     #TODO: Test that session authentication is checked in the API implementation
     #TODO: Test that the user can only access his graphs, and not the ones of other users
 
-    def testAjaxRequestCheck(self):
-        response=self.get(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
-        self.assertEqual(response.status_code, 400)
-
     def testGetGraph(self):
         for id, kind in self.graphs.iteritems():
             url = self.baseUrl+'/graphs/%u'%self.pkFaultTree
@@ -300,10 +296,10 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
 
     def testCreateNode(self):
-        newnode = json.dumps({'y'         : '3',
-                   'x'         : '7', 
+        newnode = json.dumps({'y'         : 3,
+                   'x'         : 7,
                    'kind'      : 'basicEvent', 
-                   'id'        : '1383517229910', 
+                   'client_id' : 1383517229910,
                    'properties': '{}'})
 
         response=self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/'%self.pkFaultTree,
@@ -318,11 +314,11 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 204)
 
     def testRelocateNode(self):
-        newpos = {'properties': '{"y":"3","x":"7"}'}
-        response = self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent),
+        newpos = json.dumps({'properties': {"y":3,"x":7}})
+        response = self.ajaxPatch(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent),
                                  newpos,
                                  "application/json")
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 202)
 
     def testPropertyChange(self):
         newprop = json.dumps({"properties": {"key": "foo", "value":"bar"}})
@@ -336,8 +332,9 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 204)
 
     def testCreateEdge(self):
+        newedge = json.dumps({'client_id': 4714, 'source':self.clientIdAndGate, 'target':self.clientIdBasicEvent})
         response=self.ajaxPost(self.baseUrl+'/graphs/%u/edges/'%self.pkFaultTree,
-                               {'id': 4714, 'source':self.clientIdAndGate, 'target':self.clientIdBasicEvent},
+                               newedge,
                                'application/json')
         self.assertEqual(response.status_code, 201)
 

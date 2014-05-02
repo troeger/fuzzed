@@ -3,6 +3,7 @@ import logging
 import ast
 
 from django import http
+from django.conf.urls import url
 from django.shortcuts import get_object_or_404
 from django.core.mail import mail_managers
 from tastypie.resources import ModelResource, convert_post_to_patch
@@ -128,9 +129,6 @@ class NodeResource(ModelResource):
         bundle = self.full_hydrate(bundle)
         return self.save(bundle)
 
-        return super(NodeResource, self).obj_create(bundle, **kwargs)
-
-
     def patch_detail(self, request, **kwargs):
         """
             Updates a resource in-place. We could also override obj_update, which is
@@ -159,15 +157,13 @@ class NodeResource(ModelResource):
         # return the updated node object
         return HttpResponse(obj.to_json(), 'application/javascript', status=202)
 
+
 class EdgeSerializer(Serializer):
     """
         Our custom edge serializer. Using the default serializer would demand that the
-        included node references must be URL's to node resources, instead of plain ID's.
-        This makes the frontend API unneccessarily complicated.
-        Also the graph reference would be needed to be included, while we take it from
-        the nested resource URL.
-        The object determination, however, happens in EdgeResource.obj_create, so we basically
-        map only ID's here.
+        graph reference is included, while we take it from the nested resource URL.
+        It would also demand that nodes are referenced by their full URL's, which we do not
+        do.
     """
     formats = ['json']
     content_types = {
@@ -175,12 +171,7 @@ class EdgeSerializer(Serializer):
     }
 
     def from_json(self, content):
-        # JSON parser does not like the input due to the usage of single quotes, so we use ast
-        data = ast.literal_eval(content)
-        # The JS code creates it's own client_id for new edges
-        client_id = data['id']
-        return dict(edge_client_id=client_id, source_client_id=data['source'], target_client_id=data['target'])
-
+        return json.loads(content)
 
 class EdgeResource(ModelResource):
     """
@@ -205,11 +196,10 @@ class EdgeResource(ModelResource):
          This is the only override that allows us to access 'kwargs', which contains the
          graph_id from the original request.
         """
-        bundle.data['client_id'] = bundle.data['edge_client_id']
         graph = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
         bundle.data['graph'] = graph
-        bundle.data['source'] = Node.objects.get(client_id=bundle.data['source_client_id'], graph=graph, deleted=False)
-        bundle.data['target'] = Node.objects.get(client_id=bundle.data['target_client_id'], graph=graph, deleted=False)
+        bundle.data['source'] = Node.objects.get(client_id=bundle.data['source'], graph=graph, deleted=False)
+        bundle.data['target'] = Node.objects.get(client_id=bundle.data['target'], graph=graph, deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
         return self.save(bundle)
@@ -221,6 +211,14 @@ class ProjectResource(ModelResource):
     '''
         An API resource for projects.
     '''
+    class Meta:
+        queryset = Project.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        list_allowed_methods = ['get']
+        detail_allowed_methods = ['get']
+        excludes = ['deleted', 'owner']
+        nested = 'graph'
+
     graphs = fields.ToManyField('FuzzEd.api.external.GraphResource', 'graphs')
 
     def get_object_list(self, request):
@@ -248,6 +246,54 @@ class GraphResource(ModelResource):
     project = fields.ToOneField(ProjectResource, 'project')
     nodes = fields.ToManyField(NodeResource, 'nodes')
     edges = fields.ToManyField(EdgeResource, 'edges')
+
+    def prepend_urls(self):
+        return [
+            url(r'^graphs/(?P<pk>\d+)/graph_download/$',
+                self.wrap_view('dispatch_detail'),
+                name = 'frontend_graph_download'),
+            url(r'^graphs/(?P<pk>\d+)$',
+                self.wrap_view('dispatch_detail'),
+                name = 'graph'),
+            url(r'^graphs/(?P<pk>\d+)/analysis/cutsets$',
+                self.wrap_view('dispatch_detail'),
+                name = 'analyze_cutsets'),
+            url(r'^graphs/(?P<pk>\d+)/analysis/topEventProbability$',
+                self.wrap_view('dispatch_detail'),
+                name = 'analyze_top_event_probability'),
+            url(r'^graphs/(?P<pk>\d+)/simulation/topEventProbability$',
+                self.wrap_view('dispatch_detail'),
+                name = 'simulation_top_event_probability'),
+            url(r'^graphs/(?P<pk>\d+)/edges/$',
+                self.wrap_view('dispatch_edges'),
+                name="edges"),
+            url(r'^graphs/(?P<pk>\d+)/nodes/$',
+                self.wrap_view('dispatch_nodes'),
+                name="nodes"),
+            url(r'^graphs/(?P<pk>\d+)/edges/(?P<client_id>\d+)$',
+                self.wrap_view('dispatch_edge'),
+                name="edge"),
+            url(r'^graphs/(?P<pk>\d+)/nodes/(?P<client_id>\d+)$',
+                self.wrap_view('dispatch_node'),
+                name="node"),
+        ]
+
+    def dispatch_edges(self, request, **kwargs):
+        edge_resource = EdgeResource()
+        return edge_resource.dispatch_list(request, graph_id=kwargs['pk'])
+
+    def dispatch_nodes(self, request, **kwargs):
+        node_resource = NodeResource()
+        return node_resource.dispatch_list(request, graph_id=kwargs['pk'])
+
+    def dispatch_edge(self, request, **kwargs):
+        edge_resource = EdgeResource()
+        return edge_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
+
+    def dispatch_node(self, request, **kwargs):
+        node_resource = NodeResource()
+        return node_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
+
 
     def hydrate(self, bundle):
         # Make sure that owners are assigned correctly
