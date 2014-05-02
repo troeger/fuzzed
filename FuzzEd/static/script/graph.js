@@ -109,8 +109,8 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
                 this._addEdge(edge.connection);
             }.bind(this));
 
-            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED,      this._shapeDropped.bind(this));
-            jQuery(document).on(Config.Events.NODE_DELETED,              this._updateNodeGroupDeleted.bind(this));
+            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
+            jQuery(document).on(Config.Events.NODE_DELETED,         this._updateNodeGroupDeleted.bind(this));
 
             return this;
         },
@@ -152,6 +152,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             var properties = jsonEdge.properties || {};
             properties.id  = jsonEdge.id;
             properties.graph = this;
+
             var edge = new Edge(this.getNotation().edges, sourceNode, targetNode, properties);
             this.edges[edge.id] = edge;
 
@@ -244,8 +245,10 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
 
         /**
          *  Method: addNodeGroup
+         *      Creates a new NodeGroup based on the given jsonNodeGroup.
          *
-         *  Blah
+         *  Returns:
+         *    The newly created <NodeGroup> instance.
          */
         addNodeGroup: function(jsonNodeGroup) {
             var nodes = {};
@@ -265,8 +268,10 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
 
         /**
          *  Method: deleteNodeGroup
+         *      Deletes a given NodeGroup.
          *
-         *  Blah
+         *  Returns:
+         *    This <Graph> instance for chaining.
          */
         deleteNodeGroup: function(nodeGroup) {
             if (nodeGroup.remove()) {
@@ -276,16 +281,26 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             return this;
         },
 
+        /**
+         *  Method: deleteNodeGroup
+         *      Updates all node groups on deletion of a node. Furthermore deletes empty node groups.
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
+         */
         _updateNodeGroupDeleted: function(event, nodeId) {
             var node = this.getNodeById(nodeId);
-            _.each(this.nodeGroups, function(ng) {
-                delete this.nodeGroups[ng.id].nodes[nodeId];
-                if (_.size(ng.nodes) < 2) {
-                    this.deleteNodeGroup(ng);
+
+            _.each(this.nodeGroups, function(nodegroup) {
+                delete this.nodeGroups[nodegroup.id].nodes[nodeId];
+                if (_.size(nodegroup.nodes) < 2) {
+                    this.deleteNodeGroup(nodegroup);
                 } else {
-                    ng.redraw();
+                    nodegroup.redraw();
                 }
             }.bind(this));
+
+            return this;
         },
 
         /**

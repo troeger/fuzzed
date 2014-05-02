@@ -20,10 +20,9 @@ function(Property, Mirror, Canvas, Class, Config) {
          *    {DOMElement} container           - The DOM element that contains all other visual DOM elements of the node
          *                                       such as its image, mirrors, ...
          *    {<Graph>}    graph               - The Graph this node belongs to.
-         *    {int}        id                  - A client-side generated id - i.e. UNIX-timestamp - to uniquely identify
-         *                                       the node in the frontend. It does NOT correlate with database ids in the
-         *                                       backend. Introduced to save round-trips and to later allow for an
-         *                                       offline mode.
+         *    {int}        id                  - A client-side generated id to uniquely identify the node in the
+         *                                       frontend. It does NOT correlate with database ids in the backend.
+         *                                       Introduced to save round-trips and to later allow for an offline mode.
          *    {Array[<Edge>]} incomingEdges    - An enumeration of all edges linking TO this node (this node is the target
          *                                       target of the edge).
          *    {Array[<Edge>]} outgoingEdges    - An enumeration of all edges linking FROM this node (this node is the
@@ -525,9 +524,13 @@ function(Property, Mirror, Canvas, Class, Config) {
 
         /**
          * Method: _setupProperties
+         *      Converts the informal properties stored in <properties> into Property objects ordered by this graph's
+         *      propertiesDisplayOrder (see <Graph::getNotation()> or the respective notations json-file).
+         *
+         *      ! Exact code duplication in <Node::_setupProperties()>  and <Edge::_setupPropertes()>
          *
          * Returns:
-         *   This {<Node>} instance for chaining.
+         *      This {<NodeGroup>} instance for chaining.
          */
         _setupProperties: function() {
             _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {
@@ -895,7 +898,7 @@ function(Property, Mirror, Canvas, Class, Config) {
          * Method: toDict
          *
          * Returns:
-         *   A dict representation of the node according to models/node.py:to_dict().
+         *   A dict representation of the node avoiding any circular structures.
          */
         toDict: function() {
             var properties = _.map(this.properties, function(prop) { return prop.toDict() });
