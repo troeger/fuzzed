@@ -22,6 +22,16 @@ logger = logging.getLogger('FuzzEd')
 import json, common
 from tastypie.authentication import SessionAuthentication   
 
+class NodeResource(common.NodeResource):
+    class Meta:
+        queryset = Node.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        authorization = common.GraphOwnerAuthorization()
+        serializer = common.NodeSerializer()
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post']
+        excludes = ['deleted', 'id']
+
 class EdgeResource(common.EdgeResource):
     class Meta:
         queryset = Edge.objects.filter(deleted=False)
@@ -97,59 +107,6 @@ class ProjectResource(common.ProjectResource):
         detail_allowed_methods = ['get']
         excludes = ['deleted', 'owner']
         nested = 'graph'
-
-class NodeResource(common.NodeResource):
-    class Meta:
-        queryset = Node.objects.filter(deleted=False)
-        authentication = SessionAuthentication()
-        authorization = common.GraphOwnerAuthorization()
-        list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post']
-        excludes = ['deleted', 'id']        
-
-    def prepend_urls(self):
-        return [
-            url(r'^graphs/(?P<graph_id>\d+)/nodes/(?P<pk>\d+)$', 
-                self.wrap_view('dispatch_detail'), 
-                name = 'node'),
-            url(r'^graphs/(?P<graph_id>\d+)/nodes$', 
-                self.wrap_view('dispatch_detail'), 
-                name = 'nodes'),
-        ]
-
-class NodeGroupResource(common.NodeGroupResource):
-    class Meta:
-        queryset = NodeGroup.objects.filter(deleted=False)
-        authentication = SessionAuthentication()
-        authorization = common.GraphOwnerAuthorization()
-        list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post']
-
-    def prepend_urls(self):
-        return [
-            url(r'^graphs/(?P<graph_id>\d+)/nodegroups/(?P<pk>\d+)$', 
-                self.wrap_view('dispatch_detail'), 
-                name = 'nodegroup'),
-            url(r'^graphs/(?P<graph_id>\d+)/nodegroups$', 
-                self.wrap_view('dispatch_detail'), 
-                name = 'nodegroups'),
-        ]
-
-
-class JobResource(common.JobResource):
-    class Meta:
-        queryset = Job.objects
-        authentication = SessionAuthentication()
-        authorization = common.GraphOwnerAuthorization()
-        list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post']
-
-    def prepend_urls(self):
-        return [
-            url(r'^jobs/(?P<pk>\d+)$', 
-                self.wrap_view('dispatch_detail'), 
-                name = 'frontend_job_status'),
-        ]
 
 @login_required
 @csrf_exempt

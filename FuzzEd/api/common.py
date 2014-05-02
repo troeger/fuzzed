@@ -81,11 +81,49 @@ class GraphOwnerAuthorization(Authorization):
 
 ### Resources ###
 
+class NodeSerializer(Serializer):
+    formats = ['json']
+    content_types = {
+        'json': 'application/json'
+    }
+
+    def from_json(self, content):
+        # JSON parser does not like the input due to the usage of single quotes, so we use ast
+        data = ast.literal_eval(content)
+        # The JS code creates it's own client_id for new nodes
+        client_id = data['id']
+        return dict(node_client_id=client_id)
+
 class NodeResource(ModelResource):
     '''
         An API resource for nodes.
     '''
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
+
+    def obj_create(self, bundle, **kwargs):
+        """
+         This is the only override that allows us to access 'kwargs', which contains the
+         graph_id from the original request.
+        """
+        bundle.data['graph']  = kwargs['graph']
+        bundle.obj = self._meta.object_class()
+        bundle = self.full_hydrate(bundle)
+        return self.save(bundle)
+
+        return super(NodeResource, self).obj_create(bundle, **kwargs)
+
+class EdgeSerializer(Serializer):
+    formats = ['json']
+    content_types = {
+        'json': 'application/json'
+    }
+
+    def from_json(self, content):
+        # JSON parser does not like the input due to the usage of single quotes, so we use ast
+        data = ast.literal_eval(content)
+        # The JS code creates it's own client_id for new edges
+        client_id = data['id']
+        return dict(edge_client_id=client_id, source_client_id=data['source'], target_client_id=data['target'])
 
 class EdgeResource(ModelResource):
     """
@@ -132,22 +170,6 @@ class JobResource(ModelResource):
         An API resource for jobs.
     '''
     pass
-
-class EdgeSerializer(Serializer):
-    formats = ['json']
-    content_types = {
-        'json': 'application/json'
-    }
-
-    def from_json(self, content):
-        # JSON parser does not like the input due to the usage of single quotes, so we use ast
-        data = ast.literal_eval(content)
-        # The JS code creates it's own client_id for new edges
-        # Nodes a referenced by client_id's, but not the graph
-        client_id = data['id']
-        #        source = Node.objects.get(client_id=data['source'], graph=data['graph'], deleted=False)
-        #        target = Node.objects.get(client_id=data['target'], graph=data['graph'], deleted=False)
-        return dict(edge_client_id=client_id, source_client_id=data['source'], target_client_id=data['target'])
 
 class GraphResource(ModelResource):
     '''

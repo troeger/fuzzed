@@ -300,7 +300,7 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
                    'id'        : '1383517229910', 
                    'properties': '{}'}
 
-        response=self.ajaxPost(self.baseUrl+'/graphs/%u/nodes'%self.pkFaultTree,
+        response=self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/'%self.pkFaultTree,
                                newnode,
                                'application/json')
         self.assertEqual(response.status_code, 201)
