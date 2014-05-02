@@ -23,24 +23,10 @@ import json, common
 from tastypie.authentication import SessionAuthentication   
 
 class NodeResource(common.NodeResource):
-    class Meta:
-        queryset = Node.objects.filter(deleted=False)
-        authentication = SessionAuthentication()
-        authorization = common.GraphOwnerAuthorization()
-        serializer = common.NodeSerializer()
-        list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post']
-        excludes = ['deleted', 'id']
+    pass
 
 class EdgeResource(common.EdgeResource):
-    class Meta:
-        queryset = Edge.objects.filter(deleted=False)
-        authentication = SessionAuthentication()
-        serializer = common.EdgeSerializer()
-        authorization = common.GraphOwnerAuthorization()
-        list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post']
-        excludes = ['deleted', 'id']
+    pass
 
 class GraphSerializer(common.GraphSerializer):
     '''

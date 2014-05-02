@@ -4,7 +4,7 @@ from FuzzEd.models import Graph, Job
 from django.contrib.auth.models import User
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from tastypie.resources import ModelResource
-from tastypie.authentication import ApiKeyAuthentication
+from tastypie.authentication import ApiKeyAuthentication, SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.exceptions import UnsupportedFormat, BadRequest, ImmediateHttpResponse
 from django.core.exceptions import ValidationError
@@ -82,6 +82,10 @@ class GraphOwnerAuthorization(Authorization):
 ### Resources ###
 
 class NodeSerializer(Serializer):
+    """
+        Our custom node serializer. Using the default serializer would demand that the
+        graph reference is included, while we take it from the nested resource URL.
+    """
     formats = ['json']
     content_types = {
         'json': 'application/json'
@@ -95,9 +99,18 @@ class NodeSerializer(Serializer):
         return dict(node_client_id=client_id)
 
 class NodeResource(ModelResource):
-    '''
+    """
         An API resource for nodes.
-    '''
+    """
+    class Meta:
+        queryset = Node.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        authorization = GraphOwnerAuthorization()
+        serializer = NodeSerializer()
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post']
+        excludes = ['deleted', 'id']
+
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
 
     def obj_create(self, bundle, **kwargs):
@@ -113,6 +126,15 @@ class NodeResource(ModelResource):
         return super(NodeResource, self).obj_create(bundle, **kwargs)
 
 class EdgeSerializer(Serializer):
+    """
+        Our custom edge serializer. Using the default serializer would demand that the
+        included node references must be URL's to node resources, instead of plain ID's.
+        This makes the frontend API unneccessarily complicated.
+        Also the graph reference would be needed to be included, while we take it from
+        the nested resource URL.
+        The object determination, however, happens in EdgeResource.obj_create, so we basically
+        map only ID's here.
+    """
     formats = ['json']
     content_types = {
         'json': 'application/json'
@@ -129,6 +151,15 @@ class EdgeResource(ModelResource):
     """
         An API resource for edges.
     """
+    class Meta:
+        queryset = Edge.objects.filter(deleted=False)
+        authentication = SessionAuthentication()
+        serializer = EdgeSerializer()
+        authorization = GraphOwnerAuthorization()
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post']
+        excludes = ['deleted', 'id']
+
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
     source = fields.ToOneField(NodeResource, 'source')
     target = fields.ToOneField(NodeResource, 'target')
