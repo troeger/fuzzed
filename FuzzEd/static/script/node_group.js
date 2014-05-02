@@ -13,10 +13,10 @@ function(Property, Class, Canvas, Config) {
          *  Properties:
          *    {DOMElement}     container       - A jQuery object referring to the node group's html representation.
          *    {<Graph>}        graph           - The Graph this node group belongs to.
-         *    {int}            id              - A client-side generated id to uniquely identify the node in the
+         *    {int}            id              - A client-side generated id to uniquely identify the node group in the
          *                                       frontend. It does NOT correlate with database ids in the backend.
          *                                       Introduced to save round-trips and to later allow for an offline mode.
-         *    {Array[<Edge>]}  nodes           - Enumeration of all nodes this node group belongs to
+         *    {Array[<Node>]}  nodes           - Enumeration of all nodes this node group belongs to
          *    {Object}         properties      - A dictionary of the node group's properties
          *
          */
