@@ -1,20 +1,19 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
-from FuzzEd.decorators import require_ajax
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 from django.core.urlresolvers import reverse
-from FuzzEd.middleware import HttpResponse, HttpResponseAccepted, HttpResponseRedirect
 from django.views.decorators.cache import never_cache
 
+from FuzzEd.decorators import require_ajax
+
+
 # We expect these imports to go away main the main logic finally lives in common.py
-from django.shortcuts import get_object_or_404
-from FuzzEd.models import Graph, notations, commands, Node, Job, Notification, NodeGroup, Graph, Project, Edge
+from FuzzEd.models import notations, commands, Node, Job, Notification, NodeGroup, Graph, Project
 from FuzzEd.middleware import *
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.core.mail import mail_managers
 
 import logging
 logger = logging.getLogger('FuzzEd')

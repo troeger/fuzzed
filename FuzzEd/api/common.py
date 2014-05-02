@@ -1,8 +1,9 @@
+import logging
+import ast
+
+from django import http
 from django.shortcuts import get_object_or_404
 from django.core.mail import mail_managers
-from FuzzEd.models import Graph, Job
-from django.contrib.auth.models import User
-from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from tastypie.resources import ModelResource
 from tastypie.authentication import ApiKeyAuthentication, SessionAuthentication
 from tastypie.authorization import Authorization
@@ -17,9 +18,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.cache import patch_cache_control, patch_vary_headers
 
+from FuzzEd.models import Job
 from FuzzEd.models import Project, Graph, Edge, Node
 
-import time, logging, ast
 logger = logging.getLogger('FuzzEd')
 
 class OurApiKeyAuthentication(ApiKeyAuthentication):
