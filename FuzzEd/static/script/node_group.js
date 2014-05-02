@@ -3,13 +3,21 @@ function(Property, Class, Canvas, Config) {
     /**
      *  Class: NodeGroup
      *
-     *  Blah
+     *  This class models a generic group of nodes, further specified in the respective notations file.
      *
      */
     return Class.extend({
         /**
          *  Group: Members
          *
+         *  Properties:
+         *    {DOMElement}     container       - A jQuery object referring to the node group's html representation.
+         *    {<Graph>}        graph           - The Graph this node group belongs to.
+         *    {int}            id              - A client-side generated id to uniquely identify the node in the
+         *                                       frontend. It does NOT correlate with database ids in the backend.
+         *                                       Introduced to save round-trips and to later allow for an offline mode.
+         *    {Array[<Edge>]}  nodes           - Enumeration of all nodes this node group belongs to
+         *    {Object}         properties      - A dictionary of the node group's properties
          *
          */
         container:     undefined,
@@ -25,6 +33,13 @@ function(Property, Class, Canvas, Config) {
         /**
          * Constructor: init
          *
+         * A node group's constructor. Merges the given definition and individual properties. Assigns the node group a
+         * unique frontend id.
+         *
+         * Parameters:
+         *   {Object}       definition         - An object containing default values for the node's definition.
+         *   {Array[<Node>] nodes              - A list of nodes the node group is supposed to connect.
+         *   {Object}       properties         - Initial properties to be carried into the NodeGroup object
          *
          */
         init: function(definition, nodes, properties) {
@@ -38,7 +53,8 @@ function(Property, Class, Canvas, Config) {
             delete this.properties.id;
             delete this.properties.graph;
 
-            this.redraw()
+            this._setupVisualRepresentation()
+                .redraw()
                 ._registerEventHandlers()
                 ._setupProperties();
 
@@ -52,22 +68,49 @@ function(Property, Class, Canvas, Config) {
 
         /**
          *  Method: _registerEventHandlers
+         *      Add listeners to react on moves and property changes of nodes.
          *
-         *  Blah
+         *  Returns:
+         *      This NodeGroup instance for chaining.
          *
          */
         _registerEventHandlers: function() {
-            jQuery(document).on(Config.Events.NODES_MOVED,  this.redraw.bind(this));
-            jQuery(document).on(Config.Events.NODE_PROPERTY_CHANGED,  this.redraw.bind(this));
+            jQuery(document).on([ Config.Events.NODES_MOVED,
+                                  Config.Events.NODE_PROPERTY_CHANGED ].join(' '),  this.redraw.bind(this));
+
+            return this;
+        },
+
+        /**
+         * Method: _setupVisualRepresentation
+         *
+         * This method is used in the constructor to set up the visual representation of the node group. Initially sets
+         * up this.container with css classes, its id and its data.
+         *
+         * Returns:
+         *   This {<Node>} instance for chaining.
+         */
+        _setupVisualRepresentation: function() {
+            this.container = jQuery("<div>")
+                .attr('id', Config.Keys.NODEGROUP + this.id)
+                .addClass(Config.Classes.NODEGROUP)
+                .css('position', 'absolute')
+                .data(Config.Keys.NODEGROUP, this);
+
+            this.container.appendTo(Canvas.container);
 
             return this;
         },
 
         /**
          * Method: _setupProperties
+         *      Converts the informal properties stored in <properties> into Property objects ordered by this graph's
+         *      propertiesDisplayOrder (see <Graph::getNotation()> or the respective notations json-file).
+         *
+         *      ! Exact code duplication in <Node::_setupProperties()>  and <Edge::_setupPropertes()>
          *
          * Returns:
-         *   This {<NodeGroup>} instance for chaining.
+         *      This {<NodeGroup>} instance for chaining.
          */
         _setupProperties: function() {
             _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {
@@ -87,25 +130,27 @@ function(Property, Class, Canvas, Config) {
             return this;
         },
 
+        /**
+         * Method: nodeIds
+         *      Returns an array of all nodes' ids, the NodeGroup holds. Used for lightweight node identification.
+         *
+         */
+
         nodeIds: function() {
             return _.map(this.nodes, function(node) { return node.id });
         },
 
+        /**
+         * Method: redraw
+         *      Uses d3 to calculate and redraw the NodeGroup's visual representation. Finally shrinks the container's
+         *      width and height to the svg's.
+         *
+         * Returns:
+         *      This {<NodeGroup>} instance for chaining.
+         */
+
         redraw: function() {
-            //TODO: -> Config
-            var dom_id = 'zone'+this.id;
-
-            if (this.container === undefined) {
-                this.container = jQuery("<div>")
-                    .attr('id', dom_id)
-                    .addClass(Config.Classes.NODEGROUP)
-                    .css('position', 'absolute')
-                    .data(Config.Keys.NODEGROUP, this);
-            } else {
-                this.container = jQuery('#'+dom_id)
-            }
-
-            this.container.appendTo(Canvas.container);
+            var dom_id = Config.Keys.NODEGROUP + this.id;
 
             var lineFunction = d3.svg.line()
                 .x(function(d) { return d[0]; })
@@ -170,18 +215,33 @@ function(Property, Class, Canvas, Config) {
             return this;
         },
 
+        /**
+         * Method: select
+         *   Marks the node group as selected by adding the corresponding CSS class.
+         *
+         * Returns:
+         *   This {<NodeGroup>} instance for chaining.
+         */
         select: function() {
             this.container.find('svg path').addClass(Config.Classes.SELECTED);
+
+            return this;
         },
 
+        /**
+         * Method: remove
+         *      Removes the whole visual representation from the canvas, deactivates listeners and calls home.
+         *
+         * Returns:
+         *   {boolean} Successful deletion.
+         */
         remove: function() {
             if (!this.deletable) return false;
-
-            //TODO: put selector into Config
-            jQuery('#zone'+this.id).remove();
+            this.container.remove();
 
             // don't listen anymore
-            jQuery(document).off(Config.Events.NODES_MOVED);
+            jQuery(document).off([ Config.Events.NODES_MOVED,
+                                   Config.Events.NODE_PROPERTY_CHANGED ].join(' '));
 
             // call home
             jQuery(document).trigger(Config.Events.NODEGROUP_DELETED, [this.id]);
@@ -189,6 +249,12 @@ function(Property, Class, Canvas, Config) {
             return true;
         },
 
+        /**
+         * Method: toDict
+         *
+         * Returns:
+         *   A dict representation of the node group avoiding any circular structures.
+         */
         toDict: function() {
             var properties = _.map(this.properties, function(prop) { return prop.toDict() });
 
