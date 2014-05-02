@@ -537,21 +537,22 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             jQuery(allNodeGroups).each(function(index, element) {
                 var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                // since the selectable element is an svg path, we need to look for that nested element and check its
+                //   state of selection via the CSS class .selected
                 if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
                     nodegroups.push(nodeGroup.toDict());
                 }
             }.bind(this));
 
             var clipboard = {
-                //TODO: put keys in config
                 'pasteCount': 0,
                 'nodes':      nodes,
                 'edges':      edges,
                 'nodeGroups': nodegroups
             };
 
-            // to avoid empty copyings
-            if (nodes.length > 0 || edges.length > 0) {
+            // forbid copyings without any node
+            if (nodes.length > 0) {
                 this._updateClipboard(clipboard);
             }
         },
@@ -600,6 +601,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             }.bind(this));
 
             _.each(nodeGroups, function(jsonNodeGroup) {
+                // remove the original nodeGroup's identity
                 jsonNodeGroup.id = undefined;
                 // map old ids to new ids
                 jsonNodeGroup.nodeIds = _.map(jsonNodeGroup.nodeIds, function(nodeId) {
@@ -607,7 +609,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 });
 
                 var nodeGroup = this.graph.addNodeGroup(jsonNodeGroup);
-                //if (nodeGroup) nodeGroup.select();
+                if (nodeGroup) nodeGroup.select();
             }.bind(this));
 
             //XXX: trigger selection stop event manually here

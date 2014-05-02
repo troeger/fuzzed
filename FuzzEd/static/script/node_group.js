@@ -163,7 +163,7 @@ function(Property, Class, Canvas, Config) {
             this.container.css('left', bbox.x);
             this.container.css('top', bbox.y);
 
-            jQuery('#'+dom_id+' svg path').attr("transform", "translate(-"+bbox.x+",-"+bbox.y+")");
+            this.container.find('svg path').attr("transform", "translate(-"+bbox.x+",-"+bbox.y+")");
 
             // ## /hack
 
@@ -171,7 +171,7 @@ function(Property, Class, Canvas, Config) {
         },
 
         select: function() {
-            jQuery(this.container).addClass(Config.Classes.SELECTED);
+            this.container.find('svg path').addClass(Config.Classes.SELECTED);
         },
 
         remove: function() {
