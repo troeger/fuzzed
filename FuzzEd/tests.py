@@ -300,11 +300,11 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
 
     def testCreateNode(self):
-        newnode = {'y'         : '3', 
+        newnode = json.dumps({'y'         : '3',
                    'x'         : '7', 
                    'kind'      : 'basicEvent', 
                    'id'        : '1383517229910', 
-                   'properties': '{}'}
+                   'properties': '{}'})
 
         response=self.ajaxPost(self.baseUrl+'/graphs/%u/nodes/'%self.pkFaultTree,
                                newnode,
@@ -325,11 +325,11 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 204)
 
     def testPropertyChange(self):
-        newprop = {'properties': '{"key": "foo", "value":"bar"}'}
+        newprop = json.dumps({"properties": {"key": "foo", "value":"bar"}})
         response = self.ajaxPatch(self.baseUrl+'/graphs/%u/nodes/%u'%(self.pkFaultTree, self.clientIdBasicEvent),
                                  newprop,
                                  "application/json")
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 202)
 
     def testDeleteEdge(self):
         response=self.ajaxDelete(self.baseUrl+'/graphs/%u/edges/%u'%(self.pkFaultTree, self.clientIdEdge))

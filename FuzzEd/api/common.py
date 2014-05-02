@@ -1,14 +1,15 @@
+import json
 import logging
 import ast
 
 from django import http
 from django.shortcuts import get_object_or_404
 from django.core.mail import mail_managers
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, convert_post_to_patch
 from tastypie.authentication import ApiKeyAuthentication, SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.exceptions import UnsupportedFormat, BadRequest, ImmediateHttpResponse
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist, MultipleObjectsReturned
 from tastypie.serializers import Serializer
 from tastypie.models import ApiKey
 from tastypie import fields
@@ -18,37 +19,41 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.cache import patch_cache_control, patch_vary_headers
 
-from FuzzEd.models import Job
+from FuzzEd.models import Job, commands
 from FuzzEd.models import Project, Graph, Edge, Node
 
 logger = logging.getLogger('FuzzEd')
+
 
 class OurApiKeyAuthentication(ApiKeyAuthentication):
     """
         Our own authenticator version does not demand the user name to be part of the auth header.
     """
+
     def extract_credentials(self, request):
         if request.META.get('HTTP_AUTHORIZATION') and request.META['HTTP_AUTHORIZATION'].lower().startswith('apikey '):
             (auth_type, api_key) = request.META['HTTP_AUTHORIZATION'].split(' ')
 
             if auth_type.lower() != 'apikey':
-                logger.debug("Incorrect authorization header: "+str(request.META['HTTP_AUTHORIZATION']))
+                logger.debug("Incorrect authorization header: " + str(request.META['HTTP_AUTHORIZATION']))
                 raise ValueError("Incorrect authorization header.")
             try:
                 key = ApiKey.objects.get(key=api_key.strip())
             except:
-                logger.debug("Incorrect API key in header: "+str(request.META['HTTP_AUTHORIZATION']))
+                logger.debug("Incorrect API key in header: " + str(request.META['HTTP_AUTHORIZATION']))
                 raise ValueError("Incorrect API key.")
             return key.user.username, api_key
         else:
-            logger.debug("Missing authorization header: "+str(request.META))
+            logger.debug("Missing authorization header: " + str(request.META))
             raise ValueError("Missing authorization header.")
+
 
 class GraphOwnerAuthorization(Authorization):
     """
         A tastypie authorization class that checks if the 'graph' attribute
         links to a graph that is owned by the requesting user.
     """
+
     def read_list(self, object_list, bundle):
         return object_list.filter(graph__owner=bundle.request.user)
 
@@ -80,6 +85,7 @@ class GraphOwnerAuthorization(Authorization):
     def delete_detail(self, object_list, bundle):
         return bundle.obj.graph.owner == bundle.request.user
 
+
 ### Resources ###
 
 class NodeSerializer(Serializer):
@@ -93,38 +99,65 @@ class NodeSerializer(Serializer):
     }
 
     def from_json(self, content):
-        # JSON parser does not like the input due to the usage of single quotes, so we use ast
-        data = ast.literal_eval(content)
-        # The JS code creates it's own client_id for new nodes
-        client_id = data['id']
-        return dict(node_client_id=client_id)
+        return json.loads(content)
+
 
 class NodeResource(ModelResource):
     """
         An API resource for nodes.
     """
+
     class Meta:
         queryset = Node.objects.filter(deleted=False)
         authentication = SessionAuthentication()
         authorization = GraphOwnerAuthorization()
         serializer = NodeSerializer()
         list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post', 'patch']
+        detail_allowed_methods = ['get', 'post', 'patch', 'delete']
         excludes = ['deleted', 'id']
 
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
 
     def obj_create(self, bundle, **kwargs):
         """
-         This is the only override that allows us to access 'kwargs', which contains the
-         graph_id from the original request.
+             This is the only override that allows us to access 'kwargs', which contains the
+             graph_id from the original request.
         """
-        bundle.data['graph']  = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
+        bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
         return self.save(bundle)
 
         return super(NodeResource, self).obj_create(bundle, **kwargs)
+
+
+    def patch_detail(self, request, **kwargs):
+        """
+            Updates a resource in-place. We could also override obj_update, which is
+            the Tastypie intended-way of having a custom PATCH implementation, but this
+            method gets a full updated object bundle that is expected to be directly written
+            to the object. In this method, we still have access to what actually really
+            comes as part of the update payload.
+
+            If the resource is updated, return ``HttpAccepted`` (202 Accepted).
+            If the resource did not exist, return ``HttpNotFound`` (404 Not Found).
+        """
+        try:
+            # Fetch relevant node object as Tastypie does it
+            basic_bundle = self.build_bundle(request=request)
+            obj = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices("More than one resource is found at this URI.")
+
+        # Deserialize incoming update payload JSON from request
+        deserialized = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+        if 'properties' in deserialized:
+            for key, value in deserialized['properties'].iteritems():
+                obj.set_attr(key, value)
+        # return the updated node object
+        return HttpResponse(obj.to_json(), 'application/javascript', status=202)
 
 class EdgeSerializer(Serializer):
     """
@@ -148,17 +181,19 @@ class EdgeSerializer(Serializer):
         client_id = data['id']
         return dict(edge_client_id=client_id, source_client_id=data['source'], target_client_id=data['target'])
 
+
 class EdgeResource(ModelResource):
     """
         An API resource for edges.
     """
+
     class Meta:
         queryset = Edge.objects.filter(deleted=False)
         authentication = SessionAuthentication()
         serializer = EdgeSerializer()
         authorization = GraphOwnerAuthorization()
         list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post', 'delete']
         excludes = ['deleted', 'id']
 
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
@@ -171,7 +206,7 @@ class EdgeResource(ModelResource):
          graph_id from the original request.
         """
         bundle.data['client_id'] = bundle.data['edge_client_id']
-        graph  = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
+        graph = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
         bundle.data['graph'] = graph
         bundle.data['source'] = Node.objects.get(client_id=bundle.data['source_client_id'], graph=graph, deleted=False)
         bundle.data['target'] = Node.objects.get(client_id=bundle.data['target_client_id'], graph=graph, deleted=False)
@@ -198,11 +233,13 @@ class NodeGroupResource(ModelResource):
     '''
     pass
 
+
 class JobResource(ModelResource):
     '''
         An API resource for jobs.
     '''
     pass
+
 
 class GraphResource(ModelResource):
     '''
@@ -214,13 +251,13 @@ class GraphResource(ModelResource):
 
     def hydrate(self, bundle):
         # Make sure that owners are assigned correctly
-        bundle.obj.owner=bundle.request.user
+        bundle.obj.owner = bundle.request.user
         # Get the user-specified project, and make sure that it is his.
         # This is not an authorization problem for the (graph) resource itself, 
         # so it must be handled here and not in the auth class.
         try:
             project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
-            bundle.obj.project=project
+            bundle.obj.project = project
         except:
             raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))
             # Fill the graph with the GraphML data
@@ -231,6 +268,7 @@ class GraphResource(ModelResource):
         """
         Wraps views to return custom error codes instead of generic 500's
         """
+
         @csrf_exempt
         def wrapper(request, *args, **kwargs):
             ''' This is a straight copy from the Tastypie sources,
@@ -302,6 +340,7 @@ class GraphResource(ModelResource):
 
         return wrapper
 
+
 class GraphSerializer(Serializer):
     """
         Our custom serializer / deserializer for graph formats we support.
@@ -331,12 +370,14 @@ class GraphSerializer(Serializer):
         '''
         return {}
 
+
 class GraphAuthorization(Authorization):
     '''
         Tastypie authorization class. The main task of this class 
         is to restrict the accessible objects to the ones that the currently
         logged-in user is allowed to use.
     '''
+
     def read_list(self, object_list, bundle):
         ''' User is only allowed to get the graphs he owns.'''
         return object_list.filter(owner=bundle.request.user)
@@ -368,8 +409,6 @@ class GraphAuthorization(Authorization):
 
     def delete_detail(self, object_list, bundle):
         return bundle.obj.owner == bundle.request.user
-
-
 
 
 # def graph_download(user, graph_id, export_format):
@@ -443,6 +482,7 @@ def job_create(user, graph_id, job_kind):
     logger.debug('Created new %s job with ID %d for graph %d' % (job.kind, job.pk, graph.pk))
     return job
 
+
 def job_status(user, job_id):
     ''' Returns the status information for the given job, and the job object if available.
         This API helper wraps functionality that is common to all frontend API versions of
@@ -455,7 +495,7 @@ def job_status(user, job_id):
     try:
         job = Job.objects.get(pk=job_id)
         # Prevent cross-checking of jobs by different users
-        assert(job.graph.owner == user or user.is_staff)
+        assert (job.graph.owner == user or user.is_staff)
     except:
         # The job does not exist, or it shouldn't exist for this user.        
         return 3, None
@@ -466,7 +506,7 @@ def job_status(user, job_id):
             return 0, job
         else:
             logger.debug("Job is done, but with non-zero exit code.")
-            mail_managers('Analysis of job %s ended with non-zero exit code.'%job.pk, job.graph.to_xml() )
+            mail_managers('Analysis of job %s ended with non-zero exit code.' % job.pk, job.graph.to_xml())
             return 1, job
     else:
         logger.debug("Job is pending.")
