@@ -15,7 +15,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist, Multiple
 from tastypie.serializers import Serializer
 from tastypie.models import ApiKey
 from tastypie import fields
-from tastypie.http import HttpForbidden
+from tastypie.http import HttpForbidden, HttpBadRequest
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -288,6 +288,21 @@ class GraphResource(ModelResource):
                 name="node"),
         ]
 
+    def obj_create(self, bundle, **kwargs):
+        bundle.obj = self._meta.object_class()
+        bundle.obj.owner = bundle.request.user
+        # Get the user-specified project, and make sure that it is his.
+        # This is not an authorization problem for the (graph) resource itself,
+        # so it must be handled here and not in the auth class.
+        try:
+            project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
+            bundle.obj.project = project
+        except:
+            raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))
+            # Fill the graph with the GraphML data
+        bundle.obj.from_graphml(bundle.request.body)
+        return bundle.obj
+
     def dispatch_edges(self, request, **kwargs):
         edge_resource = EdgeResource()
         return edge_resource.dispatch_list(request, graph_id=kwargs['pk'])
@@ -305,24 +320,27 @@ class GraphResource(ModelResource):
         return node_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
 
 
-    def hydrate(self, bundle):
-        # Make sure that owners are assigned correctly
-        bundle.obj.owner = bundle.request.user
-        # Get the user-specified project, and make sure that it is his.
-        # This is not an authorization problem for the (graph) resource itself, 
-        # so it must be handled here and not in the auth class.
-        try:
-            project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
-            bundle.obj.project = project
-        except:
-            raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))
-            # Fill the graph with the GraphML data
-        bundle.obj.from_graphml(bundle.request.body)
-        return bundle
+    # def hydrate(self, bundle):
+    #     # Make sure that owners are assigned correctly
+    #     bundle.obj.owner = bundle.request.user
+    #     # Get the user-specified project, and make sure that it is his.
+    #     # This is not an authorization problem for the (graph) resource itself,
+    #     # so it must be handled here and not in the auth class.
+    #     try:
+    #         project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
+    #         bundle.obj.project = project
+    #     except:
+    #         raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))
+    #         # Fill the graph with the GraphML data
+    #     bundle.obj.from_graphml(bundle.request.body)
+    #     return bundle
+
+
 
     def wrap_view(self, view):
         """
-        Wraps views to return custom error codes instead of generic 500's
+        Wrap the default Tastypie implementation to return custom error codes instead of generic 500's.
+        It also takes care of the correct content disposition.
         """
 
         @csrf_exempt
@@ -370,10 +388,10 @@ class GraphResource(ModelResource):
                 return response
             except (BadRequest, fields.ApiFieldError) as e:
                 data = {"error": e.args[0] if getattr(e, 'args') else ''}
-                return self.error_response(request, data, response_class=http.HttpBadRequest)
+                return self.error_response(request, data, response_class=HttpBadRequest)
             except ValidationError as e:
                 data = {"error": e.messages}
-                return self.error_response(request, data, response_class=http.HttpBadRequest)
+                return self.error_response(request, data, response_class=HttpBadRequest)
             except Exception as e:
                 if hasattr(e, 'response'):
                     return e.response
@@ -422,7 +440,7 @@ class GraphSerializer(Serializer):
         ''' 
            Tastypie serialization demands a dictionary of (graph) model
            attribute values here. We return a dummy to support the 
-           format officially, and solve the rest in hydrate().
+           format officially, and solve the rest in obj_create().
         '''
         return {}
 
