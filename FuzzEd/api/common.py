@@ -1,14 +1,12 @@
 import json
 import logging
-import ast
 
 from django import http
 from django.conf.urls import url
-from django.shortcuts import get_object_or_404
 from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
 from tastypie.resources import ModelResource
-from tastypie.authentication import ApiKeyAuthentication, SessionAuthentication
+from tastypie.authentication import ApiKeyAuthentication
 from tastypie.authorization import Authorization
 from tastypie.exceptions import UnsupportedFormat, BadRequest, ImmediateHttpResponse
 from django.core.exceptions import ValidationError, ObjectDoesNotExist, MultipleObjectsReturned
@@ -21,8 +19,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.cache import patch_cache_control, patch_vary_headers
 
-from FuzzEd.models import Job, commands
+from FuzzEd.models import Job, Notification
 from FuzzEd.models import Project, Graph, Edge, Node
+
 
 logger = logging.getLogger('FuzzEd')
 
@@ -90,6 +89,19 @@ class GraphOwnerAuthorization(Authorization):
 
 ### Resources ###
 
+class NotificationResource(ModelResource):
+    """
+        An API resource for notifications.
+    """
+    class Meta:
+        queryset = Notification.objects.all()
+        detail_allowed_methods = ['delete']
+
+    def obj_delete(self, bundle, **kwargs):
+        noti = self.obj_get(bundle=bundle, **kwargs)
+        noti.users.remove(bundle.request.user)
+        noti.save()
+
 class NodeSerializer(Serializer):
     """
         Our custom node serializer. Using the default serializer would demand that the
@@ -108,10 +120,8 @@ class NodeResource(ModelResource):
     """
         An API resource for nodes.
     """
-
     class Meta:
         queryset = Node.objects.filter(deleted=False)
-        authentication = SessionAuthentication()
         authorization = GraphOwnerAuthorization()
         serializer = NodeSerializer()
         list_allowed_methods = ['get', 'post']
@@ -187,10 +197,8 @@ class EdgeResource(ModelResource):
     """
         An API resource for edges.
     """
-
     class Meta:
         queryset = Edge.objects.filter(deleted=False)
-        authentication = SessionAuthentication()
         serializer = EdgeSerializer()
         authorization = GraphOwnerAuthorization()
         list_allowed_methods = ['get', 'post']
@@ -214,16 +222,12 @@ class EdgeResource(ModelResource):
         bundle = self.full_hydrate(bundle)
         return self.save(bundle)
 
-        return super(EdgeResource, self).obj_create(bundle, **kwargs)
-
-
 class ProjectResource(ModelResource):
-    '''
+    """
         An API resource for projects.
-    '''
+    """
     class Meta:
         queryset = Project.objects.filter(deleted=False)
-        authentication = SessionAuthentication()
         list_allowed_methods = ['get']
         detail_allowed_methods = ['get']
         excludes = ['deleted', 'owner']
@@ -243,16 +247,110 @@ class NodeGroupResource(ModelResource):
 
 
 class JobResource(ModelResource):
-    '''
+    """
         An API resource for jobs.
-    '''
-    pass
+    """
+    class Meta:
+        queryset = Job.objects.all()
+        authorization = GraphOwnerAuthorization()
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get', 'post']
 
+    graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
+
+    def obj_create(self, bundle, **kwargs):
+        """
+         This is the only override that allows us to access 'kwargs', which contains the
+         graph_id from the original request.
+        """
+        graph = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
+        bundle.data['graph'] = graph
+        bundle.data['graph_modified'] = graph.modified
+        bundle.data['kind'] = bundle.data['kind']
+        bundle.obj = self._meta.object_class()
+        bundle = self.full_hydrate(bundle)
+        return self.save(bundle)
+
+class GraphSerializer(Serializer):
+    """
+        Our custom serializer / deserializer for graph formats we support.
+        The XML format is GraphML, anything else is not supported.
+        The non-implemented deserialization of Tex / JSON input leads to a Tastypie exception,
+        which is translated to 401 for the client. There is no explicit way in Tastypie to
+        differentiate between supported serialization / deserialization formats.
+    """
+    formats = ['json', 'tex', 'graphml']
+    content_types = {
+        'json': 'application/json',
+        'tex': 'application/text',
+        'graphml': 'application/xml',
+    }
+
+    def to_tex(self, data, options=None):
+        return data.obj.to_tikz()
+
+    def to_graphml(self, data, options=None):
+        return data.obj.to_graphml()
+
+    def from_graphml(self, content):
+        '''
+           Tastypie serialization demands a dictionary of (graph) model
+           attribute values here. We return a dummy to support the
+           format officially, and solve the rest in obj_create().
+        '''
+        return {}
+
+
+class GraphAuthorization(Authorization):
+    '''
+        Tastypie authorization class. The main task of this class
+        is to restrict the accessible objects to the ones that the currently
+        logged-in user is allowed to use.
+    '''
+
+    def read_list(self, object_list, bundle):
+        ''' User is only allowed to get the graphs he owns.'''
+        return object_list.filter(owner=bundle.request.user)
+
+    def read_detail(self, object_list, bundle):
+        ''' User is only allowed to get the graph if he owns it.'''
+        return bundle.obj.owner == bundle.request.user
+
+    def create_list(self, object_list, bundle):
+        # Assuming they're auto-assigned to ``user``.
+        return object_list
+
+    def create_detail(self, object_list, bundle):
+        return bundle.obj.owner == bundle.request.user
+
+    def update_list(self, object_list, bundle):
+        allowed = []
+        # Since they may not all be saved, iterate over them.
+        for obj in object_list:
+            if obj.owner == bundle.request.user and not bundle.obj.read_only:
+                allowed.append(obj)
+        return allowed
+
+    def update_detail(self, object_list, bundle):
+        return bundle.obj.owner == bundle.request.user and not bundle.obj.read_only
+
+    def delete_list(self, object_list, bundle):
+        return object_list.filter(owner=bundle.request.user)
+
+    def delete_detail(self, object_list, bundle):
+        return bundle.obj.owner == bundle.request.user
 
 class GraphResource(ModelResource):
-    '''
-        An abstract base class for graph API resources.
-    '''
+    """
+        A graph resource with support for nested node / edge / job resources.
+    """
+    class Meta:
+        queryset = Graph.objects.filter(deleted=False)
+        authorization = GraphAuthorization()
+        serializer = GraphSerializer()
+        allowed_methods = ['get', 'post']
+        excludes = ['deleted', 'owner', 'read_only']
+
     project = fields.ToOneField(ProjectResource, 'project')
     nodes = fields.ToManyField(NodeResource, 'nodes')
     edges = fields.ToManyField(EdgeResource, 'edges')
@@ -277,15 +375,21 @@ class GraphResource(ModelResource):
             url(r'^graphs/(?P<pk>\d+)/edges/$',
                 self.wrap_view('dispatch_edges'),
                 name="edges"),
-            url(r'^graphs/(?P<pk>\d+)/nodes/$',
-                self.wrap_view('dispatch_nodes'),
-                name="nodes"),
             url(r'^graphs/(?P<pk>\d+)/edges/(?P<client_id>\d+)$',
                 self.wrap_view('dispatch_edge'),
                 name="edge"),
+            url(r'^graphs/(?P<pk>\d+)/nodes/$',
+                self.wrap_view('dispatch_nodes'),
+                name="nodes"),
             url(r'^graphs/(?P<pk>\d+)/nodes/(?P<client_id>\d+)$',
                 self.wrap_view('dispatch_node'),
                 name="node"),
+            url(r'^graphs/(?P<pk>\d+)/jobs/$',
+                self.wrap_view('dispatch_jobs'),
+                name="jobs"),
+            url(r'^graphs/(?P<pk>\d+)/jobs/(?P<job_pk>\d+)$',
+                self.wrap_view('dispatch_job'),
+                name="job"),
         ]
 
     def obj_create(self, bundle, **kwargs):
@@ -307,17 +411,25 @@ class GraphResource(ModelResource):
         edge_resource = EdgeResource()
         return edge_resource.dispatch_list(request, graph_id=kwargs['pk'])
 
-    def dispatch_nodes(self, request, **kwargs):
-        node_resource = NodeResource()
-        return node_resource.dispatch_list(request, graph_id=kwargs['pk'])
-
     def dispatch_edge(self, request, **kwargs):
         edge_resource = EdgeResource()
         return edge_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
 
+    def dispatch_nodes(self, request, **kwargs):
+        node_resource = NodeResource()
+        return node_resource.dispatch_list(request, graph_id=kwargs['pk'])
+
     def dispatch_node(self, request, **kwargs):
         node_resource = NodeResource()
         return node_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
+
+    def dispatch_jobs(self, request, **kwargs):
+        job_resource = JobResource()
+        return job_resource.dispatch_list(request, graph_id=kwargs['pk'])
+
+    def dispatch_job(self, request, **kwargs):
+        job_resource = JobResource()
+        return job_resource.dispatch_detail(request, graph_id=kwargs['pk'], job_pk=kwargs['job_pk'])
 
 
     # def hydrate(self, bundle):
@@ -415,76 +527,6 @@ class GraphResource(ModelResource):
         return wrapper
 
 
-class GraphSerializer(Serializer):
-    """
-        Our custom serializer / deserializer for graph formats we support.
-        The XML format is GraphML, anything else is not supported.
-        The non-implemented deserialization of Tex / JSON input leads to a Tastypie exception,
-        which is translated to 401 for the client. There is no explicit way in Tastypie to
-        differentiate between supported serialization / deserialization formats.
-    """
-    formats = ['json', 'tex', 'graphml']
-    content_types = {
-        'json': 'application/json',
-        'tex': 'application/text',
-        'graphml': 'application/xml'
-    }
-
-    def to_tex(self, data, options=None):
-        return data.obj.to_tikz()
-
-    def to_graphml(self, data, options=None):
-        return data.obj.to_graphml()
-
-    def from_graphml(self, content):
-        ''' 
-           Tastypie serialization demands a dictionary of (graph) model
-           attribute values here. We return a dummy to support the 
-           format officially, and solve the rest in obj_create().
-        '''
-        return {}
-
-
-class GraphAuthorization(Authorization):
-    '''
-        Tastypie authorization class. The main task of this class 
-        is to restrict the accessible objects to the ones that the currently
-        logged-in user is allowed to use.
-    '''
-
-    def read_list(self, object_list, bundle):
-        ''' User is only allowed to get the graphs he owns.'''
-        return object_list.filter(owner=bundle.request.user)
-
-    def read_detail(self, object_list, bundle):
-        ''' User is only allowed to get the graph if he owns it.'''
-        return bundle.obj.owner == bundle.request.user
-
-    def create_list(self, object_list, bundle):
-        # Assuming they're auto-assigned to ``user``.
-        return object_list
-
-    def create_detail(self, object_list, bundle):
-        return bundle.obj.owner == bundle.request.user
-
-    def update_list(self, object_list, bundle):
-        allowed = []
-        # Since they may not all be saved, iterate over them.
-        for obj in object_list:
-            if obj.owner == bundle.request.user and not bundle.obj.read_only:
-                allowed.append(obj)
-        return allowed
-
-    def update_detail(self, object_list, bundle):
-        return bundle.obj.owner == bundle.request.user and not bundle.obj.read_only
-
-    def delete_list(self, object_list, bundle):
-        return object_list.filter(owner=bundle.request.user)
-
-    def delete_detail(self, object_list, bundle):
-        return bundle.obj.owner == bundle.request.user
-
-
 # def graph_download(user, graph_id, export_format):
 #     """
 #     Function: graph_download
@@ -543,18 +585,6 @@ def job_create(user, graph_id, job_kind):
         Starts a job of the given kind for the given graph.
         It is intended to return immediately with job object.
     """
-    print user
-    if user.is_staff:
-        graph = get_object_or_404(Graph, pk=graph_id)
-    else:
-        graph = get_object_or_404(Graph, pk=graph_id, owner=user, deleted=False)
-
-    job = Job(graph=graph, kind=job_kind, graph_modified=graph.modified)
-    job.save()
-
-    # return URL for job status information
-    logger.debug('Created new %s job with ID %d for graph %d' % (job.kind, job.pk, graph.pk))
-    return job
 
 
 def job_status(user, job_id):

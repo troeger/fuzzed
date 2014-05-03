@@ -15,15 +15,21 @@
         database modifications are not commited at all. Explicit comitting did not help ...
 '''
 
-import json, logging, time, os, tempfile, subprocess, unittest
+import json
+import time
+import os
+import subprocess
 from subprocess import Popen
 from xml.dom.minidom import parse
+
 from django.test import LiveServerTestCase
 from django.test.client import Client
+from django.contrib.auth.models import User
+
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
 from FuzzEd.models.notification import Notification
-from django.contrib.auth.models import User
+
 
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
@@ -71,9 +77,10 @@ class FuzzEdTestCase(LiveServerTestCase):
     def ajaxDelete(self, url):
         return self.c.delete( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
 
-    def requestJob(self, url):
-        """ Helper function for requesting a job. """ 
-        response=self.ajaxGet(url)
+    def requestJob(self, base_url, graph, kind):
+        """ Helper function for requesting a job. """
+        newjob = json.dumps({'kind': kind})
+        response=self.ajaxPost(base_url + '/graphs/%u/jobs/' % graph, newjob, 'application/json')
         self.assertNotEqual(response.status_code, 500) # the backend daemon is not started
         self.assertEqual(response.status_code, 201)    # test if we got a created job
         assert('Location' in response)
@@ -382,7 +389,7 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
         Tests for backend functionality, as being triggered from frontend calls. 
     '''
 
-    baseUrl = '/front'
+    baseUrl = '/api/front'
 
     def setUp(self):
         # Start up backend daemon in testing mode so that it uses port 8081 of the live test server
@@ -398,7 +405,7 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
         self.backend.terminate()
 
     def testRateFaulttree(self):
-        response = self.requestJob(self.baseUrl+'/graphs/%u/analysis/topEventProbability'%self.rate_faulttree)
+        response = self.requestJob(self.baseUrl, self.rate_faulttree, 'topevent')
         result = json.loads(response)
         self.assertEqual(bool(result['validResult']),True)
         self.assertEqual(result['errors'],{})
@@ -406,7 +413,7 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
         self.assertEqual(result['configurations'][0]['peak'], 1.0)
 
     def testPRDCFuzztree(self):
-        response = self.requestJob(self.baseUrl+'/graphs/%u/analysis/topEventProbability'%self.prdc_fuzztree)
+        response = self.requestJob(self.baseUrl, self.prdc_fuzztree, 'topevent')
         result = json.loads(response)
         self.assertEqual(bool(result['validResult']),True)
         self.assertEqual(result['errors'],{})
@@ -417,15 +424,15 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
 
     def testFrontendAPIPdfExport(self):
         for graph in self.graphs:
-            pdfLink = self.requestJob(self.baseUrl+'/graphs/%u/exports/pdf'%graph)
+            pdfLink = self.requestJob(self.baseUrl, graph, 'pdf')
             # The result of a PDF rendering job is the download link
             pdfResponse = self.get(pdfLink)
             self.assertEqual('application/pdf', pdfResponse['CONTENT-TYPE'])
 
     def testFrontendAPIEpsExport(self):
         for graph in self.graphs:
-            epsLink = self.requestJob(self.baseUrl+'/graphs/%u/exports/eps'%graph)
-            # The result of a EPS rendering job is the download link
+            epsLink = self.requestJob(self.baseUrl, graph, 'eps')
+            # The result of a EPS rendering job is the download link for the user (normal GET)
             epsResponse = self.get(epsLink)
             self.assertEqual('application/postscript', epsResponse['CONTENT-TYPE'])
 

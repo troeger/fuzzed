@@ -1,14 +1,12 @@
 from django.conf.urls import patterns, include, url
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns, static
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.http import HttpResponse
+from django.contrib import admin
+from tastypie.api import Api
 
 from FuzzEd.models import Job
-from FuzzEd import settings
-
-from django.contrib import admin
-
-from tastypie.api import Api
 from FuzzEd.api import external, frontend
+
 v1_api = Api(api_name='v1')
 v1_api.register(external.ProjectResource())
 v1_api.register(external.GraphResource())
@@ -18,6 +16,7 @@ front_api.register(frontend.GraphResource())
 front_api.register(frontend.EdgeResource())
 front_api.register(frontend.NodeResource())
 front_api.register(frontend.NotificationResource())
+front_api.register(frontend.JobResource())
 
 admin.autodiscover()
 
@@ -52,14 +51,10 @@ urlpatterns = patterns('',
 #   url(r'^front/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.frontend.graph_download', name='frontend_graph_download'),
 
     # exports (graph downloads that return a job location instead of the direct result)
-    url(r'^front/graphs/(?P<graph_id>\d+)/exports/pdf$', 
-        'FuzzEd.api.frontend.job_create', {'job_kind': Job.PDF_RENDERING_JOB}, name='export_pdf'),
-    url(r'^front/graphs/(?P<graph_id>\d+)/exports/eps$', 
-        'FuzzEd.api.frontend.job_create', {'job_kind': Job.EPS_RENDERING_JOB}, name='export_eps'),
-
-    # node
-#    url(r'^front/graphs/(?P<graph_id>\d+)/nodes$', 'FuzzEd.api.frontend.nodes', name='nodes'),
- #   url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)$', 'FuzzEd.api.frontend.node', name='node'),
+#    url(r'^front/graphs/(?P<graph_id>\d+)/exports/pdf$',
+#        'FuzzEd.api.frontend.job_create', {'job_kind': Job.PDF_RENDERING_JOB}, name='export_pdf'),
+#    url(r'^front/graphs/(?P<graph_id>\d+)/exports/eps$',
+#        'FuzzEd.api.frontend.job_create', {'job_kind': Job.EPS_RENDERING_JOB}, name='export_eps'),
 
     # node groups
 #    url(r'^front/graphs/(?P<graph_id>\d+)/nodegroups$', 'FuzzEd.api.frontend.nodegroups', name='nodegroups'),
@@ -70,10 +65,6 @@ urlpatterns = patterns('',
     #     'FuzzEd.api.frontend.properties', name='properties'),
     # url(r'^front/graphs/(?P<graph_id>\d+)/nodes/(?P<node_id>\d+)/properties/(?P<key>)$',
     #     'FuzzEd.api.frontend.property', name='property'),
-
-    # edges
-#    url(r'^front/graphs/(?P<graph_id>\d+)/edges$','FuzzEd.api.frontend.edges', name='edges'),
-#    url(r'^front/graphs/(?P<graph_id>\d+)/edges/(?P<edge_id>\d+)$','FuzzEd.api.frontend.edge', name='edge'),
 
     # analysis
     url(r'^front/graphs/(?P<graph_id>\d+)/analysis/cutsets$', 
@@ -106,7 +97,6 @@ urlpatterns = patterns('',
 urlpatterns += staticfiles_urlpatterns()
 
 # Some debugging code that shows the final complete list of all configured URL's
-import urls
 def show_urls(urllist, depth=0):
     for entry in urllist:
         print "  " * depth, entry.regex.pattern
