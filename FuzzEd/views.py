@@ -238,13 +238,12 @@ def dashboard_edit(request, project_id):
     """
     Function: dashboard_edit
     
-    This handler function is responsible for allowing the user to edit the properties of an already existing graph.
-    Therefore the system renders a edit dialog to the user where changes can be made and saved or the graph can be
-    deleted.
+    This handler function is responsible for allowing the user to perform certain actions (copying, deleting, creating snapshots, sharing) on multiple graphs simultaneously.
+    For this purpose a button toolbar is rendered in the view with which the user can submit a list of graphs in order to perform a specific action.
     
     Parameters:
-     {HttpResponse} request  - a django request object
-     {int}          graph_id - the graph to be edited
+     {HttpResponse} request    - a django request object
+     {int}          project_id - id of the dashboard specific project
     
     Returns:
      {HttpResponse} a django response object
@@ -252,36 +251,25 @@ def dashboard_edit(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     
     POST = request.POST  
-    
+      
     selected_graphs = POST.getlist('graph_id[]')
     graphs = [ get_object_or_404(Graph, pk=graph_id, owner=request.user) for graph_id in selected_graphs]
-        
-     
     
-    # the owner made changes to the graph's field, better save it (if we can)
-    if POST.get('save'):
-        graph_id = POST.get('save')
-        graph = get_object_or_404(Graph, pk=graph_id, owner = request.user)
+    if POST.get('share'):
         
-        graph.name = POST.get('name', '')
-        graph.save()
-        messages.add_message(request, messages.SUCCESS, 'Graph saved.')
-        return redirect('dashboard', project_id = project.id)
+        users = User.objects.all() #.exclude(id=request.user.id)
         
-    # please show the edit page to the user on get requests
-    elif POST.get('edit') or request.method == 'GET':
-        graph_id = POST.get('edit')
-        graph = get_object_or_404(Graph, pk=graph_id, owner = request.user)
+        print users
         
         parameters = {
-            'graph': graph,
-            'kind':  notations.by_kind[graph.kind]['name'],
-            'project': project
+            'project': project,
+            'users': users
         }
-        return render(request, 'dashboard/dashboard_edit.html', parameters)
-
+                    
+        return render(request, 'dashboard/dashboard_share.html', parameters)
+    
     # copy requested
-    elif POST.get('copy'):
+    if POST.get('copy'):
         for old_graph in graphs:
             duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
                                                           owner=request.user,  add_default_nodes=False, project=project)
@@ -290,10 +278,10 @@ def dashboard_edit(request, project_id):
             new_graph = duplicate_command.graph
             new_graph.copy_values(old_graph)
             new_graph.save()
-
+    
         messages.add_message(request, messages.SUCCESS, 'Duplication successful.')
         return redirect('dashboard', project_id = project.id)
-
+    
     elif POST.get('snapshot'):
         for old_graph in graphs:
             duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
@@ -304,7 +292,7 @@ def dashboard_edit(request, project_id):
             new_graph.copy_values(old_graph)
             new_graph.read_only = True
             new_graph.save()
-
+    
         messages.add_message(request, messages.SUCCESS, 'Snapshot creation sucessful.')
         return redirect('dashboard', project_id=project.id)
     
@@ -315,6 +303,43 @@ def dashboard_edit(request, project_id):
         
         messages.add_message(request, messages.SUCCESS, 'Deletion sucessful.')
         return redirect('dashboard', project_id = project.id)
+    
+    # something was not quite right here
+    raise HttpResponseBadRequest()
+        
+def graph_settings(request, graph_id):        
+    """
+    Function: graph_settings    
+        
+    This handler function is responsible for allowing the user to edit the properties of an already existing graph.
+    Therefore the system renders a settings dialog to the user where changes can be made and saved for the graph.
+    
+    Parameters:
+     {HttpResponse} request  - a django request object
+     {int}          graph_id - the graph to be edited
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    graph = get_object_or_404(Graph, pk=graph_id, owner = request.user)
+    project = get_object_or_404(Project, pk=graph.project.pk, owner = request.user)
+    
+    POST = request.POST
+    
+    # the owner made changes to the graph's field, better save it (if we can)
+    if POST.get('save'):        
+        graph.name = POST.get('name', '')
+        graph.save()
+        messages.add_message(request, messages.SUCCESS, 'Graph saved.')
+        return redirect('dashboard', project_id = project.pk)
+        
+    # please show the edit page to the user on get requests
+    elif POST.get('edit') or request.method == 'GET':        
+        parameters = {
+            'graph': graph,
+            'kind':  notations.by_kind[graph.kind]['name']
+        }
+        return render(request, 'dashboard/dashboard_edit.html', parameters)
     
     # something was not quite right here
     raise HttpResponseBadRequest()

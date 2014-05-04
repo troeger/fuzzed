@@ -30,7 +30,7 @@
         
         var row_clicked = function(event){
           // highlight or unhiglight row if checkbox was clicked
-          jQuery(this).closest('tr').toggleClass("active");
+          jQuery(this).closest('tr').toggleClass('active');
           
           // hide/unhide graph toolbar
           if(jQuery('.graph_select:checked').length > 0){
@@ -40,11 +40,22 @@
             jQuery('#dashboard_toolbar').fadeOut();
           }
         };
+        
+        var initalize_graph_selection = function(){
+          // if page gets loaded with history.go(-1) restore the previous state
+          checked_rows = jQuery('.graph_select:checked');
+          
+          if(checked_rows.length > 0){
+            jQuery('#dashboard_toolbar').css("display", "block");
+            checked_rows.closest('tr').addClass('active');
+          }          
+        };
           
         jQuery(document).ready(function() {
+            initalize_graph_selection();
+            jQuery('.graph_select').click(row_clicked);
             jQuery('button.require-dialog').click(delete_clicked);
             jQuery('#confirm_delete').click(delete_confirmed);
-            jQuery('.graph_select').click(row_clicked);
         });
     });
 </script>
@@ -105,8 +116,8 @@
               </button>
            </div>
            <div class="btn-group">
-              <button type="button" class="btn btn-small">
-                  <i class="fa fa-trash"></i>
+              <button type="submit" name="share" value="share" class="btn btn-small">
+                  <i class="fa fa-share"></i>
                   Share
               </button>
            </div>
@@ -156,7 +167,7 @@
                         <td>{{ graph.created }}</td>
                         
                         <td style="text-align: right;">
-                                <button type="submit" name="edit" value="{{ graph.pk }}" class="btn btn-default btn-small">
+                                <button type="submit" name="edit" value="edit" formaction="{% url 'graph_settings' graph.pk %}" class="btn btn-default btn-small">
                                     <i class="fa fa-wrench"></i>
                                     Settings
                                 </button>
