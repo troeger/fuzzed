@@ -1,0 +1,60 @@
+{% extends "util/base.html" %}
+
+{% block title %}
+    {{ block.super }} - Edit {{ graph }}
+{% endblock %}
+
+{%block navigation_home %}hidden{% endblock %}
+
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript" language="javascript">
+  require(['selectize'], function() {
+      jQuery('#contact_selection').selectize({
+          plugins: ['remove_button'],
+		      maxItems: null,
+		      valueField: 'id',
+		      labelField: 'fullname',
+		      searchField: 'fullname',
+		      options: [
+              {% for user in users %} 
+                  { id: {{user.id}}, fullname: '{{user.first_name}} {{user.last_name}}'},
+              {% endfor %}
+                  { id: 3, fullname: 'Dieter Detlev'},
+                  { id: 4, fullname: 'Max Meier'},
+                  { id: 5, fullname: 'Rotz Wohlgemuth'},
+                  { id: 6, fullname: 'Philipp Gotsmann'},
+		      ],
+		      create: false
+      });
+  });
+</script>
+{% endblock %}
+
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        Edit <small>{{ graph }}</small>
+    </h1>
+</div>
+
+<form method="POST" action="{% url 'dashboard_edit' project.pk %}" class="form-horizontal">
+    {% csrf_token %}
+    <fieldset>
+        <div class="form-group">
+            <label for="contact_selection" class="col-lg-2 control-label">Users:</label>
+            <div class="col-lg-10">
+                <select id="contact_selection" multiple placeholder="Pick some people..."></select>
+            </div>  
+        </div>
+        <div class="form-group">
+            <div class="col-push-2 col-lg-10">
+                <button type="button" name="save" class="btn btn-primary">Save</button>
+                <button class="btn btn-default" onclick="history.go(-1); return false;">Cancel</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+{% endblock %}
