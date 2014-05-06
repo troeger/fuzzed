@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <iostream>
 
 template <typename T>
 class Dynamic2dArray
@@ -16,8 +17,10 @@ public:
 	unsigned int getWidth() const;
 	unsigned int getHeight() const;
 
+	const std::vector<T>& getRow(unsigned int index) const;
+
 protected:
-	unsigned int computeHeight() const; // for debugging
+	unsigned int computeWidth() const; // for debugging
 
 	std::vector<std::vector<T>> m_data; // rows x cols
 
@@ -28,19 +31,22 @@ protected:
 template <typename T>
 Dynamic2dArray<T>::Dynamic2dArray(unsigned int w, unsigned int h)
 {
-	m_data.emplace_back(std::vector<T>());
 	for (int i = 0; i < w; ++i)
 	{
 		m_data.emplace_back(std::vector<T>());
 		for (int j = 0; j < h; ++j)
 			m_data[i].emplace_back(T());
 	}
+	m_w = w;
+	m_h = h;
+	assert(getWidth() == w && getHeight() == h);
 }
 
 template <typename T>
 void Dynamic2dArray<T>::set(unsigned int row, unsigned int col, const T& value)
 {
-	assert(m_data.size() > row && m_data[row].size() > col);
+	//std::cout << "Setting " << row << " " << col << " to " << value << std::endl;
+	assert(m_data.size() >= row && m_data[row].size() >= col);
 	m_data[row][col] = value;
 }
 
@@ -54,14 +60,14 @@ const T& Dynamic2dArray<T>::get(unsigned int row, unsigned int col) const
 template <typename T>
 unsigned int Dynamic2dArray<T>::getWidth() const
 {
-	assert(m_data.size() == m_w);
+	assert(computeWidth() == m_w);
 	return m_w;
 }
 
 template <typename T>
 unsigned int Dynamic2dArray<T>::getHeight() const
 {
-	assert(computeHeight() == m_h);
+	assert(m_data.size() == m_h);
 	return m_h;
 }
 
@@ -69,25 +75,36 @@ template <typename T>
 void Dynamic2dArray<T>::addRow()
 {
 	m_data.emplace_back(std::vector<T>());
+	for (unsigned int i = 0; i < m_h; ++i)
+	{
+		m_data.back().emplace_back(T());
+	}
+	++m_h;
 }
 
 template <typename T>
 void Dynamic2dArray<T>::addColumn()
 {
-	for (unsigned int rowIndex = 0; rowIndex < m_w; ++rowIndex)
-	{
+	for (unsigned int rowIndex = 0; rowIndex < m_h; ++rowIndex)
 		m_data[rowIndex].emplace_back(T());
-	}
+
+	++m_w;
 }
 
 template <typename T>
-unsigned int Dynamic2dArray<T>::computeHeight() const
+unsigned int Dynamic2dArray<T>::computeWidth() const
 {
-	unsigned int maxH = 0;
+	unsigned int maxW = 0;
 	for (const auto r : m_data)
 	{
-		if (r.size() > maxH)
-			maxH = r.size();
+		if (r.size() > maxW)
+			maxW = r.size();
 	}
-	return maxH;
+	return maxW;
+}
+
+template <typename T>
+const std::vector<T>& Dynamic2dArray<T>::getRow(unsigned int index) const
+{
+	return m_data[index];
 }

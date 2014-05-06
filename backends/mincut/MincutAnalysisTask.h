@@ -9,7 +9,7 @@
 typedef std::vector<std::string> MinCut;
 typedef std::vector<MinCut> MinCutAnalysisResult;
 //typedef std::vector<std::vector<const fuzztree::Node*>> IntermediateMOCUSResult;
-typedef Dynamic2dArray<const fuzztree::Node*> IntermediateMOCUSResult;
+typedef Dynamic2dArray<const fuzztree::ChildNode*> IntermediateMOCUSResult;
 
 class MinCutAnalysisTask
 {
@@ -23,6 +23,7 @@ protected:
 	void analyzeRecursive(IntermediateMOCUSResult&, const fuzztree::ChildNode&, unsigned int r, unsigned int c);
 
 	static MinCutAnalysisResult minimizeResult(const IntermediateMOCUSResult&);
+	static bool isLeaf(const fuzztree::ChildNode*);
 
 	const fuzztree::TopEvent* const m_tree;
 

@@ -97,8 +97,13 @@ int main(int argc, char** argv)
 					for (const auto& res : mt.analyze())
 					{
 						std::string mincut;
+						bool first = true;
 						for (const auto& s : res)
+						{
+							if (!first) mincut += ",";
+							else first = false;
 							mincut += s;
+						}
 
 						r.nodeid().push_back(mincut);
 					}

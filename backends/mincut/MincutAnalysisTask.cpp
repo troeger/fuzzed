@@ -6,7 +6,7 @@
 #include <math.h>
 #include <algorithm>
 #include <bitset>
-#include <climits>
+#include <limits>
 #include <exception>
 
 using namespace fuzztree;
@@ -29,8 +29,7 @@ MinCutAnalysisResult MinCutAnalysisTask::analyze()
 	if (m_tree->children().size() == 0)
 		return MinCutAnalysisResult();
 
-	IntermediateMOCUSResult intermediateResult(0, 0);
-	intermediateResult.set(0, 0, dynamic_cast<const fuzztree::Node* const>(m_tree));
+	IntermediateMOCUSResult intermediateResult(1, 1);
 	analyzeRecursive(intermediateResult, m_tree->children().front(), 0, 0);
 	
 	return minimizeResult(intermediateResult);
@@ -48,7 +47,7 @@ void MinCutAnalysisTask::analyzeRecursive(
 	// Leaf nodes...
 	if (typeName == *BASICEVENT || typeName == *HOUSEEVENT || typeName == *UNDEVELOPEDEVENT) 
 	{
-		assert(results.getHeight() >= row);
+		//assert(results.getHeight() >= row);
 		results.set(row, col, &node);
 	}
 	else if (typeName == *BASICEVENTSET || typeName == *INTERMEDIATEEVENTSET)
@@ -71,20 +70,20 @@ void MinCutAnalysisTask::analyzeRecursive(
 	}
 	
 	else if (typeName == *AND)
-	{ // Add a new column
-		results.addColumn();
-		results.set(row, ++col, &node);
+	{ // add a new column
 		for (const auto& c : node.children())
 		{
+			results.addColumn();
+			results.set(row, ++col, &c);
 			analyzeRecursive(results, c, row, col);
 		}
 	}
 	else if (typeName == *OR || typeName == *XOR || typeName == *VOTINGOR)
 	{ // add a new row
-		results.addRow();
-		results.set(++row, col, &node);
 		for (const auto& c : node.children())
 		{
+			results.addRow();
+			results.set(++row, col, &c);
 			analyzeRecursive(results, c, row, col);
 		}
 	}
@@ -92,7 +91,39 @@ void MinCutAnalysisTask::analyzeRecursive(
 
 MinCutAnalysisResult MinCutAnalysisTask::minimizeResult(const IntermediateMOCUSResult& res)
 {
-	return MinCutAnalysisResult();
+	unsigned int minCutLength = std::numeric_limits<unsigned int>::max();
+	std::vector<MinCut> allCuts;
+	std::vector<MinCut> minCuts;
+	for (unsigned int r = 0; r < res.getHeight(); ++r)
+	{
+		const auto row = res.getRow(r);
+		MinCut mc;
+		for (const auto entry : row)
+			if (entry != nullptr && isLeaf(entry)) mc.emplace_back(entry->id());
+		
+		const auto rowLength = mc.size();
+		if (rowLength == 0) continue;
+		else if (rowLength < minCutLength)
+		{
+			minCutLength = rowLength;
+			minCuts.clear();
+			minCuts.emplace_back(mc);
+		}
+		else if (rowLength == minCutLength)
+		{
+			minCuts.emplace_back(mc);
+		}
+		allCuts.emplace_back(mc);
+	}
+	assert(allCuts.size() >= minCuts.size());
+	return MinCutAnalysisResult(allCuts);
+}
+
+bool MinCutAnalysisTask::isLeaf(const fuzztree::ChildNode* node)
+{
+	return dynamic_cast<const fuzztree::BasicEvent*>(node) != nullptr
+		|| dynamic_cast<const fuzztree::HouseEvent*>(node) != nullptr
+		|| dynamic_cast<const fuzztree::UndevelopedEvent*>(node) != nullptr;
 }
 
 MinCutAnalysisTask::~MinCutAnalysisTask()
