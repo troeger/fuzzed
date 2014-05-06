@@ -1,13 +1,8 @@
 #include "MinCutAnalysisTask.h"
 #include "FuzzTreeTypes.h"
-#include "xmlutil.h"
 #include "FatalException.h"
 
-#include <math.h>
-#include <algorithm>
-#include <bitset>
 #include <limits>
-#include <exception>
 
 using namespace fuzztree;
 using std::vector;
