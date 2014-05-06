@@ -12,6 +12,7 @@ use 'fab run.backend', so that a potential Vagrant run is considered.
 '''
 
 import ConfigParser
+import base64
 import sys
 import logging
 import urllib2
@@ -43,15 +44,16 @@ class WorkerThread(threading.Thread):
         self.joburl = joburl
         threading.Thread.__init__(self)
 
-    def sendResult(self, exit_code, files=None):
+    def sendResult(self, exit_code, file_data=None, file_name=None):
         """
         :rtype : None
         """
         results = {'exit_code': exit_code}
-        if files:
-            results['files']=files
-        headers = {'Content-type': 'application/json'}
+        if file_data and file_name:
+            results['file_name'] = file_name
+            results['file_data'] = base64.b64encode(file_data)
         logger.debug("Sending result data to %s"%(self.joburl))
+        headers = {'content-type': 'application/json'}
         r = requests.patch(self.joburl, data=json.dumps(results), verify=False, headers=headers)
         if r.text:
             logger.debug("Data sent, response was: "+str(r.text))
@@ -86,12 +88,9 @@ class WorkerThread(threading.Thread):
             exit_code = os.system(cmd)
             if exit_code == 0:
                 logger.info("Exit code 0, preparing result upload")
-                if output_file.startswith("*"):
-                    suffix = output_file[1:]
-                    results = {fname: open(tmpdir+"/"+fname, "rb") for fname in os.listdir(tmpdir) if fname.endswith(suffix)}
-                else:
-                    results = {output_file: open(tmpdir+os.sep+output_file, "rb")}
-                self.sendResult(0, results)
+                assert(not output_file.startswith("*"))     # multiple result file upload not implemented
+                with open(tmpdir+os.sep+output_file, "rb") as fd:
+                    self.sendResult(0, fd.read(), output_file)
             else:
                 logger.error("Error on execution: Exit code "+str(exit_code))  
                 logger.error("Saving input file for later reference: /tmp/lastinput.xml")

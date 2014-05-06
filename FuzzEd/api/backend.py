@@ -1,3 +1,4 @@
+import base64
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import HttpResponse
 from tastypie.http import HttpBadRequest
@@ -5,6 +6,7 @@ from tastypie.resources import ModelResource
 from tastypie import fields
 from FuzzEd.models import Job
 from django.conf.urls import url
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 import logging,json
 import common
@@ -27,7 +29,7 @@ class JobResource(common.JobResource):
 
     def prepend_urls(self):
         """
-            Make sure that job access is only possible with the shared secret.
+            Make sure that job access is only possible with the job secret.
             This gives us the liberty to avoid any shared secret between backend and frontend,
             since it is part of each single job URL.
             Ultimatively, this means that backend daemon(s) do not need to authenticate at all.
@@ -66,6 +68,9 @@ class JobResource(common.JobResource):
             to the object. In this method, we still have access to what actually really
             comes as part of the update payload.
 
+            The result comes as 'application/json' dictionary content,
+            with an entry for the exit code of the backend service and the base64-encoded file data.
+
             If the resource is updated, return ``HttpAccepted`` (202 Accepted).
             If the resource did not exist, return ``HttpNotFound`` (404 Not Found).
         """
@@ -89,11 +94,10 @@ class JobResource(common.JobResource):
             except:
                 return HttpBadRequest()
             job.exit_code = result['exit_code']   
-            if "files" in result:
+            if "file_name" in result:
                 # Retrieve binary file and store it
-                assert(len(request.FILES.values())==1)
-                job.result = request.FILES.values()[0].read()
-                if not job.requires_download():
+                job.result = base64.b64decode(result['file_data'])
+                if not job.requires_download:
                     logger.debug(''.join(job.result))
 	    job.save()
-            return HttpResponse(status=202)
+        return HttpResponse(status=202)

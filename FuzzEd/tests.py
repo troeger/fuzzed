@@ -93,7 +93,7 @@ class FuzzEdTestCase(LiveServerTestCase):
             response=self.ajaxGet(jobUrl)
             code = response.status_code 
         self.assertEqual(response.status_code, 200)
-        return response.content
+        return response
 
 class SimpleFixtureTestCase(FuzzEdTestCase):
     ''' 
@@ -407,7 +407,7 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
 
     def testRateFaulttree(self):
         response = self.requestJob(self.baseUrl, self.rate_faulttree, 'topevent')
-        result = json.loads(response)
+        result = json.loads(response.content)
         self.assertEqual(bool(result['validResult']),True)
         self.assertEqual(result['errors'],{})
         self.assertEqual(result['warnings'],{})
@@ -415,7 +415,7 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
 
     def testPRDCFuzztree(self):
         response = self.requestJob(self.baseUrl, self.prdc_fuzztree, 'topevent')
-        result = json.loads(response)
+        result = json.loads(response.content)
         self.assertEqual(bool(result['validResult']),True)
         self.assertEqual(result['errors'],{})
         self.assertEqual(result['warnings'],{})
@@ -425,17 +425,14 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
 
     def testFrontendAPIPdfExport(self):
         for graph in self.graphs:
-            pdfLink = self.requestJob(self.baseUrl, graph, 'pdf')
+            pdf = self.requestJob(self.baseUrl, graph, 'pdf')
             # The result of a PDF rendering job is the download link
-            pdfResponse = self.get(pdfLink)
-            self.assertEqual('application/pdf', pdfResponse['CONTENT-TYPE'])
+            self.assertEqual('application/pdf', pdf['CONTENT-TYPE'])
 
     def testFrontendAPIEpsExport(self):
         for graph in self.graphs:
-            epsLink = self.requestJob(self.baseUrl, graph, 'eps')
-            # The result of a EPS rendering job is the download link for the user (normal GET)
-            epsResponse = self.get(epsLink)
-            self.assertEqual('application/postscript', epsResponse['CONTENT-TYPE'])
+            eps = self.requestJob(self.baseUrl, graph, 'eps')
+            self.assertEqual('application/postscript', eps['CONTENT-TYPE'])
 
 class UnicodeTestCase(FuzzEdTestCase):
     fixtures = ['unicode.json', 'initial_data.json']

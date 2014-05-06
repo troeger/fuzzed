@@ -77,12 +77,7 @@ class JobResource(common.JobResource):
 
         if job.done():
             if job.exit_code == 0:
-                if job.requires_download():
-                    # Return the URL to the file created by the job
-                    return HttpResponse(job.get_absolute_url())
-                else:
-                    # Serve directly
-                    return HttpResponse(job.result_rendering())
+                return job.as_http_response()
             else:
                 logger.debug("Job is done, but with non-zero exit code.")
                 mail_managers('Analysis of job %s ended with non-zero exit code.' % job.pk, job.graph.to_xml())

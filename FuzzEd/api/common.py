@@ -456,7 +456,7 @@ class GraphResource(ModelResource):
                     # See http://www.enhanceie.com/ie/bugs.asp for details.
                     patch_cache_control(response, no_cache=True)
 
-                # Detect result content type and create some meaningfull disposition name
+                # Detect result content type and create some meaningful disposition name
                 if 'format' in request.GET:
                     if request.GET['format'] == 'graphml':
                         response['Content-Disposition'] = 'attachment; filename=graph.xml'
