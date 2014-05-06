@@ -92,7 +92,6 @@ class FuzzEdTestCase(LiveServerTestCase):
         while (code == 202):
             response=self.ajaxGet(jobUrl)
             code = response.status_code 
-            print ".",
         self.assertEqual(response.status_code, 200)
         return response.content
 

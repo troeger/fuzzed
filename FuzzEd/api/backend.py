@@ -1,11 +1,12 @@
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import HttpResponse
+from tastypie.http import HttpBadRequest
 from tastypie.resources import ModelResource
 from tastypie import fields
 from FuzzEd.models import Job
 from django.conf.urls import url
 
-import logging
+import logging,json
 import common
 from django.utils import http
 
@@ -32,7 +33,7 @@ class JobResource(common.JobResource):
             Ultimatively, this means that backend daemon(s) do not need to authenticate at all.
         """
         return [
-            url(r"^jobs/(?P<secret>[\w\d_.-]+)/$",
+            url(r"^jobs/(?P<secret>[\w\d_.-]+)$",
                 self.wrap_view('dispatch_detail'),
                 name="job"),
         ]
@@ -82,12 +83,19 @@ class JobResource(common.JobResource):
             return HttpResponse(status=202)     # This return code is a lie, but mitigates duplicate result submission
         else:
             logger.debug("Storing result data for job %d"%job.pk)
-            #TODO: Support submission of exit code and / or result files in the same API call
-            # Retrieve binary file and store it
-            assert(len(request.FILES.values())==1)
-            job.result = request.FILES.values()[0].read()
-            job.exit_code = 0       # This saves as a roundtrip to store also the exit code. Having files means everything is ok.
-            job.save()
-            if not job.requires_download():
-                logger.debug(''.join(job.result))
-            return HttpResponse(status=202)
+            try:
+                result = json.loads(request.body)
+                assert('exit_code' in result)
+            except:
+                return HttpBadRequest()
+            if "files" in result:
+                # Retrieve binary file and store it
+                assert(len(request.FILES.values())==1)
+                job.result = request.FILES.values()[0].read()
+                job.exit_code = 0       # This saves as a roundtrip to store also the exit code. Having files means everything is ok.
+                job.save()
+                if not job.requires_download():
+                    logger.debug(''.join(job.result))
+                return HttpResponse(status=202)
+            else:
+                

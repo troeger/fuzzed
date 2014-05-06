@@ -19,6 +19,7 @@ import tempfile
 import shutil
 import os
 import threading
+import json
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 
 import requests
@@ -42,17 +43,18 @@ class WorkerThread(threading.Thread):
         self.joburl = joburl
         threading.Thread.__init__(self)
 
-    def sendFiles(self, url, files):
-        logger.debug("Sending data to %s: %s"%(url, str(files)))
-        r = requests.post(url, files=files, allow_redirects=False, verify=False)
+    def sendResult(self, exit_code, files=None):
+        """
+        :rtype : None
+        """
+        results = {'exit_code': exit_code}
+        if files:
+            results['files']=files
+        headers = {'Content-type': 'application/json'}
+        logger.debug("Sending result data to %s"%(self.joburl))
+        r = requests.patch(self.joburl, data=json.dumps(results), verify=False, headers=headers)
         if r.text:
             logger.debug("Data sent, response was: "+str(r.text))
-
-    def report_problem(self, exit_code):
-        logger.debug("Sending exit code %s to %s"%(str(exit_code), self.joburl))
-        results = {'exit_code' : exit_code}
-        r = requests.patch(self.joburl, data=results, verify=False)
-        logger.debug("Error report sent, response was: "+str(r.text))
 
     def run(self):
         try:
@@ -89,16 +91,16 @@ class WorkerThread(threading.Thread):
                     results = {fname: open(tmpdir+"/"+fname, "rb") for fname in os.listdir(tmpdir) if fname.endswith(suffix)}
                 else:
                     results = {output_file: open(tmpdir+os.sep+output_file, "rb")}
-                self.sendFiles(self.joburl, results)
+                self.sendResult(0, results)
             else:
                 logger.error("Error on execution: Exit code "+str(exit_code))  
                 logger.error("Saving input file for later reference: /tmp/lastinput.xml")
                 os.system("cp %s /tmp/lastinput.xml"%tmpfile.name)
-                self.report_problem(exit_code)
+                self.sendResult(exit_code)
 
         except Exception as e:
             logger.debug('Exception, delivering -1 exit code to frontend: '+str(e))
-            self.report_problem(-1)
+            self.sendResult(-1)
 
         finally:
             shutil.rmtree(tmpdir, ignore_errors=True)
