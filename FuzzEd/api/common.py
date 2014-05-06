@@ -19,7 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.cache import patch_cache_control, patch_vary_headers
 
-from FuzzEd.models import Notification
+from FuzzEd.models import Notification, NodeGroup
 from FuzzEd.models import Project, Graph, Edge, Node
 
 
@@ -249,7 +249,39 @@ class NodeGroupResource(ModelResource):
     '''
         An API resource for node groups.
     '''
-    pass
+
+    class Meta:
+        queryset = NodeGroup.objects.filter(deleted=False)
+        authorization = GraphOwnerAuthorization()
+        serializer = NodeSerializer()
+        list_allowed_methods = ['post']
+        detail_allowed_methods = ['delete']
+        excludes = ['deleted']
+
+    graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
+
+    def get_resource_uri(self, bundle_or_obj=None, url_name='api_dispatch_list'):
+        """
+            Since we change the API URL format to nested resources, we need also to
+            change the location determination for a given resource object.
+        """
+        nodegroup_client_id = bundle_or_obj.obj.client_id
+        graph_pk = bundle_or_obj.obj.graph.pk
+        return reverse('nodegroup', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': nodegroup_client_id})
+
+    def obj_create(self, bundle, **kwargs):
+        """
+             This is the only override that allows us to access 'kwargs', which contains the
+             graph_id from the original request.
+        """
+        try:
+            bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
+        except:
+            raise ImmediateHttpResponse(response=HttpForbidden("You can't use this graph."))
+        bundle.obj = self._meta.object_class()
+        bundle = self.full_hydrate(bundle)
+        return self.save(bundle)
+
 
 class GraphSerializer(Serializer):
     """
@@ -364,6 +396,12 @@ class GraphResource(ModelResource):
             url(r'^graphs/(?P<pk>\d+)/jobs/(?P<secret>\S+)$',
                 self.wrap_view('dispatch_job'),
                 name="job"),
+            url(r'^graphs/(?P<pk>\d+)/nodegroups/$',
+                self.wrap_view('dispatch_nodegroups'),
+                name="nodes"),
+            url(r'^graphs/(?P<pk>\d+)/nodegroups/(?P<client_id>\d+)$',
+                self.wrap_view('dispatch_nodegroup'),
+                name="node"),
         ]
 
     def obj_create(self, bundle, **kwargs):
@@ -395,6 +433,14 @@ class GraphResource(ModelResource):
 
     @abstractmethod
     def dispatch_node(self, request, **kwargs):
+        pass
+
+    @abstractmethod
+    def dispatch_nodegroups(self, request, **kwargs):
+        pass
+
+    @abstractmethod
+    def dispatch_nodegroup(self, request, **kwargs):
         pass
 
     @abstractmethod
