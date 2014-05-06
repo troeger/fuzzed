@@ -88,14 +88,12 @@ class JobResource(common.JobResource):
                 assert('exit_code' in result)
             except:
                 return HttpBadRequest()
+            job.exit_code = result['exit_code']   
             if "files" in result:
                 # Retrieve binary file and store it
                 assert(len(request.FILES.values())==1)
                 job.result = request.FILES.values()[0].read()
-                job.exit_code = 0       # This saves as a roundtrip to store also the exit code. Having files means everything is ok.
-                job.save()
                 if not job.requires_download():
                     logger.debug(''.join(job.result))
-                return HttpResponse(status=202)
-            else:
-                
+	    job.save()
+            return HttpResponse(status=202)
