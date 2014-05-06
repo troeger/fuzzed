@@ -282,14 +282,17 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
     #TODO: Test that session authentication is checked in the API implementation
     #TODO: Test that the user can only access his graphs, and not the ones of other users
 
+    def _testValidGraphJson(self, content):
+        for key in ['id','seed','name','type','readOnly','nodes','edges','nodeGroups']:
+            self.assertIn(key, content)
+
     def testGetGraph(self):
         for id, kind in self.graphs.iteritems():
             url = self.baseUrl+'/graphs/%u'%self.pkFaultTree
             response=self.ajaxGet(url)
             self.assertEqual(response.status_code, 200)
-            result = json.loads(response.content)
-            for key in ['id','seed','name','type','readOnly','nodes','edges','nodeGroups']:
-                self.assertIn('name', result)
+            content = json.loads(response.content)
+            self._testValidGraphJson(content)
         response=self.ajaxGet(self.baseUrl+'/graphs/9999')
         self.assertEqual(response.status_code, 404)
 
@@ -297,11 +300,24 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         for id, kind in self.graphs.iteritems():
             for format, test_str in [('graphml','<graphml'), ('json','{'), ('tex','\\begin')]:
                 url = self.baseUrl+'/graphs/%u/graph_download/?format=%s'%(self.pkFaultTree, format)
-                print url
                 response=self.ajaxGet(url)
                 self.assertEqual(response.status_code, 200)
                 self.assertIn(test_str, response.content)
 
+    def testGetGraphs(self):
+        url = self.baseUrl+'/graphs/'
+        response=self.ajaxGet(url)
+        self.assertEqual(response.status_code, 200)
+        print response.content
+        content = json.loads(response.content)
+        self._testValidGraphJson(content)
+
+    def testGraphFiltering(self):
+        url = self.baseUrl+'/graphs/?kind=faulttree'
+        response=self.ajaxGet(url)
+        self._testValidGraphJson(response)
+        self.assertEqual(response.status_code, 200)
+        print response.content
 
     def testCreateNode(self):
         newnode = json.dumps({'y'         : 3,

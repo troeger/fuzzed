@@ -1,5 +1,6 @@
 import json
 import logging
+from abc import abstractmethod
 
 from django import http
 from django.conf.urls import url
@@ -327,8 +328,11 @@ class GraphResource(ModelResource):
         queryset = Graph.objects.filter(deleted=False)
         authorization = GraphAuthorization()
         serializer = GraphSerializer()
-        allowed_methods = ['get', 'post']
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get']
+
         excludes = ['deleted', 'owner', 'read_only']
+        filtering = {"kind": ('exact')}
 
     project = fields.ToOneField(ProjectResource, 'project')
     nodes = fields.ToManyField(NodeResource, 'nodes')
@@ -336,21 +340,12 @@ class GraphResource(ModelResource):
 
     def prepend_urls(self):
         return [
-            url(r'^graphs/(?P<pk>\d+)/graph_download/$',
-                self.wrap_view('dispatch_detail'),
-                name = 'frontend_graph_download'),
             url(r'^graphs/(?P<pk>\d+)$',
                 self.wrap_view('dispatch_detail'),
                 name = 'graph'),
-            url(r'^graphs/(?P<pk>\d+)/analysis/cutsets$',
-                self.wrap_view('dispatch_detail'),
-                name = 'analyze_cutsets'),
-            url(r'^graphs/(?P<pk>\d+)/analysis/topEventProbability$',
-                self.wrap_view('dispatch_detail'),
-                name = 'analyze_top_event_probability'),
-            url(r'^graphs/(?P<pk>\d+)/simulation/topEventProbability$',
-                self.wrap_view('dispatch_detail'),
-                name = 'simulation_top_event_probability'),
+            url(r'^graphs/$',
+                self.wrap_view('dispatch_list'),
+                name = 'graphs'),
             url(r'^graphs/(?P<pk>\d+)/edges/$',
                 self.wrap_view('dispatch_edges'),
                 name="edges"),
@@ -386,38 +381,44 @@ class GraphResource(ModelResource):
         bundle.obj.from_graphml(bundle.request.body)
         return bundle.obj
 
+    @abstractmethod
     def dispatch_edges(self, request, **kwargs):
-        assert(False, "Override this method")
+        pass
 
+    @abstractmethod
     def dispatch_edge(self, request, **kwargs):
-        assert(False, "Override this method")
+        pass
 
+    @abstractmethod
     def dispatch_nodes(self, request, **kwargs):
-        assert(False, "Override this method")
+        pass
 
+    @abstractmethod
     def dispatch_node(self, request, **kwargs):
-        assert(False, "Override this method")
+        pass
 
+    @abstractmethod
     def dispatch_jobs(self, request, **kwargs):
-        assert(False, "Override this method")
+        pass
 
+    @abstractmethod
     def dispatch_job(self, request, **kwargs):
-        assert(False, "Override this method")
+        pass
 
-    # def hydrate(self, bundle):
-    #     # Make sure that owners are assigned correctly
-    #     bundle.obj.owner = bundle.request.user
-    #     # Get the user-specified project, and make sure that it is his.
-    #     # This is not an authorization problem for the (graph) resource itself,
-    #     # so it must be handled here and not in the auth class.
-    #     try:
-    #         project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
-    #         bundle.obj.project = project
-    #     except:
-    #         raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))
-    #         # Fill the graph with the GraphML data
-    #     bundle.obj.from_graphml(bundle.request.body)
-    #     return bundle
+    def hydrate(self, bundle):
+        # Make sure that owners are assigned correctly
+        bundle.obj.owner = bundle.request.user
+        # Get the user-specified project, and make sure that it is his.
+        # This is not an authorization problem for the (graph) resource itself,
+        # so it must be handled here and not in the auth class.
+        try:
+            project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
+            bundle.obj.project = project
+        except:
+            raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))
+            # Fill the graph with the GraphML data
+        bundle.obj.from_graphml(bundle.request.body)
+        return bundle
 
 
 

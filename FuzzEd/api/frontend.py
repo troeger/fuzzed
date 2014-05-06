@@ -11,6 +11,7 @@ from django.views.decorators.cache import never_cache
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from tastypie.authentication import SessionAuthentication
+from tastypie.bundle import Bundle
 from tastypie.http import HttpApplicationError, HttpAccepted
 from tastypie import fields
 from django.core.mail import mail_managers
@@ -60,7 +61,6 @@ class JobResource(common.JobResource):
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
         return self.save(bundle)
-
 
     def get_detail(self, request, **kwargs):
         """
@@ -113,7 +113,11 @@ class GraphSerializer(common.GraphSerializer):
         we need a frontend API specific JSON serializer.
     """
     def to_json(self, data, options=None):
-        return data.obj.to_json()
+        if isinstance(data, Bundle):
+            return data.obj.to_json()
+        else:
+            urls = [reverse('graph', kwargs={'api_name':'front', 'pk': item.obj.pk}) for item in data['objects']]
+            return {'graphs': urls}
 
 class GraphResource(common.GraphResource):
     """
