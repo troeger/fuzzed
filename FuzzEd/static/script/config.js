@@ -79,7 +79,7 @@ define(['underscore'], function() {
             BASE_URL:                   '/api/front',
             EDITOR_URL:                 '/editor',
             GRAPHS_URL:                 '/graphs',
-            NODES_URL:                  '/nodes',
+            NODES_URL:                  '/nodes/',
             EDGES_URL:                  '/edges',
             NODEGROUPS_URL:             '/nodegroups',
             TRANSFERS_URL:              '/transfers',
