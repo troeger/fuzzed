@@ -116,8 +116,12 @@ class GraphSerializer(common.GraphSerializer):
         if isinstance(data, Bundle):
             return data.obj.to_json()
         else:
-            urls = [reverse('graph', kwargs={'api_name':'front', 'pk': item.obj.pk}) for item in data['objects']]
-            return {'graphs': urls}
+            graphs = []
+            for graph in data['objects']:
+                graphs.append({'url': reverse('graph', kwargs={'api_name': 'front', 'pk': graph.obj.pk}),
+                               'name': graph.obj.name})
+            return json.dumps({'graphs': graphs})
+
 
 class GraphResource(common.GraphResource):
     """

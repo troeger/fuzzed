@@ -18,8 +18,10 @@
 import json
 import time
 import os
+import sys
 import subprocess
 from subprocess import Popen
+import unittest
 from xml.dom.minidom import parse
 
 from django.test import LiveServerTestCase
@@ -29,6 +31,7 @@ from django.contrib.auth.models import User
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
 from FuzzEd.models.notification import Notification
+
 
 
 
@@ -299,7 +302,7 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
     def testGraphDownload(self):
         for id, kind in self.graphs.iteritems():
             for format, test_str in [('graphml','<graphml'), ('json','{'), ('tex','\\begin')]:
-                url = self.baseUrl+'/graphs/%u/graph_download/?format=%s'%(self.pkFaultTree, format)
+                url = self.baseUrl + '/graphs/%u?format=%s' % (self.pkFaultTree, format)
                 response=self.ajaxGet(url)
                 self.assertEqual(response.status_code, 200)
                 self.assertIn(test_str, response.content)
@@ -308,16 +311,17 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         url = self.baseUrl+'/graphs/'
         response=self.ajaxGet(url)
         self.assertEqual(response.status_code, 200)
-        print response.content
         content = json.loads(response.content)
-        self._testValidGraphJson(content)
+        print content
+        assert ('graphs' in content)
 
     def testGraphFiltering(self):
         url = self.baseUrl+'/graphs/?kind=faulttree'
         response=self.ajaxGet(url)
-        self._testValidGraphJson(response)
         self.assertEqual(response.status_code, 200)
-        print response.content
+        content = json.loads(response.content)
+        print content
+        assert ('graphs' in content)
 
     def testCreateNode(self):
         newnode = json.dumps({'y'         : 3,
@@ -374,11 +378,13 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 204)
 
 class AnalysisInputFilesTestCase(FuzzEdTestCase):
-    '''
+    """
         These are tests based on the analysis engine input files in fixture/analysis.
         They only test if the analysis engine crashes on them.
         The may later be translated to real tests with some expected output.
-    '''
+    """
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testFileAnalysis(self):
         for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
             for f in files:
@@ -421,6 +427,7 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
         print "\nShutting down backend daemon"
         self.backend.terminate()
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testRateFaulttree(self):
         response = self.requestJob(self.baseUrl, self.rate_faulttree, 'topevent')
         result = json.loads(response.content)
@@ -429,6 +436,7 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
         self.assertEqual(result['warnings'],{})
         self.assertEqual(result['configurations'][0]['peak'], 1.0)
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testPRDCFuzztree(self):
         response = self.requestJob(self.baseUrl, self.prdc_fuzztree, 'topevent')
         result = json.loads(response.content)
@@ -445,6 +453,7 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
             # The result of a PDF rendering job is the download link
             self.assertEqual('application/pdf', pdf['CONTENT-TYPE'])
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testFrontendAPIEpsExport(self):
         for graph in self.graphs:
             eps = self.requestJob(self.baseUrl, graph, 'eps')
@@ -463,7 +472,4 @@ class UnicodeTestCase(FuzzEdTestCase):
     def testTikzSerialize(self):
         g=Graph.objects.get(pk=self.pkFaultTree)
         assert(len(g.to_tikz()) > 0)
-
-
-
 
