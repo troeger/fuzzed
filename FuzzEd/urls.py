@@ -4,8 +4,8 @@ from django.http import HttpResponse
 from django.contrib import admin
 from tastypie.api import Api
 
-from FuzzEd.models import Job
-from FuzzEd.api import external, frontend
+from FuzzEd.api import external, frontend, backend
+
 
 v1_api = Api(api_name='v1')
 v1_api.register(external.ProjectResource())
@@ -17,6 +17,8 @@ front_api.register(frontend.EdgeResource())
 front_api.register(frontend.NodeResource())
 front_api.register(frontend.NotificationResource())
 front_api.register(frontend.JobResource())
+back_api = Api(api_name='back')
+back_api.register(backend.JobResource())
 
 admin.autodiscover()
 
@@ -47,7 +49,7 @@ urlpatterns = patterns('',
     
     # graph
  #  url(r'^front/graphs/(?P<graph_id>\d+)$', 'FuzzEd.api.frontend.graph', name='graph'),
-    url(r'^front/graphs/(?P<graph_id>\d+)/transfers$', 'FuzzEd.api.frontend.graph_transfers', name='graph_transfers'),
+    #url(r'^front/graphs/(?P<graph_id>\d+)/transfers$', 'FuzzEd.api.frontend.graph_transfers', name='graph_transfers'),
 #   url(r'^front/graphs/(?P<graph_id>\d+)/graph_download$', 'FuzzEd.api.frontend.graph_download', name='frontend_graph_download'),
 
     # exports (graph downloads that return a job location instead of the direct result)
@@ -67,21 +69,21 @@ urlpatterns = patterns('',
     #     'FuzzEd.api.frontend.property', name='property'),
 
     # analysis
-    url(r'^front/graphs/(?P<graph_id>\d+)/analysis/cutsets$', 
-        'FuzzEd.api.frontend.job_create', {'job_kind': Job.CUTSETS_JOB}, name='analyze_cutsets'),
-    url(r'^front/graphs/(?P<graph_id>\d+)/analysis/topEventProbability$',
-        'FuzzEd.api.frontend.job_create', {'job_kind': Job.TOP_EVENT_JOB}, name='analyze_top_event_probability'),
+    #url(r'^front/graphs/(?P<graph_id>\d+)/analysis/cutsets$',
+    #    'FuzzEd.api.frontend.job_create', {'job_kind': Job.CUTSETS_JOB}, name='analyze_cutsets'),
+    #url(r'^front/graphs/(?P<graph_id>\d+)/analysis/topEventProbability$',
+    #    'FuzzEd.api.frontend.job_create', {'job_kind': Job.TOP_EVENT_JOB}, name='analyze_top_event_probability'),
 
     # simulation
-    url(r'^front/graphs/(?P<graph_id>\d+)/simulation/topEventProbability$',
-        'FuzzEd.api.frontend.job_create', {'job_kind': Job.SIMULATION_JOB}, name='simulation_top_event_probability'),
+    #url(r'^front/graphs/(?P<graph_id>\d+)/simulation/topEventProbability$',
+    #    'FuzzEd.api.frontend.job_create', {'job_kind': Job.SIMULATION_JOB}, name='simulation_top_event_probability'),
 
     # jobs
     #url(r'^front/jobs/(?P<job_id>\d+)$', 'FuzzEd.api.frontend.job_status', name='frontend_job_status'),
-    url(r'^front/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.frontend.job_exitcode', name='job_exitcode'),
-    url(r'^front/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.frontend.job_files', name='job_files'),
+    #url(r'^front/jobs/(?P<job_secret>\S+)/exitcode$', 'FuzzEd.api.frontend.job_exitcode', name='job_exitcode'),
+    #url(r'^front/jobs/(?P<job_secret>\S+)/files$', 'FuzzEd.api.frontend.job_files', name='job_files'),
 
-    url(r'^api/', include(v1_api.urls + front_api.urls)),
+    url(r'^api/', include(v1_api.urls + front_api.urls + back_api.urls)),
 
     # For getting OAuth2 authentication support, enable this
     # Please note that the application and token registration views are not tailored so far

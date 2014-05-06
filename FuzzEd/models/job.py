@@ -1,18 +1,22 @@
-from django.db import models, connection
+import uuid
+import json
+import xmlrpclib
+import math
+import logging
+
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.urlresolvers import reverse
 from django.core.mail import mail_managers
-from graph import Graph
 from south.modelsinspector import add_introspection_rules
+
+from graph import Graph
 from FuzzEd.models import xml_analysis, xml_simulation
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
-import uuid, json, xmlrpclib, math
+from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice
 
-from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice, TransferInChoice
-
-import logging
 logger = logging.getLogger('FuzzEd')
 
 class NativeXmlField(models.Field):
@@ -266,15 +270,14 @@ def job_post_save(sender, instance, created, **kwargs):
         # We therefore take the static approach with a setting here, which is overriden
         # by the test suite run accordingly
 
-        #TODO: job_files_url = 
-        job_files_url    = settings.SERVER + reverse('job_files', kwargs={'job_secret': instance.secret})
-        job_exitcode_url = settings.SERVER + reverse('job_exitcode', kwargs={'job_secret': instance.secret})
+        # TODO: Use reverse() for this
+        job_url = settings.SERVER + '/api/back/jobs/' + instance.secret
 
         try:
             # The proxy is instantiated here, since the connection should go away when finished
             s = xmlrpclib.ServerProxy(settings.BACKEND_DAEMON)
-            logger.debug("Triggering %s job on url %s"%(instance.kind, job_files_url))
-            s.start_job(instance.kind, job_files_url, job_exitcode_url)
+            logger.debug("Triggering %s job on url %s"%(instance.kind, job_url))
+            s.start_job(instance.kind, job_url)
         except Exception as e:
             mail_managers("Exception on backend call - "+settings.BACKEND_DAEMON,str(e))
             raise HttpResponseServerErrorAnswer("Sorry, we seem to have a problem with our FuzzEd backend. The admins are informed, thanks for the patience.")

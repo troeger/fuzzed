@@ -3,7 +3,6 @@ import logging
 
 from django import http
 from django.conf.urls import url
-from django.core.mail import mail_managers
 from django.core.urlresolvers import reverse
 from tastypie.resources import ModelResource
 from tastypie.authentication import ApiKeyAuthentication
@@ -19,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.cache import patch_cache_control, patch_vary_headers
 
-from FuzzEd.models import Job, Notification
+from FuzzEd.models import Notification
 from FuzzEd.models import Project, Graph, Edge, Node
 
 
@@ -88,6 +87,12 @@ class GraphOwnerAuthorization(Authorization):
 
 
 ### Resources ###
+
+class JobResource(ModelResource):
+    """
+        An API resource for jobs.
+    """
+    pass
 
 class NotificationResource(ModelResource):
     """
@@ -245,32 +250,6 @@ class NodeGroupResource(ModelResource):
     '''
     pass
 
-
-class JobResource(ModelResource):
-    """
-        An API resource for jobs.
-    """
-    class Meta:
-        queryset = Job.objects.all()
-        authorization = GraphOwnerAuthorization()
-        list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post']
-
-    graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
-
-    def obj_create(self, bundle, **kwargs):
-        """
-         This is the only override that allows us to access 'kwargs', which contains the
-         graph_id from the original request.
-        """
-        graph = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
-        bundle.data['graph'] = graph
-        bundle.data['graph_modified'] = graph.modified
-        bundle.data['kind'] = bundle.data['kind']
-        bundle.obj = self._meta.object_class()
-        bundle = self.full_hydrate(bundle)
-        return self.save(bundle)
-
 class GraphSerializer(Serializer):
     """
         Our custom serializer / deserializer for graph formats we support.
@@ -387,7 +366,7 @@ class GraphResource(ModelResource):
             url(r'^graphs/(?P<pk>\d+)/jobs/$',
                 self.wrap_view('dispatch_jobs'),
                 name="jobs"),
-            url(r'^graphs/(?P<pk>\d+)/jobs/(?P<job_pk>\d+)$',
+            url(r'^graphs/(?P<pk>\d+)/jobs/(?P<secret>\S+)$',
                 self.wrap_view('dispatch_job'),
                 name="job"),
         ]
@@ -408,29 +387,22 @@ class GraphResource(ModelResource):
         return bundle.obj
 
     def dispatch_edges(self, request, **kwargs):
-        edge_resource = EdgeResource()
-        return edge_resource.dispatch_list(request, graph_id=kwargs['pk'])
+        assert(False, "Override this method")
 
     def dispatch_edge(self, request, **kwargs):
-        edge_resource = EdgeResource()
-        return edge_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
+        assert(False, "Override this method")
 
     def dispatch_nodes(self, request, **kwargs):
-        node_resource = NodeResource()
-        return node_resource.dispatch_list(request, graph_id=kwargs['pk'])
+        assert(False, "Override this method")
 
     def dispatch_node(self, request, **kwargs):
-        node_resource = NodeResource()
-        return node_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
+        assert(False, "Override this method")
 
     def dispatch_jobs(self, request, **kwargs):
-        job_resource = JobResource()
-        return job_resource.dispatch_list(request, graph_id=kwargs['pk'])
+        assert(False, "Override this method")
 
     def dispatch_job(self, request, **kwargs):
-        job_resource = JobResource()
-        return job_resource.dispatch_detail(request, graph_id=kwargs['pk'], job_pk=kwargs['job_pk'])
-
+        assert(False, "Override this method")
 
     # def hydrate(self, bundle):
     #     # Make sure that owners are assigned correctly
@@ -526,93 +498,4 @@ class GraphResource(ModelResource):
 
         return wrapper
 
-
-# def graph_download(user, graph_id, export_format):
-#     """
-#     Function: graph_download
-#         Provides a download response of the graph in the given format, or an HTTP error if 
-#         the rendering job for the export format is not ready so far.
-
-#         It is sufficient to prepare the HTTP response already here, since the link is independent
-#         from the the kind of API being used for access
-
-#     Parameters:
-#      user          - The requesting user's object in the model
-#      graph_id      - the id of the graph to be downloaded
-#      export_format - The demanded export format
-
-#     Returns:
-#      {HTTPResponse} a django response object
-#     """
-#     if user.is_staff:
-#         graph = get_object_or_404(Graph, pk=graph_id)
-#     else:
-#         graph = get_object_or_404(Graph, pk=graph_id, owner=user, deleted=False)        
-
-#     response = HttpResponse()
-#     response['Content-Disposition'] = 'attachment; filename=%s.%s' % (graph.name, export_format)
-
-#     if export_format == 'xml':
-#         response.content = graph.to_xml()
-#         response['Content-Type'] = 'application/xml'
-#     elif export_format == 'graphml':
-#         response.content = graph.to_graphml()
-#         response['Content=Type'] = 'application/xml'
-#     elif export_format == 'json':
-#         response.content = graph.to_json()
-#         response['Content-Type'] = 'application/javascript'
-#     elif export_format == 'tex':
-#         response.content = graph.to_tikz()
-#         response['Content-Type'] = 'application/text'
-#     elif export_format in ('pdf', 'eps'):
-#         try:
-#             # Take the latest file that was successfully created
-#             # This is based on the assumption that nobody calls this function before the job is done
-#             job = graph.jobs.filter(kind=export_format).latest('created')
-#             if not job.done():
-#                 raise HttpResponseNotFoundAnswer()
-#             response.content = job.result
-#             response['Content-Type'] = 'application/pdf' if export_format == 'pdf' else 'application/postscript'
-#         except ObjectDoesNotExist:
-#             raise HttpResponseNotFoundAnswer()
-#     else:
-#         raise HttpResponseNotFoundAnswer()
-#     return response
-
-
-def job_create(user, graph_id, job_kind):
-    """
-        Starts a job of the given kind for the given graph.
-        It is intended to return immediately with job object.
-    """
-
-
-def job_status(user, job_id):
-    ''' Returns the status information for the given job, and the job object if available.
-        This API helper wraps functionality that is common to all frontend API versions of
-        this call.
-        0 - Job is done, deliver the result.
-        1 - Job is done, but you can't deliver the result due to an error.
-        2 - Job is not done, try again later.
-        3 - Job does not exist, go away.
-    '''
-    try:
-        job = Job.objects.get(pk=job_id)
-        # Prevent cross-checking of jobs by different users
-        assert (job.graph.owner == user or user.is_staff)
-    except:
-        # The job does not exist, or it shouldn't exist for this user.        
-        return 3, None
-
-    if job.done():
-        if job.exit_code == 0:
-            logger.debug("Job is done.")
-            return 0, job
-        else:
-            logger.debug("Job is done, but with non-zero exit code.")
-            mail_managers('Analysis of job %s ended with non-zero exit code.' % job.pk, job.graph.to_xml())
-            return 1, job
-    else:
-        logger.debug("Job is pending.")
-        return 2, job
 

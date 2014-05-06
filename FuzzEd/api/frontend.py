@@ -1,14 +1,19 @@
 import json
 import logging
 
+from django import http
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.http import require_GET, require_POST
 from django.core.urlresolvers import reverse
 from django.views.decorators.cache import never_cache
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from tastypie.authentication import SessionAuthentication
+from tastypie.http import HttpApplicationError, HttpAccepted
+from tastypie import fields
+from django.core.mail import mail_managers
 
 from FuzzEd.decorators import require_ajax
 from FuzzEd.models import Node, Job, NodeGroup, Graph
@@ -19,8 +24,76 @@ import common
 logger = logging.getLogger('FuzzEd')
 
 class JobResource(common.JobResource):
-    class Meta(common.JobResource.Meta):
-        authentication = SessionAuthentication()
+    """
+        An API resource for jobs.
+    """
+    class Meta:
+        queryset = Job.objects.all()
+        authorization = common.GraphOwnerAuthorization()
+        authentication = SessionAuthentication()        
+        list_allowed_methods = ['post']
+        detail_allowed_methods = ['get']
+
+    graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
+
+    def get_resource_uri(self, bundle_or_obj=None, url_name='api_dispatch_list'):
+        """
+            Since we change the API URL format to nested resources, we need also to
+            change the location determination for a given resource object.
+        """
+        job_secret = bundle_or_obj.obj.secret
+        graph_pk = bundle_or_obj.obj.graph.pk
+        return reverse('job', kwargs={'api_name':'front', 'pk':graph_pk, 'secret':job_secret})
+
+    def obj_create(self, bundle, **kwargs):
+        """
+            Create a new job for the given graph.
+            The request body contains the information about the kind of job being requested.
+            The result is a job URL that is based on the generated job secret.
+            This is the only override that allows us to access 'kwargs', which contains the
+            graph_id from the original request.
+        """
+        graph = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
+        bundle.data['graph'] = graph
+        bundle.data['graph_modified'] = graph.modified
+        bundle.data['kind'] = bundle.data['kind']
+        bundle.obj = self._meta.object_class()
+        bundle = self.full_hydrate(bundle)
+        return self.save(bundle)
+
+
+    def get_detail(self, request, **kwargs):
+        """
+            Called by the request dispatcher in case somebody tries to GET a job resource.
+            For the frontend, deliver the current job status if pending, or the result.
+        """
+        basic_bundle = self.build_bundle(request=request)
+        try:
+            job = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices("More than one resource is found at this URI.")
+
+        if job.done():
+            if job.exit_code == 0:
+                if job.requires_download():
+                    # Return the URL to the file created by the job
+                    return HttpResponse(job.get_absolute_url())
+                else:
+                    # Serve directly
+                    return HttpResponse(job.result_rendering())
+            else:
+                logger.debug("Job is done, but with non-zero exit code.")
+                mail_managers('Analysis of job %s ended with non-zero exit code.' % job.pk, job.graph.to_xml())
+                return HttpApplicationError()
+        else:
+            # Job is pending, tell this by HTTP return code
+            return HttpAccepted()
+
+    def apply_authorization_limits(self, request, object_list):
+        # Prevent cross-checking of jobs by different users
+        return object_list.filter(graph__owner=request.user)                    
 
 class NotificationResource(common.NotificationResource):
     class Meta(common.NotificationResource.Meta):
@@ -56,42 +129,29 @@ class GraphResource(common.GraphResource):
         authentication = SessionAuthentication()
         serializer = GraphSerializer()
 
-@login_required
-@csrf_exempt
-@require_GET
-def job_status(request, job_id):
-    ''' Returns the status information for the given job.
-        202 is delivered if the job is pending, otherwise the result is immediately returned.
-        The result may be the actual text data, or a download link to a binary file.
-    '''
-    status, job = common.job_status(request.user, job_id)
+    def dispatch_edges(self, request, **kwargs):
+        edge_resource = EdgeResource()
+        return edge_resource.dispatch_list(request, graph_id=kwargs['pk'])
 
-    if status == 0:     # done, valid result
-        if job.requires_download():
-            # Return the URL to the file created by the job
-            return HttpResponse(job.get_absolute_url())
-        else:
-            # Serve directly
-            return HttpResponse(job.result_rendering())
-    elif status == 1:   # done and error
-        raise HttpResponseServerErrorAnswer("We have an internal problem analyzing this graph. Sorry! The developers are informed.")
-    elif status == 2:   # Pending             
-        return HttpResponseAccepted()
-    elif status == 3:   # Does not exists
-        raise HttpResponseNotFoundAnswer()
+    def dispatch_edge(self, request, **kwargs):
+        edge_resource = EdgeResource()
+        return edge_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
 
-@login_required
-@csrf_exempt
-@require_GET
-def job_create(request, graph_id, job_kind):
-    '''
-        Starts a job of the given kind for the given graph.
-        It is intended to return immediately with job information for the frontend.
-    '''
-    job = common.job_create(request.user, graph_id, job_kind)
-    response = HttpResponse(status=201)
-    response['Location'] = reverse('frontend_job_status', args=[job.pk])
-    return response
+    def dispatch_nodes(self, request, **kwargs):
+        node_resource = NodeResource()
+        return node_resource.dispatch_list(request, graph_id=kwargs['pk'])
+
+    def dispatch_node(self, request, **kwargs):
+        node_resource = NodeResource()
+        return node_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
+
+    def dispatch_jobs(self, request, **kwargs):
+        job_resource = JobResource()
+        return job_resource.dispatch_list(request, graph_id=kwargs['pk'])
+
+    def dispatch_job(self, request, **kwargs):
+        job_resource = JobResource()
+        return job_resource.dispatch_detail(request, graph_id=kwargs['pk'], secret=kwargs['secret'])
 
 @login_required
 @csrf_exempt
@@ -176,55 +236,5 @@ def nodegroup(request, graph_id, group_id):
     except Exception as exception:
         logger.error('Exception: ' + str(exception))
         raise exception
-
-
-
-
-
-@csrf_exempt
-@require_http_methods(['GET', 'POST'])
-def job_files(request, job_secret):
-    ''' Allows to retrieve a job input file (GET), or to upload job result files (POST).
-        This method is expected to only be used by our backend daemon script, 
-        which gets the shared secret as part of the PostgreSQL notification message.
-        This reduces the security down to the ability of connecting to the PostgreSQL database,
-        otherwise the job URL cannot be determined.
-    '''
-    job = get_object_or_404(Job, secret=job_secret)
-    if request.method == 'GET':
-        logger.debug("Delivering data for job %d"%job.pk)
-        response = HttpResponse()
-        response.content, response['Content-Type'] = job.input_data()
-        logger.debug(response.content)
-        return response
-    elif request.method == 'POST':
-        if job.done():
-            logger.error("Job already done, discarding uploaded results")
-            return HttpResponse() 
-        else:
-            logger.debug("Storing result data for job %d"%job.pk)
-            # Retrieve binary file and store it
-            assert(len(request.FILES.values())==1)
-            job.result = request.FILES.values()[0].read()
-            job.exit_code = 0       # This saves as a roundtrip. Having files means everything is ok.
-            job.save()
-            if not job.requires_download():
-                logger.debug(''.join(job.result))
-            return HttpResponse()        
-
-@csrf_exempt
-@require_http_methods(['POST'])
-def job_exitcode(request, job_secret):
-    ''' Allows to set the exit code of a job. 
-        This method is expected to only be used by our backend daemon script, 
-        which gets the shared secret as part of the PostgreSQL notification message.
-        This reduces the security down to the ability of connecting to the PostgreSQL database,
-        otherwise the job URL cannot be determined.
-    '''
-    job = get_object_or_404(Job, secret=job_secret)
-    logger.debug("Storing exit code for job %d"%job.pk)
-    job.exit_code = request.POST['exit_code']
-    job.save()
-    return HttpResponse()        
 
 

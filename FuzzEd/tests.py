@@ -31,6 +31,7 @@ from FuzzEd.models.node import Node
 from FuzzEd.models.notification import Notification
 
 
+
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
 
@@ -86,6 +87,7 @@ class FuzzEdTestCase(LiveServerTestCase):
         assert('Location' in response)
         jobUrl = response['Location']
         code = 202
+        assert(not jobUrl.endswith('jobs/'))
         print "Waiting for result from "+jobUrl,
         while (code == 202):
             response=self.ajaxGet(jobUrl)
