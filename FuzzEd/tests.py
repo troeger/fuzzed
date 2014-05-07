@@ -385,6 +385,7 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
                                   newprop,
                                   "application/json")
         self.assertEqual(response.status_code, 202)
+        #TODO: Fetch graph and check that the property is really stored
 
     def testDeleteEdge(self):
         response = self.ajaxDelete(self.baseUrl + '/graphs/%u/edges/%u' % (self.pkFaultTree, self.clientIdEdge))

@@ -135,7 +135,7 @@ function (Class, Config, Job, Alerts, Progress) {
         //TODO: send properties
         edgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
             var data = {
-                id:          edgeId,
+                client_id:   edgeId,
                 source:      sourceNodeId,
                 target:      targetNodeId
             };
@@ -143,9 +143,9 @@ function (Class, Config, Job, Alerts, Progress) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForEdges(),
                 type:     'POST',
-                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data:     JSON.stringify(data),
 
-                data:     data,
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
                     var message = errorThrown || 'Could not connect to backend.';
@@ -159,6 +159,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -392,11 +394,9 @@ function (Class, Config, Job, Alerts, Progress) {
         nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNode(nodeId),
-                type:     'POST',
-                data:{
-                    properties: JSON.stringify(properties)
-                },
-                dataType: 'json',
+                type:     'PATCH',
+                data: JSON.stringify({'properties': properties}),
+                contentType: 'application/json; charset=utf-8',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -411,6 +411,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -729,7 +731,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The graph's nodes URL as {String}.
          */
         _fullUrlForNodes: function() {
-            return this._fullUrlForGraph() + Config.Backend.NODES_URL;
+            return this._fullUrlForGraph() + Config.Backend.NODES_URL + '/';
         },
 
         /**
@@ -743,7 +745,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The node's URL as {String}.
          */
         _fullUrlForNode: function(nodeId) {
-            return this._fullUrlForNodes() + '/' + nodeId;
+            return this._fullUrlForNodes() + nodeId;
         },
 
         /**
@@ -754,7 +756,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The graph's edges URL as {String}.
          */
         _fullUrlForEdges: function() {
-            return this._fullUrlForGraph() + Config.Backend.EDGES_URL;
+            return this._fullUrlForGraph() + Config.Backend.EDGES_URL + '/';
         },
 
         /**
@@ -768,7 +770,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The edge's URL as {String}.
          */
         _fullUrlForEdge: function(edgeId) {
-            return this._fullUrlForEdges() + '/' + edgeId;
+            return this._fullUrlForEdges() + edgeId;
         },
 
         /**

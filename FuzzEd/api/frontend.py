@@ -127,6 +127,8 @@ class GraphSerializer(common.GraphSerializer):
     def to_json(self, data, options=None):
         if isinstance(data, Bundle):
             return data.obj.to_json()
+        elif isinstance(data, dict):        # Traceback error message, instead of a result
+            return json.dumps(data)
         else:
             graphs = []
             for graph in data['objects']:

@@ -180,8 +180,9 @@ class NodeResource(ModelResource):
         if 'properties' in deserialized:
             for key, value in deserialized['properties'].iteritems():
                 obj.set_attr(key, value)
+            obj.save()
         # return the updated node object
-        return HttpResponse(obj.to_json(), 'application/javascript', status=202)
+        return HttpResponse(obj.to_json(), 'application/json', status=202)
 
 
 class EdgeSerializer(Serializer):
