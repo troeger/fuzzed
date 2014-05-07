@@ -1,4 +1,4 @@
-define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jquery-ajaxq'],
+define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jquery-ajaxq', 'jquery-cookie'],
 function (Class, Config, Job, Alerts, Progress) {
 
     /**
@@ -210,6 +210,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
