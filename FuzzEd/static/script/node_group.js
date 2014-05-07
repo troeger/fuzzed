@@ -97,6 +97,41 @@ function(Property, Class, Canvas, Config) {
                 .css('position', 'absolute')
                 .data(Config.Keys.NODEGROUP, this);
 
+
+            // setup nodes' dragging dependency for ui draggable, so the nodes move along with the node group
+            _.each(this.nodes, function(node) {
+                node.container.addClass(Config.Keys.NODEGROUP + this.id + '_dragging')
+            }.bind(this));
+
+            // setup dragging
+            var cssClass = Config.Keys.NODEGROUP + this.id + '_dragging'
+
+            var getAll = function(t) {
+                return $('.nodegroup' + t.helper.attr('class').match(/nodegroup([0-9]+)_dragging/)[1]).not(t);
+            };
+
+            jsPlumb.draggable(this.container, {
+                revert: true,
+                revertDuration: 10,
+                // grouped items animate separately, so leave this number low
+                containment: Canvas.container,
+                start: function(event) {
+                    this.select();
+                },
+                stop: function(e, ui) {
+                    getAll(ui).css({
+                        'top': ui.helper.css('top'),
+                        'left': 0
+                    });
+                },
+                drag: function(e, ui) {
+                    getAll(ui).css({
+                        'top': ui.helper.css('top'),
+                        'left': ui.helper.css('left')
+                    });
+                }
+            });
+
             this.container.appendTo(Canvas.container);
 
             return this;
@@ -238,6 +273,11 @@ function(Property, Class, Canvas, Config) {
         remove: function() {
             if (!this.deletable) return false;
             this.container.remove();
+
+            // remove nodes' dragging dependency for ui draggable
+            _.each(this.nodes, function(node) {
+                node.container.addClass(Config.Keys.NODEGROUP + this.id + '_dragging')
+            }.bind(this));
 
             // don't listen anymore
             jQuery(document).off([ Config.Events.NODES_MOVED,
