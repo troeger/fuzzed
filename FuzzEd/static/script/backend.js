@@ -237,13 +237,12 @@ function (Class, Config, Job, Alerts, Progress) {
         nodeGroupAdded: function(event, nodeGroupId, nodeIds, success, error, complete) {
             var data = {
                 client_id:  nodeGroupId,
-                node_ids:    JSON.stringify(nodeIds)
+                nodeIds: nodeIds
             };
 
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNodeGroups(),
                 type:     'POST',
-                dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
                 data:     JSON.stringify(data),
 
@@ -360,7 +359,6 @@ function (Class, Config, Job, Alerts, Progress) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNodeGroup(nodeGroupId),
                 type:     'DELETE',
-                dataType: 'json',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {

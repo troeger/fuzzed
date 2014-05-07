@@ -37,6 +37,7 @@ from FuzzEd.models.notification import Notification
 
 
 
+
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
 
@@ -364,7 +365,8 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
 
     def testCreateNodeGroup(self):
-        newgroup = json.dumps({'client_id': 999, 'node_ids': [self.clientIdAndGate, self.clientIdBasicEvent]})
+        nodes = [self.clientIdAndGate, self.clientIdBasicEvent]
+        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % self.pkDFD,
                                  newgroup,
                                  'application/json')
@@ -372,9 +374,26 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         print response['Location']
         newid = int(response['Location'].split('/')[-1])
         newgroup = NodeGroup.objects.get(client_id=newid, deleted=False)
+        #TODO: Doesn't work due to non-saving of LiveServerTestCase
+
+    #       saved_nodes=newgroup.nodes.all()
+    #       self.assertItemsEqual(nodes, saved_nodes)
 
     def testDeleteNode(self):
         response = self.ajaxDelete(self.baseUrl + '/graphs/%u/nodes/%u' % (self.pkFaultTree, self.clientIdBasicEvent))
+        self.assertEqual(response.status_code, 204)
+
+    def testDeleteNodeGroup(self):
+        #TODO: Fixture should have a node group, instead of creating it here
+        nodes = [self.clientIdAndGate, self.clientIdBasicEvent]
+        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % self.pkDFD,
+                                 newgroup,
+                                 'application/json')
+        self.assertEqual(response.status_code, 201)
+        newgroup = response['Location']
+        # Try delete
+        response = self.ajaxDelete(newgroup)
         self.assertEqual(response.status_code, 204)
 
     def testRelocateNode(self):

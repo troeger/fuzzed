@@ -95,10 +95,12 @@ class JobResource(ModelResource):
     """
     pass
 
+
 class NotificationResource(ModelResource):
     """
         An API resource for notifications.
     """
+
     class Meta:
         queryset = Notification.objects.all()
         detail_allowed_methods = ['delete']
@@ -107,6 +109,7 @@ class NotificationResource(ModelResource):
         noti = self.obj_get(bundle=bundle, **kwargs)
         noti.users.remove(bundle.request.user)
         noti.save()
+
 
 class NodeSerializer(Serializer):
     """
@@ -126,6 +129,7 @@ class NodeResource(ModelResource):
     """
         An API resource for nodes.
     """
+
     class Meta:
         queryset = Node.objects.filter(deleted=False)
         authorization = GraphOwnerAuthorization()
@@ -143,7 +147,7 @@ class NodeResource(ModelResource):
         """
         node_client_id = bundle_or_obj.obj.client_id
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse('node', kwargs={'api_name':'front', 'pk':graph_pk, 'client_id':node_client_id})
+        return reverse('node', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': node_client_id})
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -176,7 +180,8 @@ class NodeResource(ModelResource):
             return http.HttpMultipleChoices("More than one resource is found at this URI.")
 
         # Deserialize incoming update payload JSON from request
-        deserialized = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized = self.deserialize(request, request.body,
+                                        format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
             for key, value in deserialized['properties'].iteritems():
                 obj.set_attr(key, value)
@@ -200,10 +205,12 @@ class EdgeSerializer(Serializer):
     def from_json(self, content):
         return json.loads(content)
 
+
 class EdgeResource(ModelResource):
     """
         An API resource for edges.
     """
+
     class Meta:
         queryset = Edge.objects.filter(deleted=False)
         serializer = EdgeSerializer()
@@ -229,10 +236,12 @@ class EdgeResource(ModelResource):
         bundle = self.full_hydrate(bundle)
         return self.save(bundle)
 
+
 class ProjectResource(ModelResource):
     """
         An API resource for projects.
     """
+
     class Meta:
         queryset = Project.objects.filter(deleted=False)
         list_allowed_methods = ['get']
@@ -268,7 +277,7 @@ class NodeGroupResource(ModelResource):
         """
         group_client_id = bundle_or_obj.obj.client_id
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse('nodegroup', kwargs={'api_name':'front', 'pk':graph_pk, 'client_id':group_client_id})
+        return reverse('nodegroup', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': group_client_id})
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -281,16 +290,18 @@ class NodeGroupResource(ModelResource):
             raise ImmediateHttpResponse(response=HttpForbidden("You can't use this graph."))
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
-        bundle = self.save(bundle)   # Prepare ManyToMany relationship
-        for node_id in bundle.data['node_ids']:
+        bundle = self.save(bundle)  # Prepare ManyToMany relationship
+        for node_id in bundle.data['nodeIds']:
             try:
                 # The client may refer to nodes that are already gone,
                 # we simply ignore them
-                node = Node.objects.get(client_id=node_id, deleted=False)
+                node = Node.objects.get(graph=bundle.data['graph'], client_id=node_id, deleted=False)
                 bundle.obj.nodes.add(node)
-            except:
+            except ObjectDoesNotExist:
                 pass
+            bundle.obj.save()
         return self.save(bundle)
+
 
 class GraphSerializer(Serializer):
     """
@@ -361,10 +372,12 @@ class GraphAuthorization(Authorization):
     def delete_detail(self, object_list, bundle):
         return bundle.obj.owner == bundle.request.user
 
+
 class GraphResource(ModelResource):
     """
         A graph resource with support for nested node / edge / job resources.
     """
+
     class Meta:
         queryset = Graph.objects.filter(deleted=False)
         authorization = GraphAuthorization()
@@ -383,10 +396,10 @@ class GraphResource(ModelResource):
         return [
             url(r'^graphs/(?P<pk>\d+)$',
                 self.wrap_view('dispatch_detail'),
-                name = 'graph'),
+                name='graph'),
             url(r'^graphs/$',
                 self.wrap_view('dispatch_list'),
-                name = 'graphs'),
+                name='graphs'),
             url(r'^graphs/(?P<pk>\d+)/edges/$',
                 self.wrap_view('dispatch_edges'),
                 name="edges"),
@@ -474,7 +487,6 @@ class GraphResource(ModelResource):
             # Fill the graph with the GraphML data
         bundle.obj.from_graphml(bundle.request.body)
         return bundle
-
 
 
     def wrap_view(self, view):
