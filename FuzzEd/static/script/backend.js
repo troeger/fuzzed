@@ -184,7 +184,7 @@ function (Class, Config, Job, Alerts, Progress) {
          */
         nodeAdded: function(event, nodeId, kind, x, y, properties, success, error, complete) {
             var data = {
-                id:         nodeId,
+                client_id:  nodeId,
                 kind:       kind,
                 x:          x,
                 y:          y,
@@ -194,9 +194,8 @@ function (Class, Config, Job, Alerts, Progress) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNodes(),
                 type:     'POST',
-                dataType: 'json',
-
-                data:     data,
+                contentType: 'application/json; charset=utf-8',
+                data:     JSON.stringify(data),
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
                     var message = errorThrown || 'Could not connect to backend.';
