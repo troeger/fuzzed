@@ -236,16 +236,17 @@ function (Class, Config, Job, Alerts, Progress) {
         //TODO: send properties
         nodeGroupAdded: function(event, nodeGroupId, nodeIds, success, error, complete) {
             var data = {
-                id:         nodeGroupId,
-                nodeIds:    JSON.stringify(nodeIds)
+                client_id:  nodeGroupId,
+                node_ids:    JSON.stringify(nodeIds)
             };
 
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNodeGroups(),
                 type:     'POST',
                 dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data:     JSON.stringify(data),
 
-                data:     data,
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
                     var message = errorThrown || 'Could not connect to backend.';
@@ -259,7 +260,9 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
-                }
+                     // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
+               }
             });
 
             return this;
@@ -372,6 +375,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -501,6 +506,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -783,7 +790,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The graph's node groups URL as {String}.
          */
         _fullUrlForNodeGroups: function() {
-            return this._fullUrlForGraph() + Config.Backend.NODEGROUPS_URL;
+            return this._fullUrlForGraph() + Config.Backend.NODEGROUPS_URL + '/';
         },
 
         /**
@@ -797,7 +804,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The node group's URL as {String}.
          */
         _fullUrlForNodeGroup: function(nodeGroupId) {
-            return this._fullUrlForNodeGroups() + '/' + nodeGroupId;
+            return this._fullUrlForNodeGroups() + nodeGroupId;
         },
 
         /**

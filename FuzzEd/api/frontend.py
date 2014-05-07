@@ -27,6 +27,8 @@ logger = logging.getLogger('FuzzEd')
 class JobResource(common.JobResource):
     """
         An API resource for jobs.
+        Jobs look different for the JS client than they look for the backend,
+        so we have a custom implementation here.
     """
 
     class Meta:
@@ -127,14 +129,16 @@ class GraphSerializer(common.GraphSerializer):
     def to_json(self, data, options=None):
         if isinstance(data, Bundle):
             return data.obj.to_json()
-        elif isinstance(data, dict):        # Traceback error message, instead of a result
-            return json.dumps(data)
-        else:
-            graphs = []
-            for graph in data['objects']:
-                graphs.append({'url': reverse('graph', kwargs={'api_name': 'front', 'pk': graph.obj.pk}),
-                               'name': graph.obj.name})
-            return json.dumps({'graphs': graphs})
+        elif isinstance(data, dict):
+            if 'objects' in data:               # object list
+                graphs = []
+                for graph in data['objects']:
+                    graphs.append({'url': reverse('graph', kwargs={'api_name': 'front', 'pk': graph.obj.pk}),
+                                   'name': graph.obj.name})
+                return json.dumps({'graphs': graphs})
+            else:
+                # Traceback error message, instead of a result
+                return json.dumps(data)
 
 
 class GraphResource(common.GraphResource):
@@ -179,58 +183,4 @@ class GraphResource(common.GraphResource):
     def dispatch_job(self, request, **kwargs):
         job_resource = JobResource()
         return job_resource.dispatch_detail(request, graph_id=kwargs['pk'], secret=kwargs['secret'])
-
-
-@login_required
-@csrf_exempt
-@require_ajax
-@require_POST
-@never_cache
-def nodegroups(request, graph_id):
-    if request.user.is_staff:
-        graph = get_object_or_404(Graph, pk=graph_id)
-    else:
-        graph = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    if graph.read_only:
-        raise HttpResponseForbiddenAnswer('Trying to create a node in a read-only graph')
-
-    nodeids = json.loads(request.POST['nodeIds'])
-    client_id = request.POST['id']
-    group = NodeGroup(client_id=client_id, graph=graph)
-    group.save()  # Prepare ManyToMany relationship
-    for nodeid in nodeids:
-        try:
-            # The client may refer to nodes that are already gone,
-            # we simply ignore them
-            node = Node.objects.get(pk=nodeid, deleted=False)
-            group.nodes.add(node)
-        except:
-            pass
-    group.save()
-
-    response = HttpResponse(group.to_json(), 'application/javascript', status=201)
-    response['Location'] = reverse('nodegroup', args=[graph_id, group.client_id])
-    return response
-
-
-@login_required
-@csrf_exempt
-@require_ajax
-@never_cache
-def nodegroup(request, graph_id, group_id):
-    try:
-        group = get_object_or_404(NodeGroup, client_id=group_id, graph__pk=graph_id)
-
-        if group.graph.read_only:
-            raise HttpResponseForbiddenAnswer('Trying to modify a node in a read-only graph')
-
-        if request.method == 'DELETE':
-            group.deleted = True
-            group.save()
-            return HttpResponse(status=204)
-
-    except Exception as exception:
-        logger.error('Exception: ' + str(exception))
-        raise exception
-
 

@@ -30,6 +30,7 @@ from django.contrib.auth.models import User
 
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
+from FuzzEd.models.node_group import NodeGroup
 from FuzzEd.models.notification import Notification
 
 
@@ -111,7 +112,7 @@ class SimpleFixtureTestCase(FuzzEdTestCase):
     # A couple of specific PK's from the model
     pkProject = 1
     pkFaultTree = 1
-    pkDFD = 4711  # TODO
+    pkDFD = 1  # TODO: This is a hack, since nobody checks the validity of node groups for the graph kind so far
     clientIdEdge = 4
     clientIdAndGate = 1
     clientIdBasicEvent = 2
@@ -350,23 +351,27 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         newnode = json.dumps({'y': 3,
                               'x': 7,
                               'kind': 'basicEvent',
-                              'client_id': 1383517229910,
+                              'client_id': 888,
                               'properties': '{}'})
 
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodes/' % self.pkFaultTree,
                                  newnode,
                                  'application/json')
         self.assertEqual(response.status_code, 201)
-        newid = int(response['Location'][-2])
-        newnode = Node.objects.get(pk=newid)
+        print response['Location']
+        newid = int(response['Location'].split('/')[-1])
+        newnode = Node.objects.get(client_id=newid, deleted=False)
 
 
     def testCreateNodeGroup(self):
-        newgroup = json.dumps({'nodes': []})
+        newgroup = json.dumps({'client_id': 999, 'node_ids': [self.clientIdAndGate, self.clientIdBasicEvent]})
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % self.pkDFD,
                                  newgroup,
                                  'application/json')
         self.assertEqual(response.status_code, 201)
+        print response['Location']
+        newid = int(response['Location'].split('/')[-1])
+        newgroup = NodeGroup.objects.get(client_id=newid, deleted=False)
 
     def testDeleteNode(self):
         response = self.ajaxDelete(self.baseUrl + '/graphs/%u/nodes/%u' % (self.pkFaultTree, self.clientIdBasicEvent))

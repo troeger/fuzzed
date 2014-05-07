@@ -15,6 +15,7 @@ front_api.register(frontend.ProjectResource())
 front_api.register(frontend.GraphResource())
 front_api.register(frontend.EdgeResource())
 front_api.register(frontend.NodeResource())
+front_api.register(frontend.NodeGroupResource())
 front_api.register(frontend.NotificationResource())
 front_api.register(frontend.JobResource())
 back_api = Api(api_name='back')
@@ -71,4 +72,4 @@ def show_urls(urllist, depth=0):
         print "  " * depth, entry.regex.pattern
         if hasattr(entry, 'url_patterns'):
             show_urls(entry.url_patterns, depth + 1)
-#show_urls(urls.urlpatterns)
+#show_urls(urlpatterns)

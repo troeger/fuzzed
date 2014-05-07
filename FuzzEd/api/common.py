@@ -136,7 +136,7 @@ class NodeResource(ModelResource):
 
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
 
-    def get_resource_uri(self, bundle_or_obj=None, url_name='api_dispatch_list'):
+    def get_resource_uri(self, bundle_or_obj):
         """
             Since we change the API URL format to nested resources, we need also to
             change the location determination for a given resource object.
@@ -261,14 +261,14 @@ class NodeGroupResource(ModelResource):
 
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
 
-    def get_resource_uri(self, bundle_or_obj=None, url_name='api_dispatch_list'):
+    def get_resource_uri(self, bundle_or_obj):
         """
             Since we change the API URL format to nested resources, we need also to
             change the location determination for a given resource object.
         """
-        nodegroup_client_id = bundle_or_obj.obj.client_id
+        group_client_id = bundle_or_obj.obj.client_id
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse('nodegroup', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': nodegroup_client_id})
+        return reverse('nodegroup', kwargs={'api_name':'front', 'pk':graph_pk, 'client_id':group_client_id})
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -281,8 +281,16 @@ class NodeGroupResource(ModelResource):
             raise ImmediateHttpResponse(response=HttpForbidden("You can't use this graph."))
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
+        bundle = self.save(bundle)   # Prepare ManyToMany relationship
+        for node_id in bundle.data['node_ids']:
+            try:
+                # The client may refer to nodes that are already gone,
+                # we simply ignore them
+                node = Node.objects.get(client_id=node_id, deleted=False)
+                bundle.obj.nodes.add(node)
+            except:
+                pass
         return self.save(bundle)
-
 
 class GraphSerializer(Serializer):
     """
@@ -399,10 +407,10 @@ class GraphResource(ModelResource):
                 name="job"),
             url(r'^graphs/(?P<pk>\d+)/nodegroups/$',
                 self.wrap_view('dispatch_nodegroups'),
-                name="nodes"),
+                name="nodegroups"),
             url(r'^graphs/(?P<pk>\d+)/nodegroups/(?P<client_id>\d+)$',
                 self.wrap_view('dispatch_nodegroup'),
-                name="node"),
+                name="nodegroup"),
         ]
 
     def obj_create(self, bundle, **kwargs):
