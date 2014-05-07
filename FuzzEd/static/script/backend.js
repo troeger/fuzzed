@@ -281,7 +281,6 @@ function (Class, Config, Job, Alerts, Progress) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForEdge(edgeId),
                 type:     'DELETE',
-                dataType: 'json',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -296,6 +295,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -318,7 +319,6 @@ function (Class, Config, Job, Alerts, Progress) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNode(nodeId),
                 type:     'DELETE',
-                dataType: 'json',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -333,6 +333,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
