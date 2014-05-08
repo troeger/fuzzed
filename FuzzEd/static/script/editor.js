@@ -203,14 +203,14 @@ define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', '
              *   This {<Editor>} instance for chaining.
              */
             _setupDropDownBlur: function () {
-                jQuery(document).mousedown(function () {
+                jQuery('#' + this.config.IDs.CANVAS).mousedown(function(event) {
                     // close open bootstrap dropdown
                     jQuery('.dropdown.open')
                         .removeClass('open')
                         .find('a')
                         .blur();
                 });
-
+                
                 return this;
             },
 
