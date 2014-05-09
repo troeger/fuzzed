@@ -38,6 +38,7 @@ from FuzzEd.models.notification import Notification
 
 
 
+
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
 
@@ -375,9 +376,18 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         newid = int(response['Location'].split('/')[-1])
         newgroup = NodeGroup.objects.get(client_id=newid, deleted=False)
         #TODO: Doesn't work due to non-saving of LiveServerTestCase
+        #       saved_nodes=newgroup.nodes.all()
+        #       self.assertItemsEqual(nodes, saved_nodes)
 
-    #       saved_nodes=newgroup.nodes.all()
-    #       self.assertItemsEqual(nodes, saved_nodes)
+        # Get complete graph and see if the node group is registered correctly
+        url = self.baseUrl + '/graphs/%u' % self.pkDFD
+        response = self.ajaxGet(url)
+        self.assertEqual(response.status_code, 200)
+        content = json.loads(response.content)
+        for group in content['nodeGroups']:
+            self.assertEqual(group['id'], 999)
+            self.assertItemsEqual(group['nodeIds'], nodes)
+            print group
 
     def testDeleteNode(self):
         response = self.ajaxDelete(self.baseUrl + '/graphs/%u/nodes/%u' % (self.pkFaultTree, self.clientIdBasicEvent))

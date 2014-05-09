@@ -1,6 +1,9 @@
-from django.db import models
-from FuzzEd.models import Node, Graph
 import json
+
+from django.db import models
+
+from FuzzEd.models import Node, Graph
+
 
 class NodeGroup(models.Model):
     class Meta:
@@ -13,7 +16,7 @@ class NodeGroup(models.Model):
 
     def to_dict(self):
     	return {'id'      : self.client_id,
-                'nodeIds' : [node.pk for node in self.nodes.all()]}
+                'nodeIds': [node.client_id for node in self.nodes.all()]}
 
     def to_json(self):
     	return json.dumps(self.to_dict())
