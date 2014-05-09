@@ -11,11 +11,11 @@
 #include "FaultTreeToFuzzTree.h"
 #include "util.h"
 #include "xmlutil.h"
-#include "analysisResult.h"
+#include "backendResult.h"
 
 
 void analyze(
-	analysisResults::Result& r,
+	backendResults::AnalysisResult& r,
 	const fuzztree::TopEvent* const topEvent,
 	std::ofstream* logFileStream,
 	unsigned int decompositionNumber) 
@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 	FuzzTreeTransform tf(instream, issues);
 	instream.close();
 
-	analysisResults::AnalysisResults analysisResults;
+	backendResults::BackendResults analysisResults;
 	try
 	{	
 		// please keep this here for debugging
@@ -100,8 +100,9 @@ int main(int argc, char** argv)
 				faultTree->topEvent().decompositionNumber().get() : 
 				DEFAULT_DECOMPOSITION_NUMBER;
 			const auto modelId = faultTree->id();
-
-			analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+			const auto configId = "0"; // TODO find a default id
+			backendResults::AnalysisResult r(modelId, configId, util::timeStamp(), true, decompositionNumber);
+			r.decompositionNumber(decompositionNumber);
 			try
 			{
 				const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent(), treeIssues);	
@@ -135,7 +136,7 @@ int main(int argc, char** argv)
 			for (const auto& t : tf.transform())
 			{
 				auto topEvent = fuzztree::TopEvent(t.second.topEvent());
-				analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+				backendResults::AnalysisResult r(modelId, t.first.getId(), util::timeStamp(), true, decompositionNumber);
 				try
 				{
 					analyze(r, &topEvent, logFileStream, decompositionNumber);
@@ -146,7 +147,7 @@ int main(int argc, char** argv)
 					r.validResult(false);
 				}
 				 
-				r.configuration(serializedConfiguration(t.first));
+				analysisResults.configuration().push_back(serializedConfiguration(t.first));
 				analysisResults.result().push_back(r);
 			}
 		}
@@ -169,7 +170,7 @@ int main(int argc, char** argv)
 	}
 
 	std::ofstream output(outFile);
-	analysisResults::analysisResults(output, analysisResults);
+	backendResults::backendResults(output, analysisResults);
 	
 	logFileStream->close();
 	delete logFileStream;

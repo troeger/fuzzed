@@ -7,7 +7,6 @@
 #include "FatalException.h"
 
 #include "xmlutil.h"
-#include "configurationResult.h"
 
 #include <xsd/cxx/tree/elements.hxx>
 #include <xsd/cxx/xml/dom/serialization-header.hxx>

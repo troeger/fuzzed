@@ -9,7 +9,7 @@
 #include "FuzzTreeTransform.h"
 #include "util.h"
 #include "xmlutil.h"
-#include "mincutResult.h"
+#include "backendResult.h"
 #include "FaultTreeToFuzzTree.h"
 
 int main(int argc, char** argv)
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 	FuzzTreeTransform tf(instream, issues);
 	instream.close();
 
-	mincutResults::MincutResults mincutResults;
+	backendResults::BackendResults mincutResults;
 	try
 	{	
 		if (!tf.isValid())
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 			std::vector<Issue> treeIssues;
 			const auto modelId = faultTree->id();
 
-			mincutResults::Result r(modelId, util::timeStamp(), true);
+			backendResults::MincutResult r(modelId, "", util::timeStamp(), true);
 			try
 			{
 				const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent(), treeIssues);	
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 					for (const auto& s : res)
 						mincut += s;
 
-					r.nodeids().push_back(mincut);
+					r.nodeid().push_back(mincut);
 				}
 			}
 			catch (const FatalException& e)
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 			for (const auto& t : tf.transform())
 			{
 				auto topEvent = fuzztree::TopEvent(t.second.topEvent());
-				mincutResults::Result r(modelId, util::timeStamp(), true);
+				backendResults::MincutResult r(modelId, t.first.getId(), util::timeStamp(), true);
 				try
 				{
 					MinCutAnalysisTask mt(&topEvent, *logFileStream);
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 							mincut += s;
 						}
 
-						r.nodeids().push_back(mincut);
+						r.nodeid().push_back(mincut);
 					}
 				}
 				catch (const FatalException& e)
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
 					r.validResult(false);
 				}
 
-				r.configuration(serializedConfiguration(t.first));
+				mincutResults.configuration().push_back(serializedConfiguration(t.first));
 				mincutResults.result().push_back(r);
 			}
 		}
@@ -137,7 +137,7 @@ int main(int argc, char** argv)
 	}
 
 	std::ofstream output(outFile);
-	mincutResults::mincutResults(output, mincutResults);
+	backendResults::backendResults(output, mincutResults);
 	
 	logFileStream->close();
 	delete logFileStream;

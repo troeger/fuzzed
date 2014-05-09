@@ -21,7 +21,7 @@
 // Generated files...
 #include "faulttree.h"
 #include "fuzztree.h"
-#include "simulationResult.h"
+#include "backendResult.h"
 
 #include <xsd/cxx/xml/dom/serialization-header.hxx>
 
@@ -174,7 +174,7 @@ void SimulationProxy::simulateAllConfigurations(
 		throw runtime_error("Could not open file");
 
 	std::ofstream* logFileStream = new std::ofstream(logFile.generic_string());
-	simulationResults::SimulationResults simResults;
+	backendResults::BackendResults simResults;
 
 	try
 	{
@@ -190,14 +190,14 @@ void SimulationProxy::simulateAllConfigurations(
 				const SimulationResultStruct res = 
 					simulateFaultTree(ft, workingDir, logFileStream, impl);
 
-				simulationResults::Result r(
+				backendResults::SimulationResult r(
 					ft->getId(),
+					"", // TODO config id
 					util::timeStamp(),
-					ft->getCost(),
+					res.isValid(),
 					res.reliability,
 					res.nFailures,
-					res.nRounds,
-					res.isValid());
+					res.nRounds);
 
 				r.availability(res.meanAvailability);
 				r.duration(res.duration);
@@ -219,23 +219,19 @@ void SimulationProxy::simulateAllConfigurations(
 					const SimulationResultStruct res = 
 						simulateFaultTree(simTree, workingDir, logFileStream, impl);
 
-					// debug output
-					// 			simTree->print(cout, 0);
-					// 			fuzztree::fuzzTree(cout, ft.second);
-
-					simulationResults::Result r(
+					backendResults::SimulationResult r(
 						simTree->getId(),
+						ft.first.getId(),
 						util::timeStamp(),
-						simTree->getCost(),
+						res.isValid(),
 						res.reliability,
 						res.nFailures,
-						res.nRounds,
-						res.isValid());
+						res.nRounds);
 
 					r.availability(res.meanAvailability);
 					r.duration(res.duration);
 					r.mttf(res.mttf);
-					r.configuration(serializedConfiguration(ft.first));
+					simResults.configuration().push_back(serializedConfiguration(ft.first));
 
 					simResults.result().push_back(r);
 				}
@@ -246,7 +242,7 @@ void SimulationProxy::simulateAllConfigurations(
 			simResults.issue().push_back(issue.serialized());
 
 		std::ofstream output(outputFile.generic_string());
-		simulationResults::simulationResults(output, simResults);
+		backendResults::backendResults(output, simResults);
 		output.close();
 	}
 	catch (std::exception& e)
