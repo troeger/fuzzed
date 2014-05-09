@@ -83,6 +83,11 @@ const int FuzzTreeConfiguration::getCost() const
 	return m_costs;
 }
 
+const FuzzTreeConfiguration::id_type& FuzzTreeConfiguration::getId() const
+{
+	return m_id;
+}
+
 const std::map<FuzzTreeConfiguration::id_type, bool>& FuzzTreeConfiguration::getOptionalNodes() const
 {
 	return m_optionalNodes;

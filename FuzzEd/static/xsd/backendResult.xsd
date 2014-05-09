@@ -12,16 +12,49 @@
   <xsd:import schemaLocation="configurations.xsd"
               namespace="http://www.fuzztrees.net/configurations"/>
 
-  <xsd:complexType name="Result">
+  <xsd:complexType abstract="true" name="Result">
     <xsd:attribute name="id" type="xsd:string"/>
     <xsd:attribute name="modelId" type="xsd:string" use="required"/>
     <xsd:attribute name="configId" type="xsd:string" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
     <xsd:attribute name="validResult" type="xsd:boolean" use="required"/>
-  </xsd:complexType>           
+  </xsd:complexType>
+
+  <xsd:complexType name="MincutResult">
+    <xsd:complexContent>
+      <xsd:extension base="Result">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="nodeid" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="SimulationResult">
+    <xsd:complexContent>
+      <xsd:extension base="Result">
+        <xsd:attribute name="reliability" type="xsd:double" use="required"/>
+        <xsd:attribute name="nFailures" type="xsd:int" use="required"/>
+        <xsd:attribute name="nSimulatedRounds" type="xsd:int" use="required"/>
+        <xsd:attribute name="availability" type="xsd:double"/>
+        <xsd:attribute name="duration" type="xsd:double"/>
+        <xsd:attribute name="mttf" type="xsd:double"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="AnalysisResult">
+    <xsd:complexContent>
+      <xsd:extension base="Result">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="1" name="probability" type="common:Probability"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>     
 
   <xsd:element name="backendResults">
-    <xsd:complexType abstract="true">
+    <xsd:complexType>
         <xsd:sequence>
           <xsd:element minOccurs="0" maxOccurs="1" name="configuration" type="configurations:Configuration"/>
           <xsd:element minOccurs="0" maxOccurs="unbounded" name="result" type="Result"/>

@@ -17,8 +17,8 @@
     <xsd:sequence>
       <xsd:element maxOccurs="unbounded" minOccurs="0" name="choice" type="IntegerToChoiceMap"/>
     </xsd:sequence>
-    <xsd:attribute name="costs" type="xsd:int" use="required"/>
     <xsd:attribute name="id" type="xsd:string" use="required"/>
+    <xsd:attribute name="costs" type="xsd:int" use="required"/>
   </xsd:complexType>
   
   <xsd:complexType name="InclusionChoice">
