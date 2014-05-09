@@ -13,11 +13,15 @@
               namespace="http://www.fuzztrees.net/configurations"/>
 
   <xsd:complexType abstract="true" name="Result">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="issue" type="common:Issue"/>
+    </xsd:sequence>
     <xsd:attribute name="id" type="xsd:string"/>
     <xsd:attribute name="modelId" type="xsd:string" use="required"/>
     <xsd:attribute name="configId" type="xsd:string" use="required"/>
     <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
     <xsd:attribute name="validResult" type="xsd:boolean" use="required"/>
+    <xsd:attribute name="decompositionNumber" type="xsd:int"/>
   </xsd:complexType>
 
   <xsd:complexType name="MincutResult">
