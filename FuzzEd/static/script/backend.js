@@ -485,11 +485,9 @@ function (Class, Config, Job, Alerts, Progress) {
         nodeGroupPropertyChanged: function(event, nodeGroupId, properties, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNodeGroup(nodeGroupId),
-                type:     'POST',
-                data:{
-                    properties: JSON.stringify(properties)
-                },
-                dataType: 'json',
+                type: 'PATCH',
+                data: JSON.stringify({properties: properties}),
+                contentType: 'application/json; charset=utf-8',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
