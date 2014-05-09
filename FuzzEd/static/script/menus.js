@@ -119,7 +119,7 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function(Config, Class) {
 
         _setupDragging: function() {
             this.container.draggable({
-                containment:   'body',
+                containment:   'document',
                 stack:         'svg',
                 cursor:        Config.Dragging.CURSOR,
                 scroll:        false,

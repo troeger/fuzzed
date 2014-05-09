@@ -1,16 +1,15 @@
 {% extends 'djiki/base_page.html' %}
 {% load i18n djiki_tags %}
+
+{% if user.is_staff %}
+{% block menu_right %}
+<li><a href="{% url 'djiki-page-edit' page.title|urlize_title %}"><i class="fa fa-pencil"></i> Edit </a></li>
+{% endblock %}
+{% endif %}
+
+
 {% block djiki_main %}
 <div class="page content grid_12">
-{% if user.is_authenticated %}
-<a href="{% url 'djiki-page-edit' page.title|urlize_title %}" class="btn btn-default btn-small" style="float:right">
-	<i class="fa fa-edit"></i>&nbsp;Edit this page
-</a>
-{% endif %}
-<a href="{% url 'djiki-page-view' 'index' %}" class="btn btn-default btn-small" style="float:right">
-	<i class="fa fa-home"></i>&nbsp;Docs Home
-</a>
-
 	<div class="content">
 		{{ revision.content|djiki_markup }}
 		<div class="clear"></div>

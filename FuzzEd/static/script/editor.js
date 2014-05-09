@@ -69,7 +69,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             this._setupJsPlumb()
                 ._setupNodeOffsetPrintStylesheet()
                 ._setupEventCallbacks()
-                ._setupMenuActions();
+                ._setupMenuActions()
+                ._setupDropDownBlur();
 
             // fetch the content from the backend
             this._loadGraph(graphId);
@@ -193,12 +194,33 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
 
         /**
+         * Method: _setupDropDownBlur
+         *
+         * Register an event handler that takes care of closing and blurring all currently open drop down menu items
+         * from the toolbar.
+         *
+         * Returns:
+         *   This {<Editor>} instance for chaining.
+         */
+        _setupDropDownBlur: function() {
+            jQuery(document).mousedown(function() {
+                // close open bootstrap dropdown
+                jQuery('.dropdown.open')
+                    .removeClass('open')
+                    .find('a')
+                    .blur();
+            });
+
+            return this;
+        },
+
+        /**
          *  Method: _setupMenuActions
          *
          *  Registers the event handlers for graph type - independent menu entries that trigger JS calls
          *
          *  Returns:
-         *    This {<Node>} instance for chaining.
+         *    This {<Editor>} instance for chaining.
          */
         _setupMenuActions: function() {
             jQuery('#' + this.config.IDs.ACTION_GRID_TOGGLE).click(function() {
@@ -631,10 +653,10 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             var rightMostNode   = { 'x': 0 };
 
             _.each(nodes, function(node) {
-                if (node.y < topMostNode.y)     { topMostNode = node }
-                if (node.x < leftMostNode.x)    { leftMostNode = node; }
-                if (node.y > bottomMostNode.y)  { bottomMostNode = node; }
-                if (node.x > rightMostNode.x)   { rightMostNode = node; }
+                if (node.y < topMostNode.y)    { topMostNode    = node }
+                if (node.x < leftMostNode.x)   { leftMostNode   = node; }
+                if (node.y > bottomMostNode.y) { bottomMostNode = node; }
+                if (node.x > rightMostNode.x)  { rightMostNode  = node; }
             }.bind(this));
 
             return {

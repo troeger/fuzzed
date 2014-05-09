@@ -16,16 +16,14 @@
 '''
 
 import json, logging, time, os, tempfile, subprocess, unittest
-from xml.dom import minidom
 from subprocess import Popen
+from xml.dom.minidom import parse
 from django.test import LiveServerTestCase
-from django.test.utils import override_settings
 from django.test.client import Client
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
 from FuzzEd.models.notification import Notification
 from django.contrib.auth.models import User
-from tastypie.exceptions import Unauthorized, UnsupportedFormat
 
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
@@ -36,11 +34,11 @@ class FuzzEdTestCase(LiveServerTestCase):
     '''
     def setUpAnonymous(self):
         ''' If the test case wants to have a anonymous login session, it should call this function in setUp().'''
-        self.c=Client()
+        self.c = Client()
 
     def setUpLogin(self):
         ''' If the test case wants to have a functional login session, it should call this function in setUp().'''
-        self.c=Client()
+        self.c = Client()
         self.c.login(username='testadmin', password='testadmin') 
 
     def get(self, url):
@@ -264,6 +262,10 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
     def setUp(self):
         self.setUpLogin()        
 
+    def testAjaxRequestCheck(self):
+        response=self.get(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
+        self.assertEqual(response.status_code, 400)
+
     def testGetGraph(self):
         for id, kind in self.graphs.iteritems():
             response=self.ajaxGet(self.baseUrl+'/graphs/%u'%self.pkFaultTree)
@@ -315,6 +317,30 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         # Now check the dismiss call
         response=self.ajaxPost(self.baseUrl+'/notifications/%u/dismiss'%n.pk)
         self.assertEqual(response.status_code, 200)
+
+class AnalysisInputFilesTestCase(FuzzEdTestCase):
+    '''
+        These are tests based on the analysis engine input files in fixture/analysis.
+        They only test if the analysis engine crashes on them.
+        The may later be translated to real tests with some expected output.
+    '''
+    def testFileAnalysis(self):
+        for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
+            for f in files:
+                fname = root+os.sep+f
+                print "Testing "+fname
+                retcode = subprocess.call('backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp'%(fname), shell=True)
+                self.assertEqual(retcode, 0, fname+ " failed")
+                dom = parse('/tmp/output.xml')
+
+    def testFileSimulation(self):
+        for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
+            for f in files:
+                fname = root+os.sep+f
+                print "Testing "+fname
+                retcode = subprocess.call('backends/lib/ftsimulation %s /tmp/output.xml /tmp'%(fname), shell=True)
+                self.assertEqual(retcode, 0, fname+ " failed")
+                dom = parse('/tmp/output.xml')
 
 class AnalysisFixtureTestCase(FuzzEdTestCase):
     ''' 
@@ -380,3 +406,21 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
             # The result of a EPS rendering job is the download link
             epsResponse = self.get(epsLink)
             self.assertEqual('application/postscript', epsResponse['CONTENT-TYPE'])
+
+class UnicodeTestCase(FuzzEdTestCase):
+    fixtures = ['unicode.json', 'initial_data.json']
+    graphs = {1: 'faulttree'}
+    # A couple of specific PK's from the model
+    pkProject = 1
+    pkFaultTree = 1
+
+    def setUp(self):
+        self.setUpLogin()        
+
+    def testTikzSerialize(self):
+        g=Graph.objects.get(pk=self.pkFaultTree)
+        assert(len(g.to_tikz()) > 0)
+
+
+
+

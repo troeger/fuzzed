@@ -276,7 +276,10 @@ class Node(models.Model):
                             val = format.replace("{{$0}}",str(val[1]))                            
                     elif propdetails[prop].has_key('mirror'):
                         if propdetails[prop]['mirror'].has_key('format'):
-                            val = propdetails[prop]['mirror']['format'].replace("{{$0}}",str(val))
+                            format = propdetails[prop]['mirror']['format'].encode('utf-8')
+                            if type(val) is int:
+                                val=str(val)
+                            val = format.replace("{{$0}}".encode('utf-8'),val.encode('utf-8'))
                         else:
                             logger.debug("Property '%s' has no specified mirror format"%prop)
                             val = str(val)
@@ -323,16 +326,16 @@ class Node(models.Model):
         result = "\\node [shape=%s, %s] at (%u, -%f) (%u) {};\n"%(self.kind, nodeStyle, self.x+x_offset, (self.y+y_offset)*1.2, self.pk)
         # Determine the mirror text based on all properties
         # Text width is exactly the double width of the icons
-        mirrorText = ""
+        mirrorText = unicode()
         for index,propvalue in enumerate(self.get_all_mirror_properties(hiddenProps)):
-            if type(propvalue) == type('string'):
-                propvalue = propvalue.replace("#","\\#")    # consider special LaTex character in mirror text
+            propvalue = propvalue.replace("#","\\#")    # consider special LaTex character in mirror text
             if index==0:
                 # Make the first property bigger, since it is supposed to be the name
                 propvalue = "\\baselineskip=0.8\\baselineskip\\textbf{{\\footnotesize %s}}"%propvalue  
             else:
                 propvalue = "{\\it\\scriptsize %s}"%propvalue                                
-            mirrorText += "%s\\\\"%propvalue
+            propvalue = propvalue.decode('utf-8')
+            mirrorText += propvalue+"\\\\"
         # Create child nodes and their edges
         for edge in self.outgoing.filter(deleted=False):
             # Add child node rendering
