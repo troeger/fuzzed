@@ -73,8 +73,11 @@ define(['underscore'], function() {
          *    {String} GRAPH_EXPORT_URL           - Part of the sub-URL used for graph export API calls.
          */
         Backend: {
-            ANALYSIS_URL:               '/analysis',
-            SIMULATION_URL:             '/simulation',
+            ANALYSIS_JOB:               'topevent',
+            SIMULATION_JOB:             'simulation',
+            EPS_JOB:                    'eps',
+            PDF_JOB:                    'pdf',
+            JOBS_URL:                   '/jobs', 
             BASE_URL:                   '/api/front',
             EDITOR_URL:                 '/editor',
             GRAPHS_URL:                 '/graphs',
