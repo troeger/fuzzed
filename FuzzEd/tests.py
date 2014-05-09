@@ -33,14 +33,6 @@ from FuzzEd.models.node import Node
 from FuzzEd.models.node_group import NodeGroup
 from FuzzEd.models.notification import Notification
 
-
-
-
-
-
-
-
-
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
 
@@ -111,6 +103,7 @@ class SimpleFixtureTestCase(FuzzEdTestCase):
     ''' 
         This is a base class that wraps all information about the 'simple' fixture. 
     '''
+    #TODO: use notations here?
     fixtures = ['simple.json', 'initial_data.json']
     graphs = {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'}
     # A couple of specific PK's from the model
