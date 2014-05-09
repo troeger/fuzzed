@@ -73,6 +73,9 @@ function (Class, Config, Job, Alerts, Progress) {
                 .on(Config.Events.EDITOR_CALCULATE_CUTSETS,                this.calculateCutsets.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY, this.calculateAnalyticalProbability.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY,  this.calculateSimulatedProbability.bind(this));
+            jQuery(window)
+                .on('beforeunload', this.windowClosed.bind(this));
+
             return this;
         },
 
@@ -109,6 +112,9 @@ function (Class, Config, Job, Alerts, Progress) {
                 .off(Config.Events.EDITOR_CALCULATE_CUTSETS)
                 .off(Config.Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY)
                 .off(Config.Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY);
+            jQuery(window)
+                .off('beforeunload');
+
             return this;
         },
 
@@ -132,7 +138,6 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {function} complete     - [optional] Callback that is invoked in both cases - a successful or an erroneous
          *                             AJAX request.
          */
-        //TODO: send properties
         edgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
             var data = {
                 id:          edgeId,
@@ -230,7 +235,6 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {function} complete    - [optional] Callback that is invoked when the ajax request completes successful or
          *                         erroneous.
          */
-        //TODO: send properties
         nodeGroupAdded: function(event, nodeGroupId, nodeIds, success, error, complete) {
             var data = {
                 id:         nodeGroupId,
@@ -346,7 +350,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {Number}   nodeGroupId   - The ID of the node that should be deleted.
          *   {function} success       - [optional] Callback that is being called on successful deletion on backend.
          *   {function} error         - [optional] Callback that gets called in case of an ajax-error.
-         *   {function} complete      - [optional] Callback that is invoked in both cases, successful and errornous requests.
+         *   {function} complete      - [optional] Callback that is invoked when the request wsa successful or errornous
          */
         nodeGroupDeleted: function(event, nodeGroupId, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
@@ -471,8 +475,8 @@ function (Class, Config, Job, Alerts, Progress) {
          *                            and their assigned values is the new state.
          *   {function} success     - [optional] Callback that is called when the move was successfully saved.
          *   {function} error       - [optional] Callback that gets called in case of an AJAX error.
-         *   {function} complete    - [optional] Callback that is always invoked no matter if AJAX request was successful
-         *                           or erroneous.
+         *   {function} complete    - [optional] Callback that is always invoked no matter if AJAX request was
+         *                            successful or erroneous.
          */
         nodeGroupPropertyChanged: function(event, nodeGroupId, properties, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
@@ -561,12 +565,12 @@ function (Class, Config, Job, Alerts, Progress) {
 
         /**
          *  Method: calculateAnalyticalProbability
-         *    Tell the backend to calculate the analytical probability of the top event. This is an asynchronous request, i.e. the
-         *    success callback will get a <Job> object it can use to receive the final result.
+         *    Tell the backend to calculate the analytical probability of the top event. This is an asynchronous
+         *    request, i.e. the success callback will get a <Job> object it can use to receive the final result.
          *
          *  Parameters:
-         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job submission
-         *                          was successful.
+         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job
+         *                          submission was successful.
          *    {Function} error    - [optional] Callback that gets called in case of an error.
          *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
@@ -596,12 +600,12 @@ function (Class, Config, Job, Alerts, Progress) {
 
         /**
          *  Method: calculateSimulatedProbability
-         *    Tell the backend to calculate the simulated probability of the top event. This is an asynchronous request, i.e. the
-         *    success callback will get a <Job> object it can use to receive the final result.
+         *    Tell the backend to calculate the simulated probability of the top event. This is an asynchronous request,
+         *    i.e. the success callback will get a <Job> object it can use to receive the final result.
          *
          *  Parameters:
-         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job submission
-         *                          was successful.
+         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job
+         *                          submission was successful.
          *    {Function} error    - [optional] Callback that gets called in case of an error.
          *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
@@ -681,6 +685,23 @@ function (Class, Config, Job, Alerts, Progress) {
                     (error || jQuery.noop).apply(arguments);
                 }
             });
+        },
+
+        /**
+         * Method: windowClosed
+         *   Handler that is invoked when the user tries to leave the page (close, address-bar, back, refresh, ...). In
+         *   case of pending backend synchronization requests, a native browser pop-up is being displayed asking the
+         *   user to wait for completion. The method has inconsistent return points (String, nothing). Do not change
+         *   this to be null/undefined/empty string/... in the else case for consistency reasons, as it will break
+         *   jQuery's "beforeunload" event handler implementation.
+         *
+         * Returns:
+         *   {String} - message to be displayed in compatible browsers in the pop-up
+         */
+        windowClosed: function() {
+            if (jQuery.ajaxq.isRunning()) {
+                return 'Still saving... Please wait until the progress indicator in the toolbar disappears!'
+            }
         },
 
         /**
@@ -772,7 +793,7 @@ function (Class, Config, Job, Alerts, Progress) {
 
         /**
          * Method: _fullUrlForNodeGroups
-         *   Calculates the AJAX backend URL for the graph's node groups. Allows to fetch all of them or to create a new one.
+         *   Returns the AJAX backend URL for the graph's node groups. Allows to fetch or create a new one.
          *
          * Returns:
          *   The graph's node groups URL as {String}.
@@ -783,7 +804,8 @@ function (Class, Config, Job, Alerts, Progress) {
 
         /**
          * Method: _fullUrlForNodeGroup
-         *   Calculates the AJAX backend URL for one particular node group of the graph. Allows to fetch, modify or delete it.
+         *   Calculates the AJAX backend URL for one particular node group of the graph. Allows to fetch, modify or
+         *   delete one.
          *
          * Parameters:
          *   {Number} nodeGroupId - The id of the node group.
@@ -797,8 +819,8 @@ function (Class, Config, Job, Alerts, Progress) {
 
         /**
          * Method: _fullUrlForCutsets
-         *   Calculates the AJAX backend URL for calculating the cutsets of a graph. Cutsets are only available in Fault- and
-         * Fuzztrees.
+         *   Calculates the AJAX backend URL for calculating the cutsets of a graph. Cutsets are only available in
+         *   Fault- and Fuzztrees.
          *
          * Returns:
          *   The cutset URL as {String}.
@@ -849,7 +871,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 //TODO: Raise a meaningful exception here
                 exportType = 'invalid';
             }
-            return this._fullUrlForGraph() + Config.Backend.GRAPH_EXPORT_URL + '/'+exportType;
+            return this._fullUrlForGraph() + Config.Backend.GRAPH_EXPORT_URL + '/' + exportType;
         }
     });
 
