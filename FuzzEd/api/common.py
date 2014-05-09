@@ -216,7 +216,7 @@ class EdgeResource(ModelResource):
         serializer = EdgeSerializer()
         authorization = GraphOwnerAuthorization()
         list_allowed_methods = ['get', 'post']
-        detail_allowed_methods = ['get', 'post', 'delete']
+        detail_allowed_methods = ['get', 'post', 'delete', 'patch']
         excludes = ['deleted', 'id']
 
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
@@ -235,6 +235,36 @@ class EdgeResource(ModelResource):
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
         return self.save(bundle)
+
+    def patch_detail(self, request, **kwargs):
+        """
+            Updates a resource in-place. We could also override obj_update, which is
+            the Tastypie intended-way of having a custom PATCH implementation, but this
+            method gets a full updated object bundle that is expected to be directly written
+            to the object. In this method, we still have access to what actually really
+            comes as part of the update payload.
+
+            If the resource is updated, return ``HttpAccepted`` (202 Accepted).
+            If the resource did not exist, return ``HttpNotFound`` (404 Not Found).
+        """
+        try:
+            # Fetch relevant node object as Tastypie does it
+            basic_bundle = self.build_bundle(request=request)
+            obj = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
+        except ObjectDoesNotExist:
+            return http.HttpNotFound()
+        except MultipleObjectsReturned:
+            return http.HttpMultipleChoices("More than one resource is found at this URI.")
+
+        # Deserialize incoming update payload JSON from request
+        deserialized = self.deserialize(request, request.body,
+                                        format=request.META.get('CONTENT_TYPE', 'application/json'))
+        if 'properties' in deserialized:
+            for key, value in deserialized['properties'].iteritems():
+                obj.set_attr(key, value)
+            obj.save()
+        # return the updated node object
+        return HttpResponse(obj.to_json(), 'application/json', status=202)
 
 
 class ProjectResource(ModelResource):

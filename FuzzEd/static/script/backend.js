@@ -442,11 +442,9 @@ function (Class, Config, Job, Alerts, Progress) {
         edgePropertyChanged: function(event, edgeId, properties, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForEdge(edgeId),
-                type:     'POST',
-                data:{
-                    properties: JSON.stringify(properties)
-                },
-                dataType: 'json',
+                type: 'PATCH',
+                data: JSON.stringify({properties: properties}),
+                contentType: 'application/json; charset=utf-8',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -461,6 +459,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 

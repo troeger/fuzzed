@@ -39,6 +39,7 @@ from FuzzEd.models.notification import Notification
 
 
 
+
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
 
@@ -413,9 +414,18 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
                                   "application/json")
         self.assertEqual(response.status_code, 202)
 
-    def testPropertyChange(self):
+    def testNodePropertyChange(self):
         newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
         response = self.ajaxPatch(self.baseUrl + '/graphs/%u/nodes/%u' % (self.pkFaultTree, self.clientIdBasicEvent),
+                                  newprop,
+                                  "application/json")
+        self.assertEqual(response.status_code, 202)
+        #TODO: Fetch graph and check that the property is really stored
+
+
+    def testEdgePropertyChange(self):
+        newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
+        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/edges/%u' % (self.pkDFD, self.clientIdEdge),
                                   newprop,
                                   "application/json")
         self.assertEqual(response.status_code, 202)
