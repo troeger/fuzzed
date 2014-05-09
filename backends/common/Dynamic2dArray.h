@@ -45,7 +45,6 @@ Dynamic2dArray<T>::Dynamic2dArray(unsigned int w, unsigned int h)
 template <typename T>
 void Dynamic2dArray<T>::set(unsigned int row, unsigned int col, const T& value)
 {
-	//std::cout << "Setting " << row << " " << col << " to " << value << std::endl;
 	assert(m_data.size() >= row && m_data[row].size() >= col);
 	m_data[row][col] = value;
 }

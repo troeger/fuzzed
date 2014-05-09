@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 					for (const auto& s : res)
 						mincut += s;
 
-					r.nodeid().push_back(mincut);
+					r.nodeids().push_back(mincut);
 				}
 			}
 			catch (const FatalException& e)
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
 							mincut += s;
 						}
 
-						r.nodeid().push_back(mincut);
+						r.nodeids().push_back(mincut);
 					}
 				}
 				catch (const FatalException& e)

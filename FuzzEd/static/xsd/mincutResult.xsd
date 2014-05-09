@@ -16,7 +16,7 @@
   <xsd:complexType name="Result">
     <xsd:sequence>
       <xsd:element minOccurs="0" maxOccurs="1" name="configuration" type="configurations:Configuration"/>
-      <xsd:element minOccurs="0" maxOccurs="unbounded" name="nodeid" type="xsd:string"/>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="nodeids" type="xsd:string"/>
       <xsd:element minOccurs="0" maxOccurs="unbounded" name="issue" type="common:Issue"/>
     </xsd:sequence>
     <xsd:attribute name="id" type="xsd:string"/>
