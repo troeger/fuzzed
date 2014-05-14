@@ -449,6 +449,47 @@
         }
     },
 
+    "nodeGroups": {
+        "copyable": true,
+        "deletable": true,
+
+        "properties": {
+            "name": {
+                "default": "Basic Event"
+            },
+            "probability": {
+                "kind": "compound",
+                "displayName": "Probability",
+                "default": [0, 0],
+
+                "parts": [{
+                    "kind": "numeric",
+                    "partName": "Point",
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.0000000001,
+                    "default": 0,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "p={{$0}}"
+                    }
+                }, {
+                    "kind": "numeric",
+                    "partName": "Rate",
+                    "min": 0,
+                    "step": 0.01,
+                    "default": 17532,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "λ={{$0}}"
+                    }
+                }]
+            }
+        }
+    },
+
     "propertiesDisplayOrder": [
         "name",
         "missionTime",
