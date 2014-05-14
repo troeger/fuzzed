@@ -55,6 +55,9 @@ function(Property, Class, Canvas, Config) {
 
             this._setupVisualRepresentation()
                 .redraw()
+                ._setupDragging()
+                ._setupMouse()
+                ._setupSelection()
                 ._registerEventHandlers()
                 ._setupProperties();
 
@@ -88,7 +91,7 @@ function(Property, Class, Canvas, Config) {
          * up this.container with css classes, its id and its data.
          *
          * Returns:
-         *   This {<Node>} instance for chaining.
+         *   This {<NodeGroup>} instance for chaining.
          */
         _setupVisualRepresentation: function() {
             this.container = jQuery("<div>")
@@ -97,42 +100,154 @@ function(Property, Class, Canvas, Config) {
                 .css('position', 'absolute')
                 .data(Config.Keys.NODEGROUP, this);
 
+            this.container.appendTo(Canvas.container);
 
-            // setup nodes' dragging dependency for ui draggable, so the nodes move along with the node group
+            return this;
+        },
+
+        /**
+         * Method: _setupDragging
+         *
+         * This initialization method is called in the constructor and is responsible for setting up the node group's
+         * dragging functionality. The goal is to make all contained nodes move along with the node group.  The code
+         * contains a lot of code <Node> uses to setup dragging as well.
+         *
+         * Returns:
+         *   This {<NodeGroup>} instance for chaining.
+         */
+        _setupDragging: function() {
+            if (this.readOnly) return this;
+
+            // the css class which refers to all dependant nodes
+            var dragDependant = Config.Keys.NODEGROUP + this.id + '_dragging'
+
+            // setup nodes' dragging dependency for ui draggable via a nodegroup-specific css class
             _.each(this.nodes, function(node) {
-                node.container.addClass(Config.Keys.NODEGROUP + this.id + '_dragging')
+                node.container.addClass(dragDependant);
             }.bind(this));
 
-            // setup dragging
-            var cssClass = Config.Keys.NODEGROUP + this.id + '_dragging'
-
-            var getAll = function(t) {
-                return $('.nodegroup' + t.helper.attr('class').match(/nodegroup([0-9]+)_dragging/)[1]).not(t);
-            };
+            var initialPosition = undefined;
+            var initialNodePositions = {};
 
             jsPlumb.draggable(this.container, {
-                revert: true,
-                revertDuration: 10,
-                // grouped items animate separately, so leave this number low
+                // stay in the canvas
                 containment: Canvas.container,
-                start: function(event) {
-                    this.select();
-                },
+                // become a little bit opaque when dragged
+                opacity:     Config.Dragging.OPACITY,
+                // show a cursor with four arrows
+                cursor:      Config.Dragging.CURSOR,
+                // stick to the checkered paper
+                grid:        [Canvas.gridSize, Canvas.gridSize],
+
+                // start dragging callback
+                start: function(event, ui) {
+                    // save the initial positions of the node group and dependant nodes, to calculate offsets while dragging
+                    initialPosition = this.container.position();
+                    jQuery('.' + dragDependant).each(function(index, node) {
+                        var nodeInstance = jQuery(node).data(Config.Keys.NODE);
+                        // if this DOM element does not have an associated node object, do nothing
+                        if (typeof nodeInstance === 'undefined') return;
+
+                        initialNodePositions[nodeInstance.id] = nodeInstance.container.position();
+                    }.bind(this));
+                }.bind(this),
+
+                drag: function(event, ui) {
+                    // enlarge canvas
+					Canvas.enlarge({
+                        x: ui.offset.left + ui.helper.width(),
+                        y: ui.offset.top  + ui.helper.height()
+                    });
+
+                    // determine by how many pixels we moved from our original position (see: start callback)
+                    var xOffset = ui.position.left - initialPosition.left;
+                    var yOffset = ui.position.top  - initialPosition.top;
+
+                    // tell all dependant nodes to move as well, except this node group as the user already dragged it
+                    jQuery('.' + dragDependant).not(this.container).each(function(index, node) {
+                        var nodeInstance = jQuery(node).data(Config.Keys.NODE);
+                        // if this DOM element does not have an associated node object, do nothing
+                        if (typeof nodeInstance === 'undefined') return;
+
+                        // move the other selectee by the dragging offset, do NOT report to the backend yet
+                        nodeInstance._moveContainerToPixel({
+                            'x': initialNodePositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
+                            'y': initialNodePositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
+                        });
+                    }.bind(this));
+                    jQuery(document).trigger(Config.Events.NODES_MOVED);
+                }.bind(this),
+
+                // stop dragging callback
                 stop: function(e, ui) {
-                    getAll(ui).css({
-                        'top': ui.helper.css('top'),
-                        'left': 0
-                    });
-                },
-                drag: function(e, ui) {
-                    getAll(ui).css({
-                        'top': ui.helper.css('top'),
-                        'left': ui.helper.css('left')
-                    });
-                }
+                    // redraw the node group's visual representation
+                    this.redraw();
+
+                    // calculate the final amount of pixels we moved ...
+                    var xOffset = ui.position.left - initialPosition.left;
+                    var yOffset = ui.position.top  - initialPosition.top;
+
+                    jQuery('.' + dragDependant).each(function(index, node) {
+                        var nodeInstance = jQuery(node).data(Config.Keys.NODE);
+                        // if this DOM element does not have an associated node object, do nothing
+                        if (typeof nodeInstance === 'undefined') return;
+
+                        // ... and report to the backend this time because dragging ended
+                        nodeInstance.moveToPixel({
+                            'x': initialNodePositions[nodeInstance.id].left + xOffset + nodeInstance._nodeImage.xCenter,
+                            'y': initialNodePositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
+                        });
+                    }.bind(this));
+
+                    // forget the initial position of the nodes to allow new dragging
+                    initialPositions = {};
+                    jQuery(document).trigger(Config.Events.NODE_DRAG_STOPPED);
+                }.bind(this)
             });
 
-            this.container.appendTo(Canvas.container);
+            return this;
+        },
+
+        /**
+         * Method: _setupMouse
+         *
+         * Small helper method used in the constructor for setting up mouse hover highlighting (highlight on hover,
+         * unhighlight on mouse out).
+         *
+         * Returns:
+         *   This {<NodeGroup>} instance for chaining.
+         */
+        _setupMouse: function() {
+            if (this.readOnly) return this;
+            // hovering over a node
+            this.container.find('svg path').hover(
+                // mouse in
+                this.highlight.bind(this),
+                // mouse out
+                this.unhighlight.bind(this)
+            );
+
+            return this;
+        },
+
+        /**
+         * Method: _setupSelection
+         *
+         * This initialization method is called in the constructor and sets up multi-select functionality for node groups.
+         *
+         * Returns:
+         *   This {<NodeGroup>} instance for chaining.
+         */
+        _setupSelection: function() {
+            if (this.readOnly) return this;
+
+            //XXX: select a node group on click
+            // This uses the jQuery.ui.selectable internal functions.
+            // We need to trigger them manually because only jQuery.ui.draggable gets the mouseDown events on node groups.
+            this.container.click(function(event) {
+                Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
+                Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
+            }.bind(this));
 
             return this;
         },
@@ -259,6 +374,36 @@ function(Property, Class, Canvas, Config) {
          */
         select: function() {
             this.container.find('svg path').addClass(Config.Classes.SELECTED);
+
+            return this;
+        },
+
+        /**
+         * Method: highlight
+         *   This method highlights the node group visually as long as the node is not already disabled or selected. It
+         *   is for instance called when the user hovers over a node group.
+         *
+         * Returns:
+         *   This {<NodeGroup>} instance for chaining.
+         */
+        highlight: function() {
+            this.container.addClass(Config.Classes.HIGHLIGHTED);
+
+            return this;
+        },
+
+        /**
+         * Method: unhighlight
+         *   Unhighlights the node group's visual appearance. The method is for instance calls when the user leaves a
+         *   hovered node group.
+         *
+         * P.S.: The weird word unhighlighting is an adoption of the jQueryUI dev team speak, all credits to them :)!
+         *
+         * Returns:
+         *   This {<NodeGroup>} instance for chaining.
+         */
+        unhighlight: function() {
+            this.container.removeClass(Config.Classes.HIGHLIGHTED);
 
             return this;
         },
