@@ -109,8 +109,8 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
                 this._addEdge(edge.connection);
             }.bind(this));
 
-            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED,      this._shapeDropped.bind(this));
-            jQuery(document).on(Config.Events.NODE_DELETED,              this._updateNodeGroupDeleted.bind(this));
+            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
+            jQuery(document).on(Config.Events.NODE_DELETED,         this._updateNodeGroupDeleted.bind(this));
 
             return this;
         },
@@ -138,11 +138,22 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
         addEdge: function(jsonEdge) {
             var sourceNode = this.getNodeById(jsonEdge.source);
             var targetNode = this.getNodeById(jsonEdge.target);
+
+            // check if source's max number of outgoing connections is already reached
+            if (sourceNode.numberOfOutgoingConnections != -1) { // -1 means infinite connections possible
+                if (sourceNode.outgoingEdges.length >= sourceNode.numberOfOutgoingConnections) return false;
+            }
+
+            // check if target's max number of incoming connections is already reached
+            if (targetNode.numberOfIncomingConnections != -1) { // -1 means infinite connections possible
+                if (targetNode.incomingEdges.length >= targetNode.numberOfIncomingConnections) return false;
+            }
+
             var properties = jsonEdge.properties || {};
             properties.id  = jsonEdge.id;
             properties.graph = this;
 
-            var edge = new Edge(this.getNotation().edges.properties, sourceNode, targetNode, properties);
+            var edge = new Edge(this.getNotation().edges, sourceNode, targetNode, properties);
             this.edges[edge.id] = edge;
 
             return edge;
@@ -163,7 +174,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
          *    The newly created Edge instance.
          */
         _addEdge: function(jsPlumbEdge) {
-            var edge = new Edge(this.getNotation().edges.properties, jsPlumbEdge, {graph: this});
+            var edge = new Edge(this.getNotation().edges, jsPlumbEdge, {graph: this});
             this.edges[edge.id] = edge;
 
             return edge;
@@ -234,8 +245,10 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
 
         /**
          *  Method: addNodeGroup
+         *      Creates a new NodeGroup based on the given jsonNodeGroup.
          *
-         *  Blah
+         *  Returns:
+         *    The newly created <NodeGroup> instance.
          */
         addNodeGroup: function(jsonNodeGroup) {
             var nodes = {};
@@ -247,7 +260,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             properties.id  = jsonNodeGroup.id;
             properties.graph = this;
 
-            var nodeGroup = new NodeGroup(this.getNotation().nodeGroups.properties, nodes, properties);
+            var nodeGroup = new NodeGroup(this.getNotation().nodeGroups, nodes, properties);
             this.nodeGroups[nodeGroup.id] = nodeGroup;
 
             return nodeGroup;
@@ -255,8 +268,10 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
 
         /**
          *  Method: deleteNodeGroup
+         *      Deletes a given NodeGroup.
          *
-         *  Blah
+         *  Returns:
+         *    This <Graph> instance for chaining.
          */
         deleteNodeGroup: function(nodeGroup) {
             if (nodeGroup.remove()) {
@@ -266,16 +281,26 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             return this;
         },
 
+        /**
+         *  Method: deleteNodeGroup
+         *      Updates all node groups on deletion of a node. Furthermore deletes empty node groups.
+         *
+         *  Returns:
+         *    This <Graph> instance for chaining.
+         */
         _updateNodeGroupDeleted: function(event, nodeId) {
             var node = this.getNodeById(nodeId);
-            _.each(this.nodeGroups, function(ng) {
-                delete this.nodeGroups[ng.id].nodes[nodeId];
-                if (_.size(ng.nodes) < 2) {
-                    this.deleteNodeGroup(ng);
+
+            _.each(this.nodeGroups, function(nodegroup) {
+                delete this.nodeGroups[nodegroup.id].nodes[nodeId];
+                if (_.size(nodegroup.nodes) < 2) {
+                    this.deleteNodeGroup(nodegroup);
                 } else {
-                    ng.redraw();
+                    nodegroup.redraw();
                 }
             }.bind(this));
+
+            return this;
         },
 
         /**

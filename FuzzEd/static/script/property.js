@@ -61,7 +61,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
                 //TODO: IS THIS REALLY THE RIGHT WAY TO DO IT?
                 // (we cannot put the require as dependency of this module, as there is some kind of cyclic dependency
-                // stopping Node.js to work properly
+                // stopping Node.js to work properly)
 
                 var Edge =      require("edge");
                 var Node =      require("node");
@@ -105,11 +105,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         },
 
         _sanitize: function() {
-            //var validationResult = {};
-            //if (!this.validate(this.value, validationResult)) {
-            //    var ErrorClass = validationResult.kind || Error;
-            //    throw new ErrorClass(validationResult.message);
-            //}
+            var validationResult = {};
+            if (!this.validate(this.value, validationResult)) {
+                var ErrorClass = validationResult.kind || Error;
+                throw new ErrorClass(validationResult.message);
+            }
 
             return this;
         },
