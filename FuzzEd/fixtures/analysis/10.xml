@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <faultTree:FaultTree id="569" name="Water Supply Loft Tank" xmlns:faultTree="net.faulttree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<topEvent id="0" missionTime="0" name="Failure of Water Supply Loft Tank" x="10" y="1">
+	<topEvent id="0" missionTime="1000000" name="Failure of Water Supply Loft Tank" x="10" y="1">
 		<children id="1" name="-" x="10" xsi:type="faultTree:Or" y="4">
 			<children id="5" name="Failure to Regulate or Manage Water Level" x="19" xsi:type="faultTree:IntermediateEvent" y="6">
 				<children id="11" name="-" x="19" xsi:type="faultTree:Or" y="9">

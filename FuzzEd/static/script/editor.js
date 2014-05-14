@@ -69,7 +69,8 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             this._setupJsPlumb()
                 ._setupNodeOffsetPrintStylesheet()
                 ._setupEventCallbacks()
-                ._setupMenuActions();
+                ._setupMenuActions()
+                ._setupDropDownBlur();
 
             // fetch the content from the backend
             this._loadGraph(graphId);
@@ -191,6 +192,27 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         /**
          *  Group: Setup
          */
+        
+        /**
+         * Method: _setupDropDownBlur
+         *
+         * Register an event handler that takes care of closing and blurring all currently open drop down menu items
+         * from the toolbar.
+         *
+         * Returns:
+         *   This {<Editor>} instance for chaining.
+         */
+        _setupDropDownBlur: function () {
+            jQuery('#' + this.config.IDs.CANVAS).mousedown(function(event) {
+                // close open bootstrap dropdown
+                jQuery('.dropdown.open')
+                    .removeClass('open')
+                    .find('a')
+                    .blur();
+            });
+            
+            return this;
+        },
 
         /**
          *  Method: _setupMenuActions

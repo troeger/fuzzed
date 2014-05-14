@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<ns1:FaultTree id="600" name="Test" xmlns:ns1="net.faulttree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<topEvent id="0" missionTime="17532" name="Kokos" x="10" y="1">
+		<children id="3" name="-" x="10" xsi:type="ns1:And" y="3">
+			<children id="6" name="Intermediate Event" x="12" xsi:type="ns1:IntermediateEvent" y="5"/>
+			<children id="5" name="Jupí já jou!" x="8" xsi:type="ns1:BasicEvent" y="5">
+				<probability value="17532.08" xsi:type="ns1:FailureRate"/>
+			</children>
+		</children>
+	</topEvent>
+</ns1:FaultTree>
