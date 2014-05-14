@@ -488,14 +488,16 @@ class AnalysisFixtureTestCase(FuzzEdTestCase):
     ''' 
         This is a base class that wraps all information about the 'analysis' fixture. 
     '''
-    fixtures = ['analysis.json', 'initial_data.json']
+    fixtures = ['analysis.json', 'initial_data.json', 'mincut1.json']
     # A couple of specific PK's from the model
-    graphs = [7, 8]
+    graphs = [7, 8, 9]
     rate_faulttree = 7
     prdc_fuzztree = 8
+    mincut_faulttree = 9
     # The decomposition number configured in the PRDC tree
     prdc_configurations = 8
     prdc_peaks = [0.31482, 0.12796, 0.25103, 0.04677, 0.36558, 0.19255, 0.30651, 0.11738]
+    mincut_numcuts = 3
 
 
 class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
@@ -538,6 +540,15 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
         for conf in result['configurations']:
             assert (round(conf['peak'], 5) in self.prdc_peaks)
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+    def testMincutFaulttree(self):
+        response = self.requestJob(self.baseUrl, self.mincut_faulttree, 'topevent')
+        result = json.loads(response.content)
+        self.assertEqual(bool(result['validResult']), True)
+        self.assertEqual(result['errors'], {})
+        self.assertEqual(result['warnings'], {})
+        # TODO: self.assertEqual(len(result['mincutResults']), 3)
+
     def testFrontendAPIPdfExport(self):
         for graph in self.graphs:
             pdf = self.requestJob(self.baseUrl, graph, 'pdf')
@@ -564,4 +575,3 @@ class UnicodeTestCase(FuzzEdTestCase):
     def testTikzSerialize(self):
         g = Graph.objects.get(pk=self.pkFaultTree)
         assert (len(g.to_tikz()) > 0)
-
