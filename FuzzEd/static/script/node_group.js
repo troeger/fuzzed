@@ -129,7 +129,7 @@ function(Property, Class, Canvas, Config) {
             var initialPosition = undefined;
             var initialNodePositions = {};
 
-            jsPlumb.draggable(this.container, {
+            jsPlumb.draggable(this.path(), {
                 // stay in the canvas
                 containment: Canvas.container,
                 // become a little bit opaque when dragged
@@ -141,8 +141,16 @@ function(Property, Class, Canvas, Config) {
 
                 // start dragging callback
                 start: function(event, ui) {
+                    // XXX: add dragged node to selection
+                    // This uses the jQuery.ui.selectable internal functions.
+                    // We need to trigger them manually because jQuery.ui.draggable doesn't propagate these events.
+                    if (!this.path().hasClass(Config.Classes.SELECTED)) {
+                        Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
+                        Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
+                    }
+
                     // save the initial positions of the node group and dependant nodes, to calculate offsets while dragging
-                    initialPosition = this.container.position();
+                    initialPosition = this.path().position();
                     jQuery('.' + dragDependant).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(Config.Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
@@ -220,7 +228,7 @@ function(Property, Class, Canvas, Config) {
         _setupMouse: function() {
             if (this.readOnly) return this;
             // hovering over a node
-            this.container.find('svg path').hover(
+            this.path().hover(
                 // mouse in
                 this.highlight.bind(this),
                 // mouse out
@@ -358,7 +366,7 @@ function(Property, Class, Canvas, Config) {
             this.container.css('left', bbox.x);
             this.container.css('top', bbox.y);
 
-            this.container.find('svg path').attr("transform", "translate(-"+bbox.x+",-"+bbox.y+")");
+            this.path().attr("transform", "translate(-"+bbox.x+",-"+bbox.y+")");
 
             // ## /hack
 
@@ -373,7 +381,7 @@ function(Property, Class, Canvas, Config) {
          *   This {<NodeGroup>} instance for chaining.
          */
         select: function() {
-            this.container.find('svg path').addClass(Config.Classes.SELECTED);
+            this.path().addClass(Config.Classes.SELECTED);
 
             return this;
         },
@@ -432,6 +440,15 @@ function(Property, Class, Canvas, Config) {
             jQuery(document).trigger(Config.Events.NODEGROUP_DELETED, [this.id]);
 
             return true;
+        },
+
+        /**
+         * Method: path
+         *      Convenience method for accessing the svg-path within the container
+         */
+
+        path: function() {
+            return this.container.find('svg path');
         },
 
         /**
