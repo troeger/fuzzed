@@ -133,7 +133,19 @@ define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(E
                 }
             });
 
-            if (typeof nodeGroup === 'undefined') return false;
+            if (typeof nodeGroup === 'undefined') {
+                // in case the user selected NodeGroups, (s)he wants to delete, do him/her the favor
+
+                // delete selected node groups (NASTY!!!)
+                var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
+
+                jQuery(allNodeGroups).each(function(index, element) {
+                    var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                    if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
+                        this.graph.deleteNodeGroup(nodeGroup);
+                    }
+                }.bind(this));
+            }
 
             this.graph.deleteNodeGroup(nodeGroup);
             return true;

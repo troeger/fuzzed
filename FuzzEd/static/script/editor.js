@@ -192,7 +192,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         /**
          *  Group: Setup
          */
-
+        
         /**
          * Method: _setupDropDownBlur
          *
@@ -202,15 +202,15 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          * Returns:
          *   This {<Editor>} instance for chaining.
          */
-        _setupDropDownBlur: function() {
-            jQuery(document).mousedown(function() {
+        _setupDropDownBlur: function () {
+            jQuery('#' + this.config.IDs.CANVAS).mousedown(function(event) {
                 // close open bootstrap dropdown
                 jQuery('.dropdown.open')
                     .removeClass('open')
                     .find('a')
                     .blur();
             });
-
+            
             return this;
         },
 
@@ -220,7 +220,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *  Registers the event handlers for graph type - independent menu entries that trigger JS calls
          *
          *  Returns:
-         *    This {<Editor>} instance for chaining.
+         *    This {<Node>} instance for chaining.
          */
         _setupMenuActions: function() {
             jQuery('#' + this.config.IDs.ACTION_GRID_TOGGLE).click(function() {
@@ -451,8 +451,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 this.graph.deleteEdge(edge);
             }.bind(this));
 
-            // delete selected node groups (NASTY)
-
+            // delete selected node groups (NASTY!!!)
             var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
 
             jQuery(allNodeGroups).each(function(index, element) {
@@ -476,31 +475,20 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          * Returns:
          *   This Editor instance for chaining.
          */
-        _selectAll__old: function(event) {
+
+        _selectAll: function(event) {
+
             //XXX: trigger selection start event manually here
             //XXX: hack to emulate a new selection process
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
 
-            var NODES           = '.' + this.config.Classes.NODE;
-            var NODES_AND_EDGES = NODES + ', .' + this.config.Classes.JSPLUMB_CONNECTOR;
-            var NODES_AND_EDGES_AND_NODEGROUPS = NODES_AND_EDGES + ', .' + this.config.Classes.NODEGROUP;
-
-            jQuery(NODES_AND_EDGES_AND_NODEGROUPS).each(function(index, domElement) {
-                var element = jQuery(domElement);
-
-                element.addClass(this.config.Classes.SELECTING)
-                       .addClass(this.config.Classes.SELECTED);
-            }.bind(this));
+            jQuery('.'+this.config.Classes.SELECTEE)
+                .addClass(this.config.Classes.SELECTING)
+                .addClass(this.config.Classes.SELECTED);
 
             //XXX: trigger selection stop event manually here
             //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
-        },
-
-        _selectAll: function(event) {
-            jQuery('.'+this.config.Classes.SELECTEE)
-                .addClass(this.config.Classes.SELECTING)
-                .addClass(this.config.Classes.SELECTED);
         },
 
         /**
@@ -560,17 +548,33 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             var edges = [];
             jQuery(selectedEdges).each(function(index, element) {
                 var edge = jQuery(element).data(this.config.Keys.EDGE);
-                edges.push(edge.toDict());
+                if (edge.copyable) {
+                    edges.push(edge.toDict());
+                }
+            }.bind(this));
+
+            var nodegroups = [];
+            // find selected node groups (NASTY!!!)
+            var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
+
+            jQuery(allNodeGroups).each(function(index, element) {
+                var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                // since the selectable element is an svg path, we need to look for that nested element and check its
+                //   state of selection via the CSS class .selected
+                if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
+                    nodegroups.push(nodeGroup.toDict());
+                }
             }.bind(this));
 
             var clipboard = {
                 'pasteCount': 0,
-                'nodes': nodes,
-                'edges': edges
+                'nodes':      nodes,
+                'edges':      edges,
+                'nodeGroups': nodegroups
             };
 
-            // to avoid empty copyings
-            if (nodes.length > 0 || edges.length > 0) {
+            // forbid copyings without any node
+            if (nodes.length > 0) {
                 this._updateClipboard(clipboard);
             }
         },
@@ -594,6 +598,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             var nodes       = clipboard.nodes;
             var edges       = clipboard.edges;
+            var nodeGroups  = clipboard.nodeGroups;
             var ids         = {}; // stores to every old id the newly generated id to connect the nodes again
             var boundingBox = this._boundingBoxForNodes(nodes); // used along with pasteCount to place the copy nicely
 
@@ -603,14 +608,30 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                 jsonNode.id = pasteId;
                 jsonNode.x += pasteCount * (boundingBox.width + 1);
                 jsonNode.y += pasteCount * (boundingBox.height + 1);
-                this.graph.addNode(jsonNode).select();
+
+                var node = this.graph.addNode(jsonNode);
+                if (node) node.select();
             }.bind(this));
 
-            _.each(edges, function(edge) {
-                edge.id = undefined;
-                edge.source = ids[edge.sourceNodeId] || edge.sourceNodeId;
-                edge.target = ids[edge.targetNodeId] || edge.targetNodeId;
-                this.graph.addEdge(edge).select();
+            _.each(edges, function(jsonEdge) {
+                jsonEdge.id = undefined;
+                jsonEdge.source = ids[jsonEdge.sourceNodeId] || jsonEdge.sourceNodeId;
+                jsonEdge.target = ids[jsonEdge.targetNodeId] || jsonEdge.targetNodeId;
+
+                var edge = this.graph.addEdge(jsonEdge);
+                if (edge) edge.select();
+            }.bind(this));
+
+            _.each(nodeGroups, function(jsonNodeGroup) {
+                // remove the original nodeGroup's identity
+                jsonNodeGroup.id = undefined;
+                // map old ids to new ids
+                jsonNodeGroup.nodeIds = _.map(jsonNodeGroup.nodeIds, function(nodeId) {
+                    return ids[nodeId] || nodeId;
+                });
+
+                var nodeGroup = this.graph.addNodeGroup(jsonNodeGroup);
+                if (nodeGroup) nodeGroup.select();
             }.bind(this));
 
             //XXX: trigger selection stop event manually here

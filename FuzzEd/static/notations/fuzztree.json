@@ -2,6 +2,9 @@
     "kind": "fuzztree",
     "name": "Fuzz Tree",
     "edges": {
+        "copyable": true,
+        "deletable": true,
+
         "properties": {}
     },
     "nodes": {
