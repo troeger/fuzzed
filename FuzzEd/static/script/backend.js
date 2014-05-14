@@ -138,7 +138,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 client_id:   edgeId,
                 source:      sourceNodeId,
                 target:      targetNodeId,
-                properties:  JSON.stringify(properties)
+                properties:  properties
             };
 
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
@@ -191,7 +191,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 kind:       kind,
                 x:          x,
                 y:          y,
-                properties: JSON.stringify(properties)
+                properties: properties
             };
 
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
