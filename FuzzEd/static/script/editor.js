@@ -658,6 +658,79 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
+         * Method: _groupSelection
+         *
+         *   Will create a new NodeGroup with the current selected nodes.
+         *
+         *   Note: This method can't be accessed by the user, unless you provide Menu Actions or Key Events for it.
+         *   (see dfd/editor.js for examples of correct subclassing)
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _groupSelection: function() {
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+
+            nodes = jQuery(selectedNodes);
+            if(nodes.length > 1)
+            {
+                var jsonNodeGroup = {
+                    nodeIds: _.map(nodes, function(node){return jQuery(node).data(this.config.Keys.NODE).id;}.bind(this))
+                };
+                this.graph.addNodeGroup(jsonNodeGroup);
+            }
+
+            return this;
+        },
+
+        /**
+         * Method: _ungroupSelection
+         *
+         *   Will ungroup either the NodeGroup, that only consists of the selected nodes, or the selected NodeGroups
+         *   directly.
+         *
+         *   Note: This method can't be accessed by the user, unless you provide Menu Actions or Key Events for it.
+         *   (see dfd/editor.js for examples of correct subclassing)
+         *
+         * Returns:
+         *   Success
+         */
+        _ungroupSelection: function() {
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+
+            var nodeIds = _.map(jQuery(selectedNodes), function(node){
+                return jQuery(node).data(this.config.Keys.NODE).id;
+            }.bind(this));
+
+            var nodeGroup = undefined;
+
+            // find the correct node group, whose node ids match the selected ids
+            _.each(this.graph.nodeGroups, function(ng) {
+                var ngIds = ng.nodeIds();
+                if (jQuery(ngIds).not(nodeIds).length == 0 && jQuery(nodeIds).not(ngIds).length == 0) {
+                    nodeGroup = ng;
+                }
+            });
+
+            if (typeof nodeGroup === 'undefined') {
+                // in case the user selected NodeGroups, (s)he wants to delete, do him/her the favor
+
+                // delete selected node groups (NASTY!!!)
+                var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
+
+                jQuery(allNodeGroups).each(function(index, element) {
+                    var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                    if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
+                        this.graph.deleteNodeGroup(nodeGroup);
+                    }
+                }.bind(this));
+            }
+
+            this.graph.deleteNodeGroup(nodeGroup);
+            return true;
+        },
+
+        /**
          * Method: _boundingBoxForNodes
          *
          *   Returns the (smallest) bounding box for the given nodes by accessing their x and y coordinates and finding
