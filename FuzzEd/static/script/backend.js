@@ -1,4 +1,4 @@
-define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jquery-ajaxq'],
+define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jquery-ajaxq', 'jquery-cookie'],
 function (Class, Config, Job, Alerts, Progress) {
 
     /**
@@ -73,9 +73,6 @@ function (Class, Config, Job, Alerts, Progress) {
                 .on(Config.Events.EDITOR_CALCULATE_CUTSETS,                this.calculateCutsets.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY, this.calculateAnalyticalProbability.bind(this))
                 .on(Config.Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY,  this.calculateSimulatedProbability.bind(this));
-            jQuery(window)
-                .on('beforeunload', this.windowClosed.bind(this));
-
             return this;
         },
 
@@ -112,9 +109,6 @@ function (Class, Config, Job, Alerts, Progress) {
                 .off(Config.Events.EDITOR_CALCULATE_CUTSETS)
                 .off(Config.Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY)
                 .off(Config.Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY);
-            jQuery(window)
-                .off('beforeunload');
-
             return this;
         },
 
@@ -138,9 +132,10 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {function} complete     - [optional] Callback that is invoked in both cases - a successful or an erroneous
          *                             AJAX request.
          */
+        //TODO: send properties
         edgeAdded: function(event, edgeId, sourceNodeId, targetNodeId, success, error, complete) {
             var data = {
-                id:          edgeId,
+                client_id:   edgeId,
                 source:      sourceNodeId,
                 target:      targetNodeId
             };
@@ -148,9 +143,9 @@ function (Class, Config, Job, Alerts, Progress) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForEdges(),
                 type:     'POST',
-                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data:     JSON.stringify(data),
 
-                data:     data,
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
                     var message = errorThrown || 'Could not connect to backend.';
@@ -164,6 +159,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -189,7 +186,7 @@ function (Class, Config, Job, Alerts, Progress) {
          */
         nodeAdded: function(event, nodeId, kind, x, y, properties, success, error, complete) {
             var data = {
-                id:         nodeId,
+                client_id:  nodeId,
                 kind:       kind,
                 x:          x,
                 y:          y,
@@ -199,9 +196,8 @@ function (Class, Config, Job, Alerts, Progress) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNodes(),
                 type:     'POST',
-                dataType: 'json',
-
-                data:     data,
+                contentType: 'application/json; charset=utf-8',
+                data:     JSON.stringify(data),
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
                     var message = errorThrown || 'Could not connect to backend.';
@@ -215,6 +211,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -235,18 +233,19 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {function} complete    - [optional] Callback that is invoked when the ajax request completes successful or
          *                         erroneous.
          */
+        //TODO: send properties
         nodeGroupAdded: function(event, nodeGroupId, nodeIds, success, error, complete) {
             var data = {
-                id:         nodeGroupId,
-                nodeIds:    JSON.stringify(nodeIds)
+                client_id:  nodeGroupId,
+                nodeIds: nodeIds
             };
 
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNodeGroups(),
                 type:     'POST',
-                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data:     JSON.stringify(data),
 
-                data:     data,
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
                     var message = errorThrown || 'Could not connect to backend.';
@@ -260,7 +259,9 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
-                }
+                     // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
+               }
             });
 
             return this;
@@ -282,7 +283,6 @@ function (Class, Config, Job, Alerts, Progress) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForEdge(edgeId),
                 type:     'DELETE',
-                dataType: 'json',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -297,6 +297,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -319,7 +321,6 @@ function (Class, Config, Job, Alerts, Progress) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNode(nodeId),
                 type:     'DELETE',
-                dataType: 'json',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -334,6 +335,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -350,13 +353,12 @@ function (Class, Config, Job, Alerts, Progress) {
          *   {Number}   nodeGroupId   - The ID of the node that should be deleted.
          *   {function} success       - [optional] Callback that is being called on successful deletion on backend.
          *   {function} error         - [optional] Callback that gets called in case of an ajax-error.
-         *   {function} complete      - [optional] Callback that is invoked when the request wsa successful or errornous
+         *   {function} complete      - [optional] Callback that is invoked in both cases, successful and errornous requests.
          */
         nodeGroupDeleted: function(event, nodeGroupId, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNodeGroup(nodeGroupId),
                 type:     'DELETE',
-                dataType: 'json',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -371,6 +373,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -395,11 +399,9 @@ function (Class, Config, Job, Alerts, Progress) {
         nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNode(nodeId),
-                type:     'POST',
-                data:{
-                    properties: JSON.stringify(properties)
-                },
-                dataType: 'json',
+                type:     'PATCH',
+                data: JSON.stringify({'properties': properties}),
+                contentType: 'application/json; charset=utf-8',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -414,6 +416,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -438,11 +442,9 @@ function (Class, Config, Job, Alerts, Progress) {
         edgePropertyChanged: function(event, edgeId, properties, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForEdge(edgeId),
-                type:     'POST',
-                data:{
-                    properties: JSON.stringify(properties)
-                },
-                dataType: 'json',
+                type: 'PATCH',
+                data: JSON.stringify({properties: properties}),
+                contentType: 'application/json; charset=utf-8',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -457,6 +459,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -475,17 +479,15 @@ function (Class, Config, Job, Alerts, Progress) {
          *                            and their assigned values is the new state.
          *   {function} success     - [optional] Callback that is called when the move was successfully saved.
          *   {function} error       - [optional] Callback that gets called in case of an AJAX error.
-         *   {function} complete    - [optional] Callback that is always invoked no matter if AJAX request was
-         *                            successful or erroneous.
+         *   {function} complete    - [optional] Callback that is always invoked no matter if AJAX request was successful
+         *                           or erroneous.
          */
         nodeGroupPropertyChanged: function(event, nodeGroupId, properties, success, error, complete) {
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForNodeGroup(nodeGroupId),
-                type:     'POST',
-                data:{
-                    properties: JSON.stringify(properties)
-                },
-                dataType: 'json',
+                type: 'PATCH',
+                data: JSON.stringify({properties: properties}),
+                contentType: 'application/json; charset=utf-8',
 
                 success:  success  || jQuery.noop,
                 error:    function(jqXHR, errorStatus, errorThrown) {
@@ -500,6 +502,8 @@ function (Class, Config, Job, Alerts, Progress) {
                     xhr.progressMessage        = 'Saving…';
                     xhr.progressSuccessMessage = 'Saved';
                     xhr.progressErrorMessage   = 'Not saved!';
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 }
             });
 
@@ -565,18 +569,22 @@ function (Class, Config, Job, Alerts, Progress) {
 
         /**
          *  Method: calculateAnalyticalProbability
-         *    Tell the backend to calculate the analytical probability of the top event. This is an asynchronous
-         *    request, i.e. the success callback will get a <Job> object it can use to receive the final result.
+         *    Tell the backend to calculate the analytical probability of the top event. This is an asynchronous request, i.e. the
+         *    success callback will get a <Job> object it can use to receive the final result.
          *
          *  Parameters:
-         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job
-         *                          submission was successful.
+         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job submission
+         *                          was successful.
          *    {Function} error    - [optional] Callback that gets called in case of an error.
          *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
         calculateAnalyticalProbability: function(event, success, error, complete) {
+                        
             jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
-                url:    this._fullUrlForAnalyticalProbability(),
+                url:         this._fullUrlForJobTasks(),
+                type:        'POST',
+                data:        JSON.stringify({"kind" : Config.Backend.ANALYSIS_JOB}),
+                contentType: 'application/json',
                 // don't show progress
                 global: false,
 
@@ -594,24 +602,33 @@ function (Class, Config, Job, Alerts, Progress) {
                     Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+                
+                beforeSend: function(xhr) {
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
+                }
             });
         },
 
         /**
          *  Method: calculateSimulatedProbability
-         *    Tell the backend to calculate the simulated probability of the top event. This is an asynchronous request,
-         *    i.e. the success callback will get a <Job> object it can use to receive the final result.
+         *    Tell the backend to calculate the simulated probability of the top event. This is an asynchronous request, i.e. the
+         *    success callback will get a <Job> object it can use to receive the final result.
          *
          *  Parameters:
-         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job
-         *                          submission was successful.
+         *    {Function} success  - [optional] Callback function that will receive the <Job> object if the job submission
+         *                          was successful.
          *    {Function} error    - [optional] Callback that gets called in case of an error.
          *    {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
         calculateSimulatedProbability: function(event, success, error, complete) {
             jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
-                url:    this._fullUrlForSimulatedProbability(),
+                url:         this._fullUrlForJobTasks(),
+                type:        'POST',
+                data:        JSON.stringify({"kind" : Config.Backend.SIMULATION_JOB}),
+                contentType: 'application/json',
+                
                 // don't show progress
                 global: false,
 
@@ -629,7 +646,12 @@ function (Class, Config, Job, Alerts, Progress) {
                     Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 },
-                complete: complete || jQuery.noop
+                complete: complete || jQuery.noop,
+                
+                beforeSend: function(xhr) {
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
+                }
             });
         },
 
@@ -647,19 +669,29 @@ function (Class, Config, Job, Alerts, Progress) {
          */
         graphExport: function(event, success, error) {
             var progressID = _.uniqueId('export_');
-            var fileType;
-            if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_PDF) fileType = 'PDF';
-            if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_EPS) fileType = 'EPS';
-            var progressMessage = Config.ProgressIndicator.EXPORT_PROGRESS_MESSAGE + fileType;
+        
+            var kind;
+            if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_PDF)kind = Config.Backend.PDF_JOB;
+            if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_EPS)kind = Config.Backend.EPS_JOB;
+            var progressMessage = Config.ProgressIndicator.EXPORT_PROGRESS_MESSAGE + kind.toUpperCase();
             var progressSuccessMessage = Config.ProgressIndicator.EXPORT_SUCCESS_MESSAGE;
-            var progressErrorMessage = Config.ProgressIndicator.EXPORT_ERROR_MESSAGE + fileType;
+            var progressErrorMessage = Config.ProgressIndicator.EXPORT_ERROR_MESSAGE + kind.toUpperCase();
+            
+            
+             
 
             jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
-                url:    this._fullUrlForExport(event),
+                url:         this._fullUrlForJobTasks(),
+                type:        'POST',
+                data:        JSON.stringify({"kind" : kind}),
+                contentType: 'application/json',
+                
                 // don't show progress
                 global: false,
-                beforeSend: function() {
+                beforeSend: function(xhr) {
                     Progress.showProgress(progressID, progressMessage);
+                    // set CSRF cookie
+                    xhr.setRequestHeader("X-CSRFToken", jQuery.cookie('csrftoken'))
                 },
                 statusCode: {
                     201: function(data, status, req) {
@@ -688,47 +720,8 @@ function (Class, Config, Job, Alerts, Progress) {
         },
 
         /**
-         * Method: windowClosed
-         *   Handler that is invoked when the user tries to leave the page (close, address-bar, back, refresh, ...). In
-         *   case of pending backend synchronization requests, a native browser pop-up is being displayed asking the
-         *   user to wait for completion. The method has inconsistent return points (String, nothing). Do not change
-         *   this to be null/undefined/empty string/... in the else case for consistency reasons, as it will break
-         *   jQuery's "beforeunload" event handler implementation.
-         *
-         * Returns:
-         *   {String} - message to be displayed in compatible browsers in the pop-up
-         */
-        windowClosed: function() {
-            if (jQuery.ajaxq.isRunning()) {
-                return 'Still saving... Please wait until the progress indicator in the toolbar disappears!'
-            }
-        },
-
-        /**
          * Section: URL Helper
          */
-
-        /**
-         * Method: _fullUrlForAnalysis
-         *   Calculates the AJAX backend URL for this analysis resources for this graph (see: <Backend::_graphId>).
-         *
-         * Returns:
-         *   The analysis URL as {String}.
-         */
-        _fullUrlForAnalysis: function() {
-            return this._fullUrlForGraph() + Config.Backend.ANALYSIS_URL;
-        },
-
-        /**
-         * Method: _fullUrlForSimulation
-         *   Calculates the AJAX backend URL for this simulation resources for this graph (see: <Backend::_graphId>).
-         *
-         * Returns:
-         *   The analysis URL as {String}.
-         */
-        _fullUrlForSimulation: function() {
-            return this._fullUrlForGraph() + Config.Backend.SIMULATION_URL;
-        },
 
         /**
          * Method: _fullUrlForGraph
@@ -749,7 +742,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The graph's nodes URL as {String}.
          */
         _fullUrlForNodes: function() {
-            return this._fullUrlForGraph() + Config.Backend.NODES_URL;
+            return this._fullUrlForGraph() + Config.Backend.NODES_URL + '/';
         },
 
         /**
@@ -763,7 +756,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The node's URL as {String}.
          */
         _fullUrlForNode: function(nodeId) {
-            return this._fullUrlForNodes() + '/' + nodeId;
+            return this._fullUrlForNodes() + nodeId;
         },
 
         /**
@@ -774,7 +767,7 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The graph's edges URL as {String}.
          */
         _fullUrlForEdges: function() {
-            return this._fullUrlForGraph() + Config.Backend.EDGES_URL;
+            return this._fullUrlForGraph() + Config.Backend.EDGES_URL + '/';
         },
 
         /**
@@ -788,24 +781,23 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The edge's URL as {String}.
          */
         _fullUrlForEdge: function(edgeId) {
-            return this._fullUrlForEdges() + '/' + edgeId;
+            return this._fullUrlForEdges() + edgeId;
         },
 
         /**
          * Method: _fullUrlForNodeGroups
-         *   Returns the AJAX backend URL for the graph's node groups. Allows to fetch or create a new one.
+         *   Calculates the AJAX backend URL for the graph's node groups. Allows to fetch all of them or to create a new one.
          *
          * Returns:
          *   The graph's node groups URL as {String}.
          */
         _fullUrlForNodeGroups: function() {
-            return this._fullUrlForGraph() + Config.Backend.NODEGROUPS_URL;
+            return this._fullUrlForGraph() + Config.Backend.NODEGROUPS_URL + '/';
         },
 
         /**
          * Method: _fullUrlForNodeGroup
-         *   Calculates the AJAX backend URL for one particular node group of the graph. Allows to fetch, modify or
-         *   delete one.
+         *   Calculates the AJAX backend URL for one particular node group of the graph. Allows to fetch, modify or delete it.
          *
          * Parameters:
          *   {Number} nodeGroupId - The id of the node group.
@@ -814,67 +806,23 @@ function (Class, Config, Job, Alerts, Progress) {
          *   The node group's URL as {String}.
          */
         _fullUrlForNodeGroup: function(nodeGroupId) {
-            return this._fullUrlForNodeGroups() + '/' + nodeGroupId;
+            return this._fullUrlForNodeGroups() + nodeGroupId;
         },
 
         /**
-         * Method: _fullUrlForCutsets
-         *   Calculates the AJAX backend URL for calculating the cutsets of a graph. Cutsets are only available in
-         *   Fault- and Fuzztrees.
+         * Method: _fullUrlForJobTasks
+         *   Calculates the AJAX backend URL for ...
+         *
          *
          * Returns:
-         *   The cutset URL as {String}.
+         *   The job URL as {String}.
          */
-        _fullUrlForCutsets: function() {
-            return this._fullUrlForAnalysis() + Config.Backend.CUTSETS_URL;
-        },
-
-        /**
-         * Method: _fullUrlForAnalyticalProbability
-         *   Calculates the AJAX backend URL for calculating the analytical probability of a graph. This feature is only
-         *   available in Fault- and Fuzztrees.
-         *
-         * Returns:
-         *   The analytical probability URL as {String}.
-         */
-        _fullUrlForAnalyticalProbability: function() {
-            return this._fullUrlForAnalysis() + Config.Backend.ANALYTICAL_PROBABILITY_URL;
-        },
-
-        /**
-         * Method: _fullUrlForSimulatedProbability
-         *   Calculates the AJAX backend URL for calculating the simulated probability of a graph. This feature is only
-         *   available in Fault- and Fuzztrees.
-         *
-         * Returns:
-         *   The simulation probability URL as {String}.
-         */
-        _fullUrlForSimulatedProbability: function() {
-            return this._fullUrlForSimulation() + Config.Backend.SIMULATED_PROBABILITY_URL;
-        },
-
-        /**
-         * Method: _fullUrlForExport
-         *   Calculates the AJAX backend URL for graph export.
-         *
-         * Returns:
-         *   The export URL as {String}.
-         */
-        _fullUrlForExport: function(event) {
-            if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_PDF) {
-                exportType = 'pdf';
-            }
-            else if (event.type == Config.Events.EDITOR_GRAPH_EXPORT_EPS) {
-                exportType = 'eps';
-            }
-            else {
-                //TODO: Raise a meaningful exception here
-                exportType = 'invalid';
-            }
-            return this._fullUrlForGraph() + Config.Backend.GRAPH_EXPORT_URL + '/' + exportType;
+        _fullUrlForJobTasks: function() {
+            return this._fullUrlForGraph() + Config.Backend.JOBS_URL + '/';
         }
+        
     });
-
+            
     var registeredBackends = {};
 
     return {
