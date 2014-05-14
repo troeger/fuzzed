@@ -237,9 +237,9 @@ function (Class, Config, Job, Alerts, Progress) {
          */
         nodeGroupAdded: function(event, nodeGroupId, nodeIds, properties, success, error, complete) {
             var data = {
-                client_id:         nodeGroupId,
-                nodeIds:    JSON.stringify(nodeIds),
-                properties: JSON.stringify(properties)
+                client_id:  nodeGroupId,
+                nodeIds:    nodeIds,
+                properties: properties
             };
 
             var xhr = jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
