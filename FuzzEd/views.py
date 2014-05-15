@@ -180,17 +180,37 @@ def shared_graphs_dashboard(request):
     Returns:
      {HttpResponse} a django response object
     """
-    sharings = request.user.sharings.all()
+    user = request.user
     
-    shared_graphs = [sharing.graph for sharing in sharings]
-    
-    if not (shared_graphs):
-        raise Http404
+    if request.method == 'GET':
         
-    parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in shared_graphs]}
-        
+        sharings = user.sharings.all()
     
-    return render(request, 'dashboard/shared_graphs_dashboard.html', parameters)
+        shared_graphs = [sharing.graph for sharing in sharings]
+        
+        parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in shared_graphs]}
+        
+        return render(request, 'dashboard/shared_graphs_dashboard.html', parameters)
+    
+    elif request.method == 'POST':
+        POST = request.POST
+        
+        if POST.get('unshare'):
+            
+            selected_graphs = POST.getlist('graph_id[]')
+            
+            sharings = [get_object_or_404(Sharing, user=user, graph_id=graph_id) for graph_id in selected_graphs]
+            
+            for sharing in sharings:
+                sharing.delete()
+            
+            return redirect('shared_graphs_dashboard')
+            
+            
+    # something is not right with the request
+    return HttpResponseBadRequest()
+    
+    
 
 @login_required
 def dashboard(request, project_id):
@@ -308,8 +328,10 @@ def dashboard_edit(request, project_id):
 
         for graph in graphs:
             for user in users:
-                sharing = Sharing(graph = graph, user=user)
-                sharing.save()
+                # check if graph is already shared with the specific user
+                if not Sharing.objects.filter(user=user, graph=graph).exists():
+                    sharing = Sharing(graph = graph, user=user)
+                    sharing.save()
             users_str = ','.join([u.visible_name() for u in users])
             messages.add_message(request, messages.SUCCESS, "'%s' shared with %s."%(graph, users_str ))
         return redirect('dashboard', project_id = project.id)

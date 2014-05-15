@@ -63,11 +63,11 @@
 
 
 <section>
-    <form id="graph_selection" action="" method="POST">
+    <form id="graph_selection" action="{% url 'shared_graphs_dashboard' %}" method="POST">
         {% csrf_token %}
         <div id="dashboard_toolbar" class="btn-toolbar pull-left">              
            <div class="btn-group">
-              <button type="submit" name="share" value="share" class="btn btn-small">
+              <button type="submit" name="unshare" value="unshare" class="btn btn-small">
                   <i class="fa fa-times"></i>
                   Remove Sharing
               </button>
