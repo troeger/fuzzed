@@ -1,6 +1,12 @@
 {
     "kind": "rbd",
     "name": "Reliability Block Diagram",
+    "edges": {
+        "copyable": true,
+        "deletable": true,
+
+        "properties": {}
+    },
     "nodes": {
         "node": {
             "nodeDisplayName": "Node",

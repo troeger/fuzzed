@@ -1,8 +1,10 @@
-from django.db import models
 import json
+
+from django.db import models
 
 from node import Node
 from graph import Graph
+
 
 class Edge(models.Model):
     """
@@ -41,10 +43,11 @@ class Edge(models.Model):
          {dict} the edge as dictionary
         """
         return {
-            'id':     self.client_id,
-            'graph':  self.graph.pk,
-            'source': self.source.client_id,
-            'target': self.target.client_id
+            'properties': {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)},
+            'id':         self.client_id,
+            'graph':      self.graph.pk,
+            'source':     self.source.client_id,
+            'target':     self.target.client_id
         }
 
     def to_graphml(self):
@@ -68,4 +71,43 @@ class Edge(models.Model):
          {dict} the edge as dictionary
         """
         return json.dumps(self.to_dict())
+
+    def get_attr(self, key):
+        """
+        Method: get_attr
+
+        Use this method to fetch an edges's attribute. It looks in the edge object and its related properties.
+
+        Parameters:
+            {string} key - The name of the attribute.
+
+        Returns:
+            {attr} The found attribute. Raises a ValueError if no attribute for the given key exist.
+        """
+        if hasattr(self, key):
+            return getattr(self, key)
+        else:
+            try:
+                prop = self.properties.get(key=key)
+                return prop.value
+            except Exception:
+                raise ValueError()
+
+    def set_attr(self, key, value):
+        """
+        Method: set_attr
+
+        Use this method to set a node's attribute. It looks in the node object and its related properties for an
+        attribute with the given name and changes it. If non exist, a new property is added saving this attribute.
+
+        Parameters:
+            {string} key - The name of the attribute.
+            {attr} value - The new value that should be stored.
+        """
+        if hasattr(self, key):
+            setattr(self, key, value)
+        else:
+            prop, created = self.properties.get_or_create(key=key, defaults={'edge': self})
+            prop.value = value
+            prop.save()
 

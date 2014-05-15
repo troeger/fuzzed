@@ -1,0 +1,278 @@
+% \begin{macro}{\collectedbox}
+% Box register used to store collected box.
+%    \begin{macrocode}
+\newsavebox\collectedbox
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\collectbox}
+% User level interface. Scans for potential star and optional arguments.
+%    \begin{macrocode}
+\newcommand*\collectbox{%
+    \@ifstar
+        {\collectbox@a{{\BOXCONTENT}}}%
+        {\collectbox@a{}}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectbox@a}
+%    \begin{macrocode}
+\long\def\collectbox@a#1{%
+    \@ifnextchar[%
+        {\collectbox@b{#1}}%
+        {\collectbox@b{#1}[]}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectbox@b}
+%    \begin{macrocode}
+\long\def\collectbox@b#1[#2]#3{%
+    \@ifnextchar[%
+        {\collectbox@c{#2}{#3#1}}%
+        {\collectbox@c{#2}{#3#1}[]}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectbox@c}
+%    \begin{macrocode}
+\long\def\collectbox@c#1#2[#3]{%
+    \collectbox@{#1}{#2}{#3}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectbox@}
+% The box is saved using |\setbox|. Color is supported by using |\collectbox@setgroup|.
+% A brace group is then opened using |\bgroup| which will replace the opening brace of the 
+% ``argument''. The end code is installed in this group using |\aftergroup|.
+% The opening brace written by the user is then removed by assigning it as token to a dummy variable.
+% If no |{| or |\bgroup| follows the next token is taken as sole content.
+%    \begin{macrocode}
+\newcommand\collectbox@[3]{%
+    \begingroup
+    \leavevmode
+    \@temptokena{#3\collectbox@end#2\endgroup}%
+    \setbox\collectedbox\hbox\bgroup
+       \collectbox@setgroup
+       #1\bgroup
+       \aftergroup\the
+       \aftergroup\@temptokena
+       \collectbox@bgroup
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectbox@bgroup}
+%    \begin{macrocode}
+\def\collectbox@real@bgroup{%
+    \@ifnextchar\bgroup
+        {\afterassignment\collectbox@begin\let\@let@token=}%
+        {\collectbox@arg}%
+}
+\def\collectbox@@bgroup{%
+    \let\collectbox@bgroup\collectbox@real@bgroup
+    \collectbox@begin
+}
+\let\collectbox@bgroup\collectbox@real@bgroup
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\newif\ifcollectboxignorespaces
+\collectboxignorespacestrue
+%    \end{macrocode}
+%
+% \begin{macro}{\collectbox@begin}
+% Hook executed \emph{direct} before the user content.
+%    \begin{macrocode}
+\def\collectbox@begin{%
+    \ifcollectboxignorespaces
+        \expandafter\ignorespaces
+    \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectbox@setgroup}
+%    \begin{macrocode}
+\def\collectbox@setgroup{%
+    \color@setgroup
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectbox@endgroup}
+%    \begin{macrocode}
+\def\collectbox@endgroup{%
+    \ifcollectboxignorespaces
+        \ifhmode\unskip\fi
+    \fi
+    \color@endgroup
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\@collectbox}
+% Simpler and quicker version.
+%    \begin{macrocode}
+\newcommand\@collectbox[1]{%
+    \begingroup
+    \leavevmode
+    \@temptokena{\collectbox@end#1\endgroup}%
+    \setbox\collectedbox\hbox\bgroup
+       \collectbox@setgroup\bgroup
+       \aftergroup\the
+       \aftergroup\@temptokena
+       \collectbox@bgroup
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectbox@arg}
+% Supports |\collectbox{<code>}\somemacro| in addition to
+% |\collectbox{<code>}{\somemacro}|. The first following token is read and the inner brace group is closed
+% to trigger the |\aftergroup| code.
+%    \begin{macrocode}
+\def\collectbox@arg#1{%
+    \collectbox@begin#1\egroup
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectbox@end}
+% The color group is first closed, followed by the closing brace of the |\setbox| command.
+% The user dimension macros are then defined. 
+% Direct after this code the users code is processed and concluded with a |\endgroup|.
+%    \begin{macrocode}
+\def\collectbox@end{%
+    \collectbox@endgroup
+    \egroup
+    \def\BOXCONTENT{\usebox\collectedbox}%
+    \def\width{\wd\collectedbox}%
+    \def\height{\ht\collectedbox}%
+    \def\depth{\dp\collectedbox}%
+    \let\totalheight\@ovri
+    \totalheight\height
+    \advance\totalheight\depth
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectbox@code}
+% Global storage macro for user code.
+%    \begin{macrocode}
+\let\collectbox@code\empty
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectboxto}
+% User level interface. Stores code into macro and calls the internal macro with it.
+%    \begin{macrocode}
+\newcommand\collectboxto[1]{%
+    \@ifnextchar[%
+        {\collectboxto@a{#1}}%
+        {\collectboxto@a{#1}[]}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectboxto@a}
+%    \begin{macrocode}
+\long\def\collectboxto@a#1[#2]#3{%
+    \@ifnextchar[%
+        {\collectboxto@b{#1}{#2}{#3}}%
+        {\collectboxto@b{#1}{#2}{#3}[]}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectboxto@b}
+%    \begin{macrocode}
+\long\def\collectboxto@b#1#2#3[#4]{%
+    \collectboxto@{#1}{#2}{#3}{#4}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectboxto@}
+%    \begin{macrocode}
+\newcommand\collectboxto@[4]{%
+    \leavevmode
+    \setbox#1\hbox\bgroup
+       \def\collectbox@code{#4\collectbox@endgroup\egroup#3}%
+       \collectbox@setgroup#2\bgroup
+       \aftergroup\collectbox@code
+       \collectbox@bgroup
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\@collectboxto}
+% Collects the next brace group as hbox into box register |#1| and executes token |#2| afterwards.
+%    \begin{macrocode}
+\newcommand\@collectboxto[2]{%
+    \leavevmode
+    \setbox#1\hbox\bgroup
+       \def\collectbox@code{\collectbox@endgroup\egroup#2}%
+       \collectbox@setgroup\bgroup
+       \aftergroup\collectbox@code
+       \collectbox@bgroup
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\nocollectbox@}
+% Turns a brace group into \Macro\hbox{<code before><content><code after>}<code>.
+%    \begin{macrocode}
+\newcommand\nocollectbox@[3]{%
+    \leavevmode
+    \hbox\bgroup
+       \def\collectbox@code{#3\egroup#2}%
+       #1\bgroup
+       \aftergroup\collectbox@code
+       \collectbox@bgroup
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\collectboxcheckenv}
+%    \begin{macrocode}
+\newcommand*\collectboxcheckenv[1]{%
+    \begingroup
+    \def\@tempa{#1}%
+    \ifx\@currenvir\@tempa
+        \edef\@currenvir{\@currenvir\noexpand\empty}%
+        \let\collectbox@bgroup\collectbox@@bgroup
+        \ifcsname end#1\endcsname\else
+            \@namedef{end#1}{\egroup\endgroup}%
+        \fi
+    \else
+        \endgroup
+    \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+\endinput

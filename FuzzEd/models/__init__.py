@@ -11,3 +11,4 @@ from configuration import Configuration
 from node_configuration import NodeConfiguration
 #from machine import Machine
 from notification import Notification
+from node_group import NodeGroup

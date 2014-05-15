@@ -13,8 +13,15 @@
             openid.init('openid_identifier');
         });
     });
+    require(['bootstrap'], function() {});
 </script>
 {% endblock %}
+
+{% block goto_menu %}
+<li><a href="/docs/welcome" target="_blank"><i class="fa fa-fw fa-book"></i> Documentation </a></li>
+<li><a href="http://fuzzed.uservoice.com/"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
+{% endblock %}
+
 
 {% block content %}
 <div class="alert alert-block">

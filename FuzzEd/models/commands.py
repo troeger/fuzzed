@@ -1,12 +1,12 @@
 from django.db import models
-from FuzzEd.lib.jsonfield import JSONField
 
+from FuzzEd.lib.jsonfield import JSONField
 from edge import Edge
 from graph import Graph
 from node import Node
 from project import Project
-
 import notations
+
 
 class Command(models.Model):
     """
@@ -345,6 +345,78 @@ class ChangeNode(Command):
         self.node.save()
         self.save()
 
+class ChangeEdge(Command):
+    """
+    Class: ChangeEdge
+
+    Extends: Command
+
+    Command that is issued when properties of an edge change
+    """
+    edge = models.ForeignKey(Edge, related_name='+')
+
+    @classmethod
+    def create_from(cls, graph_id, edge_id, updated_properties):
+        """
+        Method [static]: create_from
+
+        Convenience factory method for issuing a property changed command from parameters as received from API calls.
+        NOTE: if the property does not yet exist it being created and saved.
+
+        Parameters:
+         {str} graph_id   - the id of the graph that contains the edge's property changed
+         {str] edge_id    - the client id(!) of the edge's property changed
+         {str} key        - the name of the property that changed
+         {str} new_value  - the value the property has been changed to
+
+        Returns:
+         {<ChangeEdge>}   - the property changed command instance
+        """
+        edge    = Edge.objects.get(client_id=edge_id, graph__pk=graph_id)
+        command = cls(edge=edge)
+        command.save()
+
+        for key, value in updated_properties.items():
+            old_value = ''
+
+            try:
+                old_value = edge.get_attr(key)
+            except ValueError:
+                pass
+
+            property_change = EdgePropertyChange(command=command, key=key, old_value=old_value, new_value=value)
+            property_change.save()
+
+        return command
+
+    def do(self):
+        """
+        Method: do
+
+        Apply the change to the node or it's corresponding property - i.e. set the new value
+
+        Returns:
+         {None}
+        """
+        for change in self.changes.all():
+            self.edge.set_attr(change.key, change.new_value)
+        self.edge.save()
+        self.save()
+
+    def undo(self):
+        """
+        Method: undo
+
+        Reverts the changes to the node or it's corresponding property - i.e. set old value
+
+        Returns:
+         {None}
+        """
+        for change in self.changes:
+            self.edge.set_attr(change.key, change.old_value)
+        self.edge.save()
+        self.save()
+
 class PropertyChange(models.Model):
     """
     Class: PropertyChange
@@ -362,6 +434,27 @@ class PropertyChange(models.Model):
         app_label = 'FuzzEd'
 
     command   = models.ForeignKey(ChangeNode, related_name='changes')
+    key       = models.CharField(max_length=255)
+    old_value = JSONField()
+    new_value = JSONField()
+
+class EdgePropertyChange(models.Model):
+    """
+    Class: EdgePropertyChange
+
+    Extends: models.Model
+
+    Small inline container class to model arbitrary number of edge's property changes.
+
+    Attributes:
+     {<ChangeEdge>} command   - the command this property change belongs to
+     {str}          old_value - the value of the property before the change
+     {str}          new_value - the updated value
+    """
+    class Meta:
+        app_label = 'FuzzEd'
+
+    command   = models.ForeignKey(ChangeEdge, related_name='changes')
     key       = models.CharField(max_length=255)
     old_value = JSONField()
     new_value = JSONField()
