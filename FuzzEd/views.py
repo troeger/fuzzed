@@ -1,22 +1,20 @@
-import urllib, datetime
+import urllib
+import datetime
+import logging
 
 from django.core.mail import mail_managers
-
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
-
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
-from FuzzEd.models import Graph, Project, Notification, notations, commands
-import FuzzEd.settings
 
-import logging
+from FuzzEd.models import Graph, Project, notations, commands
+import FuzzEd.settings
 logger = logging.getLogger('FuzzEd')
 
 GREETINGS = [
@@ -305,7 +303,7 @@ def dashboard_edit(request, project_id):
         return redirect('dashboard', project_id = project.id)
     
     # something was not quite right here
-    raise HttpResponseBadRequest()
+    return HttpResponseBadRequest()
         
 def graph_settings(request, graph_id):        
     """
@@ -342,7 +340,7 @@ def graph_settings(request, graph_id):
         return render(request, 'dashboard/dashboard_edit.html', parameters)
     
     # something was not quite right here
-    raise HttpResponseBadRequest()
+    return HttpResponseBadRequest()
         
 @login_required
 def settings(request):
