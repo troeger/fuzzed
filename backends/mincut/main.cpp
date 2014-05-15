@@ -1,6 +1,4 @@
-#include "InstanceAnalysisTask.h"
-#include "AlphaCutAnalysisTask.h"
-#include "FuzzTreeTransform.h"
+#include "MinCutAnalysisTask.h"
 
 #include <string>
 #include <iostream>
@@ -8,47 +6,11 @@
 
 #include "FatalException.h"
 #include "CommandLineParser.h"
-#include "FaultTreeToFuzzTree.h"
+#include "FuzzTreeTransform.h"
 #include "util.h"
 #include "xmlutil.h"
 #include "backendResult.h"
-
-
-void analyze(
-	backendResults::AnalysisResult& r,
-	const fuzztree::TopEvent* const topEvent,
-	std::ofstream* logFileStream,
-	unsigned int decompositionNumber) 
-{
-	try
-	{
-		InstanceAnalysisTask* analysis = new InstanceAnalysisTask(topEvent, decompositionNumber, *logFileStream);
-		const auto result = analysis->compute();
-
-		r.probability(serialize(result));
-	}
-	catch (const FatalException& e)
-	{
-		r.validResult(false);
-		r.issue().push_back(e.getIssue().serialized());
-	}
-	catch (const std::exception& e)
-	{
-		r.validResult(false);
-		commonTypes::Issue i;
-		i.message(e.what());
-		r.issue().push_back(i);	
-	}
-	catch (...)
-	{
-		r.validResult(false);
-		commonTypes::Issue i;
-		i.message("Unknown Error");
-		r.issue().push_back(i);
-	}
-}
-
-
+#include "FaultTreeToFuzzTree.h"
 
 int main(int argc, char** argv)
 {
@@ -79,14 +41,9 @@ int main(int argc, char** argv)
 	FuzzTreeTransform tf(instream, issues);
 	instream.close();
 
-	backendResults::BackendResults analysisResults;
+	backendResults::BackendResults mincutResults;
 	try
 	{	
-		// please keep this here for debugging
-// 		std::istreambuf_iterator<char> eos;
-// 		std::string s(std::istreambuf_iterator<char>(instream), eos);
-// 		*logFileStream << s;
-
 		if (!tf.isValid())
 		{ // handle faulttree
 			std::ifstream is(inFile); // TODO: somehow avoid opening another stream here
@@ -95,18 +52,21 @@ int main(int argc, char** argv)
 			is.close();
 
 			std::vector<Issue> treeIssues;
-			const unsigned int decompositionNumber = 
-				faultTree->topEvent().decompositionNumber().present() ? 
-				faultTree->topEvent().decompositionNumber().get() : 
-				DEFAULT_DECOMPOSITION_NUMBER;
 			const auto modelId = faultTree->id();
-			const auto configId = "0"; // TODO find a default id
-			backendResults::AnalysisResult r(modelId, configId, util::timeStamp(), true, decompositionNumber);
-			r.decompositionNumber(decompositionNumber);
+
+			backendResults::MincutResult r(modelId, "", util::timeStamp(), true);
 			try
 			{
 				const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent(), treeIssues);	
-				analyze(r, topEvent.get(), logFileStream, decompositionNumber);
+				MinCutAnalysisTask mt(topEvent.get(), *logFileStream);
+				for (const auto& res : mt.analyze())
+				{
+					std::string mincut;
+					for (const auto& s : res)
+						mincut += s;
+
+					r.nodeid().push_back(mincut);
+				}
 			}
 			catch (const FatalException& e)
 			{
@@ -116,7 +76,7 @@ int main(int argc, char** argv)
 			for (const auto& i : treeIssues)
 				r.issue().push_back(i.serialized());
 			
-			analysisResults.result().push_back(r);
+			mincutResults.result().push_back(r);
 
 			if (!r.validResult())
 				faulttree::faultTree(*logFileStream, *(faultTree.get()));
@@ -127,28 +87,35 @@ int main(int argc, char** argv)
 			const auto modelId = tree->id();
 			
 			const auto topEvent = tree->topEvent();
-
-			const unsigned int decompositionNumber = 
-				topEvent.decompositionNumber().present() ? 
-				topEvent.decompositionNumber().get() : 
-				DEFAULT_DECOMPOSITION_NUMBER;
-
 			for (const auto& t : tf.transform())
 			{
 				auto topEvent = fuzztree::TopEvent(t.second.topEvent());
-				backendResults::AnalysisResult r(modelId, t.first.getId(), util::timeStamp(), true, decompositionNumber);
+				backendResults::MincutResult r(modelId, t.first.getId(), util::timeStamp(), true);
 				try
 				{
-					analyze(r, &topEvent, logFileStream, decompositionNumber);
+					MinCutAnalysisTask mt(&topEvent, *logFileStream);
+					for (const auto& res : mt.analyze())
+					{
+						std::string mincut;
+						bool first = true;
+						for (const auto& s : res)
+						{
+							if (!first) mincut += ",";
+							else first = false;
+							mincut += s;
+						}
+
+						r.nodeid().push_back(mincut);
+					}
 				}
 				catch (const FatalException& e)
 				{
 					r.issue().push_back(e.getIssue().serialized());
 					r.validResult(false);
 				}
-				 
-				analysisResults.configuration().push_back(serializedConfiguration(t.first));
-				analysisResults.result().push_back(r);
+
+				mincutResults.configuration().push_back(serializedConfiguration(t.first));
+				mincutResults.result().push_back(r);
 			}
 		}
 	}
@@ -165,12 +132,12 @@ int main(int argc, char** argv)
 	// Log errors
 	for (const Issue& issue : issues)
 	{
-		analysisResults.issue().push_back(issue.serialized());
+		mincutResults.issue().push_back(issue.serialized());
 		*logFileStream << issue.getMessage() << std::endl;
 	}
 
 	std::ofstream output(outFile);
-	backendResults::backendResults(output, analysisResults);
+	backendResults::backendResults(output, mincutResults);
 	
 	logFileStream->close();
 	delete logFileStream;

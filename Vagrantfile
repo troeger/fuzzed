@@ -29,4 +29,8 @@ Vagrant::Config.run do |config|
     config.vm.share_folder "fuzztrees", "/home/fuzztrees", "."
 
     config.vm.provision :shell, :inline => $script
+
+    # If the VM has no internet connectivity, uncomment this line:
+    # config.vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    # config.vm.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
 end

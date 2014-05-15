@@ -176,20 +176,14 @@ set(XSD_TO_FUZZTREE_ARGS
 ########### RESULT XML ##################
 
 set(XSD_GENERATED_RESULT_FILES
-	${COMMON_DIR}/analysisResult.h
-	${COMMON_DIR}/simulationResult.h
-	${COMMON_DIR}/configurationResult.h
+	${COMMON_DIR}/backendResult.h
 	${COMMON_DIR}/commonTypes.h
 	${COMMON_DIR}/configurations.h
-	${COMMON_DIR}/analysisResult.cpp
-	${COMMON_DIR}/simulationResult.cpp
-	${COMMON_DIR}/configurationResult.cpp
+	${COMMON_DIR}/backendResult.cpp
 	${COMMON_DIR}/commonTypes.cpp
 	${COMMON_DIR}/configurations.cpp)
 
-set(ANALYSIS_RESULT_XSD			"${XSD_FILE_PATH}/analysisResult.xsd")
-set(SIMULATION_RESULT_XSD		"${XSD_FILE_PATH}/simulationResult.xsd")
-set(CONFIGURATION_RESULT_XSD	"${XSD_FILE_PATH}/configurationResult.xsd")
+set(RESULT_XSD					"${XSD_FILE_PATH}/backendResult.xsd")
 set(COMMON_TYPES_XSD			"${XSD_FILE_PATH}/commonTypes.xsd")
 set(CONFIGURATION_XSD			"${XSD_FILE_PATH}/configurations.xsd")
 
@@ -218,28 +212,14 @@ add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FIL
 		cxx-tree
 			${XSD_RESULT_ARGS}
 			--output-dir ${COMMON_DIR}
+			--root-element "backendResults"
+			${RESULT_XSD}
+
+	COMMAND ${XSD_EXECUTABLE} 
+		cxx-tree
+			${XSD_RESULT_ARGS}
+			--output-dir ${COMMON_DIR}
 			${CONFIGURATION_XSD}
-
-	COMMAND ${XSD_EXECUTABLE}
-		cxx-tree 
-			${XSD_RESULT_ARGS} 
-			--output-dir ${COMMON_DIR}
-			--root-element "analysisResults"
-			${ANALYSIS_RESULT_XSD}
-
-	COMMAND ${XSD_EXECUTABLE} 
-		cxx-tree
-			${XSD_RESULT_ARGS}
-			--output-dir ${COMMON_DIR}
-			--root-element "configurationResults"
-			${CONFIGURATION_RESULT_XSD}
-
-	COMMAND ${XSD_EXECUTABLE} 
-		cxx-tree
-			${XSD_RESULT_ARGS}
-			--output-dir ${COMMON_DIR}
-			--root-element "simulationResults"
-			${SIMULATION_RESULT_XSD}
 
 	COMMAND ${XSD_EXECUTABLE}
 		cxx-tree 
@@ -270,9 +250,7 @@ set(COMMON_SOURCES
 	${COMMON_DIR}/FuzzTreeTypes.cpp
 	${COMMON_DIR}/faulttree.cpp
 	${COMMON_DIR}/fuzztree.cpp
-	${COMMON_DIR}/analysisResult.cpp
-	${COMMON_DIR}/simulationResult.cpp
-	${COMMON_DIR}/configurationResult.cpp
+	${COMMON_DIR}/backendResult.cpp
 	${COMMON_DIR}/commonTypes.cpp
 	${COMMON_DIR}/configurations.cpp
 	${COMMON_DIR}/CommandLineParser.cpp
@@ -290,9 +268,7 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/FuzzTreeTypes.h
 	${COMMON_DIR}/faulttree.h
 	${COMMON_DIR}/fuzztree.h
-	${COMMON_DIR}/analysisResult.h
-	${COMMON_DIR}/simulationResult.h
-	${COMMON_DIR}/configurationResult.h
+	${COMMON_DIR}/backendResult.h
 	${COMMON_DIR}/commonTypes.h
 	${COMMON_DIR}/configurations.h
 	${COMMON_DIR}/CommandLineParser.h
@@ -300,6 +276,7 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/Issue.h
 	${COMMON_DIR}/FatalException.h
 	${COMMON_DIR}/DeadlockMonitor.h
+	${COMMON_DIR}/Dynamic2dArray.h
 )
 
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
@@ -320,3 +297,4 @@ endif()
 add_subdirectory(fuzztreeconfiguration)
 add_subdirectory(fuzztreeanalysis)
 add_subdirectory(simulation)
+add_subdirectory(mincut)

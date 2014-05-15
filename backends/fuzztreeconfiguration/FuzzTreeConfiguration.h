@@ -34,6 +34,8 @@ public:
 	void setCost(int cost);
 	const int getCost() const;
 
+	const id_type& getId() const;
+
 	const std::map<id_type, bool>&					getOptionalNodes() const;
 	const std::map<id_type, std::tuple<int,int>>&	getRedundancyNodes() const;
 	const std::map<id_type, id_type>&				getFeaturedNodes() const;
@@ -47,6 +49,7 @@ protected:
 	std::map<id_type, id_type>								m_featureNodes;
 
 	int m_costs;
+	id_type m_id;
 
 	bool m_bValid;
 };

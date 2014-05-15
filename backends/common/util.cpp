@@ -35,8 +35,8 @@ std::string util::toString(const double& d, const int& prec /*= 5*/)
 
 string util::toString(istream& istream)
 {
-	int pos = istream.tellg();
-	string result = string(std::istreambuf_iterator<char>(istream), std::istreambuf_iterator<char>());
+	const auto pos = istream.tellg();
+	const string result = string(std::istreambuf_iterator<char>(istream), std::istreambuf_iterator<char>());
 	istream.seekg(pos);
 	return result;
 }
@@ -178,7 +178,7 @@ double util::probabilityFromRate(double rate, int missionTime)
 
 bool util::bitSet(const int var, const int pos)
 {
-	return (var) & (1<<(pos));
+	return !!((var) & (1<<(pos)));
 }
 
 bool util::isWritable(const string& path)
