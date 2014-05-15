@@ -61,7 +61,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
                 //TODO: IS THIS REALLY THE RIGHT WAY TO DO IT?
                 // (we cannot put the require as dependency of this module, as there is some kind of cyclic dependency
-                // stopping Node.js to work properly
+                // stopping Node.js to work properly)
 
                 var Edge =      require("edge");
                 var Node =      require("node");
@@ -105,11 +105,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         },
 
         _sanitize: function() {
-            //var validationResult = {};
-            //if (!this.validate(this.value, validationResult)) {
-            //    var ErrorClass = validationResult.kind || Error;
-            //    throw new ErrorClass(validationResult.message);
-            //}
+            var validationResult = {};
+            if (!this.validate(this.value, validationResult)) {
+                var ErrorClass = validationResult.kind || Error;
+                throw new ErrorClass(validationResult.message);
+            }
 
             return this;
         },
@@ -629,7 +629,6 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             var unlinked = value === this.UNLINK_VALUE;
 
             if (!unlinked) this.owner.hideBadge();
-
             jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [
                 value,
                 unlinked ? this.UNLINK_TEXT : this.transferGraphs[value],
@@ -639,7 +638,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         fetchTransferGraphs: function() {
             jQuery.ajax({
-                url:      this.GRAPHS_URL + this.owner.graph.id + Config.Backend.TRANSFERS_URL,
+                url:      this.GRAPHS_URL + '?kind=' + this.owner.graph.kind,
                 type:     'GET',
                 dataType: 'json',
                 // don't show progress
@@ -651,10 +650,12 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         },
 
         _setTransferGraphs: function(json) {
-            this.transferGraphs = _.reduce(json.transfers, function(all, current) {
-                all[current.id] = current.name;
+            this.transferGraphs = _.reduce(json.graphs, function(all, current) {
+                var id = window.parseInt(_.last(current.url.split('/')));
+                all[id] = current.name;
                 return all;
             }, {});
+            delete this.transferGraphs[this.owner.graph.id];
 
             if (this.value === this.UNLINK_VALUE)
                 this.owner.showBadge('!', 'important');

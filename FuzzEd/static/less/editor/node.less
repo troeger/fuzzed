@@ -140,7 +140,7 @@
 .fuzzed-nodegroup {
     z-index: -42; // under everything else
     svg path {
-        stroke: #4682b4;
+        stroke: #797979;
 
         // selected/selecting state
         &.ui-selected, &.ui-selecting {
@@ -149,9 +149,14 @@
     }
     .fuzzed-mirror {
         position: absolute;
-        color: #4682b4;
+        color: #797979;
         background: transparent;
         margin-top: -18px;
+    }
+    &.highlighted {
+        .fuzzed-mirror {
+             color: @theme-highlight;
+        }
     }
 }
 

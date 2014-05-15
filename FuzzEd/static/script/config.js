@@ -67,22 +67,23 @@ define(['underscore'], function() {
          *    {String} GRAPHS_URL                 - Part of the sub-URL used to perform graph-specific API calls.
          *    {String} NODES_URL                  - Part of the sub-URL used to perform node-specific API calls.
          *    {String} EDGES_URL                  - Part of the sub-URL used to perform edge-specific API calls.
-         *    {String} TRANSFERS_URL              - Part of the sub-URL used to perform transferable specific API calls.
          *    {String} CUTSETS_URL                - Part of the sub-URL used to perform cutset-specific API calls.
          *    {String} ANALYTICAL_PROBABILITY_URL - Part of the sub-URL used for top event analytical probability API calls.
          *    {String} SIMULATED_PROBABILITY_URL  - Part of the sub-URL used for top event simulated probability API calls.
          *    {String} GRAPH_EXPORT_URL           - Part of the sub-URL used for graph export API calls.
          */
         Backend: {
-            ANALYSIS_URL:               '/analysis',
-            SIMULATION_URL:             '/simulation',
-            BASE_URL:                   '/front',
+            ANALYSIS_JOB:               'topevent',
+            SIMULATION_JOB:             'simulation',
+            EPS_JOB:                    'eps',
+            PDF_JOB:                    'pdf',
+            JOBS_URL:                   '/jobs', 
+            BASE_URL:                   '/api/front',
             EDITOR_URL:                 '/editor',
             GRAPHS_URL:                 '/graphs',
             NODES_URL:                  '/nodes',
             EDGES_URL:                  '/edges',
             NODEGROUPS_URL:             '/nodegroups',
-            TRANSFERS_URL:              '/transfers',
             CUTSETS_URL:                '/cutsets',
             ANALYTICAL_PROBABILITY_URL: '/topEventProbability',
             SIMULATED_PROBABILITY_URL:  '/topEventProbability',
