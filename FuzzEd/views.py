@@ -15,6 +15,7 @@ from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClai
 
 from FuzzEd.models import Graph, Project, notations, commands
 import FuzzEd.settings
+
 logger = logging.getLogger('FuzzEd')
 
 GREETINGS = [
@@ -255,10 +256,8 @@ def dashboard_edit(request, project_id):
     
     if POST.get('share'):
         
-        users = User.objects.all() #.exclude(id=request.user.id)
-        
-        print users
-        
+        users = User.objects.exclude(pk=request.user.pk)
+
         parameters = {
             'project': project,
             'users': users

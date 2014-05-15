@@ -1,7 +1,7 @@
 {% extends "util/base.html" %}
 
 {% block title %}
-    {{ block.super }} - Edit {{ graph }}
+    {{ block.super }} - Share {{ graph }}
 {% endblock %}
 
 {%block navigation_home %}hidden{% endblock %}
@@ -19,12 +19,8 @@
 		      searchField: 'fullname',
 		      options: [
               {% for user in users %} 
-                  { id: {{user.id}}, fullname: '{{user.first_name}} {{user.last_name}}'},
+                  { id: {{user.pk}}, fullname: '{{user.get_full_name | default:user.get_username}}'},
               {% endfor %}
-                  { id: 3, fullname: 'Dieter Detlev'},
-                  { id: 4, fullname: 'Max Meier'},
-                  { id: 5, fullname: 'Rotz Wohlgemuth'},
-                  { id: 6, fullname: 'Philipp Gotsmann'},
 		      ],
 		      create: false
       });
