@@ -87,9 +87,15 @@ def projects(request):
     Returns:
      {HttpResponse} a django response object
     """
-    projects = (request.user.projects.filter(deleted=False) | request.user.own_projects.filter(deleted=False)).order_by('-created')
+    user = request.user
+    
+    projects = (user.projects.filter(deleted=False) | user.own_projects.filter(deleted=False)).order_by('-created')
+    # variable that indicates if there are graphs shared with the current user
+    shared_graphs = True if user.sharings else False
 
-    parameters = {'projects':[ project.to_dict() for project in projects]}
+    parameters = {'projects':[ project.to_dict() for project in projects],
+                  'shared_graphs':shared_graphs      
+                 }
 
     # provide notification box on the projects overview page, if something is available for this user
     try:
@@ -161,7 +167,30 @@ def project_edit(request, project_id):
     
     # something was not quite right here
     raise HttpResponseBadRequest()
+
+def shared_graphs_dashboard(request):        
+    """
+    Function: shared_graphs    
         
+    This handler function is responsible for ...
+    
+    Parameters:
+     {HttpResponse} request  - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    sharings = request.user.sharings.all()
+    
+    shared_graphs = [sharing.graph for sharing in sharings]
+    
+    if not (shared_graphs):
+        raise Http404
+        
+    parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in shared_graphs]}
+        
+    
+    return render(request, 'dashboard/shared_graphs_dashboard.html', parameters)
 
 @login_required
 def dashboard(request, project_id):

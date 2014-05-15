@@ -117,6 +117,18 @@
                       </td>
                   </tr>
               {% endfor %}
+              
+              {% if shared_graphs %}
+                <tr onclick="document.location = '{% url 'shared_graphs_dashboard' %}';">
+                    <td></td>
+                    <td>
+                        <strong class="project_name"> Shared Graphs</strong>
+                    </td>
+                    <td></td>
+                    <td></td>
+                </tr>
+              {% endif %}
+              
           </tbody>
       </table>
   </section>

@@ -45,6 +45,7 @@ urlpatterns = patterns('',
     url(r'^projects/(?P<project_id>\d+)/dashboard/$', 'FuzzEd.views.dashboard', name='dashboard'),
     url(r'^projects/(?P<project_id>\d+)/dashboard/new/(?P<kind>\w{1,50})$', 'FuzzEd.views.dashboard_new', name='dashboard_new'),
     url(r'^projects/(?P<project_id>\d+)/dashboard/edit/', 'FuzzEd.views.dashboard_edit', name='dashboard_edit'),
+    url(r'^projects/shared_graphs_dashboard', 'FuzzEd.views.shared_graphs_dashboard', name='shared_graphs_dashboard'),
     url(r'^graphs/(?P<graph_id>\d+)/', 'FuzzEd.views.graph_settings', name='graph_settings'),
 
     url(r'^robots\.txt$', lambda r: HttpResponse("User-agent: *\nDisallow: /admin/\nDisallow: /dashboard/\nDisallow: /editor/\n", mimetype="text/plain")),
