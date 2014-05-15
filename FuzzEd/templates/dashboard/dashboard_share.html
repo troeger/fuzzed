@@ -11,17 +11,9 @@
 {{ block.super }}
 <script type="text/javascript" language="javascript">
   require(['selectize'], function() {
-      jQuery('#contact_selection').selectize({
+      jQuery('#users').selectize({
           plugins: ['remove_button'],
 		      maxItems: null,
-		      valueField: 'id',
-		      labelField: 'fullname',
-		      searchField: 'fullname',
-		      options: [
-              {% for user in users %} 
-                  { id: {{user.pk}}, fullname: '{{user.get_full_name | default:user.get_username}}'},
-              {% endfor %}
-		      ],
 		      create: false
       });
   });
@@ -34,6 +26,7 @@
     <h1>
         Edit <small>{{ graph }}</small>
     </h1>
+    The graphs you share are only readable, but not modifiable, by the chosen users.
 </div>
 
 <form method="POST" action="{% url 'dashboard_edit' project.pk %}" class="form-horizontal">
@@ -41,9 +34,14 @@
     <input type="hidden" name="graph_id_list" value="{{ graph_id_list }}"/>
     <fieldset>
         <div class="form-group">
-            <label for="contact_selection" class="col-lg-2 control-label">Users:</label>
+            <label for="users" class="col-lg-2 control-label">Users:</label>
             <div class="col-lg-10">
-                <select id="contact_selection" multiple placeholder="Pick some people..."></select>
+                <select name="users" id="users" multiple placeholder="Pick some users...">
+                  {% for user in users %}
+                      <option value="{{ user.pk }}">{{ user.visible_name }}</option>
+                  {% endfor %}
+
+                </select>
             </div>  
         </div>
         <div class="form-group">

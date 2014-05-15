@@ -14,7 +14,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
 
-from FuzzEd.models import Graph, Project, notations, commands
+from FuzzEd.models import Graph, Project, notations, commands, Sharing
 import FuzzEd.settings
 
 
@@ -253,14 +253,14 @@ def dashboard_edit(request, project_id):
 
     POST = request.POST
 
+    # Save determination of chosen graphs
     if "graph_id[]" in POST:
-        # Coming direcly from a form with <select> entries
+        # Coming directly from a form with <select> entries
         selected_graphs = POST.getlist('graph_id[]')
-        graphs = [ get_object_or_404(Graph, pk=graph_id, owner=request.user) for graph_id in selected_graphs]
     elif "graph_id_list" in POST:
         # Coming from a stringified list stored by ourselves
         selected_graphs = json.loads(POST.get('graph_id_list'))
-        graphs = [ get_object_or_404(Graph, pk=graph_id, owner=request.user) for graph_id in selected_graphs]
+    graphs = [ get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False) for graph_id in selected_graphs]
 
     if POST.get('share'):
         # "Share" button pressed for one or multiple graphs
@@ -274,7 +274,16 @@ def dashboard_edit(request, project_id):
 
     elif POST.get("share_save"):
         # Save choice of users for the graphs
-        pass
+        user_ids = POST.getlist('users')
+        users = [get_object_or_404(User, pk=user_id) for user_id in user_ids]
+
+        for graph in graphs:
+            for user in users:
+                sharing = Sharing(graph = graph, user=user)
+                sharing.save()
+            users_str = ','.join([u.visible_name() for u in users])
+            messages.add_message(request, messages.SUCCESS, "'%s' shared with %s."%(graph, users_str ))
+        return redirect('dashboard', project_id = project.id)
 
     elif POST.get('copy'):
         # "Copy" button pressed for one or multiple graphs
