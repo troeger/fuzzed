@@ -192,13 +192,5 @@
             "edge": null, 
             "key": "name"
         }
-    }, 
-    {
-        "pk": 2, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "testadmin", 
-            "password": "pbkdf2_sha256$10000$JNt1EZn2g72p$vX3UFh7g4mPa313pWW4lf4YxkUhL534V8/kxFaQ1XvM="
-        }
     }
 ]

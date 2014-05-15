@@ -3,7 +3,7 @@
 
     The typical workflow to add new tests is the following:
     - Get yourself an empty local database with './manage.py flush'.
-    - Draw one or more test graphs. 
+    - Draw one or more test graphs. Make sure that they are owner by the user with user.pk = 1.
     - Create a fixture file from it with 'fab fixture_save:<filename.json>'. 
     - Create a class such as 'SimpleFixtureTestCase' to wrap all ID's for your fixture file.
     - Derive your test case class from it. Check the helper functions in 'FuzzEdTestCase'.
@@ -104,7 +104,7 @@ class SimpleFixtureTestCase(FuzzEdTestCase):
         This is a base class that wraps all information about the 'simple' fixture. 
     '''
     #TODO: use notations here?
-    fixtures = ['simple.json', 'initial_data.json']
+    fixtures = ['simple.json', 'testuser.json']
     graphs = {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'}
     # A couple of specific PK's from the model
     pkProject = 1
@@ -483,27 +483,11 @@ class AnalysisInputFilesTestCase(FuzzEdTestCase):
                 self.assertEqual(retcode, 0, fname + " failed")
                 dom = parse('/tmp/output.xml')
 
-
-class AnalysisFixtureTestCase(FuzzEdTestCase):
-    ''' 
-        This is a base class that wraps all information about the 'analysis' fixture. 
-    '''
-    fixtures = ['analysis.json', 'initial_data.json', 'mincut1.json']
-    # A couple of specific PK's from the model
-    graphs = [7, 8, 9]
-    rate_faulttree = 7
-    prdc_fuzztree = 8
-    mincut_faulttree = 9
-    # The decomposition number configured in the PRDC tree
-    prdc_configurations = 8
-    prdc_peaks = [0.31482, 0.12796, 0.25103, 0.04677, 0.36558, 0.19255, 0.30651, 0.11738]
-    mincut_numcuts = 3
-
-
-class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
-    ''' 
-        Tests for backend functionality, as being triggered from frontend calls. 
-    '''
+class BackendDaemonFromFrontendTestCase(FuzzEdTestCase):
+    """
+        Tests for backend functionality, as being triggered from frontend calls.
+        This demands firing up the backend daemon in the setup phase.
+    """
 
     baseUrl = '/api/front'
 
@@ -519,6 +503,22 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
     def tearDown(self):
         print "\nShutting down backend daemon"
         self.backend.terminate()
+
+
+class AnalysisFixtureTestCase(BackendDaemonFromFrontendTestCase):
+    """
+        This is a base class that wraps all information about the 'analysis' fixture.
+        Don't add new fixtures here. Either load - modify - save the existing fixture file,
+        or create a new class for your new fixture.
+    """
+    fixtures = ['analysis.json', 'testuser.json']
+    # A couple of specific PK's from the model
+    graphs = [7, 8]
+    rate_faulttree = 7
+    prdc_fuzztree = 8
+    # The decomposition number configured in the PRDC tree
+    prdc_configurations = 8
+    prdc_peaks = [0.31482, 0.12796, 0.25103, 0.04677, 0.36558, 0.19255, 0.30651, 0.11738]
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testRateFaulttree(self):
@@ -540,17 +540,9 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
         for conf in result['configurations']:
             assert (round(conf['peak'], 5) in self.prdc_peaks)
 
-    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
-    def testMincutFaulttree(self):
-        response = self.requestJob(self.baseUrl, self.mincut_faulttree, 'topevent')
-        result = json.loads(response.content)
-        self.assertEqual(bool(result['validResult']), True)
-        self.assertEqual(result['errors'], {})
-        self.assertEqual(result['warnings'], {})
-        # TODO: self.assertEqual(len(result['mincutResults']), 3)
-
     def testFrontendAPIPdfExport(self):
         for graph in self.graphs:
+            print graph
             pdf = self.requestJob(self.baseUrl, graph, 'pdf')
             # The result of a PDF rendering job is the download link
             self.assertEqual('application/pdf', pdf['CONTENT-TYPE'])
@@ -562,8 +554,28 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
             self.assertEqual('application/postscript', eps['CONTENT-TYPE'])
 
 
+class MinCutFixtureTestCase(BackendDaemonFromFrontendTestCase):
+    """
+        This is a base class that wraps all information about the 'mincut' fixture.
+        Don't add new fixtures here. Either load - modify - save the existing fixture file,
+        or create a new class for your new fixture.
+    """
+    fixtures = ['mincut1.json', 'testuser.json']
+    # A couple of specific PK's from the model
+    mincut_faulttree = 1
+    mincut_numcuts = 3
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+    def testMincutFaulttree(self):
+        response = self.requestJob(self.baseUrl, self.mincut_faulttree, 'topevent')
+        result = json.loads(response.content)
+        self.assertEqual(bool(result['validResult']), True)
+        self.assertEqual(result['errors'], {})
+        self.assertEqual(result['warnings'], {})
+        # TODO: self.assertEqual(len(result['mincutResults']), 3)
+
 class UnicodeTestCase(FuzzEdTestCase):
-    fixtures = ['unicode.json', 'initial_data.json']
+    fixtures = ['unicode.json', 'testuser.json']
     graphs = {1: 'faulttree'}
     # A couple of specific PK's from the model
     pkProject = 1

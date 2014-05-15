@@ -19,7 +19,7 @@
             "created": "2014-04-15T07:07:05.262", 
             "deleted": false, 
             "modified": "2014-04-15T07:09:52.731", 
-            "owner": 2, 
+            "owner": 1, 
             "users": []
         }
     }, 
@@ -34,7 +34,7 @@
             "deleted": false, 
             "modified": "2014-04-15T07:09:52.725", 
             "project": 2, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -141,14 +141,6 @@
             "value": "[0, 0.5]", 
             "edge": null, 
             "key": "probability"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "testadmin", 
-            "password": "pbkdf2_sha256$10000$JNt1EZn2g72p$vX3UFh7g4mPa313pWW4lf4YxkUhL534V8/kxFaQ1XvM="
         }
     }
 ]
