@@ -38,6 +38,7 @@
 
 <form method="POST" action="{% url 'dashboard_edit' project.pk %}" class="form-horizontal">
     {% csrf_token %}
+    <input type="hidden" name="graph_id_list" value="{{ graph_id_list }}"/>
     <fieldset>
         <div class="form-group">
             <label for="contact_selection" class="col-lg-2 control-label">Users:</label>
@@ -47,7 +48,7 @@
         </div>
         <div class="form-group">
             <div class="col-push-2 col-lg-10">
-                <button type="button" name="save" class="btn btn-primary">Save</button>
+                <button type="submit" name="share_save" value="share_save" class="btn btn-primary">Save</button>
                 <button class="btn btn-default" onclick="history.go(-1); return false;">Cancel</button>
             </div>
         </div>

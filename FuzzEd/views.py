@@ -1,3 +1,4 @@
+import json
 import urllib
 import datetime
 import logging
@@ -15,6 +16,7 @@ from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClai
 
 from FuzzEd.models import Graph, Project, notations, commands
 import FuzzEd.settings
+
 
 logger = logging.getLogger('FuzzEd')
 
@@ -248,25 +250,34 @@ def dashboard_edit(request, project_id):
      {HttpResponse} a django response object
     """
     project = get_object_or_404(Project, pk=project_id)
-    
-    POST = request.POST  
-      
-    selected_graphs = POST.getlist('graph_id[]')
-    graphs = [ get_object_or_404(Graph, pk=graph_id, owner=request.user) for graph_id in selected_graphs]
-    
-    if POST.get('share'):
-        
-        users = User.objects.exclude(pk=request.user.pk)
 
+    POST = request.POST
+
+    if "graph_id[]" in POST:
+        # Coming direcly from a form with <select> entries
+        selected_graphs = POST.getlist('graph_id[]')
+        graphs = [ get_object_or_404(Graph, pk=graph_id, owner=request.user) for graph_id in selected_graphs]
+    elif "graph_id_list" in POST:
+        # Coming from a stringified list stored by ourselves
+        selected_graphs = json.loads(POST.get('graph_id_list'))
+        graphs = [ get_object_or_404(Graph, pk=graph_id, owner=request.user) for graph_id in selected_graphs]
+
+    if POST.get('share'):
+        # "Share" button pressed for one or multiple graphs
+        users = User.objects.exclude(pk=request.user.pk)
         parameters = {
             'project': project,
-            'users': users
+            'users': users,
+            'graph_id_list': json.dumps([graph.pk for graph in graphs])
         }
-                    
         return render(request, 'dashboard/dashboard_share.html', parameters)
-    
-    # copy requested
-    if POST.get('copy'):
+
+    elif POST.get("share_save"):
+        # Save choice of users for the graphs
+        pass
+
+    elif POST.get('copy'):
+        # "Copy" button pressed for one or multiple graphs
         for old_graph in graphs:
             duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
                                                           owner=request.user,  add_default_nodes=False, project=project)
@@ -280,6 +291,7 @@ def dashboard_edit(request, project_id):
         return redirect('dashboard', project_id = project.id)
     
     elif POST.get('snapshot'):
+        # "Snapshot" button pressed for one or multiple graphs
         for old_graph in graphs:
             duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
                                                           owner=request.user, add_default_nodes=False, project=project)
@@ -293,15 +305,14 @@ def dashboard_edit(request, project_id):
         messages.add_message(request, messages.SUCCESS, 'Snapshot creation sucessful.')
         return redirect('dashboard', project_id=project.id)
     
-    # deletion requested? do it and go back to dashboard
     elif POST.get('delete'):
+        # "Delete" button pressed for one or multiple graphs
         for graph in graphs:
             commands.DeleteGraph.create_from(graph.pk).do()
         
         messages.add_message(request, messages.SUCCESS, 'Deletion sucessful.')
         return redirect('dashboard', project_id = project.id)
     
-    # something was not quite right here
     return HttpResponseBadRequest()
         
 def graph_settings(request, graph_id):        
