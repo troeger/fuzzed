@@ -317,6 +317,15 @@ class Graph(models.Model):
         self.read_only = other.read_only
         self.save()
 
+    def delete_configurations(self):
+        """
+            Deletes all informations about configurations of this graph.
+        """
+        for conf in self.configurations.all():
+            nodeconf = NodeConfiguration.objects.filter(configuration=conf)
+            nodeconf.delete()
+            conf.delete()
+
     def same_as(self, graph):
         ''' 
             Checks if this graph is equal to the given one in terms of nodes and their properties. 

@@ -12,7 +12,7 @@ from django.http import HttpResponse
 from south.modelsinspector import add_introspection_rules
 
 from graph import Graph
-from FuzzEd.models import xml_analysis, xml_simulation
+from FuzzEd.models import xml_backend
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice
@@ -100,11 +100,68 @@ class Job(models.Model):
         response['Content-Type'] = 'application/pdf' if self.kind == 'pdf' else 'application/postscript'
         return response
 
+    def parse_result(self):
+        """
+            Parses the stored binary result data and saves the content to the database, in relation to this job.
+        """
+        if self.requires_download:
+            # no parsing needed, directly delivered to client
+            return
+        logger.debug("Parsing backend result XML into database")
+        doc = xml_backend.CreateFromDocument(str(self.result))
+
+        if hasattr(doc, 'issue'):
+            for issue in doc.issue:
+                pass
+                #TODO: Save issues
+
+        conf_id_mappings = {}         # XML conf ID's to DB conf ID's
+
+        if hasattr(doc, 'configuration'):
+            # Throw away existing configurations information
+            self.graph.delete_configurations()
+            # walk through all the configurations determined by the backend, as shown in the XML
+            for configuration in doc.configuration:
+                db_conf = Configuration(graph=self.graph, costs=configuration.costs if hasattr(configuration, 'costs') else None)
+                db_conf.save()
+                conf_id_mappings[configuration.id] = db_conf
+                logger.debug("Storing configuration %u for graph %u"%(db_conf.pk, self.graph.pk))
+                # Analyze node configuration choices in this configuration
+                assert(hasattr(configuration, 'choice'))    # according to XSD, this must be given
+                for choice in configuration.choice:
+                    element = choice.value_
+                    json_choice = {}
+                    if isinstance(element, FeatureChoice):
+                        json_choice['type'] = 'FeatureChoice'
+                        json_choice['featureId'] = element.featureId
+                    elif isinstance(element, InclusionChoice):
+                        json_choice['type'] = 'InclusionChoice'
+                        json_choice['included'] = element.included
+                    elif isinstance(element, RedundancyChoice):
+                        json_choice['type'] = 'RedundancyChoice'
+                        json_choice['n'] = int(element.n)
+                    else:
+                        raise ValueError('Unknown choice %s' % element)
+                    db_node = Node.objects.get(client_id=choice.key, graph=self.graph)
+                    db_nodeconf = NodeConfiguration(node=db_node, configuration = db_conf, setting=json_choice)
+                    db_nodeconf.save()
+                    logger.debug("Storing node configuration %u for node %u"%(db_nodeconf.pk, db_node.pk))
+
+        if hasattr(doc, 'result'):
+            for result in doc.result:
+                assert(doc.result.modelId == self.graph.pk)
+                db_result = Result(graph=self.graph , job=self, configuration=conf_id_mappings[result.configId])
+                db_result.save()
+                print result
+
     def result_json(self):
         """
             Returns an HttpResponse as JSON representation of the result data.
             This currently holds only for analysis result data.
         """
+        return HttpResponse(status=200)
+
+
         json_result = {}
         errors = {}
         warnings = {}
@@ -116,12 +173,7 @@ class Job(models.Model):
         topId = self.graph.top_node().client_id
 
         # Parse analysis result XML file
-        if (self.kind == Job.TOP_EVENT_JOB):
-            doc = xml_analysis.CreateFromDocument(result_data)
-        elif (self.kind == Job.SIMULATION_JOB):
-            doc = xml_simulation.CreateFromDocument(result_data)
-        else:
-            assert (False)
+        doc = xml_backend.CreateFromDocument(result_data)
 
         # Check global (problem) issues that are independent from the particular configuration
         # and were sent as part of the analysis result

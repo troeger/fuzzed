@@ -15,13 +15,11 @@ from FuzzEd import util
 
 
 XSD_PY_FILE_MAP = {
-    'analysisResult':      'xml_analysis',
-    'simulationResult':    'xml_simulation',
+    'backendResult':       'xml_backend',
     'fuzztree':            'xml_fuzztree',
     'faulttree':           'xml_faulttree',
     'commonTypes':         'xml_common',
-    'configurations':      'xml_configurations',
-    'configurationResult': 'xml_conf_result'
+    'configurations':      'xml_configurations'
 }
 
 def svg2pgf_shape(filename):
