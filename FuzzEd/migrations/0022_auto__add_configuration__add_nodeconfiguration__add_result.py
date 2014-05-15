@@ -8,31 +8,59 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting field 'Job.result'
-        db.delete_column(u'FuzzEd_job', 'result')
+        # Adding model 'Configuration'
+        try:
+            db.delete_table(u'FuzzEd_configuration')
+        except:
+            pass
+        db.create_table(u'FuzzEd_configuration', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='configurations', to=orm['FuzzEd.Graph'])),
+            ('costs', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal('FuzzEd', ['Configuration'])
 
-        # Adding field 'Result.job'
-        db.add_column(u'FuzzEd_result', 'job',
-                      self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='results', to=orm['FuzzEd.Job']),
-                      keep_default=False)
+        # Adding model 'NodeConfiguration'
+        try:
+            db.delete_table(u'FuzzEd_nodeconfiguration')
+        except:
+            pass
+        db.create_table(u'FuzzEd_nodeconfiguration', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('node', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['FuzzEd.Node'])),
+            ('setting', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')()),
+            ('configuration', self.gf('django.db.models.fields.related.ForeignKey')(related_name='node_configurations', to=orm['FuzzEd.Configuration'])),
+        ))
+        db.send_create_signal('FuzzEd', ['NodeConfiguration'])
 
-        # Adding field 'Result.binary_value'
-        db.add_column(u'FuzzEd_result', 'binary_value',
-                      self.gf('django.db.models.fields.BinaryField')(null=True, blank=True),
-                      keep_default=False)
+        # Adding model 'Result'
+        try:
+            db.delete_table(u'FuzzEd_result')
+        except:
+            pass
+        db.create_table(u'FuzzEd_result', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='results', to=orm['FuzzEd.Graph'])),
+            ('job', self.gf('django.db.models.fields.related.ForeignKey')(related_name='results', to=orm['FuzzEd.Job'])),
+            ('configuration', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='results', null=True, to=orm['FuzzEd.Configuration'])),
+            ('kind', self.gf('django.db.models.fields.CharField')(max_length=1)),
+            ('value', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')(null=True, blank=True)),
+            ('value_sort', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('binary_value', self.gf('django.db.models.fields.BinaryField')(null=True, blank=True)),
+            ('issues', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')(null=True, blank=True)),
+        ))
+        db.send_create_signal('FuzzEd', ['Result'])
 
 
     def backwards(self, orm):
-        # Adding field 'Job.result'
-        db.add_column(u'FuzzEd_job', 'result',
-                      self.gf('django.db.models.fields.BinaryField')(null=True),
-                      keep_default=False)
+        # Deleting model 'Configuration'
+        db.delete_table(u'FuzzEd_configuration')
 
-        # Deleting field 'Result.job'
-        db.delete_column(u'FuzzEd_result', 'job_id')
+        # Deleting model 'NodeConfiguration'
+        db.delete_table(u'FuzzEd_nodeconfiguration')
 
-        # Deleting field 'Result.binary_value'
-        db.delete_column(u'FuzzEd_result', 'binary_value')
+        # Deleting model 'Result'
+        db.delete_table(u'FuzzEd_result')
 
 
     models = {
@@ -62,6 +90,13 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'project': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Project']"}),
+            'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'FuzzEd.changeedge': {
+            'Meta': {'object_name': 'ChangeEdge'},
+            'edge': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Edge']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'FuzzEd.changenode': {
@@ -114,6 +149,14 @@ class Migration(SchemaMigration):
             'source': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'outgoing'", 'to': "orm['FuzzEd.Node']"}),
             'target': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'incoming'", 'to': "orm['FuzzEd.Node']"})
         },
+        'FuzzEd.edgepropertychange': {
+            'Meta': {'object_name': 'EdgePropertyChange'},
+            'command': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'changes'", 'to': "orm['FuzzEd.ChangeEdge']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
+            'new_value': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {}),
+            'old_value': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {})
+        },
         'FuzzEd.graph': {
             'Meta': {'object_name': 'Graph'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
@@ -134,7 +177,8 @@ class Migration(SchemaMigration):
             'graph_modified': ('django.db.models.fields.DateTimeField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
-            'secret': ('django.db.models.fields.CharField', [], {'default': "'1c841e17-71c6-4246-9d4d-8bdd67f71747'", 'max_length': '64'})
+            'result': ('django.db.models.fields.BinaryField', [], {'null': 'True'}),
+            'secret': ('django.db.models.fields.CharField', [], {'default': "'d143c4f6-974f-4cd8-81e8-67ca8ee84843'", 'max_length': '64'})
         },
         'FuzzEd.node': {
             'Meta': {'object_name': 'Node'},
@@ -152,6 +196,14 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'node': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['FuzzEd.Node']"}),
             'setting': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {})
+        },
+        'FuzzEd.nodegroup': {
+            'Meta': {'object_name': 'NodeGroup'},
+            'client_id': ('django.db.models.fields.BigIntegerField', [], {}),
+            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'groups'", 'to': "orm['FuzzEd.Graph']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'nodes': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['FuzzEd.Node']", 'symmetrical': 'False'})
         },
         'FuzzEd.notification': {
             'Meta': {'object_name': 'Notification'},
@@ -175,9 +227,11 @@ class Migration(SchemaMigration):
         'FuzzEd.property': {
             'Meta': {'object_name': 'Property'},
             'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'edge': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'properties'", 'null': 'True', 'blank': 'True', 'to': "orm['FuzzEd.Edge']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'node': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'properties'", 'to': "orm['FuzzEd.Node']"}),
+            'node': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'properties'", 'null': 'True', 'blank': 'True', 'to': "orm['FuzzEd.Node']"}),
+            'node_group': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'properties'", 'null': 'True', 'blank': 'True', 'to': "orm['FuzzEd.NodeGroup']"}),
             'value': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {})
         },
         'FuzzEd.propertychange': {
