@@ -99,28 +99,30 @@
 <section>
     <form id="graph_selection" action="{% url 'dashboard_edit' project.pk %}" method="POST">
         {% csrf_token %}
-        <div id="dashboard_toolbar" class="btn-toolbar pull-left">              
-           <div class="btn-group">   
-              <button type="submit" name="copy" value="copy" class="btn btn-default btn-small">
-                  <i class="fa fa-plus-circle"></i>
-                  Copy
-              </button>
-              <button type="submit" name="snapshot" value="snapshot" class="btn btn-default btn-small">
-                  <i class="fa fa-camera"></i>
-                  Snapshot
-              </button>
-              <button type="button" name class="btn btn-danger btn-small require-dialog">
-                  <i class="fa fa-trash"></i>
-                  Delete
-                  <input type="hidden" id="delete_flag">
-              </button>
-           </div>
-           <div class="btn-group">
-              <button type="submit" name="share" value="share" class="btn btn-small">
-                  <i class="fa fa-share"></i>
-                  Share
-              </button>
-           </div>
+        <div class ="toolbar_wrap_div">
+            <div id="dashboard_toolbar" class="btn-toolbar pull-left">              
+               <div class="btn-group">   
+                  <button type="submit" name="copy" value="copy" class="btn btn-default btn-small">
+                      <i class="fa fa-plus-circle"></i>
+                      Copy
+                  </button>
+                  <button type="submit" name="snapshot" value="snapshot" class="btn btn-default btn-small">
+                      <i class="fa fa-camera"></i>
+                      Snapshot
+                  </button>
+                  <button type="button" name class="btn btn-danger btn-small require-dialog">
+                      <i class="fa fa-trash"></i>
+                      Delete
+                      <input type="hidden" id="delete_flag">
+                  </button>
+               </div>
+               <div class="btn-group">
+                  <button type="submit" name="share" value="share" class="btn btn-small">
+                      <i class="fa fa-share"></i>
+                      Share
+                  </button>
+               </div>
+            </div>
         </div>
        
         <table class="table" class="img-rounded">
@@ -130,7 +132,7 @@
                     <th></th>
                     <th>Graph</th>
                     <th>Kind</th>
-                    <th>Created</th>
+                    <th>Viewers</th>
                     <th></th>
                 </tr>
             </thead>
@@ -164,7 +166,9 @@
                         
                         <td><span class="label label-info">{{ name }}</span></td>
                         
-                        <td>{{ graph.created }}</td>
+                        <td>
+                            {% for sharing in graph.sharings.all %}{% if not forloop.first %}, {% endif %}{{sharing.user.visible_name}}{% endfor %}
+                        </td>
                         
                         <td style="text-align: right;">
                                 <button type="submit" name="edit" value="edit" formaction="{% url 'graph_settings' graph.pk %}" class="btn btn-default btn-small">

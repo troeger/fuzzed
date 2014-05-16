@@ -410,7 +410,7 @@ def graph_settings(request, graph_id):
         users_to_remove = old_users - new_users
         
         for user in users_to_add:
-            sharing = Sharing(graph = graph, user=user)
+            sharing = Sharing(graph = graph, user = user)
             sharing.save()
             
         for user in users_to_remove:

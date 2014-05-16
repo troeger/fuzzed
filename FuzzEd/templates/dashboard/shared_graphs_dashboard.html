@@ -56,7 +56,7 @@
 {% block content %}
 <div class="page-header">
     <h2>
-      <i class="fa fa-folder-open"></i>
+      <i class="fa fa-share"></i>
       Shared Graphs
     </h2>
 </div>
@@ -65,13 +65,15 @@
 <section>
     <form id="graph_selection" action="{% url 'shared_graphs_dashboard' %}" method="POST">
         {% csrf_token %}
-        <div id="dashboard_toolbar" class="btn-toolbar pull-left">              
-           <div class="btn-group">
-              <button type="submit" name="unshare" value="unshare" class="btn btn-small">
-                  <i class="fa fa-times"></i>
-                  Remove Sharing
-              </button>
-           </div>
+        <div class="toolbar_wrap_div">
+            <div id="dashboard_toolbar" class="btn-toolbar pull-left">              
+               <div class="btn-group">
+                  <button type="submit" name="unshare" value="unshare" class="btn btn-small">
+                      <i class="fa fa-times"></i>
+                      Remove Sharing
+                  </button>
+               </div>
+            </div>
         </div>
        
         <table class="table" class="img-rounded">
