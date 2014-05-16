@@ -1,0 +1,62 @@
+{% extends 'djiki/base_page.html' %}
+{% load i18n djiki_tags %}
+{% block title %}{% trans "Edit page" %}: {{ block.super }}{% endblock %}
+{% block djiki_main %}
+<div class="page edit grid_12">
+	<div class="content">
+		<h1>You are editing <i>{{ page.title }}</i></h1>
+		{% if preview_content %}
+		{{ preview_content|djiki_markup }}
+		<div class="clear"></div>
+		{% endif %}
+	</div>
+	<div class="editForm">
+		<form action="" method="post">
+			{% csrf_token %}
+			<fieldset style="float:left; margin-right: 30px">
+			{% for field in form %}
+				{% if not field.is_hidden %}
+				{{ field.label_tag }}
+				<div class="grid_11 omega field">
+				{% if field.errors %}{{ field.errors }}{% endif %}
+				{{ field }}
+				</div>
+				<div class="clear"></div>
+				{% else %}
+				{{ field }}
+				{% endif %}
+			{% endfor %}
+			</fieldset>
+			<div >
+				<label>Syntax hints:</label>
+				<p>
+					<table style="width:30%" class="table table-condensed table-bordered">
+						<tr>
+							<td>Headings</td>
+							<td> =heading1=<br/>
+								==heading2==
+							</td>
+						</tr>
+						<tr><td>Link</td><td>[[index]]</td></tr>
+						<tr>
+							<td>Text Styles</td>
+							<td><strong>'''strong'''</strong><br/>
+								<em>''emphazised''</em><br/>
+							</td>
+						</tr>
+						<tr>
+							<td>Bullet list</td>
+							<td>* Item1<br/>* Item2</td>
+						</tr>
+					</table>
+				</p>
+			</div>
+			<p style="clear:both" class="grid_1 alpha">
+				Please note that your updates are verified by the site administrators.
+			</p>
+			<button class="save" type="submit" name="action" value="save">{% trans "Save" %}</button>
+			<button class="preview" type="submit" name="action" value="preview">{% trans "Preview" %}</button>
+		</form>
+	</div>
+</div>
+{% endblock %}

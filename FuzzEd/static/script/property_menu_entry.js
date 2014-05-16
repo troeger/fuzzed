@@ -410,11 +410,16 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
          *      This Entry for chaining.
          */
         _setupEvents: function() {
-            jQuery(this.property).on(Config.Events.PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+            jQuery(this.property).on([
+                Config.Events.NODE_PROPERTY_CHANGED,
+                Config.Events.EDGE_PROPERTY_CHANGED,
+                Config.Events.NODEGROUP_PROPERTY_CHANGED
+            ].join(' '), function(event, newValue, text, issuer) {
                 // ignore changes issued by us in order to prevent race conditions with the user
                 if (issuer === this) return;
                 this._value(newValue);
             }.bind(this));
+
 
             jQuery(this.property).on(Config.Events.PROPERTY_READONLY_CHANGED, function(event, newReadonly) {
                 this.setReadonly(newReadonly);
@@ -863,10 +868,10 @@ define(['class', 'config', 'jquery'], function(Class, Config) {
         remove: function() {},
 		
         _setupContainer: function() {
-			this.property.node._nodeImage.append(
+			this.property.owner._nodeImage.append(
 				jQuery('<p align="center">').html(escape(this.property.value))
 			);
-			this.container = this.property.node.container;
+			this.container = this.property.owner.container;
 			
 			return this;
         },

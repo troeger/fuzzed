@@ -23,11 +23,14 @@ int SpareGate::serializePTNet(std::shared_ptr<PNDocument> doc) const
 	{
 		auto basicEvent = dynamic_pointer_cast<BasicEvent>(*it);
 		assert(basicEvent);
-		if (m_primaryId == basicEvent->getId()) // TODO
+		if (m_primaryId != basicEvent->getId()) // spare
 			spares.push_back(basicEvent->serializeAsColdSpare(doc));
-		else
+		else // primary
 			regularIds.push_back(basicEvent->serializePTNet(doc));
 	}
+
+	if (spares.empty() || regularIds.empty())
+		throw std::runtime_error("Spare gates need at least a spare and a primary component!");
 
 	const int allFailed	= doc->addPlace(0, getNumChildren(), "SpareGateFailure");
 	const int failGate	= doc->addImmediateTransition();
@@ -75,9 +78,6 @@ int SpareGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const
 	// fail just once
 	doc->transitionToPlace(failSpareGate, spareGateFailed);
 	doc->addInhibitorArc(spareGateFailed, failSpareGate);
-	
-// 	static const string dormancy = "dormancyFactor";
-// 	doc->addDefinition(dormancy, m_dormancyFactor); // not necessary actually
 
 	const auto& primaryChild = getChildById(m_primaryId);
 	const int primaryFailed = primaryChild->serializeTimeNet(doc);
@@ -90,8 +90,6 @@ int SpareGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const
 	{
 		if (child->getId() == m_primaryId) continue;
 
-		// TODO: in theory, BasicEventSets and house/undeveloped events are allowed as well
-		// the assumption is that BasicEventSets have previously been expanded
 		auto be = dynamic_pointer_cast<BasicEvent>(child);
 		if (!be) throw runtime_error("Spares must be BasicEvents");
 

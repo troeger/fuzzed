@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<faultTree:FaultTree id="569" name="Water Supply Loft Tank" xmlns:faultTree="net.faulttree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<topEvent id="0" missionTime="1000000" name="Failure of Water Supply Loft Tank" x="10" y="1">
+		<children id="1" name="-" x="10" xsi:type="faultTree:Or" y="4">
+			<children id="5" name="Failure to Regulate or Manage Water Level" x="19" xsi:type="faultTree:IntermediateEvent" y="6">
+				<children id="11" name="-" x="19" xsi:type="faultTree:Or" y="9">
+					<children id="43" name="-" x="24" xsi:type="faultTree:Or" y="11">
+						<children id="46" name="Primary Failure - Control Valve Stuck Open" x="25" xsi:type="faultTree:BasicEvent" y="14">
+							<probability value="0.01" xsi:type="faultTree:CrispProbability"/>
+						</children>
+						<children id="45" name="Primary Failure - Control Valve Stuck Closed" x="23" xsi:type="faultTree:BasicEvent" y="14">
+							<probability value="0.008" xsi:type="faultTree:CrispProbability"/>
+						</children>
+					</children>
+					<children id="39" name="-" x="19" xsi:type="faultTree:Or" y="11">
+						<children id="32" name="Secondary Failure - Overflow Pipe Blockage" x="20" xsi:type="faultTree:BasicEvent" y="14">
+							<probability value="0.007" xsi:type="faultTree:CrispProbability"/>
+						</children>
+						<children id="31" name="Primary Failure - Overflow Pipe Leak" x="18" xsi:type="faultTree:BasicEvent" y="14">
+							<probability value="0.08" xsi:type="faultTree:CrispProbability"/>
+						</children>
+					</children>
+					<children id="35" name="-" x="14" xsi:type="faultTree:Or" y="11">
+						<children id="53" name="-" x="14" xsi:type="faultTree:Or" y="15">
+							<children id="30" name="Primary Failure - Catastrophic Leak in Tank" x="15" xsi:type="faultTree:BasicEvent" y="17">
+								<probability value="5e-05" xsi:type="faultTree:CrispProbability"/>
+							</children>
+							<children id="34" name="Primary Failure Minor - Leak in Tank" x="13" xsi:type="faultTree:BasicEvent" y="17">
+								<probability value="0.005" xsi:type="faultTree:CrispProbability"/>
+							</children>
+						</children>
+						<children id="50" name="Secondary Failure - Sludge in Tank" x="16" xsi:type="faultTree:BasicEvent" y="14">
+							<probability value="0.0" xsi:type="faultTree:CrispProbability"/>
+						</children>
+					</children>
+				</children>
+			</children>
+			<children id="3" name="Failure to Supply Input Water" x="3" xsi:type="faultTree:IntermediateEvent" y="6">
+				<children id="9" name="-" x="3" xsi:type="faultTree:Or" y="9">
+					<children id="21" name="-" x="3" xsi:type="faultTree:Or" y="12">
+						<children id="16" name="Secondary Failure - Blockage" x="4" xsi:type="faultTree:BasicEvent" y="14">
+							<probability value="0.001" xsi:type="faultTree:CrispProbability"/>
+						</children>
+						<children id="23" name="Secondary Failure - Outage of Water Supply" x="2" xsi:type="faultTree:BasicEvent" y="14">
+							<probability value="0.0" xsi:type="faultTree:CrispProbability"/>
+						</children>
+					</children>
+					<children id="15" name="Primary Failure - Input Pipe Leak" x="1" xsi:type="faultTree:BasicEvent" y="11">
+						<probability value="0.003" xsi:type="faultTree:CrispProbability"/>
+					</children>
+				</children>
+			</children>
+			<children id="4" name="Failure to Transport Output Water" x="10" xsi:type="faultTree:IntermediateEvent" y="6">
+				<children id="10" name="-" x="10" xsi:type="faultTree:Or" y="9">
+					<children id="27" name="Secondary Failure - Blockage" x="11" xsi:type="faultTree:BasicEvent" y="11">
+						<probability value="0.004" xsi:type="faultTree:CrispProbability"/>
+					</children>
+					<children id="26" name="Primary Failure - Output Pipe Leak" x="9" xsi:type="faultTree:BasicEvent" y="11">
+						<probability value="0.001" xsi:type="faultTree:CrispProbability"/>
+					</children>
+				</children>
+			</children>
+		</children>
+	</topEvent>
+</faultTree:FaultTree>

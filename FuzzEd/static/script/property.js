@@ -1,25 +1,27 @@
-define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'alerts', 'jquery', 'underscore'],
-function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
+define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'label', 'alerts', 'jquery', 'underscore'],
+function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
     };
 	
     var Property = Class.extend({
-        node:           undefined,
+        owner:          undefined,
         value:          undefined,
         displayName:    '',
         mirror:         undefined,
+        label:          undefined,
         menuEntry:      undefined,
         hidden:         false,
         readonly:       false,
         partInCompound: undefined,
 
-        init: function(node, definition) {
+        init: function(owner, definition) {
             jQuery.extend(this, definition);
-            this.node = node;
+            this.owner = owner;
             this._sanitize()
                 ._setupMirror()
+                ._setupLabel()
                 ._setupMenuEntry();
 
             this._triggerChange(this.value, this);
@@ -56,7 +58,25 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
                 // compound parts need another format for backend propagation
                 var value = typeof this.partInCompound === 'undefined' ? newValue : [this.partInCompound, newValue];
                 properties[this.name] = value;
-                jQuery(document).trigger(Config.Events.PROPERTY_CHANGED, [this.node.id, properties]);
+
+                //TODO: IS THIS REALLY THE RIGHT WAY TO DO IT?
+                // (we cannot put the require as dependency of this module, as there is some kind of cyclic dependency
+                // stopping Node.js to work properly)
+
+                var Edge =      require("edge");
+                var Node =      require("node");
+                var NodeGroup = require("node_group");
+
+                if (this.owner instanceof Edge) {
+                    jQuery(document).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
+                } else if (this.owner instanceof Node) {
+                    jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.owner.id, properties]);
+                } else if (this.owner instanceof NodeGroup) {
+                    jQuery(document).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [this.owner.id, properties]);
+                } else {
+                    throw new TypeError ("unknown owner class")
+                }
+
             }
 
             return this;
@@ -96,7 +116,15 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         _setupMirror: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
-            this.mirror = new Mirror(this, this.node.container, this.mirror);
+
+            this.mirror = new Mirror(this, this.owner.container, this.mirror);
+
+            return this;
+        },
+
+        _setupLabel: function() {
+            if (typeof this.label === 'undefined' || this.label === null) return this;
+            this.label = new Label(this, this.owner.jsPlumbEdge, this.label);
 
             return this;
         },
@@ -108,7 +136,21 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         },
 
         _triggerChange: function(value, issuer) {
-            jQuery(this).trigger(Config.Events.PROPERTY_CHANGED, [value, value, issuer]);
+            //TODO: IS THIS REALLY THE RIGHT WAY TO DO IT?
+            // (we cannot put the following required modules as dependency of this module, as there is some kind of
+            // cyclic dependency stopping Node.js to work properly
+
+            var Edge =      require("edge");
+            var Node =      require("node");
+            var NodeGroup = require("node_group");
+
+            if (this.owner instanceof Node) {
+                jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
+            } else if (this.owner instanceof Edge) {
+                jQuery(this).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [value, value, issuer]);
+            } else if (this.owner instanceof NodeGroup) {
+                jQuery(this).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [value, value, issuer]);
+            }
         }
     });
 
@@ -140,9 +182,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
             return PropertyMenuEntry.ChoiceEntry;
         },
 
-        init: function(node, definition) {
+        init: function(owner, definition) {
             definition.values = typeof definition.values === 'undefined' ? definition.choices : definition.values;
-            this._super(node, definition);
+            this._super(owner, definition);
         },
 
         validate: function(value, validationResult) {
@@ -176,7 +218,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
                 }
             }
 
-            jQuery(this).trigger(Config.Events.PROPERTY_CHANGED, [value, this.choices[i], issuer]);
+            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, this.choices[i], issuer]);
         }
     });
 
@@ -265,7 +307,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
                     partInCompound: index,
                     value: index === this.value ? value : undefined
                 });
-                parsedParts[index] = from(this.node, partDef);
+                parsedParts[index] = from(this.owner, partDef);
             }.bind(this));
 
             this.parts = parsedParts;
@@ -551,9 +593,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         transferGraphs: undefined,
 
-        init: function(node, definition) {
+        init: function(owner, definition) {
             jQuery.extend(this, definition);
-            this.node = node;
+            this.owner = owner;
             this._sanitize()
                 ._setupMirror()
                 ._setupMenuEntry()
@@ -586,9 +628,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         _triggerChange: function(value, issuer) {
             var unlinked = value === this.UNLINK_VALUE;
 
-            if (!unlinked) this.node.hideBadge();
-
-            jQuery(this).trigger(Config.Events.PROPERTY_CHANGED, [
+            if (!unlinked) this.owner.hideBadge();
+            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [
                 value,
                 unlinked ? this.UNLINK_TEXT : this.transferGraphs[value],
                 issuer]
@@ -597,7 +638,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
 
         fetchTransferGraphs: function() {
             jQuery.ajax({
-                url:      this.GRAPHS_URL + this.node.graph.id + Config.Backend.TRANSFERS_URL,
+                url:      this.GRAPHS_URL + '?kind=' + this.owner.graph.kind,
                 type:     'GET',
                 dataType: 'json',
                 // don't show progress
@@ -609,13 +650,15 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         },
 
         _setTransferGraphs: function(json) {
-            this.transferGraphs = _.reduce(json.transfers, function(all, current) {
-                all[current.id] = current.name;
+            this.transferGraphs = _.reduce(json.graphs, function(all, current) {
+                var id = window.parseInt(_.last(current.url.split('/')));
+                all[id] = current.name;
                 return all;
             }, {});
+            delete this.transferGraphs[this.owner.graph.id];
 
             if (this.value === this.UNLINK_VALUE)
-                this.node.showBadge('!', 'important');
+                this.owner.showBadge('!', 'important');
 
             jQuery(this).trigger(Config.Events.PROPERTY_SYNCHRONIZED);
             this._triggerChange(this.value, this);
@@ -633,17 +676,17 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Alerts) {
         }
     });
 
-    var from = function(node, definition) {
+    var from = function(owner, definition) {
         switch (definition.kind) {
-            case 'bool':     return new Bool(node, definition);
-            case 'choice':   return new Choice(node, definition);
-            case 'compound': return new Compound(node, definition);
-            case 'epsilon':  return new Epsilon(node, definition);
-            case 'numeric':  return new Numeric(node, definition);
-            case 'range':    return new Range(node, definition);
-            case 'text':     return new Text(node, definition);
-			case 'textfield':return new InlineTextField(node, definition);
-            case 'transfer': return new Transfer(node, definition);
+            case 'bool':     return new Bool(owner, definition);
+            case 'choice':   return new Choice(owner, definition);
+            case 'compound': return new Compound(owner, definition);
+            case 'epsilon':  return new Epsilon(owner, definition);
+            case 'numeric':  return new Numeric(owner, definition);
+            case 'range':    return new Range(owner, definition);
+            case 'text':     return new Text(owner, definition);
+			case 'textfield':return new InlineTextField(owner, definition);
+            case 'transfer': return new Transfer(owner, definition);
 
             default: throw ValueError('unknown property kind ' + definition.kind);
         }

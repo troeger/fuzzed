@@ -79,28 +79,31 @@ class Graph(models.Model):
         """
         Method: to_dict
         
-        Encodes the whole graph as dictionary having five top level items: its id, name, type and two lists containing
-        all edges and nodes in the graph
-        
+        Encodes the whole graph as dictionary.
+
         Returns:
          {dict} the graph as dictionary
         """
-        node_set = self.nodes.filter(deleted=False)
-        edge_set = self.edges.filter(deleted=False)
-        nodes    = [node.to_dict() for node in node_set]
-        edges    = [edge.to_dict() for edge in edge_set]
+        node_set  = self.nodes.filter(deleted=False)
+        edge_set  = self.edges.filter(deleted=False)
+        group_set = self.groups.filter(deleted=False)
+        nodes     = [node.to_dict() for node in node_set]
+        edges     = [edge.to_dict() for edge in edge_set]
+        groups    = [group.to_dict() for group in group_set]
 
-        node_seed = self.nodes.aggregate(Max('client_id'))['client_id__max']
-        edge_seed = self.edges.aggregate(Max('client_id'))['client_id__max']
+        node_seed  = self.nodes.aggregate(Max('client_id'))['client_id__max']
+        edge_seed  = self.edges.aggregate(Max('client_id'))['client_id__max']
+        group_seed = self.groups.aggregate(Max('client_id'))['client_id__max']
 
         return {
             'id':       self.pk,
-            'seed':     max(node_seed, edge_seed),
+            'seed':     max(node_seed, edge_seed, group_seed),
             'name':     self.name,
             'type':     self.kind,
             'readOnly': self.read_only,
             'nodes':    nodes,
-            'edges':    edges
+            'edges':    edges,
+            'nodeGroups':   groups
         }
 
     def to_bool_term(self):
@@ -145,6 +148,7 @@ class Graph(models.Model):
 \\documentclass{article}
 \\usepackage[landscape, top=1in, bottom=1in, left=1in, right=1in]{geometry}
 \\usepackage{helvet}
+\\usepackage{adjustbox}
 \\renewcommand{\\familydefault}{\\sfdefault}
 \\usepackage{tikz}
 \\usetikzlibrary{positioning, trees, svg.path} 
@@ -155,7 +159,11 @@ class Graph(models.Model):
 \\begin{document}
 \\pagestyle{empty}
         """     
-        result += tikz_shapes + "\n\\begin{figure}\n\\begin{tikzpicture}[auto, trim left]"
+        result += tikz_shapes + """
+\\begin{figure}
+\\begin{adjustbox}{max size={\\textwidth}{\\textheight}}
+\\begin{tikzpicture}[auto, trim left]
+        """
         # Find most left node and takes it's x coordinate as start offset
         # This basically shifts the whole tree to the left border
         minx = self.nodes.aggregate(min_x = models.Min('x'))['min_x']
@@ -165,7 +173,12 @@ class Graph(models.Model):
         top_event = self.nodes.get(kind='topEvent')
         result += top_event.to_tikz(x_offset = -minx, y_offset = top_event.y)
 #        result += top_event.to_tikz_tree()
-        result += "\\end{tikzpicture}\n\\end{figure}\n\\end{document}"
+        result += """
+\\end{tikzpicture}
+\\end{adjustbox}
+\\end{figure}
+\\end{document}
+        """
         return result
 
     def to_xml(self, xmltype=None):
