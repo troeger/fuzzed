@@ -535,13 +535,13 @@ def snapshot(request, graph_id):
     Returns:
      {HttpResponse} a django response object
     """
-    if request.user.is_staff:
-        graph    = get_object_or_404(Graph, pk=graph_id)
-    else:
-        graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    if not graph.read_only:
-        return HttpResponseBadRequest()
-
+    
+    graph    = get_object_or_404(Graph, pk=graph_id)
+    
+    # either current user is owner or graph is shared with the user
+    if not (graph.owner == request.user or graph.sharings.filter(user = request.user)):
+        raise Http404    
+    
     project  = graph.project    
     notation = notations.by_kind[graph.kind]
     nodes    = notation['nodes']
