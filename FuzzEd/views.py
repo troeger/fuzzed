@@ -394,18 +394,43 @@ def graph_settings(request, graph_id):
     
     POST = request.POST
     
-    # the owner made changes to the graph's field, better save it (if we can)
+    # the owner made changes to the graph's fields, better save it (if we can)
     if POST.get('save'):        
+        # changes in the graphs name
         graph.name = POST.get('name', '')
         graph.save()
-        messages.add_message(request, messages.SUCCESS, 'Graph saved.')
+        
+        # changes in users that can see the graph 
+        user_ids = POST.getlist('users')
+        
+        new_users = set([get_object_or_404(User, pk=user_id) for user_id in user_ids])
+        old_users = set([sharing.user for sharing in graph.sharings.all()])
+        
+        users_to_add = new_users - old_users
+        users_to_remove = old_users - new_users
+        
+        for user in users_to_add:
+            sharing = Sharing(graph = graph, user=user)
+            sharing.save()
+            
+        for user in users_to_remove:
+            sharing = Sharing.objects.get(graph = graph, user = user)
+            sharing.delete()
+        
+        messages.add_message(request, messages.SUCCESS, 'Saved new graph settings.')
         return redirect('dashboard', project_id = project.pk)
         
     # please show the edit page to the user on get requests
-    elif POST.get('edit') or request.method == 'GET':        
+    elif POST.get('edit') or request.method == 'GET':
+        
+        users = User.objects.exclude(pk=request.user.pk)
+        shared_users = [ sharing.user for sharing in graph.sharings.all()]
+        
         parameters = {
             'graph': graph,
-            'kind':  notations.by_kind[graph.kind]['name']
+            'kind':  notations.by_kind[graph.kind]['name'],
+            'users': users,
+            'shared_users' : shared_users
         }
         return render(request, 'dashboard/dashboard_edit.html', parameters)
     

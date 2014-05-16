@@ -6,6 +6,20 @@
 
 {%block navigation_home %}hidden{% endblock %}
 
+{% block script %}
+{{ block.super }}
+<script type="text/javascript" language="javascript">
+  require(['selectize'], function() {
+      jQuery('#users').selectize({
+          plugins: ['remove_button'],
+		      maxItems: null,
+		      create: false
+      });
+  });
+</script>
+{% endblock %}
+
+
 {% block content %}
 <div class="page-header">
     <h1>
@@ -29,7 +43,18 @@
                 <input type="text" class="form-control" name="name" value="{{ graph }}" id="name">
             </div>
         </div>
-
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="name">Viewers</label>
+            <div class="col-lg-10">
+                <select name="users" id="users" multiple placeholder="Pick some users...">
+                {% for user in users %}
+                    <option value="{{ user.pk }}" {% if user in shared_users %} selected="selected" {% endif %} >
+                        {{ user.visible_name }} 
+                    </option>
+                {% endfor %}
+                </select>
+            </div>
+        </div>
         <div class="form-group">
             <div class="col-push-2 col-lg-10">
                 <button type="submit" name="save" value="save" class="btn btn-primary">Save</button>
