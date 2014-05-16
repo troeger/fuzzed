@@ -380,9 +380,22 @@ def css():
     '''Builds the CSS files for the project with lessc.'''
     os.system('lessc FuzzEd/static/less/theme/white/theme.less FuzzEd/static/css/theme/white.css')
 
+@task
+def patches():
+    """Performs the neccessary patches of third-party libraries in the repository."""
+    for root, dirs, files in os.walk("."):
+        for fname in files:
+            if fname.endswith(".patch"):
+                print "Applying patch file %s%s"%(root, fname)
+                olddir = os.getcwd()
+                os.chdir(root)
+                os.system("patch -N %s %s"%(os.path.splitext(fname)[0], fname))
+                os.chdir(olddir)
+
 @task()
 def all():
     '''Builds all.'''
+    patches()
     css()
     shapes()
     xmlschemas()
