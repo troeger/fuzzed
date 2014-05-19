@@ -1,188 +1,567 @@
-import json, logging, time, os, tempfile, subprocess
-from xml.dom import minidom
+'''
+    This is the test suite.
+
+    The typical workflow to add new tests is the following:
+    - Get yourself an empty local database with './manage.py flush'.
+    - Draw one or more test graphs. 
+    - Create a fixture file from it with 'fab fixture_save:<filename.json>'. 
+    - Create a class such as 'SimpleFixtureTestCase' to wrap all ID's for your fixture file.
+    - Derive your test case class from it. Check the helper functions in 'FuzzEdTestCase'.
+    - Run the tests with 'fab run_tests'.
+    - Edit your fixture file by loading it into the local database with 'fab fixture_load:<filename.json>'
+
+    TODO: Several test would look better if the model is checked afterwards for the changes being applied
+        (e.g. node relocation). Since we use the LiveServerTestCase base, this is not possible, since
+        database modifications are not commited at all. Explicit comitting did not help ...
+'''
+
+import json
+import time
+import os
+import sys
+import subprocess
 from subprocess import Popen
+import unittest
+from xml.dom.minidom import parse
+
 from django.test import LiveServerTestCase
-from django.test.utils import override_settings
 from django.test.client import Client
+from django.contrib.auth.models import User
+
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
+from FuzzEd.models.node_group import NodeGroup
+from FuzzEd.models.notification import Notification
 
-# This is the test suite.
-#
-# The typical workflow to add new tests is the following:
-# 1.) Get yourself an empty local database with 'fab reset_db'.
-# 2.) Draw one or more test graphs. 
-# 3.) Create a fixture file from it with 'fab fixture_save:<filename.json>'. 
-# 4.) Write your test class / methods as the ones below. Make heavy use of 
-#     all the helper functions in FuzzTreesTestCase.
-# 5.) Run the tests with 'fab run_tests'.
-# 6.) Edit your fixture file by loading it into the local database 
-#     with 'fab fixture_load:<filename.json>'
+# This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
+#logging.disable(logging.CRITICAL)
 
-# This disables all the debug output. Sometimes it may be helpful.
-logging.disable(logging.CRITICAL)
+class FuzzEdTestCase(LiveServerTestCase):
+    '''
+        The base class for all test cases. Mainly provides helper functions for deal with auth stuff.
+    '''
 
-class FuzzTreesTestCase(LiveServerTestCase):
-    def setUp(self):
-        self.c=Client()
-        self.c.login(username='testadmin', password='testadmin') # added by 'fab fixture_save'
+    def setUpAnonymous(self):
+        ''' If the test case wants to have a anonymous login session, it should call this function in setUp().'''
+        self.c = Client()
+
+    def setUpLogin(self):
+        ''' If the test case wants to have a functional login session, it should call this function in setUp().'''
+        self.c = Client()
+        self.c.login(username='testadmin', password='testadmin')
+
+    def get(self, url):
+        return self.c.get(url)
+
+    def post(self, url, data):
+        return self.c.post(url, data)
+
+    def getWithAPIKey(self, url):
+        return self.c.get(url, **{'HTTP_AUTHORIZATION': 'ApiKey f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
+
+    def postWithAPIKey(self, url, data, content_type):
+        return self.c.post(url, data, content_type,
+                           **{'HTTP_AUTHORIZATION': 'ApiKey f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
 
     def ajaxGet(self, url):
-        return self.c.get( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
+        return self.c.get(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-    def ajaxPost(self, url, data):
-        return self.c.post( url, data, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
+    def ajaxPost(self, url, data, content_type):
+        """
+        :rtype : django.http.response.HttpResponse
+        """
+        return self.c.post(url, data, content_type, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 
-    def ajaxPostNode(self, data):
-        return self.ajaxPost('/api/graphs/1/nodes/88', {'properties': json.dumps(data)})
+    def ajaxPatch(self, url, data, content_type):
+        """
+        :rtype : django.http.response.HttpResponse
+        """
+        return self.c.patch(url, data, content_type, **{'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'})
 
     def ajaxDelete(self, url):
-        return self.c.delete( url, HTTP_X_REQUESTED_WITH = 'XMLHttpRequest' )
+        return self.c.delete(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-    def requestJob(self, url):
-        """ Helper function for requesting a job. """ 
-        response=self.ajaxGet(url)
-        self.assertNotEqual(response.status_code, 500) # the backend daemon is not started
-        self.assertEqual(response.status_code, 201)    # test if we got a created job
-        assert('Location' in response)
+    def requestJob(self, base_url, graph, kind):
+        """ Helper function for requesting a job. """
+        newjob = json.dumps({'kind': kind})
+        response = self.ajaxPost(base_url + '/graphs/%u/jobs/' % graph, newjob, 'application/json')
+        self.assertNotEqual(response.status_code, 500)  # the backend daemon is not started
+        self.assertEqual(response.status_code, 201)  # test if we got a created job
+        assert ('Location' in response)
         jobUrl = response['Location']
         code = 202
-        print "Waiting for result from "+jobUrl,
+        assert (not jobUrl.endswith('jobs/'))
+        print "Waiting for result from " + jobUrl,
         while (code == 202):
-            response=self.ajaxGet(jobUrl)
-            code = response.status_code 
-            print ".",
+            response = self.ajaxGet(jobUrl)
+            code = response.status_code
         self.assertEqual(response.status_code, 200)
-        return response.content
+        return response
 
-    def requestAnalysis(self, graph_id):
-        """ Helper function for requesting an analysis run. 
-            Returns the analysis result as dictionary as received by the frontend.
-        """
-        url=self.ajaxGet('/api/graphs/%u/analysis/topEventProbability'%graph_id)
-        data = self.requestJob(url)
-        return json.loads(data)
 
-class BasicApiTestCase(FuzzTreesTestCase):
-    fixtures = ['basic.json']
-    """ This fixture tree looks like this, with pk and client_id per node:
-        graph(1)
-            topEvent (1, -2147483647)
-                andGate (2, 4711)
-                    basicEvent (3, 12345)
-                    orGate (4, 222)
-                        basicEvent (5, 88)
-                        basicEvent (6, 99)
+class SimpleFixtureTestCase(FuzzEdTestCase):
+    ''' 
+        This is a base class that wraps all information about the 'simple' fixture. 
+    '''
+    #TODO: use notations here?
+    fixtures = ['simple.json', 'initial_data.json']
+    graphs = {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'}
+    # A couple of specific PK's from the model
+    pkProject = 1
+    pkFaultTree = 1
+    pkDFD = 1  # TODO: This is a hack, since nobody checks the validity of node groups for the graph kind so far
+    clientIdEdge = 4
+    clientIdAndGate = 1
+    clientIdBasicEvent = 2
 
-        The following edges are defined, with pk and client_id:
-            1 / 65: 1->2
-            2 / 66: 2->3
-            3 / 77: 2->4
-            4 / 88: 4->5
-            5 / 99: 4->6
-    """
 
-    def testGetGraph(self):
-        response=self.ajaxGet('/api/graphs/1')
-        self.assertEqual(response.status_code, 200)
-        response=self.ajaxGet('/api/graphs/9999')
-        self.assertEqual(response.status_code, 404)
-
-    def testCreateNode(self):
-        oldncount=Graph.objects.get(pk=1).nodes.count()
-        response=self.ajaxPost('/api/graphs/1/nodes', {'kind': 'orGate', 'id':4712, 'x':10, 'y':7})
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response['Location'].startswith('http://'), True)
-        self.assertEqual(oldncount+1, Graph.objects.get(pk=1).nodes.count() )
-        # Check invalid type
-        response=self.ajaxPost('/api/graphs/1/nodes', {'kind': 'foobar', 'id':4712, 'x':10, 'y':7})
-        self.assertEqual(response.status_code, 400)
-
-    def testDeleteNode(self):
-        response=self.ajaxDelete('/api/graphs/1/nodes/88')
-        self.assertEqual(response.status_code, 204)
-        #TODO: Check if really gone, including edge 
-
-    def testRelocateNode(self):
-        response=self.ajaxPostNode({"y": 8, "x":10}) 
-        self.assertEqual(response.status_code, 204)
-        #TODO: Check if really done, including edge rearrangement
-
-    def testPropertyChange(self):
-        response=self.ajaxPostNode({"key": "foo", "value":"bar"})
-        self.assertEqual(response.status_code, 204)
-        #TODO: Check if really done
-
-    def testMorphNode(self):
-        response=self.ajaxPostNode({"type":"t"})
-        self.assertEqual(response.status_code, 204)
-        #TODO: Check if really done
-
-    def testCreateGraph(self):
-        response=self.ajaxPost('/api/graphs', {"kind": "fuzztree", "name":"Second graph"})
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response['Location'].startswith('http://'), True)
-        # test invalid type
-        response=self.ajaxPost('/api/graphs', {"kind": "foo", "name":"Third graph"})
-        self.assertEqual(response.status_code, 400)
-
-    def testDeleteEdge(self):
-        response=self.ajaxDelete('/api/graphs/1/edges/66')
-        self.assertEqual(response.status_code, 204)
-        #TODO: Check if really gone 
-
-    def testCreateEdge(self):
-        # Delete edge before re-creating it
-        response=self.ajaxDelete('/api/graphs/1/edges/77')
-        self.assertEqual(response.status_code, 204)
-        response=self.ajaxPost('/api/graphs/1/edges', {'id': 4714, 'source':4711, 'destination':222} )
-        self.assertEqual(response.status_code, 201)
-        #TODO: Check if really created 
-
-class BackendTestCase(FuzzTreesTestCase):
-    fixtures = ['analysis.json']
+class ViewsTestCase(SimpleFixtureTestCase):
+    ''' 
+        Tests for different Django views and their form submissions. 
+    '''
 
     def setUp(self):
-        # Start up backend daemon in testing mode, 
-        # so that it connects to the testing database and uses port 8081 of the live test server
+        self.setUpLogin()
+
+    def testRootView(self):
+        ''' Root view shall redirect to projects overview. '''
+        response = self.get('/')
+        self.assertEqual(response.status_code, 302)
+
+    def testProjectsView(self):
+        response = self.get('/projects/')
+        self.assertEqual(response.status_code, 200)
+
+    def testEditorView(self):
+        for id, kind in self.graphs.iteritems():
+            response = self.get('/editor/%u' % id)
+            self.assertEqual(response.status_code, 200)
+
+    def testInvalidEditorView(self):
+        response = self.get('/editor/999')
+        self.assertEqual(response.status_code, 404)
+
+    def testGraphCopy(self):
+        for graphid, kind in self.graphs.iteritems():
+            response = self.post('/graphs/%u/' % graphid, {'copy': 'copy'})
+            self.assertEqual(response.status_code, 302)
+            # The view code has no reason to return the new graph ID, so the redirect is to the dashboard
+            # We therefore determine the new graph by the creation time
+            copy = Graph.objects.all().order_by('-created')[0]
+            original = Graph.objects.get(pk=graphid)
+            self.assertTrue(original.same_as(copy))
+
+
+class GraphMLFilesTestCase(SimpleFixtureTestCase):
+    ''' 
+        Testing different GraphML file imports. 
+    '''
+
+    def setUp(self):
+        self.setUpAnonymous()
+
+    def testImportFiles(self):
+        files = [f for f in os.listdir('FuzzEd/fixtures') if f.endswith(".graphml")]
+        for f in files:
+            text = open('FuzzEd/fixtures/' + f).read()
+            # Now import the same GraphML
+            response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u' % self.pkProject, text,
+                                           'application/xml')
+            self.assertEqual(response.status_code, 201)
+
+
+class ExternalAPITestCase(SimpleFixtureTestCase):
+    ''' 
+        Tests for the Tastypie API. 
+    '''
+
+    def setUp(self):
+        self.setUpAnonymous()
+
+    def testMissingAPIKey(self):
+        response = self.get('/api/v1/project/?format=json')
+        self.assertEqual(response.status_code, 401)
+
+    def testOriginalAPIKeyFormat(self):
+        ''' We have our own APIKey format, so the original Tastypie version should no longer work.'''
+        response = self.c.get('/api/v1/project/?format=json',
+                              **{'HTTP_AUTHORIZATION': 'ApiKey testadmin:f1cc367bc09fc95720e6c8a4225ae2b912fff91b'})
+        self.assertEqual(response.status_code, 401)
+
+    def testRootResource(self):
+        ''' Root view of external API should provide graph and project resource base URLs, even without API key.'''
+        response = self.get('/api/v1/?format=json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        assert ('graph' in data)
+        assert ('project' in data)
+
+    def testProjectListResource(self):
+        response = self.getWithAPIKey('/api/v1/project/?format=json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        assert ('objects' in data)
+        assert ('graphs' in data['objects'][0])
+
+    def testGraphListResource(self):
+        response = self.getWithAPIKey('/api/v1/graph/?format=json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+
+    def testSingleProjectResource(self):
+        response = self.getWithAPIKey('/api/v1/project/%u/?format=json' % self.pkProject)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+
+    def testJsonExport(self):
+        for id, kind in self.graphs.iteritems():
+            response = self.get('/api/v1/graph/%u/?format=json' % id)
+            self.assertEqual(response.status_code, 401)
+            response = self.getWithAPIKey('/api/v1/graph/%u/?format=json' % id)
+            data = json.loads(response.content)
+            self.assertEqual(response.status_code, 200)
+
+    def testLatexExport(self):
+        for id, kind in self.graphs.iteritems():
+            if kind in ['faulttree', 'fuzztree']:
+                response = self.get('/api/v1/graph/%u/?format=tex' % id)
+                self.assertEqual(response.status_code, 401)
+                response = self.getWithAPIKey('/api/v1/graph/%u/?format=tex' % id)
+                self.assertEqual(response.status_code, 200)
+                assert ("tikz" in response.content)
+
+    def testGraphmlExport(self):
+        for id, kind in self.graphs.iteritems():
+            if kind in ['faulttree', 'fuzztree']:
+                # Should only be possible with API key authentication
+                response = self.get('/api/v1/graph/%u/?format=graphml' % id)
+                self.assertEqual(response.status_code, 401)
+                response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % id)
+                self.assertEqual(response.status_code, 200)
+                assert ("<graphml" in response.content)
+
+    def testGraphmlImport(self):
+        for id, kind in self.graphs.iteritems():
+            # First export GraphML
+            response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % id)
+            self.assertEqual(response.status_code, 200)
+            graphml = response.content
+            # Now import the same GraphML
+            response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u' % self.pkProject, graphml,
+                                           'application/xml')
+            self.assertEqual(response.status_code, 201)
+            # Check if the claimed graph really was created
+            newid = int(response['Location'][-2])
+            original = Graph.objects.get(pk=id)
+            copy = Graph.objects.get(pk=newid)
+            self.assertTrue(original.same_as(copy))
+
+    def testInvalidGraphImportProject(self):
+        # First export valid GraphML
+        response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % self.pkFaultTree)
+        self.assertEqual(response.status_code, 200)
+        graphml = response.content
+        # Now send request with wrong project ID
+        response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', graphml, 'application/xml')
+        self.assertEqual(response.status_code, 403)
+
+    def testMissingGraphImportProject(self):
+        # First export valid GraphML
+        response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % self.pkFaultTree)
+        self.assertEqual(response.status_code, 200)
+        graphml = response.content
+        # Now send request with wrong project ID
+        response = self.postWithAPIKey('/api/v1/graph/?format=graphml', graphml, 'application/xml')
+        self.assertEqual(response.status_code, 403)
+
+    def testInvalidGraphImportFormat(self):
+        for wrong_format in ['json', 'tex', 'xml']:
+            response = self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u' % (wrong_format, self.pkProject),
+                                           "<graphml></graphml>", 'application/text')
+            self.assertEqual(response.status_code, 413)
+
+    def testInvalidContentType(self):
+        for format in ['application/text', 'application/x-www-form-urlencoded']:
+            response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u' % (self.pkProject),
+                                           "<graphml></graphml>", format)
+            self.assertEqual(response.status_code, 413)
+
+
+    def testFoo(self):
+        ''' Leave this out, and the last test will fail. Dont ask me why.'''
+        assert (True)
+
+
+class FrontendApiTestCase(SimpleFixtureTestCase):
+    ''' 
+        Tests for the Frontend API called from JavaScript. 
+    '''
+
+    baseUrl = '/api/front'
+
+    def setUp(self):
+        self.setUpLogin()
+
+        #TODO: Test that session authentication is checked in the API implementation
+
+    #TODO: Test that the user can only access his graphs, and not the ones of other users
+
+    def _testValidGraphJson(self, content):
+        for key in ['id', 'seed', 'name', 'type', 'readOnly', 'nodes', 'edges', 'nodeGroups']:
+            self.assertIn(key, content)
+
+    def testGetGraph(self):
+        for id, kind in self.graphs.iteritems():
+            url = self.baseUrl + '/graphs/%u' % self.pkFaultTree
+            response = self.ajaxGet(url)
+            self.assertEqual(response.status_code, 200)
+            content = json.loads(response.content)
+            self._testValidGraphJson(content)
+        response = self.ajaxGet(self.baseUrl + '/graphs/9999')
+        self.assertEqual(response.status_code, 404)
+
+    def testGraphDownload(self):
+        for id, kind in self.graphs.iteritems():
+            for format, test_str in [('graphml', '<graphml'), ('json', '{'), ('tex', '\\begin')]:
+                url = self.baseUrl + '/graphs/%u?format=%s' % (self.pkFaultTree, format)
+                response = self.ajaxGet(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(test_str, response.content)
+
+    def testGetGraphs(self):
+        url = self.baseUrl + '/graphs/'
+        response = self.ajaxGet(url)
+        self.assertEqual(response.status_code, 200)
+        content = json.loads(response.content)
+        print content
+        assert ('graphs' in content)
+
+    def testGraphFiltering(self):
+        url = self.baseUrl + '/graphs/?kind=faulttree'
+        response = self.ajaxGet(url)
+        self.assertEqual(response.status_code, 200)
+        content = json.loads(response.content)
+        print content
+        assert ('graphs' in content)
+
+    def testCreateNode(self):
+        newnode = json.dumps({'y': 3,
+                              'x': 7,
+                              'kind': 'basicEvent',
+                              'client_id': 888,
+                              'properties': '{}'})
+
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodes/' % self.pkFaultTree,
+                                 newnode,
+                                 'application/json')
+        self.assertEqual(response.status_code, 201)
+        print response['Location']
+        newid = int(response['Location'].split('/')[-1])
+        newnode = Node.objects.get(client_id=newid, deleted=False)
+
+
+    def testCreateNodeGroup(self):
+        nodes = [self.clientIdAndGate, self.clientIdBasicEvent]
+        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % self.pkDFD,
+                                 newgroup,
+                                 'application/json')
+        self.assertEqual(response.status_code, 201)
+        print response['Location']
+        newid = int(response['Location'].split('/')[-1])
+        newgroup = NodeGroup.objects.get(client_id=newid, deleted=False)
+        #TODO: Doesn't work due to non-saving of LiveServerTestCase
+        #       saved_nodes=newgroup.nodes.all()
+        #       self.assertItemsEqual(nodes, saved_nodes)
+
+        # Get complete graph and see if the node group is registered correctly
+        url = self.baseUrl + '/graphs/%u' % self.pkDFD
+        response = self.ajaxGet(url)
+        self.assertEqual(response.status_code, 200)
+        content = json.loads(response.content)
+        for group in content['nodeGroups']:
+            self.assertEqual(group['id'], 999)
+            self.assertItemsEqual(group['nodeIds'], nodes)
+            print group
+
+    def testDeleteNode(self):
+        response = self.ajaxDelete(self.baseUrl + '/graphs/%u/nodes/%u' % (self.pkFaultTree, self.clientIdBasicEvent))
+        self.assertEqual(response.status_code, 204)
+
+    def testDeleteNodeGroup(self):
+        #TODO: Fixture should have a node group, instead of creating it here
+        nodes = [self.clientIdAndGate, self.clientIdBasicEvent]
+        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % self.pkDFD,
+                                 newgroup,
+                                 'application/json')
+        self.assertEqual(response.status_code, 201)
+        newgroup = response['Location']
+        # Try delete
+        response = self.ajaxDelete(newgroup)
+        self.assertEqual(response.status_code, 204)
+
+    def testRelocateNode(self):
+        newpos = json.dumps({'properties': {"y": 3, "x": 7}})
+        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/nodes/%u' % (self.pkFaultTree, self.clientIdBasicEvent),
+                                  newpos,
+                                  "application/json")
+        self.assertEqual(response.status_code, 202)
+
+    def testNodePropertyChange(self):
+        newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
+        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/nodes/%u' % (self.pkFaultTree, self.clientIdBasicEvent),
+                                  newprop,
+                                  "application/json")
+        self.assertEqual(response.status_code, 202)
+        #TODO: Fetch graph and check that the property is really stored
+
+
+    def testNodeGroupPropertyChange(self):
+        #TODO: Fixture should have a node group, instead of creating it here
+        nodes = [self.clientIdAndGate, self.clientIdBasicEvent]
+        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % self.pkDFD,
+                                 newgroup,
+                                 'application/json')
+        self.assertEqual(response.status_code, 201)
+        newgroup = response['Location']
+        # Try changing
+        newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
+        response = self.ajaxPatch(newgroup,
+                                  newprop,
+                                  "application/json")
+        self.assertEqual(response.status_code, 202)
+        #TODO: Fetch graph and check that the property is really stored
+
+
+    def testEdgePropertyChange(self):
+        newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
+        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/edges/%u' % (self.pkDFD, self.clientIdEdge),
+                                  newprop,
+                                  "application/json")
+        self.assertEqual(response.status_code, 202)
+        #TODO: Fetch graph and check that the property is really stored
+
+    def testDeleteEdge(self):
+        response = self.ajaxDelete(self.baseUrl + '/graphs/%u/edges/%u' % (self.pkFaultTree, self.clientIdEdge))
+        self.assertEqual(response.status_code, 204)
+
+    def testCreateEdge(self):
+        newedge = json.dumps({'client_id': 4714, 'source': self.clientIdAndGate, 'target': self.clientIdBasicEvent})
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/edges/' % self.pkFaultTree,
+                                 newedge,
+                                 'application/json')
+        self.assertEqual(response.status_code, 201)
+
+    def testNotificationDismiss(self):
+        # Create notification entry in the database
+        u = User.objects.get(username='testadmin')
+        n = Notification(title="Test notification")
+        n.save()
+        n.users.add(u)
+        n.save()
+        # Now check the dismiss call
+        response = self.ajaxDelete(self.baseUrl + '/notification/%u/' % n.pk)
+        self.assertEqual(response.status_code, 204)
+
+
+class AnalysisInputFilesTestCase(FuzzEdTestCase):
+    """
+        These are tests based on the analysis engine input files in fixture/analysis.
+        They only test if the analysis engine crashes on them.
+        The may later be translated to real tests with some expected output.
+    """
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+    def testFileAnalysis(self):
+        for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
+            for f in files:
+                fname = root + os.sep + f
+                print "Testing " + fname
+                retcode = subprocess.call('backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp' % (fname), shell=True)
+                self.assertEqual(retcode, 0, fname + " failed")
+                dom = parse('/tmp/output.xml')
+
+
+class AnalysisFixtureTestCase(FuzzEdTestCase):
+    ''' 
+        This is a base class that wraps all information about the 'analysis' fixture. 
+    '''
+    fixtures = ['analysis.json', 'initial_data.json']
+    # A couple of specific PK's from the model
+    graphs = [7, 8]
+    rate_faulttree = 7
+    prdc_fuzztree = 8
+    # The decomposition number configured in the PRDC tree
+    prdc_configurations = 8
+    prdc_peaks = [0.31482, 0.12796, 0.25103, 0.04677, 0.36558, 0.19255, 0.30651, 0.11738]
+
+
+class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
+    ''' 
+        Tests for backend functionality, as being triggered from frontend calls. 
+    '''
+
+    baseUrl = '/api/front'
+
+    def setUp(self):
+        # Start up backend daemon in testing mode so that it uses port 8081 of the live test server
         print "Starting backend daemon"
         os.chdir("backends")
-        self.backend = Popen(["python","daemon.py","--testing"])
+        self.backend = Popen(["python", "daemon.py", "--testing"])
         time.sleep(2)
         os.chdir("..")
-        super(BackendTestCase, self).setUp()
+        self.setUpLogin()
 
     def tearDown(self):
         print "\nShutting down backend daemon"
         self.backend.terminate()
-        super(BackendTestCase, self).tearDown()
 
-    def _testStandardFixtureAnalysis(self):
-        result=self.requestAnalysis(4)
-        self.assertEqual(bool(result['validResult']),True)
-        self.assertEqual(result['errors'],{})
-        self.assertEqual(result['warnings'],{})
-        self.assertEqual(result['configurations'][0]['alphaCuts']['1.0'],[0.5, 0.5])
-        self.assertEqual(result['configurations'][1]['alphaCuts']['1.0'],[0.4, 0.4])
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+    def testRateFaulttree(self):
+        response = self.requestJob(self.baseUrl, self.rate_faulttree, 'topevent')
+        result = json.loads(response.content)
+        self.assertEqual(bool(result['validResult']), True)
+        self.assertEqual(result['errors'], {})
+        self.assertEqual(result['warnings'], {})
+        self.assertEqual(result['configurations'][0]['peak'], 1.0)
 
-    def testIssue150(self):
-        result=self.requestAnalysis(4)
-        # This tree can lead to a k=0 redundancy configuration, which is not allowed
-        self.assertEqual(result['validResult'],False)
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+    def testPRDCFuzztree(self):
+        response = self.requestJob(self.baseUrl, self.prdc_fuzztree, 'topevent')
+        result = json.loads(response.content)
+        self.assertEqual(bool(result['validResult']), True)
+        self.assertEqual(result['errors'], {})
+        self.assertEqual(result['warnings'], {})
+        self.assertEqual(len(result['configurations']), self.prdc_configurations)
+        for conf in result['configurations']:
+            assert (round(conf['peak'], 5) in self.prdc_peaks)
 
-    def testPdfExport(self):
-        result = self.requestJob('/api/graphs/1/exports/pdf')
-        assert(len(result)>0)
-        tmp = tempfile.NamedTemporaryFile()
-        tmp.write(result)
-        output = subprocess.check_output(['file', tmp.name])
-        assert('PDF' in output)
+    def testFrontendAPIPdfExport(self):
+        for graph in self.graphs:
+            pdf = self.requestJob(self.baseUrl, graph, 'pdf')
+            # The result of a PDF rendering job is the download link
+            self.assertEqual('application/pdf', pdf['CONTENT-TYPE'])
 
-    def testEpsExport(self):
-        result = self.requestJob('/api/graphs/1/exports/eps')
-        assert(len(result)>0)
-        tmp = tempfile.NamedTemporaryFile()
-        tmp.write(result)
-        output = subprocess.check_output(['file', tmp.name])
-        print output
-        assert('EPS' in output)
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+    def testFrontendAPIEpsExport(self):
+        for graph in self.graphs:
+            eps = self.requestJob(self.baseUrl, graph, 'eps')
+            self.assertEqual('application/postscript', eps['CONTENT-TYPE'])
+
+
+class UnicodeTestCase(FuzzEdTestCase):
+    fixtures = ['unicode.json', 'initial_data.json']
+    graphs = {1: 'faulttree'}
+    # A couple of specific PK's from the model
+    pkProject = 1
+    pkFaultTree = 1
+
+    def setUp(self):
+        self.setUpLogin()
+
+    def testTikzSerialize(self):
+        g = Graph.objects.get(pk=self.pkFaultTree)
+        assert (len(g.to_tikz()) > 0)
+

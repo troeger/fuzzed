@@ -1,25 +1,30 @@
 define(['config', 'jquery'], function(Config) {
     /**
-     *  Package Faulttree
+     * Package Faulttree
      */
 
     /**
-     *  Structure: FaulttreeConfig
-     *    Faulttree-specific config.
+     * Structure: FaulttreeConfig
+     *      Faulttree-specific config.
      *
-     *  Extends: <Base::Config>
+     * Extends: <Base::Config>
      */
     return jQuery.extend(true, Config, {
         /**
-         *  Group: Events
-         *    Name of global events triggered on the document with jQuery.trigger().
+         * Group: Events
+         *      Name of global events triggered on the document with jQuery.trigger().
          *
          *  Constants:
-         *    {String} EDITOR_CALCULATE_CUTSETS                - Event triggered when he 'calculate cutsets' action has been chosen.
-         *    {String} EDITOR_CALCULATE_ANALYTICAL_PROBABILITY - Event triggered when the 'analytical probability' action has been chosen.
-         *    {String} EDITOR_CALCULATE_SIMULATED_PROBABILITY  - Event triggered when the 'simulated probability' action has been chosen.
-         *    {String} EDITOR_GRAPH_EXPORT_PDF                 - Event triggered when the 'export as PDF' action has been chosen.
-         *    {String} EDITOR_GRAPH_EXPORT_EPS                 - Event triggered when the 'export as EPS' action has been chosen.
+         *      {String} EDITOR_CALCULATE_CUTSETS                - Event triggered when he 'calculate cutsets' action
+         *                                                         has been chosen.
+         *      {String} EDITOR_CALCULATE_ANALYTICAL_PROBABILITY - Event triggered when the 'analytical probability'
+         *                                                         action has been chosen.
+         *      {String} EDITOR_CALCULATE_SIMULATED_PROBABILITY  - Event triggered when the 'simulated probability'
+         *                                                         action has been chosen.
+         *      {String} EDITOR_GRAPH_EXPORT_PDF                 - Event triggered when the 'export as PDF' action has
+         *                                                         been chosen.
+         *      {String} EDITOR_GRAPH_EXPORT_EPS                 - Event triggered when the 'export as EPS' action has
+         *                                                         been chosen.
          */
         Events: {
             EDITOR_CALCULATE_CUTSETS:                'editor-calculate-cutsets',
@@ -30,16 +35,16 @@ define(['config', 'jquery'], function(Config) {
         },
 
         /**
-         *  Group: IDs
-         *    IDs of certain DOM-elements.
+         * Group: IDs
+         *      IDs of certain DOM-elements.
          *
-         *  Constants:
-         *    {String} CUTSETS_MENU                - The container element of the cutsets menu.
-         *    {String} ACTION_CUTSETS              - The list element that contains the cut set analysis menu entry.
-         *    {String} ACTION_ANALYTICAL           - The list element that contains the analytical analysis menu entry.
-         *    {String} ACTION_SIMULATED            - The list element that contains the simulated analysis menu entry.
-         *    {String} ANALYTICAL_PROBABILITY_MENU - The container element of the analytical probability menu.
-         *    {String} SIMULATED_PROBABILITY_MENU  - The container element of the simulated probability menu.
+         * Constants:
+         *      {String} CUTSETS_MENU                - The container element of the cutsets menu.
+         *      {String} ACTION_CUTSETS              - The list element that contains the cut set analysis menu entry.
+         *      {String} ACTION_ANALYTICAL           - The list element that contains the analytical analysis menu entry
+         *      {String} ACTION_SIMULATED            - The list element that contains the simulated analysis menu entry.
+         *      {String} ANALYTICAL_PROBABILITY_MENU - The container element of the analytical probability menu.
+         *      {String} SIMULATED_PROBABILITY_MENU  - The container element of the simulated probability menu.
          */
         IDs: {
             CUTSETS_MENU:                'FuzzEdCutsetsMenu',
@@ -51,11 +56,11 @@ define(['config', 'jquery'], function(Config) {
         },
 
         /**
-         *  Group: Menus
-         *    Menu configurations.
+         * Group: Menus
+         *      Menu configurations.
          *
-         *  Constants:
-         *    {Number} PROBABILITY_MENU_MAX_GRID_HEIGHT - Max. height of the grid that displays the configurations.
+         * Constants:
+         *      {Number} PROBABILITY_MENU_MAX_GRID_HEIGHT - Max. height of the grid that displays the configurations.
          */
         Menus: {
             PROBABILITY_MENU_MAX_GRID_HEIGHT: 500

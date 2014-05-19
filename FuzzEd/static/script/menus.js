@@ -1,31 +1,25 @@
-define(['config', 'class', 'jquery'], function(Config, Class) {
+define(['config', 'class', 'jquery', 'jquery-ui'], function (Config, Class) {
     /**
      * Package: Base
      */
 
     /**
-     * Class: {Abstract} Menu
-     *
-     * Abstract base class that implements base functionality of editor menus (sometimes referred to as fly windows).
-     * Offers functionality for showing/hiding the menu, to maximize and minimize it to the editor's toolbar and to
-     * drag it around on the canvas.
-     *
-     * A concrete implementation of the menu must define the location/construct the menu's container.
+     * Abstract Class: Menu
+     *      Abstract base class that implements base functionality of editor menus (sometimes referred to as fly
+     *      windows). Offers functionality for showing/hiding the menu, to maximize and minimize it to the editor's
+     *      toolbar and to drag it around on the canvas.
      */
     var Menu = Class.extend({
         /**
          * Group: Members
+         *      {jQuerySelector} container     - The DOM element that holds all other visual elements of the menu.
          *
-         * Properties:
-         *  {DOMElement} container     - The DOM element that holds all other visual elements of the menu.
-         *
-         *  {DOMElement} _controls     -
-         *  {boolean}    _disabled     -
-         *  {DOMElement} _navbar       -
-         *  {DOMElement  _navbarButton -
+         *      {jQuerySelector} _controls     - jQuery selector referencing the menu title buttons (close, ...)
+         *      {Boolean}        _disabled     - Flag indicating whether the menu is disabled and therefore hidden.
+         *      {jQuerySelector} _navbar       - jQuery selector referencing the editor's toolbar.
+         *      {jQuerySelector} _navbarButton - jQuery selector referencing the button to the minimized menu.
          */
-        container:    undefined,
-
+        container:     undefined,
         _controls:     undefined,
         _disabled:     undefined,
         _navbar:       undefined,
@@ -37,30 +31,21 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Constructor: init
-         *
-         * Abstract constructor that will create menu instances in non abstract subclasses (see _setupContainer).
-         * Interaction is fully enabled.
-         *
-         * Returns:
-         *   This {Menu} instance.
          */
         init: function() {
             this.container = this._setupContainer();
             this._controls = this._setupControls();
             this._disabled = false;
-            this._navbar   = this._setupNavbar();
+            this._navbar = this._setupNavbar();
 
             this._setupDragging();
         },
 
         /**
-         * Method: _setupContainer
-         *
-         * Locate or create the menu's container here and return it as a jQuery selector. Must be overwritten by sub-
-         * classes. Usual approach would be to locate a previously created div in the Django templates by their id.
-         *
-         * Throws:
-         *   SubclassResponsibility
+         * Abstract Method: _setupContainer
+         *      Locate or create the menu's container here and return it as a jQuery selector. Must be overwritten by
+         *      subclasses. Usual approach would be to locate a previously created div in the Django templates by their
+         *      id.
          */
         _setupContainer: function() {
             throw new SubclassResponsibility();
@@ -68,12 +53,12 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: _setupControls
-         *
-         * Locates menu controls container inside the menu's container and its contained minimize and close buttons.
-         * Both of them are optional, but, if present, will be get their minimize or respectively close callback bound.
+         *      Locates menu controls container inside the menu's container and its contained minimize and close
+         *      buttons. Both of them are optional, but, if present, will be get their minimize or respectively close
+         *      callback bound.
          *
          * Returns:
-         *   The menu controls container as jQuery selector.
+         *      The {<Menu>} controls container as jQuery selector.
          */
         _setupControls: function() {
             var controls = this.container.find('.' + Config.Classes.MENU_CONTROLS);
@@ -91,12 +76,12 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: _setupDragging
-         *
-         * Enables the menu container to be dragged around on the canvas. Menus are always above other elements on the
-         * canvas and may not leave the canvas. When close to the edges of the canvas, menus snap to its inner edges.
+         *      Enables the menu container to be dragged around on the canvas. Menus are always above other elements on
+         *      the canvas and may not leave the canvas. When close to the edges of the canvas, menus snap to its inner
+         *      edges.
          *
          * Returns:
-         *   This {Menu} instance for chaining.
+         *      This {<Menu>} instance for chaining.
          */
         _setupDragging: function() {
             this.container.draggable({
@@ -114,11 +99,10 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: _setupNavbar
-         *
-         * Locates and returns the editor's navbar.
+         *      Locates and returns the editor's navbar.
          *
          * Returns:
-         *   The navbar's jQuery selector.
+         *      The navbar's jQuery selector.
          */
         _setupNavbar: function() {
             return jQuery('ul.nav.pull-right');
@@ -130,11 +114,10 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: _isMinimized
-         *
-         * Returns a boolean flag indicating whether the menu is minimized.
+         *      Returns a boolean flag indicating whether the menu is minimized.
          *
          * Returns:
-         *   True if the menu is minimized, false otherwise.
+         *      True if the menu is minimized, false otherwise.
          */
         _isMinimized: function() {
             return typeof this._navbarButton !== 'undefined';
@@ -146,11 +129,10 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: disable
-         *
-         * Disables the menu, meaning it is being hidden and cannot be shown until enabled again.
+         *      Disables the menu, meaning it is being hidden and cannot be shown until enabled again.
          *
          * Returns:
-         *   This {Menu} instance for chaining.
+         *      This {<Menu>} instance for chaining.
          */
         disable: function() {
             this._disabled = true;
@@ -161,11 +143,10 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: enable
-         *
-         * Enables the menu again. It is no implicitly shown again.
+         *      Enables the menu again. An implicit show is not performed.
          *
          * Returns:
-         *   This {Menu} instance for chaining.
+         *      This {<Menu>} instance for chaining.
          */
         enable: function() {
             this._disabled = false;
@@ -175,27 +156,25 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: show
-         *
-         * Shows the menu's container unless it the menu is minimized or disabled.
+         *      Shows the menu's container unless it the menu is minimized or disabled.
          *
          * Returns:
-         *   This {Menu} instance for chaining.
+         *      This {<Menu?} instance for chaining.
          */
         show: function() {
             // prevent that the menu is shown again as long it is minimized
             if (this._isMinimized() || this._disabled) return this;
-
             this.container.show();
+
             return this;
         },
 
         /**
          * Method: hide
-         *
-         * Hides the menu.
+         *      Hides the menu.
          *
          * Returns:
-         *   This {Menu} instance for chaining.
+         *      This {<Menu>} instance for chaining.
          */
         hide: function() {
             this.container.hide();
@@ -204,13 +183,12 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: maximize
-         *
-         * Maximized the menu on clicking its minimized representation in the navigation bar. Will calculate the
-         * position where the menu will be maximized to first (including a 20 pixel offset of the canvas borders) and
-         * then animate it moving there. This method will also remove the button from the bar.
+         *      Maximizes the menu on clicking its minimized representation in the navigation bar. Will calculate the
+         *      position where the menu will be maximized to first (including a 20 pixel offset of the canvas borders)
+         *      and then animate it moving there. This method will also remove the button from the bar.
          *
          * Returns:
-         *   This {Menu} instance for chaining.
+         *      This {<Menu>} instance for chaining.
          */
         maximize: function(eventObject) {
             this._navbarButton.remove();
@@ -236,19 +214,19 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: minimize
-         *
-         * Minimizes the menu from its current position to the navigation bar. A button will appear in the menu bar
-         * instead. The minimization is animated in width and height over the period of about half a second. A
-         * minimized menu will not reappear until maximized again by clicking on the navigation bar button.
+         *      Minimizes the menu from its current position to the navigation bar. A button will appear in the menu bar
+         *      instead. The minimization is animated in width and height over the period of about half a second. A
+         *      minimized menu will not reappear until maximized again by clicking on the navigation bar button.
          *
          * Returns:
-         *   This {Menu} instance for chaining.
+         *      This {<Menu>} instance for chaining.
          */
         minimize: function() {
             if (this._isMinimized()) return this;
 
             // create a button in the toolbar
-            this._navbarButton = jQuery('<li><a href="#">' + this.container.attr(Config.Attributes.HEADER) + '</a></li>')
+            this._navbarButton = jQuery('<li><a href="#">' + this.container
+                .attr(Config.Attributes.HEADER) + '</a></li>')
                 .css('visibility', 'hidden')
                 .prependTo(this._navbar)
                 // .offset() here will closure the position where the window was minimized
@@ -257,13 +235,13 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
             // animate the window minimizing towards the navigation button
             var navButtonPosition = this._navbarButton.offset();
             this.container.animate({
-                top:    navButtonPosition.top,
-                left:   navButtonPosition.left,
-                width:  0,
+                top: navButtonPosition.top,
+                left: navButtonPosition.left,
+                width: 0,
                 height: 0
             }, {
                 duration: Config.Menus.ANIMATION_DURATION,
-                complete: function() {
+                complete: function () {
                     this._navbarButton.css('visibility', '');
                     this.container.hide();
                     // width and height have to be remove here so that the css will fall back to auto
@@ -279,10 +257,9 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
     /**
      * Class: ShapeMenu
-     *
-     * Concrete implementation of a menu. This menu class manages the shapes menu and is instantiated in the editor. A
-     * shapes menu represents the repository of shapes that a user can create on its own. The thumbnail of a shape can
-     * be dragged from the menu and released on the canvas in order to create a new node.
+     *      Concrete implementation of a menu. This menu class manages the shapes menu and is instantiated in the
+     *      editor. A shapes menu represents the repository of shapes that a user can create on its own. The thumbnail
+     *      of a shape can be dragged from the menu and released on the canvas in order to create a new node.
      *
      * Extends: <Base::Menu>
      */
@@ -293,22 +270,20 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Constructor: init
-         *
-         * Overrides the default implementation of menu in order to also locate the shape thumbnails.
+         *      Overrides the default implementation of menu in order to also locate the shape thumbnails.
          */
-        init: function() {
+        init: function () {
             this._super();
             this._setupThumbnails();
         },
 
         /**
          * Method: _setupContainer
-         *
-         * Implements the abstract _setupContainer method of <Base::Menu>. Locates the shapes menu container that is
-         * pre-created in the Django template and returns it.
+         *      Implements the abstract _setupContainer method of {<Menu>}. Locates the shapes menu container that is
+         *      pre-created in the Django template and returns it.
          *
          * Returns:
-         *   jQuery set including the shapes menu's container.
+         *      jQuery set including the shapes menu's container.
          */
         _setupContainer: function() {
             return jQuery('#' + Config.IDs.SHAPES_MENU);
@@ -316,23 +291,22 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: _setupThumbnails
-         *
-         * Locates the thumbnails (pre-rendered in the Django template) and makes them draggable.
+         *      Locates the thumbnails (pre-rendered in the Django template) and makes them draggable.
          *
          * Returns:
-         *  This {ShapeMenu} instance for chaining.
+         *      This {<ShapesMenu>} instance for chaining.
          */
         _setupThumbnails: function() {
 			var thumbnails = this.container.find('.' + Config.Classes.DRAGGABLE_WRAP_DIV).children();
 
             // make shapes in the menu draggable
             thumbnails.draggable({
-                helper:   'clone',
-                opacity:  Config.Dragging.OPACITY,
-                cursor:   Config.Dragging.CURSOR,
+                helper: 'clone',
+                opacity: Config.Dragging.OPACITY,
+                cursor: Config.Dragging.CURSOR,
                 appendTo: 'body',
-                revert:   'invalid',
-                zIndex:   200
+                revert: 'invalid',
+                zIndex: 200
             });
 
             return this;
@@ -341,26 +315,24 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
     /**
      * Class: PropertiesMenu
+     *      Concrete implementation of the abstract menu class. Models the properties menu that displays the modifiable
+     *      or user-readable properties of a node. Will only display the properties of exactly one node. Multi-selected
+     *      nodes are hidden.
      *
-     * Concrete implementation of the abstract menu class. Models the properties menu that displays the modifiable or
-     * user-readable properties of a node. Will only display the properties of exactly one node. Multi-selected nodes
-     * are hidden.
-     *
-     * Extends: <Base::Menu>
+     * Extends: {<Menu>}
      */
     var PropertiesMenu = Menu.extend({
         /**
          * Group: Members
-         *
-         * {Array[String]} _displayOrder - Array containing the names of displayable properties ordered by appearance in
-         *                                 the menu.
-         * {DOMElement}    _form         - The form containing all the visual form inputs of the
-         *                                 {Base::PropertyMenuEntries::Entries}.
-         * {Node}          _node         - The node instance which properties are being currently displayed.
+         *      {Array[String]} _displayOrder - Array containing the names of displayable properties ordered by
+         *                                      appearance in the menu.
+         *      {DOMElement}    _form         - The form containing all the visual form inputs of the
+         *                                      {PropertyMenuEntries::Entries}.
+         *      {Node}          _selectee     - The node instance which properties are being currently displayed.
          */
         _displayOrder: undefined,
         _form:         undefined,
-        _node:         undefined,
+        _selectee:     undefined,
 
         /**
          * Group: Initialization
@@ -368,9 +340,8 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Constructor: init
-         *
-         * Overrides menu's constructor. Saves the display order attributed and locates the pre-rendered form.
-         * Additionally, sets up the selection event handlers.
+         *      Overrides menu's constructor. Saves the display order attributed and locates the pre-rendered form. Sets
+         *      up the selection event handlers also.
          */
         init: function(displayOrder) {
             this._super();
@@ -383,12 +354,11 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: _setupContainer
-         *
-         * Concrete implementation of the abstract base method. Locates and returns the property menu container that is
-         * pre-rendered into the editors template.
+         *      Concrete implementation of the abstract base method. Locates and returns the property menu container
+         *      that is pre-rendered into the editors template.
          *
          * Returns:
-         *   jQuery set containing the property menu container.
+         *      jQuery set containing the property menu container.
          */
         _setupContainer: function() {
             return jQuery('#' + Config.IDs.PROPERTIES_MENU);
@@ -396,14 +366,13 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: _setupSelection
-         *
-         * Registers on the selection stop event in order to display the selected node's properties.
+         *      Registers on the selection stop event in order to display the selected node's properties.
          *
          * On:
-         *   <Config::Events::CANVAS_SELECTION_STOPPED>
+         *      <Config::Events::CANVAS_SELECTION_STOPPED>
          *
          * Returns:
-         *   This {PropertyMenu} instance for chaining.
+         *      This {<PropertyMenu>} instance for chaining.
          */
         _setupSelection: function() {
             jQuery(document).on(Config.Events.CANVAS_SELECTION_STOPPED, this.show.bind(this));
@@ -417,32 +386,30 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: hide
-         *
-         * Overrides the base hide method of <Base::Menu>. Additionally, removes the visual representations of the
-         * properties from the form and resets the current node.
+         *      Overrides the base hide method of <Base::Menu>. Additionally, removes the visual representations of the
+         *      properties from the form and resets the current node.
          *
          * Returns:
-         *   This {PropertyMenu} for chaining.
+         *      This {<PropertyMenu>} for chaining.
          */
         hide: function() {
             this._removeEntries();
-            this._node = undefined;
+            this._selectee = undefined;
             return this._super();
         },
 
         /**
          * Method: _removeEntries
-         *
-         * If a node is currently selected, issues all the visual representation of the properties to remove themselves
-         * from their container, the form.
+         *      If exactly one node is selected, this method will issue all visual representation of the properties to
+         *      remove themselves.
          *
          * Returns:
-         *   This {PropertyMenu} instance for chaining.
+         *      This {<PropertyMenu>} instance for chaining.
          */
         _removeEntries: function() {
-            if (!this._node) return this;
+            if (!this._selectee) return this;
 
-            _.each(this._node.properties, function(property) {
+            _.each(this._selectee.properties, function(property) {
                 property.menuEntry.remove();
             }.bind(this));
 
@@ -451,12 +418,11 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: maximize
-         *
-         * Overrides the base implementation of maximize. Triggers the show method again in order to recalculate the
-         * current selection and consequently the property menu's visibility.
+         *      Overrides the base implementation of maximize. Triggers the show method again in order to recalculate
+         *      the current selection and consequently the property menu's visibility.
          *
          * Returns:
-         *   This {PropertyMenu} instance for chaining.
+         *      This {<PropertyMenu>} instance for chaining.
          */
         maximize: function(eventObject) {
             this._super(eventObject);
@@ -467,14 +433,13 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: show
-         *
-         * Overrides the base implementation of <Base::Menu>. First, removes all currently displayed entries (even when
-         * being the same). Then, calculates the current node selection. If and only if, the is exactly one node in the
-         * the selection and the menu is not minimized, the node's properties are displayed using _show. Otherwise, the
-         * property menu is hidden.
+         *      Overrides the base implementation of <Menu>. First, removes all currently displayed entries (even
+         *      when being the same). Then, calculates the current node selection. If and only if, the is exactly one
+         *      node in the the selection and the menu is not minimized, the node's properties are displayed using
+         *      _show. Otherwise, the property menu is hidden.
          *
          * Returns:
-         *   This {PropertyMenu} instance for chaining.
+         *      This {<PropertyMenu>} instance for chaining.
          */
         show: function() {
             var selected = jQuery('.' + Config.Classes.SELECTED + '.' + Config.Classes.NODE);
@@ -491,30 +456,36 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: _show
-         *
-         * Internal implementation of the property menu's show mechanism. Grabs the selected node instance first.
-         * Determines whether there are properties to be displayed - i.e. properties present and not hidden - and then
-         * issues the properties to display themselves on the form and to change their visibility to show.
+         *      Internal implementation of the property menu's show mechanism. Grabs the selected node instance first.
+         *      Determines whether there are properties to be displayed - i.e. properties present and not hidden - and
+         *      then issues the properties to display themselves on the form and to change their visibility to show.
          *
          * Returns:
-         *   This {PropertyMenu} instance for chaining.
+         *      This {<PropertyMenu>} instance for chaining.
          */
-        _show: function(selected) {
-            this._node = selected.data(Config.Keys.NODE);
+        _show: function (selected) {
+            if (selected.hasClass(Config.Classes.NODE)) {
+                this._selectee = selected.data(Config.Keys.NODE);
+            } else if (selected.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
+                this._selectee = selected.data(Config.Keys.EDGE);
+            } else { // if (selected.hasClass(Config.Keys.NODEGROUP
+                //TODO: do this right
+                this._selectee = selected.parent().parent().data(Config.Keys.NODEGROUP);
+            }
 
             // this node does not have any properties to display, go home!
-            if (_.isEmpty(this._node.properties)) {
+            if (_.isEmpty(this._selectee.properties)) {
                 this.hide();
                 return this;
             }
 
-            _.each(this._displayOrder, function(propertyName) {
-                var property = this._node.properties[propertyName];
+            _.each(this._displayOrder, function (propertyName) {
+                var property = this._selectee.properties[propertyName];
                 // has the node such a property? display it!
                 if (typeof property !== 'undefined' && property !== null) {
                     property.menuEntry.appendTo(this._form);
 
-                    jQuery(property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
+                    jQuery(property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function (event, hidden) {
                         this.container.toggle(!this._allHidden());
                     }.bind(this));
                 }
@@ -525,26 +496,154 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
                 var offset =  - this.container.outerWidth(true) - Config.Menus.MENU_OFFSET;
                 this.container.css('left', jQuery('body').outerWidth(true) + offset);
             }
-            this.container.toggle(!_.all(this._node.properties, function(property) { return property.hidden; }));
+            this.container.toggle(!_.all(this._selectee.properties, function(property) {
+                return property.hidden;
+            }));
 
             return this;
         },
 
         /**
          * Method: _allHidden
-         *
-         * Determines if all properties of the node are hidden preventing the menu to be displayed
+         *      Determines if all properties of the node are hidden preventing the menu to be displayed.
          *
          * Returns:
-         *   {Boolean} indicating hidden state of the properties.
+         *      {Boolean} indicating hidden state of the properties.
          */
         _allHidden: function() {
-            return !this._node || _.all(this._node.properties, function(property) { return property.hidden; });
+            return !this._selectee || _.all(this._selectee.properties, function(property) { return property.hidden; });
+        }
+    });
+
+    /**
+     * Class: LayoutMenu
+     *      Small prompt window after hitting the layout button that asks whether you want to keep the changes or not.
+     *      Any editor interaction while the prompt is open will auto-accept the layout and commit it to the backend.
+     */
+    var LayoutMenu = Menu.extend({
+        /**
+         * Group: Members
+         *      {jQuerySelector} _keep - jQuery selector referencing the keep layout button.
+         *      {jQuerySelector} _undo - jQuery selector referencing the undo layout button.
+         */
+        _keep: undefined,
+        _undo: undefined,
+
+        /**
+         * Constructor: init
+         *      Overrides the default construct so that the layout request can be captured and the undo button located.
+         *      Initially, the layout menu is also set to hidden.
+         */
+        init: function () {
+            this._super();
+            this._setupButtons()
+                ._setupLayoutRequested()
+                .hide();
+        },
+
+        /**
+         * Method: keep
+         *      Is called by the {<Editor>} in order to obtain a promise from the layout window. The promise will be kept
+         *      if the user clicks on 'Keep' in the layout window or continues modelling (including new requests to
+         *      auto layout, ...). On hitting undo in the layout menu the promise is broken and the editor is reverting
+         *      the nodes to their initial positions before the auto-layout.
+         *
+         * Returns:
+         *      A {jQuery::Promise} that is watched by the {<Editor>} for reverting the nodes' positions.
+         */
+        keep: function () {
+            var deferred = jQuery.Deferred();
+
+            // User has accepted to keep the layout by explicitly clicking the button
+            this._keep.click(function () {
+                deferred.resolve();
+            }.bind(this));
+
+            // User has accepted implicitly by continuing to edit the graph
+            jQuery(document).one([
+                Config.Events.CANVAS_SHAPE_DROPPED,
+                Config.Events.NODE_ADDED,
+                Config.Events.NODE_DELETED,
+                Config.Events.EDGE_ADDED,
+                Config.Events.EDGE_DELETED,
+                Config.Events.NODEGROUP_ADDED,
+                Config.Events.NODEGROUP_DELETED,
+                Config.Events.GRAPH_LAYOUT,
+                Config.Events.NODE_PROPERTY_CHANGED
+            ].join(' '), function () {
+                deferred.resolve();
+            }.bind(this));
+
+            // User requested an undo
+            this._undo.click(function () {
+                deferred.reject();
+            }.bind(this));
+
+            return deferred.promise();
+        },
+
+        /**
+         * Method: show
+         *      Override of the basic show method. Center the layout menu dialog on the canvas.
+         *
+         * Returns:
+         *      This {<LayoutMenu>} instance for chaining.
+         */
+        show: function () {
+            var viewport = jQuery(window);
+
+            this.container.css({
+                top: viewport.height() / 2 - this.container.height() / 2,
+                left: viewport.width() / 2 - this.container.width() / 2
+            });
+
+            return this._super();
+        },
+
+        /**
+         * Method: _setupButtons
+         *      Locates the keep and undo layout buttons.
+         *
+         * Returns:
+         *      This {<LayoutMenu>} instance for chaining.
+         */
+        _setupButtons: function () {
+            this._keep = this.container.find('button.btn-primary').add(this._controls.find('.menu-close'));
+            this._undo = this.container.find('button.btn-danger');
+
+            return this;
+        },
+
+        /**
+         * Method: _setupLayoutRequested
+         *      Sets up two global event listeners that listens to graph layout requests and performed layouts. Shows
+         *      or respectively hides the menu.
+         *
+         * Returns:
+         *      This {<LayoutMenu>} instance for chaining.
+         */
+        _setupLayoutRequested: function () {
+            jQuery(document).on(Config.Events.GRAPH_LAYOUT,   this.show.bind(this));
+            jQuery(document).on(Config.Events.GRAPH_LAYOUTED, this.hide.bind(this));
+
+            return this;
+        },
+
+        /**
+         * Method: _setupContainer
+         *      Implements the abstract base method. Locates the template-prerendered layout menu div.
+         *
+         * Returns:
+         *      The jQuery selector referencing the layout menu.
+         */
+        _setupContainer: function () {
+            return jQuery('#' + Config.IDs.LAYOUT_MENU);
         }
     });
 
     return {
         Menu:           Menu,
+        LayoutMenu:     LayoutMenu,
         ShapeMenu:      ShapeMenu,
         PropertiesMenu: PropertiesMenu
     }

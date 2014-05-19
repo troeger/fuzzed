@@ -33,12 +33,17 @@ if(APPLE)
 	# Homebrew on Mac OS X has no Codesynthesis XSD available, so we use our own copy
 	set(XSD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/xsd_apple/libxsd/)
 	set(XSD_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/xsd_apple/bin/xsd)
+	set(USE_OMP OFF)
 elseif(WIN32)
 	 set(Boost_USE_STATIC_LIBS ON)
-	 add_definitions(-DOMP_PARALLELIZATION=1)
+	 set(USE_OMP ON)
 elseif(UNIX)
 	 set(USE_INTEL_COMPILER OFF) 
-	 add_definitions(-DOMP_PARALLELIZATION=1)
+	 set(USE_OMP ON)
+endif()
+
+if (USE_OMP)
+	add_definitions(-DOMP_PARALLELIZATION=1)
 endif() 
 
 ############################################################################
@@ -71,6 +76,7 @@ set(BOOST_LIBRARYDIR ${BOOST_ROOT}/lib)
 
 set(Boost_DIR ${BOOST_ROOT} CACHE STRING "Set the value of BOOST_ROOT to point to the root folder of your boost install." FORCE)
 find_package(Boost 1.48 COMPONENTS
+	graph
 	date_time
 	system
 	filesystem
@@ -273,6 +279,7 @@ set(COMMON_SOURCES
 	${COMMON_DIR}/FaultTreeToFuzzTree.cpp
 	${COMMON_DIR}/Issue.cpp
 	${COMMON_DIR}/FatalException.cpp
+	${COMMON_DIR}/DeadlockMonitor.cpp
 )
 
 set(COMMON_HEADERS
@@ -292,6 +299,7 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/FaultTreeToFuzzTree.h
 	${COMMON_DIR}/Issue.h
 	${COMMON_DIR}/FatalException.h
+	${COMMON_DIR}/DeadlockMonitor.h
 )
 
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})

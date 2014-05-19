@@ -16,7 +16,7 @@ def fixture_save(fname=None):
             "password" : "pbkdf2_sha256$10000$JNt1EZn2g72p$vX3UFh7g4mPa313pWW4lf4YxkUhL534V8/kxFaQ1XvM="
         }
     }
-    jsontext = subprocess.check_output(['./manage.py','dumpdata','FuzzEd.node','FuzzEd.edge','FuzzEd.graph','FuzzEd.property'])
+    jsontext = subprocess.check_output(['./manage.py','dumpdata','FuzzEd.project','FuzzEd.graph','FuzzEd.node','FuzzEd.edge','FuzzEd.property'])
     data = json.loads(jsontext)
     data.append(testaccount)
     output=open("./FuzzEd/fixtures/"+fname,"w")

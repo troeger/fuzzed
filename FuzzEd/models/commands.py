@@ -4,6 +4,7 @@ from FuzzEd.lib.jsonfield import JSONField
 from edge import Edge
 from graph import Graph
 from node import Node
+from project import Project
 
 import notations
 
@@ -46,7 +47,45 @@ class Command(models.Model):
          {None}
         """
         raise NotImplementedError('[Abstract Method] Implement in subclass')
+        
+class AddProject(Command):
+    """
+    Class: AddProject
+    
+    Extends: Command
+        
+    Command that is issued when an a new project was created.
+        
+    """
+    project = models.ForeignKey(Project, related_name='+')
+    
+    @classmethod
+    def create_from(cls, name, owner):
+        """
+        Method [static]: create_from
+        
+        Convenience factory method for issuing an add project command from parameters as received from API calls.
+        NOTE: A project object is created and saved when invoking this method.
+         
+        Parameters:
+        {str}  name     - name of the project
+        {User} owner    - the user that owns this project
+        """
+        project = Project(name=name, owner=owner, deleted=True)
+        project.save()
+         
+        return cls(project=project)
+   
+    def do(self):
+        self.project.deleted = False
+        self.project.save()
+        self.save()
 
+    def undo(self):
+        self.project.deleted = True
+        self.project.save()
+        self.save()
+    
 class AddEdge(Command):
     """
     Class: AddEdge
@@ -126,7 +165,7 @@ class AddGraph(Command):
     graph = models.ForeignKey(Graph, related_name='+')
 
     @classmethod
-    def create_from(cls, kind, name, owner, add_default_nodes=True):
+    def create_from(cls, kind, name, owner, project, add_default_nodes=True):
         """
         Method [static]: create_from
         
@@ -141,13 +180,15 @@ class AddGraph(Command):
         Returns:
          {<AddGraph>} the add graph command instance
         """
-        graph = Graph(kind=kind, name=name, owner=owner, deleted=True)
+        graph = Graph(kind=kind, name=name, owner=owner, project=project, deleted=True)
         graph.save()
         if add_default_nodes:
             # pre-initialize the graph with default nodes
             notation = notations.by_kind[kind]
             if 'defaults' in notation:
                 for index, node in enumerate(notation['defaults']['nodes']):
+                    node.update({'properties': {}})
+
                     # use index as node ID
                     # this is unique since all other IDs are time stamps
                     command = AddNode.create_from(graph_id=graph.pk, node_id=index, **node)
@@ -179,7 +220,7 @@ class AddNode(Command):
     node = models.ForeignKey(Node, related_name='+')
 
     @classmethod
-    def create_from(cls, graph_id, node_id, kind, x, y):
+    def create_from(cls, graph_id, node_id, kind, x, y, properties):
         """
         Method [static]: create_from
 
@@ -192,6 +233,7 @@ class AddNode(Command):
          {str} kind      - the node's identification string
          {str} x         - x coordinate of the added node
          {str} y         - y coordinate of the added node
+         dict(str, str) properties - dictionary with the initial node properties 
                       
         Returns:
          {<AddNode>} - the add node command instance
@@ -199,6 +241,8 @@ class AddNode(Command):
         graph = Graph.objects.get(pk=int(graph_id))
         node  = Node(graph=graph, client_id=int(node_id), kind=kind, x=int(x), y=int(y), deleted=True)
         node.save()
+        for k, v in properties.iteritems():
+            node.set_attr(k, v['value'])
         
         return cls(node=node)
 
@@ -301,6 +345,78 @@ class ChangeNode(Command):
         self.node.save()
         self.save()
 
+class ChangeEdge(Command):
+    """
+    Class: ChangeEdge
+
+    Extends: Command
+
+    Command that is issued when properties of an edge change
+    """
+    edge = models.ForeignKey(Edge, related_name='+')
+
+    @classmethod
+    def create_from(cls, graph_id, edge_id, updated_properties):
+        """
+        Method [static]: create_from
+
+        Convenience factory method for issuing a property changed command from parameters as received from API calls.
+        NOTE: if the property does not yet exist it being created and saved.
+
+        Parameters:
+         {str} graph_id   - the id of the graph that contains the edge's property changed
+         {str] edge_id    - the client id(!) of the edge's property changed
+         {str} key        - the name of the property that changed
+         {str} new_value  - the value the property has been changed to
+
+        Returns:
+         {<ChangeEdge>}   - the property changed command instance
+        """
+        edge    = Edge.objects.get(client_id=edge_id, graph__pk=graph_id)
+        command = cls(edge=edge)
+        command.save()
+
+        for key, value in updated_properties.items():
+            old_value = ''
+
+            try:
+                old_value = edge.get_attr(key)
+            except ValueError:
+                pass
+
+            property_change = EdgePropertyChange(command=command, key=key, old_value=old_value, new_value=value)
+            property_change.save()
+
+        return command
+
+    def do(self):
+        """
+        Method: do
+
+        Apply the change to the node or it's corresponding property - i.e. set the new value
+
+        Returns:
+         {None}
+        """
+        for change in self.changes.all():
+            self.edge.set_attr(change.key, change.new_value)
+        self.edge.save()
+        self.save()
+
+    def undo(self):
+        """
+        Method: undo
+
+        Reverts the changes to the node or it's corresponding property - i.e. set old value
+
+        Returns:
+         {None}
+        """
+        for change in self.changes:
+            self.edge.set_attr(change.key, change.old_value)
+        self.edge.save()
+        self.save()
+
 class PropertyChange(models.Model):
     """
     Class: PropertyChange
@@ -318,6 +434,27 @@ class PropertyChange(models.Model):
         app_label = 'FuzzEd'
 
     command   = models.ForeignKey(ChangeNode, related_name='changes')
+    key       = models.CharField(max_length=255)
+    old_value = JSONField()
+    new_value = JSONField()
+
+class EdgePropertyChange(models.Model):
+    """
+    Class: EdgePropertyChange
+
+    Extends: models.Model
+
+    Small inline container class to model arbitrary number of edge's property changes.
+
+    Attributes:
+     {<ChangeEdge>} command   - the command this property change belongs to
+     {str}          old_value - the value of the property before the change
+     {str}          new_value - the updated value
+    """
+    class Meta:
+        app_label = 'FuzzEd'
+
+    command   = models.ForeignKey(ChangeEdge, related_name='changes')
     key       = models.CharField(max_length=255)
     old_value = JSONField()
     new_value = JSONField()
@@ -429,6 +566,59 @@ class DeleteGraph(Command):
         """
         self.graph.deleted = False
         self.graph.save()
+
+class DeleteProject(Command):
+    """
+    Class: DeleteProject
+    
+    Extends: Command
+
+    Command that is issued when a project is deleted.
+
+    Fields:
+     {<Project>} project  - the project that shall be deleted
+    """
+    project = models.ForeignKey(Project, related_name='+')
+
+    @classmethod
+    def create_from(cls, project_id):
+        """
+        Method [static]: create_from
+        
+        Convenience factory method for issuing a delete project command from parameters as received from API calls.
+
+        Parameters:
+         {str} project_id  - the id of the project to be deleted
+
+        Returns:
+         {<DeleteProject>}  - the delete project command instance
+        """
+        return cls(project=Project.objects.get(pk=int(project_id)))
+
+    def do(self):
+        """
+        Method: do
+        
+        Deletes the project by setting its deletion flag
+
+        Returns:
+         {None}
+        """
+        self.project.deleted = True
+        self.project.save()
+        self.save()
+
+    def undo(self):
+        """
+        Method: undo
+        
+        Restores the project by removing its deletion flag
+
+        Returns:
+         {None}
+        """
+        self.project.deleted = False
+        self.project.save()
 
 class DeleteNode(Command):
     """

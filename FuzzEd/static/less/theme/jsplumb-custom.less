@@ -27,4 +27,22 @@
             }
         }
     }
+
+    &.ui-selected, &.ui-selecting {
+        &, &.highlighted {
+            path:last-child {
+                fill: @theme-selection;
+            }
+        }
+    }
+
+    &.outlined path:first-child {
+      stroke: #ffffff;
+    }
+}
+
+._jsPlumb_overlay {
+  z-index: 51;
+  padding: 0 3px;
+  background: white;
 }

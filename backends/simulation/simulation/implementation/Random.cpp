@@ -27,7 +27,8 @@ double RandomNumberGenerator::randomNumberInInterval(double L, double H)
 
 double RandomNumberGenerator::randomNumberExponential(double rate)
 {
-	if (rate <= 0.0) return std::numeric_limits<double>::max(); // this is undefined.
+	if (rate <= 0.0)
+		return std::numeric_limits<int>::max(); // this is undefined.
 
 	exponential_distribution<double> dist(rate);
 	return dist(m_generator);

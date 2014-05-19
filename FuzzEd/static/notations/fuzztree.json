@@ -1,6 +1,12 @@
 {
     "kind": "fuzztree",
     "name": "Fuzz Tree",
+    "edges": {
+        "copyable": true,
+        "deletable": true,
+
+        "properties": {}
+    },
     "nodes": {
         "node": {
             "nodeDisplayName": "Node",
@@ -10,6 +16,7 @@
             "allowConnectionTo": [],
 
             "deletable": true,
+            "copyable": true,
 
             "connector": {
                 "offset": {
@@ -222,6 +229,7 @@
             "help": "The system failure event.",
 
             "deletable": false,
+            "copyable": false,
             "excludeFromShapesMenu": true,
 
             "properties": {

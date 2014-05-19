@@ -89,9 +89,7 @@ bool FaultTreeNode::addChildBelow(const std::string& id, FaultTreeNode::Ptr inse
 		}
 
 		else if (child->addChildBelow(id, insertedChild))
-		{
 			return true;
-		}
 	}
 	return false;
 }

@@ -130,6 +130,8 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const faulttree::Node& t
 		else if (typeName == *SPARE)
 		{
 			const faulttree::Spare& spareGate = static_cast<const faulttree::Spare&>(child);
+			if (spareGate.children().size() < 2)
+				throw std::runtime_error("Spare gates need at least two child nodes");
 			current = make_shared<SpareGate>(id, spareGate.primaryID(), spareGate.dormancyFactor()); 
 		}
 

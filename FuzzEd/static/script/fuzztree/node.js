@@ -1,14 +1,13 @@
 define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
     /**
-     *  Package: Fuzztree
+     * Package: Fuzztree
      */
 
     /**
-     *  Class: FuzztreeNode
+     * Class: FuzztreeNode
+     *      Fuzztree-specific node implementation.
      *
-     *  Fuzztree-specific node implementation.
-     *
-     *  Extends: <Faulttree::FaulttreeNode>.
+     * Extends: <Faulttree::FaulttreeNode>.
      *
      */
     return FaulttreeNode.extend({
@@ -18,15 +17,14 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
 
         /**
          * Method: _setupProperties
-         *
-         *   For a general description of this method refer to <Base::Node::_setupProperties>. Fuzztree nodes must
-         *   additionaly observe changes of the optional property in order to render the node accordingly.
+         *      For a general description of this method refer to <Base::Node::_setupProperties>. Fuzztree nodes must
+         *      additionally observe changes of the optional property in order to render the node accordingly.
          *
          * Parameters:
-         *   {Array[str]} - The order in which to display the properties if present.
+         *      {Array[str]} - The order in which to display the properties if present.
          *
          * Returns:
-         *   This {<Node>} instance for chaining.
+         *      This {<FuzztreeNode>} instance for chaining.
          */
         _setupProperties: function(propertiesDisplayOrder) {
             this._super(propertiesDisplayOrder);
@@ -34,7 +32,7 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
 
             if (optionalProperty) {
                 this.setOptional(optionalProperty.value);
-                jQuery(optionalProperty).on(Config.Events.PROPERTY_CHANGED, function(event, newValue) {
+                jQuery(optionalProperty).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue) {
                     this.setOptional(newValue);
                 }.bind(this));
             }
@@ -48,14 +46,13 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
 
         /**
          * Method: setOptional
-         *
-         * Sets the node to be optional in the Fuzztree.
+         *      Sets the node to be optional in the Fuzztree.
          *
          * Parameters:
-         *   {boolean} optional - optional flag
+         *      {Boolean} optional - optional flag
          *
          * Returns:
-         *   This {<Node>} instance for chaining.
+         *      This {<Node>} instance for chaining.
          */
         setOptional: function(optional) {
             // mark node optional (or remove mark)
@@ -68,10 +65,6 @@ define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
             return this;
         },
 
-        /**
-         *  Method: getConfig
-         *    See <Base::Graph::getConfig>.
-         */
         getConfig: function() {
             return Config;
         }

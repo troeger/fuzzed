@@ -1,6 +1,12 @@
 {
     "kind": "faulttree",
     "name": "Fault Tree",
+    "edges": {
+        "copyable": true,
+        "deletable": true,
+
+        "properties": {}
+    },
     "nodes": {
         "node": {
             "nodeDisplayName": "Node",
@@ -12,6 +18,7 @@
             "deletable": true,
             "resizable": false,
             "editable": false,
+            "copyable": true,
 
             "connector": {
                 "offset": {
@@ -77,7 +84,7 @@
             "nodeDisplayName": "Basic Event",
             "inherits": "event",
 
-            "numberOfOutoingConnections": -1,
+            "numberOfOutgoingConnections": -1,
             "allowConnectionTo": ["fdepGate"],
 
             "image": "basic_event.svg",
@@ -168,6 +175,7 @@
 
             "excludeFromShapesMenu": true,
             "deletable": false,
+            "copyable": false,
 
             "properties": {
                 "name": {
@@ -227,7 +235,7 @@
             "nodeDisplayName": "Basic Event Set",
             "inherits": "eventSet",
 
-            "numberOfOutoingConnections": -1,
+            "numberOfOutgoingConnections": -1,
             "allowConnectionTo": ["fdepGate"],
 
             "image": "basic_event_set.svg",
