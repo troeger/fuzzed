@@ -190,7 +190,14 @@ def shared_graphs_dashboard(request):
     
         shared_graphs = [sharing.graph for sharing in sharings]
         
-        parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in shared_graphs]}
+        # projects in which the actual user is owner or member and that were recently modified are proposed to the user
+        proposal_limit = 3
+        project_proposals = Project.objects.filter(Q(deleted=False),Q(users = request.user)|Q(owner = request.user)).order_by('-modified')[:proposal_limit]
+        
+        
+        parameters = {'graphs':    [(notations.by_kind[graph.kind]['name'], graph) for graph in shared_graphs],
+                      'proposals': [ project.to_dict() for project in project_proposals]           
+                     }
         
         return render(request, 'dashboard/shared_graphs_dashboard.html', parameters)
     
@@ -235,7 +242,7 @@ def dashboard(request, project_id):
         raise Http404
     
     # projects in which the actual user is owner or member and that were recently modified are proposed to the user
-    proposal_limit =5
+    proposal_limit = 3
     project_proposals = Project.objects.filter(Q(deleted=False),Q(users = request.user)|Q(owner = request.user)).exclude(id=project.id).order_by('-modified')[:proposal_limit]
     
     graphs = project.graphs.filter(deleted=False).order_by('-created')
