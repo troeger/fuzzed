@@ -90,11 +90,9 @@ def projects(request):
     user = request.user
     
     projects = (user.projects.filter(deleted=False) | user.own_projects.filter(deleted=False)).order_by('-created')
-    # variable that indicates if there are graphs shared with the current user
-    shared_graphs = True if user.sharings else False
 
-    parameters = {'projects':[ project.to_dict() for project in projects],
-                  'shared_graphs':shared_graphs      
+    parameters = {'projects': [ project.to_dict() for project in projects],
+                  'user':     user      
                  }
 
     # provide notification box on the projects overview page, if something is available for this user
@@ -187,7 +185,10 @@ def shared_graphs_dashboard(request):
     if request.method == 'GET':
         
         sharings = user.sharings.all()
-    
+        
+        if not sharings:
+            return redirect('projects')
+            
         shared_graphs = [sharing.graph for sharing in sharings]
         
         # projects in which the actual user is owner or member and that were recently modified are proposed to the user
@@ -219,8 +220,6 @@ def shared_graphs_dashboard(request):
     # something is not right with the request
     return HttpResponseBadRequest()
     
-    
-
 @login_required
 def dashboard(request, project_id):
     """
@@ -248,7 +247,8 @@ def dashboard(request, project_id):
     graphs = project.graphs.filter(deleted=False).order_by('-created')
     parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs],
                   'project': project.to_dict(),
-                  'proposals': [ project.to_dict() for project in project_proposals]
+                  'proposals': [ project.to_dict() for project in project_proposals],
+                  'user': request.user
                  }
 
     return render(request, 'dashboard/dashboard.html', parameters)
@@ -377,6 +377,7 @@ def dashboard_edit(request, project_id):
     elif POST.get('delete'):
         # "Delete" button pressed for one or multiple graphs
         for graph in graphs:
+            graph.sharings.all().delete() # all graph sharings will be deleted irretrievably
             commands.DeleteGraph.create_from(graph.pk).do()
         
         messages.add_message(request, messages.SUCCESS, 'Deletion sucessful.')

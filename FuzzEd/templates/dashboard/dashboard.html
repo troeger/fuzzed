@@ -63,10 +63,12 @@
 
 {% block goto_menu %}
     <li><a href="{% url 'projects' %}"><i class="fa fa-fw fa-home"></i> Projects</a></li>
-    <li><a href="{% url 'shared_graphs_dashboard' %}"><i class="fa fa-fw fa-share"></i> Shared Graphs</a><li>
     {% for project in proposals %} 
           <li><a href="{% url 'dashboard' project.pk %}"><i class="fa fa-fw fa-folder"></i> {{ project.name }}</a></li>
     {% endfor %}
+    {% if user.sharings.count > 0 %}
+        <li><a href="{% url 'shared_graphs_dashboard' %}"><i class="fa fa-fw fa-share"></i> Shared Graphs</a><li>
+    {% endif %}
     <li class="divider"></li>
     <li><a href="/settings"><i class="fa fa-fw fa-user"></i> Account settings</a></li>
     <li><a href="/docs/dashboard" target="_blank"><i class="fa fa-fw fa-book"></i> Documentation </a></li>
