@@ -172,7 +172,9 @@ def shared_graphs_dashboard(request):
     """
     Function: shared_graphs    
         
-    This handler function is responsible for ...
+    This handler function is responsible for rendering a list of graphs that have been shared with the current user.
+    Shared in this context means the user isn't the owner but is allowed to view a certain graph in read-only mode.
+    The graphs are listed within a specific dashboard that offers the option to remove sharing of certain gaphs.
     
     Parameters:
      {HttpResponse} request  - a django request object
@@ -400,7 +402,7 @@ def graph_settings(request, graph_id):
         graph.name = POST.get('name', '')
         graph.save()
         
-        # changes in users that can see the graph 
+        # added/removed viewers from the graph
         user_ids = POST.getlist('users')
         
         new_users = set([get_object_or_404(User, pk=user_id) for user_id in user_ids])
@@ -538,8 +540,8 @@ def snapshot(request, graph_id):
     
     graph    = get_object_or_404(Graph, pk=graph_id)
     
-    # either current user is owner or graph is shared with the user
-    if not (graph.owner == request.user or graph.sharings.filter(user = request.user)):
+    # either current user is admin, owner of the graph, or graph is shared with the user
+    if not (request.user.is_staff or graph.owner == request.user or graph.sharings.filter(user = request.user)):
         raise Http404    
     
     project  = graph.project    
@@ -551,7 +553,8 @@ def snapshot(request, graph_id):
         'graph_notation': notation,
         'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
         'greetings':      GREETINGS,
-        'project':        project.to_dict()
+        'project':        project.to_dict(),
+        'current_user':   request.user
     }
 
     return render(request, 'editor/editor.html', parameters)
