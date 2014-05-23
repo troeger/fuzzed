@@ -12,6 +12,9 @@ from django.http import HttpResponse
 from south.modelsinspector import add_introspection_rules
 
 from graph import Graph
+from node import Node
+from configuration import Configuration
+from node_configuration import NodeConfiguration
 from FuzzEd.models import xml_backend
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
@@ -149,7 +152,7 @@ class Job(models.Model):
 
         if hasattr(doc, 'result'):
             for result in doc.result:
-                assert(doc.result.modelId == self.graph.pk)
+                assert(result.modelId == self.graph.pk)
                 db_result = Result(graph=self.graph , job=self, configuration=conf_id_mappings[result.configId])
                 db_result.save()
                 print result
