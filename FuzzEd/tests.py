@@ -74,18 +74,6 @@ fixt_unicode = {
     
                }
 
-class InternalTestCase(TestCase):
-    """
-        The tests for internal functions that are not exposed directly via one of the APIs.
-    """
-    fixtures = fixt_analysis['files']
-
-    def testResultParsing(self):
-        for graphPk, graphResult in fixt_analysis['results'].iteritems(): 
-            graph = Graph.objects.get(pk=graphPk)
-            job=Job(result=open('FuzzEd/fixtures/'+graphResult).read(), graph=graph)
-            job.parse_result()
-
 class FuzzEdTestCase(LiveServerTestCase):
     """
         The base class for all test cases that work on exposed function calls. 
@@ -553,6 +541,23 @@ class BackendDaemonFromFrontendTestCase(FuzzEdTestCase):
     def tearDown(self):
         print "\nShutting down backend daemon"
         self.backend.terminate()
+
+
+class InternalTestCase(BackendDaemonFromFrontendTestCase):
+    """
+        The tests for internal functions that are not exposed directly via one of the APIs.
+        Since some tests explicitely create job objects, a signal is always triggered to talk to
+        the backend daemon. For this reason, we need to fire it up.
+        #TODO: This is no longer needed when Django supports signal disabling in tests.
+    """
+    fixtures = fixt_analysis['files']
+
+    def test_result_parsing(self):
+        for graphPk, graphResult in fixt_analysis['results'].iteritems():
+            graph = Graph.objects.get(pk=graphPk)
+            job = Job(graph_modified=graph.modified, result=open('FuzzEd/fixtures/'+graphResult).read(), graph=graph)
+            job.save()
+            job.parse_result()
 
 
 class AnalysisFixtureTestCase(BackendDaemonFromFrontendTestCase):
