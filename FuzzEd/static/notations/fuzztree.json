@@ -289,6 +289,9 @@
                         "style": ["italic"],
                         "format": "#{{$0}}"
                     }
+                },
+                "cost": {
+                    "displayName": "Cost/Event"
                 }
             }
         },

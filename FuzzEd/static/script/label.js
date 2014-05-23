@@ -15,13 +15,16 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
          * Group: Members
          *
          * Properties:
-         *   {Property}   property     - The property object displayed by the label
-         *
-         *   {jsPlumbConnection} _jsPlumbConnection - The jsPlumbConnection the label is connected to
+         *      {Property}          property           - The property object displayed by the label.
+         *      {jsPlumbConnection} _jsPlumbConnection - The jsPlumbConnection label.
          */
         property:          undefined,
 
         _jsPlumbConnection: undefined,
+
+        /**
+         * Group: Initilization
+         */
 
         /**
          * Constructor: init
@@ -29,9 +32,9 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
          * This method constructs a new label object.
          *
          * Parameters:
-         *   {Property}   property    - The property object to visualize
-         *   {jsPlumbConnection} _jsPlumbConnection - The jsPlumbConnection the label is connected to
-         *   {Objects}    properties  - Object with mirror configuration options (e.g. style)
+         *      {Property}          property           - The property object to visualize
+         *      {jsPlumbConnection} _jsPlumbConnection - The jsPlumbConnection the label is connected to
+         *      {Object}            properties         - Object with mirror configuration options (e.g. style)
          */
 
         init: function(property, jsPlumbConnection, properties) {
@@ -39,11 +42,11 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
             this._jsPlumbConnection = jsPlumbConnection;
 
             // initial creation of the overlay
-            this._jsPlumbConnection.addOverlay(["Label", {
+            this._jsPlumbConnection.addOverlay(['Label', {
                 label:    property.value || property.defaultValue,
                 id:       Config.JSPlumb.LABEL_OVERLAY_ID,
                 location: 0.4   // temporary work around to shift edge labels a bit from the center, so that they don't
-                                //   overlap each other as soon as there are two edges between two nodes
+                                // overlap each other as soon as there are two edges between two nodes
             }]);
 
             //TODO: implement usage of properties (e.g. style)
@@ -52,14 +55,13 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
 
         /**
          * Method: show
-         *
-         * This method allows to change the text of the label to the one specified in the method's only parameter.
+         *      This method allows to change the text of the label to the one specified in the method's only parameter.
          *
          * Parameters:
-         *   {String} text - The text to show in the label
+         *      {String} text - The text to show in the label
          *
          * Returns:
-         *   This {Label} instance for chaining.
+         *      This {<Label>} instance for chaining.
          */
         show: function(text) {
             var overlay = this._jsPlumbConnection.getOverlay(Config.JSPlumb.LABEL_OVERLAY_ID);
@@ -69,7 +71,7 @@ define(['config', 'class', 'jquery'], function(Config, Class) {
         },
 
         /**
-         *  Method: _setupEvents
+         * Method: _setupEvents
          *      Register for changes of the associated <Property> object.
          *
          *  Returns:

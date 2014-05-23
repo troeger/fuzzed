@@ -1,51 +1,52 @@
 define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(Editor, DfdGraph, DfdConfig) {
     /**
-     *  Package: DFD
+     * Package: DFD
      */
 
     /**
-     *  Class: DfdEditor
-     *    DFD-specific <Base::Editor> class.
+     * Class: DFDEditor
+     *      DFD-specific <Base::Editor> class.
      *
      *  Extends: <Base::Editor>
      */
     return Editor.extend({
         /**
-         *  Group: Accessors
+         * Group: Accessors
          */
 
         /**
-         *  Method: getConfig
+         * Method: getConfig
          *
-         *  Returns:
-         *    The <DfdConfig> object.
-         *
-         *  See also:
-         *    <Base::Editor::getConfig>
+         * Returns:
+         *      The <DfdConfig> object.
          */
         getConfig: function() {
             return DfdConfig;
         },
 
         /**
-         *  Method: getGraphClass
+         * Method: getGraphClass
          *
-         *  Returns:
-         *    The <DfdGraph> class.
-         *
-         *  See also:
-         *    <Base::Editor::getGraphClass>
+         * Returns:
+         *      The <DfdGraph> class.
          */
         getGraphClass: function() {
             return DfdGraph;
         },
 
+        /**
+         * Method: _setupJsPlumb
+         *      Overrides the editor's standard behaviour of JsPlumb edges in order to add an outline to them.
+         *
+         * Returns:
+         *      This {<DFDEditor>} instance for chaining.
+         */
         _setupJsPlumb: function() {
             this._super();
-            jsPlumb.connectorClass += " outlined";
+            jsPlumb.connectorClass += ' outlined';
+
             return this;
         },
-
 
         _setupMenuActions: function() {
             this._super();
@@ -60,7 +61,7 @@ define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(E
 
             // set the shortcut hints from 'Ctrl+' to '⌘' when on Mac
             if (navigator.platform == 'MacIntel' || navigator.platform == 'MacPPC') {
-                jQuery('#' + this.config.IDs.ACTION_GROUP + ' span').text('⌘G');
+                jQuery('#' + this.config.IDs.ACTION_GROUP   + ' span').text('⌘G');
                 jQuery('#' + this.config.IDs.ACTION_UNGROUP + ' span').text('⌘U');
             }
 
@@ -110,7 +111,9 @@ define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(E
             if(nodes.length > 1)
             {
                 var jsonNodeGroup = {
-                    nodeIds: _.map(nodes, function(node){return jQuery(node).data(this.config.Keys.NODE).id;}.bind(this))
+                    nodeIds: _.map(nodes, function(node) {
+                        return jQuery(node).data(this.config.Keys.NODE).id;
+                    }.bind(this))
                 };
                 this.graph.addNodeGroup(jsonNodeGroup);
             }
@@ -118,36 +121,33 @@ define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(E
 
         _ungroupSelection: function() {
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
-
-            var nodeIds = _.map(jQuery(selectedNodes), function(node){
+            var nodeIds       = _.map(jQuery(selectedNodes), function(node) {
                 return jQuery(node).data(this.config.Keys.NODE).id;
             }.bind(this));
-
-            var nodeGroup = undefined;
+            var nodeGroup     = undefined;
 
             // find the correct node group, whose node ids match the selected ids
             _.each(this.graph.nodeGroups, function(ng) {
-                var ngIds = ng.nodeIds();
-                if (jQuery(ngIds).not(nodeIds).length == 0 && jQuery(nodeIds).not(ngIds).length == 0) {
+                var nodeGroupIds = ng.nodeIds();
+
+                if (jQuery(nodeGroupIds).not(nodeIds).length == 0 && jQuery(nodeIds).not(nodeGroupIds).length == 0) {
                     nodeGroup = ng;
                 }
             });
 
             if (typeof nodeGroup === 'undefined') {
-                // in case the user selected NodeGroups, (s)he wants to delete, do him/her the favor
-
-                // delete selected node groups (NASTY!!!)
-                var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
-
-                jQuery(allNodeGroups).each(function(index, element) {
+                // in case the user selected NodeGroups, (s)he wants to delete, do him/her the favor delete selected
+                // node groups (NASTY!!!)
+                jQuery('.' + this.config.Classes.NODEGROUP).each(function(index, element) {
                     var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
-                    if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
+
+                    if (nodeGroup.container.find('svg path').hasClass(this.config.Classes.SELECTED)) {
                         this.graph.deleteNodeGroup(nodeGroup);
                     }
                 }.bind(this));
             }
-
             this.graph.deleteNodeGroup(nodeGroup);
+
             return true;
         }
     });
