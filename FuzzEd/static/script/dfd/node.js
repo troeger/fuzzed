@@ -1,12 +1,11 @@
-define(['dfd/config', 'node', 'canvas', 'jquery', 'jsplumb'], function(Config, AbstractNode, Canvas) {
+define(['dfd/config', 'node', 'jquery', 'jsplumb'], function(Config, AbstractNode) {
     /**
      * Package: DFD
      */
 
     /**
-     * Class: DfdNode
-     *
-     * Tiny class introduced for clearer typing and to adjust config to <DFD::Config>.
+     * Class: DFDNode
+     *      DFD node subclass. Mainly adapts the connector/edge style to be free-form instead of tree-like.
      *
      * Extends: <Base::Node>
      */
@@ -56,27 +55,33 @@ define(['dfd/config', 'node', 'canvas', 'jquery', 'jsplumb'], function(Config, A
         
         _calc_anchor: function(anchorCount, offset){
             var _circle = function() {
-                var r = 0.5, step = Math.PI * 2 / anchorCount, current = offset*step, a = [];
-                for (var i = 0; i < anchorCount; i++) {
-                    var x = r + (r * Math.cos(current)),
-                        y = r + (r * Math.sin(current));                                
-                    a.push( [ x, y, 0, 0]);
+                var radius  = 0.5;
+                var step    = Math.PI * 2 / anchorCount;
+                var current = offset * step;
+                var all     = [];
+
+                for (var i = 0; i < anchorCount; ++i) {
+                    var x = radius + (radius * Math.cos(current));
+                    var y = radius + (radius * Math.sin(current));
+
+                    all.push([x, y, 0, 0]);
                     current += step;
                 }
-                return a;   
-            }
+                return all;
+            };
+
             return _circle();
         },
 
         _sourceAnchors: function(){
-            return this._calc_anchor(8, +0.25);
+            return this._calc_anchor(8, 0.25);
         },
 
         _targetAnchors: function(){
             return this._calc_anchor(8, -0.25);
         },
 
-        _setupIncomingEndpoint: function(anchors, connectionOffset) {
+        _setupIncomingEndpoint: function() {
             if (this.numberOfIncomingConnections === 0) return this;
 
             jsPlumb.makeTarget(this.container, {
@@ -104,7 +109,7 @@ define(['dfd/config', 'node', 'canvas', 'jquery', 'jsplumb'], function(Config, A
             return this;
         },
 
-        _setupOutgoingEndpoint: function(anchors, connectionOffset) {
+        _setupOutgoingEndpoint: function() {
             if (this.numberOfOutgoingConnections == 0) return this;
 
             // small flag for the drag callback, explanation below
@@ -142,7 +147,6 @@ define(['dfd/config', 'node', 'canvas', 'jquery', 'jsplumb'], function(Config, A
             });
 
             return this;
-        },
-
+        }
     });
 });

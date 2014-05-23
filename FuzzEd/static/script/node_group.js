@@ -1,23 +1,23 @@
-define(['property', 'class', 'canvas', 'config', 'jquery', 'd3'],
-function(Property, Class, Canvas, Config) {
+define(['property', 'class', 'canvas', 'config', 'jquery', 'd3'], function(Property, Class, Canvas, Config) {
     /**
-     *  Class: NodeGroup
+     * Package: Base
+     */
+
+    /**
+     * Abstract Class: NodeGroup
      *
      *  This class models a generic group of nodes, further specified in the respective notations file.
-     *
      */
     return Class.extend({
         /**
-         *  Group: Members
-         *
-         *  Properties:
-         *    {DOMElement}     container       - A jQuery object referring to the node group's html representation.
-         *    {<Graph>}        graph           - The Graph this node group belongs to.
-         *    {int}            id              - A client-side generated id to uniquely identify the node group in the
-         *                                       frontend. It does NOT correlate with database ids in the backend.
-         *                                       Introduced to save round-trips and to later allow for an offline mode.
-         *    {Array[<Node>]}  nodes           - Enumeration of all nodes this node group belongs to
-         *    {Object}         properties      - A dictionary of the node group's properties
+         * Group: Members
+         *      {DOMElement}    container       - A jQuery object referring to the node group's html representation.
+         *      {<Graph>}       graph           - The Graph this node group belongs to.
+         *      {Number}        id              - A client-side generated id to uniquely identify the node group in the
+         *                                        frontend. It does NOT correlate with database ids in the backend.
+         *                                        Introduced to save round-trips and to later allow for an offline mode.
+         *      {Array[<Node>]} nodes           - Enumeration of all nodes this node group belongs to
+         *      {Object}        properties      - A dictionary of the node group's properties
          *
          */
         container:     undefined,
@@ -32,14 +32,13 @@ function(Property, Class, Canvas, Config) {
 
         /**
          * Constructor: init
-         *
-         * A node group's constructor. Merges the given definition and individual properties. Assigns the node group a
-         * unique frontend id.
+         *      A node group's constructor. Merges the given definition and individual properties. Assigns the node
+         *      group a unique client id.
          *
          * Parameters:
-         *   {Object}       definition         - An object containing default values for the node's definition.
-         *   {Array[<Node>] nodes              - A list of nodes the node group is supposed to connect.
-         *   {Object}       properties         - Initial properties to be carried into the NodeGroup object
+         *      {Object}       definition - An object containing default values for the node's definition.
+         *      {Array[<Node>] nodes      - A list of nodes the node group is supposed to connect.
+         *      {Object}       properties - Initial properties to be carried into the NodeGroup object
          *
          */
         init: function(definition, nodes, properties) {
@@ -70,11 +69,11 @@ function(Property, Class, Canvas, Config) {
         },
 
         /**
-         *  Method: _registerEventHandlers
+         * Method: _registerEventHandlers
          *      Add listeners to react on moves and property changes of nodes.
          *
-         *  Returns:
-         *      This NodeGroup instance for chaining.
+         * Returns:
+         *      This {<NodeGroup>} instance for chaining.
          *
          */
         _registerEventHandlers: function() {
@@ -86,12 +85,11 @@ function(Property, Class, Canvas, Config) {
 
         /**
          * Method: _setupVisualRepresentation
-         *
-         * This method is used in the constructor to set up the visual representation of the node group. Initially sets
-         * up this.container with css classes, its id and its data.
+         *      This method is used in the constructor to set up the visual representation of the node group. Initially
+         *      sets up this.container with css classes, its id and its data.
          *
          * Returns:
-         *   This {<NodeGroup>} instance for chaining.
+         *      This {<NodeGroup>} instance for chaining.
          */
         _setupVisualRepresentation: function() {
             this.container = jQuery("<div>")
@@ -107,27 +105,25 @@ function(Property, Class, Canvas, Config) {
 
         /**
          * Method: _setupDragging
-         *
-         * This initialization method is called in the constructor and is responsible for setting up the node group's
-         * dragging functionality. The goal is to make all contained nodes move along with the node group.  The code
-         * contains a lot of code <Node> uses to setup dragging as well.
+         *      This initialization method is called in the constructor and is responsible for setting up the node
+         *      group's dragging functionality. The goal is to make all contained nodes move along with the node group.
+         *      The code contains a lot of code <Node> uses to setup dragging as well.
          *
          * Returns:
-         *   This {<NodeGroup>} instance for chaining.
+         *      This {<NodeGroup>} instance for chaining.
          */
         _setupDragging: function() {
             if (this.readOnly) return this;
 
             // the css class which refers to all dependant nodes
-            var dragDependant = Config.Keys.NODEGROUP + this.id + '_dragging'
+            var dragDependant        = Config.Keys.NODEGROUP + this.id + '_dragging';
+            var initialPosition      = undefined;
+            var initialNodePositions = {};
 
             // setup nodes' dragging dependency for ui draggable via a nodegroup-specific css class
             _.each(this.nodes, function(node) {
                 node.container.addClass(dragDependant);
             }.bind(this));
-
-            var initialPosition = undefined;
-            var initialNodePositions = {};
 
             jsPlumb.draggable(this.path(), {
                 // stay in the canvas
@@ -149,13 +145,12 @@ function(Property, Class, Canvas, Config) {
                         Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
                     }
 
-                    // save the initial positions of the node group and dependant nodes, to calculate offsets while dragging
+                    // save the initial positions of the node group and dependant nodes, to calculate drag offsets
                     initialPosition = this.path().position();
                     jQuery('.' + dragDependant).each(function(index, node) {
                         var nodeInstance = jQuery(node).data(Config.Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
-
                         initialNodePositions[nodeInstance.id] = nodeInstance.container.position();
                     }.bind(this));
                 }.bind(this),
@@ -218,9 +213,8 @@ function(Property, Class, Canvas, Config) {
 
         /**
          * Method: _setupMouse
-         *
-         * Small helper method used in the constructor for setting up mouse hover highlighting (highlight on hover,
-         * unhighlight on mouse out).
+         *      Small helper method used in the constructor for setting up mouse hover highlighting (highlight on hover,
+         *      unhighlight on mouse out).
          *
          * Returns:
          *   This {<NodeGroup>} instance for chaining.
@@ -240,18 +234,18 @@ function(Property, Class, Canvas, Config) {
 
         /**
          * Method: _setupSelection
-         *
-         * This initialization method is called in the constructor and sets up multi-select functionality for node groups.
+         *      This initialization method is called in the constructor and sets up multi-select functionality for node
+         *      groups.
          *
          * Returns:
-         *   This {<NodeGroup>} instance for chaining.
+         *      This {<NodeGroup>} instance for chaining.
          */
         _setupSelection: function() {
             if (this.readOnly) return this;
 
             //XXX: select a node group on click
-            // This uses the jQuery.ui.selectable internal functions.
-            // We need to trigger them manually because only jQuery.ui.draggable gets the mouseDown events on node groups.
+            // This uses the jQuery.ui.selectable internal functions. We need to trigger them manually because only
+            // jQuery.ui.draggable gets the mouseDown events on node groups.
             this.container.click(function(event) {
                 Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
                 Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
@@ -262,10 +256,10 @@ function(Property, Class, Canvas, Config) {
 
         /**
          * Method: _setupProperties
-         *      Converts the informal properties stored in <properties> into Property objects ordered by this graph's
-         *      propertiesDisplayOrder (see <Graph::getNotation()> or the respective notations json-file).
-         *
-         *      ! Exact code duplication in <Node::_setupProperties()>  and <Edge::_setupPropertes()>
+         *      Creates the node's properties instances sorted by the passed display order. If a property passed in the
+         *      display order is not present in the node it is skipped silently. When a property in the node's
+         *      definition is set to null the property is not created and eventually removed if inherited from its
+         *      parent.
          *
          * Returns:
          *      This {<NodeGroup>} instance for chaining.
@@ -290,7 +284,10 @@ function(Property, Class, Canvas, Config) {
 
         /**
          * Method: nodeIds
-         *      Returns an array of all nodes' ids, the NodeGroup holds. Used for lightweight node identification.
+         *      Used for lightweight node identification.
+         *
+         * Returns:
+         *      An array {Array[Number]} of all nodes' ids, the NodeGroup holds.
          *
          */
 
@@ -313,44 +310,47 @@ function(Property, Class, Canvas, Config) {
             var lineFunction = d3.svg.line()
                 .x(function(d) { return d[0]; })
                 .y(function(d) { return d[1]; })
-                //.interpolate("linear");
-                .interpolate("basis-closed");
+                .interpolate('basis-closed');
 
-            var hull = d3.select('#'+dom_id+' svg path');
-            var svg  = d3.select('#'+dom_id+' svg');
+            var hull = d3.select('#' + dom_id + ' svg path');
+            var svg  = d3.select('#' + dom_id + ' svg');
 
-            if(hull.empty())
-            {
-                svg = d3.select('#'+dom_id).append('svg');
-
+            if (hull.empty()) {
+                svg  = d3.select('#'+dom_id).append('svg');
                 hull = svg.append('path')
                     .style('fill','none')
                     .style('stroke-dasharray', '10,10')
                     .style('stroke-width','3px');
             }
 
-            var outer_circle = function(c, r) {
-                var count = 16;
-                var step = Math.PI * 2 / count, current = 0, a = [];
-                for (var i = 0; i < count; i++) {
-                    var x = c.x + (r * Math.cos(current)),
-                        y = c.y + (r * Math.sin(current));
-                    a.push( [ x, y]);
+            var outer_circle = function(circle, radius) {
+                //TODO: put the numbers into the config
+                var count   = 16;
+                var step    = Math.PI * 2 / count;
+                var current = 0;
+                var all     = [];
+
+                for (var i = 0; i < count; ++i) {
+                    var x = circle.x + (radius * Math.cos(current));
+                    var y = circle.y + (radius * Math.sin(current));
+
+                    all.push([ x, y]);
                     current += step;
                 }
-                return a;
+                return all;
             };
 
             var vertices = _.map(this.nodes, function(node) {
-                var center = {x: node.container.position().left + node.container.width() / 2,
-                              y: node.container.position().top + node.container.height() / 2};
+                var center = {
+                    x: node.container.position().left + node.container.width() / 2,
+                    y: node.container.position().top + node.container.height() / 2
+                };
                 return outer_circle(center, 50);
             }.bind(this));
 
-            var _dist = function(a, b)
-            {
-                return Math.sqrt(Math.pow(a[0]-b[0],2)+Math.pow(a[1]-b[1],2));
-            }
+            var _dist = function(a, b) {
+                return Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2));
+            };
 
             vertices = _.flatten(vertices, true);
             vertices = d3.geom.hull(vertices);
@@ -358,16 +358,14 @@ function(Property, Class, Canvas, Config) {
 
             // ## WARNING: This is a pretty nasty hack for guys like me who have no clue of svg paths; feel free to do
             // ## this nicely, I'm seriously interested!
-
-            var bbox = jQuery('#'+dom_id+' svg path')[0].getBBox();
+            var bbox = jQuery('#' + dom_id + ' svg path')[0].getBBox();
 
             this.container.css('width', bbox.width);
             this.container.css('height', bbox.height);
             this.container.css('left', bbox.x);
             this.container.css('top', bbox.y);
 
-            this.path().attr("transform", "translate(-"+bbox.x+",-"+bbox.y+")");
-
+            this.path().attr('transform', 'translate(-' + bbox.x + ',-' + bbox.y + ')');
             // ## /hack
 
             return this;
@@ -375,10 +373,10 @@ function(Property, Class, Canvas, Config) {
 
         /**
          * Method: select
-         *   Marks the node group as selected by adding the corresponding CSS class.
+         *      Marks the node group as selected by adding the corresponding CSS class.
          *
          * Returns:
-         *   This {<NodeGroup>} instance for chaining.
+         *      This {<NodeGroup>} instance for chaining.
          */
         select: function() {
             this.path().addClass(Config.Classes.SELECTED);
@@ -388,11 +386,11 @@ function(Property, Class, Canvas, Config) {
 
         /**
          * Method: highlight
-         *   This method highlights the node group visually as long as the node is not already disabled or selected. It
-         *   is for instance called when the user hovers over a node group.
+         *      This method highlights the node group visually as long as the node is not already disabled or selected.
+         *      It is for instance called when the user hovers over a node group.
          *
          * Returns:
-         *   This {<NodeGroup>} instance for chaining.
+         *      This {<NodeGroup>} instance for chaining.
          */
         highlight: function() {
             this.container.addClass(Config.Classes.HIGHLIGHTED);
@@ -402,13 +400,12 @@ function(Property, Class, Canvas, Config) {
 
         /**
          * Method: unhighlight
-         *   Unhighlights the node group's visual appearance. The method is for instance calls when the user leaves a
-         *   hovered node group.
-         *
-         * P.S.: The weird word unhighlighting is an adoption of the jQueryUI dev team speak, all credits to them :)!
+         *      Unhighlights the node group's visual appearance. The method is for instance calls when the user leaves a
+         *      hovered node group. NOTE: The weird word unhighlighting is an adoption of the jQueryUI dev team speak,
+         *      all credits to them :)!
          *
          * Returns:
-         *   This {<NodeGroup>} instance for chaining.
+         *      This {<NodeGroup>} instance for chaining.
          */
         unhighlight: function() {
             this.container.removeClass(Config.Classes.HIGHLIGHTED);
@@ -421,7 +418,7 @@ function(Property, Class, Canvas, Config) {
          *      Removes the whole visual representation from the canvas, deactivates listeners and calls home.
          *
          * Returns:
-         *   {boolean} Successful deletion.
+         *      A {Boolean} indicating successful deletion.
          */
         remove: function() {
             if (!this.deletable) return false;
@@ -455,18 +452,18 @@ function(Property, Class, Canvas, Config) {
          * Method: toDict
          *
          * Returns:
-         *   A dict representation of the node group avoiding any circular structures.
+         *      A ke-value {Object{ representing the node group.
          */
         toDict: function() {
             var properties = _.map(this.properties, function(prop) { return prop.toDict() });
 
             return {
-                id:           this.id,
-                nodeIds:     this.nodeIds(),
-                properties:   _.reduce(properties, function(memo, prop) {
-                                    return _.extend(memo, prop);
-                              })
-            }
+                id:         this.id,
+                nodeIds:    this.nodeIds(),
+                properties: _.reduce(properties, function(memo, prop) {
+                    return _.extend(memo, prop);
+                })
+            };
         }
     });
 });
