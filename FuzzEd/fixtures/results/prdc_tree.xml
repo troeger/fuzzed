@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <p1:backendResults xmlns:p1="http://www.fuzztrees.net/backendResults" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-  <configuration costs="6" id="">
+  <configuration costs="6" id="1">
     <choice key="6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <value included="true" xmlns:p2="http://www.fuzztrees.net/configurations" xsi:type="p2:InclusionChoice"/>
     </choice>
@@ -13,7 +13,7 @@
     </choice>
   </configuration>
 
-  <configuration costs="6" id="">
+  <configuration costs="6" id="2">
     <choice key="6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <value included="true" xmlns:p2="http://www.fuzztrees.net/configurations" xsi:type="p2:InclusionChoice"/>
     </choice>
@@ -25,7 +25,7 @@
     </choice>
   </configuration>
 
-  <configuration costs="6" id="">
+  <configuration costs="6" id="3">
     <choice key="6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <value included="true" xmlns:p2="http://www.fuzztrees.net/configurations" xsi:type="p2:InclusionChoice"/>
     </choice>
@@ -37,7 +37,7 @@
     </choice>
   </configuration>
 
-  <configuration costs="6" id="">
+  <configuration costs="6" id="4">
     <choice key="6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <value included="true" xmlns:p2="http://www.fuzztrees.net/configurations" xsi:type="p2:InclusionChoice"/>
     </choice>
@@ -49,7 +49,7 @@
     </choice>
   </configuration>
 
-  <configuration costs="4" id="">
+  <configuration costs="4" id="5">
     <choice key="6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <value included="false" xmlns:p2="http://www.fuzztrees.net/configurations" xsi:type="p2:InclusionChoice"/>
     </choice>
@@ -61,7 +61,7 @@
     </choice>
   </configuration>
 
-  <configuration costs="4" id="">
+  <configuration costs="4" id="6">
     <choice key="6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <value included="false" xmlns:p2="http://www.fuzztrees.net/configurations" xsi:type="p2:InclusionChoice"/>
     </choice>
@@ -73,7 +73,7 @@
     </choice>
   </configuration>
 
-  <configuration costs="4" id="">
+  <configuration costs="4" id="7">
     <choice key="6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <value included="false" xmlns:p2="http://www.fuzztrees.net/configurations" xsi:type="p2:InclusionChoice"/>
     </choice>
@@ -85,7 +85,7 @@
     </choice>
   </configuration>
 
-  <configuration costs="4" id="">
+  <configuration costs="4" id="8">
     <choice key="6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <value included="false" xmlns:p2="http://www.fuzztrees.net/configurations" xsi:type="p2:InclusionChoice"/>
     </choice>
@@ -97,7 +97,7 @@
     </choice>
   </configuration>
 
-  <result configId="" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="p1:AnalysisResult">
+  <result configId="1" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="p1:AnalysisResult">
     <probability xmlns:p2="http://www.fuzztrees.net/commonTypes" xsi:type="p2:DecomposedFuzzyProbability">
       <alphaCuts key="0">
         <value lowerBound="0.25321831971328" upperBound="0.38474920640512"/>
@@ -108,7 +108,7 @@
     </probability>
   </result>
 
-  <result configId="" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
+  <result configId="2" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
     <probability xmlns:p2="http://www.fuzztrees.net/commonTypes" xsi:type="p2:DecomposedFuzzyProbability">
       <alphaCuts key="0">
         <value lowerBound="0.06862060099072" upperBound="0.20088115314688"/>
@@ -119,7 +119,7 @@
     </probability>
   </result>
 
-  <result configId="" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
+  <result configId="3" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
     <probability xmlns:p2="http://www.fuzztrees.net/commonTypes" xsi:type="p2:DecomposedFuzzyProbability">
       <alphaCuts key="0">
         <value lowerBound="0.218751472930816" upperBound="0.292461587365888"/>
@@ -130,7 +130,7 @@
     </probability>
   </result>
 
-  <result configId="" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
+  <result configId="4" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
     <probability xmlns:p2="http://www.fuzztrees.net/commonTypes" xsi:type="p2:DecomposedFuzzyProbability">
       <alphaCuts key="0">
         <value lowerBound="0.025633859497984" upperBound="0.081013326118912"/>
@@ -141,7 +141,7 @@
     </probability>
   </result>
 
-  <result configId="" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
+  <result configId="5" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
     <probability xmlns:p2="http://www.fuzztrees.net/commonTypes" xsi:type="p2:DecomposedFuzzyProbability">
       <alphaCuts key="0">
         <value lowerBound="0.30337529824" upperBound="0.43451213824"/>
@@ -152,7 +152,7 @@
     </probability>
   </result>
 
-  <result configId="" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
+  <result configId="6" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
     <probability xmlns:p2="http://www.fuzztrees.net/commonTypes" xsi:type="p2:DecomposedFuzzyProbability">
       <alphaCuts key="0">
         <value lowerBound="0.13117593376" upperBound="0.26551576576"/>
@@ -163,7 +163,7 @@
     </probability>
   </result>
 
-  <result configId="" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
+  <result configId="7" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
     <probability xmlns:p2="http://www.fuzztrees.net/commonTypes" xsi:type="p2:DecomposedFuzzyProbability">
       <alphaCuts key="0">
         <value lowerBound="0.271223388928" upperBound="0.349688958976"/>
@@ -174,7 +174,7 @@
     </probability>
   </result>
 
-  <result configId="" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
+  <result configId="8" decompositionNumber="10" modelId="8" timestamp="1400747005" validResult="true" xsi:type="p1:AnalysisResult">
     <probability xmlns:p2="http://www.fuzztrees.net/commonTypes" xsi:type="p2:DecomposedFuzzyProbability">
       <alphaCuts key="0">
         <value lowerBound="0.091076361472" upperBound="0.155343130624"/>

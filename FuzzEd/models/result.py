@@ -52,6 +52,14 @@ class Result(models.Model):
     binary_value  = models.BinaryField(blank=True, null=True)
     issues        = JSONField(blank=True, null=True)
 
+    def __unicode__(self):
+        return "Result for graph %s and configuration %s:\n%s\nIssues:\n%s" % (
+                  self.graph.pk, 
+                  self.configuration.pk if self.configuration else "(None)", 
+                  str(self.value) if self.value else "(None)",
+                  str(self.issues) if self.issues else "(None)",                  
+                )
+
     def is_binary(self):
         ''' Indicates if the result should be delivered directly to the frontend
             as file, or if it must be preprocessed with self.to_json().'''

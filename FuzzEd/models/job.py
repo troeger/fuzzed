@@ -20,6 +20,7 @@ from FuzzEd.models import xml_backend
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice
+from xml_backend import AnalysisResult
 
 
 logger = logging.getLogger('FuzzEd')
@@ -104,9 +105,108 @@ class Job(models.Model):
         response['Content-Type'] = 'application/pdf' if self.kind == 'pdf' else 'application/postscript'
         return response
 
+    def interpret_issues(self, xml_issues):
+        """
+            Interpret the incoming list of issues and convert to feasible JSON for storage.
+        """
+        errors = []
+        warnings = []
+        for issue in xml_issues:
+            json_issue={'message':issue.message, 
+                        'issueId':issue.issueId, 
+                        'elementId': issue.elementId}
+            if issue.isFatal:
+                errors.append(json_issue)
+            else:
+                warnings.append(json_issue)
+        return {'errors': errors, 'warnings': warnings}
+
+    def interpret_value(self, xml_result_value):
+        """
+            Interpret the incoming result value and convert it to feasible JSON for storage.
+            Secondly, the function return a plain integer representing the result
+            for sorting purposes. 
+
+            Fuzzy probability values as result are given for each alpha cut. Putting
+            all the different values together forms a triangular membership function.
+            Crisp probabilities are just a special case of this, were the membership
+            function collapses to a straight vertical line.
+
+            The method determines both a list of drawable diagram coordinates, 
+            and the result values to be shown directly to the user.
+
+            Diagram point determination:
+
+            The X axis represents the unreliability value (== probability of failure), 
+            the Y axis the membership function probability value for the given unreliability value.
+            For each alpha cut, the backend returns us the points were the upper border of the 
+            alphacut stripe is crossing the membership triangle.
+            The lowest alphacut (0) has its upper border directly on the X axis.
+            The highest alphacut has its upper border crossing the tip of the membership function. 
+                
+            The two points were the alphacut border touches the membership function are called 
+            "[lower, upper]", the number of the alphacut is the "key".
+            For this reason, "lower" and "upper" are used as X coordinates, 
+            while the key is used as "Y" coordinate.
+
+        """
+        result = {}
+        sort_value = 0
+        if hasattr(xml_result_value, 'probability') and xml_result_value.probability is not None:
+            points = []
+            logging.debug("Probability: " + str(xml_result_value.probability))
+            alphacut_count = len(xml_result_value.probability.alphaCuts)  # we don't believe the delivered decomp_number
+            for alpha_cut in xml_result_value.probability.alphaCuts:
+                y_val = alpha_cut.key + 1 / alphacut_count  # Alphacut indexes start at zero
+                assert (0 <= y_val <= 1)
+                points.append([alpha_cut.value_.lowerBound, y_val])
+                if alpha_cut.value_.upperBound != alpha_cut.value_.lowerBound:
+                    points.append([alpha_cut.value_.upperBound, y_val])
+                    if alpha_cut.value_.upperBound > sort_value:
+                        # Use the highest point in the membership function as sort value
+                        sort_value = round(alpha_cut.value_.upperBound*100)                    
+                else:
+                    # This is the tip of the triangle.
+                    # If this is a crisp probability, then there is only the point above added.
+                    # In this case, add another fake point to draw a strisaght line.
+                    # points.append([alpha_cut.value_.lowerBound, 0])
+                    pass
+            # Points is now a wild collection of coordinates, were double values for the same X 
+            # coordinate may occur. We sort it (since the JS code likes that) and leave only the 
+            # largest Y values per X value.
+            result['points'] = sorted(points)
+
+            # Compute some additional statistics for the front-end, based on the gathered probabilities
+            if len(points) > 0:
+                result['min'] = min(points, key=lambda point: point[0])[0]  # left triangle border position
+                result['max'] = max(points, key=lambda point: point[0])[0]  # right triangle border position
+                result['peak'] = max(points, key=lambda point: point[1])[0]  # triangle tip position
+                #result['ratio'] = float(current_config['peak'] * current_config['costs']) if current_config['costs'] else None
+
+        if hasattr(xml_result_value, 'reliability') and xml_result_value.reliability is not None:
+            reliability = float(xml_result_value.reliability)
+            sort_value = round(reliability)            
+            result['reliability'] = None if math.isnan(reliability) else reliability
+
+        if hasattr(xml_result_value, 'mttf') and xml_result_value.mttf is not None:
+            mttf = float(xml_result_value.mttf)
+            result['mttf'] = None if math.isnan(mttf) else mttf
+
+        if hasattr(xml_result_value, 'rounds') and xml_result_value.nSimulatedRounds is not None:
+            rounds = int(result.nSimulatedRounds)
+            result['rounds'] = None if math.isnan(rounds) else rounds
+
+        if hasattr(xml_result_value, 'nFailures') and xml_result_value.nFailures is not None:
+            failures = int(result.nFailures)
+            result['failures'] = None if math.isnan(failures) else failures
+            #result['ratio'] = float(1 - reliability * current_config['costs']) if current_config['costs'] else None
+
+        return result, sort_value
+
     def parse_result(self):
         """
-            Parses the stored binary result data and saves the content to the database, in relation to this job.
+            Parses the stored binary result data and saves the content to the database, 
+            in relation to this job.
         """
         if self.requires_download:
             # no parsing needed, directly delivered to client
@@ -115,9 +215,11 @@ class Job(models.Model):
         doc = xml_backend.CreateFromDocument(str(self.result))
 
         if hasattr(doc, 'issue'):
-            for issue in doc.issue:
-                pass
-                #TODO: Save issues
+            # Result-independent issues (for the whole graph, and not per configuration),
+            # are saved as special kind of result
+            db_result = Result(graph=self.graph , job=self, kind=Result.GRAPH_ISSUES)
+            db_result.issues = json.dumps(self.interpret_issues(doc.issue))
+            db_result.save()
 
         conf_id_mappings = {}         # XML conf ID's to DB conf ID's
 
@@ -154,9 +256,20 @@ class Job(models.Model):
         if hasattr(doc, 'result'):
             for result in doc.result:
                 assert(int(result.modelId) == self.graph.pk)
-                db_result = Result(graph=self.graph , job=self, configuration=conf_id_mappings[result.configId])
+                db_result = Result(graph=self.graph , job=self)
+                if result.configId in conf_id_mappings:
+                    db_result.configuration=conf_id_mappings[result.configId]
+                if type(result) is AnalysisResult:
+                    db_result.kind = Result.ANALYSIS_RESULT
+                elif type(result) is MincutResult:
+                    db_result.kind = Result.MINCUT_RESULT
+                elif type(result) is SimulationResult:
+                    db_result.kind = Result.SIMULATION_RESULT
+                db_result.value, db_result.value_sort = self.interpret_value(result)
+                if result.issue:
+                    db_result.issues = json.dumps(self.interpret_issues(result.issue))
                 db_result.save()
-                print result
+                logger.debug(db_result)
 
     def result_json(self):
         """

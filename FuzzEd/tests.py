@@ -521,9 +521,9 @@ class AnalysisInputFilesTestCase(FuzzEdTestCase):
                 self.assertEqual(retcode, 0, fname + " failed")
                 dom = parse('/tmp/output.xml')
 
-class BackendDaemonFromFrontendTestCase(FuzzEdTestCase):
+class BackendDaemonTestCase(FuzzEdTestCase):
     """
-        Tests for backend functionality, as being triggered from frontend calls.
+        Tests for backend functionality.
         This demands firing up the backend daemon in the setup phase.
     """
 
@@ -543,7 +543,7 @@ class BackendDaemonFromFrontendTestCase(FuzzEdTestCase):
         self.backend.terminate()
 
 
-class InternalTestCase(BackendDaemonFromFrontendTestCase):
+class InternalTestCase(BackendDaemonTestCase):
     """
         The tests for internal functions that are not exposed directly via one of the APIs.
         Since some tests explicitely create job objects, a signal is always triggered to talk to
@@ -560,11 +560,9 @@ class InternalTestCase(BackendDaemonFromFrontendTestCase):
             job.parse_result()
 
 
-class AnalysisFixtureTestCase(BackendDaemonFromFrontendTestCase):
+class AnalysisFixtureTestCase(BackendDaemonTestCase):
     """
-        This is a base class that wraps all information about the 'analysis' fixture.
-        Don't add new fixtures here. Either load - modify - save the existing fixture file,
-        or create a new class for your new fixture.
+        Analysis engine tests.
     """
     fixtures = fixt_analysis['files']
 
@@ -602,11 +600,9 @@ class AnalysisFixtureTestCase(BackendDaemonFromFrontendTestCase):
             self.assertEqual('application/postscript', eps['CONTENT-TYPE'])
 
 
-class MinCutFixtureTestCase(BackendDaemonFromFrontendTestCase):
+class MinCutFixtureTestCase(BackendDaemonTestCase):
     """
-        This is a base class that wraps all information about the 'mincut' fixture.
-        Don't add new fixtures here. Either load - modify - save the existing fixture file,
-        or create a new class for your new fixture.
+        Mincut engine tests.
     """
     fixtures = fixt_mincut['files']
 
