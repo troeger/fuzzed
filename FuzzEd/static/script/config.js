@@ -144,6 +144,7 @@ define(['underscore'], function() {
             SELECTING:               'ui-selecting',
             SELECTEE:                'ui-selectee',
             DISABLED:                'disabled',
+            AFFECTED:                'affected',
 
             CANVAS_NOT_EDITABLE:     'fuzzed-canvas-not-editable',
 

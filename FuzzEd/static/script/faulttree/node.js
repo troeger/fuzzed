@@ -12,8 +12,59 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
      * Extends: <Base::Node>
      */
     return AbstractNode.extend({
+        nodegroup: undefined,
+        ownProperties: undefined,
+
+        init: function(definition) {
+            this._super(definition);
+
+            jQuery(document).on(Config.Events.NODEGROUP_ADDED, function (event, id, nodeIds, properties, nodegroup) {
+                if (_.contains(nodeIds, this.id)) {
+                   // if we are contained in the newly created node group
+                    this.ownProperties = this.properties;
+                    this.properties = nodegroup.properties;
+                    this.nodegroup  = nodegroup;
+                }
+            }.bind(this));
+            jQuery(document).on(Config.Events.NODEGROUP_DELETED, function (event, id, nodeIds) {
+                if (_.contains(nodeIds, this.id)) {
+                   // if we were part of the deleted node group
+                    this.properties = this.ownProperties;
+                    this.nodegroup  = undefined;
+                }
+            }.bind(this));
+        },
+
         getConfig: function() {
             return Config;
+        },
+
+        select: function() {
+            this._super();
+
+            if (typeof this.nodegroup !== 'undefined') {
+                _.invoke(_.without(this.nodegroup.nodes, this), 'affect');
+            }
+        },
+
+        deselect: function() {
+            this._super();
+
+            if (typeof this.nodegroup !== 'undefined') {
+                _.invoke(_.without(this.nodegroup.nodes, this), 'unaffect');
+            }
+        },
+
+        affect: function() {
+            this.container.addClass(this.config.Classes.AFFECTED);
+
+            return this;
+        },
+
+        unaffect: function() {
+            this.container.removeClass(this.config.Classes.AFFECTED);
+
+            return this;
         }
     });
 });

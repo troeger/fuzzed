@@ -199,9 +199,7 @@ function(Class, Config, Property) {
                 id:           this.id,
                 sourceNodeId: this.source.id,
                 targetNodeId: this.target.id,
-                properties:   _.reduce(properties, function(memo, prop) {
-                                    return _.extend(memo, prop);
-                              })
+                properties:   _.reduce(properties, function(memo, prop) { return _.extend(memo, prop);}, {})
             }
         }
     });

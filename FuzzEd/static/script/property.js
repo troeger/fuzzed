@@ -9,7 +9,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         owner:          undefined,
         value:          undefined,
         displayName:    '',
-        mirror:         undefined,
+        mirrors:        undefined,
         label:          undefined,
         menuEntry:      undefined,
         hidden:         false,
@@ -19,6 +19,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         init: function(owner, definition) {
             jQuery.extend(this, definition);
             this.owner = owner;
+            this.mirrors = [];
             this._sanitize()
                 ._setupMirror()
                 ._setupLabel()
@@ -117,7 +118,13 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         _setupMirror: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
 
-            this.mirror = new Mirror(this, this.owner.container, this.mirror);
+            this.mirrors.push(new Mirror(this, this.owner.container, this.mirror));
+
+            if (typeof this.owner.nodes !== 'undefined') {
+                _.each(this.owner.nodes, function(node) {
+                    this.mirrors.push(new Mirror(this, node.container, this.mirror));
+                }.bind(this));
+            }
 
             return this;
         },

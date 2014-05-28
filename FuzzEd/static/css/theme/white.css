@@ -4420,6 +4420,14 @@ i.icon-layout-tree:hover {
 .fuzzed-nodegroup.disabled svg {
   opacity: 0.5;
 }
+.fuzzed-node.affected path,
+.fuzzed-nodegroup.affected path,
+.fuzzed-node.affected rect,
+.fuzzed-nodegroup.affected rect,
+.fuzzed-node.affected circle,
+.fuzzed-nodegroup.affected circle {
+  stroke: #8d39db !important;
+}
 .fuzzed-node.optional path,
 .fuzzed-nodegroup.optional path,
 .fuzzed-node.optional rect,

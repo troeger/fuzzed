@@ -65,7 +65,8 @@ function(Property, Class, Canvas, Config) {
             jQuery(document).trigger(Config.Events.NODEGROUP_ADDED, [
                 this.id,
                 this.nodeIds(),
-                this.toDict().properties
+                this.toDict().properties,
+                this
             ]);
         },
 
@@ -437,7 +438,7 @@ function(Property, Class, Canvas, Config) {
                                    Config.Events.NODE_PROPERTY_CHANGED ].join(' '));
 
             // call home
-            jQuery(document).trigger(Config.Events.NODEGROUP_DELETED, [this.id]);
+            jQuery(document).trigger(Config.Events.NODEGROUP_DELETED, [this.id, this.nodeIds()]);
 
             return true;
         },

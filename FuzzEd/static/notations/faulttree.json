@@ -455,7 +455,15 @@
 
         "properties": {
             "name": {
-                "default": "Basic Event"
+                "kind": "text",
+                "displayName": "Name",
+                "default": "Event",
+
+                "mirror": {
+                    "position": "bottom",
+                    "style": ["bold", "large"],
+                    "format": "{{$0}}"
+                }
             },
             "probability": {
                 "kind": "compound",

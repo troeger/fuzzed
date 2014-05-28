@@ -10,6 +10,9 @@ define(['config', 'jquery'], function(Config) {
      *  Extends: <Base::Config>
      */
     return jQuery.extend(true, Config, {
+        Classes: {
+            AFFECTED:                'affected'
+        },
         /**
          *  Group: Events
          *    Name of global events triggered on the document with jQuery.trigger().
