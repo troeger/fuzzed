@@ -200,11 +200,11 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
                 filter: '.' + Config.Classes.NODE
                     + ', .' + Config.Classes.JSPLUMB_CONNECTOR
                     + ', .' + Config.Classes.NODEGROUP + ' svg path',
-				unselected: function() {
-					jQuery(document).trigger(Config.Events.NODE_UNSELECTED);
+				unselected: function(event, ui) {
+					jQuery(document).trigger(Config.Events.NODE_UNSELECTED, ui);
 				},
-				selected: function() {
-					jQuery(document).trigger(Config.Events.NODE_SELECTED);
+				selected: function(event, ui) {
+					jQuery(document).trigger(Config.Events.NODE_SELECTED, ui);
 				},
                 stop: function() {
                     // tell other (e.g. <PropertyMenu>) that selection is done and react to the new selection

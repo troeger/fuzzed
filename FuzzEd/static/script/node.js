@@ -176,13 +176,13 @@ function(Property, Mirror, Canvas, Class, Config) {
 				
 			jQuery(document).on(this.config.Events.NODE_SELECTED, function(event, ui){
 				// bring only the sticky note in front that is selected
-				if (jQuery(sticky.container).hasClass('ui-selected'))
+				if (jQuery(sticky.container).hasClass(this.config.Classes.SELECTED))
 					jQuery(sticky.container).css('z-index', '101');
-			});
+            }.bind(this));
 			
 			jQuery(document).on(this.config.Events.NODE_UNSELECTED, function(event, ui){
 				jQuery(sticky.container).css('z-index', '-1')
-			});	
+            }.bind(this));
 			
 			
 			return this;
@@ -527,7 +527,7 @@ function(Property, Mirror, Canvas, Class, Config) {
          *      Converts the informal properties stored in <properties> into Property objects ordered by this graph's
          *      propertiesDisplayOrder (see <Graph::getNotation()> or the respective notations json-file).
          *
-         *      ! Exact code duplication in <Node::_setupProperties()>  and <Edge::_setupPropertes()>
+         *      ! Exact code duplication in <NodeGroup::_setupProperties()>  and <Edge::_setupPropertes()>
          *
          * Returns:
          *      This {<NodeGroup>} instance for chaining.
@@ -650,7 +650,7 @@ function(Property, Mirror, Canvas, Class, Config) {
 				textarea.toggle(true).focus();
 			});
 			
-			jQuery(document).on('node_unselected', function(event) {
+			jQuery(document).on(this.config.Events.NODE_UNSELECTED, function(event) {
 				textarea.blur();
 			});
 				
@@ -672,6 +672,18 @@ function(Property, Mirror, Canvas, Class, Config) {
         _registerEventHandlers: function() {
             jQuery(document).on(this.config.Events.EDGE_ADDED,   this._checkEdgeCapacity.bind(this));
             jQuery(document).on(this.config.Events.EDGE_DELETED, this._checkEdgeCapacity.bind(this));
+
+            jQuery(document).on(this.config.Events.NODE_SELECTED, function(event, ui) {
+                if (jQuery(ui.selected).data('node') == this) {
+                    this.select();
+                }
+            }.bind(this));
+
+            jQuery(document).on(this.config.Events.NODE_UNSELECTED, function(event, ui) {
+                if (jQuery(ui.unselected).data('node') == this) {
+                    this.deselect();
+                }
+            }.bind(this));
 
             return this;
         },
