@@ -1,8 +1,10 @@
-from django.db import models
 import json
+
+from django.db import models
 
 from node import Node
 from graph import Graph
+
 
 class Edge(models.Model):
     """

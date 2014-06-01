@@ -1,4 +1,4 @@
-define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'highcharts', 'jquery-ui', 'slickgrid'],
+define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'highcharts', 'jquery-ui', 'slickgrid', 'datatables'],
 function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
     /**
      *  Package: Faulttree
@@ -160,7 +160,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             this._super();
             this._editor = editor;
             this._chartContainer = this.container.find('.chart');
-            this._gridContainer  = this.container.find('.grid');
+            this._gridContainer  = this.container.find('.table_container');
         },
 
         /**
@@ -242,18 +242,28 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *    A jQuery object of the container.
          */
         _setupContainer: function() {
-            throw new SubclassResponsibility();
+            return jQuery(
+                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (analytical)">\
+                    <div class="menu-controls">\
+                        <span class="menu-minimize"></span>\
+                        <span class="menu-close"></span>\
+                    </div>\
+                    <div class="chart"></div>\
+                    <div class="table_container content"></div>\
+                </div>'
+            ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
         },
 
         _setupResizing: function() {
             this.container.resizable({
-                minHeight: this.container.height(), // use current height as minimum
-                maxHeight: this.container.height(),
+                minHeight: this.container.outerHeight(), // use current height as minimum
+                minWidth : this.container.outerWidth(),
                 resize: function(event, ui) {
                     if (this._chart != null) {
-                        // fit all available space with chart
-                        this._chartContainer.height(this.container.height() - this._gridContainer.outerHeight());
-
+                        
+                        // fit all available space with chart    
+                        this._chartContainer.height(this.container.height() - this._gridContainer.prop('scrollHeight'));
+                        
                         this._chart.setSize(
                             this._chartContainer.width(),
                             this._chartContainer.height(),
@@ -261,8 +271,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         );
                     }
 
-                    this._gridContainer.width(this._chartContainer.width());
-                    this._grid.resizeCanvas();
+                    //this._gridContainer.width(this._chartContainer.width());
+                    //this._grid.resizeCanvas();
                 }.bind(this)
             });
         },
@@ -293,7 +303,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
             if (_.size(data.configurations) > 0) {
                 var chartData = {};
+                // tableData variable now useless
                 var tableData = [];
+                // introducing tableDefinition for passing column definitions to DataTables
+                var tableDefinitions = []; 
                 var configID = '';
 
                 _.each(data.configurations, function(config, index) {
@@ -324,6 +337,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                     tableData.push(tableEntry);
 
                 }.bind(this));
+                
+                tableDefinitions["columns"] = data.columns;
 
                 // remove progress bar
                 this._chartContainer.empty();
@@ -331,9 +346,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 if (_.size(chartData) != 0) {
                     this._displayResultWithHighcharts(chartData, data['decompositionNumber']);
                 }
-                this._displayResultWithSlickGrid(tableData);
-
-                this._setupResizing();
+               
+                this._displayResultWithDataTables(tableDefinitions);
+                
+                //this._setupResizing();
             } else {
                 // close menu again if there are no results
                 this.hide();
@@ -364,7 +380,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *    A string that is displayed inside the tooltip. It may contain HTML tags.
          */
         _chartTooltipFormatter: function() {
-            throw new SubclassResponsibility();
+           
         },
 
         /**
@@ -535,6 +551,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                             radius: 1
                         },
                         events: {
+                            /*
                             // select the corresponding grid row of the hovered series
                             // this will also highlight the corresponding nodes
                             mouseOver: function() {
@@ -549,6 +566,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                             mouseOut: function() {
                                 self._grid.setSelectedRows([]);
                             }
+                            */
                         }
                     }
                 },
@@ -556,7 +574,47 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 series: series
             });
         },
-
+        
+        
+        
+        /**
+         *      TEST  
+         *        METHOD      
+         *
+         */
+        _displayResultWithDataTables: function(data) {
+            
+            // clear container
+            this._gridContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');
+            
+            var _this = this;
+              
+            this._grid = jQuery('#results_table').dataTable({
+                            "bProcessing":   true,
+                            "bFilter":       false,
+                            "bServerSide":   true,
+                            "sAjaxSource":   "/front/jobs/job_status_test",
+                            "aoColumns":     data["columns"],
+                            "bLengthChange": false,
+                            "iDisplayLength": 10,
+                            "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                                                jQuery(nRow).on("mouseover", function(){
+                                                    var configID = aData['id']
+                                                    _this._highlightConfiguration(configID);
+                                                    })
+                                             },
+                            "fnInitComplete": function(oSettings, json) {
+                                  _this._setupResizing();
+                                  
+                                }    
+                            });
+                                
+            this._grid.on( 'mouseleave', 'tr', function () {
+                _this._unhighlightConfiguration();
+            });
+            
+        },
+        
         /**
          *  Method: _displayResultWithSlickGrid
          *    Display the job's result in the menu's body using SlickGrid.
@@ -591,7 +649,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             // make rows selectable
             this._grid.setSelectionModel(new Slick.RowSelectionModel());
 
-            // highlight the corresponding nodes if a row of the grid is selected
+            // this._unhighlightConfiguration(); the corresponding nodes if a row of the grid is selected
             this._grid.onSelectedRowsChanged.subscribe(function(e, args) {
                 this._unhighlightConfiguration();
 
@@ -732,49 +790,6 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
     var AnalyticalProbabilityMenu = AnalysisResultMenu.extend({
 
         /**
-         *  Method: _setupContainer
-         *    Sets up the DOM container element for this menu and appends it to the DOM.
-         *
-         *  Returns:
-         *    A jQuery object of the container.
-         */
-        _setupContainer: function() {
-            return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Analysis Results">\
-                    <div class="menu-controls">\
-                        <span class="menu-minimize"></span>\
-                        <span class="menu-close"></span>\
-                    </div>\
-                    <div class="chart"></div>\
-                    <div class="grid" style="width: 450px; padding-top: 5px;"></div>\
-                </div>'
-            )
-            .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
-        },
-
-        /**
-         *  Method: _getDataColumns
-         *    _Abstract_, returns the format of columns that should be displayed with SlickGrid.
-         *
-         *  Returns:
-         *    An array of column descriptions. See https://github.com/mleibman/SlickGrid/wiki/Column-Options.
-         */
-        _getDataColumns: function() {
-            function shorten(row, cell, value) {
-                return Highcharts.numberFormat(value, 5);
-            }
-
-            return [
-                { id: 'id',     name: 'Config',     field: 'id',     sortable: true },
-                { id: 'min',    name: 'Min',        field: 'min',    sortable: true, formatter: shorten },
-                { id: 'peak',   name: 'Peak',       field: 'peak',   sortable: true, formatter: shorten },
-                { id: 'max',    name: 'Max',        field: 'max',    sortable: true, formatter: shorten },
-                { id: 'costs',  name: 'Costs',      field: 'costs',  sortable: true },
-                { id: 'ratio',  name: 'Risk',       field: 'ratio',  sortable: true, minWidth: 150}
-            ];
-        },
-
-        /**
          *  Method: _chartTooltipFormatter
          *    Function used to format the toolip that appears when hovering over a data point in the chart.
          *    The scope object ('this') contains the x and y value of the corresponding point.
@@ -826,29 +841,6 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 </div>'
             )
             .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
-        },
-
-        /**
-         *  Method: _getDataColumns
-         *    _Abstract_, returns the format of columns that should be displayed with SlickGrid.
-         *
-         *  Returns:
-         *    An array of column descriptions. See https://github.com/mleibman/SlickGrid/wiki/Column-Options.
-         */
-        _getDataColumns: function() {
-            function shorten(row, cell, value) {
-                return Highcharts.numberFormat(value, 5);
-            }
-
-            return [
-                { id: 'id',          name: 'Config',      field: 'id',          sortable: true },
-                { id: 'mttf',        name: 'MTTF',        field: 'mttf',        sortable: true },
-                { id: 'reliability', name: 'Reliability', field: 'reliability', sortable: true },
-                { id: 'rounds',      name: 'Rounds',      field: 'rounds',      sortable: true },
-                { id: 'failures',    name: 'Failures',    field: 'failures',    sortable: true },
-                { id: 'costs',       name: 'Costs',       field: 'costs',       sortable: true },
-                { id: 'ratio',       name: 'Risk',        field: 'ratio',       sortable: true, minWidth: 150}
-            ];
         },
 
         /**

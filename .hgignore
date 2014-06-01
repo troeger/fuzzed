@@ -12,6 +12,7 @@ FuzzEd/models/xml_analysis.py
 FuzzEd/models/xml_simulation.py
 FuzzEd/models/xml_faulttree.py
 FuzzEd/models/xml_fuzztree.py
+FuzzEd/models/xml_backend.py
 FuzzEd/models/graph_notations.py
 FuzzEd/models/node_rendering.py
 FuzzEd/models/notations.py
@@ -40,6 +41,8 @@ backends/common/fuzztree.h
 backends/common/analysisResult.cpp
 backends/common/simulationResult.h
 backends/common/simulationResult.cpp
+backends/common/backendResult.h
+backends/common/backendResult.cpp
 backends/common/configurations.h
 backends/common/configurations.cpp
 backends/common/configurationResult.h

@@ -26,6 +26,7 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 import requests
 
 
+
 # Initial configuration of logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<p1:backendResults xmlns:p1="http://www.fuzztrees.net/backendResults" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <result configId="0" decompositionNumber="10" modelId="7" timestamp="1400747010" validResult="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="p1:AnalysisResult">
+    <probability xmlns:p2="http://www.fuzztrees.net/commonTypes" xsi:type="p2:DecomposedFuzzyProbability">
+      <alphaCuts key="0">
+        <value lowerBound="1" upperBound="1"/>
+      </alphaCuts>
+    </probability>
+  </result>
+
+</p1:backendResults>

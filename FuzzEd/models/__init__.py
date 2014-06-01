@@ -6,5 +6,9 @@ from job import Job
 from properties import Property
 from commands import Command
 from user import UserProfile
+from result import Result
+from configuration import Configuration
+from node_configuration import NodeConfiguration
+#from machine import Machine
 from notification import Notification
 from node_group import NodeGroup
