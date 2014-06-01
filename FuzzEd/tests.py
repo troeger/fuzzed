@@ -135,6 +135,7 @@ class FuzzEdTestCase(LiveServerTestCase):
             response = self.ajaxGet(jobUrl)
             code = response.status_code
         self.assertEqual(response.status_code, 200)
+        print response
         return response
 
 class ViewsTestCase(FuzzEdTestCase):
@@ -570,7 +571,8 @@ class AnalysisFixtureTestCase(BackendDaemonFromFrontendTestCase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testRateFaulttree(self):
-        response = self.requestJob(self.baseUrl, self.rate_faulttree, 'topevent')
+        response = self.requestJob(self.baseUrl, fixt_analysis['rate_faulttree'], 'topevent')
+        print "content: " + response.content
         result = json.loads(response.content)
         self.assertEqual(bool(result['validResult']), True)
         self.assertEqual(result['errors'], {})
@@ -579,8 +581,8 @@ class AnalysisFixtureTestCase(BackendDaemonFromFrontendTestCase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testPRDCFuzztree(self):
-        response = self.requestJob(self.baseUrl, self.prdc_fuzztree, 'topevent')
-        print response.content
+        response = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
+        print "content: " + response.content
         result = json.loads(response.content)
         self.assertEqual(bool(result['validResult']), True)
         self.assertEqual(result['errors'], {})
@@ -617,7 +619,7 @@ class MinCutFixtureTestCase(BackendDaemonFromFrontendTestCase):
         self.assertEqual(bool(result['validResult']), True)
         self.assertEqual(result['errors'], {})
         self.assertEqual(result['warnings'], {})
-        # TODO: self.assertEqual(len(result['mincutResults']), 3)
+        self.assertEqual(len(result['mincutResults']), fixt_mincut['mincut_numcuts'])
 
 class UnicodeTestCase(FuzzEdTestCase):
     fixtures = fixt_unicode['files']
