@@ -4,7 +4,7 @@ import logging
 from django import http
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.bundle import Bundle
@@ -114,7 +114,7 @@ class JobResource(common.JobResource):
 
         if job.done():
             if job.exit_code == 0:
-                return job.as_http_response()
+                return HttpResponseRedirect(reverse('results', kwargs={'api_name': 'front', 'pk': job.graph.pk, 'secret': job.secret}))
             else:
                 logger.debug("Job is done, but with non-zero exit code.")
                 mail_managers('Analysis of job %s ended with non-zero exit code.' % job.pk, job.graph.to_xml())
@@ -449,7 +449,7 @@ class GraphResource(common.GraphResource):
 
     def dispatch_results(self, request, **kwargs):
         result_resource = ResultResource()
-        return job_resource.dispatch_list(request, graph_id=kwargs['pk'], secret=kwargs['secret'])
+        return result_resource.dispatch_list(request, graph_id=kwargs['pk'], secret=kwargs['secret'])
 
 
 class ResultResource(ModelResource):
@@ -460,35 +460,45 @@ class ResultResource(ModelResource):
         queryset = Result.objects.all()
         authorization = GraphOwnerAuthorization()
         authentication = SessionAuthentication()
-        detail_allowed_methods = ['get']
+        list_allowed_methods = ['get']
 
     def get_list(self, request, **kwargs):
         """
             Called by the request dispatcher in case somebody tries to GET result resources
             for a particular job.
         """
-        #TODO: Get job and according list of results
+        job = Job.objects.get(secret=kwargs['secret'], graph=kwargs['graph_id'])
 
-        # starting point in the current data set (from 0 to n-1)
-        displayStart =  request.GET['iDisplayStart']  
-        # number of records that shall be returned         
-        displayLength = request.GET['iDisplayLength'] 
+        if job.requires_download:
+            return job.result_download()
 
-        recordCount = 42   #TODO: Number of results for the given job
+        # It is an analysis result
+        results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
+        start  = request.GET.get('iDisplayStart', 0)
+        length = request.GET.get('iDisplayLength', 10)
+        results = results[start:start+length]
+
+        # Determine subset to be delivered, default is all
+        count = results.count()
+
+        assert('sEcho' in request.GET)
         response_data = {
-                            "sEcho": int(request.GET['sEcho']),
-                            "iTotalRecords": recordCount,
-                            "iTotalDisplayRecords": recordCount
+                            "sEcho": request.GET['sEcho'],
+                            "iTotalRecords": count,
+                            "iTotalDisplayRecords": count,
+                            "aaData": []
                         }    
-        # "aaData": [{    "ratio": 0.96, 
-        #                 "min": 0.96, 
-        #                 "max": 0.96, 
-        #                 "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 2}}, 
-        #                 "costs": 1, 
-        #                 "peak": 0.96, 
-        #                 "id": "#0", 
-        #                 "points": [[0.96, 1.0], [0.96, 1.0]]
-        #             }, 
+        for result in results:
+            response_data['aaData'].append(result.value)
+            # "aaData": [{    "ratio": 0.96, 
+            #                 "min": 0.96, 
+            #                 "max": 0.96, 
+            #                 "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 2}}, 
+            #                 "costs": 1, 
+            #                 "peak": 0.96, 
+            #                 "id": "#0", 
+            #                 "points": [[0.96, 1.0], [0.96, 1.0]]
+            #             }, 
         return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     

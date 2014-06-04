@@ -34,11 +34,13 @@ class Result(models.Model):
 
     ANALYSIS_RESULT   = 'T'
     SIMULATION_RESULT = 'S'
+    MINCUT_RESULT     = 'M'
     PDF_RESULT        = 'P'
     EPS_RESULT        = 'E'
     GRAPH_ISSUES      = 'G'
     RESULT_TYPES = [ (GRAPH_ISSUES, 'graphissues'), 
                      (SIMULATION_RESULT, 'simulation'), 
+                     (MINCUT_RESULT, 'mincut'), 
                      (ANALYSIS_RESULT, 'topevent'),
                      (PDF_RESULT, 'pdf'),
                      (EPS_RESULT, 'eps')]
@@ -53,7 +55,8 @@ class Result(models.Model):
     issues        = JSONField(blank=True, null=True)
 
     def __unicode__(self):
-        return "Result for graph %s and configuration %s:\n%s\nIssues:\n%s" % (
+        return "Result %u for graph %s and configuration %s:\n%s\nIssues:\n%s" % (
+                  self.pk,
                   self.graph.pk, 
                   self.configuration.pk if self.configuration else "(None)", 
                   str(self.value) if self.value else "(None)",

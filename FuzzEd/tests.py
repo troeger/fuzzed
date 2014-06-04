@@ -121,7 +121,9 @@ class FuzzEdTestCase(LiveServerTestCase):
         return self.c.delete(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
     def requestJob(self, base_url, graph, kind):
-        """ Helper function for requesting a job. """
+        """ 
+            Helper function for requesting a job. Waits for the result and returns its URL.
+        """
         newjob = json.dumps({'kind': kind})
         response = self.ajaxPost(base_url + '/graphs/%u/jobs/' % graph, newjob, 'application/json')
         self.assertNotEqual(response.status_code, 500)  # the backend daemon is not started
@@ -134,9 +136,10 @@ class FuzzEdTestCase(LiveServerTestCase):
         while (code == 202):
             response = self.ajaxGet(jobUrl)
             code = response.status_code
-        self.assertEqual(response.status_code, 200)
-        print response
-        return response
+        self.assertEqual(response.status_code, 302)
+        assert ('Location' in response)
+        resultUrl = response['Location']
+        return resultUrl
 
 class ViewsTestCase(FuzzEdTestCase):
     """ 
@@ -569,36 +572,33 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testRateFaulttree(self):
-        response = self.requestJob(self.baseUrl, fixt_analysis['rate_faulttree'], 'topevent')
-        print "content: " + response.content
-        result = json.loads(response.content)
-        self.assertEqual(bool(result['validResult']), True)
-        self.assertEqual(result['errors'], {})
-        self.assertEqual(result['warnings'], {})
-        self.assertEqual(result['configurations'][0]['peak'], 1.0)
+        resultUrl = self.requestJob(self.baseUrl, fixt_analysis['rate_faulttree'], 'topevent')
+        result = self.ajaxGet(resultUrl+'?sEcho=doo')   # Fetch result in datatables style
+        self.assertEqual(result.status_code, 200)
+        data = json.loads(result.content)
+        self.assertEqual(data['aaData'][0]['peak'], 1.0)
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testPRDCFuzztree(self):
-        response = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
-        print "content: " + response.content
-        result = json.loads(response.content)
-        self.assertEqual(bool(result['validResult']), True)
-        self.assertEqual(result['errors'], {})
-        self.assertEqual(result['warnings'], {})
-        self.assertEqual(len(result['configurations']), fixt_analysis['prdc_configurations'])
-        for conf in result['configurations']:
-            assert (round(conf['peak'], 5) in self.prdc_peaks)
+        resultUrl = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
+        result = self.ajaxGet(resultUrl+'?sEcho=doo')  # Fetch result in datatables style
+        self.assertEqual(result.status_code, 200)
+        data = json.loads(result.content)
+        self.assertEqual(len(data['aaData']), fixt_analysis['prdc_configurations'])
+        for conf in data['aaData']:
+            assert (round(conf['peak'], 5) in fixt_analysis['prdc_peaks'])
 
     def testFrontendAPIPdfExport(self):
         for graphPk, graphType in fixt_analysis['graphs'].iteritems():
-            pdf = self.requestJob(self.baseUrl, graphPk, 'pdf')
-            # The result of a PDF rendering job is the download link
+            pdfUrl = self.requestJob(self.baseUrl, graphPk, 'pdf')
+            pdf = self.get(pdfUrl)
             self.assertEqual('application/pdf', pdf['CONTENT-TYPE'])
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testFrontendAPIEpsExport(self):
-        for graph in self.graphs:
-            eps = self.requestJob(self.baseUrl, graph, 'eps')
+        for graphPk, graphType in fixt_analysis['graphs'].iteritems():
+            epsUrl = self.requestJob(self.baseUrl, graphPk, 'eps')
+            eps = self.get(epsUrl)
             self.assertEqual('application/postscript', eps['CONTENT-TYPE'])
 
 
@@ -610,12 +610,12 @@ class MinCutFixtureTestCase(BackendDaemonTestCase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testMincutFaulttree(self):
-        response = self.requestJob(self.baseUrl, fixt_mincut['mincut_faulttree'], 'topevent')
-        result = json.loads(response.content)
-        self.assertEqual(bool(result['validResult']), True)
-        self.assertEqual(result['errors'], {})
-        self.assertEqual(result['warnings'], {})
-        self.assertEqual(len(result['mincutResults']), fixt_mincut['mincut_numcuts'])
+        resultUrl = self.requestJob(self.baseUrl, fixt_mincut['mincut_faulttree'], 'mincut')
+        result = self.ajaxGet(resultUrl+'?sEcho=doo')   # Fetch result in datatables style
+        self.assertEqual(result.status_code, 200)
+        data = json.loads(result.content)
+        mincut_results = data['aaData'][0]['mincutResults']
+        self.assertEqual(len(mincutResults), fixt_mincut['mincut_numcuts'])
 
 class UnicodeTestCase(FuzzEdTestCase):
     fixtures = fixt_unicode['files']

@@ -18,6 +18,7 @@ front_api.register(frontend.NodeResource())
 front_api.register(frontend.NodeGroupResource())
 front_api.register(frontend.NotificationResource())
 front_api.register(frontend.JobResource())
+front_api.register(frontend.ResultResource())
 back_api = Api(api_name='back')
 back_api.register(backend.JobResource())
 
