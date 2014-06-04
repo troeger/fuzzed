@@ -118,15 +118,31 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         _setupMirror: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
 
-            this.mirrors.push(new Mirror(this, this.owner.container, this.mirror));
-
+            // if our owner is a NodeGroup, give every member of the NodeGroup a mirror
             if (typeof this.owner.nodes !== 'undefined') {
                 _.each(this.owner.nodes, function(node) {
                     this.mirrors.push(new Mirror(this, node.container, this.mirror));
                 }.bind(this));
+            } else {
+                this.mirrors.push(new Mirror(this, this.owner.container, this.mirror));
             }
 
             return this;
+        },
+
+        removeMirror: function(mirror) {
+            if (!_.contains(this.mirrors, mirror)) return false;
+
+            mirror.takeDownVisualRepresentation();
+            this.mirrors = _.without(this.mirrors, mirror);
+            return true;
+        },
+
+        removeAllMirrors: function() {
+            _.each(this.mirrors, function(mirror) {
+                this.removeMirror(mirror);
+            }.bind(this));
+            return true;
         },
 
         _setupLabel: function() {
@@ -287,6 +303,14 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             }
 
             return true;
+        },
+
+        removeAllMirrors: function() {
+            this._super();
+
+            _.each(this.parts, function(part) {
+                part.removeAllMirrors();
+            });
         },
 
         _sanitize: function() {

@@ -457,7 +457,7 @@
             "name": {
                 "kind": "text",
                 "displayName": "Name",
-                "default": "Event",
+                "default": "Repeated BasicEvent",
 
                 "mirror": {
                     "position": "bottom",

@@ -24,13 +24,26 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
                     this.ownProperties = this.properties;
                     this.properties = nodegroup.properties;
                     this.nodegroup  = nodegroup;
+
+                    _.each(this.ownProperties, function(prop) {
+                        prop.removeAllMirrors();
+                    }.bind(this));
                 }
             }.bind(this));
             jQuery(document).on(Config.Events.NODEGROUP_DELETED, function (event, id, nodeIds) {
                 if (_.contains(nodeIds, this.id)) {
                    // if we were part of the deleted node group
+                    _.each(this.properties, function(prop) {
+                        prop.removeAllMirrors();
+                    });
+
                     this.properties = this.ownProperties;
                     this.nodegroup  = undefined;
+
+                    _.each(this.properties, function(prop) {
+                        prop._setupMirror();
+                        prop._triggerChange(prop.value, prop);
+                    });
                 }
             }.bind(this));
         },

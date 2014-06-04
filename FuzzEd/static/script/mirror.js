@@ -106,6 +106,10 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
             return this;
         },
 
+        takeDownVisualRepresentation: function() {
+            this.container.remove();
+        },
+
         /**
          *  Method: _setupEvents
          *      Register for changes of the associated <Property> object.
