@@ -2,22 +2,15 @@ import json
 import logging
 
 from django import http
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 from django.core.urlresolvers import reverse
-from django.views.decorators.cache import never_cache
-from django.shortcuts import get_object_or_404
 from tastypie.authentication import SessionAuthentication
 from tastypie.bundle import Bundle
 from tastypie.http import HttpApplicationError, HttpAccepted
 from tastypie import fields
 from django.core.mail import mail_managers
 
-from FuzzEd.decorators import require_ajax
-from FuzzEd.models import Node, Job, NodeGroup, Graph
-from FuzzEd.middleware import *
+from FuzzEd.models import Job, Graph
 import common
 
 

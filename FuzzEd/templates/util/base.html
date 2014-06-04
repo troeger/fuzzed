@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:svg="http://www.w3.org/2000/svg">
+<html lang="en">
 <head>
     {% block meta %}{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +12,7 @@
         @import url("{{ STATIC_URL }}css/theme/white.css");
         @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-4.0.3.min.css");
         @import url("{{ STATIC_URL }}css/slickgrid/slick.grid-2.0.2.css");
+        @import url("{{ STATIC_URL }}css/selectize/selectize.bootstrap3.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         {% endblock %}
     </style>
@@ -32,6 +33,7 @@
                 'jquery-ui':        '../lib/jquery-ui/jquery-ui-1.10.3.min',
                 'jquery-classlist': '../lib/jquery-classlist/jquery-classlist-1.0.0',
                 'jquery-ajaxq':     '../lib/jquery-ajaxq/ajaxq-1.0.0',
+                'selectize':        '../lib/selectize/js/standalone/selectize.min',
                 'jquery-cookie':     '../lib/jquery-cookie/jquery.cookie',
                 // other libs
                 'openid-selector': '../lib/openid-selector/js',
@@ -109,7 +111,13 @@
         <div class="container">
             <a class="navbar-brand" anchor="#">
                 {% if graph and project %}
-                    <a class="navbar-brand" href="{% url 'dashboard' project.pk %}"><small>{{ project.name }}</small> -</a><a class="navbar-brand" href="#">{{ graph }}</a>
+                    {% if current_user.is_staff or current_user == project.owner %}
+                        <a class="navbar-brand" href="{% url 'dashboard' project.pk %}"><small>{{ project.name }}</small> -</a>
+                    {% else %}
+                        <!-- otherwise user is only viewer of the graph (graph is shared with the current user)-->
+                        <a class="navbar-brand" href="{% url 'shared_graphs_dashboard' %}"><small>Shared Graphs</small> -</a>
+                    {% endif %}
+                    <a class="navbar-brand" href="#">{{ graph }}</a>
                 {% else %}
                     FuzzEd 
                 {% endif %}

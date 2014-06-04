@@ -33,6 +33,8 @@ from FuzzEd.models.node import Node
 from FuzzEd.models.node_group import NodeGroup
 from FuzzEd.models.notification import Notification
 
+
+
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
 
@@ -141,9 +143,13 @@ class ViewsTestCase(SimpleFixtureTestCase):
         response = self.get('/editor/999')
         self.assertEqual(response.status_code, 404)
 
-    def testGraphCopy(self):
+    def testBulkGraphCopy(self):
+        response = self.post('/projects/%u/dashboard/edit/' % self.pkProject, {'copy': 'copy', 'graph_id[]': self.graphs})
+        self.assertEqual(response.status_code, 302)
+
+    def testSingleGraphCopy(self):
         for graphid, kind in self.graphs.iteritems():
-            response = self.post('/graphs/%u/' % graphid, {'copy': 'copy'})
+            response = self.post('/projects/%u/dashboard/edit/' % self.pkProject, {'copy': 'copy', 'graph_id[]': graphid})
             self.assertEqual(response.status_code, 302)
             # The view code has no reason to return the new graph ID, so the redirect is to the dashboard
             # We therefore determine the new graph by the creation time

@@ -1,16 +1,17 @@
 import base64
+import logging
+import json
+
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import HttpResponse
 from tastypie.http import HttpBadRequest
-from tastypie.resources import ModelResource
 from tastypie import fields
-from FuzzEd.models import Job
 from django.conf.urls import url
-from django.core.files.uploadedfile import SimpleUploadedFile
-
-import logging,json
-import common
 from django.utils import http
+
+from FuzzEd.models import Job
+import common
+
 
 logger = logging.getLogger('FuzzEd')
 

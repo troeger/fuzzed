@@ -117,6 +117,16 @@
                       </td>
                   </tr>
               {% endfor %}
+              {% if user.sharings.count > 0 %}
+                  <tr onclick="document.location = '{% url 'shared_graphs_dashboard' %}';">
+                      <td><i class="fa fa-share fa-lg"></i></td>
+                      <td>
+                          <strong class="project_name"> Shared Graphs</strong>
+                      </td>
+                      <td></td>
+                      <td></td>
+                  </tr>
+              {% endif %}
           </tbody>
       </table>
   </section>
