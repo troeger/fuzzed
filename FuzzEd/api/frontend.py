@@ -15,7 +15,7 @@ from django.core.mail import mail_managers
 from tastypie.resources import ModelResource
 from tastypie.serializers import Serializer
 
-from FuzzEd.models import Job, Graph, Notification, Node, NodeGroup, Edge
+from FuzzEd.models import Job, Graph, Notification, Node, NodeGroup, Edge, Result
 import common
 
 
@@ -446,4 +446,55 @@ class GraphResource(common.GraphResource):
     def dispatch_job(self, request, **kwargs):
         job_resource = JobResource()
         return job_resource.dispatch_detail(request, graph_id=kwargs['pk'], secret=kwargs['secret'])
+
+    def dispatch_results(self, request, **kwargs):
+        result_resource = ResultResource()
+        return job_resource.dispatch_list(request, graph_id=kwargs['pk'], secret=kwargs['secret'])
+
+
+class ResultResource(ModelResource):
+    """
+        An API resource for results.
+    """
+    class Meta:
+        queryset = Result.objects.all()
+        authorization = GraphOwnerAuthorization()
+        authentication = SessionAuthentication()
+        detail_allowed_methods = ['get']
+
+    def get_list(self, request, **kwargs):
+        """
+            Called by the request dispatcher in case somebody tries to GET result resources
+            for a particular job.
+        """
+        #TODO: Get job and according list of results
+
+        # starting point in the current data set (from 0 to n-1)
+        displayStart =  request.GET['iDisplayStart']  
+        # number of records that shall be returned         
+        displayLength = request.GET['iDisplayLength'] 
+
+        recordCount = 42   #TODO: Number of results for the given job
+        response_data = {
+                            "sEcho": int(request.GET['sEcho']),
+                            "iTotalRecords": recordCount,
+                            "iTotalDisplayRecords": recordCount
+                        }    
+        # "aaData": [{    "ratio": 0.96, 
+        #                 "min": 0.96, 
+        #                 "max": 0.96, 
+        #                 "choices": {"1390471480708": {"type": "RedundancyChoice", "n": 2}}, 
+        #                 "costs": 1, 
+        #                 "peak": 0.96, 
+        #                 "id": "#0", 
+        #                 "points": [[0.96, 1.0], [0.96, 1.0]]
+        #             }, 
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    
+
+
+
+
+
 

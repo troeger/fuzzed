@@ -156,6 +156,9 @@ class GraphResource(ModelResource):
             url(r'^graphs/(?P<pk>\d+)/jobs/(?P<secret>\S+)$',
                 self.wrap_view('dispatch_job'),
                 name="job"),
+            url(r'^graphs/(?P<pk>\d+)/jobs/(?P<secret>\S+)/results/$',
+                self.wrap_view('dispatch_results'),
+                name="results"),
             url(r'^graphs/(?P<pk>\d+)/nodegroups/$',
                 self.wrap_view('dispatch_nodegroups'),
                 name="nodegroups"),
@@ -205,6 +208,10 @@ class GraphResource(ModelResource):
 
     @abstractmethod
     def dispatch_jobs(self, request, **kwargs):
+        pass
+
+    @abstractmethod
+    def dispatch_results(self, request, **kwargs):
         pass
 
     @abstractmethod
