@@ -104,7 +104,7 @@ define(['class', 'config', 'progress_indicator', 'jquery'], function(Class, Conf
                 statusCode: {
                     200: function(data) { // success
                         Progress.flashSuccessMessage(this.progressID, this.progressSuccessMessage);
-                        this.successCallback(data);
+                        this.successCallback(data, this._url);
                     }.bind(this),
 
                     202: function(data) { // not finished

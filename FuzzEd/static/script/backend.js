@@ -569,7 +569,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 data:        JSON.stringify({kind : kind}),
 
                 beforeSend: function(xhr) {
-                    Progress.showProgress(progressID, progressMessage);
+                    //Progress.showProgress(progressID, progressMessage);
                     xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken'));
                 },
                 statusCode: {
@@ -693,10 +693,8 @@ function (Class, Config, Job, Alerts, Progress) {
 
         /**
          * Method: _fullUrlForJobTasks
-         *      Calculates the AJAX backend URL for ...
-         *
-         * Returns:
-         *      The job URL as {String}.
+         *   Calculates the AJAX backend URL used by multiple Job Tasks.
+         *   Specific tasks of a Job are PDF and EPS export, as well as Topevent and Simulation analysis.
          */
         _fullUrlForJobTasks: function() {
             return this._fullUrlForGraph() + Config.Backend.JOBS_URL + '/';

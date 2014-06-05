@@ -993,7 +993,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             jQuery("#"+this.config.IDs.ACTION_EXPORT_PDF).click(function() {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_GRAPH_EXPORT_PDF,
-                    function(url) {
+                    function(data, url) {
                         this._downloadFileFromURL(url, 'pdf');
                     }.bind(this)
                 )
@@ -1013,7 +1013,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             jQuery("#"+this.config.IDs.ACTION_EXPORT_EPS).click(function() {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_GRAPH_EXPORT_EPS,
-                    function(url) {
+                    function(data, url) {
                         this._downloadFileFromURL(url, 'eps');
                     }.bind(this)
                 )
@@ -1062,7 +1062,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
         /**
          * Method: _downloadFileFromURL
-         *      Triggers a download of the given resource. At the moment, it only opens it in the current window.
+         *      Triggers a download of the given resource.
          *
          * Parameters:
          *      {String} url - The URL to the file to be downloaded.
@@ -1071,8 +1071,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *      This {<FaulttreeEditor>} instance for chaining.
          */
         _downloadFileFromURL: function(url, format) {
-            //TODO: maybe we can use more sophisticated methods here to get the file to download directly instead
-            //      of opening in the same window
+            //TODO: File is already downloaded in the _query method (job class), maybe first or second download should be prevented if possible.
             window.location = url;
 
             return this;
