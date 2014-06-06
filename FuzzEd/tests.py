@@ -559,9 +559,9 @@ class InternalTestCase(BackendDaemonTestCase):
     def test_result_parsing(self):
         for graphPk, graphResult in fixt_analysis['results'].iteritems():
             graph = Graph.objects.get(pk=graphPk)
-            job = Job(graph_modified=graph.modified, result=open('FuzzEd/fixtures/'+graphResult).read(), graph=graph)
+            job = Job(graph_modified=graph.modified, graph=graph, kind=Job.TOP_EVENT_JOB)
             job.save()
-            job.parse_result()
+            job.parse_result(open('FuzzEd/fixtures/'+graphResult).read())
             for result in job.results.exclude(kind__exact=Result.GRAPH_ISSUES):
                 print "Result"
                 print result
@@ -628,6 +628,8 @@ class MinCutFixtureTestCase(BackendDaemonTestCase):
         result = self.ajaxGet(result_url+'?sEcho=doo')   # Fetch result in datatables style
         self.assertEqual(result.status_code, 200)
         data = json.loads(result.content)
+        assert(len(data['aaData']) > 0)
+        assert('mincutResults' in data['aaData'][0])
         mincut_results = data['aaData'][0]['mincutResults']
         self.assertEqual(len(mincutResults), fixt_mincut['mincut_numcuts'])
 

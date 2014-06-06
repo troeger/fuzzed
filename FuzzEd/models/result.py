@@ -83,7 +83,6 @@ class Result(models.Model):
         Converts the result into a JSONable dictionary, which includes all relevant
         information for showing this single result.
       '''
-      assert(self.kind == self.ANALYSIS_RESULT)
       result = self.value
       if self.configuration:
           result['choices'] = self.configuration.to_dict() 

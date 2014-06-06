@@ -20,7 +20,7 @@ from FuzzEd.models import xml_backend
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice
-from xml_backend import AnalysisResult
+from xml_backend import AnalysisResult, MincutResult
 
 
 logger = logging.getLogger('FuzzEd')
@@ -61,7 +61,6 @@ class Job(models.Model):
     secret = models.CharField(max_length=64, default=gen_uuid)  # Unique secret for this job
     kind = models.CharField(max_length=127, choices=JOB_TYPES)
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    result = models.BinaryField(null=True)  # Binary result file for this job, otherwise empty
     exit_code = models.IntegerField(null=True)  # Exit code for this job, NULL if pending
 
     def input_data(self):
@@ -103,7 +102,7 @@ class Job(models.Model):
         """
         response = HttpResponse()
         response['Content-Disposition'] = 'attachment; filename=graph%u.%s' % (self.graph.pk, self.kind)
-        response.content = self.result
+        response.content = Result.objects.exclude(kind=Result.GRAPH_ISSUES).get(job=self).binary_value
         response['Content-Type'] = 'application/pdf' if self.kind == 'pdf' else 'application/postscript'
         return response
 
@@ -205,16 +204,21 @@ class Job(models.Model):
 
         return result, sort_value
 
-    def parse_result(self):
+    def parse_result(self, data):
         """
-            Parses the stored binary result data and saves the content to the database, 
+            Parses the result data and saves the content to the database, 
             in relation to this job.
         """
         if self.requires_download:
-            # no parsing needed, directly delivered to client
+            if self.kind == self.PDF_RENDERING_JOB:
+                db_result = Result(graph=self.graph, job=self, kind=Result.PDF_RESULT)
+            elif self.kind == self.EPS_RENDERING_JOB:
+                db_result = Result(graph=self.graph, job=self, kind=Result.EPS_RESULT)
+            db_result.binary_value = data
+            db_result.save()
             return
         logger.debug("Parsing backend result XML into database")
-        doc = xml_backend.CreateFromDocument(str(self.result))
+        doc = xml_backend.CreateFromDocument(str(data))
 
         if hasattr(doc, 'issue'):
             # Result-independent issues (for the whole graph, and not per configuration),
