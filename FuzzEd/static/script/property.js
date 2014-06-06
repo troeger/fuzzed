@@ -130,6 +130,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             return this;
         },
 
+        restoreMirror: function() {
+            this._setupMirror()
+                ._triggerChange(this.value, this);
+        },
+
         removeMirror: function(mirror) {
             if (!_.contains(this.mirrors, mirror)) return false;
 
@@ -303,6 +308,14 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             }
 
             return true;
+        },
+
+        restoreMirror: function() {
+            _.each(this.parts, function(part) {
+                part.restoreMirror();
+            });
+
+            this._super();
         },
 
         removeAllMirrors: function() {

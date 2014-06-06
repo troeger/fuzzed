@@ -41,8 +41,7 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
                     this.nodegroup  = undefined;
 
                     _.each(this.properties, function(prop) {
-                        prop._setupMirror();
-                        prop._triggerChange(prop.value, prop);
+                        prop.restoreMirror();
                     });
                 }
             }.bind(this));
