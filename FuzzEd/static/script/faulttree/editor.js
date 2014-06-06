@@ -288,10 +288,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *  Parameters:
          *    {string} data - Data returned from the backend containing the result of the calculation.
          */
-        _evaluateResult: function(results_url, issues) {
+        _evaluateResult: function(data, job_result_url) {
             
             data = jQuery.parseJSON(data);
-
+            /*
             if (_.size(data.errors) > 0) {
                 // errors is a dictionary with the node ID as key
                 this._displayValidationErrors(data.errors);
@@ -339,22 +339,24 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
                 }.bind(this));
                 
-                tableDefinitions["columns"] = data.columns;
+                
 
                 // remove progress bar
                 this._chartContainer.empty();
                 // only display chart if points were given
                 if (_.size(chartData) != 0) {
                     this._displayResultWithHighcharts(chartData, data['decompositionNumber']);
-                }
-               
-                this._displayResultWithDataTables(tableDefinitions);
+                }*/
+                
+                columns = data.columns;
+                                   
+                this._displayResultWithDataTables(columns, job_result_url);
                 
                 //this._setupResizing();
-            } else {
+                /*} else {
                 // close menu again if there are no results
                 this.hide();
-            }
+            }*/
         },
 
         /**
@@ -583,7 +585,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *        METHOD      
          *
          */
-        _displayResultWithDataTables: function(data) {
+        _displayResultWithDataTables: function(columns, job_result_url) {
             
             // clear container
             this._gridContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');
@@ -594,8 +596,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                             "bProcessing":   true,
                             "bFilter":       false,
                             "bServerSide":   true,
-                            "sAjaxSource":   "/front/jobs/job_status_test",
-                            "aoColumns":     data["columns"],
+                            "sAjaxSource":   job_result_url,
+                            "aoColumns":     columns,
                             "bLengthChange": false,
                             "iDisplayLength": 10,
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
