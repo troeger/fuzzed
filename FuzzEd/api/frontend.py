@@ -119,11 +119,11 @@ class JobResource(common.JobResource):
                 results_url = reverse('results', kwargs={'api_name': 'front', 'pk': job.graph.pk, 'secret': job.secret})
                 if not job.requires_download:
                     response['columns'] = [{'mData': key, 'sTitle': title} for key, title in job.result_titles() ]
-                    try:
-                        response['issues'] = Result.objects.get(job=job, kind=Result.GRAPH_ISSUES).issues                
-                    except:
-                        # no global issues recorded, that's fine                
-                        pass
+                try:
+                    response['issues'] = Result.objects.get(job=job, kind=Result.GRAPH_ISSUES).issues                
+                except:
+                    # no global issues recorded, that's fine                
+                    pass
                 return HttpResponseRedirect(results_url, json.dumps(response))
             else:
                 logger.debug("Job is done, but with non-zero exit code.")

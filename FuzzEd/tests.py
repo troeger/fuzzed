@@ -590,10 +590,12 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
         job_result_info = json.loads(job_result.content)
         assert('issues' in job_result_info)
         assert('columns' in job_result_info)
+        print "\n"+str(job_result_info)
         result_url = job_result['LOCATION']
         result = self.ajaxGet(result_url+'?sEcho=doo')  # Fetch result in datatables style
         self.assertEqual(result.status_code, 200)
         data = json.loads(result.content)
+        print "\n"+str(data)
         self.assertEqual(len(data['aaData']), fixt_analysis['prdc_configurations'])
         for conf in data['aaData']:
             assert (round(conf['peak'], 5) in fixt_analysis['prdc_peaks'])
