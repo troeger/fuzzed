@@ -30,6 +30,7 @@ from django.contrib.auth.models import User
 
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
+from FuzzEd.models.result import Result
 from FuzzEd.models.job import Job
 from FuzzEd.models.node_group import NodeGroup
 from FuzzEd.models.notification import Notification
@@ -507,7 +508,6 @@ class FrontendApiTestCase(FuzzEdTestCase):
         response = self.ajaxDelete(self.baseUrl + '/notification/%u/' % n.pk)
         self.assertEqual(response.status_code, 204)
 
-
 class AnalysisInputFilesTestCase(FuzzEdTestCase):
     """
         These are tests based on the analysis engine input files in fixture/analysis.
@@ -562,7 +562,9 @@ class InternalTestCase(BackendDaemonTestCase):
             job = Job(graph_modified=graph.modified, result=open('FuzzEd/fixtures/'+graphResult).read(), graph=graph)
             job.save()
             job.parse_result()
-
+            for result in job.results.exclude(kind__exact=Result.GRAPH_ISSUES):
+                print "Result"
+                print result
 
 class AnalysisFixtureTestCase(BackendDaemonTestCase):
     """

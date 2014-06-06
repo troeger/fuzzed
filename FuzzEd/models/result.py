@@ -55,7 +55,7 @@ class Result(models.Model):
     issues        = JSONField(blank=True, null=True)
 
     def __unicode__(self):
-        return "Result %u for graph %s and configuration %s:\n%s\nIssues:\n%s" % (
+        return "Result %u for graph %s and configuration %s:\n    %s\n    Issues: %s" % (
                   self.pk,
                   self.graph.pk, 
                   self.configuration.pk if self.configuration else "(None)", 
@@ -76,4 +76,16 @@ class Result(models.Model):
         elif self.kind == Result.EPS_RESULT:
             kind = 'eps'
         return reverse('frontend_graph_download', args=[self.graph.pk]) + "?format="+kind
+
+    def to_dict(self):
+      '''
+        Converts the result into a JSONable dictionary, which includes all relevant
+        information for showing the results.
+      '''
+      result = self.value
+      result['choices'] = self.configuration.to_dict()
+      result['id'] = self.configuration.pk
+      result['costs'] = self.configuration.costs 
+      result['issues'] = self.issues
+      return result
 

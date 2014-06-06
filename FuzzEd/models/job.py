@@ -42,8 +42,6 @@ class Job(models.Model):
     class Meta:
         app_label = 'FuzzEd'
 
-    # These strings must be lowercase, since they travel through PostgreSQL notification,
-    # which makes everything lower case
     MINCUT_JOB = 'mincut'
     TOP_EVENT_JOB = 'topevent'
     SIMULATION_JOB = 'simulation'
@@ -73,6 +71,23 @@ class Job(models.Model):
         elif self.kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB):
             return self.graph.to_tikz(), 'application/text'
         assert (False)
+
+    def result_layout(self):
+        '''
+            Describes the layout of the job result(s) as dictionary. The main reason
+            for this function is to give the caller a clue about how to interpret
+            the JSON result data that comes from the Result objects.
+
+            TODO: Instead of doing this statically here, we could also store the layout
+            as part of the Result objects, which would make the whole thing less static.
+        '''
+        if self.kind == Job.TOP_EVENT_JOB:
+            
+        elif self.kind == Job.SIMULATION_JOB:
+
+        else:
+            return {}
+
 
     def done(self):
         return self.exit_code is not None
@@ -259,7 +274,7 @@ class Job(models.Model):
                 if result.issue:
                     db_result.issues = json.dumps(self.interpret_issues(result.issue))
                 db_result.save()
-                logger.debug(db_result)
+                #logger.debug(db_result)
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
