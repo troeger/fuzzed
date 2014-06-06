@@ -124,7 +124,9 @@ class JobResource(common.JobResource):
                 except:
                     # no global issues recorded, that's fine                
                     pass
-                return HttpResponseRedirect(results_url, json.dumps(response))
+                response = HttpResponse(json.dumps(response))
+                response["Location"] = results_url
+                return response
             else:
                 logger.debug("Job is done, but with non-zero exit code.")
                 mail_managers('Analysis of job %s ended with non-zero exit code.' % job.pk, job.graph.to_xml())

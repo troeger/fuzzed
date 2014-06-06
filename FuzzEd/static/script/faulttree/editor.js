@@ -288,7 +288,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *  Parameters:
          *    {string} data - Data returned from the backend containing the result of the calculation.
          */
-        _evaluateResult: function(data) {
+        _evaluateResult: function(results_url, issues) {
+            
             data = jQuery.parseJSON(data);
 
             if (_.size(data.errors) > 0) {
@@ -976,8 +977,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             jQuery("#"+this.config.IDs.ACTION_EXPORT_PDF).click(function() {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_GRAPH_EXPORT_PDF,
-                    function(url) {
-                        this._downloadFileFromURL(url, 'pdf');
+                    function(issues, job_result_url) {
+                        this._downloadFileFromURL(job_result_url, 'pdf');
                     }.bind(this)
                 )
             }.bind(this));
@@ -996,8 +997,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             jQuery("#"+this.config.IDs.ACTION_EXPORT_EPS).click(function() {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_GRAPH_EXPORT_EPS,
-                    function(url) {
-                        this._downloadFileFromURL(url, 'eps');
+                    function(issues, job_result_url) {
+                        this._downloadFileFromURL(job_result_url, 'eps');
                     }.bind(this)
                 )
             }.bind(this));
