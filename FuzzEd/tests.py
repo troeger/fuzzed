@@ -140,7 +140,7 @@ class FuzzEdTestCase(LiveServerTestCase):
         self.assertEqual(response.status_code, 302)
         assert ('Location' in response)
         resultUrl = response['Location']
-        return resultUrl
+        return response
 
 class ViewsTestCase(FuzzEdTestCase):
     """ 
@@ -574,16 +574,24 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testRateFaulttree(self):
-        resultUrl = self.requestJob(self.baseUrl, fixt_analysis['rate_faulttree'], 'topevent')
-        result = self.ajaxGet(resultUrl+'?sEcho=doo')   # Fetch result in datatables style
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['rate_faulttree'], 'topevent')
+        job_result_info = json.loads(job_result.content)
+        assert('issues' in job_result_info)
+        assert('columns' in job_result_info)
+        result_url = job_result['LOCATION']
+        result = self.ajaxGet(result_url+'?sEcho=doo')   # Fetch result in datatables style
         self.assertEqual(result.status_code, 200)
         data = json.loads(result.content)
         self.assertEqual(data['aaData'][0]['peak'], 1.0)
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testPRDCFuzztree(self):
-        resultUrl = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
-        result = self.ajaxGet(resultUrl+'?sEcho=doo')  # Fetch result in datatables style
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
+        job_result_info = json.loads(job_result.content)
+        assert('issues' in job_result_info)
+        assert('columns' in job_result_info)
+        result_url = job_result['LOCATION']
+        result = self.ajaxGet(result_url+'?sEcho=doo')  # Fetch result in datatables style
         self.assertEqual(result.status_code, 200)
         data = json.loads(result.content)
         self.assertEqual(len(data['aaData']), fixt_analysis['prdc_configurations'])
@@ -592,16 +600,19 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
 
     def testFrontendAPIPdfExport(self):
         for graphPk, graphType in fixt_analysis['graphs'].iteritems():
-            pdfUrl = self.requestJob(self.baseUrl, graphPk, 'pdf')
-            pdf = self.get(pdfUrl)
+            job_result = self.requestJob(self.baseUrl, graphPk, 'pdf')
+            pdf_url = job_result['LOCATION']
+            pdf = self.get(pdf_url)
             self.assertEqual('application/pdf', pdf['CONTENT-TYPE'])
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testFrontendAPIEpsExport(self):
         for graphPk, graphType in fixt_analysis['graphs'].iteritems():
-            epsUrl = self.requestJob(self.baseUrl, graphPk, 'eps')
-            eps = self.get(epsUrl)
+            job_result = self.requestJob(self.baseUrl, graphPk, 'eps')
+            eps_url = job_result['LOCATION']
+            eps = self.get(eps_url)
             self.assertEqual('application/postscript', eps['CONTENT-TYPE'])
+
 
 
 class MinCutFixtureTestCase(BackendDaemonTestCase):
@@ -612,8 +623,9 @@ class MinCutFixtureTestCase(BackendDaemonTestCase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testMincutFaulttree(self):
-        resultUrl = self.requestJob(self.baseUrl, fixt_mincut['mincut_faulttree'], 'mincut')
-        result = self.ajaxGet(resultUrl+'?sEcho=doo')   # Fetch result in datatables style
+        job_result = self.requestJob(self.baseUrl, fixt_mincut['mincut_faulttree'], 'mincut')
+        result_url = job_result['LOCATION']
+        result = self.ajaxGet(result_url+'?sEcho=doo')   # Fetch result in datatables style
         self.assertEqual(result.status_code, 200)
         data = json.loads(result.content)
         mincut_results = data['aaData'][0]['mincutResults']

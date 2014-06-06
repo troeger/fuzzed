@@ -72,23 +72,6 @@ class Job(models.Model):
             return self.graph.to_tikz(), 'application/text'
         assert (False)
 
-    def result_layout(self):
-        '''
-            Describes the layout of the job result(s) as dictionary. The main reason
-            for this function is to give the caller a clue about how to interpret
-            the JSON result data that comes from the Result objects.
-
-            TODO: Instead of doing this statically here, we could also store the layout
-            as part of the Result objects, which would make the whole thing less static.
-        '''
-        if self.kind == Job.TOP_EVENT_JOB:
-            
-        elif self.kind == Job.SIMULATION_JOB:
-
-        else:
-            return {}
-
-
     def done(self):
         return self.exit_code is not None
 
@@ -99,6 +82,20 @@ class Job(models.Model):
             as file, or if it must be preprocessed with self.result_rendering().
         """
         return self.kind in [Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB]
+
+    def result_titles(self):
+        ''' If the result is not binary, than it is JSON. This function returns
+            the human-readable sorted names of the result keys, so that the frontend
+            makes no decision about what to show and how.
+        '''
+        assert(not self.requires_download)
+        if self.kind == self.TOP_EVENT_JOB:
+            return  (('id','Config'),('min','Min'),    ('peak','Peak'),
+                     ('max','Max'),  ('costs','Costs'),('ratio','Risk'))            
+        elif self.kind == self.SIMULATION_JOB:
+            return  (('id','Config'),)      
+        elif self.kind == self.MINCUT_JOB:
+            return  (('id','Config'),)      
 
     def result_download(self):
         """

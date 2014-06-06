@@ -44,7 +44,7 @@ class Result(models.Model):
                      (ANALYSIS_RESULT, 'topevent'),
                      (PDF_RESULT, 'pdf'),
                      (EPS_RESULT, 'eps')]
-    
+
     graph         = models.ForeignKey(Graph, related_name='results')
     job           = models.ForeignKey('Job', related_name='results')
     configuration = models.ForeignKey('Configuration', related_name='results', null=True, blank=True)
@@ -63,6 +63,7 @@ class Result(models.Model):
                   str(self.issues) if self.issues else "(None)",                  
                 )
 
+    @property
     def is_binary(self):
         ''' Indicates if the result should be delivered directly to the frontend
             as file, or if it must be preprocessed with self.to_json().'''
@@ -80,12 +81,15 @@ class Result(models.Model):
     def to_dict(self):
       '''
         Converts the result into a JSONable dictionary, which includes all relevant
-        information for showing the results.
+        information for showing this single result.
       '''
+      assert(self.kind == self.ANALYSIS_RESULT)
       result = self.value
-      result['choices'] = self.configuration.to_dict()
-      result['id'] = self.configuration.pk
-      result['costs'] = self.configuration.costs 
-      result['issues'] = self.issues
+      if self.configuration:
+          result['choices'] = self.configuration.to_dict() 
+          result['id'] = self.configuration.pk
+          result['costs'] = self.configuration.costs 
+      if self.issues:
+          result['issues'] = self.issues
       return result
 

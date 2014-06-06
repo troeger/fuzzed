@@ -116,18 +116,15 @@ class JobResource(common.JobResource):
             if job.exit_code == 0:
                 response = {}
                 # We deliver the columns layout for the result tables + all global issues
-                response['url'] = reverse('results', kwargs={'api_name': 'front', 'pk': job.graph.pk, 'secret': job.secret})
-                response['columns'] = [ { 'mData': 'id',     'sTitle': 'Config' },
-                                        { 'mData': 'min',    'sTitle': 'Min'    },
-                                        { 'mData': 'peak',   'sTitle': 'Peak'   },
-                                        { 'mData': 'max',    'sTitle': 'Max'    },
-                                        { 'mData': 'costs',  'sTitle': 'Costs'  },
-                                        { 'mData': 'ratio',  'sTitle': 'Risk'   }]
-                try:
-                    response['issues'] = Result.objects.get(job=job, kind=Result.GRAPH_ISSUES)                
-                except:
-                    # no global issues recorded, that's fine                
-                    pass
+                results_url = reverse('results', kwargs={'api_name': 'front', 'pk': job.graph.pk, 'secret': job.secret})
+                if not job.requires_download:
+                    response['columns'] = [{'mData': key, 'sTitle': title} for key, title in job.result_titles() ]
+                    try:
+                        response['issues'] = Result.objects.get(job=job, kind=Result.GRAPH_ISSUES).issues                
+                    except:
+                        # no global issues recorded, that's fine                
+                        pass
+                return HttpResponseRedirect(results_url, json.dumps(response))
             else:
                 logger.debug("Job is done, but with non-zero exit code.")
                 mail_managers('Analysis of job %s ended with non-zero exit code.' % job.pk, job.graph.to_xml())
