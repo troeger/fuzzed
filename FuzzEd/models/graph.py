@@ -321,10 +321,7 @@ class Graph(models.Model):
         """
             Deletes all informations about configurations of this graph.
         """
-        for conf in self.configurations.all():
-            nodeconf = NodeConfiguration.objects.filter(configuration=conf)
-            nodeconf.delete()
-            conf.delete()
+        self.configurations.all().delete()
 
     def same_as(self, graph):
         ''' 
