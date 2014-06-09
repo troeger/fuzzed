@@ -1,24 +1,27 @@
 define(['class', 'config', 'property', 'jquery', 'jsplumb'],
 function(Class, Config, Property) {
     /**
-     *  Class: {Abstract} Edge
-     *
-     *  This class models a generic connection of two nodes, further specified in the respective notations file.
+     * Package: Base
+     */
+
+    /**
+     * Class: {Abstract} Edge
+     *      This class models a generic connection of two nodes, further specified in the respective notations file.
      *
      */
     return Class.extend({
         /**
-         *  Group: Members
+         * Group: Members
          *
-         *  Properties:
-         *    {int}            id              - A client-side generated id to uniquely identify the edge in the
-         *                                       frontend. It does NOT correlate with database ids in the backend.
-         *                                       Introduced to save round-trips and to later allow for an offline mode.
-         *    {<Node>}         source          - The source Node instance
-         *    {<Node>}         target          - The target Node instance
-         *    {Object}         properties      - A dictionary of the edge's properties
-         *    {<Graph>}        graph           - The Graph this edge belongs to.
-         *    {DOMElement}     jsPlumbEdge     - The responsible jsPlumbEdge connecting source and target
+         * Properties:
+         *      {int}        id              - A client-side generated id to uniquely identify the edge in the frontend.
+         *                                     It does NOT correlate with database ids in the backend. Introduced to
+         *                                     save round-trips and to later allow for an offline mode.
+         *      {<Node>}     source          - The source Node instance
+         *      {<Node>}     target          - The target Node instance
+         *      {Object}     properties      - A dictionary of the edge's properties
+         *      {<Graph>}    graph           - The Graph this edge belongs to.
+         *      {DOMElement} jsPlumbEdge     - The responsible jsPlumbEdge connecting source and target
          *
          */
         id:         undefined,
@@ -38,8 +41,9 @@ function(Class, Config, Property) {
          *      connection by drag and drop. In either case, _initFromJsPlumbEdge is called afterwards.
          *
          * Parameters:
-         *   {Object}       definition         - An object containing default values for the node's definition.
-         *   [...]
+         *      {Object} definition - An object containing default values for the node's definition.
+         *      [...]
+         *      {Object} properties - A key-value declaration of the edge's properties. See also the notation files.
          *
          */
         init: function(definition, sourceOrJsPlumbEdge, targetOrProperties, properties) {
@@ -65,6 +69,7 @@ function(Class, Config, Property) {
          *      target with jsPlumb's API and prevents the jsPlumbConnection-Event to circumvent another call of an
          *      Edge constructor by the <Editor>.
          *
+         * Parameters:
          *      {<Node>} source             - source Node instance
          *      {<Node>} target             - target Node instance
          *      {Object} properties         - properties to be used
@@ -87,8 +92,9 @@ function(Class, Config, Property) {
          *      Acts as a follow up for the constructor in either case. Stores the jsPlumbEdge as a member and
          *      serializes properties. Gives the Edge a unique frontend id, if it doesn't have one already. Calls home.
          *
-         *      {DOMElement} jsPlumbEdge    - jsPlumbEdge to be stored
-         *      {Object} properties         - properties to be used
+         * Parameters:
+         *      {DOMElement} jsPlumbEdge - jsPlumbEdge to be stored
+         *      {Object}     properties  - properties to be used
          */
         _initFromJsPlumbEdge: function(jsPlumbEdge, properties) {
             this.jsPlumbEdge = jsPlumbEdge;
@@ -124,7 +130,10 @@ function(Class, Config, Property) {
          *      Converts the informal properties stored in <properties> into Property objects ordered by this graph's
          *      propertiesDisplayOrder (see <Graph::getNotation()> or the respective notations json-file).
          *
-         *      ! Exact code duplication in <Node::_setupProperties()>  and <Edge::_setupPropertes()>
+         *      Note: Exact duplication of the code in <Node::_setupProperties()>
+         *
+         * Parameters:
+         *      {Array[str]} propertiesDisplayOrder - The order in which to create the properties.
          *
          * Returns:
          *      This {<NodeGroup>} instance for chaining.
@@ -149,10 +158,10 @@ function(Class, Config, Property) {
 
         /**
          * Method: select
-         *   Marks the edge as selected by adding the corresponding CSS class.
+         *      Marks the edge as selected by adding the corresponding CSS class.
          *
          * Returns:
-         *   This {<Edge>} instance for chaining.
+         *      This {<Edge>} instance for chaining.
          */
         select: function() {
             jQuery(this.jsPlumbEdge.canvas).addClass(Config.Classes.SELECTED);
@@ -165,7 +174,7 @@ function(Class, Config, Property) {
          *      Removes the whole visual representation from the canvas, restores child properties and calls home.
          *
          * Returns:
-         *   {boolean} Successful deletion.
+         *      {boolean} Successful deletion.
          */
         remove: function() {
             if (!this.deletable) return false;
@@ -188,9 +197,10 @@ function(Class, Config, Property) {
 
         /**
          * Method: toDict
+         *      Serializes the edge to a key-value representation.
          *
          * Returns:
-         *   A dict representation of the edge avoiding any circular structures.
+         *      An {Object} representation of the edge avoiding any circular structures.
          */
         toDict: function() {
             var properties = _.map(this.properties, function(prop) { return prop.toDict() });
@@ -199,10 +209,8 @@ function(Class, Config, Property) {
                 id:           this.id,
                 sourceNodeId: this.source.id,
                 targetNodeId: this.target.id,
-                properties:   _.reduce(properties, function(memo, prop) {
-                                    return _.extend(memo, prop);
-                              })
-            }
+                properties:   _.reduce(properties, function(memo, prop) { return _.extend(memo, prop);}, {})
+            };
         }
     });
 });

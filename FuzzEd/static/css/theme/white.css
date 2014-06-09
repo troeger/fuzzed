@@ -4647,6 +4647,16 @@ i.icon-layout-tree:hover {
 .table tbody form {
   margin: 0;
 }
+/**
+ *  File: dashboard.less
+ *      This file contains all styles that apply ton the dashboard.
+ */
+#dashboard_toolbar {
+  display: none;
+}
+.toolbar_wrap_div {
+  height: 30px;
+}
 .navbar-fixed-top {
   border-bottom: 1px solid #a6a6a6;
   -webkit-box-shadow: 0px 1px 3px #a6a6a6;

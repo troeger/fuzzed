@@ -86,8 +86,15 @@ class GraphAuthorization(Authorization):
 
     def read_detail(self, object_list, bundle):
         ''' User is only allowed to get the graph if he owns it.'''
-        return bundle.obj.owner == bundle.request.user
-
+        
+        if bundle.obj.owner == bundle.request.user:
+            return True
+        elif bundle.obj.sharings.filter(user = bundle.request.user):
+            bundle.obj.read_only = True
+            return True
+        else:
+            return False
+                    
     def create_list(self, object_list, bundle):
         # Assuming they're auto-assigned to ``user``.
         return object_list
