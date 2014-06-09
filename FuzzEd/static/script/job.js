@@ -106,12 +106,11 @@ define(['class', 'config', 'progress_indicator', 'jquery'], function(Class, Conf
                         Progress.flashSuccessMessage(this.progressID, this.progressSuccessMessage);
                         
                         job_result_url = req.getResponseHeader('location');
-                        issues = data;
                         
                         alert(job_result_url);
-                        alert(issues);
+                        alert(data);
                         
-                        this.successCallback(issues, job_result_url);
+                        this.successCallback(data, job_result_url);
 
                     }.bind(this),
 

@@ -500,7 +500,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 beforeSend:  function(xhr) { xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken')); },
                 statusCode:  {
                     201: function(data, status, req) {
-                        success ? success(req.getResponseHeader('location')) : jQuery.noop();
+                        success ? success(new Job(req.getResponseHeader('location'))) : jQuery.noop();
                     }
                 },
                 complete: complete || jQuery.noop,
@@ -530,7 +530,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 beforeSend:  function(xhr) { xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken')); },
                 statusCode:  {
                     201: function(data, status, req) {
-                        success ? success(req.getResponseHeader('location')) : jQuery.noop();
+                        success ? success(new Job(req.getResponseHeader('location'))) : jQuery.noop();
                     }
                 },
                 complete: complete || jQuery.noop,
