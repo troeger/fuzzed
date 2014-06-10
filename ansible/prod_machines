@@ -1,0 +1,9 @@
+[webservers]
+www.fuzzed.org
+
+[dbservers]
+www.fuzzed.org
+
+[backendservers]
+141.89.226.251
+

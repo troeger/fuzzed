@@ -1,0 +1,9 @@
+- name: Ensure PyXB is installed
+  pip: name=pyxb state=latest
+
+- name: Install XML support libraries for PyXB
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - libxerces-c-dev
+    - xsdcxx
+  when: ansible_os_family == "Debian"

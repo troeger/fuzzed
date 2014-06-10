@@ -1,0 +1,6 @@
+[webservers]
+localhost ansible_connection="local"
+
+[backendservers]
+localhost ansible_connection="local"
+

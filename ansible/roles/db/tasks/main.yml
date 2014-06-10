@@ -1,0 +1,22 @@
+---
+- name: Update APT cache
+  apt: update_cache=yes cache_valid_time=3600
+  when: ansible_os_family == "Debian"  
+- name: Install PostgreSQL Python client library
+  apt: pkg=python-psycopg2 state=latest
+  when: ansible_os_family == "Debian"
+- name: Install PostgreSQL 
+  apt: pkg=postgresql state=latest
+  when: ansible_os_family == "Debian"
+
+#- name: Install PostgreSQL Python client library
+#  homebrew: pkg=psycopg2 state=latest
+#  when: ansible_os_family == "Darwin"
+#- name: Install PostgreSQL 
+#  homebrew: pkg=postgres state=latest
+#  when: ansible_os_family == "Darwin"
+
+- name: Install PostgreSQL user
+  postgresql_user: name=fuzztrees password=fuzztrees role_attr_flags=NOSUPERUSER
+- name: Install PostgreSQL database
+  postgresql_db: name=fuzztrees owner=fuzztrees

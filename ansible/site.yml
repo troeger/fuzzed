@@ -1,0 +1,25 @@
+---
+- name: Configure and deploy the webservers
+  hosts: webservers
+  user: root
+
+  roles:
+    - common
+    - web
+
+- name: Configure and deploy the databases 
+  hosts: dbservers
+  user: root
+
+  roles:
+    - common
+    - db
+
+- name: Configure and deploy the backend servers
+  hosts: backendservers
+  user: root
+
+  roles:
+    - common
+    - backend
+

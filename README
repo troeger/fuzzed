@@ -1,19 +1,18 @@
 FuzzEd
 ======
 
-Installation of development machine
+Preparation of development machine
 ===================================
 
-The recommend development mode is with Vagrant. The Vagrantfile installs all relevant development libraries in the virtual machine.
+The recommend development mode is with Vagrant. The Vagrantfile installs all relevant stuff in the virtual machine. Inside the Vagrant VM, you can find all sources at /home/fuzztrees. Just install Vagrant and run:
 
-Inside the Vagrant VM, you can find all sources at /home/fuzztrees. Try "fab -l" then.
+vagrant up
 
-If you prefer to develop on your native machine, it needs:
-- sudo, gcc, 
-- Python 2.7 + header files
-- pip, Fabric (from PyPI) 
+If you prefer to develop on your native machine without any virtualization, it needs Python, PIP and Ansible. Then run:
 
-Based on this, you can "fab bootstrap.dev" install all additional dependencies. This is the script as used by the Vagrantfile.
+ansible-playbook -i ansible/dev_machine ansible/site.yml
+
+Add a "-s" option if you have a password-less 'sudo' available instead of working in your root account. Our Ansible code is prepared for Linux and Mac OS X development machines.
 
 Developing for FuzzEd
 =====================
@@ -53,11 +52,11 @@ Acknowledgements
 ================
 People who contributed to this project so far:
 
-Markus Götz    (core architecture, frontend)
-Frank Schlegel (core architecture, frontend)
-Stefan Richter (frontend)
-Franz Becker   (analysis)
-Lena Herscheid (analysis, simulation)
-Felix Kubicek  (frontend)
-Christian Kieschnick (frontend)
+Franz Becker      (analysis)
+Markus Götz       (core architecture, frontend)
+Lena Herscheid    (analysis, simulation)
+Felix Kubicek     (frontend)
+Stefan Richter    (frontend)
+Frank Schlegel    (core architecture, frontend)
+Christian Werling (frontend)
 
