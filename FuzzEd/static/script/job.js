@@ -107,9 +107,6 @@ define(['class', 'config', 'progress_indicator', 'jquery'], function(Class, Conf
                         
                         job_result_url = req.getResponseHeader('location');
                         
-                        alert(job_result_url);
-                        alert(data);
-                        
                         this.successCallback(data, job_result_url);
 
                     }.bind(this),
