@@ -2,7 +2,7 @@
   apt: pkg=git state=latest
   when: ansible_os_family == "Debian"
 - name: Get PyXB from GitHub (PyPI version is broken)
-  git: repo=https://github.com/pabigot/pyxb.git dest=/tmp/pyxb version=PyXB-1.2.3
+  git: repo=https://github.com/pabigot/pyxb.git dest=/tmp/pyxb version=PyXB-1.2.3 update=no
 - name: Install PyXB from GitHub sources
   sudo: yes
   shell: chdir=/tmp/pyxb creates=/usr/local/bin/pyxbgen python setup.py install

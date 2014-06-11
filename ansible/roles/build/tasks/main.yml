@@ -1,44 +1,17 @@
 ---
-
 - name: Ensure Fabric is installed
   sudo: yes
   pip: name=fabric state=latest
-- name: Ensure GCC is installed
-  apt: name=gcc state=latest
-  when: ansible_os_family == "Debian"
-- name: Ensure Boost libraries are installed
-  apt: name={{ item }} state=latest
-  with_items:
-    - libboost-dev
-    - libboost-graph-dev
-    - libboost-date-time-dev
-    - libboost-system-dev
-    - libboost-filesystem-dev
-    - libboost-program-options-dev
-  when: ansible_os_family == "Debian"
-- name: Ensure CMake is installed
-  apt: name=cmake state=present
-  when: ansible_os_family == "Debian"
-- name: Ensure C++ XML support is installed
-  apt: name={{ item }} state=present
-  with_items:
-    - libxerces-c-dev
-    - xsdcxx
+
+- name: Ensure SCONS is installed
+  sudo: yes
+  apt: pkg=scons state=present
   when: ansible_os_family == "Debian"
 
-- name: Ensure GCC is installed
-  homebrew: name=gcc state=latest
+- name: Ensure SCONS is installed
+  homebrew: pkg=scons state=present
   when: ansible_os_family == "Darwin"
-- name: Ensure Boost libraries are installed
-  homebrew: name={{ item }} state=latest
-  with_items:
-    - libboost-dev
-    - libboost-graph-dev
-    - libboost-date-time-dev
-    - libboost-system-dev
-    - libboost-filesystem-dev
-    - libboost-program-options-dev
-  when: ansible_os_family == "Darwin"
-- name: Ensure CMake is installed
-  homebrew: name=cmake state=present
-  when: ansible_os_family == "Darwin"
+
+- include: gcc.yml
+- include: lessc.yml
+- include: xml.yml
