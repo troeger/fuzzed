@@ -7,7 +7,6 @@ backends/backend_simulation.log
 .DS_Store
 .vagrant
 .idea
-build/
 FuzzEd/models/xml_analysis.py
 FuzzEd/models/xml_simulation.py
 FuzzEd/models/xml_faulttree.py

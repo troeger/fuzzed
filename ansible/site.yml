@@ -1,5 +1,5 @@
 ---
-- name: Configure and deploy the webservers
+- name: Configure production web servers
   hosts: webservers
   user: root
 
@@ -7,7 +7,7 @@
     - common
     - web
 
-- name: Configure and deploy the databases 
+- name: Configure production database servers 
   hosts: dbservers
   user: root
 
@@ -15,7 +15,7 @@
     - common
     - db
 
-- name: Configure and deploy the backend servers
+- name: Configure production backend servers
   hosts: backendservers
   user: root
 
@@ -23,3 +23,13 @@
     - common
     - backend
 
+- name: Configure developer machine
+  hosts: devmachine
+  user: root
+
+  roles:
+    - common
+    - build
+    - web
+    - db
+    - backend

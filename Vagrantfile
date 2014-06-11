@@ -8,9 +8,7 @@ Vagrant::Config.run do |config|
         ansible.sudo = true
 #       ansible.verbose = "vvvv"
         ansible.groups = {
-                           "webservers" => ["default"],
-                           "dbservers" => ["default"],
-                           "backendservers" => ["default"]
+                           "devmachine" => ["default"]
         }        
     end
 end
