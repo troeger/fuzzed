@@ -1,7 +1,4 @@
 ---
-- name: Update APT cache
-  apt: update_cache=yes cache_valid_time=3600
-  when: ansible_os_family == "Debian"
 - name: Ensure apache and modules are at the latest version
   apt: pkg={{ item }} state=latest
   with_items:

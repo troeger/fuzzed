@@ -8,5 +8,6 @@
 - name: Check if LaTex was manually installed 
   stat: path=/usr/texbin/dvips
   register: tex
-- fail: msg="DVIPS is not available. Please install a Tex distribution."
+- name: Check for DVIPS
+  fail: msg="DVIPS is not available. Please install a Tex distribution."
   when: tex.stat.isfile is defined and tex.stat.isfile == true
