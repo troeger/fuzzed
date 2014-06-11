@@ -296,17 +296,20 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
         _evaluateResult: function(data, job_result_url) {
             
-            data = jQuery.parseJSON(data);
-            /*
-            if (_.size(data.errors) > 0) {
-                // errors is a dictionary with the node ID as key
-                this._displayValidationErrors(data.errors);
+            data   = jQuery.parseJSON(data);
+            issues = data.issues
+            
+            
+            
+            if (_.size(issues.errors) > 0) {
+                // errors is array of error objects (message -> error message string, elementId -> related node id)
+                this._displayValidationErrors(issues.errors);
             }
 
-            if (_.size(data.warnings) > 0) {
-                // warnings is a dictionary with the node ID as key
-                this._displayValidationWarnings(data.warnings);
-            }*/
+            if (_.size(issues.warnings) > 0) {
+                // warnings is array of warning objects (message -> error message string, elementId -> related node id)
+                this._displayValidationWarnings(issues.warnings);
+            }
 
             //if (_.size(data.configurations) > 0) {
                 var chartData = {};
@@ -758,7 +761,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *      Display all errors that are thrown during graph validation.
          *
          * Parameters:
-         *      {Object} errors - A mapping of error messages.
+         *      {Object} errors - An array of error objects.
          *
          * Returns:
          *      This {<AnalysisResultMenu>} for chaining.
@@ -766,11 +769,11 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         _displayValidationErrors: function(errors) {
             //TODO: This is a temporary solution. Errors should be displayed per node later.
             if (_.size(errors) == 1) {
-                Alerts.showErrorAlert('Analysis error: ', errors[0]);
+                Alerts.showErrorAlert('Analysis error: ', errors[0].message);
             } else {
                 var errorList = '<ul>';
                 _.each(errors, function(error) {
-                    errorList += '<li>' + error + '</li>';
+                    errorList += '<li>' + error.message + '</li>';
                 });
                 errorList += '</ul>';
                 Alerts.showErrorAlert('Analysis errors: ', errorList);
@@ -784,7 +787,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *      Display all warnings that are thrown during graph validation.
          *
          * Parameters:
-         *      {Object} warnings - A dictionary of warning messages.
+         *      {Object} warnings - An array of warning objects.
          *
          * Returns:
          *      This {<AnalysisResultMenu>} for chaining.
@@ -792,11 +795,11 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         _displayValidationWarnings: function(warnings) {
             //TODO: This is a temporary solution. Warnings should be displayed per node later.
             if (_.size(warnings) == 1) {
-                Alerts.showWarningAlert('Warning:', warnings[0]);
+                Alerts.showWarningAlert('Warning:', warnings[0].message);
             } else {
                 var warningList = '<ul>';
                 _.each(warnings, function(warning) {
-                    warningList += '<li>' + warning + '</li>';
+                    warningList += '<li>' + warning.message + '</li>';
                 });
                 warningList += '</ul>';
                 Alerts.showWarningAlert('Multiple warnings returned from analysis:', warningList);
