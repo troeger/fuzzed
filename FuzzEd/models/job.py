@@ -83,32 +83,15 @@ class Job(models.Model):
         return self.kind in [Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB]
 
     def result_titles(self):
-        ''' If the result is not binary, than it is JSON. This function returns
-            the human-readable sorted names of the result keys, so that the frontend
-            makes no decision about what to show and how.
+        ''' 
+            The result class knows how the titles should look like.
         '''
-        assert(not self.requires_download)
         if self.kind == self.TOP_EVENT_JOB:
-            return  (('id','Config'),('min','Min'),    ('peak','Peak'),
-                     ('max','Max'),  ('costs','Costs'),('ratio','Risk'))            
+            return Result.titles(Result.ANALYSIS_RESULT)
         elif self.kind == self.SIMULATION_JOB:
-            return  (('id','Config'),)      
+            return Result.titles(Result.SIMULATION_RESULT)
         elif self.kind == self.MINCUT_JOB:
-            return  (('id','Config'),)      
-
-    def result_titles_field(self, index):
-        ''' The client expresses a wish to order result data by communicating a column ID. 
-
-        '''
-        assert(not self.requires_download)
-        if self.kind == self.TOP_EVENT_JOB:
-            return  (('id','Config'),('min','Min'),    ('peak','Peak'),
-                     ('max','Max'),  ('costs','Costs'),('ratio','Risk'))            
-        elif self.kind == self.SIMULATION_JOB:
-            return  (('id','Config'),)      
-        elif self.kind == self.MINCUT_JOB:
-            return  (('id','Config'),)      
-
+            return Result.titles(Result.MINCUT_RESULT)
 
     def result_download(self):
         """

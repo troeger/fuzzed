@@ -137,7 +137,7 @@ class FuzzEdTestCase(LiveServerTestCase):
         while (code == 202):
             response = self.ajaxGet(jobUrl)
             code = response.status_code
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         assert ('Location' in response)
         resultUrl = response['Location']
         return response

@@ -85,12 +85,32 @@ class Result(models.Model):
             kind = 'eps'
         return reverse('frontend_graph_download', args=[self.graph.pk]) + "?format="+kind
 
+    @classmethod
+    def titles(self, kind):
+        ''' If the result is not binary, than it is JSON. This function returns
+            the human-readable sorted names of data columns that can be shown directly,
+            without further interpretation by the JS code. Therefore, some data returned
+            by self.to_dict() is not included here.
+        '''
+        if kind == self.ANALYSIS_RESULT:
+            return  (('id','Config'),('minimum','Min'),    ('peak','Peak'),
+                     ('maximum','Max'),  ('costs','Costs'),('ratio','Risk'))            
+        elif kind == self.SIMULATION_RESULT:
+            return  (('id','Config'), ('reliability','Reliability'), ('mttf','MTTF'),
+                      ('rounds', 'Rounds'), ('failures', 'Failures'))      
+        elif kind == self.MINCUT_RESULT:
+            return  (('id','Config'),)      
+
     def to_dict(self):
       '''
-        Converts the result into a JSONable dictionary, which includes all relevant
-        information for showing this single result.
+        Converts the result into a JSONable dictionary, which includes all information
+        stored in this result object, plus data from the linked graph configuration.
       '''
-      result = self.value
+      result = {}
+      for field in ['minimum', 'maximum', 'peak', 'reliability', 'mttf', 'rounds', 'failures', 'ratio']:
+        value = getattr(self, field)
+        if value != None:
+          result[field] = value
       if self.configuration:
           result['choices'] = self.configuration.to_dict() 
           result['id'] = self.configuration.pk

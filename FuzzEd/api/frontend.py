@@ -498,7 +498,9 @@ class ResultResource(ModelResource):
                 sort_fields.append(job.result_titles[sort_col][0])
             except:
                 pass
-        results = job.results.all().exclude(kind=Result.GRAPH_ISSUES).order_by(sort_fields)
+        results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
+        if len(sort_fields) > 0:
+            results = results.order_by(sort_fields)
         all_count = results.count()
         results = results[start:start+length]
 
