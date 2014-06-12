@@ -309,63 +309,13 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 // warnings is array of warning objects (message -> error message string, elementId -> related node id)
                 this._displayValidationWarnings(issues.warnings);
             }
-
-            if (_.size(data.configurations) > 0) {
-                var chartData = {};
-                // tableData variable now useless
-                var tableData = [];
-                // introducing tableDefinition for passing column definitions to DataTables
-                var tableDefinitions = []; 
-                var configID = '';
-                
-                
-                _.each(data.configurations, function(config, index) {
-                    configID = config['id'];
-
-                    // remember the nodes and edges involved in this config for later highlighting
-                    this._collectNodesAndEdgesForConfiguration(configID, config['choices']);
-
-                    // remember the redundancy settings for this config for later highlighting
-                    this._redundancyNodeMap[configID] = {};
-                    _.each(config['choices'], function(choice, node) {
-                        if (choice.type == 'RedundancyChoice') {
-                            this._redundancyNodeMap[configID][node] = choice['n'];
-                        }
-                    }.bind(this));
-
-                    // collect chart data if given
-                    if (typeof config['points'] !== 'undefined') {
-                        chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
-                    }
-
-                    // collect table rows
-                    // they are basically the configs without the points and choices
-                    var tableEntry = config;
-                    // delete keys we no longer need
-                    tableEntry['points'] = undefined;
-                    tableEntry['choices'] = undefined;
-                    tableData.push(tableEntry);
-
-                }.bind(this));*/
-                
-            
-
-                
-                // remove progress bar
-                this._chartContainer.empty();
-                /*
-                // only display chart if points were given
-                if (_.size(chartData) != 0) {
-                    this._displayResultWithHighcharts(chartData, data['decompositionNumber']);
-                }*/
-                var columns = data.columns;
-                this._displayResultWithDataTables(columns, job_result_url);
-                
-                //this._setupResizing();
-                //} else {
-                // close menu again if there are no results
-                //this.hide();
-                //}
+    
+            // remove progress bar
+            this._chartContainer.empty();
+           
+            // display results within a table
+            var columns = data.columns;
+            this._displayResultWithDataTables(columns, job_result_url);
         },
 
         /**
@@ -595,9 +545,15 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         
         
         /**
-         *      TEST  
-         *        METHOD      
+         * Method: _displayResultWithDataTables
+         *      Display the job's result in ...
          *
+         * Parameters:
+         *    
+         *    
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
          */
         _displayResultWithDataTables: function(columns, job_result_url) {
             
@@ -641,15 +597,34 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                                                  })
                                              },
                             "fnInitComplete": function(oSettings, json) {
-                                  _this._setupResizing();
-                                  
-                                }    
+                                    configurations = json['aaData']
+                                    var chartData = {};
+                                     
+                                     _.each(configurations, function(config) {
+                                         var configID = config['id'];
+                                         
+                                         // collect chart data if given
+                                         if (typeof config['points'] !== 'undefined') {
+                                             chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
+                                         }
+                                         
+                                         if (_.size(chartData) != 0) {
+                                             _this._displayResultWithHighcharts(chartData, 10); //data['decompositionNumber']);
+                                         }
+                                         
+                                         
+                                     }); 
+                                     
+                                    _this._setupResizing();
+                                      
+                                    }    
                             });
                                 
             this._grid.on( 'mouseleave', 'tr', function () {
                 _this._unhighlightConfiguration();
             });
             
+            return this;
         },
         
         /**
