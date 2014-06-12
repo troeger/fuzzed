@@ -593,39 +593,57 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                                 
                                 },
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                                                // Callback is executed for each row (each row is one configuration)
-                                                
-                                                var configuration = aData;
-                                                var configID = configuration['id'];
-                                                
-                                                if ('choices' in configuration ){
-                                                    var choices  = aData['choices'];
-                                                    
-                                                    // remember the nodes and edges involved in this config for later highlighting
-                                                    
-                                                    // clear configNodeMap and configEdgeMap for specific configuration id
-                                                    _this._configNodeMap[configID] = [];
-                                                    _this._configEdgeMap[configID] = [];
-                                                    
-                                                    _this._collectNodesAndEdgesForConfiguration(configID, choices);
-                                                    
-                                                    // remember the redundancy settings for this config for later highlighting
-                                                    _this._redundancyNodeMap[configID] = {};
-                                                    _.each(choices, function(choice, node) {
-                                                        if (choice.type == 'RedundancyChoice') {
-                                                            _this._redundancyNodeMap[configID][node] = choice['n'];
-                                                        }
-                                                    });
-                                                    
-                                                    
-                                                    jQuery(nRow).on("mouseover", function(){    
-                                                        _this._highlightConfiguration(configID);                                                
-                                                     });
-                                                } 
+                                // Callback is executed for each row (each row is one configuration)
+                                
+                                var current_config = aData;
+                                var configID = current_config['id'];
+                                
+                                if ('choices' in current_config ){
+                                    var choices  = aData['choices'];
+                                    
+                                    // remember the nodes and edges involved in this config for later highlighting
+                                    
+                                    // clear configNodeMap and configEdgeMap for specific configuration id
+                                    _this._configNodeMap[configID] = [];
+                                    _this._configEdgeMap[configID] = [];
+                                    
+                                    _this._collectNodesAndEdgesForConfiguration(configID, choices);
+                                    
+                                    // remember the redundancy settings for this config for later highlighting
+                                    _this._redundancyNodeMap[configID] = {};
+                                    _.each(choices, function(choice, node) {
+                                        if (choice.type == 'RedundancyChoice') {
+                                            _this._redundancyNodeMap[configID][node] = choice['n'];
+                                        }
+                                    });
+                                    
+                                    jQuery(nRow).on("mouseover", function(){    
+                                        _this._highlightConfiguration(configID);                                                
+                                     });
+                                }
+                                
+                                //"warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}]
+                                //"errors": [{"message": "map::at", "issueId": 0, "elementId": ""}],
+                                
+                                current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
+                                if ('issues' in current_config){
+                                    var issues = current_config['issues'];
+                                    // danger triangle <i class="fa fa-exclamation-triangle"></i>
+                                    jQuery(nRow).find('td').last().append('<i class="fa fa-exclamation-triangle"></i>');
+                                    
+                                    
+                                    if ('errors' in issues){
+                                        jQuery(nRow).addClass('danger');
+                                    }
+                                    
+                                    else if ('warnings' in issues){
+                                        jQuery(nRow).addClass('warning');
+                                    }   
+                                } 
                                              },
                             "fnInitComplete": function(oSettings, json) {  
                                     _this._setupResizing();
-                                    }    
+                                }    
                             });
                                 
             this._grid.on( 'mouseleave', 'tr', function () {
