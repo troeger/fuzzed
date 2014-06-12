@@ -300,7 +300,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             issues = data.issues
             
             
-            if (_.size(issues.errors) > 0) {
+            /*if (_.size(issues.errors) > 0) {
                 // errors is array of error objects (message -> error message string, elementId -> related node id)
                 this._displayValidationErrors(issues.errors);
             }
@@ -308,7 +308,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             if (_.size(issues.warnings) > 0) {
                 // warnings is array of warning objects (message -> error message string, elementId -> related node id)
                 this._displayValidationWarnings(issues.warnings);
-            }
+            }*/
     
             // remove progress bar
             this._chartContainer.empty();
@@ -516,7 +516,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         marker: {
                             radius: 1
                         },
-                        events: {
+                        events: {/* ToDo adapt Code to DataTables
                             // select the corresponding grid row of the hovered series
                             // this will also highlight the corresponding nodes
                             mouseOver: function() {
@@ -532,7 +532,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
                                 this._grid.setSelectedRows([]);
                             }.bind(this)
-                        }
+                        */}
                     }
                 },
 
@@ -594,29 +594,34 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                                 },
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                                                 // Callback is executed for each row (each row is one configuration)
-                                                var configID = aData['id'];
-                                                var choices  = aData['choices'];
                                                 
-                                                // remember the nodes and edges involved in this config for later highlighting
+                                                var configuration = aData;
+                                                var configID = configuration['id'];
                                                 
-                                                // clear configNodeMap and configEdgeMap for specific configuration id
-                                                _this._configNodeMap[configID] = [];
-                                                _this._configEdgeMap[configID] = [];
-                                                
-                                                _this._collectNodesAndEdgesForConfiguration(configID, choices);
-                                                
-                                                // remember the redundancy settings for this config for later highlighting
-                                                _this._redundancyNodeMap[configID] = {};
-                                                _.each(choices, function(choice, node) {
-                                                    if (choice.type == 'RedundancyChoice') {
-                                                        _this._redundancyNodeMap[configID][node] = choice['n'];
-                                                    }
-                                                });
-                                                
-                                                
-                                                jQuery(nRow).on("mouseover", function(){    
-                                                    _this._highlightConfiguration(configID);                                                
-                                                 })
+                                                if ('choices' in configuration ){
+                                                    var choices  = aData['choices'];
+                                                    
+                                                    // remember the nodes and edges involved in this config for later highlighting
+                                                    
+                                                    // clear configNodeMap and configEdgeMap for specific configuration id
+                                                    _this._configNodeMap[configID] = [];
+                                                    _this._configEdgeMap[configID] = [];
+                                                    
+                                                    _this._collectNodesAndEdgesForConfiguration(configID, choices);
+                                                    
+                                                    // remember the redundancy settings for this config for later highlighting
+                                                    _this._redundancyNodeMap[configID] = {};
+                                                    _.each(choices, function(choice, node) {
+                                                        if (choice.type == 'RedundancyChoice') {
+                                                            _this._redundancyNodeMap[configID][node] = choice['n'];
+                                                        }
+                                                    });
+                                                    
+                                                    
+                                                    jQuery(nRow).on("mouseover", function(){    
+                                                        _this._highlightConfiguration(configID);                                                
+                                                     });
+                                                } 
                                              },
                             "fnInitComplete": function(oSettings, json) {  
                                     _this._setupResizing();
