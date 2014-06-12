@@ -28,7 +28,7 @@ def server():
     # Vagrant development. The backend daemon currently has
     # no Vagrant-specific settings, so we don't need to do the
     # same stunt in def backend()
-    if socket.getfqdn() == 'precise64':
+    if socket.getfqdn() == 'vagrant-ubuntu-trusty-32':
         ip = "192.168.33.10"
         print 'Using Vagrant IP: ' + ip
         os.system('fab build.configs:target=vagrant')
