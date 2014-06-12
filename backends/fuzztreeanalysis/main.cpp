@@ -99,9 +99,8 @@ int main(int argc, char** argv)
 				faultTree->topEvent().decompositionNumber().present() ? 
 				faultTree->topEvent().decompositionNumber().get() : 
 				DEFAULT_DECOMPOSITION_NUMBER;
-			const auto modelId = faultTree->id();
-			const auto configId = "0"; // TODO find a default id
-			backendResults::AnalysisResult r(modelId, configId, util::timeStamp(), true, decompositionNumber);
+
+			backendResults::AnalysisResult r(faultTree->id(), DEFAULT_CONFIG_ID, util::timeStamp(), true, decompositionNumber);
 			r.decompositionNumber(decompositionNumber);
 			try
 			{
@@ -117,6 +116,8 @@ int main(int argc, char** argv)
 				r.issue().push_back(i.serialized());
 			
 			analysisResults.result().push_back(r);
+
+			// add a dummy configuration with DEFAULT_CONFIG_ID
 
 			if (!r.validResult())
 				faulttree::faultTree(*logFileStream, *(faultTree.get()));

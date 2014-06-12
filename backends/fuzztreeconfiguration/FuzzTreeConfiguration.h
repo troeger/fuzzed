@@ -12,7 +12,7 @@ struct FuzzTreeConfiguration
 public:
 	typedef std::string id_type;
 
-	FuzzTreeConfiguration();
+	FuzzTreeConfiguration(const unsigned int id);
 	FuzzTreeConfiguration(const FuzzTreeConfiguration& other);
 	void operator=(const FuzzTreeConfiguration &other);
 	~FuzzTreeConfiguration();
@@ -35,6 +35,7 @@ public:
 	const int getCost() const;
 
 	const id_type& getId() const;
+	void setId(const unsigned int id);
 
 	const std::map<id_type, bool>&					getOptionalNodes() const;
 	const std::map<id_type, std::tuple<int,int>>&	getRedundancyNodes() const;

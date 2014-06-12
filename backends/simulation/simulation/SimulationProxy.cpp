@@ -192,7 +192,7 @@ void SimulationProxy::simulateAllConfigurations(
 
 				backendResults::SimulationResult r(
 					ft->getId(),
-					"", // TODO config id
+					"0", // TODO config id
 					util::timeStamp(),
 					res.isValid(),
 					res.reliability,
