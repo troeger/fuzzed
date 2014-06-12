@@ -1,36 +1,17 @@
-$script = <<SCRIPT
-echo Provisioning Machine...
-echo "cd /home/fuzztrees" >> .bashrc
-sudo apt-get update
-sudo apt-get -y install python-software-properties
-sudo add-apt-repository -y ppa:george-edison55/gcc4.7-precise
-sudo add-apt-repository -y ppa:chris-lea/node.js
-sudo apt-get update
-sudo apt-get -y install build-essential make gcc-4.7 g++-4.7
-sudo apt-get -y install python python-dev python-pip perl
-sudo pip install fabric
-echo ...done.
-echo Bootstrapping Dev Environment...
-echo "cd /home/fuzztrees" >> /home/vagrant/.bashrc
-cd /home/fuzztrees
-fab bootstrap.dev
-echo ...done.
-echo Building Dev Environment with Vagrant support...
-fab build.all
-echo ...done.
-SCRIPT
-
 Vagrant::Config.run do |config|
-    config.vm.box = "precise64"
-    config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-
+    config.vm.box = "ubuntu/trusty32"
     config.vm.network :hostonly, "192.168.33.10"
-   
-    config.vm.share_folder "fuzztrees", "/home/fuzztrees", "."
-
-    config.vm.provision :shell, :inline => $script
-
+    config.vm.share_folder  "fuzztrees", "/home/vagrant/fuzztrees", "."
     # If the VM has no internet connectivity, uncomment this line:
     # config.vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     # config.vm.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    config.vm.provision "ansible" do |ansible|
+        ansible.playbook = "ansible/site.yml"
+        ansible.extra_vars = { ansible_ssh_user: 'vagrant' }
+        ansible.sudo = true
+#       ansible.verbose = "vvvv"
+        ansible.groups = {
+                           "devmachine" => ["default"]
+        }        
+    end
 end

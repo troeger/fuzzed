@@ -1,0 +1,25 @@
+---
+- name: Install PostgreSQL Python client library
+  apt: pkg=python-psycopg2 state=latest
+  when: ansible_os_family == "Debian"
+- name: Install PostgreSQL 
+  apt: pkg=postgresql state=latest
+  when: ansible_os_family == "Debian"
+
+#- name: Install PostgreSQL Python client library
+#  homebrew: pkg=psycopg2 state=latest
+#  when: ansible_os_family == "Darwin"
+#- name: Install PostgreSQL 
+#  homebrew: pkg=postgres state=latest
+#  when: ansible_os_family == "Darwin"
+
+- name: Install PostgreSQL user
+  sudo: yes
+  sudo_user: postgres
+  postgresql_user: name=fuzztrees password=fuzztrees role_attr_flags=NOSUPERUSER
+  when: ansible_os_family == "Debian"
+- name: Install PostgreSQL database
+  sudo: yes
+  sudo_user: postgres
+  postgresql_db: name=fuzztrees owner=fuzztrees
+  when: ansible_os_family == "Debian"
