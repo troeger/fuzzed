@@ -300,7 +300,6 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             issues = data.issues
             
             
-            
             if (_.size(issues.errors) > 0) {
                 // errors is array of error objects (message -> error message string, elementId -> related node id)
                 this._displayValidationErrors(issues.errors);
@@ -311,14 +310,15 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 this._displayValidationWarnings(issues.warnings);
             }
 
-            //if (_.size(data.configurations) > 0) {
+            if (_.size(data.configurations) > 0) {
                 var chartData = {};
                 // tableData variable now useless
                 var tableData = [];
                 // introducing tableDefinition for passing column definitions to DataTables
                 var tableDefinitions = []; 
                 var configID = '';
-                /*
+                
+                
                 _.each(data.configurations, function(config, index) {
                     configID = config['id'];
 
@@ -615,10 +615,30 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                             "bLengthChange": false,
                             "iDisplayLength": 10,
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                                                jQuery(nRow).on("mouseover", function(){
-                                                    var configID = aData['id']
-                                                    _this._highlightConfiguration(configID);
-                                                    })
+                                                // Callback is executed for each row (each row is one configuration)
+                                                var configID = aData['id'];
+                                                var choices  = aData['choices'];
+                                                
+                                                // remember the nodes and edges involved in this config for later highlighting
+                                                
+                                                // clear configNodeMap and configEdgeMap for specific configuration id
+                                                _this._configNodeMap[configID] = [];
+                                                _this._configEdgeMap[configID] = [];
+                                                
+                                                _this._collectNodesAndEdgesForConfiguration(configID, choices);
+                                                
+                                                // remember the redundancy settings for this config for later highlighting
+                                                _this._redundancyNodeMap[configID] = {};
+                                                _.each(choices, function(choice, node) {
+                                                    if (choice.type == 'RedundancyChoice') {
+                                                        _this._redundancyNodeMap[configID][node] = choice['n'];
+                                                    }
+                                                });
+                                                
+                                                
+                                                jQuery(nRow).on("mouseover", function(){    
+                                                    _this._highlightConfiguration(configID);                                                
+                                                 })
                                              },
                             "fnInitComplete": function(oSettings, json) {
                                   _this._setupResizing();
@@ -725,7 +745,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             // highlight nodes
             _.invoke(this._configNodeMap[configID], 'highlight');
             // highlight edges
-            _.invoke(this._configEdgeMap[configID], 'setHover', true);
+            //_.invoke(this._configEdgeMap[configID], 'setHover', true);
             // show redundancy values
             _.each(this._redundancyNodeMap[configID], function(value, nodeID) {
                 var node = this._editor.graph.getNodeById(nodeID);
@@ -749,7 +769,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             // unhighlight all nodes
             _.invoke(this._editor.graph.getNodes(), 'unhighlight');
             // unhighlight all edges
-            _.invoke(this._editor.graph.getEdges(), 'setHover', false);
+            //_.invoke(this._editor.graph.getEdges(), 'setHover', false);
             // remove all badges
             _.invoke(this._editor.graph.getNodes(), 'hideBadge');
 
