@@ -485,19 +485,28 @@ class ResultResource(ModelResource):
             return job.result_download()
 
         # It is an analysis result
-        results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
+
+        # Determine options given by data tables
         start  = request.GET.get('iDisplayStart', 0)
         length = request.GET.get('iDisplayLength', 10)
+        sort_cols = request.GET.get('iSortingCols',0)
+        sort_fields = ()
+        for i in range(sort_cols):
+            try:
+                # Never trust the client input
+                sort_col = request.GET['iSortCol_'+str(i)]
+                sort_fields.append(job.result_titles[sort_col][0]
+            except:
+                pass
+        results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
+        all_count = results.count()
         results = results[start:start+length]
-
-        # Determine subset to be delivered, default is all
-        count = results.count()
 
         assert('sEcho' in request.GET)
         response_data = {
                             "sEcho": request.GET['sEcho'],
-                            "iTotalRecords": count,
-                            "iTotalDisplayRecords": count
+                            "iTotalRecords": all_count,
+                            "iTotalDisplayRecords": all_count
                         }    
         response_data['aaData'] = [result.to_dict() for result in results]
         return HttpResponse(json.dumps(response_data), content_type="application/json")

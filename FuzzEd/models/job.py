@@ -96,6 +96,20 @@ class Job(models.Model):
         elif self.kind == self.MINCUT_JOB:
             return  (('id','Config'),)      
 
+    def result_titles_field(self, index):
+        ''' The client expresses a wish to order result data by communicating a column ID. 
+
+        '''
+        assert(not self.requires_download)
+        if self.kind == self.TOP_EVENT_JOB:
+            return  (('id','Config'),('min','Min'),    ('peak','Peak'),
+                     ('max','Max'),  ('costs','Costs'),('ratio','Risk'))            
+        elif self.kind == self.SIMULATION_JOB:
+            return  (('id','Config'),)      
+        elif self.kind == self.MINCUT_JOB:
+            return  (('id','Config'),)      
+
+
     def result_download(self):
         """
             Returns an HttpResponse as direct file download of the result data.
@@ -122,7 +136,7 @@ class Job(models.Model):
                 warnings.append(json_issue)
         return {'errors': errors, 'warnings': warnings}
 
-    def interpret_value(self, xml_result_value):
+    def interpret_value(self, xml_result_value, db_result):
         """
             Interpret the incoming result value and convert it to feasible JSON for storage.
             Secondly, the function return a plain integer representing the result
@@ -151,8 +165,6 @@ class Job(models.Model):
             while the key is used as "Y" coordinate.
 
         """
-        result = {}
-        sort_value = 0
         if hasattr(xml_result_value, 'probability') and xml_result_value.probability is not None:
             points = []
             logging.debug("Probability: " + str(xml_result_value.probability))
@@ -163,9 +175,6 @@ class Job(models.Model):
                 points.append([alpha_cut.value_.lowerBound, y_val])
                 if alpha_cut.value_.upperBound != alpha_cut.value_.lowerBound:
                     points.append([alpha_cut.value_.upperBound, y_val])
-                    if alpha_cut.value_.upperBound > sort_value:
-                        # Use the highest point in the membership function as sort value
-                        sort_value = round(alpha_cut.value_.upperBound*100)                    
                 else:
                     # This is the tip of the triangle.
                     # If this is a crisp probability, then there is only the point above added.
@@ -175,34 +184,32 @@ class Job(models.Model):
             # Points is now a wild collection of coordinates, were double values for the same X 
             # coordinate may occur. We sort it (since the JS code likes that) and leave only the 
             # largest Y values per X value.
-            result['points'] = sorted(points)
+            db_result.points = json.dumps(sorted(points))
 
             # Compute some additional statistics for the front-end, based on the gathered probabilities
             if len(points) > 0:
-                result['min'] = min(points, key=lambda point: point[0])[0]  # left triangle border position
-                result['max'] = max(points, key=lambda point: point[0])[0]  # right triangle border position
-                result['peak'] = max(points, key=lambda point: point[1])[0]  # triangle tip position
+                db_result.minimum = min(points, key=lambda point: point[0])[0]  # left triangle border position
+                db_result.maximum = max(points, key=lambda point: point[0])[0]  # right triangle border position
+                db_result.peak = max(points, key=lambda point: point[1])[0]  # triangle tip position
                 #result['ratio'] = float(current_config['peak'] * current_config['costs']) if current_config['costs'] else None
 
         if hasattr(xml_result_value, 'reliability') and xml_result_value.reliability is not None:
             reliability = float(xml_result_value.reliability)
             sort_value = round(reliability)            
-            result['reliability'] = None if math.isnan(reliability) else reliability
+            db_result.reliability = None if math.isnan(reliability) else reliability
 
         if hasattr(xml_result_value, 'mttf') and xml_result_value.mttf is not None:
             mttf = float(xml_result_value.mttf)
-            result['mttf'] = None if math.isnan(mttf) else mttf
+            db_result.mttf = None if math.isnan(mttf) else mttf
 
         if hasattr(xml_result_value, 'rounds') and xml_result_value.nSimulatedRounds is not None:
             rounds = int(result.nSimulatedRounds)
-            result['rounds'] = None if math.isnan(rounds) else rounds
+            db_result.rounds = None if math.isnan(rounds) else rounds
 
         if hasattr(xml_result_value, 'nFailures') and xml_result_value.nFailures is not None:
             failures = int(result.nFailures)
-            result['failures'] = None if math.isnan(failures) else failures
+            db_result.failures = None if math.isnan(failures) else failures
             #result['ratio'] = float(1 - reliability * current_config['costs']) if current_config['costs'] else None
-
-        return result, sort_value
 
     def parse_result(self, data):
         """
@@ -271,7 +278,7 @@ class Job(models.Model):
                     db_result.kind = Result.MINCUT_RESULT
                 elif type(result) is SimulationResult:
                     db_result.kind = Result.SIMULATION_RESULT
-                db_result.value, db_result.value_sort = self.interpret_value(result)
+                self.interpret_value(result, db_result)
                 if result.issue:
                     db_result.issues = json.dumps(self.interpret_issues(result.issue))
                 db_result.save()
