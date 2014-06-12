@@ -570,6 +570,28 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                             "aoColumns":     columns,
                             "bLengthChange": false,
                             "iDisplayLength": 10,
+                            "fnDrawCallback": function(oSettings) {
+                                // display points with highchart after table was rendered
+                                var serverData = oSettings['json'];
+                                var configurations = serverData['aaData'];
+                                var chartData = {};
+                                 
+                                 _.each(configurations, function(config) {
+                                     var configID = config['id'];
+                                     
+                                     // collect chart data if given
+                                     if (typeof config['points'] !== 'undefined') {
+                                         chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
+                                     }
+                                     
+                                     if (_.size(chartData) != 0) {
+                                         _this._displayResultWithHighcharts(chartData, 10); //data['decompositionNumber']);
+                                     }
+                                     
+                                     
+                                 }); 
+                                
+                                },
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                                                 // Callback is executed for each row (each row is one configuration)
                                                 var configID = aData['id'];
@@ -596,27 +618,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                                                     _this._highlightConfiguration(configID);                                                
                                                  })
                                              },
-                            "fnInitComplete": function(oSettings, json) {
-                                    configurations = json['aaData']
-                                    var chartData = {};
-                                     
-                                     _.each(configurations, function(config) {
-                                         var configID = config['id'];
-                                         
-                                         // collect chart data if given
-                                         if (typeof config['points'] !== 'undefined') {
-                                             chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
-                                         }
-                                         
-                                         if (_.size(chartData) != 0) {
-                                             _this._displayResultWithHighcharts(chartData, 10); //data['decompositionNumber']);
-                                         }
-                                         
-                                         
-                                     }); 
-                                     
+                            "fnInitComplete": function(oSettings, json) {  
                                     _this._setupResizing();
-                                      
                                     }    
                             });
                                 
