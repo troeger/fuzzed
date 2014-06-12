@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 			std::vector<Issue> treeIssues;
 			const auto modelId = faultTree->id();
 
-			backendResults::MincutResult r(modelId, DEFAULT_CONFIG_ID, util::timeStamp(), true);
+			backendResults::MincutResult r(modelId, EMPTY_CONFIG_ID, util::timeStamp(), true);
 			try
 			{
 				const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent(), treeIssues);	

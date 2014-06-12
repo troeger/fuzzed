@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 				faultTree->topEvent().decompositionNumber().get() : 
 				DEFAULT_DECOMPOSITION_NUMBER;
 
-			backendResults::AnalysisResult r(faultTree->id(), DEFAULT_CONFIG_ID, util::timeStamp(), true, decompositionNumber);
+			backendResults::AnalysisResult r(faultTree->id(), EMPTY_CONFIG_ID, util::timeStamp(), true, decompositionNumber);
 			r.decompositionNumber(decompositionNumber);
 			try
 			{
