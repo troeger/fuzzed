@@ -92,12 +92,20 @@ class JobResource(common.JobResource):
             graph_id from the original request.
         """
         graph = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
-        bundle.data['graph'] = graph
-        bundle.data['graph_modified'] = graph.modified
-        bundle.data['kind'] = bundle.data['kind']
-        bundle.obj = self._meta.object_class()
-        bundle = self.full_hydrate(bundle)
-        return self.save(bundle)
+        # Check if we have a cached result, and deliver this job
+        job = Job.exists_with_result(graph=graph, kind=bundle.data['kind'])
+        if not job:
+            # We need a truly new job
+            bundle.data['graph'] = graph
+            bundle.data['graph_modified'] = graph.modified
+            bundle.data['kind'] = bundle.data['kind']
+            bundle.obj = self._meta.object_class()
+            bundle = self.full_hydrate(bundle)
+            return self.save(bundle)
+        else:
+            logger.debug("Responding with cached job URL, instead of creating a new one")
+            bundle.obj = job
+            return bundle
 
     def get_detail(self, request, **kwargs):
         """

@@ -323,6 +323,14 @@ class Graph(models.Model):
         """
         self.configurations.all().delete()
 
+    def delete_results(self, kind):
+        '''
+            Deletes all graph analysis results of a particular kind.
+        '''
+        old_results = self.results.filter(kind=kind).all()
+        logger.debug("Deleting %u old results of kind %s"%(len(old_results), kind))
+        old_results.delete()
+
     def same_as(self, graph):
         ''' 
             Checks if this graph is equal to the given one in terms of nodes and their properties. 
