@@ -495,10 +495,10 @@ class ResultResource(ModelResource):
             try:
                 # Never trust the client input
                 sort_col = request.GET['iSortCol_'+str(i)]
-                sort_fields.append(job.result_titles[sort_col][0]
+                sort_fields.append(job.result_titles[sort_col][0])
             except:
                 pass
-        results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
+        results = job.results.all().exclude(kind=Result.GRAPH_ISSUES).order_by(sort_fields)
         all_count = results.count()
         results = results[start:start+length]
 
