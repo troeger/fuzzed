@@ -94,6 +94,21 @@ class Job(models.Model):
         elif self.kind == self.MINCUT_JOB:
             return Result.titles(Result.MINCUT_RESULT)
 
+    @classmethod
+    def exists_with_result(cls, graph, kind):
+        ''' 
+            Return an existing job object for that graph and job kind, but only
+            if it was computed on the same graph data and has existing results.
+
+            Theoretically, there is only one cached job left, since the new creation
+            leads to deletion of old versions. We anyway prepare for the case of
+            having multiple cached old results, by just using the youngest one.
+        '''
+        try:
+            return Job.objects.filter(graph=graph, kind=kind, graph_modified=graph.modified, exit_code=0).order_by('-created')[0]    
+        except:
+            return None
+
     def result_download(self):
         """
             Returns an HttpResponse as direct file download of the result data.
@@ -200,14 +215,24 @@ class Job(models.Model):
         """
         if self.requires_download:
             if self.kind == self.PDF_RENDERING_JOB:
+                old_results = self.results.filter(graph=self.graph, kind=Result.PDF_RESULT)
+                old_results.delete()
                 db_result = Result(graph=self.graph, job=self, kind=Result.PDF_RESULT)
             elif self.kind == self.EPS_RENDERING_JOB:
+                old_results = self.results.filter(graph=self.graph, kind=Result.EPS_RESULT)
+                old_results.delete()
                 db_result = Result(graph=self.graph, job=self, kind=Result.EPS_RESULT)
             db_result.binary_value = data
             db_result.save()
             return
+
+        # Ok, it is not binary, it is true XML result data
+
         logger.debug("Parsing backend result XML into database: "+str(data))
         doc = xml_backend.CreateFromDocument(str(data))
+
+        # Delete old graph issues from a former analysis run
+        self.graph.delete_results(kind=Result.GRAPH_ISSUES)
 
         if hasattr(doc, 'issue'):
             # Result-independent issues (for the whole graph, and not per configuration),
@@ -248,6 +273,13 @@ class Job(models.Model):
                     db_nodeconf.save()
 
         if hasattr(doc, 'result'):
+            # Remove earlier results of the same kind
+            if self.kind == self.TOP_EVENT_JOB:
+                self.graph.delete_results(kind=Result.ANALYSIS_RESULT)
+            elif self.kind == self.SIMULATION_JOB:
+                self.graph.delete_results(kind=Result.SIMULATION_RESULT)
+            elif self.kind == self.MINCUT_JOB:
+                self.graph.delete_results(kind=Result.MINCUT_RESULT)
             for result in doc.result:
                 assert(int(result.modelId) == self.graph.pk)
                 db_result = Result(graph=self.graph , job=self)
