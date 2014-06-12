@@ -496,7 +496,11 @@ class ResultResource(ModelResource):
         for i in range(sort_cols):
             # Consider strange datatables way of expressing sorting criteria
             sort_col = int(request.GET['iSortCol_'+str(i)])
-            sort_fields.append(job.result_titles[sort_col][0])
+            sort_dir = request.GET['sSortDir_'+str(i)] 
+            db_field_name=job.result_titles[sort_col][0] 
+            if sort_dir == "desc":
+                db_field_name = "-"+db_field_name          
+            sort_fields.append(db_field_name)
         results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
         if len(sort_fields) > 0:
             results = results.order_by(*sort_fields)
