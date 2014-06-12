@@ -488,8 +488,8 @@ class ResultResource(ModelResource):
         #import pdb; pdb.set_trace()
 
         # Determine options given by data tables
-        start  = request.GET.get('iDisplayStart', 0)
-        length = request.GET.get('iDisplayLength', 10)
+        start  = int(request.GET.get('iDisplayStart', 0))
+        length = int(request.GET.get('iDisplayLength', 10))
         sort_cols = int(request.GET.get('iSortingCols',0))
         # Create sorted QuerySet
         sort_fields = []
