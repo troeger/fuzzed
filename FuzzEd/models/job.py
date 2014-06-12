@@ -206,7 +206,7 @@ class Job(models.Model):
             db_result.binary_value = data
             db_result.save()
             return
-        logger.debug("Parsing backend result XML into database")
+        logger.debug("Parsing backend result XML into database: "+str(data))
         doc = xml_backend.CreateFromDocument(str(data))
 
         if hasattr(doc, 'issue'):
@@ -226,7 +226,7 @@ class Job(models.Model):
                 db_conf = Configuration(graph=self.graph, costs=configuration.costs if hasattr(configuration, 'costs') else None)
                 db_conf.save()
                 conf_id_mappings[configuration.id] = db_conf
-                logger.debug("Storing configuration %u for graph %u"%(db_conf.pk, self.graph.pk))
+                logger.debug("Storing DB configuration %u for XML configuration %s in graph %u"%(db_conf.pk, configuration.id, self.graph.pk))
                 # Analyze node configuration choices in this configuration
                 assert(hasattr(configuration, 'choice'))    # according to XSD, this must be given
                 for choice in configuration.choice:
