@@ -56,7 +56,6 @@ class Result(models.Model):
     mttf          = models.FloatField(null=True)
     rounds        = models.IntegerField(null=True)
     failures      = models.IntegerField(null=True)
-    ratio         = models.FloatField(null=True)
     binary_value  = models.BinaryField(null=True)
     points        = JSONField(blank=True, null=True)
     issues        = JSONField(blank=True, null=True)
@@ -95,7 +94,7 @@ class Result(models.Model):
         '''
         if kind == self.ANALYSIS_RESULT:
             return  (('id','Config'),('minimum','Min'),    ('peak','Peak'),
-                     ('maximum','Max'),  ('configuration__costs','Costs'),('ratio','Risk'))            
+                     ('maximum','Max'),  ('configuration__costs','Costs'))            
         elif kind == self.SIMULATION_RESULT:
             return  (('id','Config'), ('reliability','Reliability'), ('mttf','MTTF'),
                       ('rounds', 'Rounds'), ('failures', 'Failures'))      
@@ -108,7 +107,7 @@ class Result(models.Model):
         stored in this result object, plus data from the linked graph configuration.
       '''
       result = {}
-      for field in ['minimum', 'maximum', 'peak', 'reliability', 'mttf', 'rounds', 'failures', 'ratio']:
+      for field in ['minimum', 'maximum', 'peak', 'reliability', 'mttf', 'rounds', 'failures']:
         value = getattr(self, field)
         if value != None:
           result[field] = value

@@ -175,7 +175,6 @@ class Job(models.Model):
                 db_result.minimum = min(points, key=lambda point: point[0])[0]  # left triangle border position
                 db_result.maximum = max(points, key=lambda point: point[0])[0]  # right triangle border position
                 db_result.peak = max(points, key=lambda point: point[1])[0]  # triangle tip position
-                #result['ratio'] = float(current_config['peak'] * current_config['costs']) if current_config['costs'] else None
 
         if hasattr(xml_result_value, 'reliability') and xml_result_value.reliability is not None:
             reliability = float(xml_result_value.reliability)
@@ -193,7 +192,6 @@ class Job(models.Model):
         if hasattr(xml_result_value, 'nFailures') and xml_result_value.nFailures is not None:
             failures = int(result.nFailures)
             db_result.failures = None if math.isnan(failures) else failures
-            #result['ratio'] = float(1 - reliability * current_config['costs']) if current_config['costs'] else None
 
     def parse_result(self, data):
         """
@@ -248,7 +246,6 @@ class Job(models.Model):
                     db_node = Node.objects.get(client_id=choice.key, graph=self.graph)
                     db_nodeconf = NodeConfiguration(node=db_node, configuration = db_conf, setting=json_choice)
                     db_nodeconf.save()
-                    logger.debug("Storing node configuration %u for node %u"%(db_nodeconf.pk, db_node.pk))
 
         if hasattr(doc, 'result'):
             for result in doc.result:

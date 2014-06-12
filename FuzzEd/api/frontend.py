@@ -510,6 +510,7 @@ class ResultResource(ModelResource):
                             "iTotalDisplayRecords": all_count
                         }    
         response_data['aaData'] = [result.to_dict() for result in results]
+        logger.debug("Delivering result data: "+str(response_data))
         return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     
