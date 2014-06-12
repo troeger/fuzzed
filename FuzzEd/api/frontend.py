@@ -118,7 +118,7 @@ class JobResource(common.JobResource):
                 # We deliver the columns layout for the result tables + all global issues
                 results_url = reverse('results', kwargs={'api_name': 'front', 'pk': job.graph.pk, 'secret': job.secret})
                 if not job.requires_download:
-                    response['columns'] = [{'mData': key, 'sTitle': title} for key, title in job.result_titles() ]
+                    response['columns'] = [{'mData': key, 'sTitle': title} for key, title in job.result_titles ]
                 try:
                     response['issues'] = Result.objects.get(job=job, kind=Result.GRAPH_ISSUES).issues                
                 except:
@@ -485,22 +485,21 @@ class ResultResource(ModelResource):
             return job.result_download()
 
         # It is an analysis result
+        #import pdb; pdb.set_trace()
 
         # Determine options given by data tables
         start  = request.GET.get('iDisplayStart', 0)
         length = request.GET.get('iDisplayLength', 10)
-        sort_cols = request.GET.get('iSortingCols',0)
-        sort_fields = ()
+        sort_cols = int(request.GET.get('iSortingCols',0))
+        # Create sorted QuerySet
+        sort_fields = []
         for i in range(sort_cols):
-            try:
-                # Never trust the client input
-                sort_col = request.GET['iSortCol_'+str(i)]
-                sort_fields.append(job.result_titles[sort_col][0])
-            except:
-                pass
+            # Consider strange datatables way of expressing sorting criteria
+            sort_col = int(request.GET['iSortCol_'+str(i)])
+            sort_fields.append(job.result_titles[sort_col][0])
         results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
         if len(sort_fields) > 0:
-            results = results.order_by(sort_fields)
+            results = results.order_by(*sort_fields)
         all_count = results.count()
         results = results[start:start+length]
 

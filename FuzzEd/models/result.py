@@ -62,12 +62,10 @@ class Result(models.Model):
     issues        = JSONField(blank=True, null=True)
 
     def __unicode__(self):
-        return "Result %u for graph %s and configuration %s:\n    %s\n    Issues: %s" % (
+        return "Result %u for graph %s and configuration %s" % (
                   self.pk,
                   self.graph.pk, 
                   self.configuration.pk if self.configuration else "(None)", 
-                  str(self.value) if self.value else "(None)",
-                  str(self.issues) if self.issues else "(None)",                  
                 )
 
     @property
@@ -91,10 +89,13 @@ class Result(models.Model):
             the human-readable sorted names of data columns that can be shown directly,
             without further interpretation by the JS code. Therefore, some data returned
             by self.to_dict() is not included here.
+
+            Field values from related models (e.g. costs) are named in Django QuerySet syntax.
+            This allows to re-use them directly in Query creation.
         '''
         if kind == self.ANALYSIS_RESULT:
             return  (('id','Config'),('minimum','Min'),    ('peak','Peak'),
-                     ('maximum','Max'),  ('costs','Costs'),('ratio','Risk'))            
+                     ('maximum','Max'),  ('configuration__costs','Costs'),('ratio','Risk'))            
         elif kind == self.SIMULATION_RESULT:
             return  (('id','Config'), ('reliability','Reliability'), ('mttf','MTTF'),
                       ('rounds', 'Rounds'), ('failures', 'Failures'))      
@@ -114,7 +115,7 @@ class Result(models.Model):
       if self.configuration:
           result['choices'] = self.configuration.to_dict() 
           result['id'] = self.configuration.pk
-          result['costs'] = self.configuration.costs 
+          result['configuration__costs'] = self.configuration.costs 
       if self.issues:
           result['issues'] = self.issues
       return result

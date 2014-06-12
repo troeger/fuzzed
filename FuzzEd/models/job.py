@@ -82,6 +82,7 @@ class Job(models.Model):
         """
         return self.kind in [Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB]
 
+    @property
     def result_titles(self):
         ''' 
             The result class knows how the titles should look like.

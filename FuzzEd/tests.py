@@ -621,7 +621,24 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
             eps = self.get(eps_url)
             self.assertEqual('application/postscript', eps['CONTENT-TYPE'])
 
-
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+    def testResultOrdering(self):
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
+        job_result_info = json.loads(job_result.content)
+        result_url = job_result['LOCATION']
+        # Ordering in datatables style
+        # First column in analysis is 'id', second is 'minimum'
+        titles = Result.titles(Result.ANALYSIS_RESULT)
+        for index, col_desc in enumerate(titles):
+            field_name = col_desc[0]
+            result = self.ajaxGet(result_url+'?sEcho=doo&iSortingCols=1&iSortCol_0='+str(index))  
+            data = json.loads(result.content)
+            if field_name in data['aaData'][0]:
+                print "Checking sorting for "+field_name
+                for i in xrange(0,len(data['aaData']),2):
+                    assert(data['aaData'][i][field_name] <= data['aaData'][i+1][field_name])
+            else:
+                print field_name + " is not part of the result, sorting not checked"
 
 class MinCutFixtureTestCase(BackendDaemonTestCase):
     """
