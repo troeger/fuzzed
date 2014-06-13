@@ -1,5 +1,5 @@
 define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'highcharts', 'jquery-ui', 'slickgrid'],
-function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, NodeGroup) {
+function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
     /**
      *  Package: Faulttree
      */

@@ -7,6 +7,13 @@
     text-align: center;
     z-index: 100; /* above connection */
 
+    // affected state
+    &.affected {
+        path, rect, circle {
+            stroke: @theme-affected !important;
+        }
+    }
+
     // highlighted state
     &.highlighted {
         path, rect, circle {
@@ -43,13 +50,6 @@
         
         svg {
             opacity: 0.5;
-        }
-    }
-
-    // affected state
-    &.affected {
-        path, rect, circle {
-            stroke: @theme-affected !important;
         }
     }
 

@@ -1,4 +1,4 @@
-define(['node_group'], function(NodeGroup) {
+define(['node_group', 'config'], function(NodeGroup, Config) {
 
     /**
      * Package: Faulttree
@@ -14,7 +14,6 @@ define(['node_group'], function(NodeGroup) {
             return this;
         },
         redraw: function() {
-            console.log("hallo");
             return this;
         },
         _setupDragging: function() {
@@ -25,6 +24,23 @@ define(['node_group'], function(NodeGroup) {
         },
         _setupSelection: function() {
             return this;
-        }
+        },
+        remove: function() {
+            if (!this.deletable) return false;
+
+            // unaffect all currently affected nodes (you know, the purple ones)
+            _.each(this.nodes, function(node) {
+                node.unaffect();
+            }.bind(this));
+
+            // don't listen anymore
+            jQuery(document).off([ Config.Events.NODES_MOVED,
+                                   Config.Events.NODE_PROPERTY_CHANGED ].join(' '), this.redraw.bind(this));
+
+            // call home
+            jQuery(document).trigger(Config.Events.NODEGROUP_DELETED, [this.id, this.nodeIds()]);
+
+            return true;
+        },
     });
 });

@@ -435,7 +435,7 @@ function(Property, Class, Canvas, Config) {
 
             // don't listen anymore
             jQuery(document).off([ Config.Events.NODES_MOVED,
-                                   Config.Events.NODE_PROPERTY_CHANGED ].join(' '));
+                                   Config.Events.NODE_PROPERTY_CHANGED ].join(' '), this.redraw.bind(this));
 
             // call home
             jQuery(document).trigger(Config.Events.NODEGROUP_DELETED, [this.id, this.nodeIds()]);

@@ -1,5 +1,5 @@
-define(['canvas', 'class', 'config', 'edge', 'node_group', 'menus', 'jquery', 'd3'],
-function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
+define(['canvas', 'class', 'config', 'edge', 'menus', 'node_group', 'faulttree/node_group', 'jquery', 'd3'],
+function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
     /**
      *  Package: Base
      */
@@ -53,7 +53,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             this.config = this.getConfig();
 
             this._loadFromJson(json)
-                ._registerEventHandlers()
+                ._registerEventHandlers();
         },
 
         /**
@@ -260,7 +260,10 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             properties.id  = jsonNodeGroup.id;
             properties.graph = this;
 
-            var nodeGroup = new NodeGroup(this.getNotation().nodeGroups, nodes, properties);
+            //TODO: make it right
+            var nodeGroupClass = this.kind == 'faulttree' ? FaulttreeNodeGroup : NodeGroup;
+
+            var nodeGroup = new nodeGroupClass(this.getNotation().nodeGroups, nodes, properties);
             this.nodeGroups[nodeGroup.id] = nodeGroup;
 
             return nodeGroup;
