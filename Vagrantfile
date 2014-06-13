@@ -3,7 +3,9 @@ $provisioning_script = <<SCRIPT
   apt-get install -y python-dev python-pip
   sudo pip install ansible
   cd fuzztrees
-  sudo ansible-playbook -i ansible/dev_machine ansible/site.yml 
+  cp ansible/dev_machine /tmp/dev_machine
+  sudo chmod -x /tmp/dev_machine
+  sudo ansible-playbook -i /tmp/dev_machine ansible/site.yml 
 SCRIPT
 
 Vagrant::Config.run do |config|
