@@ -631,7 +631,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
         titles = Result.titles(Result.ANALYSIS_RESULT)
         for index, col_desc in enumerate(titles):
             field_name = col_desc[0]
-            result = self.ajaxGet(result_url+'?sEcho=doo&iSortingCols=1&iSortCol_0='+str(index))  
+            result = self.ajaxGet(result_url+'?sEcho=doo&iSortingCols=1&sSortDir_0=asc&iSortCol_0='+str(index))  
             data = json.loads(result.content)
             if field_name in data['aaData'][0]:
                 print "Checking sorting for "+field_name
