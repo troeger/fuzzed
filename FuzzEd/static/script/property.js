@@ -21,7 +21,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             this.owner = owner;
             this.mirrors = [];
             this._sanitize()
-                ._setupMirror()
+                ._setupMirrors()
                 ._setupLabel()
                 ._setupMenuEntry();
 
@@ -115,7 +115,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             return this;
         },
 
-        _setupMirror: function() {
+        _setupMirrors: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
 
             // if our owner is a NodeGroup, give every member of the NodeGroup a mirror
@@ -130,8 +130,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             return this;
         },
 
-        restoreMirror: function() {
-            this._setupMirror()
+        restoreMirrors: function() {
+            this._setupMirrors()
                 ._triggerChange(this.value, this);
         },
 
@@ -310,9 +310,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             return true;
         },
 
-        restoreMirror: function() {
+        restoreMirrors: function() {
             _.each(this.parts, function(part) {
-                part.restoreMirror();
+                part.restoreMirrors();
             });
 
             this._super();
@@ -641,7 +641,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             jQuery.extend(this, definition);
             this.owner = owner;
             this._sanitize()
-                ._setupMirror()
+                ._setupMirrors()
                 ._setupMenuEntry()
                 .fetchTransferGraphs();
         },
