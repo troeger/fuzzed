@@ -107,7 +107,7 @@ class Result(models.Model):
         stored in this result object, plus data from the linked graph configuration.
       '''
       result = {}
-      for field in ['minimum', 'maximum', 'peak', 'reliability', 'mttf', 'rounds', 'failures']:
+      for field in ['minimum', 'maximum', 'peak', 'points', 'reliability', 'mttf', 'rounds', 'failures']:
         value = getattr(self, field)
         if value != None:
           result[field] = value

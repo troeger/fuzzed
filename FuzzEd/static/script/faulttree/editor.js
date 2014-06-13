@@ -300,7 +300,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             issues = data.issues
             
             
-            if (_.size(issues.errors) > 0) {
+            /*if (_.size(issues.errors) > 0) {
                 // errors is array of error objects (message -> error message string, elementId -> related node id)
                 this._displayValidationErrors(issues.errors);
             }
@@ -308,64 +308,14 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             if (_.size(issues.warnings) > 0) {
                 // warnings is array of warning objects (message -> error message string, elementId -> related node id)
                 this._displayValidationWarnings(issues.warnings);
-            }
-
-            if (_.size(data.configurations) > 0) {
-                var chartData = {};
-                // tableData variable now useless
-                var tableData = [];
-                // introducing tableDefinition for passing column definitions to DataTables
-                var tableDefinitions = []; 
-                var configID = '';
-                
-                
-                _.each(data.configurations, function(config, index) {
-                    configID = config['id'];
-
-                    // remember the nodes and edges involved in this config for later highlighting
-                    this._collectNodesAndEdgesForConfiguration(configID, config['choices']);
-
-                    // remember the redundancy settings for this config for later highlighting
-                    this._redundancyNodeMap[configID] = {};
-                    _.each(config['choices'], function(choice, node) {
-                        if (choice.type == 'RedundancyChoice') {
-                            this._redundancyNodeMap[configID][node] = choice['n'];
-                        }
-                    }.bind(this));
-
-                    // collect chart data if given
-                    if (typeof config['points'] !== 'undefined') {
-                        chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
-                    }
-
-                    // collect table rows
-                    // they are basically the configs without the points and choices
-                    var tableEntry = config;
-                    // delete keys we no longer need
-                    tableEntry['points'] = undefined;
-                    tableEntry['choices'] = undefined;
-                    tableData.push(tableEntry);
-
-                }.bind(this));*/
-                
-            
-
-                
-                // remove progress bar
-                this._chartContainer.empty();
-                /*
-                // only display chart if points were given
-                if (_.size(chartData) != 0) {
-                    this._displayResultWithHighcharts(chartData, data['decompositionNumber']);
-                }*/
-                var columns = data.columns;
-                this._displayResultWithDataTables(columns, job_result_url);
-                
-                //this._setupResizing();
-                //} else {
-                // close menu again if there are no results
-                //this.hide();
-                //}
+            }*/
+    
+            // remove progress bar
+            this._chartContainer.empty();
+           
+            // display results within a table
+            var columns = data.columns;
+            this._displayResultWithDataTables(columns, job_result_url);
         },
 
         /**
@@ -566,7 +516,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                         marker: {
                             radius: 1
                         },
-                        events: {
+                        events: {/* ToDo adapt Code to DataTables
                             // select the corresponding grid row of the hovered series
                             // this will also highlight the corresponding nodes
                             mouseOver: function() {
@@ -582,7 +532,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
                                 this._grid.setSelectedRows([]);
                             }.bind(this)
-                        }
+                        */}
                     }
                 },
 
@@ -595,9 +545,15 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         
         
         /**
-         *      TEST  
-         *        METHOD      
+         * Method: _displayResultWithDataTables
+         *      Display the job's result in ...
          *
+         * Parameters:
+         *    
+         *    
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
          */
         _displayResultWithDataTables: function(columns, job_result_url) {
             
@@ -614,35 +570,79 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                             "aoColumns":     columns,
                             "bLengthChange": false,
                             "iDisplayLength": 10,
+                            "fnDrawCallback": function(oSettings) {
+                                // display points with highchart after table was rendered
+                                var serverData = oSettings['json'];
+                                var configurations = serverData['aaData'];
+                                var chartData = {};
+                                 
+                                 _.each(configurations, function(config) {
+                                     var configID = config['id'];
+                                     
+                                     // collect chart data if given
+                                     if (typeof config['points'] !== 'undefined') {
+                                         chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
+                                     }
+                                     
+                                     if (_.size(chartData) != 0) {
+                                         _this._displayResultWithHighcharts(chartData, 10); //data['decompositionNumber']);
+                                     }
+                                     
+                                     
+                                 }); 
+                                
+                                },
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                                                // Callback is executed for each row (each row is one configuration)
-                                                var configID = aData['id'];
-                                                var choices  = aData['choices'];
-                                                
-                                                // remember the nodes and edges involved in this config for later highlighting
-                                                
-                                                // clear configNodeMap and configEdgeMap for specific configuration id
-                                                _this._configNodeMap[configID] = [];
-                                                _this._configEdgeMap[configID] = [];
-                                                
-                                                _this._collectNodesAndEdgesForConfiguration(configID, choices);
-                                                
-                                                // remember the redundancy settings for this config for later highlighting
-                                                _this._redundancyNodeMap[configID] = {};
-                                                _.each(choices, function(choice, node) {
-                                                    if (choice.type == 'RedundancyChoice') {
-                                                        _this._redundancyNodeMap[configID][node] = choice['n'];
-                                                    }
-                                                });
-                                                
-                                                
-                                                jQuery(nRow).on("mouseover", function(){    
-                                                    _this._highlightConfiguration(configID);                                                
-                                                 })
+                                // Callback is executed for each row (each row is one configuration)
+                                
+                                var current_config = aData;
+                                var configID = current_config['id'];
+                                
+                                if ('choices' in current_config ){
+                                    var choices  = aData['choices'];
+                                    
+                                    // remember the nodes and edges involved in this config for later highlighting
+                                    
+                                    // clear configNodeMap and configEdgeMap for specific configuration id
+                                    _this._configNodeMap[configID] = [];
+                                    _this._configEdgeMap[configID] = [];
+                                    
+                                    _this._collectNodesAndEdgesForConfiguration(configID, choices);
+                                    
+                                    // remember the redundancy settings for this config for later highlighting
+                                    _this._redundancyNodeMap[configID] = {};
+                                    _.each(choices, function(choice, node) {
+                                        if (choice.type == 'RedundancyChoice') {
+                                            _this._redundancyNodeMap[configID][node] = choice['n'];
+                                        }
+                                    });
+                                    
+                                    jQuery(nRow).on("mouseover", function(){    
+                                        _this._highlightConfiguration(configID);                                                
+                                     });
+                                }
+                                
+                                //"warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}]
+                                //"errors": [{"message": "map::at", "issueId": 0, "elementId": ""}],
+                                
+                                current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
+                                if ('issues' in current_config){
+                                    var issues = current_config['issues'];
+                                    // danger triangle <i class="fa fa-exclamation-triangle"></i>
+                                    jQuery(nRow).find('td').last().append('<i class="fa fa-exclamation-triangle"></i>');
+                                    
+                                    
+                                    if ('errors' in issues){
+                                        jQuery(nRow).addClass('danger');
+                                    }
+                                    
+                                    else if ('warnings' in issues){
+                                        jQuery(nRow).addClass('warning');
+                                    }   
+                                } 
                                              },
-                            "fnInitComplete": function(oSettings, json) {
-                                  _this._setupResizing();
-                                  
+                            "fnInitComplete": function(oSettings, json) {  
+                                    _this._setupResizing();
                                 }    
                             });
                                 
@@ -650,6 +650,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 _this._unhighlightConfiguration();
             });
             
+            return this;
         },
         
         /**

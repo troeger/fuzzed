@@ -247,6 +247,10 @@ class Job(models.Model):
             # Throw away existing configurations information
             self.graph.delete_configurations()
             # walk through all the configurations determined by the backend, as shown in the XML
+            # Node configurations can be bulk-inserted, since nobody links to them
+            # The expensive looped Configuration object creation cannot be bulk-inserted,
+            # since we need their pk's in the NodeCOnfiguration object
+            db_nodeconfs = []
             for configuration in doc.configuration:
                 db_conf = Configuration(graph=self.graph, costs=configuration.costs if hasattr(configuration, 'costs') else None)
                 db_conf.save()
@@ -270,7 +274,9 @@ class Job(models.Model):
                         raise ValueError('Unknown choice %s' % element)
                     db_node = Node.objects.get(client_id=choice.key, graph=self.graph)
                     db_nodeconf = NodeConfiguration(node=db_node, configuration = db_conf, setting=json_choice)
-                    db_nodeconf.save()
+                    db_nodeconfs.append(db_nodeconf)
+            logger.debug("Performing bulk insert of node configurations")
+            NodeConfiguration.objects.bulk_create(db_nodeconfs)
 
         if hasattr(doc, 'result'):
             # Remove earlier results of the same kind
@@ -280,6 +286,7 @@ class Job(models.Model):
                 self.graph.delete_results(kind=Result.SIMULATION_RESULT)
             elif self.kind == self.MINCUT_JOB:
                 self.graph.delete_results(kind=Result.MINCUT_RESULT)
+            db_results = []
             for result in doc.result:
                 assert(int(result.modelId) == self.graph.pk)
                 db_result = Result(graph=self.graph , job=self)
@@ -294,8 +301,9 @@ class Job(models.Model):
                 self.interpret_value(result, db_result)
                 if result.issue:
                     db_result.issues = json.dumps(self.interpret_issues(result.issue))
-                db_result.save()
-                #logger.debug(db_result)
+                db_results.append(db_result)                    
+            logger.debug("Performing bulk insert of parsed results")
+            Result.objects.bulk_create(db_results)
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
