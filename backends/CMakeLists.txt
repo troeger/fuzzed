@@ -236,7 +236,9 @@ add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FIL
 			${FUZZTREE_XSD}
 
 	COMMENT "Generating C++ / XML mapping files"
-	VERBATIM)
+	VERBATIM
+
+	DEPENDS ${COMMON_TYPES_XSD} ${RESULT_XSD} ${CONFIGURATION_XSD} ${FAULTTREE_XSD} ${FUZZTREE_XSD})
 
 ############### COMMON ##################
 #########################################
