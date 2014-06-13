@@ -45,8 +45,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             return jQuery(
                 '<div id="' + FaulttreeConfig.IDs.CUTSETS_MENU + '" class="menu" header="Cutsets">\
                     <div class="menu-controls">\
-                        <span class="menu-minimize"></span>\
-                        <span class="menu-close"></span>\
+                       <i class="menu-minimize"></i>\
+                       <i class="menu-close">   </i>\
                     </div>\
                     <ul class="nav-list unstyled"></ul>\
                 </div>'
@@ -241,8 +241,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             return jQuery(
                 '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (analytical)">\
                     <div class="menu-controls">\
-                        <span class="menu-minimize"></span>\
-                        <span class="menu-close"></span>\
+                        <i class="menu-minimize"></i>\
+                        <i class="menu-close">   </i>\
                     </div>\
                     <div class="chart"></div>\
                     <div class="table_container content"></div>\
@@ -625,20 +625,22 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                                 //"warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}]
                                 //"errors": [{"message": "map::at", "issueId": 0, "elementId": ""}],
                                 
-                                current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
+                                //current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
                                 if ('issues' in current_config){
                                     var issues = current_config['issues'];
                                     // danger triangle <i class="fa fa-exclamation-triangle"></i>
-                                    jQuery(nRow).find('td').last().append('<i class="fa fa-exclamation-triangle"></i>');
+                                    jQuery(nRow).find('td').last().append('<i class="fa fa-exclamation-triangle pull-right"></i>');
                                     
                                     
                                     if ('errors' in issues){
-                                        jQuery(nRow).addClass('danger');
+                                        //jQuery(nRow).addClass('danger');
                                     }
                                     
                                     else if ('warnings' in issues){
-                                        jQuery(nRow).addClass('warning');
-                                    }   
+                                        //jQuery(nRow).addClass('warning');
+                                    }
+                                    
+                                   jQuery(nRow).attr('data-toggle',"tooltip").attr('title',"Some tooltip text!") 
                                 } 
                                              },
                             "fnInitComplete": function(oSettings, json) {  
@@ -894,8 +896,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             return jQuery(
                 '<div id="' + FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU + '" class="menu" header="Simulation Results">\
                     <div class="menu-controls">\
-                        <span class="menu-minimize"></span>\
-                        <span class="menu-close"></span>\
+                        <i class="menu-minimize"></i>\
+                        <i class="menu-close">   </i>\
                     </div>\
                     <div class="chart"></div>\
                     <div class="grid" style="width: 450px; padding-top: 5px;"></div>\
