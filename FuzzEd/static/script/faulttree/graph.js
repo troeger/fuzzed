@@ -38,6 +38,25 @@ function(Graph, FaulttreeNode, FaulttreeConfig, FaulttreeNotation) {
          */
         getNotation: function() {
             return FaulttreeNotation;
+        },
+
+        // _clone's purpose is not to actually copy any properties, but to make the clone be in the same node group
+        //    as the original, so they share common properties implicitly
+        _clone: function(node) {
+            var clone = this.addNode({
+                kind: node.kind,
+                x: node.x + 1,
+                y: node.y + 1
+            });
+
+            // if the original node is not part of a NodeGroup yet, create a new one out of the node and the clone
+            if (typeof node.nodegroup === 'undefined') {
+                this.addNodeGroup({
+                    nodeIds: [node.id, clone.id]
+                });
+            } else {
+                node.nodegroup.addNode(clone);
+            }
         }
     });
 });

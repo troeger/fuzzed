@@ -42,5 +42,16 @@ define(['node_group', 'config'], function(NodeGroup, Config) {
 
             return true;
         },
+        addNode: function(node) {
+            this.nodes[node.id] = node;
+            node.addToNodeGroup(this);
+            this._refreshProperties();
+        },
+        _refreshProperties: function() {
+            _.each(this.properties, function(prop) {
+                prop.removeAllMirrors();
+                prop.restoreMirrors();
+            }.bind(this));
+        },
     });
 });

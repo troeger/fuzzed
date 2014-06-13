@@ -1073,12 +1073,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         _setupMenuActions: function() {
             this._super();
 
-            jQuery('#' + this.config.IDs.ACTION_GROUP).click(function() {
-                this._groupSelection();
-            }.bind(this));
-
-            jQuery('#' + this.config.IDs.ACTION_UNGROUP).click(function() {
-                this._ungroupSelection();
+            jQuery('#' + this.config.IDs.ACTION_CLONE).click(function() {
+                this._cloneSelection();
             }.bind(this));
 
             // set the shortcut hints from 'Ctrl+' to '⌘' when on Mac
@@ -1124,6 +1120,15 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             this._ungroupSelection();
 
             return this;
+        },
+
+        _cloneSelection: function(event) {
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+
+            jQuery(selectedNodes).each(function(index, element) {
+                var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
+                this.graph._clone(node);
+            }.bind(this));
         }
     });
 });

@@ -261,7 +261,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
             properties.graph = this;
 
             //TODO: make it right
-            var nodeGroupClass = this.kind == 'faulttree' ? FaulttreeNodeGroup : NodeGroup;
+            var nodeGroupClass = this.kind == 'faulttree' || 'fuzztree' ? FaulttreeNodeGroup : NodeGroup;
 
             var nodeGroup = new nodeGroupClass(this.getNotation().nodeGroups, nodes, properties);
             this.nodeGroups[nodeGroup.id] = nodeGroup;

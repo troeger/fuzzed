@@ -81,6 +81,11 @@
                     <i class="fa fa-unlink"></i> Ungroup <span class="pull-right">Ctrl+A</span>
                 </a></li>
             {% endif %}
+            {% if graph.kind == 'faulttree' or graph.kind == 'fuzztree' %}
+                <li><a href="#" id="FuzzEdActionClone">
+                    <i class="fa fa-copy"></i> Clone
+                </a></li>
+            {% endif %}
             <li class="divider"></li>
             <li><a href="#" id="FuzzEdActionLayoutCluster">
                 <i class="fa fa-magic"></i> Auto-layout (cluster algorithm)</a></li>

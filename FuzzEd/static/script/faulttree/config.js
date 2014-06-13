@@ -49,6 +49,7 @@ define(['config', 'jquery'], function(Config) {
             ACTION_CUTSETS:              'FuzzEdActionCutsets',
             ACTION_ANALYTICAL:           'FuzzEdActionAnalytical',
             ACTION_SIMULATED:            'FuzzEdActionSimulated',
+            ACTION_CLONE:                'FuzzEdActionClone',
             ANALYTICAL_PROBABILITY_MENU: 'FuzzEdAnalyticalProbabilityMenu',
             SIMULATED_PROBABILITY_MENU:  'FuzzEdSimulatedProbabilityMenu'
         },
