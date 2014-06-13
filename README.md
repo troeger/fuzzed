@@ -6,7 +6,7 @@ The recommend development mode is with Vagrant. The Vagrantfile installs all rel
 
 vagrant up
 
-If you prefer to develop on your native machine without any virtualization, it needs Python, PIP and Ansible. Then run:
+If you prefer to develop on your native machine without any virtualization, it needs Python, PIP and Ansible  (version 1.6 or higher is required). Then run:
 
 ansible-playbook -i ansible/dev_machine ansible/site.yml
 
