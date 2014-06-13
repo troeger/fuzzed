@@ -21,28 +21,13 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
             jQuery(document).on(Config.Events.NODEGROUP_ADDED, function (event, id, nodeIds, properties, nodegroup) {
                 if (_.contains(nodeIds, this.id)) {
                    // if we are contained in the newly created node group
-                    this.ownProperties = this.properties;
-                    this.properties = nodegroup.properties;
-                    this.nodegroup  = nodegroup;
-
-                    _.each(this.ownProperties, function(prop) {
-                        prop.removeAllMirrors();
-                    }.bind(this));
+                   this.addToNodeGroup(nodegroup);
                 }
             }.bind(this));
             jQuery(document).on(Config.Events.NODEGROUP_DELETED, function (event, id, nodeIds) {
                 if (_.contains(nodeIds, this.id)) {
                    // if we were part of the deleted node group
-                    _.each(this.properties, function(prop) {
-                        prop.removeAllMirrors();
-                    });
-
-                    this.properties = this.ownProperties;
-                    this.nodegroup  = undefined;
-
-                    _.each(this.properties, function(prop) {
-                        prop.restoreMirror();
-                    });
+                    this.removeNodeGroup();
                 }
             }.bind(this));
         },
@@ -77,6 +62,29 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
             this.container.removeClass(this.config.Classes.AFFECTED);
 
             return this;
+        },
+
+        addToNodeGroup: function(nodegroup) {
+            this.ownProperties = this.properties;
+            this.properties = nodegroup.properties;
+            this.nodegroup  = nodegroup;
+
+            _.each(this.ownProperties, function(prop) {
+                prop.removeAllMirrors();
+            }.bind(this));
+        },
+
+        removeNodeGroup: function() {
+            _.each(this.properties, function(prop) {
+                prop.removeAllMirrors();
+            });
+
+            this.properties = this.ownProperties;
+            this.nodegroup  = undefined;
+
+            _.each(this.properties, function(prop) {
+                prop.restoreMirrors();
+            });
         }
     });
 });
