@@ -704,30 +704,32 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             var nodeGroup = undefined;
 
-            // find the correct node group, whose node ids match the selected ids
+            // case [1]: find the correct node group, whose node ids match the selected ids
+            // (i.e. the user has to select all members of a NodeGroup to remove the NodeGroup)
             _.each(this.graph.nodeGroups, function(ng) {
                 var ngIds = ng.nodeIds();
+                // math recap: two sets are equal, when both their differences are zero length
                 if (jQuery(ngIds).not(nodeIds).length == 0 && jQuery(nodeIds).not(ngIds).length == 0) {
-                    nodeGroup = ng;
+                    this.graph.deleteNodeGroup(ng);
+                    return true;
                 }
-            });
+            }.bind(this));
 
+            // case [2]: the user selected NodeGroups, (s)he wants to delete, do him/her the favor to delete them
+            // delete selected node groups (NASTY!!!)
             if (typeof nodeGroup === 'undefined') {
-                // in case the user selected NodeGroups, (s)he wants to delete, do him/her the favor
-
-                // delete selected node groups (NASTY!!!)
                 var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
 
                 jQuery(allNodeGroups).each(function(index, element) {
                     var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
                     if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
                         this.graph.deleteNodeGroup(nodeGroup);
+                        return true;
                     }
                 }.bind(this));
             }
 
-            this.graph.deleteNodeGroup(nodeGroup);
-            return true;
+            return false;
         },
 
         /**
