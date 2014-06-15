@@ -550,7 +550,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          *      ToDo: Outsource code to a own JS class.  
          *
          * Parameters:
-         *    
+         *     {Array[Object]}  columns        - A set of columns that shall be displayed within the table.
+         *     {String}         job_result_url - URL under which the server delivers configurations for a specific analysis result (using ajax and pagingation)
          *    
          *
          * Returns:
@@ -815,7 +816,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
             // highlight nodes
             _.invoke(this._configNodeMap[configID], 'highlight');
             // highlight edges
-            //_.invoke(this._configEdgeMap[configID], 'setHover', true);
+            _.invoke(this._configEdgeMap[configID], 'highlight');
             // show redundancy values
             _.each(this._redundancyNodeMap[configID], function(value, nodeID) {
                 var node = this._editor.graph.getNodeById(nodeID);
@@ -839,7 +840,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
             // unhighlight all nodes
             _.invoke(this._editor.graph.getNodes(), 'unhighlight');
             // unhighlight all edges
-            //_.invoke(this._editor.graph.getEdges(), 'setHover', false);
+            _.invoke(this._editor.graph.getEdges(), 'unhighlight');
             // remove all badges
             _.invoke(this._editor.graph.getNodes(), 'hideBadge');
 
