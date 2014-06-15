@@ -1,5 +1,5 @@
-define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'highcharts', 'jquery-ui', 'slickgrid', 'datatables'],
-function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
+define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'highcharts', 'jquery-ui', 'slickgrid'],
+function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTables) {
     /**
      * Package: Faulttree
      */
@@ -546,7 +546,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         
         /**
          * Method: _displayResultWithDataTables
-         *      Display the job's result in ...
+         *      Display the job's result with DataTables Plugin. Configuration Issues are printed inside the table as collapsed row.
+         *      ToDo: Outsource code to a own JS class.  
          *
          * Parameters:
          *    
@@ -561,6 +562,52 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             this._gridContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');
             
             var _this = this;
+            
+            
+            var collapse_column = {
+                                    "class":          'details-control',
+                                    "orderable":      false,
+                                    "data":           null,
+                                    "defaultContent": '',
+                                    "bSortable":      false
+                                  };
+                                  
+            columns.unshift(collapse_column);
+            
+            //formating function for displaying configuration warnings/errors
+            function format (d) {
+                
+                var html_errors   = '';
+                var html_warnings = '';
+                       
+                if ('issues' in d){
+                    
+                    var issues = d['issues'];
+                    
+                    if ('errors' in issues){
+                        _.each(issues['errors'], function(error){
+                            html_errors += '<li>' + error['message'] + '</li>';
+                        });
+                        
+                        html_errors = '<li><strong>Errors:</strong></li><ul>' + html_errors + '</ul>'  
+                    }    
+                    
+                    if ('warnings' in issues){
+                        _.each(issues['warnings'], function(warning){
+                            html_warnings += '<li>' + warning['message'] + '</li>';
+                        });
+                        
+                        html_warnings = '<li><strong>Warnings:</strong></li><ul>' + html_warnings + '</ul>'  
+                    }    
+                }                
+                
+               var collapse_message = '<ul>' +
+                                          html_errors +    
+                                          html_warnings +
+                                      '</ul>';
+                          
+                return collapse_message;
+            }
               
             this._grid = jQuery('#results_table').dataTable({
                             "bProcessing":   true,
@@ -593,11 +640,12 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                                 
                                 },
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                                // Callback is executed for each row (each row is one configuration)
                                 
+                                // Callback is executed for each row (each row is one configuration)
+                                                
                                 var current_config = aData;
                                 var configID = current_config['id'];
-                                
+                                                    
                                 if ('choices' in current_config ){
                                     var choices  = aData['choices'];
                                     
@@ -622,32 +670,51 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                                      });
                                 }
                                 
-                                //"warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}]
-                                //"errors": [{"message": "map::at", "issueId": 0, "elementId": ""}],
+                                /*
+                                if (iDisplayIndex == 0){
+                                    current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
+                                } else if (iDisplayIndex == 1){
+                                    current_config["issues"] = { "warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}]};
+                                } else if (iDisplayIndex == 2){
+                                     current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""},{"message": "error error error", "issueId": 0, "elementId": ""}, {"message": "another error", "issueId": 0, "elementId": ""}], "warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}, {"message": "another warning", "issueId": 0, "elementId": "3"}] };
+                                }*/
                                 
-                                //current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
                                 if ('issues' in current_config){
-                                    var issues = current_config['issues'];
-                                    // danger triangle <i class="fa fa-exclamation-triangle"></i>
-                                    jQuery(nRow).find('td').last().append('<i class="fa fa-exclamation-triangle pull-right"></i>');
+                                    jQuery(nRow).find('td.details-control').append('<i class="fa fa-exclamation-triangle"></i>')
                                     
+                                    // Add event listener for opening and closing details
+                                    jQuery(nRow).on('click', 'td.details-control', function () {
+                                        var tr  = jQuery(nRow);
+                                        var row = _this._grid.api().row(tr);
+ 
+                                        if ( row.child.isShown() ) {
+                                            // This row is already open - close it
+                                            row.child.hide();
+                                            tr.removeClass('shown');
+                                        }
+                                        else {
+                                            // Open this row
+                                            row.child( format(row.data()) ).show();
+                                            tr.addClass('shown');
+                                        }
+                                    });
+            
+                                    var issues = current_config['issues'];
                                     
                                     if ('errors' in issues){
-                                        //jQuery(nRow).addClass('danger');
+                                        jQuery(nRow).addClass('danger');
                                     }
-                                    
                                     else if ('warnings' in issues){
-                                        //jQuery(nRow).addClass('warning');
+                                        jQuery(nRow).addClass('warning');
                                     }
                                     
-                                   jQuery(nRow).attr('data-toggle',"tooltip").attr('title',"Some tooltip text!") 
                                 } 
                                              },
                             "fnInitComplete": function(oSettings, json) {  
                                     _this._setupResizing();
                                 }    
                             });
-                                
+                             
             this._grid.on( 'mouseleave', 'tr', function () {
                 _this._unhighlightConfiguration();
             });
