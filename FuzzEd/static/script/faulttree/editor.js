@@ -115,32 +115,34 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
     /**
      * Abstract Class: AnalysisResultMenu
      *      Base class for menus that display the results of a analysis performed by the backend. It contains a chart
-     *      (currently implemented with Highcharts) and a table area (using SlickGrid). Subclasses are responsible for
+     *      (implemented with Highcharts) and a table area (using DataTables). Subclasses are responsible for
      *      providing data formatters and data conversion functions.
      */
     var AnalysisResultMenu = Menus.Menu.extend({
         /**
          * Group: Members
-         *      {<Editor>}        _editor            - The <Editor> instance.
-         *      {<Job>}           _job               - <Job> instance of the backend job that is responsible for
-         *                                             calculating the probability.
-         *      {jQuery Selector} _chartContainer    - jQuery reference to the chart's container.
-         *      {jQuery Selector} _gridContainer     - jQuery reference to the table's container.
-         *      {Highchart}       _chart             - The Highchart instance displaying the result.
-         *      {SlickGrid}       _grid              - The SlickGrid instance displaying the result.
-         *      {Object}          _configNodeMap     - A mapping of the configuration ID to its node set.
-         *      {Object}          _configNodeMap     - A mapping of the configuration ID to its edge set.
-         *      {Object}          _redundancyNodeMap - A mapping of the configuration ID to the nodes' N-values
+         *      {<Editor>}        _editor              - The <Editor> instance.
+         *      {<Job>}           _job                 - <Job> instance of the backend job that is responsible for
+         *                                               calculating the probability.
+         *      {jQuery Selector} _graphIssuesContainer - Display
+         *      {jQuery Selector} _chartContainer      - jQuery reference to the chart's container.
+         *      {jQuery Selector} _gridContainer       - jQuery reference to the table's container.
+         *      {Highchart}       _chart               - The Highchart instance displaying the result.
+         *      {DataTables}      _grid                - The DataTables instance displaying the result.
+         *      {Object}          _configNodeMap       - A mapping of the configuration ID to its node set.
+         *      {Object}          _configNodeMap       - A mapping of the configuration ID to its edge set.
+         *      {Object}          _redundancyNodeMap   - A mapping of the configuration ID to the nodes' N-values
          */
-        _editor:            undefined,
-        _job:               undefined,
-        _chartContainer:    undefined,
-        _gridContainer:     undefined,
-        _chart:             undefined,
-        _grid:              undefined,
-        _configNodeMap:     {},
-        _configEdgeMap:     {},
-        _redundancyNodeMap: {},
+        _editor:              undefined,
+        _job:                 undefined,
+        _graphIssuesContainer: undefined,
+        _chartContainer:      undefined,
+        _gridContainer:       undefined,
+        _chart:               undefined,
+        _grid:                undefined,
+        _configNodeMap:       {},
+        _configEdgeMap:       {},
+        _redundancyNodeMap:   {},
 
         /**
          * Group: Initialization
@@ -153,8 +155,9 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         init: function(editor) {
             this._super();
             this._editor = editor;
-            this._chartContainer = this.container.find('.chart');
-            this._gridContainer  = this.container.find('.table_container');
+            this._graphIssuesContainer = this.container.find('.graph_issues');
+            this._chartContainer       = this.container.find('.chart');
+            this._gridContainer        = this.container.find('.table_container');
         },
 
         /**
@@ -215,6 +218,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          */
         _clear: function() {
             if (typeof this._job !== 'undefined') this._job.cancel();
+            
+            this._graphIssuesContainer.empty();
             this._chartContainer.empty();
             this._gridContainer.empty();
             // reset height in case it was set during grid creation
@@ -242,8 +247,9 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                 '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (analytical)">\
                     <div class="menu-controls">\
                         <i class="menu-minimize"></i>\
-                        <i class="menu-close">   </i>\
+                        <i class="menu-close"></i>\
                     </div>\
+                    <div class="graph_issues"></div>\
                     <div class="chart"></div>\
                     <div class="table_container content"></div>\
                 </div>'
@@ -267,7 +273,16 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                     if (this._chart != null) {
                         
                         // fit all available space with chart    
-                        this._chartContainer.height(this.container.height() - this._gridContainer.prop('scrollHeight'));
+                       
+                       //console.log('container: ' + this.container.height());
+                       //console.log('graph issues: ' + this._graphIssueContainer.height());
+                       //console.log('grid: ' + this._gridContainer.height());
+                       //console.log('chart: ' +   this._chartContainer.height());
+                       //console.log('calculated:' + (this.container.height() - this._graphIssueContainer.height() - this._gridContainer.height()));
+                       
+                        var offset = 30;
+                        
+                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._gridContainer.height() - offset);
                         
                         this._chart.setSize(
                             this._chartContainer.width(),
@@ -275,9 +290,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                             false
                         );
                     }
-
-                    //this._gridContainer.width(this._chartContainer.width());
-                    //this._grid.resizeCanvas();
+                    
                 }.bind(this)
 
             });
@@ -297,19 +310,11 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         _evaluateResult: function(data, job_result_url) {
             
             data   = jQuery.parseJSON(data);
-            issues = data.issues
+            var issues = data.issues
             
+            this._displayGraphIssues(issues.errors, issues.warnings);
             
-            /*if (_.size(issues.errors) > 0) {
-                // errors is array of error objects (message -> error message string, elementId -> related node id)
-                this._displayValidationErrors(issues.errors);
-            }
-
-            if (_.size(issues.warnings) > 0) {
-                // warnings is array of warning objects (message -> error message string, elementId -> related node id)
-                this._displayValidationWarnings(issues.warnings);
-            }*/
-    
+                
             // remove progress bar
             this._chartContainer.empty();
            
@@ -724,82 +729,6 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         },
         
         /**
-         * Method: _displayResultWithSlickGrid
-         *      Display the job's result in the menu's body using SlickGrid.
-         *
-         * Parameters:
-         *      {Object} data - A set of one or more data series to display in the SlickGrid.
-         *
-         * Returns:
-         *      This {<AnalysisResultMenu>} for chaining.
-         */
-        _displayResultWithSlickGrid: function(data) {
-            var columns = this._getDataColumns();
-            var options = {
-                enableCellNavigation:       true,
-                enableColumnReorder:        false,
-                multiColumnSort:            true,
-                autoHeight:                 true,
-                forceFitColumns:            true
-            };
-            // little workaround for constraining the height of the grid
-            var maxHeight = this._editor.getConfig().Menus.PROBABILITY_MENU_MAX_GRID_HEIGHT;
-
-            if ((data.length + 1) * 25 > maxHeight) {
-                options.autoHeight = false;
-                this._gridContainer.height(maxHeight);
-            }
-
-            // clear container
-            this._gridContainer.empty();
-            // create new grid
-            this._grid = new Slick.Grid(this._gridContainer, data, columns, options);
-            // make rows selectable
-            this._grid.setSelectionModel(new Slick.RowSelectionModel());
-
-            // highlight the corresponding nodes if a row of the grid is selected
-            this._grid.onSelectedRowsChanged.subscribe(function(e, args) {
-                this._unhighlightConfiguration();
-                // only highlight the configuration if only one config is selected
-                if (args.rows.length == 1) {
-                    var configID = args.grid.getDataItem(args.rows[0])['id'];
-                    this._highlightConfiguration(configID);
-                }
-            }.bind(this));
-
-            // highlight rows on mouse over
-            this._grid.onMouseEnter.subscribe(function(e, args) {
-                var row = args.grid.getCellFromEvent(e)['row'];
-                args.grid.setSelectedRows([row]);
-            });
-            // unhighlight cells on mouse out
-            this._grid.onMouseLeave.subscribe(function(e, args) {
-                args.grid.setSelectedRows([]);
-            });
-
-            // enable sorting of the grid
-            this._grid.onSort.subscribe(function(e, args) {
-                var cols = args.sortCols;
-                data.sort(function (dataRow1, dataRow2) {
-                    for (var i = 0, l = cols.length; i < l; i++) {
-                        var field = cols[i].sortCol.field;
-                        var sign = cols[i].sortAsc ? 1 : -1;
-                        var value1 = dataRow1[field], value2 = dataRow2[field];
-                        var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-                        if (result != 0) {
-                            return result;
-                        }
-                    }
-                    return 0;
-                });
-
-                this._grid.invalidate();
-            }.bind(this));
-
-            return this;
-        },
-
-        /**
          *  Method: _highlightConfiguration
          *      Highlights all nodes, edges and n-values that are part of the given configuration on hover.
          *
@@ -846,57 +775,47 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
 
             return this;
         },
-
+        
         /**
-         * Method: _displayValidationErrors
-         *      Display all errors that are thrown during graph validation.
-         *
-         * Parameters:
-         *      {Object} errors - An array of error objects.
-         *
-         * Returns:
-         *      This {<AnalysisResultMenu>} for chaining.
-         */
-        _displayValidationErrors: function(errors) {
-            //TODO: This is a temporary solution. Errors should be displayed per node later.
-            if (_.size(errors) == 1) {
-                Alerts.showErrorAlert('Analysis error: ', errors[0].message);
-            } else {
-                var errorList = '<ul>';
-                _.each(errors, function(error) {
-                    errorList += '<li>' + error.message + '</li>';
-                });
-                errorList += '</ul>';
-                Alerts.showErrorAlert('Analysis errors: ', errorList);
-            }
-
-            return this;
-        },
-
-        /**
-         * Method: _displayValidationWarnings
-         *      Display all warnings that are thrown during graph validation.
+         * Method: _displayGraphIssues
+         *      Display all warnings/errors that are thrown during graph validation.
          *
          * Parameters:
          *      {Object} warnings - An array of warning objects.
+         *      {Object} errors   - An array of error objects.
          *
          * Returns:
          *      This {<AnalysisResultMenu>} for chaining.
          */
-        _displayValidationWarnings: function(warnings) {
-            //TODO: This is a temporary solution. Warnings should be displayed per node later.
-            if (_.size(warnings) == 1) {
-                Alerts.showWarningAlert('Warning:', warnings[0].message);
-            } else {
-                var warningList = '<ul>';
-                _.each(warnings, function(warning) {
-                    warningList += '<li>' + warning.message + '</li>';
-                });
-                warningList += '</ul>';
-                Alerts.showWarningAlert('Multiple warnings returned from analysis:', warningList);
-            }
+        _displayGraphIssues: function(errors, warnings) {
 
-            return this;
+            var num_errors   = _.size(errors);
+            var num_warnings = _.size(warnings);
+            
+            var alert_container = jQuery('<div class="alert"></div>')
+            
+            if (num_errors > 0){
+                alert_container.addClass('alert-error');                
+            } else if(num_warnings >0){
+                alert_container.addClass('alert-warning');  
+            } else{
+                alert_container.addClass('alert-success');  
+            }
+            
+            var issues_heading   = jQuery('<a class="alert-link"> Errors: ' + num_errors + ' Warnings: ' + num_warnings + '</a>');
+            var issues_details   = jQuery('<div class="collapse"> aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa </div>');
+            
+            alert_container.append(issues_heading).append(issues_details);
+            
+            // collapse error/warning messages details after clicking on the heading
+            issues_heading.click(function(){
+                issues_details.collapse('toggle');
+            });
+            
+           
+           this._graphIssuesContainer.append(alert_container);
+
+           return this;
         },
 
         /**
