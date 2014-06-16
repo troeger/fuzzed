@@ -53,20 +53,6 @@ define(['config', 'jquery'], function(Config) {
             ACTION_SIMULATED:            'FuzzEdActionSimulated',
             ANALYTICAL_PROBABILITY_MENU: 'FuzzEdAnalyticalProbabilityMenu',
             SIMULATED_PROBABILITY_MENU:  'FuzzEdSimulatedProbabilityMenu'
-           
-        },
-        
-        /**
-         * Group: Classes
-         *      Names of certain CSS classes.
-         *
-         * Constants:
-         *      {STRING} GRAPH_ISSUES_HEADING        -
-         *      {STRING} GRAPH_ISSUES_LIST           -
-         */
-        Classes: {
-            GRAPH_ISSUES_HEADING:        'graph_issues_heading',
-            GRAPH_ISSUES_LIST:           'graph_issues_list'
         },
 
         /**
