@@ -582,37 +582,16 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
             
             //formating function for displaying configuration warnings/errors
             function format (d) {
-                
-                var html_errors   = '';
-                var html_warnings = '';
-                       
                 if ('issues' in d){
-                    
                     var issues = d['issues'];
                     
-                    if ('errors' in issues){
-                        _.each(issues['errors'], function(error){
-                            html_errors += '<li>' + error['message'] + '</li>';
-                        });
-                        
-                        html_errors = '<li><strong>Errors:</strong></li><ul>' + html_errors + '</ul>'  
-                    }    
+                    var errors   = issues['errors'] || [];
+                    var warnings = issues['warnings'] || [];
                     
-                    if ('warnings' in issues){
-                        _.each(issues['warnings'], function(warning){
-                            html_warnings += '<li>' + warning['message'] + '</li>';
-                        });
-                        
-                        html_warnings = '<li><strong>Warnings:</strong></li><ul>' + html_warnings + '</ul>'  
-                    }    
-                }                
+                    return _this._displayIsussuesList(errors, warnings);
+                }
                 
-               var collapse_message = '<ul>' +
-                                          html_errors +    
-                                          html_warnings +
-                                      '</ul>';
-                          
-                return collapse_message;
+                return '';
             }
               
             this._grid = jQuery('#results_table').dataTable({
@@ -803,7 +782,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
             }
             
             var issues_heading   = jQuery('<a class="alert-link"> Errors: ' + num_errors + ' Warnings: ' + num_warnings + '</a>');
-            var issues_details   = jQuery('<div class="collapse"> aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa </div>');
+            var issues_details   = jQuery('<div class="collapse">' + this._displayIsussuesList(errors, warnings) + '</div>');
             
             alert_container.append(issues_heading).append(issues_details);
             
@@ -812,12 +791,49 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                 issues_details.collapse('toggle');
             });
             
-           
            this._graphIssuesContainer.append(alert_container);
 
            return this;
         },
-
+        
+        
+        /**
+         * Method: _displayIsussuesList
+         *      Display all errors/warnings in a HTML unordered list.
+         *
+         * Parameters:
+         *      {Object} warnings - An array of warning objects.
+         *      {Object} errors   - An array of error objects.
+         *
+         * Returns:
+         *     {String} contains HTML with error/warning messages.
+         */
+        _displayIsussuesList: function(errors, warnings){
+            var html_errors   = '';
+            var html_warnings = '';
+                   
+            
+            if(_.size(errors) > 0){
+                _.each(errors, function(error){
+                    html_errors += '<li>' + error['message'] + '</li>';
+                });
+                html_errors = '<li><strong>Errors:</strong></li><ul>' + html_errors + '</ul>';  
+            }
+            
+             if(_.size(warnings) > 0){        
+                _.each(warnings, function(warning){
+                    html_warnings += '<li>' + warning['message'] + '</li>';
+                });
+                html_warnings = '<li><strong>Warnings:</strong></li><ul>' + html_warnings + '</ul>';
+            }
+                            
+            return '<ul>' + 
+                        html_errors + 
+                        html_warnings + 
+                   '</ul>';
+                      
+        },
+        
         /**
          * Method: _displayJobError
          *      Display an error massage resulting from a job error.
