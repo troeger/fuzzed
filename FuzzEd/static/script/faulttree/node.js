@@ -15,23 +15,6 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
         nodegroup: undefined,
         ownProperties: undefined,
 
-        init: function(definition) {
-            this._super(definition);
-
-            jQuery(document).on(Config.Events.NODEGROUP_ADDED, function (event, id, nodeIds, properties, nodegroup) {
-                if (_.contains(nodeIds, this.id)) {
-                   // if we are contained in the newly created node group
-                   this.addToNodeGroup(nodegroup);
-                }
-            }.bind(this));
-            jQuery(document).on(Config.Events.NODEGROUP_DELETED, function (event, id, nodeIds) {
-                if (_.contains(nodeIds, this.id)) {
-                   // if we were part of the deleted node group
-                    this.removeNodeGroup();
-                }
-            }.bind(this));
-        },
-
         getConfig: function() {
             return Config;
         },

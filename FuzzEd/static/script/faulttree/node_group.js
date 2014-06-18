@@ -10,6 +10,13 @@ define(['node_group', 'config'], function(NodeGroup, Config) {
      * Extends: <Base::NodeGroup>
      */
     return NodeGroup.extend({
+        init: function(definition, nodes, properties) {
+            this._super(definition, nodes, properties);
+
+            _.each(this.nodes, function(node) {
+                node.addToNodeGroup(this);
+            }.bind(this));
+        },
         _setupVisualRepresentation: function() {
             return this;
         },
@@ -28,9 +35,10 @@ define(['node_group', 'config'], function(NodeGroup, Config) {
         remove: function() {
             if (!this.deletable) return false;
 
-            // unaffect all currently affected nodes (you know, the purple ones)
+            // unaffect all currently affected nodes (you know, the purple ones) and remove their reference to us
             _.each(this.nodes, function(node) {
                 node.unaffect();
+                node.removeNodeGroup();
             }.bind(this));
 
             // don't listen anymore
