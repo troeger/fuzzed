@@ -57,6 +57,8 @@ function(Graph, FaulttreeNode, FaulttreeConfig, FaulttreeNotation) {
             } else {
                 node.nodegroup.addNode(clone);
             }
+
+            return clone;
         }
     });
 });

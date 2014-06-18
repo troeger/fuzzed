@@ -1123,12 +1123,28 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         _cloneSelection: function(event) {
-            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selected = jQuery('.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE);
 
-            jQuery(selectedNodes).each(function(index, element) {
-                var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
-                this.graph._clone(node);
-            }.bind(this));
+            // we will only clone the selection, if a single node is selected
+            if (selected.length === 1) {
+                // temporarily hide the properties menu to avoid, that it shows the newly created node's individual
+                //    properties, as it is supposed to show the common properties with it's original node (i.e. the
+                //    NodeGroup's properties)
+                this.properties.hide();
+
+                var node  = this.graph.getNodeById(selected.data(this.config.Keys.NODE).id);
+                var clone = this.graph._clone(node);
+
+                if (clone) {
+                    // highlight the newly generated node by selecting it
+                    this._deselectAll();
+                    clone.select();
+                }
+
+                // allow the properties menu to be shown again
+                this.properties.show();
+            }
+            // otherwise do nothing
         }
     });
 });
