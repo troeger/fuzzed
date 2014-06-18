@@ -1,5 +1,5 @@
-define(['graph', 'fuzztree/node', 'fuzztree/config', 'json!notations/fuzztree.json'],
-function(Graph, FuzztreeNode, FuzztreeConfig, FuzztreeNotation) {
+define(['faulttree/graph', 'fuzztree/node', 'fuzztree/config', 'json!notations/fuzztree.json'],
+function(FaulttreeGraph, FuzztreeNode, FuzztreeConfig, FuzztreeNotation) {
     /**
      *  Package: Fuzztree
      */
@@ -8,7 +8,7 @@ function(Graph, FuzztreeNode, FuzztreeConfig, FuzztreeNotation) {
      *  Class: Graph
      *    Fuzztree-specific graph. Extends <Base::Graph>.
      */
-    return Graph.extend({
+    return FaulttreeGraph.extend({
         /**
          *  Group: Accessors
          */
