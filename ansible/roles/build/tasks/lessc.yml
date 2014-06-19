@@ -14,4 +14,10 @@
 
 - name: Bring lessc executable into path
   sudo: yes
-  file: src=/usr/local/share/npm/bin/lessc dest=/usr/local/bin/lessc state=link force=true
+  file: src=/usr/local/share/npm/bin/lessc dest=/usr/local/bin/lessc state=link
+  when: ansible_os_family == "Darwin"
+  
+- name: Bring lessc executable into path
+  sudo: yes
+  file: src=/usr/local/lib/node_modules/less/bin/lessc dest=/usr/local/bin/lessc state=link
+  when: ansible_os_family == "Debian"
