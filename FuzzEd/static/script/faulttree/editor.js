@@ -224,6 +224,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
             this._gridContainer.empty();
             // reset height in case it was set during grid creation
             this._gridContainer.css('height', '');
+            // reset container width (which is set after initalisation of DataTables)
+            this.container.css('width','');
             this._chart = null; this._grid = null;
             this._configNodeMap = {};
             this._redundancyNodeMap = {};
@@ -655,20 +657,19 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                                      });
                                 }
                                 
-                                /*
                                 if (iDisplayIndex == 0){
                                     current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
                                 } else if (iDisplayIndex == 1){
                                     current_config["issues"] = { "warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}]};
                                 } else if (iDisplayIndex == 2){
                                      current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""},{"message": "error error error", "issueId": 0, "elementId": ""}, {"message": "another error", "issueId": 0, "elementId": ""}], "warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}, {"message": "another warning", "issueId": 0, "elementId": "3"}] };
-                                }*/
+                                }
                                 
                                 if ('issues' in current_config){
-                                    jQuery(nRow).find('td.details-control').append('<i class="fa fa-exclamation-triangle"></i>')
+                                    jQuery(nRow).find('td.details-control').append('<i class="fa fa-exclamation-triangle"></i>');
                                     
                                     // Add event listener for opening and closing details
-                                    jQuery(nRow).on('click', 'td.details-control', function () {
+                                    jQuery(nRow).on('click', function () {
                                         var tr  = jQuery(nRow);
                                         var row = _this._grid.api().row(tr);
  
@@ -693,10 +694,20 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                                         jQuery(nRow).addClass('warning');
                                     }
                                     
+                                }
+                                else{
+                                    // if row is not collapsable show default pointer
+                                    jQuery(nRow).css('cursor', 'default');
                                 } 
                                              },
                             "fnInitComplete": function(oSettings, json) {  
                                     _this._setupResizing();
+                                    
+                                    //fixed height of grid
+                                    _this._gridContainer.css('height',_this._gridContainer.height());
+                                    // keep container width when switching the page
+                                    _this.container.css('width', _this.container.width());
+                                    
                                 }    
                             });
                              
@@ -771,7 +782,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
             var num_errors   = _.size(errors);
             var num_warnings = _.size(warnings);
             
-            var alert_container = jQuery('<div class="alert"></div>')
+            var alert_container = jQuery('<div class="alert"><i class="fa fa-exclamation-triangle"></i></div>')
             
             if (num_errors > 0){
                 alert_container.addClass('alert-error');                
@@ -781,7 +792,11 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                 alert_container.addClass('alert-success');  
             }
             
-            var issues_heading   = jQuery('<a class="alert-link"> Errors: ' + num_errors + ' Warnings: ' + num_warnings + '</a>');
+            var issues_heading   = jQuery('<a class="alert-link">\
+                                            Errors: ' + num_errors + '&nbsp;&nbsp;&nbsp;\
+                                            Warnings: ' + num_warnings +
+                                          '</a>');
+                                            
             var issues_details   = jQuery('<div class="collapse">' + this._displayIsussuesList(errors, warnings) + '</div>');
             
             alert_container.append(issues_heading).append(issues_details);
