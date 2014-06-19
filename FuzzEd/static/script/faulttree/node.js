@@ -62,12 +62,31 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
                 prop.removeAllMirrors();
             });
 
-            this.properties = this.ownProperties;
+            //this.properties = this.ownProperties;
+            /*_.each(this.properties, function(prop) {
+                prop.changeOwnerTo(this);
+            }.bind(this));*/
+
+            var jsonNode = jQuery.extend({},
+                _.pick(this,
+                    'id',
+                    'kind',
+                    'x',
+                    'y'
+                ),
+                {
+                    properties: this.nodegroup.toDict().properties
+                }
+            );
+
             this.nodegroup  = undefined;
 
-            _.each(this.properties, function(prop) {
+            /*_.each(this.properties, function(prop) {
                 prop.restoreMirrors();
-            });
+            });*/
+
+            this.remove();
+            this.graph.addNode(jsonNode);
         }
     });
 });
