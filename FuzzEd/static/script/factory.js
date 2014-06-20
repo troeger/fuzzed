@@ -41,12 +41,12 @@ function(Class) {
                             // our second try supposes that the constructor is a member of the return object and is called the same
                             //  as the concrete class we are looking for (e.g. FaulttreeNodeGroup)
                             var clsName = resolveObj.kind
-                            creation = this._construct(clsModule[baseCls], args.slice(1));
+                            creation = this._construct(clsModule[resolveObj.fullClassName], args.slice(1));
                         } catch (f) {
                             if (e instanceof ClassNotFound) {
                                 // our third try is to find the wanted class inside the found package, but this time named in
                                 //  as the baseCls (e.g. NodeGroup)
-                                creation = this._construct(clsModule[baseCls], args.slice(1));
+                                creation = this._construct(clsModule[resolveObj.cls], args.slice(1));
                             } else {
                                 throw f;
                             }
