@@ -219,7 +219,6 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
             definition.readOnly = this.readOnly;
             definition.graph    = this;
 
-            //TODO: put this into the factory, maybe
             var node = new (this.nodeClassFor(definition.kind))(this.factory, definition);
             this.nodes[node.id] = node;
 

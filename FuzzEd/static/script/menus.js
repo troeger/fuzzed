@@ -239,7 +239,7 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function (Config, Class) {
             } else if (selected.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
                 this._selectee = selected.data(Config.Keys.EDGE);
             } else { // if (selected.hasClass(Config.Keys.NODEGROUP
-                //TODO: do this right
+                //TODO: do this right (which is handling all
                 this._selectee = selected.parent().parent().data(Config.Keys.NODEGROUP);
             }
 
