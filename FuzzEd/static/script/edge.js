@@ -141,7 +141,7 @@ function(Class, Config, Property) {
                 }
 
                 property.name = propertyName;
-                this.properties[propertyName] = Property.from(this, property);
+                this.properties[propertyName] = Property.from(this.factory, this, property);
             }.bind(this));
 
             return this;

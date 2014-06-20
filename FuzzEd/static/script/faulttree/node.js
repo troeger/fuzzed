@@ -67,7 +67,7 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
                 prop.changeOwnerTo(this);
             }.bind(this));*/
 
-            var jsonNode = jQuery.extend({},
+            /*var jsonNode = jQuery.extend({},
                 _.pick(this,
                     'id',
                     'kind',
@@ -77,16 +77,17 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
                 {
                     properties: this.nodegroup.toDict().properties
                 }
-            );
+            );*/
 
+            this.properties = this.ownProperties;
             this.nodegroup  = undefined;
 
-            /*_.each(this.properties, function(prop) {
+            _.each(this.properties, function(prop) {
                 prop.restoreMirrors();
-            });*/
+            });
 
-            this.remove();
-            this.graph.addNode(jsonNode);
+            //this.remove();
+            //this.graph.addNode(jsonNode);
         }
     });
 });

@@ -121,10 +121,10 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             // if our owner is a NodeGroup, give every member of the NodeGroup a mirror
             if (typeof this.owner.nodes !== 'undefined') {
                 _.each(this.owner.nodes, function(node) {
-                    this.mirrors.push(new Mirror(this, node.container, this.mirror));
+                    this.mirrors.push(this.factory.create('Mirror', this, node.container, this.mirror));
                 }.bind(this));
             } else {
-                this.mirrors.push(new Mirror(this, this.owner.container, this.mirror));
+                this.mirrors.push(this.factory.create('Mirror', this, this.owner.container, this.mirror));
             }
 
             return this;
@@ -152,13 +152,14 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         _setupLabel: function() {
             if (typeof this.label === 'undefined' || this.label === null) return this;
-            this.label = new Label(this, this.owner.jsPlumbEdge, this.label);
+            this.label = this.factory.create('Label', this, this.owner.jsPlumbEdge, this.label);
 
             return this;
         },
 
         _setupMenuEntry: function() {
-            this.menuEntry = new (this.menuEntryClass())(this);
+            //TODO: put this into the factory
+            this.menuEntry = new (this.menuEntryClass())(this.factory, this);
 
             return this;
         },
@@ -351,7 +352,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
                     partInCompound: index,
                     value: index === this.value ? value : undefined
                 });
-                parsedParts[index] = from(this.owner, partDef);
+                parsedParts[index] = from(this.factory, this.owner, partDef);
             }.bind(this));
 
             this.parts = parsedParts;
@@ -720,17 +721,18 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         }
     });
 
-    var from = function(owner, definition) {
+    //TODO: put this into the factory
+    var from = function(factory, owner, definition) {
         switch (definition.kind) {
-            case 'bool':     return new Bool(owner, definition);
-            case 'choice':   return new Choice(owner, definition);
-            case 'compound': return new Compound(owner, definition);
-            case 'epsilon':  return new Epsilon(owner, definition);
-            case 'numeric':  return new Numeric(owner, definition);
-            case 'range':    return new Range(owner, definition);
-            case 'text':     return new Text(owner, definition);
-			case 'textfield':return new InlineTextField(owner, definition);
-            case 'transfer': return new Transfer(owner, definition);
+            case 'bool':     return new Bool(factory, owner, definition);
+            case 'choice':   return new Choice(factory, owner, definition);
+            case 'compound': return new Compound(factory, owner, definition);
+            case 'epsilon':  return new Epsilon(factory, owner, definition);
+            case 'numeric':  return new Numeric(factory, owner, definition);
+            case 'range':    return new Range(factory, owner, definition);
+            case 'text':     return new Text(factory, owner, definition);
+			case 'textfield':return new InlineTextField(factory, owner, definition);
+            case 'transfer': return new Transfer(factory, owner, definition);
 
             default: throw ValueError('unknown property kind ' + definition.kind);
         }

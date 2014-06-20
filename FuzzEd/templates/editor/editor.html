@@ -11,7 +11,7 @@
         require(['{{ graph.kind }}/editor', 'bootstrap', 'exception'], function (Editor) {
             jQuery(document).ready(function () {
                 try {
-                    var editor = new Editor({{ graph.pk }});
+                    var editor = new Editor(undefined, {{ graph.pk }});
                 } catch (exception) {
                     var exceptions = jQuery('#FuzzEdExceptions');
 

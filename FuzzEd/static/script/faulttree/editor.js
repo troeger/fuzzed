@@ -1,5 +1,5 @@
-define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'highcharts', 'jquery-ui', 'slickgrid'],
-function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
+define(['editor', 'factory', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'faulttree/node_group', 'highcharts', 'jquery-ui', 'slickgrid'],
+function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, FaulttreeNodeGroup) {
     /**
      *  Package: Faulttree
      */
@@ -911,6 +911,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          *  Group: Accessors
          */
 
+        getFactory: function() {
+            return new Factory(undefined, 'faulttree');
+        },
+
         /**
          *  Method: getConfig
          *
@@ -943,8 +947,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
         _loadGraphCompleted: function(readOnly) {
             //this.cutsetsMenu     = new CutsetsMenu(this);
-            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this);
-            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this);
+            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this.factory, this);
+            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this.factory, this);
 
             this._setupCutsetsAction()
                 ._setupAnalyticalProbabilityAction()

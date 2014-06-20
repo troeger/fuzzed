@@ -153,7 +153,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
             properties.id  = jsonEdge.id;
             properties.graph = this;
 
-            var edge = new Edge(this.getNotation().edges, sourceNode, targetNode, properties);
+            var edge = this.factory.create('Edge', this.getNotation().edges, sourceNode, targetNode, properties);
             this.edges[edge.id] = edge;
 
             return edge;
@@ -174,7 +174,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
          *    The newly created Edge instance.
          */
         _addEdge: function(jsPlumbEdge) {
-            var edge = new Edge(this.getNotation().edges, jsPlumbEdge, {graph: this});
+            var edge = this.factory.create('Edge', this.getNotation().edges, jsPlumbEdge, {graph: this});
             this.edges[edge.id] = edge;
 
             return edge;
@@ -219,7 +219,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
             definition.readOnly = this.readOnly;
             definition.graph    = this;
 
-            var node = new (this.nodeClassFor(definition.kind))(definition);
+            var node = new (this.nodeClassFor(definition.kind))(this.factory, definition);
             this.nodes[node.id] = node;
 
             return node;
@@ -260,10 +260,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
             properties.id  = jsonNodeGroup.id;
             properties.graph = this;
 
-            //TODO: make it right
-            var nodeGroupClass = this.kind == 'faulttree' || this.kind == 'fuzztree' ? FaulttreeNodeGroup : NodeGroup;
-
-            var nodeGroup = new nodeGroupClass(this.getNotation().nodeGroups, nodes, properties);
+            var nodeGroup = this.factory.create('NodeGroup', this.getNotation().nodeGroups, nodes, properties);
             this.nodeGroups[nodeGroup.id] = nodeGroup;
 
             return nodeGroup;
@@ -542,7 +539,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
          *    The newly created <Node> subclass.
          */
         _newNodeClassForKind: function(definition) {
-            var BaseClass = this.getNodeClass();
+            var BaseClass = this.factory.getClassModule('Node');
             var inherits = definition.inherits;
 
             if (inherits) {
