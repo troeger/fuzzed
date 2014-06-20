@@ -564,10 +564,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         _displayResultWithDataTables: function(columns, job_result_url) {
             
             // clear container
-            this._gridContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');
-            
-            var _this = this;
-            
+            this._gridContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');            
             
             var collapse_column = {
                                     "class":          'details-control',
@@ -580,18 +577,18 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
             columns.unshift(collapse_column);
             
             //formating function for displaying configuration warnings/errors
-            function format (d) {
+            var format = function (d) {
                 if ('issues' in d){
                     var issues = d['issues'];
                     
                     var errors   = issues['errors'] || [];
                     var warnings = issues['warnings'] || [];
                     
-                    return _this._displayIsussuesList(errors, warnings);
+                    return this._displayIsussuesList(errors, warnings);
                 }
                 
                 return '';
-            }
+            }.bind(this);
               
             this._grid = jQuery('#results_table').dataTable({
                             "bProcessing":   true,
@@ -616,13 +613,13 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                                      }
                                      
                                      if (_.size(chartData) != 0) {
-                                         _this._displayResultWithHighcharts(chartData, 10); //data['decompositionNumber']);
+                                         this._displayResultWithHighcharts(chartData, 10); //data['decompositionNumber']);
                                      }
                                      
                                      
-                                 }); 
+                                 }.bind(this)); 
                                 
-                                },
+                                }.bind(this),
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                                 
                                 // Callback is executed for each row (each row is one configuration)
@@ -636,25 +633,25 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                                     // remember the nodes and edges involved in this config for later highlighting
                                     
                                     // clear configNodeMap and configEdgeMap for specific configuration id
-                                    _this._configNodeMap[configID] = [];
-                                    _this._configEdgeMap[configID] = [];
+                                    this._configNodeMap[configID] = [];
+                                    this._configEdgeMap[configID] = [];
                                     
-                                    _this._collectNodesAndEdgesForConfiguration(configID, choices);
+                                    this._collectNodesAndEdgesForConfiguration(configID, choices);
                                     
                                     // remember the redundancy settings for this config for later highlighting
-                                    _this._redundancyNodeMap[configID] = {};
+                                    this._redundancyNodeMap[configID] = {};
                                     _.each(choices, function(choice, node) {
                                         if (choice.type == 'RedundancyChoice') {
-                                            _this._redundancyNodeMap[configID][node] = choice['n'];
+                                            this._redundancyNodeMap[configID][node] = choice['n'];
                                         }
-                                    });
+                                    }.bind(this));
                                     
                                     jQuery(nRow).on("mouseover", function(){    
-                                        _this._highlightConfiguration(configID);                                                
-                                     });
+                                            this._highlightConfiguration(configID);                                                
+                                     }.bind(this));
                                 }
                                 
-                                /*
+                                /* Sample Configuration issues
                                 if (iDisplayIndex == 0){
                                     current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
                                 } else if (iDisplayIndex == 1){
@@ -669,7 +666,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                                     // Add event listener for opening and closing details
                                     jQuery(nRow).on('click', function () {
                                         var tr  = jQuery(nRow);
-                                        var row = _this._grid.api().row(tr);
+                                        var row = this._grid.api().row(tr);
  
                                         if ( row.child.isShown() ) {
                                             // This row is already open - close it
@@ -678,10 +675,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                                         }
                                         else {
                                             // Open this row
-                                            row.child( format(row.data()) ).show();
+                                            row.child(format(row.data())).show();
                                             tr.addClass('shown');
                                         }
-                                    });
+                                    }.bind(this));
             
                                     var issues = current_config['issues'];
                                     
@@ -697,21 +694,22 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                                     // if row is not collapsable show default pointer
                                     jQuery(nRow).css('cursor', 'default');
                                 } 
-                                             },
+                            }.bind(this),
+                                             
                             "fnInitComplete": function(oSettings, json) {  
-                                    _this._setupResizing();
+                                    this._setupResizing();
                                     
                                     // set minumum height of grid as the height of the first draw of the grid
-                                    _this._gridContainer.css('min-height',_this._gridContainer.height());
+                                    this._gridContainer.css('min-height', this._gridContainer.height());
                                     // keep container width when switching the page (-> otherwise jumping width when switching)
-                                    _this.container.css('width', _this.container.width());
+                                    this.container.css('width', this.container.width());
                                     
-                                }    
+                                }.bind(this)    
                             });
                              
-            this._grid.on( 'mouseleave', 'tr', function () {
-                _this._unhighlightConfiguration();
-            });
+            this._grid.on('mouseleave', 'tr', function () {
+                this._unhighlightConfiguration();
+            }.bind(this));
             
             return this;
         },
