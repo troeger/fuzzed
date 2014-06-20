@@ -4,17 +4,20 @@
 
 The recommend development mode is with Vagrant. The Vagrantfile installs all relevant stuff in the virtual machine. Inside the Vagrant VM, you can find all sources at /home/fuzztrees. Just install Vagrant and run:
 
-vagrant up
+`vagrant up`
 
 If you prefer to develop on your native machine without any virtualization, it needs Python, PIP and Ansible  (version 1.6 or higher is required). Then run:
 
-ansible-playbook -i ansible/dev_machine ansible/site.yml
+`ansible-playbook -i ansible/dev_machine ansible/site.yml`
 
 Add a "-s" option if you have a password-less 'sudo' available instead of working in your root account. Our Ansible code is prepared for Linux and Mac OS X development machines.
 
 ## Developing for FuzzEd
 
-Compile static stuff:                              > fab build.all
+### Compile static stuff                              
+
+`> fab build.all`
+
 Synchronize local database with current model:     > ./manage.py syncdb --migrate
 Run development web server (inside VM or on host): > fab run.server
 Run backend services (inside VM or on host):       > fab run.backend
@@ -54,4 +57,3 @@ Felix Kubicek     (frontend)
 Stefan Richter    (frontend)
 Frank Schlegel    (core architecture, frontend)
 Christian Werling (frontend)
-
