@@ -14,19 +14,19 @@ Add a "-s" option if you have a password-less 'sudo' available instead of workin
 
 ## Developing for FuzzEd
 
-### Compile static stuff                              
+#### Compile static stuff                              
 
 `> fab build.all`
 
-### Synchronize local database with current model
+#### Synchronize local database with current model
 
 `> ./manage.py syncdb --migrate`
 
-### Run development web server (inside VM or on host)
+#### Run development web server (inside VM or on host)
 
 `> fab run.server`
 
-### Run backend services (inside VM or on host)
+#### Run backend services (inside VM or on host)
 
 `> fab run.backend`
 
