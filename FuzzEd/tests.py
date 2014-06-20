@@ -3,7 +3,7 @@
 
     The typical workflow to add new tests is the following:
     - Get yourself an empty local database with './manage.py flush'.
-    - Draw one or more test graphs. 
+    - Draw one or more test graphs. Make sure that they are owner by the user with user.pk = 1.
     - Create a fixture file from it with 'fab fixture_save:<filename.json>'. 
     - Create a class such as 'SimpleFixtureTestCase' to wrap all ID's for your fixture file.
     - Derive your test case class from it. Check the helper functions in 'FuzzEdTestCase'.
@@ -24,24 +24,62 @@ from subprocess import Popen
 import unittest
 from xml.dom.minidom import parse
 
-from django.test import LiveServerTestCase
+from django.test import LiveServerTestCase, TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
 
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
+from FuzzEd.models.result import Result
+from FuzzEd.models.job import Job
 from FuzzEd.models.node_group import NodeGroup
 from FuzzEd.models.notification import Notification
-
 
 
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
 #logging.disable(logging.CRITICAL)
 
+# The fixtures used in different test classes
+fixt_analysis = {
+                'files' :  ['analysis.json', 'testuser.json'], 
+                'graphs':  {7: 'faulttree', 8: 'faulttree'},
+                'results': {7: 'results/rate_tree.xml', 8: 'results/prdc_tree.xml'},               
+                'rate_faulttree': 7,                # Graph PK
+                'prdc_faulttree': 8,                # Graph PK
+                'prdc_configurations': 8,           # Decomposition number
+                'prdc_peaks': [0.31482, 0.12796, 0.25103, 0.04677, 0.36558, 0.19255, 0.30651, 0.11738]
+                }
+
+fixt_simple = {
+                'files' : ['simple.json', 'testuser.json'], 
+                'graphs': {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'},
+                'pkProject': 1,
+                'pkFaultTree': 1,
+                'pkDFD': 1,  # TODO: This is a hack, since nobody checks the validity of node groups for the graph kind so far
+                'clientIdEdge': 4,
+                'clientIdAndGate': 1,
+                'clientIdBasicEvent': 2
+              }
+
+fixt_mincut = {
+                'files': ['mincut1.json', 'testuser.json'],
+                'mincut_faulttree': 1,
+                'mincut_numcuts': 3
+              }
+
+fixt_unicode = {
+                'files': ['unicode.json', 'testuser.json'],
+                'graphs': {1: 'faulttree'},
+                'pkProject': 1,
+                'pkFaultTree': 1
+    
+               }
+
 class FuzzEdTestCase(LiveServerTestCase):
-    '''
-        The base class for all test cases. Mainly provides helper functions for deal with auth stuff.
-    '''
+    """
+        The base class for all test cases that work on exposed function calls. 
+        Mainly provides helper functions for deal with auth stuff.
+    """
 
     def setUpAnonymous(self):
         ''' If the test case wants to have a anonymous login session, it should call this function in setUp().'''
@@ -84,7 +122,9 @@ class FuzzEdTestCase(LiveServerTestCase):
         return self.c.delete(url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
     def requestJob(self, base_url, graph, kind):
-        """ Helper function for requesting a job. """
+        """ 
+            Helper function for requesting a job. Waits for the result and returns its URL.
+        """
         newjob = json.dumps({'kind': kind})
         response = self.ajaxPost(base_url + '/graphs/%u/jobs/' % graph, newjob, 'application/json')
         self.assertNotEqual(response.status_code, 500)  # the backend daemon is not started
@@ -98,29 +138,15 @@ class FuzzEdTestCase(LiveServerTestCase):
             response = self.ajaxGet(jobUrl)
             code = response.status_code
         self.assertEqual(response.status_code, 200)
+        assert ('Location' in response)
+        resultUrl = response['Location']
         return response
 
-
-class SimpleFixtureTestCase(FuzzEdTestCase):
-    ''' 
-        This is a base class that wraps all information about the 'simple' fixture. 
-    '''
-    #TODO: use notations here?
-    fixtures = ['simple.json', 'initial_data.json']
-    graphs = {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'}
-    # A couple of specific PK's from the model
-    pkProject = 1
-    pkFaultTree = 1
-    pkDFD = 1  # TODO: This is a hack, since nobody checks the validity of node groups for the graph kind so far
-    clientIdEdge = 4
-    clientIdAndGate = 1
-    clientIdBasicEvent = 2
-
-
-class ViewsTestCase(SimpleFixtureTestCase):
-    ''' 
+class ViewsTestCase(FuzzEdTestCase):
+    """ 
         Tests for different Django views and their form submissions. 
-    '''
+    """
+    fixtures = fixt_simple['files']
 
     def setUp(self):
         self.setUpLogin()
@@ -135,8 +161,8 @@ class ViewsTestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 200)
 
     def testEditorView(self):
-        for id, kind in self.graphs.iteritems():
-            response = self.get('/editor/%u' % id)
+        for graphId, kind in fixt_simple['graphs'].iteritems():
+            response = self.get('/editor/%u' % graphId)
             self.assertEqual(response.status_code, 200)
 
     def testInvalidEditorView(self):
@@ -144,12 +170,14 @@ class ViewsTestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 404)
 
     def testBulkGraphCopy(self):
-        response = self.post('/projects/%u/dashboard/edit/' % self.pkProject, {'copy': 'copy', 'graph_id[]': self.graphs})
+        response = self.post('/projects/%u/dashboard/edit/' % fixt_simple['pkProject'], 
+                             {'copy': 'copy', 'graph_id[]': fixt_simple['graphs']})
         self.assertEqual(response.status_code, 302)
 
     def testSingleGraphCopy(self):
-        for graphid, kind in self.graphs.iteritems():
-            response = self.post('/projects/%u/dashboard/edit/' % self.pkProject, {'copy': 'copy', 'graph_id[]': graphid})
+        for graphid, kind in fixt_simple['graphs'].iteritems():
+            response = self.post('/projects/%u/dashboard/edit/' % fixt_simple['pkProject'], 
+                                 {'copy': 'copy', 'graph_id[]': graphid})
             self.assertEqual(response.status_code, 302)
             # The view code has no reason to return the new graph ID, so the redirect is to the dashboard
             # We therefore determine the new graph by the creation time
@@ -158,10 +186,11 @@ class ViewsTestCase(SimpleFixtureTestCase):
             self.assertTrue(original.same_as(copy))
 
 
-class GraphMLFilesTestCase(SimpleFixtureTestCase):
-    ''' 
+class GraphMLFilesTestCase(FuzzEdTestCase):
+    """ 
         Testing different GraphML file imports. 
-    '''
+    """
+    fixtures = fixt_simple['files']
 
     def setUp(self):
         self.setUpAnonymous()
@@ -171,15 +200,18 @@ class GraphMLFilesTestCase(SimpleFixtureTestCase):
         for f in files:
             text = open('FuzzEd/fixtures/' + f).read()
             # Now import the same GraphML
-            response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u' % self.pkProject, text,
-                                           'application/xml')
+            response = self.postWithAPIKey(
+                        '/api/v1/graph/?format=graphml&project=%u' % fixt_simple['pkProject'], 
+                        text,
+                        'application/xml')
             self.assertEqual(response.status_code, 201)
 
 
-class ExternalAPITestCase(SimpleFixtureTestCase):
-    ''' 
+class ExternalAPITestCase(FuzzEdTestCase):
+    """ 
         Tests for the Tastypie API. 
-    '''
+    """
+    fixtures = fixt_simple['files']
 
     def setUp(self):
         self.setUpAnonymous()
@@ -215,12 +247,12 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         data = json.loads(response.content)
 
     def testSingleProjectResource(self):
-        response = self.getWithAPIKey('/api/v1/project/%u/?format=json' % self.pkProject)
+        response = self.getWithAPIKey('/api/v1/project/%u/?format=json' % fixt_simple['pkProject'])
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
 
     def testJsonExport(self):
-        for id, kind in self.graphs.iteritems():
+        for id, kind in fixt_simple['graphs'].iteritems():
             response = self.get('/api/v1/graph/%u/?format=json' % id)
             self.assertEqual(response.status_code, 401)
             response = self.getWithAPIKey('/api/v1/graph/%u/?format=json' % id)
@@ -228,7 +260,7 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
             self.assertEqual(response.status_code, 200)
 
     def testLatexExport(self):
-        for id, kind in self.graphs.iteritems():
+        for id, kind in fixt_simple['graphs'].iteritems():
             if kind in ['faulttree', 'fuzztree']:
                 response = self.get('/api/v1/graph/%u/?format=tex' % id)
                 self.assertEqual(response.status_code, 401)
@@ -237,7 +269,7 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
                 assert ("tikz" in response.content)
 
     def testGraphmlExport(self):
-        for id, kind in self.graphs.iteritems():
+        for id, kind in fixt_simple['graphs'].iteritems():
             if kind in ['faulttree', 'fuzztree']:
                 # Should only be possible with API key authentication
                 response = self.get('/api/v1/graph/%u/?format=graphml' % id)
@@ -247,13 +279,13 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
                 assert ("<graphml" in response.content)
 
     def testGraphmlImport(self):
-        for id, kind in self.graphs.iteritems():
+        for id, kind in fixt_simple['graphs'].iteritems():
             # First export GraphML
             response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % id)
             self.assertEqual(response.status_code, 200)
             graphml = response.content
             # Now import the same GraphML
-            response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u' % self.pkProject, graphml,
+            response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u' % fixt_simple['pkProject'], graphml,
                                            'application/xml')
             self.assertEqual(response.status_code, 201)
             # Check if the claimed graph really was created
@@ -264,7 +296,7 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
 
     def testInvalidGraphImportProject(self):
         # First export valid GraphML
-        response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % self.pkFaultTree)
+        response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % fixt_simple['pkFaultTree'])
         self.assertEqual(response.status_code, 200)
         graphml = response.content
         # Now send request with wrong project ID
@@ -273,7 +305,7 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
 
     def testMissingGraphImportProject(self):
         # First export valid GraphML
-        response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % self.pkFaultTree)
+        response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % fixt_simple['pkFaultTree'])
         self.assertEqual(response.status_code, 200)
         graphml = response.content
         # Now send request with wrong project ID
@@ -282,13 +314,13 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
 
     def testInvalidGraphImportFormat(self):
         for wrong_format in ['json', 'tex', 'xml']:
-            response = self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u' % (wrong_format, self.pkProject),
+            response = self.postWithAPIKey('/api/v1/graph/?format=%s&project=%u' % (wrong_format, fixt_simple['pkProject']),
                                            "<graphml></graphml>", 'application/text')
             self.assertEqual(response.status_code, 413)
 
     def testInvalidContentType(self):
         for format in ['application/text', 'application/x-www-form-urlencoded']:
-            response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u' % (self.pkProject),
+            response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u' % (fixt_simple['pkProject']),
                                            "<graphml></graphml>", format)
             self.assertEqual(response.status_code, 413)
 
@@ -298,10 +330,11 @@ class ExternalAPITestCase(SimpleFixtureTestCase):
         assert (True)
 
 
-class FrontendApiTestCase(SimpleFixtureTestCase):
-    ''' 
+class FrontendApiTestCase(FuzzEdTestCase):
+    """
         Tests for the Frontend API called from JavaScript. 
-    '''
+    """
+    fixtures = fixt_simple['files']
 
     baseUrl = '/api/front'
 
@@ -317,8 +350,8 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
             self.assertIn(key, content)
 
     def testGetGraph(self):
-        for id, kind in self.graphs.iteritems():
-            url = self.baseUrl + '/graphs/%u' % self.pkFaultTree
+        for id, kind in fixt_simple['graphs'].iteritems():
+            url = self.baseUrl + '/graphs/%u' % fixt_simple['pkFaultTree']
             response = self.ajaxGet(url)
             self.assertEqual(response.status_code, 200)
             content = json.loads(response.content)
@@ -327,9 +360,9 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         self.assertEqual(response.status_code, 404)
 
     def testGraphDownload(self):
-        for id, kind in self.graphs.iteritems():
+        for id, kind in fixt_simple['graphs'].iteritems():
             for format, test_str in [('graphml', '<graphml'), ('json', '{'), ('tex', '\\begin')]:
-                url = self.baseUrl + '/graphs/%u?format=%s' % (self.pkFaultTree, format)
+                url = self.baseUrl + '/graphs/%u?format=%s' % (fixt_simple['pkFaultTree'], format)
                 response = self.ajaxGet(url)
                 self.assertEqual(response.status_code, 200)
                 self.assertIn(test_str, response.content)
@@ -357,7 +390,7 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
                               'client_id': 888,
                               'properties': '{}'})
 
-        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodes/' % self.pkFaultTree,
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodes/' % fixt_simple['pkFaultTree'],
                                  newnode,
                                  'application/json')
         self.assertEqual(response.status_code, 201)
@@ -367,11 +400,12 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
 
     def testCreateNodeGroup(self):
-        nodes = [self.clientIdAndGate, self.clientIdBasicEvent]
+        nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
         newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
-        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % self.pkDFD,
-                                 newgroup,
-                                 'application/json')
+        response = self.ajaxPost(
+                    self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
+                    newgroup,
+                    'application/json')
         self.assertEqual(response.status_code, 201)
         print response['Location']
         newid = int(response['Location'].split('/')[-1])
@@ -381,7 +415,7 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         #       self.assertItemsEqual(nodes, saved_nodes)
 
         # Get complete graph and see if the node group is registered correctly
-        url = self.baseUrl + '/graphs/%u' % self.pkDFD
+        url = self.baseUrl + '/graphs/%u' % fixt_simple['pkDFD']
         response = self.ajaxGet(url)
         self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
@@ -391,14 +425,16 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
             print group
 
     def testDeleteNode(self):
-        response = self.ajaxDelete(self.baseUrl + '/graphs/%u/nodes/%u' % (self.pkFaultTree, self.clientIdBasicEvent))
+        response = self.ajaxDelete(
+            self.baseUrl + '/graphs/%u/nodes/%u' % (fixt_simple['pkFaultTree'], fixt_simple['clientIdBasicEvent'])
+        )
         self.assertEqual(response.status_code, 204)
 
     def testDeleteNodeGroup(self):
         #TODO: Fixture should have a node group, instead of creating it here
-        nodes = [self.clientIdAndGate, self.clientIdBasicEvent]
+        nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
         newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
-        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % self.pkDFD,
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
                                  newgroup,
                                  'application/json')
         self.assertEqual(response.status_code, 201)
@@ -409,14 +445,15 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
     def testRelocateNode(self):
         newpos = json.dumps({'properties': {"y": 3, "x": 7}})
-        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/nodes/%u' % (self.pkFaultTree, self.clientIdBasicEvent),
-                                  newpos,
-                                  "application/json")
+        response = self.ajaxPatch(
+                    self.baseUrl + '/graphs/%u/nodes/%u' % (fixt_simple['pkFaultTree'], fixt_simple['clientIdBasicEvent']),
+                    newpos,
+                    "application/json")
         self.assertEqual(response.status_code, 202)
 
     def testNodePropertyChange(self):
         newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
-        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/nodes/%u' % (self.pkFaultTree, self.clientIdBasicEvent),
+        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/nodes/%u' % (fixt_simple['pkFaultTree'], fixt_simple['clientIdBasicEvent']),
                                   newprop,
                                   "application/json")
         self.assertEqual(response.status_code, 202)
@@ -425,9 +462,9 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
     def testNodeGroupPropertyChange(self):
         #TODO: Fixture should have a node group, instead of creating it here
-        nodes = [self.clientIdAndGate, self.clientIdBasicEvent]
+        nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
         newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
-        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % self.pkDFD,
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
                                  newgroup,
                                  'application/json')
         self.assertEqual(response.status_code, 201)
@@ -443,19 +480,25 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
 
     def testEdgePropertyChange(self):
         newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
-        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/edges/%u' % (self.pkDFD, self.clientIdEdge),
+        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/edges/%u' % (fixt_simple['pkDFD'], fixt_simple['clientIdEdge']),
                                   newprop,
                                   "application/json")
         self.assertEqual(response.status_code, 202)
         #TODO: Fetch graph and check that the property is really stored
 
     def testDeleteEdge(self):
-        response = self.ajaxDelete(self.baseUrl + '/graphs/%u/edges/%u' % (self.pkFaultTree, self.clientIdEdge))
+        response = self.ajaxDelete(
+            self.baseUrl + '/graphs/%u/edges/%u' % (fixt_simple['pkFaultTree'], fixt_simple['clientIdEdge']))
         self.assertEqual(response.status_code, 204)
 
     def testCreateEdge(self):
-        newedge = json.dumps({'client_id': 4714, 'source': self.clientIdAndGate, 'target': self.clientIdBasicEvent})
-        response = self.ajaxPost(self.baseUrl + '/graphs/%u/edges/' % self.pkFaultTree,
+        newedge = json.dumps(
+            {   'client_id': 4714, 
+                'source': fixt_simple['clientIdAndGate'], 
+                'target': fixt_simple['clientIdBasicEvent']
+            }
+        )
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/edges/' % fixt_simple['pkFaultTree'],
                                  newedge,
                                  'application/json')
         self.assertEqual(response.status_code, 201)
@@ -470,7 +513,6 @@ class FrontendApiTestCase(SimpleFixtureTestCase):
         # Now check the dismiss call
         response = self.ajaxDelete(self.baseUrl + '/notification/%u/' % n.pk)
         self.assertEqual(response.status_code, 204)
-
 
 class AnalysisInputFilesTestCase(FuzzEdTestCase):
     """
@@ -489,25 +531,11 @@ class AnalysisInputFilesTestCase(FuzzEdTestCase):
                 self.assertEqual(retcode, 0, fname + " failed")
                 dom = parse('/tmp/output.xml')
 
-
-class AnalysisFixtureTestCase(FuzzEdTestCase):
-    ''' 
-        This is a base class that wraps all information about the 'analysis' fixture. 
-    '''
-    fixtures = ['analysis.json', 'initial_data.json']
-    # A couple of specific PK's from the model
-    graphs = [7, 8]
-    rate_faulttree = 7
-    prdc_fuzztree = 8
-    # The decomposition number configured in the PRDC tree
-    prdc_configurations = 8
-    prdc_peaks = [0.31482, 0.12796, 0.25103, 0.04677, 0.36558, 0.19255, 0.30651, 0.11738]
-
-
-class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
-    ''' 
-        Tests for backend functionality, as being triggered from frontend calls. 
-    '''
+class BackendDaemonTestCase(FuzzEdTestCase):
+    """
+        Tests for backend functionality.
+        This demands firing up the backend daemon in the setup phase.
+    """
 
     baseUrl = '/api/front'
 
@@ -524,50 +552,119 @@ class BackendFromFrontendTestCase(AnalysisFixtureTestCase):
         print "\nShutting down backend daemon"
         self.backend.terminate()
 
+
+class InternalTestCase(BackendDaemonTestCase):
+    """
+        The tests for internal functions that are not exposed directly via one of the APIs.
+        Since some tests explicitely create job objects, a signal is always triggered to talk to
+        the backend daemon. For this reason, we need to fire it up.
+        #TODO: This is no longer needed when Django supports signal disabling in tests.
+    """
+    fixtures = fixt_analysis['files']
+
+    def test_result_parsing(self):
+        for graphPk, graphResult in fixt_analysis['results'].iteritems():
+            graph = Graph.objects.get(pk=graphPk)
+            job = Job(graph_modified=graph.modified, graph=graph, kind=Job.TOP_EVENT_JOB)
+            job.save()
+            job.parse_result(open('FuzzEd/fixtures/'+graphResult).read())
+            for result in job.results.exclude(kind__exact=Result.GRAPH_ISSUES):
+                print "Result"
+                print result
+
+class AnalysisFixtureTestCase(BackendDaemonTestCase):
+    """
+        Analysis engine tests.
+    """
+    fixtures = fixt_analysis['files']
+
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testRateFaulttree(self):
-        response = self.requestJob(self.baseUrl, self.rate_faulttree, 'topevent')
-        result = json.loads(response.content)
-        self.assertEqual(bool(result['validResult']), True)
-        self.assertEqual(result['errors'], {})
-        self.assertEqual(result['warnings'], {})
-        self.assertEqual(result['configurations'][0]['peak'], 1.0)
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['rate_faulttree'], 'topevent')
+        job_result_info = json.loads(job_result.content)
+        assert('issues' in job_result_info)
+        assert('columns' in job_result_info)
+        result_url = job_result['LOCATION']
+        result = self.ajaxGet(result_url+'?sEcho=doo')   # Fetch result in datatables style
+        self.assertEqual(result.status_code, 200)
+        data = json.loads(result.content)
+        self.assertEqual(data['aaData'][0]['peak'], 1.0)
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testPRDCFuzztree(self):
-        response = self.requestJob(self.baseUrl, self.prdc_fuzztree, 'topevent')
-        result = json.loads(response.content)
-        self.assertEqual(bool(result['validResult']), True)
-        self.assertEqual(result['errors'], {})
-        self.assertEqual(result['warnings'], {})
-        self.assertEqual(len(result['configurations']), self.prdc_configurations)
-        for conf in result['configurations']:
-            assert (round(conf['peak'], 5) in self.prdc_peaks)
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
+        job_result_info = json.loads(job_result.content)
+        assert('issues' in job_result_info)
+        assert('columns' in job_result_info)
+        print "\n"+str(job_result_info)
+        result_url = job_result['LOCATION']
+        result = self.ajaxGet(result_url+'?sEcho=doo')  # Fetch result in datatables style
+        self.assertEqual(result.status_code, 200)
+        data = json.loads(result.content)
+        print "\n"+str(data)
+        self.assertEqual(len(data['aaData']), fixt_analysis['prdc_configurations'])
+        for conf in data['aaData']:
+            assert (round(conf['peak'], 5) in fixt_analysis['prdc_peaks'])
 
     def testFrontendAPIPdfExport(self):
-        for graph in self.graphs:
-            pdf = self.requestJob(self.baseUrl, graph, 'pdf')
-            # The result of a PDF rendering job is the download link
+        for graphPk, graphType in fixt_analysis['graphs'].iteritems():
+            job_result = self.requestJob(self.baseUrl, graphPk, 'pdf')
+            pdf_url = job_result['LOCATION']
+            pdf = self.get(pdf_url)
             self.assertEqual('application/pdf', pdf['CONTENT-TYPE'])
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testFrontendAPIEpsExport(self):
-        for graph in self.graphs:
-            eps = self.requestJob(self.baseUrl, graph, 'eps')
+        for graphPk, graphType in fixt_analysis['graphs'].iteritems():
+            job_result = self.requestJob(self.baseUrl, graphPk, 'eps')
+            eps_url = job_result['LOCATION']
+            eps = self.get(eps_url)
             self.assertEqual('application/postscript', eps['CONTENT-TYPE'])
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+    def testResultOrdering(self):
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
+        job_result_info = json.loads(job_result.content)
+        result_url = job_result['LOCATION']
+        # Ordering in datatables style
+        # First column in analysis is 'id', second is 'minimum'
+        titles = Result.titles(Result.ANALYSIS_RESULT)
+        for index, col_desc in enumerate(titles):
+            field_name = col_desc[0]
+            result = self.ajaxGet(result_url+'?sEcho=doo&iSortingCols=1&sSortDir_0=asc&iSortCol_0='+str(index))  
+            data = json.loads(result.content)
+            if field_name in data['aaData'][0]:
+                print "Checking sorting for "+field_name
+                for i in xrange(0,len(data['aaData']),2):
+                    assert(data['aaData'][i][field_name] <= data['aaData'][i+1][field_name])
+            else:
+                print field_name + " is not part of the result, sorting not checked"
+
+class MinCutFixtureTestCase(BackendDaemonTestCase):
+    """
+        Mincut engine tests.
+    """
+    fixtures = fixt_mincut['files']
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+    def testMincutFaulttree(self):
+        job_result = self.requestJob(self.baseUrl, fixt_mincut['mincut_faulttree'], 'mincut')
+        result_url = job_result['LOCATION']
+        result = self.ajaxGet(result_url+'?sEcho=doo')   # Fetch result in datatables style
+        self.assertEqual(result.status_code, 200)
+        data = json.loads(result.content)
+        assert(len(data['aaData']) > 0)
+        assert('mincutResults' in data['aaData'][0])
+        mincut_results = data['aaData'][0]['mincutResults']
+        self.assertEqual(len(mincutResults), fixt_mincut['mincut_numcuts'])
 
 class UnicodeTestCase(FuzzEdTestCase):
-    fixtures = ['unicode.json', 'initial_data.json']
-    graphs = {1: 'faulttree'}
-    # A couple of specific PK's from the model
-    pkProject = 1
-    pkFaultTree = 1
+    fixtures = fixt_unicode['files']
 
     def setUp(self):
         self.setUpLogin()
 
     def testTikzSerialize(self):
-        g = Graph.objects.get(pk=self.pkFaultTree)
+        g = Graph.objects.get(pk=fixt_unicode['pkFaultTree'])
         assert (len(g.to_tikz()) > 0)
 

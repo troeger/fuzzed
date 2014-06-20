@@ -170,6 +170,32 @@ function(Class, Config, Property) {
         },
 
         /**
+         * Method: highlight
+         *      Marks the edge as being hovered (hovering class is added).
+         *
+         * Returns:
+         *      This {<Edge>} instance for chaining.
+         */
+        highlight: function(){
+            this.jsPlumbEdge.setHover(true);
+            
+            return this
+        },
+        
+        /**
+         * Method: unhighlight
+         *      Removes hovering class from the Edge.
+         *
+         * Returns:
+         *      This {<Edge>} instance for chaining.
+         */
+        unhighlight: function(){
+            this.jsPlumbEdge.setHover(false);
+            
+            return this
+        },
+        
+        /**
          * Method: remove
          *      Removes the whole visual representation from the canvas, restores child properties and calls home.
          *

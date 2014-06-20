@@ -12,6 +12,7 @@
         @import url("{{ STATIC_URL }}css/theme/white.css");
         @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-4.0.3.min.css");
         @import url("{{ STATIC_URL }}css/slickgrid/slick.grid-2.0.2.css");
+        @import url("{{ STATIC_URL }}css/datatables/dataTables.bootstrap.css");
         @import url("{{ STATIC_URL }}css/selectize/selectize.bootstrap3.css");
         @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         {% endblock %}
@@ -42,6 +43,8 @@
                 'highcharts': '../lib/highcharts/highcharts-3.0.2.min',
                 'jsplumb':    '../lib/jsplumb/jsplumb-1.5.5.min',
                 'slickgrid':  '../lib/slickgrid/slick.grid-2.0.2',
+                'datatables-base': '../lib/datatables/jquery.dataTables.min',
+                'datatables': '../lib/datatables/plugins/dataTables.bootstrap',
                 'underscore': '../lib/underscore/underscore-1.4.4.min',
                 'd3':         '../lib/d3/d3-3.3.11.min',
                 // fuzzed specifics
@@ -75,6 +78,12 @@
                 'highcharts': {
                     deps: ['jquery'],
                     exports: 'Highcharts'
+                },
+                'datatables-base': {
+                  deps: ['jquery']
+                },
+                'datatables':{
+                  deps:['datatables-base']
                 },
                 'slickgrid': {
                     deps: [

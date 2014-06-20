@@ -1,12 +1,12 @@
 from django.db import models
-from FuzzEd.lib.jsonfield import JSONField
 
+from FuzzEd.lib.jsonfield import JSONField
 from edge import Edge
 from graph import Graph
 from node import Node
 from project import Project
-
 import notations
+
 
 class Command(models.Model):
     """

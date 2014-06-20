@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
+from django.db import models
 
 
 class Migration(SchemaMigration):
@@ -16,10 +18,98 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('FuzzEd', ['Sharing'])
 
+        # Deleting field 'Result.value_sort'
+        db.delete_column(u'FuzzEd_result', 'value_sort')
+
+        # Deleting field 'Result.value'
+        db.delete_column(u'FuzzEd_result', 'value')
+
+        # Adding field 'Result.minimum'
+        db.add_column(u'FuzzEd_result', 'minimum',
+                      self.gf('django.db.models.fields.FloatField')(null=True),
+                      keep_default=False)
+
+        # Adding field 'Result.maximum'
+        db.add_column(u'FuzzEd_result', 'maximum',
+                      self.gf('django.db.models.fields.FloatField')(null=True),
+                      keep_default=False)
+
+        # Adding field 'Result.peak'
+        db.add_column(u'FuzzEd_result', 'peak',
+                      self.gf('django.db.models.fields.FloatField')(null=True),
+                      keep_default=False)
+
+        # Adding field 'Result.reliability'
+        db.add_column(u'FuzzEd_result', 'reliability',
+                      self.gf('django.db.models.fields.FloatField')(null=True),
+                      keep_default=False)
+
+        # Adding field 'Result.mttf'
+        db.add_column(u'FuzzEd_result', 'mttf',
+                      self.gf('django.db.models.fields.FloatField')(null=True),
+                      keep_default=False)
+
+        # Adding field 'Result.rounds'
+        db.add_column(u'FuzzEd_result', 'rounds',
+                      self.gf('django.db.models.fields.IntegerField')(null=True),
+                      keep_default=False)
+
+        # Adding field 'Result.failures'
+        db.add_column(u'FuzzEd_result', 'failures',
+                      self.gf('django.db.models.fields.IntegerField')(null=True),
+                      keep_default=False)
+
+        # Adding field 'Result.ratio'
+        db.add_column(u'FuzzEd_result', 'ratio',
+                      self.gf('django.db.models.fields.FloatField')(null=True),
+                      keep_default=False)
+
+        # Adding field 'Result.points'
+        db.add_column(u'FuzzEd_result', 'points',
+                      self.gf('FuzzEd.lib.jsonfield.fields.JSONField')(null=True, blank=True),
+                      keep_default=False)
+
 
     def backwards(self, orm):
         # Deleting model 'Sharing'
         db.delete_table(u'FuzzEd_sharing')
+
+        # Adding field 'Result.value_sort'
+        db.add_column(u'FuzzEd_result', 'value_sort',
+                      self.gf('django.db.models.fields.IntegerField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Adding field 'Result.value'
+        db.add_column(u'FuzzEd_result', 'value',
+                      self.gf('FuzzEd.lib.jsonfield.fields.JSONField')(null=True, blank=True),
+                      keep_default=False)
+
+        # Deleting field 'Result.minimum'
+        db.delete_column(u'FuzzEd_result', 'minimum')
+
+        # Deleting field 'Result.maximum'
+        db.delete_column(u'FuzzEd_result', 'maximum')
+
+        # Deleting field 'Result.peak'
+        db.delete_column(u'FuzzEd_result', 'peak')
+
+        # Deleting field 'Result.reliability'
+        db.delete_column(u'FuzzEd_result', 'reliability')
+
+        # Deleting field 'Result.mttf'
+        db.delete_column(u'FuzzEd_result', 'mttf')
+
+        # Deleting field 'Result.rounds'
+        db.delete_column(u'FuzzEd_result', 'rounds')
+
+        # Deleting field 'Result.failures'
+        db.delete_column(u'FuzzEd_result', 'failures')
+
+        # Deleting field 'Result.ratio'
+        db.delete_column(u'FuzzEd_result', 'ratio')
+
+        # Deleting field 'Result.points'
+        db.delete_column(u'FuzzEd_result', 'points')
 
 
     models = {
@@ -64,6 +154,12 @@ class Migration(SchemaMigration):
             'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'node': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Node']"}),
             'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'FuzzEd.configuration': {
+            'Meta': {'object_name': 'Configuration'},
+            'costs': ('django.db.models.fields.IntegerField', [], {}),
+            'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'configurations'", 'to': "orm['FuzzEd.Graph']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'FuzzEd.deleteedge': {
             'Meta': {'object_name': 'DeleteEdge'},
@@ -130,18 +226,24 @@ class Migration(SchemaMigration):
             'graph_modified': ('django.db.models.fields.DateTimeField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
-            'result': ('django.db.models.fields.BinaryField', [], {'null': 'True'}),
-            'secret': ('django.db.models.fields.CharField', [], {'default': "'b8928c7a-b47f-40fd-b528-80c3f598ec21'", 'max_length': '64'})
+            'secret': ('django.db.models.fields.CharField', [], {'default': "'5260fe57-879b-4d8d-a145-667acc369b6f'", 'max_length': '64'})
         },
         'FuzzEd.node': {
             'Meta': {'object_name': 'Node'},
-            'client_id': ('django.db.models.fields.BigIntegerField', [], {'default': '-9223372036854775807'}),
+            'client_id': ('django.db.models.fields.BigIntegerField', [], {'default': '-2147483647'}),
             'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'nodes'", 'to': "orm['FuzzEd.Graph']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
             'x': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'y': ('django.db.models.fields.IntegerField', [], {'default': '0'})
+        },
+        'FuzzEd.nodeconfiguration': {
+            'Meta': {'object_name': 'NodeConfiguration'},
+            'configuration': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'node_configurations'", 'to': "orm['FuzzEd.Configuration']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'node': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['FuzzEd.Node']"}),
+            'setting': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {})
         },
         'FuzzEd.nodegroup': {
             'Meta': {'object_name': 'NodeGroup'},
@@ -196,6 +298,25 @@ class Migration(SchemaMigration):
             'new_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'old_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
             'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        'FuzzEd.result': {
+            'Meta': {'object_name': 'Result'},
+            'binary_value': ('django.db.models.fields.BinaryField', [], {'null': 'True'}),
+            'configuration': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'results'", 'null': 'True', 'to': "orm['FuzzEd.Configuration']"}),
+            'failures': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'results'", 'to': "orm['FuzzEd.Graph']"}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'issues': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {'null': 'True', 'blank': 'True'}),
+            'job': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'results'", 'to': "orm['FuzzEd.Job']"}),
+            'kind': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
+            'maximum': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
+            'minimum': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
+            'mttf': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
+            'peak': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
+            'points': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {'null': 'True', 'blank': 'True'}),
+            'ratio': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
+            'reliability': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
+            'rounds': ('django.db.models.fields.IntegerField', [], {'null': 'True'})
         },
         'FuzzEd.sharing': {
             'Meta': {'object_name': 'Sharing'},

@@ -1,10 +1,11 @@
 #include "FuzzTreeConfiguration.h"
-
+#include "xmlutil.h"
 #include "FuzzTreeTypes.h"
 
-FuzzTreeConfiguration::FuzzTreeConfiguration()
+FuzzTreeConfiguration::FuzzTreeConfiguration(const unsigned int id)
 	: m_costs(0),
-	m_bValid(true)
+	m_bValid(true),
+	m_id(std::to_string(id))
 {}
 
 FuzzTreeConfiguration::FuzzTreeConfiguration(const FuzzTreeConfiguration& other)
@@ -13,7 +14,8 @@ FuzzTreeConfiguration::FuzzTreeConfiguration(const FuzzTreeConfiguration& other)
 	m_redundancyNodes(other.m_redundancyNodes),
 	m_optionalNodes(other.m_optionalNodes),
 	m_costs(other.m_costs),
-	m_bValid(true)
+	m_bValid(true),
+	m_id(other.getId())
 {}
 
 void FuzzTreeConfiguration::operator=(const FuzzTreeConfiguration &other)
@@ -24,6 +26,7 @@ void FuzzTreeConfiguration::operator=(const FuzzTreeConfiguration &other)
 	m_optionalNodes = other.m_optionalNodes;
 	m_costs = other.m_costs;
 	m_bValid = true;
+	m_id = other.getId();
 }
 
 
@@ -83,6 +86,11 @@ const int FuzzTreeConfiguration::getCost() const
 	return m_costs;
 }
 
+const FuzzTreeConfiguration::id_type& FuzzTreeConfiguration::getId() const
+{
+	return m_id;
+}
+
 const std::map<FuzzTreeConfiguration::id_type, bool>& FuzzTreeConfiguration::getOptionalNodes() const
 {
 	return m_optionalNodes;
@@ -117,4 +125,9 @@ const int FuzzTreeConfiguration::computeCostRecursive(const fuzztree::Node& node
 		result += computeCostRecursive(child);
 
 	return result;
+}
+
+void FuzzTreeConfiguration::setId(const unsigned int id)
+{
+	m_id = std::to_string(id);
 }

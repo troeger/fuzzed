@@ -1,10 +1,8 @@
-from django.core.exceptions import ObjectDoesNotExist
-
+import logging
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
-import logging
 logger = logging.getLogger('FuzzEd')
 
 import xml_fuzztree
@@ -561,6 +559,9 @@ class Node(models.Model):
             except KeyError:
                 logger.debug('No default given in notation, using given default "%s" instead' % default)
                 return default
+        except MultipleObjectsReturned:
+            logger.error("ERROR: Property %s in node %u exists in multiple instances"%(key, self.pk))
+            raise MultipleObjectsReturned()
 
     def get_attr(self, key):
         """

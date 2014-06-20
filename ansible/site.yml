@@ -1,0 +1,35 @@
+---
+- name: Configure production web servers
+  hosts: webservers
+  user: root
+
+  roles:
+    - common
+    - web
+
+- name: Configure production database servers 
+  hosts: dbservers
+  user: root
+
+  roles:
+    - common
+    - db
+
+- name: Configure production backend servers
+  hosts: backendservers
+  user: root
+
+  roles:
+    - common
+    - backend
+
+- name: Configure developer machine
+  hosts: devmachine
+  user: root
+
+  roles:
+    - common
+    - build
+    - web
+    - db
+    - backend

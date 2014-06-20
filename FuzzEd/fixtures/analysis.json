@@ -7,7 +7,7 @@
             "created": "2014-03-17T07:50:45.835", 
             "deleted": false, 
             "modified": "2014-03-21T13:44:09.405", 
-            "owner": 2, 
+            "owner": 1, 
             "users": []
         }
     }, 
@@ -22,7 +22,7 @@
             "deleted": true, 
             "modified": "2014-03-21T13:37:51.595", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -36,7 +36,7 @@
             "deleted": true, 
             "modified": "2014-03-21T13:37:49.419", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -50,7 +50,7 @@
             "deleted": true, 
             "modified": "2014-03-21T13:37:46.936", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -64,7 +64,7 @@
             "deleted": true, 
             "modified": "2014-03-17T18:18:53.637", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -78,7 +78,7 @@
             "deleted": true, 
             "modified": "2014-03-17T18:18:53.642", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -92,7 +92,7 @@
             "deleted": true, 
             "modified": "2014-03-19T22:27:42.886", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -106,7 +106,7 @@
             "deleted": false, 
             "modified": "2014-03-21T13:38:58.989", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -120,7 +120,7 @@
             "deleted": false, 
             "modified": "2014-03-21T13:46:38.586", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -1856,14 +1856,6 @@
             "deleted": false, 
             "key": "probability", 
             "value": "[0, [0.12, 0.01]]"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "testadmin", 
-            "password": "pbkdf2_sha256$10000$JNt1EZn2g72p$vX3UFh7g4mPa313pWW4lf4YxkUhL534V8/kxFaQ1XvM="
         }
     }
 ]

@@ -96,9 +96,14 @@ class JobResource(common.JobResource):
                 return HttpBadRequest()
             job.exit_code = result['exit_code']   
             if "file_name" in result:
-                # Retrieve binary file and store it
-                job.result = base64.b64decode(result['file_data'])
-                if not job.requires_download:
-                    logger.debug(''.join(job.result))
-	    job.save()
+                try:
+                    job.parse_result(base64.b64decode(result['file_data']))
+                except Exception as e:
+                    # Do not blame the calling backend for parsing problems, it has done it's job
+                    logger.error("Could not parse result data retrieved for job %u"%job.pk)
+                    logger.error(str(e))
+                    #TODO: mail_managers
+                    pass
+        # This immediately triggers pulling clients to get the result data, so it MUST be the very last thing to do
+	    job.save() 
         return HttpResponse(status=202)

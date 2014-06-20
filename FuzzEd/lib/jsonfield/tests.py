@@ -1,8 +1,10 @@
+import json
+
 from django.db import models
 from django.test import TestCase
+
 from fields import JSONField, JSONCharField
 
-import json
 
 class JsonModel(models.Model):
     json = JSONField()

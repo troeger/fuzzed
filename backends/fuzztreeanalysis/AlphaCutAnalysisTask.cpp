@@ -63,10 +63,9 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		}
 		else if (probType == *FAILURERATE)
 		{
-			unsigned int mt = DEFAULT_MISSION_TIME; // TODO
-			if (m_tree->missionTime().present())
-				mt = m_tree->missionTime().get();
-
+			const unsigned int mt = m_tree->missionTime().present() ?  
+				m_tree->missionTime().get() : DEFAULT_MISSION_TIME;
+			
 			return probability::getAlphaCutBounds(static_cast<const fuzztree::FailureRate&>(prob), mt);
 		}
 		else

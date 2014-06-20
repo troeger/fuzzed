@@ -3,7 +3,6 @@ project(fuzztreeconfiguration)
 set(SOURCES
   FuzzTreeTransform.cpp
   FuzzTreeConfiguration.cpp
-  VerificationTask.cpp
   TreeHelpers.cpp
   main.cpp
 )
@@ -12,7 +11,6 @@ set(HEADERS
   FuzzTreeTransform.h
   FuzzTreeConfiguration.h
   TreeHelpers.h
-  VerificationTask.h
   VerificationResult.h
   platform.h
 )

@@ -1,10 +1,10 @@
 from django.db import models
-from FuzzEd.lib.jsonfield import JSONField
-import  json
 
+from FuzzEd.lib.jsonfield import JSONField
 from node import Node
 from edge import Edge
 from node_group import NodeGroup
+
 
 class Property(models.Model):
     """
