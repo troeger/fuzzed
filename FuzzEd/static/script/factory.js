@@ -29,7 +29,7 @@ function(Class) {
             } else {
             // if baseCls is a string describing the demanded class (most common case)
                 var resolveObj = this._resolveClassName(baseCls);
-                path = resolveObj.path;
+                var path = resolveObj.path;
                 var clsModule = require(path);
 
                 var creation = undefined;
@@ -66,6 +66,11 @@ function(Class) {
             } else {
                 throw new ClassResolveError("Could not resolve class '" + baseCls + "' for kind '" + this.kind + "'");
             }
+        },
+
+        getClassModule: function(baseCls) {
+            var resolveObj = this._resolveClassName(baseCls);
+            return require(resolveObj.path);
         },
 
         _construct: function(constructor, args) {

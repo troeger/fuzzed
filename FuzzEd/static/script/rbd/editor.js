@@ -1,4 +1,4 @@
-define(['editor', 'rbd/graph', 'rbd/config'], function(Editor, RbdGraph, RbdConfig) {
+define(['editor', 'factory', 'rbd/graph', 'rbd/config'], function(Editor, Factory, RbdGraph, RbdConfig) {
     /**
      *  Package: RBD
      */
@@ -13,6 +13,10 @@ define(['editor', 'rbd/graph', 'rbd/config'], function(Editor, RbdGraph, RbdConf
         /**
          *  Group: Accessors
          */
+
+        getFactory: function() {
+            return new Factory(undefined, 'rbd');
+        },
 
         /**
          *  Method: getConfig

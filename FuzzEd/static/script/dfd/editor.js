@@ -1,4 +1,4 @@
-define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(Editor, DfdGraph, DfdConfig) {
+define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(Editor, Factory, DfdGraph, DfdConfig) {
     /**
      *  Package: DFD
      */
@@ -13,6 +13,10 @@ define(['editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(E
         /**
          *  Group: Accessors
          */
+
+        getFactory: function() {
+            return new Factory(undefined, 'dfd');
+        },
 
         /**
          *  Method: getConfig

@@ -540,7 +540,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
          *    The newly created <Node> subclass.
          */
         _newNodeClassForKind: function(definition) {
-            var BaseClass = this.getNodeClass();
+            var BaseClass = this.factory.getClassModule('Node');
             var inherits = definition.inherits;
 
             if (inherits) {
