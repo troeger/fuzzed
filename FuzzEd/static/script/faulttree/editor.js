@@ -574,7 +574,12 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                 
                 return '';
             }.bind(this);
-              
+            
+            // clear global dictionaries (with cached data) before initalisation 
+            this._configNodeMap     = {};
+            this._configEdgeMap     = {};
+            this._redundancyNodeMap = {};
+            
             this._grid = jQuery('#results_table').dataTable({
                             "bProcessing":   true,
                             "bFilter":       false,
@@ -615,21 +620,22 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                                 if ('choices' in current_config ){
                                     var choices  = aData['choices'];
                                     
-                                    // remember the nodes and edges involved in this config for later highlighting
+                                    // check if config is alredy cached in configNodeMap/configEdgeMap
+                                    if (! (configID in this._configNodeMap)){
+                                        // remember the nodes and edges involved in this config for later highlighting
+                                        this._collectNodesAndEdgesForConfiguration(configID, choices);
+                                    }
                                     
-                                    // clear configNodeMap and configEdgeMap for specific configuration id
-                                    this._configNodeMap[configID] = [];
-                                    this._configEdgeMap[configID] = [];
-                                    
-                                    this._collectNodesAndEdgesForConfiguration(configID, choices);
-                                    
-                                    // remember the redundancy settings for this config for later highlighting
-                                    this._redundancyNodeMap[configID] = {};
-                                    _.each(choices, function(choice, node) {
-                                        if (choice.type == 'RedundancyChoice') {
-                                            this._redundancyNodeMap[configID][node] = choice['n'];
-                                        }
-                                    }.bind(this));
+                                     // check if config is alredy cached in redundancyNodeMap 
+                                    if (! (configID in this._redundancyNodeMap)){
+                                        // remember the redundancy settings for this config for later highlighting
+                                        this._redundancyNodeMap[configID] = {};
+                                        _.each(choices, function(choice, node) {
+                                            if (choice.type == 'RedundancyChoice') {
+                                                this._redundancyNodeMap[configID][node] = choice['n'];
+                                            }
+                                        }.bind(this));
+                                    }
                                     
                                     jQuery(nRow).on("mouseover", function(){    
                                             this._highlightConfiguration(configID);                                                
