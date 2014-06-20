@@ -223,7 +223,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
             this._chartContainer.empty();
             this._gridContainer.empty();
             // reset height in case it was set during grid creation
-            this._gridContainer.css('height', '');
+            this._gridContainer.css('min-height', '');
             // reset container width (which is set after initalisation of DataTables)
             this.container.css('width','');
             this._chart = null; this._grid = null;
@@ -275,23 +275,20 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                     if (this._chart != null) {
                         
                         // fit all available space with chart    
-                       
-                       //console.log('container: ' + this.container.height());
-                       //console.log('graph issues: ' + this._graphIssueContainer.height());
-                       //console.log('grid: ' + this._gridContainer.height());
-                       //console.log('chart: ' +   this._chartContainer.height());
-                       //console.log('calculated:' + (this.container.height() - this._graphIssueContainer.height() - this._gridContainer.height()));
-                       
-                        var offset = 30;
+                        var margin_offset = 30;
                         
-                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._gridContainer.height() - offset);
+                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._gridContainer.height() - margin_offset);
                         
                         this._chart.setSize(
                             this._chartContainer.width(),
                             this._chartContainer.height(),
                             false
                         );
-                    }
+                    }   
+                }.bind(this),
+                stop: function(event, ui) {
+                    // set container height to auto after resizing (because of collapsing elements)
+                    this.container.css('height', 'auto');
                     
                 }.bind(this)
 
@@ -704,9 +701,9 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                             "fnInitComplete": function(oSettings, json) {  
                                     _this._setupResizing();
                                     
-                                    //fixed height of grid
-                                    _this._gridContainer.css('height',_this._gridContainer.height());
-                                    // keep container width when switching the page
+                                    // set minumum height of grid as the height of the first draw of the grid
+                                    _this._gridContainer.css('min-height',_this._gridContainer.height());
+                                    // keep container width when switching the page (-> otherwise jumping width when switching)
                                     _this.container.css('width', _this.container.width());
                                     
                                 }    

@@ -88,11 +88,11 @@ class Job(models.Model):
             The result class knows how the titles should look like.
         '''
         if self.kind == self.TOP_EVENT_JOB:
-            return Result.titles(Result.ANALYSIS_RESULT)
+            return Result.titles(Result.ANALYSIS_RESULT, self.graph.kind)
         elif self.kind == self.SIMULATION_JOB:
-            return Result.titles(Result.SIMULATION_RESULT)
+            return Result.titles(Result.SIMULATION_RESULT, self.graph.kind)
         elif self.kind == self.MINCUT_JOB:
-            return Result.titles(Result.MINCUT_RESULT)
+            return Result.titles(Result.MINCUT_RESULT, self.graph.kind)
 
     @classmethod
     def exists_with_result(cls, graph, kind):

@@ -83,7 +83,7 @@ class Result(models.Model):
         return reverse('frontend_graph_download', args=[self.graph.pk]) + "?format="+kind
 
     @classmethod
-    def titles(self, kind):
+    def titles(self, kind, graph_type):
         ''' If the result is not binary, than it is JSON. This function returns
             the human-readable sorted names of data columns that can be shown directly,
             without further interpretation by the JS code. Therefore, some data returned
@@ -91,13 +91,20 @@ class Result(models.Model):
 
             Field values from related models (e.g. costs) are named in Django QuerySet syntax.
             This allows to re-use them directly in Query creation.
-        '''
+        '''        
         if kind == self.ANALYSIS_RESULT:
-            return  (('id','Config'),('minimum','Min'),    ('peak','Peak'),
+            if graph_type == 'faulttree':
+                return (('minimum','Min'), ('peak','Peak'),('maximum','Max')) 
+            elif graph_type == 'fuzztree' :   
+                return  (('id','Config'),('minimum','Min'), ('peak','Peak'),
                      ('maximum','Max'),  ('configuration__costs','Costs'))            
         elif kind == self.SIMULATION_RESULT:
-            return  (('id','Config'), ('reliability','Reliability'), ('mttf','MTTF'),
-                      ('rounds', 'Rounds'), ('failures', 'Failures'))      
+            if graph_type == 'faulttree':
+                return  (('reliability','Reliability'), ('mttf','MTTF'),
+                      ('rounds', 'Rounds'), ('failures', 'Failures'))
+            elif graph_type == 'fuzztree' : 
+                return  (('id','Config'), ('reliability','Reliability'), ('mttf','MTTF'),
+                      ('rounds', 'Rounds'), ('failures', 'Failures'))                
         elif kind == self.MINCUT_RESULT:
             return  (('id','Config'),)      
 
