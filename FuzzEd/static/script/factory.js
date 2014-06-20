@@ -70,6 +70,7 @@ function(Class) {
 
         getClassModule: function(baseCls) {
             var resolveObj = this._resolveClassName(baseCls);
+            console.log('Successfully resolved class module for ' + baseCls + ' from ' + resolveObj.path);
             return require(resolveObj.path);
         },
 

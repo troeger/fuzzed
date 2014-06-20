@@ -7,6 +7,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 	
     var Property = Class.extend({
         owner:          undefined,
+        mirrorers:      undefined,
         value:          undefined,
         displayName:    '',
         mirrors:        undefined,
@@ -16,9 +17,10 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         readonly:       false,
         partInCompound: undefined,
 
-        init: function(owner, definition) {
+        init: function(owner, mirrorers, definition) {
             jQuery.extend(this, definition);
             this.owner = owner;
+            this.mirrorers = mirrorers;
             this.mirrors = [];
             this._sanitize()
                 ._setupMirrors()
@@ -118,14 +120,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         _setupMirrors: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
 
-            // if our owner is a NodeGroup, give every member of the NodeGroup a mirror
-            if (typeof this.owner.nodes !== 'undefined') {
-                _.each(this.owner.nodes, function(node) {
-                    this.mirrors.push(this.factory.create('Mirror', this, node.container, this.mirror));
-                }.bind(this));
-            } else {
-                this.mirrors.push(this.factory.create('Mirror', this, this.owner.container, this.mirror));
-            }
+            _.each(this.mirrorers, function(mirrorer) {
+                this.mirrors.push(this.factory.create('Mirror', this, mirrorer.container, this.mirror));
+            }.bind(this));
 
             return this;
         },
@@ -352,7 +349,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
                     partInCompound: index,
                     value: index === this.value ? value : undefined
                 });
-                parsedParts[index] = from(this.factory, this.owner, partDef);
+                parsedParts[index] = from(this.factory, this.owner, this.mirrorers, partDef);
             }.bind(this));
 
             this.parts = parsedParts;
@@ -722,17 +719,17 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
     });
 
     //TODO: put this into the factory
-    var from = function(factory, owner, definition) {
+    var from = function(factory, owner, mirrorers, definition) {
         switch (definition.kind) {
-            case 'bool':     return new Bool(factory, owner, definition);
-            case 'choice':   return new Choice(factory, owner, definition);
-            case 'compound': return new Compound(factory, owner, definition);
-            case 'epsilon':  return new Epsilon(factory, owner, definition);
-            case 'numeric':  return new Numeric(factory, owner, definition);
-            case 'range':    return new Range(factory, owner, definition);
-            case 'text':     return new Text(factory, owner, definition);
-			case 'textfield':return new InlineTextField(factory, owner, definition);
-            case 'transfer': return new Transfer(factory, owner, definition);
+            case 'bool':     return new Bool(factory, owner, mirrorers, definition);
+            case 'choice':   return new Choice(factory, owner, mirrorers, definition);
+            case 'compound': return new Compound(factory, owner, mirrorers, definition);
+            case 'epsilon':  return new Epsilon(factory, owner, mirrorers, definition);
+            case 'numeric':  return new Numeric(factory, owner, mirrorers, definition);
+            case 'range':    return new Range(factory, owner, mirrorers, definition);
+            case 'text':     return new Text(factory, owner, mirrorers, definition);
+			case 'textfield':return new InlineTextField(factory, owner, mirrorers, definition);
+            case 'transfer': return new Transfer(factory, owner, mirrorers, definition);
 
             default: throw ValueError('unknown property kind ' + definition.kind);
         }

@@ -1,5 +1,6 @@
-define(['editor', 'factory', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'faulttree/node_group', 'highcharts', 'jquery-ui', 'slickgrid'],
-function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, FaulttreeNodeGroup) {
+define(['editor', 'factory', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'faulttree/node_group',
+        'highcharts', 'jquery-ui', 'slickgrid'],
+function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
     /**
      *  Package: Faulttree
      */

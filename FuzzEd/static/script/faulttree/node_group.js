@@ -32,6 +32,35 @@ define(['node_group', 'config'], function(NodeGroup, Config) {
         _setupSelection: function() {
             return this;
         },
+
+        /**
+         * Method: _setupProperties
+         *      Converts the informal properties stored in <properties> into Property objects ordered by this graph's
+         *      propertiesDisplayOrder (see <Graph::getNotation()> or the respective notations json-file).
+         *
+         *      ! Exact code duplication in <Node::_setupProperties()>  and <Edge::_setupPropertes()>
+         *
+         * Returns:
+         *      This {<NodeGroup>} instance for chaining.
+         */
+        _setupProperties: function() {
+            _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {
+                var property = this.properties[propertyName];
+
+                if (typeof property === 'undefined') {
+                    return;
+                } else if (property === null) {
+                    delete this.properties[propertyName];
+                    return;
+                }
+
+                property.name = propertyName;
+                this.properties[propertyName] = this.factory.getClassModule('Property')
+                                                            .from(this.factory, this, this.nodes, property);
+            }.bind(this));
+
+            return this;
+        },
         remove: function() {
             if (!this.deletable) return false;
 
@@ -60,6 +89,6 @@ define(['node_group', 'config'], function(NodeGroup, Config) {
                 prop.removeAllMirrors();
                 prop.restoreMirrors();
             }.bind(this));
-        },
+        }
     });
 });
