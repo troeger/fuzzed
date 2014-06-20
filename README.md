@@ -50,12 +50,11 @@ Run all tests stored in tests.py.
 
 Please note that the machine were the packaging (and implicit build) takes place must be the same as the production machine. The smartest approach therefore is to develop in Vagrant with some distribution, and use then the same distro on the production host.
 
-`
-> fab package.web
-> fab package.backend
-> fab deploy.web
-> fab.deploy.backend
-`
+`> fab package.web`
+`> fab package.backend`
+`> fab deploy.web`
+`> fab.deploy.backend`
+
 
 ## Acknowledgements
 
