@@ -1,5 +1,5 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist', 'jsplumb'],
-function(Class, Menus, Canvas, Backend, Alerts, Progress) {
+define(['class', 'factory', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist', 'jsplumb'],
+function(Class, Factory, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base
      */
@@ -29,6 +29,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *    {Underscore Template} _nodeOffsetStylesheetTemplate - The underscore.js template used to generate the
          *                                                          CSS transformation for <_nodeOffsetPrintStylesheet>.
          */
+        factory:                       undefined,
         config:                        undefined,
         graph:                         undefined,
         properties:                    undefined,
@@ -55,11 +56,13 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *    {int} graphId - The ID of the graph that is going to be edited by this editor.
          */
         init: function(graphId) {
+            this.factory = this.getFactory();
+
             if (typeof graphId !== 'number')
                 throw new TypeError('numeric graph ID', typeof graphId);
 
             this.config   = this.getConfig();
-            this._backend = Backend.establish(graphId);
+            this._backend = Backend.establish(this.factory, graphId);
 
             // remember certain UI elements
             this._progressIndicator = jQuery('#' + this.config.IDs.PROGRESS_INDICATOR);
@@ -79,6 +82,10 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         /**
          *  Group: Accessors
          */
+
+        getFactory: function() {
+            throw new SubclassResponsibility();
+        },
 
         /**
          *  Method: getConfig
@@ -183,7 +190,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *    This editor instance for chaining.
          */
         _loadGraphFromJson: function(json) {
-            this.graph = new (this.getGraphClass())(json);
+            this.graph = this.factory.create('Graph', json);
             this._loadGraphCompleted(json.readOnly);
 
             return this;

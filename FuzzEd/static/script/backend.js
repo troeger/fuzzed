@@ -594,7 +594,7 @@ function (Class, Config, Job, Alerts, Progress) {
                     201: function(data, status, req) {
                         var jobUrl = req.getResponseHeader('location');
                         if (typeof success !== 'undefined') {
-                            success(new Job(jobUrl));
+                            success(this.factory.build('Job', jobUrl));
                         }
                     }
                 },
@@ -698,7 +698,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 statusCode: {
                     201: function(data, status, req) {
                         var jobUrl = req.getResponseHeader('location');
-                        var job = new Job(jobUrl);
+                        var job = this.factory.build('Job', jobUrl);
                         job.progressID = progressID;
                         job.progressMessage = progressMessage;
                         job.progressSuccessMessage = progressSuccessMessage;
@@ -828,9 +828,10 @@ function (Class, Config, Job, Alerts, Progress) {
     var registeredBackends = {};
 
     return {
-        establish: function(graphId) {
+        Backend: Backend,
+        establish: function(factory, graphId) {
             if (typeof registeredBackends[graphId] === 'undefined') {
-                registeredBackends[graphId] = new Backend(graphId);
+                registeredBackends[graphId] = factory.create('Backend', graphId);
             }
             return registeredBackends[graphId];
         }

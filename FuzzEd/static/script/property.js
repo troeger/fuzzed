@@ -121,10 +121,10 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             // if our owner is a NodeGroup, give every member of the NodeGroup a mirror
             if (typeof this.owner.nodes !== 'undefined') {
                 _.each(this.owner.nodes, function(node) {
-                    this.mirrors.push(new Mirror(this, node.container, this.mirror));
+                    this.mirrors.push(this.factory.create('Mirror', this, node.container, this.mirror));
                 }.bind(this));
             } else {
-                this.mirrors.push(new Mirror(this, this.owner.container, this.mirror));
+                this.mirrors.push(this.factory.create('Mirror', this, this.owner.container, this.mirror));
             }
 
             return this;
@@ -152,13 +152,14 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         _setupLabel: function() {
             if (typeof this.label === 'undefined' || this.label === null) return this;
-            this.label = new Label(this, this.owner.jsPlumbEdge, this.label);
+            this.label = this.factory.create('Label', this, this.owner.jsPlumbEdge, this.label);
 
             return this;
         },
 
         _setupMenuEntry: function() {
-            this.menuEntry = new (this.menuEntryClass())(this);
+            //TODO: put this into the factory
+            this.menuEntry = new (this.menuEntryClass())(this.factory, this);
 
             return this;
         },
@@ -381,8 +382,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             var epsilon = value[1];
 
             // doing a big decimal conversion here due to JavaScripts awesome floating point handling xoxo
-            var decimalCenter  = new Decimal(center);
-            var decimalEpsilon = new Decimal(epsilon);
+            var decimalCenter  = new Decimal(this.factory, center);
+            var decimalEpsilon = new Decimal(this.factory, epsilon);
 
             if (typeof center  !== 'number' || window.isNaN(center)) {
                 validationResult.kind    = TypeError;
@@ -421,23 +422,23 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             this.value = typeof this.value === 'undefined' ? this.default.slice(0) : this.value;
 
             if (!(this.default[0] instanceof Decimal) && isNumber(this.default[0])) {
-                this.default[0] = new Decimal(this.default[0]);
+                this.default[0] = new Decimal(this.factory, this.default[0]);
             } else {
                 throw new TypeError('numeric lower bound', typeof this.default[0]);
             }
             if (!(this.default[1] instanceof Decimal) && isNumber(this.default[1])) {
-                this.default[1] = new Decimal(this.default[1]);
+                this.default[1] = new Decimal(this.factory, this.default[1]);
             } else {
                 throw new TypeError('numeric upper bound', typeof this.default[1]);
             }
 
             if (!(this.min instanceof Decimal) && isNumber(this.min)) {
-                this.min = new Decimal(this.min);
+                this.min = new Decimal(this.factory, this.min);
             } else {
                 throw new TypeError('numeric minimum', typeof this.min);
             }
             if (!(this.max instanceof Decimal) && isNumber(this.max)) {
-                this.max = new Decimal(this.max);
+                this.max = new Decimal(this.factory, this.max);
             } else {
                 throw new TypeError('numeric maximum', typeof this.max);
             }
@@ -488,17 +489,17 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             this.value = typeof this.value === 'undefined' ? this.default : this.value;
 
             if (isNumber(this.default)) {
-                this.default = new Decimal(this.default);
+                this.default = new Decimal(this.factory, this.default);
             } else {
                 throw new TypeError('numeric default', this.default);
             }
             if (isNumber(this.min)) {
-                this.min = new Decimal(this.min);
+                this.min = new Decimal(this.factory, this.min);
             } else {
                 throw new TypeError('numeric min', this.min);
             }
             if (isNumber(this.max)) {
-                this.max = new Decimal(this.max);
+                this.max = new Decimal(this.factory, this.max);
             } else {
                 throw new TypeError('numeric max', this.max);
             }
@@ -560,23 +561,23 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             this.value = typeof this.value === 'undefined' ? this.default.slice(0) : this.value;
 
             if (!(this.default[0] instanceof Decimal) && isNumber(this.default[0])) {
-                this.default[0] = new Decimal(this.default[0]);
+                this.default[0] = new Decimal(this.factory, this.default[0]);
             } else {
                 throw new TypeError('numeric default lower bound', this.default[0]);
             }
             if (!(this.default[1] instanceof Decimal) && isNumber(this.default[1])) {
-                this.default[1] = new Decimal(this.default[1]);
+                this.default[1] = new Decimal(this.factory, this.default[1]);
             } else {
                 throw new TypeError('numeric default upper bound', this.default[1]);
             }
 
             if (!(this.min instanceof Decimal) && isNumber(this.min)) {
-                this.min = new Decimal(this.min);
+                this.min = new Decimal(this.factory, this.min);
             } else {
                 throw new TypeError('numeric min', this.min);
             }
             if (!(this.max instanceof Decimal) && isNumber(this.max)) {
-                this.max = new Decimal(this.max);
+                this.max = new Decimal(this.factory, this.max);
             } else {
                 throw new TypeError('numeric max', this.max);
             }
@@ -720,17 +721,18 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         }
     });
 
-    var from = function(owner, definition) {
+    //TODO: put this into the factory
+    var from = function(factory, owner, definition) {
         switch (definition.kind) {
-            case 'bool':     return new Bool(owner, definition);
-            case 'choice':   return new Choice(owner, definition);
-            case 'compound': return new Compound(owner, definition);
-            case 'epsilon':  return new Epsilon(owner, definition);
-            case 'numeric':  return new Numeric(owner, definition);
-            case 'range':    return new Range(owner, definition);
-            case 'text':     return new Text(owner, definition);
-			case 'textfield':return new InlineTextField(owner, definition);
-            case 'transfer': return new Transfer(owner, definition);
+            case 'bool':     return new Bool(factory, owner, definition);
+            case 'choice':   return new Choice(factory, owner, definition);
+            case 'compound': return new Compound(factory, owner, definition);
+            case 'epsilon':  return new Epsilon(factory, owner, definition);
+            case 'numeric':  return new Numeric(factory, owner, definition);
+            case 'range':    return new Range(factory, owner, definition);
+            case 'text':     return new Text(factory, owner, definition);
+			case 'textfield':return new InlineTextField(factory, owner, definition);
+            case 'transfer': return new Transfer(factory, owner, definition);
 
             default: throw ValueError('unknown property kind ' + definition.kind);
         }
