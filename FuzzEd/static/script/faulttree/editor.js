@@ -309,10 +309,11 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         _evaluateResult: function(data, job_result_url) {
             
             data   = jQuery.parseJSON(data);
-            var issues = data.issues
+            var issues = data.issues;
             
-            this._displayGraphIssues(issues.errors, issues.warnings);
-            
+            if (issues){
+                this._displayGraphIssues(issues.errors, issues.warnings);
+            }
                 
             // remove progress bar
             this._chartContainer.empty();
@@ -520,23 +521,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                         marker: {
                             radius: 1
                         },
-                        events: {/* ToDo adapt Code to DataTables
-                            // select the corresponding grid row of the hovered series
-                            // this will also highlight the corresponding nodes
-                            mouseOver: function() {
-                                var configID = this.name;
-                                _.each(this._grid.getData(), function(dataItem, index) {
-                                    if (dataItem.id == configID) {
-                                        this._grid.setSelectedRows([index]);
-                                    }
-                                }.bind(this));
-                            },
-                            // unselect all grid cells
-                            mouseOut: function() {
-
-                                this._grid.setSelectedRows([]);
-                            }.bind(this)
-                        */}
+                        events: {}
                     }
                 },
 
@@ -545,13 +530,10 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
 
             return this;
         },
-        
-        
-        
+                
         /**
          * Method: _displayResultWithDataTables
-         *      Display the job's result with DataTables Plugin. Configuration Issues are printed inside the table as collapsed row.
-         *      ToDo: Outsource code to a own JS class.  
+         *      Display the job's result with DataTables Plugin. Configuration Issues are printed inside the table as collapsed row. 
          *
          * Parameters:
          *     {Array[Object]}  columns        - A set of columns that shall be displayed within the table.
@@ -605,7 +587,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                                 var chartData = {};
                                  
                                  _.each(configurations, function(config) {
-                                     var configID = config['id'];
+                                     var configID = config['id'] || '';
                                      
                                      // collect chart data if given
                                      if (typeof config['points'] !== 'undefined') {
