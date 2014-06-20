@@ -220,6 +220,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
             if (typeof this._job !== 'undefined') this._job.cancel();
             
             this._graphIssuesContainer.empty();
+            // reset height of the chart container (which is set after resizing event)
+            this._chartContainer.height('')
             this._chartContainer.empty();
             this._gridContainer.empty();
             // reset height in case it was set during grid creation
@@ -490,7 +492,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                 chart: {
                     renderTo: this._chartContainer[0],
                     type:     'line',
-                    height:   180
+                    height:   Math.max(180, this._chartContainer.height()),
+
                 },
                 title: {
                     text: null
