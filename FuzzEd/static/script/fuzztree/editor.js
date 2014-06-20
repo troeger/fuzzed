@@ -1,4 +1,4 @@
-define(['faulttree/editor', 'fuzztree/graph', 'fuzztree/config'],
+define(['faulttree/editor', 'fuzztree/graph', 'fuzztree/config', 'fuzztree/node'],
 function(FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
     /**
      *  Package: Fuzztree

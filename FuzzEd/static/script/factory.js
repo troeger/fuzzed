@@ -24,6 +24,7 @@ function(Class) {
 
             // if baseCls already is a constructor and not a class-string
             if (typeof baseCls === 'function') {
+                console.log('[-] Creating a ' + baseCls + ' directly from given constructor.')
                 creation = this._construct(baseCls, args.slice(1));
             } else {
             // if baseCls is a string describing the demanded class (most common case)
@@ -34,18 +35,20 @@ function(Class) {
                 var creation = undefined;
                 try {
                     // our first try is based on the assumption, that the class module only returns the class constructor
+                    console.log('[1] Trying to create a ' + baseCls + ' directly from module ' + path);
                     creation = this._construct(clsModule, args.slice(1));
                 } catch (e) {
                     if (e instanceof ClassNotFound) {
                         try {
                             // our second try supposes that the constructor is a member of the return object and is called the same
                             //  as the concrete class we are looking for (e.g. FaulttreeNodeGroup)
-                            var clsName = resolveObj.kind
+                            console.log('[2] Trying to create a ' + baseCls + ' from ' + resolveObj.path + '.' + resolveObj.fullClassName);
                             creation = this._construct(clsModule[resolveObj.fullClassName], args.slice(1));
                         } catch (f) {
                             if (e instanceof ClassNotFound) {
                                 // our third try is to find the wanted class inside the found package, but this time named in
                                 //  as the baseCls (e.g. NodeGroup)
+                                console.log('[3] Trying to create a ' + baseCls + ' from ' + resolveObj.path + '.' + resolveObj.cls);
                                 creation = this._construct(clsModule[resolveObj.cls], args.slice(1));
                             } else {
                                 throw f;
@@ -58,6 +61,7 @@ function(Class) {
             }
 
             if (typeof creation !== 'undefined') {
+                console.log('Sucessfully created a ' + baseCls);
                 return creation;
             } else {
                 throw new ClassResolveError("Could not resolve class '" + baseCls + "' for kind '" + this.kind + "'");
@@ -76,7 +80,8 @@ function(Class) {
                 var that = this;
                 return new Creation(that);
             } catch (e) {
-                throw new ClassNotFound();
+                if (e.message === "undefined is not a function") throw new ClassNotFound();
+                else throw e;
             }
         },
 

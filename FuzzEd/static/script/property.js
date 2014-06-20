@@ -352,7 +352,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
                     partInCompound: index,
                     value: index === this.value ? value : undefined
                 });
-                parsedParts[index] = from(this.owner, partDef);
+                parsedParts[index] = from(this.factory, this.owner, partDef);
             }.bind(this));
 
             this.parts = parsedParts;
@@ -382,8 +382,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             var epsilon = value[1];
 
             // doing a big decimal conversion here due to JavaScripts awesome floating point handling xoxo
-            var decimalCenter  = new Decimal(this.factory, center);
-            var decimalEpsilon = new Decimal(this.factory, epsilon);
+            var decimalCenter  = new Decimal(center);
+            var decimalEpsilon = new Decimal(epsilon);
 
             if (typeof center  !== 'number' || window.isNaN(center)) {
                 validationResult.kind    = TypeError;
@@ -422,23 +422,23 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             this.value = typeof this.value === 'undefined' ? this.default.slice(0) : this.value;
 
             if (!(this.default[0] instanceof Decimal) && isNumber(this.default[0])) {
-                this.default[0] = new Decimal(this.factory, this.default[0]);
+                this.default[0] = new Decimal(this.default[0]);
             } else {
                 throw new TypeError('numeric lower bound', typeof this.default[0]);
             }
             if (!(this.default[1] instanceof Decimal) && isNumber(this.default[1])) {
-                this.default[1] = new Decimal(this.factory, this.default[1]);
+                this.default[1] = new Decimal(this.default[1]);
             } else {
                 throw new TypeError('numeric upper bound', typeof this.default[1]);
             }
 
             if (!(this.min instanceof Decimal) && isNumber(this.min)) {
-                this.min = new Decimal(this.factory, this.min);
+                this.min = new Decimal(this.min);
             } else {
                 throw new TypeError('numeric minimum', typeof this.min);
             }
             if (!(this.max instanceof Decimal) && isNumber(this.max)) {
-                this.max = new Decimal(this.factory, this.max);
+                this.max = new Decimal(this.max);
             } else {
                 throw new TypeError('numeric maximum', typeof this.max);
             }
@@ -489,17 +489,17 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             this.value = typeof this.value === 'undefined' ? this.default : this.value;
 
             if (isNumber(this.default)) {
-                this.default = new Decimal(this.factory, this.default);
+                this.default = new Decimal(this.default);
             } else {
                 throw new TypeError('numeric default', this.default);
             }
             if (isNumber(this.min)) {
-                this.min = new Decimal(this.factory, this.min);
+                this.min = new Decimal(this.min);
             } else {
                 throw new TypeError('numeric min', this.min);
             }
             if (isNumber(this.max)) {
-                this.max = new Decimal(this.factory, this.max);
+                this.max = new Decimal(this.max);
             } else {
                 throw new TypeError('numeric max', this.max);
             }
@@ -561,23 +561,23 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             this.value = typeof this.value === 'undefined' ? this.default.slice(0) : this.value;
 
             if (!(this.default[0] instanceof Decimal) && isNumber(this.default[0])) {
-                this.default[0] = new Decimal(this.factory, this.default[0]);
+                this.default[0] = new Decimal(this.default[0]);
             } else {
                 throw new TypeError('numeric default lower bound', this.default[0]);
             }
             if (!(this.default[1] instanceof Decimal) && isNumber(this.default[1])) {
-                this.default[1] = new Decimal(this.factory, this.default[1]);
+                this.default[1] = new Decimal(this.default[1]);
             } else {
                 throw new TypeError('numeric default upper bound', this.default[1]);
             }
 
             if (!(this.min instanceof Decimal) && isNumber(this.min)) {
-                this.min = new Decimal(this.factory, this.min);
+                this.min = new Decimal(this.min);
             } else {
                 throw new TypeError('numeric min', this.min);
             }
             if (!(this.max instanceof Decimal) && isNumber(this.max)) {
-                this.max = new Decimal(this.factory, this.max);
+                this.max = new Decimal(this.max);
             } else {
                 throw new TypeError('numeric max', this.max);
             }
