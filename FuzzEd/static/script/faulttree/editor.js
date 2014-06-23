@@ -277,9 +277,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                     if (this._chart != null) {
                         
                         // fit all available space with chart    
-                        var margin_offset = 30;
                         
-                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._gridContainer.height() - margin_offset);
+                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._gridContainer.height());
                         
                         this._chart.setSize(
                             this._chartContainer.width(),
@@ -492,7 +491,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                 chart: {
                     renderTo: this._chartContainer[0],
                     type:     'line',
-                    height:   Math.max(180, this._chartContainer.height()),
+                    height:   Math.max(140, this._chartContainer.height()),
 
                 },
                 title: {
