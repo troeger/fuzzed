@@ -7,7 +7,9 @@ from django.core.urlresolvers import reverse
 from graph import Graph
 from FuzzEd.lib.jsonfield import JSONField
 
-import json
+import json, logging
+
+logger = logging.getLogger('FuzzEd')
 
 class Result(models.Model):
     """
@@ -116,8 +118,7 @@ class Result(models.Model):
       result = {}
       for field in ['minimum', 'maximum', 'peak', 'points', 'reliability', 'mttf', 'rounds', 'failures']:
         value = getattr(self, field)
-        if value != None:
-          result[field] = value
+        result[field] = value   # None values are needed, since datatables needs all columns filled
       if self.configuration:
           result['choices'] = self.configuration.to_dict() 
           result['id'] = self.configuration.pk
