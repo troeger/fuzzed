@@ -599,8 +599,7 @@ class Node(models.Model):
             setattr(self, key, value)
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'node': self})
-            prop.value = value
-            prop.save()
+            prop.save_sanitized(key, value)
 
     def same_as(self, node):
         ''' 
