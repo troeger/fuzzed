@@ -37,6 +37,7 @@ from FuzzEd.models.notification import Notification
 
 
 # This disables all the debug output from the FuzzEd server, e.g. Latex rendering nodes etc.
+#import logging
 #logging.disable(logging.CRITICAL)
 
 # The fixtures used in different test classes
@@ -189,6 +190,7 @@ class ViewsTestCase(FuzzEdTestCase):
 class GraphMLFilesTestCase(FuzzEdTestCase):
     """ 
         Testing different GraphML file imports. 
+        The fixture gives us existing user accounts and a valid project ID.
     """
     fixtures = fixt_simple['files']
 
@@ -197,7 +199,9 @@ class GraphMLFilesTestCase(FuzzEdTestCase):
 
     def testImportFiles(self):
         files = [f for f in os.listdir('FuzzEd/fixtures') if f.endswith(".graphml")]
+        print files
         for f in files:
+            print("Testing "+f)
             text = open('FuzzEd/fixtures/' + f).read()
             # Now import the same GraphML
             response = self.postWithAPIKey(
@@ -205,7 +209,6 @@ class GraphMLFilesTestCase(FuzzEdTestCase):
                         text,
                         'application/xml')
             self.assertEqual(response.status_code, 201)
-
 
 class ExternalAPITestCase(FuzzEdTestCase):
     """ 
@@ -530,6 +533,10 @@ class AnalysisInputFilesTestCase(FuzzEdTestCase):
                 retcode = subprocess.call('backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp' % (fname), shell=True)
                 self.assertEqual(retcode, 0, fname + " failed")
                 dom = parse('/tmp/output.xml')
+                # print(dom.toprettyxml())
+                results = dom.getElementsByTagName('result')
+                for result in results:
+                    self.assertEqual(result.getAttribute('validResult'), 'true')
 
 class BackendDaemonTestCase(FuzzEdTestCase):
     """
