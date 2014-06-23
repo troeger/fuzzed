@@ -134,7 +134,7 @@ class Node(models.Model):
          {dict} the node as dictionary
         """
         return {
-            'properties': {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)},
+            'properties': {prop.key: {'value': prop.sanitized_value} for prop in self.properties.filter(deleted=False)},
             'id':         self.client_id,
             'kind':       self.kind,
             'x':          self.x,
@@ -580,7 +580,7 @@ class Node(models.Model):
         else:
             try:
                 prop = self.properties.get(key=key)
-                return prop.value
+                return prop.sanitized_value
             except Exception:
                 raise ValueError()
 
@@ -599,7 +599,8 @@ class Node(models.Model):
             setattr(self, key, value)
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'node': self})
-            prop.save_sanitized(key, value)
+            prop.value = value
+            prop.save()
 
     def same_as(self, node):
         ''' 

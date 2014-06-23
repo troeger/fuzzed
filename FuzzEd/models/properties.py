@@ -5,7 +5,7 @@ from node import Node
 from edge import Edge
 from node_group import NodeGroup
 
-import logging
+import logging, json
 logger = logging.getLogger('FuzzEd')
 
 import notations
@@ -38,27 +38,21 @@ class Property(models.Model):
     def __unicode__(self):
         return '%s%s: %s' % ('[DELETED] ' if self.deleted else '', self.key, self.value)
 
-    def save_sanitized(self, key, value):
+    @property
+    def sanitized_value(self):
         '''
             Convert the property value into a datatype that is accepted
-            according to the notations file, before saving it to the DB.
-            Assumes that the object already exists and that self.node
-            is correctly set.
+            according to the notations file.
         '''
         val_type = notations.by_kind[self.node.graph.kind]['nodes'][self.node.kind]['properties'][self.key]['kind']
         if val_type == 'text':
             # JSONField is performing some conversion magic, so must tell
             # it explicitely that even numerical strings remain strings
-            value = "'"+value+"'"
+            return str(self.value)
         elif val_type == 'numeric':
-            try:
-                numval = float(value)
-            except ValueError:
-                logger.info('%s property value is supposed to be numeric, conversion of %s failed, ignoring it'%(key, value))
-                return                
-        self.key = key
-        self.value = value
-        self.save()
+            return float(self.value)
+        else:
+            return self.value
 
     def to_dict(self):
         """
