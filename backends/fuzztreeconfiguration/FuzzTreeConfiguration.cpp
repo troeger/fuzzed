@@ -131,3 +131,8 @@ void FuzzTreeConfiguration::setId(const unsigned int id)
 {
 	m_id = std::to_string(id);
 }
+
+const bool FuzzTreeConfiguration::isValid() const
+{
+	return m_bValid;
+}
