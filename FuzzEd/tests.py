@@ -375,7 +375,6 @@ class FrontendApiTestCase(FuzzEdTestCase):
         response = self.ajaxGet(url)
         self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
-        print content
         assert ('graphs' in content)
 
     def testGraphFiltering(self):
@@ -383,24 +382,23 @@ class FrontendApiTestCase(FuzzEdTestCase):
         response = self.ajaxGet(url)
         self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
-        print content
         assert ('graphs' in content)
 
     def testCreateNode(self):
+        properties = {"key": "foo", "value": "bar"}
         newnode = json.dumps({'y': 3,
                               'x': 7,
                               'kind': 'basicEvent',
                               'client_id': 888,
-                              'properties': '{}'})
+                              'properties': properties})
 
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodes/' % fixt_simple['pkFaultTree'],
                                  newnode,
                                  'application/json')
         self.assertEqual(response.status_code, 201)
-        print response['Location']
         newid = int(response['Location'].split('/')[-1])
         newnode = Node.objects.get(client_id=newid, deleted=False)
-
+        self.assertItemsEqual(properties, newnode.get_properties())
 
     def testCreateNodeGroup(self):
         nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]

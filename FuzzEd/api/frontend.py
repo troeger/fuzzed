@@ -208,6 +208,10 @@ class NodeResource(ModelResource):
         bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
+        bundle.obj.save()   # Ordering is important, so that set_attr has something to relate to
+        if 'properties' in bundle.data:
+            for key, value in bundle.data['properties'].iteritems():
+                bundle.obj.set_attr(key, value)
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
