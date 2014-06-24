@@ -267,8 +267,10 @@ class NodeGroupResource(ModelResource):
 
     def obj_create(self, bundle, **kwargs):
         """
-             This is the only override that allows us to access 'kwargs', which contains the
-             graph_id from the original request.
+            The method called by the dispatcher when a NodeGroup resource is created.
+
+            This is the only override that allows us to access 'kwargs', which contains the
+            graph_id from the original request.
         """
         try:
             bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
@@ -285,7 +287,11 @@ class NodeGroupResource(ModelResource):
                 bundle.obj.nodes.add(node)
             except ObjectDoesNotExist:
                 pass
-            bundle.obj.save()
+        if 'properties' in bundle.data:
+            # set initial node group properties
+            for key, value in bundle.data['properties'].iteritems():
+                bundle.obj.set_attr(key, value)
+        bundle.obj.save()
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -312,9 +318,17 @@ class NodeGroupResource(ModelResource):
         deserialized = self.deserialize(request, request.body,
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
+            logger.debug("Updating properties for node group")
             for key, value in deserialized['properties'].iteritems():
                 obj.set_attr(key, value)
             obj.save()
+        if 'nodeIds' in deserialized:
+            logger.debug("Updating nodes for node group")
+            obj.nodes.clear()    # nodes_set is magically created by Django
+            node_objects = Node.objects.filter(deleted=False, graph=obj.graph, client_id__in=deserialized['nodeIds'])
+            obj.nodes = node_objects
+            obj.save()
+
         # return the updated node group object
         return HttpResponse(obj.to_json(), 'application/json', status=202)
 

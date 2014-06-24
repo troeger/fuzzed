@@ -404,7 +404,8 @@ class FrontendApiTestCase(FuzzEdTestCase):
 
     def testCreateNodeGroup(self):
         nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
-        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
+        initial_properties =  {"key": "foo", "value": "bar"}
+        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes, "properties": initial_properties})
         response = self.ajaxPost(
                     self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
                     newgroup,
@@ -425,7 +426,7 @@ class FrontendApiTestCase(FuzzEdTestCase):
         for group in content['nodeGroups']:
             self.assertEqual(group['id'], 999)
             self.assertItemsEqual(group['nodeIds'], nodes)
-            print group
+            self.assertItemsEqual(group['properties'], initial_properties)
 
     def testDeleteNode(self):
         response = self.ajaxDelete(
@@ -480,6 +481,29 @@ class FrontendApiTestCase(FuzzEdTestCase):
         self.assertEqual(response.status_code, 202)
         #TODO: Fetch graph and check that the property is really stored
 
+    def testNodeGroupNodesChange(self):
+        #TODO: Fixture should have a node group, instead of creating it here
+        nodes1 = [fixt_simple['clientIdAndGate']]
+        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes1})
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
+                                 newgroup,
+                                 'application/json')
+        self.assertEqual(response.status_code, 201)
+        newgroup = response['Location']
+        # Try changing
+        nodes2 = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
+        newnodes = json.dumps({"nodeIds": nodes2})
+        response = self.ajaxPatch(newgroup,
+                                  newnodes,
+                                  "application/json")
+        self.assertEqual(response.status_code, 202)
+        # Get complete graph and see if the node group is registered correctly
+        url = self.baseUrl + '/graphs/%u' % fixt_simple['pkDFD']
+        response = self.ajaxGet(url)
+        self.assertEqual(response.status_code, 200)
+        content = json.loads(response.content)
+        for group in content['nodeGroups']:
+            self.assertItemsEqual(group['nodeIds'], nodes2)
 
     def testEdgePropertyChange(self):
         newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
