@@ -538,6 +538,7 @@ class ResultResource(ModelResource):
             sort_col = int(request.GET['iSortCol_'+str(i)])
             sort_dir = request.GET['sSortDir_'+str(i)] 
             db_field_name=job.result_titles[sort_col][0] 
+            logger.debug("Sorting result set for "+db_field_name)
             if sort_dir == "desc":
                 db_field_name = "-"+db_field_name          
             sort_fields.append(db_field_name)

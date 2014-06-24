@@ -47,7 +47,7 @@ fixt_analysis = {
                 'graphs':  {7: 'faulttree', 8: 'faulttree'},
                 'results': {7: 'results/rate_tree.xml', 8: 'results/prdc_tree.xml'},               
                 'rate_faulttree': 7,                # Graph PK
-                'prdc_faulttree': 8,                # Graph PK
+                'prdc_fuzztree': 8,                # Graph PK
                 'prdc_configurations': 8,           # Decomposition number
                 'prdc_peaks': [0.31482, 0.12796, 0.25103, 0.04677, 0.36558, 0.19255, 0.30651, 0.11738]
                 }
@@ -634,7 +634,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testPRDCFuzztree(self):
-        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_fuzztree'], 'topevent')
         job_result_info = json.loads(job_result.content)
         assert('issues' in job_result_info)
         assert('columns' in job_result_info)
@@ -665,15 +665,17 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testResultOrdering(self):
-        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_fuzztree'], 'topevent')
         job_result_info = json.loads(job_result.content)
         result_url = job_result['LOCATION']
         # Ordering in datatables style
-        titles = Result.titles(Result.ANALYSIS_RESULT, 'faulttree')
+        titles = Result.titles(Result.ANALYSIS_RESULT, 'fuzztree')
         print "Titles: %s\n"%str(titles)
         for index, col_desc in enumerate(titles):
             field_name = col_desc[0]
-            result = self.ajaxGet(result_url+'?sEcho=doo&iSortingCols=1&sSortDir_0=asc&iSortCol_0='+str(index))  
+            url = result_url+'?sEcho=doo&iSortingCols=1&sSortDir_0=asc&iSortCol_0='+str(index)
+            print url
+            result = self.ajaxGet(url)  
             data = json.loads(result.content)
             if field_name in data['aaData'][0]:
                 print "Checking sorting for "+field_name
