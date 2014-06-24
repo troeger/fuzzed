@@ -28,26 +28,27 @@ class Graph(models.Model):
     its contained nodes and edges. Additionally, it provides functionality for serializing it.
 
     Fields:
-     {str}            kind     - unique identifier that indicates the graph's notation (e.g. fuzztree). Must be an
-                                 element of the set of available notations (See also: <notations>)
-     {str}            name     - the name of the graph
-     {User}           owner    - a link to the owner of the graph
-     {Project}        project  - the project corresponding to the graph
-     {const datetime} created  - timestamp of the moment of graph creation (default: now)
-     {bool}           deleted  - flag indicating whether this graph was deleted or not. Simplifies restoration of the
-                                 graph if needed by toggling this member (default: False)
+     {str}            kind         - unique identifier that indicates the graph's notation (e.g. fuzztree). Must be an
+                                     element of the set of available notations (See also: <notations>)
+     {str}            name         - the name of the graph
+     {User}           owner        - a link to the owner of the graph
+     {Project}        project      - the project corresponding to the graph
+     {const datetime} created      - timestamp of the moment of graph creation (default: now)
+     {bool}           deleted      - flag indicating whether this graph was deleted or not. Simplifies restoration of the
+                                     graph if needed by toggling this member (default: False)
+     {JSON}           graph_issues - 
     """
     class Meta:
         app_label = 'FuzzEd'
 
-    kind      = models.CharField(max_length=127, choices=notations.choices)
-    name      = models.CharField(max_length=255)
-    owner     = models.ForeignKey(User, related_name='graphs')
-    project   = models.ForeignKey(Project, related_name='graphs')
-    created   = models.DateTimeField(auto_now_add=True, editable=False)
-    modified  = models.DateTimeField(auto_now=True)
-    deleted   = models.BooleanField(default=False)
-    read_only = models.BooleanField(default=False)
+    kind           = models.CharField(max_length=127, choices=notations.choices)
+    name           = models.CharField(max_length=255)
+    owner          = models.ForeignKey(User, related_name='graphs')
+    project        = models.ForeignKey(Project, related_name='graphs')
+    created        = models.DateTimeField(auto_now_add=True, editable=False)
+    modified       = models.DateTimeField(auto_now=True)
+    deleted        = models.BooleanField(default=False)
+    read_only      = models.BooleanField(default=False)
 
     def __unicode__(self):
         return unicode('%s%s' % ('[DELETED] ' if self.deleted else '', self.name))
@@ -315,6 +316,20 @@ class Graph(models.Model):
 
         self.read_only = other.read_only
         self.save()
+
+    def delete_configurations(self):
+        """
+            Deletes all informations about configurations of this graph.
+        """
+        self.configurations.all().delete()
+
+    def delete_results(self, kind):
+        '''
+            Deletes all graph analysis results of a particular kind.
+        '''
+        old_results = self.results.filter(kind=kind).all()
+        logger.debug("Deleting %u old results of kind %s"%(len(old_results), kind))
+        old_results.delete()
 
     def same_as(self, graph):
         ''' 

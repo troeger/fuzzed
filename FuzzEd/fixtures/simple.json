@@ -7,7 +7,7 @@
             "created": "2014-03-17T07:50:45.835", 
             "deleted": false, 
             "modified": "2014-03-19T22:29:35.236", 
-            "owner": 2, 
+            "owner": 1, 
             "users": []
         }
     }, 
@@ -22,7 +22,7 @@
             "deleted": false, 
             "modified": "2014-03-19T22:29:35.233", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -36,7 +36,7 @@
             "deleted": false, 
             "modified": "2014-03-19T22:29:24.337", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -50,7 +50,7 @@
             "deleted": false, 
             "modified": "2014-03-19T22:29:03.009", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -64,7 +64,7 @@
             "deleted": true, 
             "modified": "2014-03-17T18:18:53.637", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -78,7 +78,7 @@
             "deleted": true, 
             "modified": "2014-03-17T18:18:53.642", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -92,7 +92,7 @@
             "deleted": true, 
             "modified": "2014-03-19T22:27:42.886", 
             "project": 1, 
-            "owner": 2
+            "owner": 1
         }
     }, 
     {
@@ -733,20 +733,12 @@
             "key": "missionTime", 
             "value": 16600
         }
-    }, 
-    {
-        "pk": 2, 
-        "model": "auth.user", 
-        "fields": {
-            "username": "testadmin", 
-            "password": "pbkdf2_sha256$10000$JNt1EZn2g72p$vX3UFh7g4mPa313pWW4lf4YxkUhL534V8/kxFaQ1XvM="
-        }
     },
     {
         "pk": 1, 
         "model": "tastypie.apikey", 
         "fields": {
-            "user": 2, 
+            "user": 1, 
             "key": "f1cc367bc09fc95720e6c8a4225ae2b912fff91b", 
             "created": "2014-03-17T08:26:26.242"
     }

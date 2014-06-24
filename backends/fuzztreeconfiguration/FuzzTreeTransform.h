@@ -71,7 +71,8 @@ protected:
 	void generateConfigurations(std::vector<FuzzTreeConfiguration>& configurations);
 	ErrorType generateConfigurationsRecursive(
 		const fuzztree::Node* node, 
-		std::vector<FuzzTreeConfiguration>& configurations);
+		std::vector<FuzzTreeConfiguration>& configurations,
+		unsigned int& configCount);
 
 	static bool isOptional(const fuzztree::Node& node);
 	static int parseCost(const fuzztree::InclusionVariationPoint& node);

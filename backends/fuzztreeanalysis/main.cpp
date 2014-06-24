@@ -11,11 +11,11 @@
 #include "FaultTreeToFuzzTree.h"
 #include "util.h"
 #include "xmlutil.h"
-#include "analysisResult.h"
+#include "backendResult.h"
 
 
 void analyze(
-	analysisResults::Result& r,
+	backendResults::AnalysisResult& r,
 	const fuzztree::TopEvent* const topEvent,
 	std::ofstream* logFileStream,
 	unsigned int decompositionNumber) 
@@ -74,21 +74,23 @@ int main(int argc, char** argv)
 		*logFileStream << "Invalid input file: " << inFile << std::endl;
 		return -1;
 	}
+	// please keep this here for debugging
+	std::istreambuf_iterator<char> eos;
+	std::ifstream inputFileStream(inFile);
+	std::string s(std::istreambuf_iterator<char>(inputFileStream), eos);
+	*logFileStream << "Analysis input file: " << s << std::endl;
+	inputFileStream.close();
 
 	std::set<Issue> issues; // issues at fuzztree level
 	FuzzTreeTransform tf(instream, issues);
 	instream.close();
 
-	analysisResults::AnalysisResults analysisResults;
+	backendResults::BackendResults analysisResults;
 	try
 	{	
-		// please keep this here for debugging
-// 		std::istreambuf_iterator<char> eos;
-// 		std::string s(std::istreambuf_iterator<char>(instream), eos);
-// 		*logFileStream << s;
-
 		if (!tf.isValid())
 		{ // handle faulttree
+			*logFileStream << "Starting FaultTree Analysis..." << std::endl;
 			std::ifstream is(inFile); // TODO: somehow avoid opening another stream here
 			const std::auto_ptr<faulttree::FaultTree> faultTree = 
 				faulttree::faultTree(inFile, xml_schema::Flags::dont_validate);
@@ -99,9 +101,9 @@ int main(int argc, char** argv)
 				faultTree->topEvent().decompositionNumber().present() ? 
 				faultTree->topEvent().decompositionNumber().get() : 
 				DEFAULT_DECOMPOSITION_NUMBER;
-			const auto modelId = faultTree->id();
 
-			analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+			backendResults::AnalysisResult r(faultTree->id(), EMPTY_CONFIG_ID, util::timeStamp(), true, decompositionNumber);
+			r.decompositionNumber(decompositionNumber);
 			try
 			{
 				const auto topEvent = faultTreeToFuzzTree(faultTree->topEvent(), treeIssues);	
@@ -117,11 +119,14 @@ int main(int argc, char** argv)
 			
 			analysisResults.result().push_back(r);
 
+			// add a dummy configuration with DEFAULT_CONFIG_ID
+
 			if (!r.validResult())
 				faulttree::faultTree(*logFileStream, *(faultTree.get()));
 		}
 		else
 		{ // handle fuzztree
+			*logFileStream << "Starting FuzzTree Analysis..." << std::endl;
 			const auto tree = tf.getFuzzTree();
 			const auto modelId = tree->id();
 			
@@ -135,7 +140,7 @@ int main(int argc, char** argv)
 			for (const auto& t : tf.transform())
 			{
 				auto topEvent = fuzztree::TopEvent(t.second.topEvent());
-				analysisResults::Result r(modelId, util::timeStamp(), true, decompositionNumber);
+				backendResults::AnalysisResult r(modelId, t.first.getId(), util::timeStamp(), true, decompositionNumber);
 				try
 				{
 					analyze(r, &topEvent, logFileStream, decompositionNumber);
@@ -146,7 +151,7 @@ int main(int argc, char** argv)
 					r.validResult(false);
 				}
 				 
-				r.configuration(serializedConfiguration(t.first));
+				analysisResults.configuration().push_back(serializedConfiguration(t.first));
 				analysisResults.result().push_back(r);
 			}
 		}
@@ -169,7 +174,7 @@ int main(int argc, char** argv)
 	}
 
 	std::ofstream output(outFile);
-	analysisResults::analysisResults(output, analysisResults);
+	backendResults::backendResults(output, analysisResults);
 	
 	logFileStream->close();
 	delete logFileStream;

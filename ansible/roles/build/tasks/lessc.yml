@@ -1,0 +1,23 @@
+---
+# Installing less via npm: no brew on Darwin, too old in Linux apt
+- name: Ensure NPM is installed
+  sudo: yes
+  apt: pkg=npm state=present
+  when: ansible_os_family == "Debian"
+
+- name: Ensure NPM is installed
+  homebrew: pkg=npm state=present
+  when: ansible_os_family == "Darwin"
+
+- name: Install Less Compiler
+  npm: name=less global=yes
+
+- name: Bring lessc executable into path
+  sudo: yes
+  file: src=/usr/local/share/npm/bin/lessc dest=/usr/local/bin/lessc state=link
+  when: ansible_os_family == "Darwin"
+  
+- name: Bring lessc executable into path
+  sudo: yes
+  file: src=/usr/local/lib/node_modules/less/bin/lessc dest=/usr/local/bin/lessc state=link
+  when: ansible_os_family == "Debian"

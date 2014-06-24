@@ -1,4 +1,8 @@
-import tempfile, os, shutil, signal, sys, ConfigParser, logging
+import os
+import shutil
+import sys
+import logging
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')
 

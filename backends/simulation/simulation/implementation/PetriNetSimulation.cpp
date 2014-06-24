@@ -195,7 +195,7 @@ bool PetriNetSimulation::run()
 	res.nFailures			= numFailures;
 	res.nRounds				= count;
 	res.mttf				= avgFailureTime_all;
-	res.duration			= elapsedTime.count();
+	res.duration			= (double) elapsedTime.count();
 	
 #if  defined(RELIABILITY_DISTRIBUTION) || defined(NUM_MONTE_CARLO_ROUNDS)
 	statdoc << util::toString(res.duration) << std::endl;
@@ -237,7 +237,7 @@ bool PetriNetSimulation::simulationStep(PetriNet* pn, int tick)
 	// propagate all failures upwards in the correct time step
 	bool immediateCanFire = true;
 
-	int tries = 0;
+	unsigned int tries = 0;
 	while (immediateCanFire && ++tries < m_numSimulationSteps)
 	{
 		tryImmediateTransitions(pn, tick, immediateCanFire);

@@ -128,7 +128,7 @@ COMMON_XSD = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
     <xsd:complexType name="UndevelopedEvent">
         <xsd:complexContent>
-            <xsd:extension base="ft:ChildNode"/>
+            <xsd:extension base="{3}"/>
         </xsd:complexContent>
     </xsd:complexType>
     <xsd:element name="UndevelopedEvent" type="ft:UndevelopedEvent"/>

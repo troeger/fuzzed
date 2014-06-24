@@ -1,0 +1,5 @@
+---
+- include: apache2.yml
+- include: django.yml
+- include: xml_support.yml
+

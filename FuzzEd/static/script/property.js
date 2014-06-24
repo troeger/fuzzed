@@ -1,10 +1,37 @@
 define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'label', 'alerts', 'jquery', 'underscore'],
 function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
+    /**
+     * Package: Base
+     */
 
+    /**
+     * Function: isNumber
+     *      Small helper function that checks the parameter for being a number and not 'NaN'.
+     *
+     * Parameters:
+     *      {Object} number - object to be checked for being a number
+     *
+     * Returns:
+     *      A {Boolean} indicating whether the passed parameter is a number.
+     */
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
     };
-	
+
+    /**
+     * Abstract Class: Property
+     *      Abstract base implementation of a node property. A property models a key-value-attribute. It contains e.g.
+     *      the name, cost, probability... of a node. It is only used as a data object and DOES NOT take care of its
+     *      visual representation.
+     *
+     *      In line with that, properties may have a <Mirror> that will reflect the properties current value below a
+     *      node. Additionally a property has a reference to his <PropertyMenuEntry> which will allow the modification
+     *      of the property value by the user through a visual element (think: text input, checkbox...).
+     *
+     *      Properties can be declared readonly or hidden, which will accordingly prevent the modification of visual
+     *      display.
+     *
+     */
     var Property = Class.extend({
         owner:          undefined,
         mirrorers:      undefined,
@@ -57,18 +84,17 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             this._triggerChange(newValue, issuer);
 
             if (propagate) {
-                var properties = {};
-                // compound parts need another format for backend propagation
-                var value = typeof this.partInCompound === 'undefined' ? newValue : [this.partInCompound, newValue];
-                properties[this.name] = value;
-
                 //TODO: IS THIS REALLY THE RIGHT WAY TO DO IT?
                 // (we cannot put the require as dependency of this module, as there is some kind of cyclic dependency
                 // stopping Node.js to work properly)
+                var Edge       = require('edge');
+                var Node       = require('node');
+                var NodeGroup  = require('node_group');
+                var properties = {};
 
-                var Edge =      require("edge");
-                var Node =      require("node");
-                var NodeGroup = require("node_group");
+                // compound parts need another format for backend propagation
+                var value = typeof this.partInCompound === 'undefined' ? newValue : [this.partInCompound, newValue];
+                properties[this.name] = value;
 
                 if (this.owner instanceof Edge) {
                     jQuery(document).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
@@ -77,9 +103,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
                 } else if (this.owner instanceof NodeGroup) {
                     jQuery(document).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [this.owner.id, properties]);
                 } else {
-                    throw new TypeError ("unknown owner class")
+                    throw new TypeError ('unknown owner class');
                 }
-
             }
 
             return this;
@@ -93,16 +118,14 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         setHidden: function(newHidden) {
             this.hidden = newHidden;
-
-             jQuery(this).trigger(Config.Events.PROPERTY_HIDDEN_CHANGED, [newHidden]);
+            jQuery(this).trigger(Config.Events.PROPERTY_HIDDEN_CHANGED, [newHidden]);
 
             return this;
         },
 
         setReadonly: function(newReadonly) {
             this.readonly = newReadonly;
-
-             jQuery(this).trigger(Config.Events.PROPERTY_READONLY_CHANGED, [newReadonly]);
+            jQuery(this).trigger(Config.Events.PROPERTY_READONLY_CHANGED, [newReadonly]);
 
             return this;
         },
@@ -165,10 +188,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             //TODO: IS THIS REALLY THE RIGHT WAY TO DO IT?
             // (we cannot put the following required modules as dependency of this module, as there is some kind of
             // cyclic dependency stopping Node.js to work properly
-
-            var Edge =      require("edge");
-            var Node =      require("node");
-            var NodeGroup = require("node_group");
+            var Edge      = require('edge');
+            var Node      = require('node');
+            var NodeGroup = require('node_group');
 
             if (this.owner instanceof Node) {
                 jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
@@ -177,6 +199,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             } else if (this.owner instanceof NodeGroup) {
                 jQuery(this).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [value, value, issuer]);
             }
+
+            return this;
         }
     });
 
@@ -237,7 +261,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         _triggerChange: function(value, issuer) {
             var index = -1;
-            for (var i = this.values.length - 1; i >=0; i--) {
+            for (var i = this.values.length - 1; i >=0; --i) {
                 if (_.isEqual(this.values[i], value)) {
                     index = i;
                     break;
@@ -291,6 +315,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         toDict: function() {
             var obj = {};
             obj[this.name] = { 'value': [this.value, this.parts[this.value].value] };
+
             return obj;
         },
 
@@ -736,17 +761,16 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
     };
 
     return {
-        Bool:      			Bool,
-        Choice:    			Choice,
-        Compound:  			Compound,
-        Epsilon:   			Epsilon,
-        Numeric:   			Numeric,
-        Property:  			Property,
-        Range:     			Range,
-        Text:      			Text,
-		InlineTextField: 	InlineTextField,
-        Transfer:  			Transfer,
-
-        from: 				from
+        Bool:            Bool,
+        Choice:          Choice,
+        Compound:        Compound,
+        Epsilon:         Epsilon,
+        Numeric:         Numeric,
+        Property:  		 Property,
+        Range:     		 Range,
+        Text:            Text,
+		InlineTextField: InlineTextField,
+        Transfer:        Transfer,
+        from:            from
     };
 });

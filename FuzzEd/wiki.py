@@ -1,5 +1,7 @@
 from django.core.urlresolvers import reverse
+
 from FuzzEd.lib.wikimarkup import parse, registerInternalLinkHook
+
 
 # Our markup renderer implementation, simply relaying to wikimarkup
 def render(src):

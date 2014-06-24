@@ -1,18 +1,18 @@
 define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 'dfd/node_group'],
     function(Editor, Factory, DfdGraph, DfdConfig) {
     /**
-     *  Package: DFD
+     * Package: DFD
      */
 
     /**
-     *  Class: DfdEditor
-     *    DFD-specific <Base::Editor> class.
+     * Class: DFDEditor
+     *      DFD-specific <Base::Editor> class.
      *
      *  Extends: <Base::Editor>
      */
     return Editor.extend({
         /**
-         *  Group: Accessors
+         * Group: Accessors
          */
 
         getFactory: function() {
@@ -20,37 +20,38 @@ define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 
         },
 
         /**
-         *  Method: getConfig
+         * Method: getConfig
          *
-         *  Returns:
-         *    The <DfdConfig> object.
-         *
-         *  See also:
-         *    <Base::Editor::getConfig>
+         * Returns:
+         *      The <DfdConfig> object.
          */
         getConfig: function() {
             return DfdConfig;
         },
 
         /**
-         *  Method: getGraphClass
+         * Method: getGraphClass
          *
-         *  Returns:
-         *    The <DfdGraph> class.
-         *
-         *  See also:
-         *    <Base::Editor::getGraphClass>
+         * Returns:
+         *      The <DfdGraph> class.
          */
         getGraphClass: function() {
             return DfdGraph;
         },
 
+        /**
+         * Method: _setupJsPlumb
+         *      Overrides the editor's standard behaviour of JsPlumb edges in order to add an outline to them.
+         *
+         * Returns:
+         *      This {<DFDEditor>} instance for chaining.
+         */
         _setupJsPlumb: function() {
             this._super();
-            jsPlumb.connectorClass += " outlined";
+            jsPlumb.connectorClass += ' outlined';
+
             return this;
         },
-
 
         _setupMenuActions: function() {
             this._super();
@@ -65,7 +66,7 @@ define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 
 
             // set the shortcut hints from 'Ctrl+' to '⌘' when on Mac
             if (navigator.platform == 'MacIntel' || navigator.platform == 'MacPPC') {
-                jQuery('#' + this.config.IDs.ACTION_GROUP + ' span').text('⌘G');
+                jQuery('#' + this.config.IDs.ACTION_GROUP   + ' span').text('⌘G');
                 jQuery('#' + this.config.IDs.ACTION_UNGROUP + ' span').text('⌘U');
             }
 
