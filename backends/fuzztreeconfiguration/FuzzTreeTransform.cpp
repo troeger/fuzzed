@@ -89,7 +89,12 @@ bool FuzzTreeTransform::isOptional(const fuzztree::Node& node)
 {
 	const type_info& typeName = typeid(node);
 	
-	if (typeName != *fuzztreeType::INTERMEDIATEEVENT && !fuzztreeType::isLeaf(typeName)) 
+	if (typeName != *fuzztreeType::BASICEVENT &&
+		typeName != *fuzztreeType::BASICEVENTSET &&
+		typeName != *fuzztreeType::INTERMEDIATEEVENT &&
+		typeName != *fuzztreeType::INTERMEDIATEEVENTSET &&
+		typeName != *fuzztreeType::HOUSEEVENT &&
+		typeName != *fuzztreeType::UNDEVELOPEDEVENT) 
 		return false;
 	
 	const fuzztree::InclusionVariationPoint* inclusionNode =

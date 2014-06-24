@@ -533,7 +533,7 @@ class AnalysisInputFilesTestCase(FuzzEdTestCase):
                 retcode = subprocess.call('backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp' % (fname), shell=True)
                 self.assertEqual(retcode, 0, fname + " failed")
                 dom = parse('/tmp/output.xml')
-                # print(dom.toprettyxml())
+                #print(dom.toprettyxml())
                 results = dom.getElementsByTagName('result')
                 for result in results:
                     self.assertEqual(result.getAttribute('validResult'), 'true')

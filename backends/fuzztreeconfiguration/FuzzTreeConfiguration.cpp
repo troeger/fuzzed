@@ -58,6 +58,8 @@ void FuzzTreeConfiguration::setNotIncludedRecursive(const fuzztree::Node& node)
 
 const bool& FuzzTreeConfiguration::isOptionalEnabled(const id_type& ID) const
 {
+	const bool included = m_optionalNodes.find(ID) != m_optionalNodes.end();
+	assert(included);
 	return m_optionalNodes.at(ID);
 }
 
