@@ -1,40 +1,39 @@
 define(['graph', 'faulttree/node', 'faulttree/config', 'json!notations/faulttree.json'],
 function(Graph, FaulttreeNode, FaulttreeConfig, FaulttreeNotation) {
     /**
-     *  Package: Faulttree
+     * Package: Faulttree
      */
 
     /**
-     *  Class: Graph
+     * Class: Graph
+     *      Faulttree-specific graph.
      *
-     *  Faulttree-specific graph.
-     *
-     *  Extends <Base::Graph>.
+     * Extends <Base::Graph>.
      */
     return Graph.extend({
         /**
-         *  Group: Accessors
+         * Group: Accessors
          */
 
         /**
-         *  Method: getConfig
-         *    See <Base::Graph::getConfig>.
+         * Method: getConfig
+         *      See <Base::Graph::getConfig>.
          */
         getConfig: function() {
             return FaulttreeConfig;
         },
 
         /**
-         *  Method: getNodeClass
-         *    See <Base::Graph::getNodeClass>.
+         * Method: getNodeClass
+         *      See <Base::Graph::getNodeClass>.
          */
         getNodeClass: function() {
             return FaulttreeNode;
         },
 
         /**
-         *  Method: getNotation
-         *    See <Base::Graph::getNotation>.
+         * Method: getNotation
+         *      See <Base::Graph::getNotation>.
          */
         getNotation: function() {
             return FaulttreeNotation;

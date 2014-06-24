@@ -7,7 +7,6 @@
 #include "FatalException.h"
 
 #include "xmlutil.h"
-#include "configurationResult.h"
 
 #include <xsd/cxx/tree/elements.hxx>
 #include <xsd/cxx/xml/dom/serialization-header.hxx>
@@ -57,7 +56,7 @@ FuzzTreeTransform::FuzzTreeTransform(
 			throw FatalException("Invalid FuzzTree");
 		}
 	}
-	catch (const xml_schema::Exception& e)
+	catch (const xml_schema::Exception&)
 	{
 		m_bValid = false;
 
@@ -90,7 +89,12 @@ bool FuzzTreeTransform::isOptional(const fuzztree::Node& node)
 {
 	const type_info& typeName = typeid(node);
 	
-	if (typeName != *fuzztreeType::INTERMEDIATEEVENT && !fuzztreeType::isLeaf(typeName)) 
+	if (typeName != *fuzztreeType::BASICEVENT &&
+		typeName != *fuzztreeType::BASICEVENTSET &&
+		typeName != *fuzztreeType::INTERMEDIATEEVENT &&
+		typeName != *fuzztreeType::INTERMEDIATEEVENTSET &&
+		typeName != *fuzztreeType::HOUSEEVENT &&
+		typeName != *fuzztreeType::UNDEVELOPEDEVENT) 
 		return false;
 	
 	const fuzztree::InclusionVariationPoint* inclusionNode =
@@ -110,13 +114,15 @@ std::string FuzzTreeTransform::generateUniqueId(const std::string& oldId)
 
 void FuzzTreeTransform::generateConfigurations(std::vector<FuzzTreeConfiguration>& configurations)
 {
-	configurations.emplace_back(FuzzTreeConfiguration()); // default
-	generateConfigurationsRecursive(&m_fuzzTree->topEvent(), configurations); // TODO handle errors here
+	unsigned int configCount = 0;
+	configurations.emplace_back(FuzzTreeConfiguration(++configCount)); // default
+	generateConfigurationsRecursive(&m_fuzzTree->topEvent(), configurations, configCount); // TODO handle errors here
 }
 
 ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 	const fuzztree::Node* node, 
-	std::vector<FuzzTreeConfiguration>& configurations)
+	std::vector<FuzzTreeConfiguration>& configurations,
+	unsigned int& configCount)
 {
 	using namespace fuzztree;
 	using namespace fuzztreeType;
@@ -135,6 +141,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 					continue;
 
 				FuzzTreeConfiguration copied = config;
+				copied.setId(++configCount);
 				// one configuration with this node
 				copied.setOptionalEnabled(id, true);
 				if (childType == *BASICEVENT || childType == *INTERMEDIATEEVENT)
@@ -193,6 +200,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 							continue;
 						}
 						FuzzTreeConfiguration copied = config;
+						copied.setId(++configCount);
 						copied.setRedundancyNumber(id, k, N);
 						newConfigs.emplace_back(copied);
 					}
@@ -225,6 +233,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 						for (const auto& featuredChild : featureNode->children())
 						{
 							FuzzTreeConfiguration copied = config;
+							copied.setId(++configCount);
 							copied.setFeatureNumber(id, featuredChild.id());
 							for (const auto& other : featureNode->children())
 							{
@@ -272,7 +281,7 @@ ErrorType FuzzTreeTransform::generateConfigurationsRecursive(
 
 			if (isLeaf(childType)) continue; // end recursion
 		}
-		generateConfigurationsRecursive(&child, configurations);
+		generateConfigurationsRecursive(&child, configurations, configCount);
 	}
 
 	return OK;

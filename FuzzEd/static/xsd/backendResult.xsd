@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<xsd:schema version="1.0"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:configurations="http://www.fuzztrees.net/configurations"
+            xmlns:common="http://www.fuzztrees.net/commonTypes"
+            targetNamespace = "http://www.fuzztrees.net/backendResults"
+            xmlns="http://www.fuzztrees.net/backendResults">
+
+  <xsd:import schemaLocation="commonTypes.xsd"
+              namespace="http://www.fuzztrees.net/commonTypes"/>
+  
+  <xsd:import schemaLocation="configurations.xsd"
+              namespace="http://www.fuzztrees.net/configurations"/>
+
+  <xsd:complexType abstract="true" name="Result">
+    <xsd:sequence>
+      <xsd:element minOccurs="0" maxOccurs="unbounded" name="issue" type="common:Issue"/>
+    </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:string"/>
+    <xsd:attribute name="modelId" type="xsd:string" use="required"/>
+    <xsd:attribute name="configId" type="xsd:string" use="required"/>
+    <xsd:attribute name="timestamp" type="xsd:string" use="required"/>
+    <xsd:attribute name="validResult" type="xsd:boolean" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="MincutResult">
+    <xsd:complexContent>
+      <xsd:extension base="Result">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="nodeid" type="xsd:string"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="SimulationResult">
+    <xsd:complexContent>
+      <xsd:extension base="Result">
+        <xsd:attribute name="reliability" type="xsd:double" use="required"/>
+        <xsd:attribute name="nFailures" type="xsd:int" use="required"/>
+        <xsd:attribute name="nSimulatedRounds" type="xsd:int" use="required"/>
+        <xsd:attribute name="availability" type="xsd:double"/>
+        <xsd:attribute name="duration" type="xsd:double"/>
+        <xsd:attribute name="mttf" type="xsd:double"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="AnalysisResult">
+    <xsd:complexContent>
+      <xsd:extension base="Result">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="1" name="probability" type="common:Probability"/>
+        </xsd:sequence>
+        <xsd:attribute name="decompositionNumber" type="xsd:int" use="required"/>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>     
+
+  <xsd:element name="backendResults">
+    <xsd:complexType>
+        <xsd:sequence>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="configuration" type="configurations:Configuration"/>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="result" type="Result"/>
+          <xsd:element minOccurs="0" maxOccurs="unbounded" name="issue" type="common:Issue"/>
+        </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>

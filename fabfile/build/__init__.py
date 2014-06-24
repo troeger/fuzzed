@@ -1,21 +1,25 @@
-import platform, os, json, pprint
+import platform
+import os
+import json
+import pprint
 from xml.dom.minidom import parse as parseXml
+
+from fabric.api import task
+
 from setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 from setup_settings import createDjangoSettings, createBackendSettings
-from fabric.api import task
 from FuzzEd import util
+
 # check FuzzEd/__init__.py for the project version number
 # from FuzzEd import __version__, util, settings
 
 
 XSD_PY_FILE_MAP = {
-    'analysisResult':      'xml_analysis',
-    'simulationResult':    'xml_simulation',
+    'backendResult':       'xml_backend',
     'fuzztree':            'xml_fuzztree',
     'faulttree':           'xml_faulttree',
     'commonTypes':         'xml_common',
-    'configurations':      'xml_configurations',
-    'configurationResult': 'xml_conf_result'
+    'configurations':      'xml_configurations'
 }
 
 def svg2pgf_shape(filename):

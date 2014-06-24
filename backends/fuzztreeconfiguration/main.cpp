@@ -12,7 +12,7 @@
 #include "CommandLineParser.h"
 #include "FatalException.h"
 
-#include "configurationResult.h"
+#include "backendResult.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -29,7 +29,8 @@ int main(int argc, char **argv)
 	*logFileStream << "Configuration errors for " << inFile << std::endl;
 	if (!logFileStream->good())
 	{// create default log file
-		logFileStream = new std::ofstream(logFile);	// TODO: wtf this is the same line as above? retry?
+		std::cout << "Could not open logfile" << std::endl;
+		return -1;
 	}
 
 	std::ifstream instream(inFile);
@@ -45,7 +46,7 @@ int main(int argc, char **argv)
 
 	try
 	{
-		configurationResults::ConfigurationResults configurationResults;
+		backendResults::BackendResults backendresults;
 
 		if (!tf.isValid())
 		{ // only fuzztrees should be configured 
@@ -56,21 +57,20 @@ int main(int argc, char **argv)
 			const auto modelId = tf.getFuzzTree()->id();
 			for (const auto& t : tf.transform())
 			{
-				configurationResults::Result r(modelId, util::timeStamp(), true); 
-				r.configuration(serializedConfiguration(t.first));
-				configurationResults.result().push_back(r);
+				// TODO: where to put the ModelID?
+				backendresults.configuration().push_back(serializedConfiguration(t.first));
 			}
 		}
 
 		// Log errors
 		for (const Issue& issue : issues)
 		{
-			configurationResults.issue().push_back(issue.serialized());
+			backendresults.issue().push_back(issue.serialized());
 			*logFileStream << issue.getMessage() << std::endl;
 		}
 
 		std::ofstream output(outFile);
-		configurationResults::configurationResults(output, configurationResults);
+		backendResults::backendResults(output, backendresults);
 	}
 
 	// This should not happen.

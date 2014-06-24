@@ -18,8 +18,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import re, random, locale
-from base64 import b64encode, b64decode
+import re
+import random
+import locale
+from base64 import b64decode
+
 
 # a few patterns we use later
 

@@ -6,11 +6,8 @@
 
 void Place::consumeTokens(Transition* const t, int numTokens)
 {
-	if (m_transitionQueue.empty())
-	{
-		// TODO find out if this is legitimate
-		return;
-	}
+	if (m_transitionQueue.empty()) return;
+
 	assert(m_transitionQueue.find(t) != m_transitionQueue.end());
 	assert(m_marking >= numTokens);
 	

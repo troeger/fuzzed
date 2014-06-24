@@ -128,7 +128,7 @@
 
     <xsd:complexType name="UndevelopedEvent">
         <xsd:complexContent>
-            <xsd:extension base="ft:ChildNode"/>
+            <xsd:extension base="ft:InclusionVariationPoint"/>
         </xsd:complexContent>
     </xsd:complexType>
     <xsd:element name="UndevelopedEvent" type="ft:UndevelopedEvent"/>

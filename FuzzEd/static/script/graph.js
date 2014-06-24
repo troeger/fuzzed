@@ -1,28 +1,25 @@
 define(['canvas', 'class', 'config', 'edge', 'menus', 'node_group', 'faulttree/node_group', 'jquery', 'd3'],
 function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
     /**
-     *  Package: Base
+     * Package: Base
      */
 
     /**
-     *  Class: Graph
-     *
-     *  This class models the _abstract_ base class for all graphs. It manages all graph elements (Edges and <Nodes>)
-     *  and provide methods for adding and deleting them. Further it can generate <Node> classes
-     *  for given kinds of nodes.
+     * Class: Graph
+     *      This class models the _abstract_ base class for all graphs. It manages all graph elements (<Edges> and
+     *      <Nodes>) and provide methods for adding and deleting them. Further it can generate <Node> classes for given
+     *      kinds of nodes.
      */
     return Class.extend({
         /**
-         *  Group: Members
-         *
-         *  Properties:
-         *    {Config}  config      - An object containing graph configuration constants as found in <Config>.
-         *    {int}     id          - A server-side generated ID.
-         *    {Object}  edges       - A map that stores all edges of the graph by their ID. Edges are jsPlumb Connection
-         *                            objects, the ID is the _fuzzedId assigned to them.
-         *    {Object}  nodes       - A map that stores all <Nodes> of the graph by their ID.
-         *    {str}     name        - The name of the graph, specified by the user when creating it.
-         *    {Object} _nodeClasses - A map caching all node classes already generated and storing them by their kind.
+         * Group: Members
+         *      {Config}  config      - An object containing graph configuration constants as found in <Config>.
+         *      {Number}  id          - A server-side generated ID.
+         *      {Object}  edges       - A map that stores all edges of the graph by their ID. Edges are jsPlumb
+         *                              Connection objects, the ID is the _fuzzedId assigned to them.
+         *      {Object}  nodes       - A map that stores all <Nodes> of the graph by their ID.
+         *      {String}  name        - The name of the graph, specified by the user when creating it.
+         *      {Object} _nodeClasses - A map caching all node classes already generated and storing them by their kind.
          */
         config:       undefined,
         id:           undefined,
@@ -36,15 +33,15 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         _nodeClasses: {},
 
         /**
-         *  Group: Initialization
+         * Group: Initialization
          */
 
         /**
-         *  Constructor: init
+         * Constructor: init
          *
-         *  Parameters:
-         *    {JSON} json - The JSON representation of the graph. This is usually fetched from the backend and used
-         *                  to restore the graph in the frontend.
+         * Parameters:
+         *      {Object} json - The JSON representation of the graph. This is usually fetched from the backend and used
+         *                      to restore the graph in the frontend.
          */
         init: function(json) {
             this.id     = json.id;
@@ -57,14 +54,14 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: _loadFromJson
-         *    Extracts and restores the <Nodes> and edges from the given JSON representation of the graph.
+         * Method: _loadFromJson
+         *      Extracts and restores the <Nodes> and edges from the given JSON representation of the graph.
          *
-         *  Parameters:
-         *    {JSON} json - The JSON representation of the graph, containing nodes and edges.
+         * Parameters:
+         *      {Object} json - The JSON representation of the graph, containing nodes and edges.
          *
-         *  Returns:
-         *    This <Graph> instance for chaining.
+         * Returns:
+         *      This <Graph> instance for chaining.
          */
         _loadFromJson: function(json) {
             this.kind     = json.type;
@@ -92,17 +89,16 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: _registerEventHandlers
-         *    Register on <Canvas> events in order to recognize shape drops and register to
-         *    jsPlumb events in order to recognize connection events.
-         *    This should be done _after_ the initial graph loading from the backend to avoid the creation
-         *    of duplicate nodes/edges.
+         * Method: _registerEventHandlers
+         *      Register on <Canvas> events in order to recognize shape drops and register to jsPlumb events in order
+         *      to recognize connection events. This should be done _after_ the initial graph loading from the backend
+         *      to avoid the creation of duplicate nodes/edges.
          *
-         *  On:
-         *    <Config::Events::CANVAS_SHAPE_DROPPED>
+         * On:
+         *      <Config::Events::CANVAS_SHAPE_DROPPED>
          *
-         *  Returns:
-         *    This <Graph> instance for chaining.
+         * Returns:
+         *      This <Graph> instance for chaining.
          */
         _registerEventHandlers: function() {
             jsPlumb.bind('connection', function(edge) {
@@ -115,24 +111,21 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Group: Graph manipulation
+         * Group: Graph manipulation
          */
 
         /**
-         *  Method: addEdge
-         *    Adds a given edge to this graph by "jsPlumb.connect"ing source and target node as if it was done manually.
-         *    Only use this method if an edge needs to be added programmatically and not manually. Manual creation of an
-         *    edge (i.e. connect-dragging nodes in the editor) is done by jsPlumbConnection event, which calls _addEdge
-         *    directly.
+         * Method: addEdge
+         *      Adds a given edge to this graph by "jsPlumb.connect"ing source and target node as if it was done
+         *      manually. Only use this method if an edge needs to be added programatically and not manually. Manual
+         *      creation of an edge (i.e. connect-dragging nodes in the editor) is done by jsPlumbConnection event,
+         *      which calls _addEdge directly.
          *
-         *  Parameters:
-         *    {JSON} jsonEdge - JSON representation of the edge to be added to the graph.
+         * Parameters:
+         *      {Object} jsonEdge - JSON representation of the edge to be added to the graph.
          *
-         *  Returns:
-         *    The newly created Edge instance.
-         *
-         *  See also:
-         *    <Graph::_registerEventHandlers>
+         * Returns:
+         *      The newly created {<Edge>} instance.
          */
         addEdge: function(jsonEdge) {
             var sourceNode = this.getNodeById(jsonEdge.source);
@@ -159,18 +152,19 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: _addEdge
-         *    Actual register of a new edge in the graph object and call home via backend.
+         * Method: _addEdge
+         *      Actual register of a new edge in the graph object and call home via backend.
          *
-         *  Parameters:
-         *    {jsPlumb::Connection} jsPlumbEdge - Edge to be added to the graph object. jsPlumbEdge has to be already
-         *      "jsPlumb.connected". If you want to add an edge programmatically, use <Graph::addEdge> instead.
+         * Parameters:
+         *      {jsPlumb::Connection} jsPlumbEdge - Edge to be added to the graph object. jsPlumbEdge has to be already
+         *                                          jsPlumb.connected. If you want to add an edge programmatically, use
+         *                                          <Graph::addEdge> instead.
          *
-         *  Triggers:
-         *    <Config::Events::EDGE_ADDED>
+         * Triggers:
+         *      <Config::Events::EDGE_ADDED>
          *
          *  Returns:
-         *    The newly created Edge instance.
+         *      The newly created {<Edge>} instance.
          */
         _addEdge: function(jsPlumbEdge) {
             var edge = this.factory.create('Edge', this.getNotation().edges, jsPlumbEdge, {graph: this});
@@ -180,18 +174,15 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: deleteEdge
-         *    Deletes a given edge from this graph. Calls jsPlumb.detach, which calls _deleteEdge. Functionality is
-         *    splitted into deleteEdge and _deleteEdge as in addEdge.
+         * Method: deleteEdge
+         *      Deletes a given edge from this graph. Calls jsPlumb.detach, which calls _deleteEdge. Functionality is
+         *      split into deleteEdge and _deleteEdge as in addEdge.
          *
-         *  Parameters:
-         *    {Edge} edge - Edge to be deleted from the graph.
+         * Parameters:
+         *      {<Edge>} edge - Edge to be deleted from the graph.
          *
-         *  Returns:
-         *    This <Graph> instance for chaining.
-         *
-         *  See also:
-         *    <Graph::_registerEventHandlers>
+         * Returns:
+         *      This {<Graph>} instance for chaining.
          */
         deleteEdge: function(edge) {
             if (edge.remove()) {
@@ -202,17 +193,17 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: addNode
-         *    Adds a given node to this graph.
+         * Method: addNode
+         *      Adds a given node to this graph.
          *
-         *  Parameters:
-         *    {Object} definition - Properties that should be merged into the new node.
+         * Parameters:
+         *      {Object} definition - Properties that should be merged into the new node.
          *
-         *  Triggers:
-         *    <Config::Events::NODE_ADDED>
+         * Triggers:
+         *      <Config::Events::NODE_ADDED>
          *
-         *  Returns:
-         *    The added node.
+         * Returns:
+         *      The added {<Node>} instance.
          */
         addNode: function(definition) {
             definition.readOnly = this.readOnly;
@@ -225,14 +216,14 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: deleteNode
-         *    Deletes the given node from the graph if present.
+         * Method: deleteNode
+         *      Deletes the given node from the graph if present.
          *
-         *  Parameters:
-         *    {int} nodeId - ID of the <Node> that should be removed from this graph.
+         * Parameters:
+         *      {Number} nodeId - ID of the <Node> that should be removed from this graph.
          *
-         *  Returns:
-         *    This <Graph> instance for chaining.
+         * Returns:
+         *      This {<Graph>} instance for chaining.
          */
         deleteNode: function(node) {
             if (node.remove()) {
@@ -243,11 +234,11 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: addNodeGroup
-         *      Creates a new NodeGroup based on the given jsonNodeGroup.
+         * Method: addNodeGroup
+         *      Creates a new NodeGroup based on the given JSON representation.
          *
          *  Returns:
-         *    The newly created <NodeGroup> instance if successful.
+         *    The newly created {<NodeGroup>} instance if successful.
          */
         addNodeGroup: function(jsonNodeGroup) {
             // first let's check if we already have a NodeGroup with the requested nodeIds
@@ -277,11 +268,11 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: deleteNodeGroup
-         *      Deletes a given NodeGroup.
+         * Method: deleteNodeGroup
+         *      Deletes a given {<NodeGroup>} instance.
          *
-         *  Returns:
-         *    This <Graph> instance for chaining.
+         * Returns:
+         *      This {<Graph>} instance for chaining.
          */
         deleteNodeGroup: function(nodeGroup) {
             if (nodeGroup.remove()) {
@@ -295,8 +286,8 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
          *  Method: _layoutWithAlgorithm
          *    Layouts the nodes of this graph with the given layouting algorithm.
          *
-         *  Returns:
-         *    This <Graph> instance for chaining.
+         * Returns:
+         *      This {<Graph>} instance for chaining.
          */
         _layoutWithAlgorithm: function(algorithm) {
             jQuery(document).trigger(Config.Events.GRAPH_LAYOUT);
@@ -337,19 +328,19 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Group: Accessors
+         * Group: Accessors
          */
 
         /**
-         *  Method: nodeClassFor
-         *    Returns the <Node> class for the given kind. If the class does not yet exist it is created from the
-         *    notation definition. It is an error if the given node kind does not exist in the notation.
+         * Method: nodeClassFor
+         *      Returns the {<Node>} class for the given kind. If the class does not yet exist it is created from the
+         *      notation definition. It is an error if the given node kind does not exist in the notation.
          *
-         *  Parameters:
-         *    {str} kind - The kind of the node class to be retrieved, e.g., 'basicEvent'.
+         * Parameters:
+         *      {String} kind - The kind of the node class to be retrieved, e.g., 'basicEvent'.
          *
          *  Returns:
-         *    The class for the given kind.
+         *      The {<Class>} for the given kind.
          */
         nodeClassFor: function(kind) {
             var nodeClass = this._nodeClasses[kind];
@@ -365,34 +356,30 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: getNotation
-         *    _Abstract_ method that returns the Notation object for the specific graph. Subclasses need to overwrite
-         *    this method.
+         * Abstract Method: getNotation
          *
-         *  Returns:
-         *    The Notation for the graph.
+         * Returns:
+         *      The notation definition for the graph.
          */
         getNotation: function() {
             throw new SubclassResponsibility();
         },
 
         /**
-         *  Method: getNodeClass
-         *    _Abstract_ method that returns the class of the abstract base node that should be used by <Node>
-         *    subclasses generated by this graph. Subclasses need to overwrite this method.
+         * Abstract Method: getNodeClass
          *
-         *  Returns:
-         *    The abstract <Node> class for all <Nodes> of this graph.
+         * Returns:
+         *      The abstract {<Node>} class for all <Nodes> of this graph.
          */
         getNodeClass: function() {
             throw new SubclassResponsibility();
         },
 
         /**
-         *  Method: getNodes
+         * Method: getNodes
          *
-         *  Returns:
-         *    An Array containing all <Nodes> of the graph.
+         * Returns:
+         *      An {Array[<Node>]} containing all <Nodes> of the graph.
          *
          */
         getNodes: function() {
@@ -400,10 +387,10 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: getEdges
+         * Method: getEdges
          *
-         *  Returns:
-         *    An Array containing all <Edges> of the graph.
+         * Returns:
+         *      An {Array[<Edge>]} containing all <Edges> of the graph.
          *
          */
         getEdges: function() {
@@ -411,68 +398,61 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: getNodeById
+         * Method: getNodeById
          *
-         *  Parameters:
-         *    {int} nodeId - ID of the <Node> that should be returned.
+         * Parameters:
+         *      {Number} nodeId - ID of the <Node> that should be returned.
          *
-         *  Returns:
-         *    The <Node> with the given ID.
+         * Returns:
+         *      The {<Node>} with the given ID.
          */
         getNodeById: function(nodeId) {
             return this.nodes[nodeId];
         },
 
         /**
-         *  Method: getEdgeById
+         * Method: getEdgeById
          *
-         *  Parameters:
-         *    {int} edgeId - ID of the edge that should be returned.
+         * Parameters:
+         *      {Number} edgeId - ID of the edge that should be returned.
          *
-         *  Returns:
-         *    The edge (<jsPlumb::Connection> object) with the given ID.
+         * Returns:
+         *      The {<Edge>} instance with the given ID.
          */
         getEdgeById: function(edgeId) {
             return this.edges[edgeId];
         },
 
         /**
-         *  Method: getConfig
-         *    _Abstract_ method that returns the graph-specific <Config> object.
-         *    Subclasses need to overwrite this method.
+         * Abstract Method: getConfig
          *
-         *  Returns:
-         *    The graph-specific <Config> object.
-         *
-         *  See also:
-         *    <Node::getConfig>
+         * Returns:
+         *      The graph-specific <Config> object.
          */
         getConfig: function() {
             throw new SubclassResponsibility();
         },
 
         /**
-         *  Method: createId
-         *    Returns a new unique id for nodes or edges.
+         * Method: createId
          *
-         *  Returns:
-         *    {Number} The next free node or edge id
-         *
-         *  See also:
-         *    <Editor::_pastePressed>
+         * Returns:
+         *      A {Number} representing a next unique ID for {<Edges>} or {<Nodes>}
          */
         createId: function() {
             return ++this.seed;
         },
 
         /**
-         *  Method: _getClusterLayoutAlgorithm
-         *    Returns the cluster layouting algorithm supported by this graph.
-         *    This is the default implementation. Subclasses may override this behavior.
+         * Method: _getClusterLayoutAlgorithm
+         *
+         * Returns:
+         *      The cluster layout algorithm supported by this graph.
          *
          */
         _getClusterLayoutAlgorithm: function() {
-            return d3.layout.cluster()
+            return d3.layout
+                .cluster()
                 .nodeSize([1, 2]) // leave some space for the mirror
                 .separation(function(a, b) {
                     // sibling nodes are tidier
@@ -481,10 +461,10 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: _getTreeLayoutAlgorithm
-         *    Returns the tree layouting algorithm supported by this graph.
-         *    This is the default implementation. Subclasses may override this behavior.
+         * Method: _getTreeLayoutAlgorithm
          *
+         * Returns:
+         *      The tree layouting algorithm supported by this graph.
          */
         _getTreeLayoutAlgorithm: function() {
             return d3.layout.tree()
@@ -496,12 +476,11 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
         },
 
         /**
-         *  Method: _getNodeHierarchy
-         *    Returns a dictionary representation of the node hierarchy of this graph.
+         * Method: _getNodeHierarchy
          *
          *  Returns:
-         *    A dictionary representation of the node hierarchy of this graph. Each entry represents a node with
-         *    its ID and a list of children.
+         *      A dictionary representation of the node hierarchy of this graph. Each entry represents a node with its
+         *      ID and a list of children.
          */
         _getNodeHierarchy: function() {
             return this.getNodeById(0)._hierarchy();
@@ -509,22 +488,22 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
 
 
         /**
-         *  Group: Node class generation
+         * Group: Node class generation
          */
 
         /**
          *  Method: _newNodeClassForKind
-         *    Constructs a new <Node> class from the given JSON node definition. It considers the inheritance relation
-         *    specified in the definition and constructs the base classes (if not already done) as well. If no
-         *    super class is specified, the base class returned by <getNodeClass> is used. Properties defined in the
-         *    definition parameter will become members of the newly created class. Created classes will be cached
-         *    in the <_nodeClasses> field so that they do not need to be regenerated every time.
+         *      Constructs a new <Node> class from the given JSON node definition. It considers the inheritance relation
+         *      specified in the definition and constructs the base classes (if not already done) as well. If no super
+         *      class is specified, the base class returned by <getNodeClass> is used. Properties defined in the
+         *      definition parameter will become members of the newly created class. Created classes will be cached in
+         *      the <_nodeClasses> field so that they do not need to be regenerated every time.
          *
          *  Parameters:
-         *    {JSON} definition - Node definition taken from the graph-specific notation file.
+         *      {Object} definition - Node definition taken from the graph-specific notation file.
          *
          *  Returns:
-         *    The newly created <Node> subclass.
+         *      The newly created {<Node>} {<Class>}.
          */
         _newNodeClassForKind: function(definition) {
             var BaseClass = this.factory.getClassModule('Node');
@@ -552,21 +531,20 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
             return newClass;
         },
 
-
         /**
-         *  Group: Event handling
+         * Group: Event handling
          */
 
         /**
-         *  Method: _shapeDropped
-         *    Callback that gets called every time a new shape (from the <ShapeMenu>) is dropped on the <Canvas>.
-         *    It will create a new <Node> of the corresponding kind at the drop location.
+         * Method: _shapeDropped
+         *      Callback that gets called every time a new shape (from the <ShapeMenu>) is dropped on the <Canvas>. It
+         *      will create a new <Node> of the corresponding kind at the drop location.
          *
-         *  Parameters:
-         *    {jQuery::Event} event    - The event object passed by the jQuery event handling framework.
-         *    {str}           kind     - The kind associated with the dropped shape, e.g., 'basicEvent'.
-         *    {Object}        position - An object containing the pixel position of the
-         *                               dropped shape ({'x': ..., 'y': ...}).
+         * Parameters:
+         *      {jQuery::Event} event    - The event object passed by the jQuery event handling framework.
+         *      {String}        kind     - The kind associated with the dropped shape, e.g., 'basicEvent'.
+         *      {Object}        position - An object containing the pixel position of the dropped shape
+         *                                 ({'x': ..., 'y': ...}).
          */
         _shapeDropped: function(event, kind, position) {
             var node = jQuery.extend(Canvas.toGrid(position), {'kind': kind});

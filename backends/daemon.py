@@ -26,6 +26,7 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 import requests
 
 
+
 # Initial configuration of logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')
@@ -67,8 +68,9 @@ class WorkerThread(threading.Thread):
             tmpfile = tempfile.NamedTemporaryFile(dir=tmpdir, delete=False)
 
             # Fetch input data and store it
-            input_data = urllib2.urlopen(self.joburl)
-            tmpfile.write(input_data.read())
+            input_data = urllib2.urlopen(self.joburl).read()
+            tmpfile.write(input_data)
+#            logger.debug(input_data)
             tmpfile.close()
 
             # There trick is that we do not need to know the operational details 
@@ -90,7 +92,9 @@ class WorkerThread(threading.Thread):
                 logger.info("Exit code 0, preparing result upload")
                 assert(not output_file.startswith("*"))     # multiple result file upload not implemented
                 with open(tmpdir+os.sep+output_file, "rb") as fd:
-                    self.sendResult(0, fd.read(), output_file)
+                    data = fd.read()
+                    self.sendResult(0, data, output_file)
+#                    logger.debug(data)
             else:
                 logger.error("Error on execution: Exit code "+str(exit_code))  
                 logger.error("Saving input file for later reference: /tmp/lastinput.xml")

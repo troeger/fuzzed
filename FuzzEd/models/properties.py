@@ -1,10 +1,14 @@
 from django.db import models
-from FuzzEd.lib.jsonfield import JSONField
-import  json
 
+from FuzzEd.lib.jsonfield import JSONField
 from node import Node
 from edge import Edge
 from node_group import NodeGroup
+
+import logging, json
+logger = logging.getLogger('FuzzEd')
+
+import notations
 
 class Property(models.Model):
     """
@@ -33,6 +37,26 @@ class Property(models.Model):
 
     def __unicode__(self):
         return '%s%s: %s' % ('[DELETED] ' if self.deleted else '', self.key, self.value)
+
+    @property
+    def sanitized_value(self):
+        '''
+            Convert the property value into a datatype that is accepted
+            according to the notations file.
+        '''
+        try:
+            val_type = notations.by_kind[self.node.graph.kind]['nodes'][self.node.kind]['properties'][self.key]['kind']
+        except KeyError:
+            # No information in the notations file , leave it as it is
+            val_type = None
+        if val_type == 'text':
+            # JSONField is performing some conversion magic, so must tell
+            # it explicitely that even numerical strings remain strings
+            return str(self.value)
+        elif val_type == 'numeric':
+            return float(self.value)
+        else:
+            return self.value
 
     def to_dict(self):
         """

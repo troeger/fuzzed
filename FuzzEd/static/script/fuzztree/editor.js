@@ -1,18 +1,18 @@
 define(['factory', 'faulttree/editor', 'fuzztree/graph', 'fuzztree/config', 'fuzztree/node'],
 function(Factory, FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
     /**
-     *  Package: Fuzztree
+     * Package: Fuzztree
      */
 
     /**
-     *  Class: FuzztreeEditor
-     *    Fuzztree-specific <Base::Editor> class.
+     * Class: FuzztreeEditor
+     *      Fuzztree-specific <Base::Editor> class.
      *
-     *  Extends: <Faulttree::FaultTreeEditor>
+     * Extends: <Faulttree::FaultTreeEditor>
      */
     return FaulttreeEditor.extend({
         /**
-         *  Group: Accessors
+         * Group: Accessors
          */
 
         getFactory: function() {
@@ -20,26 +20,20 @@ function(Factory, FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
         },
 
         /**
-         *  Method: getConfig
+         * Method: getConfig
          *
-         *  Returns:
-         *    The <FuzztreeConfig> object.
-         *
-         *  See also:
-         *    <Base::Editor::getConfig>
+         * Returns:
+         *      The <FuzztreeConfig> object.
          */
         getConfig: function() {
             return FuzztreeConfig;
         },
 
         /**
-         *  Method: getGraphClass
+         * Method: getGraphClass
          *
-         *  Returns:
-         *    The <FuzztreeGraph> class.
-         *
-         *  See also:
-         *    <Base::Editor::getGraphClass>
+         * Returns:
+         *      The <FuzztreeGraph> class.
          */
         getGraphClass: function() {
             return FuzztreeGraph;
