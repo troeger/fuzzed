@@ -44,7 +44,11 @@ class Property(models.Model):
             Convert the property value into a datatype that is accepted
             according to the notations file.
         '''
-        val_type = notations.by_kind[self.node.graph.kind]['nodes'][self.node.kind]['properties'][self.key]['kind']
+        try:
+            val_type = notations.by_kind[self.node.graph.kind]['nodes'][self.node.kind]['properties'][self.key]['kind']
+        except KeyError:
+            # No information in the notations file , leave it as it is
+            val_type = None
         if val_type == 'text':
             # JSONField is performing some conversion magic, so must tell
             # it explicitely that even numerical strings remain strings
