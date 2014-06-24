@@ -579,6 +579,16 @@ class InternalTestCase(BackendDaemonTestCase):
                 print "Result"
                 print result
 
+    def test_numerical_property_storage(self):
+        for graphPk, graphResult in fixt_analysis['results'].iteritems():
+            graph = Graph.objects.get(pk=graphPk)
+            node = graph.top_node()
+            # 'name' has the type text in JSON according to notations.py, 
+            # so it must be converted accordingly
+            for key, val in (('name','bar'),('name',1)):
+                node.set_attr(key, val)
+                self.assertEqual(node.get_attr(key), str(val))
+
 class AnalysisFixtureTestCase(BackendDaemonTestCase):
     """
         Analysis engine tests.

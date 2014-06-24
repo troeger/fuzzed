@@ -42,6 +42,7 @@ public:
 	const std::map<id_type, id_type>&				getFeaturedNodes() const;
 
 	void markInvalid();
+	const bool isValid() const;
 
 protected:
 	std::set<id_type>										m_notIncluded;

@@ -234,6 +234,43 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
 
             return this;
         },
+        
+        /**
+         * Group: Accessors
+         */
+       
+        /**
+         *  Abstract Method: _progressMessage
+         *      Should compute the message that is displayed while the backend calculation is pending.
+         *
+         *  Returns:
+         *      A {String} with the message. May contain HTML.
+         */
+        _progressMessage: function() {
+            throw new SubclassResponsibility();
+        },
+        
+        /**
+         *  Abstract Method: _menuHeader
+         *      Computes the header of the menu.
+         *
+         *  Returns:
+         *      A {String} which is the header of the menu.
+         */
+        _menuHeader: function() {
+            throw new SubclassResponsibility();
+        },
+        
+        /**
+         * Method: _containerID
+         *      Computes the HTML ID of the container.
+         *
+         * Returns:
+         *      A {String} which is the ID of the Container.
+         */
+        _containerID: function() {
+            throw new SubclassResponsibility();
+        },
 
         /**
          *  Group: Setup
@@ -248,7 +285,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          */
         _setupContainer: function() {
             return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (analytical)">\
+                '<div id="' + this._containerID()  + '" class="menu probabillity_menu" header="'+ this._menuHeader() +'">\
                     <div class="menu-controls">\
                         <i class="menu-minimize"></i>\
                         <i class="menu-close"></i>\
@@ -277,7 +314,6 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                     if (this._chart != null) {
                         
                         // fit all available space with chart    
-                        
                         this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._gridContainer.height());
                         
                         this._chart.setSize(
@@ -325,21 +361,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         },
 
         /**
-         * Group: Accessors
-         */
-
-        /**
-         * Abstract Method: _getDataColumns
-         *
-         *  Returns:
-         *      An {Array[Object]} of column descriptions (https://github.com/mleibman/SlickGrid/wiki/Column-Options).
-         */
-        _getDataColumns: function() {
-            throw new SubclassResponsibility();
-        },
-
-        /**
-         * Abstract Method: _chartTooltipFormatter
+         * Method: _chartTooltipFormatter
          *      This function is used to format the tooltip that appears when hovering over a data point in the chart.
          *      The scope object ('this') contains the x and y value of the corresponding point.
          *
@@ -347,18 +369,9 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          *      A {String} that is displayed inside the tooltip. It may HTML.
          */
         _chartTooltipFormatter: function() {
-           
-        },
-
-        /**
-         *  Abstract Method: _progressMessage
-         *      Should compute the message that is displayed while the backend calculation is pending.
-         *
-         *  Returns:
-         *      A {String} with the message. May contain HTML.
-         */
-        _progressMessage: function() {
-            throw new SubclassResponsibility();
+            return '<b>' + this.series.name + '</b><br/>' +
+                   '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
+                   '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
         },
 
         /**
@@ -859,25 +872,27 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
      */
     var AnalyticalProbabilityMenu = AnalysisResultMenu.extend({
         /**
-         *  Method: _chartTooltipFormatter
-         *    Function used to format the toolip that appears when hovering over a data point in the chart.
-         *    The scope object ('this') contains the x and y value of the corresponding point.
-         *
-         * Returns:
-         *      A {String} that is displayed inside the tooltip. It may HTML.
+         * Method: _containerID
+         *      Override of the abstract base class method.
          */
-        _chartTooltipFormatter: function() {
-            return '<b>' + this.series.name + '</b><br/>' +
-                   '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
-                   '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
+        _containerID: function() {
+            return FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU;
         },
-
+        
         /**
          * Method: _progressMessage
          *      Override of the abstract base class method.
          */
         _progressMessage: function() {
             return 'Running probability analysis...';
+        },
+        
+        /**
+         * Method: _menuHeader
+         *      Override of the abstract base class method.
+         */
+        _menuHeader: function() { 
+            return 'Top Event Probability (analytical)';
         }
     });
 
@@ -888,49 +903,29 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
      *
      * Extends: AnalysisResultMenu
      */
-    var SimulatedProbabilityMenu = AnalysisResultMenu.extend({
+    var SimulatedProbabilityMenu = AnalysisResultMenu.extend({      
         /**
-         * Method: _setupContainer
-         *      Sets up the DOM container element for this menu and appends it to the DOM.
-         *
-         * Returns:
-         *      A jQuery object of the container.
+         * Method: _containerID
+         *      Override of the abstract base class method.
          */
-        _setupContainer: function() {
-            return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU + '" class="menu" header="Simulation Results">\
-                    <div class="menu-controls">\
-                        <i class="menu-minimize"></i>\
-                        <i class="menu-close">   </i>\
-                    </div>\
-                    <div class="chart"></div>\
-                    <div class="grid" style="width: 450px; padding-top: 5px;"></div>\
-                </div>'
-            )
-            .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+        _containerID: function() {
+            return FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU;
         },
-
-        /**
-         *  Method: _chartTooltipFormatter
-         *    Function used to format the tooltip that appears when hovering over a data point in the chart.
-         *    The scope object ('this') contains the x and y value of the corresponding point.
-         *
-         *  Returns:
-         *    A {String} that is displayed inside the tooltip. It may HTML.
-         */
-        _chartTooltipFormatter: function() {
-            //TODO: adapt to JSON format
-            return '<b>' + this.series.name + '</b><br/>' +
-                   '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
-                   '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
-        },
-
+        
         /**
          * Method: _progressMessage
          *      Override of the abstract base method.
          */
         _progressMessage: function() {
             return 'Running simulation...';
+        },
+        
+        /**
+         * Method: _menuHeader
+         *      Override of the abstract base class method.
+         */
+        _menuHeader: function() { 
+            return 'Simulation Results';
         }
     });
 

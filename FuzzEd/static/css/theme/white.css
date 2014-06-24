@@ -4261,7 +4261,7 @@ i.icon-layout-tree:hover {
 /*
  *  Probability Menus
  */
-#FuzzEdAnalyticalProbabilityMenu {
+.probabillity_menu {
   display: none;
   position: absolute;
   top: 5px;
@@ -4270,81 +4270,38 @@ i.icon-layout-tree:hover {
   height: auto;
   overflow: hidden;
 }
-#FuzzEdAnalyticalProbabilityMenu .content {
+.probabillity_menu .content {
   width: 100% !important;
 }
-#FuzzEdAnalyticalProbabilityMenu .graph_issues .alert {
+.probabillity_menu .graph_issues .alert {
   margin-bottom: 5px;
   padding: 5px;
   font-size: 12px;
 }
-#FuzzEdAnalyticalProbabilityMenu .graph_issues ul {
+.probabillity_menu .graph_issues ul {
   color: black;
   margin-top: 5px;
 }
-#FuzzEdAnalyticalProbabilityMenu .graph_issues a {
+.probabillity_menu .graph_issues a {
   Cursor: pointer;
 }
-#FuzzEdAnalyticalProbabilityMenu .graph_issues i {
+.probabillity_menu .graph_issues i {
   margin-right: 3px;
 }
-#FuzzEdAnalyticalProbabilityMenu .table_container td {
+.probabillity_menu .table_container td {
   font-size: 12px;
   padding: 7px;
 }
-#FuzzEdAnalyticalProbabilityMenu .table_container th {
+.probabillity_menu .table_container th {
   font-size: 12px;
 }
-#FuzzEdAnalyticalProbabilityMenu .table_container div {
+.probabillity_menu .table_container div {
   font-size: 12px;
   padding-top: 0px;
   padding-left: 4px;
   padding-right: 4px;
 }
-#FuzzEdAnalyticalProbabilityMenu .table_container .row:first-of-type {
-  height: 0px;
-}
-#FuzzEdSimulatedProbabilityMenu {
-  display: none;
-  position: absolute;
-  top: 5px;
-  left: 240px;
-  min-width: 500px;
-  height: auto;
-  overflow: hidden;
-}
-#FuzzEdSimulatedProbabilityMenu .content {
-  width: 100% !important;
-}
-#FuzzEdSimulatedProbabilityMenu .graph_issues .alert {
-  margin-bottom: 5px;
-  padding: 5px;
-  font-size: 12px;
-}
-#FuzzEdSimulatedProbabilityMenu .graph_issues ul {
-  color: black;
-  margin-top: 5px;
-}
-#FuzzEdSimulatedProbabilityMenu .graph_issues a {
-  Cursor: pointer;
-}
-#FuzzEdSimulatedProbabilityMenu .graph_issues i {
-  margin-right: 3px;
-}
-#FuzzEdSimulatedProbabilityMenu .table_container td {
-  font-size: 12px;
-  padding: 7px;
-}
-#FuzzEdSimulatedProbabilityMenu .table_container th {
-  font-size: 12px;
-}
-#FuzzEdSimulatedProbabilityMenu .table_container div {
-  font-size: 12px;
-  padding-top: 0px;
-  padding-left: 4px;
-  padding-right: 4px;
-}
-#FuzzEdSimulatedProbabilityMenu .table_container .row:first-of-type {
+.probabillity_menu .table_container .row:first-of-type {
   height: 0px;
 }
 /**
