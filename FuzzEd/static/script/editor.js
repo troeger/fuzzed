@@ -143,9 +143,10 @@ function(Class, Factory, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _loadGraphCompleted: function(readOnly) {
             // create manager objects for the bars
-            this.properties = new Menus.PropertiesMenu(this.graph.getNotation().propertiesDisplayOrder);
-            this.shapes     = new Menus.ShapeMenu();
-            this.layout     = new Menus.LayoutMenu();
+            //TODO: put this into the factory
+            this.properties = new Menus.PropertiesMenu(this.factory, this.graph.getNotation().propertiesDisplayOrder);
+            this.shapes     = new Menus.ShapeMenu(this.factory);
+            this.layout     = new Menus.LayoutMenu(this.factory);
             this._backend.activate();
 
             if (readOnly) {
