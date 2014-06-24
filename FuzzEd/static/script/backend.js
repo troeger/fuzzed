@@ -62,6 +62,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 .on(Config.Events.NODE_PROPERTY_CHANGED,                   this.nodePropertyChanged.bind(this))
                 .on(Config.Events.EDGE_PROPERTY_CHANGED,                   this.edgePropertyChanged.bind(this))
                 .on(Config.Events.NODEGROUP_PROPERTY_CHANGED,              this.nodeGroupPropertyChanged.bind(this))
+                .on(Config.Events.NODEGROUP_NODEIDS_CHANGED,               this.nodeGroupNodeIdsChanged.bind(this))
                 .on(Config.Events.NODE_ADDED,                              this.nodeAdded.bind(this))
                 .on(Config.Events.NODE_DELETED,                            this.nodeDeleted.bind(this))
                 .on(Config.Events.EDGE_ADDED,                              this.edgeAdded.bind(this))
@@ -427,6 +428,36 @@ function (Class, Config, Job, Alerts, Progress) {
                 success:     success  || jQuery.noop,
                 complete:    complete || jQuery.noop,
                 error:       this.errorCallback('Node group property could not be changed:', error)
+            });
+
+            return this;
+        },
+
+        /**
+         * Method: nodeGroupNodeIdsChanged
+         *      Changes the nodeIds of a given node group.
+         *
+         * Parameters:
+         *      {Event}    event       - jQuery event object of the custom trigger.
+         *      {Number}   nodeGroupId - The edge that shall be moved.
+         *      {Object}   properties  - The node group's properties that should be changed. Keys stand for property
+         *                               names and their assigned values is the new state.
+         *      {Function} success     - [optional] Callback that is called when the move was successfully saved.
+         *      {Function} error       - [optional] Callback that gets called in case of an AJAX error.
+         *      {Function} complete    - [optional] Callback that is always invoked no matter if AJAX request was
+         *                               successful or erroneous.
+         */
+        nodeGroupNodeIdsChanged: function(event, nodeGroupId, nodeIds, success, error, complete) {
+            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+                url:         this._fullUrlForNodeGroup(nodeGroupId),
+                type:        'PATCH',
+                contentType: 'application/json; charset=utf-8',
+                data:        JSON.stringify({nodeIds: nodeIds}),
+
+                beforeSend:  this.showProgress,
+                success:     success  || jQuery.noop,
+                complete:    complete || jQuery.noop,
+                error:       this.errorCallback('Node group nodeIds could not be changed:', error)
             });
 
             return this;

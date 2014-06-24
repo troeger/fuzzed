@@ -103,10 +103,16 @@ define(['property', 'class', 'canvas', 'config', 'jquery', 'd3'], function(Prope
 
         _addNode: function(node) {
             this.nodes[node.id] = node;
+
+            // call home
+            jQuery(document).trigger(Config.Events.NODEGROUP_NODEIDS_CHANGED, [this.id, this.nodeIds()]);
         },
 
         removeNode: function(node) {
             delete this.nodes[node.id];
+
+            // call home
+            jQuery(document).trigger(Config.Events.NODEGROUP_NODEIDS_CHANGED, [this.id, this.nodeIds()]);
 
             // if we have less than two members left, remove us, as we are no longer relevant
             if (_.size(this.nodes) < 2) {

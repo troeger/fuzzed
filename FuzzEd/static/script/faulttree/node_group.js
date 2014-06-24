@@ -59,6 +59,9 @@ define(['node_group', 'config'], function(NodeGroup, Config) {
         removeNode: function(node) {
             delete this.nodes[node.id];
 
+            // call home
+            jQuery(document).trigger(Config.Events.NODEGROUP_NODEIDS_CHANGED, [this.id, this.nodeIds()]);
+
             // if we have less than one member node left, remove us, as we are no longer relevant
             if (_.size(this.nodes) == 1) {
                 // and replace the last standing node with a new node, that carries forth our properties
