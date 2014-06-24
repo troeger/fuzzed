@@ -370,6 +370,15 @@ class EdgeResource(ModelResource):
     source = fields.ToOneField(NodeResource, 'source')
     target = fields.ToOneField(NodeResource, 'target')
 
+    def get_resource_uri(self, bundle_or_obj):
+        """
+            Since we change the API URL format to nested resources, we need also to
+            change the location determination for a given resource object.
+        """
+        edge_client_id = bundle_or_obj.obj.client_id
+        graph_pk = bundle_or_obj.obj.graph.pk
+        return reverse('edge', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': edge_client_id})
+
     def obj_create(self, bundle, **kwargs):
         """
          This is the only override that allows us to access 'kwargs', which contains the
@@ -381,6 +390,11 @@ class EdgeResource(ModelResource):
         bundle.data['target'] = Node.objects.get(client_id=bundle.data['target'], graph=graph, deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
+        bundle.obj.save()       # to allow property changes
+        if 'properties' in bundle.data:
+            # set initial edge properties
+            for key, value in bundle.data['properties'].iteritems():
+                bundle.obj.set_attr(key, value)
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):

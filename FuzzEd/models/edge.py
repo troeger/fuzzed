@@ -33,6 +33,9 @@ class Edge(models.Model):
         prefix = '[DELETED] ' if self.deleted else ''
         return  unicode('%s%s -> %s' % (prefix, str(self.source), str(self.target)))
 
+    def get_properties(self):
+        return {prop.key: {'value': prop.sanitized_value} for prop in self.properties.filter(deleted=False)}
+
     def to_dict(self):
         """
         Method: to_dict
@@ -43,7 +46,7 @@ class Edge(models.Model):
          {dict} the edge as dictionary
         """
         return {
-            'properties': {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)},
+            'properties': self.get_properties(),
             'id':         self.client_id,
             'graph':      self.graph.pk,
             'source':     self.source.client_id,

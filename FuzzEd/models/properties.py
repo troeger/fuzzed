@@ -45,7 +45,14 @@ class Property(models.Model):
             according to the notations file.
         '''
         try:
-            val_type = notations.by_kind[self.node.graph.kind]['nodes'][self.node.kind]['properties'][self.key]['kind']
+            if self.node:
+                val_type = notations.by_kind[self.node.graph.kind]['nodes'][self.node.kind]['properties'][self.key]['kind']
+            elif self.edge:                
+                val_type = notations.by_kind[self.edge.graph.kind]['edges']['properties'][self.key]['kind']
+            elif self.node_group:
+                val_type = notations.by_kind[self.node_group.graph.kind]['nodeGroups']['properties'][self.key]['kind']
+            else:
+                val_type = None
         except KeyError:
             # No information in the notations file , leave it as it is
             val_type = None

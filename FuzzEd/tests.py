@@ -30,6 +30,7 @@ from django.contrib.auth.models import User
 
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
+from FuzzEd.models.edge import Edge
 from FuzzEd.models.result import Result
 from FuzzEd.models.job import Job
 from FuzzEd.models.node_group import NodeGroup
@@ -385,12 +386,12 @@ class FrontendApiTestCase(FuzzEdTestCase):
         assert ('graphs' in content)
 
     def testCreateNode(self):
-        properties = {"key": "foo", "value": "bar"}
+        initial_properties = {"key": "foo", "value": "bar"}
         newnode = json.dumps({'y': 3,
                               'x': 7,
                               'kind': 'basicEvent',
                               'client_id': 888,
-                              'properties': properties})
+                              'properties': initial_properties})
 
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodes/' % fixt_simple['pkFaultTree'],
                                  newnode,
@@ -398,7 +399,7 @@ class FrontendApiTestCase(FuzzEdTestCase):
         self.assertEqual(response.status_code, 201)
         newid = int(response['Location'].split('/')[-1])
         newnode = Node.objects.get(client_id=newid, deleted=False)
-        self.assertItemsEqual(properties, newnode.get_properties())
+        self.assertItemsEqual(initial_properties, newnode.get_properties())
 
     def testCreateNodeGroup(self):
         nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
@@ -517,16 +518,22 @@ class FrontendApiTestCase(FuzzEdTestCase):
         self.assertEqual(response.status_code, 204)
 
     def testCreateEdge(self):
+        initial_properties =  {"key": "foo", "value": "bar"}
         newedge = json.dumps(
             {   'client_id': 4714, 
                 'source': fixt_simple['clientIdAndGate'], 
-                'target': fixt_simple['clientIdBasicEvent']
+                'target': fixt_simple['clientIdBasicEvent'],
+                'properties': initial_properties
             }
         )
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/edges/' % fixt_simple['pkFaultTree'],
                                  newedge,
                                  'application/json')
         self.assertEqual(response.status_code, 201)
+        print response['Location']
+        newid = int(response['Location'].split('/')[-1])
+        newedge = Edge.objects.get(client_id=newid, deleted=False)
+        self.assertItemsEqual(initial_properties, newedge.get_properties())
 
     def testNotificationDismiss(self):
         # Create notification entry in the database
@@ -555,10 +562,6 @@ class AnalysisInputFilesTestCase(FuzzEdTestCase):
                 retcode = subprocess.call('backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp' % (fname), shell=True)
                 self.assertEqual(retcode, 0, fname + " failed")
                 dom = parse('/tmp/output.xml')
-                #print(dom.toprettyxml())
-                results = dom.getElementsByTagName('result')
-                for result in results:
-                    self.assertEqual(result.getAttribute('validResult'), 'true')
 
 class BackendDaemonTestCase(FuzzEdTestCase):
     """
