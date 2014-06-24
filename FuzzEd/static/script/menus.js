@@ -442,7 +442,7 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function (Config, Class) {
          *      This {<PropertyMenu>} instance for chaining.
          */
         show: function() {
-            var selected = jQuery('.' + Config.Classes.SELECTED + '.' + Config.Classes.NODE);
+            var selected = jQuery('.' + Config.Classes.SELECTED);
             this._removeEntries();
 
             // display the properties menu only if there is exactly one node selected
