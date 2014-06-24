@@ -232,9 +232,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             return PropertyMenuEntry.ChoiceEntry;
         },
 
-        init: function(owner, definition) {
+        init: function(owner, mirrorers, definition) {
             definition.values = typeof definition.values === 'undefined' ? definition.choices : definition.values;
-            this._super(owner, definition);
+            this._super(owner, mirrorers, definition);
         },
 
         validate: function(value, validationResult) {
@@ -660,7 +660,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         transferGraphs: undefined,
 
-        init: function(owner, definition) {
+        init: function(owner, mirrorers, definition) {
             jQuery.extend(this, definition);
             this.owner = owner;
             this._sanitize()

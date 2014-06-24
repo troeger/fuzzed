@@ -1,5 +1,5 @@
-define(['canvas', 'class', 'config', 'edge', 'menus', 'node_group', 'faulttree/node_group', 'jquery', 'd3'],
-function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
+define(['canvas', 'class', 'config', 'edge', 'menus', 'node_group', 'jquery', 'd3'],
+function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
     /**
      * Package: Base
      */
