@@ -39,6 +39,7 @@ function(Property, Mirror, Canvas, Class, Config) {
         container:     undefined,
         graph:         undefined,
         id:            undefined,
+        nodegroups:     undefined,
         incomingEdges: undefined,
         outgoingEdges: undefined,
 
@@ -82,6 +83,7 @@ function(Property, Mirror, Canvas, Class, Config) {
             }
             this.config = this.getConfig();
 
+            this.nodegroups    = {};
             this.incomingEdges = [];
             this.outgoingEdges = [];
 
@@ -804,6 +806,22 @@ function(Property, Mirror, Canvas, Class, Config) {
             return true;
         },
 
+        //TODO: documentation
+        addToNodeGroup: function(nodegroup) {
+            this.nodegroups[nodegroup.id] = nodegroup;
+        },
+
+        removeFromNodeGroup: function(nodegroup) {
+            delete this.nodegroups[nodegroup.id];
+        },
+
+        // the internal variant of removeFromNodeGroup also notifies the nodegroup of the removal
+        _removeFromNodeGroup: function(nodegroup) {
+            nodegroup.removeNode(this);
+
+            this.removeFromNodeGroup(nodegroup);
+        },
+
         /**
          * Method: setChildProperties
          *
@@ -1049,6 +1067,11 @@ function(Property, Mirror, Canvas, Class, Config) {
             _.each(jsPlumb.getEndpoints(this.container), function(endpoint) {
                 jsPlumb.deleteEndpoint(endpoint);
             });
+
+            // Remove us from all NodeGroups we are part of
+            _.each(this.nodegroups, function(nodegroup) {
+                this._removeFromNodeGroup(nodegroup);
+            }.bind(this));
 
             // Call home
             jQuery(document).trigger(this.config.Events.NODE_DELETED, this.id);

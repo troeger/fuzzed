@@ -110,7 +110,6 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
             }.bind(this));
 
             jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
-            jQuery(document).on(Config.Events.NODE_DELETED,         this._updateNodeGroupDeleted.bind(this));
 
             return this;
         },
@@ -248,9 +247,22 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
          *      Creates a new NodeGroup based on the given jsonNodeGroup.
          *
          *  Returns:
-         *    The newly created <NodeGroup> instance.
+         *    The newly created <NodeGroup> instance if successful.
          */
         addNodeGroup: function(jsonNodeGroup) {
+            // first let's check if we already have a NodeGroup with the requested nodeIds
+            var jngNodeIds = jsonNodeGroup.nodeIds;
+
+            var alreadyExisting = false;
+            _.each(this.nodeGroups, function(ng) {
+                // math recap: two sets are equal, when both their differences are zero length
+                if (jQuery(jngNodeIds).not(ng.nodeIds()).length == 0 && jQuery(ng.nodeIds()).not(jngNodeIds).length == 0) {
+                    alreadyExisting = true;
+                }
+            }.bind(this));
+
+            if (alreadyExisting) return;
+
             var nodes = {};
             _.each(jsonNodeGroup.nodeIds, function(nodeId) {
                 nodes[nodeId] = this.getNodeById(nodeId);
@@ -262,8 +274,6 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
 
             var nodeGroup = this.factory.create('NodeGroup', this.getNotation().nodeGroups, nodes, properties);
             this.nodeGroups[nodeGroup.id] = nodeGroup;
-
-            return nodeGroup;
         },
 
         /**
@@ -277,28 +287,6 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup, FaulttreeNodeGroup) {
             if (nodeGroup.remove()) {
                 delete this.nodeGroups[nodeGroup.id];
             }
-
-            return this;
-        },
-
-        /**
-         *  Method: deleteNodeGroup
-         *      Updates all node groups on deletion of a node. Furthermore deletes empty node groups.
-         *
-         *  Returns:
-         *    This <Graph> instance for chaining.
-         */
-        _updateNodeGroupDeleted: function(event, nodeId) {
-            var node = this.getNodeById(nodeId);
-
-            _.each(this.nodeGroups, function(nodegroup) {
-                delete this.nodeGroups[nodegroup.id].nodes[nodeId];
-                if (_.size(nodegroup.nodes) < 2) {
-                    this.deleteNodeGroup(nodegroup);
-                } else {
-                    nodegroup.redraw();
-                }
-            }.bind(this));
 
             return this;
         },

@@ -1082,48 +1082,6 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 this._cloneSelection();
             }.bind(this));
 
-            // set the shortcut hints from 'Ctrl+' to '⌘' when on Mac
-            if (navigator.platform == 'MacIntel' || navigator.platform == 'MacPPC') {
-                jQuery('#' + this.config.IDs.ACTION_GROUP + ' span').text('⌘G');
-                jQuery('#' + this.config.IDs.ACTION_UNGROUP + ' span').text('⌘U');
-            }
-
-
-            return this;
-        },
-
-        _setupKeyBindings: function(readOnly) {
-            this._super(readOnly)
-            if (readOnly) return this;
-
-            jQuery(document).keydown(function(event) {
-                if (event.which === 'G'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
-                    this._groupPressed(event);
-                } else if (event.which === 'U'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
-                    this._ungroupPressed(event);
-                }
-            }.bind(this));
-
-            return this;
-        },
-
-        _groupPressed: function(event) {
-            // prevent that node is being deleted when we edit an input field
-            if (jQuery(event.target).is('input, textarea')) return this;
-            event.preventDefault();
-
-            this._groupSelection();
-
-            return this;
-        },
-
-        _ungroupPressed: function(event) {
-            // prevent that node is being deleted when we edit an input field
-            if (jQuery(event.target).is('input, textarea')) return this;
-            event.preventDefault();
-
-            this._ungroupSelection();
-
             return this;
         },
 

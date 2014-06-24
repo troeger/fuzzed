@@ -10,29 +10,6 @@ define(['node_group', 'config'], function(NodeGroup, Config) {
      * Extends: <Base::NodeGroup>
      */
     return NodeGroup.extend({
-        init: function(definition, nodes, properties) {
-            this._super(definition, nodes, properties);
-
-            _.each(this.nodes, function(node) {
-                node.addToNodeGroup(this);
-            }.bind(this));
-        },
-        _setupVisualRepresentation: function() {
-            return this;
-        },
-        redraw: function() {
-            return this;
-        },
-        _setupDragging: function() {
-            return this;
-        },
-        _setupMouse: function() {
-            return this;
-        },
-        _setupSelection: function() {
-            return this;
-        },
-
         /**
          * Method: _setupProperties
          *      Converts the informal properties stored in <properties> into Property objects ordered by this graph's
@@ -61,29 +38,33 @@ define(['node_group', 'config'], function(NodeGroup, Config) {
 
             return this;
         },
+
         remove: function() {
-            if (!this.deletable) return false;
+            this._super();
 
             // unaffect all currently affected nodes (you know, the purple ones) and remove their reference to us
             _.each(this.nodes, function(node) {
                 node.unaffect();
-                node.removeNodeGroup();
+                node.removeFromNodeGroup(this);
             }.bind(this));
-
-            // don't listen anymore
-            jQuery(document).off([ Config.Events.NODES_MOVED,
-                                   Config.Events.NODE_PROPERTY_CHANGED ].join(' '), this.redraw.bind(this));
-
-            // call home
-            jQuery(document).trigger(Config.Events.NODEGROUP_DELETED, [this.id, this.nodeIds()]);
 
             return true;
         },
-        addNode: function(node) {
-            this.nodes[node.id] = node;
-            node.addToNodeGroup(this);
+
+        _addNode: function(node) {
+            this._super(node);
             this._refreshProperties();
         },
+
+        removeNode: function(node) {
+            delete this.nodes[node.id];
+
+            // if we have less than two members left, remove us, as we are no longer relevant
+            if (_.size(this.nodes) < 2) {
+                this.graph.deleteNodeGroup(this);
+            }
+        },
+
         _refreshProperties: function() {
             _.each(this.properties, function(prop) {
                 prop.removeAllMirrors();

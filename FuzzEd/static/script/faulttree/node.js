@@ -12,7 +12,6 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
      * Extends: <Base::Node>
      */
     return AbstractNode.extend({
-        nodegroup: undefined,
         ownProperties: undefined,
 
         getConfig: function() {
@@ -22,16 +21,26 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
         select: function() {
             this._super();
 
-            if (typeof this.nodegroup !== 'undefined') {
-                _.invoke(_.without(this.nodegroup.nodes, this), 'affect');
+            if (!_.isEmpty(this.nodegroups)) {
+                // invoke 'affect' on all our NodeGroups' nodes (normally should only have one NodeGroup)
+                _.each(this.nodegroups, function(nodegroup) {
+                    _.each(nodegroup.nodes, function(node) {
+                        if (this != node) node.affect();
+                    }.bind(this));
+                }.bind(this));
             }
         },
 
         deselect: function() {
             this._super();
 
-            if (typeof this.nodegroup !== 'undefined') {
-                _.invoke(_.without(this.nodegroup.nodes, this), 'unaffect');
+            if (!_.isEmpty(this.nodegroups)) {
+                // invoke 'unaffect' on all our NodeGroups' nodes (normally should only have one NodeGroup)
+                _.each(this.nodegroups, function(nodegroup) {
+                    _.each(nodegroup.nodes, function(node) {
+                        if (this != node) node.unaffect();
+                    }.bind(this));
+                }.bind(this));
             }
         },
 
@@ -48,46 +57,33 @@ define(['faulttree/config', 'node'], function(Config, AbstractNode) {
         },
 
         addToNodeGroup: function(nodegroup) {
+            this._super(nodegroup);
+
             this.ownProperties = this.properties;
             this.properties = nodegroup.properties;
-            this.nodegroup  = nodegroup;
 
             _.each(this.ownProperties, function(prop) {
                 prop.removeAllMirrors();
             }.bind(this));
         },
 
-        removeNodeGroup: function() {
-            _.each(this.properties, function(prop) {
-                prop.removeAllMirrors();
-            });
+        removeFromNodeGroup: function(nodegroup) {
+            this._super(nodegroup);
 
-            //this.properties = this.ownProperties;
-            /*_.each(this.properties, function(prop) {
-                prop.changeOwnerTo(this);
-            }.bind(this));*/
+            // if we were the last node of the node group
+            if (_.isEmpty(nodegroup.nodes)) {
+                var jsonNode = jQuery.extend({},
+                    _.pick(this,
+                        'kind',
+                        'x',
+                        'y'
+                    ), {
+                        properties: this.nodegroup.toDict().properties
+                    });
 
-            /*var jsonNode = jQuery.extend({},
-                _.pick(this,
-                    'id',
-                    'kind',
-                    'x',
-                    'y'
-                ),
-                {
-                    properties: this.nodegroup.toDict().properties
-                }
-            );*/
-
-            this.properties = this.ownProperties;
-            this.nodegroup  = undefined;
-
-            _.each(this.properties, function(prop) {
-                prop.restoreMirrors();
-            });
-
-            //this.remove();
-            //this.graph.addNode(jsonNode);
+                this.remove();
+                this.graph.addNode(jsonNode);
+            }
         }
     });
 });

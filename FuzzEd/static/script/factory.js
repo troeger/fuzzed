@@ -86,6 +86,7 @@ function(Class) {
                 var that = this;
                 return new Creation(that);
             } catch (e) {
+                //TODO: try to catch this case more precisely, so we don't catch exceptions from elsewhere
                 if (e.message === "undefined is not a function") throw new ClassNotFound();
                 else throw e;
             }

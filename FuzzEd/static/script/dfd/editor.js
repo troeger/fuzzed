@@ -1,4 +1,5 @@
-define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore'], function(Editor, Factory, DfdGraph, DfdConfig) {
+define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 'dfd/node_group'],
+    function(Editor, Factory, DfdGraph, DfdConfig) {
     /**
      *  Package: DFD
      */
