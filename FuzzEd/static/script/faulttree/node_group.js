@@ -59,9 +59,30 @@ define(['node_group', 'config'], function(NodeGroup, Config) {
         removeNode: function(node) {
             delete this.nodes[node.id];
 
-            // if we have less than two members left, remove us, as we are no longer relevant
-            if (_.size(this.nodes) < 2) {
+            // if we have less than one member node left, remove us, as we are no longer relevant
+            if (_.size(this.nodes) == 1) {
+                // and replace the last standing node with a new node, that carries forth our properties
+
+                // as we assured that the size of this.nodes is 1 we can just pick any key
+                var key = Object.keys(this.nodes)[0];
+                var lastStandingNode = this.nodes[key];
+
+                var jsonNode = jQuery.extend({},
+                   _.pick(lastStandingNode,
+                        'kind',
+                        'x',
+                        'y'
+                    ),
+                    {
+                        properties: this.toDict().properties
+                    }
+                );
+
+                this.graph.addNode(jsonNode);
+
                 this.graph.deleteNodeGroup(this);
+
+                this.graph.deleteNode(lastStandingNode);
             }
         },
 

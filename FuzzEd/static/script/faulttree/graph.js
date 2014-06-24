@@ -52,7 +52,8 @@ function(Graph, FaulttreeNode, FaulttreeConfig, FaulttreeNotation) {
             // if the original node is not part of a NodeGroup yet, create a new one out of the node and the clone
             if (_.isEmpty(node.nodegroups)) {
                 this.addNodeGroup({
-                    nodeIds: [node.id, clone.id]
+                    nodeIds: [node.id, clone.id],
+                    properties: node.toDict().properties
                 });
             } else {
                 // well this is a bit hacky now: in this special case we assume that the original node only has one
