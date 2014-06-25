@@ -97,16 +97,16 @@ class Result(models.Model):
         '''      
         if kind == self.ANALYSIS_RESULT:
             if graph_type == 'faulttree':
-                return (('timestamp', 'Mission Time'), ('peak','Top Event Probability')) 
+                return (('timestamp', 'Time'), ('peak','Top Event Probability')) 
             elif graph_type == 'fuzztree' :   
-                return  (('id','Config'),('minimum','Min'), ('peak','Peak'),
+                return  (('id','Config'), ('timestamp', 'Time'), ('minimum','Min'), ('peak','Peak'),
                      ('maximum','Max'),  ('configuration__costs','Costs'))            
         elif kind == self.SIMULATION_RESULT:
             if graph_type == 'faulttree':
-                return  (('reliability','Reliability'), ('mttf','MTTF'),
+                return  (('timestamp', 'Time'), ('reliability','Reliability'), ('mttf','MTTF'),
                       ('rounds', 'Rounds'), ('failures', 'Failures'))
             elif graph_type == 'fuzztree' : 
-                return  (('id','Config'), ('reliability','Reliability'), ('mttf','MTTF'),
+                return  (('id','Config'), ('timestamp', 'Time'), ('reliability','Reliability'), ('mttf','MTTF'),
                       ('rounds', 'Rounds'), ('failures', 'Failures'))                
         elif kind == self.MINCUT_RESULT:
             return  (('id','Config'),)      
@@ -117,9 +117,12 @@ class Result(models.Model):
         stored in this result object, plus data from the linked graph configuration.
       '''
       result = {}
-      for field in ['minimum', 'maximum', 'peak', 'points', 'reliability', 'mttf', 'rounds', 'failures', 'timestamp']:
+      for field in ['minimum', 'maximum', 'peak', 'reliability', 'mttf', 'rounds', 'failures', 'timestamp']:
         value = getattr(self, field)
         result[field] = value   # 'None' values are needed, since datatables needs all columns filled
+      # Points information is now shown in the table, but triggers graph rendering, so include it only when needed
+      if self.points:
+        result['points'] = self.points
       if self.configuration:
           result['choices'] = self.configuration.to_dict() 
           result['id'] = self.configuration.pk

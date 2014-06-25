@@ -892,7 +892,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          *      Override of the abstract base class method.
          */
         _menuHeader: function() { 
-            return 'Top Event Probability (analytical)';
+            return 'Analysis Results';
         }
     });
 

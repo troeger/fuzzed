@@ -20,7 +20,7 @@ from FuzzEd.models import xml_backend
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice
-from xml_backend import AnalysisResult, MincutResult
+from xml_backend import AnalysisResult, MincutResult, SimulationResult
 
 
 logger = logging.getLogger('FuzzEd')
@@ -138,8 +138,6 @@ class Job(models.Model):
     def interpret_value(self, xml_result_value, db_result):
         """
             Interpret the incoming result value and convert it to feasible JSON for storage.
-            Secondly, the function return a plain integer representing the result
-            for sorting purposes. 
 
             Fuzzy probability values as result are given for each alpha cut. Putting
             all the different values together forms a triangular membership function.
@@ -180,10 +178,16 @@ class Job(models.Model):
                     # In this case, add another fake point to draw a strisaght line.
                     # points.append([alpha_cut.value_.lowerBound, 0])
                     pass
+
             # Points is now a wild collection of coordinates, were double values for the same X 
             # coordinate may occur. We sort it (since the JS code likes that) and leave only the 
             # largest Y values per X value.
-            db_result.points = json.dumps(sorted(points))
+
+            # If we have only one point, it makes no sense to draw a graph
+            #TODO: Instead, we could draw a nice exponential curve for the resulting rate parameter
+            #      This demands some better support for feeding the frontend graph rendering (Axis range etc.)
+            if alphacut_count > 1:
+                db_result.points = json.dumps(sorted(points))
 
             # Compute some additional statistics for the front-end, based on the gathered probabilities
             if len(points) > 0:
