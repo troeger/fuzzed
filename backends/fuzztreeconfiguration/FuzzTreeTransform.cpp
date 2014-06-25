@@ -308,7 +308,7 @@ fuzztree::FuzzTree FuzzTreeTransform::generateVariationFreeFuzzTree(const FuzzTr
 	newTopEvent.name(topEvent.name());
 
 	if (generateVariationFreeFuzzTreeRecursive(&topEvent, &newTopEvent, configuration) == OK)
-		return fuzztree::FuzzTree(generateUniqueId(topEvent.id()), newTopEvent);
+		return fuzztree::FuzzTree(/*generateUniqueId(topEvent.id())*/m_fuzzTree->id(), newTopEvent);
 	else
 	{
 		// m_logFile << "FaultTree Generation failed." << endl;
