@@ -3,15 +3,17 @@ import logging
 import json
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.mail import mail_managers
 from django.http import HttpResponse
 from tastypie.http import HttpBadRequest
 from tastypie import fields
 from django.conf.urls import url
 from django.utils import http
 
-from FuzzEd.models import Job
-import common
 
+import common
+from FuzzEd.models import Job
+from FuzzEd import settings
 
 logger = logging.getLogger('FuzzEd')
 
@@ -101,9 +103,8 @@ class JobResource(common.JobResource):
                 except Exception as e:
                     # Do not blame the calling backend for parsing problems, it has done it's job
                     logger.error("Could not parse result data retrieved for job %u"%job.pk)
-                    logger.error(str(e))
-                    #TODO: mail_managers
-                    pass
+                    mail_managers("Exception on backend result parsing - " + settings.BACKEND_DAEMON, str(e))
+                    job.exit_code = -444  # Inform the frontend that this went wrong   
         # This immediately triggers pulling clients to get the result data, so it MUST be the very last thing to do
 	    job.save() 
         return HttpResponse(status=202)

@@ -137,7 +137,7 @@ class JobResource(common.JobResource):
                 return response
             else:
                 logger.debug("Job is done, but with non-zero exit code.")
-                mail_managers('Analysis of job %s ended with non-zero exit code.' % job.pk, job.graph.to_xml())
+                mail_managers('Job %s for graph %u ended with non-zero exit code %u.' % (job.pk, job.graph.pk, job.exit_code), job.graph.to_xml())
                 return HttpApplicationError()
         else:
             # Job is pending, tell this by HTTP return code

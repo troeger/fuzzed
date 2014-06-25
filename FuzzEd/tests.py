@@ -608,6 +608,15 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
         self.assertEqual(data['aaData'][0]['peak'], 1.0)
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+    def testRateFaulttreeSimulation(self):
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['rate_faulttree'], 'simulation')
+        result_url = job_result['LOCATION']
+        result = self.ajaxGet(result_url+'?sEcho=doo')   # Fetch result in datatables style
+        self.assertEqual(result.status_code, 200)
+        data = json.loads(result.content)
+        assert(len(data['aaData']) > 0)
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testPRDCFuzztree(self):
         job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
         job_result_info = json.loads(job_result.content)

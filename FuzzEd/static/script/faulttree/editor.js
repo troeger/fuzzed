@@ -858,7 +858,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         _displayJobError: function(xhr) {
             Alerts.showErrorAlert(
                 'An error occurred!', xhr.responseText ||
-                'Are you still connected to the internet? If so, please let us know, we made a mistake here!');
+                'We were trying to trigger a computational job, but this crashed on our side. A retry may help. The developers are already informed, sorry for the inconvinience.');
             this.hide();
         }
     });

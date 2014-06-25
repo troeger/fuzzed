@@ -193,20 +193,23 @@ class Job(models.Model):
 
         if hasattr(xml_result_value, 'reliability') and xml_result_value.reliability is not None:
             reliability = float(xml_result_value.reliability)
-            sort_value = round(reliability)            
             db_result.reliability = None if math.isnan(reliability) else reliability
+            logging.debug("Reliability: " + str(reliability))
 
         if hasattr(xml_result_value, 'mttf') and xml_result_value.mttf is not None:
             mttf = float(xml_result_value.mttf)
             db_result.mttf = None if math.isnan(mttf) else mttf
+            logging.debug("MTTF: " + str(mttf))
 
-        if hasattr(xml_result_value, 'rounds') and xml_result_value.nSimulatedRounds is not None:
+        if hasattr(xml_result_value, 'nSimulatedRounds') and xml_result_value.nSimulatedRounds is not None:
             rounds = int(result.nSimulatedRounds)
             db_result.rounds = None if math.isnan(rounds) else rounds
+            logging.debug("Rounds: " + str(rounds))
 
         if hasattr(xml_result_value, 'nFailures') and xml_result_value.nFailures is not None:
             failures = int(result.nFailures)
             db_result.failures = None if math.isnan(failures) else failures
+            logging.debug("Failures: " + str(failures))
 
     def parse_result(self, data):
         """
@@ -228,7 +231,7 @@ class Job(models.Model):
 
         # Ok, it is not binary, it is true XML result data
 
-        logger.debug("Parsing backend result XML into database: "+str(data))
+        logger.debug("Parsing backend result XML into database: \n"+str(data))
         doc = xml_backend.CreateFromDocument(str(data))
 
         # Delete old graph issues from a former analysis run
