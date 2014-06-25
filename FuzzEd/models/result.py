@@ -93,7 +93,7 @@ class Result(models.Model):
 
             Field values from related models (e.g. costs) are named in Django QuerySet syntax.
             This allows to re-use them directly in Query creation.
-        '''        
+        '''      
         if kind == self.ANALYSIS_RESULT:
             if graph_type == 'faulttree':
                 return (('minimum','Min'), ('peak','Peak'),('maximum','Max')) 

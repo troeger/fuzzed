@@ -44,10 +44,10 @@ int main(int argc, char **argv)
 	FuzzTreeTransform tf(instream, issues);
 	instream.close();
 
+	backendResults::BackendResults backendresults;
+
 	try
 	{
-		backendResults::BackendResults backendresults;
-
 		if (!tf.isValid())
 		{ // only fuzztrees should be configured 
 			issues.insert(Issue::fatalIssue("Could not configure the model. Did you try to configure a fault tree?"));
@@ -76,14 +76,16 @@ int main(int argc, char **argv)
 	// This should not happen.
 	catch (const std::exception& e)
 	{
-		*logFileStream << "Exception while trying to configure " << inFile << e.what() << std::endl;
-		fuzztree::fuzzTree(*logFileStream, *(tf.getFuzzTree()));
+		*logFileStream << "Exception while trying to configure " << inFile << e.what() << std::endl << "Results so far: ";
+		backendResults::backendResults(*logFileStream, backendresults);
 
+		fuzztree::fuzzTree(*logFileStream, *(tf.getFuzzTree()));
 		return -1;
 	}
 	catch (...)
 	{
-		*logFileStream << "Exception while trying to configure " << inFile << std::endl;
+		*logFileStream << "Exception while trying to configure " << inFile << std::endl << "Results so far: ";
+		backendResults::backendResults(*logFileStream, backendresults);
 		return -1;
 	}
 

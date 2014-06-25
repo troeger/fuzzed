@@ -124,10 +124,12 @@ include_directories(
 	${Boost_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration
 	${CMAKE_CURRENT_SOURCE_DIR}/common
+	${CMAKE_CURRENT_SOURCE_DIR}/common_generated
 	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
 )
 
 set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
+set(COMMON_GEN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common_generated)
 
 ############### XSD COMPILER ############
 #########################################
@@ -135,10 +137,10 @@ set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
 set(XSD_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../FuzzEd/static/xsd")
 
 set(XSD_GENERATED_TREE_FILES
-	${COMMON_DIR}/fuzztree.h
-	${COMMON_DIR}/faulttree.h
-	${COMMON_DIR}/fuzztree.cpp
-	${COMMON_DIR}/faulttree.cpp)
+	${COMMON_GEN_DIR}/fuzztree.h
+	${COMMON_GEN_DIR}/faulttree.h
+	${COMMON_GEN_DIR}/fuzztree.cpp
+	${COMMON_GEN_DIR}/faulttree.cpp)
 
 set(FAULTTREE_XSD "${XSD_FILE_PATH}/faulttree.xsd")
 set(FUZZTREE_XSD  "${XSD_FILE_PATH}/fuzztree.xsd")
@@ -176,12 +178,12 @@ set(XSD_TO_FUZZTREE_ARGS
 ########### RESULT XML ##################
 
 set(XSD_GENERATED_RESULT_FILES
-	${COMMON_DIR}/backendResult.h
-	${COMMON_DIR}/commonTypes.h
-	${COMMON_DIR}/configurations.h
-	${COMMON_DIR}/backendResult.cpp
-	${COMMON_DIR}/commonTypes.cpp
-	${COMMON_DIR}/configurations.cpp)
+	${COMMON_GEN_DIR}/backendResult.h
+	${COMMON_GEN_DIR}/commonTypes.h
+	${COMMON_GEN_DIR}/configurations.h
+	${COMMON_GEN_DIR}/backendResult.cpp
+	${COMMON_GEN_DIR}/commonTypes.cpp
+	${COMMON_GEN_DIR}/configurations.cpp)
 
 set(RESULT_XSD					"${XSD_FILE_PATH}/backendResult.xsd")
 set(COMMON_TYPES_XSD			"${XSD_FILE_PATH}/commonTypes.xsd")
@@ -205,34 +207,34 @@ add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FIL
 	COMMAND ${XSD_EXECUTABLE}
 		cxx-tree 
 			${XSD_RESULT_ARGS} 
-			--output-dir ${COMMON_DIR}
+			--output-dir ${COMMON_GEN_DIR}
 			${COMMON_TYPES_XSD}
 
 	COMMAND ${XSD_EXECUTABLE} 
 		cxx-tree
 			${XSD_RESULT_ARGS}
-			--output-dir ${COMMON_DIR}
+			--output-dir ${COMMON_GEN_DIR}
 			--root-element "backendResults"
 			${RESULT_XSD}
 
 	COMMAND ${XSD_EXECUTABLE} 
 		cxx-tree
 			${XSD_RESULT_ARGS}
-			--output-dir ${COMMON_DIR}
+			--output-dir ${COMMON_GEN_DIR}
 			${CONFIGURATION_XSD}
 
 	COMMAND ${XSD_EXECUTABLE}
 		cxx-tree 
 			${XSD_TO_FAULTTREE_ARGS} 
 			${TREE_CUSTOMIZATION_ARGS}
-			--output-dir ${COMMON_DIR}
+			--output-dir ${COMMON_GEN_DIR}
 			${FAULTTREE_XSD}
 
 	COMMAND ${XSD_EXECUTABLE} 
 		cxx-tree
 			${XSD_TO_FUZZTREE_ARGS}
 			${FUZZTREE_CUSTOMIZATION_ARGS}
-			--output-dir ${COMMON_DIR}
+			--output-dir ${COMMON_GEN_DIR}
 			${FUZZTREE_XSD}
 
 	COMMENT "Generating C++ / XML mapping files"
@@ -250,16 +252,18 @@ set(COMMON_SOURCES
 	${COMMON_DIR}/FuzzTreeTypes.cpp
 	${COMMON_DIR}/FaultTreeTypes.cpp
 	${COMMON_DIR}/FuzzTreeTypes.cpp
-	${COMMON_DIR}/faulttree.cpp
-	${COMMON_DIR}/fuzztree.cpp
-	${COMMON_DIR}/backendResult.cpp
-	${COMMON_DIR}/commonTypes.cpp
-	${COMMON_DIR}/configurations.cpp
+
 	${COMMON_DIR}/CommandLineParser.cpp
 	${COMMON_DIR}/FaultTreeToFuzzTree.cpp
 	${COMMON_DIR}/Issue.cpp
 	${COMMON_DIR}/FatalException.cpp
 	${COMMON_DIR}/DeadlockMonitor.cpp
+
+	${COMMON_GEN_DIR}/faulttree.cpp
+	${COMMON_GEN_DIR}/fuzztree.cpp
+	${COMMON_GEN_DIR}/backendResult.cpp
+	${COMMON_GEN_DIR}/commonTypes.cpp
+	${COMMON_GEN_DIR}/configurations.cpp
 )
 
 set(COMMON_HEADERS
@@ -268,17 +272,19 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/xmlutil.h
 	${COMMON_DIR}/FaultTreeTypes.h
 	${COMMON_DIR}/FuzzTreeTypes.h
-	${COMMON_DIR}/faulttree.h
-	${COMMON_DIR}/fuzztree.h
-	${COMMON_DIR}/backendResult.h
-	${COMMON_DIR}/commonTypes.h
-	${COMMON_DIR}/configurations.h
+
 	${COMMON_DIR}/CommandLineParser.h
 	${COMMON_DIR}/FaultTreeToFuzzTree.h
 	${COMMON_DIR}/Issue.h
 	${COMMON_DIR}/FatalException.h
 	${COMMON_DIR}/DeadlockMonitor.h
 	${COMMON_DIR}/Dynamic2dArray.h
+
+	${COMMON_GEN_DIR}/faulttree.h
+	${COMMON_GEN_DIR}/fuzztree.h
+	${COMMON_GEN_DIR}/backendResult.h
+	${COMMON_GEN_DIR}/commonTypes.h
+	${COMMON_GEN_DIR}/configurations.h
 )
 
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})

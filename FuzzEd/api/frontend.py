@@ -208,6 +208,10 @@ class NodeResource(ModelResource):
         bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
+        bundle.obj.save()   # Ordering is important, so that set_attr has something to relate to
+        if 'properties' in bundle.data:
+            for key, value in bundle.data['properties'].iteritems():
+                bundle.obj.set_attr(key, value)
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -267,8 +271,10 @@ class NodeGroupResource(ModelResource):
 
     def obj_create(self, bundle, **kwargs):
         """
-             This is the only override that allows us to access 'kwargs', which contains the
-             graph_id from the original request.
+            The method called by the dispatcher when a NodeGroup resource is created.
+
+            This is the only override that allows us to access 'kwargs', which contains the
+            graph_id from the original request.
         """
         try:
             bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
@@ -285,7 +291,11 @@ class NodeGroupResource(ModelResource):
                 bundle.obj.nodes.add(node)
             except ObjectDoesNotExist:
                 pass
-            bundle.obj.save()
+        if 'properties' in bundle.data:
+            # set initial node group properties
+            for key, value in bundle.data['properties'].iteritems():
+                bundle.obj.set_attr(key, value)
+        bundle.obj.save()
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -312,9 +322,17 @@ class NodeGroupResource(ModelResource):
         deserialized = self.deserialize(request, request.body,
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
+            logger.debug("Updating properties for node group")
             for key, value in deserialized['properties'].iteritems():
                 obj.set_attr(key, value)
             obj.save()
+        if 'nodeIds' in deserialized:
+            logger.debug("Updating nodes for node group")
+            obj.nodes.clear()    # nodes_set is magically created by Django
+            node_objects = Node.objects.filter(deleted=False, graph=obj.graph, client_id__in=deserialized['nodeIds'])
+            obj.nodes = node_objects
+            obj.save()
+
         # return the updated node group object
         return HttpResponse(obj.to_json(), 'application/json', status=202)
 
@@ -352,6 +370,15 @@ class EdgeResource(ModelResource):
     source = fields.ToOneField(NodeResource, 'source')
     target = fields.ToOneField(NodeResource, 'target')
 
+    def get_resource_uri(self, bundle_or_obj):
+        """
+            Since we change the API URL format to nested resources, we need also to
+            change the location determination for a given resource object.
+        """
+        edge_client_id = bundle_or_obj.obj.client_id
+        graph_pk = bundle_or_obj.obj.graph.pk
+        return reverse('edge', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': edge_client_id})
+
     def obj_create(self, bundle, **kwargs):
         """
          This is the only override that allows us to access 'kwargs', which contains the
@@ -363,6 +390,11 @@ class EdgeResource(ModelResource):
         bundle.data['target'] = Node.objects.get(client_id=bundle.data['target'], graph=graph, deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
+        bundle.obj.save()       # to allow property changes
+        if 'properties' in bundle.data:
+            # set initial edge properties
+            for key, value in bundle.data['properties'].iteritems():
+                bundle.obj.set_attr(key, value)
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -506,6 +538,7 @@ class ResultResource(ModelResource):
             sort_col = int(request.GET['iSortCol_'+str(i)])
             sort_dir = request.GET['sSortDir_'+str(i)] 
             db_field_name=job.result_titles[sort_col][0] 
+            logger.debug("Sorting result set for "+db_field_name)
             if sort_dir == "desc":
                 db_field_name = "-"+db_field_name          
             sort_fields.append(db_field_name)

@@ -30,4 +30,6 @@ protected:
 	const fuzztree::TopEvent* m_tree;
 
 	std::ofstream& m_logFile;
+
+	bool m_bDetectedUndeveloped;
 };

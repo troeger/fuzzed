@@ -30,6 +30,7 @@ from django.contrib.auth.models import User
 
 from FuzzEd.models.graph import Graph
 from FuzzEd.models.node import Node
+from FuzzEd.models.edge import Edge
 from FuzzEd.models.result import Result
 from FuzzEd.models.job import Job
 from FuzzEd.models.node_group import NodeGroup
@@ -46,7 +47,7 @@ fixt_analysis = {
                 'graphs':  {7: 'faulttree', 8: 'faulttree'},
                 'results': {7: 'results/rate_tree.xml', 8: 'results/prdc_tree.xml'},               
                 'rate_faulttree': 7,                # Graph PK
-                'prdc_faulttree': 8,                # Graph PK
+                'prdc_fuzztree': 8,                # Graph PK
                 'prdc_configurations': 8,           # Decomposition number
                 'prdc_peaks': [0.31482, 0.12796, 0.25103, 0.04677, 0.36558, 0.19255, 0.30651, 0.11738]
                 }
@@ -375,7 +376,6 @@ class FrontendApiTestCase(FuzzEdTestCase):
         response = self.ajaxGet(url)
         self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
-        print content
         assert ('graphs' in content)
 
     def testGraphFiltering(self):
@@ -383,28 +383,28 @@ class FrontendApiTestCase(FuzzEdTestCase):
         response = self.ajaxGet(url)
         self.assertEqual(response.status_code, 200)
         content = json.loads(response.content)
-        print content
         assert ('graphs' in content)
 
     def testCreateNode(self):
+        initial_properties = {"key": "foo", "value": "bar"}
         newnode = json.dumps({'y': 3,
                               'x': 7,
                               'kind': 'basicEvent',
                               'client_id': 888,
-                              'properties': '{}'})
+                              'properties': initial_properties})
 
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodes/' % fixt_simple['pkFaultTree'],
                                  newnode,
                                  'application/json')
         self.assertEqual(response.status_code, 201)
-        print response['Location']
         newid = int(response['Location'].split('/')[-1])
         newnode = Node.objects.get(client_id=newid, deleted=False)
-
+        self.assertItemsEqual(initial_properties, newnode.get_properties())
 
     def testCreateNodeGroup(self):
         nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
-        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
+        initial_properties =  {"key": "foo", "value": "bar"}
+        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes, "properties": initial_properties})
         response = self.ajaxPost(
                     self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
                     newgroup,
@@ -425,7 +425,7 @@ class FrontendApiTestCase(FuzzEdTestCase):
         for group in content['nodeGroups']:
             self.assertEqual(group['id'], 999)
             self.assertItemsEqual(group['nodeIds'], nodes)
-            print group
+            self.assertItemsEqual(group['properties'], initial_properties)
 
     def testDeleteNode(self):
         response = self.ajaxDelete(
@@ -480,6 +480,29 @@ class FrontendApiTestCase(FuzzEdTestCase):
         self.assertEqual(response.status_code, 202)
         #TODO: Fetch graph and check that the property is really stored
 
+    def testNodeGroupNodesChange(self):
+        #TODO: Fixture should have a node group, instead of creating it here
+        nodes1 = [fixt_simple['clientIdAndGate']]
+        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes1})
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
+                                 newgroup,
+                                 'application/json')
+        self.assertEqual(response.status_code, 201)
+        newgroup = response['Location']
+        # Try changing
+        nodes2 = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
+        newnodes = json.dumps({"nodeIds": nodes2})
+        response = self.ajaxPatch(newgroup,
+                                  newnodes,
+                                  "application/json")
+        self.assertEqual(response.status_code, 202)
+        # Get complete graph and see if the node group is registered correctly
+        url = self.baseUrl + '/graphs/%u' % fixt_simple['pkDFD']
+        response = self.ajaxGet(url)
+        self.assertEqual(response.status_code, 200)
+        content = json.loads(response.content)
+        for group in content['nodeGroups']:
+            self.assertItemsEqual(group['nodeIds'], nodes2)
 
     def testEdgePropertyChange(self):
         newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
@@ -495,16 +518,22 @@ class FrontendApiTestCase(FuzzEdTestCase):
         self.assertEqual(response.status_code, 204)
 
     def testCreateEdge(self):
+        initial_properties =  {"key": "foo", "value": "bar"}
         newedge = json.dumps(
             {   'client_id': 4714, 
                 'source': fixt_simple['clientIdAndGate'], 
-                'target': fixt_simple['clientIdBasicEvent']
+                'target': fixt_simple['clientIdBasicEvent'],
+                'properties': initial_properties
             }
         )
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/edges/' % fixt_simple['pkFaultTree'],
                                  newedge,
                                  'application/json')
         self.assertEqual(response.status_code, 201)
+        print response['Location']
+        newid = int(response['Location'].split('/')[-1])
+        newedge = Edge.objects.get(client_id=newid, deleted=False)
+        self.assertItemsEqual(initial_properties, newedge.get_properties())
 
     def testNotificationDismiss(self):
         # Create notification entry in the database
@@ -533,10 +562,6 @@ class AnalysisInputFilesTestCase(FuzzEdTestCase):
                 retcode = subprocess.call('backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp' % (fname), shell=True)
                 self.assertEqual(retcode, 0, fname + " failed")
                 dom = parse('/tmp/output.xml')
-                #print(dom.toprettyxml())
-                results = dom.getElementsByTagName('result')
-                for result in results:
-                    self.assertEqual(result.getAttribute('validResult'), 'true')
 
 class BackendDaemonTestCase(FuzzEdTestCase):
     """
@@ -618,7 +643,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testPRDCFuzztree(self):
-        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_fuzztree'], 'topevent')
         job_result_info = json.loads(job_result.content)
         assert('issues' in job_result_info)
         assert('columns' in job_result_info)
@@ -649,15 +674,17 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
     def testResultOrdering(self):
-        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_faulttree'], 'topevent')
+        job_result = self.requestJob(self.baseUrl, fixt_analysis['prdc_fuzztree'], 'topevent')
         job_result_info = json.loads(job_result.content)
         result_url = job_result['LOCATION']
         # Ordering in datatables style
-        titles = Result.titles(Result.ANALYSIS_RESULT, 'faulttree')
+        titles = Result.titles(Result.ANALYSIS_RESULT, 'fuzztree')
         print "Titles: %s\n"%str(titles)
         for index, col_desc in enumerate(titles):
             field_name = col_desc[0]
-            result = self.ajaxGet(result_url+'?sEcho=doo&iSortingCols=1&sSortDir_0=asc&iSortCol_0='+str(index))  
+            url = result_url+'?sEcho=doo&iSortingCols=1&sSortDir_0=asc&iSortCol_0='+str(index)
+            print url
+            result = self.ajaxGet(url)  
             data = json.loads(result.content)
             if field_name in data['aaData'][0]:
                 print "Checking sorting for "+field_name

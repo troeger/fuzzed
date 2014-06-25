@@ -124,6 +124,9 @@ class Node(models.Model):
             except KeyError:
                 return self.kind
 
+    def get_properties(self):
+        return {prop.key: {'value': prop.sanitized_value} for prop in self.properties.filter(deleted=False)}
+
     def to_dict(self):
         """
         Method: to_dict
@@ -134,7 +137,7 @@ class Node(models.Model):
          {dict} the node as dictionary
         """
         return {
-            'properties': {prop.key: {'value': prop.sanitized_value} for prop in self.properties.filter(deleted=False)},
+            'properties': self.get_properties(),
             'id':         self.client_id,
             'kind':       self.kind,
             'x':          self.x,
@@ -575,6 +578,7 @@ class Node(models.Model):
         Returns:
             {attr} The found attribute. Raises a ValueError if no attribute for the given key exist.
         """
+        assert(self.pk)         # Catch attribute setting before object saving cases
         if hasattr(self, key):
             return getattr(self, key)
         else:
@@ -595,6 +599,7 @@ class Node(models.Model):
             {string} key - The name of the attribute.
             {attr} value - The new value that should be stored.
         """
+        assert(self.pk)         # Catch attribute setting before object saving cases
         if hasattr(self, key):
             setattr(self, key, value)
         else:
