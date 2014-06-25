@@ -58,8 +58,7 @@ void FuzzTreeConfiguration::setNotIncludedRecursive(const fuzztree::Node& node)
 
 const bool& FuzzTreeConfiguration::isOptionalEnabled(const id_type& ID) const
 {
-	const bool included = m_optionalNodes.find(ID) != m_optionalNodes.end();
-	assert(included);
+	assert(m_optionalNodes.find(ID) != m_optionalNodes.end());
 	return m_optionalNodes.at(ID);
 }
 
@@ -70,11 +69,13 @@ const bool FuzzTreeConfiguration::isIncluded(const id_type& ID) const
 
 const std::tuple<int,int>& FuzzTreeConfiguration::getRedundancyCount(const id_type& ID) const
 {
+	assert(m_redundancyNodes.find(ID) != m_redundancyNodes.end());
 	return m_redundancyNodes.at(ID);
 }
 
 const FuzzTreeConfiguration::id_type& FuzzTreeConfiguration::getFeaturedChild(const id_type& ID) const
 {
+	assert(m_featureNodes.find(ID) != m_featureNodes.end());
 	return m_featureNodes.at(ID);
 }
 

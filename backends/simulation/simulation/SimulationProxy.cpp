@@ -183,15 +183,16 @@ void SimulationProxy::simulateAllConfigurations(
 		if (!ftTransform.isValid())
 		{
 			const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
-			const std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
-			if (ft)
+			const std::shared_ptr<TopLevelEvent> topEvent = fromGeneratedFaultTree(simTree->topEvent()); 
+			if (topEvent)
 			{ // in this case there is only a faulttree, so no configuration information will be serialized
 
 				const SimulationResultStruct res = 
-					simulateFaultTree(ft, workingDir, logFileStream, impl);
+					simulateFaultTree(topEvent, workingDir, logFileStream, impl);
 
+				const std::string modelId = simTree->id();
 				backendResults::SimulationResult r(
-					ft->getId(),
+					modelId,
 					EMPTY_CONFIG_ID,
 					util::timeStamp(),
 					res.isValid(),
@@ -215,26 +216,25 @@ void SimulationProxy::simulateAllConfigurations(
 			for (const auto& ft : ftTransform.transform())
 			{
 				std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
-				{
-					const SimulationResultStruct res = 
-						simulateFaultTree(simTree, workingDir, logFileStream, impl);
 
-					backendResults::SimulationResult r(
-						simTree->getId(),
-						ft.first.getId(),
-						util::timeStamp(),
-						res.isValid(),
-						res.reliability,
-						res.nFailures,
-						res.nRounds);
+				const SimulationResultStruct res =
+					simulateFaultTree(simTree, workingDir, logFileStream, impl);
 
-					r.availability(res.meanAvailability);
-					r.duration(res.duration);
-					r.mttf(res.mttf);
-					simResults.configuration().push_back(serializedConfiguration(ft.first));
+				backendResults::SimulationResult r(
+					ft.second.id(),
+					ft.first.getId(),
+					util::timeStamp(),
+					res.isValid(),
+					res.reliability,
+					res.nFailures,
+					res.nRounds);
 
-					simResults.result().push_back(r);
-				}
+				r.availability(res.meanAvailability);
+				r.duration(res.duration);
+				r.mttf(res.mttf);
+				simResults.configuration().push_back(serializedConfiguration(ft.first));
+
+				simResults.result().push_back(r);
 			}
 		}
 		// Log errors
