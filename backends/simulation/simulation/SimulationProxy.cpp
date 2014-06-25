@@ -183,15 +183,16 @@ void SimulationProxy::simulateAllConfigurations(
 		if (!ftTransform.isValid())
 		{
 			const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
-			const std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
-			if (ft)
+			const std::shared_ptr<TopLevelEvent> topEvent = fromGeneratedFaultTree(simTree->topEvent()); 
+			if (topEvent)
 			{ // in this case there is only a faulttree, so no configuration information will be serialized
 
 				const SimulationResultStruct res = 
-					simulateFaultTree(ft, workingDir, logFileStream, impl);
+					simulateFaultTree(topEvent, workingDir, logFileStream, impl);
 
+				const std::string modelId = simTree->id();
 				backendResults::SimulationResult r(
-					ft->getId(),
+					modelId,
 					EMPTY_CONFIG_ID,
 					util::timeStamp(),
 					res.isValid(),
