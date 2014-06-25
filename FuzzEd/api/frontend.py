@@ -210,6 +210,7 @@ class NodeResource(ModelResource):
         bundle = self.full_hydrate(bundle)
         bundle.obj.save()   # Ordering is important, so that set_attr has something to relate to
         if 'properties' in bundle.data:
+            logger.debug("Setting initial node properties: "+str(bundle.data['properties']))
             for key, value in bundle.data['properties'].iteritems():
                 bundle.obj.set_attr(key, value)
         return self.save(bundle)
@@ -238,6 +239,7 @@ class NodeResource(ModelResource):
         deserialized = self.deserialize(request, request.body,
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
+            logger.debug("Setting node properties: "+str(deserialized['properties']))
             for key, value in deserialized['properties'].iteritems():
                 obj.set_attr(key, value)
             obj.save()

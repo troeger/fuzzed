@@ -56,14 +56,18 @@ class Property(models.Model):
         except KeyError:
             # No information in the notations file , leave it as it is
             val_type = None
-        if val_type == 'text':
-            # JSONField is performing some conversion magic, so must tell
-            # it explicitely that even numerical strings remain strings
-            return str(self.value)
-        elif val_type == 'numeric':
-            return float(self.value)
-        else:
-            return self.value
+        try:
+            if val_type == 'text':
+                # JSONField is performing some conversion magic, so must tell
+                # it explicitely that even numerical strings remain strings
+                return str(self.value)
+            elif val_type == 'numeric':
+                return float(self.value)
+            else:
+                return self.value
+        except e:
+            logger.error("Conversion of property %s (with value %s) to type %s failed"%(self.key, self.value, val_type))
+            raise e
 
     def to_dict(self):
         """
