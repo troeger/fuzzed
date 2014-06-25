@@ -17,13 +17,13 @@ using std::string;
 
 namespace
 {
-	static const std::string UNDEVELOPED_ERROR	= "Cannot analyze trees with undeveloped events!";
-	static const std::string UNKNOWN_TYPE		= "Unknown Child Node Type";
+	static const std::string UNDEVELOPED_ERROR	= "The tree contains undeveloped events and cannot be analyzed.";
+	static const std::string UNKNOWN_TYPE		= "Unknown child node type.";
 }
 
 
 AlphaCutAnalysisTask::AlphaCutAnalysisTask(const TopEvent* topEvent, const double alpha, std::ofstream& logfile)
-	: m_tree(topEvent), m_alpha(alpha), m_logFile(logfile)
+: m_tree(topEvent), m_alpha(alpha), m_logFile(logfile), m_bDetectedUndeveloped(false)
 {}
 
 std::future<AlphaCutAnalysisResult> AlphaCutAnalysisTask::run()
@@ -94,8 +94,12 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 	else if (typeName == *UNDEVELOPEDEVENT)
 	{
 		m_logFile << "Found Undeveloped Event, ID: " << node.id() << std::endl;
-
-		throw FatalException(UNDEVELOPED_ERROR, 0, node.id());
+		if (m_bDetectedUndeveloped)
+			return NumericInterval(); // this error was already reported once
+		
+		m_bDetectedUndeveloped = true;
+		
+		throw FatalException(UNDEVELOPED_ERROR, 0);
 	}
 	else if (typeName == *INTERMEDIATEEVENT)
 	{
