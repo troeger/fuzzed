@@ -62,8 +62,10 @@ class Graph(models.Model):
         Returns:
          {Node} instance
         """
-        assert(self.kind in {'faulttree', 'fuzztree'})
-        return self.nodes.all().get(kind='topEvent')
+        if self.kind in {'faulttree', 'fuzztree'}:
+            return self.nodes.all().get(kind='topEvent')
+        else:
+            return None
 
     def to_json(self):
         """

@@ -90,7 +90,7 @@ class JobResource(common.JobResource):
             logger.error("Job already done, discarding uploaded results")
             return HttpResponse(status=202)     # This return code is a lie, but mitigates duplicate result submission
         else:
-            logger.debug("Storing result data for job %d"%job.pk)
+            logger.debug("Parsing and storing result data for job %d"%job.pk)
             try:
                 result = json.loads(request.body)
                 assert('exit_code' in result)
@@ -101,10 +101,14 @@ class JobResource(common.JobResource):
                 try:
                     job.parse_result(base64.b64decode(result['file_data']))
                 except Exception as e:
-                    # Do not blame the calling backend for parsing problems, it has done it's job
-                    logger.error("Could not parse result data retrieved for job %u"%job.pk)
-                    mail_managers("Exception on backend result parsing - " + settings.BACKEND_DAEMON, str(e))
-                    job.exit_code = -444  # Inform the frontend that this went wrong   
+                    if settings.DEBUG:
+                        logger.error(e)
+                        raise e
+                    else: 
+                        # Do not blame the calling backend for parsing problems, it has done it's job
+                        logger.error("Could not parse result data retrieved for job %u"%job.pk)
+                        mail_managers("Exception on backend result parsing - " + settings.BACKEND_DAEMON, str(e))
+                        job.exit_code = -444  # Inform the frontend that this went wrong   
         # This immediately triggers pulling clients to get the result data, so it MUST be the very last thing to do
 	    job.save() 
         return HttpResponse(status=202)

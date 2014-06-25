@@ -194,22 +194,29 @@ class Job(models.Model):
         if hasattr(xml_result_value, 'reliability') and xml_result_value.reliability is not None:
             reliability = float(xml_result_value.reliability)
             db_result.reliability = None if math.isnan(reliability) else reliability
-            logging.debug("Reliability: " + str(reliability))
 
         if hasattr(xml_result_value, 'mttf') and xml_result_value.mttf is not None:
             mttf = float(xml_result_value.mttf)
             db_result.mttf = None if math.isnan(mttf) else mttf
-            logging.debug("MTTF: " + str(mttf))
 
         if hasattr(xml_result_value, 'nSimulatedRounds') and xml_result_value.nSimulatedRounds is not None:
-            rounds = int(result.nSimulatedRounds)
+            rounds = int(xml_result_value.nSimulatedRounds)
             db_result.rounds = None if math.isnan(rounds) else rounds
-            logging.debug("Rounds: " + str(rounds))
 
         if hasattr(xml_result_value, 'nFailures') and xml_result_value.nFailures is not None:
-            failures = int(result.nFailures)
+            failures = int(xml_result_value.nFailures)
             db_result.failures = None if math.isnan(failures) else failures
-            logging.debug("Failures: " + str(failures))
+
+        if hasattr(xml_result_value, 'timestamp') and xml_result_value.timestamp is not None:
+            timestamp = int(xml_result_value.timestamp)
+            db_result.timestamp = None if math.isnan(timestamp) else timestamp
+        else:
+            # All analysis results not refering to a particular timestamp refer to the configured missionTime
+            top_node = db_result.graph.top_node()
+            if top_node:
+                timestamp = top_node.get_property('missionTime')
+                db_result.timestamp = None if math.isnan(timestamp) else timestamp
+
 
     def parse_result(self, data):
         """

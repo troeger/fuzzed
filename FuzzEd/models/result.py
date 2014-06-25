@@ -56,6 +56,7 @@ class Result(models.Model):
     peak          = models.FloatField(null=True)
     reliability   = models.FloatField(null=True)
     mttf          = models.FloatField(null=True)
+    timestamp     = models.IntegerField(null=True)
     rounds        = models.IntegerField(null=True)
     failures      = models.IntegerField(null=True)
     binary_value  = models.BinaryField(null=True)
@@ -96,7 +97,7 @@ class Result(models.Model):
         '''      
         if kind == self.ANALYSIS_RESULT:
             if graph_type == 'faulttree':
-                return (('minimum','Min'), ('peak','Peak'),('maximum','Max')) 
+                return (('timestamp', 'Mission Time'), ('peak','Top Event Probability')) 
             elif graph_type == 'fuzztree' :   
                 return  (('id','Config'),('minimum','Min'), ('peak','Peak'),
                      ('maximum','Max'),  ('configuration__costs','Costs'))            
@@ -116,9 +117,9 @@ class Result(models.Model):
         stored in this result object, plus data from the linked graph configuration.
       '''
       result = {}
-      for field in ['minimum', 'maximum', 'peak', 'points', 'reliability', 'mttf', 'rounds', 'failures']:
+      for field in ['minimum', 'maximum', 'peak', 'points', 'reliability', 'mttf', 'rounds', 'failures', 'timestamp']:
         value = getattr(self, field)
-        result[field] = value   # None values are needed, since datatables needs all columns filled
+        result[field] = value   # 'None' values are needed, since datatables needs all columns filled
       if self.configuration:
           result['choices'] = self.configuration.to_dict() 
           result['id'] = self.configuration.pk
