@@ -6,10 +6,10 @@ import time
 import os
 
 from FuzzEd.models import Graph, Job, Result
-from common import fixt_analysis, fixt_mincut, FuzzEdTestCase
+from common import fixt_analysis, fixt_mincut, FuzzEdLiveServerTestCase
 
 
-class BackendDaemonTestCase(FuzzEdTestCase):
+class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
     """
         Tests for backend functionality.
         This demands firing up the backend daemon in the setup phase.
@@ -49,16 +49,6 @@ class InternalTestCase(BackendDaemonTestCase):
             for result in job.results.exclude(kind__exact=Result.GRAPH_ISSUES):
                 print "Result"
                 print result
-
-    def test_numerical_property_storage(self):
-        for graphPk, graphResult in fixt_analysis['results'].iteritems():
-            graph = Graph.objects.get(pk=graphPk)
-            node = graph.top_node()
-            # 'name' has the type text in JSON according to notations.py,
-            # so it must be converted accordingly
-            for key, val in (('name','bar'),('name',1)):
-                node.set_attr(key, val)
-                self.assertEqual(node.get_attr(key), str(val))
 
 class AnalysisFixtureTestCase(BackendDaemonTestCase):
     """
@@ -126,10 +116,9 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
         # Ordering in datatables style
         titles = Result.titles(Result.ANALYSIS_RESULT, 'fuzztree')
         print "Titles: %s\n"%str(titles)
-        for index, col_desc in enumerate(titles):
+        for index, col_desc in enumerate(titles, start=1):      # Datatables starts at column 1
             field_name = col_desc[0]
             url = result_url+'?sEcho=doo&iSortingCols=1&sSortDir_0=asc&iSortCol_0='+str(index)
-            print url
             result = self.ajaxGet(url)
             data = json.loads(result.content)
             if field_name in data['aaData'][0]:
@@ -137,7 +126,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
                 for i in xrange(0,len(data['aaData']),2):
                     prec = data['aaData'][i][field_name]
                     succ = data['aaData'][i+1][field_name]
-                    assert( prec <= succ )
+                    assert(prec <= succ)
             else:
                 print field_name + " is not part of the result, sorting not checked"
 

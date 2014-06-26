@@ -3,10 +3,10 @@ import json
 from django.contrib.auth.models import User
 
 from FuzzEd.models import Node, Notification, Edge
-from common import fixt_simple, FuzzEdTestCase
+from common import fixt_simple, FuzzEdLiveServerTestCase
 
 
-class FrontendApiTestCase(FuzzEdTestCase):
+class FrontendApiTestCase(FuzzEdLiveServerTestCase):
     """
         Tests for the Frontend API called from JavaScript.
     """
@@ -177,7 +177,7 @@ class FrontendApiTestCase(FuzzEdTestCase):
 
     def testEdgePropertyChange(self):
         newprop = json.dumps({"properties": {"name": "bar"}})
-        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/edges/%u' % (fixt_simple['pkDFD'], fixt_simple['clientIdEdge']),
+        response = self.ajaxPatch(self.baseUrl + '/graphs/%u/edges/%u' % (fixt_simple['pkDFD'], fixt_simple['clientIdEdgeDfd']),
                                   newprop,
                                   "application/json")
         self.assertEqual(response.status_code, 202)
@@ -192,12 +192,13 @@ class FrontendApiTestCase(FuzzEdTestCase):
         initial_properties =  {"name": "foo"}
         newedge = json.dumps(
             {   'client_id': 4714,
-                'source': fixt_simple['clientIdAndGate'],
-                'target': fixt_simple['clientIdBasicEvent'],
+                'source': fixt_simple['clientIdProcess'],
+                'target': fixt_simple['clientIdStorage'],
                 'properties': initial_properties
             }
         )
-        response = self.ajaxPost(self.baseUrl + '/graphs/%u/edges/' % fixt_simple['pkFaultTree'],
+        # Only DFD edges support properties, so we use them here
+        response = self.ajaxPost(self.baseUrl + '/graphs/%u/edges/' % fixt_simple['pkDFD'],
                                  newedge,
                                  'application/json')
         self.assertEqual(response.status_code, 201)

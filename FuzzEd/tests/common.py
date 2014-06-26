@@ -33,10 +33,14 @@ fixt_simple = {
                 'graphs': {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'},
                 'pkProject': 1,
                 'pkFaultTree': 1,
-                'pkDFD': 1,  # TODO: This is a hack, since nobody checks the validity of node groups for the graph kind so far
+                'pkDFD': 7,  
                 'clientIdEdge': 4,
                 'clientIdAndGate': 1,
-                'clientIdBasicEvent': 2
+                'clientIdBasicEvent': 2,
+                'clientIdProcess': 1,
+                'clientIdStorage': 2,
+                'clientIdExternal': 3,
+                'clientIdEdgeDfd': 5,
               }
 
 fixt_mincut = {

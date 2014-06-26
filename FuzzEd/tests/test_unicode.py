@@ -7,9 +7,6 @@ from common import fixt_unicode
 class UnicodeTestCase(TestCase):
     fixtures = fixt_unicode['files']
 
-    def setUp(self):
-        self.setUpLogin()
-
     def testTikzSerialize(self):
         g = Graph.objects.get(pk=fixt_unicode['pkFaultTree'])
         assert (len(g.to_tikz()) > 0)

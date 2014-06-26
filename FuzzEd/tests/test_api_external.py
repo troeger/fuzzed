@@ -2,10 +2,10 @@ import json
 import os
 
 from FuzzEd.models import Graph
-from common import fixt_simple, FuzzEdTestCase
+from common import fixt_simple, FuzzEdLiveServerTestCase, FuzzEdTestCase
 
 
-class ExternalAPITestCase(FuzzEdTestCase):
+class ExternalAPITestCase(FuzzEdLiveServerTestCase):
     """
         Tests for the Tastypie API.
     """

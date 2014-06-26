@@ -9,7 +9,7 @@ from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.bundle import Bundle
 from tastypie.exceptions import ImmediateHttpResponse
-from tastypie.http import HttpApplicationError, HttpAccepted, HttpForbidden
+from tastypie.http import HttpApplicationError, HttpAccepted, HttpForbidden, HttpNotFound, HttpMultipleChoices
 from tastypie import fields
 from django.core.mail import mail_managers
 from tastypie.resources import ModelResource
@@ -408,9 +408,9 @@ class EdgeResource(ModelResource):
             basic_bundle = self.build_bundle(request=request)
             obj = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
-            return http.HttpNotFound()
+            return HttpNotFound()
         except MultipleObjectsReturned:
-            return http.HttpMultipleChoices("More than one resource is found at this URI.")
+            return HttpMultipleChoices("More than one resource is found at this URI.")
 
         # Deserialize incoming update payload JSON from request
         deserialized = self.deserialize(request, request.body,

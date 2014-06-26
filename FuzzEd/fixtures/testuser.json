@@ -6,5 +6,14 @@
             "username": "testadmin", 
             "password": "pbkdf2_sha256$10000$JNt1EZn2g72p$vX3UFh7g4mPa313pWW4lf4YxkUhL534V8/kxFaQ1XvM="
         }
-    }
+    },
+	{
+	    "pk": 1, 
+	    "model": "tastypie.apikey", 
+	    "fields": {
+	        "user": 1, 
+	        "key": "f1cc367bc09fc95720e6c8a4225ae2b912fff91b", 
+	        "created": "2014-03-17T08:26:26.242"
+	    }
+    }    
 ]
