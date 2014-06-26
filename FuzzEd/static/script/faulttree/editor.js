@@ -542,12 +542,12 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                             mouseOver : function () {
                                 var config_id = this.name
                                 var row = self._grid.fnFindCellRowNodes(config_id, 1 );
-                                jQuery(row).addClass("active");
+                                jQuery(row).addClass('tr_hover');
                             },
                             mouseOut  : function () {
                                 var config_id = this.name
                                 var row = self._grid.fnFindCellRowNodes(config_id, 1 );
-                                jQuery(row).removeClass("active");
+                                jQuery(row).removeClass('tr_hover');
                             },
                         }
                     }
