@@ -8,6 +8,7 @@ logger = logging.getLogger('FuzzEd')
 import xml_fuzztree
 import xml_faulttree
 from graph import Graph
+from properties import Property
 
 import json, notations, sys, datetime, time
 
@@ -600,12 +601,22 @@ class Node(models.Model):
             {attr} value - The new value that should be stored.
         """
         assert(self.pk)         # Catch attribute setting before object saving cases
+        value = Property.sanitized_value(self, key, value)
         if hasattr(self, key):
             setattr(self, key, value)
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'node': self})
             prop.value = value
             prop.save()
+
+    def set_attrs(self, d):
+        '''
+            Set node attributes according to the provided dictionary.
+
+            TODO: Replace by true bulk insert implementation.
+        '''
+        for key, value in d.iteritems():
+            self.set_attr(key, value)
 
     def same_as(self, node):
         ''' 

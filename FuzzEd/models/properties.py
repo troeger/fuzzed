@@ -38,33 +38,34 @@ class Property(models.Model):
     def __unicode__(self):
         return '%s%s: %s' % ('[DELETED] ' if self.deleted else '', self.key, self.value)
 
-    @property
-    def sanitized_value(self):
+    @classmethod
+    def value_type(cls, key, obj):
         '''
-            Convert the property value into a datatype that is accepted
-            according to the notations file.
+            Return the expected value data type of the property 'key' in
+            an node / edge / node group object. Data types are as used
+            in the notations files.
         '''
-        try:
-            if self.node:
-                val_type = notations.by_kind[self.node.graph.kind]['nodes'][self.node.kind]['properties'][self.key]['kind']
-            elif self.edge:                
-                val_type = notations.by_kind[self.edge.graph.kind]['edges']['properties'][self.key]['kind']
-            elif self.node_group:
-                val_type = notations.by_kind[self.node_group.graph.kind]['nodeGroups']['properties'][self.key]['kind']
-            else:
-                val_type = None
-        except KeyError:
-            # No information in the notations file , leave it as it is
-            val_type = None
-        # No exception handling here, in order to trigger a 500 if we get malicious value input from the outside
+        if type(obj) == Node:
+            return notations.by_kind[obj.graph.kind]['nodes'][obj.kind]['properties'][key]['kind']
+        elif type(obj) == Edge:                
+            return notations.by_kind[obj.graph.kind]['edges']['properties'][key]['kind']
+        elif type(obj) == NodeGroup:
+            return notations.by_kind[obj.graph.kind]['nodeGroups']['properties'][key]['kind']
+
+    @classmethod
+    def sanitized_value(cls, obj, key, value):
+        '''
+            Return the sanitized property value for this kind of object and property.
+        '''
+        val_type = Property.value_type(key, obj)
         if val_type == 'text':
             # JSONField is performing some conversion magic, so must tell
             # it explicitely that even numerical strings remain strings
-            return str(self.value)
+            return str(value)
         elif val_type == 'numeric':
-            return float(self.value)
+            return float(value)
         else:
-            return self.value
+            return value
 
     def to_dict(self):
         """

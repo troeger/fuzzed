@@ -208,11 +208,10 @@ class NodeResource(ModelResource):
         bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
-        bundle.obj.save()   # Ordering is important, so that set_attr has something to relate to
+        bundle.obj.save()   # Save node, so that set_attr has something to relate to
         if 'properties' in bundle.data:
             logger.debug("Setting initial node properties: "+str(bundle.data['properties']))
-            for key, value in bundle.data['properties'].iteritems():
-                bundle.obj.set_attr(key, value)
+            bundle.obj.set_attrs(bundle.data['properties'])
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -240,9 +239,7 @@ class NodeResource(ModelResource):
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
             logger.debug("Setting node properties: "+str(deserialized['properties']))
-            for key, value in deserialized['properties'].iteritems():
-                obj.set_attr(key, value)
-            obj.save()
+            obj.set_attrs(deserialized['properties'])
         # return the updated node object
         return HttpResponse(obj.to_json(), 'application/json', status=202)
 
@@ -294,9 +291,8 @@ class NodeGroupResource(ModelResource):
             except ObjectDoesNotExist:
                 pass
         if 'properties' in bundle.data:
-            # set initial node group properties
-            for key, value in bundle.data['properties'].iteritems():
-                bundle.obj.set_attr(key, value)
+            logger.debug("Setting initial node group properties: "+str(bundle.data['properties']))
+            bundle.obj.set_attrs(bundle.data['properties'])
         bundle.obj.save()
         return self.save(bundle)
 
@@ -325,9 +321,7 @@ class NodeGroupResource(ModelResource):
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
             logger.debug("Updating properties for node group")
-            for key, value in deserialized['properties'].iteritems():
-                obj.set_attr(key, value)
-            obj.save()
+            obj.set_attrs(deserialized['properties'])
         if 'nodeIds' in deserialized:
             logger.debug("Updating nodes for node group")
             obj.nodes.clear()    # nodes_set is magically created by Django
@@ -394,9 +388,8 @@ class EdgeResource(ModelResource):
         bundle = self.full_hydrate(bundle)
         bundle.obj.save()       # to allow property changes
         if 'properties' in bundle.data:
-            # set initial edge properties
-            for key, value in bundle.data['properties'].iteritems():
-                bundle.obj.set_attr(key, value)
+            logger.debug("Setting initial edge properties: "+str(bundle.data['properties']))
+            bundle.obj.set_attr(bundle.data['properties'])
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -423,10 +416,8 @@ class EdgeResource(ModelResource):
         deserialized = self.deserialize(request, request.body,
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
-            for key, value in deserialized['properties'].iteritems():
-                obj.set_attr(key, value)
-            obj.save()
-        # return the updated node object
+            obj.set_attrs(bundle.data['properties'])
+        # return the updated edge object
         return HttpResponse(obj.to_json(), 'application/json', status=202)
 
 class ProjectResource(common.ProjectResource):

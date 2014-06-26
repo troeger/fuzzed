@@ -56,9 +56,21 @@ class NodeGroup(models.Model):
             {string} key - The name of the attribute.
             {attr} value - The new value that should be stored.
         """
+        assert(self.pk)
+        value = Property.sanitized_value(self, key, value)        
         if hasattr(self, key):
             setattr(self, key, value)
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'node_group': self})
             prop.value = value
             prop.save()
+
+    def set_attrs(self, d):
+        '''
+            Set groups attributes according to the provided dictionary.
+
+            TODO: Replace by true bulk insert implementation.
+        '''
+        for key, value in d.iteritems():
+            self.set_attr(key, value)
+

@@ -100,17 +100,28 @@ class Edge(models.Model):
         """
         Method: set_attr
 
-        Use this method to set a node's attribute. It looks in the node object and its related properties for an
+        Use this method to set a edge's attribute. It looks in the edge object and its related properties for an
         attribute with the given name and changes it. If non exist, a new property is added saving this attribute.
 
         Parameters:
             {string} key - The name of the attribute.
             {attr} value - The new value that should be stored.
         """
+        assert(self.pk)
+        value = Property.sanitized_value(self, key, value)        
         if hasattr(self, key):
             setattr(self, key, value)
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'edge': self})
             prop.value = value
             prop.save()
+
+    def set_attrs(self, d):
+        '''
+            Set edge attributes according to the provided dictionary.
+
+            TODO: Replace by true bulk insert implementation.
+        '''
+        for key, value in d.iteritems():
+            self.set_attr(key, value)
 
