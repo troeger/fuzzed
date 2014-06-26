@@ -72,12 +72,14 @@ class Property(models.Model):
             Return the sanitized property value for this kind of object and property.
         '''
         val_type = Property.value_type(key, obj)
-        if val_type == 'text':
+        if val_type in ['text','compound']:
             # JSONField is performing some conversion magic, so must tell
             # it explicitely that even numerical strings remain strings
             return str(value)
         elif val_type == 'numeric':
-            return float(value)
+            return int(value)
+        elif val_type == 'bool':
+            return value.lower() == 'true'
         else:
             return value
 
@@ -109,6 +111,10 @@ class Property(models.Model):
         '''
         if self.key != prop.key:
             return False
-        return (str(self.value) == str(prop.value))
+        same_val = (str(self.value) == str(prop.value))
+        if not same_val:
+            return False
+        return True
+
 
 

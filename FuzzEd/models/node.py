@@ -127,7 +127,7 @@ class Node(models.Model):
                 return self.kind
 
     def get_properties(self):
-        return {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
+        return {prop.key: prop.value for prop in self.properties.filter(deleted=False)}
 
     def to_dict(self):
         """
@@ -604,8 +604,10 @@ class Node(models.Model):
         from FuzzEd.models import Property
         assert(self.pk)         # Catch attribute setting before object saving cases
         value = Property.sanitized_value(self, key, value)
+        # logger.debug("Setting node attribute %s to %s"%(key, value))
         if hasattr(self, key):
             setattr(self, key, value)
+            self.save()
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'node': self})
             prop.value = value
@@ -625,6 +627,10 @@ class Node(models.Model):
             Checks if this node is equal to the given one in terms of properties. 
             This is a very expensive operation that is only intended for testing purposes.
         '''
+        #logger.debug(self.to_dict())
+        #logger.debug(node.to_dict())
+        if self.kind != node.kind or self.x != node.x or self.y != node.y:
+            return False
         for my_property in self.properties.all().filter(deleted=False):
             found_match = False
             for their_property in node.properties.all().filter(deleted=False):
@@ -632,7 +638,6 @@ class Node(models.Model):
                     found_match = True
                     break
             if not found_match:
-                logger.debug("Could not find match for property %s in %s"%(my_property.value, str(self)))
                 return False
         return True
 

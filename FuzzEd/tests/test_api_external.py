@@ -79,6 +79,7 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
     def testGraphmlImport(self):
         for id, kind in fixt_simple['graphs'].iteritems():
             # First export GraphML
+            print "Testing graph %u (%s)"%(id, kind)
             response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % id)
             self.assertEqual(response.status_code, 200)
             graphml = response.content
@@ -87,7 +88,7 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
                                            'application/xml')
             self.assertEqual(response.status_code, 201)
             # Check if the claimed graph really was created
-            newid = int(response['Location'][-2])
+            newid = int(response['Location'].split('/')[-2])
             original = Graph.objects.get(pk=id)
             copy = Graph.objects.get(pk=newid)
             self.assertTrue(original.same_as(copy))

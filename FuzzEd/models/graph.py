@@ -270,7 +270,7 @@ class Graph(models.Model):
                     node.save()
                 else:
                     node.set_attr(name, value)
-            logger.debug("New node: "+str(node.to_dict()))
+            logger.debug("New node from GraphML import: "+str(node.to_dict()))
         # Graph properties belong to the TOP node
         # GraphML files without graph <data> properties may refer to a graph type that has no
         # TOP node concept
@@ -279,6 +279,7 @@ class Graph(models.Model):
             if name != 'kind':          # already handled above
                 if name not in notations.graphml_graph_data[graph_kind]:
                     raise Exception("Invalid graph data element '%s'"%name)
+                logger.debug("Setting attribute %s to %s on top node"%(name, data.text))
                 self.top_node().set_attr(name, data.text)   # Fetch TOP node here, not existent in RBD's
 
         # go through all GraphML edges and create them as model edges for this graph
@@ -343,11 +344,13 @@ class Graph(models.Model):
         for my_node in self.nodes.all().filter(deleted=False):
             found_match = False
             for their_node in graph.nodes.all().filter(deleted=False):
+                #logger.debug("Checking our %s (%u) against %s (%u)"%(str(my_node), my_node.pk, str(their_node), their_node.pk))
                 if my_node.same_as(their_node):
+                    #logger.debug("Match")
                     found_match = True
                     break
             if not found_match:
-                logger.debug("Couldn't find a match for node %s"%(str(my_node)))
+                #logger.debug("Couldn't find a match for node %s"%(str(my_node)))
                 return False
 
         return True

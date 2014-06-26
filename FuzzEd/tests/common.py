@@ -30,7 +30,7 @@ fixt_analysis = {
 
 fixt_simple = {
                 'files' : ['simple.json', 'testuser.json'], 
-                'graphs': {1: 'faulttree', 2: 'fuzztree', 3: 'rbd'},
+                'graphs': {1: 'faulttree', 2: 'fuzztree', 3: 'rbd', 7: 'dfd'},
                 'pkProject': 1,
                 'pkFaultTree': 1,
                 'pkDFD': 7,  

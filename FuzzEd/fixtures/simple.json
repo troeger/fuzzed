@@ -54,48 +54,6 @@
         }
     }, 
     {
-        "pk": 4, 
-        "model": "FuzzEd.graph", 
-        "fields": {
-            "read_only": false, 
-            "kind": "faulttree", 
-            "name": "Reliability Diagram", 
-            "created": "2013-11-03T22:53:11.563", 
-            "deleted": true, 
-            "modified": "2014-03-17T18:18:53.637", 
-            "project": 1, 
-            "owner": 1
-        }
-    }, 
-    {
-        "pk": 5, 
-        "model": "FuzzEd.graph", 
-        "fields": {
-            "read_only": false, 
-            "kind": "faulttree", 
-            "name": "Reliability Diagram", 
-            "created": "2013-11-03T23:02:41.621", 
-            "deleted": true, 
-            "modified": "2014-03-17T18:18:53.642", 
-            "project": 1, 
-            "owner": 1
-        }
-    }, 
-    {
-        "pk": 6, 
-        "model": "FuzzEd.graph", 
-        "fields": {
-            "read_only": false, 
-            "kind": "faulttree", 
-            "name": "Reliability Diagram", 
-            "created": "2013-11-03T23:03:02.242", 
-            "deleted": true, 
-            "modified": "2014-03-19T22:27:42.886", 
-            "project": 1, 
-            "owner": 1
-        }
-    }, 
-    {
         "pk": 7, 
         "model": "FuzzEd.graph", 
         "fields": {
@@ -179,18 +137,6 @@
             "client_id": 2, 
             "y": 5, 
             "x": 9
-        }
-    }, 
-    {
-        "pk": 7, 
-        "model": "FuzzEd.node", 
-        "fields": {
-            "kind": "basicEvent", 
-            "deleted": true, 
-            "graph": 1, 
-            "client_id": 3, 
-            "y": 5, 
-            "x": 11
         }
     }, 
     {
@@ -368,17 +314,6 @@
             "graph": 1, 
             "target": 6, 
             "client_id": 5, 
-            "source": 5
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "FuzzEd.edge", 
-        "fields": {
-            "deleted": true, 
-            "graph": 1, 
-            "target": 7, 
-            "client_id": 6, 
             "source": 5
         }
     }, 
