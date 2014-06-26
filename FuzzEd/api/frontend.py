@@ -528,7 +528,7 @@ class ResultResource(ModelResource):
         sort_fields = []
         for i in range(sort_cols):
             # Consider strange datatables way of expressing sorting criteria
-            sort_col = int(request.GET['iSortCol_'+str(i)])
+            sort_col = int(request.GET['iSortCol_'+str(i)]) - 1 # datatables starts counting columns with 1
             sort_dir = request.GET['sSortDir_'+str(i)] 
             db_field_name=job.result_titles[sort_col][0] 
             logger.debug("Sorting result set for "+db_field_name)
