@@ -1,14 +1,15 @@
 import logging
+
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
 logger = logging.getLogger('FuzzEd')
 
 import xml_fuzztree
 import xml_faulttree
 from graph import Graph
-from properties import Property
 
 import json, notations, sys, datetime, time
 
@@ -126,7 +127,7 @@ class Node(models.Model):
                 return self.kind
 
     def get_properties(self):
-        return {prop.key: {'value': prop.sanitized_value} for prop in self.properties.filter(deleted=False)}
+        return {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
 
     def to_dict(self):
         """
@@ -585,7 +586,7 @@ class Node(models.Model):
         else:
             try:
                 prop = self.properties.get(key=key)
-                return prop.sanitized_value
+                return prop.value
             except Exception:
                 raise ValueError()
 
@@ -600,6 +601,7 @@ class Node(models.Model):
             {string} key - The name of the attribute.
             {attr} value - The new value that should be stored.
         """
+        from FuzzEd.models import Property
         assert(self.pk)         # Catch attribute setting before object saving cases
         value = Property.sanitized_value(self, key, value)
         if hasattr(self, key):

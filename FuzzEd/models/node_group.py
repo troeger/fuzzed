@@ -57,7 +57,8 @@ class NodeGroup(models.Model):
             {attr} value - The new value that should be stored.
         """
         assert(self.pk)
-        value = Property.sanitized_value(self, key, value)        
+        from FuzzEd.models import Property
+        value = Property.sanitized_value(self, key, value)
         if hasattr(self, key):
             setattr(self, key, value)
         else:

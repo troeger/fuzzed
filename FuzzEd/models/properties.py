@@ -1,3 +1,5 @@
+import logging
+
 from django.db import models
 
 from FuzzEd.lib.jsonfield import JSONField
@@ -5,7 +7,6 @@ from node import Node
 from edge import Edge
 from node_group import NodeGroup
 
-import logging, json
 logger = logging.getLogger('FuzzEd')
 
 import notations
@@ -44,13 +45,21 @@ class Property(models.Model):
             Return the expected value data type of the property 'key' in
             an node / edge / node group object. Data types are as used
             in the notations files.
+
+            There is no fallback here, so this function will crash if some utilized
+            property name is not covered in the notations file. This is good at test suite runs,
+            and leads to a 500 in production if somebody tries to inject arbitrary property keys
+            or misformated property values through the API.
         '''
-        if type(obj) == Node:
-            return notations.by_kind[obj.graph.kind]['nodes'][obj.kind]['properties'][key]['kind']
-        elif type(obj) == Edge:                
-            return notations.by_kind[obj.graph.kind]['edges']['properties'][key]['kind']
-        elif type(obj) == NodeGroup:
-            return notations.by_kind[obj.graph.kind]['nodeGroups']['properties'][key]['kind']
+        try:
+            if type(obj) == Node:
+                return notations.by_kind[obj.graph.kind]['nodes'][obj.kind]['properties'][key]['kind']
+            elif type(obj) == Edge:
+                return notations.by_kind[obj.graph.kind]['edges']['properties'][key]['kind']
+            elif type(obj) == NodeGroup:
+                return notations.by_kind[obj.graph.kind]['nodeGroups']['properties'][key]['kind']
+        except:
+            raise Exception("Invalid property key '%s' being used for %s"%(key, str(obj)))
 
     @classmethod
     def sanitized_value(cls, obj, key, value):

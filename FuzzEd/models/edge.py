@@ -34,7 +34,7 @@ class Edge(models.Model):
         return  unicode('%s%s -> %s' % (prefix, str(self.source), str(self.target)))
 
     def get_properties(self):
-        return {prop.key: {'value': prop.sanitized_value} for prop in self.properties.filter(deleted=False)}
+        return {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
 
     def to_dict(self):
         """
@@ -108,7 +108,8 @@ class Edge(models.Model):
             {attr} value - The new value that should be stored.
         """
         assert(self.pk)
-        value = Property.sanitized_value(self, key, value)        
+        from FuzzEd.models import Property
+        value = Property.sanitized_value(self, key, value)
         if hasattr(self, key):
             setattr(self, key, value)
         else:

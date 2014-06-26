@@ -5,15 +5,15 @@ import json
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.mail import mail_managers
 from django.http import HttpResponse
-from tastypie.http import HttpBadRequest
+from tastypie.http import HttpBadRequest, HttpNotFound, HttpMultipleChoices
 from tastypie import fields
 from django.conf.urls import url
 from django.utils import http
 
-
 import common
 from FuzzEd.models import Job
 from FuzzEd import settings
+
 
 logger = logging.getLogger('FuzzEd')
 
@@ -51,9 +51,9 @@ class JobResource(common.JobResource):
         try:
             job = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
-            return http.HttpNotFound()
+            return HttpNotFound()
         except MultipleObjectsReturned:
-            return http.HttpMultipleChoices("More than one resource is found at this URI.")
+            return HttpMultipleChoices("More than one resource is found at this URI.")
 
         logger.debug("Delivering data for job %d"%job.pk)
         response = HttpResponse()
