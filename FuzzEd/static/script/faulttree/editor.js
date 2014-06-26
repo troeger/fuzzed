@@ -1,4 +1,4 @@
-define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'highcharts', 'jquery-ui', 'slickgrid'],
+define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'datatables-api', 'highcharts', 'jquery-ui'],
 function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTables) {
     /**
      * Package: Faulttree
@@ -489,6 +489,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
 
             yTick = yTick || 5;
             var series = [];
+            
+            var self = this;
 
             _.each(data, function(cutset, name) {
                 series.push({
@@ -536,7 +538,18 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                         marker: {
                             radius: 1
                         },
-                        events: {}
+                        events: {
+                            mouseOver : function () {
+                                var config_id = this.name
+                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                jQuery(row).addClass('tr_hover');
+                            },
+                            mouseOut  : function () {
+                                var config_id = this.name
+                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                jQuery(row).removeClass('tr_hover');
+                            },
+                        }
                     }
                 },
 
