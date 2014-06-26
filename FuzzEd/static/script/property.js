@@ -109,7 +109,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         toDict: function() {
             var obj = {};
-            obj[this.name] = { 'value': this.value };
+            // obj[this.name] = { 'value': this.value };
+            obj[this.name] = this.value;
             return obj;
         },
 
@@ -287,7 +288,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         toDict: function() {
             var obj = {};
-            obj[this.name] = { 'value': [this.value, this.parts[this.value].value] };
+            // obj[this.name] = { 'value': [this.value, this.parts[this.value].value] };
+            obj[this.name] = [this.value, this.parts[this.value].value];
 
             return obj;
         },
