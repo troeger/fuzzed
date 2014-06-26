@@ -51,6 +51,11 @@ class Property(models.Model):
             and leads to a 500 in production if somebody tries to inject arbitrary property keys
             or misformated property values through the API.
         '''
+        # Check for property keys that are not part of the notations file
+        # TODO: Make this an issue for the JS guys, so that the notations
+        #       file really has all possible properties defined
+        if key in ['x','y','key']:
+            return 'numeric'        
         try:
             if type(obj) == Node:
                 return notations.by_kind[obj.graph.kind]['nodes'][obj.kind]['properties'][key]['kind']

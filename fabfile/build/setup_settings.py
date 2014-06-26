@@ -98,12 +98,12 @@ LOGGING = {
         'django.request': {
             'handlers':  ['%(logger_requests)s'],
             'level':     'ERROR',
-            'propagate': True,
+            'propagate': False,
         },
         'FuzzEd': {
             'handlers':  ['%(logger_fuzzed)s'],
             'level':     'DEBUG',
-            'propagate': True,
+            'propagate': False,
         }
     }
 }

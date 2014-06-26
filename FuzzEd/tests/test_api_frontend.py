@@ -57,7 +57,7 @@ class FrontendApiTestCase(FuzzEdTestCase):
         assert ('graphs' in content)
 
     def testCreateNode(self):
-        initial_properties = {"key": "foo", "value": "bar"}
+        initial_properties = {"name": "foo"}
         newnode = json.dumps({'y': 3,
                               'x': 7,
                               'kind': 'basicEvent',
@@ -74,7 +74,7 @@ class FrontendApiTestCase(FuzzEdTestCase):
 
     def testCreateNodeGroup(self):
         nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
-        initial_properties =  {"key": "foo", "value": "bar"}
+        initial_properties =  {"name": "foo"}
         newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes, "properties": initial_properties})
         response = self.ajaxPost(
                     self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
@@ -126,7 +126,7 @@ class FrontendApiTestCase(FuzzEdTestCase):
         self.assertEqual(response.status_code, 202)
 
     def testNodePropertyChange(self):
-        newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
+        newprop = json.dumps({"properties": {"name": "bar"}})
         response = self.ajaxPatch(self.baseUrl + '/graphs/%u/nodes/%u' % (fixt_simple['pkFaultTree'], fixt_simple['clientIdBasicEvent']),
                                   newprop,
                                   "application/json")
@@ -144,7 +144,7 @@ class FrontendApiTestCase(FuzzEdTestCase):
         self.assertEqual(response.status_code, 201)
         newgroup = response['Location']
         # Try changing
-        newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
+        newprop = json.dumps({"properties": {"name": "bar"}})
         response = self.ajaxPatch(newgroup,
                                   newprop,
                                   "application/json")
@@ -176,7 +176,7 @@ class FrontendApiTestCase(FuzzEdTestCase):
             self.assertItemsEqual(group['nodeIds'], nodes2)
 
     def testEdgePropertyChange(self):
-        newprop = json.dumps({"properties": {"key": "foo", "value": "bar"}})
+        newprop = json.dumps({"properties": {"name": "bar"}})
         response = self.ajaxPatch(self.baseUrl + '/graphs/%u/edges/%u' % (fixt_simple['pkDFD'], fixt_simple['clientIdEdge']),
                                   newprop,
                                   "application/json")
@@ -189,7 +189,7 @@ class FrontendApiTestCase(FuzzEdTestCase):
         self.assertEqual(response.status_code, 204)
 
     def testCreateEdge(self):
-        initial_properties =  {"key": "foo", "value": "bar"}
+        initial_properties =  {"name": "foo"}
         newedge = json.dumps(
             {   'client_id': 4714,
                 'source': fixt_simple['clientIdAndGate'],

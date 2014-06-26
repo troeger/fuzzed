@@ -389,7 +389,7 @@ class EdgeResource(ModelResource):
         bundle.obj.save()       # to allow property changes
         if 'properties' in bundle.data:
             logger.debug("Setting initial edge properties: "+str(bundle.data['properties']))
-            bundle.obj.set_attr(bundle.data['properties'])
+            bundle.obj.set_attrs(bundle.data['properties'])
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -416,7 +416,7 @@ class EdgeResource(ModelResource):
         deserialized = self.deserialize(request, request.body,
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
-            obj.set_attrs(bundle.data['properties'])
+            obj.set_attrs(deserialized['properties'])
         # return the updated edge object
         return HttpResponse(obj.to_json(), 'application/json', status=202)
 
