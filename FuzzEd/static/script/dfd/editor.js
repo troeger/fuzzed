@@ -1,18 +1,18 @@
 define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 'dfd/node_group'],
     function(Editor, Factory, DfdGraph, DfdConfig) {
     /**
-     * Package: DFD
+     *  Package: DFD
      */
 
     /**
-     * Class: DFDEditor
-     *      DFD-specific <Base::Editor> class.
+     *  Class: DfdEditor
+     *    DFD-specific <Base::Editor> class.
      *
      *  Extends: <Base::Editor>
      */
     return Editor.extend({
         /**
-         * Group: Accessors
+         *  Group: Accessors
          */
 
         getFactory: function() {
@@ -48,10 +48,10 @@ define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 
          */
         _setupJsPlumb: function() {
             this._super();
-            jsPlumb.connectorClass += ' outlined';
-
+            jsPlumb.connectorClass += " outlined";
             return this;
         },
+
 
         _setupMenuActions: function() {
             this._super();
@@ -66,7 +66,7 @@ define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 
 
             // set the shortcut hints from 'Ctrl+' to '⌘' when on Mac
             if (navigator.platform == 'MacIntel' || navigator.platform == 'MacPPC') {
-                jQuery('#' + this.config.IDs.ACTION_GROUP   + ' span').text('⌘G');
+                jQuery('#' + this.config.IDs.ACTION_GROUP + ' span').text('⌘G');
                 jQuery('#' + this.config.IDs.ACTION_UNGROUP + ' span').text('⌘U');
             }
 
