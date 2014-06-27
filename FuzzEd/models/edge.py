@@ -1,5 +1,7 @@
 import json
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.db import models
 
 from node import Node
@@ -127,4 +129,12 @@ class Edge(models.Model):
         '''
         for key, value in d.iteritems():
             self.set_attr(key, value)
+
+@receiver(post_save, sender=Edge)
+def graph_modify(sender, instance, **kwargs):
+    instance.graph.modified = datetime.datetime.now()
+    instance.graph.save()
+    # updating project modification date
+    instance.graph.project.modified = instance.graph.modified
+    instance.graph.project.save()
 

@@ -622,6 +622,7 @@ class Node(models.Model):
         '''
         for key, value in d.iteritems():
             self.set_attr(key, value)
+        post_save.send(sender=self.__class__, instance=self)
 
     def same_as(self, node):
         ''' 

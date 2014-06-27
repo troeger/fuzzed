@@ -39,6 +39,19 @@ class Property(models.Model):
     def __unicode__(self):
         return '%s%s: %s' % ('[DELETED] ' if self.deleted else '', self.key, self.value)
 
+    @property
+    def graph(self):
+        '''
+            Return the graph this property (indirectly) belongs to.
+        '''
+        if self.node:
+            return self.node.graph
+        elif self.edge:
+            return self.edge.graph
+        elif self.node_group:
+            return self.node_group.graph
+        assert(False)
+
     @classmethod
     def value_type(cls, key, obj):
         '''
@@ -94,6 +107,5 @@ class Property(models.Model):
         if not same_val:
             return False
         return True
-
 
 
