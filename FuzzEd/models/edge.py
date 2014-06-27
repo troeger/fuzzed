@@ -110,6 +110,8 @@ class Edge(models.Model):
         Parameters:
             {string} key - The name of the attribute.
             {attr} value - The new value that should be stored.
+
+        TODO: Deprecate this method, set_attrs() should only be used to have an efficient modification signal handling.
         """
         assert(self.pk)
         from FuzzEd.models import Property
@@ -129,6 +131,7 @@ class Edge(models.Model):
         '''
         for key, value in d.iteritems():
             self.set_attr(key, value)
+        post_save.send(sender=self.__class__, instance=self)
 
 @receiver(post_save, sender=Edge)
 def graph_modify(sender, instance, **kwargs):

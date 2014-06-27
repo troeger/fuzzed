@@ -601,6 +601,8 @@ class Node(models.Model):
         Parameters:
             {string} key - The name of the attribute.
             {attr} value - The new value that should be stored.
+
+        TODO: Deprecate this method, set_attrs() should only be used to have an efficient modification signal handling.
         """
         from FuzzEd.models import Property
         assert(self.pk)         # Catch attribute setting before object saving cases
