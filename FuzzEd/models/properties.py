@@ -79,7 +79,8 @@ class Property(models.Model):
         elif val_type == 'numeric':
             return int(value)
         elif val_type == 'bool':
-            return value.lower() == 'true'
+            # Value may be string or a real value
+            return str(value).lower() == 'true'
         else:
             return value
 
