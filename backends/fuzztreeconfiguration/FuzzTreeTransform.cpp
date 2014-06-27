@@ -13,6 +13,7 @@
 #include <boost/range/counting_range.hpp>
 
 #include <functional>
+#include <unordered_set>
 #include "util.h"
 
 using xercesc::DOMNode;
@@ -89,13 +90,18 @@ bool FuzzTreeTransform::isOptional(const fuzztree::Node& node)
 {
 	const type_info& typeName = typeid(node);
 	
-	if (typeName != *fuzztreeType::BASICEVENT &&
-		typeName != *fuzztreeType::BASICEVENTSET &&
-		typeName != *fuzztreeType::INTERMEDIATEEVENT &&
-		typeName != *fuzztreeType::INTERMEDIATEEVENTSET &&
-		typeName != *fuzztreeType::HOUSEEVENT &&
-		typeName != *fuzztreeType::UNDEVELOPEDEVENT) 
-		return false;
+	// The following types can be optional:
+	static const std::unordered_set<const type_info*> optionalTypes
+	{
+		fuzztreeType::BASICEVENT ,
+		fuzztreeType::BASICEVENTSET,
+		fuzztreeType::INTERMEDIATEEVENT,
+		fuzztreeType::INTERMEDIATEEVENTSET,
+		fuzztreeType::HOUSEEVENT,
+		fuzztreeType::UNDEVELOPEDEVENT
+	};
+
+	if (optionalTypes.find(&typeName) == optionalTypes.end()) return false;
 	
 	const fuzztree::InclusionVariationPoint* inclusionNode =
 		static_cast<const fuzztree::InclusionVariationPoint*>(&node);
@@ -302,7 +308,7 @@ fuzztree::FuzzTree FuzzTreeTransform::generateVariationFreeFuzzTree(const FuzzTr
 	newTopEvent.name(topEvent.name());
 
 	if (generateVariationFreeFuzzTreeRecursive(&topEvent, &newTopEvent, configuration) == OK)
-		return fuzztree::FuzzTree(generateUniqueId(topEvent.id()), newTopEvent);
+		return fuzztree::FuzzTree(/*generateUniqueId(topEvent.id())*/m_fuzzTree->id(), newTopEvent);
 	else
 	{
 		// m_logFile << "FaultTree Generation failed." << endl;

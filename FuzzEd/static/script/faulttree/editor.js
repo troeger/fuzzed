@@ -1,6 +1,5 @@
-define(['editor', 'factory', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'faulttree/node_group',
-        'highcharts', 'jquery-ui', 'slickgrid'],
-function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
+define(['editor', 'factory', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'datatables-api', 'faulttree/node_group', 'highcharts', 'jquery-ui'],
+function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTables) {
     /**
      * Package: Faulttree
      */
@@ -490,6 +489,8 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
 
             yTick = yTick || 5;
             var series = [];
+            
+            var self = this;
 
             _.each(data, function(cutset, name) {
                 series.push({
@@ -537,7 +538,18 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                         marker: {
                             radius: 1
                         },
-                        events: {}
+                        events: {
+                            mouseOver : function () {
+                                var config_id = this.name
+                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                jQuery(row).addClass('tr_hover');
+                            },
+                            mouseOut  : function () {
+                                var config_id = this.name
+                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                jQuery(row).removeClass('tr_hover');
+                            },
+                        }
                     }
                 },
 
@@ -859,7 +871,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
         _displayJobError: function(xhr) {
             Alerts.showErrorAlert(
                 'An error occurred!', xhr.responseText ||
-                'Are you still connected to the internet? If so, please let us know, we made a mistake here!');
+                'We were trying to trigger a computational job, but this crashed on our side. A retry may help. The developers are already informed, sorry for the inconvinience.');
             this.hide();
         }
     });
@@ -893,7 +905,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
          *      Override of the abstract base class method.
          */
         _menuHeader: function() { 
-            return 'Top Event Probability (analytical)';
+            return 'Analysis Results';
         }
     });
 

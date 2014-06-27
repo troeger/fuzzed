@@ -56,6 +56,7 @@ class Result(models.Model):
     peak          = models.FloatField(null=True)
     reliability   = models.FloatField(null=True)
     mttf          = models.FloatField(null=True)
+    timestamp     = models.IntegerField(null=True)
     rounds        = models.IntegerField(null=True)
     failures      = models.IntegerField(null=True)
     binary_value  = models.BinaryField(null=True)
@@ -93,19 +94,19 @@ class Result(models.Model):
 
             Field values from related models (e.g. costs) are named in Django QuerySet syntax.
             This allows to re-use them directly in Query creation.
-        '''        
+        '''      
         if kind == self.ANALYSIS_RESULT:
             if graph_type == 'faulttree':
-                return (('minimum','Min'), ('peak','Peak'),('maximum','Max')) 
+                return (('timestamp', 'Time'), ('peak','Top Event Probability')) 
             elif graph_type == 'fuzztree' :   
-                return  (('id','Config'),('minimum','Min'), ('peak','Peak'),
+                return  (('id','Config'), ('timestamp', 'Time'), ('minimum','Min'), ('peak','Peak'),
                      ('maximum','Max'),  ('configuration__costs','Costs'))            
         elif kind == self.SIMULATION_RESULT:
             if graph_type == 'faulttree':
-                return  (('reliability','Reliability'), ('mttf','MTTF'),
+                return  (('timestamp', 'Time'), ('reliability','Reliability'), ('mttf','MTTF'),
                       ('rounds', 'Rounds'), ('failures', 'Failures'))
             elif graph_type == 'fuzztree' : 
-                return  (('id','Config'), ('reliability','Reliability'), ('mttf','MTTF'),
+                return  (('id','Config'), ('timestamp', 'Time'), ('reliability','Reliability'), ('mttf','MTTF'),
                       ('rounds', 'Rounds'), ('failures', 'Failures'))                
         elif kind == self.MINCUT_RESULT:
             return  (('id','Config'),)      
@@ -116,9 +117,12 @@ class Result(models.Model):
         stored in this result object, plus data from the linked graph configuration.
       '''
       result = {}
-      for field in ['minimum', 'maximum', 'peak', 'points', 'reliability', 'mttf', 'rounds', 'failures']:
+      for field in ['minimum', 'maximum', 'peak', 'reliability', 'mttf', 'rounds', 'failures', 'timestamp']:
         value = getattr(self, field)
-        result[field] = value   # None values are needed, since datatables needs all columns filled
+        result[field] = value   # 'None' values are needed, since datatables needs all columns filled
+      # Points information is now shown in the table, but triggers graph rendering, so include it only when needed
+      if self.points:
+        result['points'] = self.points
       if self.configuration:
           result['choices'] = self.configuration.to_dict() 
           result['id'] = self.configuration.pk

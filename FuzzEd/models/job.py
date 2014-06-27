@@ -20,7 +20,7 @@ from FuzzEd.models import xml_backend
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
 from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice
-from xml_backend import AnalysisResult, MincutResult
+from xml_backend import AnalysisResult, MincutResult, SimulationResult
 
 
 logger = logging.getLogger('FuzzEd')
@@ -138,8 +138,6 @@ class Job(models.Model):
     def interpret_value(self, xml_result_value, db_result):
         """
             Interpret the incoming result value and convert it to feasible JSON for storage.
-            Secondly, the function return a plain integer representing the result
-            for sorting purposes. 
 
             Fuzzy probability values as result are given for each alpha cut. Putting
             all the different values together forms a triangular membership function.
@@ -180,10 +178,16 @@ class Job(models.Model):
                     # In this case, add another fake point to draw a strisaght line.
                     # points.append([alpha_cut.value_.lowerBound, 0])
                     pass
+
             # Points is now a wild collection of coordinates, were double values for the same X 
             # coordinate may occur. We sort it (since the JS code likes that) and leave only the 
             # largest Y values per X value.
-            db_result.points = json.dumps(sorted(points))
+
+            # If we have only one point, it makes no sense to draw a graph
+            #TODO: Instead, we could draw a nice exponential curve for the resulting rate parameter
+            #      This demands some better support for feeding the frontend graph rendering (Axis range etc.)
+            if alphacut_count > 1:
+                db_result.points = json.dumps(sorted(points))
 
             # Compute some additional statistics for the front-end, based on the gathered probabilities
             if len(points) > 0:
@@ -193,20 +197,30 @@ class Job(models.Model):
 
         if hasattr(xml_result_value, 'reliability') and xml_result_value.reliability is not None:
             reliability = float(xml_result_value.reliability)
-            sort_value = round(reliability)            
             db_result.reliability = None if math.isnan(reliability) else reliability
 
         if hasattr(xml_result_value, 'mttf') and xml_result_value.mttf is not None:
             mttf = float(xml_result_value.mttf)
             db_result.mttf = None if math.isnan(mttf) else mttf
 
-        if hasattr(xml_result_value, 'rounds') and xml_result_value.nSimulatedRounds is not None:
-            rounds = int(result.nSimulatedRounds)
+        if hasattr(xml_result_value, 'nSimulatedRounds') and xml_result_value.nSimulatedRounds is not None:
+            rounds = int(xml_result_value.nSimulatedRounds)
             db_result.rounds = None if math.isnan(rounds) else rounds
 
         if hasattr(xml_result_value, 'nFailures') and xml_result_value.nFailures is not None:
-            failures = int(result.nFailures)
+            failures = int(xml_result_value.nFailures)
             db_result.failures = None if math.isnan(failures) else failures
+
+        if hasattr(xml_result_value, 'timestamp') and xml_result_value.timestamp is not None:
+            timestamp = int(xml_result_value.timestamp)
+            db_result.timestamp = None if math.isnan(timestamp) else timestamp
+        else:
+            # All analysis results not refering to a particular timestamp refer to the configured missionTime
+            top_node = db_result.graph.top_node()
+            if top_node:
+                timestamp = top_node.get_property('missionTime')
+                db_result.timestamp = None if math.isnan(timestamp) else timestamp
+
 
     def parse_result(self, data):
         """
@@ -228,7 +242,7 @@ class Job(models.Model):
 
         # Ok, it is not binary, it is true XML result data
 
-        logger.debug("Parsing backend result XML into database: "+str(data))
+        logger.debug("Parsing backend result XML into database: \n"+str(data))
         doc = xml_backend.CreateFromDocument(str(data))
 
         # Delete old graph issues from a former analysis run

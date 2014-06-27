@@ -9,7 +9,7 @@ from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.bundle import Bundle
 from tastypie.exceptions import ImmediateHttpResponse
-from tastypie.http import HttpApplicationError, HttpAccepted, HttpForbidden
+from tastypie.http import HttpApplicationError, HttpAccepted, HttpForbidden, HttpNotFound, HttpMultipleChoices
 from tastypie import fields
 from django.core.mail import mail_managers
 from tastypie.resources import ModelResource
@@ -17,7 +17,6 @@ from tastypie.serializers import Serializer
 
 from FuzzEd.models import Job, Graph, Notification, Node, NodeGroup, Edge, Result
 import common
-
 
 logger = logging.getLogger('FuzzEd')
 
@@ -137,7 +136,7 @@ class JobResource(common.JobResource):
                 return response
             else:
                 logger.debug("Job is done, but with non-zero exit code.")
-                mail_managers('Analysis of job %s ended with non-zero exit code.' % job.pk, job.graph.to_xml())
+                mail_managers('Job %s for graph %u ended with non-zero exit code %u.' % (job.pk, job.graph.pk, job.exit_code), job.graph.to_xml())
                 return HttpApplicationError()
         else:
             # Job is pending, tell this by HTTP return code
@@ -173,7 +172,18 @@ class NodeSerializer(Serializer):
     }
 
     def from_json(self, content):
-        return json.loads(content)
+        data_dict = json.loads(content)
+        if 'properties' in data_dict:
+            props = data_dict['properties']
+            for key, val in props.iteritems():
+                # JS code: {'prop_name': {'value':'prop_value'}}
+                # All others: {'prop_name': 'prop_value'}
+                if isinstance(val, dict) and 'value' in val:
+                    props[key] = val['value']
+        return data_dict
+
+    def to_json(self, data):
+        return json.dumps(data)
 
 class NodeResource(ModelResource):
     """
@@ -208,6 +218,9 @@ class NodeResource(ModelResource):
         bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
+        bundle.obj.save()   # Save node, so that set_attr has something to relate to
+        if 'properties' in bundle.data:
+            bundle.obj.set_attrs(bundle.data['properties'])            
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -234,9 +247,7 @@ class NodeResource(ModelResource):
         deserialized = self.deserialize(request, request.body,
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
-            for key, value in deserialized['properties'].iteritems():
-                obj.set_attr(key, value)
-            obj.save()
+            obj.set_attrs(deserialized['properties'])            
         # return the updated node object
         return HttpResponse(obj.to_json(), 'application/json', status=202)
 
@@ -267,8 +278,10 @@ class NodeGroupResource(ModelResource):
 
     def obj_create(self, bundle, **kwargs):
         """
-             This is the only override that allows us to access 'kwargs', which contains the
-             graph_id from the original request.
+            The method called by the dispatcher when a NodeGroup resource is created.
+
+            This is the only override that allows us to access 'kwargs', which contains the
+            graph_id from the original request.
         """
         try:
             bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
@@ -285,7 +298,9 @@ class NodeGroupResource(ModelResource):
                 bundle.obj.nodes.add(node)
             except ObjectDoesNotExist:
                 pass
-            bundle.obj.save()
+        if 'properties' in bundle.data:
+            bundle.obj.set_attrs(bundle.data['properties'])
+        bundle.obj.save()
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -312,9 +327,14 @@ class NodeGroupResource(ModelResource):
         deserialized = self.deserialize(request, request.body,
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
-            for key, value in deserialized['properties'].iteritems():
-                obj.set_attr(key, value)
+            obj.set_attrs(deserialized['properties'])
+        if 'nodeIds' in deserialized:
+            logger.debug("Updating nodes for node group")
+            obj.nodes.clear()    # nodes_set is magically created by Django
+            node_objects = Node.objects.filter(deleted=False, graph=obj.graph, client_id__in=deserialized['nodeIds'])
+            obj.nodes = node_objects
             obj.save()
+
         # return the updated node group object
         return HttpResponse(obj.to_json(), 'application/json', status=202)
 
@@ -352,6 +372,15 @@ class EdgeResource(ModelResource):
     source = fields.ToOneField(NodeResource, 'source')
     target = fields.ToOneField(NodeResource, 'target')
 
+    def get_resource_uri(self, bundle_or_obj):
+        """
+            Since we change the API URL format to nested resources, we need also to
+            change the location determination for a given resource object.
+        """
+        edge_client_id = bundle_or_obj.obj.client_id
+        graph_pk = bundle_or_obj.obj.graph.pk
+        return reverse('edge', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': edge_client_id})
+
     def obj_create(self, bundle, **kwargs):
         """
          This is the only override that allows us to access 'kwargs', which contains the
@@ -363,6 +392,9 @@ class EdgeResource(ModelResource):
         bundle.data['target'] = Node.objects.get(client_id=bundle.data['target'], graph=graph, deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
+        bundle.obj.save()       # to allow property changes
+        if 'properties' in bundle.data:
+            bundle.obj.set_attrs(bundle.data['properties'])
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -381,18 +413,16 @@ class EdgeResource(ModelResource):
             basic_bundle = self.build_bundle(request=request)
             obj = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
-            return http.HttpNotFound()
+            return HttpNotFound()
         except MultipleObjectsReturned:
-            return http.HttpMultipleChoices("More than one resource is found at this URI.")
+            return HttpMultipleChoices("More than one resource is found at this URI.")
 
         # Deserialize incoming update payload JSON from request
         deserialized = self.deserialize(request, request.body,
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
-            for key, value in deserialized['properties'].iteritems():
-                obj.set_attr(key, value)
-            obj.save()
-        # return the updated node object
+            obj.set_attrs(deserialized['properties'])
+        # return the updated edge object
         return HttpResponse(obj.to_json(), 'application/json', status=202)
 
 class ProjectResource(common.ProjectResource):
@@ -409,7 +439,7 @@ class GraphSerializer(common.GraphSerializer):
 
     def to_json(self, data, options=None):
         if isinstance(data, Bundle):
-            return data.obj.to_json()
+            return data.obj.to_json(use_value_dict=True)
         elif isinstance(data, dict):
             if 'objects' in data:               # object list
                 graphs = []
@@ -503,12 +533,16 @@ class ResultResource(ModelResource):
         sort_fields = []
         for i in range(sort_cols):
             # Consider strange datatables way of expressing sorting criteria
-            sort_col = int(request.GET['iSortCol_'+str(i)])
-            sort_dir = request.GET['sSortDir_'+str(i)] 
-            db_field_name=job.result_titles[sort_col][0] 
-            if sort_dir == "desc":
-                db_field_name = "-"+db_field_name          
-            sort_fields.append(db_field_name)
+            sort_col = int(request.GET['iSortCol_'+str(i)]) 
+            
+            if (request.GET['bSortable_'+ str(sort_col)] == 'true'):
+                sort_dir = request.GET['sSortDir_'+str(i)] 
+                db_field_name=job.result_titles[sort_col - 1][0] # first column is not sent from the backend
+                logger.debug("Sorting result set for "+db_field_name)
+                if sort_dir == "desc":
+                    db_field_name = "-"+db_field_name          
+                sort_fields.append(db_field_name)
+                
         results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
         if len(sort_fields) > 0:
             results = results.order_by(*sort_fields)

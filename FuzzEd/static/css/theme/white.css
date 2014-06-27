@@ -4288,6 +4288,9 @@ i.icon-layout-tree:hover {
 .probabillity_menu .graph_issues i {
   margin-right: 3px;
 }
+.probabillity_menu .table_container tr.tr_hover {
+  background: #f2f2f2;
+}
 .probabillity_menu .table_container td {
   font-size: 12px;
   padding: 7px;
