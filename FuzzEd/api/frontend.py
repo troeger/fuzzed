@@ -18,7 +18,6 @@ from tastypie.serializers import Serializer
 from FuzzEd.models import Job, Graph, Notification, Node, NodeGroup, Edge, Result
 import common
 
-
 logger = logging.getLogger('FuzzEd')
 
 class GraphOwnerAuthorization(Authorization):
@@ -173,7 +172,18 @@ class NodeSerializer(Serializer):
     }
 
     def from_json(self, content):
-        return json.loads(content)
+        data_dict = json.loads(content)
+        if 'properties' in data_dict:
+            props = data_dict['properties']
+            for key, val in props.iteritems():
+                # JS code: {'prop_name': {'value':'prop_value'}}
+                # All others: {'prop_name': 'prop_value'}
+                if isinstance(val, dict) and 'value' in val:
+                    props[key] = val['value']
+        return data_dict
+
+    def to_json(self, data):
+        return json.dumps(data)
 
 class NodeResource(ModelResource):
     """
@@ -210,8 +220,7 @@ class NodeResource(ModelResource):
         bundle = self.full_hydrate(bundle)
         bundle.obj.save()   # Save node, so that set_attr has something to relate to
         if 'properties' in bundle.data:
-            logger.debug("Setting initial node properties: "+str(bundle.data['properties']))
-            bundle.obj.set_attrs(bundle.data['properties'])
+            bundle.obj.set_attrs(bundle.data['properties'])            
         return self.save(bundle)
 
     def patch_detail(self, request, **kwargs):
@@ -238,8 +247,7 @@ class NodeResource(ModelResource):
         deserialized = self.deserialize(request, request.body,
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
-            logger.debug("Setting node properties: "+str(deserialized['properties']))
-            obj.set_attrs(deserialized['properties'])
+            obj.set_attrs(deserialized['properties'])            
         # return the updated node object
         return HttpResponse(obj.to_json(), 'application/json', status=202)
 
@@ -291,7 +299,6 @@ class NodeGroupResource(ModelResource):
             except ObjectDoesNotExist:
                 pass
         if 'properties' in bundle.data:
-            logger.debug("Setting initial node group properties: "+str(bundle.data['properties']))
             bundle.obj.set_attrs(bundle.data['properties'])
         bundle.obj.save()
         return self.save(bundle)
@@ -320,7 +327,6 @@ class NodeGroupResource(ModelResource):
         deserialized = self.deserialize(request, request.body,
                                         format=request.META.get('CONTENT_TYPE', 'application/json'))
         if 'properties' in deserialized:
-            logger.debug("Updating properties for node group")
             obj.set_attrs(deserialized['properties'])
         if 'nodeIds' in deserialized:
             logger.debug("Updating nodes for node group")
@@ -388,7 +394,6 @@ class EdgeResource(ModelResource):
         bundle = self.full_hydrate(bundle)
         bundle.obj.save()       # to allow property changes
         if 'properties' in bundle.data:
-            logger.debug("Setting initial edge properties: "+str(bundle.data['properties']))
             bundle.obj.set_attrs(bundle.data['properties'])
         return self.save(bundle)
 
@@ -434,7 +439,7 @@ class GraphSerializer(common.GraphSerializer):
 
     def to_json(self, data, options=None):
         if isinstance(data, Bundle):
-            return data.obj.to_json()
+            return data.obj.to_json(use_value_dict=True)
         elif isinstance(data, dict):
             if 'objects' in data:               # object list
                 graphs = []

@@ -126,10 +126,7 @@ class Node(models.Model):
             except KeyError:
                 return self.kind
 
-    def get_properties(self):
-        return {prop.key: prop.value for prop in self.properties.filter(deleted=False)}
-
-    def to_dict(self):
+    def to_dict(self, use_value_dict=False):
         """
         Method: to_dict
         
@@ -138,8 +135,12 @@ class Node(models.Model):
         Returns:
          {dict} the node as dictionary
         """
+        if use_value_dict:
+            prop_values = {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
+        else:
+            prop_values = {prop.key: prop.value for prop in self.properties.filter(deleted=False)}
         return {
-            'properties': self.get_properties(),
+            'properties': prop_values,
             'id':         self.client_id,
             'kind':       self.kind,
             'x':          self.x,
@@ -195,7 +196,7 @@ class Node(models.Model):
     def graphml_data_key(self, key, value):
         return '            <data key="%s">%s</data>\n' % (key, value,)
 
-    def to_json(self):
+    def to_json(self, use_value_dict=False):
         """
         Method: to_json
 
@@ -204,7 +205,7 @@ class Node(models.Model):
         Returns:
          {str} the node in JSON representation
         """
-        return json.dumps(self.to_dict())
+        return json.dumps(self.to_dict(use_value_dict))
 
     def to_bool_term(self):
         edges = self.outgoing.filter(deleted=False).all()

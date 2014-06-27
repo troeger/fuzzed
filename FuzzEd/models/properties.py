@@ -84,28 +84,6 @@ class Property(models.Model):
         else:
             return value
 
-    def to_dict(self):
-        """
-        Method: to_dict
-
-        Converts the property instance into a native dictionary
-
-        Returns:
-         {dict} the property as dictionary
-        """
-        return {self.key: self.value}
-
-    def to_tuple(self):
-        """
-        Method: to_tuple
-
-        Converts the property instance to a native tuple.
-
-        Returns:
-         {tuple(str, str)} the property as tuple
-        """
-        return (self.key, self.value)
-
     def same_as(self, prop):
         ''' 
             Checks if this property is equal to the given one. 

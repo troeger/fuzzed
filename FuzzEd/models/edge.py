@@ -33,10 +33,7 @@ class Edge(models.Model):
         prefix = '[DELETED] ' if self.deleted else ''
         return  unicode('%s%s -> %s' % (prefix, str(self.source), str(self.target)))
 
-    def get_properties(self):
-        return {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
-
-    def to_dict(self):
+    def to_dict(self, use_value_dict=False):
         """
         Method: to_dict
         
@@ -45,8 +42,13 @@ class Edge(models.Model):
         Returns:
          {dict} the edge as dictionary
         """
+        if use_value_dict:
+            prop_values = {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
+        else:
+            prop_values = {prop.key: prop.value for prop in self.properties.filter(deleted=False)}
+
         return {
-            'properties': self.get_properties(),
+            'properties': prop_values,
             'id':         self.client_id,
             'graph':      self.graph.pk,
             'source':     self.source.client_id,
@@ -64,7 +66,7 @@ class Edge(models.Model):
         """
         return '       <edge source="%s" target="%s" />\n' % (self.source.client_id, self.target.client_id,)
 
-    def to_json(self):
+    def to_json(self, use_value_dict=False):
         """
         Method: to_json
 
@@ -73,7 +75,7 @@ class Edge(models.Model):
         Returns:
          {dict} the edge as dictionary
         """
-        return json.dumps(self.to_dict())
+        return json.dumps(self.to_dict(use_value_dict))
 
     def get_attr(self, key):
         """

@@ -14,14 +14,19 @@ class NodeGroup(models.Model):
     nodes     = models.ManyToManyField(Node)
     deleted   = models.BooleanField(default=False)
 
-    def to_dict(self):
+    def to_dict(self, use_value_dict=False):
+        if use_value_dict:
+            prop_values =  {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
+        else:
+            prop_values =  {prop.key: prop.value for prop in self.properties.filter(deleted=False)}
+
         return {'id': self.client_id,
                 'nodeIds': [node.client_id for node in self.nodes.all()],
-                'properties': {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)},
+                'properties': prop_values,
         }
 
-    def to_json(self):
-    	return json.dumps(self.to_dict())
+    def to_json(self, use_value_dict=False):
+    	return json.dumps(self.to_dict(use_value_dict))
 
     def get_attr(self, key):
         """

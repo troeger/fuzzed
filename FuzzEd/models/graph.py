@@ -67,7 +67,7 @@ class Graph(models.Model):
         else:
             return None
 
-    def to_json(self):
+    def to_json(self, use_value_dict = False):
         """
         Method: to_json
         
@@ -76,9 +76,9 @@ class Graph(models.Model):
         Returns:
          {dict} the graph in JSON representation
         """
-        return json.dumps(self.to_dict())
+        return json.dumps(self.to_dict(use_value_dict))
 
-    def to_dict(self):
+    def to_dict(self, use_value_dict=False):
         """
         Method: to_dict
         
@@ -90,9 +90,9 @@ class Graph(models.Model):
         node_set  = self.nodes.filter(deleted=False)
         edge_set  = self.edges.filter(deleted=False)
         group_set = self.groups.filter(deleted=False)
-        nodes     = [node.to_dict() for node in node_set]
-        edges     = [edge.to_dict() for edge in edge_set]
-        groups    = [group.to_dict() for group in group_set]
+        nodes     = [node.to_dict(use_value_dict) for node in node_set]
+        edges     = [edge.to_dict(use_value_dict) for edge in edge_set]
+        groups    = [group.to_dict(use_value_dict) for group in group_set]
 
         node_seed  = self.nodes.aggregate(Max('client_id'))['client_id__max']
         edge_seed  = self.edges.aggregate(Max('client_id'))['client_id__max']
@@ -270,7 +270,7 @@ class Graph(models.Model):
                     node.save()
                 else:
                     node.set_attr(name, value)
-            logger.debug("New node from GraphML import: "+str(node.to_dict()))
+            #logger.debug("New node from GraphML import: "+str(node.to_dict()))
         # Graph properties belong to the TOP node
         # GraphML files without graph <data> properties may refer to a graph type that has no
         # TOP node concept
