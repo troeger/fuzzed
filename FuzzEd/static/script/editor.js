@@ -139,6 +139,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             this.properties = new Menus.PropertiesMenu(this.graph.getNotation().propertiesDisplayOrder);
             this.shapes     = new Menus.ShapeMenu();
             this.layout     = new Menus.LayoutMenu();
+            this.graph.layoutMenu = this.layout;
             this._backend.activate();
 
             if (readOnly) {

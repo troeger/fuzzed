@@ -20,6 +20,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
          *      {Object}  nodes       - A map that stores all <Nodes> of the graph by their ID.
          *      {String}  name        - The name of the graph, specified by the user when creating it.
          *      {Object} _nodeClasses - A map caching all node classes already generated and storing them by their kind.
+         *      {Object}  layoutMenu  - A reference to the layout menu
          */
         config:       undefined,
         id:           undefined,
@@ -29,6 +30,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
         name:         undefined,
         readOnly:     undefined,
         seed:         undefined,
+        layoutMenu:   undefined,
 
         _nodeClasses: {},
 
@@ -325,7 +327,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             }.bind(this));
 
             // ask the user to keep the layout
-            jQuery.when(Menus.LayoutMenu.keep())
+            jQuery.when(this.layoutMenu.keep())
                 .fail(function() {
                     _.each(layoutedNodes, function(n, index) {
                         var node = this.getNodeById(n.id);
