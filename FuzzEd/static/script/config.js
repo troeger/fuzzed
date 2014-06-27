@@ -144,6 +144,7 @@ define(['underscore'], function() {
             SELECTING:               'ui-selecting',
             SELECTEE:                'ui-selectee',
             DISABLED:                'disabled',
+            AFFECTED:                'affected',
 
             CANVAS_NOT_EDITABLE:     'fuzzed-canvas-not-editable',
             
@@ -250,6 +251,7 @@ define(['underscore'], function() {
 
             NODEGROUP_ADDED:           'nodegroup-added',
             NODEGROUP_DELETED:         'nodegroup-deleted',
+            NODEGROUP_NODEIDS_CHANGED: 'nodegroup-nodeids-changed',
 
             PROPERTY_HIDDEN_CHANGED:   'property-hidden-changed',
             PROPERTY_READONLY_CHANGED: 'property-readonly-changed',

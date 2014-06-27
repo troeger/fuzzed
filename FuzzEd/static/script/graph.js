@@ -1,5 +1,5 @@
-define(['canvas', 'class', 'config', 'edge', 'node_group', 'menus', 'jquery', 'd3'],
-function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
+define(['canvas', 'class', 'config', 'edge', 'menus', 'node_group', 'jquery', 'd3'],
+function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
     /**
      * Package: Base
      */
@@ -52,7 +52,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             this.config = this.getConfig();
 
             this._loadFromJson(json)
-                ._registerEventHandlers()
+                ._registerEventHandlers();
         },
 
         /**
@@ -108,7 +108,6 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             }.bind(this));
 
             jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
-            jQuery(document).on(Config.Events.NODE_DELETED,         this._updateNodeGroupDeleted.bind(this));
 
             return this;
         },
@@ -148,7 +147,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             properties.id  = jsonEdge.id;
             properties.graph = this;
 
-            var edge = new Edge(this.getNotation().edges, sourceNode, targetNode, properties);
+            var edge = this.factory.create('Edge', this.getNotation().edges, sourceNode, targetNode, properties);
             this.edges[edge.id] = edge;
 
             return edge;
@@ -170,7 +169,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
          *      The newly created {<Edge>} instance.
          */
         _addEdge: function(jsPlumbEdge) {
-            var edge = new Edge(this.getNotation().edges, jsPlumbEdge, {graph: this});
+            var edge = this.factory.create('Edge', this.getNotation().edges, jsPlumbEdge, {graph: this});
             this.edges[edge.id] = edge;
 
             return edge;
@@ -212,7 +211,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             definition.readOnly = this.readOnly;
             definition.graph    = this;
 
-            var node = new (this.nodeClassFor(definition.kind))(definition);
+            var node = new (this.nodeClassFor(definition.kind))(this.factory, definition);
             this.nodes[node.id] = node;
 
             return node;
@@ -240,10 +239,23 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
          * Method: addNodeGroup
          *      Creates a new NodeGroup based on the given JSON representation.
          *
-         * Returns:
-         *      The newly created {<NodeGroup>} instance.
+         *  Returns:
+         *    The newly created <NodeGroup> instance if successful.
          */
         addNodeGroup: function(jsonNodeGroup) {
+            // first let's check if we already have a NodeGroup with the requested nodeIds
+            var jngNodeIds = jsonNodeGroup.nodeIds;
+
+            var alreadyExisting = false;
+            _.each(this.nodeGroups, function(ng) {
+                // math recap: two sets are equal, when both their differences are zero length
+                if (jQuery(jngNodeIds).not(ng.nodeIds()).length == 0 && jQuery(ng.nodeIds()).not(jngNodeIds).length == 0) {
+                    alreadyExisting = true;
+                }
+            }.bind(this));
+
+            if (alreadyExisting) return;
+
             var nodes = {};
             _.each(jsonNodeGroup.nodeIds, function(nodeId) {
                 nodes[nodeId] = this.getNodeById(nodeId);
@@ -253,10 +265,8 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
             properties.id  = jsonNodeGroup.id;
             properties.graph = this;
 
-            var nodeGroup = new NodeGroup(this.getNotation().nodeGroups, nodes, properties);
+            var nodeGroup = this.factory.create('NodeGroup', this.getNotation().nodeGroups, nodes, properties);
             this.nodeGroups[nodeGroup.id] = nodeGroup;
-
-            return nodeGroup;
         },
 
         /**
@@ -275,30 +285,8 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
         },
 
         /**
-         * Method: deleteNodeGroup
-         *      Updates all node groups on deletion of a node. Furthermore deletes empty node groups.
-         *
-         * Returns:
-         *      This {<Graph>} instance for chaining.
-         */
-        _updateNodeGroupDeleted: function(event, nodeId) {
-            var node = this.getNodeById(nodeId);
-
-            _.each(this.nodeGroups, function(nodegroup) {
-                delete this.nodeGroups[nodegroup.id].nodes[nodeId];
-                if (_.size(nodegroup.nodes) < 2) {
-                    this.deleteNodeGroup(nodegroup);
-                } else {
-                    nodegroup.redraw();
-                }
-            }.bind(this));
-
-            return this;
-        },
-
-        /**
-         * Method: _layoutWithAlgorithm
-         *      Layouts the nodes of this graph with the given layout algorithm.
+         *  Method: _layoutWithAlgorithm
+         *    Layouts the nodes of this graph with the given layouting algorithm.
          *
          * Returns:
          *      This {<Graph>} instance for chaining.
@@ -520,7 +508,7 @@ function(Canvas, Class, Config, Edge, NodeGroup, Menus) {
          *      The newly created {<Node>} {<Class>}.
          */
         _newNodeClassForKind: function(definition) {
-            var BaseClass = this.getNodeClass();
+            var BaseClass = this.factory.getClassModule('Node');
             var inherits = definition.inherits;
 
             if (inherits) {

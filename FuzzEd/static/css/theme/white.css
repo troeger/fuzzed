@@ -4317,6 +4317,14 @@ i.icon-layout-tree:hover {
   z-index: 100;
   /* above connection */
 }
+.fuzzed-node.affected path,
+.fuzzed-nodegroup.affected path,
+.fuzzed-node.affected rect,
+.fuzzed-nodegroup.affected rect,
+.fuzzed-node.affected circle,
+.fuzzed-nodegroup.affected circle {
+  stroke: #8d39db !important;
+}
 .fuzzed-node.highlighted path,
 .fuzzed-nodegroup.highlighted path,
 .fuzzed-node.highlighted rect,
