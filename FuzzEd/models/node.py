@@ -1,8 +1,10 @@
 import logging
+
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
 logger = logging.getLogger('FuzzEd')
 
 import xml_fuzztree
@@ -124,7 +126,7 @@ class Node(models.Model):
             except KeyError:
                 return self.kind
 
-    def to_dict(self):
+    def to_dict(self, use_value_dict=False):
         """
         Method: to_dict
         
@@ -133,8 +135,12 @@ class Node(models.Model):
         Returns:
          {dict} the node as dictionary
         """
+        if use_value_dict:
+            prop_values = {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
+        else:
+            prop_values = {prop.key: prop.value for prop in self.properties.filter(deleted=False)}
         return {
-            'properties': {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)},
+            'properties': prop_values,
             'id':         self.client_id,
             'kind':       self.kind,
             'x':          self.x,
@@ -190,7 +196,7 @@ class Node(models.Model):
     def graphml_data_key(self, key, value):
         return '            <data key="%s">%s</data>\n' % (key, value,)
 
-    def to_json(self):
+    def to_json(self, use_value_dict=False):
         """
         Method: to_json
 
@@ -199,7 +205,7 @@ class Node(models.Model):
         Returns:
          {str} the node in JSON representation
         """
-        return json.dumps(self.to_dict())
+        return json.dumps(self.to_dict(use_value_dict))
 
     def to_bool_term(self):
         edges = self.outgoing.filter(deleted=False).all()
@@ -575,6 +581,7 @@ class Node(models.Model):
         Returns:
             {attr} The found attribute. Raises a ValueError if no attribute for the given key exist.
         """
+        assert(self.pk)         # Catch attribute setting before object saving cases
         if hasattr(self, key):
             return getattr(self, key)
         else:
@@ -594,19 +601,40 @@ class Node(models.Model):
         Parameters:
             {string} key - The name of the attribute.
             {attr} value - The new value that should be stored.
+
+        TODO: Deprecate this method, set_attrs() should only be used to have an efficient modification signal handling.
         """
+        from FuzzEd.models import Property
+        assert(self.pk)         # Catch attribute setting before object saving cases
+        value = Property.sanitized_value(self, key, value)
+        # logger.debug("Setting node attribute %s to %s"%(key, value))
         if hasattr(self, key):
             setattr(self, key, value)
+            self.save()
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'node': self})
             prop.value = value
             prop.save()
+
+    def set_attrs(self, d):
+        '''
+            Set node attributes according to the provided dictionary.
+
+            TODO: Replace by true bulk insert implementation.
+        '''
+        for key, value in d.iteritems():
+            self.set_attr(key, value)
+        post_save.send(sender=self.__class__, instance=self)
 
     def same_as(self, node):
         ''' 
             Checks if this node is equal to the given one in terms of properties. 
             This is a very expensive operation that is only intended for testing purposes.
         '''
+        #logger.debug(self.to_dict())
+        #logger.debug(node.to_dict())
+        if self.kind != node.kind or self.x != node.x or self.y != node.y:
+            return False
         for my_property in self.properties.all().filter(deleted=False):
             found_match = False
             for their_property in node.properties.all().filter(deleted=False):
@@ -614,7 +642,6 @@ class Node(models.Model):
                     found_match = True
                     break
             if not found_match:
-                logger.debug("Could not find match for property %s in %s"%(my_property.value, str(self)))
                 return False
         return True
 

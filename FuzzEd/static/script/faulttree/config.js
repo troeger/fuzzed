@@ -10,6 +10,9 @@ define(['config', 'jquery'], function(Config) {
      * Extends: <Base::Config>
      */
     return jQuery.extend(true, Config, {
+        Classes: {
+            AFFECTED:                'affected'
+        },
         /**
          * Group: Events
          *      Name of global events triggered on the document with jQuery.trigger().
@@ -51,6 +54,7 @@ define(['config', 'jquery'], function(Config) {
             ACTION_CUTSETS:              'FuzzEdActionCutsets',
             ACTION_ANALYTICAL:           'FuzzEdActionAnalytical',
             ACTION_SIMULATED:            'FuzzEdActionSimulated',
+            ACTION_CLONE:                'FuzzEdActionClone',
             ANALYTICAL_PROBABILITY_MENU: 'FuzzEdAnalyticalProbabilityMenu',
             SIMULATED_PROBABILITY_MENU:  'FuzzEdSimulatedProbabilityMenu'
         },

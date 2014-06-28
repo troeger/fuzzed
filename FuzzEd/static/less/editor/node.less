@@ -7,6 +7,13 @@
     text-align: center;
     z-index: 100; /* above connection */
 
+    // affected state
+    &.affected {
+        path, rect, circle {
+            stroke: @theme-affected !important;
+        }
+    }
+
     // highlighted state
     &.highlighted {
         path, rect, circle {

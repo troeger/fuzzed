@@ -1,5 +1,7 @@
 import json
 
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 from django.db import models
 
 from FuzzEd.models import Node, Graph
@@ -14,14 +16,19 @@ class NodeGroup(models.Model):
     nodes     = models.ManyToManyField(Node)
     deleted   = models.BooleanField(default=False)
 
-    def to_dict(self):
+    def to_dict(self, use_value_dict=False):
+        if use_value_dict:
+            prop_values =  {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
+        else:
+            prop_values =  {prop.key: prop.value for prop in self.properties.filter(deleted=False)}
+
         return {'id': self.client_id,
                 'nodeIds': [node.client_id for node in self.nodes.all()],
-                'properties': {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)},
+                'properties': prop_values,
         }
 
-    def to_json(self):
-    	return json.dumps(self.to_dict())
+    def to_json(self, use_value_dict=False):
+    	return json.dumps(self.to_dict(use_value_dict))
 
     def get_attr(self, key):
         """
@@ -55,10 +62,34 @@ class NodeGroup(models.Model):
         Parameters:
             {string} key - The name of the attribute.
             {attr} value - The new value that should be stored.
+
+        TODO: Deprecate this method, set_attrs() should only be used to have an efficient modification signal handling.
         """
+        assert(self.pk)
+        from FuzzEd.models import Property
+        value = Property.sanitized_value(self, key, value)
         if hasattr(self, key):
             setattr(self, key, value)
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'node_group': self})
             prop.value = value
             prop.save()
+
+    def set_attrs(self, d):
+        '''
+            Set groups attributes according to the provided dictionary.
+
+            TODO: Replace by true bulk insert implementation.
+        '''
+        for key, value in d.iteritems():
+            self.set_attr(key, value)
+        post_save.send(sender=self.__class__, instance=self)
+
+@receiver(post_save, sender=NodeGroup)
+def graph_modify(sender, instance, **kwargs):
+    instance.graph.modified = datetime.datetime.now()
+    instance.graph.save()
+    # updating project modification date
+    instance.graph.project.modified = instance.graph.modified
+    instance.graph.project.save()
+

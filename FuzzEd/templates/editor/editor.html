@@ -11,7 +11,7 @@
         require(['{{ graph.kind }}/editor', 'bootstrap', 'exception'], function (Editor) {
             jQuery(document).ready(function () {
                 try {
-                    var editor = new Editor({{ graph.pk }});
+                    var editor = new Editor(undefined, {{ graph.pk }});
                 } catch (exception) {
                     var exceptions = jQuery('#FuzzEdExceptions');
 
@@ -79,6 +79,11 @@
                 </a></li>
                 <li><a href="#" id="FuzzEdActionUngroup">
                     <i class="fa fa-unlink"></i> Ungroup <span class="pull-right">Ctrl+A</span>
+                </a></li>
+            {% endif %}
+            {% if graph.kind == 'faulttree' or graph.kind == 'fuzztree' %}
+                <li><a href="#" id="FuzzEdActionClone">
+                    <i class="fa fa-copy"></i> Clone
                 </a></li>
             {% endif %}
             <li class="divider"></li>

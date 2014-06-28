@@ -8,6 +8,8 @@ function(Class, Config, Property) {
      * Class: {Abstract} Edge
      *      This class models a generic connection of two nodes, further specified in the respective notations file.
      *
+     *  This class models a generic connection of two nodes, further specified in the respective notations file.
+     *
      */
     return Class.extend({
         /**
@@ -150,7 +152,7 @@ function(Class, Config, Property) {
                 }
 
                 property.name = propertyName;
-                this.properties[propertyName] = Property.from(this, property);
+                this.properties[propertyName] = this.factory.getClassModule('Property').from(this.factory, this, [], property);
             }.bind(this));
 
             return this;
@@ -236,7 +238,7 @@ function(Class, Config, Property) {
                 sourceNodeId: this.source.id,
                 targetNodeId: this.target.id,
                 properties:   _.reduce(properties, function(memo, prop) { return _.extend(memo, prop);}, {})
-            };
+            }
         }
     });
 });

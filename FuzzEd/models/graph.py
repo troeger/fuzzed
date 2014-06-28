@@ -62,10 +62,12 @@ class Graph(models.Model):
         Returns:
          {Node} instance
         """
-        assert(self.kind in {'faulttree', 'fuzztree'})
-        return self.nodes.all().get(kind='topEvent')
+        if self.kind in {'faulttree', 'fuzztree'}:
+            return self.nodes.all().get(kind='topEvent')
+        else:
+            return None
 
-    def to_json(self):
+    def to_json(self, use_value_dict = False):
         """
         Method: to_json
         
@@ -74,9 +76,9 @@ class Graph(models.Model):
         Returns:
          {dict} the graph in JSON representation
         """
-        return json.dumps(self.to_dict())
+        return json.dumps(self.to_dict(use_value_dict))
 
-    def to_dict(self):
+    def to_dict(self, use_value_dict=False):
         """
         Method: to_dict
         
@@ -88,9 +90,9 @@ class Graph(models.Model):
         node_set  = self.nodes.filter(deleted=False)
         edge_set  = self.edges.filter(deleted=False)
         group_set = self.groups.filter(deleted=False)
-        nodes     = [node.to_dict() for node in node_set]
-        edges     = [edge.to_dict() for edge in edge_set]
-        groups    = [group.to_dict() for group in group_set]
+        nodes     = [node.to_dict(use_value_dict) for node in node_set]
+        edges     = [edge.to_dict(use_value_dict) for edge in edge_set]
+        groups    = [group.to_dict(use_value_dict) for group in group_set]
 
         node_seed  = self.nodes.aggregate(Max('client_id'))['client_id__max']
         edge_seed  = self.edges.aggregate(Max('client_id'))['client_id__max']
@@ -268,7 +270,7 @@ class Graph(models.Model):
                     node.save()
                 else:
                     node.set_attr(name, value)
-            logger.debug("New node: "+str(node.to_dict()))
+            #logger.debug("New node from GraphML import: "+str(node.to_dict()))
         # Graph properties belong to the TOP node
         # GraphML files without graph <data> properties may refer to a graph type that has no
         # TOP node concept
@@ -277,6 +279,7 @@ class Graph(models.Model):
             if name != 'kind':          # already handled above
                 if name not in notations.graphml_graph_data[graph_kind]:
                     raise Exception("Invalid graph data element '%s'"%name)
+                logger.debug("Setting attribute %s to %s on top node"%(name, data.text))
                 self.top_node().set_attr(name, data.text)   # Fetch TOP node here, not existent in RBD's
 
         # go through all GraphML edges and create them as model edges for this graph
@@ -341,11 +344,13 @@ class Graph(models.Model):
         for my_node in self.nodes.all().filter(deleted=False):
             found_match = False
             for their_node in graph.nodes.all().filter(deleted=False):
+                #logger.debug("Checking our %s (%u) against %s (%u)"%(str(my_node), my_node.pk, str(their_node), their_node.pk))
                 if my_node.same_as(their_node):
+                    #logger.debug("Match")
                     found_match = True
                     break
             if not found_match:
-                logger.debug("Couldn't find a match for node %s"%(str(my_node)))
+                #logger.debug("Couldn't find a match for node %s"%(str(my_node)))
                 return False
 
         return True

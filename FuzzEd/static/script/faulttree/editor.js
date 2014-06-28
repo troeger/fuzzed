@@ -1,5 +1,5 @@
-define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'highcharts', 'jquery-ui', 'slickgrid'],
-function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTables) {
+define(['editor', 'factory', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'datatables-api', 'faulttree/node_group', 'highcharts', 'jquery-ui'],
+function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTables) {
     /**
      * Package: Faulttree
      */
@@ -234,6 +234,43 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
 
             return this;
         },
+        
+        /**
+         * Group: Accessors
+         */
+       
+        /**
+         *  Abstract Method: _progressMessage
+         *      Should compute the message that is displayed while the backend calculation is pending.
+         *
+         *  Returns:
+         *      A {String} with the message. May contain HTML.
+         */
+        _progressMessage: function() {
+            throw new SubclassResponsibility();
+        },
+        
+        /**
+         *  Abstract Method: _menuHeader
+         *      Computes the header of the menu.
+         *
+         *  Returns:
+         *      A {String} which is the header of the menu.
+         */
+        _menuHeader: function() {
+            throw new SubclassResponsibility();
+        },
+        
+        /**
+         * Method: _containerID
+         *      Computes the HTML ID of the container.
+         *
+         * Returns:
+         *      A {String} which is the ID of the Container.
+         */
+        _containerID: function() {
+            throw new SubclassResponsibility();
+        },
 
         /**
          *  Group: Setup
@@ -248,7 +285,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          */
         _setupContainer: function() {
             return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Top Event Probability (analytical)">\
+                '<div id="' + this._containerID()  + '" class="menu probabillity_menu" header="'+ this._menuHeader() +'">\
                     <div class="menu-controls">\
                         <i class="menu-minimize"></i>\
                         <i class="menu-close"></i>\
@@ -277,9 +314,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                     if (this._chart != null) {
                         
                         // fit all available space with chart    
-                        var margin_offset = 30;
-                        
-                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._gridContainer.height() - margin_offset);
+                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._gridContainer.height());
                         
                         this._chart.setSize(
                             this._chartContainer.width(),
@@ -326,21 +361,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         },
 
         /**
-         * Group: Accessors
-         */
-
-        /**
-         * Abstract Method: _getDataColumns
-         *
-         *  Returns:
-         *      An {Array[Object]} of column descriptions (https://github.com/mleibman/SlickGrid/wiki/Column-Options).
-         */
-        _getDataColumns: function() {
-            throw new SubclassResponsibility();
-        },
-
-        /**
-         * Abstract Method: _chartTooltipFormatter
+         * Method: _chartTooltipFormatter
          *      This function is used to format the tooltip that appears when hovering over a data point in the chart.
          *      The scope object ('this') contains the x and y value of the corresponding point.
          *
@@ -348,18 +369,9 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          *      A {String} that is displayed inside the tooltip. It may HTML.
          */
         _chartTooltipFormatter: function() {
-           
-        },
-
-        /**
-         *  Abstract Method: _progressMessage
-         *      Should compute the message that is displayed while the backend calculation is pending.
-         *
-         *  Returns:
-         *      A {String} with the message. May contain HTML.
-         */
-        _progressMessage: function() {
-            throw new SubclassResponsibility();
+            return '<b>' + this.series.name + '</b><br/>' +
+                   '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
+                   '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
         },
 
         /**
@@ -477,6 +489,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
 
             yTick = yTick || 5;
             var series = [];
+            
+            var self = this;
 
             _.each(data, function(cutset, name) {
                 series.push({
@@ -492,7 +506,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                 chart: {
                     renderTo: this._chartContainer[0],
                     type:     'line',
-                    height:   Math.max(180, this._chartContainer.height()),
+                    height:   Math.max(140, this._chartContainer.height()),
 
                 },
                 title: {
@@ -524,7 +538,18 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                         marker: {
                             radius: 1
                         },
-                        events: {}
+                        events: {
+                            mouseOver : function () {
+                                var config_id = this.name
+                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                jQuery(row).addClass('tr_hover');
+                            },
+                            mouseOut  : function () {
+                                var config_id = this.name
+                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                jQuery(row).removeClass('tr_hover');
+                            },
+                        }
                     }
                 },
 
@@ -846,7 +871,7 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         _displayJobError: function(xhr) {
             Alerts.showErrorAlert(
                 'An error occurred!', xhr.responseText ||
-                'Are you still connected to the internet? If so, please let us know, we made a mistake here!');
+                'We were trying to trigger a computational job, but this crashed on our side. A retry may help. The developers are already informed, sorry for the inconvinience.');
             this.hide();
         }
     });
@@ -860,25 +885,27 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
      */
     var AnalyticalProbabilityMenu = AnalysisResultMenu.extend({
         /**
-         *  Method: _chartTooltipFormatter
-         *    Function used to format the toolip that appears when hovering over a data point in the chart.
-         *    The scope object ('this') contains the x and y value of the corresponding point.
-         *
-         * Returns:
-         *      A {String} that is displayed inside the tooltip. It may HTML.
+         * Method: _containerID
+         *      Override of the abstract base class method.
          */
-        _chartTooltipFormatter: function() {
-            return '<b>' + this.series.name + '</b><br/>' +
-                   '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
-                   '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
+        _containerID: function() {
+            return FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU;
         },
-
+        
         /**
          * Method: _progressMessage
          *      Override of the abstract base class method.
          */
         _progressMessage: function() {
             return 'Running probability analysis...';
+        },
+        
+        /**
+         * Method: _menuHeader
+         *      Override of the abstract base class method.
+         */
+        _menuHeader: function() { 
+            return 'Analysis Results';
         }
     });
 
@@ -889,49 +916,29 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
      *
      * Extends: AnalysisResultMenu
      */
-    var SimulatedProbabilityMenu = AnalysisResultMenu.extend({
+    var SimulatedProbabilityMenu = AnalysisResultMenu.extend({      
         /**
-         * Method: _setupContainer
-         *      Sets up the DOM container element for this menu and appends it to the DOM.
-         *
-         * Returns:
-         *      A jQuery object of the container.
+         * Method: _containerID
+         *      Override of the abstract base class method.
          */
-        _setupContainer: function() {
-            return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU + '" class="menu" header="Simulation Results">\
-                    <div class="menu-controls">\
-                        <i class="menu-minimize"></i>\
-                        <i class="menu-close">   </i>\
-                    </div>\
-                    <div class="chart"></div>\
-                    <div class="grid" style="width: 450px; padding-top: 5px;"></div>\
-                </div>'
-            )
-            .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+        _containerID: function() {
+            return FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU;
         },
-
-        /**
-         *  Method: _chartTooltipFormatter
-         *    Function used to format the tooltip that appears when hovering over a data point in the chart.
-         *    The scope object ('this') contains the x and y value of the corresponding point.
-         *
-         *  Returns:
-         *    A {String} that is displayed inside the tooltip. It may HTML.
-         */
-        _chartTooltipFormatter: function() {
-            //TODO: adapt to JSON format
-            return '<b>' + this.series.name + '</b><br/>' +
-                   '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
-                   '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
-        },
-
+        
         /**
          * Method: _progressMessage
          *      Override of the abstract base method.
          */
         _progressMessage: function() {
             return 'Running simulation...';
+        },
+        
+        /**
+         * Method: _menuHeader
+         *      Override of the abstract base class method.
+         */
+        _menuHeader: function() { 
+            return 'Simulation Results';
         }
     });
 
@@ -961,8 +968,15 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          */
 
         /**
-         * Method: getConfig
-         *      Overrides the abstract base method.
+         *  Group: Accessors
+         */
+
+        getFactory: function() {
+            return new Factory(undefined, 'faulttree');
+        },
+
+        /**
+         *  Method: getConfig
          *
          * Returns:
          *      The <FaulttreeConfig> object.
@@ -987,8 +1001,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          */
         _loadGraphCompleted: function(readOnly) {
             //this.cutsetsMenu     = new CutsetsMenu(this);
-            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this);
-            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this);
+            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this.factory, this);
+            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this.factory, this);
 
             this._setupCutsetsAction()
                 ._setupAnalyticalProbabilityAction()
@@ -1110,8 +1124,41 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         _downloadFileFromURL: function(url, format) {
             //TODO: File is already downloaded in the _query method (job class), maybe first or second download should be prevented if possible.
             window.location = url;
+        },
+
+        _setupMenuActions: function() {
+            this._super();
+
+            jQuery('#' + this.config.IDs.ACTION_CLONE).click(function() {
+                this._cloneSelection();
+            }.bind(this));
 
             return this;
+        },
+
+        _cloneSelection: function(event) {
+            var selected = jQuery('.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE);
+
+            // we will only clone the selection, if a single node is selected
+            if (selected.length === 1) {
+                // temporarily hide the properties menu to avoid, that it shows the newly created node's individual
+                //    properties, as it is supposed to show the common properties with it's original node (i.e. the
+                //    NodeGroup's properties)
+                this.properties.hide();
+
+                var node  = this.graph.getNodeById(selected.data(this.config.Keys.NODE).id);
+                var clone = this.graph._clone(node);
+
+                if (clone) {
+                    // highlight the newly generated node by selecting it
+                    this._deselectAll();
+                    clone.select();
+                }
+
+                // allow the properties menu to be shown again
+                this.properties.show();
+            }
+            // otherwise do nothing
         }
     });
 });
