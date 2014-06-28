@@ -1,6 +1,5 @@
 from fabric.api import task, env, roles
 from fabfile.common import version
-from fabfile import bootstrap
 from fabric.operations import put, run, sudo
 import os.path
 import os, ConfigParser

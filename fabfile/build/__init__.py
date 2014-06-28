@@ -6,7 +6,6 @@ from xml.dom.minidom import parse as parseXml
 
 from fabric.api import task
 
-from setup_schemas import createFaultTreeSchema, createFuzzTreeSchema
 from setup_settings import createDjangoSettings, createBackendSettings
 from FuzzEd import util
 
@@ -323,10 +322,7 @@ def build_xmlschema_wrappers():
 
 @task
 def xmlschemas():
-    '''Builds XML schema files and according Python wrappers.'''
-    print "Generating XML schema files ..."
-    createFaultTreeSchema("FuzzEd/static/xsd/faulttree.xsd")
-    createFuzzTreeSchema("FuzzEd/static/xsd/fuzztree.xsd")
+    '''Builds XML schema Python wrappers.'''
     build_xmlschema_wrappers()
 
 @task
