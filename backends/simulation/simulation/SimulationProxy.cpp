@@ -215,26 +215,42 @@ void SimulationProxy::simulateAllConfigurations(
 		{
 			for (const auto& ft : ftTransform.transform())
 			{
-				std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
+				try
+				{
+					std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
 
-				const SimulationResultStruct res =
-					simulateFaultTree(simTree, workingDir, logFileStream, impl);
+					const SimulationResultStruct res =
+						simulateFaultTree(simTree, workingDir, logFileStream, impl);
 
-				backendResults::SimulationResult r(
-					ft.second.id(),
-					ft.first.getId(),
-					util::timeStamp(),
-					res.isValid(),
-					res.reliability,
-					res.nFailures,
-					res.nRounds);
+					backendResults::SimulationResult r(
+						ft.second.id(),
+						ft.first.getId(),
+						util::timeStamp(),
+						res.isValid(),
+						res.reliability,
+						res.nFailures,
+						res.nRounds);
 
-				r.availability(res.meanAvailability);
-				r.duration(res.duration);
-				r.mttf(res.mttf);
-				simResults.configuration().push_back(serializedConfiguration(ft.first));
+					r.availability(res.meanAvailability);
+					r.duration(res.duration);
+					r.mttf(res.mttf);
+					simResults.configuration().push_back(serializedConfiguration(ft.first));
 
-				simResults.result().push_back(r);
+					simResults.result().push_back(r);
+
+				}
+				catch (FatalException& e)
+				{
+					issues.insert(e.getIssue());
+				}
+				catch (std::exception& e)
+				{
+					issues.insert(Issue::fatalIssue(e.what()));
+				}
+				catch (...)
+				{
+					issues.insert(Issue::fatalIssue("Unknown error during fuzztree to faulttree conversion or faulttree simulation"));
+				}
 			}
 		}
 		// Log errors
@@ -247,6 +263,7 @@ void SimulationProxy::simulateAllConfigurations(
 	}
 	catch (std::exception& e)
 	{
+		std::cout << e.what();
 		*logFileStream << e.what() << std::endl;
 	}
 }
