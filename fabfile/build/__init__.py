@@ -13,13 +13,6 @@ from FuzzEd import util
 # from FuzzEd import __version__, util, settings
 
 
-XSD_PY_FILE_MAP = {
-    'backendResult':       'xml_backend',
-    'fuzztree':            'xml_fuzztree',
-    'faulttree':           'xml_faulttree',
-    'commonTypes':         'xml_common',
-    'configurations':      'xml_configurations'
-}
 
 def svg2pgf_shape(filename):
     '''
@@ -291,48 +284,6 @@ def notations():
         out.write('\ngraphml_node_data = ')
         pprint.pprint(node_data, out)
         out.write('\n# END OF GENERATED CONTENT')
-
-def build_xmlschema_wrappers():
-    print 'Building XML schema wrappers ...'
-
-    IS_WINDOWS     = os.name == 'nt'
-    FILE_EXTENSION = '.py' if IS_WINDOWS else ''
-    FILE_PREFIX    = ('file:///' + os.getcwd() + '/' if IS_WINDOWS else '') + 'FuzzEd/static/xsd/'
-    BASE_PATH      = 'FuzzEd/models'
-
-    # Remove old binding files and generate new ones
-    for binding in XSD_PY_FILE_MAP.values():
-        path = '%s/%s.py' % (BASE_PATH, binding,)
-        if os.path.exists(path):
-            os.remove(path)
-
-    BINDINGS = ' '.join(['-u %(path)s%(xsd)s.xsd -m %(py)s' % {
-        'path': FILE_PREFIX,
-        'xsd':  xsd,
-        'py':   py
-    } for xsd, py in XSD_PY_FILE_MAP.items()])
-
-    # generate new bindings
-    if os.system('pyxbgen%(extension)s --binding-root=%(root)s %(bindings)s' % {
-        'extension': FILE_EXTENSION,
-        'root':      BASE_PATH,
-        'bindings':  BINDINGS
-    }) != 0:
-        raise Exception('Execution of pyxbgen failed.')
-
-@task
-def xmlschemas():
-    '''Builds XML schema Python wrappers.'''
-    build_xmlschema_wrappers()
-
-@task
-def naturaldocs():
-    '''Builds source code documentation in /docs.'''
-    # Build natural docs in 'docs' subdirectory
-    if not os.path.exists('docs'):
-        os.mkdir('docs')
-    if os.system('tools/NaturalDocs/NaturalDocs -i FuzzEd -xi FuzzEd/static/lib -o HTML docs -p docs ') != 0:
-        raise Exception('Execution of NaturalDocs compiler failed.')
 
 @task 
 def configs(target='development'):

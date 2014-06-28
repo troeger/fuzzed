@@ -24,11 +24,18 @@ env.Lessc('FuzzEd/static/css/theme/white.css',
 env.FuzzedConfig(['FuzzEd/settings.py', 'backends/daemon.ini'], 'settings.ini')
 
 # XML Wrapper generation
-env.PyXB('Fuzzed/models/xml_backend.py','FuzzEd/static/xsd/backendResult.xsd')
-env.PyXB('Fuzzed/models/xml_fuzztree.py','FuzzEd/static/xsd/fuzztree.xsd')
-env.PyXB('Fuzzed/models/xml_faulttree.py','FuzzEd/static/xsd/faulttree.xsd')
-env.PyXB('Fuzzed/models/xml_common.py','FuzzEd/static/xsd/commonTypes.xsd')
-env.PyXB('Fuzzed/models/xml_configurations.py','FuzzEd/static/xsd/configurations.xsd')
+#VariantDir('Fuzzed/models','FuzzEd/static/xsd')
+env.PyXB(   [  'Fuzzed/models/xml_common.py',
+               'Fuzzed/models/xml_configurations.py',
+               'Fuzzed/models/xml_backend.py',
+               'Fuzzed/models/xml_fuzztree.py',
+               'Fuzzed/models/xml_faulttree.py'   ],
+            [  'FuzzEd/static/xsd/commonTypes.xsd',
+               'FuzzEd/static/xsd/configurations.xsd',
+               'FuzzEd/static/xsd/backendResult.xsd',
+               'FuzzEd/static/xsd/fuzztree.xsd',
+               'FuzzEd/static/xsd/faulttree.xsd' 
+            ])
 
 # Generate SVG name collection recursively
 def get_svg_names(startdir='FuzzEd/static/img', covered=[]):
