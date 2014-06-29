@@ -87,7 +87,9 @@ function(Class) {
                 return new Creation(that);
             } catch (e) {
                 //TODO: try to catch this case more precisely, so we don't catch exceptions from elsewhere
-                if (e.message === "undefined is not a function") throw new ClassNotFound();
+                if (e.message === "undefined is not a function" || e.message === "constructor.apply is not a function"
+                    || e.message === "'undefined' is not a function (evaluating 'constructor.apply(this, [ that ].concat(args))')")
+                    throw new ClassNotFound();
                 else throw e;
             }
         },
