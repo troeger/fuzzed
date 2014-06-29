@@ -531,7 +531,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 beforeSend:  function(xhr) { xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken')); },
                 statusCode:  {
                     201: function(data, status, req) {
-                        success ? success(this.factory.create('Job', req.getResponseHeader('location'))) : jQuery.noop();
+                        success ? success(new Job(undefined, req.getResponseHeader('location'))) : jQuery.noop();
                     }
                 },
                 complete: complete || jQuery.noop,
@@ -561,7 +561,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 beforeSend:  function(xhr) { xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken')); },
                 statusCode:  {
                     201: function(data, status, req) {
-                        success ? success(new Job(req.getResponseHeader('location'))) : jQuery.noop();
+                        success ? success(new Job(undefined, req.getResponseHeader('location'))) : jQuery.noop();
                     }
                 },
                 complete: complete || jQuery.noop,
@@ -605,7 +605,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 },
                 statusCode: {
                     201: function(data, status, req) {
-                        var job = this.factory.create('Job', req.getResponseHeader('location'));
+                        var job = new Job(undefined, req.getResponseHeader('location'));
                         job.progressID             = progressID;
                         job.progressMessage        = pendingMessage;
                         job.progressSuccessMessage = successMessage;
