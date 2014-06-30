@@ -104,7 +104,7 @@
             "inherits": "event",
 
             "image": "basic_event.svg",
-            "help": "An initial fault or a primary component failure event.",
+            "help": "An initial fault event.",
 
             "properties": {
                 "name": {
@@ -208,7 +208,7 @@
             "allowConnectionTo": ["staticGate", "variationPoint"],
 
             "image": "intermediate_event.svg",
-            "help": "An error event resulting from a combination of previous events.",
+            "help": "An event resulting from a combination of previous events.",
 
             "properties": {
                 "name": {
@@ -418,7 +418,7 @@
             "inherits": "staticGate",
 
             "image": "and_gate.svg",
-            "help": "The output event occurs if all input events occur."
+            "help": "The above event occurs if all events below occur."
         },
 
         "orGate": {
@@ -426,7 +426,7 @@
             "inherits": "staticGate",
 
             "image": "or_gate.svg",
-            "help": "The output event occurs if one or more input events occur.",
+            "help": "The above event occurs if one or of the below events occur.",
 
             "connector": {
                 "offset": {
@@ -440,7 +440,7 @@
             "inherits": "orGate",
 
             "image": "xor_gate.svg",
-            "help": "The output event occurs if exactly one of the input events occur."
+            "help": "The above event occurs if exactly one of the events below occurs."
         },
 
         "votingOrGate": {
@@ -448,7 +448,7 @@
             "inherits": "orGate",
 
             "image": "voting_or_gate.svg",
-            "help": "The output event occurs if the given number of input events occur.",
+            "help": "The above event occurs if k of the below events occur.",
 
             "properties": {
                 "k": {
@@ -539,7 +539,7 @@
             "allowConnectionTo": ["event", "variationPoint", "dynamicGate"],
 
             "image": "feature_variation.svg",
-            "help": "Expresses the feature choice for one of the child trees.",
+            "help": "Each child tree expresses a system configuration.",
 
             "properties": {
                 "name": {
@@ -563,7 +563,7 @@
             "allowConnectionTo": ["eventSet"],
 
             "image": "redundancy_variation.svg",
-            "help": "Expresses different possible configurations of a Voting OR gate at this point of the tree.",
+            "help": "Expresses different Voting OR gate configurations.",
 
             "properties": {
                 "name": {
