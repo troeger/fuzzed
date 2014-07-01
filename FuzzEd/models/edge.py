@@ -1,7 +1,7 @@
 import json
 import datetime
 
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.db import models
 
@@ -135,6 +135,7 @@ class Edge(models.Model):
         post_save.send(sender=self.__class__, instance=self)
 
 @receiver(post_save, sender=Edge)
+@receiver(pre_delete, sender=Edge)
 def graph_modify(sender, instance, **kwargs):
     instance.graph.modified = datetime.datetime.now()
     instance.graph.save()

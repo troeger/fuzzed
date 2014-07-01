@@ -3,7 +3,7 @@ import datetime
 import sys
 
 from django.dispatch import receiver
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.db import models
 
 from FuzzEd.models import Node, Graph
@@ -104,6 +104,7 @@ class NodeGroup(models.Model):
 
 
 @receiver(post_save, sender=NodeGroup)
+@receiver(pre_delete, sender=NodeGroup)
 def graph_modify(sender, instance, **kwargs):
     instance.graph.modified = datetime.datetime.now()
     instance.graph.save()

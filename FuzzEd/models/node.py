@@ -2,7 +2,7 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 logger = logging.getLogger('FuzzEd')
@@ -646,6 +646,7 @@ class Node(models.Model):
         return True
 
 @receiver(post_save, sender=Node)
+@receiver(pre_delete, sender=Node)
 def graph_modify(sender, instance, **kwargs):
     instance.graph.modified = datetime.datetime.now()
     instance.graph.save()
