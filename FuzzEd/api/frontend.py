@@ -251,6 +251,31 @@ class NodeResource(ModelResource):
         # return the updated node object
         return HttpResponse(obj.to_json(), 'application/json', status=202)
 
+class NodeGroupSerializer(Serializer):
+    """
+        Our custom node group serializer. Using the default serializer would demand that the
+        graph reference is included, while we take it from the nested resource URL.
+    """
+    formats = ['json']
+    content_types = {
+        'json': 'application/json'
+    }
+
+    def from_json(self, content):
+        data_dict = json.loads(content)
+        if 'properties' in data_dict:
+            props = data_dict['properties']
+            for key, val in props.iteritems():
+                # JS code: {'prop_name': {'value':'prop_value'}}
+                # All others: {'prop_name': 'prop_value'}
+                if isinstance(val, dict) and 'value' in val:
+                    props[key] = val['value']
+        return data_dict
+
+    def to_json(self, data):
+        return json.dumps(data)
+
+
 class NodeGroupResource(ModelResource):
     '''
         An API resource for node groups.
@@ -260,7 +285,7 @@ class NodeGroupResource(ModelResource):
         queryset = NodeGroup.objects.filter(deleted=False)
         authorization = GraphOwnerAuthorization()
         authentication = SessionAuthentication()        
-        serializer = NodeSerializer()
+        serializer = NodeGroupSerializer()
         list_allowed_methods = ['post']
         detail_allowed_methods = ['delete', 'patch']
         excludes = ['deleted']
