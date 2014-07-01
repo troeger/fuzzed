@@ -351,8 +351,15 @@ class EdgeSerializer(Serializer):
     }
 
     def from_json(self, content):
-        return json.loads(content)
-
+        data_dict = json.loads(content)
+        if 'properties' in data_dict:
+            props = data_dict['properties']
+            for key, val in props.iteritems():
+                # JS code: {'prop_name': {'value':'prop_value'}}
+                # All others: {'prop_name': 'prop_value'}
+                if isinstance(val, dict) and 'value' in val:
+                    props[key] = val['value']
+        return data_dict
 
 class EdgeResource(ModelResource):
     """
