@@ -155,6 +155,7 @@ class NotificationResource(ModelResource):
         queryset = Notification.objects.all()
         detail_allowed_methods = ['delete']
         authentication = SessionAuthentication()
+        authorization = Authorization()
 
     def obj_delete(self, bundle, **kwargs):
         noti = self.obj_get(bundle=bundle, **kwargs)
