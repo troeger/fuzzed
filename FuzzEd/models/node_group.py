@@ -32,26 +32,27 @@ class NodeGroup(models.Model):
     def to_json(self, use_value_dict=False):
     	return json.dumps(self.to_dict(use_value_dict))
 
-    def get_attr(self, key):
-        """
-        Method: get_attr
-
-        Use this method to fetch an group's attribute. It looks in the node group object and its related properties.
-
-        Parameters:
-            {string} key - The name of the attribute.
-
-        Returns:
-            {attr} The found attribute. Raises a ValueError if no attribute for the given key exist.
-        """
-        if hasattr(self, key):
-            return getattr(self, key)
-        else:
+    def get_property(self, key, default=None):
+        try:
+            return self.properties.get(key=key).value
+        except ObjectDoesNotExist:
+            node_kind = nodes.all()[0].kind
+            logger.debug("Assuming node kind %s for node group properties"%node_kind)
             try:
-                prop = self.properties.get(key=key)
-                return prop.value
-            except Exception:
-                raise ValueError()
+                prop = notations.by_kind[self.graph.kind]['nodes'][node_kind]['properties'][key]
+                if prop is None:
+                    logger.warning('Notation configuration has empty default for node property ' + key)
+                    result = default
+                else:
+                    result = prop['default']
+                logger.debug('Node has no property "%s", using default "%s"' % (key, str(result)))
+                return result
+            except KeyError:
+                logger.debug('No default given in notation, using given default "%s" instead' % default)
+                return default
+        except MultipleObjectsReturned:
+            logger.error("ERROR: Property %s in node group %u exists in multiple instances"%(key, self.pk))
+            raise MultipleObjectsReturned()
 
 
     def set_attr(self, key, value):
