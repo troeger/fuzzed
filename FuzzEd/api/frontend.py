@@ -555,21 +555,22 @@ class ResultResource(ModelResource):
             return job.result_download()
 
         # It is an analysis result
-        #import pdb; pdb.set_trace()
 
         # Determine options given by data tables
-        start  = int(request.GET.get('iDisplayStart', 0))
+        start  = int(request.GET.get('iDisplayStart', 0))       # Starts at 0, if given
         length = int(request.GET.get('iDisplayLength', 10))
-        sort_cols = int(request.GET.get('iSortingCols',0))
+        sort_col_settings = int(request.GET.get('iSortingCols',0))      
         # Create sorted QuerySet
         sort_fields = []
-        for i in range(sort_cols):
+        for i in range(sort_col_settings):
             # Consider strange datatables way of expressing sorting criteria
-            sort_col = int(request.GET['iSortCol_'+str(i)]) 
+            # Sorting settings start at 0, sorting column numbers at 1
+            sort_col = int(request.GET['iSortCol_'+str(i)])     
             
-            if (request.GET.get('bSortable_'+ str(sort_col), 'false') == 'true'):
-                sort_dir = request.GET['sSortDir_'+str(i)] 
-                db_field_name=job.result_titles[sort_col - 1][0] # first column is not sent from the backend
+            if (request.GET.get('bSortable_'+ str(sort_col), 'false') == 'true'):   
+                sort_dir = request.GET['sSortDir_'+str(i)]      
+                # As said above, column numbers start at 1
+                db_field_name=job.result_titles[sort_col - 1][0] 
                 logger.debug("Sorting result set for "+db_field_name)
                 if sort_dir == "desc":
                     db_field_name = "-"+db_field_name          
