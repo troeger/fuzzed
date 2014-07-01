@@ -567,13 +567,15 @@ class ResultResource(ModelResource):
             # Consider strange datatables way of expressing sorting criteria
             sort_col = int(request.GET['iSortCol_'+str(i)]) 
             
-            if (request.GET['bSortable_'+ str(sort_col)] == 'true'):
+            if (request.GET.get('bSortable_'+ str(sort_col), 'false') == 'true'):
                 sort_dir = request.GET['sSortDir_'+str(i)] 
                 db_field_name=job.result_titles[sort_col - 1][0] # first column is not sent from the backend
                 logger.debug("Sorting result set for "+db_field_name)
                 if sort_dir == "desc":
                     db_field_name = "-"+db_field_name          
                 sort_fields.append(db_field_name)
+            else:
+                logger.error("Column %u is not marked to be sortable"%sort_col)
                 
         results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
         if len(sort_fields) > 0:

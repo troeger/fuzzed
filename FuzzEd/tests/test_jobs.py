@@ -115,10 +115,10 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
         result_url = job_result['LOCATION']
         # Ordering in datatables style
         titles = Result.titles(Result.ANALYSIS_RESULT, 'fuzztree')
-        print "Titles: %s\n"%str(titles)
+        print "\nTitles: %s\n"%str(titles)
         for index, col_desc in enumerate(titles, start=1):      # Datatables starts at column 1
             field_name = col_desc[0]
-            url = result_url+'?sEcho=doo&iSortingCols=1&sSortDir_0=asc&iSortCol_0='+str(index)
+            url = result_url+'?sEcho=doo&bSortable_0=true&iSortingCols=1&sSortDir_0=asc&iSortCol_0='+str(index)
             result = self.ajaxGet(url)
             data = json.loads(result.content)
             if field_name in data['aaData'][0]:

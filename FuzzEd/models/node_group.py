@@ -1,5 +1,6 @@
 import json
 import datetime
+import sys
 
 from django.dispatch import receiver
 from django.db.models.signals import post_save
@@ -12,7 +13,7 @@ class NodeGroup(models.Model):
     class Meta:
         app_label = 'FuzzEd'
 
-    client_id = models.BigIntegerField()
+    client_id = models.BigIntegerField(default=-sys.maxint)
     graph     = models.ForeignKey(Graph, null=False, related_name='groups')
     nodes     = models.ManyToManyField(Node)
     deleted   = models.BooleanField(default=False)
@@ -85,6 +86,22 @@ class NodeGroup(models.Model):
         for key, value in d.iteritems():
             self.set_attr(key, value)
         post_save.send(sender=self.__class__, instance=self)
+
+    def same_as(self, group):
+        ''' 
+            Checks if this group is equal to the given group in terms of nodes and attributes. 
+            This is a very expensive operation that is only intended for testing purposes.
+        '''
+        for my_node in self.nodes.all().filter(deleted=False):
+            found_match = False
+            for their_node in group.nodes.all().filter(deleted=False):
+                if my_node.same_as(their_node):
+                    found_match = True
+                    break
+            if not found_match:
+                return False
+        return True
+
 
 @receiver(post_save, sender=NodeGroup)
 def graph_modify(sender, instance, **kwargs):

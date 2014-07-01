@@ -290,7 +290,7 @@ class Graph(models.Model):
             edge.save()
 
     def copy_values(self, other):
-        # copy all nodes and their properties
+        # copy all nodes, groups and their properties
         node_cache = {}
 
         for node in other.nodes.all():
@@ -311,11 +311,34 @@ class Graph(models.Model):
                 prop.save()
 
         for edge in other.edges.all():
+            properties = edge.properties.all()            
             edge.pk = None
             edge.source = node_cache[edge.source.pk]
             edge.target = node_cache[edge.target.pk]
             edge.graph = self
             edge.save()
+
+            # now save the property objects for the new edge
+            for prop in properties:
+                prop.pk = None
+                prop.edge = edge
+                prop.save()
+
+        from node_group import NodeGroup
+        for group in other.groups.all():
+            # create group copy by overwriting the ID field
+            newgroup = NodeGroup(graph=self)
+            newgroup.save()         # prepare M2M field
+            for node in group.nodes.all():
+                newgroup.nodes.add(node_cache[node.pk])
+            newgroup.save()
+
+            # now save the property objects for the new group
+            for prop in group.properties.all():
+                prop.pk = None
+                prop.node_group = newgroup
+                prop.save()
+
 
         self.read_only = other.read_only
         self.save()
@@ -351,6 +374,15 @@ class Graph(models.Model):
                     break
             if not found_match:
                 #logger.debug("Couldn't find a match for node %s"%(str(my_node)))
+                return False
+
+        for my_group in self.groups.all().filter(deleted=False):
+            found_match = False
+            for their_group in graph.groups.all().filter(deleted=False):
+                if my_group.same_as(their_group):
+                    found_match = True
+                    break
+            if not found_match:
                 return False
 
         return True
