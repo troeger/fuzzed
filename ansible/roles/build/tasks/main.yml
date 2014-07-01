@@ -14,4 +14,6 @@
 
 - include: gcc.yml
 - include: lessc.yml
-- include: xml.yml
+- include: node.yml
+- include: ../../common/tasks/xml.yml
+- include: ../../common/tasks/boost.yml

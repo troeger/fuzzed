@@ -11,3 +11,6 @@
 - name: Check for DVIPS
   fail: msg="DVIPS is not available. Please install a Tex distribution."
   when: tex.stat.isfile is defined and tex.stat.isfile == true
+
+- include: ../../common/tasks/xml.yml
+- include: ../../common/tasks/boost.yml

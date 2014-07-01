@@ -38,6 +38,7 @@ def web():
 @roles('backend')
 def backend():
     ''' Performs deployment of the local packaging result on the backend server.'''
+    os.system("ansible-playbook -l backendservers -i ansible/prod_machines ansible/site.yml")
     package = "FuzzEdBackend-"+version+".tar.gz"
     # TODO: Run ansible on remote machine
     assert(os.path.isfile('dist/'+package))
