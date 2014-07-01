@@ -17,6 +17,7 @@
 
             "deletable": true,
             "copyable": true,
+            "cloneable": false,
 
             "connector": {
                 "offset": {
@@ -105,6 +106,8 @@
 
             "image": "basic_event.svg",
             "help": "An initial fault event.",
+
+            "cloneable": true,
 
             "properties": {
                 "name": {

@@ -1147,6 +1147,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 this.properties.hide();
 
                 var node  = this.graph.getNodeById(selected.data(this.config.Keys.NODE).id);
+
+                if (!node.cloneable) return false;
+
                 var clone = this.graph._clone(node);
 
                 if (clone) {
