@@ -1,7 +1,5 @@
 from SCons.Script import * 
 
-#TODO: Take source XSD and target PY module from Builder arguments
-
 def build_xmlschema_wrappers(target, source, env):
     '''
         SCons needs real file names, so the main script must use proper file

@@ -86,5 +86,5 @@ def createTikzLib(target, source, env):
     f.write("'''")
     f.close()
 
-tikzbuilder = Builder(action = createTikzLib, suffix = '.py', src_suffix = '.svg')
+tikzbuilder = Builder(action = createTikzLib)
 

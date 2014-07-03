@@ -37,7 +37,14 @@ env.PyXB(   [  'Fuzzed/models/xml_common.py',
                'FuzzEd/static/xsd/faulttree.xsd' 
             ])
 
+env.Notations(  'FuzzEd/models/notations.py',
+              [ 'FuzzEd/static/notations/dfd.json',
+                'FuzzEd/static/notations/faulttree.json',
+                'FuzzEd/static/notations/fuzztree.json',
+                'FuzzEd/static/notations/rbd.json'] )
+
 # Generate SVG name collection recursively
+#TODO: Perform file name search with recursive SCons Glob()
 def get_svg_names(startdir='FuzzEd/static/img', covered=[]):
     for root, dirs, files in os.walk(startdir):
         for d in dirs:
@@ -47,6 +54,5 @@ def get_svg_names(startdir='FuzzEd/static/img', covered=[]):
             if fullname.endswith('.svg') and fullname not in covered:
                 covered.append(fullname)
     return covered
-
 env.Tikz('FuzzEd/models/node_rendering.py', get_svg_names())
 

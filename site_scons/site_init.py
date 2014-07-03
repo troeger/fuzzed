@@ -2,6 +2,7 @@ from less_builder import lessbuilder
 from pyxb_builder import pyxbbuilder
 from conf_builder import confbuilder
 from tikz_builder import tikzbuilder
+from notations_builder import notationsbuilder
 
 def fuzzed_builders(env):
 	env.Append(BUILDERS = 
@@ -9,6 +10,7 @@ def fuzzed_builders(env):
 					'Lessc' : lessbuilder,
 					'FuzzedConfig' : confbuilder,
 					'PyXB' : pyxbbuilder,
-					'Tikz' : tikzbuilder
+					'Tikz' : tikzbuilder,
+					'Notations' : notationsbuilder
 				})
 
