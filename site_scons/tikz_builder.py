@@ -67,7 +67,7 @@ def build_shape_lib_recursive(sources, covered=[]):
     result = ''
     for f in sources:
         try:
-            result += svg2pgf_shape(f)
+            result += svg2pgf_shape(str(f))
             print "Converting %s to TiKZ shape ..."%f
         except Exception, e:
             print "Error on parsing, ignoring %s ..."%f

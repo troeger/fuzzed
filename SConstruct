@@ -1,3 +1,11 @@
+'''
+  The central SCons file for this project, which is based on a set of FuzzEd-specific
+  builders stored in the site_scons folder.
+
+  TODO:
+    - Add clean target for .pyc files.
+'''
+
 import os
 
 #./site_scons automatically becomes part of the Python search path
@@ -43,16 +51,10 @@ env.Notations(  'FuzzEd/models/notations.py',
                 'FuzzEd/static/notations/fuzztree.json',
                 'FuzzEd/static/notations/rbd.json'] )
 
-# Generate SVG name collection recursively
-#TODO: Perform file name search with recursive SCons Glob()
-def get_svg_names(startdir='FuzzEd/static/img', covered=[]):
-    for root, dirs, files in os.walk(startdir):
-        for d in dirs:
-            covered += get_svg_names(root+d,covered)
-        for f in files:
-            fullname = root+os.sep+f
-            if fullname.endswith('.svg') and fullname not in covered:
-                covered.append(fullname)
-    return covered
-env.Tikz('FuzzEd/models/node_rendering.py', get_svg_names())
+env.Tikz( 'FuzzEd/models/node_rendering.py', 
+          Glob('FuzzEd/static/img/dfd/*.svg') +
+          Glob('FuzzEd/static/img/faulttree/*.svg') +
+          Glob('FuzzEd/static/img/fuzztree/*.svg') +
+          Glob('FuzzEd/static/img/rbd/*.svg') )
+
 
