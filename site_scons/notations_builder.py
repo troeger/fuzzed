@@ -7,6 +7,7 @@
 '''
 
 from SCons.Script import * 
+import json, pprint
 
 def generate_graphml_keys(notations):
     '''
@@ -113,6 +114,23 @@ def generate_graphml_keys(notations):
 
     return graphml_keys, graphml_graph_data, graphml_node_data
 
+def extend(target, source, *others, **options):
+    all_sources = (source,) + others
+    deep = options.get('deep', False)
+
+    for other in all_sources:
+        if not deep:
+            # perform classical dict update, since nested dicts are not used
+            target.update(other)
+            continue
+
+        for key, value in other.items():
+            if key in target and isinstance(target[key], dict) and isinstance(value, dict):
+                target[key] = extend({}, target[key], other[key], deep=True)
+            else:
+                target[key] = value
+
+    return target
 
 def generate_choices(notations):
     return [(notation['kind'], notation['name']) for notation in notations]
@@ -143,7 +161,7 @@ def inherit(node_name, node, nodes, node_cache):
     elif inherits_from not in node_cache:
         inherit(inherits_from, nodes[inherits_from], nodes, node_cache)
 
-    resolved = util.extend({}, node_cache[inherits_from], node, deep=True)
+    resolved = extend({}, node_cache[inherits_from], node, deep=True)
     node_cache[node_name] = resolved
 
     return resolved
