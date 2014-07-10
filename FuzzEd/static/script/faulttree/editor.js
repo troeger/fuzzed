@@ -584,7 +584,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                     "bSortable":      false
                                   };
                                   
-            columns.unshift(collapse_column);
+            columns.push(collapse_column);
             
             //formating function for displaying configuration warnings/errors
             var format = function (d) {
@@ -667,7 +667,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                      }.bind(this));
                                 }
                                 
-                                /* Sample Configuration issues
+                                /* Sample Configuration issues 
                                 if (iDisplayIndex == 0){
                                     current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
                                 } else if (iDisplayIndex == 1){
