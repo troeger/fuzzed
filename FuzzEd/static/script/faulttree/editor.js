@@ -120,29 +120,33 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
      */
     var AnalysisResultMenu = Menus.Menu.extend({
         /**
-         * Group: Members
-         *      {<Editor>}        _editor              - The <Editor> instance.
-         *      {<Job>}           _job                 - <Job> instance of the backend job that is responsible for
-         *                                               calculating the probability.
+         * Group: Members 
+         *      {<Editor>}        _editor               - The <Editor> instance.
+         *      {<Job>}           _job                  - <Job> instance of the backend job that is responsible for
+         *                                                calculating the probability.
          *      {jQuery Selector} _graphIssuesContainer - Display
-         *      {jQuery Selector} _chartContainer      - jQuery reference to the chart's container.
+         *      {jQuery Selector} _chartContainer       - jQuery reference to the chart's container.
          *      {jQuery Selector} _tableContainer       - jQuery reference to the table's container.
-         *      {Highchart}       _chart               - The Highchart instance displaying the result.
+         *      {Highchart}       _chart                - The Highchart instance displaying the result.
          *      {DataTables}      _table                - The DataTables instance displaying the result.
-         *      {Object}          _configNodeMap       - A mapping of the configuration ID to its node set.
-         *      {Object}          _configNodeMap       - A mapping of the configuration ID to its edge set.
-         *      {Object}          _redundancyNodeMap   - A mapping of the configuration ID to the nodes' N-values
+         *      {Object}          _configNodeMap        - A mapping of the configuration ID to its node set.
+         *      {Object}          _configNodeMap        - A mapping of the configuration ID to its edge set.
+         *      {Object}          _redundancyNodeMap    - A mapping of the configuration ID to the nodes' N-values
+         *      {Object}          _configMetaDataCached - A dictionary indicating if choice meta data for a specific configuration is cached.
+
          */
-        _editor:              undefined,
-        _job:                 undefined,
+        _editor:               undefined,
+        _job:                  undefined,
         _graphIssuesContainer: undefined,
-        _chartContainer:      undefined,
+        _chartContainer:       undefined,
         _tableContainer:       undefined,
-        _chart:               undefined,
+        _chart:                undefined,
         _table:                undefined,
-        _configNodeMap:       {},
-        _configEdgeMap:       {},
-        _redundancyNodeMap:   {},
+        _configNodeMap:        {},
+        _configEdgeMap:        {},
+        _redundancyNodeMap:    {},
+        _configMetaDataCached: {},
+        
 
         /**
          * Group: Initialization
@@ -602,10 +606,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 return '';
             }.bind(this);
             
-            // clear global dictionaries (with cached data) before initalisation 
-            this._configNodeMap     = {};
-            this._configEdgeMap     = {};
-            this._redundancyNodeMap = {};
+            
+            // clear all cached metadata (from previous analysis run)
+            this._clearAllConfigurationMetaData();
             
             this._table = jQuery('#results_table').dataTable({
                             "bProcessing":   true,
@@ -658,14 +661,12 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                 if ('choices' in current_config ){
                                     var choices  = aData['choices'];
                                     
-                                    // check if config is alredy cached in configNodeMap/configEdgeMap
-                                    if (! (configID in this._configNodeMap)){
+                                    // check if config meta data is alredy cached 
+                                    if (! (configID in this._configMetaDataCached)){
                                         // remember the nodes and edges involved in this config for later highlighting
                                         this._collectNodesAndEdgesForConfiguration(configID, choices);
-                                    }
                                     
-                                     // check if config is alredy cached in redundancyNodeMap 
-                                    if (! (configID in this._redundancyNodeMap)){
+                                    
                                         // remember the redundancy settings for this config for later highlighting
                                         this._redundancyNodeMap[configID] = {};
                                         _.each(choices, function(choice, node) {
@@ -673,6 +674,8 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                                 this._redundancyNodeMap[configID][node] = choice['n'];
                                             }
                                         }.bind(this));
+                                        
+                                        this._configMetaDataCached[configID] = true;
                                     }
                                     
                                     jQuery(nRow).on("mouseover", function(){    
@@ -742,6 +745,24 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
             
             return this;
         },
+        
+        
+        
+        /*
+         * Method _clearAllConfigurationMetadata
+         *      Clear all global Dictionaries that contains cached informations about specific configurations
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
+         */
+            
+         _clearAllConfigurationMetaData: function() {
+             this._configNodeMap        = {};
+             this._configEdgeMap        = {};
+             this._redundancyNodeMap    = {};
+             this._configMetaDataCached = {};
+            
+             return this;
+         },
         
         /**
          *  Method: _highlightConfiguration
