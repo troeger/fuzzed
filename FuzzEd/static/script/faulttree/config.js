@@ -64,10 +64,10 @@ define(['config', 'jquery'], function(Config) {
          *      Menu configurations.
          *
          * Constants:
-         *      {Number} PROBABILITY_MENU_MAX_GRID_HEIGHT - Max. height of the grid that displays the configurations.
+         *      {Number} RESULTS_TABLE_MAX_ROWS - Max. number of configurations that can be dispayed within one page in the analysis results table.
          */
         Menus: {
-            PROBABILITY_MENU_MAX_GRID_HEIGHT: 500
+            RESULTS_TABLE_MAX_ROWS: 10
         }
     });
 });

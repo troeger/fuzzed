@@ -126,9 +126,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
          *                                               calculating the probability.
          *      {jQuery Selector} _graphIssuesContainer - Display
          *      {jQuery Selector} _chartContainer      - jQuery reference to the chart's container.
-         *      {jQuery Selector} _gridContainer       - jQuery reference to the table's container.
+         *      {jQuery Selector} _tableContainer       - jQuery reference to the table's container.
          *      {Highchart}       _chart               - The Highchart instance displaying the result.
-         *      {DataTables}      _grid                - The DataTables instance displaying the result.
+         *      {DataTables}      _table                - The DataTables instance displaying the result.
          *      {Object}          _configNodeMap       - A mapping of the configuration ID to its node set.
          *      {Object}          _configNodeMap       - A mapping of the configuration ID to its edge set.
          *      {Object}          _redundancyNodeMap   - A mapping of the configuration ID to the nodes' N-values
@@ -137,9 +137,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
         _job:                 undefined,
         _graphIssuesContainer: undefined,
         _chartContainer:      undefined,
-        _gridContainer:       undefined,
+        _tableContainer:       undefined,
         _chart:               undefined,
-        _grid:                undefined,
+        _table:                undefined,
         _configNodeMap:       {},
         _configEdgeMap:       {},
         _redundancyNodeMap:   {},
@@ -157,7 +157,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
             this._editor = editor;
             this._graphIssuesContainer = this.container.find('.graph_issues');
             this._chartContainer       = this.container.find('.chart');
-            this._gridContainer        = this.container.find('.table_container');
+            this._tableContainer        = this.container.find('.table_container');
         },
 
         /**
@@ -223,12 +223,12 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
             // reset height of the chart container (which is set after resizing event)
             this._chartContainer.height('')
             this._chartContainer.empty();
-            this._gridContainer.empty();
+            this._tableContainer.empty();
             // reset height in case it was set during grid creation
-            this._gridContainer.css('min-height', '');
+            this._tableContainer.css('min-height', '');
             // reset container width (which is set after initalisation of DataTables)
             this.container.css('width','');
-            this._chart = null; this._grid = null;
+            this._chart = null; this._table = null;
             this._configNodeMap = {};
             this._redundancyNodeMap = {};
 
@@ -314,7 +314,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                     if (this._chart != null) {
                         
                         // fit all available space with chart    
-                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._gridContainer.height());
+                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._tableContainer.height());
                         
                         this._chart.setSize(
                             this._chartContainer.width(),
@@ -470,7 +470,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 '</div>');
 
             this._chartContainer.empty().append(progressBar);
-            this._gridContainer.empty();
+            this._tableContainer.empty();
 
             return this;
         },
@@ -543,12 +543,12 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                         events: {
                             mouseOver : function () {
                                 var config_id = this.name
-                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                var row = self._table.fnFindCellRowNodes(config_id, 1 );
                                 jQuery(row).addClass('tr_hover');
                             },
                             mouseOut  : function () {
                                 var config_id = this.name
-                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                var row = self._table.fnFindCellRowNodes(config_id, 1 );
                                 jQuery(row).removeClass('tr_hover');
                             },
                         }
@@ -576,7 +576,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
         _displayResultWithDataTables: function(columns, job_result_url) {
             
             // clear container
-            this._gridContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');            
+            this._tableContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');            
             
             var collapse_column = {
                                     "class":          'details-control',
@@ -607,14 +607,14 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
             this._configEdgeMap     = {};
             this._redundancyNodeMap = {};
             
-            this._grid = jQuery('#results_table').dataTable({
+            this._table = jQuery('#results_table').dataTable({
                             "bProcessing":   true,
                             "bFilter":       false,
                             "bServerSide":   true,
                             "sAjaxSource":   job_result_url,
                             "aoColumns":     columns,
                             "bLengthChange": false,
-                            "iDisplayLength": 10,
+                            "iDisplayLength": FaulttreeConfig.Menus.RESULTS_TABLE_MAX_ROWS,
                             "fnDrawCallback": function(oSettings) {
                                 
                                 var serverData = oSettings['json'];
@@ -623,13 +623,13 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                
                                 if(totalRecords < 2){
                                      // unbind sorting events if there are less than 2 rows
-                                    this._gridContainer.find('th').removeClass().unbind('click.DT');    
+                                    this._tableContainer.find('th').removeClass().unbind('click.DT');    
                                 }
                                 
-                                if(totalRecords <= 10){
+                                if(totalRecords <= FaulttreeConfig.Menus.RESULTS_TABLE_MAX_ROWS){
                                      // remove pagination elements if only one page is displayed
-                                     this._gridContainer.find('div.dataTables_paginate').css('display', 'none');
-                                     this._gridContainer.find('div.dataTables_info').css('display', 'none');
+                                     this._tableContainer.find('div.dataTables_paginate').css('display', 'none');
+                                     this._tableContainer.find('div.dataTables_info').css('display', 'none');
                                 }
                                 
                                 // display points with highchart after table was rendered
@@ -695,7 +695,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                     // Add event listener for opening and closing details
                                     jQuery(nRow).on('click', function () {
                                         var tr  = jQuery(nRow);
-                                        var row = this._grid.api().row(tr);
+                                        var row = this._table.api().row(tr);
  
                                         if ( row.child.isShown() ) {
                                             // This row is already open - close it
@@ -729,14 +729,14 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                     this._setupResizing();
                                     
                                     // set minumum height of grid as the height of the first draw of the grid
-                                    this._gridContainer.css('min-height', this._gridContainer.height());
+                                    this._tableContainer.css('min-height', this._tableContainer.height());
                                     // keep container width when switching the page (-> otherwise jumping width when switching)
                                     this.container.css('width', this.container.width());
                                     
                                 }.bind(this)    
                             });
                              
-            this._grid.on('mouseleave', 'tr', function () {
+            this._table.on('mouseleave', 'tr', function () {
                 this._unhighlightConfiguration();
             }.bind(this));
             
