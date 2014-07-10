@@ -34,6 +34,7 @@ Alias('css', lessc_targets)
 # Config file generation - 'settings.py' and 'daemon.ini' target
 config_targets = ['FuzzEd/settings.py', 'backends/daemon.ini']
 env.FuzzedConfig( config_targets, 'settings.ini')
+AlwaysBuild('settings')     # to support flipping betwenn Vagrant and native dev
 Alias('settings', config_targets)
 
 # XML Wrapper generation
@@ -71,5 +72,8 @@ Alias('shapes', tikz_targets)
 env.Default('docs', 'css', 'settings', 'xml', 'notations', 'shapes')
 
 # Special pseudo-targets to run stuff via Scons
-server = env.Command('run.server', None, server)
+env.Command('run.server', None, server)
+env.Command('run.backend', None, backend)
+env.Command('run.tests', None, tests)
+
 

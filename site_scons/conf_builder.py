@@ -174,8 +174,12 @@ def createDjangoSettings(confFile, specialSections):
     replacements['conf_lines']='\n'.join(sorted(conf_lines))
     return settings%replacements
 
-def createConfigs(target, source, env, mode='development'):
+def createConfigs(target, source, env):
     '''Builds the configuration files for sub projects out of settings.ini'''
+    if socket.getfqdn() == 'vagrant-ubuntu-trusty-32':
+        mode = "vagrant"
+    else:
+        mode = "development"
     assert(mode in ['development','vagrant','production'])
     for t in target:
         fname = str(t)
