@@ -616,11 +616,25 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                             "bLengthChange": false,
                             "iDisplayLength": 10,
                             "fnDrawCallback": function(oSettings) {
-                                // display points with highchart after table was rendered
+                                
                                 var serverData = oSettings['json'];
+                                
+                                var totalRecords = serverData['iTotalRecords']
+                               
+                                if(totalRecords < 2){
+                                     // unbind sorting events if there are less than 2 rows
+                                    this._gridContainer.find('th').removeClass().unbind('click.DT');    
+                                }
+                                
+                                if(totalRecords <= 10){
+                                     // remove pagination elements if only one page is displayed
+                                     this._gridContainer.find('div.dataTables_paginate').css('display', 'none');
+                                     this._gridContainer.find('div.dataTables_info').css('display', 'none');
+                                }
+                                
+                                // display points with highchart after table was rendered
                                 var configurations = serverData['aaData'];
-                                var chartData = {};
-                                 
+                                var chartData = {}; 
                                  _.each(configurations, function(config) {
                                      var configID = config['id'] || '';
                                      
@@ -628,14 +642,11 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                      if (typeof config['points'] !== 'undefined') {
                                          chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
                                      }
-                                     
-                                     if (_.size(chartData) != 0) {
-                                         this._displayResultWithHighcharts(chartData, 10); //data['decompositionNumber']);
-                                     }
-                                     
-                                     
-                                 }.bind(this)); 
-                                
+                                 }.bind(this));
+                                 
+                                 if (_.size(chartData) != 0) {
+                                     this._displayResultWithHighcharts(chartData, 10); //data['decompositionNumber']);
+                                 }     
                                 }.bind(this),
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                                 
