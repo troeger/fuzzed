@@ -4293,10 +4293,12 @@ i.icon-layout-tree:hover {
 }
 .probabillity_menu .table_container td {
   font-size: 12px;
+  text-align: center;
   padding: 7px;
 }
 .probabillity_menu .table_container th {
   font-size: 12px;
+  text-align: center;
 }
 .probabillity_menu .table_container div {
   font-size: 12px;

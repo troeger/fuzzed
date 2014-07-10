@@ -349,7 +349,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
             var issues = data.issues;
             
             if (issues){
-                this._displayGraphIssues(issues.errors, issues.warnings);
+                if (_.size(issues.errors) > 0 || _.size(issues.warnings) > 0){
+                    this._displayGraphIssues(issues.errors, issues.warnings);
+                }
             }
                 
             // remove progress bar
