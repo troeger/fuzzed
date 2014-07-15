@@ -96,8 +96,6 @@ bool FaultTreeNode::addChildBelow(const std::string& id, FaultTreeNode::Ptr inse
 
 FaultTreeNode::~FaultTreeNode()
 {
-// 	for (const auto& child : m_children)
-// 		delete child;
 }
 
 const FaultTreeNode* FaultTreeNode::getRoot() const
