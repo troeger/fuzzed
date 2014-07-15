@@ -67,7 +67,7 @@ class Graph(models.Model):
         else:
             return None
 
-    def to_json(self):
+    def to_json(self, use_value_dict = False):
         """
         Method: to_json
         
@@ -76,9 +76,9 @@ class Graph(models.Model):
         Returns:
          {dict} the graph in JSON representation
         """
-        return json.dumps(self.to_dict())
+        return json.dumps(self.to_dict(use_value_dict))
 
-    def to_dict(self):
+    def to_dict(self, use_value_dict=False):
         """
         Method: to_dict
         
@@ -90,9 +90,9 @@ class Graph(models.Model):
         node_set  = self.nodes.filter(deleted=False)
         edge_set  = self.edges.filter(deleted=False)
         group_set = self.groups.filter(deleted=False)
-        nodes     = [node.to_dict() for node in node_set]
-        edges     = [edge.to_dict() for edge in edge_set]
-        groups    = [group.to_dict() for group in group_set]
+        nodes     = [node.to_dict(use_value_dict) for node in node_set]
+        edges     = [edge.to_dict(use_value_dict) for edge in edge_set]
+        groups    = [group.to_dict(use_value_dict) for group in group_set]
 
         node_seed  = self.nodes.aggregate(Max('client_id'))['client_id__max']
         edge_seed  = self.edges.aggregate(Max('client_id'))['client_id__max']
@@ -270,7 +270,7 @@ class Graph(models.Model):
                     node.save()
                 else:
                     node.set_attr(name, value)
-            logger.debug("New node: "+str(node.to_dict()))
+            #logger.debug("New node from GraphML import: "+str(node.to_dict()))
         # Graph properties belong to the TOP node
         # GraphML files without graph <data> properties may refer to a graph type that has no
         # TOP node concept
@@ -279,6 +279,7 @@ class Graph(models.Model):
             if name != 'kind':          # already handled above
                 if name not in notations.graphml_graph_data[graph_kind]:
                     raise Exception("Invalid graph data element '%s'"%name)
+                logger.debug("Setting attribute %s to %s on top node"%(name, data.text))
                 self.top_node().set_attr(name, data.text)   # Fetch TOP node here, not existent in RBD's
 
         # go through all GraphML edges and create them as model edges for this graph
@@ -289,7 +290,7 @@ class Graph(models.Model):
             edge.save()
 
     def copy_values(self, other):
-        # copy all nodes and their properties
+        # copy all nodes, groups and their properties
         node_cache = {}
 
         for node in other.nodes.all():
@@ -310,11 +311,34 @@ class Graph(models.Model):
                 prop.save()
 
         for edge in other.edges.all():
+            properties = edge.properties.all()            
             edge.pk = None
             edge.source = node_cache[edge.source.pk]
             edge.target = node_cache[edge.target.pk]
             edge.graph = self
             edge.save()
+
+            # now save the property objects for the new edge
+            for prop in properties:
+                prop.pk = None
+                prop.edge = edge
+                prop.save()
+
+        from node_group import NodeGroup
+        for group in other.groups.all():
+            # create group copy by overwriting the ID field
+            newgroup = NodeGroup(graph=self)
+            newgroup.save()         # prepare M2M field
+            for node in group.nodes.all():
+                newgroup.nodes.add(node_cache[node.pk])
+            newgroup.save()
+
+            # now save the property objects for the new group
+            for prop in group.properties.all():
+                prop.pk = None
+                prop.node_group = newgroup
+                prop.save()
+
 
         self.read_only = other.read_only
         self.save()
@@ -343,11 +367,22 @@ class Graph(models.Model):
         for my_node in self.nodes.all().filter(deleted=False):
             found_match = False
             for their_node in graph.nodes.all().filter(deleted=False):
+                #logger.debug("Checking our %s (%u) against %s (%u)"%(str(my_node), my_node.pk, str(their_node), their_node.pk))
                 if my_node.same_as(their_node):
+                    #logger.debug("Match")
                     found_match = True
                     break
             if not found_match:
-                logger.debug("Couldn't find a match for node %s"%(str(my_node)))
+                #logger.debug("Couldn't find a match for node %s"%(str(my_node)))
+                return False
+
+        for my_group in self.groups.all().filter(deleted=False):
+            found_match = False
+            for their_group in graph.groups.all().filter(deleted=False):
+                if my_group.same_as(their_group):
+                    found_match = True
+                    break
+            if not found_match:
                 return False
 
         return True

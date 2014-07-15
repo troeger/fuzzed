@@ -97,6 +97,10 @@ define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, C
             return this;
         },
 
+        takeDownVisualRepresentation: function() {
+            this.container.remove();
+        },
+
         /**
          * Method: _setupEvents
          *      Sets up the mirror's event handling. The handlers will respectively change the mirror's text when the

@@ -1,5 +1,8 @@
 import json
+import datetime
 
+from django.db.models.signals import post_save, pre_delete
+from django.dispatch import receiver
 from django.db import models
 
 from node import Node
@@ -33,10 +36,7 @@ class Edge(models.Model):
         prefix = '[DELETED] ' if self.deleted else ''
         return  unicode('%s%s -> %s' % (prefix, str(self.source), str(self.target)))
 
-    def get_properties(self):
-        return {prop.key: {'value': prop.sanitized_value} for prop in self.properties.filter(deleted=False)}
-
-    def to_dict(self):
+    def to_dict(self, use_value_dict=False):
         """
         Method: to_dict
         
@@ -45,8 +45,13 @@ class Edge(models.Model):
         Returns:
          {dict} the edge as dictionary
         """
+        if use_value_dict:
+            prop_values = {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
+        else:
+            prop_values = {prop.key: prop.value for prop in self.properties.filter(deleted=False)}
+
         return {
-            'properties': self.get_properties(),
+            'properties': prop_values,
             'id':         self.client_id,
             'graph':      self.graph.pk,
             'source':     self.source.client_id,
@@ -64,7 +69,7 @@ class Edge(models.Model):
         """
         return '       <edge source="%s" target="%s" />\n' % (self.source.client_id, self.target.client_id,)
 
-    def to_json(self):
+    def to_json(self, use_value_dict=False):
         """
         Method: to_json
 
@@ -73,44 +78,47 @@ class Edge(models.Model):
         Returns:
          {dict} the edge as dictionary
         """
-        return json.dumps(self.to_dict())
-
-    def get_attr(self, key):
-        """
-        Method: get_attr
-
-        Use this method to fetch an edges's attribute. It looks in the edge object and its related properties.
-
-        Parameters:
-            {string} key - The name of the attribute.
-
-        Returns:
-            {attr} The found attribute. Raises a ValueError if no attribute for the given key exist.
-        """
-        if hasattr(self, key):
-            return getattr(self, key)
-        else:
-            try:
-                prop = self.properties.get(key=key)
-                return prop.value
-            except Exception:
-                raise ValueError()
+        return json.dumps(self.to_dict(use_value_dict))
 
     def set_attr(self, key, value):
         """
         Method: set_attr
 
-        Use this method to set a node's attribute. It looks in the node object and its related properties for an
+        Use this method to set a edge's attribute. It looks in the edge object and its related properties for an
         attribute with the given name and changes it. If non exist, a new property is added saving this attribute.
 
         Parameters:
             {string} key - The name of the attribute.
             {attr} value - The new value that should be stored.
+
+        TODO: Deprecate this method, set_attrs() should only be used to have an efficient modification signal handling.
         """
+        assert(self.pk)
+        from FuzzEd.models import Property
+        value = Property.sanitized_value(self, key, value)
         if hasattr(self, key):
             setattr(self, key, value)
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'edge': self})
             prop.value = value
             prop.save()
+
+    def set_attrs(self, d):
+        '''
+            Set edge attributes according to the provided dictionary.
+
+            TODO: Replace by true bulk insert implementation.
+        '''
+        for key, value in d.iteritems():
+            self.set_attr(key, value)
+        post_save.send(sender=self.__class__, instance=self)
+
+@receiver(post_save, sender=Edge)
+@receiver(pre_delete, sender=Edge)
+def graph_modify(sender, instance, **kwargs):
+    instance.graph.modified = datetime.datetime.now()
+    instance.graph.save()
+    # updating project modification date
+    instance.graph.project.modified = instance.graph.modified
+    instance.graph.project.save()
 

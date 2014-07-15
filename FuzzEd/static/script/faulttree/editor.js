@@ -1,5 +1,5 @@
-define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'highcharts', 'jquery-ui', 'slickgrid'],
-function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTables) {
+define(['editor', 'factory', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'datatables-api', 'faulttree/node_group', 'highcharts', 'jquery-ui'],
+function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTables) {
     /**
      * Package: Faulttree
      */
@@ -489,6 +489,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
 
             yTick = yTick || 5;
             var series = [];
+            
+            var self = this;
 
             _.each(data, function(cutset, name) {
                 series.push({
@@ -536,7 +538,18 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
                         marker: {
                             radius: 1
                         },
-                        events: {}
+                        events: {
+                            mouseOver : function () {
+                                var config_id = this.name
+                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                jQuery(row).addClass('tr_hover');
+                            },
+                            mouseOut  : function () {
+                                var config_id = this.name
+                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                jQuery(row).removeClass('tr_hover');
+                            },
+                        }
                     }
                 },
 
@@ -955,8 +968,15 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          */
 
         /**
-         * Method: getConfig
-         *      Overrides the abstract base method.
+         *  Group: Accessors
+         */
+
+        getFactory: function() {
+            return new Factory(undefined, 'faulttree');
+        },
+
+        /**
+         *  Method: getConfig
          *
          * Returns:
          *      The <FaulttreeConfig> object.
@@ -981,8 +1001,8 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
          */
         _loadGraphCompleted: function(readOnly) {
             //this.cutsetsMenu     = new CutsetsMenu(this);
-            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this);
-            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this);
+            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this.factory, this);
+            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this.factory, this);
 
             this._setupCutsetsAction()
                 ._setupAnalyticalProbabilityAction()
@@ -1104,8 +1124,44 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTab
         _downloadFileFromURL: function(url, format) {
             //TODO: File is already downloaded in the _query method (job class), maybe first or second download should be prevented if possible.
             window.location = url;
+        },
+
+        _setupMenuActions: function() {
+            this._super();
+
+            jQuery('#' + this.config.IDs.ACTION_CLONE).click(function() {
+                this._cloneSelection();
+            }.bind(this));
 
             return this;
+        },
+
+        _cloneSelection: function(event) {
+            var selected = jQuery('.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE);
+
+            // we will only clone the selection, if a single node is selected
+            if (selected.length === 1) {
+                // temporarily hide the properties menu to avoid, that it shows the newly created node's individual
+                //    properties, as it is supposed to show the common properties with it's original node (i.e. the
+                //    NodeGroup's properties)
+                this.properties.hide();
+
+                var node  = this.graph.getNodeById(selected.data(this.config.Keys.NODE).id);
+
+                if (!node.cloneable) return false;
+
+                var clone = this.graph._clone(node);
+
+                if (clone) {
+                    // highlight the newly generated node by selecting it
+                    this._deselectAll();
+                    clone.select();
+                }
+
+                // allow the properties menu to be shown again
+                this.properties.show();
+            }
+            // otherwise do nothing
         }
     });
 });

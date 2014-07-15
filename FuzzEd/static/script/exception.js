@@ -97,3 +97,13 @@ function Warning(message) {
 }
 Warning.prototype = new Error();
 Warning.prototype.constructor = Warning;
+
+function ClassResolveError(message) {
+    var error = Error.apply(this, arguments);
+
+    this.name    = 'ClassResolveError';
+    this.message = message || '';
+    this.stack   = error.stack;
+}
+ClassResolveError.prototype = new Error();
+ClassResolveError.prototype.constructor = ClassResolveError;

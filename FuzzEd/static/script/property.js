@@ -34,20 +34,23 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
      */
     var Property = Class.extend({
         owner:          undefined,
+        mirrorers:      undefined,
         value:          undefined,
         displayName:    '',
-        mirror:         undefined,
+        mirrors:        undefined,
         label:          undefined,
         menuEntry:      undefined,
         hidden:         false,
         readonly:       false,
         partInCompound: undefined,
 
-        init: function(owner, definition) {
+        init: function(owner, mirrorers, definition) {
             jQuery.extend(this, definition);
             this.owner = owner;
+            this.mirrorers = mirrorers;
+            this.mirrors = [];
             this._sanitize()
-                ._setupMirror()
+                ._setupMirrors()
                 ._setupLabel()
                 ._setupMenuEntry();
 
@@ -137,22 +140,46 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             return this;
         },
 
-        _setupMirror: function() {
+        _setupMirrors: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
-            this.mirror = new Mirror(this, this.owner.container, this.mirror);
+
+            _.each(this.mirrorers, function(mirrorer) {
+                this.mirrors.push(this.factory.create('Mirror', this, mirrorer.container, this.mirror));
+            }.bind(this));
 
             return this;
         },
 
+        restoreMirrors: function() {
+            this._setupMirrors()
+                ._triggerChange(this.value, this);
+        },
+
+        removeMirror: function(mirror) {
+            if (!_.contains(this.mirrors, mirror)) return false;
+
+            mirror.takeDownVisualRepresentation();
+            this.mirrors = _.without(this.mirrors, mirror);
+            return true;
+        },
+
+        removeAllMirrors: function() {
+            _.each(this.mirrors, function(mirror) {
+                this.removeMirror(mirror);
+            }.bind(this));
+            return true;
+        },
+
         _setupLabel: function() {
             if (typeof this.label === 'undefined' || this.label === null) return this;
-            this.label = new Label(this, this.owner.jsPlumbEdge, this.label);
+            this.label = this.factory.create('Label', this, this.owner.jsPlumbEdge, this.label);
 
             return this;
         },
 
         _setupMenuEntry: function() {
-            this.menuEntry = new (this.menuEntryClass())(this);
+            //TODO: put this into the factory
+            this.menuEntry = new (this.menuEntryClass())(this.factory, this);
 
             return this;
         },
@@ -205,9 +232,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             return PropertyMenuEntry.ChoiceEntry;
         },
 
-        init: function(owner, definition) {
+        init: function(owner, mirrorers, definition) {
             definition.values = typeof definition.values === 'undefined' ? definition.choices : definition.values;
-            this._super(owner, definition);
+            this._super(owner, mirrorers, definition);
         },
 
         validate: function(value, validationResult) {
@@ -306,6 +333,22 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             return true;
         },
 
+        restoreMirrors: function() {
+            _.each(this.parts, function(part) {
+                part.restoreMirrors();
+            });
+
+            this._super();
+        },
+
+        removeAllMirrors: function() {
+            this._super();
+
+            _.each(this.parts, function(part) {
+                part.removeAllMirrors();
+            });
+        },
+
         _sanitize: function() {
             var value = typeof this.value === 'undefined' ? this.default : this.value;
 
@@ -331,7 +374,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
                     partInCompound: index,
                     value: index === this.value ? value : undefined
                 });
-                parsedParts[index] = from(this.owner, partDef);
+                parsedParts[index] = from(this.factory, this.owner, this.mirrorers, partDef);
             }.bind(this));
 
             this.parts = parsedParts;
@@ -617,11 +660,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         transferGraphs: undefined,
 
-        init: function(owner, definition) {
+        init: function(owner, mirrorers, definition) {
             jQuery.extend(this, definition);
             this.owner = owner;
             this._sanitize()
-                ._setupMirror()
+                ._setupMirrors()
                 ._setupMenuEntry()
                 .fetchTransferGraphs();
         },
@@ -700,17 +743,18 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         }
     });
 
-    var from = function(owner, definition) {
+    //TODO: put this into the factory
+    var from = function(factory, owner, mirrorers, definition) {
         switch (definition.kind) {
-            case 'bool':      return new Bool(owner, definition);
-            case 'choice':    return new Choice(owner, definition);
-            case 'compound':  return new Compound(owner, definition);
-            case 'epsilon':   return new Epsilon(owner, definition);
-            case 'numeric':   return new Numeric(owner, definition);
-            case 'range':     return new Range(owner, definition);
-            case 'text':      return new Text(owner, definition);
-			case 'textfield': return new InlineTextField(owner, definition);
-            case 'transfer':  return new Transfer(owner, definition);
+            case 'bool':     return new Bool(factory, owner, mirrorers, definition);
+            case 'choice':   return new Choice(factory, owner, mirrorers, definition);
+            case 'compound': return new Compound(factory, owner, mirrorers, definition);
+            case 'epsilon':  return new Epsilon(factory, owner, mirrorers, definition);
+            case 'numeric':  return new Numeric(factory, owner, mirrorers, definition);
+            case 'range':    return new Range(factory, owner, mirrorers, definition);
+            case 'text':     return new Text(factory, owner, mirrorers, definition);
+			case 'textfield':return new InlineTextField(factory, owner, mirrorers, definition);
+            case 'transfer': return new Transfer(factory, owner, mirrorers, definition);
 
             default: throw ValueError('unknown property kind ' + definition.kind);
         }

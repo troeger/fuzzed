@@ -1,3 +1,5 @@
+import logging
+
 from django.db import models
 
 from FuzzEd.lib.jsonfield import JSONField
@@ -5,7 +7,6 @@ from node import Node
 from edge import Edge
 from node_group import NodeGroup
 
-import logging, json
 logger = logging.getLogger('FuzzEd')
 
 import notations
@@ -39,54 +40,62 @@ class Property(models.Model):
         return '%s%s: %s' % ('[DELETED] ' if self.deleted else '', self.key, self.value)
 
     @property
-    def sanitized_value(self):
+    def graph(self):
         '''
-            Convert the property value into a datatype that is accepted
-            according to the notations file.
+            Return the graph this property (indirectly) belongs to.
         '''
+        if self.node:
+            return self.node.graph
+        elif self.edge:
+            return self.edge.graph
+        elif self.node_group:
+            return self.node_group.graph
+        assert(False)
+
+    @classmethod
+    def value_type(cls, key, obj):
+        '''
+            Return the expected value data type of the property 'key' in
+            an node / edge / node group object. Data types are as used
+            in the notations files.
+
+            There is no fallback here, so this function will crash if some utilized
+            property name is not covered in the notations file. This is good at test suite runs,
+            and leads to a 500 in production if somebody tries to inject arbitrary property keys
+            or misformated property values through the API.
+        '''
+        # Check for property keys that are not part of the notations file
+        # TODO: Make this an issue for the JS guys, so that the notations
+        #       file really has all possible properties defined
+        if key in ['x','y','key']:
+            return 'numeric'        
         try:
-            if self.node:
-                val_type = notations.by_kind[self.node.graph.kind]['nodes'][self.node.kind]['properties'][self.key]['kind']
-            elif self.edge:                
-                val_type = notations.by_kind[self.edge.graph.kind]['edges']['properties'][self.key]['kind']
-            elif self.node_group:
-                val_type = notations.by_kind[self.node_group.graph.kind]['nodeGroups']['properties'][self.key]['kind']
-            else:
-                val_type = None
-        except KeyError:
-            # No information in the notations file , leave it as it is
-            val_type = None
-        # No exception handling here, in order to trigger a 500 if we get malicious value input from the outside
-        if val_type == 'text':
+            if type(obj) == Node:
+                return notations.by_kind[obj.graph.kind]['nodes'][obj.kind]['properties'][key]['kind']
+            elif type(obj) == Edge:
+                return notations.by_kind[obj.graph.kind]['edges']['properties'][key]['kind']
+            elif type(obj) == NodeGroup:
+                return notations.by_kind[obj.graph.kind]['nodeGroups']['properties'][key]['kind']
+        except:
+            raise Exception("Invalid property key '%s' being used for %s"%(key, str(obj)))
+
+    @classmethod
+    def sanitized_value(cls, obj, key, value):
+        '''
+            Return the sanitized property value for this kind of object and property.
+        '''
+        val_type = Property.value_type(key, obj)
+        if val_type in ['text','compound']:
             # JSONField is performing some conversion magic, so must tell
             # it explicitely that even numerical strings remain strings
-            return str(self.value)
+            return str(value)
         elif val_type == 'numeric':
-            return float(self.value)
+            return int(value)
+        elif val_type == 'bool':
+            # Value may be string or a real value
+            return str(value).lower() == 'true'
         else:
-            return self.value
-
-    def to_dict(self):
-        """
-        Method: to_dict
-
-        Converts the property instance into a native dictionary
-
-        Returns:
-         {dict} the property as dictionary
-        """
-        return {self.key: self.value}
-
-    def to_tuple(self):
-        """
-        Method: to_tuple
-
-        Converts the property instance to a native tuple.
-
-        Returns:
-         {tuple(str, str)} the property as tuple
-        """
-        return (self.key, self.value)
+            return value
 
     def same_as(self, prop):
         ''' 
@@ -94,6 +103,9 @@ class Property(models.Model):
         '''
         if self.key != prop.key:
             return False
-        return (str(self.value) == str(prop.value))
+        same_val = (str(self.value) == str(prop.value))
+        if not same_val:
+            return False
+        return True
 
 

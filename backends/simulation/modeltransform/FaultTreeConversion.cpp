@@ -8,6 +8,7 @@
 
 #include "util.h"
 #include "xmlutil.h"
+#include "FatalException.h"
 
 using std::string;
 using std::shared_ptr;
@@ -179,7 +180,14 @@ void convertFuzzTreeRecursive(FaultTreeNode::Ptr node, const fuzztree::Node& tem
 
 			double failureRate = 0.f;
 			if (probName == *CRISPPROB)
+			{
 				failureRate = util::rateFromProbability(static_cast<const fuzztree::CrispProbability&>(prob).value(), missionTime);
+			}
+			else if (probName == *TRIANGULARFUZZYINTERVAL)
+			{
+				//std::cout << "Encountered fuzzy probability during simulation";
+				throw FatalException("Fuzztrees containing fuzzy probabilities cannot be converted to fault trees and thus cannot be simulated.", 0, id);
+			}
 			else
 			{
 				assert(dynamic_cast<const fuzztree::FailureRate*>(&prob));

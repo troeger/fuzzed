@@ -1,5 +1,5 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist', 'jsplumb'],
-function(Class, Menus, Canvas, Backend, Alerts, Progress) {
+define(['class', 'factory', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist', 'jsplumb'],
+function(Class, Factory, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base
      */
@@ -28,6 +28,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      {Underscore Template} _nodeOffsetStylesheetTemplate - The underscore.js template used to generate the
          *                                                            CSS transformation for the print offset.
          */
+        factory:                       undefined,
         config:                        undefined,
         graph:                         undefined,
         properties:                    undefined,
@@ -53,11 +54,13 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      {Number} graphId - The ID of the graph that is going to be edited by this editor.
          */
         init: function(graphId) {
+            this.factory = this.getFactory();
+
             if (typeof graphId !== 'number')
                 throw new TypeError('numeric graph ID', typeof graphId);
 
             this.config   = this.getConfig();
-            this._backend = Backend.establish(graphId);
+            this._backend = Backend.establish(this.factory, graphId);
 
             // remember certain UI elements
             this._progressIndicator = jQuery('#' + this.config.IDs.PROGRESS_INDICATOR);
@@ -77,6 +80,10 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         /**
          * Group: Accessors
          */
+
+        getFactory: function() {
+            throw new SubclassResponsibility();
+        },
 
         /**
          * Method: getConfig
@@ -136,9 +143,10 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _loadGraphCompleted: function(readOnly) {
             // create manager objects for the bars
-            this.properties = new Menus.PropertiesMenu(this.graph.getNotation().propertiesDisplayOrder);
-            this.shapes     = new Menus.ShapeMenu();
-            this.layout     = new Menus.LayoutMenu();
+            //TODO: put this into the factory
+            this.properties = new Menus.PropertiesMenu(this.factory, this.graph.getNotation().propertiesDisplayOrder);
+            this.shapes     = new Menus.ShapeMenu(this.factory);
+            this.layout     = new Menus.LayoutMenu(this.factory);
             this._backend.activate();
 
             if (readOnly) {
@@ -180,7 +188,7 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      This {<Editor>} instance for chaining.
          */
         _loadGraphFromJson: function(json) {
-            this.graph = new (this.getGraphClass())(json);
+            this.graph = this.factory.create('Graph', json);
             this._loadGraphCompleted(json.readOnly);
 
             return this;
@@ -644,6 +652,81 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
             var clipboard = this._getClipboard();
             --clipboard['pasteCount'];
             this._updateClipboard(clipboard);
+        },
+
+        /**
+         * Method: _groupSelection
+         *
+         *   Will create a new NodeGroup with the current selected nodes.
+         *
+         *   Note: This method can't be accessed by the user, unless you provide Menu Actions or Key Events for it.
+         *   (see dfd/editor.js for examples of correct subclassing)
+         *
+         * Returns:
+         *   This Editor instance for chaining.
+         */
+        _groupSelection: function() {
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+
+            nodes = jQuery(selectedNodes);
+            if(nodes.length > 1)
+            {
+                var jsonNodeGroup = {
+                    nodeIds: _.map(nodes, function(node){return jQuery(node).data(this.config.Keys.NODE).id;}.bind(this))
+                };
+                this.graph.addNodeGroup(jsonNodeGroup);
+            }
+
+            return this;
+        },
+
+        /**
+         * Method: _ungroupSelection
+         *
+         *   Will ungroup either the NodeGroup, that only consists of the selected nodes, or the selected NodeGroups
+         *   directly.
+         *
+         *   Note: This method can't be accessed by the user, unless you provide Menu Actions or Key Events for it.
+         *   (see dfd/editor.js for examples of correct subclassing)
+         *
+         * Returns:
+         *   Success
+         */
+        _ungroupSelection: function() {
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+
+            var nodeIds = _.map(jQuery(selectedNodes), function(node){
+                return jQuery(node).data(this.config.Keys.NODE).id;
+            }.bind(this));
+
+            var nodeGroup = undefined;
+
+            // case [1]: find the correct node group, whose node ids match the selected ids
+            // (i.e. the user has to select all members of a NodeGroup to remove the NodeGroup)
+            _.each(this.graph.nodeGroups, function(ng) {
+                var ngIds = ng.nodeIds();
+                // math recap: two sets are equal, when both their differences are zero length
+                if (jQuery(ngIds).not(nodeIds).length == 0 && jQuery(nodeIds).not(ngIds).length == 0) {
+                    this.graph.deleteNodeGroup(ng);
+                    return true;
+                }
+            }.bind(this));
+
+            // case [2]: the user selected NodeGroups, (s)he wants to delete, do him/her the favor to delete them
+            // delete selected node groups (NASTY!!!)
+            if (typeof nodeGroup === 'undefined') {
+                var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
+
+                jQuery(allNodeGroups).each(function(index, element) {
+                    var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                    if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
+                        this.graph.deleteNodeGroup(nodeGroup);
+                        return true;
+                    }
+                }.bind(this));
+            }
+
+            return false;
         },
 
         /**

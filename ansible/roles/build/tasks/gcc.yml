@@ -3,16 +3,6 @@
 - name: Ensure GCC is installed
   apt: name=gcc state=latest
   when: ansible_os_family == "Debian"
-- name: Ensure Boost libraries are installed
-  apt: name={{ item }} state=latest
-  with_items:
-    - libboost-dev
-    - libboost-graph-dev
-    - libboost-date-time-dev
-    - libboost-system-dev
-    - libboost-filesystem-dev
-    - libboost-program-options-dev
-  when: ansible_os_family == "Debian"
 - name: Ensure CMake is installed
   apt: name=cmake state=present
   when: ansible_os_family == "Debian"
@@ -22,9 +12,6 @@
   when: ansible_os_family == "Darwin"
 - name: Ensure GCC is installed
   homebrew: name=gcc49 state=latest
-  when: ansible_os_family == "Darwin"
-- name: Ensure Boost libraries are installed
-  homebrew: name=boost state=latest install_options=c++11
   when: ansible_os_family == "Darwin"
 - name: Ensure CMake is installed
   homebrew: name=cmake state=present

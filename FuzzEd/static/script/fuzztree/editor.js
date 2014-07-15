@@ -1,5 +1,5 @@
-define(['faulttree/editor', 'fuzztree/graph', 'fuzztree/config'],
-function(FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
+define(['factory', 'faulttree/editor', 'fuzztree/graph', 'fuzztree/config', 'fuzztree/node'],
+function(Factory, FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
     /**
      * Package: Fuzztree
      */
@@ -14,6 +14,10 @@ function(FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
         /**
          * Group: Accessors
          */
+
+        getFactory: function() {
+            return new Factory(undefined, 'fuzztree');
+        },
 
         /**
          * Method: getConfig
