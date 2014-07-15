@@ -16,17 +16,8 @@
 
 class TopLevelEvent;
 
-enum SimulationImpl
-{
-	TIMENET,
-	DEFAULT,
-	STRUCTUREFORMULA_ONLY
-};
- 
-struct TimeNETProperties;
-
 /************************************************************************/
-/* This class handles the different simulations:						*/
+/* This class used to handle the different simulations:					*/
 /*	- TimeNET-based														*/
 /*	  (no support for PAND, SEQ, MTTF)									*/
 /*		- with normal petri net structures only							*/
@@ -36,6 +27,7 @@ struct TimeNETProperties;
 /*		- OpenMP parallelization										*/
 /*		- C++11-thread parallelization (slightly slower)				*/
 /*	- just outputting the structure formula								*/
+/*	!!! As of 15/07/2014, only the own algorithm with OpenMP. !!!		*/
 /************************************************************************/
 
 class SimulationProxy
@@ -51,24 +43,17 @@ protected:
 		const boost::filesystem::path& input,
 		const boost::filesystem::path& output,
 		const boost::filesystem::path& workingDir,
-		const boost::filesystem::path& logFile,
-		SimulationImpl impl);
+		const boost::filesystem::path& logFile);
 
 	SimulationResultStruct simulateFaultTree(
 		const std::shared_ptr<TopLevelEvent> ft,
 		const boost::filesystem::path& workingDir,
-		std::ofstream* logFile,
-		SimulationImpl impl);
+		std::ofstream* logFile);
 
-	SimulationResultStruct runSimulationInternal(
-		const boost::filesystem::path& inPath,
-		SimulationImpl implementationType,
-		void* additionalArguments = NULL);
+	SimulationResultStruct runSimulationInternal(const boost::filesystem::path& petriNetFile);
 	
 	unsigned int m_missionTime;
 	unsigned int m_simulationTime;
 	unsigned int m_numRounds;
 	double m_convergenceThresh;
-
-	TimeNETProperties* m_timeNetProperties; // ownership usually transferred to Simulation. Do NOT call delete on it. -.-
 };

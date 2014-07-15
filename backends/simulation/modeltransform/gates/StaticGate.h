@@ -13,8 +13,6 @@ public:
 
 	virtual double computeUnreliability() const;
 	
-	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const override;
-
 protected:
 	bool hasDynamicChildren() const;
 

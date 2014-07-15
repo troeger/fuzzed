@@ -15,6 +15,4 @@ public:
 	{
 		return "DYNAMIC_BEHAVIOUR";
 	}
-
-	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const override = 0;
 };

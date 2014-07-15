@@ -1,9 +1,7 @@
 #include "SimulationProxy.h"
-#include "implementation/TimeNETSimulation.h"
 #include "implementation/PetriNetSimulation.h"
 
 #include "serialization/PNMLDocument.h"
-#include "serialization/TNDocument.h"
 #include "events/TopLevelEvent.h"
 #include "FuzzTreeTransform.h"
 #include "FaultTreeConversion.h"
@@ -42,63 +40,29 @@ namespace fs = boost::filesystem;
 SimulationProxy::SimulationProxy(int argc, char** arguments) :
 	m_numRounds(DEFAULT_SIMULATION_ROUNDS),
 	m_convergenceThresh(0.000005),
-	m_simulationTime(DEFAULT_SIMULATION_TIME),
-	m_timeNetProperties(nullptr)
+	m_simulationTime(DEFAULT_SIMULATION_TIME)
 {
 	parseCommandline_default(argc, arguments);
 }
 
-SimulationResultStruct SimulationProxy::runSimulationInternal(
-	const boost::filesystem::path& petriNetFile,
-	SimulationImpl implementationType,
-	void* additionalArguments) 
+SimulationResultStruct SimulationProxy::runSimulationInternal(const boost::filesystem::path& petriNetFile) 
 {
-	Simulation* sim = nullptr;
+	Simulation* sim = new PetriNetSimulation(
+		petriNetFile,
+		m_simulationTime,
+		m_missionTime,
+		m_numRounds,
+		m_convergenceThresh,
+		true);
 	SimulationResultStruct res;
-	switch (implementationType)
-	{
-	case TIMENET:
-		{
-			assert(additionalArguments != nullptr);
-			// TODO make this produce rubbish output only in workingDir
-			sim = new TimeNETSimulation(petriNetFile, m_simulationTime, m_missionTime, m_numRounds, additionalArguments);
-			break;
-		}
-	case DEFAULT:
-		{
-			sim = new PetriNetSimulation(
-				petriNetFile,
-				m_simulationTime, 
-				m_missionTime, 
-				m_numRounds,
-				m_convergenceThresh,
-				true);
 
-			break;
-		}
-	default:
-		assert(false);
-		return res;
-	}
-	
 	try
 	{
-#ifdef MEASURE_SPEEDUP
-		for (int i : boost::counting_range(1, omp_get_max_threads()))
-		{
-			omp_set_num_threads(i);
-//			cout << "*** " << i << "THREADS ***" << endl;
-			sim->run();
-		}
-#else
 		std::function<void()> fun = [&]() { sim->run(); };
 		DeadlockMonitor monitor(&fun);
 		monitor.executeWithin(10000);
 
-		//sim->run();
-		if (implementationType == DEFAULT)
-			res = (static_cast<PetriNetSimulation*>(sim))->result();
-#endif
+		res = (static_cast<PetriNetSimulation*>(sim))->result();
 	}
 	catch (exception& e)
 	{
@@ -116,10 +80,9 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 SimulationResultStruct SimulationProxy::simulateFaultTree(
 	const std::shared_ptr<TopLevelEvent> ft,
 	const boost::filesystem::path& workingDir,
-	std::ofstream* logfile,
-	SimulationImpl impl)
+	std::ofstream* logfile)
 {
-	std::shared_ptr<PNDocument> doc;
+	
 
 	m_missionTime = ft->getMissionTime();
 	if (m_missionTime <= 1)
@@ -128,28 +91,11 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 			<< "For a very short mission time, possible failures may never occur." 
 			<< std::endl;
 
-	switch (impl)
-	{
-	case DEFAULT:
-		doc = std::shared_ptr<PNMLDocument>(new PNMLDocument());
-		ft->serializePTNet(doc);
-		break;
-
-	// TimeNET and printing just structure formulas need a different type of document
-	// since the structure formula is only printed as a TimeNET expression
-	case TIMENET:
-		m_timeNetProperties->maxExecutionTime = m_simulationTime;
-		m_timeNetProperties->transientSimTime = m_missionTime;
-	case STRUCTUREFORMULA_ONLY:
-		auto TNdoc = std::shared_ptr<TNDocument>(new TNDocument());
-		ft->serializeTimeNet(TNdoc);
-		doc = TNdoc;
-		return SimulationResultStruct();
-	}
-
+	std::shared_ptr<PNDocument> doc = std::shared_ptr<PNMLDocument>(new PNMLDocument());
+	ft->serializePTNet(doc);
+	
 	const std::string petriNetFile = 
-		workingDir.generic_string() + "petrinet" + 
-		std::string((impl == DEFAULT) ? PNML::PNML_EXT : timeNET::TN_EXT);
+		workingDir.generic_string() + "petrinet" + std::string(PNML::PNML_EXT);
 
 	if (!doc->save(petriNetFile))
 	{
@@ -158,15 +104,14 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 		throw FatalException(err);
 	}
 
-	return runSimulationInternal(petriNetFile, impl, m_timeNetProperties);
+	return runSimulationInternal(petriNetFile);
 }
 
 void SimulationProxy::simulateAllConfigurations(
 	const fs::path& inputFile,
 	const fs::path& outputFile,
 	const fs::path& workingDir,
-	const fs::path& logFile,
-	SimulationImpl impl)
+	const fs::path& logFile)
 {
 	const auto inFile = inputFile.generic_string();
 	ifstream file(inFile, ios::in | ios::binary);
@@ -188,7 +133,7 @@ void SimulationProxy::simulateAllConfigurations(
 			{ // in this case there is only a faulttree, so no configuration information will be serialized
 
 				const SimulationResultStruct res = 
-					simulateFaultTree(topEvent, workingDir, logFileStream, impl);
+					simulateFaultTree(topEvent, workingDir, logFileStream);
 
 				const std::string modelId = simTree->id();
 				backendResults::SimulationResult r(
@@ -218,7 +163,7 @@ void SimulationProxy::simulateAllConfigurations(
 				std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
 
 				const SimulationResultStruct res =
-					simulateFaultTree(simTree, workingDir, logFileStream, impl);
+					simulateFaultTree(simTree, workingDir, logFileStream);
 
 				backendResults::SimulationResult r(
 					ft.second.id(),
@@ -260,6 +205,5 @@ void SimulationProxy::parseCommandline_default(int numArguments, char** argument
 		parser.getInputFilePath(),
 		parser.getOutputFilePath(),
 		parser.getWorkingDirectory(),
-		parser.getLogFilePath(),
-		DEFAULT /*Simulation Implementation: custom*/);
+		parser.getLogFilePath());
 }

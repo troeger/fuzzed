@@ -22,28 +22,3 @@ FaultTreeNode::Ptr FDEPGate::clone() const
 
 	return newNode;
 }
-
-int FDEPGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const 
-{
-	assert(getNumChildren() == 1);
-
-	auto& trigger = m_children.front();
-	if (trigger->getId() != m_triggerID)
-		throw std::runtime_error("Trigger must be first and only child of FDEP");
-	
-	const int triggered = trigger->serializeTimeNet(doc);
-	const int triggerTrans = doc->addImmediateTransition();
-	doc->placeToTransition(triggered, triggerTrans);
-
-	for (const auto& dependent : m_dependentEvents)
-	{
-		auto be = std::dynamic_pointer_cast<BasicEvent>(getChildById(dependent));
-		if (!be)
-			throw std::runtime_error("Dependent events must be BasicEvents");
-
-		const int dependentEventOccured = be->serializeTimeNet(doc); // TODO: serialize just once!
-		doc->transitionToPlace(triggerTrans, dependentEventOccured);
-	}
-
-	return -1; // FDEP gates do not propagate upwards
-}

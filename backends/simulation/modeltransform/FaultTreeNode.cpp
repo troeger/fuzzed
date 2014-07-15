@@ -117,11 +117,6 @@ int FaultTreeNode::getCost() const
 	return result;
 }
 
-int FaultTreeNode::serializeTimeNet(std::shared_ptr<TNDocument> doc) const
-{
-	return serializePTNet(doc);
-}
-
 void FaultTreeNode::markDynamic()
 {
 	m_bStaticSubTree = false;

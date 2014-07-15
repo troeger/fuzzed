@@ -6,19 +6,6 @@ const char* const NOT_IMPLEMENTED = "not yet implemented";
 /************************************************************************/
 /* XML Tags                                                             */
 /************************************************************************/
-namespace timeNET
-{
-	const char* const TIMED_TRANSITION_TAG = "timedTransition";
-	const char* const IMMEDIATE_TRANSITION_TAG = "immediateTransition";
-	const char* const PLACE_TAG = "place";
-	const char* const ARC_TAG = "arc";
-	const char* const MEASURE_TAG = "measure";
-	const char* const RATE_TAG = "rate";
-	const char* const INITIALMARKING_TAG = "initialMarking";
-	const char* const ROOT_TAG = "net";
-
-	const char* const TN_EXT = ".TN";
-}
 
 namespace PNML
 {
@@ -56,8 +43,6 @@ const char* const FAILURE_LABEL = "SystemFailure";
 const char* const TRANSITION_IDENTIFIER = "T"; 
 const char* const PLACE_IDENTIFIER = "p";
 const char* const ARC_IDENTIFIER = "a";
-
-const std::string g_alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 const char* const ID_ATTRIBUTE = "id";
 

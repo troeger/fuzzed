@@ -8,7 +8,6 @@ set(SOURCES
    SimulationProxy.cpp
 
    implementation/PetriNetSimulation.cpp
-   implementation/TimeNETSimulation.cpp
    implementation/Random.cpp
 
    petrinet/Place.cpp
@@ -28,7 +27,6 @@ set(HEADERS
    Config.h
    
    implementation/PetriNetSimulation.h
-   implementation/TimeNETSimulation.h
    implementation/Simulation.h
    implementation/Random.h
 
@@ -39,10 +37,6 @@ set(HEADERS
    petrinet/PNMLImport.h
    petrinet/PetriNet.h
 )
-
-if (USE_TIMENET)
-	find_package(TimeNET REQUIRED)
-endif (USE_TIMENET)
 
 if (USE_OMP)
 	find_package(OpenMP REQUIRED)
