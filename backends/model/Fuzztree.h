@@ -1,5 +1,6 @@
 #pragma once
 #include "AbstractModel.h"
+#include "FuzzTreeConfiguration.h"
 
 class Fuzztree : public AbstractModel
 {

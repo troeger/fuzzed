@@ -4,7 +4,7 @@
 class BasicEvent : public AbstractNode
 {
 public:
-	BasicEvent(const std::string id) : AbstractNode(id, "basicEvent") {};
+	BasicEvent();
 
 	virtual void toPetriNet(PetriNet* pn) override { /*TODO*/ };
 

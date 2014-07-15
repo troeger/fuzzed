@@ -128,8 +128,9 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
 )
 
-set(COMMON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common)
-set(COMMON_GEN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common_generated)
+set(COMMON_DIR 		${CMAKE_CURRENT_SOURCE_DIR}/common)
+set(MODEL_DIR 		${CMAKE_CURRENT_SOURCE_DIR}/model)
+set(COMMON_GEN_DIR 	${CMAKE_CURRENT_SOURCE_DIR}/common_generated)
 
 ############### XSD COMPILER ############
 #########################################
@@ -246,6 +247,9 @@ add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FIL
 #########################################
 
 set(COMMON_SOURCES
+	${MODEL_DIR}/Fuzztree.cpp
+	${MODEL_DIR}/Faulttree.cpp
+
 	${COMMON_DIR}/util.cpp
 	${COMMON_DIR}/xmlutil.cpp
 	${COMMON_DIR}/FaultTreeTypes.cpp
@@ -267,6 +271,15 @@ set(COMMON_SOURCES
 )
 
 set(COMMON_HEADERS
+	${MODEL_DIR}/Fuzztree.h
+	${MODEL_DIR}/Faulttree.h
+	${MODEL_DIR}/AbstractModel.h
+	${MODEL_DIR}/AbstractNode.h
+	${MODEL_DIR}/BasicEvent.h
+	${MODEL_DIR}/TopEvent.h
+	${MODEL_DIR}/OrGate.h
+	${MODEL_DIR}/AbstractProbability.h
+
 	${COMMON_DIR}/platform.h
 	${COMMON_DIR}/util.h
 	${COMMON_DIR}/xmlutil.h

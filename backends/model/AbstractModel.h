@@ -4,17 +4,15 @@
 class AbstractModel
 {
 public:
-	AbstractModel(const std::string graphMLFileName)
-	{
-		initFromGraphML(graphMLFileName);
-	};
-
+	AbstractModel() {};
 	virtual ~AbstractModel() {};
 	
 	const TopEvent* getTopEvent() const { return m_topEvent; };
 
+	void loadGraphML(const std::string graphMLFileName) { initFromGraphML(graphMLFileName); };
+
 protected:
-	void initFromGraphML(const std::string& graphMLFileName) = 0;
+	virtual void initFromGraphML(const std::string& graphMLFileName) = 0;
 
 	AbstractModel(const std::string id, const std::string type) : m_id(id), m_typeDescriptor(type) {};
 

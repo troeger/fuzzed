@@ -1,18 +1,18 @@
 #pragma once
 #include "AbstractNode.h"
+#include <cassert>
 
 class TopEvent : public AbstractNode
 {
 public:
-	TopEvent(const std::string id) : Node(id) {};
+	TopEvent(const std::string id) : AbstractNode(id, "topEvent") {};
 	virtual ~TopEvent();
 
-	virtual void addChild(Node* child) override
+	virtual void addChild(AbstractNode* child) override
 	{
 		assert(m_children.empty() && "Top Events can only have one child");
-		Node::addChild(child);
+		AbstractNode::addChild(child);
 	};
 
 protected:
-	static std::string m_typeDescriptor = "topEvent";
 };
