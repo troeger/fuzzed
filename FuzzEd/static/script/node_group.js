@@ -94,20 +94,51 @@ define(['property', 'class', 'canvas', 'config', 'jquery', 'd3'], function(Prope
 
             return this;
         },
-
-        //TODO: documentation
+        
+        /**
+         * Method: addNode
+         *      Adds a node instance to the node group and forwards the add operation to the node..
+         *
+         * Parameters:
+         *      {Node} node - the node to be added.
+         *
+         * Returns:
+         *      This {NodeGroup} instance for chaining.
+         */
         addNode: function(node) {
             node.addToNodeGroup(this);
-            this._addNode(node);
+            return this._addNode(node);
         },
 
+        /**
+         * Method: _addNode
+         *      Internal method that does the actual addition of a node instance to the node group. addNode should be
+         *      called from outside, since it also establishes the double link with the node instance.
+         *
+         * Parameters:
+         *      {Node} node - the node instance to be added.
+         *
+         * Returns:
+         *      This {NodeGroup} for chaining.
+         */
         _addNode: function(node) {
             this.nodes[node.id] = node;
-
             // call home
             jQuery(document).trigger(Config.Events.NODEGROUP_NODEIDS_CHANGED, [this.id, this.nodeIds()]);
+
+            return this;
         },
 
+        /**
+         * Method: removeNode
+         *      Removes a given node instance from the node group.
+         *
+         * Parameters:
+         *      {Node} node - the node instance to be removed
+         *
+         * Returns:
+         *      This {NodeGroup} instance for chaining.
+         */
         removeNode: function(node) {
             delete this.nodes[node.id];
 
@@ -118,6 +149,8 @@ define(['property', 'class', 'canvas', 'config', 'jquery', 'd3'], function(Prope
             if (_.size(this.nodes) < 2) {
                 this.graph.deleteNodeGroup(this);
             }
+
+            return this;
         },
 
         /**
@@ -200,7 +233,7 @@ define(['property', 'class', 'canvas', 'config', 'jquery', 'd3'], function(Prope
          * Method: toDict
          *
          * Returns:
-         *      A ke-value {Object{ representing the node group.
+         *      A key-value {Object} representing the node group.
          */
         toDict: function() {
             var properties = _.map(this.properties, function(prop) { return prop.toDict() });
