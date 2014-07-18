@@ -4296,6 +4296,9 @@ i.icon-layout-tree:hover {
   text-align: center;
   padding: 7px;
 }
+.probabillity_menu .table_container td ul {
+  text-align: left;
+}
 .probabillity_menu .table_container th {
   font-size: 12px;
   text-align: center;

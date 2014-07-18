@@ -60,7 +60,7 @@ define(['config', 'jquery'], function(Config) {
         },
 
         /**
-         * Group: AnlysisMenu
+         * Group: AnalysisMenu
          *      Configurations for results table, as well as highcharts diagram within the analysis results menu. 
          *
          * Constants:

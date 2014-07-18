@@ -546,12 +546,12 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                         events: {
                             mouseOver : function () {
                                 var config_id = this.name
-                                var row = self._table.fnFindCellRowNodes(config_id, 1 );
+                                var row = self._table.fnFindCellRowNodes(config_id, 0);
                                 jQuery(row).addClass('tr_hover');
                             },
                             mouseOut  : function () {
                                 var config_id = this.name
-                                var row = self._table.fnFindCellRowNodes(config_id, 1 );
+                                var row = self._table.fnFindCellRowNodes(config_id, 0);
                                 jQuery(row).removeClass('tr_hover');
                             },
                         }
@@ -620,8 +620,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                             "fnDrawCallback": function(oSettings) {
                                 
                                 var serverData = oSettings['json'];
-                                
-                                var totalRecords = serverData['iTotalRecords']
+                                var totalRecords = serverData['iTotalRecords'];
                                
                                 if(totalRecords < 2){
                                      // unbind sorting events if there are less than 2 rows
@@ -647,7 +646,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                  }.bind(this));
                                  
                                  if (_.size(chartData) != 0) {
-                                     this._displayResultWithHighcharts(chartData, 10); //data['decompositionNumber']);
+                                     this._displayResultWithHighcharts(chartData, null);
                                  }     
                                 }.bind(this),
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
@@ -680,6 +679,11 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                     jQuery(nRow).on("mouseover", function(){    
                                             this._highlightConfiguration(configID);                                                
                                      }.bind(this));
+                                     
+                                     
+                                     jQuery(nRow).on("mouseleave", function(){    
+                                            this._unhighlightConfiguration();                                                
+                                     }.bind(this));
                                 }
                                 
                                 /* Sample Configuration issues 
@@ -702,12 +706,10 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                         if ( row.child.isShown() ) {
                                             // This row is already open - close it
                                             row.child.hide();
-                                            tr.removeClass('shown');
                                         }
                                         else {
                                             // Open this row
                                             row.child(format(row.data())).show();
-                                            tr.addClass('shown');
                                         }
                                     }.bind(this));
             
@@ -719,7 +721,6 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                     else if ('warnings' in issues){
                                         jQuery(nRow).addClass('warning');
                                     }
-                                    
                                 }
                                 else{
                                     // if row is not collapsable show default pointer
@@ -729,7 +730,6 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                              
                             "fnInitComplete": function(oSettings, json) {  
                                     this._setupResizing();
-                                    
                                     // set minumum height of grid as the height of the first draw of the grid
                                     this._tableContainer.css('min-height', this._tableContainer.height());
                                     // keep container width when switching the page (-> otherwise jumping width when switching)
@@ -737,11 +737,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                     
                                 }.bind(this)    
                             });
-                             
-            this._table.on('mouseleave', 'tr', function () {
-                this._unhighlightConfiguration();
-            }.bind(this));
-            
+             
             return this;
         },
         
