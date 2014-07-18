@@ -127,6 +127,15 @@ class JobResource(common.JobResource):
                 results_url = reverse('results', kwargs={'api_name': 'front', 'pk': job.graph.pk, 'secret': job.secret})
                 if not job.requires_download:
                     response['columns'] = [{'mData': key, 'sTitle': title} for key, title in job.result_titles]
+                    response['axis_titles'] = {
+                        'X_MIN':-0.05,
+                        'X_MAX':1.05,
+                        'Y_MIN':0, 
+                        'Y_MAX':1.0,
+                        'Y_TICK_INTERVAL':1.0,
+                        'Y_MINOR_TICK_INTERVAL':10,
+                        'POINT_RADIUS':1
+                    }
                 try:
                     response['issues'] = Result.objects.get(job=job, kind=Result.GRAPH_ISSUES).issues
                 except:

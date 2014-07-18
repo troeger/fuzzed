@@ -563,6 +563,45 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
 
             return this;
         },
+        
+        /**
+         * Method: _initializeHighcharts
+         *      Intialize highcharts with Axis definitions.
+         *
+         * Parameters:
+         *    {Array[Object]} defititions  - A set of 
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
+         */
+        _initializeHighcharts: function(defintitions) {
+            
+        },
+        
+        
+        /**
+         * Method: _drawSeriesWithHighcharts
+         *      Draw series within the Highcharts diagram. 
+         *
+         * Parameters:
+         *    {Array[Object]} defititions  - A set of one or more data series to display in the Highchart.
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
+         */
+        _drawSeriesWithHighcharts: function(){
+         
+        // ...
+        
+        while(chart.series.length > 0){
+            this._chart.series[0].remove(false);
+        }
+        
+        
+        
+         this._chart.redraw() //...   
+        },
+        
                 
         /**
          * Method: _displayResultWithDataTables
