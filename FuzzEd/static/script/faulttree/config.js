@@ -60,14 +60,34 @@ define(['config', 'jquery'], function(Config) {
         },
 
         /**
-         * Group: Menus
-         *      Menu configurations.
+         * Group: AnalysisMenu
+         *      Configurations for results table, as well as highcharts diagram within the analysis results menu. 
          *
          * Constants:
-         *      {Number} PROBABILITY_MENU_MAX_GRID_HEIGHT - Max. height of the grid that displays the configurations.
+         *      {Number} RESULTS_TABLE_MAX_ROWS       - Max. number of configurations that can be dispayed within one page in the analysis results table.
+         *
+         *      {Number} HIGHCHARTS_MIN_HEIGHT        - Min. height of the highcharts container.
+         *      {Number} HIGHCHARTS_X_MIN             - Min. value on the X axis.
+         *      {Number} HIGHCHARTS_X_MAX             - Max. value on the X axis.
+         *      {Number} HIGHCHARTS_Y_MIN             - Min value on the Y axis.
+         *      {Number} HIGHCHARTS_Y_MAX             - Max value on the Y axis.
+         *      {Number} HIGHCHARTS_Y_TICK_INTERVAL   - Interval in which values are labeled on the Y axis.
+         *      {Number} HIGHCHARTS_POINT_RADIUS      - Radius of probabillity points drawn in the coordinate system.
+         *      {String} HIGHCHARTS_CREDIT_LABEL_SIZE - Font size of the highcharts credit label.
+         *
+         *
          */
-        Menus: {
-            PROBABILITY_MENU_MAX_GRID_HEIGHT: 500
+        AnalysisMenu: {
+            RESULTS_TABLE_MAX_ROWS: 10,
+            
+            HIGHCHARTS_MIN_HEIGHT: 140,
+            HIGHCHARTS_X_MIN:-0.05,
+            HIGHCHARTS_X_MAX:1.05,
+            HIGHCHARTS_Y_MIN:0, 
+            HIGHCHARTS_Y_MAX:1.0,
+            HIGHCHARTS_Y_TICK_INTERVAL:1.0,
+            HIGHCHARTS_POINT_RADIUS:1,
+            HIGHCHARTS_CREDIT_LABEL_SIZE:'8px'
         }
     });
 });
