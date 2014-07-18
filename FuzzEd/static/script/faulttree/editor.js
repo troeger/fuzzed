@@ -507,12 +507,11 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
             // clear container
             this._chartContainer.empty();
 
-            //TODO: This is all pretty hard-coded. Put it into config instead.
             this._chart = new Highcharts.Chart({
                 chart: {
                     renderTo: this._chartContainer[0],
                     type:     'line',
-                    height:   Math.max(140, this._chartContainer.height()),
+                    height:   Math.max(FaulttreeConfig.AnalysisMenu.HIGHCHARTS_MIN_HEIGHT, this._chartContainer.height()),
 
                 },
                 title: {
@@ -520,21 +519,21 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 },
                 credits: {
                     style: {
-                        fontSize: '8px'
+                        fontSize: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_CREDIT_LABEL_SIZE
                     }
                 },
                 xAxis: {
-                    min: -0.05,
-                    max:  1.05
+                    min: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_X_MIN,
+                    max: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_X_MAX
                 },
                 yAxis: {
-                    min: 0,
-                    max: 1,
+                    min: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_Y_MIN,
+                    max: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_Y_MAX,
                     title: {
                         text: null
                     },
-                    tickInterval: 1.0,
-                    minorTickInterval: 1.0 / yTick
+                    tickInterval: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_Y_TICK_INTERVAL,
+                    minorTickInterval: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_Y_TICK_INTERVAL / yTick
                 },
                 tooltip: {
                     formatter: this._chartTooltipFormatter
@@ -542,7 +541,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 plotOptions: {
                     series: {
                         marker: {
-                            radius: 1
+                            radius: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_POINT_RADIUS
                         },
                         events: {
                             mouseOver : function () {
@@ -617,7 +616,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                             "sAjaxSource":   job_result_url,
                             "aoColumns":     columns,
                             "bLengthChange": false,
-                            "iDisplayLength": FaulttreeConfig.Menus.RESULTS_TABLE_MAX_ROWS,
+                            "iDisplayLength": FaulttreeConfig.AnalysisMenu.RESULTS_TABLE_MAX_ROWS,
                             "fnDrawCallback": function(oSettings) {
                                 
                                 var serverData = oSettings['json'];
@@ -629,7 +628,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                     this._tableContainer.find('th').removeClass().unbind('click.DT');    
                                 }
                                 
-                                if(totalRecords <= FaulttreeConfig.Menus.RESULTS_TABLE_MAX_ROWS){
+                                if(totalRecords <= FaulttreeConfig.AnalysisMenu.RESULTS_TABLE_MAX_ROWS){
                                      // remove pagination elements if only one page is displayed
                                      this._tableContainer.find('div.dataTables_paginate').css('display', 'none');
                                      this._tableContainer.find('div.dataTables_info').css('display', 'none');
