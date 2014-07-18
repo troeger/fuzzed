@@ -592,17 +592,12 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
             columns.push(collapse_column);
             
             //formating function for displaying configuration warnings/errors
-            var format = function (d) {
-                if ('issues' in d){
-                    var issues = d['issues'];
+            var format = function (issues) {
                     
                     var errors   = issues['errors'] || [];
                     var warnings = issues['warnings'] || [];
                     
                     return this._displayIsussuesList(errors, warnings);
-                }
-                
-                return '';
             }.bind(this);
             
             
@@ -685,8 +680,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                             this._unhighlightConfiguration();                                                
                                      }.bind(this));
                                 }
-                                
-                                /* Sample Configuration issues 
+                                /* Sample Configuration issues
                                 if (iDisplayIndex == 0){
                                     current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
                                 } else if (iDisplayIndex == 1){
@@ -694,10 +688,10 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                 } else if (iDisplayIndex == 2){
                                      current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""},{"message": "error error error", "issueId": 0, "elementId": ""}, {"message": "another error", "issueId": 0, "elementId": ""}], "warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}, {"message": "another warning", "issueId": 0, "elementId": "3"}] };
                                 }*/
-                                
                                 if ('issues' in current_config){
-                                    jQuery(nRow).find('td.details-control').append('<i class="fa fa-exclamation-triangle"></i>');
+                                    var issues = current_config['issues'];
                                     
+                                    jQuery(nRow).find('td.details-control').append('<i class="fa fa-exclamation-triangle"></i>');
                                     // Add event listener for opening and closing details
                                     jQuery(nRow).on('click', function () {
                                         var tr  = jQuery(nRow);
@@ -709,11 +703,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                         }
                                         else {
                                             // Open this row
-                                            row.child(format(row.data())).show();
+                                            row.child(format(issues)).show();
                                         }
                                     }.bind(this));
-            
-                                    var issues = current_config['issues'];
                                     
                                     if ('errors' in issues){
                                         jQuery(nRow).addClass('danger');
