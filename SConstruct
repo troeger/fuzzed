@@ -72,8 +72,10 @@ Alias('shapes', tikz_targets)
 env.Default('docs', 'css', 'settings', 'xml', 'notations', 'shapes')
 
 # Special pseudo-targets to run stuff via Scons
-env.Command('run.server', None, server)
-env.Command('run.backend', None, backend)
-env.Command('run.tests', None, tests)
+AlwaysBuild(env.Command('run.server', None, server))
+AlwaysBuild(env.Command('run.backend', None, backend))
+AlwaysBuild(env.Command('run.tests', None, tests))
+AlwaysBuild(env.Command('fixture.save', None, fixture_save))
+
 
 
