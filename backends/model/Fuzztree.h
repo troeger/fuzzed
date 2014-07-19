@@ -6,10 +6,10 @@ class Fuzztree : public AbstractModel
 {
 public:
 	std::vector<FuzzTreeConfiguration> generateConfigurations() const;
-	Fuzztree generateVariationFreeFuzzTree(const FuzzTreeConfiguration& configuration);
+	Fuzztree* generateVariationFreeFuzzTree(const FuzzTreeConfiguration& configuration);
 
 protected:
-	void initFromGraphML(const std::string& graphMLFileName) override;
+	void handleBasicEvent(const pugi::xml_node xmlnode, AbstractNode* node) override;
 
 	unsigned int m_decompositionNumber;
 };

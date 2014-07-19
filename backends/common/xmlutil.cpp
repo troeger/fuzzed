@@ -30,3 +30,8 @@ configurations::Configuration serializedConfiguration(const FuzzTreeConfiguratio
 	return conf;
 }
 
+const std::string getId(const pugi::xml_node& node)
+{
+	return "TODO: implement me";
+}
+

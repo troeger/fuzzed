@@ -1,12 +1,6 @@
-#pragma once
-#include "AbstractModel.h"
+#include "Faulttree.h"
 
-class Faulttree : public AbstractModel
+void Faulttree::handleBasicEvent(const pugi::xml_node xmlnode, AbstractNode* node)
 {
-public:
-	// whatever logic is faulttree-specific. MOCUS?
 
-protected:
-	void initFromGraphML(const std::string& graphMLFileName) override;
-
-};
+}

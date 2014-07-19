@@ -2,8 +2,10 @@
 
 #include <configurations.h>
 #include "FuzzTreeConfiguration.h"
+#include <pugixml.hpp>
 
 configurations::Configuration serializedConfiguration(const FuzzTreeConfiguration &c);
+const std::string getId(const pugi::xml_node& node);
 
 #define DEFAULT_DECOMPOSITION_NUMBER 10
 #define DEFAULT_MISSION_TIME 17520

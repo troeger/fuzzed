@@ -7,6 +7,6 @@ public:
 	// whatever logic is faulttree-specific. MOCUS?
 
 protected:
-	void initFromGraphML(const std::string& graphMLFileName) override;
+	void handleBasicEvent(const pugi::xml_node xmlnode, AbstractNode* node) override;
 
 };

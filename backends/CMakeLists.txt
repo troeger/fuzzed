@@ -249,6 +249,9 @@ add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FIL
 set(COMMON_SOURCES
 	${MODEL_DIR}/Fuzztree.cpp
 	${MODEL_DIR}/Faulttree.cpp
+	${MODEL_DIR}/TopEvent.cpp
+	${MODEL_DIR}/BasicEvent.cpp
+	${MODEL_DIR}/AbstractModel.cpp
 
 	${COMMON_DIR}/util.cpp
 	${COMMON_DIR}/xmlutil.cpp
@@ -279,6 +282,8 @@ set(COMMON_HEADERS
 	${MODEL_DIR}/TopEvent.h
 	${MODEL_DIR}/OrGate.h
 	${MODEL_DIR}/AbstractProbability.h
+	${MODEL_DIR}/StaticProbability.h
+	${MODEL_DIR}/FuzzyProbability.h
 
 	${COMMON_DIR}/platform.h
 	${COMMON_DIR}/util.h
