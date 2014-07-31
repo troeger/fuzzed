@@ -501,7 +501,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 chart: {
                     renderTo: this._chartContainer[0],
                     type:     'line',
-                    height:   Math.max(FaulttreeConfig.AnalysisMenu.HIGHCHARTS_MIN_HEIGHT, this._chartContainer.height()),
+                    height:   FaulttreeConfig.AnalysisMenu.HIGHCHARTS_MIN_HEIGHT,
 
                 },
                 title: {
@@ -665,6 +665,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                  
                                  if (_.size(chartData) != 0) {
                                      this._displaySeriesWithHighcharts(chartData);
+                                 }
+                                 else{
+                                     this._chart.setSize (0, 0, false);
                                  }     
                                 }.bind(this),
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
