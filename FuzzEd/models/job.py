@@ -93,7 +93,24 @@ class Job(models.Model):
             return Result.titles(Result.SIMULATION_RESULT, self.graph.kind)
         elif self.kind == self.MINCUT_JOB:
             return Result.titles(Result.MINCUT_RESULT, self.graph.kind)
-
+    
+    def axis_titles(self):
+        ''' 
+        Computes labeling and axis scales for the analysis results menu 
+        '''
+        
+        axis_titles = {
+            'X_MIN':-0.05,                           # Min. value on the X axis.
+            'X_MAX':1.05,                            # Max. value on the X axis.
+            'Y_MIN':0,                               # Min value on the Y axis.
+            'Y_MAX':1.0,                             # Max value on the Y axis.
+            'Y_TICK_INTERVAL':1.0,                   # Interval in which values are labeled on the Y axis.
+            'Y_MINOR_TICK_INTERVAL': 1.0/10,         # Cross stripe is shown after each mino tick.              
+            'POINT_RADIUS':1                         # Radius of the points drawn in higcharts.
+            }
+        
+        return axis_titles   
+    
     @classmethod
     def exists_with_result(cls, graph, kind):
         ''' 
