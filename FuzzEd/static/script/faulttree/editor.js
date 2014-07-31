@@ -360,10 +360,15 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 
             // remove progress bar
             this._chartContainer.empty();
+            var axisTitles = data.axis_titles;
+            this._initializeHighcharts(axisTitles);
            
+            
             // display results within a table
             var columns = data.columns;
             this._displayResultWithDataTables(columns, job_result_url);
+            
+            
         },
 
         /**
@@ -478,35 +483,20 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
 
             return this;
         },
-
+        
         /**
-         * Method: _displayResultWithHighcharts
-         *      Display the job's result in the menu's body using Highcharts.
+         * Method: _initializeHighcharts
+         *      Intialize highcharts with Axis definitions.
          *
          * Parameters:
-         *    {Array[Object]} data  - A set of one or more data series to display in the Highchart.
-         *    {Number}        yTick - [optional] The tick of the y-axis (number of lines).
+         *    {Array[Object]} defititions  - A set of definitions used in highcharts initialisation.
          *
          * Returns:
          *      This {<AnalysisResultMenu>} for chaining.
          */
-        _displayResultWithHighcharts: function(data, yTick) {
-            if (data.length == 0) return this;
-
-            yTick = yTick || 5;
-            var series = [];
-            
+        _initializeHighcharts: function(definitions) { 
             var self = this;
-
-            _.each(data, function(cutset, name) {
-                series.push({
-                    name: name,
-                    data: cutset
-                });
-            });
-            // clear container
-            this._chartContainer.empty();
-
+                        
             this._chart = new Highcharts.Chart({
                 chart: {
                     renderTo: this._chartContainer[0],
@@ -523,17 +513,17 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                     }
                 },
                 xAxis: {
-                    min: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_X_MIN,
-                    max: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_X_MAX
+                    min: definitions.X_MIN,
+                    max: definitions.X_MAX
                 },
                 yAxis: {
-                    min: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_Y_MIN,
-                    max: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_Y_MAX,
+                    min: definitions.Y_MIN,
+                    max: definitions.Y_MAX,
                     title: {
                         text: null
                     },
-                    tickInterval: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_Y_TICK_INTERVAL,
-                    minorTickInterval: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_Y_TICK_INTERVAL / yTick
+                    tickInterval: definitions.Y_TICK_INTERVAL,
+                    minorTickInterval: definitions.Y_MINOR_TICK_INTERVAL
                 },
                 tooltip: {
                     formatter: this._chartTooltipFormatter
@@ -541,7 +531,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 plotOptions: {
                     series: {
                         marker: {
-                            radius: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_POINT_RADIUS
+                            radius: definitions.POINT_RADIUS
                         },
                         events: {
                             mouseOver : function () {
@@ -557,30 +547,14 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                         }
                     }
                 },
-
-                series: series
+                data: []
             });
-
+            
             return this;
         },
         
         /**
-         * Method: _initializeHighcharts
-         *      Intialize highcharts with Axis definitions.
-         *
-         * Parameters:
-         *    {Array[Object]} defititions  - A set of 
-         *
-         * Returns:
-         *      This {<AnalysisResultMenu>} for chaining.
-         */
-        _initializeHighcharts: function(defintitions) {
-            
-        },
-        
-        
-        /**
-         * Method: _drawSeriesWithHighcharts
+         * Method: _displaySeriesWithHighcharts
          *      Draw series within the Highcharts diagram. 
          *
          * Parameters:
@@ -589,20 +563,30 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
          * Returns:
          *      This {<AnalysisResultMenu>} for chaining.
          */
-        _drawSeriesWithHighcharts: function(){
-         
-        // ...
-        
-        while(chart.series.length > 0){
-            this._chart.series[0].remove(false);
-        }
-        
-        
-        
-         this._chart.redraw() //...   
+        _displaySeriesWithHighcharts: function(data){
+            // remove series from the last draw
+            while(this._chart.series.length > 0){
+                this._chart.series[0].remove(false);
+            }
+            
+            var series = [];
+            _.each(data, function(cutset, name) {
+                series.push({
+                    name: name,
+                    data: cutset
+                });
+            });
+            
+            // draw series
+            _.each(series, function(config){
+                this._chart.addSeries(config, false, false)
+            }.bind(this));
+            
+            this._chart.redraw();
+            
+            return this;
         },
-        
-                
+              
         /**
          * Method: _displayResultWithDataTables
          *      Display the job's result with DataTables Plugin. Configuration Issues are printed inside the table as collapsed row. 
@@ -680,7 +664,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                  }.bind(this));
                                  
                                  if (_.size(chartData) != 0) {
-                                     this._displayResultWithHighcharts(chartData, null);
+                                     this._displaySeriesWithHighcharts(chartData);
                                  }     
                                 }.bind(this),
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
