@@ -205,6 +205,9 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
          *      This {<Canvas>} instance for chaining.
          */
         _setupCanvas: function() {
+            
+            var self = this;
+            
             // make canvas droppable for shapes from the shape menu
             this.container.droppable({
                 accept: function(draggable) {
@@ -213,10 +216,10 @@ define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Con
                 tolerance: 'fit',
                 drop:      function(uiEvent, uiObject) {
                     var kind     = uiObject.draggable.attr('id');
-                    var offset   = this.container.offset();
+                    var offset   = self.container.offset();
                     var position = {x: uiEvent.pageX - offset.left, y: uiEvent.pageY - offset.top};
                     jQuery(document).trigger(Config.Events.CANVAS_SHAPE_DROPPED, [kind, position]);
-                }.bind(this)
+                }
             });
 
             this.container.selectable({
