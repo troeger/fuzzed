@@ -36,12 +36,3 @@ def server():
     else:
         os.system('fab build.configs:target=development')
         os.system('./manage.py runserver')
-
-@task
-def tests(test=None):
-    '''Runs all the tests.'''
-    os.system("fab build.configs")          # Makes sure that the configs match to the runtime environment for the test
-    if test:
-        os.system('./manage.py test FuzzEd.tests.'+test)
-    else:
-        os.system('./manage.py test FuzzEd.tests')

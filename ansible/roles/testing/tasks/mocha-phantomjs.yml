@@ -1,0 +1,13 @@
+---
+# Installing mocha-phantomjs for headless js unit testing
+- name: Ensure NPM is installed
+  sudo: yes
+  apt: pkg=npm state=present
+  when: ansible_os_family == "Debian"
+
+- name: Ensure NPM is installed
+  homebrew: pkg=npm state=present
+  when: ansible_os_family == "Darwin"
+
+- name: Install mocha-phantomjs
+  npm: name=mocha-phantomjs global=yes

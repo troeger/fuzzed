@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Tests</title>
+  <style type="text/css">
+      @import url("/home/vagrant/fuzztrees/FuzzEd/static/css/mocha/mocha-1.21.4.css");
+  </style>
+
+  <script src="/home/vagrant/fuzztrees/FuzzEd/static/lib/requirejs/require-2.1.6.min.js" type="text/javascript" language="javascript"></script>
+  <script type="text/javascript" language="javascript">
+      require.config({
+          baseUrl: '/home/vagrant/fuzztrees/FuzzEd/static/script/',
+          waitSeconds: 5,
+          paths: {
+              // testing plugins
+              'mocha'         : '../lib/mocha/mocha-1.21.4',
+              'chai'          : '../lib/chai/chai-1.9.1',
+              // require plugins
+              'text' :      '../lib/requirejs/plugins/text-2.0.7', // required by json plugin
+              'json' :      '../lib/requirejs/plugins/json-0.3.1',
+              // jquery and plugins
+              'jquery':           '../lib/jquery/jquery-2.0.2.min',
+              'jquery-ui':        '../lib/jquery-ui/jquery-ui-1.10.3.min',
+              'jquery-classlist': '../lib/jquery-classlist/jquery-classlist-1.0.0',
+              'jquery-ajaxq':     '../lib/jquery-ajaxq/ajaxq-1.0.0',
+              'selectize':        '../lib/selectize/js/standalone/selectize.min',
+              'jquery-cookie':     '../lib/jquery-cookie/jquery.cookie',
+              // other libs
+              'openid-selector': '../lib/openid-selector/js',
+              'bignumber':  '../lib/bignumber/bignumber-1.0.1.min',
+              'bootstrap':  '../lib/bootstrap/bootstrap-3.0.0rc1.min',
+              'highcharts': '../lib/highcharts/highcharts-3.0.2.min',
+              'jsplumb':    '../lib/jsplumb/jsplumb-1.5.5.min',
+              'datatables-base': '../lib/datatables/jquery.dataTables.min',
+              'datatables': '../lib/datatables/plugins/dataTables.bootstrap',
+              'datatables-api' : '../lib/datatables/plugins/datatables.api',
+              'underscore': '../lib/underscore/underscore-1.4.4.min',
+              'd3':         '../lib/d3/d3-3.3.11.min',
+              // fuzzed specifics
+              'notations':  '../notations'
+          },
+          // define dependencies for libs that are not AMD compatible
+          shim: {
+      
+              'openid-selector/openid-jquery': {
+                  deps: ['jquery'],
+                  exports: 'openid'
+             },
+              'openid-selector/openid-en': 
+                  ['openid-selector/openid-jquery'],
+              'bootstrap': {
+                  deps: ['jquery']
+              },
+              'jquery-ui': {
+                  deps: ['jquery']
+              },
+              'jquery-classlist': {
+                  deps: ['jquery']
+              },
+              'jquery-ajaxq': {
+                  deps: ['jquery']
+              },
+              'jsplumb': {
+                  deps: ['jquery', 'jquery-ui'],
+                  exports: 'jsPlumb'
+              },
+              'highcharts': {
+                  deps: ['jquery'],
+                  exports: 'Highcharts'
+              },
+              'datatables-base': {
+                deps: ['jquery']
+              },
+              'datatables':{
+                deps:['datatables-base']
+              },
+              'datatables-api':{
+                deps: ['datatables-base']
+              },
+              'underscore': {
+                  exports: '_'
+              }
+          }
+      });
+  </script>
+</head>
+    
+<body>
+    <div id="mocha"></div>
+    <script>
+        require(['require', 'chai', 'mocha'], function(require, chai){
+            
+            // global initialization of mocha 
+            assert = chai.assert;
+            mocha.setup('bdd');
+           
+            // run all tests   
+            require(['sample_test.js', 'editor_test.js'], function() {                
+                if (window.mochaPhantomJS){
+                    mochaPhantomJS.run();
+                }
+                else {
+                    mocha.run();
+                }
+            });
+        });
+    </script>
+</body>
+
