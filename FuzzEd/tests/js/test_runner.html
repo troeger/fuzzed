@@ -6,6 +6,38 @@
       @import url("/home/vagrant/fuzztrees/FuzzEd/static/css/mocha/mocha-1.21.4.css");
   </style>
 
+ 
+  <script>
+      // polyfill for missing bind function in phantomjs
+  
+      // source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fbind
+      if (!Function.prototype.bind) {
+        Function.prototype.bind = function (oThis) {
+          if (typeof this !== "function") {
+            // closest thing possible to the ECMAScript 5
+            // internal IsCallable function
+            throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+          }
+        
+          var aArgs = Array.prototype.slice.call(arguments, 1), 
+              fToBind = this, 
+              fNOP = function () {},
+              fBound = function () {
+                return fToBind.apply(this instanceof fNOP && oThis
+                       ? this
+                       : oThis,
+                       aArgs.concat(Array.prototype.slice.call(arguments)));
+              };
+        
+          fNOP.prototype = this.prototype;
+          fBound.prototype = new fNOP();
+        
+          return fBound;
+        };
+      }
+  </script>
+ 
+  
   <script src="/home/vagrant/fuzztrees/FuzzEd/static/lib/requirejs/require-2.1.6.min.js" type="text/javascript" language="javascript"></script>
   <script type="text/javascript" language="javascript">
       require.config({
