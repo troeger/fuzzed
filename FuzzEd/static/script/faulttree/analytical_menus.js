@@ -113,18 +113,26 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
             if (typeof this._job !== 'undefined') this._job.cancel();
             
             this._graphIssuesContainer.empty();
-            // reset height of the chart container (which is set after resizing event)
-            this._chartContainer.height('')
             this._chartContainer.empty();
             this._tableContainer.empty();
+            
+            this._chart = null;
+            this._table = null;
+            
+            this._configNodeMap = {};
+            this._redundancyNodeMap = {};
+            this._redundancyNodeMap = {};
+            this._configMetaDataCached = {};
+            
+            
+            // reset height of the chart container (which is set after resizing event)
+            this._chartContainer.height('')
             // reset height in case it was set during grid creation
             this._tableContainer.css('min-height', '');
             // reset container width (which is set after initalisation of DataTables)
             this.container.css('width','');
-            this._chart = null; this._table = null;
-            this._configNodeMap = {};
-            this._redundancyNodeMap = {};
-
+            
+            
             return this;
         },
         
@@ -621,22 +629,6 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
              
             return this;
         },
-        
-        /*
-         * Method _clearAllConfigurationMetadata
-         *      Clear all global Dictionaries that contains cached informations about specific configurations
-         * Returns:
-         *      This {<AnalysisResultMenu>} for chaining.
-         */
-            
-         _clearAllConfigurationMetaData: function() {
-             this._configNodeMap        = {};
-             this._configEdgeMap        = {};
-             this._redundancyNodeMap    = {};
-             this._configMetaDataCached = {};
-            
-             return this;
-         },
         
         /**
          *  Method: _highlightConfiguration

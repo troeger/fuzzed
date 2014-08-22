@@ -3,14 +3,14 @@
   <meta charset="utf-8"/>
   <title>Tests</title>
   <style type="text/css">
-      @import url("/home/vagrant/fuzztrees/FuzzEd/static/css/mocha/mocha-1.21.4.css");
+      @import url("../lib/css/mocha/mocha-1.21.4.css");
   </style>
 
  
   <script>
       // polyfill for missing bind function in phantomjs
-  
       // source: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind?redirectlocale=en-US&redirectslug=JavaScript%2FReference%2FGlobal_Objects%2FFunction%2Fbind
+      
       if (!Function.prototype.bind) {
         Function.prototype.bind = function (oThis) {
           if (typeof this !== "function") {
@@ -38,15 +38,15 @@
   </script>
  
   
-  <script src="/home/vagrant/fuzztrees/FuzzEd/static/lib/requirejs/require-2.1.6.min.js" type="text/javascript" language="javascript"></script>
+  <script src="../../static/lib/requirejs/require-2.1.6.min.js" type="text/javascript" language="javascript"></script>
   <script type="text/javascript" language="javascript">
       require.config({
-          baseUrl: '/home/vagrant/fuzztrees/FuzzEd/static/script/',
+          baseUrl: '../../static/script/',
           waitSeconds: 5,
           paths: {
               // testing plugins
-              'mocha'         : '../lib/mocha/mocha-1.21.4',
-              'chai'          : '../lib/chai/chai-1.9.1',
+              'mocha'         : '../../tests/lib/script/mocha/mocha-1.21.4',
+              'chai'          : '../../tests/lib/script/chai/chai-1.9.1',
               // require plugins
               'text' :      '../lib/requirejs/plugins/text-2.0.7', // required by json plugin
               'json' :      '../lib/requirejs/plugins/json-0.3.1',
@@ -119,6 +119,9 @@
     
 <body>
     <div id="mocha"></div>
+    
+    <div id="FuzzEdContent"></div>
+    
     <script>
         require(['require', 'chai', 'mocha'], function(require, chai){
             
