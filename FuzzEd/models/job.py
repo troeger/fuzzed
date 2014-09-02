@@ -104,18 +104,18 @@ class Job(models.Model):
                 'min': -0.05,               
                 'max': 1.05,
                 'title':{
-                    'text': 'x title',
+                    'text': None, #'x title',
                     'style': {
                         'fontSize': '9px'
                     }
                 },
-                'tickInterval': 0.1
+                'tickInterval': 0.2
             },
             'yAxis': {
                 'min': 0,
                 'max': 1.0,
                 'title': {
-                    'text':  'y title',
+                    'text': None, #'y title',
                     'style': {
                         'fontSize': '9px'
                     }
