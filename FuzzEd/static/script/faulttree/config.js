@@ -68,14 +68,16 @@ define(['config', 'jquery'], function(Config) {
          *
          *      {Number} HIGHCHARTS_MIN_HEIGHT        - Min. height of the highcharts container.
          *      {String} HIGHCHARTS_CREDIT_LABEL_SIZE - Font size of the highcharts credit label.
-         *
+         *      {Nuber}  HIGHCHARTS_POINT_RADIUS      - Radius of the point marker
          *
          */
         AnalysisMenu: {
             RESULTS_TABLE_MAX_ROWS: 10,
             
             HIGHCHARTS_MIN_HEIGHT: 140,
-            HIGHCHARTS_CREDIT_LABEL_SIZE:'8px'
+            HIGHCHARTS_CREDIT_LABEL_SIZE:'8px',
+            HIGHCHARTS_POINT_RADIUS: 1
+            
         }
     });
 });

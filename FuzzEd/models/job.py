@@ -96,18 +96,34 @@ class Job(models.Model):
     
     def axis_titles(self):
         ''' 
-        Computes labeling and axis scales for the analysis results menu 
+        Computes labeling and axis scales for the analysis results menu. 
+        Descriptions of configurations values for 'xAxis' and 'yAxis' can be taken from the official Highcharts api.
         '''
-        
         axis_titles = {
-            'X_MIN':-0.05,                           # Min. value on the X axis.
-            'X_MAX':1.05,                            # Max. value on the X axis.
-            'Y_MIN':0,                               # Min value on the Y axis.
-            'Y_MAX':1.0,                             # Max value on the Y axis.
-            'Y_TICK_INTERVAL':1.0,                   # Interval in which values are labeled on the Y axis.
-            'Y_MINOR_TICK_INTERVAL': 1.0/10,         # Cross stripe is shown after each mino tick.              
-            'POINT_RADIUS':1                         # Radius of the points drawn in higcharts.
+            'xAxis': {
+                'min': -0.05,               
+                'max': 1.05,
+                'title':{
+                    'text': 'x title',
+                    'style': {
+                        'fontSize': '9px'
+                    }
+                },
+                'tickInterval': 0.1
+            },
+            'yAxis': {
+                'min': 0,
+                'max': 1.0,
+                'title': {
+                    'text':  'y title',
+                    'style': {
+                        'fontSize': '9px'
+                    }
+                },
+                'tickInterval': 1.0,
+                'minorTickInterval':  1.0/10
             }
+        }
         
         return axis_titles   
     

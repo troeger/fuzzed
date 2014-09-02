@@ -489,12 +489,12 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
          *      Intialize highcharts with Axis definitions.
          *
          * Parameters:
-         *    {Array[Object]} defititions  - A set of definitions used in highcharts initialisation.
+         *    {Array[Object]} axis_defititions  - A set of definitions used in Highcharts initialisation.
          *
          * Returns:
          *      This {<AnalysisResultMenu>} for chaining.
          */
-        _initializeHighcharts: function(definitions) { 
+        _initializeHighcharts: function(axis_definitions) { 
             var self = this;
                         
             this._chart = new Highcharts.Chart({
@@ -512,26 +512,15 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                         fontSize: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_CREDIT_LABEL_SIZE
                     }
                 },
-                xAxis: {
-                    min: definitions.X_MIN,
-                    max: definitions.X_MAX
-                },
-                yAxis: {
-                    min: definitions.Y_MIN,
-                    max: definitions.Y_MAX,
-                    title: {
-                        text: null
-                    },
-                    tickInterval: definitions.Y_TICK_INTERVAL,
-                    minorTickInterval: definitions.Y_MINOR_TICK_INTERVAL
-                },
+                xAxis: axis_definitions.xAxis,
+                yAxis: axis_definitions.yAxis,
                 tooltip: {
                     formatter: this._chartTooltipFormatter
                 },
                 plotOptions: {
                     series: {
                         marker: {
-                            radius: definitions.POINT_RADIUS
+                            radius: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_POINT_RADIUS
                         },
                         events: {
                             mouseOver : function () {
