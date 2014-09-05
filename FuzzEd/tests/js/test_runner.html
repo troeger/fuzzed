@@ -136,8 +136,7 @@
         require(['require', 'chai', 'chai-jquery', 'mocha', 'sinon', 'sinon-server'], function(require, chai, chaiJquery){
             
             // global initialization of mocha and chai
-            assert = chai.assert;
-            should = chai.should();
+            var should = chai.should();
             
             chai.use(chaiJquery);
             
