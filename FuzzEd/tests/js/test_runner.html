@@ -45,8 +45,12 @@
           waitSeconds: 5,
           paths: {
               // testing plugins
-              'mocha'         : '../../tests/lib/script/mocha/mocha-1.21.4',
-              'chai'          : '../../tests/lib/script/chai/chai-1.9.1',
+              'mocha'                       : '../../tests/lib/script/mocha/mocha-1.21.4',
+              'chai'                        : '../../tests/lib/script/chai/chai-1.9.1',
+              'chai-jquery'                 : '../../tests/lib/script/chai-jquery/chai-jquery-1.2.2',
+              'sinon'                       : '../../tests/lib/script/sinon/sinon-1.10.3',
+              'sinon-server'                : '../../tests/lib/script/sinon/sinon-1.10.3/util/sinon-server-1.10.3',
+              //'sinon-fake-xml-http-request' : '../../tests/lib/script/sinon/sinon-1.10.3/util/fake_xml_http_request',
               // require plugins
               'text' :      '../lib/requirejs/plugins/text-2.0.7', // required by json plugin
               'json' :      '../lib/requirejs/plugins/json-0.3.1',
@@ -73,7 +77,12 @@
           },
           // define dependencies for libs that are not AMD compatible
           shim: {
-      
+              'sinon-server' : {
+                  deps: ['sinon']
+              },
+              'chai-query' : {
+                  deps: ['jquery', 'chai']
+              },
               'openid-selector/openid-jquery': {
                   deps: ['jquery'],
                   exports: 'openid'
@@ -120,13 +129,18 @@
 <body>
     <div id="mocha"></div>
     
-    <div id="FuzzEdContent"></div>
+    <div id="FuzzEdContent" style="display:none;"></div>
+    <div id="FuzzEdAlertContainer"style="display:none;"></div>
     
     <script>
-        require(['require', 'chai', 'mocha'], function(require, chai){
+        require(['require', 'chai', 'chai-jquery', 'mocha', 'sinon', 'sinon-server'], function(require, chai, chaiJquery){
             
-            // global initialization of mocha 
+            // global initialization of mocha and chai
             assert = chai.assert;
+            should = chai.should();
+            
+            chai.use(chaiJquery);
+            
             mocha.setup('bdd');
            
             // run all tests   

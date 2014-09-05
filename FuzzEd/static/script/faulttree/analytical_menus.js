@@ -4,8 +4,8 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
    /*
     * Abstract Class: AnalysisResultMenu
     *      Base class for menus that display the results of a analysis performed by the backend. It contains a chart
-    *      (implemented with Highcharts) and a table area (using DataTables). Subclasses are responsible for
-    *      providing data formatters and data conversion functions.
+    *      (implemented with Highcharts) and a table area (using DataTables).
+    *
     */
    var AnalysisResultMenu = Menus.Menu.extend({
        /**
@@ -50,7 +50,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
            this._editor = editor;
            this._graphIssuesContainer = this.container.find('.graph_issues');
            this._chartContainer       = this.container.find('.chart');
-           this._tableContainer        = this.container.find('.table_container');
+           this._tableContainer       = this.container.find('.table_container');
        },
 
        /**
@@ -112,18 +112,24 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
        _clear: function() {
            if (typeof this._job !== 'undefined') this._job.cancel();
            
-           this._graphIssuesContainer.empty();
            // reset height of the chart container (which is set after resizing event)
-           this._chartContainer.height('')
-           this._chartContainer.empty();
-           this._tableContainer.empty();
+           this._chartContainer.height('');
+           
            // reset height in case it was set during grid creation
            this._tableContainer.css('min-height', '');
+           
            // reset container width (which is set after initalisation of DataTables)
            this.container.css('width','');
-           this._chart = null; this._table = null;
-           this._configNodeMap = {};
-           this._redundancyNodeMap = {};
+           
+           this._graphIssuesContainer.empty();
+           this._chartContainer.empty();
+           this._tableContainer.empty();
+           this._chart = null;
+           this._table = null;
+           this._configNodeMap        = {};
+           this._redundancyNodeMap    = {};
+           this._configEdgeMap        = {};
+           this._configMetaDataCached = {};
 
            return this;
        },
@@ -234,7 +240,11 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
         *      Evaluates the job result. Either displays the analysis results or the returned error message.
         *
         * Parameters:
-        *      {String} data - Data returned from the backend containing the result of the calculation.
+        *      {String} data           - Data returned from the backend containing global graph issues,
+        *                                configuration data for Highcharts, as well as column definitions for DataTables.
+        *
+        *      {String} job_result_url - URL for accessing the job result (configuration data).
+        *
         */
        _evaluateResult: function(data, job_result_url) {
            
@@ -501,10 +511,6 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                    return this._displayIsussuesList(errors, warnings);
            }.bind(this);
            
-           
-           // clear all cached metadata (from previous analysis run)
-           this._clearAllConfigurationMetaData();
-           
            this._table = jQuery('#results_table').dataTable({
                            "bProcessing":   true,
                            "bFilter":       false,
@@ -559,7 +565,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                                    var choices  = aData['choices'];
                                    
                                    // check if config meta data is alredy cached 
-                                   if (! (configID in this._configMetaDataCached)){
+                                   if (this._configMetaDataCached[configID] !== true){
                                        // remember the nodes and edges involved in this config for later highlighting
                                        this._collectNodesAndEdgesForConfiguration(configID, choices);
                                    
@@ -584,6 +590,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                                            this._unhighlightConfiguration();                                                
                                     }.bind(this));
                                }
+                               
                                /* Sample Configuration issues
                                if (iDisplayIndex == 0){
                                    current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
@@ -592,6 +599,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                                } else if (iDisplayIndex == 2){
                                     current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""},{"message": "error error error", "issueId": 0, "elementId": ""}, {"message": "another error", "issueId": 0, "elementId": ""}], "warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}, {"message": "another warning", "issueId": 0, "elementId": "3"}] };
                                }*/
+                               
                                if ('issues' in current_config){
                                    var issues = current_config['issues'];
                                    
@@ -636,24 +644,6 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
             
            return this;
        },
-       
-       
-       
-       /*
-        * Method _clearAllConfigurationMetadata
-        *      Clear all global Dictionaries that contains cached informations about specific configurations
-        * Returns:
-        *      This {<AnalysisResultMenu>} for chaining.
-        */
-           
-        _clearAllConfigurationMetaData: function() {
-            this._configNodeMap        = {};
-            this._configEdgeMap        = {};
-            this._redundancyNodeMap    = {};
-            this._configMetaDataCached = {};
-           
-            return this;
-        },
        
        /**
         *  Method: _highlightConfiguration
@@ -804,7 +794,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
 
    /**
     *  Class: AnalyticalProbabilityMenu
-    *      The menu responsible for displaying the results of the 'analytical' analysis.
+    *      The menu responsible for displaying analysis results.
     *
     *  Extends: {<AnalyticalResultMenu>}
     */
@@ -837,7 +827,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
 
    /**
     * Class: SimulatedProbabilityMenu
-    *      The menu responsible for displaying the results of the 'analytical' analysis.
+    *      The menu responsible for displaying simulation results.
     *
     * Extends: AnalysisResultMenu
     */
