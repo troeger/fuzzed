@@ -6,7 +6,7 @@ class TopEvent : public AbstractNode
 {
 public:
 	TopEvent(const std::string id) : AbstractNode(id) {};
-	virtual ~TopEvent();
+	virtual ~TopEvent() {};
 
 	virtual void addChild(AbstractNode* child) override
 	{
@@ -15,9 +15,9 @@ public:
 	};
 
 
-	virtual void toPetriNet(PetriNet* pn) override;
+	void toPetriNet(PetriNet* pn) override;
 
-	virtual const std::string& getTypeDescriptor();
+	const std::string& getTypeDescriptor() const override;
 
 protected:
 };

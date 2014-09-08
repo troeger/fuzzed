@@ -4,9 +4,8 @@
 #include <map>
 #include <set>
 #include <tuple>
-#include "fuzztree.h"
+#include "AbstractNode.h"
 
-// No tree, just a flat data structure for configuring which nodes are enabled
 struct FuzzTreeConfiguration
 {
 public:
@@ -21,9 +20,9 @@ public:
 	void setRedundancyNumber(const id_type& ID, int k, int outOfN);
 	void setFeatureNumber(const id_type& ID, const id_type& configuredChild);
 
-	void setNotIncludedRecursive(const fuzztree::Node& ID);
+	void setNotIncludedRecursive(const AbstractNode& ID);
 
-	static const int computeCostRecursive(const fuzztree::Node& ID);
+	static const int computeCostRecursive(const AbstractNode& ID);
 
 	const bool& isOptionalEnabled(const id_type& ID) const;
 	const bool isIncluded(const id_type& ID) const;

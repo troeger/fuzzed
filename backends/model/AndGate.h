@@ -6,6 +6,6 @@ class AndGate : public AbstractNode
 public:
 	AndGate(const std::string id) : AbstractNode(id) {};
 
-	void toPetriNet(PetriNet* pn) override { /*TODO*/ };
-	const std::string& getTypeDescriptor() override;
+	void toPetriNet(PetriNet* pn) override;
+	const std::string& getTypeDescriptor() const override;
 };

@@ -37,7 +37,7 @@ AbstractModel* AbstractModel::loadGraphML(const std::string graphMLFileName)
 #endif
 		AbstractModel* res = nullptr;
 
-		const auto modelKind = doc.find_child_by_attribute(DATA, KEY, KIND).value();
+		const std::string modelKind = doc.find_child_by_attribute(DATA, KEY, KIND).value();
 		if (modelKind == "fuzztree")
 			res = new Fuzztree();
 		else if (modelKind == "faulttree")
@@ -98,7 +98,7 @@ void AbstractModel::loadRecursive(
 		{
 			if (c.attribute(ID).value() != childId) continue;
 			
-			const auto childType = c.find_child_by_attribute(DATA, KEY, KIND).value();
+			const std::string childType = c.find_child_by_attribute(DATA, KEY, KIND).value();
 			if (childType == "basicEvent")
 				handleBasicEvent(c, childModelNode);
 			else if (childType == "orGate")
@@ -110,4 +110,9 @@ void AbstractModel::loadRecursive(
 			parentModelNode->addChild(childModelNode);
 		}
 	}
+}
+
+const std::string AbstractModel::getId(const pugi::xml_node& node)
+{
+	return "TODO";
 }

@@ -1,6 +1,7 @@
 #pragma once
+#include "AbstractProbability.h"
 
-class AbstractProbability
+class FuzzyProbability : public AbstractProbability
 {
 
 };

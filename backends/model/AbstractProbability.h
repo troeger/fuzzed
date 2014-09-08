@@ -2,5 +2,6 @@
 
 class AbstractProbability
 {
-
+public:
+	AbstractProbability() {};
 };

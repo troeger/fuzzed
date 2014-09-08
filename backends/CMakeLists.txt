@@ -123,6 +123,7 @@ include_directories(
 	${PUGIXML_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration
+	${CMAKE_CURRENT_SOURCE_DIR}/model
 	${CMAKE_CURRENT_SOURCE_DIR}/common
 	${CMAKE_CURRENT_SOURCE_DIR}/common_generated
 	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
@@ -136,15 +137,6 @@ set(COMMON_GEN_DIR 	${CMAKE_CURRENT_SOURCE_DIR}/common_generated)
 #########################################
 
 set(XSD_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../FuzzEd/static/xsd")
-
-set(XSD_GENERATED_TREE_FILES
-	${COMMON_GEN_DIR}/fuzztree.h
-	${COMMON_GEN_DIR}/faulttree.h
-	${COMMON_GEN_DIR}/fuzztree.cpp
-	${COMMON_GEN_DIR}/faulttree.cpp)
-
-set(FAULTTREE_XSD "${XSD_FILE_PATH}/faulttree.xsd")
-set(FUZZTREE_XSD  "${XSD_FILE_PATH}/fuzztree.xsd")
 
 ########### FAULT TREE MODEL ############
 
@@ -224,24 +216,10 @@ add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FIL
 			--output-dir ${COMMON_GEN_DIR}
 			${CONFIGURATION_XSD}
 
-	COMMAND ${XSD_EXECUTABLE}
-		cxx-tree 
-			${XSD_TO_FAULTTREE_ARGS} 
-			${TREE_CUSTOMIZATION_ARGS}
-			--output-dir ${COMMON_GEN_DIR}
-			${FAULTTREE_XSD}
-
-	COMMAND ${XSD_EXECUTABLE} 
-		cxx-tree
-			${XSD_TO_FUZZTREE_ARGS}
-			${FUZZTREE_CUSTOMIZATION_ARGS}
-			--output-dir ${COMMON_GEN_DIR}
-			${FUZZTREE_XSD}
-
 	COMMENT "Generating C++ / XML mapping files"
 	VERBATIM
 
-	DEPENDS ${COMMON_TYPES_XSD} ${RESULT_XSD} ${CONFIGURATION_XSD} ${FAULTTREE_XSD} ${FUZZTREE_XSD})
+	DEPENDS ${COMMON_TYPES_XSD} ${RESULT_XSD} ${CONFIGURATION_XSD})
 
 ############### COMMON ##################
 #########################################
@@ -250,24 +228,19 @@ set(COMMON_SOURCES
 	${MODEL_DIR}/Fuzztree.cpp
 	${MODEL_DIR}/Faulttree.cpp
 	${MODEL_DIR}/TopEvent.cpp
+	${MODEL_DIR}/OrGate.cpp
+	${MODEL_DIR}/AndGate.cpp
 	${MODEL_DIR}/BasicEvent.cpp
 	${MODEL_DIR}/AbstractModel.cpp
 
 	${COMMON_DIR}/util.cpp
-	${COMMON_DIR}/xmlutil.cpp
-	${COMMON_DIR}/FaultTreeTypes.cpp
-	${COMMON_DIR}/FuzzTreeTypes.cpp
-	${COMMON_DIR}/FaultTreeTypes.cpp
-	${COMMON_DIR}/FuzzTreeTypes.cpp
+	#${COMMON_DIR}/xmlutil.cpp
 
 	${COMMON_DIR}/CommandLineParser.cpp
-	${COMMON_DIR}/FaultTreeToFuzzTree.cpp
 	${COMMON_DIR}/Issue.cpp
 	${COMMON_DIR}/FatalException.cpp
 	${COMMON_DIR}/DeadlockMonitor.cpp
 
-	${COMMON_GEN_DIR}/faulttree.cpp
-	${COMMON_GEN_DIR}/fuzztree.cpp
 	${COMMON_GEN_DIR}/backendResult.cpp
 	${COMMON_GEN_DIR}/commonTypes.cpp
 	${COMMON_GEN_DIR}/configurations.cpp
@@ -281,32 +254,30 @@ set(COMMON_HEADERS
 	${MODEL_DIR}/BasicEvent.h
 	${MODEL_DIR}/TopEvent.h
 	${MODEL_DIR}/OrGate.h
+	${MODEL_DIR}/AndGate.h
 	${MODEL_DIR}/AbstractProbability.h
 	${MODEL_DIR}/StaticProbability.h
 	${MODEL_DIR}/FuzzyProbability.h
 
 	${COMMON_DIR}/platform.h
 	${COMMON_DIR}/util.h
-	${COMMON_DIR}/xmlutil.h
-	${COMMON_DIR}/FaultTreeTypes.h
-	${COMMON_DIR}/FuzzTreeTypes.h
+	#${COMMON_DIR}/xmlutil.h
 
 	${COMMON_DIR}/CommandLineParser.h
-	${COMMON_DIR}/FaultTreeToFuzzTree.h
 	${COMMON_DIR}/Issue.h
 	${COMMON_DIR}/FatalException.h
 	${COMMON_DIR}/DeadlockMonitor.h
 	${COMMON_DIR}/Dynamic2dArray.h
 
-	${COMMON_GEN_DIR}/faulttree.h
-	${COMMON_GEN_DIR}/fuzztree.h
 	${COMMON_GEN_DIR}/backendResult.h
 	${COMMON_GEN_DIR}/commonTypes.h
 	${COMMON_GEN_DIR}/configurations.h
 )
 
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
+add_executable(common_model_test test_common_model.cpp ${COMMON_SOURCES} ${COMMON_HEADERS})
 target_link_libraries(common_model ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB})
+target_link_libraries(common_model_test ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB})
 
 ############### UNIT TESTS ##############
 #########################################

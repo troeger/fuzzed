@@ -1,6 +1,6 @@
 #include "TopEvent.h"
 
-const std::string& TopEvent::getTypeDescriptor()
+const std::string& TopEvent::getTypeDescriptor() const
 {
 	static const std::string str = "topEvent";
 	return str;

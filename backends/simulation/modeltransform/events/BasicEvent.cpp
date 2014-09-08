@@ -97,3 +97,4 @@ void BasicEvent::serializeFDEPChildren(std::shared_ptr<PNDocument> doc, const in
 	doc->transitionToPlace(fdepTriggerTransition, failedPlaceId);
 	doc->addInhibitorArc(failedPlaceId, fdepTriggerTransition);
 }
+
