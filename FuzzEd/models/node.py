@@ -2,7 +2,7 @@ import logging
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
 logger = logging.getLogger('FuzzEd')
@@ -407,11 +407,10 @@ class Node(models.Model):
             n=Node(graph=self.graph)
             n.load_xml(child, self)
 
-    def get_xml_probability(self):
+    def to_xml_probability(self, probability):
         """
-        Returns an XML wrapper object for the probability value being stored in frontend encoding.
+        Returns an XML wrapper object for the probability value given in frontend encoding.
         """
-        probability = self.get_property('probability', None)
         logger.debug("Determining XML representation for probability "+str(probability))
         # Probability is a 2-tuple, were the first value is a type indicator and the second the value
         if probability[0] == 0:
@@ -460,57 +459,68 @@ class Node(models.Model):
         if not xmltype:
             xmltype = self.graph.kind
 
+        from node_group import NodeGroup
+        group = NodeGroup.objects.filter(deleted=False, graph=self.graph, nodes=self)
+        if len(group) == 0:
+            # This node is not in a node group
+            prop_src = self
+        else:
+            logger.debug("Considering node group properties instead of node properties")
+            # In theory, the node can be in multiple groups
+            # In (fault / fuzz) tree practice, it is only in one
+            prop_src = group[0]
+
         properties = {
             'id':   self.client_id,
-            'name': self.get_property('name', '-'),
+            'name': prop_src.get_property('name', '-'),
             'x':    self.x,
             'y':    self.y
         }
 
         if self.kind == 'transferIn':
-            properties['fromModelId'] = self.get_property('transfer')
+            properties['fromModelId'] = prop_src.get_property('transfer')
 
         # for any node that may have a quantity, set the according property
         if self.kind in {'basicEventSet', 'intermediateEventSet'}:
-            properties['quantity'] = self.get_property('cardinality')
+            properties['quantity'] = prop_src.get_property('cardinality')
 
         if self.kind == 'topEvent':
-            properties['missionTime'] = self.get_property('missionTime')
-            properties['decompositionNumber'] = self.get_property('decompositions')
+            properties['missionTime'] = prop_src.get_property('missionTime')
+            properties['decompositionNumber'] = prop_src.get_property('decompositions')
 
         # Special treatment for some of the FuzzTree node types
         if xmltype == 'fuzztree':
             # for any node that may be optional, set the according property
             if self.kind in {'basicEvent', 'basicEventSet', 'intermediateEvent', 'intermediateEventSet', 'houseEvent'}:
-                properties['optional'] = self.get_property('optional', False)
+                properties['optional'] = prop_src.get_property('optional', False)
 
             # determine fuzzy or crisp probability, set it accordingly
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
-                properties['probability'] = self.get_xml_probability()
+                properties['probability'] = self.to_xml_probability(prop_src.get_property('probability', False))
                 # nodes that have a probability also have costs in FuzzTrees
-                properties['costs'] = self.get_property('cost', 0)
+                properties['costs'] = prop_src.get_property('cost', 0)
 
             # Voting OR in FuzzTrees has different parameter name than in fault trees
             elif self.kind == 'votingOrGate':
-                properties['k'] = self.get_property('k')
+                properties['k'] = prop_src.get_property('k')
 
             # add range attribute for redundancy variation
             elif self.kind == 'redundancyVariation':
-                nRange = self.get_property('nRange')
+                nRange = prop_src.get_property('nRange')
                 properties['start']   = nRange[0]
                 properties['end']     = nRange[1]
-                properties['formula'] = self.get_property('kFormula')
+                properties['formula'] = prop_src.get_property('kFormula')
 
             xml_node = fuzztree_classes[self.kind](**properties)
 
         # Special treatment for some of the FaultTree node types
         elif xmltype == 'faulttree':
             if self.kind == 'votingOrGate':
-                properties['k'] = self.get_property('k')
+                properties['k'] = prop_src.get_property('k')
 
             # determine fuzzy or crisp probability, set it accordingly
             if self.kind in {'basicEvent', 'basicEventSet', 'houseEvent'}:
-                properties['probability'] = self.get_xml_probability()
+                properties['probability'] = self.to_xml_probability(prop_src.get_property('probability'))
 
             if self.kind == 'fdepGate':
                 properties['triggeredEvents'] = [parent.client_id for parent in self.parents()]
@@ -522,7 +532,7 @@ class Node(models.Model):
                 children_sorted = self.children_left2right()
                 assert(len(children_sorted)>0)      #TODO: This will kill the XML generation if the graph is incompletly drawn. Do we want that?
                 properties['primaryID'] = children_sorted[0].client_id
-                properties['dormancyFactor'] = self.get_property('dormancyFactor')
+                properties['dormancyFactor'] = prop_src.get_property('dormancyFactor')
 
             if self.kind in ['seqGate','priorityAndGate']:
                 properties['eventSequence'] = [child.client_id for child in self.children_left2right()]
@@ -568,28 +578,6 @@ class Node(models.Model):
         except MultipleObjectsReturned:
             logger.error("ERROR: Property %s in node %u exists in multiple instances"%(key, self.pk))
             raise MultipleObjectsReturned()
-
-    def get_attr(self, key):
-        """
-        Method: get_attr
-
-        Use this method to fetch a node's attribute. It looks in the node object and its related properties.
-
-        Parameters:
-            {string} key - The name of the attribute.
-
-        Returns:
-            {attr} The found attribute. Raises a ValueError if no attribute for the given key exist.
-        """
-        assert(self.pk)         # Catch attribute setting before object saving cases
-        if hasattr(self, key):
-            return getattr(self, key)
-        else:
-            try:
-                prop = self.properties.get(key=key)
-                return prop.value
-            except Exception:
-                raise ValueError()
 
     def set_attr(self, key, value):
         """
@@ -646,6 +634,7 @@ class Node(models.Model):
         return True
 
 @receiver(post_save, sender=Node)
+@receiver(pre_delete, sender=Node)
 def graph_modify(sender, instance, **kwargs):
     instance.graph.modified = datetime.datetime.now()
     instance.graph.save()

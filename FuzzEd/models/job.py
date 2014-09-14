@@ -93,7 +93,40 @@ class Job(models.Model):
             return Result.titles(Result.SIMULATION_RESULT, self.graph.kind)
         elif self.kind == self.MINCUT_JOB:
             return Result.titles(Result.MINCUT_RESULT, self.graph.kind)
-
+    
+    def axis_titles(self):
+        ''' 
+        Computes labeling and axis scales for the analysis results menu. 
+        Descriptions of configurations values for 'xAxis' and 'yAxis' can be taken from the official Highcharts api.
+        '''
+        axis_titles = {
+            'xAxis': {
+                'min': -0.05,               
+                'max': 1.05,
+                'title':{
+                    'text': None, #'x title',
+                    'style': {
+                        'fontSize': '9px'
+                    }
+                },
+                'tickInterval': 0.2
+            },
+            'yAxis': {
+                'min': 0,
+                'max': 1.0,
+                'title': {
+                    'text': None, #'y title',
+                    'style': {
+                        'fontSize': '9px'
+                    }
+                },
+                'tickInterval': 1.0,
+                'minorTickInterval':  1.0/10
+            }
+        }
+        
+        return axis_titles   
+    
     @classmethod
     def exists_with_result(cls, graph, kind):
         ''' 

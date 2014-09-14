@@ -60,14 +60,24 @@ define(['config', 'jquery'], function(Config) {
         },
 
         /**
-         * Group: Menus
-         *      Menu configurations.
+         * Group: AnalysisMenu
+         *      Configurations for results table, as well as highcharts diagram within the analysis results menu. 
          *
          * Constants:
-         *      {Number} PROBABILITY_MENU_MAX_GRID_HEIGHT - Max. height of the grid that displays the configurations.
+         *      {Number} RESULTS_TABLE_MAX_ROWS       - Max. number of configurations that can be dispayed within one page in the analysis results table.
+         *
+         *      {Number} HIGHCHARTS_MIN_HEIGHT        - Min. height of the highcharts container.
+         *      {String} HIGHCHARTS_CREDIT_LABEL_SIZE - Font size of the highcharts credit label.
+         *      {Nuber}  HIGHCHARTS_POINT_RADIUS      - Radius of the point marker
+         *
          */
-        Menus: {
-            PROBABILITY_MENU_MAX_GRID_HEIGHT: 500
+        AnalysisMenu: {
+            RESULTS_TABLE_MAX_ROWS: 10,
+            
+            HIGHCHARTS_MIN_HEIGHT: 140,
+            HIGHCHARTS_CREDIT_LABEL_SIZE:'8px',
+            HIGHCHARTS_POINT_RADIUS: 1
+            
         }
     });
 });

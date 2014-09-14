@@ -42,7 +42,7 @@ in the unit tests stored in tests.py.
 Overwrites the current database with the test fixture. This allows local
 editing of the test database with the editor, which can than be saved again.
 
-`> fab run_tests`
+`> fab run.tests`
 
 Run all tests stored in tests.py.
 

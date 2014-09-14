@@ -1,4 +1,4 @@
-#include "MinCutAnalysisTask.h"
+#include "MincutAnalysisTask.h"
 #include "FuzzTreeTypes.h"
 #include "FatalException.h"
 

@@ -7,6 +7,9 @@ class ViewsTestCase(FuzzEdTestCase):
     """
     fixtures = fixt_simple['files']
 
+    #TODO: Test root view rendering with existing notification
+    #TODO: Test dismiss click for existing notification
+
     def setUp(self):
         self.setUpLogin()
 

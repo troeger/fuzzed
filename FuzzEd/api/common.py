@@ -92,6 +92,9 @@ class GraphAuthorization(Authorization):
         elif bundle.obj.sharings.filter(user = bundle.request.user):
             bundle.obj.read_only = True
             return True
+        elif bundle.request.user.is_staff:
+            bundle.obj.read_only = True
+            return True
         else:
             return False
                     

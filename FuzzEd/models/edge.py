@@ -1,7 +1,7 @@
 import json
 import datetime
 
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 from django.db import models
 
@@ -80,27 +80,6 @@ class Edge(models.Model):
         """
         return json.dumps(self.to_dict(use_value_dict))
 
-    def get_attr(self, key):
-        """
-        Method: get_attr
-
-        Use this method to fetch an edges's attribute. It looks in the edge object and its related properties.
-
-        Parameters:
-            {string} key - The name of the attribute.
-
-        Returns:
-            {attr} The found attribute. Raises a ValueError if no attribute for the given key exist.
-        """
-        if hasattr(self, key):
-            return getattr(self, key)
-        else:
-            try:
-                prop = self.properties.get(key=key)
-                return prop.value
-            except Exception:
-                raise ValueError()
-
     def set_attr(self, key, value):
         """
         Method: set_attr
@@ -135,6 +114,7 @@ class Edge(models.Model):
         post_save.send(sender=self.__class__, instance=self)
 
 @receiver(post_save, sender=Edge)
+@receiver(pre_delete, sender=Edge)
 def graph_modify(sender, instance, **kwargs):
     instance.graph.modified = datetime.datetime.now()
     instance.graph.save()

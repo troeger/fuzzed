@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<ns1:FuzzTree id="1083" name="Reliability Diagram" xmlns:ns1="net.fuzztree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<topEvent decompositionNumber="1" id="0" missionTime="17532" name="Top Event" x="10" y="1">
+		<children id="6" name="-" x="10" xsi:type="ns1:And" y="4">
+			<children costs="1" id="1" name="Basic Event" optional="false" x="11" xsi:type="ns1:BasicEvent" y="6">
+				<probability a="0.2" b1="0.5" b2="0.5" c="0.8" xsi:type="ns1:TriangularFuzzyInterval"/>
+			</children>
+			<children end="2" formula="N-1" id="3" name="Redundancy Variation" start="1" x="9" xsi:type="ns1:RedundancyVariationPoint" y="6">
+				<children costs="1" id="2" name="Basic Event Set" optional="false" quantity="1" x="9" xsi:type="ns1:BasicEventSet" y="9">
+					<probability a="0.3" b1="0.5" b2="0.5" c="0.7" xsi:type="ns1:TriangularFuzzyInterval"/>
+				</children>
+			</children>
+		</children>
+	</topEvent>
+</ns1:FuzzTree>

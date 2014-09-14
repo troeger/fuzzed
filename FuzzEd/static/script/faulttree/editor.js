@@ -120,29 +120,33 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
      */
     var AnalysisResultMenu = Menus.Menu.extend({
         /**
-         * Group: Members
-         *      {<Editor>}        _editor              - The <Editor> instance.
-         *      {<Job>}           _job                 - <Job> instance of the backend job that is responsible for
-         *                                               calculating the probability.
+         * Group: Members 
+         *      {<Editor>}        _editor               - The <Editor> instance.
+         *      {<Job>}           _job                  - <Job> instance of the backend job that is responsible for
+         *                                                calculating the probability.
          *      {jQuery Selector} _graphIssuesContainer - Display
-         *      {jQuery Selector} _chartContainer      - jQuery reference to the chart's container.
-         *      {jQuery Selector} _gridContainer       - jQuery reference to the table's container.
-         *      {Highchart}       _chart               - The Highchart instance displaying the result.
-         *      {DataTables}      _grid                - The DataTables instance displaying the result.
-         *      {Object}          _configNodeMap       - A mapping of the configuration ID to its node set.
-         *      {Object}          _configNodeMap       - A mapping of the configuration ID to its edge set.
-         *      {Object}          _redundancyNodeMap   - A mapping of the configuration ID to the nodes' N-values
+         *      {jQuery Selector} _chartContainer       - jQuery reference to the chart's container.
+         *      {jQuery Selector} _tableContainer       - jQuery reference to the table's container.
+         *      {Highchart}       _chart                - The Highchart instance displaying the result.
+         *      {DataTables}      _table                - The DataTables instance displaying the result.
+         *      {Object}          _configNodeMap        - A mapping of the configuration ID to its node set.
+         *      {Object}          _configNodeMap        - A mapping of the configuration ID to its edge set.
+         *      {Object}          _redundancyNodeMap    - A mapping of the configuration ID to the nodes' N-values
+         *      {Object}          _configMetaDataCached - A dictionary indicating if choice meta data for a specific configuration is cached.
+
          */
-        _editor:              undefined,
-        _job:                 undefined,
+        _editor:               undefined,
+        _job:                  undefined,
         _graphIssuesContainer: undefined,
-        _chartContainer:      undefined,
-        _gridContainer:       undefined,
-        _chart:               undefined,
-        _grid:                undefined,
-        _configNodeMap:       {},
-        _configEdgeMap:       {},
-        _redundancyNodeMap:   {},
+        _chartContainer:       undefined,
+        _tableContainer:       undefined,
+        _chart:                undefined,
+        _table:                undefined,
+        _configNodeMap:        {},
+        _configEdgeMap:        {},
+        _redundancyNodeMap:    {},
+        _configMetaDataCached: {},
+        
 
         /**
          * Group: Initialization
@@ -157,7 +161,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
             this._editor = editor;
             this._graphIssuesContainer = this.container.find('.graph_issues');
             this._chartContainer       = this.container.find('.chart');
-            this._gridContainer        = this.container.find('.table_container');
+            this._tableContainer        = this.container.find('.table_container');
         },
 
         /**
@@ -223,12 +227,12 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
             // reset height of the chart container (which is set after resizing event)
             this._chartContainer.height('')
             this._chartContainer.empty();
-            this._gridContainer.empty();
+            this._tableContainer.empty();
             // reset height in case it was set during grid creation
-            this._gridContainer.css('min-height', '');
+            this._tableContainer.css('min-height', '');
             // reset container width (which is set after initalisation of DataTables)
             this.container.css('width','');
-            this._chart = null; this._grid = null;
+            this._chart = null; this._table = null;
             this._configNodeMap = {};
             this._redundancyNodeMap = {};
 
@@ -314,7 +318,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                     if (this._chart != null) {
                         
                         // fit all available space with chart    
-                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._gridContainer.height());
+                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._tableContainer.height());
                         
                         this._chart.setSize(
                             this._chartContainer.width(),
@@ -349,15 +353,22 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
             var issues = data.issues;
             
             if (issues){
-                this._displayGraphIssues(issues.errors, issues.warnings);
+                if (_.size(issues.errors) > 0 || _.size(issues.warnings) > 0){
+                    this._displayGraphIssues(issues.errors, issues.warnings);
+                }
             }
                 
             // remove progress bar
             this._chartContainer.empty();
+            var axisTitles = data.axis_titles;
+            this._initializeHighcharts(axisTitles);
            
+            
             // display results within a table
             var columns = data.columns;
             this._displayResultWithDataTables(columns, job_result_url);
+            
+            
         },
 
         /**
@@ -468,45 +479,29 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 '</div>');
 
             this._chartContainer.empty().append(progressBar);
-            this._gridContainer.empty();
+            this._tableContainer.empty();
 
             return this;
         },
-
+        
         /**
-         * Method: _displayResultWithHighcharts
-         *      Display the job's result in the menu's body using Highcharts.
+         * Method: _initializeHighcharts
+         *      Intialize highcharts with Axis definitions.
          *
          * Parameters:
-         *    {Array[Object]} data  - A set of one or more data series to display in the Highchart.
-         *    {Number}        yTick - [optional] The tick of the y-axis (number of lines).
+         *    {Array[Object]} axis_defititions  - A set of definitions used in Highcharts initialisation.
          *
          * Returns:
          *      This {<AnalysisResultMenu>} for chaining.
          */
-        _displayResultWithHighcharts: function(data, yTick) {
-            if (data.length == 0) return this;
-
-            yTick = yTick || 5;
-            var series = [];
-            
+        _initializeHighcharts: function(axis_definitions) { 
             var self = this;
-
-            _.each(data, function(cutset, name) {
-                series.push({
-                    name: name,
-                    data: cutset
-                });
-            });
-            // clear container
-            this._chartContainer.empty();
-
-            //TODO: This is all pretty hard-coded. Put it into config instead.
+                        
             this._chart = new Highcharts.Chart({
                 chart: {
                     renderTo: this._chartContainer[0],
                     type:     'line',
-                    height:   Math.max(140, this._chartContainer.height()),
+                    height:   FaulttreeConfig.AnalysisMenu.HIGHCHARTS_MIN_HEIGHT,
 
                 },
                 title: {
@@ -514,51 +509,73 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 },
                 credits: {
                     style: {
-                        fontSize: '8px'
+                        fontSize: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_CREDIT_LABEL_SIZE
                     }
                 },
-                xAxis: {
-                    min: -0.05,
-                    max:  1.05
-                },
-                yAxis: {
-                    min: 0,
-                    max: 1,
-                    title: {
-                        text: null
-                    },
-                    tickInterval: 1.0,
-                    minorTickInterval: 1.0 / yTick
-                },
+                xAxis: axis_definitions.xAxis,
+                yAxis: axis_definitions.yAxis,
                 tooltip: {
                     formatter: this._chartTooltipFormatter
                 },
                 plotOptions: {
                     series: {
                         marker: {
-                            radius: 1
+                            radius: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_POINT_RADIUS
                         },
                         events: {
                             mouseOver : function () {
                                 var config_id = this.name
-                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                var row = self._table.fnFindCellRowNodes(config_id, 0);
                                 jQuery(row).addClass('tr_hover');
                             },
                             mouseOut  : function () {
                                 var config_id = this.name
-                                var row = self._grid.fnFindCellRowNodes(config_id, 1 );
+                                var row = self._table.fnFindCellRowNodes(config_id, 0);
                                 jQuery(row).removeClass('tr_hover');
                             },
                         }
                     }
                 },
-
-                series: series
+                data: []
             });
-
+            
             return this;
         },
-                
+        
+        /**
+         * Method: _displaySeriesWithHighcharts
+         *      Draw series within the Highcharts diagram. 
+         *
+         * Parameters:
+         *    {Array[Object]} defititions  - A set of one or more data series to display in the Highchart.
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
+         */
+        _displaySeriesWithHighcharts: function(data){
+            // remove series from the last draw
+            while(this._chart.series.length > 0){
+                this._chart.series[0].remove(false);
+            }
+            
+            var series = [];
+            _.each(data, function(cutset, name) {
+                series.push({
+                    name: name,
+                    data: cutset
+                });
+            });
+            
+            // draw series
+            _.each(series, function(config){
+                this._chart.addSeries(config, false, false)
+            }.bind(this));
+            
+            this._chart.redraw();
+            
+            return this;
+        },
+              
         /**
          * Method: _displayResultWithDataTables
          *      Display the job's result with DataTables Plugin. Configuration Issues are printed inside the table as collapsed row. 
@@ -574,7 +591,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
         _displayResultWithDataTables: function(columns, job_result_url) {
             
             // clear container
-            this._gridContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');            
+            this._tableContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');            
             
             var collapse_column = {
                                     "class":          'details-control',
@@ -584,41 +601,48 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                     "bSortable":      false
                                   };
                                   
-            columns.unshift(collapse_column);
+            columns.push(collapse_column);
             
             //formating function for displaying configuration warnings/errors
-            var format = function (d) {
-                if ('issues' in d){
-                    var issues = d['issues'];
+            var format = function (issues) {
                     
                     var errors   = issues['errors'] || [];
                     var warnings = issues['warnings'] || [];
                     
                     return this._displayIsussuesList(errors, warnings);
-                }
-                
-                return '';
             }.bind(this);
             
-            // clear global dictionaries (with cached data) before initalisation 
-            this._configNodeMap     = {};
-            this._configEdgeMap     = {};
-            this._redundancyNodeMap = {};
             
-            this._grid = jQuery('#results_table').dataTable({
+            // clear all cached metadata (from previous analysis run)
+            this._clearAllConfigurationMetaData();
+            
+            this._table = jQuery('#results_table').dataTable({
                             "bProcessing":   true,
                             "bFilter":       false,
                             "bServerSide":   true,
                             "sAjaxSource":   job_result_url,
                             "aoColumns":     columns,
                             "bLengthChange": false,
-                            "iDisplayLength": 10,
+                            "iDisplayLength": FaulttreeConfig.AnalysisMenu.RESULTS_TABLE_MAX_ROWS,
                             "fnDrawCallback": function(oSettings) {
-                                // display points with highchart after table was rendered
+                                
                                 var serverData = oSettings['json'];
+                                var totalRecords = serverData['iTotalRecords'];
+                               
+                                if(totalRecords < 2){
+                                     // unbind sorting events if there are less than 2 rows
+                                    this._tableContainer.find('th').removeClass().unbind('click.DT');    
+                                }
+                                
+                                if(totalRecords <= FaulttreeConfig.AnalysisMenu.RESULTS_TABLE_MAX_ROWS){
+                                     // remove pagination elements if only one page is displayed
+                                     this._tableContainer.find('div.dataTables_paginate').css('display', 'none');
+                                     this._tableContainer.find('div.dataTables_info').css('display', 'none');
+                                }
+                                
+                                // display points with highchart after table was rendered
                                 var configurations = serverData['aaData'];
-                                var chartData = {};
-                                 
+                                var chartData = {}; 
                                  _.each(configurations, function(config) {
                                      var configID = config['id'] || '';
                                      
@@ -626,14 +650,14 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                      if (typeof config['points'] !== 'undefined') {
                                          chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
                                      }
-                                     
-                                     if (_.size(chartData) != 0) {
-                                         this._displayResultWithHighcharts(chartData, 10); //data['decompositionNumber']);
-                                     }
-                                     
-                                     
-                                 }.bind(this)); 
-                                
+                                 }.bind(this));
+                                 
+                                 if (_.size(chartData) != 0) {
+                                     this._displaySeriesWithHighcharts(chartData);
+                                 }
+                                 else{
+                                     this._chart.setSize (0, 0, false);
+                                 }     
                                 }.bind(this),
                             "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                                 
@@ -645,14 +669,12 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                 if ('choices' in current_config ){
                                     var choices  = aData['choices'];
                                     
-                                    // check if config is alredy cached in configNodeMap/configEdgeMap
-                                    if (! (configID in this._configNodeMap)){
+                                    // check if config meta data is alredy cached 
+                                    if (! (configID in this._configMetaDataCached)){
                                         // remember the nodes and edges involved in this config for later highlighting
                                         this._collectNodesAndEdgesForConfiguration(configID, choices);
-                                    }
                                     
-                                     // check if config is alredy cached in redundancyNodeMap 
-                                    if (! (configID in this._redundancyNodeMap)){
+                                    
                                         // remember the redundancy settings for this config for later highlighting
                                         this._redundancyNodeMap[configID] = {};
                                         _.each(choices, function(choice, node) {
@@ -660,13 +682,19 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                                 this._redundancyNodeMap[configID][node] = choice['n'];
                                             }
                                         }.bind(this));
+                                        
+                                        this._configMetaDataCached[configID] = true;
                                     }
                                     
                                     jQuery(nRow).on("mouseover", function(){    
                                             this._highlightConfiguration(configID);                                                
                                      }.bind(this));
+                                     
+                                     
+                                     jQuery(nRow).on("mouseleave", function(){    
+                                            this._unhighlightConfiguration();                                                
+                                     }.bind(this));
                                 }
-                                
                                 /* Sample Configuration issues
                                 if (iDisplayIndex == 0){
                                     current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
@@ -675,28 +703,24 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                 } else if (iDisplayIndex == 2){
                                      current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""},{"message": "error error error", "issueId": 0, "elementId": ""}, {"message": "another error", "issueId": 0, "elementId": ""}], "warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}, {"message": "another warning", "issueId": 0, "elementId": "3"}] };
                                 }*/
-                                
                                 if ('issues' in current_config){
-                                    jQuery(nRow).find('td.details-control').append('<i class="fa fa-exclamation-triangle"></i>');
+                                    var issues = current_config['issues'];
                                     
+                                    jQuery(nRow).find('td.details-control').append('<i class="fa fa-exclamation-triangle"></i>');
                                     // Add event listener for opening and closing details
                                     jQuery(nRow).on('click', function () {
                                         var tr  = jQuery(nRow);
-                                        var row = this._grid.api().row(tr);
+                                        var row = this._table.api().row(tr);
  
                                         if ( row.child.isShown() ) {
                                             // This row is already open - close it
                                             row.child.hide();
-                                            tr.removeClass('shown');
                                         }
                                         else {
                                             // Open this row
-                                            row.child(format(row.data())).show();
-                                            tr.addClass('shown');
+                                            row.child(format(issues)).show();
                                         }
                                     }.bind(this));
-            
-                                    var issues = current_config['issues'];
                                     
                                     if ('errors' in issues){
                                         jQuery(nRow).addClass('danger');
@@ -704,7 +728,6 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                     else if ('warnings' in issues){
                                         jQuery(nRow).addClass('warning');
                                     }
-                                    
                                 }
                                 else{
                                     // if row is not collapsable show default pointer
@@ -714,21 +737,34 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                                              
                             "fnInitComplete": function(oSettings, json) {  
                                     this._setupResizing();
-                                    
                                     // set minumum height of grid as the height of the first draw of the grid
-                                    this._gridContainer.css('min-height', this._gridContainer.height());
+                                    this._tableContainer.css('min-height', this._tableContainer.height());
                                     // keep container width when switching the page (-> otherwise jumping width when switching)
                                     this.container.css('width', this.container.width());
                                     
                                 }.bind(this)    
                             });
-                             
-            this._grid.on('mouseleave', 'tr', function () {
-                this._unhighlightConfiguration();
-            }.bind(this));
-            
+             
             return this;
         },
+        
+        
+        
+        /*
+         * Method _clearAllConfigurationMetadata
+         *      Clear all global Dictionaries that contains cached informations about specific configurations
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
+         */
+            
+         _clearAllConfigurationMetaData: function() {
+             this._configNodeMap        = {};
+             this._configEdgeMap        = {};
+             this._redundancyNodeMap    = {};
+             this._configMetaDataCached = {};
+            
+             return this;
+         },
         
         /**
          *  Method: _highlightConfiguration
@@ -1147,6 +1183,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
                 this.properties.hide();
 
                 var node  = this.graph.getNodeById(selected.data(this.config.Keys.NODE).id);
+
+                if (!node.cloneable) return false;
+
                 var clone = this.graph._clone(node);
 
                 if (clone) {

@@ -1,339 +1,452 @@
 # -*- coding: utf-8 -*-
-import datetime
-from south.db import db
-from south.v2 import SchemaMigration
-from django.db import models
+from __future__ import unicode_literals
+
+from django.db import models, migrations
+import FuzzEd.models.job
+from django.conf import settings
+import FuzzEd.lib.jsonfield.fields
 
 
-class Migration(SchemaMigration):
+class Migration(migrations.Migration):
 
-    def forwards(self, orm):
-        # Adding model 'Graph'
-        db.create_table('FuzzEd_graph', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('kind', self.gf('django.db.models.fields.CharField')(max_length=127)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('owner', self.gf('django.db.models.fields.related.ForeignKey')(related_name='graphs', to=orm['auth.User'])),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('deleted', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('FuzzEd', ['Graph'])
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
 
-        # Adding model 'Node'
-        db.create_table('FuzzEd_node', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('client_id', self.gf('django.db.models.fields.BigIntegerField')(default=-9223372036854775807)),
-            ('kind', self.gf('django.db.models.fields.CharField')(max_length=127)),
-            ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='nodes', to=orm['FuzzEd.Graph'])),
-            ('x', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('y', self.gf('django.db.models.fields.IntegerField')(default=0)),
-            ('deleted', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('FuzzEd', ['Node'])
-
-        # Adding model 'Edge'
-        db.create_table('FuzzEd_edge', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('client_id', self.gf('django.db.models.fields.BigIntegerField')()),
-            ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='edges', to=orm['FuzzEd.Graph'])),
-            ('source', self.gf('django.db.models.fields.related.ForeignKey')(related_name='outgoing', to=orm['FuzzEd.Node'])),
-            ('target', self.gf('django.db.models.fields.related.ForeignKey')(related_name='incoming', to=orm['FuzzEd.Node'])),
-            ('deleted', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('FuzzEd', ['Edge'])
-
-        # Adding model 'Property'
-        db.create_table('FuzzEd_property', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('key', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('value', self.gf('FuzzEd.lib.jsonfield.fields.JSONField')()),
-            ('node', self.gf('django.db.models.fields.related.ForeignKey')(related_name='properties', to=orm['FuzzEd.Node'])),
-            ('deleted', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('FuzzEd', ['Property'])
-
-        # Adding model 'AddEdge'
-        db.create_table('FuzzEd_addedge', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('undoable', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('insert_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('edge', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['FuzzEd.Edge'])),
-        ))
-        db.send_create_signal('FuzzEd', ['AddEdge'])
-
-        # Adding model 'AddGraph'
-        db.create_table('FuzzEd_addgraph', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('undoable', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('insert_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['FuzzEd.Graph'])),
-        ))
-        db.send_create_signal('FuzzEd', ['AddGraph'])
-
-        # Adding model 'AddNode'
-        db.create_table('FuzzEd_addnode', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('undoable', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('insert_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('node', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['FuzzEd.Node'])),
-        ))
-        db.send_create_signal('FuzzEd', ['AddNode'])
-
-        # Adding model 'ChangeNode'
-        db.create_table('FuzzEd_changenode', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('undoable', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('insert_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('node', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['FuzzEd.Node'])),
-        ))
-        db.send_create_signal('FuzzEd', ['ChangeNode'])
-
-        # Adding model 'PropertyChange'
-        db.create_table('FuzzEd_propertychange', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('command', self.gf('django.db.models.fields.related.ForeignKey')(related_name='changes', to=orm['FuzzEd.ChangeNode'])),
-            ('key', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('old_value', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('new_value', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal('FuzzEd', ['PropertyChange'])
-
-        # Adding model 'DeleteEdge'
-        db.create_table('FuzzEd_deleteedge', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('undoable', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('insert_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('edge', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['FuzzEd.Edge'])),
-        ))
-        db.send_create_signal('FuzzEd', ['DeleteEdge'])
-
-        # Adding model 'DeleteGraph'
-        db.create_table('FuzzEd_deletegraph', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('undoable', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('insert_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['FuzzEd.Graph'])),
-        ))
-        db.send_create_signal('FuzzEd', ['DeleteGraph'])
-
-        # Adding model 'DeleteNode'
-        db.create_table('FuzzEd_deletenode', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('undoable', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('insert_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('node', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['FuzzEd.Node'])),
-        ))
-        db.send_create_signal('FuzzEd', ['DeleteNode'])
-
-        # Adding model 'RenameGraph'
-        db.create_table('FuzzEd_renamegraph', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('undoable', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('insert_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('graph', self.gf('django.db.models.fields.related.ForeignKey')(related_name='+', to=orm['FuzzEd.Graph'])),
-            ('old_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-            ('new_name', self.gf('django.db.models.fields.CharField')(max_length=255)),
-        ))
-        db.send_create_signal('FuzzEd', ['RenameGraph'])
-
-        # Adding model 'UserProfile'
-        db.create_table('FuzzEd_userprofile', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(related_name='profile', unique=True, to=orm['auth.User'])),
-            ('newsletter', self.gf('django.db.models.fields.BooleanField')(default=False)),
-        ))
-        db.send_create_signal('FuzzEd', ['UserProfile'])
-
-
-    def backwards(self, orm):
-        # Deleting model 'Graph'
-        db.delete_table('FuzzEd_graph')
-
-        # Deleting model 'Node'
-        db.delete_table('FuzzEd_node')
-
-        # Deleting model 'Edge'
-        db.delete_table('FuzzEd_edge')
-
-        # Deleting model 'Property'
-        db.delete_table('FuzzEd_property')
-
-        # Deleting model 'AddEdge'
-        db.delete_table('FuzzEd_addedge')
-
-        # Deleting model 'AddGraph'
-        db.delete_table('FuzzEd_addgraph')
-
-        # Deleting model 'AddNode'
-        db.delete_table('FuzzEd_addnode')
-
-        # Deleting model 'ChangeNode'
-        db.delete_table('FuzzEd_changenode')
-
-        # Deleting model 'PropertyChange'
-        db.delete_table('FuzzEd_propertychange')
-
-        # Deleting model 'DeleteEdge'
-        db.delete_table('FuzzEd_deleteedge')
-
-        # Deleting model 'DeleteGraph'
-        db.delete_table('FuzzEd_deletegraph')
-
-        # Deleting model 'DeleteNode'
-        db.delete_table('FuzzEd_deletenode')
-
-        # Deleting model 'RenameGraph'
-        db.delete_table('FuzzEd_renamegraph')
-
-        # Deleting model 'UserProfile'
-        db.delete_table('FuzzEd_userprofile')
-
-
-    models = {
-        'FuzzEd.addedge': {
-            'Meta': {'object_name': 'AddEdge'},
-            'edge': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Edge']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'FuzzEd.addgraph': {
-            'Meta': {'object_name': 'AddGraph'},
-            'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Graph']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'FuzzEd.addnode': {
-            'Meta': {'object_name': 'AddNode'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'node': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Node']"}),
-            'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'FuzzEd.changenode': {
-            'Meta': {'object_name': 'ChangeNode'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'node': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Node']"}),
-            'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'FuzzEd.deleteedge': {
-            'Meta': {'object_name': 'DeleteEdge'},
-            'edge': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Edge']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'FuzzEd.deletegraph': {
-            'Meta': {'object_name': 'DeleteGraph'},
-            'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Graph']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'FuzzEd.deletenode': {
-            'Meta': {'object_name': 'DeleteNode'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'node': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Node']"}),
-            'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'FuzzEd.edge': {
-            'Meta': {'object_name': 'Edge'},
-            'client_id': ('django.db.models.fields.BigIntegerField', [], {}),
-            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'edges'", 'to': "orm['FuzzEd.Graph']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'source': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'outgoing'", 'to': "orm['FuzzEd.Node']"}),
-            'target': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'incoming'", 'to': "orm['FuzzEd.Node']"})
-        },
-        'FuzzEd.graph': {
-            'Meta': {'object_name': 'Graph'},
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'graphs'", 'to': "orm['auth.User']"})
-        },
-        'FuzzEd.node': {
-            'Meta': {'object_name': 'Node'},
-            'client_id': ('django.db.models.fields.BigIntegerField', [], {'default': '-9223372036854775807'}),
-            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'nodes'", 'to': "orm['FuzzEd.Graph']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'kind': ('django.db.models.fields.CharField', [], {'max_length': '127'}),
-            'x': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'y': ('django.db.models.fields.IntegerField', [], {'default': '0'})
-        },
-        'FuzzEd.property': {
-            'Meta': {'object_name': 'Property'},
-            'deleted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'node': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'properties'", 'to': "orm['FuzzEd.Node']"}),
-            'value': ('FuzzEd.lib.jsonfield.fields.JSONField', [], {})
-        },
-        'FuzzEd.propertychange': {
-            'Meta': {'object_name': 'PropertyChange'},
-            'command': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'changes'", 'to': "orm['FuzzEd.ChangeNode']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'key': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'new_value': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'old_value': ('django.db.models.fields.CharField', [], {'max_length': '255'})
-        },
-        'FuzzEd.renamegraph': {
-            'Meta': {'object_name': 'RenameGraph'},
-            'graph': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'+'", 'to': "orm['FuzzEd.Graph']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'insert_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'new_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'old_name': ('django.db.models.fields.CharField', [], {'max_length': '255'}),
-            'undoable': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
-        },
-        'FuzzEd.userprofile': {
-            'Meta': {'object_name': 'UserProfile'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'newsletter': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'to': "orm['auth.User']"})
-        },
-        'auth.group': {
-            'Meta': {'object_name': 'Group'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'}),
-            'permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'})
-        },
-        'auth.permission': {
-            'Meta': {'ordering': "('content_type__app_label', 'content_type__model', 'codename')", 'unique_together': "(('content_type', 'codename'),)", 'object_name': 'Permission'},
-            'codename': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
-        },
-        'auth.user': {
-            'Meta': {'object_name': 'User'},
-            'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'symmetrical': 'False', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_superuser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'last_login': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'password': ('django.db.models.fields.CharField', [], {'max_length': '128'}),
-            'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
-            'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
-        },
-        'contenttypes.contenttype': {
-            'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
-            'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        }
-    }
-
-    complete_apps = ['FuzzEd']
+    operations = [
+        migrations.CreateModel(
+            name='AddEdge',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='AddGraph',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='AddNode',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='AddProject',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ChangeEdge',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='ChangeNode',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Configuration',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('costs', models.IntegerField()),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='DeleteEdge',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='DeleteGraph',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='DeleteNode',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='DeleteProject',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Edge',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('client_id', models.BigIntegerField()),
+                ('deleted', models.BooleanField(default=False)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='EdgePropertyChange',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('key', models.CharField(max_length=255)),
+                ('old_value', FuzzEd.lib.jsonfield.fields.JSONField()),
+                ('new_value', FuzzEd.lib.jsonfield.fields.JSONField()),
+                ('command', models.ForeignKey(related_name=b'changes', to='FuzzEd.ChangeEdge')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Graph',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('kind', models.CharField(max_length=127, choices=[('dfd', 'Data Flow Diagram'), ('faulttree', 'Fault Tree'), ('fuzztree', 'Fuzz Tree'), ('rbd', 'Reliability Block Diagram')])),
+                ('name', models.CharField(max_length=255)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('modified', models.DateTimeField(auto_now=True)),
+                ('deleted', models.BooleanField(default=False)),
+                ('read_only', models.BooleanField(default=False)),
+                ('owner', models.ForeignKey(related_name=b'graphs', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Job',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('graph_modified', models.DateTimeField()),
+                ('secret', models.CharField(default=FuzzEd.models.job.gen_uuid, max_length=64)),
+                ('kind', models.CharField(max_length=127, choices=[(b'mincut', b'Cutset computation'), (b'topevent', b'Top event calculation (analytical)'), (b'simulation', b'Top event calculation (simulation)'), (b'eps', b'EPS rendering job'), (b'pdf', b'PDF rendering job')])),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('exit_code', models.IntegerField(null=True)),
+                ('graph', models.ForeignKey(related_name=b'jobs', to='FuzzEd.Graph', null=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Node',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('client_id', models.BigIntegerField(default=-9223372036854775807)),
+                ('kind', models.CharField(max_length=127, choices=[('Data Flow Diagram', (('node', 'Node'), ('process', 'Process'), ('stickyNote', 'Sticky Note'), ('storage', 'Storage'), ('external', 'External Entity'))), ('Fault Tree', (('dynamicGate', 'Dynamic Gate'), ('intermediateEventSet', 'Intermediate Event Set'), ('xorGate', 'XOR Gate'), ('undevelopedEvent', 'Undeveloped Event'), ('event', 'Event'), ('houseEvent', 'House Event'), ('eventSet', 'Event Set'), ('stickyNote', 'Sticky Note'), ('spareGate', 'Spare Gate'), ('intermediateEvent', 'Intermediate Event'), ('fdepGate', 'FDEP Gate'), ('staticGate', 'Static Gate'), ('gate', 'Gate'), ('seqGate', 'Sequential Gate'), ('node', 'Node'), ('transferIn', 'Transfer In'), ('basicEvent', 'Basic Event'), ('andGate', 'AND Gate'), ('basicEventSet', 'Basic Event Set'), ('votingOrGate', 'Voting OR Gate'), ('orGate', 'OR Gate'), ('topEvent', 'Top Event'), ('priorityAndGate', 'Priority AND Gate'))), ('Fuzz Tree', (('dynamicGate', 'Dynamic Gate'), ('intermediateEventSet', 'Intermediate Event Set'), ('xorGate', 'XOR Gate'), ('undevelopedEvent', 'Undeveloped Event'), ('event', 'Event'), ('houseEvent', 'House Event'), ('eventSet', 'eventSet'), ('stickyNote', 'Sticky Note'), ('intermediateEvent', 'Intermediate Event'), ('staticGate', 'Static Gate'), ('gate', 'Gate'), ('node', 'Node'), ('featureVariation', 'Feature Variation'), ('redundancyVariation', 'Redundancy Variation'), ('transferIn', 'Transfer In'), ('basicEvent', 'Basic Event'), ('andGate', 'AND Gate'), ('basicEventSet', 'Basic Event Set'), ('variationPoint', 'Variation Point'), ('votingOrGate', 'Voting OR Gate'), ('orGate', 'OR Gate'), ('topEvent', 'Top Event'))), ('Reliability Block Diagram', (('node', 'Node'), ('stickyNote', 'Sticky Note'), ('end', 'End'), ('out_of', 'Out of'), ('start', 'Start'), ('block', 'Block')))])),
+                ('x', models.IntegerField(default=0)),
+                ('y', models.IntegerField(default=0)),
+                ('deleted', models.BooleanField(default=False)),
+                ('graph', models.ForeignKey(related_name=b'nodes', to='FuzzEd.Graph')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='NodeConfiguration',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('setting', FuzzEd.lib.jsonfield.fields.JSONField()),
+                ('configuration', models.ForeignKey(related_name=b'node_configurations', to='FuzzEd.Configuration')),
+                ('node', models.ForeignKey(to='FuzzEd.Node')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='NodeGroup',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('client_id', models.BigIntegerField(default=-9223372036854775807)),
+                ('deleted', models.BooleanField(default=False)),
+                ('graph', models.ForeignKey(related_name=b'groups', to='FuzzEd.Graph')),
+                ('nodes', models.ManyToManyField(to='FuzzEd.Node')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Notification',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('title', models.CharField(max_length=255)),
+                ('modified', models.DateTimeField(auto_now=True)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('text', models.CharField(max_length=255)),
+                ('users', models.ManyToManyField(to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Project',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=255)),
+                ('modified', models.DateTimeField(auto_now=True)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('deleted', models.BooleanField(default=False)),
+                ('owner', models.ForeignKey(related_name=b'own_projects', to=settings.AUTH_USER_MODEL)),
+                ('users', models.ManyToManyField(related_name=b'projects', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Property',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('key', models.CharField(max_length=255)),
+                ('value', FuzzEd.lib.jsonfield.fields.JSONField()),
+                ('deleted', models.BooleanField(default=False)),
+                ('edge', models.ForeignKey(related_name=b'properties', default=None, blank=True, to='FuzzEd.Edge', null=True)),
+                ('node', models.ForeignKey(related_name=b'properties', default=None, blank=True, to='FuzzEd.Node', null=True)),
+                ('node_group', models.ForeignKey(related_name=b'properties', default=None, blank=True, to='FuzzEd.NodeGroup', null=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='PropertyChange',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('key', models.CharField(max_length=255)),
+                ('old_value', FuzzEd.lib.jsonfield.fields.JSONField()),
+                ('new_value', FuzzEd.lib.jsonfield.fields.JSONField()),
+                ('command', models.ForeignKey(related_name=b'changes', to='FuzzEd.ChangeNode')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='RenameGraph',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('undoable', models.BooleanField(default=False)),
+                ('insert_date', models.DateTimeField(auto_now_add=True)),
+                ('old_name', models.CharField(max_length=255)),
+                ('new_name', models.CharField(max_length=255)),
+                ('graph', models.ForeignKey(related_name=b'+', to='FuzzEd.Graph')),
+            ],
+            options={
+                'abstract': False,
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Result',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('kind', models.CharField(max_length=1, choices=[(b'G', b'graphissues'), (b'S', b'simulation'), (b'M', b'mincut'), (b'T', b'topevent'), (b'P', b'pdf'), (b'E', b'eps')])),
+                ('minimum', models.FloatField(null=True)),
+                ('maximum', models.FloatField(null=True)),
+                ('peak', models.FloatField(null=True)),
+                ('reliability', models.FloatField(null=True)),
+                ('mttf', models.FloatField(null=True)),
+                ('timestamp', models.IntegerField(null=True)),
+                ('rounds', models.IntegerField(null=True)),
+                ('failures', models.IntegerField(null=True)),
+                ('binary_value', models.BinaryField(null=True)),
+                ('points', FuzzEd.lib.jsonfield.fields.JSONField(null=True, blank=True)),
+                ('issues', FuzzEd.lib.jsonfield.fields.JSONField(null=True, blank=True)),
+                ('configuration', models.ForeignKey(related_name=b'results', blank=True, to='FuzzEd.Configuration', null=True)),
+                ('graph', models.ForeignKey(related_name=b'results', to='FuzzEd.Graph')),
+                ('job', models.ForeignKey(related_name=b'results', to='FuzzEd.Job')),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Sharing',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('graph', models.ForeignKey(related_name=b'sharings', to='FuzzEd.Graph')),
+                ('project', models.ForeignKey(related_name=b'sharings', default=None, to='FuzzEd.Project', null=True)),
+                ('user', models.ForeignKey(related_name=b'sharings', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='UserProfile',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('newsletter', models.BooleanField(default=False)),
+                ('user', models.OneToOneField(related_name=b'profile', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.AddField(
+            model_name='graph',
+            name='project',
+            field=models.ForeignKey(related_name=b'graphs', to='FuzzEd.Project'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='edge',
+            name='graph',
+            field=models.ForeignKey(related_name=b'edges', to='FuzzEd.Graph'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='edge',
+            name='source',
+            field=models.ForeignKey(related_name=b'outgoing', to='FuzzEd.Node'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='edge',
+            name='target',
+            field=models.ForeignKey(related_name=b'incoming', to='FuzzEd.Node'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='deleteproject',
+            name='project',
+            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Project'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='deletenode',
+            name='node',
+            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Node'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='deletegraph',
+            name='graph',
+            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Graph'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='deleteedge',
+            name='edge',
+            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Edge'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='configuration',
+            name='graph',
+            field=models.ForeignKey(related_name=b'configurations', to='FuzzEd.Graph'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='changenode',
+            name='node',
+            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Node'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='changeedge',
+            name='edge',
+            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Edge'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='addproject',
+            name='project',
+            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Project'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='addnode',
+            name='node',
+            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Node'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='addgraph',
+            name='graph',
+            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Graph'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='addedge',
+            name='edge',
+            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Edge'),
+            preserve_default=True,
+        ),
+    ]

@@ -50,7 +50,7 @@
 
         "process": {
             "nodeDisplayName": "Process",
-            "help": "This is a process! weeh",
+            "help": "A process in the system producing or consuming data.",
             "inherits": "node",
             "image": "process.svg",
 
@@ -65,7 +65,7 @@
 
         "storage": {
             "nodeDisplayName": "Storage",
-            "help": "A Storage yoh",
+            "help": "A storage entity able to save or deliver data.",
             "inherits": "node",
             "image": "storage.svg",
 
@@ -80,7 +80,7 @@
 
         "external": {
             "nodeDisplayName": "External Entity",
-            "help": "EE",
+            "help": "An external entity fetching data from, or feeding data into, the system.",
             "inherits": "node",
             "image": "external.svg",
 

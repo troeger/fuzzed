@@ -147,6 +147,7 @@ function(Class, Factory, Menus, Canvas, Backend, Alerts, Progress) {
             this.properties = new Menus.PropertiesMenu(this.factory, this.graph.getNotation().propertiesDisplayOrder);
             this.shapes     = new Menus.ShapeMenu(this.factory);
             this.layout     = new Menus.LayoutMenu(this.factory);
+            this.graph.layoutMenu = this.layout;
             this._backend.activate();
 
             if (readOnly) {

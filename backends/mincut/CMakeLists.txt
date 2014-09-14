@@ -2,11 +2,11 @@ project(ftmincuts)
 
 set(SOURCES
   main.cpp
-  MinCutAnalysisTask.cpp
+  MincutAnalysisTask.cpp
 )
 
 set(HEADERS
-  MinCutAnalysisTask.h
+  MincutAnalysisTask.h
 )
 
 add_executable(ftmincuts ${SOURCES} ${HEADERS})

@@ -10,7 +10,7 @@
         {% block style %}
         @import url("{{ STATIC_URL }}css/jquery-ui/jquery-ui-1.10.3.min.css");
         @import url("{{ STATIC_URL }}css/theme/white.css");
-        @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-4.0.3.min.css");
+        @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-4.1.0.min.css");
         @import url("{{ STATIC_URL }}css/slickgrid/slick.grid-2.0.2.css");
         @import url("{{ STATIC_URL }}css/datatables/dataTables.bootstrap.css");
         @import url("{{ STATIC_URL }}css/selectize/selectize.bootstrap3.css");
@@ -114,7 +114,7 @@
         <div class="container">
             <a class="navbar-brand" anchor="#">
                 {% if graph and project %}
-                    {% if current_user.is_staff or current_user == project.owner %}
+                    {% if user == project.owner %}
                         <a class="navbar-brand" href="{% url 'dashboard' project.pk %}"><small>{{ project.name }}</small> -</a>
                     {% else %}
                         <!-- otherwise user is only viewer of the graph (graph is shared with the current user)-->

@@ -19,6 +19,7 @@
             "resizable": false,
             "editable": false,
             "copyable": true,
+            "cloneable": false,
 
             "connector": {
                 "offset": {
@@ -87,8 +88,10 @@
             "numberOfOutgoingConnections": -1,
             "allowConnectionTo": ["fdepGate"],
 
+            "cloneable": true,
+
             "image": "basic_event.svg",
-            "help": "An initial fault or a primary component failure event.",
+            "help": "An initial fault event.",
 
             "properties": {
                 "name": {
@@ -152,7 +155,7 @@
             "allowConnectionTo": ["staticGate", "spareGate", "priorityAndGate", "seqGate"],
 
             "image": "intermediate_event.svg",
-            "help": "An error event resulting from a combination of previous events.",
+            "help": "An event resulting from a combination of previous events.",
 
             "properties": {
                 "name": {
@@ -312,7 +315,7 @@
             "inherits": "staticGate",
 
             "image": "and_gate.svg",
-            "help": "The output event occurs if all input events occur."
+            "help": "The above event occurs if all events below occur."
         },
 
         "orGate": {
@@ -320,7 +323,7 @@
             "inherits": "staticGate",
 
             "image": "or_gate.svg",
-            "help": "The output event occurs if one or more input events occur.",
+            "help": "The above event occurs if one or more of the below events occur.",
 
             "connector": {
                 "offset": {
@@ -334,7 +337,7 @@
             "inherits": "orGate",
 
             "image": "xor_gate.svg",
-            "help": "The output event occurs if exactly one of the input events occur."
+            "help": "The above event occurs if exactly one of the events below occurs."
         },
 
         "votingOrGate": {
@@ -342,7 +345,7 @@
             "inherits": "orGate",
 
             "image": "voting_or_gate.svg",
-            "help": "The output event occurs if the given number of input events occur.",
+            "help": "The above event occurs if k of the below events occur.",
 
             "properties": {
                 "k": {
@@ -370,7 +373,7 @@
             "inherits": "dynamicGate",
 
             "image": "spare_gate.svg",
-            "help": "The output event occurs if the primary and all secondary events occur. The primary event changes the probability of the secondary events.",
+            "help": "The above event occurs if the primary and all secondary events below occur. The primary event changes the probability of the secondary events.",
 
             "allowConnectionTo": [
                 "basicEvent", "basicEventSet", "undevelopedEvent", "houseEvent", "staticGate",
@@ -406,7 +409,7 @@
             ],
 
             "image": "fdep_gate.svg",
-            "help": "The dependent events occur immediately if the trigger event occurs."
+            "help": "All above events occur immediately if the below event occurs."
         },
 
         "priorityAndGate": {
@@ -414,7 +417,7 @@
             "inherits": "dynamicGate",
 
             "image": "priority_and_gate.svg",
-            "help": "The output event occurs if all input events occur from left to right."
+            "help": "The above event occurs if all below events occur from left to right. The below events may happen out of order."
         },
 
         "seqGate": {
@@ -422,7 +425,7 @@
             "inherits": "dynamicGate",
 
             "image": "seq_gate.svg",
-            "help": "The output event occurs if all input events occur from left to right."
+            "help": "The above event occurs if all below events occur from left to right. An out-of-order occurence is not possible."
         },
 
         "transferIn": {

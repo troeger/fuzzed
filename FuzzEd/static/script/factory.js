@@ -33,30 +33,23 @@ function(Class) {
                 var clsModule = require(path);
 
                 var creation = undefined;
-                try {
-                    // our first try is based on the assumption, that the class module only returns the class constructor
-                    //console.log('[1] Trying to create a ' + baseCls + ' directly from module ' + path);
+
+                // our first try is based on the assumption, that the class module only returns the class constructor
+                if (typeof clsModule           !== 'undefined'
+                 && typeof clsModule.prototype !== 'undefined') {
                     creation = this._construct(clsModule, args.slice(1));
-                } catch (e) {
-                    if (e instanceof ClassNotFound) {
-                        try {
-                            // our second try supposes that the constructor is a member of the return object and is called the same
-                            //  as the concrete class we are looking for (e.g. FaulttreeNodeGroup)
-                            //console.log('[2] Trying to create a ' + baseCls + ' from ' + resolveObj.path + '.' + resolveObj.fullClassName);
-                            creation = this._construct(clsModule[resolveObj.fullClassName], args.slice(1));
-                        } catch (f) {
-                            if (e instanceof ClassNotFound) {
-                                // our third try is to find the wanted class inside the found package, but this time named in
-                                //  as the baseCls (e.g. NodeGroup)
-                                //console.log('[3] Trying to create a ' + baseCls + ' from ' + resolveObj.path + '.' + resolveObj.cls);
-                                creation = this._construct(clsModule[resolveObj.cls], args.slice(1));
-                            } else {
-                                throw f;
-                            }
-                        }
-                    } else {
-                        throw e;
-                    }
+
+                // our second try supposes that the constructor is a member of the return object and is called the same
+                //  as the concrete class we are looking for (e.g. FaulttreeNodeGroup)
+                } else if (typeof clsModule[resolveObj.fullClassName]           !== 'undefined'
+                        && typeof clsModule[resolveObj.fullClassName].prototype !== 'undefined') {
+                    creation = this._construct(clsModule[resolveObj.fullClassName], args.slice(1));
+
+                // our third try is to find the wanted class inside the found package, but this time named in
+                //  as the baseCls (e.g. NodeGroup)
+                } else if (typeof clsModule[resolveObj.cls]           !== 'undefined'
+                        && typeof clsModule[resolveObj.cls].prototype !== 'undefined') {
+                    creation = this._construct(clsModule[resolveObj.cls], args.slice(1));
                 }
             }
 
@@ -81,15 +74,9 @@ function(Class) {
                 //  factory
                 return constructor.apply(this, [ that ].concat(args));
             }
-            try {
-                Creation.prototype = constructor.prototype;
-                var that = this;
-                return new Creation(that);
-            } catch (e) {
-                //TODO: try to catch this case more precisely, so we don't catch exceptions from elsewhere
-                if (e.message === "undefined is not a function") throw new ClassNotFound();
-                else throw e;
-            }
+            Creation.prototype = constructor.prototype;
+            var that = this;
+            return new Creation(that);
         },
 
         _resolveClassName: function(cls, kind) {
