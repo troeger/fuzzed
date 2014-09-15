@@ -11,7 +11,7 @@
         require(['{{ graph.kind }}/editor', 'bootstrap', 'exception'], function (Editor) {
             jQuery(document).ready(function () {
                 try {
-                    var editor = new Editor({{ graph.pk }});
+                    var editor = new Editor(undefined, {{ graph.pk }});
                 } catch (exception) {
                     var exceptions = jQuery('#FuzzEdExceptions');
 
@@ -81,6 +81,11 @@
                     <i class="fa fa-unlink"></i> Ungroup <span class="pull-right">Ctrl+A</span>
                 </a></li>
             {% endif %}
+            {% if graph.kind == 'faulttree' or graph.kind == 'fuzztree' %}
+                <li><a href="#" id="FuzzEdActionClone">
+                    <i class="fa fa-circle-thin"></i> Mirror
+                </a></li>
+            {% endif %}
             <li class="divider"></li>
             <li><a href="#" id="FuzzEdActionLayoutCluster">
                 <i class="fa fa-magic"></i> Auto-layout (cluster algorithm)</a></li>
@@ -133,8 +138,15 @@
     </li>
 {% endblock %}
 
-{% block goto_menu %}
-    <li><a href="{% url 'dashboard' project.pk %}"><i class="fa fa-fw fa-folder-open"></i> {{ project.name }} </a></li>
+{% block goto_menu %}   
+    <li>
+      {% if user == project.owner %}
+          <a href="{% url 'dashboard' project.pk %}"><i class="fa fa-fw fa-folder-open"></i> {{ project.name }} </a>
+      {% else %}
+          <!-- otherwise user is only viewer of the graph (graph is shared with the current user)-->
+          <a href="{% url 'shared_graphs_dashboard' %}"><i class="fa fa-fw fa-share"></i> Shared Graphs </a>
+      {% endif %}
+    </li>
     <li class="divider"></li>
     <li><a href="/settings"><i class="fa fa-fw fa-user"></i> Account settings</a></li>
     <li><a href="/docs/editor" target="_blank"><i class="fa fa-fw fa-book"></i> Documentation </a></li>

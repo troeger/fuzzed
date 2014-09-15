@@ -2,7 +2,7 @@
 
 configurations::Configuration serializedConfiguration(const FuzzTreeConfiguration &c)
 {
-	configurations::Configuration conf(c.getCost());
+	configurations::Configuration conf(c.getId(), c.getCost());
 	for (const auto& inclusionChoice : c.getOptionalNodes())
 	{
 		conf.choice().push_back(

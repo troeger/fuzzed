@@ -1,0 +1,19 @@
+---
+- name: Ensure Fabric is installed
+  sudo: yes
+  pip: name=fabric state=latest
+
+- name: Ensure SCONS is installed
+  sudo: yes
+  apt: pkg=scons state=present
+  when: ansible_os_family == "Debian"
+
+- name: Ensure SCONS is installed
+  homebrew: pkg=scons state=present
+  when: ansible_os_family == "Darwin"
+
+- include: gcc.yml
+- include: lessc.yml
+- include: node.yml
+- include: ../../common/tasks/xml.yml
+- include: ../../common/tasks/boost.yml

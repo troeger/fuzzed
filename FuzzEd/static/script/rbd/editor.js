@@ -1,40 +1,38 @@
-define(['editor', 'rbd/graph', 'rbd/config'], function(Editor, RbdGraph, RbdConfig) {
+define(['editor', 'factory', 'rbd/graph', 'rbd/config'], function(Editor, Factory, RbdGraph, RbdConfig) {
     /**
-     *  Package: RBD
+     * Package: RBD
      */
 
     /**
-     *  Class: RbdEditor
-     *    RBD-specific <Base::Editor> class.
+     * Class: RbdEditor
+     *      RBD-specific <Base::Editor> class.
      *
-     *  Extends: <Base::Editor>
+     * Extends: <Base::Editor>
      */
     return Editor.extend({
         /**
-         *  Group: Accessors
+         * Group: Accessors
          */
 
+        getFactory: function() {
+            return new Factory(undefined, 'rbd');
+        },
+
         /**
-         *  Method: getConfig
+         * Method: getConfig
          *
-         *  Returns:
-         *    The <RbdConfig> object.
-         *
-         *  See also:
-         *    <Base::Editor::getConfig>
+         * Returns:
+         *      The <RbdConfig> object.
          */
         getConfig: function() {
             return RbdConfig;
         },
 
         /**
-         *  Method: getGraphClass
+         * Method: getGraphClass
          *
-         *  Returns:
-         *    The <RbdGraph> class.
-         *
-         *  See also:
-         *    <Base::Editor::getGraphClass>
+         * Returns:
+         *      The <RbdGraph> class.
          */
         getGraphClass: function() {
             return RbdGraph;

@@ -1,12 +1,12 @@
 from django.db import models
-from FuzzEd.lib.jsonfield import JSONField
 
+from FuzzEd.lib.jsonfield import JSONField
 from edge import Edge
 from graph import Graph
 from node import Node
 from project import Project
-
 import notations
+
 
 class Command(models.Model):
     """
@@ -285,37 +285,7 @@ class ChangeNode(Command):
 
     @classmethod
     def create_from(cls, graph_id, node_id, updated_properties):
-        """
-        Method [static]: create_from
-        
-        Convenience factory method for issuing a property changed command from parameters as received from API calls.
-        NOTE: if the property does not yet exist it being created and saved.
-
-        Parameters:
-         {str} graph_id   - the id of the graph that contains the node's property changed
-         {str] node_id    - the client id(!) of the node's property changed
-         {str} key        - the name of the property that changed
-         {str} new_value  - the value the property has been changed to
-
-        Returns:
-         {<ChangeNode>}  - the property changed command instance
-        """
-        node    = Node.objects.get(client_id=node_id, graph__pk=graph_id)
-        command = cls(node=node)
-        command.save()
-
-        for key, value in updated_properties.items():
-            old_value = ''
-
-            try:
-                old_value = node.get_attr(key)
-            except ValueError:
-                pass
-
-            property_change = PropertyChange(command=command, key=key, old_value=old_value, new_value=value)
-            property_change.save()
-
-        return command
+        assert(False)       # Command objects are deprecated.
 
     def do(self):
         """
@@ -357,37 +327,7 @@ class ChangeEdge(Command):
 
     @classmethod
     def create_from(cls, graph_id, edge_id, updated_properties):
-        """
-        Method [static]: create_from
-
-        Convenience factory method for issuing a property changed command from parameters as received from API calls.
-        NOTE: if the property does not yet exist it being created and saved.
-
-        Parameters:
-         {str} graph_id   - the id of the graph that contains the edge's property changed
-         {str] edge_id    - the client id(!) of the edge's property changed
-         {str} key        - the name of the property that changed
-         {str} new_value  - the value the property has been changed to
-
-        Returns:
-         {<ChangeEdge>}   - the property changed command instance
-        """
-        edge    = Edge.objects.get(client_id=edge_id, graph__pk=graph_id)
-        command = cls(edge=edge)
-        command.save()
-
-        for key, value in updated_properties.items():
-            old_value = ''
-
-            try:
-                old_value = edge.get_attr(key)
-            except ValueError:
-                pass
-
-            property_change = EdgePropertyChange(command=command, key=key, old_value=old_value, new_value=value)
-            property_change.save()
-
-        return command
+        assert(False)           # Command objects are deprecated
 
     def do(self):
         """

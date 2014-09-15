@@ -12,7 +12,7 @@
 #include "CommandLineParser.h"
 #include "FatalException.h"
 
-#include "configurationResult.h"
+#include "backendResult.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -29,7 +29,8 @@ int main(int argc, char **argv)
 	*logFileStream << "Configuration errors for " << inFile << std::endl;
 	if (!logFileStream->good())
 	{// create default log file
-		logFileStream = new std::ofstream(logFile);	// TODO: wtf this is the same line as above? retry?
+		std::cout << "Could not open logfile" << std::endl;
+		return -1;
 	}
 
 	std::ifstream instream(inFile);
@@ -43,10 +44,10 @@ int main(int argc, char **argv)
 	FuzzTreeTransform tf(instream, issues);
 	instream.close();
 
+	backendResults::BackendResults backendresults;
+
 	try
 	{
-		configurationResults::ConfigurationResults configurationResults;
-
 		if (!tf.isValid())
 		{ // only fuzztrees should be configured 
 			issues.insert(Issue::fatalIssue("Could not configure the model. Did you try to configure a fault tree?"));
@@ -56,34 +57,35 @@ int main(int argc, char **argv)
 			const auto modelId = tf.getFuzzTree()->id();
 			for (const auto& t : tf.transform())
 			{
-				configurationResults::Result r(modelId, util::timeStamp(), true); 
-				r.configuration(serializedConfiguration(t.first));
-				configurationResults.result().push_back(r);
+				// TODO: where to put the ModelID?
+				backendresults.configuration().push_back(serializedConfiguration(t.first));
 			}
 		}
 
 		// Log errors
 		for (const Issue& issue : issues)
 		{
-			configurationResults.issue().push_back(issue.serialized());
+			backendresults.issue().push_back(issue.serialized());
 			*logFileStream << issue.getMessage() << std::endl;
 		}
 
 		std::ofstream output(outFile);
-		configurationResults::configurationResults(output, configurationResults);
+		backendResults::backendResults(output, backendresults);
 	}
 
 	// This should not happen.
 	catch (const std::exception& e)
 	{
-		*logFileStream << "Exception while trying to configure " << inFile << e.what() << std::endl;
-		fuzztree::fuzzTree(*logFileStream, *(tf.getFuzzTree()));
+		*logFileStream << "Exception while trying to configure " << inFile << e.what() << std::endl << "Results so far: ";
+		backendResults::backendResults(*logFileStream, backendresults);
 
+		fuzztree::fuzzTree(*logFileStream, *(tf.getFuzzTree()));
 		return -1;
 	}
 	catch (...)
 	{
-		*logFileStream << "Exception while trying to configure " << inFile << std::endl;
+		*logFileStream << "Exception while trying to configure " << inFile << std::endl << "Results so far: ";
+		backendResults::backendResults(*logFileStream, backendresults);
 		return -1;
 	}
 

@@ -1,16 +1,19 @@
 import base64
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.http import HttpResponse
-from tastypie.http import HttpBadRequest
-from tastypie.resources import ModelResource
-from tastypie import fields
-from FuzzEd.models import Job
-from django.conf.urls import url
-from django.core.files.uploadedfile import SimpleUploadedFile
+import logging
+import json
 
-import logging,json
-import common
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.mail import mail_managers
+from django.http import HttpResponse
+from tastypie.http import HttpBadRequest, HttpNotFound, HttpMultipleChoices
+from tastypie import fields
+from django.conf.urls import url
 from django.utils import http
+
+import common
+from FuzzEd.models import Job
+from FuzzEd import settings
+
 
 logger = logging.getLogger('FuzzEd')
 
@@ -48,9 +51,9 @@ class JobResource(common.JobResource):
         try:
             job = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
-            return http.HttpNotFound()
+            return HttpNotFound()
         except MultipleObjectsReturned:
-            return http.HttpMultipleChoices("More than one resource is found at this URI.")
+            return HttpMultipleChoices("More than one resource is found at this URI.")
 
         logger.debug("Delivering data for job %d"%job.pk)
         response = HttpResponse()
@@ -87,7 +90,7 @@ class JobResource(common.JobResource):
             logger.error("Job already done, discarding uploaded results")
             return HttpResponse(status=202)     # This return code is a lie, but mitigates duplicate result submission
         else:
-            logger.debug("Storing result data for job %d"%job.pk)
+            logger.debug("Parsing and storing result data for job %d"%job.pk)
             try:
                 result = json.loads(request.body)
                 assert('exit_code' in result)
@@ -95,9 +98,17 @@ class JobResource(common.JobResource):
                 return HttpBadRequest()
             job.exit_code = result['exit_code']   
             if "file_name" in result:
-                # Retrieve binary file and store it
-                job.result = base64.b64decode(result['file_data'])
-                if not job.requires_download:
-                    logger.debug(''.join(job.result))
-	    job.save()
+                try:
+                    job.parse_result(base64.b64decode(result['file_data']))
+                except Exception as e:
+                    if settings.DEBUG:
+                        logger.error(e)
+                        raise e
+                    else: 
+                        # Do not blame the calling backend for parsing problems, it has done it's job
+                        logger.error("Could not parse result data retrieved for job %u"%job.pk)
+                        mail_managers("Exception on backend result parsing - " + settings.BACKEND_DAEMON, str(e))
+                        job.exit_code = -444  # Inform the frontend that this went wrong   
+        # This immediately triggers pulling clients to get the result data, so it MUST be the very last thing to do
+	    job.save() 
         return HttpResponse(status=202)

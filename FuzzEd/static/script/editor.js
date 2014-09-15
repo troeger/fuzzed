@@ -1,34 +1,34 @@
-define(['class', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist', 'jsplumb'],
-function(Class, Menus, Canvas, Backend, Alerts, Progress) {
+define(['class', 'factory', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist', 'jsplumb'],
+function(Class, Factory, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base
      */
 
     /**
-     *  Class: Editor
-     *
-     *  This is the _abstract_ base class for all graph-kind-specific editors. It manages the visual components
-     *  like menus and the graph itself. It is also responsible for global keybindings.
+     * Class: Editor
+     *      This is the _abstract_ base class for all graph-kind-specific editors. It manages the visual components
+     *      like menus and the graph itself. It is also responsible for global keybindings.
      */
     return Class.extend({
         /**
-         *  Group: Members
-         *
-         *  Properties:
-         *    {Object}          config                      - Graph-specific <Config> object.
-         *    {Graph}           graph                       - <Graph> instance to be edited.
-         *    {PropertiesMenu}  properties                  - The <Menu::PropertiesMenu> instance used by this editor
-         *                                                    for changing the properties of nodes of the edited graph.
-         *    {ShapesMenu}      shapes                      - The <Menu::ShapeMenu> instance use by this editor to show
-         *                                                    the available shapes for the kind of the edited graph.
-         *    {Backend}         _backend                    - The instance of the <Backend> that is used to communicate
-         *                                                    graph changes to the server.
-         *    {Object}          _currentMinContentOffsets   - Previously calculated minimal content offsets.
-         *    {jQuery Selector} _nodeOffsetPrintStylesheet  - The dynamically generated and maintained stylesheet
-         *                                                    used to fix the node offset when printing the page.
-         *    {Underscore Template} _nodeOffsetStylesheetTemplate - The underscore.js template used to generate the
-         *                                                          CSS transformation for <_nodeOffsetPrintStylesheet>.
+         * Group: Members:
+         *      {Object}              config                        - Graph-specific <Config> object.
+         *      {<Graph>}             graph                         - <Graph> instance to be edited.
+         *      {<PropertiesMenu>}    properties                    - The <PropertiesMenu> instance used by this editor
+         *                                                            for changing the properties of nodes of the edited
+         *                                                            graph.
+         *      {<ShapesMenu>}        shapes                        - The <Menu::ShapeMenu> instance use by this editor
+         *                                                            to show the available shapes for the kind of the
+         *                                                            edited graph.
+         *      {<Backend>}           _backend                      - The instance of the <Backend> that is used to
+         *                                                            communicate graph changes to the server.
+         *      {Object}              _currentMinContentOffsets     - Previously calculated minimal content offsets.
+         *      {jQuery Selector}     _nodeOffsetPrintStylesheet    - The dynamically generated stylesheet used to fix
+         *                                                            the node offset when printing the page.
+         *      {Underscore Template} _nodeOffsetStylesheetTemplate - The underscore.js template used to generate the
+         *                                                            CSS transformation for the print offset.
          */
+        factory:                       undefined,
         config:                        undefined,
         graph:                         undefined,
         properties:                    undefined,
@@ -43,23 +43,24 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         _clipboard:                    '',
 
         /**
-         *  Group: Initialization
+         * Group: Initialization
          */
 
         /**
-         *  Constructor: init
-         *    Sets up the editor interface and necessary callbacks and loads the graph with the given ID
-         *    from the backend.
+         * Constructor: init
+         *      Sets up the editor interface, handlers and loads the graph with the given ID from the backend.
          *
-         *  Parameters:
-         *    {int} graphId - The ID of the graph that is going to be edited by this editor.
+         * Parameters:
+         *      {Number} graphId - The ID of the graph that is going to be edited by this editor.
          */
         init: function(graphId) {
+            this.factory = this.getFactory();
+
             if (typeof graphId !== 'number')
                 throw new TypeError('numeric graph ID', typeof graphId);
 
             this.config   = this.getConfig();
-            this._backend = Backend.establish(graphId);
+            this._backend = Backend.establish(this.factory, graphId);
 
             // remember certain UI elements
             this._progressIndicator = jQuery('#' + this.config.IDs.PROGRESS_INDICATOR);
@@ -77,46 +78,50 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Group: Accessors
+         * Group: Accessors
          */
 
+        getFactory: function() {
+            throw new SubclassResponsibility();
+        },
+
         /**
-         *  Method: getConfig
-         *    _Abstract_, needs to be overridden in specific editor classes.
+         * Method: getConfig
+         *      _Abstract_, needs to be overridden in specific editor classes.
          *
-         *  Returns:
-         *    The <Config> object that corresponds to the loaded graph's kind.
+         * Returns:
+         *      The {<Config>} object that corresponds to the loaded graph's kind.
          */
         getConfig: function() {
             throw new SubclassResponsibility();
         },
 
         /**
-         *  Method: getGraphClass
-         *    _Abstract_, needs to be overridden in specific editor classes.
+         * Method: getGraphClass
+         *      _Abstract_, needs to be overridden in specific editor classes.
          *
-         *  Returns:
-         *    The specific <Graph> class that should be used to instantiate the editor's graph with information
-         *    loaded from the backend.
+         * Returns:
+         *      The specific {<Graph>} class that should be used to instantiate the editor's graph with information
+         *      loaded from the backend.
          */
         getGraphClass: function() {
             throw new SubclassResponsibility();
         },
 
         /**
-         *  Group: Graph Loading
+         * Group: Graph Loading
          */
 
         /**
-         *  Method: _loadGraph
-         *    Asynchronously loads the graph with the given ID from the backend.
-         *    <_loadGraphFromJson> will be called when done.
+         * Method: _loadGraph
+         *      Asynchronously loads the graph with the given ID from the backend. <_loadGraphFromJson> will be called
+         *      when retrieval was successful.
          *
-         *  Parameters:
-         *    {int} graphId - ID of the graph that should be loaded.
+         * Parameters:
+         *      {Number} graphId - ID of the graph that should be loaded.
          *
-         *  Returns:
-         *    This editor instance for chaining.
+         * Returns:
+         *      This {<Editor>} instance for chaining.
          */
         _loadGraph: function(graphId) {
             this._backend.getGraph(
@@ -128,21 +133,22 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _loadGraphCompleted
-         *    Callback that gets fired when the graph is loaded completely.
-         *    We need to perform certain actions afterwards, like initialization of menus and activation of
-         *    backend observers to prevent calls to the backend while the graph is initially constructed.
+         * Method: _loadGraphCompleted
+         *      Callback that gets fired when the graph is loaded completely. We need to perform certain actions
+         *      afterwards, like initialization of menus and activation of backend observers to prevent calls to the
+         *      backend while the graph is initially constructed.
          *
-         *  Returns:
-         *    This editor instance for chaining.
+         * Returns:
+         *      This {<Editor>} instance for chaining.
          */
         _loadGraphCompleted: function(readOnly) {
             // create manager objects for the bars
-            this.properties = Menus.PropertiesMenu;
-            this.shapes     = Menus.ShapeMenu;
-            this.layout     = Menus.LayoutMenu;
+            //TODO: put this into the factory
+            this.properties = new Menus.PropertiesMenu(this.factory, this.graph.getNotation().propertiesDisplayOrder);
+            this.shapes     = new Menus.ShapeMenu(this.factory);
+            this.layout     = new Menus.LayoutMenu(this.factory);
+            this.graph.layoutMenu = this.layout;
             this._backend.activate();
-            this.properties.displayOrder(this.graph.getNotation().propertiesDisplayOrder);
 
             if (readOnly) {
                 Alerts.showInfoAlert('Remember:', 'this diagram is read-only');
@@ -164,26 +170,26 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _loadGraphError
-         *    Callback that gets called in case <_loadGraph> results in an error.
+         * Method: _loadGraphError
+         *      Callback that gets called in case <_loadGraph> results in an error.
          */
         _loadGraphError: function(response, textStatus, errorThrown) {
             throw new NetworkError('could not retrieve graph');
         },
 
         /**
-         *  Method: _loadGraphFromJson
-         *    Callback triggered by the backend, passing the loaded JSON representation of the graph.
-         *    It will initialize the editor's graph instance using the <Graph> class returned in <getGraphClass>.
+         * Method: _loadGraphFromJson
+         *      Callback triggered by the backend, passing the loaded JSON representation of the graph. It will
+         *      initialize the editor's graph instance using the <Graph> class returned in <getGraphClass>.
          *
-         *  Parameters:
-         *    {JSON} json - JSON representation of the graph, loaded from the backend.
+         * Parameters:
+         *      {Object} json - JSON representation of the graph, loaded from the backend.
          *
          *  Returns:
-         *    This editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _loadGraphFromJson: function(json) {
-            this.graph = new (this.getGraphClass())(json);
+            this.graph = this.factory.create('Graph', json);
             this._loadGraphCompleted(json.readOnly);
 
             return this;
@@ -195,12 +201,11 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         
         /**
          * Method: _setupDropDownBlur
-         *
-         * Register an event handler that takes care of closing and blurring all currently open drop down menu items
-         * from the toolbar.
+         *      Register an event handler that takes care of closing and blurring all currently open drop down menu
+         *      items from the toolbar.
          *
          * Returns:
-         *   This {<Editor>} instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _setupDropDownBlur: function () {
             jQuery('#' + this.config.IDs.CANVAS).mousedown(function(event) {
@@ -215,12 +220,11 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _setupMenuActions
+         * Method: _setupMenuActions
+         *      Registers the event handlers for graph type - independent menu entries that trigger JS calls
          *
-         *  Registers the event handlers for graph type - independent menu entries that trigger JS calls
-         *
-         *  Returns:
-         *    This {<Node>} instance for chaining.
+         * Returns:
+         *      This {<Editor>} instance for chaining.
          */
         _setupMenuActions: function() {
             jQuery('#' + this.config.IDs.ACTION_GRID_TOGGLE).click(function() {
@@ -267,11 +271,11 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _setupJsPlumb
-         *    Sets all jsPlumb defaults used by this editor.
+         * Method: _setupJsPlumb
+         *      Sets all jsPlumb defaults used by this editor.
          *
-         *  Returns:
-         *    This editor instance for chaining.
+         * Returns:
+         *      This {<Editor>} instance for chaining.
          */
         _setupJsPlumb: function() {
             jsPlumb.importDefaults({
@@ -304,12 +308,12 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _setupMouse
-         *    Sets up callbacks that fire when the user interacts with the editor using his mouse. So far this is only
-         *    concerns resizing the window.
+         * Method: _setupMouse
+         *      Sets up callbacks that fire when the user interacts with the editor using his mouse. So far this is
+         *      only concerns resizing the window.
          *
-         *  Returns:
-         *    This editor instance for chaining.
+         * Returns:
+         *      This {<Editor>} instance for chaining.
          */
         _setupMouse: function() {
             jQuery(window).resize(function() {
@@ -325,17 +329,18 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _setupKeyBindings
-         *    Setup the global key bindings
+         * Method: _setupKeyBindings
+         *      Setup the global key bindings
          *
-         *  Keys:
-         *    ESCAPE             - Clear selection.
-         *    DELETE             - Delete all selected elements (nodes/edges).
-         *    UP/RIGHT/DOWN/LEFT - Move the node in the according direction
-         *    CTRL/CMD + A       - Select all nodes and edges
+         * Keys:
+         *      ESCAPE             - Clear selection.
+         *      DELETE/BACKSPACE   - Delete all selected elements (nodes/edges).
+         *      UP/RIGHT/DOWN/LEFT - Move the node in the according direction
+         *      CTRL/CMD + A       - Select all nodes and edges
+         *      CTRL/CMD + C/X/V   - Copy, cut and paste
          *
-         *  Returns:
-         *    This editor instance for chaining.
+         * Returns:
+         *      This {<Editor>} instance for chaining.
          */
         _setupKeyBindings: function(readOnly) {
             if (readOnly) return this;
@@ -357,10 +362,10 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
                     this._selectAllPressed(event);
                 } else if (event.which === 'C'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
                     this._copyPressed(event);
-                } else if (event.which === 'V'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
-                    this._pastePressed(event);
                 } else if (event.which === 'X'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
                     this._cutPressed(event);
+                } else if (event.which === 'V'.charCodeAt() && (event.metaKey || event.ctrlKey)) {
+                    this._pastePressed(event);
                 }
             }.bind(this));
 
@@ -368,12 +373,12 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _setupNodeOffsetPrintStylesheet
-         *    Creates a print stylesheet which is used to compensate the node offsets on the canvas when printing.
-         *    Also sets up the CSS template which is used to change the transformation every time the content changes.
+         * Method: _setupNodeOffsetPrintStylesheet
+         *      Creates a print stylesheet which is used to compensate the node offsets on the canvas when printing.
+         *      Also sets up the CSS template which is used to change the transformation every time the content changes.
          *
-         *  Returns:
-         *    This Editor instance for chaining.
+         * Returns:
+         *      This {<Editor>} instance for chaining.
          */
         _setupNodeOffsetPrintStylesheet: function() {
             // dynamically create a stylesheet, append it to the head and keep the reference to it
@@ -398,16 +403,16 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _setupEventCallbacks
-         *    Registers all event listeners of the editor.
+         * Method: _setupEventCallbacks
+         *      Registers all event listeners of the editor.
          *
-         *  On:
-         *    <Config::Events::NODE_DRAG_STOPPED>
-         *    <Config::Events::NODE_ADDED>
-         *    <Config::Events::NODE_DELETED>
+         * On:
+         *      <Config::Events::NODE_DRAG_STOPPED>
+         *      <Config::Events::NODE_ADDED>
+         *      <Config::Events::NODE_DELETED>
          *
-         *  Returns:
-         *    This Editor instance for chaining.
+         * Returns:
+         *      This {<Editor>} instance for chaining.
          */
         _setupEventCallbacks: function() {
             // events that trigger a re-calculation of the print offsets
@@ -424,16 +429,15 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Group: Graph Editing
+         * Group: Graph Editing
          */
 
         /**
-         *  Method: _deleteSelection
+         * Method: _deleteSelection
+         *      Will remove the selected nodes and edges.
          *
-         *    Will remove the selected nodes and edges.
-         *
-         *  Returns:
-         *    This Editor instance for chaining
+         * Returns:
+         *      This {<Editor>} instance for chaining
          */
         _deleteSelection: function() {
             var selectedNodes =      '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
@@ -466,18 +470,16 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _selectAll
-         *
-         *   Will select all nodes and edges.
+         *      Will select all nodes and edges.
          *
          * Parameters:
-         *   {jQuery::Event} event - the issued select all keypress event
+         *      {jQuery::Event} event - the issued select all keypress event
          *
          * Returns:
-         *   This Editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
 
         _selectAll: function(event) {
-
             //XXX: trigger selection start event manually here
             //XXX: hack to emulate a new selection process
             Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
@@ -493,14 +495,13 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _deselectAll
-         *
-         *   Deselects all the nodes and edges in the current graph.
+         *      Deselects all the nodes and edges in the current graph.
          *
          * Parameters:
-         *   {jQuery::Event} event - (optional) the issued select all keypress event
+         *      {jQuery::Event} event - (optional) the issued select all keypress event
          *
          * Returns:
-         *   This Editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _deselectAll: function(event) {
             if (typeof event === 'undefined') {
@@ -525,12 +526,11 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _copySelection
-         *
-         *   Will copy selected nodes by serializing and saving them to html5 Local Storage or the _clipboard var using
-         *   _updateClipboard().
+         *      Will copy all selected nodes by serializing and saving them to HTML5 Local Storage or the _clipboard
+         *      variable if the former capability is not available.
          *
          * Returns:
-         *   This Editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _copySelection: function() {
             var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
@@ -581,11 +581,10 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _paste
-         *
-         *   Will paste previously copied nodes from html5 Local Storage or the _clipboard var by using _getClipboard().
+         *      Will paste previously copied nodes from HTML5 Local Storage or the _clipboard variable.
          *
          * Returns:
-         *   This Editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _paste: function() {
             // deselect the original nodes and edges
@@ -641,11 +640,10 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _cutSelection
-         *
-         *   Will delete and copy selected nodes by using _updateClipboard().
+         *      Will delete and copy selected nodes by using _updateClipboard().
          *
          * Returns:
-         *   This Editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _cutSelection: function() {
             this._copySelection();
@@ -658,13 +656,87 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         * Method: _boundingBoxForNodes
+         * Method: _groupSelection
          *
-         *   Returns the (smallest) bounding box for the given nodes by accessing their x and y coordinates and finding
-         *   mins and maxes. Used by _paste() to place the copy nicely.
+         *   Will create a new NodeGroup with the current selected nodes.
+         *
+         *   Note: This method can't be accessed by the user, unless you provide Menu Actions or Key Events for it.
+         *   (see dfd/editor.js for examples of correct subclassing)
          *
          * Returns:
-         *   A dictionary containing 'width' and 'height' of the calculated bounding box.
+         *   This Editor instance for chaining.
+         */
+        _groupSelection: function() {
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+
+            nodes = jQuery(selectedNodes);
+            if(nodes.length > 1)
+            {
+                var jsonNodeGroup = {
+                    nodeIds: _.map(nodes, function(node){return jQuery(node).data(this.config.Keys.NODE).id;}.bind(this))
+                };
+                this.graph.addNodeGroup(jsonNodeGroup);
+            }
+
+            return this;
+        },
+
+        /**
+         * Method: _ungroupSelection
+         *
+         *   Will ungroup either the NodeGroup, that only consists of the selected nodes, or the selected NodeGroups
+         *   directly.
+         *
+         *   Note: This method can't be accessed by the user, unless you provide Menu Actions or Key Events for it.
+         *   (see dfd/editor.js for examples of correct subclassing)
+         *
+         * Returns:
+         *   Success
+         */
+        _ungroupSelection: function() {
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+
+            var nodeIds = _.map(jQuery(selectedNodes), function(node){
+                return jQuery(node).data(this.config.Keys.NODE).id;
+            }.bind(this));
+
+            var nodeGroup = undefined;
+
+            // case [1]: find the correct node group, whose node ids match the selected ids
+            // (i.e. the user has to select all members of a NodeGroup to remove the NodeGroup)
+            _.each(this.graph.nodeGroups, function(ng) {
+                var ngIds = ng.nodeIds();
+                // math recap: two sets are equal, when both their differences are zero length
+                if (jQuery(ngIds).not(nodeIds).length == 0 && jQuery(nodeIds).not(ngIds).length == 0) {
+                    this.graph.deleteNodeGroup(ng);
+                    return true;
+                }
+            }.bind(this));
+
+            // case [2]: the user selected NodeGroups, (s)he wants to delete, do him/her the favor to delete them
+            // delete selected node groups (NASTY!!!)
+            if (typeof nodeGroup === 'undefined') {
+                var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
+
+                jQuery(allNodeGroups).each(function(index, element) {
+                    var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                    if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
+                        this.graph.deleteNodeGroup(nodeGroup);
+                        return true;
+                    }
+                }.bind(this));
+            }
+
+            return false;
+        },
+
+        /**
+         * Method: _boundingBoxForNodes
+         *      Returns the (smallest) bounding box for the given nodes by accessing their x and y coordinates and
+         *      finding the minimum and maximum. Used by _paste() to place the copy nicely.
+         *
+         * Returns:
+         *      An {Object} containing the 'width' and 'height' keys of the calculated bounding box.
          */
 
         _boundingBoxForNodes: function(nodes) {
@@ -688,20 +760,19 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
 
         /**
-         *  Group: Clipboard Handling
+         * Group: Clipboard Handling
          */
 
         /**
          * Method: _updateClipboard
-         *
-         *   Saves the given clipboardDict either to html5 Local Storage or at least to the Graph's _clipboard var as
-         *   JSON string.
+         *      Saves the given clipboardDict either to html5 Local Storage or at least to the Graph's _clipboard var
+         *      as JSON string.
          *
          * Parameters:
-         *   {JSON} clipboardDict - JSON dict to be stored
+         *      {Object} clipboardDict - JSON object to be stored
          *
          * Returns:
-         *   This Editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _updateClipboard: function(clipboardDict) {
             var clipboardString = JSON.stringify(clipboardDict);
@@ -716,11 +787,11 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _getClipboard
-         *
-         *   Returns the current clipboard either from html5 Local Storage or from the Graph's _clipboard var as JSON.
+         *      Returns the current clipboard either from html5 Local Storage or from the Graph's _clipboard var as
+         *      JSON.
          *
          * Returns:
-         *   The clipboard contents as JSON object.
+         *      The clipboard contents as {Object}.
          */
         _getClipboard: function() {
             if (typeof window.Storage !== 'undefined' && localStorage['clipboard_' + this.graph.kind] !== 'undefined') {
@@ -731,23 +802,22 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Group: Keyboard Interaction
+         * Group: Keyboard Interaction
          */
 
         /**
-         *  Method: _arrowKeyPressed
+         * Method: _arrowKeyPressed
+         *      Event callback for handling presses of arrow keys. Will move the selected nodes in the given direction
+         *      by and offset equal to the canvas' grid size. The movement is not done when an input field is currently
+         *      in focus.
          *
-         *    Event callback for handling presses of arrow keys. Will move the selected nodes in the given direction by
-         *    and offset equal to the canvas' grid size. The movement is not done when an input field is currently in
-         *    focus.
+         * Parameters:
+         *      {jQuery::Event} event      - the issued delete keypress event
+         *      {Number}        xDirection - signum of the arrow key's x direction movement (e.g. -1 for left)
+         *      {Number}        yDirection - signum of the arrow key's y direction movement (e.g.  1 for down)
          *
-         *  Parameters:
-         *    {jQuery::Event} event      - the issued delete keypress event
-         *    {Number}        xDirection - signum of the arrow key's x direction movement (e.g. -1 for left)
-         *    {Number}        yDirection - signum of the arrow key's y direction movement (e.g.  1 for down)
-         *
-         *  Return:
-         *    This Editor instance for chaining
+         * Return:
+         *      This {<Editor>} instance for chaining
          */
         _arrowKeyPressed: function(event, xDirection, yDirection) {
             if (jQuery(event.target).is('input, textarea')) return this;
@@ -767,17 +837,16 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _deletePressed
+         * Method: _deletePressed
+         *      Event callback for handling delete key presses. Will remove the selected nodes and edges by calling
+         *      _deleteSelection as long as no input field is currently focused (allows e.g. character removal in
+         *      properties).
          *
-         *    Event callback for handling delete key presses. Will remove the selected nodes and edges by calling
-         *    _deleteSelection as long as no input field is currently focused (allows e.g. character removal in
-         *    properties).
+         * Parameters:
+         *      {jQuery::Event} event - the issued delete keypress event
          *
-         *  Parameters:
-         *    {jQuery::Event} event - the issued delete keypress event
-         *
-         *  Return:
-         *    This Editor instance for chaining
+         * Returns:
+         *      This {<Editor>} instance for chaining
          */
         _deletePressed: function(event) {
             // prevent that node is being deleted when we edit an input field
@@ -788,16 +857,15 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _escapePressed
+         * Method: _escapePressed
+         *      Event callback for handling escape key presses. Will deselect any selected nodes and edges by calling
+         *      _deselectAll().
          *
-         *    Event callback for handling escape key presses. Will deselect any selected nodes and edges by calling
-         *    _deselectAll().
+         * Parameters:
+         *      {jQuery::Event} event - the issued escape keypress event
          *
-         *  Parameters:
-         *    {jQuery::Event} event - the issued escape keypress event
-         *
-         *  Returns:
-         *    This Editor instance for chaining
+         * Returns:
+         *      This {<Editor>} instance for chaining
          */
         _escapePressed: function(event) {
             event.preventDefault();
@@ -807,15 +875,14 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _selectAllPressed
-         *
-         *   Event callback for handling a select all (CTRL/CMD + A) key presses. Will select all nodes and edges by
-         *   calling _selectAll().
+         *      Event callback for handling a select all (CTRL/CMD + A) key presses. Will select all nodes and edges by
+         *      calling _selectAll().
          *
          * Parameters:
-         *   {jQuery::Event} event - the issued select all keypress event
+         *      {jQuery::Event} event - the issued select all keypress event
          *
          * Returns:
-         *   This Editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _selectAllPressed: function(event) {
             if (jQuery(event.target).is('input, textarea')) return this;
@@ -826,15 +893,14 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _copyPressed
-         *
-         *   Event callback for handling a copy (CTRL/CMD + C) key press. Will copy selected nodes by serializing and
-         *   saving them to html5 Local Storage or the _clipboard var by calling _copySelection().
+         *      Event callback for handling a copy (CTRL/CMD + C) key press. Will copy selected nodes by serializing
+         *      and saving them to HTML5 Local Storage or the _clipboard var by calling _copySelection().
          *
          * Parameters:
-         *   {jQuery::Event} event - the issued select all keypress event
+         *      {jQuery::Event} event - the issued select all keypress event
          *
          * Returns:
-         *   This Editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _copyPressed: function(event) {
             if (jQuery(event.target).is('input, textarea')) return this;
@@ -845,15 +911,14 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _pastePressed
-         *
-         *   Event callback for handling a paste (CTRL/CMD + V) key press. Will paste previously copied nodes from
-         *   html5 Local Storage or the _clipboard var by calling _paste().
+         *      Event callback for handling a paste (CTRL/CMD + V) key press. Will paste previously copied nodes from
+         *      HTML% Local Storage or the _clipboard var by calling _paste().
          *
          * Parameters:
-         *   {jQuery::Event} event - the issued select all keypress event
+         *      {jQuery::Event} event - the issued select all keypress event
          *
          * Returns:
-         *   This Editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _pastePressed: function(event) {
             if (jQuery(event.target).is('input, textarea')) return this;
@@ -864,15 +929,14 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _cutPressed
-         *
-         *   Event callback for handling a cut (CTRL/CMD + X) key press. Will delete and copy selected nodes by calling
-         *   _cutSelection().
+         *      Event callback for handling a cut (CTRL/CMD + X) key press. Will delete and copy selected nodes by
+         *      calling _cutSelection().
          *
          * Parameters:
-         *   {jQuery::Event} event - the issued select all keypress event
+         *      {jQuery::Event} event - the issued select all keypress event
          *
          * Returns:
-         *   This Editor instance for chaining.
+         *      This {<Editor>} instance for chaining.
          */
         _cutPressed: function(event) {
             if (jQuery(event.target).is('input, textarea')) return this;
@@ -882,84 +946,15 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Group: Progress Indication
+         * Group: Print Offset Calculation
          */
 
         /**
-         *  Method _showProgressIndicator
-         *    Display the progress indicator.
+         * Method: _calculateContentOffsets
+         *      Calculates the minimal offsets from top and left among all elements displayed on the canvas.
          *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _showProgressIndicator: function() {
-            // show indicator only if it takes longer then 500 ms
-            this._progressIndicatorTimeout = setTimeout(function() {
-                jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).show();
-            }.bind(this), 500);
-
-            return this;
-        },
-
-        /**
-         *  Method _hideProgressIndicator
-         *    Hides the progress indicator.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _hideProgressIndicator: function() {
-            // prevent indicator from showing before 500 ms are passed
-            clearTimeout(this._progressIndicatorTimeout);
-            jQuery('#' + this.config.IDs.PROGRESS_INDICATOR).hide();
-
-            return this;
-        },
-
-        /**
-         *  Method: _flashSaveIndicator
-         *    Flash the save indicator to show that the current graph is saved in the backend.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _flashSaveIndicator: function() {
-            var indicator = jQuery('#' + this.config.IDs.SAVE_INDICATOR);
-            // only flash if not already visible
-            if (indicator.is(':hidden')) {
-                indicator.fadeIn(200).delay(600).fadeOut(200);
-            }
-
-            return this;
-        },
-
-        /**
-         *  Method _flashErrorIndicator
-         *    Flash the error indicator to show that the current graph has not been saved to the backend.
-         *
-         *  Returns:
-         *    This Editor instance for chaining.
-         */
-        _flashErrorIndicator: function() {
-            var indicator = jQuery('#' + this.config.IDs.ERROR_INDICATOR);
-            // only flash if not already visible
-            if (indicator.is(':hidden')) {
-                indicator.fadeIn(200).delay(5000).fadeOut(200);
-            }
-
-            return this;
-        },
-
-        /**
-         *  Group: Print Offset Calculation
-         */
-
-        /**
-         *  Method: _calculateContentOffsets
-         *    Calculates the minimal offsets from top and left among all elements displayed on the canvas.
-         *
-         *  Returns:
-         *    An object containing the minimal top ('top') and minimal left ('left') offset to the browser borders.
+         * Returns:
+         *      An {Object} containing the minimal top ('top') and minimal left ('left') offset to the browser borders.
          */
         _calculateContentOffsets: function() {
             var minLeftOffset = window.Infinity;
@@ -978,10 +973,10 @@ function(Class, Menus, Canvas, Backend, Alerts, Progress) {
         },
 
         /**
-         *  Method: _updatePrintOffsets
-         *    Calculate the minimal offsets of elements on the canvas and updates the print stylesheet so that it will
-         *    compensate these offsets while printing (using CSS transforms).
-         *    This update is triggered every time a node was added, removed or moved on the canvas.
+         * Method: _updatePrintOffsets
+         *      Calculate the minimal offsets of elements on the canvas and updates the print stylesheet so that it will
+         *      compensate these offsets while printing (using CSS transforms). This update is triggered every time a
+         *      node was added, removed or moved on the canvas.
          */
         _updatePrintOffsets: function(event) {
             var minOffsets = this._calculateContentOffsets();

@@ -21,7 +21,7 @@
 // Generated files...
 #include "faulttree.h"
 #include "fuzztree.h"
-#include "simulationResult.h"
+#include "backendResult.h"
 
 #include <xsd/cxx/xml/dom/serialization-header.hxx>
 
@@ -174,7 +174,7 @@ void SimulationProxy::simulateAllConfigurations(
 		throw runtime_error("Could not open file");
 
 	std::ofstream* logFileStream = new std::ofstream(logFile.generic_string());
-	simulationResults::SimulationResults simResults;
+	backendResults::BackendResults simResults;
 
 	try
 	{
@@ -183,21 +183,22 @@ void SimulationProxy::simulateAllConfigurations(
 		if (!ftTransform.isValid())
 		{
 			const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
-			const std::shared_ptr<TopLevelEvent> ft = fromGeneratedFaultTree(simTree->topEvent()); 
-			if (ft)
+			const std::shared_ptr<TopLevelEvent> topEvent = fromGeneratedFaultTree(simTree->topEvent()); 
+			if (topEvent)
 			{ // in this case there is only a faulttree, so no configuration information will be serialized
 
 				const SimulationResultStruct res = 
-					simulateFaultTree(ft, workingDir, logFileStream, impl);
+					simulateFaultTree(topEvent, workingDir, logFileStream, impl);
 
-				simulationResults::Result r(
-					ft->getId(),
+				const std::string modelId = simTree->id();
+				backendResults::SimulationResult r(
+					modelId,
+					EMPTY_CONFIG_ID,
 					util::timeStamp(),
-					ft->getCost(),
+					res.isValid(),
 					res.reliability,
 					res.nFailures,
-					res.nRounds,
-					res.isValid());
+					res.nRounds);
 
 				r.availability(res.meanAvailability);
 				r.duration(res.duration);
@@ -214,30 +215,41 @@ void SimulationProxy::simulateAllConfigurations(
 		{
 			for (const auto& ft : ftTransform.transform())
 			{
-				std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
+				try
 				{
-					const SimulationResultStruct res = 
+					std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
+
+					const SimulationResultStruct res =
 						simulateFaultTree(simTree, workingDir, logFileStream, impl);
 
-					// debug output
-					// 			simTree->print(cout, 0);
-					// 			fuzztree::fuzzTree(cout, ft.second);
-
-					simulationResults::Result r(
-						simTree->getId(),
+					backendResults::SimulationResult r(
+						ft.second.id(),
+						ft.first.getId(),
 						util::timeStamp(),
-						simTree->getCost(),
+						res.isValid(),
 						res.reliability,
 						res.nFailures,
-						res.nRounds,
-						res.isValid());
+						res.nRounds);
 
 					r.availability(res.meanAvailability);
 					r.duration(res.duration);
 					r.mttf(res.mttf);
-					r.configuration(serializedConfiguration(ft.first));
+					simResults.configuration().push_back(serializedConfiguration(ft.first));
 
 					simResults.result().push_back(r);
+
+				}
+				catch (FatalException& e)
+				{
+					issues.insert(e.getIssue());
+				}
+				catch (std::exception& e)
+				{
+					issues.insert(Issue::fatalIssue(e.what()));
+				}
+				catch (...)
+				{
+					issues.insert(Issue::fatalIssue("Unknown error during fuzztree to faulttree conversion or faulttree simulation"));
 				}
 			}
 		}
@@ -246,11 +258,12 @@ void SimulationProxy::simulateAllConfigurations(
 			simResults.issue().push_back(issue.serialized());
 
 		std::ofstream output(outputFile.generic_string());
-		simulationResults::simulationResults(output, simResults);
+		backendResults::backendResults(output, simResults);
 		output.close();
 	}
 	catch (std::exception& e)
 	{
+		std::cout << e.what();
 		*logFileStream << e.what() << std::endl;
 	}
 }

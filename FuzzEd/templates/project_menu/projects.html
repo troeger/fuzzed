@@ -7,7 +7,7 @@
 {% block script %}
 {{ block.super }}
 <script type="text/javascript" language="javascript">
-    require(['bootstrap'], function() {
+    require(['bootstrap', 'jquery-cookie'], function() {
         var project_to_delete = null;
 
         var delete_clicked = function(event) {
@@ -31,7 +31,11 @@
 
         var dismiss_notification = function(event) {
             {% if notification %}
-            jQuery.post('{% url 'noti_dismiss' notification.pk %}');
+              jQuery.ajax({ url: '/api/front/notification/{{notification.pk}}/',
+                            type: 'DELETE' ,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken'));
+                            }});
             {% endif %}
         };
 
@@ -117,6 +121,16 @@
                       </td>
                   </tr>
               {% endfor %}
+              {% if user.sharings.count > 0 %}
+                  <tr onclick="document.location = '{% url 'shared_graphs_dashboard' %}';">
+                      <td><i class="fa fa-share fa-lg"></i></td>
+                      <td>
+                          <strong class="project_name"> Shared Graphs</strong>
+                      </td>
+                      <td></td>
+                      <td></td>
+                  </tr>
+              {% endif %}
           </tbody>
       </table>
   </section>

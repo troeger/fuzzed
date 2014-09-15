@@ -1,36 +1,33 @@
-define(['editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'highcharts', 'jquery-ui', 'slickgrid'],
-function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
+define(['editor', 'factory', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'datatables-api', 'faulttree/node_group', 'highcharts', 'jquery-ui'],
+function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTables) {
     /**
-     *  Package: Faulttree
+     * Package: Faulttree
      */
 
     /**
-     *  Class: CutsetsMenu
-     *∂DOW
-     *  A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
-     *  cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
+     * Class: CutsetsMenu
+     *      A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
+     *      cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
      *
-     *  Extends: <Base::Menus::Menu>
+     * Extends: <Base::Menus::Menu>
      */
     var CutsetsMenu = Menus.Menu.extend({
         /**
-         *  Group: Members
-         *
-         *  Properties:
-         *    {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
+         * Group: Members
+         *      {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
          */
         _editor: undefined,
 
         /**
-         *  Group: Initialization
+         * Group: Initialization
          */
 
         /**
-         *  Constructor: init
-         *    Sets up the menu.
+         * Constructor: init
+         *      Sets up the menu.
          *
-         *  Parameters:
-         *    {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
+         * Parameters:
+         *      {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
          */
         init: function(editor) {
             this._super();
@@ -38,18 +35,18 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         /**
-         *  Method: _setupContainer
-         *    Sets up the DOM container element for this menu and appends it to the DOM.
+         * Method: _setupContainer
+         *      Sets up the DOM container element for this menu and appends it to the DOM.
          *
-         *  Returns:
-         *    A jQuery object of the container.
+         * Returns:
+         *      A {jQuery} set holding the container.
          */
         _setupContainer: function() {
             return jQuery(
                 '<div id="' + FaulttreeConfig.IDs.CUTSETS_MENU + '" class="menu" header="Cutsets">\
                     <div class="menu-controls">\
-                        <span class="menu-minimize"></span>\
-                        <span class="menu-close"></span>\
+                       <i class="menu-minimize"></i>\
+                       <i class="menu-close">   </i>\
                     </div>\
                     <ul class="nav-list unstyled"></ul>\
                 </div>'
@@ -57,18 +54,18 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         /**
-         *  Group: Actions
+         * Group: Actions
          */
 
         /**
-         *  Method: show
-         *    Display the given cutsets in the menu and make the menu visible.
+         * Method: show
+         *      Display the given cutsets in the menu and make the menu visible.
          *
-         *  Parameters:
-         *    {Array} cutsets - A list of cutsets calculated by the backend.
+         * Parameters:
+         *      {Array[Object]} cutsets - A list of cutsets calculated by the backend.
          *
          *  Returns:
-         *    This menu instance for chaining.
+         *      This{<Menu>} instance for chaining.
          */
         show: function(cutsets) {
             if (typeof cutsets === 'undefined') {
@@ -116,66 +113,70 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
     });
 
     /**
-     *  Class: AnalysisResultMenu
-     *    _Abstract_ base class for menus that display the results of a analysis performed by the backend.
-     *    It contains a chart (currently implemented with Highcharts) and a table area (using SlickGrid).
-     *    Subclasses are responsible for providing data formatters and data conversion functions.
+     * Abstract Class: AnalysisResultMenu
+     *      Base class for menus that display the results of a analysis performed by the backend. It contains a chart
+     *      (implemented with Highcharts) and a table area (using DataTables). Subclasses are responsible for
+     *      providing data formatters and data conversion functions.
      */
     var AnalysisResultMenu = Menus.Menu.extend({
         /**
-         *  Group: Members
-         *
-         *  Properties:
-         *    {<Editor>}        _editor            - The <Editor> instance.
-         *    {<Job>}           _job               - <Job> instance of the backend job that is responsible for
-         *                                           calculating the probability.
-         *    {jQuery Selector} _chartContainer    - jQuery reference to the div inside the container containing the chart.
-         *    {jQuery Selector} _gridContainer     - jQuery reference to the div inside the container containing the table.
-         *    {Highchart}       _chart             - The Highchart instance displaying the result.
-         *    {SlickGrid}       _grid              - The SlickGrid instance displaying the result.
-         *    {Object}          _configNodeMap     - A dictionary mapping from configuration ID to a set of involved nodes.
-         *    {Object}          _configNodeMap     - A dictionary mapping from configuration ID to a set of involved edges.
-         *    {Object}          _redundancyNodeMap - A dictionary mapping from configuration ID to a map of
-         *                                           node IDs to N values.
+         * Group: Members 
+         *      {<Editor>}        _editor               - The <Editor> instance.
+         *      {<Job>}           _job                  - <Job> instance of the backend job that is responsible for
+         *                                                calculating the probability.
+         *      {jQuery Selector} _graphIssuesContainer - Display
+         *      {jQuery Selector} _chartContainer       - jQuery reference to the chart's container.
+         *      {jQuery Selector} _tableContainer       - jQuery reference to the table's container.
+         *      {Highchart}       _chart                - The Highchart instance displaying the result.
+         *      {DataTables}      _table                - The DataTables instance displaying the result.
+         *      {Object}          _configNodeMap        - A mapping of the configuration ID to its node set.
+         *      {Object}          _configNodeMap        - A mapping of the configuration ID to its edge set.
+         *      {Object}          _redundancyNodeMap    - A mapping of the configuration ID to the nodes' N-values
+         *      {Object}          _configMetaDataCached - A dictionary indicating if choice meta data for a specific configuration is cached.
+
          */
-        _editor:            undefined,
-        _job:               undefined,
-        _chartContainer:    undefined,
-        _gridContainer:     undefined,
-        _chart:             undefined,
-        _grid:              undefined,
-        _configNodeMap:     {},
-        _configEdgeMap:     {},
-        _redundancyNodeMap: {},
+        _editor:               undefined,
+        _job:                  undefined,
+        _graphIssuesContainer: undefined,
+        _chartContainer:       undefined,
+        _tableContainer:       undefined,
+        _chart:                undefined,
+        _table:                undefined,
+        _configNodeMap:        {},
+        _configEdgeMap:        {},
+        _redundancyNodeMap:    {},
+        _configMetaDataCached: {},
+        
 
         /**
-         *  Group: Initialization
+         * Group: Initialization
          */
 
         /**
-         *  Constructor: init
-         *    Sets up the menu.
+         * Constructor: init
+         *      Sets up the menu.
          */
         init: function(editor) {
             this._super();
             this._editor = editor;
-            this._chartContainer = this.container.find('.chart');
-            this._gridContainer  = this.container.find('.grid');
+            this._graphIssuesContainer = this.container.find('.graph_issues');
+            this._chartContainer       = this.container.find('.chart');
+            this._tableContainer        = this.container.find('.table_container');
         },
 
         /**
-         *  Group: Actions
+         * Group: Actions
          */
 
         /**
-         *  Method: show
-         *    Display the given job status (and finally its result).
+         * Method: show
+         *      Display the given job status its results.
          *
-         *  Parameters:
-         *    {<Job>} job - The backend job that calculates the probability of the top event.
+         * Parameters:
+         *      {<Job>} job - The backend job that calculates the probability of the top event.
          *
-         *  Returns:
-         *    This menu instance for chaining.
+         * Returns:
+         *      This {<AnalysisResultMenu>} instance for chaining.
          */
         show: function(job) {
             // clear the content
@@ -196,11 +197,11 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         /**
-         *  Method: hide
-         *    Hide the menu and clear all its content. Also stops querying for job results.
+         * Method: hide
+         *      Hide the menu and clear all its content. Also stops querying for job results.
          *
-         *  Returns:
-         *    This menu instance for chaining.
+         * Returns:
+         *      This {<AnalysisResultMenu>} instance for chaining.
          */
         hide: function() {
             this._super();
@@ -213,21 +214,66 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         /**
-         *  Method: _clear
-         *    Clear the content of the menu and cancel any running jobs.
+         * Method: _clear
+         *      Clear the content of the menu and cancel any running jobs.
          *
-         *  Returns:
-         *    This menu instance for chaining.
+         * Returns:
+         *      This {<AnalysisResultMenu>} instance for chaining.
          */
         _clear: function() {
             if (typeof this._job !== 'undefined') this._job.cancel();
+            
+            this._graphIssuesContainer.empty();
+            // reset height of the chart container (which is set after resizing event)
+            this._chartContainer.height('')
             this._chartContainer.empty();
-            this._gridContainer.empty();
+            this._tableContainer.empty();
             // reset height in case it was set during grid creation
-            this._gridContainer.css('height', '');
-            this._chart = null; this._grid = null;
+            this._tableContainer.css('min-height', '');
+            // reset container width (which is set after initalisation of DataTables)
+            this.container.css('width','');
+            this._chart = null; this._table = null;
             this._configNodeMap = {};
             this._redundancyNodeMap = {};
+
+            return this;
+        },
+        
+        /**
+         * Group: Accessors
+         */
+       
+        /**
+         *  Abstract Method: _progressMessage
+         *      Should compute the message that is displayed while the backend calculation is pending.
+         *
+         *  Returns:
+         *      A {String} with the message. May contain HTML.
+         */
+        _progressMessage: function() {
+            throw new SubclassResponsibility();
+        },
+        
+        /**
+         *  Abstract Method: _menuHeader
+         *      Computes the header of the menu.
+         *
+         *  Returns:
+         *      A {String} which is the header of the menu.
+         */
+        _menuHeader: function() {
+            throw new SubclassResponsibility();
+        },
+        
+        /**
+         * Method: _containerID
+         *      Computes the HTML ID of the container.
+         *
+         * Returns:
+         *      A {String} which is the ID of the Container.
+         */
+        _containerID: function() {
+            throw new SubclassResponsibility();
         },
 
         /**
@@ -235,164 +281,129 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
          */
 
         /**
-         *  Method: _setupContainer
-         *    _Abstract_, sets up the DOM container element for this menu and appends it to the DOM.
+         * Abstract Method: _setupContainer
+         *      Sets up the DOM container element for this menu and appends it to the DOM.
          *
-         *  Returns:
-         *    A jQuery object of the container.
+         * Returns:
+         *      A jQuery object of the container.
          */
         _setupContainer: function() {
-            throw new SubclassResponsibility();
+            return jQuery(
+                '<div id="' + this._containerID()  + '" class="menu probabillity_menu" header="'+ this._menuHeader() +'">\
+                    <div class="menu-controls">\
+                        <i class="menu-minimize"></i>\
+                        <i class="menu-close"></i>\
+                    </div>\
+                    <div class="graph_issues"></div>\
+                    <div class="chart"></div>\
+                    <div class="table_container content"></div>\
+                </div>'
+            ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
         },
 
+        /**
+         * Method: setupResizing
+         *      Enables this menu to be resizable and therefore to enlarge or shrink the calculated analysis results.
+         *      Any subclass has to ensure that its particular outcomes adhere to this behaviour.
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
+         */
         _setupResizing: function() {
             this.container.resizable({
-                minHeight: this.container.height(), // use current height as minimum
-                maxHeight: this.container.height(),
+                minHeight: this.container.outerHeight(), // use current height as minimum
+                minWidth : this.container.outerWidth(),
                 resize: function(event, ui) {
-                    if (this._chart != null) {
-                        // fit all available space with chart
-                        this._chartContainer.height(this.container.height() - this._gridContainer.outerHeight());
 
+                    if (this._chart != null) {
+                        
+                        // fit all available space with chart    
+                        this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._tableContainer.height());
+                        
                         this._chart.setSize(
                             this._chartContainer.width(),
                             this._chartContainer.height(),
                             false
                         );
-                    }
-
-                    this._gridContainer.width(this._chartContainer.width());
-                    this._grid.resizeCanvas();
+                    }   
+                }.bind(this),
+                stop: function(event, ui) {
+                    // set container height to auto after resizing (because of collapsing elements)
+                    this.container.css('height', 'auto');
+                    
                 }.bind(this)
+
             });
         },
 
         /**
-         *  Group: Evaluation
+         * Group: Evaluation
          */
 
         /**
-         *  Method: _evaluateResult
-         *    Evaluates the job result. Either displays the analysis results or the returned error message.
+         * Method: _evaluateResult
+         *      Evaluates the job result. Either displays the analysis results or the returned error message.
          *
-         *  Parameters:
-         *    {string} data - Data returned from the backend containing the result of the calculation.
+         * Parameters:
+         *      {String} data - Data returned from the backend containing the result of the calculation.
          */
-        _evaluateResult: function(data) {
-            data = jQuery.parseJSON(data);
-
-            if (_.size(data.errors) > 0) {
-                // errors is a dictionary with the node ID as key
-                this._displayValidationErrors(data.errors);
-            }
-
-            if (_.size(data.warnings) > 0) {
-                // warnings is a dictionary with the node ID as key
-                this._displayValidationWarnings(data.warnings);
-            }
-
-            if (_.size(data.configurations) > 0) {
-                var chartData = {};
-                var tableData = [];
-                var configID = '';
-
-                _.each(data.configurations, function(config, index) {
-                    configID = config['id'];
-
-                    // remember the nodes and edges involved in this config for later highlighting
-                    this._collectNodesAndEdgesForConfiguration(configID, config['choices']);
-
-                    // remember the redundancy settings for this config for later highlighting
-                    this._redundancyNodeMap[configID] = {};
-                    _.each(config['choices'], function(choice, node) {
-                        if (choice.type == 'RedundancyChoice') {
-                            this._redundancyNodeMap[configID][node] = choice['n'];
-                        }
-                    }.bind(this));
-
-                    // collect chart data if given
-                    if (typeof config['points'] !== 'undefined') {
-                        chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
-                    }
-
-                    // collect table rows
-                    // they are basically the configs without the points and choices
-                    var tableEntry = config;
-                    // delete keys we no longer need
-                    tableEntry['points'] = undefined;
-                    tableEntry['choices'] = undefined;
-                    tableData.push(tableEntry);
-
-                }.bind(this));
-
-                // remove progress bar
-                this._chartContainer.empty();
-                // only display chart if points were given
-                if (_.size(chartData) != 0) {
-                    this._displayResultWithHighcharts(chartData, data['decompositionNumber']);
+        _evaluateResult: function(data, job_result_url) {
+            
+            data   = jQuery.parseJSON(data);
+            var issues = data.issues;
+            
+            if (issues){
+                if (_.size(issues.errors) > 0 || _.size(issues.warnings) > 0){
+                    this._displayGraphIssues(issues.errors, issues.warnings);
                 }
-                this._displayResultWithSlickGrid(tableData);
-
-                this._setupResizing();
-            } else {
-                // close menu again if there are no results
-                this.hide();
             }
+                
+            // remove progress bar
+            this._chartContainer.empty();
+            var axisTitles = data.axis_titles;
+            this._initializeHighcharts(axisTitles);
+           
+            
+            // display results within a table
+            var columns = data.columns;
+            this._displayResultWithDataTables(columns, job_result_url);
+            
+            
         },
 
         /**
-         *  Group: Accessors
-         */
-
-        /**
-         *  Method: _getDataColumns
-         *    _Abstract_, returns the format of columns that should be displayed with SlickGrid.
+         * Method: _chartTooltipFormatter
+         *      This function is used to format the tooltip that appears when hovering over a data point in the chart.
+         *      The scope object ('this') contains the x and y value of the corresponding point.
          *
          *  Returns:
-         *    An array of column descriptions. See https://github.com/mleibman/SlickGrid/wiki/Column-Options.
-         */
-        _getDataColumns: function() {
-            throw new SubclassResponsibility();
-        },
-
-        /**
-         *  Method: _chartTooltipFormatter
-         *    _Abstract_, function used to format the toolip that appears when hovering over a data point in the chart.
-         *    The scope object ('this') contains the x and y value of the corresponding point.
-         *
-         *  Returns:
-         *    A string that is displayed inside the tooltip. It may contain HTML tags.
+         *      A {String} that is displayed inside the tooltip. It may HTML.
          */
         _chartTooltipFormatter: function() {
-            throw new SubclassResponsibility();
+            return '<b>' + this.series.name + '</b><br/>' +
+                   '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
+                   '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
         },
 
         /**
-         *  Method: _progressMessage
-         *    _Abstract_, returns the message that should be displayed while the backend is calculating the result.
-         *
-         *  Returns:
-         *    A string with the message. May contain HTML tags.
-         */
-        _progressMessage: function() {
-            throw new SubclassResponsibility();
-        },
-
-        /**
-         *  Group: Conversion
+         * Group: Conversion
          */
 
         /**
          *  Method: _collectNodesAndEdgesForConfiguration
-         *    Traverse the graph and collect all nodes and edges which are part of the configuration defined by the
-         *    given set of choices. Remember those entities in the <_configNodeMap> and <_configEdgeMap> fields
-         *    under the given configID.
+         *      Traverses the graph and collects all nodes and edges which are part of the configuration defined by the
+         *      given set of choices. Remember those entities in the <_configNodeMap> and <_configEdgeMap> fields
+         *      using the given configID.
          *
-         *  Parameters:
-         *    {String} configID - The name of the configuration that is used to store the nodes and edges in the maps.
-         *    {Array}  choices  - A map from node IDs to choice objects (with 'type' and 'value') used to filter
-         *                        the graph entities.
-         *    {<Node>} topNode  - [optional] The top node of the graph. Used for recursion. Defaults to the top event.
+         * Parameters:
+         *      {String}         configID - The id of the configuration that is used to store the nodes and edges.
+         *      {Array[Object]}  choices  - A map from node IDs to choice objects (with 'type' and 'value') used to
+         *                                  filter the graph entities.
+         *      {<Node>}         topNode  - [optional] The top node of the graph. Used for recursion. Defaults to the
+         *                                  top event.
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
          */
         _collectNodesAndEdgesForConfiguration: function(configID, choices, topNode) {
             // start from top event if not further
@@ -438,21 +449,26 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             _.each(children, function(child) {
                 this._collectNodesAndEdgesForConfiguration(configID, choices, child);
             }.bind(this));
+
+            return this;
         },
 
         /**
-         *  Group: Display
+         * Group: Display
          */
 
         /**
-         *  Method: _displayProgress
-         *    Display the job's progress in the menu's body.
+         * Method: _displayProgress
+         *      Display the job's progress in the menu's body.
          *
-         *  Parameters:
-         *    {JSON} data - Data returned from the backend with information about the job's progress.
+         * Parameters:
+         *      {Object} data - Data returned from the backend with information about the job's progress.
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
          */
         _displayProgress: function(data) {
-            if (this._chartContainer.find('.progress').length > 0) return;
+            if (this._chartContainer.find('.progress').length > 0) return this;
 
             var progressBar = jQuery(
                 '<div style="text-align: center;">' +
@@ -463,183 +479,302 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
                 '</div>');
 
             this._chartContainer.empty().append(progressBar);
-            this._gridContainer.empty();
+            this._tableContainer.empty();
+
+            return this;
         },
-
+        
         /**
-         *  Method: _displayResultWithHighcharts
-         *    Display the job's result in the menu's body using Highcharts.
+         * Method: _initializeHighcharts
+         *      Intialize highcharts with Axis definitions.
          *
-         *  Parameters:
-         *    {Array} data  - A set of one or more data series to display in the Highchart.
-         *    {int}   yTick - [optional] The tick of the y-axis (number of lines).
+         * Parameters:
+         *    {Array[Object]} axis_defititions  - A set of definitions used in Highcharts initialisation.
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
          */
-        _displayResultWithHighcharts: function(data, yTick) {
-            if (data.length == 0) return;
+        _initializeHighcharts: function(axis_definitions) { 
+            var self = this;
+                        
+            this._chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: this._chartContainer[0],
+                    type:     'line',
+                    height:   FaulttreeConfig.AnalysisMenu.HIGHCHARTS_MIN_HEIGHT,
 
-            yTick = yTick || 5;
-
+                },
+                title: {
+                    text: null
+                },
+                credits: {
+                    style: {
+                        fontSize: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_CREDIT_LABEL_SIZE
+                    }
+                },
+                xAxis: axis_definitions.xAxis,
+                yAxis: axis_definitions.yAxis,
+                tooltip: {
+                    formatter: this._chartTooltipFormatter
+                },
+                plotOptions: {
+                    series: {
+                        marker: {
+                            radius: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_POINT_RADIUS
+                        },
+                        events: {
+                            mouseOver : function () {
+                                var config_id = this.name
+                                var row = self._table.fnFindCellRowNodes(config_id, 0);
+                                jQuery(row).addClass('tr_hover');
+                            },
+                            mouseOut  : function () {
+                                var config_id = this.name
+                                var row = self._table.fnFindCellRowNodes(config_id, 0);
+                                jQuery(row).removeClass('tr_hover');
+                            },
+                        }
+                    }
+                },
+                data: []
+            });
+            
+            return this;
+        },
+        
+        /**
+         * Method: _displaySeriesWithHighcharts
+         *      Draw series within the Highcharts diagram. 
+         *
+         * Parameters:
+         *    {Array[Object]} defititions  - A set of one or more data series to display in the Highchart.
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
+         */
+        _displaySeriesWithHighcharts: function(data){
+            // remove series from the last draw
+            while(this._chart.series.length > 0){
+                this._chart.series[0].remove(false);
+            }
+            
             var series = [];
-
             _.each(data, function(cutset, name) {
                 series.push({
                     name: name,
                     data: cutset
                 });
             });
-
-            // clear container
-            this._chartContainer.empty();
-
-            var self = this;
-
-            //TODO: This is all pretty hard-coded. Put it into config instead.
-            this._chart = new Highcharts.Chart({
-                chart: {
-                    renderTo: this._chartContainer[0],
-                    type:     'line',
-                    height:   180
-                },
-
-                title: {
-                    text: null
-                },
-
-                credits: {
-                    style: {
-                        fontSize: '8px'
-                    }
-                },
-
-                xAxis: {
-                    min: -0.05,
-                    max:  1.05
-                },
-                yAxis: {
-                    min: 0,
-                    max: 1,
-                    title: {
-                        text: null
-                    },
-                    tickInterval: 1.0,
-                    minorTickInterval: 1.0 / yTick
-                },
-
-                tooltip: {
-                    formatter: this._chartTooltipFormatter
-                },
-
-                plotOptions: {
-                    series: {
-                        marker: {
-                            radius: 1
-                        },
-                        events: {
-                            // select the corresponding grid row of the hovered series
-                            // this will also highlight the corresponding nodes
-                            mouseOver: function() {
-                                var configID = this.name;
-                                _.each(self._grid.getData(), function(dataItem, index) {
-                                    if (dataItem.id == configID) {
-                                        self._grid.setSelectedRows([index]);
-                                    }
-                                });
-                            },
-                            // unselect all grid cells
-                            mouseOut: function() {
-                                self._grid.setSelectedRows([]);
-                            }
-                        }
-                    }
-                },
-
-                series: series
-            });
+            
+            // draw series
+            _.each(series, function(config){
+                this._chart.addSeries(config, false, false)
+            }.bind(this));
+            
+            this._chart.redraw();
+            
+            return this;
         },
-
+              
         /**
-         *  Method: _displayResultWithSlickGrid
-         *    Display the job's result in the menu's body using SlickGrid.
+         * Method: _displayResultWithDataTables
+         *      Display the job's result with DataTables Plugin. Configuration Issues are printed inside the table as collapsed row. 
          *
-         *  Parameters:
-         *    {JSON} data - A set of one or more data series to display in the SlickGrid.
+         * Parameters:
+         *     {Array[Object]}  columns        - A set of columns that shall be displayed within the table.
+         *     {String}         job_result_url - URL under which the server delivers configurations for a specific analysis result (using ajax and pagingation)
+         *    
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
          */
-        _displayResultWithSlickGrid: function(data) {
-            var columns = this._getDataColumns();
-
-            var options = {
-                enableCellNavigation:       true,
-                enableColumnReorder:        false,
-                multiColumnSort:            true,
-                autoHeight:                 true,
-                forceFitColumns:            true
-            };
-
-            // little workaround for constraining the height of the grid
-            var maxHeight = this._editor.getConfig().Menus.PROBABILITY_MENU_MAX_GRID_HEIGHT;
-            if ((data.length + 1) * 25 > maxHeight) {
-                options.autoHeight = false;
-                this._gridContainer.height(maxHeight);
-            }
-
+        _displayResultWithDataTables: function(columns, job_result_url) {
+            
             // clear container
-            this._gridContainer.empty();
-
-            // create new grid
-            this._grid = new Slick.Grid(this._gridContainer, data, columns, options);
-
-            // make rows selectable
-            this._grid.setSelectionModel(new Slick.RowSelectionModel());
-
-            // highlight the corresponding nodes if a row of the grid is selected
-            this._grid.onSelectedRowsChanged.subscribe(function(e, args) {
-                this._unhighlightConfiguration();
-
-                // only highlight the configuration if only one config is selected
-                if (args.rows.length == 1) {
-                    var configID = args.grid.getDataItem(args.rows[0])['id'];
-                    this._highlightConfiguration(configID);
-                }
-            }.bind(this));
-
-            // highlight rows on mouse over
-            this._grid.onMouseEnter.subscribe(function(e, args) {
-                var row = args.grid.getCellFromEvent(e)['row'];
-                args.grid.setSelectedRows([row]);
-            });
-            // unhighlight cells on mouse out
-            this._grid.onMouseLeave.subscribe(function(e, args) {
-                args.grid.setSelectedRows([]);
-            });
-
-            // enable sorting of the grid
-            this._grid.onSort.subscribe(function(e, args) {
-                var cols = args.sortCols;
-
-                data.sort(function (dataRow1, dataRow2) {
-                    for (var i = 0, l = cols.length; i < l; i++) {
-                        var field = cols[i].sortCol.field;
-                        var sign = cols[i].sortAsc ? 1 : -1;
-                        var value1 = dataRow1[field], value2 = dataRow2[field];
-                        var result = (value1 == value2 ? 0 : (value1 > value2 ? 1 : -1)) * sign;
-                        if (result != 0) {
-                            return result;
-                        }
-                    }
-                    return 0;
-                });
-
-                this._grid.invalidate();
-            }.bind(this));
+            this._tableContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');            
+            
+            var collapse_column = {
+                                    "class":          'details-control',
+                                    "orderable":      false,
+                                    "data":           null,
+                                    "defaultContent": '',
+                                    "bSortable":      false
+                                  };
+                                  
+            columns.push(collapse_column);
+            
+            //formating function for displaying configuration warnings/errors
+            var format = function (issues) {
+                    
+                    var errors   = issues['errors'] || [];
+                    var warnings = issues['warnings'] || [];
+                    
+                    return this._displayIsussuesList(errors, warnings);
+            }.bind(this);
+            
+            
+            // clear all cached metadata (from previous analysis run)
+            this._clearAllConfigurationMetaData();
+            
+            this._table = jQuery('#results_table').dataTable({
+                            "bProcessing":   true,
+                            "bFilter":       false,
+                            "bServerSide":   true,
+                            "sAjaxSource":   job_result_url,
+                            "aoColumns":     columns,
+                            "bLengthChange": false,
+                            "iDisplayLength": FaulttreeConfig.AnalysisMenu.RESULTS_TABLE_MAX_ROWS,
+                            "fnDrawCallback": function(oSettings) {
+                                
+                                var serverData = oSettings['json'];
+                                var totalRecords = serverData['iTotalRecords'];
+                               
+                                if(totalRecords < 2){
+                                     // unbind sorting events if there are less than 2 rows
+                                    this._tableContainer.find('th').removeClass().unbind('click.DT');    
+                                }
+                                
+                                if(totalRecords <= FaulttreeConfig.AnalysisMenu.RESULTS_TABLE_MAX_ROWS){
+                                     // remove pagination elements if only one page is displayed
+                                     this._tableContainer.find('div.dataTables_paginate').css('display', 'none');
+                                     this._tableContainer.find('div.dataTables_info').css('display', 'none');
+                                }
+                                
+                                // display points with highchart after table was rendered
+                                var configurations = serverData['aaData'];
+                                var chartData = {}; 
+                                 _.each(configurations, function(config) {
+                                     var configID = config['id'] || '';
+                                     
+                                     // collect chart data if given
+                                     if (typeof config['points'] !== 'undefined') {
+                                         chartData[configID] = _.sortBy(config['points'], function(point){ return point[0] });
+                                     }
+                                 }.bind(this));
+                                 
+                                 if (_.size(chartData) != 0) {
+                                     this._displaySeriesWithHighcharts(chartData);
+                                 }
+                                 else{
+                                     this._chart.setSize (0, 0, false);
+                                 }     
+                                }.bind(this),
+                            "fnRowCallback": function( nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                                
+                                // Callback is executed for each row (each row is one configuration)
+                                                
+                                var current_config = aData;
+                                var configID = current_config['id'];
+                                                    
+                                if ('choices' in current_config ){
+                                    var choices  = aData['choices'];
+                                    
+                                    // check if config meta data is alredy cached 
+                                    if (! (configID in this._configMetaDataCached)){
+                                        // remember the nodes and edges involved in this config for later highlighting
+                                        this._collectNodesAndEdgesForConfiguration(configID, choices);
+                                    
+                                    
+                                        // remember the redundancy settings for this config for later highlighting
+                                        this._redundancyNodeMap[configID] = {};
+                                        _.each(choices, function(choice, node) {
+                                            if (choice.type == 'RedundancyChoice') {
+                                                this._redundancyNodeMap[configID][node] = choice['n'];
+                                            }
+                                        }.bind(this));
+                                        
+                                        this._configMetaDataCached[configID] = true;
+                                    }
+                                    
+                                    jQuery(nRow).on("mouseover", function(){    
+                                            this._highlightConfiguration(configID);                                                
+                                     }.bind(this));
+                                     
+                                     
+                                     jQuery(nRow).on("mouseleave", function(){    
+                                            this._unhighlightConfiguration();                                                
+                                     }.bind(this));
+                                }
+                                /* Sample Configuration issues
+                                if (iDisplayIndex == 0){
+                                    current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""}]};
+                                } else if (iDisplayIndex == 1){
+                                    current_config["issues"] = { "warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}]};
+                                } else if (iDisplayIndex == 2){
+                                     current_config["issues"] = { "errors": [{"message": "map::at", "issueId": 0, "elementId": ""},{"message": "error error error", "issueId": 0, "elementId": ""}, {"message": "another error", "issueId": 0, "elementId": ""}], "warnings": [{"message": "Ignoring invalid redundancy configuration with k=-2 N=0", "issueId": 0, "elementId": "3"}, {"message": "another warning", "issueId": 0, "elementId": "3"}] };
+                                }*/
+                                if ('issues' in current_config){
+                                    var issues = current_config['issues'];
+                                    
+                                    jQuery(nRow).find('td.details-control').append('<i class="fa fa-exclamation-triangle"></i>');
+                                    // Add event listener for opening and closing details
+                                    jQuery(nRow).on('click', function () {
+                                        var tr  = jQuery(nRow);
+                                        var row = this._table.api().row(tr);
+ 
+                                        if ( row.child.isShown() ) {
+                                            // This row is already open - close it
+                                            row.child.hide();
+                                        }
+                                        else {
+                                            // Open this row
+                                            row.child(format(issues)).show();
+                                        }
+                                    }.bind(this));
+                                    
+                                    if ('errors' in issues){
+                                        jQuery(nRow).addClass('danger');
+                                    }
+                                    else if ('warnings' in issues){
+                                        jQuery(nRow).addClass('warning');
+                                    }
+                                }
+                                else{
+                                    // if row is not collapsable show default pointer
+                                    jQuery(nRow).css('cursor', 'default');
+                                } 
+                            }.bind(this),
+                                             
+                            "fnInitComplete": function(oSettings, json) {  
+                                    this._setupResizing();
+                                    // set minumum height of grid as the height of the first draw of the grid
+                                    this._tableContainer.css('min-height', this._tableContainer.height());
+                                    // keep container width when switching the page (-> otherwise jumping width when switching)
+                                    this.container.css('width', this.container.width());
+                                    
+                                }.bind(this)    
+                            });
+             
+            return this;
         },
-
+        
+        
+        
+        /*
+         * Method _clearAllConfigurationMetadata
+         *      Clear all global Dictionaries that contains cached informations about specific configurations
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
+         */
+            
+         _clearAllConfigurationMetaData: function() {
+             this._configNodeMap        = {};
+             this._configEdgeMap        = {};
+             this._redundancyNodeMap    = {};
+             this._configMetaDataCached = {};
+            
+             return this;
+         },
+        
         /**
          *  Method: _highlightConfiguration
-         *    Highlight all nodes and edges that are part of the given configuration.
-         *    Also display the N value on redundancy nodes.
+         *      Highlights all nodes, edges and n-values that are part of the given configuration on hover.
          *
          *  Parameters:
-         *    {String} configID - The ID of the configuration that should be highlighted.
+         *      {String} configID - The ID of the configuration that should be highlighted.
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
          */
         _highlightConfiguration: function(configID) {
             // prevents that node edge anchors are being displayed
@@ -648,17 +783,22 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             // highlight nodes
             _.invoke(this._configNodeMap[configID], 'highlight');
             // highlight edges
-            _.invoke(this._configEdgeMap[configID], 'setHover', true);
+            _.invoke(this._configEdgeMap[configID], 'highlight');
             // show redundancy values
             _.each(this._redundancyNodeMap[configID], function(value, nodeID) {
                 var node = this._editor.graph.getNodeById(nodeID);
                 node.showBadge('N=' + value, 'info');
-            }.bind(this))
+            }.bind(this));
+
+            return this;
         },
 
         /**
          *  Method: _unhighlightConfiguration
-         *    Remove all highlights from the graph.
+         *      Remove all hover highlights handler currently attached.
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
          */
         _unhighlightConfiguration: function() {
             // make the anchors visible again
@@ -667,59 +807,107 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
             // unhighlight all nodes
             _.invoke(this._editor.graph.getNodes(), 'unhighlight');
             // unhighlight all edges
-            _.invoke(this._editor.graph.getEdges(), 'setHover', false);
+            _.invoke(this._editor.graph.getEdges(), 'unhighlight');
             // remove all badges
             _.invoke(this._editor.graph.getNodes(), 'hideBadge');
-        },
 
+            return this;
+        },
+        
         /**
-         *  Method: _displayValidationErrors
-         *    Display all errors that are thrown during graph validation.
+         * Method: _displayGraphIssues
+         *      Display all warnings/errors that are thrown during graph validation.
          *
-         *  Parameters:
-         *    {Object} errors - A dictionary of error messages.
-         */
-        _displayValidationErrors: function(errors) {
-            //TODO: This is a temporary solution. Errors should be displayed per node later.
-            if (_.size(errors) == 1) {
-                Alerts.showErrorAlert('Analysis error: ', errors[0]);
-            } else {
-                var errorList = '<ul>';
-                _.each(errors, function(error) {
-                    errorList += '<li>' + error + '</li>';
-                });
-                errorList += '</ul>'
-                Alerts.showErrorAlert('Analysis errors: ', errorList);
-            }
-        },
-
-        /**
-         *  Method: _displayValidationWarnings
-         *    Display all warnings that are thrown during graph validation.
+         * Parameters:
+         *      {Object} warnings - An array of warning objects.
+         *      {Object} errors   - An array of error objects.
          *
-         *  Parameters:
-         *    {Object} warnings - A dictionary of warning messages.
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
          */
-        _displayValidationWarnings: function(warnings) {
-            //TODO: This is a temporary solution. Warnings should be displayed per node later.
-            if (_.size(warnings) == 1) {
-                Alerts.showWarningAlert('Warning:', warnings[0]);
-            } else {
-                var warningList = '<ul>';
-                _.each(warnings, function(warning) {
-                    warningList += '<li>' + warning + '</li>';
-                });
-                warningList += '</ul>'
-                Alerts.showWarningAlert('Multiple warnings returned from analysis:', warningList);
-            }
-        },
+        _displayGraphIssues: function(errors, warnings) {
 
+            var num_errors   = _.size(errors);
+            var num_warnings = _.size(warnings);
+            
+            var alert_container = jQuery('<div class="alert"><i class="fa fa-exclamation-triangle"></i></div>')
+            
+            if (num_errors > 0){
+                alert_container.addClass('alert-error');                
+            } else if(num_warnings >0){
+                alert_container.addClass('alert-warning');  
+            } else{
+                alert_container.addClass('alert-success');  
+            }
+            
+            var issues_heading   = jQuery('<a class="alert-link">\
+                                            Errors: ' + num_errors + '&nbsp;&nbsp;&nbsp;\
+                                            Warnings: ' + num_warnings +
+                                          '</a>');
+                                            
+            var issues_details   = jQuery('<div class="collapse">' + this._displayIsussuesList(errors, warnings) + '</div>');
+            
+            alert_container.append(issues_heading).append(issues_details);
+            
+            // collapse error/warning messages details after clicking on the heading
+            issues_heading.click(function(){
+                issues_details.collapse('toggle');
+            });
+            
+           this._graphIssuesContainer.append(alert_container);
+
+           return this;
+        },
+        
+        
         /**
-         *  Method: _displayJobError
-         *    Display an error massage resulting from a job error.
+         * Method: _displayIsussuesList
+         *      Display all errors/warnings in a HTML unordered list.
+         *
+         * Parameters:
+         *      {Object} warnings - An array of warning objects.
+         *      {Object} errors   - An array of error objects.
+         *
+         * Returns:
+         *     {String} contains HTML with error/warning messages.
+         */
+        _displayIsussuesList: function(errors, warnings){
+            var html_errors   = '';
+            var html_warnings = '';
+                   
+            
+            if(_.size(errors) > 0){
+                _.each(errors, function(error){
+                    html_errors += '<li>' + error['message'] + '</li>';
+                });
+                html_errors = '<li><strong>Errors:</strong></li><ul>' + html_errors + '</ul>';  
+            }
+            
+             if(_.size(warnings) > 0){        
+                _.each(warnings, function(warning){
+                    html_warnings += '<li>' + warning['message'] + '</li>';
+                });
+                html_warnings = '<li><strong>Warnings:</strong></li><ul>' + html_warnings + '</ul>';
+            }
+                            
+            return '<ul>' + 
+                        html_errors + 
+                        html_warnings + 
+                   '</ul>';
+                      
+        },
+        
+        /**
+         * Method: _displayJobError
+         *      Display an error massage resulting from a job error.
+         *
+         * Returns:
+         *      This {<AnalysisResultMenu>} for chaining.
          */
         _displayJobError: function(xhr) {
-            Alerts.showErrorAlert('An error occurred!', xhr.responseText || 'Are you still connected to the internet? If so it\'s our fault and we are working on it.');
+            Alerts.showErrorAlert(
+                'An error occurred!', xhr.responseText ||
+                'We were trying to trigger a computational job, but this crashed on our side. A retry may help. The developers are already informed, sorry for the inconvinience.');
             this.hide();
         }
     });
@@ -727,224 +915,130 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
     /**
      *  Class: AnalyticalProbabilityMenu
-     *    The menu responsible for displaying the results of the 'analytical' analysis.
+     *      The menu responsible for displaying the results of the 'analytical' analysis.
+     *
+     *  Extends: {<AnalyticalResultMenu>}
      */
     var AnalyticalProbabilityMenu = AnalysisResultMenu.extend({
-
         /**
-         *  Method: _setupContainer
-         *    Sets up the DOM container element for this menu and appends it to the DOM.
-         *
-         *  Returns:
-         *    A jQuery object of the container.
+         * Method: _containerID
+         *      Override of the abstract base class method.
          */
-        _setupContainer: function() {
-            return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU + '" class="menu" header="Analysis Results">\
-                    <div class="menu-controls">\
-                        <span class="menu-minimize"></span>\
-                        <span class="menu-close"></span>\
-                    </div>\
-                    <div class="chart"></div>\
-                    <div class="grid" style="width: 450px; padding-top: 5px;"></div>\
-                </div>'
-            )
-            .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+        _containerID: function() {
+            return FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU;
         },
-
+        
         /**
-         *  Method: _getDataColumns
-         *    _Abstract_, returns the format of columns that should be displayed with SlickGrid.
-         *
-         *  Returns:
-         *    An array of column descriptions. See https://github.com/mleibman/SlickGrid/wiki/Column-Options.
-         */
-        _getDataColumns: function() {
-            function shorten(row, cell, value) {
-                return Highcharts.numberFormat(value, 5);
-            }
-
-            return [
-                { id: 'id',     name: 'Config',     field: 'id',     sortable: true },
-                { id: 'min',    name: 'Min',        field: 'min',    sortable: true, formatter: shorten },
-                { id: 'peak',   name: 'Peak',       field: 'peak',   sortable: true, formatter: shorten },
-                { id: 'max',    name: 'Max',        field: 'max',    sortable: true, formatter: shorten },
-                { id: 'costs',  name: 'Costs',      field: 'costs',  sortable: true },
-                { id: 'ratio',  name: 'Risk',       field: 'ratio',  sortable: true, minWidth: 150}
-            ];
-        },
-
-        /**
-         *  Method: _chartTooltipFormatter
-         *    Function used to format the toolip that appears when hovering over a data point in the chart.
-         *    The scope object ('this') contains the x and y value of the corresponding point.
-         *
-         *  Returns:
-         *    A string that is displayed inside the tooltip. It may contain HTML tags.
-         */
-        _chartTooltipFormatter: function() {
-            return '<b>' + this.series.name + '</b><br/>' +
-                   '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
-                   '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
-        },
-
-        /**
-         *  Method: _progressMessage
-         *    Returns the message that should be displayed while the backend is calculating the result.
-         *
-         *  Returns:
-         *    A string with the message.
+         * Method: _progressMessage
+         *      Override of the abstract base class method.
          */
         _progressMessage: function() {
             return 'Running probability analysis...';
+        },
+        
+        /**
+         * Method: _menuHeader
+         *      Override of the abstract base class method.
+         */
+        _menuHeader: function() { 
+            return 'Analysis Results';
         }
     });
 
 
     /**
-     *  Class: SimulatedProbabilityMenu
-     *    The menu responsible for displaying the results of the 'analytical' analysis.
+     * Class: SimulatedProbabilityMenu
+     *      The menu responsible for displaying the results of the 'analytical' analysis.
+     *
+     * Extends: AnalysisResultMenu
      */
-    var SimulatedProbabilityMenu = AnalysisResultMenu.extend({
-
+    var SimulatedProbabilityMenu = AnalysisResultMenu.extend({      
         /**
-         *  Method: _setupContainer
-         *    Sets up the DOM container element for this menu and appends it to the DOM.
-         *
-         *  Returns:
-         *    A jQuery object of the container.
+         * Method: _containerID
+         *      Override of the abstract base class method.
          */
-        _setupContainer: function() {
-            return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU + '" class="menu" header="Simulation Results">\
-                    <div class="menu-controls">\
-                        <span class="menu-minimize"></span>\
-                        <span class="menu-close"></span>\
-                    </div>\
-                    <div class="chart"></div>\
-                    <div class="grid" style="width: 450px; padding-top: 5px;"></div>\
-                </div>'
-            )
-            .appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+        _containerID: function() {
+            return FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU;
         },
-
+        
         /**
-         *  Method: _getDataColumns
-         *    _Abstract_, returns the format of columns that should be displayed with SlickGrid.
-         *
-         *  Returns:
-         *    An array of column descriptions. See https://github.com/mleibman/SlickGrid/wiki/Column-Options.
-         */
-        _getDataColumns: function() {
-            function shorten(row, cell, value) {
-                return Highcharts.numberFormat(value, 5);
-            }
-
-            return [
-                { id: 'id',          name: 'Config',      field: 'id',          sortable: true },
-                { id: 'mttf',        name: 'MTTF',        field: 'mttf',        sortable: true },
-                { id: 'reliability', name: 'Reliability', field: 'reliability', sortable: true },
-                { id: 'rounds',      name: 'Rounds',      field: 'rounds',      sortable: true },
-                { id: 'failures',    name: 'Failures',    field: 'failures',    sortable: true },
-                { id: 'costs',       name: 'Costs',       field: 'costs',       sortable: true },
-                { id: 'ratio',       name: 'Risk',        field: 'ratio',       sortable: true, minWidth: 150}
-            ];
-        },
-
-        /**
-         *  Method: _chartTooltipFormatter
-         *    Function used to format the tooltip that appears when hovering over a data point in the chart.
-         *    The scope object ('this') contains the x and y value of the corresponding point.
-         *
-         *  Returns:
-         *    A string that is displayed inside the tooltip. It may contain HTML tags.
-         */
-        _chartTooltipFormatter: function() {
-            //TODO: adapt to JSON format
-            return '<b>' + this.series.name + '</b><br/>' +
-                   '<i>Probability:</i> <b>' + Highcharts.numberFormat(this.x, 5) + '</b><br/>' +
-                   '<i>Membership Value:</i> <b>' + Highcharts.numberFormat(this.y, 2) + '</b>';
-        },
-
-        /**
-         *  Method: _progressMessage
-         *    Returns the message that should be displayed while the backend is calculating the result.
-         *
-         *  Returns:
-         *    A string with the message.
+         * Method: _progressMessage
+         *      Override of the abstract base method.
          */
         _progressMessage: function() {
             return 'Running simulation...';
+        },
+        
+        /**
+         * Method: _menuHeader
+         *      Override of the abstract base class method.
+         */
+        _menuHeader: function() { 
+            return 'Simulation Results';
         }
     });
 
-
     /**
-     *  Class: FaulttreeEditor
+     * Class: FaulttreeEditor
+     *      Faulttree-specific <Base::Editor> class. The fault tree editor distinguishes from the 'normal' editor by
+     *      their ability to calculate minimal cutsets for the displayed graph.
      *
-     *  Faulttree-specific <Base::Editor> class. The fault tree editor distinguishes from the 'normal' editor by their
-     *  ability to calculate minimal cutsets for the displayed graph.
-     *
-     *  Extends: <Base::Editor>
+     * Extends: <Base::Editor>
      */
     return Editor.extend({
         /**
-         *  Group: Members
-         *
-         *  Properties:
-         *    {<CutsetsMenu>}               cutsetsMenu               - The <CutsetsMenu> instance used to display the
-         *                                                              calculated minimal cutsets.
-         *    {<AnalyticalProbabilityMenu>} analyticalProbabilityMenu - The <AnalyticalProbabilityMenu> instance used to
-         *                                                              display the probability of the top event.
-         *    {<SimulatedProbabilityMenu>} simulatedProbabilityMenu  - The <SimulatedProbabilityMenu> instance used to
-         *                                                              display the probability of the top event.
+         * Group: Members
+         *      {<CutsetsMenu>}               cutsetsMenu               - The <CutsetsMenu> instance used to display the
+         *                                                                calculated minimal cutsets.
+         *      {<AnalyticalProbabilityMenu>} analyticalProbabilityMenu - The <AnalyticalProbabilityMenu> instance used
+         *                                                                to display the probability of the top event.
+         *      {<SimulatedProbabilityMenu>}  simulatedProbabilityMenu  - The <SimulatedProbabilityMenu> instance used
+         *                                                                to display the probability of the top event.
          */
         cutsetsMenu:               undefined,
         analyticalProbabilityMenu: undefined,
         simulatedProbabilityMenu:  undefined,
 
         /**
-         *  Group: Initialization
+         * Group: Accessors
          */
 
         /**
          *  Group: Accessors
          */
 
+        getFactory: function() {
+            return new Factory(undefined, 'faulttree');
+        },
+
         /**
          *  Method: getConfig
          *
-         *  Returns:
-         *    The <FaulttreeConfig> object.
-         *
-         *  See also:
-         *    <Base::Editor::getConfig>
+         * Returns:
+         *      The <FaulttreeConfig> object.
          */
         getConfig: function() {
             return FaulttreeConfig;
         },
 
         /**
-         *  Method: getGraphClass
+         * Method: getGraphClass
+         *      Overrides the abstract base method.
          *
-         *  Returns:
-         *    The <FaulttreeGraph> class.
-         *
-         *  See also:
-         *    <Base::Editor::getGraphClass>
+         * Returns:
+         *      The <FaulttreeGraph> class.
          */
         getGraphClass: function() {
             return FaulttreeGraph;
         },
 
         /**
-         *  Group: Setup
+         * Group: Setup
          */
-
         _loadGraphCompleted: function(readOnly) {
             //this.cutsetsMenu     = new CutsetsMenu(this);
-            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this);
-            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this);
+            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this.factory, this);
+            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this.factory, this);
 
             this._setupCutsetsAction()
                 ._setupAnalyticalProbabilityAction()
@@ -956,11 +1050,11 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         /**
-         *  Method: _setupCutsetsAction
-         *    Registers the click handler for the 'cut set analysis' menu entry.
+         * Method: _setupCutsetsAction
+         *      Registers the click handler for the 'cut set analysis' menu entry.
          *
-         *  Returns:
-         *    This editor instance for chaining.
+         * Returns:
+         *      This {<FaulttreeEditor>} instance for chaining.
          */
         _setupCutsetsAction: function() {
             jQuery("#"+this.config.IDs.ACTION_CUTSETS).click(function() {
@@ -975,17 +1069,18 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
 
         /**
          *  Method: _setupExportPDFAction
-         *    Registers the click handler for the 'export PDF document' menu entry.
+         *      Registers the click handler for the 'export PDF document' menu entry.
          *
-         *  Returns:
-         *    This editor instance for chaining.
+         * Returns:
+         *      This {<FaulttreeEditor>} instance for chaining.
          */
         _setupExportPDFAction: function() {
             jQuery("#"+this.config.IDs.ACTION_EXPORT_PDF).click(function() {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_GRAPH_EXPORT_PDF,
-                    function(url) {
-                        this._downloadFileFromURL(url, 'pdf');
+                    function(issues, job_result_url) {
+                        this._downloadFileFromURL(job_result_url, 'pdf');
+
                     }.bind(this)
                 )
             }.bind(this));
@@ -994,18 +1089,19 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         /**
-         *  Method: _setupExportEPSAction
-         *    Registers the click handler for the 'export EPS document' menu entry.
+         * Method: _setupExportEPSAction
+         *      Registers the click handler for the 'export EPS document' menu entry.
          *
-         *  Returns:
-         *    This editor instance for chaining.
+         * Returns:
+         *      This {<FaulttreeEditor>} instance for chaining.
          */
         _setupExportEPSAction: function() {
             jQuery("#"+this.config.IDs.ACTION_EXPORT_EPS).click(function() {
                 jQuery(document).trigger(
                     this.config.Events.EDITOR_GRAPH_EXPORT_EPS,
-                    function(url) {
-                        this._downloadFileFromURL(url, 'eps');
+                    function(issues, job_result_url) {
+                        this._downloadFileFromURL(job_result_url, 'eps');
+
                     }.bind(this)
                 )
             }.bind(this));
@@ -1014,13 +1110,13 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         /**
-         *  Method: _setupAnalyticalProbabilityAction
-         *    Registers the click handler for the 'analytical analysis' menu entry. Clicking will
-         *    issue an asynchronous backend call which returns a <Job> object that can be queried for the final result.
-         *    The job object will be used to initialize the analytical probability menu.
+         * Method: _setupAnalyticalProbabilityAction
+         *      Registers the click handler for the 'analytical analysis' menu entry. Clicking will issue an
+         *      asynchronous backend call which returns a <Job> object that can be queried for the final result. The
+         *      job object will be used to initialize the analytical probability menu.
          *
-         *  Returns:
-         *    This editor instance for chaining.
+         * Returns:
+         *      This {<FaulttreeEditor>} instance for chaining.
          */
         _setupAnalyticalProbabilityAction: function() {
             jQuery("#"+this.config.IDs.ACTION_ANALYTICAL).click(function() {
@@ -1033,13 +1129,13 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         /**
-         *  Method: _setupSimulatedProbabilityAction
-         *    Registers the click handler for the 'simulated analysis' menu entry. Clicking will
-         *    issue an asynchronous backend call which returns a <Job> object that can be queried for the final result.
-         *    The job object will be used to initialize the simulated probability menu.
+         * Method: _setupSimulatedProbabilityAction
+         *      Registers the click handler for the 'simulated analysis' menu entry. Clicking will issue an asynchronous
+         *      backend call which returns a <Job> object that can be queried for the final result. The job object will
+         *      be used to initialize the simulated probability menu.
          *
-         *  Returns:
-         *    This editor instance for chaining.
+         * Returns:
+         *      This {<FaulttreeEditor>} instance for chaining.
          */
         _setupSimulatedProbabilityAction: function() {
             jQuery("#"+this.config.IDs.ACTION_SIMULATED).click(function() {
@@ -1052,16 +1148,56 @@ function(Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts) {
         },
 
         /**
-         *  Method: _downloadFileFromURL
-         *    Triggers a download of the given resource. At the moment, it only opens it in the current window.
+         * Method: _downloadFileFromURL
+         *      Triggers a download of the given resource.
          *
-         *  Parameters:
-         *    {String} url - The URL to the file to be downloaded.
+         * Parameters:
+         *      {String} url - The URL to the file to be downloaded.
+         *
+         * Returns:
+         *      This {<FaulttreeEditor>} instance for chaining.
          */
         _downloadFileFromURL: function(url, format) {
-            //TODO: maybe we can use more sophisticated methods here to get the file to download directly instead
-            //      of opening in the same window
+            //TODO: File is already downloaded in the _query method (job class), maybe first or second download should be prevented if possible.
             window.location = url;
+        },
+
+        _setupMenuActions: function() {
+            this._super();
+
+            jQuery('#' + this.config.IDs.ACTION_CLONE).click(function() {
+                this._cloneSelection();
+            }.bind(this));
+
+            return this;
+        },
+
+        _cloneSelection: function(event) {
+            var selected = jQuery('.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE);
+
+            // we will only clone the selection, if a single node is selected
+            if (selected.length === 1) {
+                // temporarily hide the properties menu to avoid, that it shows the newly created node's individual
+                //    properties, as it is supposed to show the common properties with it's original node (i.e. the
+                //    NodeGroup's properties)
+                this.properties.hide();
+
+                var node  = this.graph.getNodeById(selected.data(this.config.Keys.NODE).id);
+
+                if (!node.cloneable) return false;
+
+                var clone = this.graph._clone(node);
+
+                if (clone) {
+                    // highlight the newly generated node by selecting it
+                    this._deselectAll();
+                    clone.select();
+                }
+
+                // allow the properties menu to be shown again
+                this.properties.show();
+            }
+            // otherwise do nothing
         }
     });
 });

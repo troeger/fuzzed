@@ -1,26 +1,56 @@
 define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'label', 'alerts', 'jquery', 'underscore'],
 function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
+    /**
+     * Package: Base
+     */
 
+    /**
+     * Function: isNumber
+     *      Small helper function that checks the parameter for being a number and not 'NaN'.
+     *
+     * Parameters:
+     *      {Object} number - object to be checked for being a number
+     *
+     * Returns:
+     *      A {Boolean} indicating whether the passed parameter is a number.
+     */
     var isNumber = function(number) {
         return _.isNumber(number) && !_.isNaN(number);
     };
-	
+
+    /**
+     * Abstract Class: Property
+     *      Abstract base implementation of a node property. A property models a key-value-attribute. It contains e.g.
+     *      the name, cost, probability... of a node. It is only used as a data object and DOES NOT take care of its
+     *      visual representation.
+     *
+     *      In line with that, properties may have a <Mirror> that will reflect the properties current value below a
+     *      node. Additionally a property has a reference to his <PropertyMenuEntry> which will allow the modification
+     *      of the property value by the user through a visual element (think: text input, checkbox...).
+     *
+     *      Properties can be declared readonly or hidden, which will accordingly prevent the modification of visual
+     *      display.
+     *
+     */
     var Property = Class.extend({
         owner:          undefined,
+        mirrorers:      undefined,
         value:          undefined,
         displayName:    '',
-        mirror:         undefined,
+        mirrors:        undefined,
         label:          undefined,
         menuEntry:      undefined,
         hidden:         false,
         readonly:       false,
         partInCompound: undefined,
 
-        init: function(owner, definition) {
+        init: function(owner, mirrorers, definition) {
             jQuery.extend(this, definition);
             this.owner = owner;
+            this.mirrorers = mirrorers;
+            this.mirrors = [];
             this._sanitize()
-                ._setupMirror()
+                ._setupMirrors()
                 ._setupLabel()
                 ._setupMenuEntry();
 
@@ -54,18 +84,17 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             this._triggerChange(newValue, issuer);
 
             if (propagate) {
-                var properties = {};
-                // compound parts need another format for backend propagation
-                var value = typeof this.partInCompound === 'undefined' ? newValue : [this.partInCompound, newValue];
-                properties[this.name] = value;
-
                 //TODO: IS THIS REALLY THE RIGHT WAY TO DO IT?
                 // (we cannot put the require as dependency of this module, as there is some kind of cyclic dependency
                 // stopping Node.js to work properly)
+                var Edge       = require('edge');
+                var Node       = require('node');
+                var NodeGroup  = require('node_group');
+                var properties = {};
 
-                var Edge =      require("edge");
-                var Node =      require("node");
-                var NodeGroup = require("node_group");
+                // compound parts need another format for backend propagation
+                var value = typeof this.partInCompound === 'undefined' ? newValue : [this.partInCompound, newValue];
+                properties[this.name] = value;
 
                 if (this.owner instanceof Edge) {
                     jQuery(document).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
@@ -74,9 +103,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
                 } else if (this.owner instanceof NodeGroup) {
                     jQuery(document).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [this.owner.id, properties]);
                 } else {
-                    throw new TypeError ("unknown owner class")
+                    throw new TypeError ('unknown owner class');
                 }
-
             }
 
             return this;
@@ -90,16 +118,14 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         setHidden: function(newHidden) {
             this.hidden = newHidden;
-
-             jQuery(this).trigger(Config.Events.PROPERTY_HIDDEN_CHANGED, [newHidden]);
+            jQuery(this).trigger(Config.Events.PROPERTY_HIDDEN_CHANGED, [newHidden]);
 
             return this;
         },
 
         setReadonly: function(newReadonly) {
             this.readonly = newReadonly;
-
-             jQuery(this).trigger(Config.Events.PROPERTY_READONLY_CHANGED, [newReadonly]);
+            jQuery(this).trigger(Config.Events.PROPERTY_READONLY_CHANGED, [newReadonly]);
 
             return this;
         },
@@ -114,23 +140,46 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             return this;
         },
 
-        _setupMirror: function() {
+        _setupMirrors: function() {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
 
-            this.mirror = new Mirror(this, this.owner.container, this.mirror);
+            _.each(this.mirrorers, function(mirrorer) {
+                this.mirrors.push(this.factory.create('Mirror', this, mirrorer.container, this.mirror));
+            }.bind(this));
 
             return this;
         },
 
+        restoreMirrors: function() {
+            this._setupMirrors()
+                ._triggerChange(this.value, this);
+        },
+
+        removeMirror: function(mirror) {
+            if (!_.contains(this.mirrors, mirror)) return false;
+
+            mirror.takeDownVisualRepresentation();
+            this.mirrors = _.without(this.mirrors, mirror);
+            return true;
+        },
+
+        removeAllMirrors: function() {
+            _.each(this.mirrors, function(mirror) {
+                this.removeMirror(mirror);
+            }.bind(this));
+            return true;
+        },
+
         _setupLabel: function() {
             if (typeof this.label === 'undefined' || this.label === null) return this;
-            this.label = new Label(this, this.owner.jsPlumbEdge, this.label);
+            this.label = this.factory.create('Label', this, this.owner.jsPlumbEdge, this.label);
 
             return this;
         },
 
         _setupMenuEntry: function() {
-            this.menuEntry = new (this.menuEntryClass())(this);
+            //TODO: put this into the factory
+            this.menuEntry = new (this.menuEntryClass())(this.factory, this);
 
             return this;
         },
@@ -139,10 +188,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             //TODO: IS THIS REALLY THE RIGHT WAY TO DO IT?
             // (we cannot put the following required modules as dependency of this module, as there is some kind of
             // cyclic dependency stopping Node.js to work properly
-
-            var Edge =      require("edge");
-            var Node =      require("node");
-            var NodeGroup = require("node_group");
+            var Edge      = require('edge');
+            var Node      = require('node');
+            var NodeGroup = require('node_group');
 
             if (this.owner instanceof Node) {
                 jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
@@ -151,6 +199,8 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             } else if (this.owner instanceof NodeGroup) {
                 jQuery(this).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [value, value, issuer]);
             }
+
+            return this;
         }
     });
 
@@ -182,9 +232,9 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             return PropertyMenuEntry.ChoiceEntry;
         },
 
-        init: function(owner, definition) {
+        init: function(owner, mirrorers, definition) {
             definition.values = typeof definition.values === 'undefined' ? definition.choices : definition.values;
-            this._super(owner, definition);
+            this._super(owner, mirrorers, definition);
         },
 
         validate: function(value, validationResult) {
@@ -211,7 +261,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         _triggerChange: function(value, issuer) {
             var index = -1;
-            for (var i = this.values.length - 1; i >=0; i--) {
+            for (var i = this.values.length - 1; i >=0; --i) {
                 if (_.isEqual(this.values[i], value)) {
                     index = i;
                     break;
@@ -265,6 +315,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         toDict: function() {
             var obj = {};
             obj[this.name] = { 'value': [this.value, this.parts[this.value].value] };
+
             return obj;
         },
 
@@ -280,6 +331,22 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             }
 
             return true;
+        },
+
+        restoreMirrors: function() {
+            _.each(this.parts, function(part) {
+                part.restoreMirrors();
+            });
+
+            this._super();
+        },
+
+        removeAllMirrors: function() {
+            this._super();
+
+            _.each(this.parts, function(part) {
+                part.removeAllMirrors();
+            });
         },
 
         _sanitize: function() {
@@ -307,7 +374,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
                     partInCompound: index,
                     value: index === this.value ? value : undefined
                 });
-                parsedParts[index] = from(this.owner, partDef);
+                parsedParts[index] = from(this.factory, this.owner, this.mirrorers, partDef);
             }.bind(this));
 
             this.parts = parsedParts;
@@ -593,11 +660,11 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         transferGraphs: undefined,
 
-        init: function(owner, definition) {
+        init: function(owner, mirrorers, definition) {
             jQuery.extend(this, definition);
             this.owner = owner;
             this._sanitize()
-                ._setupMirror()
+                ._setupMirrors()
                 ._setupMenuEntry()
                 .fetchTransferGraphs();
         },
@@ -676,34 +743,34 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
         }
     });
 
-    var from = function(owner, definition) {
+    //TODO: put this into the factory
+    var from = function(factory, owner, mirrorers, definition) {
         switch (definition.kind) {
-            case 'bool':     return new Bool(owner, definition);
-            case 'choice':   return new Choice(owner, definition);
-            case 'compound': return new Compound(owner, definition);
-            case 'epsilon':  return new Epsilon(owner, definition);
-            case 'numeric':  return new Numeric(owner, definition);
-            case 'range':    return new Range(owner, definition);
-            case 'text':     return new Text(owner, definition);
-			case 'textfield':return new InlineTextField(owner, definition);
-            case 'transfer': return new Transfer(owner, definition);
+            case 'bool':     return new Bool(factory, owner, mirrorers, definition);
+            case 'choice':   return new Choice(factory, owner, mirrorers, definition);
+            case 'compound': return new Compound(factory, owner, mirrorers, definition);
+            case 'epsilon':  return new Epsilon(factory, owner, mirrorers, definition);
+            case 'numeric':  return new Numeric(factory, owner, mirrorers, definition);
+            case 'range':    return new Range(factory, owner, mirrorers, definition);
+            case 'text':     return new Text(factory, owner, mirrorers, definition);
+			case 'textfield':return new InlineTextField(factory, owner, mirrorers, definition);
+            case 'transfer': return new Transfer(factory, owner, mirrorers, definition);
 
             default: throw ValueError('unknown property kind ' + definition.kind);
         }
     };
 
     return {
-        Bool:      			Bool,
-        Choice:    			Choice,
-        Compound:  			Compound,
-        Epsilon:   			Epsilon,
-        Numeric:   			Numeric,
-        Property:  			Property,
-        Range:     			Range,
-        Text:      			Text,
-		InlineTextField: 	InlineTextField,
-        Transfer:  			Transfer,
-
-        from: 				from
+        Bool:            Bool,
+        Choice:          Choice,
+        Compound:        Compound,
+        Epsilon:         Epsilon,
+        Numeric:         Numeric,
+        Property:  		 Property,
+        Range:     		 Range,
+        Text:            Text,
+		InlineTextField: InlineTextField,
+        Transfer:        Transfer,
+        from:            from
     };
 });

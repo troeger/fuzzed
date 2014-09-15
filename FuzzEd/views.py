@@ -1,22 +1,23 @@
-import urllib, datetime
+import json
+import urllib
+import datetime
+import logging
 
 from django.core.mail import mail_managers
-
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
-
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
-from FuzzEd.models import Graph, Project, Notification, notations, commands
+
+from FuzzEd.models import Graph, Project, notations, commands, Sharing
 import FuzzEd.settings
 
-import logging
+
 logger = logging.getLogger('FuzzEd')
 
 GREETINGS = [
@@ -86,9 +87,13 @@ def projects(request):
     Returns:
      {HttpResponse} a django response object
     """
-    projects = (request.user.projects.filter(deleted=False) | request.user.own_projects.filter(deleted=False)).order_by('-created')
+    user = request.user
+    
+    projects = (user.projects.filter(deleted=False) | user.own_projects.filter(deleted=False)).order_by('-created')
 
-    parameters = {'projects':[ project.to_dict() for project in projects]}
+    parameters = {'projects': [ project.to_dict() for project in projects],
+                  'user':     user      
+                 }
 
     # provide notification box on the projects overview page, if something is available for this user
     try:
@@ -160,8 +165,61 @@ def project_edit(request, project_id):
     
     # something was not quite right here
     raise HttpResponseBadRequest()
-        
 
+def shared_graphs_dashboard(request):        
+    """
+    Function: shared_graphs    
+        
+    This handler function is responsible for rendering a list of graphs that have been shared with the current user.
+    Shared in this context means the user isn't the owner but is allowed to view a certain graph in read-only mode.
+    The graphs are listed within a specific dashboard that offers the option to remove sharing of certain gaphs.
+    
+    Parameters:
+     {HttpResponse} request  - a django request object
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    user = request.user
+    
+    if request.method == 'GET':
+        
+        sharings = user.sharings.all()
+        
+        if not sharings:
+            return redirect('projects')
+            
+        shared_graphs = [sharing.graph for sharing in sharings]
+        
+        # projects in which the actual user is owner or member and that were recently modified are proposed to the user
+        proposal_limit = 3
+        project_proposals = Project.objects.filter(Q(deleted=False),Q(users = request.user)|Q(owner = request.user)).order_by('-modified')[:proposal_limit]
+        
+        
+        parameters = {'graphs':    [(notations.by_kind[graph.kind]['name'], graph) for graph in shared_graphs],
+                      'proposals': [ project.to_dict() for project in project_proposals]           
+                     }
+        
+        return render(request, 'dashboard/shared_graphs_dashboard.html', parameters)
+    
+    elif request.method == 'POST':
+        POST = request.POST
+        
+        if POST.get('unshare'):
+            
+            selected_graphs = POST.getlist('graph_id[]')
+            
+            sharings = [get_object_or_404(Sharing, user=user, graph_id=graph_id) for graph_id in selected_graphs]
+            
+            for sharing in sharings:
+                sharing.delete()
+            
+            return redirect('shared_graphs_dashboard')
+            
+            
+    # something is not right with the request
+    return HttpResponseBadRequest()
+    
 @login_required
 def dashboard(request, project_id):
     """
@@ -183,13 +241,14 @@ def dashboard(request, project_id):
         raise Http404
     
     # projects in which the actual user is owner or member and that were recently modified are proposed to the user
-    proposal_limit =5
+    proposal_limit = 3
     project_proposals = Project.objects.filter(Q(deleted=False),Q(users = request.user)|Q(owner = request.user)).exclude(id=project.id).order_by('-modified')[:proposal_limit]
     
     graphs = project.graphs.filter(deleted=False).order_by('-created')
     parameters = {'graphs': [(notations.by_kind[graph.kind]['name'], graph) for graph in graphs],
                   'project': project.to_dict(),
-                  'proposals': [ project.to_dict() for project in project_proposals]
+                  'proposals': [ project.to_dict() for project in project_proposals],
+                  'user': request.user
                  }
 
     return render(request, 'dashboard/dashboard.html', parameters)
@@ -234,13 +293,104 @@ def dashboard_new(request, project_id, kind):
     return HttpResponseBadRequest()
 
 @login_required
-def dashboard_edit(request, graph_id):
+def dashboard_edit(request, project_id):
     """
     Function: dashboard_edit
     
+    This handler function is responsible for allowing the user to perform certain actions (copying, deleting, creating snapshots, sharing) on multiple graphs simultaneously.
+    For this purpose a button toolbar is rendered in the view with which the user can submit a list of graphs in order to perform a specific action.
+    
+    Parameters:
+     {HttpResponse} request    - a django request object
+     {int}          project_id - id of the dashboard specific project
+    
+    Returns:
+     {HttpResponse} a django response object
+    """
+    project = get_object_or_404(Project, pk=project_id)
+
+    POST = request.POST
+
+    # Save determination of chosen graphs
+    if "graph_id[]" in POST:
+        # Coming directly from a form with <select> entries
+        selected_graphs = POST.getlist('graph_id[]')
+    elif "graph_id_list" in POST:
+        # Coming from a stringified list stored by ourselves
+        selected_graphs = json.loads(POST.get('graph_id_list'))
+    graphs = [ get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False) for graph_id in selected_graphs]
+
+    if POST.get('share'):
+        # "Share" button pressed for one or multiple graphs
+        users = User.objects.exclude(pk=request.user.pk)
+        parameters = {
+            'project': project,
+            'users': users,
+            'graph_id_list': json.dumps([graph.pk for graph in graphs])
+        }
+        return render(request, 'dashboard/dashboard_share.html', parameters)
+
+    elif POST.get("share_save"):
+        # Save choice of users for the graphs
+        user_ids = POST.getlist('users')
+        users = [get_object_or_404(User, pk=user_id) for user_id in user_ids]
+
+        for graph in graphs:
+            for user in users:
+                # check if graph is already shared with the specific user
+                if not Sharing.objects.filter(user=user, graph=graph).exists():
+                    sharing = Sharing(graph = graph, user=user)
+                    sharing.save()
+            users_str = ','.join([u.visible_name() for u in users])
+            messages.add_message(request, messages.SUCCESS, "'%s' shared with %s."%(graph, users_str ))
+        return redirect('dashboard', project_id = project.id)
+
+    elif POST.get('copy'):
+        # "Copy" button pressed for one or multiple graphs
+        for old_graph in graphs:
+            duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
+                                                          owner=request.user,  add_default_nodes=False, project=project)
+            duplicate_command.do()
+            
+            new_graph = duplicate_command.graph
+            new_graph.copy_values(old_graph)
+            new_graph.save()
+    
+        messages.add_message(request, messages.SUCCESS, 'Duplication successful.')
+        return redirect('dashboard', project_id = project.id)
+    
+    elif POST.get('snapshot'):
+        # "Snapshot" button pressed for one or multiple graphs
+        for old_graph in graphs:
+            duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
+                                                          owner=request.user, add_default_nodes=False, project=project)
+            duplicate_command.do()
+            
+            new_graph = duplicate_command.graph
+            new_graph.copy_values(old_graph)
+            new_graph.read_only = True
+            new_graph.save()
+    
+        messages.add_message(request, messages.SUCCESS, 'Snapshot creation sucessful.')
+        return redirect('dashboard', project_id=project.id)
+    
+    elif POST.get('delete'):
+        # "Delete" button pressed for one or multiple graphs
+        for graph in graphs:
+            graph.sharings.all().delete() # all graph sharings will be deleted irretrievably
+            commands.DeleteGraph.create_from(graph.pk).do()
+        
+        messages.add_message(request, messages.SUCCESS, 'Deletion sucessful.')
+        return redirect('dashboard', project_id = project.id)
+    
+    return HttpResponseBadRequest()
+        
+def graph_settings(request, graph_id):        
+    """
+    Function: graph_settings    
+        
     This handler function is responsible for allowing the user to edit the properties of an already existing graph.
-    Therefore the system renders a edit dialog to the user where changes can be made and saved or the graph can be
-    deleted.
+    Therefore the system renders a settings dialog to the user where changes can be made and saved for the graph.
     
     Parameters:
      {HttpResponse} request  - a django request object
@@ -249,64 +399,54 @@ def dashboard_edit(request, graph_id):
     Returns:
      {HttpResponse} a django response object
     """
-    graph = get_object_or_404(Graph, pk=graph_id, owner=request.user)
-    project = graph.project
+    graph = get_object_or_404(Graph, pk=graph_id, owner = request.user)
+    project = get_object_or_404(Project, pk=graph.project.pk, owner = request.user)
     
-    POST  = request.POST
-
-    # the owner made changes to the graph's field, better save it (if we can)
-    if POST.get('save'):
+    POST = request.POST
+    
+    # the owner made changes to the graph's fields, better save it (if we can)
+    if POST.get('save'):        
+        # changes in the graphs name
         graph.name = POST.get('name', '')
         graph.save()
-        messages.add_message(request, messages.SUCCESS, 'Graph saved.')
-        return redirect('dashboard', project_id = project.id)
-
-    # deletion requested? do it and go back to dashboard
-    elif POST.get('delete'):
-        commands.DeleteGraph.create_from(graph_id).do()
-        messages.add_message(request, messages.SUCCESS, 'Graph deleted.')
-        return redirect('dashboard', project_id = project.id)
-
-    # copy requested
-    elif POST.get('copy'):
-        old_graph = Graph.objects.get(pk=graph_id)
-        duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
-                                                          owner=request.user,  add_default_nodes=False, project=project)
-        duplicate_command.do()
-        new_graph = duplicate_command.graph
-
-        new_graph.copy_values(old_graph)
-        new_graph.save()
-
-        messages.add_message(request, messages.SUCCESS, 'Graph duplicated.')
-        return redirect('dashboard', project_id = project.id)
-
-    elif POST.get('snapshot'):
-        old_graph = Graph.objects.get(pk=graph_id)
-        duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
-                                                          owner=request.user, add_default_nodes=False, project=project)
-        duplicate_command.do()
-        new_graph = duplicate_command.graph
-
-        new_graph.copy_values(old_graph)
-        new_graph.read_only = True
-        new_graph.save()
-
-        messages.add_message(request, messages.SUCCESS, 'Created snapshot.')
-        return redirect('dashboard', project_id=project.id)
-
-
+        
+        # added/removed viewers from the graph
+        user_ids = POST.getlist('users')
+        
+        new_users = set([get_object_or_404(User, pk=user_id) for user_id in user_ids])
+        old_users = set([sharing.user for sharing in graph.sharings.all()])
+        
+        users_to_add = new_users - old_users
+        users_to_remove = old_users - new_users
+        
+        for user in users_to_add:
+            sharing = Sharing(graph = graph, user = user)
+            sharing.save()
+            
+        for user in users_to_remove:
+            sharing = Sharing.objects.get(graph = graph, user = user)
+            sharing.delete()
+        
+        messages.add_message(request, messages.SUCCESS, 'Saved new graph settings.')
+        return redirect('dashboard', project_id = project.pk)
+        
     # please show the edit page to the user on get requests
     elif POST.get('edit') or request.method == 'GET':
+        
+        users = User.objects.exclude(pk=request.user.pk)
+        shared_users = [ sharing.user for sharing in graph.sharings.all()]
+        
         parameters = {
             'graph': graph,
-            'kind':  notations.by_kind[graph.kind]['name']
+            'kind':  notations.by_kind[graph.kind]['name'],
+            'users': users,
+            'shared_users' : shared_users
         }
         return render(request, 'dashboard/dashboard_edit.html', parameters)
-
+    
     # something was not quite right here
-    raise HttpResponseBadRequest()
-
+    return HttpResponseBadRequest()
+        
 @login_required
 def settings(request):
     """
@@ -383,8 +523,9 @@ def editor(request, graph_id):
         'graph':          graph,
         'graph_notation': notation,
         'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
-        'greetings':      GREETINGS, 
-        'project' :       project.to_dict()
+        'greetings':      GREETINGS,
+        'project':        project,
+        'user':           request.user
     }
 
     return render(request, 'editor/editor.html', parameters)
@@ -405,13 +546,13 @@ def snapshot(request, graph_id):
     Returns:
      {HttpResponse} a django response object
     """
-    if request.user.is_staff:
-        graph    = get_object_or_404(Graph, pk=graph_id)
-    else:
-        graph    = get_object_or_404(Graph, pk=graph_id, owner=request.user, deleted=False)
-    if not graph.read_only:
-        return HttpResponseBadRequest()
-
+    
+    graph    = get_object_or_404(Graph, pk=graph_id)
+    
+    # either current user is admin, owner of the graph, or graph is shared with the user
+    if not (request.user.is_staff or graph.owner == request.user or graph.sharings.filter(user = request.user)):
+        raise Http404    
+    
     project  = graph.project    
     notation = notations.by_kind[graph.kind]
     nodes    = notation['nodes']
@@ -421,7 +562,8 @@ def snapshot(request, graph_id):
         'graph_notation': notation,
         'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
         'greetings':      GREETINGS,
-        'project':        project.to_dict()
+        'project':        project,
+        'user':           request.user
     }
 
     return render(request, 'editor/editor.html', parameters)
