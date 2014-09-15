@@ -11,9 +11,6 @@ function(Factory, FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
      * Extends: <Faulttree::FaultTreeEditor>
      */
     return FaulttreeEditor.extend({
-        init: function(graphId) {
-            if (typeof Factory.kind === 'undefined') Factory.kind = 'fuzztree';
-            this._super(graphId);
-        }
+        // nothing to overwrite here
     });
 });

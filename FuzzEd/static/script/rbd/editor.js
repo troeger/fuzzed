@@ -10,9 +10,6 @@ define(['factory', 'editor', 'rbd/graph', 'rbd/config'], function(Factory, Edito
      * Extends: <Base::Editor>
      */
     return Editor.extend({
-        init: function(graphId) {
-            if (typeof Factory.kind === 'undefined') Factory.kind = 'rbd';
-            this._super(graphId);
-        }
+        // nothing to overwrite here
     });
 });

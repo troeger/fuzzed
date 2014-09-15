@@ -11,11 +11,6 @@ define(['factory', 'editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 
      *  Extends: <Base::Editor>
      */
     return Editor.extend({
-        init: function(graphId) {
-            if (typeof Factory.kind === 'undefined') Factory.kind = 'dfd';
-            this._super(graphId);
-        },
-
         /**
          *  Group: Accessors
          */

@@ -999,11 +999,6 @@ function(Factory, Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
         analyticalProbabilityMenu: undefined,
         simulatedProbabilityMenu:  undefined,
 
-        init: function(graphId) {
-            if (typeof Factory.kind === 'undefined') Factory.kind = 'faulttree';
-            this._super(graphId);
-        },
-
         /**
          * Group: Setup
          */
