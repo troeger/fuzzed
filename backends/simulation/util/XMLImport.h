@@ -6,9 +6,11 @@
 #endif
 #include <boost/filesystem/path.hpp>
 
-/************************************************************************/
-/* Abstract XML File importer.											*/
-/************************************************************************/
+/**
+ * Class: XMLImport
+ *
+ * A utility class for loading XML documents using pugixml.
+ */
 class XMLImport
 {
 public:

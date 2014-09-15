@@ -1,6 +1,11 @@
 #pragma once
 #include "Types.h"
 
+/**
+ * Class: Condition
+ *
+ * A boolean condition on a petri net marking.
+ */
 class Condition
 {
 public:
