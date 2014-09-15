@@ -18,15 +18,29 @@ typedef tuple<string, string, int, ArcType>	ArcSpec;
 typedef vector<ArcSpec> ArcList;
 typedef multimap<unsigned int, TimedTransition*> TransitionTimeMapping;
 
+/**
+ * Class: PetriNet
+ *
+ * A representation of a Generalized Stochastic Petri Net (GSPN).
+ */
 class PetriNet
 {
-	friend class PetriNetSimulation; // ugh.
-	friend class SequentialConstraint; // yikes.
+	friend class PetriNetSimulation;
+	friend class SequentialConstraint;
 
 public:
 	typedef std::shared_ptr<PetriNet> Ptr;
 
 	// explicit constructor, from file import
+	/**
+	 * Constructor: PetriNet
+	 * 
+	 * Parameters:
+	 * 	immediateTransitions - a list of immediate transitions, which fire at once when they are enabled.
+	 *	timedTransitions - a list of timed transitions, which fire after an exponentially distributed delay.
+	 *	places - a map of place identifiers to places, containing a number of tokens.
+	 *	arcDict - a description of the connections between places and transitions. Each entry has the form [from id, to id, number of tokens consumed, type (normal/inhibitor)]
+	 */
 	PetriNet(
 		const vector<ImmediateTransition>& immediateTransitions, 
 		const vector<TimedTransition>& timedTransitions, 
@@ -38,7 +52,13 @@ public:
 
 	virtual ~PetriNet();
 
-	// returns the next time a timed transition fires and increases internal time counter
+	/**
+	 * Function: nextFiringTime
+	 * Returns the next time a timed transition fires and increases internal time counter.
+	 *
+	 * Parameters:
+	 *	currentTime - the current discrete time tick, from which the next firing needs to be determinated.
+	 */
 	unsigned int nextFiringTime(const unsigned int& currentTime);
 
 	void updateFiringTime(TimedTransition* tt);
@@ -50,27 +70,58 @@ public:
 	
 	double averageFiringTime()	const { return m_avgFiringTime; }
 
-	// check if simulation can be terminated
+	/**
+	 * Function: failed
+	 * Returns whether the simulation can be terminated, because the top event place contains a token (i.e., the corresponding tree has 'failed').
+	 */
 	bool failed() const;
 
-	// check if an invalid marking (due to a wrong sequence of events) was reached
+	/**
+	 * Function: markingInvalid
+	 * Returns whether an invalid marking (due to a wrong sequence of events) was reached.
+	 */
 	bool markingInvalid() const;
 
-	// check if cold spares could yet become activated
+	// 
+	/**
+	 * Function: hasInactiveTransitions
+	 * Returns whether some immediate transitions have not yet fired, although they could be enabled (this happens when spares could yet become activated).
+	 */
 	bool hasInactiveTransitions() const;
 
-	// reduce number of places and immediate transitions which are not essential for the net semantics
+	/**
+	 * Function: simplify
+	 * Reduces the places and immediate transitions which are not essential for the net semantics.
+	 */
 	void simplify();
 
 	bool valid() const;
 
+	/**
+	 * Function: generateRandomFiringTimes
+	 * Samples a random firing time for each timed transition, and saves the activated timed transitions separately. Tries to ensure that no two timed transitions have the same firing time.
+	 */
 	void generateRandomFiringTimes();
+	
+	/**
+	 * Function: restoreInitialMarking
+	 * Resets the entire net (all place markings and transition firing times) to its initial state. Necessary for Monte carlo simulation.
+	 * 
+	 * See also: <PetriNetSimulation::runOneRound>
+	 */
 	void restoreInitialMarking();
 
 protected:
-	// uses the information in m_arcDict to tell each transition about its in- and out-places
+	/**
+	 * Function: setup
+	 * Uses the information in m_arcDict to tell each transition about its in- and out-places.
+	 */
 	void setup();
 
+	/**
+	 * Function: applyToAllTransitions
+	 * Utility method for applying a lambda function to all transitions in the petri net.
+	 */
 	void applyToAllTransitions(std::function<void (Transition& t)> func);
 
 	vector<ImmediateTransition> m_immediateTransitions; 

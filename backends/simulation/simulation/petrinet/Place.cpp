@@ -69,7 +69,6 @@ void Place::resolveConflictsImmediate(int tick)
 	assert(hasRequests());
 
 	// TODO handle weights?
-
 	ImmediateTransition* maxPrioIT = nullptr;
 	for (auto i = m_transitionQueue.begin(); i != m_transitionQueue.end(); )
 	{
