@@ -2,7 +2,7 @@
 #include "FuzzyProbability.h"
 #include "StaticProbability.h"
 
-const std::string& BasicEvent::getTypeDescriptor()
+const std::string& BasicEvent::getTypeDescriptor() const
 {
 	static const std::string str = "basicEvent";
 	return str;

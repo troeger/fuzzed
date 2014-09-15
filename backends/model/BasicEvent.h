@@ -10,7 +10,7 @@ public:
 	BasicEvent(const std::string id) : AbstractNode(id) {};
 
 	virtual void toPetriNet(PetriNet* pn) override { /*TODO*/ };
-	virtual const std::string& getTypeDescriptor();
+	virtual const std::string& getTypeDescriptor() const override;
 
 	void setProbability(const pugi::xml_node& probabilityNode);
 

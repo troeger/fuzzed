@@ -19,6 +19,8 @@ public:
 	virtual const std::string& getTypeDescriptor() const = 0;
 	
 	const std::string& getId()		{ return m_id; };
+	const std::string& getName()	{ return m_name; };
+	
 	const unsigned int& getCost()	{ return m_cost; };
 	const bool& isOptional()		{ return m_optional; };
 
@@ -26,6 +28,8 @@ public:
 protected:
 	bool m_optional;
 	unsigned int m_cost;
+
+	std::string m_name;
 	std::string m_id;
 
 	std::vector<AbstractNode*> m_children;

@@ -1,29 +1,18 @@
 project(fuzztreeconfiguration)
 
 set(SOURCES
-  FuzzTreeTransform.cpp
+  FuzzTreeConfigurationGenerator.cpp
   FuzzTreeConfiguration.cpp
-  TreeHelpers.cpp
   main.cpp
 )
 
 set(HEADERS
-  FuzzTreeTransform.h
+  FuzzTreeConfigurationGenerator.h
   FuzzTreeConfiguration.h
-  TreeHelpers.h
-  VerificationResult.h
   platform.h
 )
 
-if (VARIADIC_TEMPLATES)
-  set(SOURCES ${SOURCES}
-    PrintVisitor.cpp)
-
-  set(HEADERS ${HEADERS}
-    Visitor.h
-    Visitable.h
-    PrintVisitor.h)
-endif(VARIADIC_TEMPLATES)
+include_directories()
 
 # Compile as library for usage from analysis executable
 add_library(ftconfiguration STATIC ${SOURCES} ${HEADERS})

@@ -229,9 +229,13 @@ set(COMMON_SOURCES
 	${MODEL_DIR}/Faulttree.cpp
 	${MODEL_DIR}/TopEvent.cpp
 	${MODEL_DIR}/OrGate.cpp
+	${MODEL_DIR}/VotingOrGate.cpp
 	${MODEL_DIR}/AndGate.cpp
 	${MODEL_DIR}/BasicEvent.cpp
 	${MODEL_DIR}/AbstractModel.cpp
+
+	${MODEL_DIR}/FeatureVariationPoint.cpp
+	${MODEL_DIR}/RedundancyVariationPoint.cpp
 
 	${COMMON_DIR}/util.cpp
 	#${COMMON_DIR}/xmlutil.cpp
@@ -251,9 +255,18 @@ set(COMMON_HEADERS
 	${MODEL_DIR}/Faulttree.h
 	${MODEL_DIR}/AbstractModel.h
 	${MODEL_DIR}/AbstractNode.h
+
+	${MODEL_DIR}/EventSet.h
+	${MODEL_DIR}/BasicEventSet.h
+	${MODEL_DIR}/IntermediateEventSet.h
+
+	${MODEL_DIR}/FeatureVariationPoint.h
+	${MODEL_DIR}/RedundancyVariationPoint.h
+
 	${MODEL_DIR}/BasicEvent.h
 	${MODEL_DIR}/TopEvent.h
 	${MODEL_DIR}/OrGate.h
+	${MODEL_DIR}/VotingOrGate.h
 	${MODEL_DIR}/AndGate.h
 	${MODEL_DIR}/AbstractProbability.h
 	${MODEL_DIR}/StaticProbability.h
@@ -276,6 +289,8 @@ set(COMMON_HEADERS
 
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
 add_executable(common_model_test test_common_model.cpp ${COMMON_SOURCES} ${COMMON_HEADERS})
+
+include_directories(${COMMON_DIR})
 target_link_libraries(common_model ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB})
 target_link_libraries(common_model_test ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB})
 
