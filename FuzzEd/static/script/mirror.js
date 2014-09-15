@@ -1,4 +1,4 @@
-define(['config', 'canvas', 'class', 'jquery', 'underscore'], function(Config, Canvas, Class) {
+define(['factory', 'config', 'canvas', 'class', 'jquery', 'underscore'], function(Factory, Config, Canvas, Class) {
     /**
      * Package: Base
      */

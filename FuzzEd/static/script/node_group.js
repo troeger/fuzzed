@@ -1,4 +1,5 @@
-define(['property', 'class', 'canvas', 'config', 'jquery', 'd3'], function(Property, Class, Canvas, Config) {
+define(['factory', 'property', 'class', 'canvas', 'config', 'jquery', 'd3'],
+function(Factory, Property, Class, Canvas, Config) {
     /**
      * Package: Base
      */
@@ -88,8 +89,8 @@ define(['property', 'class', 'canvas', 'config', 'jquery', 'd3'], function(Prope
                 }
 
                 property.name = propertyName;
-                this.properties[propertyName] = this.factory.getClassModule('Property')
-                                                            .from(this.factory, this, [ this ], property);
+                this.properties[propertyName] = Factory.getModule('Property')
+                                                            .from(this, [ this ], property);
             }.bind(this));
 
             return this;

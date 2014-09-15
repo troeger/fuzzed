@@ -1,5 +1,5 @@
-define(['graph', 'rbd/node', 'rbd/config', 'json!notations/rbd.json'],
-function(Graph, RbdNode, RbdConfig, RbdNotation) {
+define(['factory', 'graph', 'rbd/node', 'rbd/config', 'json!notations/rbd.json'],
+function(Factory, Graph, RbdNode, RbdConfig, RbdNotation) {
     /**
      * Package: RBD
      */

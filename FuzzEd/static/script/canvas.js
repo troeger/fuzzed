@@ -1,4 +1,4 @@
-define(['class', 'config', 'jquery-ui', 'jquery-classlist'], function(Class, Config) {
+define(['factory', 'class', 'config', 'jquery-ui', 'jquery-classlist'], function(Factory, Class, Config) {
     /**
      * Package: Base
      */

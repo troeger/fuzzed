@@ -1,4 +1,4 @@
-define(['bignumber'], function(BigNumber) {
+define(['factory', 'bignumber'], function(Factory, BigNumber) {
     /**
      * Package: Base
      */

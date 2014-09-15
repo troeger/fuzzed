@@ -1,4 +1,4 @@
-define(['node_group', 'config'], function(NodeGroup, Config) {
+define(['factory', 'node_group', 'config'], function(Factory, NodeGroup, Config) {
 
     /**
      * Package: Faulttree
@@ -32,8 +32,8 @@ define(['node_group', 'config'], function(NodeGroup, Config) {
                 }
 
                 property.name = propertyName;
-                this.properties[propertyName] = this.factory.getClassModule('Property')
-                                                            .from(this.factory, this, this.nodes, property);
+                this.properties[propertyName] = Factory.getClassModule('Property')
+                                                            .from(this, this.nodes, property);
             }.bind(this));
 
             return this;

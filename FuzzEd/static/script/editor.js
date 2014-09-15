@@ -1,5 +1,5 @@
-define(['class', 'factory', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist', 'jsplumb'],
-function(Class, Factory, Menus, Canvas, Backend, Alerts, Progress) {
+define(['factory', 'class', 'menus', 'canvas', 'backend', 'alerts', 'progress_indicator', 'jquery-classlist', 'jsplumb'],
+function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
     /**
      *  Package: Base
      */
@@ -54,13 +54,11 @@ function(Class, Factory, Menus, Canvas, Backend, Alerts, Progress) {
          *      {Number} graphId - The ID of the graph that is going to be edited by this editor.
          */
         init: function(graphId) {
-            this.factory = this.getFactory();
-
             if (typeof graphId !== 'number')
                 throw new TypeError('numeric graph ID', typeof graphId);
 
-            this.config   = this.getConfig();
-            this._backend = Backend.establish(this.factory, graphId);
+            this.config   = Factory.getModule('Config');
+            this._backend = Backend.establish(graphId);
 
             // remember certain UI elements
             this._progressIndicator = jQuery('#' + this.config.IDs.PROGRESS_INDICATOR);
@@ -75,37 +73,6 @@ function(Class, Factory, Menus, Canvas, Backend, Alerts, Progress) {
 
             // fetch the content from the backend
             this._loadGraph(graphId);
-        },
-
-        /**
-         * Group: Accessors
-         */
-
-        getFactory: function() {
-            throw new SubclassResponsibility();
-        },
-
-        /**
-         * Method: getConfig
-         *      _Abstract_, needs to be overridden in specific editor classes.
-         *
-         * Returns:
-         *      The {<Config>} object that corresponds to the loaded graph's kind.
-         */
-        getConfig: function() {
-            throw new SubclassResponsibility();
-        },
-
-        /**
-         * Method: getGraphClass
-         *      _Abstract_, needs to be overridden in specific editor classes.
-         *
-         * Returns:
-         *      The specific {<Graph>} class that should be used to instantiate the editor's graph with information
-         *      loaded from the backend.
-         */
-        getGraphClass: function() {
-            throw new SubclassResponsibility();
         },
 
         /**
@@ -144,9 +111,9 @@ function(Class, Factory, Menus, Canvas, Backend, Alerts, Progress) {
         _loadGraphCompleted: function(readOnly) {
             // create manager objects for the bars
             //TODO: put this into the factory
-            this.properties = new Menus.PropertiesMenu(this.factory, this.graph.getNotation().propertiesDisplayOrder);
-            this.shapes     = new Menus.ShapeMenu(this.factory);
-            this.layout     = new Menus.LayoutMenu(this.factory);
+            this.properties = new Menus.PropertiesMenu(this.graph.getNotation().propertiesDisplayOrder);
+            this.shapes     = new Menus.ShapeMenu();
+            this.layout     = new Menus.LayoutMenu();
             this.graph.layoutMenu = this.layout;
             this._backend.activate();
 
@@ -189,7 +156,7 @@ function(Class, Factory, Menus, Canvas, Backend, Alerts, Progress) {
          *      This {<Editor>} instance for chaining.
          */
         _loadGraphFromJson: function(json) {
-            this.graph = this.factory.create('Graph', json);
+            this.graph = Factory.create('Graph', json);
             this._loadGraphCompleted(json.readOnly);
 
             return this;

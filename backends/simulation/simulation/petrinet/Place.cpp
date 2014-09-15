@@ -57,7 +57,7 @@ void Place::resolveConflictsTimed(int)
 	assert(hasRequests());
 
 	// always take the first transition.
-	// this is not strictly correct. TODO implement arbitrary precision random numbers or something
+	// this is not strictly correct. TODO implement arbitrary precision random numbers.
 	TimedTransition* tt = dynamic_cast<TimedTransition*>(*m_transitionQueue.begin());
 	tt->fire();
 	m_transitionQueue.clear();
@@ -69,7 +69,6 @@ void Place::resolveConflictsImmediate(int tick)
 	assert(hasRequests());
 
 	// TODO handle weights?
-
 	ImmediateTransition* maxPrioIT = nullptr;
 	for (auto i = m_transitionQueue.begin(); i != m_transitionQueue.end(); )
 	{

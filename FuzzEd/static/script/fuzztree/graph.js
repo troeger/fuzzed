@@ -1,5 +1,5 @@
-define(['faulttree/graph', 'fuzztree/node', 'fuzztree/config', 'json!notations/fuzztree.json'],
-function(FaulttreeGraph, FuzztreeNode, FuzztreeConfig, FuzztreeNotation) {
+define(['factory', 'faulttree/graph', 'fuzztree/node', 'fuzztree/config', 'json!notations/fuzztree.json'],
+function(Factory, FaulttreeGraph, FuzztreeNode, FuzztreeConfig, FuzztreeNotation) {
     /**
      *  Package: Fuzztree
      */

@@ -1,4 +1,4 @@
-define(['class', 'config', 'jquery'], function(Class, Config) {
+define(['factory', 'class', 'config', 'jquery'], function(Factory, Class, Config) {
     /**
      * Package: Base
      */

@@ -1,4 +1,4 @@
-define(['dfd/config', 'node', 'jquery', 'jsplumb'], function(Config, AbstractNode) {
+define(['factory', 'dfd/config', 'node', 'jquery', 'jsplumb'], function(Factory, Config, AbstractNode) {
     /**
      * Package: DFD
      */

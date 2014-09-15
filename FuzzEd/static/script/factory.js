@@ -9,12 +9,8 @@ function(Class) {
      *
      *  TODO: documentation
      */
-    return Class.extend({
+    var Factory = Class.extend({
         kind: undefined,
-
-        init: function(kind) {
-            this.kind = kind;
-        },
 
         // create's first argument is the name of the base class, we want to create an instance of
         //  all other arguments are passed directly into the class constructor
@@ -22,12 +18,12 @@ function(Class) {
             // arguments is just an "array-like" object, not an actual array, so we have to convert it into an actual array
             var args = Array.prototype.slice.call(arguments);
 
-            // if baseCls already is a constructor and not a class-string
+            // if baseCls already is a constructor and not a string describing the desired class
             if (typeof baseCls === 'function') {
                 //console.log('[-] Creating a ' + baseCls + ' directly from given constructor.')
                 creation = this._construct(baseCls, args.slice(1));
             } else {
-            // if baseCls is a string describing the demanded class (most common case)
+            // if baseCls is a string describing the desired class (most common case)
                 var resolveObj = this._resolveClassName(baseCls);
                 var path = resolveObj.path;
                 var clsModule = require(path);
@@ -45,8 +41,8 @@ function(Class) {
                         && typeof clsModule[resolveObj.fullClassName].prototype !== 'undefined') {
                     creation = this._construct(clsModule[resolveObj.fullClassName], args.slice(1));
 
-                // our third try is to find the wanted class inside the found package, but this time named in
-                //  as the baseCls (e.g. NodeGroup)
+                // our third try is to find the wanted class inside the found package, but this time named as the
+                //  baseCls (e.g. NodeGroup)
                 } else if (typeof clsModule[resolveObj.cls]           !== 'undefined'
                         && typeof clsModule[resolveObj.cls].prototype !== 'undefined') {
                     creation = this._construct(clsModule[resolveObj.cls], args.slice(1));
@@ -61,22 +57,18 @@ function(Class) {
             }
         },
 
-        getClassModule: function(baseCls) {
+        getModule: function(baseCls) {
             var resolveObj = this._resolveClassName(baseCls);
             //console.log('Successfully resolved class module for ' + baseCls + ' from ' + resolveObj.path);
             return require(resolveObj.path);
         },
 
         _construct: function(constructor, args) {
-            function Creation(that) {
-                // here come's the magic: every object that we create automatically gets a reference to this factory, so
-                //  that it doesn't have to build any class instances on its own – yeah, i know, i'm an overly attached
-                //  factory
-                return constructor.apply(this, [ that ].concat(args));
+            function Creation() {
+                return constructor.apply(this, args);
             }
             Creation.prototype = constructor.prototype;
-            var that = this;
-            return new Creation(that);
+            return new Creation();
         },
 
         _resolveClassName: function(cls, kind) {
@@ -123,11 +115,17 @@ function(Class) {
         },
 
         _baseKind: function(kind) {
-            if (kind === 'fuzztree') {
+            // this is the part where we hardcode any inheritances _not_ from the abstract editor.
+            // we assume, that in most of the cases editors inherit directly from the abstract editor, so any other
+            //  case has to be described here.
+
+            if (kind === 'fuzztree') { // Fuzztrees inherit form Faulttrees
                 return 'faulttree';
             } else {
                 return false;
             }
         }
     });
+
+    return new Factory();
 });

@@ -1,4 +1,4 @@
-define(['fuzztree/config', 'faulttree/node'], function(Config, FaulttreeNode) {
+define(['factory', 'fuzztree/config', 'faulttree/node'], function(Factory, Config, FaulttreeNode) {
     /**
      * Package: Fuzztree
      */

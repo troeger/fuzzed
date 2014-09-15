@@ -1,5 +1,5 @@
-define(['property', 'mirror', 'canvas', 'class', 'config', 'jquery', 'jsplumb'],
-function(Property, Mirror, Canvas, Class, Config) {
+define(['factory', 'property', 'mirror', 'canvas', 'class', 'config', 'jquery', 'jsplumb'],
+function(Factory, Property, Mirror, Canvas, Class, Config) {
     /**
      * Package: Base
      */
@@ -527,7 +527,7 @@ function(Property, Mirror, Canvas, Class, Config) {
                 }
 
                 property.name = propertyName;
-                this.properties[propertyName] = this.factory.getClassModule('Property').from(this.factory, this, [ this ], property);
+                this.properties[propertyName] = Factory.getModule('Property').from(this, [ this ], property);
             }.bind(this));
 
             return this;
