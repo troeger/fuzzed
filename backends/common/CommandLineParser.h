@@ -2,11 +2,11 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/program_options.hpp>
 
-/************************************************************************/
-/* Parses the command line for an input and output path specification.	*/
-/* Exits the application on invalid options								*/
-/************************************************************************/
-
+/**
+ * Class: CommandLineParser
+ * Parses the command line for an input and output path specification.
+ * Exits the application on invalid options.
+ */
 class CommandLineParser
 {
 public:

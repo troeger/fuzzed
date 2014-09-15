@@ -31,7 +31,6 @@ class PetriNet
 public:
 	typedef std::shared_ptr<PetriNet> Ptr;
 
-	// explicit constructor, from file import
 	/**
 	 * Constructor: PetriNet
 	 * 

@@ -65,8 +65,22 @@ public:
 	 * Afterwards, the marking is at most m_capacity.
 	 */
 	void produceTokens(int numTokens);
+
+	/**
+	 * Function: consumeTokens
+	 * Removes a number of tokens, consumed by a transition.
+	 * Afterwards, the marking is at least 0.
+	 */
 	void consumeTokens(Transition* const t, int numTokens);
-	void requestTokens(Transition* const t);
+
+	/**
+	 * Function: requestTokens
+	 * Called to add a transition to the set of transitions considered by conflict resolution.
+	 *
+	 * Parameters:
+	 * 	transition - the transition which wants to consume tokens.
+	 */
+	void requestTokens(Transition* const transition);
 
 	const bool isTopLevelPlace() const { return m_semantics == TOP_LEVEL_PLACE; }
 	const bool isConstraintPlace() const { return m_semantics ==  CONSTRAINT_VIOLATED_PLACE; }
