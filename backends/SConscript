@@ -1,0 +1,30 @@
+import platform
+
+env = Environment()
+
+# Build backend modules by triggering CMake
+# TODO: This is obviousely a hack, build directly with SCons 
+if platform.system() == "Darwin":
+    cmake_call = "cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 backends/"
+else:
+    cmake_call = "cmake backends/"
+
+makefile = env.Command('Makefile', 'CMakeLists.txt', cmake_call)
+
+ftconfiguration_targets = 'lib/ftconfiguration_exe'
+ftconfiguration = env.Command(ftconfiguration_targets, 
+                              [Dir('fuzztreeconfiguration'), makefile],
+                              'make ftconfiguration_exe')
+Alias('ftconfiguration', ftconfiguration)
+
+ftanalysis_targets = 'lib/ftanalysis_exe'
+ftanalysis = env.Command(ftanalysis_targets, 
+                         [Dir('fuzztreeanalysis'), makefile],
+                         'make ftanalysis_exe')
+Alias('ftanalysis', ftanalysis)
+
+ftsimulation_targets = 'lib/ftsimulation_exe'
+ftsimulation = env.Command(ftsimulation_targets, 
+                         [Dir('simulation'), makefile],
+                         'make ftsimulation')
+Alias('ftsimulation', ftsimulation)

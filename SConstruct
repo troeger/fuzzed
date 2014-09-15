@@ -6,11 +6,14 @@
     - Add clean target for .pyc files.
 '''
 
-import os
+import os, platform
 
 #./site_scons automatically becomes part of the Python search path
 # Add our own builders to the SCons environment
 env=Environment(tools=['default', fuzzed_builders])
+
+# Include SCons file 
+SConscript(['backends/SConscript'])
 
 # NaturalDocs generation - 'docs' target
 docs_targets = Dir('docs')
@@ -69,7 +72,8 @@ env.Tikz( tikz_targets,
 Alias('shapes', tikz_targets)
 
 # Default targets when nothing is specified
-env.Default('docs', 'css', 'settings', 'xml', 'notations', 'shapes')
+env.Default('docs', 'css', 'settings', 'xml', 'notations', 'shapes',
+            'ftanalysis', 'ftsimulation')
 
 # Special pseudo-targets to run stuff via Scons
 AlwaysBuild(env.Command('run.server', None, server))
