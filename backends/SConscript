@@ -1,6 +1,7 @@
 import platform
 
-env=Environment(tools=['default', fuzzed_builders])
+env=Environment(
+  tools=['default', fuzzed_builders])  
 
 # Build backend modules by triggering CMake
 # TODO: This is obviousely a hack, build directly with SCons instead

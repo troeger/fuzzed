@@ -8,7 +8,8 @@ from FuzzEd.settings import VERSION
 
 #./site_scons automatically becomes part of the Python search path
 # Add our own builders to the SCons environment
-env=Environment(tools=['default', fuzzed_builders])
+env=Environment(
+  tools=['default', fuzzed_builders])  
 
 # Decide which build mode we have here
 # development: Prepare everything for Mac OS X machine in dev mode
@@ -25,18 +26,38 @@ env['mode']=mode
 # Include SCons file for backend daemons
 SConscript('backends/SConscript')
 
-# package generation - 'package.backend' target
-package_backend = "FuzzEdBackend-%s"%VERSION
-env.PackageBackend( package_backend,
-                    [Dir("lib"),
-                     "initscript.sh",
-                     "daemon.py",
-                     "daemon.ini",
-                     Dir("rendering")],
-                     chdir='backends'
+# Static files generation - 'static-release' target
+statics = env.Command( Dir('FuzzEd/static-release'), 
+                       Dir('FuzzEd/static'), 
+                       './manage.py collectstatic -v3 --noinput'
+                      )
+Clean(statics, 'FuzzEd/static-release')
+
+# Web package generation - 'package.web' target
+package_web = env.Package(
+                     "dist/FuzzEd-%s"%VERSION, 
+                     [Dir("FuzzEd/api"),
+                      Dir("FuzzEd/lib"),
+                      Dir("FuzzEd/management"),
+                      Dir("FuzzEd/migrations"),
+                      Dir("FuzzEd/models"),
+                      Dir("FuzzEd/static-release"),
+                      Dir("FuzzEd/templates"),
+                      Glob("FuzzEd/*"),
+                     "manage.py"]
+                  )
+Alias('package.web', package_web)
+
+# Backend package generation - 'package.backend' target
+package_backend = env.Package(
+                     "dist/FuzzEdBackend-%s"%VERSION, 
+                     [Dir("backends/lib"),
+                     "backends/initscript.sh",
+                     "backends/daemon.py",
+                     "backends/daemon.ini",
+                     Dir("backends/rendering")]
                   )
 Alias('package.backend', package_backend)
-
 
 # NaturalDocs generation - 'docs' target
 docs_targets = Dir('docs')
