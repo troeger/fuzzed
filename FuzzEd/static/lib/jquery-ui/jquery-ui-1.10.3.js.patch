@@ -1,3 +1,11 @@
-1155a1156,1157
->         if (this.options.containment) this._setContainment();
-> 
+--- jquery-ui-1.10.3.js.original	2014-09-15 13:35:36.392189258 +0200
++++ jquery-ui-1.10.3.js	2014-09-15 13:37:42.812188325 +0200
+@@ -1153,6 +1153,8 @@
+ 	},
+ 
+ 	_mouseDrag: function(event, noPropagation) {
++        if (this.options.containment) this._setContainment();
++
+ 		// reset any necessary cached properties (see #5009)
+ 		if ( this.offsetParentCssPosition === "fixed" ) {
+ 			this.offset.parent = this._getParentOffset();
