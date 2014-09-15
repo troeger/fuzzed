@@ -13,28 +13,32 @@ else:
     cmake_call = "cmake ."
 makefile = env.Command(['CMakeCache.txt','Makefile'], 'CMakeLists.txt', cmake_call,
                         chdir='backends')
+Clean(makefile, 'backends/CMakeFiles')
 AlwaysBuild(makefile)
 
 # Build configuration engine
-ftconfiguration_targets = 'ftconfiguration_exe'
+ftconfiguration_targets = 'lib/ftconfiguration_exe'
 ftconfiguration = env.Command(ftconfiguration_targets, 
                               [Dir('fuzztreeconfiguration'), makefile],
                               'make ftconfiguration_exe',
                               chdir='backends')
+Clean(ftconfiguration, 'backends/CMakeFiles')
 Alias('ftconfiguration', ftconfiguration)
 
 # Build analysis engine
-ftanalysis_targets = 'ftanalysis_exe'
+ftanalysis_targets = 'lib/ftanalysis_exe'
 ftanalysis = env.Command(ftanalysis_targets, 
                          [Dir('fuzztreeanalysis'), makefile],
                          'make ftanalysis_exe',
                          chdir='backends')
+Clean(ftanalysis, 'backends/CMakeFiles')
 Alias('ftanalysis', ftanalysis)
 
 # Build simulation engine
-ftsimulation_targets = 'ftsimulation_exe'
+ftsimulation_targets = 'lib/ftsimulation_exe'
 ftsimulation = env.Command(ftsimulation_targets, 
                          [Dir('simulation'), makefile],
                          'make ftsimulation',
                          chdir='backends')
+Clean(ftsimulation, 'backends/CMakeFiles')
 Alias('ftsimulation', ftsimulation)

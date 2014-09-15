@@ -1,9 +1,6 @@
 '''
   The central SCons file for this project, which is based on a set of FuzzEd-specific
   builders stored in the site_scons folder.
-
-  TODO:
-    - Add clean target for .pyc files.
 '''
 
 import os, platform, socket
@@ -14,6 +11,9 @@ from FuzzEd.settings import VERSION
 env=Environment(tools=['default', fuzzed_builders])
 
 # Decide which build mode we have here
+# development: Prepare everything for Mac OS X machine in dev mode
+# vagrant:     Prepare everything for Vagrant Ubuntu Trusty machine in dev mode
+# production:  Prepare everything for Ubuntu Trusty machine in production
 if socket.getfqdn() == 'vagrant-ubuntu-trusty-32':
     mode = "vagrant"
 else:
