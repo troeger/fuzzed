@@ -10,11 +10,11 @@
 #include <set>
 #include <map>
 
-/************************************************************************/
-/* Imports a PNML document												*/
-/* generates lists of Timed/Immediate Transitions and Places from it    */
-/************************************************************************/
-
+/**
+ * Class: PNMLImport
+ * 
+ * A class which imports a PNML document and generates lists of timed/immediate transitions and places from it
+ */
 class PNMLImport : public XMLImport
 {
 public:
