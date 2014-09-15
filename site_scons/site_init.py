@@ -3,7 +3,7 @@ from pyxb_builder import pyxbbuilder
 from conf_builder import confbuilder
 from tikz_builder import tikzbuilder
 from notations_builder import notationsbuilder
-from package_builder import packagebuilder
+from package_builder import packageweb, packagebackend
 from run_commands import *
 
 def fuzzed_builders(env):
@@ -14,6 +14,7 @@ def fuzzed_builders(env):
 					'PyXB' : pyxbbuilder,
 					'Tikz' : tikzbuilder,
 					'Notations' : notationsbuilder,
-					'Package' : packagebuilder
+					'PackageWeb' : packageweb,
+					'PackageBackend' : packagebackend					
 				})
 

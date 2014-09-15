@@ -1,15 +1,29 @@
 import platform
+import package_builder
+from FuzzEd.settings import VERSION
 
-env = Environment()
+env=Environment(tools=['default', fuzzed_builders])
+
+# Support backend packaging
+# Packaging of compiled code
+package_backend = "FuzzEdBackend-%s"%VERSION
+env.PackageBackend( package_backend,
+                    [Dir("lib"),
+                     "initscript.sh",
+                     "daemon.py",
+                     "daemon.ini",
+                     Dir("rendering")]
+                  )
+Alias('package.backend', package_backend)
 
 # Build backend modules by triggering CMake
-# TODO: This is obviousely a hack, build directly with SCons 
+# TODO: This is obviousely a hack, build directly with SCons instead
 if platform.system() == "Darwin":
     cmake_call = "cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 backends/"
 else:
     cmake_call = "cmake backends/"
 
-makefile = env.Command('Makefile', 'CMakeLists.txt', cmake_call)
+makefile = env.Command(['CMakeCache.txt','Makefile'], 'CMakeLists.txt', cmake_call)
 
 ftconfiguration_targets = 'lib/ftconfiguration_exe'
 ftconfiguration = env.Command(ftconfiguration_targets, 

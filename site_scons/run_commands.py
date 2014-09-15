@@ -26,7 +26,7 @@ def server(target, source, env):
     # permanently flips between native development and
     # Vagrant development. The backend daemon currently has
     # no Vagrant-specific settings, so we don't need to do the same stunt there
-    if env['mode'] == 'vagrant'
+    if env['mode'] == 'vagrant':
         ip = "192.168.33.10"
         print 'Using Vagrant IP: ' + ip
         os.system('./manage.py runserver %s:8000' % ip)

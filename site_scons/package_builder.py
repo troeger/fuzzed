@@ -54,10 +54,9 @@ def package_backend(target, source, env):
                 print "Adding file "+fname
                 return tarinfo
 
-        basename="FuzzEdBackend-%s"%version
-        tar = tarfile.open(basename+".tar.gz","w:gz")
+        tar = tarfile.open(target[0]+".tar.gz","w:gz")
         for src, dest in inclusions:
-            tar.add(src, arcname=basename+"/"+dest, filter=tarfilter)
+            tar.add(src, arcname=target[0]+"/"+dest, filter=tarfilter)
         tar.close()
 
 def package_web(target, source, env):
@@ -105,14 +104,10 @@ def package_web(target, source, env):
                 print "Adding file "+fname
                 return tarinfo
 
-        basename="FuzzEd-%s"%version
-        tar = tarfile.open(basename+".tar.gz","w:gz")
+        tar = tarfile.open(target[0]+".tar.gz","w:gz")
         for src, dest in inclusions:
-            tar.add(src, arcname=basename+"/"+dest, filter=tarfilter)
+            tar.add(src, arcname=target[0]+"/"+dest, filter=tarfilter)
         tar.close()
 
-
-
-
-
-packagebuilder = Builder(action=package_all)
+packageweb = Builder(action=package_web)
+packagebackend = Builder(action=package_backend)
