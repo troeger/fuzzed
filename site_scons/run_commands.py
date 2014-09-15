@@ -26,7 +26,7 @@ def server(target, source, env):
     # permanently flips between native development and
     # Vagrant development. The backend daemon currently has
     # no Vagrant-specific settings, so we don't need to do the same stunt there
-    if socket.getfqdn() == 'vagrant-ubuntu-trusty-32':
+    if env['mode'] == 'vagrant'
         ip = "192.168.33.10"
         print 'Using Vagrant IP: ' + ip
         os.system('./manage.py runserver %s:8000' % ip)
@@ -67,6 +67,7 @@ def fixture_save(target, source, env):
     data.append(testaccount)
     output=open("FuzzEd/fixtures/new.json","w")
     output.write(json.dumps(data, indent=4))
+    print "New fixture file is now available at fixtures/new.json"
     output.close()
 
 #def fixture_load(fname=None):

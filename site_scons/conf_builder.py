@@ -176,21 +176,16 @@ def createDjangoSettings(confFile, specialSections):
 
 def createConfigs(target, source, env):
     '''Builds the configuration files for sub projects out of settings.ini'''
-    if socket.getfqdn() == 'vagrant-ubuntu-trusty-32':
-        mode = "vagrant"
-    else:
-        mode = "development"
-    assert(mode in ['development','vagrant','production'])
     for t in target:
         fname = str(t)
         if fname.endswith('settings.py'):
             # Generate Django setting
             f=open(fname,'w')
-            f.write(createDjangoSettings(str(source[0]), [mode]))
+            f.write(createDjangoSettings(str(source[0]), [env['mode']]))
             f.close()
         if fname.endswith('daemon.ini'):
             f=open(fname,'w')
-            f.write(createBackendSettings(str(source[0]), [mode, 'backend_']))
+            f.write(createBackendSettings(str(source[0]), [env['mode'], 'backend_']))
             f.close()
 
 confbuilder = Builder(action = createConfigs, src_suffix = '.ini')

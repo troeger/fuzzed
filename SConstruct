@@ -6,13 +6,22 @@
     - Add clean target for .pyc files.
 '''
 
-import os, platform
+import os, platform, socket
 
 #./site_scons automatically becomes part of the Python search path
 # Add our own builders to the SCons environment
 env=Environment(tools=['default', fuzzed_builders])
 
-# Include SCons file 
+# Decide which build mode we have here
+if socket.getfqdn() == 'vagrant-ubuntu-trusty-32':
+    mode = "vagrant"
+else:
+    mode = "development"
+assert(mode in ['development','vagrant','production'])
+print "Building for "+mode+" mode"
+env['mode']=mode
+
+# Include SCons file for backend daemons
 SConscript(['backends/SConscript'])
 
 # NaturalDocs generation - 'docs' target
@@ -55,6 +64,7 @@ env.PyXB(   xml_targets,
             ])
 Alias('xml', xml_targets)
 
+# Generation of Python version of the notation files 
 notation_targets = 'FuzzEd/models/notations.py'
 env.Notations(  notation_targets,
               [ 'FuzzEd/static/notations/dfd.json',
@@ -63,6 +73,7 @@ env.Notations(  notation_targets,
                 'FuzzEd/static/notations/rbd.json'] )
 Alias('notations', notation_targets)
 
+# Generation of the TikZ library code, based on SVG images
 tikz_targets = 'FuzzEd/models/node_rendering.py'
 env.Tikz( tikz_targets, 
           Glob('FuzzEd/static/img/dfd/*.svg') +
