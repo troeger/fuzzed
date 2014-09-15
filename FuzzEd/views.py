@@ -523,8 +523,9 @@ def editor(request, graph_id):
         'graph':          graph,
         'graph_notation': notation,
         'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
-        'greetings':      GREETINGS, 
-        'project' :       project.to_dict()
+        'greetings':      GREETINGS,
+        'project':        project,
+        'user':           request.user
     }
 
     return render(request, 'editor/editor.html', parameters)
@@ -561,8 +562,8 @@ def snapshot(request, graph_id):
         'graph_notation': notation,
         'nodes':          [(node, nodes[node]) for node in notation['shapeMenuNodeDisplayOrder']],
         'greetings':      GREETINGS,
-        'project':        project.to_dict(),
-        'current_user':   request.user
+        'project':        project,
+        'user':           request.user
     }
 
     return render(request, 'editor/editor.html', parameters)

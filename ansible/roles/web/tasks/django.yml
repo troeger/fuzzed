@@ -1,7 +1,7 @@
 ---
 - name: Ensure Django is installed
   sudo: yes
-  pip: name=django state=present version=1.6.4
+  pip: name=django state=present version=1.7
 - name: Ensure Django South is installed
   sudo: yes
   pip: name=south state=latest

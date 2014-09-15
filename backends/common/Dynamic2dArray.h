@@ -2,6 +2,10 @@
 #include <vector>
 #include <iostream>
 
+/**
+ * Class: Dynamic2dArray
+ * Template class for managing a twodimensional array of growing size.
+ */
 template <typename T>
 class Dynamic2dArray
 {
@@ -22,7 +26,11 @@ public:
 protected:
 	unsigned int computeWidth() const; // for debugging
 
-	std::vector<std::vector<T>> m_data; // rows x cols
+	/**
+	 * Variable: m_data
+	 * The actual data container, of size #rows x #cols
+	 */
+	std::vector<std::vector<T>> m_data;
 
 	unsigned int m_w;
 	unsigned int m_h;

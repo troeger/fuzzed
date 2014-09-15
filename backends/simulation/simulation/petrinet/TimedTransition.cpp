@@ -28,12 +28,12 @@ TimedTransition& TimedTransition::operator=(const TimedTransition &other)
 	return *this;
 }
 
-bool TimedTransition::tryUpdateStartupTime(const unsigned int& tick)
+bool TimedTransition::tryUpdateStartupTime(const unsigned int& d)
 {
 	if (m_hasNotFired && m_wasNotEnabled && enoughTokens())
 	{
 		m_wasNotEnabled = false;
-		m_r += tick;
+		m_r += d;
 		return true;
 	}
 	return false;

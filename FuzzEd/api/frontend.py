@@ -127,6 +127,7 @@ class JobResource(common.JobResource):
                 results_url = reverse('results', kwargs={'api_name': 'front', 'pk': job.graph.pk, 'secret': job.secret})
                 if not job.requires_download:
                     response['columns'] = [{'mData': key, 'sTitle': title} for key, title in job.result_titles]
+                    response['axis_titles'] = job.axis_titles()
                 try:
                     response['issues'] = Result.objects.get(job=job, kind=Result.GRAPH_ISSUES).issues
                 except:
@@ -576,20 +577,14 @@ class ResultResource(ModelResource):
         sort_fields = []
         for i in range(sort_col_settings):
             # Consider strange datatables way of expressing sorting criteria
-            # Sorting settings start at 0, sorting column numbers at 1
-            sort_col = int(request.GET['iSortCol_' + str(i)])
-
-            if request.GET.get('bSortable_' + str(sort_col), 'false') == 'true':
-                sort_dir = request.GET['sSortDir_' + str(i)]
-                # As said above, column numbers start at 1
-                db_field_name = job.result_titles[sort_col - 1][0]
-                logger.debug("Sorting result set for " + db_field_name)
-                if sort_dir == "desc":
-                    db_field_name = "-" + db_field_name
-                sort_fields.append(db_field_name)
-            else:
-                logger.error("Column %u is not marked to be sortable" % sort_col)
-
+            sort_col = int(request.GET['iSortCol_'+str(i)])     
+            sort_dir = request.GET['sSortDir_'+str(i)]      
+            db_field_name=job.result_titles[sort_col][0] 
+            logger.debug("Sorting result set for "+ db_field_name)
+            if sort_dir == "desc":
+                db_field_name = "-"+db_field_name          
+            sort_fields.append(db_field_name)
+                
         results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
         if len(sort_fields) > 0:
             results = results.order_by(*sort_fields)

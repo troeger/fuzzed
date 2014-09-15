@@ -54,14 +54,12 @@ bool Transition::enoughTokens() const
 {
 	for (const auto& p : m_inPlaces)
 	{
-		const unsigned int currentMarking = p.first->getCurrentMarking();
-		if (currentMarking < p.second)
+		if (p.first->getCurrentMarking() < p.second)
 			return false;
 	}
 	for (const auto& p: m_inhibitingPlaces)
 	{
-		const unsigned int currentMarking = p.first->getCurrentMarking();
-		if (currentMarking > p.second)
+		if (p.first->getCurrentMarking() > p.second)
 			return false;
 	}
 	return true;

@@ -19,6 +19,14 @@
 
 class Transition;
 
+/**
+ * Class: Place
+ * Represents a place in a GSPN, including its internal state and its semantics within the fault tree.
+ *
+ * Conflict resolution based on:
+ * http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.110.2081
+ * "race with age memory" + atomic firing
+ */
 class Place
 {
 public:
@@ -35,12 +43,44 @@ public:
 	
 	bool hasRequests() const { return !m_transitionQueue.empty(); }
 
+	/**
+	 * Function: resolveConflictsImmediate
+	 * Conflict resolution for the immediate transitions, by priority only.
+	 * Immediate transitions always fire first, so their conflict resolution can be separated from the timed transitions.
+	 * 
+	 * See also: <resolveConflictsTimed>
+	 */
 	void resolveConflictsImmediate(int tick);
+
+	/**
+	 * Function: resolveConflictsTimed
+	 * Conflict resolution for the immediate transitions.
+	 */
 	void resolveConflictsTimed(int tick);
 
+
+	/**
+	 * Function: produceTokens
+	 * Adds a number of tokens, produced as transition output, to the current marking.
+	 * Afterwards, the marking is at most m_capacity.
+	 */
 	void produceTokens(int numTokens);
+
+	/**
+	 * Function: consumeTokens
+	 * Removes a number of tokens, consumed by a transition.
+	 * Afterwards, the marking is at least 0.
+	 */
 	void consumeTokens(Transition* const t, int numTokens);
-	void requestTokens(Transition* const t);
+
+	/**
+	 * Function: requestTokens
+	 * Called to add a transition to the set of transitions considered by conflict resolution.
+	 *
+	 * Parameters:
+	 * 	transition - the transition which wants to consume tokens.
+	 */
+	void requestTokens(Transition* const transition);
 
 	const bool isTopLevelPlace() const { return m_semantics == TOP_LEVEL_PLACE; }
 	const bool isConstraintPlace() const { return m_semantics ==  CONSTRAINT_VIOLATED_PLACE; }
@@ -55,6 +95,10 @@ protected:
 	const int m_initialMarking;
 	
 	const std::string m_ID;
+	/**
+	 * Variable: m_capacity
+		The maximal possible marking for this place.
+	 */
 	const int m_capacity;
 
 	PlaceSemantics m_semantics;
