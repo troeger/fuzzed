@@ -1,5 +1,5 @@
-define(['editor', 'factory', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'datatables-api', 'faulttree/node_group', 'highcharts', 'jquery-ui'],
-function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTables) {
+define(['factory', 'editor', 'canvas', 'faulttree/graph', 'menus', 'faulttree/config', 'alerts', 'datatables', 'datatables-api', 'faulttree/node_group', 'highcharts', 'jquery-ui'],
+function(Factory, Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts, DataTables) {
     /**
      * Package: Faulttree
      */
@@ -999,37 +999,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
         analyticalProbabilityMenu: undefined,
         simulatedProbabilityMenu:  undefined,
 
-        /**
-         * Group: Accessors
-         */
-
-        /**
-         *  Group: Accessors
-         */
-
-        getFactory: function() {
-            return new Factory(undefined, 'faulttree');
-        },
-
-        /**
-         *  Method: getConfig
-         *
-         * Returns:
-         *      The <FaulttreeConfig> object.
-         */
-        getConfig: function() {
-            return FaulttreeConfig;
-        },
-
-        /**
-         * Method: getGraphClass
-         *      Overrides the abstract base method.
-         *
-         * Returns:
-         *      The <FaulttreeGraph> class.
-         */
-        getGraphClass: function() {
-            return FaulttreeGraph;
+        init: function(graphId) {
+            Factory.kind = 'faulttree';
+            this._super(graphId);
         },
 
         /**
@@ -1037,8 +1009,8 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
          */
         _loadGraphCompleted: function(readOnly) {
             //this.cutsetsMenu     = new CutsetsMenu(this);
-            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this.factory, this);
-            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this.factory, this);
+            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this);
+            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this);
 
             this._setupCutsetsAction()
                 ._setupAnalyticalProbabilityAction()

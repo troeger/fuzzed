@@ -1,5 +1,5 @@
-define(['node_group', 'property', 'class', 'canvas', 'config', 'jquery', 'd3'],
-    function(NodeGroup, Property, Class, Canvas, Config) {
+define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquery', 'd3'],
+    function(Factory, NodeGroup, Property, Class, Canvas, Config) {
 
     /**
      * Package: Faulttree

@@ -1,5 +1,5 @@
-define(['graph', 'dfd/node', 'dfd/config', 'json!notations/dfd.json', 'underscore', 'd3'],
-function(Graph, DfdNode, DfdConfig, DfdNotation) {
+define(['factory', 'graph', 'dfd/node', 'dfd/config', 'json!notations/dfd.json', 'underscore', 'd3'],
+function(Factory, Graph, DfdNode, DfdConfig, DfdNotation) {
     /**
      * Package: DFD
      */

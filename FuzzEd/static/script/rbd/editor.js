@@ -1,4 +1,4 @@
-define(['editor', 'factory', 'rbd/graph', 'rbd/config'], function(Editor, Factory, RbdGraph, RbdConfig) {
+define(['factory', 'editor', 'rbd/graph', 'rbd/config'], function(Factory, Editor, RbdGraph, RbdConfig) {
     /**
      * Package: RBD
      */
@@ -10,32 +10,9 @@ define(['editor', 'factory', 'rbd/graph', 'rbd/config'], function(Editor, Factor
      * Extends: <Base::Editor>
      */
     return Editor.extend({
-        /**
-         * Group: Accessors
-         */
-
-        getFactory: function() {
-            return new Factory(undefined, 'rbd');
-        },
-
-        /**
-         * Method: getConfig
-         *
-         * Returns:
-         *      The <RbdConfig> object.
-         */
-        getConfig: function() {
-            return RbdConfig;
-        },
-
-        /**
-         * Method: getGraphClass
-         *
-         * Returns:
-         *      The <RbdGraph> class.
-         */
-        getGraphClass: function() {
-            return RbdGraph;
+        init: function(graphId) {
+            Factory.kind = 'rbd';
+            this._super(graphId);
         }
     });
 });

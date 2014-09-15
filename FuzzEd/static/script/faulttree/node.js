@@ -1,4 +1,4 @@
-define(['faulttree/config', 'node'], function(Config, AbstractNode) {
+define(['factory', 'faulttree/config', 'node'], function(Factory, Config, AbstractNode) {
     /**
      * Package: Faulttree
      */

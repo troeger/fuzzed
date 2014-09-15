@@ -1,5 +1,5 @@
-define(['graph', 'faulttree/node', 'faulttree/config', 'json!notations/faulttree.json'],
-function(Graph, FaulttreeNode, FaulttreeConfig, FaulttreeNotation) {
+define(['factory', 'graph', 'faulttree/node', 'faulttree/config', 'json!notations/faulttree.json'],
+function(Factory, Graph, FaulttreeNode, FaulttreeConfig, FaulttreeNotation) {
     /**
      * Package: Faulttree
      */

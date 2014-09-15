@@ -45,10 +45,7 @@ define(function() {
         function Class() {
             // All construction is actually done in the init method
             if (!initializing && this.init) {
-                // arguments is just an "array-like" object, not an actual array, so we have to convert it into an actual array
-                var args = Array.prototype.slice.call(arguments);
-                this.factory = args[0];
-                this.init.apply(this, args.slice(1));
+                this.init.apply(this, arguments);
             }
         }
 

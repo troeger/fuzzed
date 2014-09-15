@@ -1,5 +1,5 @@
-define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 'dfd/node_group'],
-    function(Editor, Factory, DfdGraph, DfdConfig) {
+define(['factory', 'editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 'dfd/node_group'],
+    function(Factory, Editor, DfdGraph, DfdConfig) {
     /**
      *  Package: DFD
      */
@@ -11,33 +11,14 @@ define(['editor', 'factory', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 
      *  Extends: <Base::Editor>
      */
     return Editor.extend({
+        init: function(graphId) {
+            Factory.kind = 'dfd';
+            this._super(graphId);
+        },
+
         /**
          *  Group: Accessors
          */
-
-        getFactory: function() {
-            return new Factory(undefined, 'dfd');
-        },
-
-        /**
-         * Method: getConfig
-         *
-         * Returns:
-         *      The <DfdConfig> object.
-         */
-        getConfig: function() {
-            return DfdConfig;
-        },
-
-        /**
-         * Method: getGraphClass
-         *
-         * Returns:
-         *      The <DfdGraph> class.
-         */
-        getGraphClass: function() {
-            return DfdGraph;
-        },
 
         /**
          * Method: _setupJsPlumb
