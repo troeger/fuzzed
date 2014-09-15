@@ -7,6 +7,7 @@
 '''
 
 import os, platform, socket
+from FuzzEd.settings import VERSION
 
 #./site_scons automatically becomes part of the Python search path
 # Add our own builders to the SCons environment
@@ -22,7 +23,20 @@ print "Building for "+mode+" mode"
 env['mode']=mode
 
 # Include SCons file for backend daemons
-SConscript(['backends/SConscript'])
+SConscript('backends/SConscript')
+
+# package generation - 'package.backend' target
+package_backend = "FuzzEdBackend-%s"%VERSION
+env.PackageBackend( package_backend,
+                    [Dir("lib"),
+                     "initscript.sh",
+                     "daemon.py",
+                     "daemon.ini",
+                     Dir("rendering")],
+                     chdir='backends'
+                  )
+Alias('package.backend', package_backend)
+
 
 # NaturalDocs generation - 'docs' target
 docs_targets = Dir('docs')

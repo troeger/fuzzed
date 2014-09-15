@@ -18,6 +18,7 @@ FuzzEd/static/css/theme/white.css
 backends/**CMakeFiles
 backends/**Makefile
 backends/**cmake_install.cmake
+backends/common_generated/*
 backends/lib
 backends/daemon.ini
 .sconsign.dblite

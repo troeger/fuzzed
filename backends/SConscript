@@ -1,44 +1,40 @@
 import platform
-import package_builder
-from FuzzEd.settings import VERSION
 
 env=Environment(tools=['default', fuzzed_builders])
 
-# Support backend packaging
-# Packaging of compiled code
-package_backend = "FuzzEdBackend-%s"%VERSION
-env.PackageBackend( package_backend,
-                    [Dir("lib"),
-                     "initscript.sh",
-                     "daemon.py",
-                     "daemon.ini",
-                     Dir("rendering")]
-                  )
-Alias('package.backend', package_backend)
-
 # Build backend modules by triggering CMake
 # TODO: This is obviousely a hack, build directly with SCons instead
+
+# Let CMake run to generate Makefile
+# This always needs to run, in order to consider Vagrant / native flipping
 if platform.system() == "Darwin":
-    cmake_call = "cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 backends/"
+    cmake_call = "cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 ."
 else:
-    cmake_call = "cmake backends/"
+    cmake_call = "cmake ."
+makefile = env.Command(['CMakeCache.txt','Makefile'], 'CMakeLists.txt', cmake_call,
+                        chdir='backends')
+AlwaysBuild(makefile)
 
-makefile = env.Command(['CMakeCache.txt','Makefile'], 'CMakeLists.txt', cmake_call)
-
-ftconfiguration_targets = 'lib/ftconfiguration_exe'
+# Build configuration engine
+ftconfiguration_targets = 'ftconfiguration_exe'
 ftconfiguration = env.Command(ftconfiguration_targets, 
                               [Dir('fuzztreeconfiguration'), makefile],
-                              'make ftconfiguration_exe')
+                              'make ftconfiguration_exe',
+                              chdir='backends')
 Alias('ftconfiguration', ftconfiguration)
 
-ftanalysis_targets = 'lib/ftanalysis_exe'
+# Build analysis engine
+ftanalysis_targets = 'ftanalysis_exe'
 ftanalysis = env.Command(ftanalysis_targets, 
                          [Dir('fuzztreeanalysis'), makefile],
-                         'make ftanalysis_exe')
+                         'make ftanalysis_exe',
+                         chdir='backends')
 Alias('ftanalysis', ftanalysis)
 
-ftsimulation_targets = 'lib/ftsimulation_exe'
+# Build simulation engine
+ftsimulation_targets = 'ftsimulation_exe'
 ftsimulation = env.Command(ftsimulation_targets, 
                          [Dir('simulation'), makefile],
-                         'make ftsimulation')
+                         'make ftsimulation',
+                         chdir='backends')
 Alias('ftsimulation', ftsimulation)
