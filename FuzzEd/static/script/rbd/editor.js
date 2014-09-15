@@ -11,7 +11,7 @@ define(['factory', 'editor', 'rbd/graph', 'rbd/config'], function(Factory, Edito
      */
     return Editor.extend({
         init: function(graphId) {
-            Factory.kind = 'rbd';
+            if (typeof Factory.kind === 'undefined') Factory.kind = 'rbd';
             this._super(graphId);
         }
     });

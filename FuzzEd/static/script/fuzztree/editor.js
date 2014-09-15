@@ -12,7 +12,7 @@ function(Factory, FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
      */
     return FaulttreeEditor.extend({
         init: function(graphId) {
-            Factory.kind = 'fuzztree';
+            if (typeof Factory.kind === 'undefined') Factory.kind = 'fuzztree';
             this._super(graphId);
         }
     });

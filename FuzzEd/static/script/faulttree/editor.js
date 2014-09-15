@@ -1000,7 +1000,7 @@ function(Factory, Editor, Canvas, FaulttreeGraph, Menus, FaulttreeConfig, Alerts
         simulatedProbabilityMenu:  undefined,
 
         init: function(graphId) {
-            Factory.kind = 'faulttree';
+            if (typeof Factory.kind === 'undefined') Factory.kind = 'faulttree';
             this._super(graphId);
         },
 
