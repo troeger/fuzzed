@@ -4312,6 +4312,12 @@ i.icon-layout-tree:hover {
 .probabillity_menu .table_container .row:first-of-type {
   height: 0px;
 }
+/*
+ * Dashboard Menu       
+ */
+#DashboardTable tr {
+  cursor: default;
+}
 /**
  *  File: node.less
  *      This file contains all styles that apply to graph nodes.
