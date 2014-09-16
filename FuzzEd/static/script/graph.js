@@ -295,7 +295,7 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
             jQuery(document).trigger(Config.Events.GRAPH_LAYOUT);
             var layoutedNodes = algorithm(this._getNodeHierarchy());
 
-            this.layoutMenu = jQuery('#'+this.config.IDs.SHAPES_MENU).data(this.config.Keys.MENU);
+            this.layoutMenu = jQuery('#'+this.config.IDs.LAYOUT_MENU).data(this.config.Keys.MENU);
 
             // center the top node on the currently visible canvas (if there's enough space)
             var centerX = Math.floor((jQuery('#' + this.config.IDs.CANVAS).width() / this.config.Grid.SIZE) / 2);
