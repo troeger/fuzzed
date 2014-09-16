@@ -79,7 +79,7 @@ define(['factory', 'class', 'config', 'progress_indicator', 'jquery'], function(
             // prevent re-fetches due to race conditions
             this._refetch = false;
             Progress.flashErrorMessage(this.progressID, Config.ProgressIndicator.DEFAULT_CANCELED_MESSAGE);
-            //TODO: call backend as soon as the call is available
+            //TODO: call backend as soon as the call is available (cancel method for backend job not yet )
 
             return this;
         },
@@ -127,8 +127,8 @@ define(['factory', 'class', 'config', 'progress_indicator', 'jquery'], function(
                 },
                 error: function(xhr) {
                     // 404 is caught separately
-                    if (xhr.status = 404) return;
-
+                    if (xhr.status == 404) return;
+                    
                     Progress.flashErrorMessage(this.progressID, this.progressErrorMessage);
                     this.errorCallback.apply(this, arguments);
                 }.bind(this)
