@@ -1,4 +1,4 @@
-define(['rbd/config', 'node'], function(Config, AbstractNode) {
+define(['factory', 'rbd/config', 'node'], function(Factory, Config, AbstractNode) {
     /**
      * Package: RBD
      */

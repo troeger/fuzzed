@@ -1,4 +1,4 @@
-define(['config', 'class', 'jquery', 'jquery-ui'], function (Config, Class) {
+define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory, Config, Class) {
     /**
      * Package: Base
      */
@@ -37,6 +37,8 @@ define(['config', 'class', 'jquery', 'jquery-ui'], function (Config, Class) {
             this._controls = this._setupControls();
             this._disabled = false;
             this._navbar = this._setupNavbar();
+
+            jQuery(this.container).data(Config.Keys.MENU, this);
 
             this._setupDragging();
         },

@@ -1,4 +1,4 @@
-define(['config', 'jquery'], function(Config) {
+define(['factory', 'config', 'jquery'], function(Factory, Config) {
     /**
      * Package Faulttree
      */

@@ -1,5 +1,5 @@
-define(['canvas', 'class', 'config', 'edge', 'menus', 'node_group', 'jquery', 'd3'],
-function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
+define(['factory', 'canvas', 'class', 'config', 'edge', 'menus', 'node_group', 'jquery', 'd3'],
+function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
     /**
      * Package: Base
      */
@@ -49,7 +49,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
             this.id     = json.id;
             this.name   = json.name;
             this.seed   = json.seed;
-            this.config = this.getConfig();
+            this.config = Factory.getModule('Config');
 
             this._loadFromJson(json)
                 ._registerEventHandlers();
@@ -147,7 +147,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
             properties.id  = jsonEdge.id;
             properties.graph = this;
 
-            var edge = this.factory.create('Edge', this.getNotation().edges, sourceNode, targetNode, properties);
+            var edge = Factory.create('Edge', this.getNotation().edges, sourceNode, targetNode, properties);
             this.edges[edge.id] = edge;
 
             return edge;
@@ -169,7 +169,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
          *      The newly created {<Edge>} instance.
          */
         _addEdge: function(jsPlumbEdge) {
-            var edge = this.factory.create('Edge', this.getNotation().edges, jsPlumbEdge, {graph: this});
+            var edge = Factory.create('Edge', this.getNotation().edges, jsPlumbEdge, {graph: this});
             this.edges[edge.id] = edge;
 
             return edge;
@@ -211,7 +211,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
             definition.readOnly = this.readOnly;
             definition.graph    = this;
 
-            var node = new (this.nodeClassFor(definition.kind))(this.factory, definition);
+            var node = new (this.nodeClassFor(definition.kind))(definition);
             this.nodes[node.id] = node;
 
             return node;
@@ -265,7 +265,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
             properties.id  = jsonNodeGroup.id;
             properties.graph = this;
 
-            var nodeGroup = this.factory.create('NodeGroup', this.getNotation().nodeGroups, nodes, properties);
+            var nodeGroup = Factory.create('NodeGroup', this.getNotation().nodeGroups, nodes, properties);
             this.nodeGroups[nodeGroup.id] = nodeGroup;
         },
 
@@ -294,6 +294,8 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
         _layoutWithAlgorithm: function(algorithm) {
             jQuery(document).trigger(Config.Events.GRAPH_LAYOUT);
             var layoutedNodes = algorithm(this._getNodeHierarchy());
+
+            this.layoutMenu = jQuery('#'+this.config.IDs.SHAPES_MENU).data(this.config.Keys.MENU);
 
             // center the top node on the currently visible canvas (if there's enough space)
             var centerX = Math.floor((jQuery('#' + this.config.IDs.CANVAS).width() / this.config.Grid.SIZE) / 2);
@@ -426,16 +428,6 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
         },
 
         /**
-         * Abstract Method: getConfig
-         *
-         * Returns:
-         *      The graph-specific <Config> object.
-         */
-        getConfig: function() {
-            throw new SubclassResponsibility();
-        },
-
-        /**
          * Method: createId
          *
          * Returns:
@@ -508,7 +500,7 @@ function(Canvas, Class, Config, Edge, Menus, NodeGroup) {
          *      The newly created {<Node>} {<Class>}.
          */
         _newNodeClassForKind: function(definition) {
-            var BaseClass = this.factory.getClassModule('Node');
+            var BaseClass = Factory.getModule('Node');
             var inherits = definition.inherits;
 
             if (inherits) {
