@@ -9,7 +9,7 @@ function(Job, Config) {
         describe('_query', function(){
             
             beforeEach(function(){
-                job    = new Job(undefined, '/server_url');
+                job    = new Job('/server_url');
                 server = sinon.fakeServer.create();
                 clock = sinon.useFakeTimers();
             });
@@ -24,7 +24,7 @@ function(Job, Config) {
                 server.respondWith(
                     'GET',
                     /\/server_url/,
-                    [500, {}, ""]
+                    [500, {},'']
                 );
                 
                 var job_mock = sinon.mock(job);
@@ -43,7 +43,7 @@ function(Job, Config) {
                 server.respondWith(
                     'GET',
                     /\/server_url/,
-                    [404, {}, ""]
+                    [404, {}, '']
                 );
                 
                 var job_mock = sinon.mock(job);

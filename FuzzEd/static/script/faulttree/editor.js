@@ -138,8 +138,8 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
          */
         _loadGraphCompleted: function(readOnly) {
             //this.cutsetsMenu     = new CutsetsMenu(this);
-            this.analyticalProbabilityMenu = new AnalyticalProbabilityMenu(this);
-            this.simulatedProbabilityMenu  = new SimulatedProbabilityMenu(this);
+            this.analyticalProbabilityMenu = new AnalyticalMenus.AnalyticalProbabilityMenu(this);
+            this.simulatedProbabilityMenu  = new AnalyticalMenus.SimulatedProbabilityMenu(this);
 
             this._setupCutsetsAction()
                 ._setupAnalyticalProbabilityAction()
