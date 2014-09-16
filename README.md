@@ -10,14 +10,13 @@ If you prefer to develop on your native machine without any virtualization, it n
 
 `ansible-playbook -i ansible/dev_machine ansible/site.yml`
 
-Add a "-s" option if you want to avoid working as root by using 'sudo'.
+Add a "-s" option if you want to let ansible use 'sudo'.
 
 The Ansible code is prepared for Linux and Mac OS X development machines.
 
 ## Developing for FuzzEd
 
-#### Compile static stuff                              
-
+#### Compile some static stuff, needed to run the project                              
 `> scons`
 
 #### Synchronize local database with current model
