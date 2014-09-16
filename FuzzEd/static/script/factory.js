@@ -7,13 +7,20 @@ function(Class) {
     /**
      *  Class: Factory
      *
-     *  TODO: documentation
+     *  The factory class acts as an object factory for almost all classes. It is based on the desired class layout of
+     *  the whole client side JavaScript code, which dynamically replaces abstract classes with its concrete children
+     *  when possible. An abstract Editor for example uses the factory to create a concrete graph instead of the abstract
+     *  graph (every concrete graph inherits from). To achieve this, you generally have to call
+     *      Factory.create('MyAbstractClass', arg1, arg2, ...);
+     *  instead of calling the constructor on your own. This allows the factory to determine the right subclass and
+     *  its constructor. It will then call the constructor with the given arguments and return the object to the you.
+     *
      */
     var Factory = Class.extend({
         kind: undefined,
 
-        // create's first argument is the name of the base class, we want to create an instance of
-        //  all other arguments are passed directly into the class constructor
+        // create's first argument is either the name of the base class or a constructor, we want to create an instance of
+        //  all other arguments are passed directly into the  constructor
         create: function(baseCls) {
             // arguments is just an "array-like" object, not an actual array, so we have to convert it into an actual array
             var args = Array.prototype.slice.call(arguments);
@@ -57,6 +64,14 @@ function(Class) {
             }
         },
 
+        /**
+         * Method: _setupDropDownBlur
+         *      Register an event handler that takes care of closing and blurring all currently open drop down menu
+         *      items from the toolbar.
+         *
+         * Returns:
+         *      This {<Editor>} instance for chaining.
+         */
         getModule: function(baseCls) {
             var resolveObj = this._resolveClassName(baseCls);
             //console.log('Successfully resolved class module for ' + baseCls + ' from ' + resolveObj.path);
@@ -101,7 +116,7 @@ function(Class) {
             } else if (this._baseKind(kind)) {                            // else if our kind inherits from a base kind
                 return this._resolveClassName(cls, this._baseKind(kind)); // resolve the class name from that base
             } else {
-                retObj.path = this._fromClassToPath(cls);                 // else use the default class, e.g. Node
+                retObj.path = this._fromClassToPath(cls);                 // else use the abstract class, e.g. Node
                 return retObj;
             }
         },
