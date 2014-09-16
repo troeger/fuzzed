@@ -143,7 +143,7 @@
             mocha.setup('bdd');
            
             // run all tests   
-            require(['analytical_menus_tests.js'], function() {                
+            require(['analytical_menus_tests.js', 'job_tests.js'], function() {                
                 if (window.mochaPhantomJS){
                     mochaPhantomJS.run();
                 }
