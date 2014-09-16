@@ -6,6 +6,8 @@
   roles:
     - common
     - web
+    - web_install
+
 
 - name: Configure production database servers 
   hosts: dbservers
@@ -22,6 +24,7 @@
   roles:
     - common
     - backend
+    - backend_install
 
 - name: Configure developer machine
   hosts: devmachine
