@@ -7,8 +7,10 @@
 class AbstractModel
 {
 public:
-	AbstractModel() : m_topEvent(nullptr) {};
+	AbstractModel(std::string id, TopEvent* topEvent) : m_id(id), m_topEvent(topEvent) {};
 	virtual ~AbstractModel() {};
+	
+	AbstractModel() : m_topEvent(nullptr) {};
 	
 	const TopEvent* getTopEvent() const { return m_topEvent; };
 
@@ -19,6 +21,7 @@ public:
 	virtual const std::string& getTypeDescriptor() const = 0;
 
 protected:
+
 	virtual void initFromGraphML(const pugi::xml_document& graphMLFile);
 	virtual void loadTree(const std::vector<pugi::xml_node> nodes, const std::vector<pugi::xml_node> edges);
 

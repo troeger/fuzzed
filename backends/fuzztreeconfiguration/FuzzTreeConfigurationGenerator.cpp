@@ -3,9 +3,7 @@
 #include "FatalException.h"
 #include "ExpressionParser.h"
 
-#include "RedundancyVariationPoint.h"
-#include "FeatureVariationPoint.h"
-#include "BasicEventSet.h"
+#include "ModelIncludes.h"
 
 #include "xmlutil.h"
 
@@ -51,7 +49,7 @@ bool isEventSet(const std::string& typeName)
 		typeName == "IntermediateEventSet";
 }
 
-FuzzTreeTransform::FuzzTreeTransform(
+/*FuzzTreeTransform::FuzzTreeTransform(
 	const string& fuzzTreeXML, 
 	std::set<Issue>& errors) :
 	m_count(0),
@@ -70,7 +68,7 @@ FuzzTreeTransform::FuzzTreeTransform(
 	m_issues(errors)
 {
 	// TODO: parse GraphML
-}
+}*/
 
 FuzzTreeTransform::FuzzTreeTransform(
 	std::auto_ptr<Fuzztree> ft,
@@ -271,7 +269,7 @@ Fuzztree FuzzTreeTransform::generateVariationFreeFuzzTree(const FuzzTreeConfigur
 	//newTopEvent.missionTime(topEvent.missionTime());
 	//newTopEvent.decompositionNumber(topEvent.decompositionNumber());
 
-	if (generateVariationFreeFuzzTreeRecursive(&topEvent, &newTopEvent, configuration) == OK)
+	if (generateVariationFreeFuzzTreeRecursive(topEvent, &newTopEvent, configuration) == OK)
 		return Fuzztree(m_fuzzTree->getId(), newTopEvent);
 	else
 		return Fuzztree("", newTopEvent); // TODO handle properly
@@ -287,7 +285,7 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		const string id = currentChild->getId();
 		const auto typeName = currentChild->getTypeDescriptor();
 		
-		const bool opt = isOptional(currentChild);
+		const bool opt = currentChild->isOptional();
 
 		if (!configuration.isIncluded(id) || (opt && !configuration.isOptionalEnabled(id)))
 			continue; // do not add this node
@@ -296,18 +294,18 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 		
 		if (typeName == "redundancyVariationPoint")
 		{ // TODO: probably this always ends up with a leaf node
-			int numChildren = currentChild.children().size();
+			int numChildren = currentChild->children().size();
 			if (numChildren != 1)
 			{
 				throw FatalException(
 					std::string("Redundancy VP with invalid number of children found: ") + util::toString(numChildren),
 					0, id);
 			}
-			const auto& firstChild = currentChild.children().front();
+			const auto& firstChild = currentChild->children().front();
 			const auto& childTypeName = firstChild->getTypeDescriptor();
 			const auto kOutOfN = configuration.getRedundancyCount(id);
 
-			VotingOrGate votingOrGate(id, get<0>(kOutOfN));
+			VotingOrGate votingOrGate = new VotingOrGate(id, get<0>(kOutOfN));
 			if (childTypeName == "basicEventSet")
 			{
 				const BasicEventSet* bes = 
@@ -327,7 +325,7 @@ ErrorType FuzzTreeTransform::generateVariationFreeFuzzTreeRecursive(
 				m_issues.insert(Issue(std::string("Unrecognized Child Type: ") + typeName, 0, id));
 				return WRONG_CHILD_TYPE;
 			}
-			node->children().push_back(votingOrGate);
+			node->addChild(votingOrGate);
 
 			continue; // stop recursion
 		}
@@ -392,7 +390,7 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 		m_issues.insert(Issue("Invalid number of Children in BasicEventSet", 0 , eventSet->getId()));
 		return INVALID_ATTRIBUTE;
 	}
-	const auto& prob = eventSet->probability();
+	const auto prob = eventSet->getProbability();
 
 	const int cost = eventSet->getCost();
 	unsigned int i = 0;

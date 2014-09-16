@@ -8,7 +8,7 @@ const std::string& BasicEvent::getTypeDescriptor() const
 	return str;
 }
 
-void BasicEvent::setProbability(const pugi::xml_node& probabilityNode)
+void BasicEvent::setProbabilityFromXml(const pugi::xml_node& probabilityNode)
 {
-	m_probability = new StaticProbability(atof(probabilityNode.value()));
+	m_probability = StaticProbability(atof(probabilityNode.value()));
 }

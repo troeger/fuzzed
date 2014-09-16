@@ -5,9 +5,9 @@
 class Fuzztree : public AbstractModel
 {
 public:
-	std::vector<FuzzTreeConfiguration> generateConfigurations() const;
-	Fuzztree* generateVariationFreeFuzzTree(const FuzzTreeConfiguration& configuration);
-
+    Fuzztree() : AbstractModel() {};
+    Fuzztree(std::string id, TopEvent* topEvent) : AbstractModel(id, topEvent) {};
+    
 	const std::string& getTypeDescriptor() const override;
 
 protected:

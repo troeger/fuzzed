@@ -10,4 +10,3 @@ const std::string& Fuzztree::getTypeDescriptor() const
 	static const std::string str = "fuzztree";
 	return str;
 }
-
