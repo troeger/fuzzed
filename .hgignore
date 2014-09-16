@@ -15,7 +15,9 @@ FuzzEd/models/xml_faulttree.py
 FuzzEd/models/xml_fuzztree.py
 FuzzEd/settings.py
 FuzzEd/static/css/theme/white.css
+FuzzEd/static-release
 backends/**CMakeFiles
+backends/**CMakeCache.txt
 backends/**Makefile
 backends/**cmake_install.cmake
 backends/common_generated/*
