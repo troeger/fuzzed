@@ -13,7 +13,7 @@ public:
 	const TopEvent* getTopEvent() const { return m_topEvent; };
 
 	static AbstractModel* loadGraphML(const std::string graphMLFileName);
-	static const std::string getId(const pugi::xml_node& node);
+	const std::string getId(const pugi::xml_node& node);
 
 
 	virtual const std::string& getTypeDescriptor() const = 0;

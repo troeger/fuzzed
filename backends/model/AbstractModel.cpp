@@ -114,5 +114,5 @@ void AbstractModel::loadRecursive(
 
 const std::string AbstractModel::getId(const pugi::xml_node& node)
 {
-	return "TODO";
+	return m_id;
 }

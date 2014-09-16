@@ -7,8 +7,8 @@ class PetriNet;
 class AbstractNode
 {
 public:
-	AbstractNode(const std::string id) : 
-		m_id(id), m_optional(false), m_cost(1) {};
+	AbstractNode(const std::string id, const std::string name="") : 
+		m_id(id), m_name(name), m_optional(false), m_cost(1) {};
 	virtual ~AbstractNode() {};
 
 	virtual void addChild(AbstractNode* child) { m_children.emplace_back(child); };

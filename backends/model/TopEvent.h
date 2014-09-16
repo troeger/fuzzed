@@ -5,7 +5,7 @@
 class TopEvent : public AbstractNode
 {
 public:
-	TopEvent(const std::string id) : AbstractNode(id) {};
+	TopEvent(const std::string id, const std::string name="") : AbstractNode(id, name) {};
 	virtual ~TopEvent() {};
 
 	virtual void addChild(AbstractNode* child) override

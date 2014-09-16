@@ -7,7 +7,7 @@ class AbstractProbability;
 class BasicEvent : public AbstractNode
 {
 public:
-	BasicEvent(const std::string id) : AbstractNode(id) {};
+	BasicEvent(const std::string id, const std::string name="") : AbstractNode(id, name) {};
 
 	virtual void toPetriNet(PetriNet* pn) override { /*TODO*/ };
 	virtual const std::string& getTypeDescriptor() const override;

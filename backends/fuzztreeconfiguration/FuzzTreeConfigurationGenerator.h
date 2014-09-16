@@ -42,8 +42,7 @@ protected:
 		AbstractNode* node,
 		const FuzzTreeConfiguration& configuration);
 
-	static void copyNode(
-		const std::type_info& typeName,
+	static void copyNodeAsChild(
 		AbstractNode* node,
 		const std::string id,
 		const AbstractNode& currentChild);
