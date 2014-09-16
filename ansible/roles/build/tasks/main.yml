@@ -1,8 +1,4 @@
 ---
-- name: Ensure Fabric is installed
-  sudo: yes
-  pip: name=fabric state=latest
-
 - name: Ensure SCONS is installed
   sudo: yes
   apt: pkg=scons state=present

@@ -10,51 +10,46 @@ If you prefer to develop on your native machine without any virtualization, it n
 
 `ansible-playbook -i ansible/dev_machine ansible/site.yml`
 
-Add a "-s" option if you have a password-less 'sudo' available instead of working in your root account. Our Ansible code is prepared for Linux and Mac OS X development machines.
+Add a "-s" option if you want to let ansible use 'sudo'.
+
+The Ansible code is prepared for Linux and Mac OS X development machines.
 
 ## Developing for FuzzEd
 
-#### Compile static stuff                              
-
-`> fab build.all`
+#### Compile some static stuff, needed to run the project                              
+`> scons`
 
 #### Synchronize local database with current model
 
-`> ./manage.py syncdb --migrate`
+`> ./manage.py migrate`
 
 #### Run development web server (inside VM or on host)
 
-`> fab run.server`
+`> scons run.server`
+
+You can also use the standard `> ./manage.py runserver` command from Django, but this works only without Vagrant. Inside a Vagrant box, the command above adjusts the IP adress for the development server.
 
 #### Run backend services (inside VM or on host)
 
-`> fab run.backend`
+`> scons run.backend`
 
 ## Writing tests for FuzzEd
 
-`> fab fixture_save:testgraphs.json`
+`> scons fixture.save`
 
 Saves a new fixture file from the current database. It can be referenced
-in the unit tests stored in tests.py.
+in the unit tests stored in the tests directory.
 
-`> fab fixture_load:testgraphs.json`
+`> scons run.tests`
 
-Overwrites the current database with the test fixture. This allows local
-editing of the test database with the editor, which can than be saved again.
+Run all tests stored in the tests directory.
 
-`> fab run.tests`
-
-Run all tests stored in tests.py.
-
-## Deploying FuzzEd
+## Packaging FuzzEd
 
 Please note that the machine were the packaging (and implicit build) takes place must be the same as the production machine. The smartest approach therefore is to develop in Vagrant with some distribution, and use then the same distro on the production host.
 
-`> fab package.web`
-`> fab package.backend`
-`> fab deploy.web`
-`> fab.deploy.backend`
-
+`> scons package.web`
+`> scons package.backend`
 
 ## Acknowledgements
 

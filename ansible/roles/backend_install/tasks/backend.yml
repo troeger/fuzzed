@@ -1,0 +1,12 @@
+---
+- name: Ensure latest FuzzEd backend version is installed
+  get_url: url=http://github.com/XXX dest=/tmp mode=0440
+- name: Unarchive FuzzEd backend download package
+  unarchive: src=/tmp/XXX dest=usr/local/fuzzed/XXX
+- name: Adjusting links for pointing to download package 
+  file: dest=usr/local/fuzzed/XXX src=/usr/local/fuzzed/FuzzEdBackend owner=root group=root state=link
+- name: Ensure startup script link 
+  file: dest=/usr/local/fuzzed/FuzzEdBackend/initscript.sh src=/etc/init.d/fuzzed-backend owner=root group=root state=link
+- name: Ensure FuzzEd backend being started 
+  service: name=fuzzed-backend state=started
+
