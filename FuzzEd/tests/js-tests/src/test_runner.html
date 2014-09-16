@@ -38,18 +38,18 @@
   </script>
  
   
-  <script src="../../static/lib/requirejs/require-2.1.6.min.js" type="text/javascript" language="javascript"></script>
+  <script src="../../../static/lib/requirejs/require-2.1.6.min.js" type="text/javascript" language="javascript"></script>
   <script type="text/javascript" language="javascript">
       require.config({
-          baseUrl: '../../static/script/',
+          baseUrl: '../../../static/script/',
           waitSeconds: 5,
           paths: {
               // testing plugins
-              'mocha'                       : '../../tests/lib/script/mocha/mocha-1.21.4',
-              'chai'                        : '../../tests/lib/script/chai/chai-1.9.1',
-              'chai-jquery'                 : '../../tests/lib/script/chai-jquery/chai-jquery-1.2.2',
-              'sinon'                       : '../../tests/lib/script/sinon/sinon-1.10.3',
-              'sinon-server'                : '../../tests/lib/script/sinon/sinon-1.10.3/util/sinon-server-1.10.3',
+              'mocha'                       : '../../tests/js-tests/lib/script/mocha/mocha-1.21.4',
+              'chai'                        : '../../tests/js-tests/lib/script/chai/chai-1.9.1',
+              'chai-jquery'                 : '../../tests/js-tests/lib/script/chai-jquery/chai-jquery-1.2.2',
+              'sinon'                       : '../../tests/js-tests/lib/script/sinon/sinon-1.10.3',
+              'sinon-server'                : '../../tests/js-tests/lib/script/sinon/sinon-1.10.3/util/sinon-server-1.10.3',
               //'sinon-fake-xml-http-request' : '../../tests/lib/script/sinon/sinon-1.10.3/util/fake_xml_http_request',
               // require plugins
               'text' :      '../lib/requirejs/plugins/text-2.0.7', // required by json plugin

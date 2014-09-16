@@ -13,4 +13,4 @@ def api(test=None):
 @task
 def js(test=None):
     '''Runs js unit tests.'''
-    os.system('mocha-phantomjs FuzzEd/tests/js/test_runner.html')
+    os.system('mocha-phantomjs FuzzEd/tests/js-tests/src/test_runner.html')
