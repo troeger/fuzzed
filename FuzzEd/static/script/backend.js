@@ -1,5 +1,5 @@
-define(['class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jquery-ajaxq', 'jquery-cookie'],
-function (Class, Config, Job, Alerts, Progress) {
+define(['factory', 'class', 'config', 'job', 'alerts', 'progress_indicator', 'jquery', 'jquery-ajaxq', 'jquery-cookie'],
+function (Factory, Class, Config, Job, Alerts, Progress) {
     /**
      * Package: Base
      */
@@ -531,7 +531,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 beforeSend:  function(xhr) { xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken')); },
                 statusCode:  {
                     201: function(data, status, req) {
-                        success ? success(new Job(undefined, req.getResponseHeader('location'))) : jQuery.noop();
+                        success ? success(new Job(req.getResponseHeader('location'))) : jQuery.noop();
                     }
                 },
                 complete: complete || jQuery.noop,
@@ -561,7 +561,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 beforeSend:  function(xhr) { xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken')); },
                 statusCode:  {
                     201: function(data, status, req) {
-                        success ? success(new Job(undefined, req.getResponseHeader('location'))) : jQuery.noop();
+                        success ? success(new Job(req.getResponseHeader('location'))) : jQuery.noop();
                     }
                 },
                 complete: complete || jQuery.noop,
@@ -605,7 +605,7 @@ function (Class, Config, Job, Alerts, Progress) {
                 },
                 statusCode: {
                     201: function(data, status, req) {
-                        var job = new Job(undefined, req.getResponseHeader('location'));
+                        var job = new Job(req.getResponseHeader('location'));
                         job.progressID             = progressID;
                         job.progressMessage        = pendingMessage;
                         job.progressSuccessMessage = successMessage;
@@ -749,9 +749,9 @@ function (Class, Config, Job, Alerts, Progress) {
          * Returns:
          *      A {Backend} singleton
          */
-        establish: function(factory, graphId) {
+        establish: function(graphId) {
             if (typeof registeredBackends[graphId] === 'undefined') {
-                registeredBackends[graphId] = factory.create('Backend', graphId);
+                registeredBackends[graphId] = Factory.create('Backend', graphId);
             }
             return registeredBackends[graphId];
         }

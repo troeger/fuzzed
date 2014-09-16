@@ -1,4 +1,4 @@
-define(['config', 'jquery', 'underscore'], function(Config) {
+define(['factory', 'config', 'jquery', 'underscore'], function(Factory, Config) {
     var _progressIndicatorSingle   = jQuery('#' + Config.IDs.PROGRESS_INDICATOR_SINGLE);
     var _progressIndicatorDropdown = jQuery('#' + Config.IDs.PROGRESS_INDICATOR_DROPDOWN);
     var _progressIndicatorEntry    = jQuery(_progressIndicatorSingle.html()); // copy an entry form template

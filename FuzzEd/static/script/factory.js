@@ -7,27 +7,30 @@ function(Class) {
     /**
      *  Class: Factory
      *
-     *  TODO: documentation
+     *  The factory class acts as an object factory for almost all classes. It is based on the desired class layout of
+     *  the whole client side JavaScript code, which dynamically replaces abstract classes with its concrete children
+     *  when possible. An abstract Editor for example uses the factory to create a concrete graph instead of the abstract
+     *  graph (every concrete graph inherits from). To achieve this, you generally have to call
+     *      Factory.create('MyAbstractClass', arg1, arg2, ...);
+     *  instead of calling the constructor on your own. This allows the factory to determine the right subclass and
+     *  its constructor. It will then call the constructor with the given arguments and return the object to the you.
+     *
      */
-    return Class.extend({
+    var Factory = Class.extend({
         kind: undefined,
 
-        init: function(kind) {
-            this.kind = kind;
-        },
-
-        // create's first argument is the name of the base class, we want to create an instance of
-        //  all other arguments are passed directly into the class constructor
+        // create's first argument is either the name of the base class or a constructor, we want to create an instance of
+        //  all other arguments are passed directly into the  constructor
         create: function(baseCls) {
             // arguments is just an "array-like" object, not an actual array, so we have to convert it into an actual array
             var args = Array.prototype.slice.call(arguments);
 
-            // if baseCls already is a constructor and not a class-string
+            // if baseCls already is a constructor and not a string describing the desired class
             if (typeof baseCls === 'function') {
                 //console.log('[-] Creating a ' + baseCls + ' directly from given constructor.')
                 creation = this._construct(baseCls, args.slice(1));
             } else {
-            // if baseCls is a string describing the demanded class (most common case)
+            // if baseCls is a string describing the desired class (most common case)
                 var resolveObj = this._resolveClassName(baseCls);
                 var path = resolveObj.path;
                 var clsModule = require(path);
@@ -45,8 +48,8 @@ function(Class) {
                         && typeof clsModule[resolveObj.fullClassName].prototype !== 'undefined') {
                     creation = this._construct(clsModule[resolveObj.fullClassName], args.slice(1));
 
-                // our third try is to find the wanted class inside the found package, but this time named in
-                //  as the baseCls (e.g. NodeGroup)
+                // our third try is to find the wanted class inside the found package, but this time named as the
+                //  baseCls (e.g. NodeGroup)
                 } else if (typeof clsModule[resolveObj.cls]           !== 'undefined'
                         && typeof clsModule[resolveObj.cls].prototype !== 'undefined') {
                     creation = this._construct(clsModule[resolveObj.cls], args.slice(1));
@@ -61,22 +64,26 @@ function(Class) {
             }
         },
 
-        getClassModule: function(baseCls) {
+        /**
+         * Method: _setupDropDownBlur
+         *      Register an event handler that takes care of closing and blurring all currently open drop down menu
+         *      items from the toolbar.
+         *
+         * Returns:
+         *      This {<Editor>} instance for chaining.
+         */
+        getModule: function(baseCls) {
             var resolveObj = this._resolveClassName(baseCls);
             //console.log('Successfully resolved class module for ' + baseCls + ' from ' + resolveObj.path);
             return require(resolveObj.path);
         },
 
         _construct: function(constructor, args) {
-            function Creation(that) {
-                // here come's the magic: every object that we create automatically gets a reference to this factory, so
-                //  that it doesn't have to build any class instances on its own – yeah, i know, i'm an overly attached
-                //  factory
-                return constructor.apply(this, [ that ].concat(args));
+            function Creation() {
+                return constructor.apply(this, args);
             }
             Creation.prototype = constructor.prototype;
-            var that = this;
-            return new Creation(that);
+            return new Creation();
         },
 
         _resolveClassName: function(cls, kind) {
@@ -109,7 +116,7 @@ function(Class) {
             } else if (this._baseKind(kind)) {                            // else if our kind inherits from a base kind
                 return this._resolveClassName(cls, this._baseKind(kind)); // resolve the class name from that base
             } else {
-                retObj.path = this._fromClassToPath(cls);                 // else use the default class, e.g. Node
+                retObj.path = this._fromClassToPath(cls);                 // else use the abstract class, e.g. Node
                 return retObj;
             }
         },
@@ -123,11 +130,17 @@ function(Class) {
         },
 
         _baseKind: function(kind) {
-            if (kind === 'fuzztree') {
+            // this is the part where we hardcode any inheritances _not_ from the abstract editor.
+            // we assume, that in most of the cases editors inherit directly from the abstract editor, so any other
+            //  case has to be described here.
+
+            if (kind === 'fuzztree') { // Fuzztrees inherit form Faulttrees
                 return 'faulttree';
             } else {
                 return false;
             }
         }
     });
+
+    return new Factory();
 });

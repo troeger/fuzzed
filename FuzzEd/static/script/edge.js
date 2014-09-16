@@ -1,5 +1,5 @@
-define(['class', 'config', 'property', 'jquery', 'jsplumb'],
-function(Class, Config, Property) {
+define(['factory', 'class', 'config', 'property', 'jquery', 'jsplumb'],
+function(Factory, Class, Config, Property) {
     /**
      * Package: Base
      */
@@ -152,7 +152,7 @@ function(Class, Config, Property) {
                 }
 
                 property.name = propertyName;
-                this.properties[propertyName] = this.factory.getClassModule('Property').from(this.factory, this, [], property);
+                this.properties[propertyName] = Factory.getModule('Property').from(this, [], property);
             }.bind(this));
 
             return this;

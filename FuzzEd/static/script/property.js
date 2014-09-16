@@ -1,5 +1,5 @@
-define(['class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'label', 'alerts', 'jquery', 'underscore'],
-function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
+define(['factory', 'class', 'config', 'decimal', 'property_menu_entry', 'mirror', 'label', 'alerts', 'jquery', 'underscore'],
+function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
     /**
      * Package: Base
      */
@@ -144,7 +144,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
             if (typeof this.mirror === 'undefined' || this.mirror === null) return this;
 
             _.each(this.mirrorers, function(mirrorer) {
-                this.mirrors.push(this.factory.create('Mirror', this, mirrorer.container, this.mirror));
+                this.mirrors.push(Factory.create('Mirror', this, mirrorer.container, this.mirror));
             }.bind(this));
 
             return this;
@@ -172,14 +172,14 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
 
         _setupLabel: function() {
             if (typeof this.label === 'undefined' || this.label === null) return this;
-            this.label = this.factory.create('Label', this, this.owner.jsPlumbEdge, this.label);
+            this.label = Factory.create('Label', this, this.owner.jsPlumbEdge, this.label);
 
             return this;
         },
 
         _setupMenuEntry: function() {
             //TODO: put this into the factory
-            this.menuEntry = new (this.menuEntryClass())(this.factory, this);
+            this.menuEntry = new (this.menuEntryClass())(this);
 
             return this;
         },
@@ -374,7 +374,7 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
                     partInCompound: index,
                     value: index === this.value ? value : undefined
                 });
-                parsedParts[index] = from(this.factory, this.owner, this.mirrorers, partDef);
+                parsedParts[index] = from(this.owner, this.mirrorers, partDef);
             }.bind(this));
 
             this.parts = parsedParts;
@@ -744,17 +744,17 @@ function(Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Alerts) {
     });
 
     //TODO: put this into the factory
-    var from = function(factory, owner, mirrorers, definition) {
+    var from = function(owner, mirrorers, definition) {
         switch (definition.kind) {
-            case 'bool':     return new Bool(factory, owner, mirrorers, definition);
-            case 'choice':   return new Choice(factory, owner, mirrorers, definition);
-            case 'compound': return new Compound(factory, owner, mirrorers, definition);
-            case 'epsilon':  return new Epsilon(factory, owner, mirrorers, definition);
-            case 'numeric':  return new Numeric(factory, owner, mirrorers, definition);
-            case 'range':    return new Range(factory, owner, mirrorers, definition);
-            case 'text':     return new Text(factory, owner, mirrorers, definition);
-			case 'textfield':return new InlineTextField(factory, owner, mirrorers, definition);
-            case 'transfer': return new Transfer(factory, owner, mirrorers, definition);
+            case 'bool':     return new Bool(owner, mirrorers, definition);
+            case 'choice':   return new Choice(owner, mirrorers, definition);
+            case 'compound': return new Compound(owner, mirrorers, definition);
+            case 'epsilon':  return new Epsilon(owner, mirrorers, definition);
+            case 'numeric':  return new Numeric(owner, mirrorers, definition);
+            case 'range':    return new Range(owner, mirrorers, definition);
+            case 'text':     return new Text(owner, mirrorers, definition);
+			case 'textfield':return new InlineTextField(owner, mirrorers, definition);
+            case 'transfer': return new Transfer(owner, mirrorers, definition);
 
             default: throw ValueError('unknown property kind ' + definition.kind);
         }

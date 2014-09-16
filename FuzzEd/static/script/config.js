@@ -1,4 +1,4 @@
-define(['underscore'], function() {
+define(['factory', 'underscore'], function(Factory) {
     /**
      *  Package: Base
      */
@@ -366,6 +366,7 @@ define(['underscore'], function() {
             EDGE:       'edge',
             NODE:       'node',
             NODEGROUP:  'nodegroup',
+            MENU:       'menu',
             SELECTABLE: 'ui-selectable'
         },
 
