@@ -229,11 +229,9 @@ set(COMMON_HEADERS
 )
 
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
-add_executable(common_model_test test_common_model.cpp ${COMMON_SOURCES} ${COMMON_HEADERS})
 
 include_directories(${COMMON_DIR})
 target_link_libraries(common_model ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB})
-target_link_libraries(common_model_test ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB})
 
 ############### UNIT TESTS ##############
 #########################################
@@ -251,3 +249,7 @@ add_subdirectory(fuzztreeconfiguration)
 add_subdirectory(fuzztreeanalysis)
 add_subdirectory(simulation)
 add_subdirectory(mincut)
+
+
+add_executable(common_model_test test_common_model.cpp ${COMMON_SOURCES} ${COMMON_HEADERS})
+target_link_libraries(common_model_test ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB} ftconfiguration)

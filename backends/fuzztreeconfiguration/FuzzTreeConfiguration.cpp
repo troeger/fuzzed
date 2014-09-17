@@ -1,12 +1,13 @@
 #include "FuzzTreeConfiguration.h"
 #include "xmlutil.h"
-#include "FuzzTreeTypes.h"
 
 FuzzTreeConfiguration::FuzzTreeConfiguration(const unsigned int id)
 	: m_costs(0),
 	m_bValid(true),
 	m_id(std::to_string(id))
-{}
+{
+	std::cout << m_id;
+}
 
 FuzzTreeConfiguration::FuzzTreeConfiguration(const FuzzTreeConfiguration& other)
 	: m_notIncluded(other.m_notIncluded),
@@ -16,7 +17,9 @@ FuzzTreeConfiguration::FuzzTreeConfiguration(const FuzzTreeConfiguration& other)
 	m_costs(other.m_costs),
 	m_bValid(true),
 	m_id(other.getId())
-{}
+{
+	std::cout << m_id;
+}
 
 void FuzzTreeConfiguration::operator=(const FuzzTreeConfiguration &other)
 {
@@ -27,6 +30,7 @@ void FuzzTreeConfiguration::operator=(const FuzzTreeConfiguration &other)
 	m_costs = other.m_costs;
 	m_bValid = true;
 	m_id = other.getId();
+	std::cout << m_id;
 }
 
 
@@ -50,10 +54,10 @@ void FuzzTreeConfiguration::setFeatureNumber(const id_type& ID, const id_type& c
 
 void FuzzTreeConfiguration::setNotIncludedRecursive(const Node& node)
 {
-	for (const auto child : node.children())
+	for (const auto child : node.getChildren())
 		setNotIncludedRecursive(child);
 	
-	m_notIncluded.insert(node.id());
+	m_notIncluded.insert(node.getId());
 }
 
 const bool& FuzzTreeConfiguration::isOptionalEnabled(const id_type& ID) const
@@ -79,12 +83,12 @@ const FuzzTreeConfiguration::id_type& FuzzTreeConfiguration::getFeaturedChild(co
 	return m_featureNodes.at(ID);
 }
 
-void FuzzTreeConfiguration::setCost(int cost)
+void FuzzTreeConfiguration::setCost(unsigned int cost)
 {
 	m_costs = cost;
 }
 
-const int FuzzTreeConfiguration::getCost() const
+const unsigned int FuzzTreeConfiguration::getCost() const
 {
 	return m_costs;
 }
@@ -115,15 +119,15 @@ void FuzzTreeConfiguration::markInvalid()
 	m_bValid = false;
 }
 
-const int FuzzTreeConfiguration::computeCostRecursive(const Node& node)
+const unsigned int FuzzTreeConfiguration::computeCostRecursive(const Node& node)
 {
-	int result = 0;
+	unsigned int result = 0;
 	const auto& nodeType = node.getType();
 	if (nodeType == "intermediateEvent" || nodeType == "basicEvent")
 	{
 		result = node.getCost();
 	}
-	for (const auto child : node.children())
+	for (const auto child : node.getChildren())
 		result += computeCostRecursive(child);
 
 	return result;

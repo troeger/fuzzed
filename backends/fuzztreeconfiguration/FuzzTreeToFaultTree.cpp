@@ -1,16 +1,20 @@
 #include "FuzzTreeToFaultTree.h"
+#include "FatalException.h"
 
 std::vector<FuzzTreeConfiguration> FuzzTreeToFaultTree::generateConfigurations() const
 {
-	std::vector<FuzzTreeConfiguration> result;
+	std::vector<FuzzTreeConfiguration> results;
 
 	/**
 	 * Traverse tree recursively to obtain configurations.
 	 */
 	unsigned int configCount = 0;
-	generateConfigurationsRecursive(m_model->getTopEvent(), results, count);
 
-	return result;
+	FuzzTreeConfiguration f = FuzzTreeConfiguration();
+	results.push_back(f);
+	generateConfigurationsRecursive(m_model->getTopEvent(), results, configCount);
+
+	return results;
 }
 
 Model FuzzTreeToFaultTree::faultTreeFromConfiguration(const FuzzTreeConfiguration& config) const
@@ -27,16 +31,18 @@ Model FuzzTreeToFaultTree::faultTreeFromConfiguration(const FuzzTreeConfiguratio
 bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 	const Node* node, 
 	std::vector<FuzzTreeConfiguration>& configurations,
-	unsigned int& configCount)
+	unsigned int& configCount) const
 {
-	for (const auto& child : node->children())
+	for (const auto& child : node->getChildren())
 	{
-		const string id 		= child->getId();
-		const auto childType 	= child->getType();
+		const std::string id = child.getId();
+		const std::string childType = child.getType();
 		
 		if (child.isOptional())
 		{ // inclusion variation point. Generate n + n configurations.
-			vector<FuzzTreeConfiguration> additional;
+			std::cout << "optional";
+
+			std::vector<FuzzTreeConfiguration> additional;
 			for (FuzzTreeConfiguration& config : configurations)
 			{
 				if (!config.isIncluded(id) || !config.isIncluded(node->getId())) 
@@ -47,11 +53,11 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 				// one configuration with this node
 				copied.setOptionalEnabled(id, true);
 				if (childType == "basicEvent" || childType == "intermediateEvent")
-					copied.setCost(copied.getCost() + child->getCost());
+					copied.setCost(copied.getCost() + child.getCost());
 
 				// one configuration without this node
 				config.setOptionalEnabled(id, false);
-				config.setNotIncludedRecursive(*child);
+				config.setNotIncludedRecursive(child);
 
 				additional.emplace_back(copied);
 			}
@@ -119,28 +125,26 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 		}
 		else
 		{
-			if (childType == "featureVariationPoint")
+			if (childType == nodetype::FEATUREVP)
 			{ // exactly one subtree. Generate N * #Features configurations.
-				/*const FeatureVariationPoint* featureNode = static_cast<const FeatureVariationPoint*>(child);
-				if (featureNode->children().size() == 0)
-				{
+				if (node->getChildren().size() == 0)
 					throw FatalException(std::string("FeatureVP without children found: ") + id, 0, id);
-				}
-
-				vector<FuzzTreeConfiguration> newConfigs;
-				for (FuzzTreeConfiguration& config : configurations)
+				
+				std::cout << "FEATUREVP";
+				std::vector<FuzzTreeConfiguration> newConfigs;
+				for (const FuzzTreeConfiguration& config : configurations)
 				{
 					if (config.isIncluded(id))
 					{
-						for (const auto& featuredChild : featureNode->children())
+						for (const auto& featuredChild : node->getChildren())
 						{
 							FuzzTreeConfiguration copied = config;
 							copied.setId(++configCount);
-							copied.setFeatureNumber(id, featuredChild->getId());
-							for (const auto& other : featureNode->children())
+							copied.setFeatureNumber(id, featuredChild.getId());
+							for (const auto& other : node->getChildren())
 							{
-								if (other->getId() != featuredChild->getId()) 
-									copied.setNotIncludedRecursive(*other);
+								if (other.getId() != featuredChild.getId()) 
+									copied.setNotIncludedRecursive(other);
 							}
 							newConfigs.emplace_back(copied);
 						}
@@ -153,20 +157,17 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 				{
 					assert(newConfigs.size() >= configurations.size());
 					configurations.assign(newConfigs.begin(), newConfigs.end());
-				}*/
+				}
 			}
 			else if (
-				childType == "basicEvent" || 
-				childType == "basicEventSet")
+				childType == nodetype::BASICEVENT || 
+				childType == nodetype::BASICEVENTSET)
 			{ // handle costs, TODO intermediateEvents!
-				int costs = child->getCost();
+				int costs = child.getCost();
 
-/*				// multiply costs...
-				if (childType == "basicEventSet")
-				{
-					const auto bes = static_cast<const BasicEventSet*>(child);
-					costs *= bes->getQuantity();
-				}*/
+				// multiply costs...
+				if (childType == nodetype::BASICEVENTSET)
+					costs *= child.getQuantity();
 
 				for (FuzzTreeConfiguration& config : configurations)
 				{
@@ -177,8 +178,8 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 
 			if (node->isLeaf()) continue; // end recursion
 		}
-		generateConfigurationsRecursive(child, configurations, configCount);
+		std::cout << "....";
+		generateConfigurationsRecursive(&child, configurations, configCount);
 	}
-
 	return true;
 }

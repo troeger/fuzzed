@@ -16,7 +16,7 @@ private:
 	bool generateConfigurationsRecursive(
 		const Node* node, 
 		std::vector<FuzzTreeConfiguration>& configurations,
-		unsigned int& configCount);
+		unsigned int& configCount) const;
 
 	const Model* m_model;
 	std::set<Issue> m_issues;

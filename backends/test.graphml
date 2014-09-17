@@ -1,33 +1,38 @@
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
     <graph id="graph" edgedefault="directed">
-        <data key="kind">faulttree</data>
+        <data key="kind">fuzztree</data>
         <data key="missionTime">17532</data>
-        <node id="3">
+        <node id="14">
             <data key="kind">basicEvent</data>
-            <data key="x">10</data>
-            <data key="y">6</data>
-            <data key="probability">[0, 0]</data>
+            <data key="x">12</data>
+            <data key="y">8</data>
+            <data key="probability">[0, [0.5, 0]]</data>
             <data key="name">Basic Event</data>
+            <data key="optional">False</data>
+            <data key="cost">1</data>
         </node>
-        <node id="4">
-            <data key="kind">basicEvent</data>
-            <data key="x">10</data>
-            <data key="y">6</data>
-            <data key="probability">[1, [0]]</data>
-            <data key="name">Basic Event</data>
-        </node>
-        <node id="1">
-            <data key="kind">andGate</data>
+        <node id="11">
+            <data key="kind">featureVariation</data>
             <data key="x">10</data>
             <data key="y">4</data>
+            <data key="name">Feature Variation</data>
+        </node>
+        <node id="7">
+            <data key="kind">basicEvent</data>
+            <data key="x">8</data>
+            <data key="y">8</data>
+            <data key="probability">[0, [0.5, 0]]</data>
+            <data key="name">Basic Event</data>
+            <data key="optional">True</data>
+            <data key="cost">1</data>
         </node>
         <node id="0">
             <data key="kind">topEvent</data>
             <data key="x">10</data>
             <data key="y">1</data>
         </node>
-        <edge source="1" target="3"/>
-        <edge source="1" target="4"/>
-        <edge source="0" target="1"/>
+        <edge source="11" target="14"/>
+        <edge source="11" target="7"/>
+        <edge source="0" target="11"/>
     </graph>
 </graphml>

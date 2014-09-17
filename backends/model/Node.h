@@ -27,8 +27,8 @@ namespace nodetype
     const std::string BASICEVENTSET         = "basicEventSet";
     const std::string INTERMEDIATEEVENTSET  = "intermediateEventSet";
 
-    const std::string REDUNDANCYVP  = "redundancyVariationPoint";
-    const std::string FEATUREVP     = "featureVariationPoint";
+    const std::string REDUNDANCYVP  = "redundancyVariation";
+    const std::string FEATUREVP     = "featureVariation";
 }
 
 
@@ -51,6 +51,7 @@ public:
 
     const bool& isOptional()        const { return m_isOptional; }
     const unsigned int& getCost()   const { return m_cost; }
+    const unsigned int& getQuantity() const { assert(isEventSet()); return m_quantity; }
 
     /**
      * Utility functions
@@ -59,6 +60,7 @@ public:
     bool isGate() const;
     bool isLeaf() const;
     bool isVariationPoint() const;
+    bool isEventSet() const;
 
     void setProbability(const Probability p) { assert(m_type == nodetype::BASICEVENT); m_probability = p; }
     const Probability& getProbability() const { assert(m_type == nodetype::BASICEVENT); return m_probability; }
@@ -83,4 +85,9 @@ private:
      * Basic Event members
      */
     Probability m_probability;
+
+    /**
+     * Event Set members
+     */
+    unsigned int m_quantity;
 };

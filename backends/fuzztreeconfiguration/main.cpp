@@ -1,5 +1,3 @@
-#include "FuzzTreeTransform.h"
-
 #include <string>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -41,7 +39,7 @@ int main(int argc, char **argv)
 	}
 
 	std::set<Issue> issues; // issues at fuzztree level
-	FuzzTreeTransform tf(instream, issues);
+	/*FuzzTreeTransform tf(instream, issues);
 	instream.close();
 
 	backendResults::BackendResults backendresults;
@@ -87,7 +85,7 @@ int main(int argc, char **argv)
 		*logFileStream << "Exception while trying to configure " << inFile << std::endl << "Results so far: ";
 		backendResults::backendResults(*logFileStream, backendresults);
 		return -1;
-	}
+	}*/
 
 	logFileStream->close();
 	delete logFileStream;

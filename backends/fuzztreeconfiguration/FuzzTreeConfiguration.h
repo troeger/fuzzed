@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <tuple>
+#include <iostream>
 #include "Node.h"
 
 struct FuzzTreeConfiguration
@@ -11,6 +12,7 @@ struct FuzzTreeConfiguration
 public:
 	typedef std::string id_type;
 
+	FuzzTreeConfiguration() { std::cout << "Hello"; };
 	FuzzTreeConfiguration(const unsigned int id);
 	FuzzTreeConfiguration(const FuzzTreeConfiguration& other);
 	void operator=(const FuzzTreeConfiguration &other);
@@ -22,7 +24,7 @@ public:
 
 	void setNotIncludedRecursive(const Node& ID);
 
-	static const int computeCostRecursive(const Node& ID);
+	static const unsigned int computeCostRecursive(const Node& ID);
 
 	const bool& isOptionalEnabled(const id_type& ID) const;
 	const bool isIncluded(const id_type& ID) const;
@@ -30,8 +32,8 @@ public:
 	const std::tuple<int,int>& getRedundancyCount(const id_type& ID) const;
 	const id_type& getFeaturedChild(const id_type& ID) const;
 
-	void setCost(int cost);
-	const int getCost() const;
+	void setCost(unsigned int cost);
+	const unsigned int getCost() const;
 
 	const id_type& getId() const;
 	void setId(const unsigned int id);
@@ -49,7 +51,7 @@ protected:
 	std::map<id_type, std::tuple<int,int> /*n out of m*/>	m_redundancyNodes;
 	std::map<id_type, id_type>								m_featureNodes;
 
-	int m_costs;
+	unsigned int m_costs;
 	id_type m_id;
 
 	bool m_bValid;

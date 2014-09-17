@@ -34,6 +34,8 @@ public:
     const std::string& getType()    const { return m_type; };
     const Node* getTopEvent()       const { return m_topEvent; };
 
+    static void printTreeRecursive(const Node* node, unsigned int indent);
+
 private:
     void loadTree(const std::vector<pugi::xml_node>& nodes, const std::vector<pugi::xml_node>& edges);
     void loadRecursive(
@@ -41,8 +43,6 @@ private:
         const std::vector<pugi::xml_node> edges,
         const std::string parentId,
         Node* parentModelNode);
-
-    static void printTreeRecursive(const Node* node, unsigned int indent);
 
     Model(std::string type, std::string id, std::string name)
         : m_type(type), m_id(id), m_name(name), m_topEvent(nullptr), m_decompositionNumber(0)

@@ -29,7 +29,9 @@ bool Node::isLeaf() const
     return
         m_type == BASICEVENT ||
         m_type == UNDEVELOPEDEVENT ||
-        m_type == HOUSEEVENT;
+        m_type == HOUSEEVENT ||
+        m_type == BASICEVENTSET ||
+        m_type == INTERMEDIATEEVENTSET;
 }
 
 bool Node::isVariationPoint() const
@@ -38,4 +40,12 @@ bool Node::isVariationPoint() const
     return
         m_type == REDUNDANCYVP ||
         m_type == FEATUREVP;
+}
+
+bool Node::isEventSet() const
+{
+    using namespace nodetype;
+    return
+        m_type == BASICEVENTSET ||
+        m_type == INTERMEDIATEEVENTSET;
 }
