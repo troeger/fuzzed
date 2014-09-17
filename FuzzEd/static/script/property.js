@@ -624,7 +624,12 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
             return PropertyMenuEntry.TextEntry;
         },
 
-        validate: function(value, validationResult) {
+        validate: function(value, validationResult) {   
+            if (this.notEmpty && value === '') {
+                validationResult.kind    = ValueError;
+                validationResult.message = 'value must not be empty';
+                return false;
+            }
             return true;
         },
 
