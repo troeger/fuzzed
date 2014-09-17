@@ -54,7 +54,7 @@ define(['factory', 'config', 'jquery'], function(Factory, Config) {
             ACTION_CUTSETS:              'FuzzEdActionCutsets',
             ACTION_ANALYTICAL:           'FuzzEdActionAnalytical',
             ACTION_SIMULATED:            'FuzzEdActionSimulated',
-            ACTION_CLONE:                'FuzzEdActionClone',
+            ACTION_MIRROR:               'FuzzEdActionMirror',
             ANALYTICAL_PROBABILITY_MENU: 'FuzzEdAnalyticalProbabilityMenu',
             SIMULATED_PROBABILITY_MENU:  'FuzzEdSimulatedProbabilityMenu'
         },

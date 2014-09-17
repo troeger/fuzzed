@@ -17,7 +17,7 @@
 
             "deletable": true,
             "copyable": true,
-            "cloneable": false,
+            "mirrorable": false,
 
             "connector": {
                 "offset": {
@@ -107,7 +107,7 @@
             "image": "basic_event.svg",
             "help": "An initial fault event.",
 
-            "cloneable": true,
+            "mirrorable": true,
 
             "properties": {
                 "name": {
@@ -136,6 +136,7 @@
                         "kind": "numeric",
                         "partName": "Rate",
                         "min": 0,
+                        "max": 1000000000,
                         "step": 0.01,
                         "default": 17532,
 
@@ -333,6 +334,7 @@
                         "kind": "numeric",
                         "partName": "Rate",
                         "min": 0,
+                        "max": 1000000000,
                         "step": 0.01,
                         "default": 17532,
 
@@ -650,6 +652,7 @@
                         "kind": "numeric",
                         "partName": "Rate",
                         "min": 0,
+                        "max": 1000000000,
                         "step": 0.01,
                         "default": 17532,
 

@@ -1153,8 +1153,6 @@ $.widget("ui.draggable", $.ui.mouse, {
 	},
 
 	_mouseDrag: function(event, noPropagation) {
-        if (this.options.containment) this._setContainment();
-
 		// reset any necessary cached properties (see #5009)
 		if ( this.offsetParentCssPosition === "fixed" ) {
 			this.offset.parent = this._getParentOffset();

@@ -19,7 +19,7 @@
             "resizable": false,
             "editable": false,
             "copyable": true,
-            "cloneable": false,
+            "mirrorable": false,
 
             "connector": {
                 "offset": {
@@ -88,7 +88,7 @@
             "numberOfOutgoingConnections": -1,
             "allowConnectionTo": ["fdepGate"],
 
-            "cloneable": true,
+            "mirrorable": true,
 
             "image": "basic_event.svg",
             "help": "An initial fault event.",
@@ -118,6 +118,7 @@
                         "kind": "numeric",
                         "partName": "Rate",
                         "min": 0,
+                        "max": 1000000000,
                         "step": 0.01,
                         "default": 17532,
                         "mirror": {
@@ -269,6 +270,7 @@
                         "kind": "numeric",
                         "partName": "Rate",
                         "min": 0,
+                        "max": 1000000000,
                         "step": 0.01,
                         "default": 17532,
                         "mirror": {
@@ -489,6 +491,7 @@
                     "kind": "numeric",
                     "partName": "Rate",
                     "min": 0,
+                    "max": 1000000000,
                     "step": 0.01,
                     "default": 17532,
                     "mirror": {

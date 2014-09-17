@@ -624,12 +624,8 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
             return PropertyMenuEntry.TextEntry;
         },
 
-        validate: function(value, validationResult) {
-            if (typeof value !== 'string') {
-                validationResult.kind    = TypeError;
-                validationResult.message = 'value must be string';
-                return false;
-            } else if (this.notEmpty && value === '') {
+        validate: function(value, validationResult) {   
+            if (this.notEmpty && value === '') {
                 validationResult.kind    = ValueError;
                 validationResult.message = 'value must not be empty';
                 return false;
@@ -638,7 +634,7 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
         },
 
         _sanitize: function() {
-            this.value = typeof this.value === 'undefined' ? this.default : this.value;
+            this.value = typeof this.value === 'undefined' ? this.default : String(this.value);
             return this._super();
         }
     });

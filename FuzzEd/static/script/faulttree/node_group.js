@@ -32,8 +32,8 @@ define(['factory', 'node_group', 'config'], function(Factory, NodeGroup, Config)
                 }
 
                 property.name = propertyName;
-                this.properties[propertyName] = Factory.getClassModule('Property')
-                                                            .from(this, this.nodes, property);
+                this.properties[propertyName] = Factory.getModule('Property')
+                                                       .from(this, this.nodes, property);
             }.bind(this));
 
             return this;

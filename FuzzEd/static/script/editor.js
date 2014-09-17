@@ -40,7 +40,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
         _nodeOffsetPrintStylesheet:    undefined,
         _nodeOffsetStylesheetTemplate: undefined,
 
-        _clipboard:                    '',
+        _clipboard:                    undefined,
 
         /**
          * Group: Initialization
@@ -123,6 +123,9 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
                 this.properties.disable();
                 Canvas.disableInteraction();
             }
+
+            // update the available menu items for the first time
+            this._updateMenuActions();
 
             // enable user interaction
             this._setupMouse()
@@ -387,6 +390,10 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             jQuery(document).on(this.config.Events.NODE_ADDED,         this._updatePrintOffsets.bind(this));
             jQuery(document).on(this.config.Events.NODE_DELETED,       this._updatePrintOffsets.bind(this));
 
+            // update the available menu actions corresponding to the current selection
+            jQuery(document).on([ this.config.Events.NODE_SELECTED,
+                                  this.config.Events.NODE_UNSELECTED ].join(' '), this._updateMenuActions.bind(this));
+
             // show status of global AJAX events in navbar
             jQuery(document).ajaxSend(Progress.showAjaxProgress);
             jQuery(document).ajaxSuccess(Progress.flashAjaxSuccessMessage);
@@ -407,32 +414,164 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      This {<Editor>} instance for chaining
          */
         _deleteSelection: function() {
-            var selectedNodes =      '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
-            var selectedEdges =      '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+            var deletableNodes      = this._deletable(this._selectedNodes());
+            var deletableEdges      = this._deletable(this._selectedEdges());
+            var deletableNodeGroups = this._deletable(this._selectedNodeGroups());
 
             // delete selected nodes
-            jQuery(selectedNodes).each(function(index, element) {
-                var node = jQuery(element).data(this.config.Keys.NODE);
-                this.graph.deleteNode(node);
-            }.bind(this));
+            _.each(deletableNodes, this.graph.deleteNode.bind(this.graph));
 
             // delete selected edges
-            jQuery(selectedEdges).each(function(index, element) {
-                var edge = jQuery(element).data(this.config.Keys.EDGE);
-                this.graph.deleteEdge(edge);
+            _.each(deletableEdges, this.graph.deleteEdge.bind(this.graph));
+
+            // delete selected node groups
+            _.each(deletableNodeGroups, this.graph.deleteNodeGroup.bind(this.graph));
+
+            // if at least one element was deletable, hide the properties window
+            if (_.union(deletableNodes, deletableEdges, deletableNodeGroups).length > 0) this.properties.hide();
+
+            return this;
+        },
+
+        /**
+         * Method: _selectedNodes
+         *      Finds currently selected nodes.
+         *
+         * Returns:
+         *      An array of currently selected {<Node>} instances.
+         */
+        _selectedNodes: function() {
+            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+
+            var nodes = [];
+            jQuery(selectedNodes).each(function(index, element) {
+                var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
+                nodes.push(node);
             }.bind(this));
 
-            // delete selected node groups (NASTY!!!)
+            return nodes;
+        },
+
+        /**
+         * Method: _selectedEdges
+         *      Finds currently selected edges.
+         *
+         * Returns:
+         *      An array of currently selected {<Edge>} instances.
+         */
+        _selectedEdges: function() {
+            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+
+            var edges = [];
+            jQuery(selectedEdges).each(function(index, element) {
+                var edge = jQuery(element).data(this.config.Keys.EDGE);
+                edges.push(edge);
+            }.bind(this));
+
+            return edges;
+        },
+
+        /**
+         * Method: _selectedNodeGroups
+         *      Finds currently selected node groups.
+         *
+         * Returns:
+         *      An array of currently selected {<NodeGroup>} instances.
+         */
+        _selectedNodeGroups: function() {
+            var nodegroups = [];
+            // find selected node groups (NASTY!!!)
             var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
 
             jQuery(allNodeGroups).each(function(index, element) {
                 var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                // since the selectable element is an svg path, we need to look for that nested element and check its
+                //   state of selection via the CSS class .selected
                 if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
-                    this.graph.deleteNodeGroup(nodeGroup);
+                    nodegroups.push(nodeGroup);
                 }
             }.bind(this));
 
-            this.properties.hide();
+            return nodegroups;
+        },
+
+        /**
+         * Method: _copyable
+         *      Filters the given array of elements (Nodes, Edges, NodeGroups) for copyable ones.
+         *
+         * Returns:
+         *      An array of elements that are copyable.
+         */
+        _copyable: function(elements) {
+            return _.filter(elements, function(elem) { return elem.copyable });
+        },
+
+        /**
+         * Method: _deletable
+         *      Filters the given array of elements (Nodes, Edges, NodeGroups) for deletable ones.
+         *
+         * Returns:
+         *      An array of elements that are deletable.
+         */
+        _deletable: function(elements) {
+            return _.filter(elements, function(elem) { return elem.deletable });
+        },
+
+        /**
+         * Method: _cuttable
+         *      Filters the given array of elements (Nodes, Edges, NodeGroups) for cuttable ones.
+         *
+         * Returns:
+         *      An array of elements that are cuttable.
+         */
+        _cuttable: function(elements) {
+            return _.intersection(this._copyable(elements), this._deletable(elements));
+        },
+
+        /**
+         * Method: _updateMenuActions
+         *      Will update the enabled/disabled status of the menu actions depending on the current selection.
+         *
+         * Returns:
+         *      This {<Editor>} instance for chaining.
+         */
+
+        _updateMenuActions: function() {
+            var selectedNodes = this._selectedNodes();
+            var selectedElems =       selectedNodes.concat(
+                                this._selectedEdges().concat(
+                                this._selectedNodeGroups()));
+
+            // copy is only available when at least one node is copyable as copying edges or node groups solely won't
+            //  have any effect (because they can't be restored)
+            if (this._copyable(selectedNodes).length > 0) {
+                jQuery('#' + this.config.IDs.ACTION_COPY).parent().removeClass('disabled');
+            } else {
+                jQuery('#' + this.config.IDs.ACTION_COPY).parent().addClass('disabled');
+            }
+
+            // same here: cut is only available when at least one node is cuttable
+            if (this._cuttable(selectedNodes).length > 0) {
+                jQuery('#' + this.config.IDs.ACTION_CUT).parent().removeClass('disabled');
+            } else {
+                jQuery('#' + this.config.IDs.ACTION_CUT).parent().addClass('disabled');
+            }
+
+            // delete is only available when the selection is not empty and at least one element is deletable
+            if (selectedElems.length > 0 && this._deletable(selectedElems).length > 0) {
+                jQuery('#' + this.config.IDs.ACTION_DELETE).parent().removeClass('disabled');
+            } else {
+                jQuery('#' + this.config.IDs.ACTION_DELETE).parent().addClass('disabled');
+            }
+
+            // paste is only available when there is something in the clipboard
+            if (this._getClipboard()) {
+                jQuery('#' + this.config.IDs.ACTION_PASTE).parent().removeClass('disabled');
+            } else {
+                jQuery('#' + this.config.IDs.ACTION_PASTE).parent().addClass('disabled');
+            }
+
+            return this;
         },
 
         /**
@@ -500,38 +639,14 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      This {<Editor>} instance for chaining.
          */
         _copySelection: function() {
-            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
-            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+            // select copyable elements and transform them into dicts for later serialization
+            var nodes      = _.invoke(this._copyable(this._selectedNodes()), 'toDict');
+            var edges      = _.invoke(this._copyable(this._selectedEdges()), 'toDict');
+            var nodegroups = _.invoke(this._copyable(this._selectedNodeGroups()), 'toDict');
 
-            // put nodes as dicts into nodes
-            var nodes = [];
-            jQuery(selectedNodes).each(function(index, element) {
-                var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
-                if (node.copyable) {
-                    nodes.push(node.toDict());
-                }
-            }.bind(this));
-
-            var edges = [];
-            jQuery(selectedEdges).each(function(index, element) {
-                var edge = jQuery(element).data(this.config.Keys.EDGE);
-                if (edge.copyable) {
-                    edges.push(edge.toDict());
-                }
-            }.bind(this));
-
-            var nodegroups = [];
-            // find selected node groups (NASTY!!!)
-            var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
-
-            jQuery(allNodeGroups).each(function(index, element) {
-                var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
-                // since the selectable element is an svg path, we need to look for that nested element and check its
-                //   state of selection via the CSS class .selected
-                if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
-                    nodegroups.push(nodeGroup.toDict());
-                }
-            }.bind(this));
+            // copying only makes sense, when at least one node is involved (i.e. in the current selection), because
+            //  edges and node groups can only be recreated at paste, when nodes are as well.
+            if (nodes.length == 0) return;
 
             var clipboard = {
                 'pasteCount': 0,
@@ -540,10 +655,10 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
                 'nodeGroups': nodegroups
             };
 
-            // forbid copyings without any node
-            if (nodes.length > 0) {
-                this._updateClipboard(clipboard);
-            }
+            this._updateClipboard(clipboard);
+
+            // update available menu actions, so the paste menu action will be enabled
+            this._updateMenuActions();
         },
 
         /**
@@ -554,11 +669,16 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      This {<Editor>} instance for chaining.
          */
         _paste: function() {
+            // fetch clipboard from local storage or variable
+            var clipboard = this._getClipboard();
+
+            // if there is nothing in the clipboard, return
+            if (!clipboard) return;
+
             // deselect the original nodes and edges
             this._deselectAll();
 
-            // fetch clipboard from local storage or variable and increase pasteCount
-            var clipboard = this._getClipboard();
+            // increase paste count (used for nicely positioning multiple pastes)
             var pasteCount = ++clipboard.pasteCount;
             this._updateClipboard(clipboard);
 
@@ -627,20 +747,20 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *
          *   Will create a new NodeGroup with the current selected nodes.
          *
-         *   Note: This method can't be accessed by the user, unless you provide Menu Actions or Key Events for it.
+         *   Note: Node Groups are an abstract concept, that every diagram type has to implement on its own. So this
+         *   method can't be accessed by the user, unless you provide Menu Actions or Key Events for it.
          *   (see dfd/editor.js for examples of correct subclassing)
          *
          * Returns:
          *   This Editor instance for chaining.
          */
         _groupSelection: function() {
-            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedNodes = this._selectedNodes();
 
-            nodes = jQuery(selectedNodes);
-            if(nodes.length > 1)
+            if(selectedNodes.length > 1)
             {
                 var jsonNodeGroup = {
-                    nodeIds: _.map(nodes, function(node){return jQuery(node).data(this.config.Keys.NODE).id;}.bind(this))
+                    nodeIds: _.map(selectedNodes, function(node){return node.id;}.bind(this))
                 };
                 this.graph.addNodeGroup(jsonNodeGroup);
             }
@@ -661,12 +781,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *   Success
          */
         _ungroupSelection: function() {
-            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
-
-            var nodeIds = _.map(jQuery(selectedNodes), function(node){
-                return jQuery(node).data(this.config.Keys.NODE).id;
-            }.bind(this));
-
+            var nodeIds = _.map(this._selectedNodes(), function(node) { return node.id; }.bind(this));
             var nodeGroup = undefined;
 
             // case [1]: find the correct node group, whose node ids match the selected ids
@@ -681,18 +796,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             }.bind(this));
 
             // case [2]: the user selected NodeGroups, (s)he wants to delete, do him/her the favor to delete them
-            // delete selected node groups (NASTY!!!)
-            if (typeof nodeGroup === 'undefined') {
-                var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
-
-                jQuery(allNodeGroups).each(function(index, element) {
-                    var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
-                    if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
-                        this.graph.deleteNodeGroup(nodeGroup);
-                        return true;
-                    }
-                }.bind(this));
-            }
+            _.each(this._selectedNodeGroups(), this.graph.deleteNodeGroup.bind(this.graph));
 
             return false;
         },
@@ -761,10 +865,12 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      The clipboard contents as {Object}.
          */
         _getClipboard: function() {
-            if (typeof window.Storage !== 'undefined' && localStorage['clipboard_' + this.graph.kind] !== 'undefined') {
+            if (typeof window.Storage !== 'undefined' && typeof localStorage['clipboard_' + this.graph.kind] !== 'undefined') {
                 return JSON.parse(localStorage['clipboard_' + this.graph.kind]);
-            } else {
+            } else if (typeof this._clipboard !== 'undefined') {
                 return JSON.parse(this._clipboard);
+            } else {
+                return false;
             }
         },
 
