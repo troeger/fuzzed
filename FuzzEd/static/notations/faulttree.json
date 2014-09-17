@@ -19,7 +19,7 @@
             "resizable": false,
             "editable": false,
             "copyable": true,
-            "cloneable": false,
+            "mirrorable": false,
 
             "connector": {
                 "offset": {
@@ -88,7 +88,7 @@
             "numberOfOutgoingConnections": -1,
             "allowConnectionTo": ["fdepGate"],
 
-            "cloneable": true,
+            "mirrorable": true,
 
             "image": "basic_event.svg",
             "help": "An initial fault event.",

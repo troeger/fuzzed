@@ -266,17 +266,17 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
         _setupMenuActions: function() {
             this._super();
 
-            jQuery('#' + this.config.IDs.ACTION_CLONE).click(function() {
-                this._cloneSelection();
+            jQuery('#' + this.config.IDs.ACTION_MIRROR).click(function() {
+                this._mirrorSelection();
             }.bind(this));
 
             return this;
         },
 
-        _cloneSelection: function(event) {
+        _mirrorSelection: function(event) {
             var selected = jQuery('.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE);
 
-            // we will only clone the selection, if a single node is selected
+            // we will only mirror the selection, if a single node is selected
             if (selected.length === 1) {
                 // temporarily hide the properties menu to avoid, that it shows the newly created node's individual
                 //    properties, as it is supposed to show the common properties with it's original node (i.e. the
@@ -285,14 +285,14 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
 
                 var node  = this.graph.getNodeById(selected.data(this.config.Keys.NODE).id);
 
-                if (!node.cloneable) return false;
+                if (!node.mirrorable) return false;
 
-                var clone = this.graph._clone(node);
+                var mirroredNode = this.graph._mirror(node);
 
-                if (clone) {
+                if (mirroredNode) {
                     // highlight the newly generated node by selecting it
                     this._deselectAll();
-                    clone.select();
+                    mirroredNode.select();
                 }
 
                 // allow the properties menu to be shown again
