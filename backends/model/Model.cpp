@@ -19,7 +19,8 @@ static const char* TARGET = "target";
 static const char* NAME = "name";
 static const char* OPTIONAL = "optional";
 
-#define GET_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (std::string(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_string()))
+#define GET_STRING_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (std::string(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_string()))
+#define GET_BOOL_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_bool())
 
 Model::Model(const std::string graphMLFileName)
 {
@@ -41,7 +42,7 @@ Model::Model(const std::string graphMLFileName)
     //graph.print(std::cout);
     //graph.find_child_by_attribute(DATA, KEY, KIND).print(std::cout);
     
-    m_type = GET_VALUE_BY_ATTR(graph, DATA, KEY, KIND);
+    m_type = GET_STRING_VALUE_BY_ATTR(graph, DATA, KEY, KIND);
 
     if (m_type != modeltype::FUZZTREE && m_type != modeltype::FAULTTREE)
         throw FatalException(std::string("Could not parse model kind in file: ") + m_type);
@@ -55,7 +56,7 @@ Model::Model(const std::string graphMLFileName)
     for (xml_node node = graph.child(NODE); node; node = node.next_sibling(NODE))
     {
         node.print(std::cout);
-        if (GET_VALUE_BY_ATTR(node, DATA, KEY, KIND) == nodetype::TOPEVENT)
+        if (GET_STRING_VALUE_BY_ATTR(node, DATA, KEY, KIND) == nodetype::TOPEVENT)
         {
             if (m_topEvent != nullptr)
                 throw FatalException("Multiple top events detected");
@@ -107,12 +108,12 @@ void Model::loadRecursive(
             const std::string cid = c.attribute(ID).value();
             if (cid != childId) continue;
             
-            const std::string childType = GET_VALUE_BY_ATTR(c, DATA, KEY, KIND);
+            const std::string childType = GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, KIND);
             parentModelNode->addChild(Node(
                 childType,
                 cid,
-                GET_VALUE_BY_ATTR(c, DATA, KEY, OPTIONAL),
-                GET_VALUE_BY_ATTR(c, DATA, KEY, NAME)));
+                GET_BOOL_VALUE_BY_ATTR(c, DATA, KEY, OPTIONAL),
+                GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, NAME)));
             {
                 if (childType == nodetype::BASICEVENT)
                 { // determine probability
