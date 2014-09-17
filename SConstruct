@@ -131,6 +131,6 @@ AlwaysBuild(env.Command("run.tests", None,
                         "scons settings; ./manage.py test FuzzEd.tests"))
 
 AlwaysBuild(env.Command("run.js_tests", None, 
-                        "scons settings; mocha-phantomjs FuzzEd/tests/js-tests/src/test_runner.html"))
+                        "mocha-phantomjs FuzzEd/tests/js-tests/src/test_runner.html"))
 
 
