@@ -119,11 +119,26 @@ patch4 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js',
           ['FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.patch',
            'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.orig'])
 
+# Define meta-targets for ease of use
+env.Alias("backend", settings)
+env.Alias("backend", "ftconfiguration")
+env.Alias("backend", "ftanalysis")
+env.Alias("backend", "ftsimulation")
+env.Alias("backend", shapes)
+
+env.Alias("frontend", settings)
+env.Alias("frontend", css)
+env.Alias("frontend", xml)
+env.Alias("frontend", notations)
+env.Alias("frontend", patch1)
+env.Alias("frontend", patch2)
+env.Alias("frontend", patch3)
+env.Alias("frontend", patch4)
+
 # Default targets when nothing is specified
-# We skip the backend and doc builds here, which mainly serves the
-# Web frontend developer
-env.Default(css, settings, xml, notations, shapes,
-            patch1, patch2, patch3, patch4)
+# We skip the backend and doc builds here, which mainly is speeding
+# up frontend development
+env.Default("frontend")
 
 # Special pseudo-targets to run stuff via Scons
 AlwaysBuild(env.Command('fixture.save', None, fixture_save))
