@@ -65,6 +65,27 @@ define(['factory', 'editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 
             return this;
         },
 
+        _updateMenuActions: function() {
+            this._super();
+
+            var selectedNodes = this._selectedNodes();
+            var selectedNodeGroups = this._selectedNodeGroups();
+
+            // group is only available when at least two nodes are selected
+            if (selectedNodes.length >= 2) {
+                jQuery('#' + this.config.IDs.ACTION_GROUP).parent().removeClass('disabled');
+            } else {
+                jQuery('#' + this.config.IDs.ACTION_GROUP).parent().addClass('disabled');
+            }
+
+            // ungroup is only available when at least two nodes or at least one node group is selected
+            if (selectedNodes.length >= 2 || selectedNodeGroups.length > 0) {
+                jQuery('#' + this.config.IDs.ACTION_UNGROUP).parent().removeClass('disabled');
+            } else {
+                jQuery('#' + this.config.IDs.ACTION_UNGROUP).parent().addClass('disabled');
+            }
+        },
+
         _groupPressed: function(event) {
             // prevent that node is being deleted when we edit an input field
             if (jQuery(event.target).is('input, textarea')) return this;
