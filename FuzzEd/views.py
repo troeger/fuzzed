@@ -280,15 +280,7 @@ def dashboard_new(request, project_id, kind):
     if POST.get('save') and POST.get('name'):
         graph = Graph(kind=kind, name=POST['name'], owner=request.user, project=project)
         graph.save()
-        # pre-initialize the graph with default nodes
-        notation = notations.by_kind[kind]
-        if 'defaults' in notation:
-            for index, default_node in enumerate(notation['defaults']['nodes']):
-                default_node.update({'properties': {}})
-                # use index as node client ID
-                # this is unique since all other client IDs are time stamps
-                node = Node(graph=graph, client_id=int(index), x=default_node['x'], y=default_node['y'])
-                node.save()
+        graph.add_default_nodes()
         return redirect('dashboard', project_id = project_id)
 
     # render the create diagram if fuzztree

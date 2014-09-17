@@ -34,6 +34,7 @@ class ViewsTestCase(FuzzEdTestCase):
     def testNewGraphFromDashboard(self):
         response = self.post('/projects/%u/dashboard/new/faulttree' % fixt_simple['pkProject'],
                              {'save': 'save', 'name': 'My new graph'})
+        #TODO: Check that the new fault tree contains a top event node
         self.assertEqual(response.status_code, 302)
 
     def testBulkGraphCopy(self):
