@@ -14,7 +14,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
 
-from FuzzEd.models import Graph, Project, notations, commands, Sharing
+from FuzzEd.models import Graph, Project, notations, Sharing, Node
 import FuzzEd.settings
 
 
@@ -120,8 +120,8 @@ def project_new(request):
     """
   
     if request.method == 'POST':
-        POST = request.POST
-        commands.AddProject.create_from(name=POST.get('name'), owner=request.user).do()
+        project = Project(name=request.POST.get('name'), owner=request.user, deleted=False)
+        project.save()
         return redirect('projects')
         
     return render(request, 'project_menu/project_new.html')
@@ -147,7 +147,8 @@ def project_edit(request, project_id):
 
     # deletion requested? do it and go back to project overview
     if POST.get('delete'):
-        commands.DeleteProject.create_from(project_id).do()
+        project.deleted = True
+        project.save()
         messages.add_message(request, messages.SUCCESS, 'Project deleted.')
         return redirect('projects')
        
@@ -277,7 +278,17 @@ def dashboard_new(request, project_id, kind):
 
     # save the graph
     if POST.get('save') and POST.get('name'):
-        commands.AddGraph.create_from(kind=kind, name=POST['name'], owner=request.user, project=project).do()
+        graph = Graph(kind=kind, name=POST['name'], owner=request.user, project=project)
+        graph.save()
+        # pre-initialize the graph with default nodes
+        notation = notations.by_kind[kind]
+        if 'defaults' in notation:
+            for index, default_node in enumerate(notation['defaults']['nodes']):
+                default_node.update({'properties': {}})
+                # use index as node client ID
+                # this is unique since all other client IDs are time stamps
+                node = Node(graph=graph, client_id=int(index), x=default_node['x'], y=default_node['y'])
+                node.save()
         return redirect('dashboard', project_id = project_id)
 
     # render the create diagram if fuzztree
@@ -348,29 +359,21 @@ def dashboard_edit(request, project_id):
     elif POST.get('copy'):
         # "Copy" button pressed for one or multiple graphs
         for old_graph in graphs:
-            duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (copy)',
-                                                          owner=request.user,  add_default_nodes=False, project=project)
-            duplicate_command.do()
-            
-            new_graph = duplicate_command.graph
-            new_graph.copy_values(old_graph)
-            new_graph.save()
-    
+            graph = Graph(kind=old_graph.kind, name=old_graph.name + ' (copy)', owner=request.user, project=project)
+            graph.save()
+            graph.copy_values(old_graph)
+            graph.save()
         messages.add_message(request, messages.SUCCESS, 'Duplication successful.')
         return redirect('dashboard', project_id = project.id)
     
     elif POST.get('snapshot'):
         # "Snapshot" button pressed for one or multiple graphs
         for old_graph in graphs:
-            duplicate_command = commands.AddGraph.create_from(kind=old_graph.kind, name=old_graph.name + ' (snapshot)',
-                                                          owner=request.user, add_default_nodes=False, project=project)
-            duplicate_command.do()
-            
-            new_graph = duplicate_command.graph
-            new_graph.copy_values(old_graph)
-            new_graph.read_only = True
-            new_graph.save()
-    
+            graph = Graph(kind=old_graph.kind, name=old_graph.name + ' (snapshot)', owner=request.user, project=project)
+            graph.save()
+            graph.copy_values(old_graph)
+            graph.read_only = True
+            graph.save()
         messages.add_message(request, messages.SUCCESS, 'Snapshot creation sucessful.')
         return redirect('dashboard', project_id=project.id)
     
@@ -378,7 +381,8 @@ def dashboard_edit(request, project_id):
         # "Delete" button pressed for one or multiple graphs
         for graph in graphs:
             graph.sharings.all().delete() # all graph sharings will be deleted irretrievably
-            commands.DeleteGraph.create_from(graph.pk).do()
+            graph.deleted = True
+            graph.save()
         
         messages.add_message(request, messages.SUCCESS, 'Deletion sucessful.')
         return redirect('dashboard', project_id = project.id)
