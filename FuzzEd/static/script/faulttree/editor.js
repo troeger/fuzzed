@@ -273,6 +273,28 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
             return this;
         },
 
+        _updateMenuActions: function() {
+            this._super();
+
+            // mirror is only available when exactly one mirrorable node is selected
+            if (this._mirrorable(this._selectedNodes()).length == 1) {
+                jQuery('#' + this.config.IDs.ACTION_MIRROR).parent().removeClass('disabled');
+            } else {
+                jQuery('#' + this.config.IDs.ACTION_MIRROR).parent().addClass('disabled');
+            }
+        },
+
+        /**
+         * Method: _mirrorable
+         *      Filters the given array of elements (Nodes, Edges, NodeGroups) for mirrorable ones.
+         *
+         * Returns:
+         *      An array of elements that are mirrorable.
+         */
+        _mirrorable: function(elements) {
+            return _.filter(elements, function(elem) { return elem.mirrorable });
+        },
+
         _mirrorSelection: function(event) {
             var selected = jQuery('.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE);
 
