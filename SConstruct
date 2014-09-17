@@ -130,8 +130,8 @@ env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js',
 
 
 # Default targets when nothing is specified
-env.Default('docs', 'css', 'settings', 'xml', 'notations', 'shapes',
-            'ftanalysis', 'ftsimulation')
+#env.Default('docs', 'css', 'settings', 'xml', 'notations', 'shapes',
+#            'ftanalysis', 'ftsimulation')
 
 # Special pseudo-targets to run stuff via Scons
 AlwaysBuild(env.Command('run.server', None, server))
