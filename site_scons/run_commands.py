@@ -33,11 +33,6 @@ def server(target, source, env):
     else:
         os.system('./manage.py runserver')
 
-def tests(target, source, env):
-    '''Runs all the tests.'''
-    os.system("scons settings")          # Makes sure that the configs match to the runtime environment for the test
-    os.system('./manage.py test FuzzEd.tests')
-
 def fixture_save(target, source, env):
     '''Creates a test fixture from the current database.'''
     testaccount = {"model": "auth.user", "pk": 2,

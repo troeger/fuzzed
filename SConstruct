@@ -60,8 +60,7 @@ package_backend = env.Package(
 Alias('package.backend', package_backend)
 
 # NaturalDocs generation - 'docs' target
-docs_targets = Dir('docs')
-natdocs = env.Command(  docs_targets, 
+docs = env.Command(  Dir('docs'), 
                         Dir('FuzzEd'), 
                         [
                             Delete("docs"),
@@ -69,20 +68,14 @@ natdocs = env.Command(  docs_targets,
                             'tools/NaturalDocs/NaturalDocs -i $SOURCE -o HTML $TARGET -p $TARGET'
                         ]
                      )
-Clean(natdocs, 'docs')
-Alias('docs', docs_targets)
 
 # Lessc compilation - 'white.css' target
-lessc_targets = 'FuzzEd/static/css/theme/white.css'
-env.Lessc( lessc_targets,
+css = env.Lessc( 'FuzzEd/static/css/theme/white.css',
           'FuzzEd/static/less/theme/white/theme.less')
-Alias('css', lessc_targets)
 
 # Config file generation - 'settings.py' and 'daemon.ini' target
-config_targets = ['FuzzEd/settings.py', 'backends/daemon.ini']
-env.FuzzedConfig( config_targets, 'settings.ini')
-AlwaysBuild('settings')     # to support flipping betwenn Vagrant and native dev
-Alias('settings', config_targets)
+settings = env.FuzzedConfig( ['FuzzEd/settings.py', 'backends/daemon.ini'], 'settings.ini')
+AlwaysBuild(settings)     # to support flipping betwenn Vagrant and native dev
 
 # XML Wrapper generation
 xml_targets = [  'Fuzzed/models/xml_common.py',
@@ -90,53 +83,48 @@ xml_targets = [  'Fuzzed/models/xml_common.py',
                'Fuzzed/models/xml_backend.py',
                'Fuzzed/models/xml_fuzztree.py',
                'Fuzzed/models/xml_faulttree.py'   ]
-env.PyXB(   xml_targets,
+xml = env.PyXB(   xml_targets,
             [  'FuzzEd/static/xsd/commonTypes.xsd',
                'FuzzEd/static/xsd/configurations.xsd',
                'FuzzEd/static/xsd/backendResult.xsd',
                'FuzzEd/static/xsd/fuzztree.xsd',
                'FuzzEd/static/xsd/faulttree.xsd' 
             ])
-Alias('xml', xml_targets)
 
 # Generation of Python version of the notation files 
-notation_targets = 'FuzzEd/models/notations.py'
-env.Notations(  notation_targets,
+notations = env.Notations(  'FuzzEd/models/notations.py',
               [ 'FuzzEd/static/notations/dfd.json',
                 'FuzzEd/static/notations/faulttree.json',
                 'FuzzEd/static/notations/fuzztree.json',
                 'FuzzEd/static/notations/rbd.json'] )
-Alias('notations', notation_targets)
 
 # Generation of the TikZ library code, based on SVG images
-tikz_targets = 'FuzzEd/models/node_rendering.py'
-env.Tikz( tikz_targets, 
+shapes = env.Tikz( 'FuzzEd/models/node_rendering.py', 
           Glob('FuzzEd/static/img/dfd/*.svg') +
           Glob('FuzzEd/static/img/faulttree/*.svg') +
           Glob('FuzzEd/static/img/fuzztree/*.svg') +
           Glob('FuzzEd/static/img/rbd/*.svg') )
-Alias('shapes', tikz_targets)
 
 # Generate patched versions of third patry code
-env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css',
+patch1 = env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css',
           ['FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.patch',
            'FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.orig'])
-env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css',
+patch2 = env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css',
           ['FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css.patch',
            'FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css.orig'])
-env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js',
+patch3 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js',
           ['FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.patch',
            'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.orig'])
 
-
 # Default targets when nothing is specified
-#env.Default('docs', 'css', 'settings', 'xml', 'notations', 'shapes',
-#            'ftanalysis', 'ftsimulation')
+env.Default(css, settings, xml, notations, shapes,
+            patch1, patch2, patch3)
 
 # Special pseudo-targets to run stuff via Scons
+AlwaysBuild(env.Command('fixture.save', None, fixture_save))
 AlwaysBuild(env.Command('run.server', None, server))
 AlwaysBuild(env.Command('run.backend', None, backend))
-AlwaysBuild(env.Command('run.tests', None, tests))
-AlwaysBuild(env.Command('fixture.save', None, fixture_save))
+AlwaysBuild(env.Command("run.tests", None, 
+                        "scons settings; ./manage.py test FuzzEd.tests"))
 
 

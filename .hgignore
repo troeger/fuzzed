@@ -24,3 +24,6 @@ backends/common_generated/*
 backends/lib
 backends/daemon.ini
 .sconsign.dblite
+FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css
+FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css
+FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js

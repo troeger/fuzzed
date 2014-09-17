@@ -18,8 +18,7 @@ Clean(makefile, 'backends/CMakeFiles')
 AlwaysBuild(makefile)
 
 # Build configuration engine
-ftconfiguration_targets = 'lib/ftconfiguration_exe'
-ftconfiguration = env.Command(ftconfiguration_targets, 
+ftconfiguration = env.Command('lib/ftconfiguration_exe', 
                               [Dir('fuzztreeconfiguration'), makefile],
                               'make ftconfiguration_exe',
                               chdir='backends')
@@ -27,17 +26,16 @@ Clean(ftconfiguration, 'backends/CMakeFiles')
 Alias('ftconfiguration', ftconfiguration)
 
 # Build analysis engine
-ftanalysis_targets = 'lib/ftanalysis_exe'
-ftanalysis = env.Command(ftanalysis_targets, 
+ftanalysis = env.Command('lib/ftanalysis_exe', 
                          [Dir('fuzztreeanalysis'), makefile],
                          'make ftanalysis_exe',
                          chdir='backends')
 Clean(ftanalysis, 'backends/CMakeFiles')
+
 Alias('ftanalysis', ftanalysis)
 
 # Build simulation engine
-ftsimulation_targets = 'lib/ftsimulation_exe'
-ftsimulation = env.Command(ftsimulation_targets, 
+ftsimulation = env.Command('lib/ftsimulation_exe', 
                          [Dir('simulation'), makefile],
                          'make ftsimulation',
                          chdir='backends')
