@@ -26,7 +26,7 @@ public:
 
     typedef std::vector<Node> ChildList;
 
-    Node(const std::string type, const std::string id, const std::string name="") :
+    Node(const std::string type, const std::string id, const bool isOptional=false, const std::string name="") :
         m_type(type), m_id(id), m_name(name) {};
 
     void addChild(const Node c) { m_children.emplace_back(c); }

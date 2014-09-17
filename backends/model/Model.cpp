@@ -16,6 +16,8 @@ static const char* NODE = "node";
 static const char* EDGE = "edge";
 static const char* SOURCE = "source";
 static const char* TARGET = "target";
+static const char* NAME = "name";
+static const char* OPTIONAL = "optional";
 
 #define GET_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (std::string(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_string()))
 
@@ -106,7 +108,18 @@ void Model::loadRecursive(
             if (cid != childId) continue;
             
             const std::string childType = GET_VALUE_BY_ATTR(c, DATA, KEY, KIND);
-            parentModelNode->addChild(Node(childType, cid));
+            parentModelNode->addChild(Node(
+                childType,
+                cid,
+                GET_VALUE_BY_ATTR(c, DATA, KEY, OPTIONAL),
+                GET_VALUE_BY_ATTR(c, DATA, KEY, NAME)));
+            {
+                if (childType == nodetype::BASICEVENT)
+                { // determine probability
+
+                }
+            }
+
             loadRecursive(nodes, edges, cid, &parentModelNode->getChildren().back());
         }
     }
