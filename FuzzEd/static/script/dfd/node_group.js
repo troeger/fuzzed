@@ -332,7 +332,7 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
             jQuery(document).off([ Config.Events.NODES_MOVED,
                                    Config.Events.NODE_PROPERTY_CHANGED ].join(' '), this._redraw.bind(this));
 
-            this._super();
+            return this._super();
         },
 
        removeNode: function(node) {
