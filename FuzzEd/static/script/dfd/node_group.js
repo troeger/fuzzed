@@ -306,6 +306,8 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
             this.container.css('top', bbox.y);
 
             this.path().attr("transform", "translate(-"+bbox.x+",-"+bbox.y+")");
+            this.path().parent().css('width', '100%');
+            this.path().parent().css('height', '100%');
 
             // ## /hack
 
