@@ -4,6 +4,7 @@
 #include "ExpressionParser.h"
 
 #include "ModelIncludes.h"
+#include "TypeNames.h"
 
 #include "xmlutil.h"
 
@@ -48,27 +49,6 @@ bool isEventSet(const std::string& typeName)
 		typeName == "basicEventSet" ||
 		typeName == "IntermediateEventSet";
 }
-
-/*FuzzTreeTransform::FuzzTreeTransform(
-	const string& fuzzTreeXML, 
-	std::set<Issue>& errors) :
-	m_count(0),
-	m_bValid(true),
-	m_issues(errors)
-{
-	// TODO: parse GraphML
-}
-
-
-FuzzTreeTransform::FuzzTreeTransform(
-	std::istream& fuzzTreeXML,
-	std::set<Issue>& errors) :
-	m_count(0),
-	m_bValid(true),
-	m_issues(errors)
-{
-	// TODO: parse GraphML
-}*/
 
 FuzzTreeTransform::FuzzTreeTransform(
 	std::auto_ptr<Fuzztree> ft,
@@ -398,7 +378,7 @@ ErrorType FuzzTreeTransform::expandBasicEventSet(
 	while (i < numChildren)
 	{
 		BasicEvent be(eventSetId + "." + util::toString(i), eventSet->getName(), prob);
-		be.costs(costs);
+		be.getCost(costs);
 		parentNode->children().push_back(be);
 		i++;
 	}
@@ -477,7 +457,7 @@ bool FuzzTreeTransform::handleFeatureVP(
 		expandBasicEventSet(&featuredTemplate, node, 0);
 		return true;
 	}
-	else if (featuredType == "andGate")
+	else if (featuredType == AND)
 		node->addChild(new AndGate(configuredChildId));
 	else if (featuredType == "orGate")
 		node->addChild(new Or(configuredChildId));
@@ -534,7 +514,7 @@ void FuzzTreeTransform::copyNodeAsChild(
 	const string id, 
 	const AbstractNode& currentChild)
 {
-	if (typeName == "andGate")					
+	if (typeName == AND)					
 		node->addChild(new AndGate(currentChild.getId(), currentChild.getName()));
 	// else if (typeName == *OR)				
 	// 	node->children().push_back(fuzztree::Or(id));
@@ -552,12 +532,4 @@ void FuzzTreeTransform::copyNodeAsChild(
 	// {
 	// 	throw FatalException(std::string("Unexpected Node Type encountered: ") + typeName, 0, id);
 	// }
-}
-
-int FuzzTreeTransform::parseCost(const fuzztree::InclusionVariationPoint& node)
-{
-	auto c = node.costs();
-	if (c.present())
-		return c.get();
-	return 0;
 }

@@ -112,7 +112,7 @@ void AbstractModel::loadRecursive(
 	}
 }
 
-const std::string AbstractModel::getId(const pugi::xml_node& node)
+const std::string AbstractModel::getId()
 {
 	return m_id;
 }
