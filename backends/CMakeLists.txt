@@ -138,38 +138,6 @@ set(COMMON_GEN_DIR 	${CMAKE_CURRENT_SOURCE_DIR}/common_generated)
 
 set(XSD_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../FuzzEd/static/xsd")
 
-########### FAULT TREE MODEL ############
-
-set(XSD_TO_FAULTTREE_ARGS
-	--include-with-brackets #include with <> instead of ""
-	--generate-polymorphic  #needed for xsi:type
-	--polymorphic-type-all
-	--root-element "FaultTree"
-	--type-naming ucc
-	--function-naming lcc
-	--generate-serialization
-	--namespace-map net.faulttree=faulttree
-	--generate-forward
-	--hxx-suffix .h
-	--cxx-suffix .cpp
-)
-
-set(XSD_TO_FUZZTREE_ARGS
-	--include-with-brackets #include with <> instead of ""
-	--generate-polymorphic  #needed for xsi:type
-	--polymorphic-type-all
-	--root-element "FuzzTree"
-	--type-naming ucc 
-	--function-naming lcc
-	--generate-serialization
-	--namespace-map net.fuzztree=fuzztree 
-	--generate-forward
-	--hxx-suffix .h
-	--cxx-suffix .cpp
-)
-
-########### RESULT XML ##################
-
 set(XSD_GENERATED_RESULT_FILES
 	${COMMON_GEN_DIR}/backendResult.h
 	${COMMON_GEN_DIR}/commonTypes.h
@@ -225,17 +193,8 @@ add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FIL
 #########################################
 
 set(COMMON_SOURCES
-	${MODEL_DIR}/Fuzztree.cpp
-	${MODEL_DIR}/Faulttree.cpp
-	${MODEL_DIR}/TopEvent.cpp
-	${MODEL_DIR}/OrGate.cpp
-	${MODEL_DIR}/VotingOrGate.cpp
-	${MODEL_DIR}/AndGate.cpp
-	${MODEL_DIR}/BasicEvent.cpp
-	${MODEL_DIR}/AbstractModel.cpp
-
-	${MODEL_DIR}/FeatureVariationPoint.cpp
-	${MODEL_DIR}/RedundancyVariationPoint.cpp
+	${MODEL_DIR}/Model.cpp
+	${MODEL_DIR}/Node.cpp
 
 	${COMMON_DIR}/util.cpp
 	#${COMMON_DIR}/xmlutil.cpp
@@ -251,26 +210,8 @@ set(COMMON_SOURCES
 )
 
 set(COMMON_HEADERS
-	${MODEL_DIR}/Fuzztree.h
-	${MODEL_DIR}/Faulttree.h
-	${MODEL_DIR}/AbstractModel.h
-	${MODEL_DIR}/AbstractNode.h
-
-	${MODEL_DIR}/EventSet.h
-	${MODEL_DIR}/BasicEventSet.h
-	${MODEL_DIR}/IntermediateEventSet.h
-
-	${MODEL_DIR}/FeatureVariationPoint.h
-	${MODEL_DIR}/RedundancyVariationPoint.h
-
-	${MODEL_DIR}/BasicEvent.h
-	${MODEL_DIR}/TopEvent.h
-	${MODEL_DIR}/OrGate.h
-	${MODEL_DIR}/VotingOrGate.h
-	${MODEL_DIR}/AndGate.h
-	${MODEL_DIR}/AbstractProbability.h
-	${MODEL_DIR}/StaticProbability.h
-	${MODEL_DIR}/FuzzyProbability.h
+	${MODEL_DIR}/Model.h
+	${MODEL_DIR}/Node.h
 
 	${COMMON_DIR}/platform.h
 	${COMMON_DIR}/util.h

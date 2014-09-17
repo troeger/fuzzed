@@ -1,13 +1,11 @@
 project(fuzztreeconfiguration)
 
 set(SOURCES
-  FuzzTreeConfigurationGenerator.cpp
   FuzzTreeConfiguration.cpp
   main.cpp
 )
 
 set(HEADERS
-  FuzzTreeConfigurationGenerator.h
   FuzzTreeConfiguration.h
   platform.h
 )
