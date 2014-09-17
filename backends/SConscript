@@ -12,17 +12,24 @@ if platform.system() == "Darwin":
     cmake_call = "cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 ."
 else:
     cmake_call = "cmake ."
-makefile = env.Command(['CMakeCache.txt','Makefile'], 'CMakeLists.txt', cmake_call,
-                        chdir='backends')
-Clean(makefile, 'backends/CMakeFiles')
+makefile = env.Command(
+    ['CMakeCache.txt',
+     'Makefile',
+     'simulation/Makefile',
+     'fuzztreeconfiguration/Makefile',
+     'fuzztreeanalysis/Makefile'], 
+     'CMakeLists.txt', cmake_call,
+     chdir='backends')
+Clean(makefile, Dir('backends/CMakeFiles'))
 AlwaysBuild(makefile)
 
 # Build configuration engine
-ftconfiguration = env.Command('lib/ftconfiguration_exe', 
-                              [Dir('fuzztreeconfiguration'), makefile],
-                              'make ftconfiguration_exe',
-                              chdir='backends')
-Clean(ftconfiguration, 'backends/CMakeFiles')
+ftconfiguration = env.Command(
+   'lib/ftconfiguration_exe', 
+   [Dir('fuzztreeconfiguration'), makefile],
+   'make ftconfiguration_exe',
+   chdir='backends')
+Clean(ftconfiguration, Dir('fuzztreeconfiguration/CMakeFiles'))
 Alias('ftconfiguration', ftconfiguration)
 
 # Build analysis engine
@@ -30,8 +37,7 @@ ftanalysis = env.Command('lib/ftanalysis_exe',
                          [Dir('fuzztreeanalysis'), makefile],
                          'make ftanalysis_exe',
                          chdir='backends')
-Clean(ftanalysis, 'backends/CMakeFiles')
-
+Clean(ftanalysis, Dir('fuzztreeanalysis/CMakeFiles'))
 Alias('ftanalysis', ftanalysis)
 
 # Build simulation engine
@@ -39,5 +45,5 @@ ftsimulation = env.Command('lib/ftsimulation_exe',
                          [Dir('simulation'), makefile],
                          'make ftsimulation',
                          chdir='backends')
-Clean(ftsimulation, 'backends/CMakeFiles')
+Clean(ftsimulation, Dir('simulation/CMakeFiles'))
 Alias('ftsimulation', ftsimulation)

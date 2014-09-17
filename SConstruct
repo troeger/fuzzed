@@ -120,6 +120,8 @@ patch4 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js',
            'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.orig'])
 
 # Default targets when nothing is specified
+# We skip the backend and doc builds here, which mainly serves the
+# Web frontend developer
 env.Default(css, settings, xml, notations, shapes,
             patch1, patch2, patch3, patch4)
 
@@ -129,7 +131,6 @@ AlwaysBuild(env.Command('run.server', None, server))
 AlwaysBuild(env.Command('run.backend', None, backend))
 AlwaysBuild(env.Command("run.tests", None, 
                         "scons settings; ./manage.py test FuzzEd.tests"))
-
 AlwaysBuild(env.Command("run.js_tests", None, 
                         "mocha-phantomjs FuzzEd/tests/js-tests/src/test_runner.html"))
 
