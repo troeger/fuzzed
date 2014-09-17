@@ -1,7 +1,8 @@
 {% extends "util/base.html" %}
+{% load settings %}
 
 {% block meta %}
-<meta name="description" content="FuzzEd gives you the fastest way for creating system dependability models in the cloud. The online editor supports fault trees modeling, fault tree analysis (FTA), reliability block diagram (RBD) modeling, top event probability computation, and the novel FuzzTree modeling concept. Non-commercial usage is always free of charge.">
+<meta name="description" content="FuzzEd gives you the fastest way for creating system dependability models in the browser.">
 {% endblock %}
 
 {% block script %}
@@ -18,20 +19,11 @@
 {% endblock %}
 
 {% block goto_menu %}
-<li><a href="/docs/welcome" target="_blank"><i class="fa fa-fw fa-book"></i> Documentation </a></li>
-<li><a href="http://fuzzed.uservoice.com/"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
+<li><a href="{% setting 'FEEDBACK_PAGE' %}"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
 {% endblock %}
 
 
 {% block content %}
-<div class="alert alert-block">
-    <h4 class="alert-heading">
-        <a href="http://en.wikipedia.org/wiki/Software_release_life_cycle#Beta">Public Beta</a>
-    </h4>
-    Feel free to try out everything. However, please excuse sudden outages as the online editor and the analysis engines are still under development.<br>
-    If you have any <a href="http://fuzztrees.uservoice.com">feedback</a>, we would be happy to hear it.
-</div>
-
 <section>
     <div class="row">
         <div class="col-4">
@@ -63,7 +55,7 @@
             </h4>
             <p>
                 FuzzEd is intended for both academic and commercial usage. We do (and always will) provide a free basic account for non-commercial use.<br/>
-                If you are interested in running this service inside your company, just <a href="mail:peter.troeger@hpi.uni-potsdam.de">talk to us</a>. 
+                If you are interested in running this service inside your company, just <a href="{% setting 'FEEDBACK_PAGE' %}">talk to us</a>. 
             </p>
         </div>
     </div>
