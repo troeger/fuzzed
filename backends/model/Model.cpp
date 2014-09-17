@@ -4,6 +4,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <iostream>
 #include <set>
+#include <regex>
 
 namespace fs = boost::filesystem;
 using namespace pugi;
@@ -18,6 +19,7 @@ static const char* SOURCE = "source";
 static const char* TARGET = "target";
 static const char* NAME = "name";
 static const char* OPTIONAL = "optional";
+static const char* PROB = "probability";
 
 #define GET_STRING_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (std::string(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_string()))
 #define GET_BOOL_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_bool())
@@ -55,7 +57,6 @@ Model::Model(const std::string graphMLFileName)
     std::vector<pugi::xml_node> nodeList;
     for (xml_node node = graph.child(NODE); node; node = node.next_sibling(NODE))
     {
-        node.print(std::cout);
         if (GET_STRING_VALUE_BY_ATTR(node, DATA, KEY, KIND) == nodetype::TOPEVENT)
         {
             if (m_topEvent != nullptr)
@@ -87,6 +88,15 @@ void Model::loadTree(const std::vector<pugi::xml_node>& nodes, const std::vector
     printTreeRecursive(m_topEvent, 0);
 }
 
+// TODO move to utilities
+std::string insideBrackets(std::string str)
+{
+    const auto i1 = str.find_first_of("[")+1;
+    const auto i2 = str.find_last_of("]")-1;
+    return str.substr(i1, i2);
+}
+
+
 void Model::loadRecursive(
     const std::vector<pugi::xml_node> nodes,
     const std::vector<pugi::xml_node> edges,
@@ -117,7 +127,21 @@ void Model::loadRecursive(
             {
                 if (childType == nodetype::BASICEVENT)
                 { // determine probability
+                    std::string probabilityDescriptor = 
+                        insideBrackets(GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, PROB));
+                    
+                    const std::string probTypeId = probabilityDescriptor.substr(0,1);
+                    probabilityDescriptor = insideBrackets(probabilityDescriptor);
+                    if (probTypeId == "0") // static probability
+                    {   
+                        // std::cout << probabilityDescriptor;
+                        parentModelNode->getChildren().back().setProbability(atoi(
+                            probabilityDescriptor.substr(0, probabilityDescriptor.find_first_of(",")-1).c_str()));
+                    }
+                    else if (probTypeId == "1")
+                    {
 
+                    }
                 }
             }
 

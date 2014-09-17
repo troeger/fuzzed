@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <iostream>
 
 // TODO
 typedef double Probability;
@@ -10,12 +11,24 @@ namespace nodetype
 {
     const std::string AND   = "andGate";
     const std::string OR    = "orGate";
+    const std::string XOR   = "xorGate";
+    const std::string VOTINGOR  = "votingOrGate";
+    const std::string SPARE     = "spareGate";
+    const std::string PAND      = "pandGate";
+    const std::string SEQ       = "seqGate";
 
     const std::string BASICEVENT    = "basicEvent";
     const std::string TOPEVENT      = "topEvent";
+    const std::string HOUSEEVENT    = "houseEvent";
 
     const std::string INTERMEDIATEEVENT = "intermediateEvent";
     const std::string UNDEVELOPEDEVENT  = "undevelopedEvent";
+
+    const std::string BASICEVENTSET         = "basicEventSet";
+    const std::string INTERMEDIATEEVENTSET  = "intermediateEventSet";
+
+    const std::string REDUNDANCYVP  = "redundancyVariationPoint";
+    const std::string FEATUREVP     = "featureVariationPoint";
 }
 
 
@@ -47,6 +60,7 @@ public:
     bool isLeaf() const;
     bool isVariationPoint() const;
 
+    void setProbability(const Probability p) { assert(m_type == nodetype::BASICEVENT); m_probability = p; }
     const Probability& getProbability() const { assert(m_type == nodetype::BASICEVENT); return m_probability; }
 
     std::string print() const { return std::string("- ") + m_type + " ID: " + m_id + " " + m_name; };

@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 #include <tuple>
-#include "AbstractNode.h"
+#include "Node.h"
 
 struct FuzzTreeConfiguration
 {
@@ -20,9 +20,9 @@ public:
 	void setRedundancyNumber(const id_type& ID, int k, int outOfN);
 	void setFeatureNumber(const id_type& ID, const id_type& configuredChild);
 
-	void setNotIncludedRecursive(const AbstractNode& ID);
+	void setNotIncludedRecursive(const Node& ID);
 
-	static const int computeCostRecursive(const AbstractNode& ID);
+	static const int computeCostRecursive(const Node& ID);
 
 	const bool& isOptionalEnabled(const id_type& ID) const;
 	const bool isIncluded(const id_type& ID) const;

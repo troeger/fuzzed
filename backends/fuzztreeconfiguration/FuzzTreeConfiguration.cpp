@@ -48,7 +48,7 @@ void FuzzTreeConfiguration::setFeatureNumber(const id_type& ID, const id_type& c
 	m_featureNodes[ID] = configuredChild;
 }
 
-void FuzzTreeConfiguration::setNotIncludedRecursive(const AbstractNode& node)
+void FuzzTreeConfiguration::setNotIncludedRecursive(const Node& node)
 {
 	for (const auto child : node.children())
 		setNotIncludedRecursive(child);
@@ -115,10 +115,10 @@ void FuzzTreeConfiguration::markInvalid()
 	m_bValid = false;
 }
 
-const int FuzzTreeConfiguration::computeCostRecursive(const AbstractNode& node)
+const int FuzzTreeConfiguration::computeCostRecursive(const Node& node)
 {
 	int result = 0;
-	const auto& nodeType = node.getTypeDescriptor();
+	const auto& nodeType = node.getType();
 	if (nodeType == "intermediateEvent" || nodeType == "basicEvent")
 	{
 		result = node.getCost();

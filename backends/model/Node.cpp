@@ -12,15 +12,30 @@ bool Node::isEvent() const
 
 bool Node::isGate() const
 {
-    return false;   
+    using namespace nodetype;
+    return
+        m_type == AND ||
+        m_type == OR ||
+        m_type == XOR ||
+        m_type == VOTINGOR ||
+        m_type == SPARE ||
+        m_type == SEQ ||
+        m_type == PAND;  
 }
 
 bool Node::isLeaf() const
 {
-    return false;
+    using namespace nodetype;
+    return
+        m_type == BASICEVENT ||
+        m_type == UNDEVELOPEDEVENT ||
+        m_type == HOUSEEVENT;
 }
 
 bool Node::isVariationPoint() const
 {
-    return false;
+    using namespace nodetype;
+    return
+        m_type == REDUNDANCYVP ||
+        m_type == FEATUREVP;
 }

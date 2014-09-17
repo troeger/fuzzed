@@ -2,11 +2,13 @@ project(fuzztreeconfiguration)
 
 set(SOURCES
   FuzzTreeConfiguration.cpp
+  FuzzTreeToFaultTree.cpp
   main.cpp
 )
 
 set(HEADERS
   FuzzTreeConfiguration.h
+  FuzzTreeToFaultTree.h
   platform.h
 )
 

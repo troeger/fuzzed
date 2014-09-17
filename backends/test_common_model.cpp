@@ -1,4 +1,5 @@
 #include "Model.h"
+#include "FuzzTreeToFaultTree.h"
 #include <iostream>
 
 int main()
