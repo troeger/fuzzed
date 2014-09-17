@@ -117,6 +117,18 @@ env.Tikz( tikz_targets,
           Glob('FuzzEd/static/img/rbd/*.svg') )
 Alias('shapes', tikz_targets)
 
+# Generate patched versions of third patry code
+env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css',
+          ['FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.patch',
+           'FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.orig'])
+env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css',
+          ['FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css.patch',
+           'FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css.orig'])
+env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js',
+          ['FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.patch',
+           'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.orig'])
+
+
 # Default targets when nothing is specified
 env.Default('docs', 'css', 'settings', 'xml', 'notations', 'shapes',
             'ftanalysis', 'ftsimulation')
