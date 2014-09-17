@@ -168,8 +168,10 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
         _updateMenuActions: function() {
             this._super();
 
-            // mirror is only available when exactly one mirrorable node is selected
-            if (this._mirrorable(this._selectedNodes()).length == 1) {
+            var selectedNodes = this._selectedNodes();
+
+            // mirror is only available when exactly one node is selected and this one is mirrorable
+            if (selectedNodes.length == 1 && this._mirrorable(selectedNodes).length == 1) {
                 jQuery('#' + this.config.IDs.ACTION_MIRROR).parent().removeClass('disabled');
             } else {
                 jQuery('#' + this.config.IDs.ACTION_MIRROR).parent().addClass('disabled');
