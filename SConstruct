@@ -115,10 +115,13 @@ patch2 = env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css',
 patch3 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js',
           ['FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.patch',
            'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.orig'])
+patch4 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js',
+          ['FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.patch',
+           'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.orig'])
 
 # Default targets when nothing is specified
 env.Default(css, settings, xml, notations, shapes,
-            patch1, patch2, patch3)
+            patch1, patch2, patch3, patch4)
 
 # Special pseudo-targets to run stuff via Scons
 AlwaysBuild(env.Command('fixture.save', None, fixture_save))
@@ -126,5 +129,8 @@ AlwaysBuild(env.Command('run.server', None, server))
 AlwaysBuild(env.Command('run.backend', None, backend))
 AlwaysBuild(env.Command("run.tests", None, 
                         "scons settings; ./manage.py test FuzzEd.tests"))
+
+AlwaysBuild(env.Command("run.js_tests", None, 
+                        "scons settings; mocha-phantomjs FuzzEd/tests/js-tests/src/test_runner.html"))
 
 
