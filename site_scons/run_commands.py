@@ -45,6 +45,7 @@ def fixture_save(target, source, env):
                                         'FuzzEd.project',
                                         'FuzzEd.graph',
                                         'FuzzEd.node',
+                                        'FuzzEd.nodegroup',
                                         'FuzzEd.edge',
                                         'FuzzEd.property'])
     data = json.loads(jsontext)

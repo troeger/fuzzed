@@ -140,6 +140,18 @@
         }
     }, 
     {
+        "pk": 7, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": true, 
+            "graph": 1, 
+            "client_id": 3, 
+            "y": 5, 
+            "x": 11
+        }
+    }, 
+    {
         "pk": 8, 
         "model": "FuzzEd.node", 
         "fields": {
@@ -826,12 +838,12 @@
         "fields": {
             "node": null, 
             "deleted": false, 
-            "node_group": 1, 
+            "node_group": null, 
             "value": "{u'value': u'Node Group'}", 
             "edge": null, 
             "key": "name"
         }
-    }, 
+    },    
     {
         "pk": 32, 
         "model": "FuzzEd.property", 
