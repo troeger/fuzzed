@@ -90,7 +90,7 @@ function(Class) {
             kind = kind || this.kind;
 
             // e.g. (NodeGroup, faulttree) becomes FaulttreeNodeGroup
-            var fullClassName = kind[0].toUpperCase() + kind.slice(1) + cls[0].toUpperCase() + cls.slice(1);
+            var fullClassName = kind[0].toUpperCase() + kind.slice(1) + cls;
             // e.g. (NodeGroup, faulttree) becomes faulttree/node
             var path = kind + '/' + this._fromClassToPath(cls);
 
@@ -103,9 +103,9 @@ function(Class) {
 
             // precondition: to subclass any class, one has to subclass an Editor (directly or indirectly) and require
             //  all classes in the XYEditor's module, that shall replace base classes in general.
-            //  e.g. if I want to have an Editor Foo that only differs from Faulttrees in its Nodes, I have to subclass
-            //  a FaulttreeEditor in 'foo/editor.js', beginning with
-            //      define(['class'], ['editor'], ['foo/node'], function(Class, Editor, FooNode) { ...
+            //  e.g. if I want to have a FooEditor that only differs from a FaulttreeEditor in its Nodes, I have to
+            //  subclass a FaulttreeEditor in 'foo/editor.js', beginning with
+            //      define(['class', 'editor', 'foo/node'], function(Class, Editor, FooNode) { ...
             //  and off course I also have to implement
             //      getFactory: function() {
             //          return new Factory('foo');
@@ -123,10 +123,9 @@ function(Class) {
 
         _fromClassToPath: function(cls) {
             // convert every upper case letter into a '_' and a lowercase letter, so that NodeGroup becomes node_group
-            var path = cls.replace(/[A-Z]/g, function(t){
+            return cls.replace(/[A-Z]/g, function(t) {
                 return t.slice(0, -1) + '_' + t.slice(-1).toLowerCase();
             }).slice(1);
-            return path;
         },
 
         _baseKind: function(kind) {
