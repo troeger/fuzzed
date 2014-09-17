@@ -1,6 +1,114 @@
 define(['factory', 'canvas', 'menus', 'faulttree/config', 'alerts', 'datatables', 'datatables-api', 'faulttree/node_group', 'highcharts', 'jquery-ui'],
 function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
     
+    /**
+     * Class: CutsetsMenu
+     *      A menu for displaying a list of minimal cutsets calculated for the edited graph. The nodes that belong to a
+     *      cutset become highlighted when hovering over the corresponding entry in the cutsets menu.
+     *
+     * Extends: <Base::Menus::Menu>
+     */
+    var CutsetsMenu = Menus.Menu.extend({
+        /**
+         * Group: Members
+         *      {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
+         */
+        _editor: undefined,
+
+        /**
+         * Group: Initialization
+         */
+
+        /**
+         * Constructor: init
+         *      Sets up the menu.
+         *
+         * Parameters:
+         *      {Editor} _editor - <Faulttree::Editor> the editor that owns this menu.
+         */
+        init: function(editor) {
+            this._super();
+            this._editor = editor;
+        },
+
+        /**
+         * Method: _setupContainer
+         *      Sets up the DOM container element for this menu and appends it to the DOM.
+         *
+         * Returns:
+         *      A {jQuery} set holding the container.
+         */
+        _setupContainer: function() {
+            return jQuery(
+                '<div id="' + FaulttreeConfig.IDs.CUTSETS_MENU + '" class="menu" header="Cutsets">\
+                    <div class="menu-controls">\
+                       <i class="menu-minimize"></i>\
+                       <i class="menu-close">   </i>\
+                    </div>\
+                    <ul class="nav-list unstyled"></ul>\
+                </div>'
+            ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+        },
+
+        /**
+         * Group: Actions
+         */
+
+        /**
+         * Method: show
+         *      Display the given cutsets in the menu and make the menu visible.
+         *
+         * Parameters:
+         *      {Array[Object]} cutsets - A list of cutsets calculated by the backend.
+         *
+         *  Returns:
+         *      This{<Menu>} instance for chaining.
+         */
+        show: function(cutsets) {
+            if (typeof cutsets === 'undefined') {
+                this.container.show();
+                return this;
+            }
+
+            var listElement = this.container.find('ul').empty();
+
+            _.each(cutsets, function(cutset) {
+                var nodeIDs = cutset['nodes'];
+                var nodes = _.map(nodeIDs, function(id) {
+                    return this._editor.graph.getNodeById(id);
+                }.bind(this));
+                var nodeNames = _.map(nodes, function(node) {
+                    return node.name;
+                });
+
+                // create list entry for the menu
+                var entry = jQuery('<li><a href="#">' + nodeNames.join(', ') + '</a></li>');
+
+                // highlight the corresponding nodes on hover
+                entry.hover(
+                    // in
+                    function() {
+                        var disable = _.difference(this._editor.graph.getNodes(), nodes);
+                        _.invoke(disable, 'disable');
+                        _.invoke(nodes, 'highlight');
+                    }.bind(this),
+
+                    // out
+                    function() {
+                        var enable = _.difference(this._editor.graph.getNodes(), nodes);
+                        _.invoke(enable, 'enable');
+                        _.invoke(nodes, 'unhighlight');
+                    }.bind(this)
+                );
+
+                listElement.append(entry);
+            }.bind(this));
+
+            this._super();
+            return this;
+        }
+    });
+    
    /*
     * Abstract Class: AnalysisResultMenu
     *      Base class for menus that display the results of a analysis performed by the backend. It contains a chart
@@ -859,6 +967,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
     
     return{
         AnalyticalProbabilityMenu : AnalyticalProbabilityMenu,
-        SimulatedProbabilityMenu  : SimulatedProbabilityMenu
+        SimulatedProbabilityMenu  : SimulatedProbabilityMenu,
+        CutsetsMenu               : CutsetsMenu
     } 
 });
