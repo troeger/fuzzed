@@ -1,7 +1,11 @@
 #include "FuzzTreeToFaultTree.h"
 #include "FatalException.h"
+#include "ExpressionParser.h"
+#include "util.h"
 
-std::vector<FuzzTreeConfiguration> FuzzTreeToFaultTree::generateConfigurations() const
+#include <functional>
+
+std::vector<FuzzTreeConfiguration> FuzzTreeToFaultTree::generateConfigurations()
 {
 	std::vector<FuzzTreeConfiguration> results;
 
@@ -10,7 +14,7 @@ std::vector<FuzzTreeConfiguration> FuzzTreeToFaultTree::generateConfigurations()
 	 */
 	unsigned int configCount = 0;
 
-	FuzzTreeConfiguration f = FuzzTreeConfiguration();
+	FuzzTreeConfiguration f = FuzzTreeConfiguration(++configCount);
 	results.push_back(f);
 	generateConfigurationsRecursive(m_model->getTopEvent(), results, configCount);
 
@@ -31,7 +35,7 @@ Model FuzzTreeToFaultTree::faultTreeFromConfiguration(const FuzzTreeConfiguratio
 bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 	const Node* node, 
 	std::vector<FuzzTreeConfiguration>& configurations,
-	unsigned int& configCount) const
+	unsigned int& configCount)
 {
 	for (const auto& child : node->getChildren())
 	{
@@ -66,9 +70,8 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 
 		if (childType == nodetype::REDUNDANCYVP)
 		{ // any VotingOR with k in [from, to] and k=n-2. Generate n * #validVotingOrs configurations.
-			/*// const RedundancyVariationPoint* redundancyNode = static_cast<const RedundancyVariationPoint*>(child);
-			const int from = redundancyNode->start();
-			const int to = redundancyNode->end();
+			const int from	= child.getFrom();
+			const int to	= child.getTo();
 			if (from < 0 || to < 0 || from > to)
 			{
 				m_issues.insert(Issue(
@@ -77,10 +80,10 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 					", from: " + 
 					util::toString(from), 0, id));
 				
-				return INVALID_ATTRIBUTE;
+				return false;
 			}
 			
-			const std::string formulaString = redundancyNode->formula();
+			const std::string formulaString = child.getRedundancyFormula();
 			ExpressionParser<int> parser;
 			const std::function<int(int)> formula = [&](int n) -> int
 			{
@@ -121,7 +124,7 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 			{
 				assert(newConfigs.size() >= configurations.size());
 				configurations.assign(newConfigs.begin(), newConfigs.end());
-			}*/
+			}
 		}
 		else
 		{
@@ -178,7 +181,6 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 
 			if (node->isLeaf()) continue; // end recursion
 		}
-		std::cout << "....";
 		generateConfigurationsRecursive(&child, configurations, configCount);
 	}
 	return true;

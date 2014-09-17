@@ -20,8 +20,11 @@ static const char* TARGET = "target";
 static const char* NAME = "name";
 static const char* OPTIONAL = "optional";
 static const char* PROB = "probability";
+static const char* FROM = "from";
+static const char* TO = "to";
 
 #define GET_STRING_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (std::string(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_string()))
+#define GET_INT_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_int())
 #define GET_BOOL_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_bool())
 
 Model::Model(const std::string graphMLFileName)
@@ -119,11 +122,12 @@ void Model::loadRecursive(
             if (cid != childId) continue;
             
             const std::string childType = GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, KIND);
-            parentModelNode->addChild(Node(
-                childType,
-                cid,
-                GET_BOOL_VALUE_BY_ATTR(c, DATA, KEY, OPTIONAL),
-                GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, NAME)));
+			Node child = Node(
+				childType,
+				cid,
+				GET_BOOL_VALUE_BY_ATTR(c, DATA, KEY, OPTIONAL),
+				GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, NAME));
+
             {
                 if (childType == nodetype::BASICEVENT)
                 { // determine probability
@@ -135,16 +139,28 @@ void Model::loadRecursive(
                     if (probTypeId == "0") // static probability
                     {   
                         // std::cout << probabilityDescriptor;
-                        parentModelNode->getChildren().back().setProbability(atoi(
-                            probabilityDescriptor.substr(0, probabilityDescriptor.find_first_of(",")-1).c_str()));
+						child.setProbability(atoi(probabilityDescriptor.substr(0, probabilityDescriptor.find_first_of(",")-1).c_str()));
                     }
                     else if (probTypeId == "1")
                     {
 
                     }
                 }
-            }
+				else if (childType == nodetype::REDUNDANCYVP)
+				{
+					//<data key="nRange">[1, 2]</data>
+					//<data key = "kFormula">N - 1 < / data >
+					std::string nRange =
+						insideBrackets(GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, "nRange"));
 
+					const int commaIndex = nRange.find_first_of(",") - 1;
+
+					child.m_from = atoi(nRange.substr(0, commaIndex).c_str());
+					child.m_to = atoi(nRange.substr(commaIndex, nRange.length()).c_str());
+					child.m_redundancyFormula = GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, "kFormula");
+				}
+            }
+			parentModelNode->addChild(child);
             loadRecursive(nodes, edges, cid, &parentModelNode->getChildren().back());
         }
     }

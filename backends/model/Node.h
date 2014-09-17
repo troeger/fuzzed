@@ -40,7 +40,7 @@ public:
     typedef std::vector<Node> ChildList;
 
     Node(const std::string type, const std::string id, const bool isOptional=false, const std::string name="") :
-        m_type(type), m_id(id), m_name(name) {};
+        m_type(type), m_id(id), m_name(name), m_isOptional(isOptional) {};
 
     void addChild(const Node c) { m_children.emplace_back(c); }
     const ChildList& getChildren() const { return m_children; }
@@ -52,6 +52,10 @@ public:
     const bool& isOptional()        const { return m_isOptional; }
     const unsigned int& getCost()   const { return m_cost; }
     const unsigned int& getQuantity() const { assert(isEventSet()); return m_quantity; }
+
+	const unsigned int& getFrom() const { assert(m_type == nodetype::REDUNDANCYVP); return m_from; }
+	const unsigned int& getTo() const { assert(m_type == nodetype::REDUNDANCYVP); return m_to; }
+	const std::string& getRedundancyFormula() const { assert(m_type == nodetype::REDUNDANCYVP); return m_redundancyFormula; }
 
     /**
      * Utility functions
@@ -90,4 +94,12 @@ private:
      * Event Set members
      */
     unsigned int m_quantity;
+
+	/**
+	* Redundancy Variation
+	*/
+	unsigned int m_from;
+	unsigned int m_to;
+
+	std::string m_redundancyFormula;
 };
