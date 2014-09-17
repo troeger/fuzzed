@@ -1,56 +1,34 @@
 # FuzzEd
 
-## Preparation of development machine
+FuzzEd is an browser-based editor for drawing and analyzing dependability models. The currently supported model types are:
 
-The recommend development mode is with Vagrant. The Vagrantfile installs all relevant stuff in the virtual machine. Inside the Vagrant VM, you can find all sources at /home/fuzztrees. Just install Vagrant and run:
+* Fault Tree Diagrams
+* FuzzTree Diagrams
+* Reliability Block Diagrams
+* Data Flow Diagrams
 
-`vagrant up`
+You can try the editor at http://www.fuzzed.org.
 
-If you prefer to develop on your native machine without any virtualization, it needs Python, PIP and Ansible  (version 1.6 or higher is required). Then run:
+## Installation
 
-`ansible-playbook -i ansible/dev_machine ansible/site.yml`
+If you just want to install your own copy of FuzzEd, please read the [[installation guide]].
 
-Add a "-s" option if you want to let ansible use 'sudo'.
+## Development
 
-The Ansible code is prepared for Linux and Mac OS X development machines.
+If you want to contribute to FuzzEd, there is a lot of information in the [[developer section]] of the Wiki.
 
-## Developing for FuzzEd
+The developers hang around on the [[dev mailing list|mailto:fuzzed@lists.nclmail.de]].
 
-#### Compile some static stuff, needed to run the project                              
-`> scons`
+## Licence
 
-#### Synchronize local database with current model
+FuzzEd ist licensed under the AGPL version3. This means your are allowed to:
 
-`> ./manage.py migrate`
+* Install and run the unmodified FuzzEd code at your site.
+* Re-package and distribute the unmodified version of FuzzEd from this repository. 
+* Modify and re-publish (fork) the editor, as long as your modified sources are accessible for everybody.
 
-#### Run development web server (inside VM or on host)
-
-`> scons run.server`
-
-You can also use the standard `> ./manage.py runserver` command from Django, but this works only without Vagrant. Inside a Vagrant box, the command above adjusts the IP adress for the development server.
-
-#### Run backend services (inside VM or on host)
-
-`> scons run.backend`
-
-## Writing tests for FuzzEd
-
-`> scons fixture.save`
-
-Saves a new fixture file from the current database. It can be referenced
-in the unit tests stored in the tests directory.
-
-`> scons run.tests`
-
-Run all tests stored in the tests directory.
-
-## Packaging FuzzEd
-
-Please note that the machine were the packaging (and implicit build) takes place must be the same as the production machine. The smartest approach therefore is to develop in Vagrant with some distribution, and use then the same distro on the production host.
-
-`> scons package.web`
-`> scons package.backend`
-
+In short, AGPL forbids you to distribute / run your own modified version of FuzzEd without publishing your code.
+ 
 ## Acknowledgements
 
 People who contributed to this project so far:
