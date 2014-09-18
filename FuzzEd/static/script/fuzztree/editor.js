@@ -11,6 +11,6 @@ function(Factory, FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
      * Extends: <Faulttree::FaultTreeEditor>
      */
     return FaulttreeEditor.extend({
-        // nothing to overwrite here
+        //TODO: nothing to overwrite here
     });
 });

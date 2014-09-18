@@ -50,9 +50,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
          *      This {<FaulttreeEditor>} instance for chaining.
          */
         _setupCutsetsAction: function() {
-            jQuery("#"+this.config.IDs.ACTION_CUTSETS).click(function() {
+            jQuery("#"+Factory.getModule('Config').IDs.ACTION_CUTSETS).click(function() {
                 jQuery(document).trigger(
-                    this.config.Events.EDITOR_CALCULATE_CUTSETS,
+                    Factory.getModule('Config').Events.EDITOR_CALCULATE_CUTSETS,
                     this.cutsetsMenu.show.bind(this.cutsetsMenu)
                 );
             }.bind(this));
@@ -68,9 +68,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
          *      This {<FaulttreeEditor>} instance for chaining.
          */
         _setupExportPDFAction: function() {
-            jQuery("#"+this.config.IDs.ACTION_EXPORT_PDF).click(function() {
+            jQuery("#"+Factory.getModule('Config').IDs.ACTION_EXPORT_PDF).click(function() {
                 jQuery(document).trigger(
-                    this.config.Events.EDITOR_GRAPH_EXPORT_PDF,
+                    Factory.getModule('Config').Events.EDITOR_GRAPH_EXPORT_PDF,
                     function(issues, job_result_url) {
                         this._downloadFileFromURL(job_result_url, 'pdf');
 
@@ -89,9 +89,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
          *      This {<FaulttreeEditor>} instance for chaining.
          */
         _setupExportEPSAction: function() {
-            jQuery("#"+this.config.IDs.ACTION_EXPORT_EPS).click(function() {
+            jQuery("#"+Factory.getModule('Config').IDs.ACTION_EXPORT_EPS).click(function() {
                 jQuery(document).trigger(
-                    this.config.Events.EDITOR_GRAPH_EXPORT_EPS,
+                    Factory.getModule('Config').Events.EDITOR_GRAPH_EXPORT_EPS,
                     function(issues, job_result_url) {
                         this._downloadFileFromURL(job_result_url, 'eps');
 
@@ -112,9 +112,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
          *      This {<FaulttreeEditor>} instance for chaining.
          */
         _setupAnalyticalProbabilityAction: function() {
-            jQuery("#"+this.config.IDs.ACTION_ANALYTICAL).click(function() {
+            jQuery("#"+Factory.getModule('Config').IDs.ACTION_ANALYTICAL).click(function() {
                 jQuery(document).trigger(
-                    this.config.Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY,
+                    Factory.getModule('Config').Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY,
                     this.analyticalProbabilityMenu.show.bind(this.analyticalProbabilityMenu));
             }.bind(this));
 
@@ -131,9 +131,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
          *      This {<FaulttreeEditor>} instance for chaining.
          */
         _setupSimulatedProbabilityAction: function() {
-            jQuery("#"+this.config.IDs.ACTION_SIMULATED).click(function() {
+            jQuery("#"+Factory.getModule('Config').IDs.ACTION_SIMULATED).click(function() {
                 jQuery(document).trigger(
-                    this.config.Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY,
+                    Factory.getModule('Config').Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY,
                     this.simulatedProbabilityMenu.show.bind(this.simulatedProbabilityMenu));
             }.bind(this));
 
@@ -158,7 +158,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
         _setupMenuActions: function() {
             this._super();
 
-            jQuery('#' + this.config.IDs.ACTION_MIRROR).click(function() {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_MIRROR).click(function() {
                 this._mirrorSelection();
             }.bind(this));
 
@@ -172,9 +172,9 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
 
             // mirror is only available when exactly one node is selected and this one is mirrorable
             if (selectedNodes.length == 1 && this._mirrorable(selectedNodes).length == 1) {
-                jQuery('#' + this.config.IDs.ACTION_MIRROR).parent().removeClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_MIRROR).parent().removeClass('disabled');
             } else {
-                jQuery('#' + this.config.IDs.ACTION_MIRROR).parent().addClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_MIRROR).parent().addClass('disabled');
             }
         },
 
@@ -190,7 +190,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
         },
 
         _mirrorSelection: function(event) {
-            var selected = jQuery('.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE);
+            var selected = jQuery('.' + Factory.getModule('Config').Classes.SELECTED + '.' + Factory.getModule('Config').Classes.NODE);
 
             // we will only mirror the selection, if a single node is selected
             if (selected.length === 1) {
@@ -199,7 +199,7 @@ function(Editor, Factory, Canvas, FaulttreeGraph, Menus, AnalyticalMenus, Faultt
                 //    NodeGroup's properties)
                 this.properties.hide();
 
-                var node  = this.graph.getNodeById(selected.data(this.config.Keys.NODE).id);
+                var node  = this.graph.getNodeById(selected.data(Factory.getModule('Config').Keys.NODE).id);
 
                 if (!node.mirrorable) return false;
 

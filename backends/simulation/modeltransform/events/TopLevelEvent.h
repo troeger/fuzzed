@@ -11,7 +11,6 @@ public:
 
 	virtual void addChild(FaultTreeNode::Ptr child) override;
 
-	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const override;
 	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const override;
 	virtual std::string serializeAsFormula(std::shared_ptr<PNDocument> doc) const override;
 

@@ -22,7 +22,6 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
          *      {Object} _nodeClasses - A map caching all node classes already generated and storing them by their kind.
          *      {Object}  layoutMenu  - A reference to the layout menu
          */
-        config:       undefined,
         id:           undefined,
         edges:        {},
         nodes:        {},
@@ -49,7 +48,6 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
             this.id     = json.id;
             this.name   = json.name;
             this.seed   = json.seed;
-            this.config = Factory.getModule('Config');
 
             this._loadFromJson(json)
                 ._registerEventHandlers();
@@ -71,19 +69,37 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
 
             var maxX = 0;
             var maxY = 0;
-
+            
             // parse the json nodes and convert them to node objects
             _.each(json.nodes, function(jsonNode) {
+                //XXX adapt json format of node properties: property_name: propterty_value  => property_name : { value : propterty_value } for later processing
+                var current_node = jsonNode;
+                _.each(Object.keys(current_node.properties),function(property_key){
+                    current_node.properties[property_key] = {'value' : current_node.properties[property_key]};
+                }.bind(this));
+                
                 this.addNode(jsonNode);
             }.bind(this));
 
             // connect the nodes again
             _.each(json.edges, function(jsonEdge) {
+                //XXX adapt json format of edge properties: property_name: propterty_value  => property_name : { value : propterty_value } for later processing
+                var current_edge = jsonEdge;
+                _.each(Object.keys(current_edge.properties),function(property_key){
+                    current_edge.properties[property_key] = {'value' : current_edge.properties[property_key]};
+                }.bind(this));
+                
                 this.addEdge(jsonEdge);
             }.bind(this));
 
             // create nodeGroups
             _.each(json.nodeGroups, function(jsonNodeGroup) {
+                //XXX adapt json format of node group properties: property_name: propterty_value  => property_name : { value : propterty_value } for later processing
+                var current_nodeGroups = jsonNodeGroup;
+                _.each(Object.keys(current_nodeGroups.properties),function(property_key){
+                    current_nodeGroups.properties[property_key] = {'value' : current_nodeGroups.properties[property_key]};
+                }.bind(this));
+                
                 this.addNodeGroup(jsonNodeGroup);
             }.bind(this));
 
@@ -107,7 +123,7 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
                 this._addEdge(edge.connection);
             }.bind(this));
 
-            jQuery(document).on(Config.Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
+            jQuery(document).on(Factory.getModule('Config').Events.CANVAS_SHAPE_DROPPED, this._shapeDropped.bind(this));
 
             return this;
         },
@@ -147,7 +163,7 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
             properties.id  = jsonEdge.id;
             properties.graph = this;
 
-            var edge = Factory.create('Edge', this.getNotation().edges, sourceNode, targetNode, properties);
+            var edge = Factory.create('Edge', Factory.getNotation().edges, sourceNode, targetNode, properties);
             this.edges[edge.id] = edge;
 
             return edge;
@@ -169,7 +185,7 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
          *      The newly created {<Edge>} instance.
          */
         _addEdge: function(jsPlumbEdge) {
-            var edge = Factory.create('Edge', this.getNotation().edges, jsPlumbEdge, {graph: this});
+            var edge = Factory.create('Edge', Factory.getNotation().edges, jsPlumbEdge, {graph: this});
             this.edges[edge.id] = edge;
 
             return edge;
@@ -265,7 +281,7 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
             properties.id  = jsonNodeGroup.id;
             properties.graph = this;
 
-            var nodeGroup = Factory.create('NodeGroup', this.getNotation().nodeGroups, nodes, properties);
+            var nodeGroup = Factory.create('NodeGroup', Factory.getNotation().nodeGroups, nodes, properties);
             this.nodeGroups[nodeGroup.id] = nodeGroup;
         },
 
@@ -292,13 +308,13 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
          *      This {<Graph>} instance for chaining.
          */
         _layoutWithAlgorithm: function(algorithm) {
-            jQuery(document).trigger(Config.Events.GRAPH_LAYOUT);
+            jQuery(document).trigger(Factory.getModule('Config').Events.GRAPH_LAYOUT);
             var layoutedNodes = algorithm(this._getNodeHierarchy());
 
-            this.layoutMenu = jQuery('#'+this.config.IDs.LAYOUT_MENU).data(this.config.Keys.MENU);
+            this.layoutMenu = jQuery('#'+Factory.getModule('Config').IDs.LAYOUT_MENU).data(Factory.getModule('Config').Keys.MENU);
 
             // center the top node on the currently visible canvas (if there's enough space)
-            var centerX = Math.floor((jQuery('#' + this.config.IDs.CANVAS).width() / this.config.Grid.SIZE) / 2);
+            var centerX = Math.floor((jQuery('#' + Factory.getModule('Config').IDs.CANVAS).width() / Factory.getModule('Config').Grid.SIZE) / 2);
             // returned coordinates can be negative, so add that offset
             var minX = _.min(layoutedNodes, function(n) { return n.x }).x;
             centerX -= Math.min(centerX + minX, 0);
@@ -325,7 +341,7 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
                     }.bind(this));
                 }.bind(this))
                 .always(function() {
-                    jQuery(document).trigger(Config.Events.GRAPH_LAYOUTED);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.GRAPH_LAYOUTED);
                 });
 
             return this;
@@ -351,32 +367,12 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
 
             if (typeof nodeClass !== 'undefined') return nodeClass;
 
-            var notationDefinition = this.getNotation().nodes[kind];
+            var notationDefinition = Factory.getNotation().nodes[kind];
             if (typeof notationDefinition === 'undefined')
                 throw TypeError('no definition for kind ' + kind);
             notationDefinition.kind = kind;
 
             return this._newNodeClassForKind(notationDefinition);
-        },
-
-        /**
-         * Abstract Method: getNotation
-         *
-         * Returns:
-         *      The notation definition for the graph.
-         */
-        getNotation: function() {
-            throw new SubclassResponsibility();
-        },
-
-        /**
-         * Abstract Method: getNodeClass
-         *
-         * Returns:
-         *      The abstract {<Node>} class for all <Nodes> of this graph.
-         */
-        getNodeClass: function() {
-            throw new SubclassResponsibility();
         },
 
         /**

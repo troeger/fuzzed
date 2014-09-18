@@ -29,7 +29,6 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *                                                            CSS transformation for the print offset.
          */
         factory:                       undefined,
-        config:                        undefined,
         graph:                         undefined,
         properties:                    undefined,
         shapes:                        undefined,
@@ -57,12 +56,11 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             if (typeof graphId !== 'number')
                 throw new TypeError('numeric graph ID', typeof graphId);
 
-            this.config   = Factory.getModule('Config');
             this._backend = Backend.establish(graphId);
 
             // remember certain UI elements
-            this._progressIndicator = jQuery('#' + this.config.IDs.PROGRESS_INDICATOR);
-            this._progressMessage = jQuery('#' + this.config.IDs.PROGRESS_MESSAGE);
+            this._progressIndicator = jQuery('#' + Factory.getModule('Config').IDs.PROGRESS_INDICATOR);
+            this._progressMessage = jQuery('#' + Factory.getModule('Config').IDs.PROGRESS_MESSAGE);
 
             // run a few sub initializer
             this._setupJsPlumb()
@@ -111,7 +109,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
         _loadGraphCompleted: function(readOnly) {
             // create manager objects for the bars
             //TODO: put this into the factory
-            this.properties = new Menus.PropertiesMenu(this.graph.getNotation().propertiesDisplayOrder);
+            this.properties = new Menus.PropertiesMenu(Factory.getNotation().propertiesDisplayOrder);
             this.shapes     = new Menus.ShapeMenu();
             this.layout     = new Menus.LayoutMenu();
             this.graph.layoutMenu = this.layout;
@@ -132,7 +130,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
                 ._setupKeyBindings(readOnly);
 
             // fade out the splash screen
-            jQuery('#' + this.config.IDs.SPLASH).fadeOut(this.config.Splash.FADE_TIME, function() {
+            jQuery('#' + Factory.getModule('Config').IDs.SPLASH).fadeOut(Factory.getModule('Config').Splash.FADE_TIME, function() {
                 jQuery(this).remove();
             });
 
@@ -178,7 +176,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      This {<Editor>} instance for chaining.
          */
         _setupDropDownBlur: function () {
-            jQuery('#' + this.config.IDs.CANVAS).mousedown(function(event) {
+            jQuery('#' + Factory.getModule('Config').IDs.CANVAS).mousedown(function(event) {
                 // close open bootstrap dropdown
                 jQuery('.dropdown.open')
                     .removeClass('open')
@@ -197,44 +195,44 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      This {<Editor>} instance for chaining.
          */
         _setupMenuActions: function() {
-            jQuery('#' + this.config.IDs.ACTION_GRID_TOGGLE).click(function() {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_GRID_TOGGLE).click(function() {
                 Canvas.toggleGrid();
             }.bind(this));
 
-            jQuery('#' + this.config.IDs.ACTION_CUT).click(function() {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_CUT).click(function() {
                 this._cutSelection();
             }.bind(this));
 
-            jQuery('#' + this.config.IDs.ACTION_COPY).click(function() {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_COPY).click(function() {
                 this._copySelection();
             }.bind(this));
 
-            jQuery('#' + this.config.IDs.ACTION_PASTE).click(function() {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_PASTE).click(function() {
                 this._paste();
             }.bind(this));
 
-            jQuery('#' + this.config.IDs.ACTION_DELETE).click(function() {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_DELETE).click(function() {
                 this._deleteSelection();
             }.bind(this));
 
-            jQuery('#' + this.config.IDs.ACTION_SELECTALL).click(function(event) {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_SELECTALL).click(function(event) {
                 this._selectAll(event);
             }.bind(this));
 
-            jQuery('#' + this.config.IDs.ACTION_LAYOUT_CLUSTER).click(function() {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_LAYOUT_CLUSTER).click(function() {
                 this.graph._layoutWithAlgorithm(this.graph._getClusterLayoutAlgorithm());
             }.bind(this));
 
-            jQuery('#' + this.config.IDs.ACTION_LAYOUT_TREE).click(function() {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_LAYOUT_TREE).click(function() {
                 this.graph._layoutWithAlgorithm(this.graph._getTreeLayoutAlgorithm());
             }.bind(this));
 
             // set the shortcut hints from 'Ctrl+' to '⌘' when on Mac
             if (navigator.platform == 'MacIntel' || navigator.platform == 'MacPPC') {
-                jQuery('#' + this.config.IDs.ACTION_CUT + ' span').text('⌘X');
-                jQuery('#' + this.config.IDs.ACTION_COPY + ' span').text('⌘C');
-                jQuery('#' + this.config.IDs.ACTION_PASTE + ' span').text('⌘P');
-                jQuery('#' + this.config.IDs.ACTION_SELECTALL + ' span').text('⌘A');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_CUT + ' span').text('⌘X');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_COPY + ' span').text('⌘C');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_PASTE + ' span').text('⌘P');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_SELECTALL + ' span').text('⌘A');
             }
 
             return this;
@@ -250,29 +248,29 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
         _setupJsPlumb: function() {
             jsPlumb.importDefaults({
                 EndpointStyle: {
-                    fillStyle:   this.config.JSPlumb.ENDPOINT_FILL
+                    fillStyle:   Factory.getModule('Config').JSPlumb.ENDPOINT_FILL
                 },
-                Endpoint:        [this.config.JSPlumb.ENDPOINT_STYLE, {
-                    radius:      this.config.JSPlumb.ENDPOINT_RADIUS,
-                    cssClass:    this.config.Classes.JSPLUMB_ENDPOINT,
-                    hoverClass:  this.config.Classes.HIGHLIGHTED
+                Endpoint:        [Factory.getModule('Config').JSPlumb.ENDPOINT_STYLE, {
+                    radius:      Factory.getModule('Config').JSPlumb.ENDPOINT_RADIUS,
+                    cssClass:    Factory.getModule('Config').Classes.JSPLUMB_ENDPOINT,
+                    hoverClass:  Factory.getModule('Config').Classes.HIGHLIGHTED
                 }],
                 PaintStyle: {
-                    strokeStyle: this.config.JSPlumb.STROKE_COLOR,
-                    lineWidth:   this.config.JSPlumb.STROKE_WIDTH,
-                    outlineColor:this.config.JSPlumb.OUTLINE_COLOR,
-                    outlineWidth:this.config.JSPlumb.OUTLINE_WIDTH
+                    strokeStyle: Factory.getModule('Config').JSPlumb.STROKE_COLOR,
+                    lineWidth:   Factory.getModule('Config').JSPlumb.STROKE_WIDTH,
+                    outlineColor:Factory.getModule('Config').JSPlumb.OUTLINE_COLOR,
+                    outlineWidth:Factory.getModule('Config').JSPlumb.OUTLINE_WIDTH
                 },
                 HoverPaintStyle: {
-                    strokeStyle: this.config.JSPlumb.STROKE_COLOR_HIGHLIGHTED
+                    strokeStyle: Factory.getModule('Config').JSPlumb.STROKE_COLOR_HIGHLIGHTED
                 },
-                HoverClass:      this.config.Classes.HIGHLIGHTED,
-                Connector:       [this.config.JSPlumb.CONNECTOR_STYLE, this.config.JSPlumb.CONNECTOR_OPTIONS],
+                HoverClass:      Factory.getModule('Config').Classes.HIGHLIGHTED,
+                Connector:       [Factory.getModule('Config').JSPlumb.CONNECTOR_STYLE, Factory.getModule('Config').JSPlumb.CONNECTOR_OPTIONS],
                 ConnectionsDetachable: false,
-                ConnectionOverlays: this.config.JSPlumb.CONNECTION_OVERLAYS
+                ConnectionOverlays: Factory.getModule('Config').JSPlumb.CONNECTION_OVERLAYS
             });
 
-            jsPlumb.connectorClass = this.config.Classes.JSPLUMB_CONNECTOR;
+            jsPlumb.connectorClass = Factory.getModule('Config').Classes.JSPLUMB_CONNECTOR;
 
             return this;
         },
@@ -287,7 +285,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _setupMouse: function() {
             jQuery(window).resize(function() {
-                var content = jQuery('#' + this.config.IDs.CONTENT);
+                var content = jQuery('#' + Factory.getModule('Config').IDs.CONTENT);
 
                 Canvas.enlarge({
                     x: content.width(),
@@ -359,7 +357,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             // this style will transform all elements on the canvas by the given 'x' and 'y' offset
             var transformCssTemplateText =
-                '#' + this.config.IDs.CANVAS + ' > * {\n' +
+                '#' + Factory.getModule('Config').IDs.CANVAS + ' > * {\n' +
                 '   transform: translate(<%= x %>px,<%= y %>px);\n' +
                 '   -ms-transform: translate(<%= x %>px,<%= y %>px); /* IE 9 */\n' +
                 '   -webkit-transform: translate(<%= x %>px,<%= y %>px); /* Safari and Chrome */\n' +
@@ -386,13 +384,13 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _setupEventCallbacks: function() {
             // events that trigger a re-calculation of the print offsets
-            jQuery(document).on(this.config.Events.NODE_DRAG_STOPPED,  this._updatePrintOffsets.bind(this));
-            jQuery(document).on(this.config.Events.NODE_ADDED,         this._updatePrintOffsets.bind(this));
-            jQuery(document).on(this.config.Events.NODE_DELETED,       this._updatePrintOffsets.bind(this));
+            jQuery(document).on(Factory.getModule('Config').Events.NODE_DRAG_STOPPED,  this._updatePrintOffsets.bind(this));
+            jQuery(document).on(Factory.getModule('Config').Events.NODE_ADDED,         this._updatePrintOffsets.bind(this));
+            jQuery(document).on(Factory.getModule('Config').Events.NODE_DELETED,       this._updatePrintOffsets.bind(this));
 
             // update the available menu actions corresponding to the current selection
-            jQuery(document).on([ this.config.Events.NODE_SELECTED,
-                                  this.config.Events.NODE_UNSELECTED ].join(' '), this._updateMenuActions.bind(this));
+            jQuery(document).on([ Factory.getModule('Config').Events.NODE_SELECTED,
+                                  Factory.getModule('Config').Events.NODE_UNSELECTED ].join(' '), this._updateMenuActions.bind(this));
 
             // show status of global AJAX events in navbar
             jQuery(document).ajaxSend(Progress.showAjaxProgress);
@@ -430,6 +428,9 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             // if at least one element was deletable, hide the properties window
             if (_.union(deletableNodes, deletableEdges, deletableNodeGroups).length > 0) this.properties.hide();
 
+            // update the available menu actions
+            this._updateMenuActions();
+
             return this;
         },
 
@@ -441,11 +442,11 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      An array of currently selected {<Node>} instances.
          */
         _selectedNodes: function() {
-            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedNodes = '.' + Factory.getModule('Config').Classes.SELECTED + '.' + Factory.getModule('Config').Classes.NODE;
 
             var nodes = [];
             jQuery(selectedNodes).each(function(index, element) {
-                var node = this.graph.getNodeById(jQuery(element).data(this.config.Keys.NODE).id);
+                var node = this.graph.getNodeById(jQuery(element).data(Factory.getModule('Config').Keys.NODE).id);
                 nodes.push(node);
             }.bind(this));
 
@@ -460,11 +461,11 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      An array of currently selected {<Edge>} instances.
          */
         _selectedEdges: function() {
-            var selectedEdges = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.JSPLUMB_CONNECTOR;
+            var selectedEdges = '.' + Factory.getModule('Config').Classes.SELECTED + '.' + Factory.getModule('Config').Classes.JSPLUMB_CONNECTOR;
 
             var edges = [];
             jQuery(selectedEdges).each(function(index, element) {
-                var edge = jQuery(element).data(this.config.Keys.EDGE);
+                var edge = jQuery(element).data(Factory.getModule('Config').Keys.EDGE);
                 edges.push(edge);
             }.bind(this));
 
@@ -481,13 +482,13 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
         _selectedNodeGroups: function() {
             var nodegroups = [];
             // find selected node groups (NASTY!!!)
-            var allNodeGroups = '.' + this.config.Classes.NODEGROUP;
+            var allNodeGroups = '.' + Factory.getModule('Config').Classes.NODEGROUP;
 
             jQuery(allNodeGroups).each(function(index, element) {
-                var nodeGroup = jQuery(element).data(this.config.Keys.NODEGROUP);
+                var nodeGroup = jQuery(element).data(Factory.getModule('Config').Keys.NODEGROUP);
                 // since the selectable element is an svg path, we need to look for that nested element and check its
                 //   state of selection via the CSS class .selected
-                if (nodeGroup.container.find("svg path").hasClass(this.config.Classes.SELECTED)) {
+                if (nodeGroup.container.find("svg path").hasClass(Factory.getModule('Config').Classes.SELECTED)) {
                     nodegroups.push(nodeGroup);
                 }
             }.bind(this));
@@ -545,30 +546,30 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             // copy is only available when at least one node is copyable as copying edges or node groups solely won't
             //  have any effect (because they can't be restored)
             if (this._copyable(selectedNodes).length > 0) {
-                jQuery('#' + this.config.IDs.ACTION_COPY).parent().removeClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_COPY).parent().removeClass('disabled');
             } else {
-                jQuery('#' + this.config.IDs.ACTION_COPY).parent().addClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_COPY).parent().addClass('disabled');
             }
 
             // same here: cut is only available when at least one node is cuttable
             if (this._cuttable(selectedNodes).length > 0) {
-                jQuery('#' + this.config.IDs.ACTION_CUT).parent().removeClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_CUT).parent().removeClass('disabled');
             } else {
-                jQuery('#' + this.config.IDs.ACTION_CUT).parent().addClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_CUT).parent().addClass('disabled');
             }
 
             // delete is only available when the selection is not empty and at least one element is deletable
             if (selectedElems.length > 0 && this._deletable(selectedElems).length > 0) {
-                jQuery('#' + this.config.IDs.ACTION_DELETE).parent().removeClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_DELETE).parent().removeClass('disabled');
             } else {
-                jQuery('#' + this.config.IDs.ACTION_DELETE).parent().addClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_DELETE).parent().addClass('disabled');
             }
 
             // paste is only available when there is something in the clipboard
             if (this._getClipboard()) {
-                jQuery('#' + this.config.IDs.ACTION_PASTE).parent().removeClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_PASTE).parent().removeClass('disabled');
             } else {
-                jQuery('#' + this.config.IDs.ACTION_PASTE).parent().addClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_PASTE).parent().addClass('disabled');
             }
 
             return this;
@@ -588,15 +589,15 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
         _selectAll: function(event) {
             //XXX: trigger selection start event manually here
             //XXX: hack to emulate a new selection process
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
+            Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStart(event);
 
-            jQuery('.'+this.config.Classes.SELECTEE)
-                .addClass(this.config.Classes.SELECTING)
-                .addClass(this.config.Classes.SELECTED);
+            jQuery('.'+Factory.getModule('Config').Classes.SELECTEE)
+                .addClass(Factory.getModule('Config').Classes.SELECTING)
+                .addClass(Factory.getModule('Config').Classes.SELECTED);
 
             //XXX: trigger selection stop event manually here
             //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
+            Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStop(null);
         },
 
         /**
@@ -624,8 +625,8 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             //XXX: deselect everything
             // This uses the jQuery.ui.selectable internal functions.
             // We need to trigger them manually in order to simulate a click on the canvas.
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(hackEvent);
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(hackEvent);
+            Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStart(hackEvent);
+            Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStop(hackEvent);
 
             return this;
         },
@@ -722,7 +723,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             //XXX: trigger selection stop event manually here
             //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
-            Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(null);
+            Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStop(null);
         },
 
         /**
@@ -894,16 +895,16 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
         _arrowKeyPressed: function(event, xDirection, yDirection) {
             if (jQuery(event.target).is('input, textarea')) return this;
 
-            var selectedNodes = '.' + this.config.Classes.SELECTED + '.' + this.config.Classes.NODE;
+            var selectedNodes = '.' + Factory.getModule('Config').Classes.SELECTED + '.' + Factory.getModule('Config').Classes.NODE;
             jQuery(selectedNodes).each(function(index, element) {
-                var node = jQuery(element).data(this.config.Keys.NODE);
+                var node = jQuery(element).data(Factory.getModule('Config').Keys.NODE);
                 node.moveBy({
                     x: xDirection * Canvas.gridSize,
                     y: yDirection * Canvas.gridSize
                 });
             }.bind(this));
 
-            jQuery(document).trigger(this.config.Events.NODES_MOVED);
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODES_MOVED);
 
             return this;
         },
@@ -1032,7 +1033,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             var minLeftOffset = window.Infinity;
             var minTopOffset  = window.Infinity;
 
-            jQuery('.' + this.config.Classes.NODE + ', .' + this.config.Classes.MIRROR).each(function(index, element) {
+            jQuery('.' + Factory.getModule('Config').Classes.NODE + ', .' + Factory.getModule('Config').Classes.MIRROR).each(function(index, element) {
                 var offset = jQuery(element).offset();
                 minLeftOffset = Math.min(minLeftOffset, offset.left);
                 minTopOffset  = Math.min(minTopOffset,  offset.top);

@@ -32,7 +32,7 @@ define(['factory', 'fuzztree/config', 'faulttree/node'], function(Factory, Confi
 
             if (optionalProperty) {
                 this.setOptional(optionalProperty.value);
-                jQuery(optionalProperty).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue) {
+                jQuery(optionalProperty).on(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, function(event, newValue) {
                     this.setOptional(newValue);
                 }.bind(this));
             }
@@ -57,16 +57,12 @@ define(['factory', 'fuzztree/config', 'faulttree/node'], function(Factory, Confi
         setOptional: function(optional) {
             // mark node optional (or remove mark)
             if (optional) {
-                this.container.addClass(this.config.Classes.OPTIONAL);
+                this.container.addClass(Factory.getModule('Config').Classes.OPTIONAL);
             } else {
-                this.container.removeClass(this.config.Classes.OPTIONAL);
+                this.container.removeClass(Factory.getModule('Config').Classes.OPTIONAL);
             }
 
             return this;
-        },
-
-        getConfig: function() {
-            return Config;
         }
     });
 });

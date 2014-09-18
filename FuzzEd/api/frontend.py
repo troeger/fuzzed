@@ -483,7 +483,7 @@ class GraphSerializer(common.GraphSerializer):
 
     def to_json(self, data, options=None):
         if isinstance(data, Bundle):
-            return data.obj.to_json(use_value_dict=True)
+            return data.obj.to_json(use_value_dict=False)
         elif isinstance(data, dict):
             if 'objects' in data:  # object list
                 graphs = []

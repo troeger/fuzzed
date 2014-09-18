@@ -15,30 +15,6 @@ function(Factory, Graph, FaulttreeNode, FaulttreeConfig, FaulttreeNotation) {
          * Group: Accessors
          */
 
-        /**
-         * Method: getConfig
-         *      See <Base::Graph::getConfig>.
-         */
-        getConfig: function() {
-            return FaulttreeConfig;
-        },
-
-        /**
-         * Method: getNodeClass
-         *      See <Base::Graph::getNodeClass>.
-         */
-        getNodeClass: function() {
-            return FaulttreeNode;
-        },
-
-        /**
-         * Method: getNotation
-         *      See <Base::Graph::getNotation>.
-         */
-        getNotation: function() {
-            return FaulttreeNotation;
-        },
-
         // _mirror's purpose is not to actually copy any properties, but to make the mirrored node be in the same node
         //     group as the original, so they share common properties implicitly
         _mirror: function(node) {

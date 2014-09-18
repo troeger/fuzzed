@@ -24,10 +24,10 @@ define(['factory', 'class', 'config', 'progress_indicator', 'jquery'], function(
         notFoundCallback: jQuery.noop,
         errorCallback:    jQuery.noop,
         queryInterval:    1000,
-        progressMessage:          Config.ProgressIndicator.DEFAULT_PROGRESS_MESSAGE,
-        progressSuccessMessage:   Config.ProgressIndicator.DEFAULT_SUCCESS_MESSAGE,
-        progressErrorMessage:     Config.ProgressIndicator.DEFAULT_ERROR_MESSAGE,
-        progressNotFoundMessage:  Config.ProgressIndicator.DEFAULT_NOT_FOUND_MESSAGE,
+        progressMessage:          Factory.getModule('Config').ProgressIndicator.DEFAULT_PROGRESS_MESSAGE,
+        progressSuccessMessage:   Factory.getModule('Config').ProgressIndicator.DEFAULT_SUCCESS_MESSAGE,
+        progressErrorMessage:     Factory.getModule('Config').ProgressIndicator.DEFAULT_ERROR_MESSAGE,
+        progressNotFoundMessage:  Factory.getModule('Config').ProgressIndicator.DEFAULT_NOT_FOUND_MESSAGE,
         progressID:      undefined,
 
         _url:             undefined,
@@ -78,7 +78,7 @@ define(['factory', 'class', 'config', 'progress_indicator', 'jquery'], function(
             clearTimeout(this._timeout);
             // prevent re-fetches due to race conditions
             this._refetch = false;
-            Progress.flashErrorMessage(this.progressID, Config.ProgressIndicator.DEFAULT_CANCELED_MESSAGE);
+            Progress.flashErrorMessage(this.progressID, Factory.getModule('Config').ProgressIndicator.DEFAULT_CANCELED_MESSAGE);
             //TODO: call backend as soon as the call is available (cancel method for backend job not yet )
 
             return this;

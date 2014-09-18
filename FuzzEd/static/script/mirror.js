@@ -48,9 +48,9 @@ define(['factory', 'config', 'canvas', 'class', 'jquery', 'underscore'], functio
             this._setupVisualRepresentation();
             // style the mirror's visualization - i.e. bold, italic or larger text
             _.each(properties.style, function(style) {
-                if (style === 'italic') this.container.addClass(Config.Classes.MIRROR_ITALIC);
-                if (style === 'bold')   this.container.addClass(Config.Classes.MIRROR_BOLD);
-                if (style === 'large')  this.container.addClass(Config.Classes.MIRROR_LARGE);
+                if (style === 'italic') this.container.addClass(Factory.getModule('Config').Classes.MIRROR_ITALIC);
+                if (style === 'bold')   this.container.addClass(Factory.getModule('Config').Classes.MIRROR_BOLD);
+                if (style === 'large')  this.container.addClass(Factory.getModule('Config').Classes.MIRROR_LARGE);
             }.bind(this));
 
             this._appendContainerToContainment(properties.position)
@@ -66,13 +66,13 @@ define(['factory', 'config', 'canvas', 'class', 'jquery', 'underscore'], functio
          *      This {<Mirror>} instance for chaining.
          */
         _setupVisualRepresentation: function() {
-            this.container = jQuery('<span>').addClass(Config.Classes.MIRROR)
+            this.container = jQuery('<span>').addClass(Factory.getModule('Config').Classes.MIRROR)
                 // The label is double the grid/node's width to allow for large textual content. Since the mirror is
                 // already partially centered (see CSS), we only need to offset the container by a quarter of its size.
                 // In order to not cover the grid lines behind the mirror box, we need to down size the box by the
                 // grid's stroke.
-                .css('width', Canvas.gridSize * 2 - Config.Grid.STROKE_WIDTH * 4)
-                .css('margin-left', -(Canvas.gridSize / 2) + Config.Grid.STROKE_WIDTH);
+                .css('width', Canvas.gridSize * 2 - Factory.getModule('Config').Grid.STROKE_WIDTH * 4)
+                .css('margin-left', -(Canvas.gridSize / 2) + Factory.getModule('Config').Grid.STROKE_WIDTH);
 
             return this;
         },
@@ -111,13 +111,13 @@ define(['factory', 'config', 'canvas', 'class', 'jquery', 'underscore'], functio
          *      This {<Mirror>} instance for chaining.
          */
         _setupEvents: function() {
-            jQuery(this.property).on(Config.Events.NODE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+            jQuery(this.property).on(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 this.show(text);
             }.bind(this));
-            jQuery(this.property).on(Config.Events.NODEGROUP_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+            jQuery(this.property).on(Factory.getModule('Config').Events.NODEGROUP_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 this.show(text);
             }.bind(this));
-            jQuery(this.property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
+            jQuery(this.property).on(Factory.getModule('Config').Events.PROPERTY_HIDDEN_CHANGED, function(event, hidden) {
                 this.container.toggle(!hidden);
             }.bind(this));
 

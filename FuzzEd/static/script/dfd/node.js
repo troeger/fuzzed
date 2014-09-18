@@ -10,10 +10,6 @@ define(['factory', 'dfd/config', 'node', 'jquery', 'jsplumb'], function(Factory,
      * Extends: <Base::Node>
      */
     return AbstractNode.extend({
-        getConfig: function() {
-            return Config;
-        },
-
         _connectorAnchors: function() {
             return {
                 'in':  [0.5, 0, 0, 0],
@@ -40,10 +36,10 @@ define(['factory', 'dfd/config', 'node', 'jquery', 'jsplumb'], function(Factory,
             if (this.numberOfOutgoingConnection == 0) return this;
 
             var position = this._nodeImageContainer.position();
-            var stroke   = this.config.JSPlumb.STROKE_WIDTH;
+            var stroke   = Factory.getModule('Config').JSPlumb.STROKE_WIDTH;
 
             this._connectionHandle = jQuery('<i class="fa fa-plus"></i>')
-                .addClass(this.config.Classes.NODE_HALO_CONNECT)
+                .addClass(Factory.getModule('Config').Classes.NODE_HALO_CONNECT)
                 .css({
                     'top':  position.top  + this._nodeImage.outerHeight(true) / 2 + stroke * 1.5,
                     'left': position.left + this._nodeImage.outerWidth(true)  / 2
@@ -96,13 +92,13 @@ define(['factory', 'dfd/config', 'node', 'jquery', 'jsplumb'], function(Factory,
                         if (typeof elid === 'undefined') return false;
 
                         // ...as well as nodes without a node object representing it.
-                        var sourceNode = jQuery('.' + this.config.Classes.NODE + ':has(#' + elid + ')').data('node');
+                        var sourceNode = jQuery('.' + Factory.getModule('Config').Classes.NODE + ':has(#' + elid + ')').data('node');
                         if (typeof sourceNode === 'undefined') return false;
 
                         // Ask the source node if it can connect to us.
                         return sourceNode.allowsConnectionsTo(this);
                     }.bind(this),
-                    activeClass: this.config.Classes.NODE_DROP_ACTIVE
+                    activeClass: Factory.getModule('Config').Classes.NODE_DROP_ACTIVE
                 }
             });
 
@@ -114,15 +110,15 @@ define(['factory', 'dfd/config', 'node', 'jquery', 'jsplumb'], function(Factory,
 
             // small flag for the drag callback, explanation below
             var highlight     = true;
-            var inactiveNodes = '.' + this.config.Classes.NODE + ':not(.'+ this.config.Classes.NODE_DROP_ACTIVE + ')';
+            var inactiveNodes = '.' + Factory.getModule('Config').Classes.NODE + ':not(.'+ Factory.getModule('Config').Classes.NODE_DROP_ACTIVE + ')';
 
             jsPlumb.makeSource(this._connectionHandle, {
                 parent:         this.container,
                 anchor:         this._sourceAnchors(),
                 maxConnections: this.numberOfOutgoingConnections,
-                connectorStyle: this.connector,//[this.config.JSPlumb.CONNECTOR_STYLE, { curviness: 30, stub: 5}],
+                connectorStyle: this.connector,//[Factory.getModule('Config').JSPlumb.CONNECTOR_STYLE, { curviness: 30, stub: 5}],
                 dragOptions: {
-                    cursor: this.config.Dragging.CURSOR_EDGE,
+                    cursor: Factory.getModule('Config').Dragging.CURSOR_EDGE,
                     // XXX: have to use drag callback here instead of start
                     // The activeClass assigned in <Node::_setupIncomingEndpoint> is unfortunately assigned only AFTER
                     // the execution of the start callback by jsPlumb.
@@ -131,14 +127,14 @@ define(['factory', 'dfd/config', 'node', 'jquery', 'jsplumb'], function(Factory,
                         if (!highlight) return;
                         // disable all nodes that can not be targeted
                         jQuery(inactiveNodes).each(function(index, node){
-                            jQuery(node).data(this.config.Keys.NODE).disable();
+                            jQuery(node).data(Factory.getModule('Config').Keys.NODE).disable();
                         }.bind(this));
                         highlight = false;
                     }.bind(this),
                     stop: function() {
                         // re-enable disabled nodes
                         jQuery(inactiveNodes).each(function(index, node){
-                            jQuery(node).data(this.config.Keys.NODE).enable();
+                            jQuery(node).data(Factory.getModule('Config').Keys.NODE).enable();
                         }.bind(this));
                         // release the flag, to allow fading out nodes again
                         highlight = true;

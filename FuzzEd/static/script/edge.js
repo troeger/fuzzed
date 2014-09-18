@@ -54,8 +54,8 @@ function(Factory, Class, Config, Property) {
             if (typeof properties === 'undefined') {
                 // case 1: create Edge instance for existing jsPlumbConnection
                 properties  = jQuery.extend(true, {}, definition.properties, targetOrProperties);
-                this.source = jQuery(sourceOrJsPlumbEdge.source).data(Config.Keys.NODE);
-                this.target = jQuery(sourceOrJsPlumbEdge.target).data(Config.Keys.NODE);
+                this.source = jQuery(sourceOrJsPlumbEdge.source).data(Factory.getModule('Config').Keys.NODE);
+                this.target = jQuery(sourceOrJsPlumbEdge.target).data(Factory.getModule('Config').Keys.NODE);
                 this._initFromJsPlumbEdge(sourceOrJsPlumbEdge, properties);
 
             } else {
@@ -109,7 +109,7 @@ function(Factory, Class, Config, Property) {
             delete this.properties.graph;
 
             // store the edge instance in an attribute so we can retrieve it later from the DOM element
-            jQuery(jsPlumbEdge.canvas).data(Config.Keys.EDGE, this);
+            jQuery(jsPlumbEdge.canvas).data(Factory.getModule('Config').Keys.EDGE, this);
             this.source.setChildProperties(this.target);
 
             // correct target and source node incoming and outgoing edges
@@ -119,7 +119,7 @@ function(Factory, Class, Config, Property) {
             this._setupProperties();
 
             // call home
-            jQuery(document).trigger(Config.Events.EDGE_ADDED, [
+            jQuery(document).trigger(Factory.getModule('Config').Events.EDGE_ADDED, [
                 this.id,
                 this.source.id,
                 this.target.id,
@@ -141,7 +141,7 @@ function(Factory, Class, Config, Property) {
          *      This {<NodeGroup>} instance for chaining.
          */
         _setupProperties: function() {
-            _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {
+            _.each(Factory.getNotation().propertiesDisplayOrder, function(propertyName) {
                 var property = this.properties[propertyName];
 
                 if (typeof property === 'undefined') {
@@ -166,7 +166,7 @@ function(Factory, Class, Config, Property) {
          *      This {<Edge>} instance for chaining.
          */
         select: function() {
-            jQuery(this.jsPlumbEdge.canvas).addClass(Config.Classes.SELECTED);
+            jQuery(this.jsPlumbEdge.canvas).addClass(Factory.getModule('Config').Classes.SELECTED);
 
             return this;
         },
@@ -218,7 +218,7 @@ function(Factory, Class, Config, Property) {
             this.target.incomingEdges = _.without(this.target.incomingEdges, this);
 
             // call home
-            jQuery(document).trigger(Config.Events.EDGE_DELETED, this.id);
+            jQuery(document).trigger(Factory.getModule('Config').Events.EDGE_DELETED, this.id);
 
             return true;
         },

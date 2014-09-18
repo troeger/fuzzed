@@ -21,7 +21,7 @@ define(['factory', 'node_group', 'config'], function(Factory, NodeGroup, Config)
          *      This {<NodeGroup>} instance for chaining.
          */
         _setupProperties: function() {
-            _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {
+            _.each(Factory.getNotation().propertiesDisplayOrder, function(propertyName) {
                 var property = this.properties[propertyName];
 
                 if (typeof property === 'undefined') {
@@ -60,7 +60,7 @@ define(['factory', 'node_group', 'config'], function(Factory, NodeGroup, Config)
             delete this.nodes[node.id];
 
             // call home
-            jQuery(document).trigger(Config.Events.NODEGROUP_NODEIDS_CHANGED, [this.id, this.nodeIds()]);
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODEGROUP_NODEIDS_CHANGED, [this.id, this.nodeIds()]);
 
             // if we have less than one member node left, remove us, as we are no longer relevant
             if (_.size(this.nodes) == 1) {

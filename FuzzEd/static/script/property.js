@@ -97,11 +97,11 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
                 properties[this.name] = value;
 
                 if (this.owner instanceof Edge) {
-                    jQuery(document).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
                 } else if (this.owner instanceof Node) {
-                    jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.owner.id, properties]);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, [this.owner.id, properties]);
                 } else if (this.owner instanceof NodeGroup) {
-                    jQuery(document).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [this.owner.id, properties]);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.NODEGROUP_PROPERTY_CHANGED, [this.owner.id, properties]);
                 } else {
                     throw new TypeError ('unknown owner class');
                 }
@@ -118,14 +118,14 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
 
         setHidden: function(newHidden) {
             this.hidden = newHidden;
-            jQuery(this).trigger(Config.Events.PROPERTY_HIDDEN_CHANGED, [newHidden]);
+            jQuery(this).trigger(Factory.getModule('Config').Events.PROPERTY_HIDDEN_CHANGED, [newHidden]);
 
             return this;
         },
 
         setReadonly: function(newReadonly) {
             this.readonly = newReadonly;
-            jQuery(this).trigger(Config.Events.PROPERTY_READONLY_CHANGED, [newReadonly]);
+            jQuery(this).trigger(Factory.getModule('Config').Events.PROPERTY_READONLY_CHANGED, [newReadonly]);
 
             return this;
         },
@@ -193,11 +193,11 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
             var NodeGroup = require('node_group');
 
             if (this.owner instanceof Node) {
-                jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
+                jQuery(this).trigger(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
             } else if (this.owner instanceof Edge) {
-                jQuery(this).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [value, value, issuer]);
+                jQuery(this).trigger(Factory.getModule('Config').Events.EDGE_PROPERTY_CHANGED, [value, value, issuer]);
             } else if (this.owner instanceof NodeGroup) {
-                jQuery(this).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [value, value, issuer]);
+                jQuery(this).trigger(Factory.getModule('Config').Events.NODEGROUP_PROPERTY_CHANGED, [value, value, issuer]);
             }
 
             return this;
@@ -268,7 +268,7 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
                 }
             }
 
-            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, this.choices[i], issuer]);
+            jQuery(this).trigger(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, [value, this.choices[i], issuer]);
         }
     });
 
@@ -652,7 +652,7 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
     var Transfer = Property.extend({
         UNLINK_VALUE: -1,
         UNLINK_TEXT:  'unlinked',
-        GRAPHS_URL:   Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/',
+        GRAPHS_URL:   Factory.getModule('Config').Backend.BASE_URL + Factory.getModule('Config').Backend.GRAPHS_URL + '/',
 
         transferGraphs: undefined,
 
@@ -692,7 +692,7 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
             var unlinked = value === this.UNLINK_VALUE;
 
             if (!unlinked) this.owner.hideBadge();
-            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [
+            jQuery(this).trigger(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, [
                 value,
                 unlinked ? this.UNLINK_TEXT : this.transferGraphs[value],
                 issuer]
@@ -723,19 +723,19 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
             if (this.value === this.UNLINK_VALUE)
                 this.owner.showBadge('!', 'important');
 
-            jQuery(this).trigger(Config.Events.PROPERTY_SYNCHRONIZED);
+            jQuery(this).trigger(Factory.getModule('Config').Events.PROPERTY_SYNCHRONIZED);
             this._triggerChange(this.value, this);
 
             return this;
         },
 
         _throwError: function(xhr, textStatus, errorThrown) {
-            Alerts.showWarningAlert('Could not fetch graph for transfer:', errorThrown, Config.Alerts.TIMEOUT);
+            Alerts.showWarningAlert('Could not fetch graph for transfer:', errorThrown, Factory.getModule('Config').Alerts.TIMEOUT);
 
             this.value = this.UNLINK_VALUE;
             this.transferGraphs = undefined;
 
-            jQuery(this).trigger(Config.Events.PROPERTY_SYNCHRONIZED);
+            jQuery(this).trigger(Factory.getModule('Config').Events.PROPERTY_SYNCHRONIZED);
         }
     });
 

@@ -7,12 +7,15 @@
 {% block script %}
     {{ block.super }}
     <script type="text/javascript" language="javascript">
+        // initialize factory
+        require(['factory'], function (Factory) {
+            Factory.kind = '{{ graph.kind }}';
+        });
         // start editor
         require(['{{ graph.kind }}/editor', 'factory', 'bootstrap', 'exception'], function (Editor, Factory) {
             jQuery(document).ready(function () {
                 try {
-                    Factory.kind = '{{ graph.kind }}';
-                    var editor = new Editor({{ graph.pk }});
+                    new Editor({{ graph.pk }});
                 } catch (exception) {
                     var exceptions = jQuery('#FuzzEdExceptions');
 

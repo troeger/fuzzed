@@ -44,7 +44,7 @@ define(['factory', 'config', 'class', 'jquery'], function(Factory, Config, Class
             // initial creation of the overlay
             this._jsPlumbConnection.addOverlay(['Label', {
                 label:    property.value || property.defaultValue,
-                id:       Config.JSPlumb.LABEL_OVERLAY_ID,
+                id:       Factory.getModule('Config').JSPlumb.LABEL_OVERLAY_ID,
                 location: 0.4   // temporary work around to shift edge labels a bit from the center, so that they don't
                                 // overlap each other as soon as there are two edges between two nodes
             }]);
@@ -64,7 +64,7 @@ define(['factory', 'config', 'class', 'jquery'], function(Factory, Config, Class
          *      This {<Label>} instance for chaining.
          */
         show: function(text) {
-            var overlay = this._jsPlumbConnection.getOverlay(Config.JSPlumb.LABEL_OVERLAY_ID);
+            var overlay = this._jsPlumbConnection.getOverlay(Factory.getModule('Config').JSPlumb.LABEL_OVERLAY_ID);
             overlay.setLabel(text);
 
             return this;
@@ -78,7 +78,7 @@ define(['factory', 'config', 'class', 'jquery'], function(Factory, Config, Class
          *      This {Label} instance for chaining.
          */
         _setupEvents: function() {
-            jQuery(this.property).on(Config.Events.EDGE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
+            jQuery(this.property).on(Factory.getModule('Config').Events.EDGE_PROPERTY_CHANGED, function(event, newValue, text, issuer) {
                 this.show(text);
             }.bind(this));
 
