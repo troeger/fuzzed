@@ -1,14 +1,3 @@
-####################################################################################################
-# Overwriting the default compiler is a bad thing:
-# http://www.cmake.org/Wiki/CMake_FAQ
-# It must be done before the project definition.
-#
-# We only need this for Mac's, were Codesynthesis
-# cannot deal with the default CLang compiler.
-# A manual switch to g++ is therefore needed by calling:
-# cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 .
-####################################################################################################
-
 ###################
 # Generic settings
 ###################
@@ -29,12 +18,7 @@ SET (CMAKE_BUILD_TYPE Debug)
 ############################################################################
 # Platform-specific compilation behavior
 ############################################################################
-if(APPLE)
-	# Homebrew on Mac OS X has no Codesynthesis XSD available, so we use our own copy
-	set(XSD_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/xsd_apple/libxsd/)
-	set(XSD_EXECUTABLE ${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/xsd_apple/bin/xsd)
-	set(USE_OMP OFF)
-elseif(WIN32)
+if(WIN32)
 	 set(Boost_USE_STATIC_LIBS ON)
 	 set(USE_OMP ON)
 elseif(UNIX)
