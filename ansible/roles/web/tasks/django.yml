@@ -1,35 +1,32 @@
 ---
 - name: Ensure Django is installed
   sudo: yes
-  pip: name=django state=present version=1.7
-- name: Ensure Django South is installed
-  sudo: yes
-  pip: name=south state=latest
+  easy_install: name=django
 - name: Ensure OpenID2RP is installed
   sudo: yes
-  pip: name=openid2rp state=latest
+  easy_install: name=openid2rp 
 - name: Ensure Django Require is installed
   sudo: yes
-  pip: name=django-require state=latest
+  easy_install: name=django-require 
 - name: Ensure Django OAuth Toolkit and dependencies are installed
   sudo: yes
-  pip: name={{item}} state=latest
+  easy_install: name={{item}}
   with_items:
   - django-oauth-toolkit
   - django-cors-headers
 - name: Ensure Django Tastypie is installed
   sudo: yes
-  pip: name=django-tastypie state=latest
+  easy_install: name=django-tastypie 
 - name: Ensure Django Wiki and dependencies are installed
   sudo: yes
-  pip: name={{item}} state=latest
+  easy_install: name={{item}}
   with_items:
   - djiki
   - py-wikimarkup
   - defusedxml
 - name: Ensure Django configurations is installed
   sudo: yes
-  pip: name=django-configurations state=latest
+  easy_install: name=django-configurations
 - name: Ensure OAuth client libary is installed for testing purposes
   sudo: yes
-  pip: name=requests_oauthlib state=latest
+  easy_install: name=requests_oauthlib 
