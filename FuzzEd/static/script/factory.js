@@ -8,18 +8,18 @@ function(Class, DFDNotation, FaulttreeNotation, FuzztreeNotation, RBDNotation) {
     /**
      *  Class: Factory
      *
-     *  The factory class acts as an object factory for almost all classes. It is based on the desired class layout of
-     *  the whole client side JavaScript code, which dynamically replaces abstract classes with its concrete children
-     *  when possible. An abstract Editor for example uses the factory to create a concrete graph instead of the abstract
-     *  graph (every concrete graph inherits from). To achieve this, you generally have to call
-     *      Factory.create('MyAbstractClass', arg1, arg2, ...);
-     *  instead of calling the constructor on your own. This allows the factory to determine the right subclass and
-     *  its constructor. It will then call the constructor with the given arguments and return the object to you.
-     *
+     * The factory class acts as an object factory for almost all classes. It is based on the desired class layout of
+     * the whole client side JavaScript code, which dynamically replaces abstract classes with its concrete children
+     * when possible. An abstract Editor for example uses the factory to create a concrete graph instead of the abstract
+     * graph (every concrete graph inherits from). To achieve this, you generally have to call
+     *     Factory.create('MyAbstractClass', arg1, arg2, ...);
+     * instead of calling the constructor on your own. This allows the factory to determine the right subclass and
+     * its constructor. It will then call the constructor with the given arguments and return the object to you. The
+     * only thing you have to take care of is importing the desired require-modules for a specific graph type into its
+     * editor (by define([..., 'foo/bar', ...]))
      */
     var Factory = Class.extend({
         kind: undefined,
-
         // create's first argument is either the name of the base class or a constructor, we want to create an instance of
         //  all other arguments are passed directly into the  constructor
         create: function(baseCls) {
@@ -65,16 +65,20 @@ function(Class, DFDNotation, FaulttreeNotation, FuzztreeNotation, RBDNotation) {
             }
         },
 
+        // getModule's purpose is to just find the right module and return it, instead of looking for the constructor
+        //  and creating an instance
         getModule: function(baseCls) {
             var resolveObj = this._resolveClassName(baseCls);
             //console.log('Successfully resolved class module for ' + baseCls + ' from ' + resolveObj.path);
             return require(resolveObj.path);
         },
 
+        // returns the kind-specific notation object parsed from the notation json-files
         getNotation: function() {
             return require('json!notations/' + this.kind + '.json');
         },
 
+        // constructs and returns an instance out of the given constructor and args
         _construct: function(constructor, args) {
             function Creation() {
                 return constructor.apply(this, args);
@@ -83,6 +87,7 @@ function(Class, DFDNotation, FaulttreeNotation, FuzztreeNotation, RBDNotation) {
             return new Creation();
         },
 
+        // resolves the right module by going through the graph kind's inheritance (bottom-up)
         _resolveClassName: function(cls, kind) {
             kind = kind || this.kind;
 
@@ -100,7 +105,7 @@ function(Class, DFDNotation, FaulttreeNotation, FuzztreeNotation, RBDNotation) {
 
             // precondition: to subclass any class, one has to subclass an Editor (directly or indirectly) and require
             //  all classes in the XYEditor's module, that shall replace base classes in general.
-            //  e.g. if I want to have a FooEditor that only differs from a FaulttreeEditor in its Nodes, I have to
+            //  e.g. if you want to have a FooEditor that only differs from a FaulttreeEditor in its Nodes, you have to
             //  subclass a FaulttreeEditor in 'foo/editor.js', beginning with
             //      define(['class', 'editor', 'foo/node'], function(Class, Editor, FooNode) { ...
             //  and off course I also have to implement
@@ -118,13 +123,14 @@ function(Class, DFDNotation, FaulttreeNotation, FuzztreeNotation, RBDNotation) {
             }
         },
 
+        // converts every upper case letter into a '_' and a lowercase letter, so that NodeGroup becomes node_group
         _fromClassToPath: function(cls) {
-            // convert every upper case letter into a '_' and a lowercase letter, so that NodeGroup becomes node_group
             return cls.replace(/[A-Z]/g, function(t) {
                 return t.slice(0, -1) + '_' + t.slice(-1).toLowerCase();
             }).slice(1);
         },
 
+        // returns either false, if kind inherits from the base classes, or the parent kind
         _baseKind: function(kind) {
             // retrieve the baseKind from the "inherits" attribute in the notations file
             var inherits = require('json!notations/' + kind + '.json').inherits;
