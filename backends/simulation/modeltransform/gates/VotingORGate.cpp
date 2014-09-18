@@ -2,7 +2,7 @@
 #include "serialization/PNDocument.h"
 #include "util.h"
 
-VotingORGate::VotingORGate(const std::string& id, int numVotes, const string& name) 
+VotingORGate::VotingORGate(const std::string& id, unsigned int numVotes, const string& name) 
 	: StaticGate(id, name), m_numVotes(numVotes)
 {
 	initActivationFunc();
@@ -46,7 +46,7 @@ FaultTreeNode::Ptr VotingORGate::clone() const
 
 std::string VotingORGate::description() const 
 {
-	return util::toString(m_numVotes) + " out of " + util::toString(getNumChildren());
+	return util::toString((int)m_numVotes) + " out of " + util::toString(getNumChildren());
 }
 
 std::string VotingORGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) const 
@@ -58,7 +58,7 @@ std::string VotingORGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) co
 	const int numChildren = childFormulas.size();
 	string res = s_formulaBegin;
 
-	// we need all n-combinations with n in [numVotes, numChildren]
+	// computes all n-combinations with n in [numVotes, numChildren]
 	for (int i = m_numVotes; i <= numChildren; ++i)
 	{
 		do
@@ -75,7 +75,7 @@ std::string VotingORGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) co
 
 		} while (util::next_combination(childFormulas.begin(), childFormulas.begin() + i, childFormulas.end()));
 	}
-	res.erase(res.length() - s_ORoperator.length(), s_ORoperator.length()); // TODO remove last OR
+	res.erase(res.length() - s_ORoperator.length(), s_ORoperator.length());
 	return res + s_formulaEnd;
 }
 

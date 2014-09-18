@@ -37,7 +37,7 @@ public:
 	FaultTreeNode::Ptr getChildById(const std::string& ID);
 	const FaultTreeNode::Ptr getChildById(const std::string& ID) const; // TODO copy-pasted just to enforce const-ness
 
-	int getNumChildren() const { return m_children.size(); };
+	unsigned int getNumChildren() const { return (unsigned int)m_children.size(); };
 
 	virtual bool isValid() const { return m_children.size() > 0; };
 	const std::string& getId() const { return m_id; };

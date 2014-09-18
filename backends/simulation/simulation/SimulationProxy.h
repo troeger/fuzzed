@@ -16,15 +16,6 @@
 
 class TopLevelEvent;
 
-enum SimulationImpl
-{
-	TIMENET,
-	DEFAULT,
-	STRUCTUREFORMULA_ONLY
-};
- 
-struct TimeNETProperties;
-
 /************************************************************************/
 /* This class handles the different simulations:						*/
 /*	- TimeNET-based														*/
@@ -51,8 +42,7 @@ protected:
 		const boost::filesystem::path& input,
 		const boost::filesystem::path& output,
 		const boost::filesystem::path& workingDir,
-		const boost::filesystem::path& logFile,
-		SimulationImpl impl);
+		const boost::filesystem::path& logFile);
 
 	SimulationResultStruct simulateFaultTree(
 		const std::shared_ptr<TopLevelEvent> ft,
@@ -60,13 +50,10 @@ protected:
 		std::ofstream* logFile);
 
 	SimulationResultStruct runSimulationInternal(
-		const boost::filesystem::path& inPath,
-		void* additionalArguments = NULL);
+		const boost::filesystem::path& inPath);
 	
 	unsigned int m_missionTime;
 	unsigned int m_simulationTime;
 	unsigned int m_numRounds;
 	double m_convergenceThresh;
-
-	TimeNETProperties* m_timeNetProperties; // ownership usually transferred to Simulation. Do NOT call delete on it. -.-
 };

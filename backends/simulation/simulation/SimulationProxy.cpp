@@ -37,15 +37,13 @@ namespace fs = boost::filesystem;
 SimulationProxy::SimulationProxy(int argc, char** arguments) :
 	m_numRounds(DEFAULT_SIMULATION_ROUNDS),
 	m_convergenceThresh(0.000005),
-	m_simulationTime(DEFAULT_SIMULATION_TIME),
-	m_timeNetProperties(nullptr)
+	m_simulationTime(DEFAULT_SIMULATION_TIME)
 {
 	parseCommandline_default(argc, arguments);
 }
 
 SimulationResultStruct SimulationProxy::runSimulationInternal(
-	const boost::filesystem::path& petriNetFile,
-	void* additionalArguments) 
+	const boost::filesystem::path& petriNetFile) 
 {
 	Simulation* sim = new PetriNetSimulation(
 		petriNetFile,
@@ -103,15 +101,14 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 		throw FatalException(err);
 	}
 
-	return runSimulationInternal(petriNetFile, m_timeNetProperties);
+	return runSimulationInternal(petriNetFile);
 }
 
 void SimulationProxy::simulateAllConfigurations(
 	const fs::path& inputFile,
 	const fs::path& outputFile,
 	const fs::path& workingDir,
-	const fs::path& logFile,
-	SimulationImpl impl)
+	const fs::path& logFile)
 {
 	const auto inFile = inputFile.generic_string();
 	ifstream file(inFile, ios::in | ios::binary);
@@ -222,6 +219,5 @@ void SimulationProxy::parseCommandline_default(int numArguments, char** argument
 		parser.getInputFilePath(),
 		parser.getOutputFilePath(),
 		parser.getWorkingDirectory(),
-		parser.getLogFilePath(),
-		DEFAULT /*Simulation Implementation: custom*/);
+		parser.getLogFilePath());
 }
