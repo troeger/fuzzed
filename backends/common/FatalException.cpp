@@ -1,5 +1,5 @@
 #include "FatalException.h"
-
+#include <sstream>
 using std::endl;
 
 FatalException::FatalException(const std::string msg, const int issueId /*= 0*/, const std::string elementId /*= ""*/)
