@@ -34,7 +34,7 @@ class NodeGroup(models.Model):
 
     def get_property(self, key, default=None):
         try:
-            return self.properties.get(key=key).value
+            return self.properties.get(key=key).get_value()
         except ObjectDoesNotExist:
             node_kind = nodes.all()[0].kind
             logger.debug("Assuming node kind %s for node group properties"%node_kind)
@@ -70,13 +70,12 @@ class NodeGroup(models.Model):
         """
         assert(self.pk)
         from FuzzEd.models import Property
-        value = Property.sanitized_value(self, key, value)
         if hasattr(self, key):
+            # Native NodeGroup attribute, such as client_id
             setattr(self, key, value)
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'node_group': self})
-            prop.value = value
-            prop.save()
+            prop.save_value(value)
 
     def set_attrs(self, d):
         '''

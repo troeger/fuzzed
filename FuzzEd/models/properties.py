@@ -98,13 +98,14 @@ class Property(models.Model):
         val_type = Property.value_type(self.key, self.object())
         if val_type == 'text':
             return unicode(val)
-        elif val_type == 'compound':
+        elif val_type == 'compound' or val_type == 'range':
             return json.loads(val)            
         elif val_type == 'numeric':
             return int(val)
         elif val_type == 'bool':
             # Value may be string or a real boolean value
             return str(val).lower() == 'true'
+        import pdb; pdb.set_trace()
         assert(False)
 
     def save_value(self, new_value):
@@ -114,7 +115,7 @@ class Property(models.Model):
         val_type = Property.value_type(self.key, self.object())
         if val_type == 'text':
             self.value = unicode(new_value)
-        elif val_type == 'compound':
+        elif val_type == 'compound' or val_type == 'range':
             self.value = json.dumps(new_value)            
         elif val_type == 'numeric':
             self.value = str(new_value)

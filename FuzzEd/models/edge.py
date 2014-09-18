@@ -95,13 +95,12 @@ class Edge(models.Model):
         """
         assert(self.pk)
         from FuzzEd.models import Property
-        value = Property.sanitized_value(self, key, value)
         if hasattr(self, key):
+            # Native Edge attribute, such as client_id
             setattr(self, key, value)
         else:
             prop, created = self.properties.get_or_create(key=key, defaults={'edge': self})
-            prop.value = value
-            prop.save()
+            prop.save_value(value)
 
     def set_attrs(self, d):
         '''
