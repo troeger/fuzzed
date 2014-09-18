@@ -11,7 +11,6 @@ set(HEADERS
   FuzzTreeTransform.h
   FuzzTreeConfiguration.h
   TreeHelpers.h
-  VerificationResult.h
   platform.h
 )
 
