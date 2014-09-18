@@ -1,141 +1,138 @@
 from configurations import Configuration, values
 import os.path, logging
 
-VERSION=0.67
+class Common(Configuration):
+    AUTH_PROFILE_MODULE='FuzzEd.UserProfile'
+    CORS_ORIGIN_ALLOW_ALL=True
+    DJIKI_AUTHORIZATION_BACKEND='FuzzEd.wiki.FuzzEdWikiAccess'
+    DJIKI_IMAGES_PATH='wiki_img'
+    DJIKI_PARSER='FuzzEd.wiki'
+    EMAIL_HOST='localhost'
+    EMAIL_SUBJECT_PREFIX='[FuzzEd] '
+    LANGUAGE_CODE='en-en'
+    LOGIN_REDIRECT_URL='/dashboard/'
+    LOGIN_URL='/'
+    REQUIRE_BASE_URL='script'
+    REQUIRE_BUILD_PROFILE='../lib/requirejs/require_build_profile.js'
+    REQUIRE_JS='../lib/requirejs/require-jquery.js'
+    ROOT_URLCONF='FuzzEd.urls'
+    MEDIA_ROOT=''
+    MEDIA_URL=''
+    SEND_BROKEN_LINK_EMAILS=False
+    SERVER_EMAIL=values.Value('webmaster@fuzzed.org', environ_name='FUZZED_ADMIN_EMAIL')
+    ADMINS=(('FuzzEd Admin', SERVER_EMAIL),)
+    SITE_ID=1
+    STATICFILES_DIRS=('FuzzEd/static',)
+    STATICFILES_STORAGE='require.storage.OptimizedStaticFilesStorage'
+    STATIC_ROOT='FuzzEd/static-release/'
+    STATIC_URL='/static/'
+    TEST_RUNNER='django.test.runner.DiscoverRunner'
+    TIME_ZONE=None
+    USE_I18N=False
+    USE_L10N=True
+    USE_TZ=False
+    WSGI_APPLICATION='FuzzEd.wsgi.application'
 
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+    STATICFILES_FINDERS = (
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    )
 
-AUTH_PROFILE_MODULE='FuzzEd.UserProfile'
-CORS_ORIGIN_ALLOW_ALL=True
-DJIKI_AUTHORIZATION_BACKEND='FuzzEd.wiki.FuzzEdWikiAccess'
-DJIKI_IMAGES_PATH='wiki_img'
-DJIKI_PARSER='FuzzEd.wiki'
-EMAIL_HOST='localhost'
-EMAIL_SUBJECT_PREFIX='[FuzzEd] '
-LANGUAGE_CODE='en-en'
-LOGIN_REDIRECT_URL='/dashboard/'
-LOGIN_URL='/'
-REQUIRE_BASE_URL='script'
-REQUIRE_BUILD_PROFILE='../lib/requirejs/require_build_profile.js'
-REQUIRE_JS='../lib/requirejs/require-jquery.js'
-ROOT_URLCONF='FuzzEd.urls'
-SECRET_KEY=values.SecretValue(environ_name='FUZZED_SECRET')
-MEDIA_ROOT=''
-MEDIA_URL=''
-SEND_BROKEN_LINK_EMAILS=False
-SERVER_EMAIL=values.Value('webmaster@fuzzed.org', environ_name='FUZZED_ADMIN_EMAIL')
-ADMINS=(('FuzzEd Admin', SERVER_EMAIL),)
-SITE_ID=1
-STATICFILES_DIRS=('FuzzEd/static',)
-STATICFILES_STORAGE='require.storage.OptimizedStaticFilesStorage'
-STATIC_ROOT='FuzzEd/static-release/'
-STATIC_URL='/static/'
-TEST_RUNNER='django.test.runner.DiscoverRunner'
-TIME_ZONE=None
-USE_I18N=False
-USE_L10N=True
-USE_TZ=False
-WSGI_APPLICATION='FuzzEd.wsgi.application'
+    TEMPLATE_LOADERS = (
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    )
 
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-)
+    TEMPLATE_CONTEXT_PROCESSORS = (
+        'django.core.context_processors.static',
+        'django.contrib.auth.context_processors.auth',
+        'django.contrib.messages.context_processors.messages'
+    )
 
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
+    MIDDLEWARE_CLASSES = (
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        #Uncomment the next line for simple clickjacking protection:
+        #'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        'FuzzEd.middleware.HttpErrorMiddleware', 
+        'corsheaders.middleware.CorsMiddleware', 
+        'oauth2_provider.middleware.OAuth2TokenMiddleware'
+    )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.static',
-    'django.contrib.auth.context_processors.auth',
-    'django.contrib.messages.context_processors.messages'
-)
-
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    #Uncomment the next line for simple clickjacking protection:
-    #'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'FuzzEd.middleware.HttpErrorMiddleware', 
-    'corsheaders.middleware.CorsMiddleware', 
-    'oauth2_provider.middleware.OAuth2TokenMiddleware'
-)
-
-INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.contrib.admin',
-    'django.contrib.admindocs',
-    'openid2rp.django',
-    'require',
-    'oauth2_provider',
-    'corsheaders',
-    'tastypie', 
-    'djiki', 
-    'FuzzEd'
-)
+    INSTALLED_APPS = (
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.messages',
+        'django.contrib.staticfiles',
+        'django.contrib.admin',
+        'django.contrib.admindocs',
+        'openid2rp.django',
+        'require',
+        'oauth2_provider',
+        'corsheaders',
+        'tastypie', 
+        'djiki', 
+        'FuzzEd'
+    )
 
 
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'oauth2_provider.backends.OAuth2Backend', 
-    'openid2rp.django.auth.Backend'
-)
+    AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+        'oauth2_provider.backends.OAuth2Backend', 
+        'openid2rp.django.auth.Backend'
+    )
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
-    'handlers': {
-        'console': {
-            'level':   'DEBUG',
-            'class':   'logging.StreamHandler'
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse'
+            }
         },
-        'mail_admins': {
-            'level':   'ERROR',
-            'class':   'django.utils.log.AdminEmailHandler',
-            'filters': ['require_debug_false'],
-        }, 
-        'file':{
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/tmp/fuzzed.log',
-        },               
-        'False': {
-            'level': 'DEBUG',
-            'class': 'logging.NullHandler',
+        'handlers': {
+            'console': {
+                'level':   'DEBUG',
+                'class':   'logging.StreamHandler'
+            },
+            'mail_admins': {
+                'level':   'ERROR',
+                'class':   'django.utils.log.AdminEmailHandler',
+                'filters': ['require_debug_false'],
+            }, 
+            'file':{
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '/tmp/fuzzed.log',
+            },               
+            'False': {
+                'level': 'DEBUG',
+                'class': 'logging.NullHandler',
+            },
         },
-    },
-    'loggers': {
-        'django.request': {
-            'handlers':  ['console'],
-            'level':     'ERROR',
-            'propagate': True,
-        },
-        'FuzzEd': {
-            'handlers':  ['console'],
-            'level':     'DEBUG',
-            'propagate': True,
+        'loggers': {
+            'django.request': {
+                'handlers':  ['console'],
+                'level':     'ERROR',
+                'propagate': True,
+            },
+            'FuzzEd': {
+                'handlers':  ['console'],
+                'level':     'DEBUG',
+                'propagate': True,
+            }
         }
     }
-}
 
-class Dev(Configuration):
+class Dev(Common):
     DEBUG = True
     TEMPLATE_DEBUG = True
+    SECRET_KEY = 'kjshdgfiu438o374o38g4o8figwilfuz4iou34gli'
     DATABASES = {
         'default': {
             'ENGINE':   'django.db.backends.sqlite3', 
@@ -155,14 +152,21 @@ class Dev(Configuration):
                       'FuzzEd/templates/djiki', 
                       'djiki')
     BACKEND_DAEMON = "http://localhost:8000"
+    TERMS_PAGE     = '/about/'
+    FEEDBACK_PAGE  = 'http://fuzzed.uservoice.com'
+    FOOTER         = 'FuzzEd Development Team (Dev Server)'
 
-class VagrantDev(Dev):
+class Vagrant(Dev):
     SERVER        = 'http://192.168.33.10:8000'
     OPENID_RETURN = 'http://192.168.33.10:8000/login/?openidreturn'
+    FOOTER         = 'FuzzEd Development Team (Vagrant Server)'
 
-class Production(Configuration):
+class Production(Common):
     DEBUG = False
     TEMPLATE_DEBUG = False
+    # Using values.SecretValue here breaks the Dev configuration
+    SECRET_KEY = values.Value('837dsfskfjh!',
+                                    environ_name='FUZZED_SECRET')
     DATABASES = {
         'default': {
             'ENGINE':   'django.db.backends.postgresql_psycopg2', 
@@ -181,14 +185,23 @@ class Production(Configuration):
     EMAIL_BACKEND  = 'django.core.mail.backends.smtp.EmailBackend'
     ALLOWED_HOSTS  = [values.Value('fuzzed.org', 
                                     environ_name='FUZZED_HOST_NAME')] 
-    SERVER         = 'https://' + values.Value('fuzzed.org', 
-                                    environ_name='FUZZED_HOST_NAME')    
+    SERVER         = 'https://' + str(values.Value('fuzzed.org', 
+                                    environ_name='FUZZED_HOST_NAME'))    
     OPENID_RETURN  = SERVER+'/login/?openidreturn'
+    PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
     TEMPLATE_DIRS  = (PROJECT_ROOT+'/templates',
                       PROJECT_ROOT+'/static-release/img',
                       PROJECT_ROOT+'/templates/djiki')
-    LOGGING = Configuration.LOGGING    
+    LOGGING = Common.LOGGING    
     LOGGING['loggers']['django.request']['handlers']=['mail_admins']
     LOGGING['loggers']['FuzzEd']['handlers']        =['file']
     BACKEND_DAEMON = values.Value('http://backend.fuzzed.org:8000', 
                                     environ_name='FUZZED_BACKEND_HOST_NAME')
+    TERMS_PAGE     = values.Value('/about/',
+                                    environ_name='FUZZED_TERMS_PAGE')
+    FEEDBACK_PAGE  = values.URLValue('http://fuzzed.uservoice.com',
+                                    environ_name='FUZZED_FEEDBACK_PAGE')
+    FOOTER         = values.Value('FuzzEd Development Team (Dev Server)',
+                                    environ_name='FUZZED_FOOTER')
+
+

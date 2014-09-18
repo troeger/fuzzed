@@ -4,7 +4,7 @@
 '''
 
 import os, platform, socket
-from FuzzEd.settings import VERSION
+from FuzzEd import VERSION
 
 #./site_scons automatically becomes part of the Python search path
 # Add our own builders to the SCons environment
@@ -116,13 +116,11 @@ patch4 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js',
            'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.orig'])
 
 # Define meta-targets for ease of use
-env.Alias("backend", settings)
 env.Alias("backend", "ftconfiguration")
 env.Alias("backend", "ftanalysis")
 env.Alias("backend", "ftsimulation")
 env.Alias("backend", shapes)
 
-env.Alias("frontend", settings)
 env.Alias("frontend", css)
 env.Alias("frontend", xml)
 env.Alias("frontend", notations)

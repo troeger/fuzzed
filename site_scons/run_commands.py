@@ -29,9 +29,9 @@ def server(target, source, env):
     if env['mode'] == 'vagrant':
         ip = "192.168.33.10"
         print 'Using Vagrant IP: ' + ip
-        os.system('./manage.py runserver %s:8000' % ip)
+        os.system('./manage.py runserver %s:8000 --configuration=Vagrant' % ip)
     else:
-        os.system('./manage.py runserver')
+        os.system('./manage.py runserver --configuration=Dev')
 
 def fixture_save(target, source, env):
     '''Creates a test fixture from the current database.'''
