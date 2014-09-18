@@ -13,7 +13,7 @@ function(Class) {
      *  graph (every concrete graph inherits from). To achieve this, you generally have to call
      *      Factory.create('MyAbstractClass', arg1, arg2, ...);
      *  instead of calling the constructor on your own. This allows the factory to determine the right subclass and
-     *  its constructor. It will then call the constructor with the given arguments and return the object to the you.
+     *  its constructor. It will then call the constructor with the given arguments and return the object to you.
      *
      */
     var Factory = Class.extend({
@@ -129,14 +129,13 @@ function(Class) {
         },
 
         _baseKind: function(kind) {
-            // this is the part where we hardcode any inheritances _not_ from the abstract editor.
-            // we assume, that in most of the cases editors inherit directly from the abstract editor, so any other
-            //  case has to be described here.
+            // retrieve the baseKind from the "inherits" attribute in the notations file
+            var inherits = require('json!notations/' + kind + '.json').inherits;
 
-            if (kind === 'fuzztree') { // Fuzztrees inherit form Faulttrees
-                return 'faulttree';
-            } else {
+            if (inherits === '' || typeof inherits === 'undefined') {
                 return false;
+            } else {
+                return inherits;
             }
         }
     });

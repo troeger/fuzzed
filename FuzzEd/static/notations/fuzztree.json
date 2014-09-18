@@ -1,6 +1,7 @@
 {
     "kind": "fuzztree",
     "name": "Fuzz Tree",
+    "inherits": "faulttree",
     "edges": {
         "copyable": true,
         "deletable": true,
