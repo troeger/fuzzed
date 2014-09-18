@@ -88,7 +88,7 @@ class Property(models.Model):
         if val_type in ['text','compound']:
             # JSONField is performing some conversion magic, so must tell
             # it explicitely that even numerical strings remain strings
-            return str(value)
+            return unicode(value)
         elif val_type == 'numeric':
             return int(value)
         elif val_type == 'bool':

@@ -4,24 +4,12 @@
 '''
 
 import os, platform, socket
-from FuzzEd.settings import VERSION
+from FuzzEd import VERSION
 
 #./site_scons automatically becomes part of the Python search path
 # Add our own builders to the SCons environment
 env=Environment(
   tools=['default', fuzzed_builders])  
-
-# Decide which build mode we have here
-# development: Prepare everything for Mac OS X machine in dev mode
-# vagrant:     Prepare everything for Vagrant Ubuntu Trusty machine in dev mode
-# production:  Prepare everything for Ubuntu Trusty machine in production
-if socket.getfqdn() == 'vagrant-ubuntu-trusty-32':
-    mode = "vagrant"
-else:
-    mode = "development"
-assert(mode in ['development','vagrant','production'])
-print "Building for "+mode+" mode"
-env['mode']=mode
 
 # Include SCons file for backend daemons
 SConscript('backends/SConscript')
@@ -59,23 +47,9 @@ package_backend = env.Package(
                   )
 Alias('package.backend', package_backend)
 
-# NaturalDocs generation - 'docs' target
-docs = env.Command(  Dir('docs'), 
-                        Dir('FuzzEd'), 
-                        [
-                            Delete("docs"),
-                            Mkdir("docs"),
-                            'tools/NaturalDocs/NaturalDocs -i $SOURCE -o HTML $TARGET -p $TARGET'
-                        ]
-                     )
-
 # Lessc compilation - 'white.css' target
 css = env.Lessc( 'FuzzEd/static/css/theme/white.css',
           'FuzzEd/static/less/theme/white/theme.less')
-
-# Config file generation - 'settings.py' and 'daemon.ini' target
-settings = env.FuzzedConfig( ['FuzzEd/settings.py', 'backends/daemon.ini'], 'settings.ini')
-AlwaysBuild(settings)     # to support flipping betwenn Vagrant and native dev
 
 # XML Wrapper generation
 xml_targets = [  'Fuzzed/models/xml_common.py',
@@ -119,19 +93,28 @@ patch4 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js',
           ['FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.patch',
            'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.orig'])
 
+# Define meta-targets for ease of use
+env.Alias("backend", "ftconfiguration")
+env.Alias("backend", "ftanalysis")
+env.Alias("backend", "ftsimulation")
+env.Alias("backend", shapes)
+
+env.Alias("frontend", css)
+env.Alias("frontend", xml)
+env.Alias("frontend", notations)
+env.Alias("frontend", patch1)
+env.Alias("frontend", patch2)
+env.Alias("frontend", patch3)
+env.Alias("frontend", patch4)
+
 # Default targets when nothing is specified
-# We skip the backend and doc builds here, which mainly serves the
-# Web frontend developer
-env.Default(css, settings, xml, notations, shapes,
-            patch1, patch2, patch3, patch4)
+# We skip the backend and doc builds here, which mainly is speeding
+# up frontend development
+env.Default("frontend")
 
 # Special pseudo-targets to run stuff via Scons
 AlwaysBuild(env.Command('fixture.save', None, fixture_save))
 AlwaysBuild(env.Command('run.server', None, server))
 AlwaysBuild(env.Command('run.backend', None, backend))
-AlwaysBuild(env.Command("run.tests", None, 
-                        "scons settings; ./manage.py test FuzzEd.tests"))
-AlwaysBuild(env.Command("run.js_tests", None, 
-                        "mocha-phantomjs FuzzEd/tests/js-tests/src/test_runner.html"))
 
 

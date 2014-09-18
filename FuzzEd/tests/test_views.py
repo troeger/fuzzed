@@ -31,9 +31,20 @@ class ViewsTestCase(FuzzEdTestCase):
         response = self.get('/editor/999')
         self.assertEqual(response.status_code, 404)
 
+    def testNewGraphFromDashboard(self):
+        response = self.post('/projects/%u/dashboard/new/faulttree' % fixt_simple['pkProject'],
+                             {'save': 'save', 'name': 'My new graph'})
+        #TODO: Check that the new fault tree contains a top event node
+        self.assertEqual(response.status_code, 302)
+
     def testBulkGraphCopy(self):
         response = self.post('/projects/%u/dashboard/edit/' % fixt_simple['pkProject'],
                              {'copy': 'copy', 'graph_id[]': fixt_simple['graphs']})
+        self.assertEqual(response.status_code, 302)
+
+    def testBulkGraphSnapshot(self):
+        response = self.post('/projects/%u/dashboard/edit/' % fixt_simple['pkProject'],
+                             {'snapshot': 'snapshot', 'graph_id[]': fixt_simple['graphs']})
         self.assertEqual(response.status_code, 302)
 
     def testSingleGraphCopy(self):

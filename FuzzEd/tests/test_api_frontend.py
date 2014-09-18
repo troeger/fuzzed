@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import json
 
 from django.contrib.auth.models import User
@@ -126,7 +128,7 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
         self.assertEqual(response.status_code, 202)
 
     def testNodePropertyChange(self):
-        newprop = json.dumps({"properties": {"name": "bar"}})
+        newprop = json.dumps({"properties": {"name": "bar_öäü_1234"}})
         response = self.ajaxPatch(self.baseUrl + '/graphs/%u/nodes/%u' % (fixt_simple['pkFaultTree'], fixt_simple['clientIdBasicEvent']),
                                   newprop,
                                   "application/json")
