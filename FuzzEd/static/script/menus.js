@@ -38,7 +38,7 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
             this._disabled = false;
             this._navbar = this._setupNavbar();
 
-            jQuery(this.container).data(Config.Keys.MENU, this);
+            jQuery(this.container).data(Factory.getModule('Config').Keys.MENU, this);
 
             this._setupDragging();
         },
@@ -63,13 +63,13 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
          *      The {<Menu>} controls container as jQuery selector.
          */
         _setupControls: function() {
-            var controls = this.container.find('.' + Config.Classes.MENU_CONTROLS);
+            var controls = this.container.find('.' + Factory.getModule('Config').Classes.MENU_CONTROLS);
 
-            controls.find('.' + Config.Classes.MENU_MINIMIZE)
+            controls.find('.' + Factory.getModule('Config').Classes.MENU_MINIMIZE)
                 .addClass('fa fa-minus-circle')
                 .click(this.minimize.bind(this));
 
-            controls.find('.' + Config.Classes.MENU_CLOSE)
+            controls.find('.' + Factory.getModule('Config').Classes.MENU_CLOSE)
                 .addClass('fa fa-times-circle')
                 .click(this.hide.bind(this));
 
@@ -89,11 +89,11 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
             this.container.draggable({
                 containment:   'body',
                 stack:         'svg',
-                cursor:        Config.Dragging.CURSOR,
+                cursor:        Factory.getModule('Config').Dragging.CURSOR,
                 scroll:        false,
                 snap:          'body',
                 snapMode:      'inner',
-                snapTolerance: Config.Dragging.SNAP_TOLERANCE
+                snapTolerance: Factory.getModule('Config').Dragging.SNAP_TOLERANCE
             });
 
             return this;
@@ -202,14 +202,14 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
             // ensure that maximized menus will be visible (in case the window has been resized)
             destinationTransformation.left = Math.min(
                 destinationTransformation.left,
-                jQuery(window).width() - this.container.outerWidth() - Config.Menus.MENU_OFFSET
+                jQuery(window).width() - this.container.outerWidth() - Factory.getModule('Config').Menus.MENU_OFFSET
             );
             destinationTransformation.top = Math.min(
                 destinationTransformation.top,
-                jQuery(window).height() - this.container.outerHeight() - Config.Menus.MENU_OFFSET
+                jQuery(window).height() - this.container.outerHeight() - Factory.getModule('Config').Menus.MENU_OFFSET
             );
 
-            this.container.animate(destinationTransformation, { duration: Config.Menus.ANIMATION_DURATION });
+            this.container.animate(destinationTransformation, { duration: Factory.getModule('Config').Menus.ANIMATION_DURATION });
 
             return this;
         },
@@ -228,7 +228,7 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
 
             // create a button in the toolbar
             this._navbarButton = jQuery('<li><a href="#">' + this.container
-                .attr(Config.Attributes.HEADER) + '</a></li>')
+                .attr(Factory.getModule('Config').Attributes.HEADER) + '</a></li>')
                 .css('visibility', 'hidden')
                 .prependTo(this._navbar)
                 // .offset() here will closure the position where the window was minimized
@@ -242,7 +242,7 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
                 width: 0,
                 height: 0
             }, {
-                duration: Config.Menus.ANIMATION_DURATION,
+                duration: Factory.getModule('Config').Menus.ANIMATION_DURATION,
                 complete: function () {
                     this._navbarButton.css('visibility', '');
                     this.container.hide();
@@ -288,7 +288,7 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
          *      jQuery set including the shapes menu's container.
          */
         _setupContainer: function() {
-            return jQuery('#' + Config.IDs.SHAPES_MENU);
+            return jQuery('#' + Factory.getModule('Config').IDs.SHAPES_MENU);
         },
 
         /**
@@ -299,13 +299,13 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
          *      This {<ShapesMenu>} instance for chaining.
          */
         _setupThumbnails: function() {
-			var thumbnails = this.container.find('.' + Config.Classes.DRAGGABLE_WRAP_DIV).children();
+			var thumbnails = this.container.find('.' + Factory.getModule('Config').Classes.DRAGGABLE_WRAP_DIV).children();
 
             // make shapes in the menu draggable
             thumbnails.draggable({
                 helper: 'clone',
-                opacity: Config.Dragging.OPACITY,
-                cursor: Config.Dragging.CURSOR,
+                opacity: Factory.getModule('Config').Dragging.OPACITY,
+                cursor: Factory.getModule('Config').Dragging.CURSOR,
                 appendTo: 'body',
                 revert: 'invalid',
                 zIndex: 200
@@ -363,7 +363,7 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
          *      jQuery set containing the property menu container.
          */
         _setupContainer: function() {
-            return jQuery('#' + Config.IDs.PROPERTIES_MENU);
+            return jQuery('#' + Factory.getModule('Config').IDs.PROPERTIES_MENU);
         },
 
         /**
@@ -377,7 +377,7 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
          *      This {<PropertyMenu>} instance for chaining.
          */
         _setupSelection: function() {
-            jQuery(document).on(Config.Events.CANVAS_SELECTION_STOPPED, this.show.bind(this));
+            jQuery(document).on(Factory.getModule('Config').Events.CANVAS_SELECTION_STOPPED, this.show.bind(this));
 
             return this;
         },
@@ -444,7 +444,7 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
          *      This {<PropertyMenu>} instance for chaining.
          */
         show: function() {
-            var selected = jQuery('.' + Config.Classes.SELECTED);
+            var selected = jQuery('.' + Factory.getModule('Config').Classes.SELECTED);
             this._removeEntries();
 
             // display the properties menu only if there is exactly one node selected
@@ -466,13 +466,13 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
          *      This {<PropertyMenu>} instance for chaining.
          */
         _show: function (selected) {
-            if (selected.hasClass(Config.Classes.NODE)) {
-                this._selectee = selected.data(Config.Keys.NODE);
-            } else if (selected.hasClass(Config.Classes.JSPLUMB_CONNECTOR)) {
-                this._selectee = selected.data(Config.Keys.EDGE);
-            } else { // if (selected.hasClass(Config.Keys.NODEGROUP
+            if (selected.hasClass(Factory.getModule('Config').Classes.NODE)) {
+                this._selectee = selected.data(Factory.getModule('Config').Keys.NODE);
+            } else if (selected.hasClass(Factory.getModule('Config').Classes.JSPLUMB_CONNECTOR)) {
+                this._selectee = selected.data(Factory.getModule('Config').Keys.EDGE);
+            } else { // if (selected.hasClass(Factory.getModule('Config').Keys.NODEGROUP
                 //TODO: do this right (which is handling all
-                this._selectee = selected.parent().parent().data(Config.Keys.NODEGROUP);
+                this._selectee = selected.parent().parent().data(Factory.getModule('Config').Keys.NODEGROUP);
             }
 
             // this node does not have any properties to display, go home!
@@ -487,7 +487,7 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
                 if (typeof property !== 'undefined' && property !== null) {
                     property.menuEntry.appendTo(this._form);
 
-                    jQuery(property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function (event, hidden) {
+                    jQuery(property).on(Factory.getModule('Config').Events.PROPERTY_HIDDEN_CHANGED, function (event, hidden) {
                         this.container.toggle(!this._allHidden());
                     }.bind(this));
                 }
@@ -495,7 +495,7 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
 
             // fix the left offset (jQueryUI bug with draggable menus and CSS right property)
             if (this.container.css('left') === 'auto') {
-                var offset =  - this.container.outerWidth(true) - Config.Menus.MENU_OFFSET;
+                var offset =  - this.container.outerWidth(true) - Factory.getModule('Config').Menus.MENU_OFFSET;
                 this.container.css('left', jQuery('body').outerWidth(true) + offset);
             }
             this.container.toggle(!_.all(this._selectee.properties, function(property) {
@@ -563,15 +563,15 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
 
             // User has accepted implicitly by continuing to edit the graph
             jQuery(document).one([
-                Config.Events.CANVAS_SHAPE_DROPPED,
-                Config.Events.NODE_ADDED,
-                Config.Events.NODE_DELETED,
-                Config.Events.EDGE_ADDED,
-                Config.Events.EDGE_DELETED,
-                Config.Events.NODEGROUP_ADDED,
-                Config.Events.NODEGROUP_DELETED,
-                Config.Events.GRAPH_LAYOUT,
-                Config.Events.NODE_PROPERTY_CHANGED
+                Factory.getModule('Config').Events.CANVAS_SHAPE_DROPPED,
+                Factory.getModule('Config').Events.NODE_ADDED,
+                Factory.getModule('Config').Events.NODE_DELETED,
+                Factory.getModule('Config').Events.EDGE_ADDED,
+                Factory.getModule('Config').Events.EDGE_DELETED,
+                Factory.getModule('Config').Events.NODEGROUP_ADDED,
+                Factory.getModule('Config').Events.NODEGROUP_DELETED,
+                Factory.getModule('Config').Events.GRAPH_LAYOUT,
+                Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED
             ].join(' '), function () {
                 deferred.resolve();
             }.bind(this));
@@ -625,8 +625,8 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
          *      This {<LayoutMenu>} instance for chaining.
          */
         _setupLayoutRequested: function () {
-            jQuery(document).on(Config.Events.GRAPH_LAYOUT,   this.show.bind(this));
-            jQuery(document).on(Config.Events.GRAPH_LAYOUTED, this.hide.bind(this));
+            jQuery(document).on(Factory.getModule('Config').Events.GRAPH_LAYOUT,   this.show.bind(this));
+            jQuery(document).on(Factory.getModule('Config').Events.GRAPH_LAYOUTED, this.hide.bind(this));
 
             return this;
         },
@@ -639,7 +639,7 @@ define(['factory', 'config', 'class', 'jquery', 'jquery-ui'], function (Factory,
          *      The jQuery selector referencing the layout menu.
          */
         _setupContainer: function () {
-            return jQuery('#' + Config.IDs.LAYOUT_MENU);
+            return jQuery('#' + Factory.getModule('Config').IDs.LAYOUT_MENU);
         }
     });
 

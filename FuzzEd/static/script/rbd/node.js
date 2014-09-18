@@ -1,4 +1,4 @@
-define(['factory', 'rbd/config', 'node'], function(Factory, Config, AbstractNode) {
+define(['factory', 'node'], function(Factory, AbstractNode) {
     /**
      * Package: RBD
      */
@@ -17,11 +17,11 @@ define(['factory', 'rbd/config', 'node'], function(Factory, Config, AbstractNode
 
             return {
                 'in': {
-                    'x': this.config.JSPlumb.STROKE_WIDTH + (this.connector.offset.left || 0),
+                    'x': Factory.getModule('Config').JSPlumb.STROKE_WIDTH + (this.connector.offset.left || 0),
                     'y': topOffset
                 },
                 'out': {
-                    'x': width - this.config.JSPlumb.STROKE_WIDTH + (this.connector.offset.right || 0),
+                    'x': width - Factory.getModule('Config').JSPlumb.STROKE_WIDTH + (this.connector.offset.right || 0),
                     'y': topOffset
                 }
             }
@@ -34,16 +34,12 @@ define(['factory', 'rbd/config', 'node'], function(Factory, Config, AbstractNode
             }
         },
 
-        getConfig: function() {
-            return Config;
-        },
-
         _setupConnectionHandle: function() {
             if (this.numberOfOutgoingConnections != 0) {
-                var leftOffset = -this.config.JSPlumb.STROKE_WIDTH + (this.connector.offset.right || 0);
+                var leftOffset = -Factory.getModule('Config').JSPlumb.STROKE_WIDTH + (this.connector.offset.right || 0);
 
                 this._connectionHandle = jQuery('<i class="fa fa-plus"></i>')
-                    .addClass(this.config.Classes.NODE_HALO_CONNECT)
+                    .addClass(Factory.getModule('Config').Classes.NODE_HALO_CONNECT)
                     .css({
                         top:  this._nodeImageContainer.position().top  + this._nodeImage.outerHeight(true) / 2,
                         left: this._nodeImageContainer.position().left + this._nodeImage.outerWidth() + leftOffset

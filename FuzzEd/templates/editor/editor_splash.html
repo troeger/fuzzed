@@ -5,11 +5,13 @@
     Kind regards, murxman@gmail.com.
 {% endcomment %}
 
+{% load settings %}
+
 <table id="FuzzEdSplash" class="overlay">
     <tr>
         <td class="col-4">&nbsp;</td>
         <td class="col-4 center-vertical">
-            <h1>FuzzEd <small>v{{ version }}</small></h1>
+            <h1>FuzzEd <small>v{% setting 'VERSION' %}</small></h1>
             developed at <strong>Hasso-Plattner-Institute, Germany</strong>
 
             <section>
