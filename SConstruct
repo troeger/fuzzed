@@ -47,16 +47,6 @@ package_backend = env.Package(
                   )
 Alias('package.backend', package_backend)
 
-# NaturalDocs generation - 'docs' target
-docs = env.Command(  Dir('docs'), 
-                        Dir('FuzzEd'), 
-                        [
-                            Delete("docs"),
-                            Mkdir("docs"),
-                            'tools/NaturalDocs/NaturalDocs -i $SOURCE -o HTML $TARGET -p $TARGET'
-                        ]
-                     )
-
 # Lessc compilation - 'white.css' target
 css = env.Lessc( 'FuzzEd/static/css/theme/white.css',
           'FuzzEd/static/less/theme/white/theme.less')

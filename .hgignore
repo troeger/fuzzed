@@ -3,7 +3,6 @@ fuzztrees.sqlite
 test_fuzztrees.sqlite
 *.pyc
 *.log
-docs
 .idea
 .vagrant
 .DS_Store

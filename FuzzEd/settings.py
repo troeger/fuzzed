@@ -195,13 +195,13 @@ class Production(Common):
     LOGGING = Common.LOGGING    
     LOGGING['loggers']['django.request']['handlers']=['mail_admins']
     LOGGING['loggers']['FuzzEd']['handlers']        =['file']
-    BACKEND_DAEMON = values.Value('http://backend.fuzzed.org:8000', 
+    BACKEND_DAEMON = values.Value('http://example.com:8000', 
                                     environ_name='FUZZED_BACKEND_HOST_NAME')
     TERMS_PAGE     = values.Value('/about/',
                                     environ_name='FUZZED_TERMS_PAGE')
-    FEEDBACK_PAGE  = values.URLValue('http://fuzzed.uservoice.com',
+    FEEDBACK_PAGE  = values.URLValue('http://example.com',
                                     environ_name='FUZZED_FEEDBACK_PAGE')
-    FOOTER         = values.Value('FuzzEd Development Team (Dev Server)',
+    FOOTER         = values.Value('FuzzEd Development Team',
                                     environ_name='FUZZED_FOOTER')
 
 
