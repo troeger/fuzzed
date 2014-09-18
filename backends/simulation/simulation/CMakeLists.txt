@@ -8,7 +8,6 @@ set(SOURCES
    SimulationProxy.cpp
 
    implementation/PetriNetSimulation.cpp
-   implementation/TimeNETSimulation.cpp
    implementation/Random.cpp
 
    petrinet/Place.cpp
@@ -28,7 +27,6 @@ set(HEADERS
    Config.h
    
    implementation/PetriNetSimulation.h
-   implementation/TimeNETSimulation.h
    implementation/Simulation.h
    implementation/Random.h
 
@@ -39,10 +37,6 @@ set(HEADERS
    petrinet/PNMLImport.h
    petrinet/PetriNet.h
 )
-
-if (USE_TIMENET)
-	find_package(TimeNET REQUIRED)
-endif (USE_TIMENET)
 
 if (USE_OMP)
 	find_package(OpenMP REQUIRED)
@@ -55,13 +49,4 @@ if (USE_OMP)
 endif()
 
 add_executable(ftsimulation ${SOURCES} ${HEADERS})
-target_link_libraries(ftsimulation pugixml common_model ftconfiguration ftmodeltransform )
-
-#include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PUGIXML_INCLUDE_DIR})
-
-if (BUILD_TESTS)
-   add_library(ftsimulation_static STATIC ${SOURCES} ${HEADERS})
-   target_link_libraries(ftsimulation_static
-      ftmodeltransform)
-   set_target_properties(ftsimulation_static PROPERTIES COMPILE_DEFINITIONS "SIMULATION_STATIC")
-endif(BUILD_TESTS)
+target_link_libraries(ftsimulation pugixml common_model ftconfiguration ftmodeltransform)

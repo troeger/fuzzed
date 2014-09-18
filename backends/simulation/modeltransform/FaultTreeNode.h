@@ -1,11 +1,9 @@
 #pragma once
-
+#include "serialization/PNDocument.h"
 #include <vector>
 #include <ostream>
 #include <string>
 #include <memory>
-
-#include "serialization/TNDocument.h"
 
 class FaultTreeNode
 {
@@ -55,7 +53,6 @@ public:
 
 	// returns ID of the "top level" place
 	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const = 0;
-	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const;
 
 	virtual std::string serializeAsFormula(std::shared_ptr<PNDocument> doc) const = 0;
 

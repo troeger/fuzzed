@@ -9,7 +9,6 @@ public:
 	virtual ~FDEPGate(void) {};
 
 	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const override;
-	virtual int serializeTimeNet(std::shared_ptr<TNDocument> doc) const override;
 
 	virtual FaultTreeNode::Ptr clone() const override; // virtual deep copying
 

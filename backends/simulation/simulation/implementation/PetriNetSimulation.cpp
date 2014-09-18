@@ -297,7 +297,7 @@ void PetriNetSimulation::tryTimedTransitions(PetriNet* pn, int tick)
 
 void PetriNetSimulation::printResults(const SimulationResultStruct& res)
 {
-	string results = str(
+	const string results = str(
 		format("----- File %1%, %2% simulations with %3% simulated time steps \n \
 			   #Failures: %4% out of %5% \n \
 			   Reliability: %6% \n \
