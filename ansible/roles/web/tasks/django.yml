@@ -27,6 +27,9 @@
   - djiki
   - py-wikimarkup
   - defusedxml
+- name: Ensure Django configurations is installed
+  sudo: yes
+  pip: name=django-configurations state=latest
 - name: Ensure OAuth client libary is installed for testing purposes
   sudo: yes
   pip: name=requests_oauthlib state=latest

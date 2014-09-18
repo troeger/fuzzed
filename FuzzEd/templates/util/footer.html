@@ -1,5 +1,7 @@
+{% load settings %}
+
 <footer class="footer">
 	<small>
-    FuzzEd v{{ version }} &copy Hasso Plattner Institute, University of Potsdam | <a href="/about/">Terms of Service</a>
+    v{% setting 'VERSION' %} &copy {% setting 'FOOTER'%} | <a href="{% setting 'TERMS_PAGE'%}">Terms of Service</a>
 </small>
 </footer>

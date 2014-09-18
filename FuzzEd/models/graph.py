@@ -53,6 +53,21 @@ class Graph(models.Model):
     def __unicode__(self):
         return unicode('%s%s' % ('[DELETED] ' if self.deleted else '', self.name))
 
+    def add_default_nodes(self):
+        """
+            Add nodes that are contained in this kind of graph by default.
+        """
+        notation = notations.by_kind[self.kind]
+        if 'defaults' in notation:
+            from node import Node
+            for index, default_node in enumerate(notation['defaults']['nodes']):
+                print default_node
+                default_node.update({'properties': {}})
+                # use index as node client ID
+                # this is unique since all other client IDs are time stamps
+                node = Node(graph=self, client_id=int(index), kind=default_node['kind'], x=default_node['x'], y=default_node['y'])
+                node.save()
+
     def top_node(self):
         """
         Method: top_node

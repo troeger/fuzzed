@@ -1,8 +1,8 @@
 syntax: glob
 fuzztrees.sqlite
+test_fuzztrees.sqlite
 *.pyc
 *.log
-docs
 .idea
 .vagrant
 .DS_Store
@@ -13,7 +13,6 @@ FuzzEd/models/xml_common.py
 FuzzEd/models/xml_configurations.py
 FuzzEd/models/xml_faulttree.py
 FuzzEd/models/xml_fuzztree.py
-FuzzEd/settings.py
 FuzzEd/static/css/theme/white.css
 FuzzEd/static-release
 backends/**CMakeFiles
@@ -22,9 +21,10 @@ backends/**Makefile
 backends/**cmake_install.cmake
 backends/common_generated/*
 backends/lib
-backends/daemon.ini
 .sconsign.dblite
 FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css
 FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css
 FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js
 FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js
+backends/build
+backends/thirdParty/pugixml/build
