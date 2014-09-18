@@ -49,3 +49,11 @@ bool Node::isEventSet() const
         m_type == BASICEVENTSET ||
         m_type == INTERMEDIATEEVENTSET;
 }
+
+bool Node::canHaveProbability() const
+{
+	using namespace nodetype;
+	return
+		m_type == BASICEVENTSET ||
+		m_type == BASICEVENT;
+}

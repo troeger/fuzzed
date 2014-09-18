@@ -115,7 +115,6 @@ void Model::loadRecursive(
 
     for (const auto childId : childIds) // recursively descend into child nodes
     {
-        Node* childModelNode = nullptr;
         for (const xml_node& c : nodes)
         {
             const std::string cid = c.attribute(ID).value();
@@ -129,7 +128,7 @@ void Model::loadRecursive(
 				GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, NAME));
 
             {
-                if (childType == nodetype::BASICEVENT)
+                if (child.canHaveProbability())
                 { // determine probability
                     std::string probabilityDescriptor = 
                         insideBrackets(GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, PROB));
@@ -153,11 +152,15 @@ void Model::loadRecursive(
 					std::string nRange =
 						insideBrackets(GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, "nRange"));
 
-					const int commaIndex = nRange.find_first_of(",") - 1;
+					const int commaIndex = nRange.find_first_of(",");
 
 					child.m_from = atoi(nRange.substr(0, commaIndex).c_str());
-					child.m_to = atoi(nRange.substr(commaIndex, nRange.length()).c_str());
+					child.m_to = atoi(std::string(nRange.begin()+commaIndex+1, nRange.end()).c_str());
 					child.m_redundancyFormula = GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, "kFormula");
+				}
+				else if (child.isEventSet())
+				{
+					child.m_quantity = GET_INT_VALUE_BY_ATTR(c, DATA, KEY, "quantity");
 				}
             }
 			parentModelNode->addChild(child);

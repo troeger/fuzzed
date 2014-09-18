@@ -36,6 +36,7 @@ class Node
 {
 public:
     friend class Model;
+	friend class FuzzTreeToFaultTree;
 
     typedef std::vector<Node> ChildList;
 
@@ -65,9 +66,12 @@ public:
     bool isLeaf() const;
     bool isVariationPoint() const;
     bool isEventSet() const;
+	bool canHaveProbability() const;
 
-    void setProbability(const Probability p) { assert(m_type == nodetype::BASICEVENT); m_probability = p; }
-    const Probability& getProbability() const { assert(m_type == nodetype::BASICEVENT); return m_probability; }
+	void setProbability(const Probability p) { assert(canHaveProbability()); m_probability = p; }
+    const Probability& getProbability() const { assert(canHaveProbability()); return m_probability; }
+
+	void setKOutOfN(const unsigned int& k) { assert(m_type == nodetype::VOTINGOR); m_kOutOfN = k; };
 
     std::string print() const { return std::string("- ") + m_type + " ID: " + m_id + " " + m_name; };
 
@@ -102,4 +106,9 @@ private:
 	unsigned int m_to;
 
 	std::string m_redundancyFormula;
+
+	/**
+    * Voting Or
+    */
+	unsigned int m_kOutOfN;
 };

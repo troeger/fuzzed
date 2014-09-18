@@ -251,5 +251,22 @@ add_subdirectory(simulation)
 add_subdirectory(mincut)
 
 
-add_executable(common_model_test test_common_model.cpp ${COMMON_SOURCES} ${COMMON_HEADERS})
-target_link_libraries(common_model_test ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB} ftconfiguration)
+add_executable(common_model_test test_common_model.cpp 
+	${MODEL_DIR}/Model.cpp
+	${MODEL_DIR}/Node.cpp
+	${MODEL_DIR}/Model.h
+	${MODEL_DIR}/Node.h
+
+	${COMMON_DIR}/Issue.h
+	${COMMON_DIR}/FatalException.h
+	${COMMON_DIR}/Issue.cpp
+	${COMMON_DIR}/FatalException.cpp
+	${COMMON_DIR}/util.cpp
+	${COMMON_DIR}/util.h
+
+	fuzztreeconfiguration/FuzzTreeConfiguration.cpp
+	fuzztreeconfiguration/FuzzTreeConfiguration.h
+	fuzztreeconfiguration/FuzzTreeToFaultTree.cpp
+	fuzztreeconfiguration/FuzzTreeToFaultTree.h
+)
+target_link_libraries(common_model_test ${Boost_LIBRARIES} ${PUGIXML_LIB})

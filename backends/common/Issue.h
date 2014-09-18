@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "commonTypes.h"
+//#include "commonTypes.h"
 
 /**
  * Class: Issue
@@ -38,7 +38,7 @@ public:
 	 */
 	static Issue fatalIssue(const std::string& msg, const int issueId = 0, const std::string elementId = "");
 
-	commonTypes::Issue serialized() const;
+	//commonTypes::Issue serialized() const;
 
 	const std::string getMessage() const; 
 
