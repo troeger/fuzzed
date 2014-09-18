@@ -11,6 +11,6 @@ function(Factory, FaulttreeEditor, FuzztreeConfig) {
      * Extends: <Faulttree::FaultTreeEditor>
      */
     return FaulttreeEditor.extend({
-        //TODO: nothing to overwrite here
+        // nothing to overwrite here, but this file is necessary to import graph specific modules at the top
     });
 });
