@@ -428,6 +428,9 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             // if at least one element was deletable, hide the properties window
             if (_.union(deletableNodes, deletableEdges, deletableNodeGroups).length > 0) this.properties.hide();
 
+            // update the available menu actions
+            this._updateMenuActions();
+
             return this;
         },
 
