@@ -126,7 +126,5 @@ env.Default("frontend")
 AlwaysBuild(env.Command('fixture.save', None, fixture_save))
 AlwaysBuild(env.Command('run.server', None, server))
 AlwaysBuild(env.Command('run.backend', None, backend))
-AlwaysBuild(env.Command("run.js_tests", None, 
-                        "mocha-phantomjs FuzzEd/tests/js-tests/src/test_runner.html"))
 
 

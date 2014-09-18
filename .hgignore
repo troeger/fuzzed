@@ -1,5 +1,6 @@
 syntax: glob
 fuzztrees.sqlite
+test_fuzztrees.sqlite
 *.pyc
 *.log
 docs
