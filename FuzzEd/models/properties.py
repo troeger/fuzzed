@@ -38,20 +38,6 @@ class Property(models.Model):
     def __unicode__(self):
         return '%s%s: %s' % ('[DELETED] ' if self.deleted else '', self.key, self.value)
 
-    def json_or_string_value(self):
-        '''
-            Returns the text value as decoded JSON data structure,
-            or string if it is no text-urized JSON data.
-            Historically, self.value was a JSONField that managed this
-            by itself, but the package become so unreliable that we switched
-            to our own little version here.
-        '''
-        try:
-            return json.loads(self.value)
-        except Exception as e:
-            # Value might also be a pure string, which is good enough
-            return self.value
-
     @property
     def graph(self):
         '''
@@ -92,21 +78,51 @@ class Property(models.Model):
         except:
             raise Exception("Invalid property key '%s' being used for %s"%(key, str(obj)))
 
-    @classmethod
-    def sanitized_value(cls, obj, key, value):
+    def object(self):
+        if self.node:
+            return self.node
+        elif self.edge:
+            return self.edge
+        elif self.node_group:
+            return self.node_group
+        assert(False)
+
+    def get_value(self, from_text=None):
         '''
-            Return the sanitized property value for this kind of object and property.
+            Returns the current property value, or the given text value, in native representation.
         '''
-        val_type = Property.value_type(key, obj)
-        if val_type in ['text','compound']:
-            return unicode(value)
-        elif val_type == 'numeric':
-            return int(value)
-        elif val_type == 'bool':
-            # Value may be string or a real value
-            return str(value).lower() == 'true'
+        if from_text:
+            val = from_text
         else:
-            return value
+            val = self.value
+        val_type = Property.value_type(self.key, self.object())
+        if val_type == 'text':
+            return unicode(val)
+        elif val_type == 'compound':
+            return json.loads(val)            
+        elif val_type == 'numeric':
+            return int(val)
+        elif val_type == 'bool':
+            # Value may be string or a real boolean value
+            return str(val).lower() == 'true'
+        assert(False)
+
+    def save_value(self, new_value):
+        '''
+            Saves the given value, converts from native representation before.
+        '''
+        val_type = Property.value_type(self.key, self.object())
+        if val_type == 'text':
+            self.value = unicode(new_value)
+        elif val_type == 'compound':
+            self.value = json.dumps(new_value)            
+        elif val_type == 'numeric':
+            self.value = str(new_value)
+        elif val_type == 'bool':
+            self.value = str(value)
+        else:
+            assert(False)
+        self.save()
 
     def same_as(self, prop):
         ''' 

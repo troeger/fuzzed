@@ -136,9 +136,9 @@ class Node(models.Model):
          {dict} the node as dictionary
         """
         if use_value_dict:
-            prop_values = {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
+            prop_values = {prop.key: {'value': prop.get_value()} for prop in self.properties.filter(deleted=False)}
         else:
-            prop_values = {prop.key: prop.value for prop in self.properties.filter(deleted=False)}
+            prop_values = {prop.key: prop.get_value() for prop in self.properties.filter(deleted=False)}
         return {
             'properties': prop_values,
             'id':         self.client_id,
@@ -561,7 +561,7 @@ class Node(models.Model):
 
     def get_property(self, key, default=None):
         try:
-            return self.properties.get(key=key).json_or_string_value()
+            return self.properties.get(key=key).get_value()
         except ObjectDoesNotExist:
             try:
                 prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
@@ -594,15 +594,14 @@ class Node(models.Model):
         """
         from FuzzEd.models import Property
         assert(self.pk)         # Catch attribute setting before object saving cases
-        value = Property.sanitized_value(self, key, value)
-        # logger.debug("Setting node attribute %s to %s"%(key, value))
         if hasattr(self, key):
+            # Native node attribute, such as X or Y
             setattr(self, key, value)
             self.save()
         else:
+            # Node property
             prop, created = self.properties.get_or_create(key=key, defaults={'node': self})
-            prop.value = value
-            prop.save()
+            prop.save_value(value)
 
     def set_attrs(self, d):
         '''
