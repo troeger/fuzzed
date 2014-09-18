@@ -293,15 +293,6 @@ target_link_libraries(common_model ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUG
 ############### UNIT TESTS ##############
 #########################################
 
-# builds some very basic low-level white box tests
-# requires Googletest
-set(BUILD_TESTS OFF)
-if (${BUILD_TESTS})
-	find_package(gtest REQUIRED)
-	add_subdirectory(tests)
-	message("Building Tests")
-endif()
-
 add_subdirectory(fuzztreeconfiguration)
 add_subdirectory(fuzztreeanalysis)
 add_subdirectory(simulation)
