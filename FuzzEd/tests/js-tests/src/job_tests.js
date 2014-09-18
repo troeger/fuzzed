@@ -1,5 +1,5 @@
-define(['job', 'config', 'jquery'],
-function(Job, Config) {
+define(['job', 'jquery'],
+function(Job) {
     describe('Job',function(){        
         
         var server   = undefined;
