@@ -71,19 +71,37 @@ function(Factory, Canvas, Class, Config, Edge, Menus, NodeGroup) {
 
             var maxX = 0;
             var maxY = 0;
-
+            
             // parse the json nodes and convert them to node objects
             _.each(json.nodes, function(jsonNode) {
+                //XXX adapt json format of node properties: property_name: propterty_value  => property_name : { value : propterty_value } for later processing
+                var current_node = jsonNode;
+                _.each(Object.keys(current_node.properties),function(property_key){
+                    current_node.properties[property_key] = {'value' : current_node.properties[property_key]};
+                }.bind(this));
+                
                 this.addNode(jsonNode);
             }.bind(this));
 
             // connect the nodes again
             _.each(json.edges, function(jsonEdge) {
+                //XXX adapt json format of edge properties: property_name: propterty_value  => property_name : { value : propterty_value } for later processing
+                var current_edge = jsonEdge;
+                _.each(Object.keys(current_edge.properties),function(property_key){
+                    current_edge.properties[property_key] = {'value' : current_edge.properties[property_key]};
+                }.bind(this));
+                
                 this.addEdge(jsonEdge);
             }.bind(this));
 
             // create nodeGroups
             _.each(json.nodeGroups, function(jsonNodeGroup) {
+                //XXX adapt json format of node group properties: property_name: propterty_value  => property_name : { value : propterty_value } for later processing
+                var current_nodeGroups = jsonNodeGroup;
+                _.each(Object.keys(current_nodeGroups.properties),function(property_key){
+                    current_nodeGroups.properties[property_key] = {'value' : current_nodeGroups.properties[property_key]};
+                }.bind(this));
+                
                 this.addNodeGroup(jsonNodeGroup);
             }.bind(this));
 
