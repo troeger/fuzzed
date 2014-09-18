@@ -17,7 +17,7 @@
 class TopLevelEvent;
 
 /************************************************************************/
-/* This class used to handle the different simulations:					*/
+/* This class handles the different simulations:						*/
 /*	- TimeNET-based														*/
 /*	  (no support for PAND, SEQ, MTTF)									*/
 /*		- with normal petri net structures only							*/
@@ -27,7 +27,6 @@ class TopLevelEvent;
 /*		- OpenMP parallelization										*/
 /*		- C++11-thread parallelization (slightly slower)				*/
 /*	- just outputting the structure formula								*/
-/*	!!! As of 15/07/2014, only the own algorithm with OpenMP. !!!		*/
 /************************************************************************/
 
 class SimulationProxy
@@ -50,7 +49,8 @@ protected:
 		const boost::filesystem::path& workingDir,
 		std::ofstream* logFile);
 
-	SimulationResultStruct runSimulationInternal(const boost::filesystem::path& petriNetFile);
+	SimulationResultStruct runSimulationInternal(
+		const boost::filesystem::path& inPath);
 	
 	unsigned int m_missionTime;
 	unsigned int m_simulationTime;

@@ -27,28 +27,6 @@ double StaticGate::computeUnreliability() const
 	return m_activationFunc(unreliabilities);
 }
 
-// TODO: a similar approach may be used in the future without timenet: for static subtrees, guarded transitions could be used.
-// They would have to be implemented in the Petri Net Simulation
-
-// int StaticGate::serializeTimeNet(std::shared_ptr<TNDocument> doc) const 
-// {
-// 	assert(doc.get());
-// 
-// 	std::string staticFormula = serializeAsFormula(doc);
-// 	const int gateInput = doc->addPlace(1, 1);
-// 
-// 	if (hasDynamicChildren())
-// 		return serializePTNet(doc);
-// 	
-// 	const int fulfilFormula = doc->addGuardedTransition(staticFormula);
-// 	const int gateFired = doc->addPlace(0, 1);
-// 
-// 	doc->placeToTransition(gateInput, fulfilFormula);
-// 	doc->transitionToPlace(fulfilFormula, gateFired);
-// 
-// 	return gateFired;
-// }
-
 bool StaticGate::hasDynamicChildren() const
 {
 	return !m_bStaticSubTree; // TODO

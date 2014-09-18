@@ -61,4 +61,3 @@ int PANDGate::addSequenceViolatedPlace(std::shared_ptr<PNDocument> doc) const
 {
 	return doc->addPlace(0, 1, "SequenceViolated");
 }
-

@@ -503,7 +503,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      An array of elements that are copyable.
          */
         _copyable: function(elements) {
-            return _.filter(elements, function(elem) { return elem.copyable });
+            return _.filter(elements, function(elem) { return elem.copyable; });
         },
 
         /**
@@ -514,7 +514,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      An array of elements that are deletable.
          */
         _deletable: function(elements) {
-            return _.filter(elements, function(elem) { return elem.deletable });
+            return _.filter(elements, function(elem) { return elem.deletable; });
         },
 
         /**
@@ -646,7 +646,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             // copying only makes sense, when at least one node is involved (i.e. in the current selection), because
             //  edges and node groups can only be recreated at paste, when nodes are as well.
-            if (nodes.length == 0) return;
+            if (nodes.length === 0) return;
 
             var clipboard = {
                 'pasteCount': 0,
@@ -738,7 +738,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             // set the just copied clipboard's pasteCount to -1, so that it will paste right in place of the original.
             var clipboard = this._getClipboard();
-            --clipboard['pasteCount'];
+            --clipboard.pasteCount;
             this._updateClipboard(clipboard);
         },
 
@@ -782,14 +782,13 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _ungroupSelection: function() {
             var nodeIds = _.map(this._selectedNodes(), function(node) { return node.id; }.bind(this));
-            var nodeGroup = undefined;
 
             // case [1]: find the correct node group, whose node ids match the selected ids
             // (i.e. the user has to select all members of a NodeGroup to remove the NodeGroup)
             _.each(this.graph.nodeGroups, function(ng) {
                 var ngIds = ng.nodeIds();
                 // math recap: two sets are equal, when both their differences are zero length
-                if (jQuery(ngIds).not(nodeIds).length == 0 && jQuery(nodeIds).not(ngIds).length == 0) {
+                if (jQuery(ngIds).not(nodeIds).length === 0 && jQuery(nodeIds).not(ngIds).length === 0) {
                     this.graph.deleteNodeGroup(ng);
                     return true;
                 }
@@ -817,7 +816,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             var rightMostNode   = { 'x': 0 };
 
             _.each(nodes, function(node) {
-                if (node.y < topMostNode.y)    { topMostNode    = node }
+                if (node.y < topMostNode.y)    { topMostNode    = node; }
                 if (node.x < leftMostNode.x)   { leftMostNode   = node; }
                 if (node.y > bottomMostNode.y) { bottomMostNode = node; }
                 if (node.x > rightMostNode.x)  { rightMostNode  = node; }
@@ -826,7 +825,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             return {
                 'width':  rightMostNode.x - leftMostNode.x,
                 'height': bottomMostNode.y - topMostNode.y
-            }
+            };
         },
 
 
@@ -1042,7 +1041,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             return {
                 'top':  minTopOffset,
                 'left': minLeftOffset
-            }
+            };
         },
 
         /**

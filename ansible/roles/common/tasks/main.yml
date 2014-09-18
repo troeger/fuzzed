@@ -5,8 +5,3 @@
 - name: Update Homebrew cache
   homebrew: update_homebrew=yes 
   when: ansible_os_family == "Darwin"
-- name: Ensure requests is freshly installed (Debian bug 744145)
-  easy_install: name=requests==2.2.1
-- name: Ensure PIP is installed
-  apt: pkg=python-pip state=latest
-  when: ansible_os_family == "Debian"

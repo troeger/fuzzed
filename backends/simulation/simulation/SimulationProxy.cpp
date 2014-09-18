@@ -13,9 +13,6 @@
 #include "CommandLineParser.h"
 #include "FatalException.h"
 
-#if defined(MEASURE_SPEEDUP)
-#include <omp.h>
-#endif
 // Generated files...
 #include "faulttree.h"
 #include "fuzztree.h"
@@ -45,7 +42,8 @@ SimulationProxy::SimulationProxy(int argc, char** arguments) :
 	parseCommandline_default(argc, arguments);
 }
 
-SimulationResultStruct SimulationProxy::runSimulationInternal(const boost::filesystem::path& petriNetFile) 
+SimulationResultStruct SimulationProxy::runSimulationInternal(
+	const boost::filesystem::path& petriNetFile) 
 {
 	Simulation* sim = new PetriNetSimulation(
 		petriNetFile,
@@ -55,14 +53,13 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(const boost::files
 		m_convergenceThresh,
 		true);
 	SimulationResultStruct res;
-
+	
 	try
 	{
 		std::function<void()> fun = [&]() { sim->run(); };
 		DeadlockMonitor monitor(&fun);
 		monitor.executeWithin(10000);
-
-		res = (static_cast<PetriNetSimulation*>(sim))->result();
+        res = (static_cast<PetriNetSimulation*>(sim))->result();
 	}
 	catch (exception& e)
 	{
@@ -82,7 +79,7 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 	const boost::filesystem::path& workingDir,
 	std::ofstream* logfile)
 {
-	
+	std::shared_ptr<PNDocument> doc;
 
 	m_missionTime = ft->getMissionTime();
 	if (m_missionTime <= 1)
@@ -91,11 +88,11 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 			<< "For a very short mission time, possible failures may never occur." 
 			<< std::endl;
 
-	std::shared_ptr<PNDocument> doc = std::shared_ptr<PNMLDocument>(new PNMLDocument());
+	doc = std::shared_ptr<PNMLDocument>(new PNMLDocument());
 	ft->serializePTNet(doc);
-	
+
 	const std::string petriNetFile = 
-		workingDir.generic_string() + "petrinet" + std::string(PNML::PNML_EXT);
+		workingDir.generic_string() + "petrinet" +  PNML::PNML_EXT;
 
 	if (!doc->save(petriNetFile))
 	{
@@ -165,7 +162,7 @@ void SimulationProxy::simulateAllConfigurations(
 					std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
 
 					const SimulationResultStruct res =
-					simulateFaultTree(simTree, workingDir, logFileStream);
+						simulateFaultTree(simTree, workingDir, logFileStream);
 
 					backendResults::SimulationResult r(
 						ft.second.id(),

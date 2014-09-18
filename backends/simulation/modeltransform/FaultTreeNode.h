@@ -1,11 +1,9 @@
 #pragma once
-
+#include "serialization/PNDocument.h"
 #include <vector>
 #include <ostream>
 #include <string>
 #include <memory>
-
-#include "serialization/PNDocument.h"
 
 class FaultTreeNode
 {
@@ -39,7 +37,7 @@ public:
 	FaultTreeNode::Ptr getChildById(const std::string& ID);
 	const FaultTreeNode::Ptr getChildById(const std::string& ID) const; // TODO copy-pasted just to enforce const-ness
 
-	int getNumChildren() const { return m_children.size(); };
+	unsigned int getNumChildren() const { return (unsigned int)m_children.size(); };
 
 	virtual bool isValid() const { return m_children.size() > 0; };
 	const std::string& getId() const { return m_id; };
@@ -55,6 +53,7 @@ public:
 
 	// returns ID of the "top level" place
 	virtual int serializePTNet(std::shared_ptr<PNDocument> doc) const = 0;
+
 	virtual std::string serializeAsFormula(std::shared_ptr<PNDocument> doc) const = 0;
 
 	std::pair<int /*placeID*/,int /*spareActivationTransition*/> 

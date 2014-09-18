@@ -40,53 +40,6 @@ bool PetriNetSimulation::run()
 	auto startTime = std::chrono::system_clock::now();
 	RandomNumberGenerator::initGenerators();
 
-#ifdef RELIABILITY_DISTRIBUTION
-	auto fileName = m_netFile.generic_string();
-	util::replaceFileExtensionInPlace(fileName, ".statistics_custom");
-	ofstream statdoc(fileName);
-	statdoc << std::endl;
-
-	// cout << "----- Simulating entire reliability distribution up to mission time " << m_numSimulationSteps << "..." << std::endl;
-
-	const auto maxTime = m_numSimulationSteps;
-	for (int k = 0; k < maxTime; ++k)
-	{
-		m_numSimulationSteps = k;
-		if (k > 0) RandomNumberGenerator::reseed();
-
-		numFailures = 0;
-		sumFailureTime_all = 0;
-		sumFailureTime_fail = 0;
-		privateLast = 10000.0L;
-		privateConvergence = false;
-		privateBreak = false;
-		globalConvergence = true;
-		count = 0;
-#endif
-
-#ifdef NUM_MONTE_CARLO_ROUNDS
-		auto fileName = m_netFile.generic_string();
-		util::replaceFileExtensionInPlace(fileName, ".statistics_custom");
-		ofstream statdoc(fileName);
-		statdoc << std::endl;
-
-		cout << "----- Running many simulation rounds" << std::endl;
-
-		for (int k = 0; k < NUM_MONTE_CARLO_ROUNDS; ++k)
-		{
-			if (k>0) RandomNumberGenerator::reseed();
-
-			numFailures = 0;
-			sumFailureTime_all = 0;
-			sumFailureTime_fail = 0;
-			privateLast = 10000.0L;
-			privateConvergence = false;
-			privateBreak = false;
-			globalConvergence = true;
-			count = 0;
-			startTime = omp_get_wtime();
-#endif
-
 #ifdef OMP_PARALLELIZATION
 #pragma omp parallel for\
 	reduction(+:numFailures, sumFailureTime_all, sumFailureTime_fail, count)\
@@ -197,19 +150,8 @@ bool PetriNetSimulation::run()
 	res.mttf				= avgFailureTime_all;
 	res.duration			= (double) elapsedTime.count();
 	
-#if  defined(RELIABILITY_DISTRIBUTION) || defined(NUM_MONTE_CARLO_ROUNDS)
-	statdoc << util::toString(res.duration) << std::endl;
-	}
-#else
 	// printResults(res);
 	// writeResultXML(res);
-#endif
-
-#ifndef MEASURE_SPEEDUP
-	// tidyUp();
-#else
-	cout << res.duration << endl;
-#endif
 
 	m_result = res;
 	return true;
@@ -355,7 +297,7 @@ void PetriNetSimulation::tryTimedTransitions(PetriNet* pn, int tick)
 
 void PetriNetSimulation::printResults(const SimulationResultStruct& res)
 {
-	string results = str(
+	const string results = str(
 		format("----- File %1%, %2% simulations with %3% simulated time steps \n \
 			   #Failures: %4% out of %5% \n \
 			   Reliability: %6% \n \
