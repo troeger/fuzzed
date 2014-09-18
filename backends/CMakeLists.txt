@@ -19,11 +19,10 @@ SET (CMAKE_BUILD_TYPE Debug)
 # Platform-specific compilation behavior
 ############################################################################
 if(WIN32)
-	 set(Boost_USE_STATIC_LIBS ON)
-	 set(USE_OMP ON)
+	set(Boost_USE_STATIC_LIBS ON)
+	set(USE_OMP ON)
 elseif(UNIX)
-	 set(USE_INTEL_COMPILER OFF) 
-	 set(USE_OMP ON)
+	set(USE_OMP ON)
 endif()
 
 if (USE_OMP)

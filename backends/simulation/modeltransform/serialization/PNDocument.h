@@ -5,11 +5,11 @@
 #endif
 #include "pugixml.hpp"
 #include <vector>
+#include "Types.h"
+
 #if IS_WINDOWS 
 	#pragma warning(pop)
 #endif
-
-#include "Condition.h"
 
 /************************************************************************/
 /* Abstract Class for XML documents representing Petri Nets             */

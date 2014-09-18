@@ -9,15 +9,12 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
      *      This class models the abstract base class for all nodes. It provides basic functionality for CRUD
      *      operations, setting up visual representation, dragging, selection, <Mirrors>, <Properties> and defines basic
      *      connection rules. Other classes, like e.g. <Editor> and <Graph>, rely on the interface provided by this
-     *      class. It is therefore strongly recommended to inherit from <Node> and to add custom behaviour. Any non
-     *      abstract subclass MUST implement <Node::getConfig()>.
+     *      class. It is therefore strongly recommended to inherit from <Node> and to add custom behaviour.
      *
      */
     return Class.extend({
         /**
          * Group: Members
-         *      {Object}        config              - An object containing node configuration constants. If not set
-         *                                            otherwise, defaults to <Node::getConfig()>.
          *      {DOMElement}    container           - The DOM element that contains all other visual DOM elements of the node
          *                                            such as its image, mirrors, ...
          *      {<Graph>}       graph               - The Graph this node belongs to.
@@ -37,7 +34,6 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          *      {DOMElement} _connectionHandle      - DOM element containing the visual representation of the handle
          *                                            where one can pull out new edges.
          */
-        config:              undefined,
         container:           undefined,
         graph:               undefined,
         id:                  undefined,
@@ -76,8 +72,6 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
             // merge all presets of the configuration and data from the backend into this object
             jQuery.extend(true, this, definition);
 
-            this.config        = this.getConfig();
-
             this.nodegroups    = {};
             this.incomingEdges = [];
             this.outgoingEdges = [];
@@ -105,7 +99,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
                 ._registerEventHandlers();
 
             // call home
-            jQuery(document).trigger(Config.Events.NODE_ADDED, [
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODE_ADDED, [
                 this.id,
                 this.kind,
                 this.x,
@@ -126,13 +120,13 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          */
         _setupVisualRepresentation: function() {
             // get the thumbnail, clone it and wrap it with a container (for labels)
-            this._nodeImage = jQuery('#' + this.config.IDs.SHAPES_MENU + ' #' + this.kind)
+            this._nodeImage = jQuery('#' + Factory.getModule('Config').IDs.SHAPES_MENU + ' #' + this.kind)
                 .clone()
                 // cleanup the thumbnail's specific properties
                 .removeClass('ui-draggable')
                 .removeAttr('id')
                 // add new classes for the actual node
-                .addClass(this.config.Classes.NODE_IMAGE);
+                .addClass(Factory.getModule('Config').Classes.NODE_IMAGE);
 				
             this._badge = jQuery('<span class="badge"></span>')
                 .hide();
@@ -143,9 +137,9 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
 
             this.container = jQuery('<div>')
                 .attr('id', this.kind + this.id)
-                .addClass(this.config.Classes.NODE)
+                .addClass(Factory.getModule('Config').Classes.NODE)
                 .css('position', 'absolute')
-                .data(this.config.Keys.NODE, this)
+                .data(Factory.getModule('Config').Keys.NODE, this)
                 .append(this._nodeImageContainer);
 			
             this.container.appendTo(Canvas.container);
@@ -168,13 +162,13 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
 
 			jQuery(this.container).css('z-index', '-1');
 
-			jQuery(document).on(this.config.Events.NODE_SELECTED, function(event, ui) {
+			jQuery(document).on(Factory.getModule('Config').Events.NODE_SELECTED, function(event, ui) {
 				// bring only the sticky note in front that is selected
 				if (jQuery(this.container).hasClass('ui-selected'))
 					jQuery(this.container).css('z-index', '101');
             }.bind(this));
 			
-			jQuery(document).on(this.config.Events.NODE_UNSELECTED, function() {
+			jQuery(document).on(Factory.getModule('Config').Events.NODE_UNSELECTED, function() {
 				jQuery(this.container).css('z-index', '-1')
             }.bind(this));
 
@@ -231,7 +225,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
         _setupConnectionHandle: function() {
             if (this.numberOfOutgoingConnections != 0) {
                 this._connectionHandle = jQuery('<i class="fa fa-plus"></i>')
-                    .addClass(this.config.Classes.NODE_HALO_CONNECT + ' ' + this.config.Classes.NO_PRINT)
+                    .addClass(Factory.getModule('Config').Classes.NODE_HALO_CONNECT + ' ' + Factory.getModule('Config').Classes.NO_PRINT)
                     .css({
                         'top':  this._nodeImage.yCenter + this._nodeImage.outerHeight(true) / 2,
                         'left': this._nodeImage.xCenter
@@ -293,13 +287,13 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
                         if (typeof elid === 'undefined') return false;
 
                         // ...as well as nodes without a node object representing it.
-                        var sourceNode = jQuery('.' + this.config.Classes.NODE + ':has(#' + elid + ')').data('node');
+                        var sourceNode = jQuery('.' + Factory.getModule('Config').Classes.NODE + ':has(#' + elid + ')').data('node');
                         if (typeof sourceNode === 'undefined') return false;
 
                         // Ask the source node if it can connect to us.
                         return sourceNode.allowsConnectionsTo(this);
                     }.bind(this),
-                    activeClass: this.config.Classes.NODE_DROP_ACTIVE
+                    activeClass: Factory.getModule('Config').Classes.NODE_DROP_ACTIVE
                 }
             });
 
@@ -328,7 +322,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
 
             // small flag for the drag callback, explanation below
             var highlight     = true;
-            var inactiveNodes = '.' + this.config.Classes.NODE + ':not(.'+ this.config.Classes.NODE_DROP_ACTIVE + ')';
+            var inactiveNodes = '.' + Factory.getModule('Config').Classes.NODE + ':not(.'+ Factory.getModule('Config').Classes.NODE_DROP_ACTIVE + ')';
 
             jsPlumb.makeSource(this._connectionHandle, {
                 parent:         this.container,
@@ -336,7 +330,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
                 maxConnections: this.numberOfOutgoingConnections,
                 connectorStyle: this.connector,
                 dragOptions: {
-                    cursor: this.config.Dragging.CURSOR_EDGE,
+                    cursor: Factory.getModule('Config').Dragging.CURSOR_EDGE,
                     // XXX: have to use drag callback here instead of start
                     // The activeClass assigned in <Node::_setupIncomingEndpoint> is unfortunately assigned only AFTER
                     // the execution of the start callback by jsPlumb.
@@ -345,14 +339,14 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
                         if (!highlight) return;
                         // disable all nodes that can not be targeted
                         jQuery(inactiveNodes).each(function(index, node){
-                            jQuery(node).data(this.config.Keys.NODE).disable();
+                            jQuery(node).data(Factory.getModule('Config').Keys.NODE).disable();
                         }.bind(this));
                         highlight = false;
                     }.bind(this),
                     stop: function() {
                         // re-enable disabled nodes
                         jQuery(inactiveNodes).each(function(index, node){
-                            jQuery(node).data(this.config.Keys.NODE).enable();
+                            jQuery(node).data(Factory.getModule('Config').Keys.NODE).enable();
                         }.bind(this));
                         // release the flag, to allow fading out nodes again
                         highlight = true;
@@ -382,27 +376,27 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
                 // stay in the canvas
                 containment: Canvas.container,
                 // become a little bit opaque when dragged
-                opacity:     this.config.Dragging.OPACITY,
+                opacity:     Factory.getModule('Config').Dragging.OPACITY,
                 // show a cursor with four arrows
-                cursor:      this.config.Dragging.CURSOR,
+                cursor:      Factory.getModule('Config').Dragging.CURSOR,
                 // stick to the checkered paper
                 grid:        [Canvas.gridSize, Canvas.gridSize],
                 // when dragged a node is send to front, overlaying other nodes and edges
-                stack:       '.' + this.config.Classes.NODE + ', .' + this.config.Classes.JSPLUMB_CONNECTOR,
+                stack:       '.' + Factory.getModule('Config').Classes.NODE + ', .' + Factory.getModule('Config').Classes.JSPLUMB_CONNECTOR,
 
                 // start dragging callback
                 start: function(event) {
                     // XXX: add dragged node to selection
                     // This uses the jQuery.ui.selectable internal functions.
                     // We need to trigger them manually because jQuery.ui.draggable doesn't propagate these events.
-                    if (!this.container.hasClass(this.config.Classes.SELECTED)) {
-                        Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
-                        Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
+                    if (!this.container.hasClass(Factory.getModule('Config').Classes.SELECTED)) {
+                        Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStart(event);
+                        Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStop(event);
                     }
 
                     // capture the original positions of all (multi) selected nodes and save them
-                    jQuery('.' + this.config.Classes.SELECTED).each(function(index, node) {
-                        var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
+                    jQuery('.' + Factory.getModule('Config').Classes.SELECTED).each(function(index, node) {
+                        var nodeInstance = jQuery(node).data(Factory.getModule('Config').Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
 
@@ -422,8 +416,8 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
                     var yOffset = ui.position.top  - initialPositions[this.id].top;
 
                     // tell all selected nodes to move as well, except this node; the user already dragged it
-                    jQuery('.' + this.config.Classes.SELECTED).not(this.container).each(function(index, node) {
-                        var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
+                    jQuery('.' + Factory.getModule('Config').Classes.SELECTED).not(this.container).each(function(index, node) {
+                        var nodeInstance = jQuery(node).data(Factory.getModule('Config').Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
 
@@ -433,7 +427,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
                             'y': initialPositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
                         });
                     }.bind(this));
-                    jQuery(document).trigger(this.config.Events.NODES_MOVED);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.NODES_MOVED);
                 }.bind(this),
 
                 // stop dragging callback
@@ -442,8 +436,8 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
                     var xOffset = ui.position.left - initialPositions[this.id].left;
                     var yOffset = ui.position.top  - initialPositions[this.id].top;
 
-                    jQuery('.' + this.config.Classes.SELECTED).each(function(index, node) {
-                        var nodeInstance = jQuery(node).data(this.config.Keys.NODE);
+                    jQuery('.' + Factory.getModule('Config').Classes.SELECTED).each(function(index, node) {
+                        var nodeInstance = jQuery(node).data(Factory.getModule('Config').Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
 
@@ -456,7 +450,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
 
                     // forget the initial position of the nodes to allow new dragging
                     initialPositions = {};
-                    jQuery(document).trigger(this.config.Events.NODE_DRAG_STOPPED);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.NODE_DRAG_STOPPED);
                 }.bind(this)
             });
 
@@ -498,8 +492,8 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
             // This uses the jQuery.ui.selectable internal functions.
             // We need to trigger them manually because only jQuery.ui.draggable gets the mouseDown events on nodes.
             this.container.click(function(event) {
-                Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStart(event);
-                Canvas.container.data(this.config.Keys.SELECTABLE)._mouseStop(event);
+                Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStart(event);
+                Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStop(event);
             }.bind(this));
 
             return this;
@@ -516,7 +510,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          *      This {<Node>} instance for chaining.
          */
         _setupProperties: function() {
-            _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {
+            _.each(Factory.getNotation().propertiesDisplayOrder, function(propertyName) {
                 var property = this.properties[propertyName];
 
                 if (typeof property === 'undefined') {
@@ -553,7 +547,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
 			var height = properties.height.value;
 			var width  = properties.width.value;
 		
-			var resizable = this.container.find('.' + this.config.Classes.RESIZABLE).resizable();
+			var resizable = this.container.find('.' + Factory.getModule('Config').Classes.RESIZABLE).resizable();
 			// setup resizable with width/height values stored in the backend
 			jQuery(resizable).height(height).width(width);
 			
@@ -582,7 +576,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
 				var screenHeight  = jQuery(window).height();
 				var rightScrolled = scrollable.scrollLeft();
 				var downScrolled  = scrollable.scrollTop();
-				var scrollOffset  = this.config.Resizable.SCROLL_OFFSET;
+				var scrollOffset  = Factory.getModule('Config').Resizable.SCROLL_OFFSET;
 				
 				// resize to the right	-> scroll right			
 				if (event.clientX > screenWidth - scrollOffset)
@@ -616,7 +610,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
 			if (!this.editable) return this;
 			
 			var container = this.container
-			var editable  = container.find('.'+ this.config.Classes.EDITABLE);
+			var editable  = container.find('.'+ Factory.getModule('Config').Classes.EDITABLE);
 			var textarea  = editable.find('textarea');				
 			var paragraph = editable.find('p');
 						
@@ -625,7 +619,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
 				textarea.toggle(true).focus();
 			});
 			
-			jQuery(document).on(this.config.Events.NODE_UNSELECTED, function(event) {
+			jQuery(document).on(Factory.getModule('Config').Events.NODE_UNSELECTED, function(event) {
 				textarea.blur();
 			});
 				
@@ -645,16 +639,16 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          *      This {<Node>} instance for chaining.
          */
         _registerEventHandlers: function() {
-            jQuery(document).on(this.config.Events.EDGE_ADDED,   this._checkEdgeCapacity.bind(this));
-            jQuery(document).on(this.config.Events.EDGE_DELETED, this._checkEdgeCapacity.bind(this));
+            jQuery(document).on(Factory.getModule('Config').Events.EDGE_ADDED,   this._checkEdgeCapacity.bind(this));
+            jQuery(document).on(Factory.getModule('Config').Events.EDGE_DELETED, this._checkEdgeCapacity.bind(this));
 
-            jQuery(document).on(this.config.Events.NODE_SELECTED, function(event, ui) {
+            jQuery(document).on(Factory.getModule('Config').Events.NODE_SELECTED, function(event, ui) {
                 if (jQuery(ui.selected).data('node') == this) {
                     this.select();
                 }
             }.bind(this));
 
-            jQuery(document).on(this.config.Events.NODE_UNSELECTED, function(event, ui) {
+            jQuery(document).on(Factory.getModule('Config').Events.NODE_UNSELECTED, function(event, ui) {
                 if (jQuery(ui.unselected).data('node') == this) {
                     this.deselect();
                 }
@@ -853,31 +847,6 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          */
 
         /**
-         * Method: getConfig
-         *      This method is abstract. All non abstract subclasses MUST override this method. It is an error to call
-         *      this function otherwise. The expected return value of this function is an Object containing at least all
-         *      key-value pairs as defined in <Config> (return it when in doubt). This Object is used for the
-         *      initialization of node instances and contains static values such as e.g. colors, pixel values, CSS class
-         *      names, ... that are shared with other classes like <Editor> or <Graph>. Ensure that all notation
-         *      specific subclasses use the very same reference to a config object.
-         *
-         *      NOTE: Are you wondering about the reason for this seemingly overly complex config access mechanism?
-         *      Rest assured we understand you. An attempt for explanation. When using JavaScript "classes" and AMD
-         *      closures you run quickly into scoping issues when also trying to facilitate inheritance. An Example:
-         *      Imagine you would like to subclass this class <Node> by another class called Derivative. In Derivative
-         *      you would like to change some very basic config options. These options shall already be taken into
-         *      account when executing the abstract base constructor. However, since you required the config already in
-         *      the base class in form of an AMD closure, there is no way you could possibly obtain the reference to the
-         *      config in Derived without requiring it again and trying to overwrite presumably constant values. And all
-         *      of that, before the base class can even possibly reads from the config, due to asynchronous AMD
-         *      requests... For this reason, we use this work-around. By requiring the most specific subclass to return
-         *      the "most up-to-date" config, which that in turn can be easily accessed by the base class.
-         */
-        getConfig: function() {
-            throw new SubclassResponsibility();
-        },
-
-        /**
          * Method: getChildren
          *
          * Returns:
@@ -977,7 +946,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
 
             this._moveContainerToPixel(position, animated);
             // call home
-            jQuery(document).trigger(this.config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },
@@ -1002,7 +971,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
             this._moveContainerToPixel(pixelPos, animated);
 
             // call home
-            jQuery(document).trigger(this.config.Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, [this.id, {'x': this.x, 'y': this.y}]);
 
             return this;
         },
@@ -1033,7 +1002,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
             }.bind(this));
 
             // Call home
-            jQuery(document).trigger(this.config.Events.NODE_DELETED, this.id);
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODE_DELETED, this.id);
             this.container.remove();
 
             return true;
@@ -1092,7 +1061,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          *      This {<Node>} instance for chaining.
          */
         disable: function() {
-            this.container.addClass(this.config.Classes.DISABLED);
+            this.container.addClass(Factory.getModule('Config').Classes.DISABLED);
 
             return this;
         },
@@ -1105,7 +1074,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          *      This {<Node>} instance for chaining.
          */
         enable: function() {
-            this.container.removeClass(this.config.Classes.DISABLED);
+            this.container.removeClass(Factory.getModule('Config').Classes.DISABLED);
 
             return this;
         },
@@ -1118,7 +1087,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          *      This {<Node>} instance for chaining.
          */
         select: function() {
-            this.container.addClass(this.config.Classes.SELECTED);
+            this.container.addClass(Factory.getModule('Config').Classes.SELECTED);
 
             return this;
         },
@@ -1131,7 +1100,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          *      This {<Node>} instance for chaining.
          */
         deselect: function() {
-            this.container.removeClass(this.config.Classes.SELECTED);
+            this.container.removeClass(Factory.getModule('Config').Classes.SELECTED);
 
             return this;
         },
@@ -1145,7 +1114,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          *      This {<Node>} instance for chaining.
          */
         highlight: function() {
-            this.container.addClass(this.config.Classes.HIGHLIGHTED);
+            this.container.addClass(Factory.getModule('Config').Classes.HIGHLIGHTED);
 
             return this;
         },
@@ -1160,7 +1129,7 @@ function(Factory, Property, Mirror, Canvas, Class, Config) {
          *      This {<Node>} instance for chaining.
          */
         unhighlight: function() {
-            this.container.removeClass(this.config.Classes.HIGHLIGHTED);
+            this.container.removeClass(Factory.getModule('Config').Classes.HIGHLIGHTED);
 
             return this;
         },

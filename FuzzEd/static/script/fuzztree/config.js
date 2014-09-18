@@ -5,7 +5,7 @@ define(['factory', 'faulttree/config', 'jquery'], function(Factory, FaulttreeCon
 
     /**
      * Structure: FuzztreeConfig
-     *      Fuzztree-specific config.
+     *      Fuzztree-specific Factory.getModule('Config').
      *
      * Extends: <Faulttree::FaulttreeConfig>
      */

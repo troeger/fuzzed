@@ -23,7 +23,6 @@ set(SOURCES
    
    serialization/PNDocument.cpp
    serialization/PNMLDocument.cpp
-   serialization/TNDocument.cpp
 )
 
 set(HEADERS
@@ -52,7 +51,6 @@ set(HEADERS
    
    serialization/PNDocument.h
    serialization/PNMLDocument.h
-   serialization/TNDocument.h
 )
 
 add_library(ftmodeltransform STATIC ${SOURCES} ${HEADERS})

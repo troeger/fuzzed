@@ -59,7 +59,7 @@ function(Factory, Property, Class, Canvas, Config) {
             this._setupProperties();
 
             // call home
-            jQuery(document).trigger(Config.Events.NODEGROUP_ADDED, [
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODEGROUP_ADDED, [
                 this.id,
                 this.nodeIds(),
                 this.toDict().properties,
@@ -78,7 +78,7 @@ function(Factory, Property, Class, Canvas, Config) {
          *      This {<NodeGroup>} instance for chaining.
          */
         _setupProperties: function() {
-            _.each(this.graph.getNotation().propertiesDisplayOrder, function(propertyName) {
+            _.each(Factory.getNotation().propertiesDisplayOrder, function(propertyName) {
                 var property = this.properties[propertyName];
 
                 if (typeof property === 'undefined') {
@@ -125,7 +125,7 @@ function(Factory, Property, Class, Canvas, Config) {
         _addNode: function(node) {
             this.nodes[node.id] = node;
             // call home
-            jQuery(document).trigger(Config.Events.NODEGROUP_NODEIDS_CHANGED, [this.id, this.nodeIds()]);
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODEGROUP_NODEIDS_CHANGED, [this.id, this.nodeIds()]);
 
             return this;
         },
@@ -144,7 +144,7 @@ function(Factory, Property, Class, Canvas, Config) {
             delete this.nodes[node.id];
 
             // call home
-            jQuery(document).trigger(Config.Events.NODEGROUP_NODEIDS_CHANGED, [this.id, this.nodeIds()]);
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODEGROUP_NODEIDS_CHANGED, [this.id, this.nodeIds()]);
 
             // if we have less than two members left, remove us, as we are no longer relevant
             if (_.size(this.nodes) < 2) {
@@ -175,7 +175,7 @@ function(Factory, Property, Class, Canvas, Config) {
          *      This {<NodeGroup>} instance for chaining.
          */
         select: function() {
-            this.path().addClass(Config.Classes.SELECTED);
+            this.path().addClass(Factory.getModule('Config').Classes.SELECTED);
 
             return this;
         },
@@ -189,7 +189,7 @@ function(Factory, Property, Class, Canvas, Config) {
          *      This {<NodeGroup>} instance for chaining.
          */
         highlight: function() {
-            this.container.addClass(Config.Classes.HIGHLIGHTED);
+            this.container.addClass(Factory.getModule('Config').Classes.HIGHLIGHTED);
 
             return this;
         },
@@ -204,7 +204,7 @@ function(Factory, Property, Class, Canvas, Config) {
          *      This {<NodeGroup>} instance for chaining.
          */
         unhighlight: function() {
-            this.container.removeClass(Config.Classes.HIGHLIGHTED);
+            this.container.removeClass(Factory.getModule('Config').Classes.HIGHLIGHTED);
 
             return this;
         },
@@ -225,7 +225,7 @@ function(Factory, Property, Class, Canvas, Config) {
             }.bind(this));
 
             // call home
-            jQuery(document).trigger(Config.Events.NODEGROUP_DELETED, [this.id, this.nodeIds()]);
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODEGROUP_DELETED, [this.id, this.nodeIds()]);
 
             return true;
         },

@@ -25,6 +25,11 @@ std::string util::toString(const int& i)
 	return lexical_cast<string>(i);
 }
 
+std::string util::toString(const unsigned int& i)
+{
+	return lexical_cast<string>(i);
+}
+
 std::string util::toString(const double& d, const int& prec /*= 5*/)
 {
 	std::ostringstream oss;

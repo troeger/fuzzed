@@ -48,6 +48,7 @@ namespace util
 #endif
 
 	string toString(const int& i);
+	string toString(const unsigned int& i);
 	string toString(const double& d, const int& prec = 10);
 	string toString(std::istream& istream);
 

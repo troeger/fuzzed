@@ -197,7 +197,7 @@ define(['factory', 'class', 'config', 'jquery'], function(Factory, Class, Config
             // create a new one
             this._timer = window.setTimeout(function() {
                 this.property.setValue(value, this);
-            }.bind(this), Config.Menus.PROPERTIES_MENU_TIMEOUT);
+            }.bind(this), Factory.getModule('Config').Menus.PROPERTIES_MENU_TIMEOUT);
 
             return this;
         },
@@ -313,12 +313,12 @@ define(['factory', 'class', 'config', 'jquery'], function(Factory, Class, Config
          *      This {Entry} for chaining.
          */
         warn: function(text) {
-            if (this.container.hasClass(Config.Classes.PROPERTY_WARNING) &&
+            if (this.container.hasClass(Factory.getModule('Config').Classes.PROPERTY_WARNING) &&
                 this.container.attr('data-original-title') === text)
                 return this;
 
             this.container
-                .addClass(Config.Classes.PROPERTY_WARNING)
+                .addClass(Factory.getModule('Config').Classes.PROPERTY_WARNING)
                 .attr('data-original-title', text)
                 .tooltip('show');
 
@@ -333,7 +333,7 @@ define(['factory', 'class', 'config', 'jquery'], function(Factory, Class, Config
          *      This {Entry} for chaining.
          */
         unwarn: function() {
-            this.container.removeClass(Config.Classes.PROPERTY_WARNING).tooltip('hide');
+            this.container.removeClass(Factory.getModule('Config').Classes.PROPERTY_WARNING).tooltip('hide');
 
             return this;
         },
@@ -415,9 +415,9 @@ define(['factory', 'class', 'config', 'jquery'], function(Factory, Class, Config
          */
         _setupEvents: function() {
             jQuery(this.property).on([
-                Config.Events.NODE_PROPERTY_CHANGED,
-                Config.Events.EDGE_PROPERTY_CHANGED,
-                Config.Events.NODEGROUP_PROPERTY_CHANGED
+                Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED,
+                Factory.getModule('Config').Events.EDGE_PROPERTY_CHANGED,
+                Factory.getModule('Config').Events.NODEGROUP_PROPERTY_CHANGED
             ].join(' '), function(event, newValue, text, issuer) {
                 // ignore changes issued by us in order to prevent race conditions with the user
                 if (issuer === this) return;
@@ -425,11 +425,11 @@ define(['factory', 'class', 'config', 'jquery'], function(Factory, Class, Config
             }.bind(this));
 
 
-            jQuery(this.property).on(Config.Events.PROPERTY_READONLY_CHANGED, function(event, newReadonly) {
+            jQuery(this.property).on(Factory.getModule('Config').Events.PROPERTY_READONLY_CHANGED, function(event, newReadonly) {
                 this.setReadonly(newReadonly);
             }.bind(this));
 
-            jQuery(this.property).on(Config.Events.PROPERTY_HIDDEN_CHANGED, function(event, newHidden) {
+            jQuery(this.property).on(Factory.getModule('Config').Events.PROPERTY_HIDDEN_CHANGED, function(event, newHidden) {
                 this.setHidden(newHidden);
             }.bind(this));
 
@@ -1110,7 +1110,7 @@ define(['factory', 'class', 'config', 'jquery'], function(Factory, Class, Config
         _setupVisualRepresentation: function() {
             this._setupInput();
 			this._setupContainer();
-			this.container.find('.' + Config.Classes.EDITABLE).append(this.inputs);
+			this.container.find('.' + Factory.getModule('Config').Classes.EDITABLE).append(this.inputs);
 
             return this;
         },
@@ -1137,7 +1137,7 @@ define(['factory', 'class', 'config', 'jquery'], function(Factory, Class, Config
             this._super(property);
 
             jQuery(window).on('focus', this._refetchEntries.bind(this));
-            jQuery(this.property).on(Config.Events.PROPERTY_SYNCHRONIZED, this._refreshEntries.bind(this));
+            jQuery(this.property).on(Factory.getModule('Config').Events.PROPERTY_SYNCHRONIZED, this._refreshEntries.bind(this));
         },
 
         blurEvents: function() {
@@ -1171,7 +1171,7 @@ define(['factory', 'class', 'config', 'jquery'], function(Factory, Class, Config
 
             this._openButton = jQuery('<button type="button">')
                 .addClass('btn btn-default btn-small col-12')
-                .addClass(Config.Classes.PROPERTY_OPEN_BUTTON)
+                .addClass(Factory.getModule('Config').Classes.PROPERTY_OPEN_BUTTON)
                 .text('Open in new tab')
                 .appendTo(this.container.children('.inputs'))
                 .css('display', 'none');
@@ -1218,7 +1218,7 @@ define(['factory', 'class', 'config', 'jquery'], function(Factory, Class, Config
                 var value = this._value();
 
                 if (value != this.property.UNLINK_VALUE) {
-                    window.open(Config.Backend.EDITOR_URL + '/' + value, '_blank');
+                    window.open(Factory.getModule('Config').Backend.EDITOR_URL + '/' + value, '_blank');
                 }
             }.bind(this));
 
