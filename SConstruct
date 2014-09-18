@@ -11,18 +11,6 @@ from FuzzEd import VERSION
 env=Environment(
   tools=['default', fuzzed_builders])  
 
-# Decide which build mode we have here
-# development: Prepare everything for Mac OS X machine in dev mode
-# vagrant:     Prepare everything for Vagrant Ubuntu Trusty machine in dev mode
-# production:  Prepare everything for Ubuntu Trusty machine in production
-if socket.getfqdn() == 'vagrant-ubuntu-trusty-32':
-    mode = "vagrant"
-else:
-    mode = "development"
-assert(mode in ['development','vagrant','production'])
-print "Building for "+mode+" mode"
-env['mode']=mode
-
 # Include SCons file for backend daemons
 SConscript('backends/SConscript')
 
