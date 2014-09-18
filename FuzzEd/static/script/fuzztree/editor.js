@@ -1,5 +1,5 @@
-define(['factory', 'faulttree/editor', 'fuzztree/graph', 'fuzztree/config', 'fuzztree/node'],
-function(Factory, FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
+define(['factory', 'faulttree/editor', 'fuzztree/config', 'fuzztree/node'],
+function(Factory, FaulttreeEditor, FuzztreeConfig) {
     /**
      * Package: Fuzztree
      */
