@@ -37,3 +37,16 @@
     - db
     - backend
     - testing
+
+- name: Configure Vagrant developer machine
+  hosts: vagrantmachine
+  user: root
+
+  roles:
+    - common
+    - build
+    - web
+    - db
+    - backend
+    - testing
+    - env_vagrant
