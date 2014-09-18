@@ -1,5 +1,6 @@
-define(['class'],
-function(Class) {
+define(['class', 'json!notations/dfd.json', 'json!notations/faulttree.json', 'json!notations/fuzztree.json',
+    'json!notations/rbd.json'],
+function(Class, DFDNotation, FaulttreeNotation, FuzztreeNotation, RBDNotation) {
     /**
      *  Package: Base
      */
@@ -64,18 +65,14 @@ function(Class) {
             }
         },
 
-        /**
-         * Method: _setupDropDownBlur
-         *      Register an event handler that takes care of closing and blurring all currently open drop down menu
-         *      items from the toolbar.
-         *
-         * Returns:
-         *      This {<Editor>} instance for chaining.
-         */
         getModule: function(baseCls) {
             var resolveObj = this._resolveClassName(baseCls);
             //console.log('Successfully resolved class module for ' + baseCls + ' from ' + resolveObj.path);
             return require(resolveObj.path);
+        },
+
+        getNotation: function() {
+            return require('json!notations/' + this.kind + '.json');
         },
 
         _construct: function(constructor, args) {

@@ -1,6 +1,6 @@
 define(['factory', 'config', 'jquery', 'underscore'], function(Factory, Config) {
-    var _progressIndicatorSingle   = jQuery('#' + Config.IDs.PROGRESS_INDICATOR_SINGLE);
-    var _progressIndicatorDropdown = jQuery('#' + Config.IDs.PROGRESS_INDICATOR_DROPDOWN);
+    var _progressIndicatorSingle   = jQuery('#' + Factory.getModule('Config').IDs.PROGRESS_INDICATOR_SINGLE);
+    var _progressIndicatorDropdown = jQuery('#' + Factory.getModule('Config').IDs.PROGRESS_INDICATOR_DROPDOWN);
     var _progressIndicatorEntry    = jQuery(_progressIndicatorSingle.html()); // copy an entry form template
     var _progressList              = {};
 
@@ -88,11 +88,11 @@ define(['factory', 'config', 'jquery', 'underscore'], function(Factory, Config) 
 
         // create a new progress entry
         var entry = _progressIndicatorEntry.clone();
-        entry.find('i').removeClass().addClass(Config.Classes.ICON_PROGRESS)
+        entry.find('i').removeClass().addClass(Factory.getModule('Config').Classes.ICON_PROGRESS)
             .find('span').text(message)
             .hide();
 
-        var timeout = setTimeout(function() { entry.show(); }, Config.ProgressIndicator.PROGRESS_APPEARANCE_DELAY);
+        var timeout = setTimeout(function() { entry.show(); }, Factory.getModule('Config').ProgressIndicator.PROGRESS_APPEARANCE_DELAY);
         var listSize = _.size(_progressList);
 
         if (listSize === 0) {
@@ -130,7 +130,7 @@ define(['factory', 'config', 'jquery', 'underscore'], function(Factory, Config) 
      *      {String} message    - the message of the progress indicator
      */
     var flashSuccessMessage = function(progressID, message) {
-        _flashMessage(progressID, message, Config.Classes.ICON_SUCCESS, Config.ProgressIndicator.SUCCESS_FLASH_DELAY);
+        _flashMessage(progressID, message, Factory.getModule('Config').Classes.ICON_SUCCESS, Factory.getModule('Config').ProgressIndicator.SUCCESS_FLASH_DELAY);
     };
 
     /**
@@ -142,7 +142,7 @@ define(['factory', 'config', 'jquery', 'underscore'], function(Factory, Config) 
      *      {String} message    - the message of the progress indicator
      */
     var flashErrorMessage = function(progressID, message) {
-        _flashMessage(progressID, message, Config.Classes.ICON_ERROR, Config.ProgressIndicator.ERROR_FLASH_DELAY);
+        _flashMessage(progressID, message, Factory.getModule('Config').Classes.ICON_ERROR, Factory.getModule('Config').ProgressIndicator.ERROR_FLASH_DELAY);
         // if the erroneous entry is in the dropdown, show the dropdown menu
         if (!_progressIndicatorDropdown.is(':hidden')) {
             _progressIndicatorDropdown.addClass('open');
@@ -164,7 +164,7 @@ define(['factory', 'config', 'jquery', 'underscore'], function(Factory, Config) 
     var showAjaxProgress = function(event, xhr) {
         // assign an ID for later reference
         xhr.progressID = _.uniqueId('progress_');
-        showProgress(xhr.progressID, xhr.progressMessage || Config.ProgressIndicator.DEFAULT_PROGRESS_MESSAGE);
+        showProgress(xhr.progressID, xhr.progressMessage || Factory.getModule('Config').ProgressIndicator.DEFAULT_PROGRESS_MESSAGE);
     };
 
     /**
@@ -176,7 +176,7 @@ define(['factory', 'config', 'jquery', 'underscore'], function(Factory, Config) 
      *      {XMLHTTPRequest} xhr   - the actual XHR object of the browser
      */
     var flashAjaxSuccessMessage = function(event, xhr) {
-        flashSuccessMessage(xhr.progressID, xhr.progressSuccessMessage || Config.ProgressIndicator.DEFAULT_SUCCESS_MESSAGE);
+        flashSuccessMessage(xhr.progressID, xhr.progressSuccessMessage || Factory.getModule('Config').ProgressIndicator.DEFAULT_SUCCESS_MESSAGE);
     };
 
 
@@ -189,7 +189,7 @@ define(['factory', 'config', 'jquery', 'underscore'], function(Factory, Config) 
      *      {XMLHTTPRequest} xhr   - the actual XHR object of the browser
      */
     var flashAjaxErrorMessage = function(event, xhr) {
-        flashErrorMessage(xhr.progressID, xhr.progressErrorMessage || Config.ProgressIndicator.DEFAULT_ERROR_MESSAGE);
+        flashErrorMessage(xhr.progressID, xhr.progressErrorMessage || Factory.getModule('Config').ProgressIndicator.DEFAULT_ERROR_MESSAGE);
     };
 
     return {

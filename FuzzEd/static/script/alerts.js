@@ -21,7 +21,7 @@ define(['factory', 'config', 'jquery'], function(Factory, Config) {
                               <a class="close" data-dismiss="alert" href="#">&times;</a> \
                               <strong>' + message + '</strong> ' + description +
                          '</div>');
-        jQuery('#' + Config.IDs.ALERT_CONTAINER).append(dom);
+        jQuery('#' + Factory.getModule('Config').IDs.ALERT_CONTAINER).append(dom);
 
         if (typeof timeout !== 'undefined') {
             function fadeOut() {
