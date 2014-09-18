@@ -1,4 +1,4 @@
-import logging
+import logging, json
 
 from django.db import models
 
@@ -37,6 +37,20 @@ class Property(models.Model):
 
     def __unicode__(self):
         return '%s%s: %s' % ('[DELETED] ' if self.deleted else '', self.key, self.value)
+
+    def json_or_string_value(self):
+        '''
+            Returns the text value as decoded JSON data structure,
+            or string if it is no text-urized JSON data.
+            Historically, self.value was a JSONField that managed this
+            by itself, but the package become so unreliable that we switched
+            to our own little version here.
+        '''
+        try:
+            return json.loads(self.value)
+        except Exception as e:
+            # Value might also be a pure string, which is good enough
+            return self.value
 
     @property
     def graph(self):

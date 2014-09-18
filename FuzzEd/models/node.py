@@ -561,7 +561,7 @@ class Node(models.Model):
 
     def get_property(self, key, default=None):
         try:
-            return self.properties.get(key=key).value
+            return self.properties.get(key=key).json_or_string_value()
         except ObjectDoesNotExist:
             try:
                 prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
