@@ -2,7 +2,6 @@ import logging
 
 from django.db import models
 
-from FuzzEd.lib.jsonfield import JSONField
 from node import Node
 from edge import Edge
 from node_group import NodeGroup
@@ -30,7 +29,7 @@ class Property(models.Model):
         app_label = 'FuzzEd'
 
     key        = models.CharField(max_length=255)
-    value      = JSONField()
+    value      = models.TextField()
     node       = models.ForeignKey(Node, related_name='properties', blank=True, null=True, default=None)
     edge       = models.ForeignKey(Edge, related_name='properties', blank=True, null=True, default=None)
     node_group = models.ForeignKey(NodeGroup, related_name='properties', blank=True, null=True, default=None)
@@ -86,8 +85,6 @@ class Property(models.Model):
         '''
         val_type = Property.value_type(key, obj)
         if val_type in ['text','compound']:
-            # JSONField is performing some conversion magic, so must tell
-            # it explicitely that even numerical strings remain strings
             return unicode(value)
         elif val_type == 'numeric':
             return int(value)
