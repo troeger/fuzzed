@@ -15,19 +15,5 @@ Vagrant::Config.run do |config|
     # If the VM has no internet connectivity, uncomment this line:
     # config.vm.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
     # config.vm.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
-
-#   This is how the ansible provider normally would be used. Since Ansible
-#   is not supported on Windows, we need the alternative strategy of running
-#   something shell magic inside of the VM
-
-#   config.vm.provision "ansible" do |ansible|
-#       ansible.playbook = "ansible/site.yml"
-#       ansible.extra_vars = { ansible_ssh_user: 'vagrant' }
-#       ansible.sudo = true
-#       ansible.verbose = "vvvv"
-#       ansible.groups = {
-#                          "devmachine" => ["default"]
-#       }        
-#   end
     config.vm.provision "shell", inline: $provisioning_script
 end
