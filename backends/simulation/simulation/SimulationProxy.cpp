@@ -3,7 +3,6 @@
 
 #include "serialization/PNMLDocument.h"
 #include "events/TopLevelEvent.h"
-#include "FuzzTreeTransform.h"
 #include "FaultTreeConversion.h"
 
 #include "util.h"
@@ -12,13 +11,6 @@
 #include "Constants.h"
 #include "CommandLineParser.h"
 #include "FatalException.h"
-
-// Generated files...
-#include "faulttree.h"
-#include "fuzztree.h"
-#include "backendResult.h"
-
-#include <xsd/cxx/xml/dom/serialization-header.hxx>
 
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -116,92 +108,14 @@ void SimulationProxy::simulateAllConfigurations(
 		throw runtime_error("Could not open file");
 
 	std::ofstream* logFileStream = new std::ofstream(logFile.generic_string());
-	backendResults::BackendResults simResults;
-
+	
 	try
 	{
-		std::set<Issue> issues;
-		FuzzTreeTransform ftTransform(file, issues);
-		if (!ftTransform.isValid())
-		{
-			const auto simTree = faulttree::faultTree(inputFile.generic_string(), xml_schema::Flags::dont_validate);
-			const std::shared_ptr<TopLevelEvent> topEvent = fromGeneratedFaultTree(simTree->topEvent()); 
-			if (topEvent)
-			{ // in this case there is only a faulttree, so no configuration information will be serialized
+		// TODO: Rewrite the actual simulation call
 
-				const SimulationResultStruct res = 
-					simulateFaultTree(topEvent, workingDir, logFileStream);
-
-				const std::string modelId = simTree->id();
-				backendResults::SimulationResult r(
-					modelId,
-					EMPTY_CONFIG_ID,
-					util::timeStamp(),
-					res.isValid(),
-					res.reliability,
-					res.nFailures,
-					res.nRounds);
-
-				r.availability(res.meanAvailability);
-				r.duration(res.duration);
-				r.mttf(res.mttf);
-				
-				simResults.result().push_back(r);
-			}
-			else
-			{
-				issues.insert(Issue::fatalIssue("Could not read fault tree. Problem during transformation."));
-			}
-		}
-		else
-		{
-			for (const auto& ft : ftTransform.transform())
-			{
-				try
-				{
-					std::shared_ptr<TopLevelEvent> simTree = fromGeneratedFuzzTree(ft.second.topEvent());
-
-					const SimulationResultStruct res =
-						simulateFaultTree(simTree, workingDir, logFileStream);
-
-					backendResults::SimulationResult r(
-						ft.second.id(),
-						ft.first.getId(),
-						util::timeStamp(),
-						res.isValid(),
-						res.reliability,
-						res.nFailures,
-						res.nRounds);
-
-					r.availability(res.meanAvailability);
-					r.duration(res.duration);
-					r.mttf(res.mttf);
-					simResults.configuration().push_back(serializedConfiguration(ft.first));
-
-					simResults.result().push_back(r);
-
-				}
-				catch (FatalException& e)
-				{
-					issues.insert(e.getIssue());
-				}
-				catch (std::exception& e)
-				{
-					issues.insert(Issue::fatalIssue(e.what()));
-				}
-				catch (...)
-				{
-					issues.insert(Issue::fatalIssue("Unknown error during fuzztree to faulttree conversion or faulttree simulation"));
-				}
-			}
-		}
-		// Log errors
-		for (const Issue& issue : issues)
-			simResults.issue().push_back(issue.serialized());
-
-		std::ofstream output(outputFile.generic_string());
-		backendResults::backendResults(output, simResults);
-		output.close();
+		// TODO: Log errors
+		
+		// TODO: Output results
 	}
 	catch (std::exception& e)
 	{

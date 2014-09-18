@@ -73,6 +73,8 @@ Model::Model(const std::string graphMLFileName)
     
     if (m_topEvent == nullptr) throw FatalException("Could not detect top event");
 
+	m_missionTime = GET_INT_VALUE_BY_ATTR(graph, DATA, KEY, "missionTime");
+
     /**
      * Load the edges...
      */

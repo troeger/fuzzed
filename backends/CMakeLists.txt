@@ -68,25 +68,6 @@ REQUIRED)
 
 message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
 
-################# XSD ###################
-#########################################
-
-find_package(XercesC REQUIRED) # XSD DEPENDS ON ${XERCESC_FOUND}
-if(XERCESC_FOUND)
-	message(STATUS "Found Xerces-C: ${XERCESC_LIBRARIES}")
-	message(STATUS "              : ${XERCESC_INCLUDE_DIR}")
-	message(STATUS "       Version: ${XERCESC_VERSION}")
-else(XERCESC_FOUND)
-	message(FATAL_ERROR "The package Apache Xerces-C++ has not been found")
-endif(XERCESC_FOUND)
-
-find_package(Xsd REQUIRED) # CODESYNTHESIS
-if(XSD_FOUND)
-	message(STATUS "Package CodeSynthesis XSD found: ${XSD_INCLUDE_DIR}")
-else(XSD_FOUND)
-	message(FATAL_ERROR "The package CodeSynthesis XSD has not been found")
-endif(XSD_FOUND)  
-
 ############### PUGI ####################
 #########################################
 
@@ -101,76 +82,16 @@ set(PUGIXML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/pugixml/src")
 #      Try to make 'common' a self-hosted compilation unit as the others
 
 include_directories(
-	${XERCESC_INCLUDE_DIR}
-	${XSD_INCLUDE_DIR}
 	${PUGIXML_INCLUDE_DIR}
 	${Boost_INCLUDE_DIRS}
 	${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration
 	${CMAKE_CURRENT_SOURCE_DIR}/model
 	${CMAKE_CURRENT_SOURCE_DIR}/common
-	${CMAKE_CURRENT_SOURCE_DIR}/common_generated
 	${CMAKE_CURRENT_SOURCE_DIR}/thirdParty
 )
 
 set(COMMON_DIR 		${CMAKE_CURRENT_SOURCE_DIR}/common)
 set(MODEL_DIR 		${CMAKE_CURRENT_SOURCE_DIR}/model)
-set(COMMON_GEN_DIR 	${CMAKE_CURRENT_SOURCE_DIR}/common_generated)
-
-############### XSD COMPILER ############
-#########################################
-
-set(XSD_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../FuzzEd/static/xsd")
-
-set(XSD_GENERATED_RESULT_FILES
-	${COMMON_GEN_DIR}/backendResult.h
-	${COMMON_GEN_DIR}/commonTypes.h
-	${COMMON_GEN_DIR}/configurations.h
-	${COMMON_GEN_DIR}/backendResult.cpp
-	${COMMON_GEN_DIR}/commonTypes.cpp
-	${COMMON_GEN_DIR}/configurations.cpp)
-
-set(RESULT_XSD					"${XSD_FILE_PATH}/backendResult.xsd")
-set(COMMON_TYPES_XSD			"${XSD_FILE_PATH}/commonTypes.xsd")
-set(CONFIGURATION_XSD			"${XSD_FILE_PATH}/configurations.xsd")
-
-set(XSD_RESULT_ARGS
-	--include-with-brackets #include with <> instead of ""
-	--generate-polymorphic  #needed for xsi:type
-	--polymorphic-type-all
-	--type-naming ucc
-	--function-naming lcc
-	--generate-serialization
-	--hxx-suffix .h
-	--cxx-suffix .cpp
-)
-
-########### CODE GENERATION ################
-
-add_custom_command(OUTPUT ${XSD_GENERATED_RESULT_FILES} ${XSD_GENERATED_TREE_FILES}
-	
-	COMMAND ${XSD_EXECUTABLE}
-		cxx-tree 
-			${XSD_RESULT_ARGS} 
-			--output-dir ${COMMON_GEN_DIR}
-			${COMMON_TYPES_XSD}
-
-	COMMAND ${XSD_EXECUTABLE} 
-		cxx-tree
-			${XSD_RESULT_ARGS}
-			--output-dir ${COMMON_GEN_DIR}
-			--root-element "backendResults"
-			${RESULT_XSD}
-
-	COMMAND ${XSD_EXECUTABLE} 
-		cxx-tree
-			${XSD_RESULT_ARGS}
-			--output-dir ${COMMON_GEN_DIR}
-			${CONFIGURATION_XSD}
-
-	COMMENT "Generating C++ / XML mapping files"
-	VERBATIM
-
-	DEPENDS ${COMMON_TYPES_XSD} ${RESULT_XSD} ${CONFIGURATION_XSD})
 
 ############### COMMON ##################
 #########################################
@@ -186,10 +107,6 @@ set(COMMON_SOURCES
 	${COMMON_DIR}/Issue.cpp
 	${COMMON_DIR}/FatalException.cpp
 	${COMMON_DIR}/DeadlockMonitor.cpp
-
-	${COMMON_GEN_DIR}/backendResult.cpp
-	${COMMON_GEN_DIR}/commonTypes.cpp
-	${COMMON_GEN_DIR}/configurations.cpp
 )
 
 set(COMMON_HEADERS
@@ -205,25 +122,17 @@ set(COMMON_HEADERS
 	${COMMON_DIR}/FatalException.h
 	${COMMON_DIR}/DeadlockMonitor.h
 	${COMMON_DIR}/Dynamic2dArray.h
-
-	${COMMON_GEN_DIR}/backendResult.h
-	${COMMON_GEN_DIR}/commonTypes.h
-	${COMMON_GEN_DIR}/configurations.h
 )
 
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
 
 include_directories(${COMMON_DIR})
-target_link_libraries(common_model ${XERCESC_LIBRARIES} ${Boost_LIBRARIES} ${PUGIXML_LIB})
-
-############### UNIT TESTS ##############
-#########################################
+target_link_libraries(common_model ${Boost_LIBRARIES} ${PUGIXML_LIB})
 
 add_subdirectory(fuzztreeconfiguration)
 add_subdirectory(fuzztreeanalysis)
 add_subdirectory(simulation)
 add_subdirectory(mincut)
-
 
 add_executable(common_model_test test_common_model.cpp 
 	${MODEL_DIR}/Model.cpp

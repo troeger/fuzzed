@@ -32,6 +32,9 @@ public:
     const std::string& getId()      const { return m_id; };
     const std::string& getName()    const { return m_name; };
     const std::string& getType()    const { return m_type; };
+
+	const unsigned int& getMissionTime() const { return m_missionTime; };
+
     const Node* getTopEvent()       const { return m_topEvent; };
 
     static void printTreeRecursive(const Node* node, unsigned int indent);
@@ -59,4 +62,6 @@ private:
     unsigned int m_decompositionNumber;
 
     Node* m_topEvent;
+
+	unsigned int m_missionTime;
 };

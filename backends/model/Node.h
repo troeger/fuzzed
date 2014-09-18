@@ -16,6 +16,7 @@ namespace nodetype
     const std::string SPARE     = "spareGate";
     const std::string PAND      = "pandGate";
     const std::string SEQ       = "seqGate";
+	const std::string FDEP		= "fdepGate";
 
     const std::string BASICEVENT    = "basicEvent";
     const std::string TOPEVENT      = "topEvent";
@@ -58,6 +59,9 @@ public:
 	const unsigned int& getTo() const { assert(m_type == nodetype::REDUNDANCYVP); return m_to; }
 	const std::string& getRedundancyFormula() const { assert(m_type == nodetype::REDUNDANCYVP); return m_redundancyFormula; }
 
+	void setKOutOfN(const unsigned int& k) { assert(m_type == nodetype::VOTINGOR); m_kOutOfN = k; };
+	const unsigned int& getKOutOfN() const { { assert(m_type == nodetype::VOTINGOR); return m_kOutOfN; }
+
     /**
      * Utility functions
      */
@@ -70,8 +74,6 @@ public:
 
 	void setProbability(const Probability p) { assert(canHaveProbability()); m_probability = p; }
     const Probability& getProbability() const { assert(canHaveProbability()); return m_probability; }
-
-	void setKOutOfN(const unsigned int& k) { assert(m_type == nodetype::VOTINGOR); m_kOutOfN = k; };
 
     std::string print() const { return std::string("- ") + m_type + " ID: " + m_id + " " + m_name; };
 

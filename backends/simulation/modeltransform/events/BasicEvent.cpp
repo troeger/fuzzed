@@ -75,7 +75,7 @@ std::tuple<int /*not failed*/, int /*failed*/, int /*failure transition*/>
 
 	serializeFDEPChildren(doc, failed);
 
-	return make_tuple(notFailed, failed, failComponent);
+	return std::make_tuple(notFailed, failed, failComponent);
 }
 
 void BasicEvent::serializeFDEPChildren(std::shared_ptr<PNDocument> doc, const int& failedPlaceId) const
