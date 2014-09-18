@@ -1,6 +1,6 @@
 ---
 - name: Ensure backend daemon dependencies are installed
-  pip: name=requests state=latest
+  easy_install: name=requests state=latest
 
 - name: Ensure LaTex is installed
   apt: pkg=texlive state=latest
