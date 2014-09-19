@@ -1,5 +1,5 @@
-define(['factory', 'faulttree/editor', 'fuzztree/graph', 'fuzztree/config', 'fuzztree/node'],
-function(Factory, FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
+define(['factory', 'faulttree/editor', 'fuzztree/config', 'fuzztree/node'],
+function(Factory, FaulttreeEditor, FuzztreeConfig) {
     /**
      * Package: Fuzztree
      */
@@ -11,6 +11,6 @@ function(Factory, FaulttreeEditor, FuzztreeGraph, FuzztreeConfig) {
      * Extends: <Faulttree::FaultTreeEditor>
      */
     return FaulttreeEditor.extend({
-        //TODO: nothing to overwrite here
+        // nothing to overwrite here, but this file is necessary to import graph specific modules at the top
     });
 });

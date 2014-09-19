@@ -20,12 +20,13 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
 
     /**
      * Abstract Class: Property
-     *      Abstract base implementation of a node property. A property models a key-value-attribute. It contains e.g.
-     *      the name, cost, probability... of a node. It is only used as a data object and DOES NOT take care of its
-     *      visual representation.
+     *      Abstract base implementation of a property. A property models a key-value-attribute. It contains e.g. the
+     *      name, cost, probability... of a node, edge or node group. It is only used as a data object and DOES NOT take
+     *      care of its visual representation.
      *
-     *      In line with that, properties may have a <Mirror> that will reflect the properties current value below a
-     *      node. Additionally a property has a reference to his <PropertyMenuEntry> which will allow the modification
+     *      In line with that, properties may have multiple mirrors (<Mirror>) that will reflect the property's
+     *      current value below a mirrorer (<Node>). Labels are special mirrors, that are  currently used for edges
+     *      only. Additionally a property has a reference to its <PropertyMenuEntry> which will allow the modification
      *      of the property value by the user through a visual element (think: text input, checkbox...).
      *
      *      Properties can be declared readonly or hidden, which will accordingly prevent the modification of visual
@@ -178,7 +179,6 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
         },
 
         _setupMenuEntry: function() {
-            //TODO: put this into the factory
             this.menuEntry = new (this.menuEntryClass())(this);
 
             return this;
@@ -739,7 +739,6 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
         }
     });
 
-    //TODO: put this into the factory
     var from = function(owner, mirrorers, definition) {
         switch (definition.kind) {
             case 'bool':     return new Bool(owner, mirrorers, definition);
