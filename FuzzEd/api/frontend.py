@@ -15,12 +15,13 @@ from tastypie.resources import ModelResource
 from tastypie.serializers import Serializer
 
 from FuzzEd.models import Job, Graph, Notification, Node, NodeGroup, Edge, Result
-import common
+from . import common
 
 logger = logging.getLogger('FuzzEd')
 
 
 class GraphOwnerAuthorization(Authorization):
+
     """
         A tastypie authorization class that checks if the 'graph' attribute
         links to a graph that is owned by the requesting user.
@@ -33,12 +34,14 @@ class GraphOwnerAuthorization(Authorization):
         return bundle.obj.graph.owner == bundle.request.user
 
     def create_list(self, object_list, bundle):
-        # Assuming they're auto-assigned to graphs that are owned by the requester
+        # Assuming they're auto-assigned to graphs that are owned by the
+        # requester
         return object_list
 
     def create_detail(self, object_list, bundle):
         #graph = Graph.objects.get(pk=bundle.data['graph'], deleted=False)
-        return bundle.data['graph'].owner == bundle.request.user and not bundle.data['graph'].read_only
+        return bundle.data['graph'].owner == bundle.request.user and not bundle.data[
+            'graph'].read_only
 
     def update_list(self, object_list, bundle):
         allowed = []
@@ -59,6 +62,7 @@ class GraphOwnerAuthorization(Authorization):
 
 
 class JobResource(common.JobResource):
+
     """
         An API resource for jobs.
         Jobs look different for the JS client than they look for the backend,
@@ -74,14 +78,16 @@ class JobResource(common.JobResource):
 
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
 
-    def get_resource_uri(self, bundle_or_obj=None, url_name='api_dispatch_list'):
+    def get_resource_uri(
+            self, bundle_or_obj=None, url_name='api_dispatch_list'):
         """
             Since we change the API URL format to nested resources, we need also to
             change the location determination for a given resource object.
         """
         job_secret = bundle_or_obj.obj.secret
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse('job', kwargs={'api_name': 'front', 'pk': graph_pk, 'secret': job_secret})
+        return reverse(
+            'job', kwargs={'api_name': 'front', 'pk': graph_pk, 'secret': job_secret})
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -103,7 +109,8 @@ class JobResource(common.JobResource):
             bundle = self.full_hydrate(bundle)
             return self.save(bundle)
         else:
-            logger.debug("Responding with cached job URL, instead of creating a new one")
+            logger.debug(
+                "Responding with cached job URL, instead of creating a new one")
             bundle.obj = job
             return bundle
 
@@ -114,24 +121,36 @@ class JobResource(common.JobResource):
         """
         basic_bundle = self.build_bundle(request=request)
         try:
-            job = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
+            job = self.cached_obj_get(
+                bundle=basic_bundle,
+                **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
             return HttpNotFound()
         except MultipleObjectsReturned:
-            return HttpMultipleChoices("More than one resource is found at this URI.")
+            return HttpMultipleChoices(
+                "More than one resource is found at this URI.")
 
         if job.done():
             if job.exit_code == 0:
                 response = {}
-                # We deliver the columns layout for the result tables + all global issues
-                results_url = reverse('results', kwargs={'api_name': 'front', 'pk': job.graph.pk, 'secret': job.secret})
+                # We deliver the columns layout for the result tables + all
+                # global issues
+                results_url = reverse(
+                    'results',
+                    kwargs={
+                        'api_name': 'front',
+                        'pk': job.graph.pk,
+                        'secret': job.secret})
                 if not job.requires_download:
-                    response['columns'] = [{'mData': key, 'sTitle': title} for key, title in job.result_titles]
+                    response['columns'] = [
+                        {'mData': key, 'sTitle': title} for key, title in job.result_titles]
                     response['axis_titles'] = job.axis_titles()
                 try:
-                    response['issues'] = Result.objects.get(job=job, kind=Result.GRAPH_ISSUES).issues
+                    response['issues'] = Result.objects.get(
+                        job=job,
+                        kind=Result.GRAPH_ISSUES).issues
                 except:
-                    # no global issues recorded, that's fine                
+                    # no global issues recorded, that's fine
                     pass
                 response = HttpResponse(json.dumps(response))
                 response["Location"] = results_url
@@ -139,7 +158,10 @@ class JobResource(common.JobResource):
             else:
                 logger.debug("Job is done, but with non-zero exit code.")
                 mail_managers(
-                    'Job %s for graph %u ended with non-zero exit code %u.' % (job.pk, job.graph.pk, job.exit_code),
+                    'Job %s for graph %u ended with non-zero exit code %u.' % (
+                        job.pk,
+                        job.graph.pk,
+                        job.exit_code),
                     job.graph.to_xml())
                 return HttpApplicationError()
         else:
@@ -152,6 +174,7 @@ class JobResource(common.JobResource):
 
 
 class NotificationResource(ModelResource):
+
     """
         An API resource for notifications.
     """
@@ -169,6 +192,7 @@ class NotificationResource(ModelResource):
 
 
 class NodeSerializer(Serializer):
+
     """
         Our custom node serializer. Using the default serializer would demand that the
         graph reference is included, while we take it from the nested resource URL.
@@ -194,6 +218,7 @@ class NodeSerializer(Serializer):
 
 
 class NodeResource(ModelResource):
+
     """
         An API resource for nodes.
     """
@@ -216,17 +241,21 @@ class NodeResource(ModelResource):
         """
         node_client_id = bundle_or_obj.obj.client_id
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse('node', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': node_client_id})
+        return reverse(
+            'node', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': node_client_id})
 
     def obj_create(self, bundle, **kwargs):
         """
              This is the only override that allows us to access 'kwargs', which contains the
              graph_id from the original request.
         """
-        bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
+        bundle.data['graph'] = Graph.objects.get(
+            pk=kwargs['graph_id'],
+            deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
-        bundle.obj.save()  # Save node, so that set_attr has something to relate to
+        # Save node, so that set_attr has something to relate to
+        bundle.obj.save()
         if 'properties' in bundle.data:
             bundle.obj.set_attrs(bundle.data['properties'])
         return self.save(bundle)
@@ -245,11 +274,14 @@ class NodeResource(ModelResource):
         try:
             # Fetch relevant node object as Tastypie does it
             basic_bundle = self.build_bundle(request=request)
-            obj = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
+            obj = self.cached_obj_get(
+                bundle=basic_bundle,
+                **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
             return HttpNotFound()
         except MultipleObjectsReturned:
-            return HttpMultipleChoices("More than one resource is found at this URI.")
+            return HttpMultipleChoices(
+                "More than one resource is found at this URI.")
 
         # Deserialize incoming update payload JSON from request
         deserialized = self.deserialize(request, request.body,
@@ -261,6 +293,7 @@ class NodeResource(ModelResource):
 
 
 class NodeGroupSerializer(Serializer):
+
     """
         Our custom node group serializer. Using the default serializer would demand that the
         graph reference is included, while we take it from the nested resource URL.
@@ -286,6 +319,7 @@ class NodeGroupSerializer(Serializer):
 
 
 class NodeGroupResource(ModelResource):
+
     """
         An API resource for node groups.
     """
@@ -308,7 +342,8 @@ class NodeGroupResource(ModelResource):
         """
         group_client_id = bundle_or_obj.obj.client_id
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse('nodegroup', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': group_client_id})
+        return reverse('nodegroup', kwargs={
+                       'api_name': 'front', 'pk': graph_pk, 'client_id': group_client_id})
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -318,9 +353,12 @@ class NodeGroupResource(ModelResource):
             graph_id from the original request.
         """
         try:
-            bundle.data['graph'] = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
+            bundle.data['graph'] = Graph.objects.get(
+                pk=kwargs['graph_id'],
+                deleted=False)
         except:
-            raise ImmediateHttpResponse(response=HttpForbidden("You can't use this graph."))
+            raise ImmediateHttpResponse(
+                response=HttpForbidden("You can't use this graph."))
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
         bundle = self.save(bundle)  # Prepare ManyToMany relationship
@@ -328,7 +366,10 @@ class NodeGroupResource(ModelResource):
             try:
                 # The client may refer to nodes that are already gone,
                 # we simply ignore them
-                node = Node.objects.get(graph=bundle.data['graph'], client_id=node_id, deleted=False)
+                node = Node.objects.get(
+                    graph=bundle.data['graph'],
+                    client_id=node_id,
+                    deleted=False)
                 bundle.obj.nodes.add(node)
             except ObjectDoesNotExist:
                 pass
@@ -351,11 +392,14 @@ class NodeGroupResource(ModelResource):
         try:
             # Fetch relevant node object as Tastypie does it
             basic_bundle = self.build_bundle(request=request)
-            obj = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
+            obj = self.cached_obj_get(
+                bundle=basic_bundle,
+                **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
             return HttpNotFound()
         except MultipleObjectsReturned:
-            return HttpMultipleChoices("More than one resource is found at this URI.")
+            return HttpMultipleChoices(
+                "More than one resource is found at this URI.")
 
         # Deserialize incoming update payload JSON from request
         deserialized = self.deserialize(request, request.body,
@@ -365,7 +409,10 @@ class NodeGroupResource(ModelResource):
         if 'nodeIds' in deserialized:
             logger.debug("Updating nodes for node group")
             obj.nodes.clear()  # nodes_set is magically created by Django
-            node_objects = Node.objects.filter(deleted=False, graph=obj.graph, client_id__in=deserialized['nodeIds'])
+            node_objects = Node.objects.filter(
+                deleted=False,
+                graph=obj.graph,
+                client_id__in=deserialized['nodeIds'])
             obj.nodes = node_objects
             obj.save()
 
@@ -374,6 +421,7 @@ class NodeGroupResource(ModelResource):
 
 
 class EdgeSerializer(Serializer):
+
     """
         Our custom edge serializer. Using the default serializer would demand that the
         graph reference is included, while we take it from the nested resource URL.
@@ -398,6 +446,7 @@ class EdgeSerializer(Serializer):
 
 
 class EdgeResource(ModelResource):
+
     """
         An API resource for edges.
     """
@@ -422,7 +471,8 @@ class EdgeResource(ModelResource):
         """
         edge_client_id = bundle_or_obj.obj.client_id
         graph_pk = bundle_or_obj.obj.graph.pk
-        return reverse('edge', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': edge_client_id})
+        return reverse(
+            'edge', kwargs={'api_name': 'front', 'pk': graph_pk, 'client_id': edge_client_id})
 
     def obj_create(self, bundle, **kwargs):
         """
@@ -431,8 +481,14 @@ class EdgeResource(ModelResource):
         """
         graph = Graph.objects.get(pk=kwargs['graph_id'], deleted=False)
         bundle.data['graph'] = graph
-        bundle.data['source'] = Node.objects.get(client_id=bundle.data['source'], graph=graph, deleted=False)
-        bundle.data['target'] = Node.objects.get(client_id=bundle.data['target'], graph=graph, deleted=False)
+        bundle.data['source'] = Node.objects.get(
+            client_id=bundle.data['source'],
+            graph=graph,
+            deleted=False)
+        bundle.data['target'] = Node.objects.get(
+            client_id=bundle.data['target'],
+            graph=graph,
+            deleted=False)
         bundle.obj = self._meta.object_class()
         bundle = self.full_hydrate(bundle)
         bundle.obj.save()  # to allow property changes
@@ -454,11 +510,14 @@ class EdgeResource(ModelResource):
         try:
             # Fetch relevant node object as Tastypie does it
             basic_bundle = self.build_bundle(request=request)
-            obj = self.cached_obj_get(bundle=basic_bundle, **self.remove_api_resource_names(kwargs))
+            obj = self.cached_obj_get(
+                bundle=basic_bundle,
+                **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
             return HttpNotFound()
         except MultipleObjectsReturned:
-            return HttpMultipleChoices("More than one resource is found at this URI.")
+            return HttpMultipleChoices(
+                "More than one resource is found at this URI.")
 
         # Deserialize incoming update payload JSON from request
         deserialized = self.deserialize(request, request.body,
@@ -470,11 +529,13 @@ class EdgeResource(ModelResource):
 
 
 class ProjectResource(common.ProjectResource):
+
     class Meta(common.ProjectResource.Meta):
         authentication = SessionAuthentication()
 
 
 class GraphSerializer(common.GraphSerializer):
+
     """
         The frontend gets its own JSON format for the graph information,
         not the default HATEOAS format generated by Tastypie. For this reason,
@@ -497,6 +558,7 @@ class GraphSerializer(common.GraphSerializer):
 
 
 class GraphResource(common.GraphResource):
+
     """
         Override our GraphResource Meta class to register the custom
         frontend JSON serializer and the frontent auth method.
@@ -515,7 +577,8 @@ class GraphResource(common.GraphResource):
 
     def dispatch_edge(self, request, **kwargs):
         edge_resource = EdgeResource()
-        return edge_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
+        return edge_resource.dispatch_detail(
+            request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
 
     def dispatch_nodes(self, request, **kwargs):
         node_resource = NodeResource()
@@ -523,7 +586,8 @@ class GraphResource(common.GraphResource):
 
     def dispatch_node(self, request, **kwargs):
         node_resource = NodeResource()
-        return node_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
+        return node_resource.dispatch_detail(
+            request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
 
     def dispatch_nodegroups(self, request, **kwargs):
         nodegroup_resource = NodeGroupResource()
@@ -531,7 +595,8 @@ class GraphResource(common.GraphResource):
 
     def dispatch_nodegroup(self, request, **kwargs):
         nodegroup_resource = NodeGroupResource()
-        return nodegroup_resource.dispatch_detail(request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
+        return nodegroup_resource.dispatch_detail(
+            request, graph_id=kwargs['pk'], client_id=kwargs['client_id'])
 
     def dispatch_jobs(self, request, **kwargs):
         job_resource = JobResource()
@@ -539,14 +604,17 @@ class GraphResource(common.GraphResource):
 
     def dispatch_job(self, request, **kwargs):
         job_resource = JobResource()
-        return job_resource.dispatch_detail(request, graph_id=kwargs['pk'], secret=kwargs['secret'])
+        return job_resource.dispatch_detail(
+            request, graph_id=kwargs['pk'], secret=kwargs['secret'])
 
     def dispatch_results(self, request, **kwargs):
         result_resource = ResultResource()
-        return result_resource.dispatch_list(request, graph_id=kwargs['pk'], secret=kwargs['secret'])
+        return result_resource.dispatch_list(
+            request, graph_id=kwargs['pk'], secret=kwargs['secret'])
 
 
 class ResultResource(ModelResource):
+
     """
         An API resource for results.
     """
@@ -562,7 +630,9 @@ class ResultResource(ModelResource):
             Called by the request dispatcher in case somebody tries to GET result resources
             for a particular job.
         """
-        job = Job.objects.get(secret=kwargs['secret'], graph=kwargs['graph_id'])
+        job = Job.objects.get(
+            secret=kwargs['secret'],
+            graph=kwargs['graph_id'])
 
         if job.requires_download:
             return job.result_download()
@@ -570,21 +640,24 @@ class ResultResource(ModelResource):
         # It is an analysis result
 
         # Determine options given by data tables
-        start = int(request.GET.get('iDisplayStart', 0))  # Starts at 0, if given
+        start = int(
+            request.GET.get(
+                'iDisplayStart',
+                0))  # Starts at 0, if given
         length = int(request.GET.get('iDisplayLength', 10))
         sort_col_settings = int(request.GET.get('iSortingCols', 0))
         # Create sorted QuerySet
         sort_fields = []
         for i in range(sort_col_settings):
             # Consider strange datatables way of expressing sorting criteria
-            sort_col = int(request.GET['iSortCol_'+str(i)])     
-            sort_dir = request.GET['sSortDir_'+str(i)]      
-            db_field_name=job.result_titles[sort_col][0] 
-            logger.debug("Sorting result set for "+ db_field_name)
+            sort_col = int(request.GET['iSortCol_' + str(i)])
+            sort_dir = request.GET['sSortDir_' + str(i)]
+            db_field_name = job.result_titles[sort_col][0]
+            logger.debug("Sorting result set for " + db_field_name)
             if sort_dir == "desc":
-                db_field_name = "-"+db_field_name          
+                db_field_name = "-" + db_field_name
             sort_fields.append(db_field_name)
-                
+
         results = job.results.all().exclude(kind=Result.GRAPH_ISSUES)
         if len(sort_fields) > 0:
             results = results.order_by(*sort_fields)
@@ -595,12 +668,5 @@ class ResultResource(ModelResource):
         response_data = {"sEcho": request.GET['sEcho'], "iTotalRecords": all_count, "iTotalDisplayRecords": all_count,
                          'aaData': [result.to_dict() for result in results]}
         logger.debug("Delivering result data: " + str(response_data))
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
-
-    
-
-
-
-
-
-
+        return HttpResponse(
+            json.dumps(response_data), content_type="application/json")

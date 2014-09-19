@@ -21,13 +21,17 @@ logger = logging.getLogger('FuzzEd')
 
 ### Resources ###
 
+
 class JobResource(ModelResource):
+
     """
         An API resource for jobs.
     """
     pass
 
+
 class ProjectResource(ModelResource):
+
     """
         An API resource for projects.
     """
@@ -42,9 +46,12 @@ class ProjectResource(ModelResource):
     graphs = fields.ToManyField('FuzzEd.api.external.GraphResource', 'graphs')
 
     def get_object_list(self, request):
-        return super(ProjectResource, self).get_object_list(request).filter(owner=request.user)
+        return super(ProjectResource, self).get_object_list(
+            request).filter(owner=request.user)
+
 
 class GraphSerializer(Serializer):
+
     """
         Our custom serializer / deserializer for graph formats we support.
         The XML format is GraphML, anything else is not supported.
@@ -73,7 +80,9 @@ class GraphSerializer(Serializer):
         '''
         return {}
 
+
 class GraphAuthorization(Authorization):
+
     '''
         Tastypie authorization class. The main task of this class
         is to restrict the accessible objects to the ones that the currently
@@ -86,10 +95,10 @@ class GraphAuthorization(Authorization):
 
     def read_detail(self, object_list, bundle):
         ''' User is only allowed to get the graph if he owns it.'''
-        
+
         if bundle.obj.owner == bundle.request.user:
             return True
-        elif bundle.obj.sharings.filter(user = bundle.request.user):
+        elif bundle.obj.sharings.filter(user=bundle.request.user):
             bundle.obj.read_only = True
             return True
         elif bundle.request.user.is_staff:
@@ -97,7 +106,7 @@ class GraphAuthorization(Authorization):
             return True
         else:
             return False
-                    
+
     def create_list(self, object_list, bundle):
         # Assuming they're auto-assigned to ``user``.
         return object_list
@@ -124,6 +133,7 @@ class GraphAuthorization(Authorization):
 
 
 class GraphResource(ModelResource):
+
     """
         A graph resource with support for nested node / edge / job resources.
     """
@@ -184,10 +194,13 @@ class GraphResource(ModelResource):
         # This is not an authorization problem for the (graph) resource itself,
         # so it must be handled here and not in the auth class.
         try:
-            project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
+            project = Project.objects.get(
+                pk=bundle.request.GET['project'],
+                owner=bundle.request.user)
             bundle.obj.project = project
         except:
-            raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))
+            raise ImmediateHttpResponse(
+                response=HttpForbidden("You can't use this project for your new graph."))
             # Fill the graph with the GraphML data
         bundle.obj.from_graphml(bundle.request.body)
         return bundle.obj
@@ -235,14 +248,16 @@ class GraphResource(ModelResource):
         # This is not an authorization problem for the (graph) resource itself,
         # so it must be handled here and not in the auth class.
         try:
-            project = Project.objects.get(pk=bundle.request.GET['project'], owner=bundle.request.user)
+            project = Project.objects.get(
+                pk=bundle.request.GET['project'],
+                owner=bundle.request.user)
             bundle.obj.project = project
         except:
-            raise ImmediateHttpResponse(response=HttpForbidden("You can't use this project for your new graph."))
+            raise ImmediateHttpResponse(
+                response=HttpForbidden("You can't use this project for your new graph."))
             # Fill the graph with the GraphML data
         bundle.obj.from_graphml(bundle.request.body)
         return bundle
-
 
     def wrap_view(self, view):
         """
@@ -253,7 +268,7 @@ class GraphResource(ModelResource):
         @csrf_exempt
         def wrapper(request, *args, **kwargs):
             ''' This is a straight copy from the Tastypie sources,
-                extended with the 415 generation code. 
+                extended with the 415 generation code.
             '''
             try:
                 callback = getattr(self, view)
@@ -271,22 +286,29 @@ class GraphResource(ModelResource):
                     if self._meta.cache.cache_control():
                         # If the request is cacheable and we have a
                         # ``Cache-Control`` available then patch the header.
-                        patch_cache_control(response, **self._meta.cache.cache_control())
+                        patch_cache_control(
+                            response,
+                            **self._meta.cache.cache_control())
 
-                if request.is_ajax() and not response.has_header("Cache-Control"):
+                if request.is_ajax() and not response.has_header(
+                        "Cache-Control"):
                     # IE excessively caches XMLHttpRequests, so we're disabling
                     # the browser cache here.
                     # See http://www.enhanceie.com/ie/bugs.asp for details.
                     patch_cache_control(response, no_cache=True)
 
-                # Detect result content type and create some meaningful disposition name
+                # Detect result content type and create some meaningful
+                # disposition name
                 if 'format' in request.GET:
                     if request.GET['format'] == 'graphml':
-                        response['Content-Disposition'] = 'attachment; filename=graph.xml'
+                        response[
+                            'Content-Disposition'] = 'attachment; filename=graph.xml'
                     elif request.GET['format'] == 'tex':
-                        response['Content-Disposition'] = 'attachment; filename=graph.tex'
+                        response[
+                            'Content-Disposition'] = 'attachment; filename=graph.tex'
                     elif request.GET['format'] == 'json':
-                        response['Content-Disposition'] = 'attachment; filename=graph.json'
+                        response[
+                            'Content-Disposition'] = 'attachment; filename=graph.json'
 
                 return response
             except UnsupportedFormat as e:
@@ -295,10 +317,12 @@ class GraphResource(ModelResource):
                 return response
             except (BadRequest, fields.ApiFieldError) as e:
                 data = {"error": e.args[0] if getattr(e, 'args') else ''}
-                return self.error_response(request, data, response_class=HttpBadRequest)
+                return self.error_response(
+                    request, data, response_class=HttpBadRequest)
             except ValidationError as e:
                 data = {"error": e.messages}
-                return self.error_response(request, data, response_class=HttpBadRequest)
+                return self.error_response(
+                    request, data, response_class=HttpBadRequest)
             except Exception as e:
                 if hasattr(e, 'response'):
                     return e.response
@@ -306,7 +330,8 @@ class GraphResource(ModelResource):
                 # A real, non-expected exception.
                 # Handle the case where the full traceback is more helpful
                 # than the serialized error.
-                if settings.DEBUG and getattr(settings, 'TASTYPIE_FULL_DEBUG', False):
+                if settings.DEBUG and getattr(
+                        settings, 'TASTYPIE_FULL_DEBUG', False):
                     raise
 
                 # Re-raise the error to get a proper traceback when the error
@@ -320,5 +345,3 @@ class GraphResource(ModelResource):
                 return self._handle_500(request, e)
 
         return wrapper
-
-

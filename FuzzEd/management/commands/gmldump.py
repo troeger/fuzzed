@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from FuzzEd.models import Graph
 
+
 class Command(BaseCommand):
     args = '<graph_id>'
     help = 'Dumps the graph with the given ID into GraphML'

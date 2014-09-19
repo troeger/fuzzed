@@ -1,14 +1,16 @@
 from FuzzEd.models import Graph
-from common import fixt_simple, FuzzEdTestCase
+from .common import fixt_simple, FuzzEdTestCase
+
 
 class ViewsTestCase(FuzzEdTestCase):
+
     """
         Tests for different Django views and their form submissions.
     """
     fixtures = fixt_simple['files']
 
-    #TODO: Test root view rendering with existing notification
-    #TODO: Test dismiss click for existing notification
+    # TODO: Test root view rendering with existing notification
+    # TODO: Test dismiss click for existing notification
 
     def setUp(self):
         self.setUpLogin()
@@ -34,7 +36,7 @@ class ViewsTestCase(FuzzEdTestCase):
     def testNewGraphFromDashboard(self):
         response = self.post('/projects/%u/dashboard/new/faulttree' % fixt_simple['pkProject'],
                              {'save': 'save', 'name': 'My new graph'})
-        #TODO: Check that the new fault tree contains a top event node
+        # TODO: Check that the new fault tree contains a top event node
         self.assertEqual(response.status_code, 302)
 
     def testBulkGraphCopy(self):

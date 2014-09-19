@@ -5,10 +5,11 @@ import json
 from django.contrib.auth.models import User
 
 from FuzzEd.models import Node, Notification, Edge
-from common import fixt_simple, FuzzEdLiveServerTestCase
+from .common import fixt_simple, FuzzEdLiveServerTestCase
 
 
 class FrontendApiTestCase(FuzzEdLiveServerTestCase):
+
     """
         Tests for the Frontend API called from JavaScript.
     """
@@ -19,11 +20,13 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
     def setUp(self):
         self.setUpLogin()
 
-    #TODO: Test that session authentication is checked in the API implementation
-    #TODO: Test that the user can only access his graphs, and not the ones of other users
+    # TODO: Test that session authentication is checked in the API implementation
+    # TODO: Test that the user can only access his graphs, and not the ones of
+    # other users
 
     def _testValidGraphJson(self, content):
-        for key in ['id', 'seed', 'name', 'type', 'readOnly', 'nodes', 'edges', 'nodeGroups']:
+        for key in ['id', 'seed', 'name', 'type',
+                    'readOnly', 'nodes', 'edges', 'nodeGroups']:
             self.assertIn(key, content)
 
     def testGetGraph(self):
@@ -38,8 +41,12 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
 
     def testGraphDownload(self):
         for id, kind in fixt_simple['graphs'].iteritems():
-            for format, test_str in [('graphml', '<graphml'), ('json', '{'), ('tex', '\\begin')]:
-                url = self.baseUrl + '/graphs/%u?format=%s' % (fixt_simple['pkFaultTree'], format)
+            for format, test_str in [
+                    ('graphml', '<graphml'), ('json', '{'), ('tex', '\\begin')]:
+                url = self.baseUrl + \
+                    '/graphs/%u?format=%s' % (
+                        fixt_simple['pkFaultTree'],
+                        format)
                 response = self.ajaxGet(url)
                 self.assertEqual(response.status_code, 200)
                 self.assertIn(test_str, response.content)
@@ -75,17 +82,20 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
 #        self.assertItemsEqual(initial_properties, newnode.get_properties())
 
     def testCreateNodeGroup(self):
-        nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
-        initial_properties =  {"name": "foo"}
-        newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes, "properties": initial_properties})
+        nodes = [
+            fixt_simple['clientIdAndGate'],
+            fixt_simple['clientIdBasicEvent']]
+        initial_properties = {"name": "foo"}
+        newgroup = json.dumps(
+            {'client_id': 999, 'nodeIds': nodes, "properties": initial_properties})
         response = self.ajaxPost(
-                    self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
-                    newgroup,
-                    'application/json')
+            self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
+            newgroup,
+            'application/json')
         self.assertEqual(response.status_code, 201)
         print response['Location']
         newid = int(response['Location'].split('/')[-1])
-        #TODO: Doesn't work due to non-saving of LiveServerTestCase
+        # TODO: Doesn't work due to non-saving of LiveServerTestCase
         #       newgroup = NodeGroup.objects.get(client_id=newid, deleted=False)
         #       saved_nodes=newgroup.nodes.all()
         #       self.assertItemsEqual(nodes, saved_nodes)
@@ -102,13 +112,18 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
 
     def testDeleteNode(self):
         response = self.ajaxDelete(
-            self.baseUrl + '/graphs/%u/nodes/%u' % (fixt_simple['pkFaultTree'], fixt_simple['clientIdBasicEvent'])
+            self.baseUrl +
+            '/graphs/%u/nodes/%u' % (
+                fixt_simple['pkFaultTree'],
+                fixt_simple['clientIdBasicEvent'])
         )
         self.assertEqual(response.status_code, 204)
 
     def testDeleteNodeGroup(self):
-        #TODO: Fixture should have a node group, instead of creating it here
-        nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
+        # TODO: Fixture should have a node group, instead of creating it here
+        nodes = [
+            fixt_simple['clientIdAndGate'],
+            fixt_simple['clientIdBasicEvent']]
         newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
                                  newgroup,
@@ -122,9 +137,12 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
     def testRelocateNode(self):
         newpos = json.dumps({'properties': {"y": 3, "x": 7}})
         response = self.ajaxPatch(
-                    self.baseUrl + '/graphs/%u/nodes/%u' % (fixt_simple['pkFaultTree'], fixt_simple['clientIdBasicEvent']),
-                    newpos,
-                    "application/json")
+            self.baseUrl +
+            '/graphs/%u/nodes/%u' % (
+                fixt_simple['pkFaultTree'],
+                fixt_simple['clientIdBasicEvent']),
+            newpos,
+            "application/json")
         self.assertEqual(response.status_code, 202)
 
     def testNodePropertyChange(self):
@@ -133,12 +151,13 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
                                   newprop,
                                   "application/json")
         self.assertEqual(response.status_code, 202)
-        #TODO: Fetch graph and check that the property is really stored
-
+        # TODO: Fetch graph and check that the property is really stored
 
     def testNodeGroupPropertyChange(self):
-        #TODO: Fixture should have a node group, instead of creating it here
-        nodes = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
+        # TODO: Fixture should have a node group, instead of creating it here
+        nodes = [
+            fixt_simple['clientIdAndGate'],
+            fixt_simple['clientIdBasicEvent']]
         newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes})
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
                                  newgroup,
@@ -151,10 +170,10 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
                                   newprop,
                                   "application/json")
         self.assertEqual(response.status_code, 202)
-        #TODO: Fetch graph and check that the property is really stored
+        # TODO: Fetch graph and check that the property is really stored
 
     def testNodeGroupNodesChange(self):
-        #TODO: Fixture should have a node group, instead of creating it here
+        # TODO: Fixture should have a node group, instead of creating it here
         nodes1 = [fixt_simple['clientIdAndGate']]
         newgroup = json.dumps({'client_id': 999, 'nodeIds': nodes1})
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/nodegroups/' % fixt_simple['pkDFD'],
@@ -163,7 +182,9 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
         self.assertEqual(response.status_code, 201)
         newgroup = response['Location']
         # Try changing
-        nodes2 = [fixt_simple['clientIdAndGate'], fixt_simple['clientIdBasicEvent']]
+        nodes2 = [
+            fixt_simple['clientIdAndGate'],
+            fixt_simple['clientIdBasicEvent']]
         newnodes = json.dumps({"nodeIds": nodes2})
         response = self.ajaxPatch(newgroup,
                                   newnodes,
@@ -183,7 +204,7 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
                                   newprop,
                                   "application/json")
         self.assertEqual(response.status_code, 202)
-        #TODO: Fetch graph and check that the property is really stored
+        # TODO: Fetch graph and check that the property is really stored
 
     def testDeleteEdge(self):
         response = self.ajaxDelete(
@@ -191,13 +212,13 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
         self.assertEqual(response.status_code, 204)
 
     def testCreateEdge(self):
-        initial_properties =  {"name": "foo"}
+        initial_properties = {"name": "foo"}
         newedge = json.dumps(
-            {   'client_id': 4714,
+            {'client_id': 4714,
                 'source': fixt_simple['clientIdProcess'],
                 'target': fixt_simple['clientIdStorage'],
                 'properties': initial_properties
-            }
+             }
         )
         # Only DFD edges support properties, so we use them here
         response = self.ajaxPost(self.baseUrl + '/graphs/%u/edges/' % fixt_simple['pkDFD'],

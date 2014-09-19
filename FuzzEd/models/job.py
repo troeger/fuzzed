@@ -10,30 +10,33 @@ from django.dispatch import receiver
 from django.core.mail import mail_managers
 from django.http import HttpResponse
 
-from graph import Graph
-from node import Node
-from configuration import Configuration
-from node_configuration import NodeConfiguration
-from result import Result
+from .graph import Graph
+from .node import Node
+from .configuration import Configuration
+from .node_configuration import NodeConfiguration
+from .result import Result
 from FuzzEd.models import xml_backend
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
-from xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice
-from xml_backend import AnalysisResult, MincutResult, SimulationResult
+from .xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice
+from .xml_backend import AnalysisResult, MincutResult, SimulationResult
 
 
 logger = logging.getLogger('FuzzEd')
 
 
 class NativeXmlField(models.Field):
+
     def db_type(self, connection):
         return 'xml'
+
 
 def gen_uuid():
     return str(uuid.uuid4())
 
 
 class Job(models.Model):
+
     class Meta:
         app_label = 'FuzzEd'
 
@@ -52,15 +55,20 @@ class Job(models.Model):
     )
 
     graph = models.ForeignKey(Graph, null=True, related_name='jobs')
-    graph_modified = models.DateTimeField()  # Detect graph changes during job execution
-    secret = models.CharField(max_length=64, default=gen_uuid)  # Unique secret for this job
+    # Detect graph changes during job execution
+    graph_modified = models.DateTimeField()
+    secret = models.CharField(
+        max_length=64,
+        default=gen_uuid)  # Unique secret for this job
     kind = models.CharField(max_length=127, choices=JOB_TYPES)
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    exit_code = models.IntegerField(null=True)  # Exit code for this job, NULL if pending
+    # Exit code for this job, NULL if pending
+    exit_code = models.IntegerField(null=True)
 
     def input_data(self):
         ''' Used by the API to get the input data needed for the particular job type.'''
-        if self.kind in (Job.MINCUT_JOB, Job.TOP_EVENT_JOB, Job.SIMULATION_JOB):
+        if self.kind in (
+                Job.MINCUT_JOB, Job.TOP_EVENT_JOB, Job.SIMULATION_JOB):
             return self.graph.to_xml(), 'application/xml'
         elif self.kind in (Job.EPS_RENDERING_JOB, Job.PDF_RENDERING_JOB):
             return self.graph.to_tikz(), 'application/text'
@@ -79,7 +87,7 @@ class Job(models.Model):
 
     @property
     def result_titles(self):
-        ''' 
+        '''
             The result class knows how the titles should look like.
         '''
         if self.kind == self.TOP_EVENT_JOB:
@@ -88,18 +96,18 @@ class Job(models.Model):
             return Result.titles(Result.SIMULATION_RESULT, self.graph.kind)
         elif self.kind == self.MINCUT_JOB:
             return Result.titles(Result.MINCUT_RESULT, self.graph.kind)
-    
+
     def axis_titles(self):
-        ''' 
-        Computes labeling and axis scales for the analysis results menu. 
+        '''
+        Computes labeling and axis scales for the analysis results menu.
         Descriptions of configurations values for 'xAxis' and 'yAxis' can be taken from the official Highcharts api.
         '''
         axis_titles = {
             'xAxis': {
-                'min': -0.05,               
+                'min': -0.05,
                 'max': 1.05,
-                'title':{
-                    'text': None, #'x title',
+                'title': {
+                    'text': None,  # 'x title',
                     'style': {
                         'fontSize': '9px'
                     }
@@ -110,21 +118,21 @@ class Job(models.Model):
                 'min': 0,
                 'max': 1.0,
                 'title': {
-                    'text': None, #'y title',
+                    'text': None,  # 'y title',
                     'style': {
                         'fontSize': '9px'
                     }
                 },
                 'tickInterval': 1.0,
-                'minorTickInterval':  1.0/10
+                'minorTickInterval': 1.0 / 10
             }
         }
-        
-        return axis_titles   
-    
+
+        return axis_titles
+
     @classmethod
     def exists_with_result(cls, graph, kind):
-        ''' 
+        '''
             Return an existing job object for that graph and job kind, but only
             if it was computed on the same graph data and has existing results.
 
@@ -133,7 +141,8 @@ class Job(models.Model):
             having multiple cached old results, by just using the youngest one.
         '''
         try:
-            return Job.objects.filter(graph=graph, kind=kind, graph_modified=graph.modified, exit_code=0).order_by('-created')[0]    
+            return Job.objects.filter(
+                graph=graph, kind=kind, graph_modified=graph.modified, exit_code=0).order_by('-created')[0]
         except:
             return None
 
@@ -142,9 +151,13 @@ class Job(models.Model):
             Returns an HttpResponse as direct file download of the result data.
         """
         response = HttpResponse()
-        response['Content-Disposition'] = 'attachment; filename=graph%u.%s' % (self.graph.pk, self.kind)
-        response.content = Result.objects.exclude(kind=Result.GRAPH_ISSUES).get(job=self).binary_value
-        response['Content-Type'] = 'application/pdf' if self.kind == 'pdf' else 'application/postscript'
+        response[
+            'Content-Disposition'] = 'attachment; filename=graph%u.%s' % (self.graph.pk, self.kind)
+        response.content = Result.objects.exclude(
+            kind=Result.GRAPH_ISSUES).get(
+            job=self).binary_value
+        response[
+            'Content-Type'] = 'application/pdf' if self.kind == 'pdf' else 'application/postscript'
         return response
 
     def interpret_issues(self, xml_issues):
@@ -154,9 +167,9 @@ class Job(models.Model):
         errors = []
         warnings = []
         for issue in xml_issues:
-            json_issue={'message':issue.message, 
-                        'issueId':issue.issueId, 
-                        'elementId': issue.elementId}
+            json_issue = {'message': issue.message,
+                          'issueId': issue.issueId,
+                          'elementId': issue.elementId}
             if issue.isFatal:
                 errors.append(json_issue)
             else:
@@ -172,30 +185,33 @@ class Job(models.Model):
             Crisp probabilities are just a special case of this, were the membership
             function collapses to a straight vertical line.
 
-            The method determines both a list of drawable diagram coordinates, 
+            The method determines both a list of drawable diagram coordinates,
             and the result values to be shown directly to the user.
 
             Diagram point determination:
 
-            The X axis represents the unreliability value (== probability of failure), 
+            The X axis represents the unreliability value (== probability of failure),
             the Y axis the membership function probability value for the given unreliability value.
-            For each alpha cut, the backend returns us the points were the upper border of the 
+            For each alpha cut, the backend returns us the points were the upper border of the
             alphacut stripe is crossing the membership triangle.
             The lowest alphacut (0) has its upper border directly on the X axis.
-            The highest alphacut has its upper border crossing the tip of the membership function. 
-                
-            The two points were the alphacut border touches the membership function are called 
+            The highest alphacut has its upper border crossing the tip of the membership function.
+
+            The two points were the alphacut border touches the membership function are called
             "[lower, upper]", the number of the alphacut is the "key".
-            For this reason, "lower" and "upper" are used as X coordinates, 
+            For this reason, "lower" and "upper" are used as X coordinates,
             while the key is used as "Y" coordinate.
 
         """
-        if hasattr(xml_result_value, 'probability') and xml_result_value.probability is not None:
+        if hasattr(xml_result_value,
+                   'probability') and xml_result_value.probability is not None:
             points = []
             logging.debug("Probability: " + str(xml_result_value.probability))
-            alphacut_count = len(xml_result_value.probability.alphaCuts)  # we don't believe the delivered decomp_number
+            # we don't believe the delivered decomp_number
+            alphacut_count = len(xml_result_value.probability.alphaCuts)
             for alpha_cut in xml_result_value.probability.alphaCuts:
-                y_val = alpha_cut.key + 1 / alphacut_count  # Alphacut indexes start at zero
+                # Alphacut indexes start at zero
+                y_val = alpha_cut.key + 1 / alphacut_count
                 assert (0 <= y_val <= 1)
                 points.append([alpha_cut.value_.lowerBound, y_val])
                 if alpha_cut.value_.upperBound != alpha_cut.value_.lowerBound:
@@ -207,70 +223,97 @@ class Job(models.Model):
                     # points.append([alpha_cut.value_.lowerBound, 0])
                     pass
 
-            # Points is now a wild collection of coordinates, were double values for the same X 
-            # coordinate may occur. We sort it (since the JS code likes that) and leave only the 
+            # Points is now a wild collection of coordinates, were double values for the same X
+            # coordinate may occur. We sort it (since the JS code likes that) and leave only the
             # largest Y values per X value.
 
             # If we have only one point, it makes no sense to draw a graph
-            #TODO: Instead, we could draw a nice exponential curve for the resulting rate parameter
-            #      This demands some better support for feeding the frontend graph rendering (Axis range etc.)
+            # TODO: Instead, we could draw a nice exponential curve for the resulting rate parameter
+            # This demands some better support for feeding the frontend graph
+            # rendering (Axis range etc.)
             if alphacut_count > 1:
                 db_result.points = json.dumps(sorted(points))
 
-            # Compute some additional statistics for the front-end, based on the gathered probabilities
+            # Compute some additional statistics for the front-end, based on
+            # the gathered probabilities
             if len(points) > 0:
-                db_result.minimum = min(points, key=lambda point: point[0])[0]  # left triangle border position
-                db_result.maximum = max(points, key=lambda point: point[0])[0]  # right triangle border position
-                db_result.peak = max(points, key=lambda point: point[1])[0]  # triangle tip position
+                db_result.minimum = min(
+                    points,
+                    key=lambda point: point[0])[0]  # left triangle border position
+                db_result.maximum = max(
+                    points,
+                    key=lambda point: point[0])[0]  # right triangle border position
+                db_result.peak = max(
+                    points,
+                    key=lambda point: point[1])[0]  # triangle tip position
 
-        if hasattr(xml_result_value, 'reliability') and xml_result_value.reliability is not None:
+        if hasattr(xml_result_value,
+                   'reliability') and xml_result_value.reliability is not None:
             reliability = float(xml_result_value.reliability)
-            db_result.reliability = None if math.isnan(reliability) else reliability
+            db_result.reliability = None if math.isnan(
+                reliability) else reliability
 
-        if hasattr(xml_result_value, 'mttf') and xml_result_value.mttf is not None:
+        if hasattr(xml_result_value,
+                   'mttf') and xml_result_value.mttf is not None:
             mttf = float(xml_result_value.mttf)
             db_result.mttf = None if math.isnan(mttf) else mttf
 
-        if hasattr(xml_result_value, 'nSimulatedRounds') and xml_result_value.nSimulatedRounds is not None:
+        if hasattr(
+                xml_result_value, 'nSimulatedRounds') and xml_result_value.nSimulatedRounds is not None:
             rounds = int(xml_result_value.nSimulatedRounds)
             db_result.rounds = None if math.isnan(rounds) else rounds
 
-        if hasattr(xml_result_value, 'nFailures') and xml_result_value.nFailures is not None:
+        if hasattr(xml_result_value,
+                   'nFailures') and xml_result_value.nFailures is not None:
             failures = int(xml_result_value.nFailures)
             db_result.failures = None if math.isnan(failures) else failures
 
-        if hasattr(xml_result_value, 'timestamp') and xml_result_value.timestamp is not None:
+        if hasattr(xml_result_value,
+                   'timestamp') and xml_result_value.timestamp is not None:
             timestamp = int(xml_result_value.timestamp)
             db_result.timestamp = None if math.isnan(timestamp) else timestamp
         else:
-            # All analysis results not refering to a particular timestamp refer to the configured missionTime
+            # All analysis results not refering to a particular timestamp refer
+            # to the configured missionTime
             top_node = db_result.graph.top_node()
             if top_node:
                 timestamp = top_node.get_property('missionTime')
-                db_result.timestamp = None if math.isnan(timestamp) else timestamp
-
+                db_result.timestamp = None if math.isnan(
+                    timestamp) else timestamp
 
     def parse_result(self, data):
         """
-            Parses the result data and saves the content to the database, 
+            Parses the result data and saves the content to the database,
             in relation to this job.
         """
         if self.requires_download:
             if self.kind == self.PDF_RENDERING_JOB:
-                old_results = self.results.filter(graph=self.graph, kind=Result.PDF_RESULT)
+                old_results = self.results.filter(
+                    graph=self.graph,
+                    kind=Result.PDF_RESULT)
                 old_results.delete()
-                db_result = Result(graph=self.graph, job=self, kind=Result.PDF_RESULT)
+                db_result = Result(
+                    graph=self.graph,
+                    job=self,
+                    kind=Result.PDF_RESULT)
             elif self.kind == self.EPS_RENDERING_JOB:
-                old_results = self.results.filter(graph=self.graph, kind=Result.EPS_RESULT)
+                old_results = self.results.filter(
+                    graph=self.graph,
+                    kind=Result.EPS_RESULT)
                 old_results.delete()
-                db_result = Result(graph=self.graph, job=self, kind=Result.EPS_RESULT)
+                db_result = Result(
+                    graph=self.graph,
+                    job=self,
+                    kind=Result.EPS_RESULT)
             db_result.binary_value = data
             db_result.save()
             return
 
         # Ok, it is not binary, it is true XML result data
 
-        logger.debug("Parsing backend result XML into database: \n"+str(data))
+        logger.debug(
+            "Parsing backend result XML into database: \n" +
+            str(data))
         doc = xml_backend.CreateFromDocument(str(data))
 
         # Delete old graph issues from a former analysis run
@@ -279,7 +322,10 @@ class Job(models.Model):
         if hasattr(doc, 'issue'):
             # Result-independent issues (for the whole graph, and not per configuration),
             # are saved as special kind of result
-            db_result = Result(graph=self.graph , job=self, kind=Result.GRAPH_ISSUES)
+            db_result = Result(
+                graph=self.graph,
+                job=self,
+                kind=Result.GRAPH_ISSUES)
             db_result.issues = json.dumps(self.interpret_issues(doc.issue))
             db_result.save()
 
@@ -294,12 +340,21 @@ class Job(models.Model):
             # since we need their pk's in the NodeCOnfiguration object
             db_nodeconfs = []
             for configuration in doc.configuration:
-                db_conf = Configuration(graph=self.graph, costs=configuration.costs if hasattr(configuration, 'costs') else None)
+                db_conf = Configuration(
+                    graph=self.graph,
+                    costs=configuration.costs if hasattr(
+                        configuration,
+                        'costs') else None)
                 db_conf.save()
                 conf_id_mappings[configuration.id] = db_conf
-                logger.debug("Storing DB configuration %u for XML configuration %s in graph %u"%(db_conf.pk, configuration.id, self.graph.pk))
+                logger.debug(
+                    "Storing DB configuration %u for XML configuration %s in graph %u" %
+                    (db_conf.pk, configuration.id, self.graph.pk))
                 # Analyze node configuration choices in this configuration
-                assert(hasattr(configuration, 'choice'))    # according to XSD, this must be given
+                assert(
+                    hasattr(
+                        configuration,
+                        'choice'))    # according to XSD, this must be given
                 for choice in configuration.choice:
                     element = choice.value_
                     json_choice = {}
@@ -314,8 +369,13 @@ class Job(models.Model):
                         json_choice['n'] = int(element.n)
                     else:
                         raise ValueError('Unknown choice %s' % element)
-                    db_node = Node.objects.get(client_id=choice.key, graph=self.graph)
-                    db_nodeconf = NodeConfiguration(node=db_node, configuration = db_conf, setting=json.dumps(json_choice))
+                    db_node = Node.objects.get(
+                        client_id=choice.key,
+                        graph=self.graph)
+                    db_nodeconf = NodeConfiguration(
+                        node=db_node,
+                        configuration=db_conf,
+                        setting=json.dumps(json_choice))
                     db_nodeconfs.append(db_nodeconf)
             logger.debug("Performing bulk insert of node configurations")
             NodeConfiguration.objects.bulk_create(db_nodeconfs)
@@ -331,31 +391,34 @@ class Job(models.Model):
             db_results = []
             for result in doc.result:
                 assert(int(result.modelId) == self.graph.pk)
-                db_result = Result(graph=self.graph , job=self)
+                db_result = Result(graph=self.graph, job=self)
                 if result.configId in conf_id_mappings:
-                    db_result.configuration=conf_id_mappings[result.configId]
-                if type(result) is AnalysisResult:
+                    db_result.configuration = conf_id_mappings[result.configId]
+                if isinstance(result, AnalysisResult):
                     db_result.kind = Result.ANALYSIS_RESULT
-                elif type(result) is MincutResult:
+                elif isinstance(result, MincutResult):
                     db_result.kind = Result.MINCUT_RESULT
-                elif type(result) is SimulationResult:
+                elif isinstance(result, SimulationResult):
                     db_result.kind = Result.SIMULATION_RESULT
                 self.interpret_value(result, db_result)
                 if result.issue:
-                    db_result.issues = json.dumps(self.interpret_issues(result.issue))
-                db_results.append(db_result)                    
+                    db_result.issues = json.dumps(
+                        self.interpret_issues(
+                            result.issue))
+                db_results.append(db_result)
             logger.debug("Performing bulk insert of parsed results")
             Result.objects.bulk_create(db_results)
+
 
 @receiver(post_save, sender=Job)
 def job_post_save(sender, instance, created, **kwargs):
     ''' Informs notification listeners.
-        The payload contains the job URL prefix with a secret, 
+        The payload contains the job URL prefix with a secret,
         which allows the listener to perform according actions.
     '''
     if created:
         # The only way to determine our own hostname + port number at runtime in Django
-        # is from an HttpRequest object, which we do not have here. 
+        # is from an HttpRequest object, which we do not have here.
         # Option 1 is to fetch this information from the HttpRequest and somehow move it here.
         # This works nice as long as LiveServerTestCase is not used, since the Django Test
         # Client still accesses the http://testserver URL and not the live server URL.
@@ -366,12 +429,17 @@ def job_post_save(sender, instance, created, **kwargs):
         job_url = settings.SERVER + '/api/back/jobs/' + instance.secret
 
         try:
-            # The proxy is instantiated here, since the connection should go away when finished
+            # The proxy is instantiated here, since the connection should go
+            # away when finished
             s = xmlrpclib.ServerProxy(settings.BACKEND_DAEMON)
-            logger.debug("Triggering %s job on url %s" % (instance.kind, job_url))
+            logger.debug(
+                "Triggering %s job on url %s" %
+                (instance.kind, job_url))
             s.start_job(instance.kind, job_url)
         except Exception as e:
-            mail_managers("Exception on backend call - " + settings.BACKEND_DAEMON, str(e))
+            mail_managers(
+                "Exception on backend call - " +
+                settings.BACKEND_DAEMON,
+                str(e))
             raise HttpResponseServerErrorAnswer(
                 "Sorry, we seem to have a problem with our FuzzEd backend. The admins are informed, thanks for the patience.")
-

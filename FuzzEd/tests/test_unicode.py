@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from FuzzEd.models import Graph
-from common import fixt_unicode
+from .common import fixt_unicode
 
 
 class UnicodeTestCase(TestCase):
@@ -10,4 +10,3 @@ class UnicodeTestCase(TestCase):
     def testTikzSerialize(self):
         g = Graph.objects.get(pk=fixt_unicode['pkFaultTree'])
         assert (len(g.to_tikz()) > 0)
-
