@@ -121,7 +121,7 @@ class Result(models.Model):
         result[field] = value   # 'None' values are needed, since datatables needs all columns filled
       # Points information is now shown in the table, but triggers graph rendering, so include it only when needed
       if self.points:
-        result['points'] = self.points
+        result['points'] = json.loads(self.points)
       if self.configuration:
           result['choices'] = self.configuration.to_dict() 
           result['id'] = self.configuration.pk
