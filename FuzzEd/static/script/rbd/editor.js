@@ -1,4 +1,4 @@
-define(['factory', 'editor', 'rbd/graph', 'rbd/config'], function(Factory, Editor, RbdGraph, RbdConfig) {
+define(['factory', 'editor', 'rbd/graph'], function(Factory, Editor, RbdGraph) {
     /**
      * Package: RBD
      */
@@ -10,6 +10,6 @@ define(['factory', 'editor', 'rbd/graph', 'rbd/config'], function(Factory, Edito
      * Extends: <Base::Editor>
      */
     return Editor.extend({
-        // nothing to overwrite here
+        // nothing to overwrite here, but this file is necessary to import graph specific modules at the top
     });
 });

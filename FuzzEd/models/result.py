@@ -5,7 +5,6 @@ from django.dispatch import receiver
 from django.core.urlresolvers import reverse
 
 from graph import Graph
-from FuzzEd.lib.jsonfield import JSONField
 
 import json, logging
 
@@ -60,8 +59,8 @@ class Result(models.Model):
     rounds        = models.IntegerField(null=True)
     failures      = models.IntegerField(null=True)
     binary_value  = models.BinaryField(null=True)
-    points        = JSONField(blank=True, null=True)
-    issues        = JSONField(blank=True, null=True)
+    points        = models.TextField(blank=True, null=True)
+    issues        = models.TextField(blank=True, null=True)
 
     def __unicode__(self):
         return "Result %u for graph %s and configuration %s" % (
@@ -122,7 +121,7 @@ class Result(models.Model):
         result[field] = value   # 'None' values are needed, since datatables needs all columns filled
       # Points information is now shown in the table, but triggers graph rendering, so include it only when needed
       if self.points:
-        result['points'] = self.points
+        result['points'] = json.loads(self.points)
       if self.configuration:
           result['choices'] = self.configuration.to_dict() 
           result['id'] = self.configuration.pk

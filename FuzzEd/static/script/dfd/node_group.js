@@ -37,7 +37,7 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
                 ._setupProperties();
 
             // call home
-            jQuery(document).trigger(Config.Events.NODEGROUP_ADDED, [
+            jQuery(document).trigger(Factory.getModule('Config').Events.NODEGROUP_ADDED, [
                 this.id,
                 this.nodeIds(),
                 this.toDict().properties,
@@ -57,10 +57,10 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
          */
         _setupVisualRepresentation: function() {
             this.container = jQuery("<div>")
-                .attr('id', Config.Keys.NODEGROUP + this.id)
-                .addClass(Config.Classes.NODEGROUP)
+                .attr('id', Factory.getModule('Config').Keys.NODEGROUP + this.id)
+                .addClass(Factory.getModule('Config').Classes.NODEGROUP)
                 .css('position', 'absolute')
-                .data(Config.Keys.NODEGROUP, this);
+                .data(Factory.getModule('Config').Keys.NODEGROUP, this);
 
             this.container.appendTo(Canvas.container);
 
@@ -81,7 +81,7 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
             if (this.readOnly) return this;
 
             // the css class which refers to all dependant nodes
-            var dragDependant = Config.Keys.NODEGROUP + this.id + '_dragging'
+            var dragDependant = Factory.getModule('Config').Keys.NODEGROUP + this.id + '_dragging'
 
             // setup nodes' dragging dependency for ui draggable via a nodegroup-specific css class
             _.each(this.nodes, function(node) {
@@ -95,9 +95,9 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
                 // stay in the canvas
                 containment: Canvas.container,
                 // become a little bit opaque when dragged
-                opacity:     Config.Dragging.OPACITY,
+                opacity:     Factory.getModule('Config').Dragging.OPACITY,
                 // show a cursor with four arrows
-                cursor:      Config.Dragging.CURSOR,
+                cursor:      Factory.getModule('Config').Dragging.CURSOR,
                 // stick to the checkered paper
                 grid:        [Canvas.gridSize, Canvas.gridSize],
 
@@ -106,15 +106,15 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
                     // XXX: add dragged node to selection
                     // This uses the jQuery.ui.selectable internal functions.
                     // We need to trigger them manually because jQuery.ui.draggable doesn't propagate these events.
-                    if (!this.path().hasClass(Config.Classes.SELECTED)) {
-                        Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
-                        Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
+                    if (!this.path().hasClass(Factory.getModule('Config').Classes.SELECTED)) {
+                        Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStart(event);
+                        Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStop(event);
                     }
 
                     // save the initial positions of the node group and dependant nodes, to calculate offsets while dragging
                     initialPosition = this.path().position();
                     jQuery('.' + dragDependant).each(function(index, node) {
-                        var nodeInstance = jQuery(node).data(Config.Keys.NODE);
+                        var nodeInstance = jQuery(node).data(Factory.getModule('Config').Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
 
@@ -135,7 +135,7 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
 
                     // tell all dependant nodes to move as well, except this node group as the user already dragged it
                     jQuery('.' + dragDependant).not(this.container).each(function(index, node) {
-                        var nodeInstance = jQuery(node).data(Config.Keys.NODE);
+                        var nodeInstance = jQuery(node).data(Factory.getModule('Config').Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
 
@@ -145,7 +145,7 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
                             'y': initialNodePositions[nodeInstance.id].top  + yOffset + nodeInstance._nodeImage.yCenter
                         });
                     }.bind(this));
-                    jQuery(document).trigger(Config.Events.NODES_MOVED);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.NODES_MOVED);
                 }.bind(this),
 
                 // stop dragging callback
@@ -158,7 +158,7 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
                     var yOffset = ui.position.top  - initialPosition.top;
 
                     jQuery('.' + dragDependant).each(function(index, node) {
-                        var nodeInstance = jQuery(node).data(Config.Keys.NODE);
+                        var nodeInstance = jQuery(node).data(Factory.getModule('Config').Keys.NODE);
                         // if this DOM element does not have an associated node object, do nothing
                         if (typeof nodeInstance === 'undefined') return;
 
@@ -171,7 +171,7 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
 
                     // forget the initial position of the nodes to allow new dragging
                     initialPositions = {};
-                    jQuery(document).trigger(Config.Events.NODE_DRAG_STOPPED);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.NODE_DRAG_STOPPED);
                 }.bind(this)
             });
 
@@ -215,8 +215,8 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
             // This uses the jQuery.ui.selectable internal functions.
             // We need to trigger them manually because only jQuery.ui.draggable gets the mouseDown events on node groups.
             this.container.click(function(event) {
-                Canvas.container.data(Config.Keys.SELECTABLE)._mouseStart(event);
-                Canvas.container.data(Config.Keys.SELECTABLE)._mouseStop(event);
+                Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStart(event);
+                Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStop(event);
             }.bind(this));
 
             return this;
@@ -231,8 +231,8 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
          *
          */
         _registerEventHandlers: function() {
-            jQuery(document).on([ Config.Events.NODES_MOVED,
-                                  Config.Events.NODE_PROPERTY_CHANGED ].join(' '),  this._redraw.bind(this));
+            jQuery(document).on([ Factory.getModule('Config').Events.NODES_MOVED,
+                                  Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED ].join(' '),  this._redraw.bind(this));
 
             return this;
         },
@@ -247,7 +247,7 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
          */
 
         _redraw: function() {
-            var dom_id = Config.Keys.NODEGROUP + this.id;
+            var dom_id = Factory.getModule('Config').Keys.NODEGROUP + this.id;
 
             var lineFunction = d3.svg.line()
                 .x(function(d) { return d[0]; })
@@ -327,12 +327,12 @@ define(['factory', 'node_group', 'property', 'class', 'canvas', 'config', 'jquer
 
             // remove nodes' dragging dependency for ui draggable
             _.each(this.nodes, function(node) {
-                node.container.addClass(Config.Keys.NODEGROUP + this.id + '_dragging')
+                node.container.addClass(Factory.getModule('Config').Keys.NODEGROUP + this.id + '_dragging')
             }.bind(this));
 
             // don't listen anymore
-            jQuery(document).off([ Config.Events.NODES_MOVED,
-                                   Config.Events.NODE_PROPERTY_CHANGED ].join(' '), this._redraw.bind(this));
+            jQuery(document).off([ Factory.getModule('Config').Events.NODES_MOVED,
+                                   Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED ].join(' '), this._redraw.bind(this));
 
             return this._super();
         },

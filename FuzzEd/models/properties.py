@@ -1,8 +1,7 @@
-import logging
+import logging, json
 
 from django.db import models
 
-from FuzzEd.lib.jsonfield import JSONField
 from node import Node
 from edge import Edge
 from node_group import NodeGroup
@@ -30,7 +29,7 @@ class Property(models.Model):
         app_label = 'FuzzEd'
 
     key        = models.CharField(max_length=255)
-    value      = JSONField()
+    value      = models.TextField()
     node       = models.ForeignKey(Node, related_name='properties', blank=True, null=True, default=None)
     edge       = models.ForeignKey(Edge, related_name='properties', blank=True, null=True, default=None)
     node_group = models.ForeignKey(NodeGroup, related_name='properties', blank=True, null=True, default=None)
@@ -79,23 +78,63 @@ class Property(models.Model):
         except:
             raise Exception("Invalid property key '%s' being used for %s"%(key, str(obj)))
 
-    @classmethod
-    def sanitized_value(cls, obj, key, value):
+    def object(self):
+        if self.node:
+            return self.node
+        elif self.edge:
+            return self.edge
+        elif self.node_group:
+            return self.node_group
+        assert(False)
+
+    def get_value(self, from_text=None):
         '''
-            Return the sanitized property value for this kind of object and property.
+            Returns the current property value, or the given text value, in native representation.
         '''
-        val_type = Property.value_type(key, obj)
-        if val_type in ['text','compound']:
-            # JSONField is performing some conversion magic, so must tell
-            # it explicitely that even numerical strings remain strings
-            return unicode(value)
-        elif val_type == 'numeric':
-            return int(value)
-        elif val_type == 'bool':
-            # Value may be string or a real value
-            return str(value).lower() == 'true'
+        if from_text:
+            val = from_text
         else:
-            return value
+            val = self.value
+        val_type = Property.value_type(self.key, self.object())
+        if val_type == 'text':
+            return unicode(val)
+        elif val_type == 'compound' or val_type == 'range':
+            if val.startswith('"') and val.endswith('"'):
+                # Illformed legacy data stored in older versions
+                # We prefer to trust the notation type specification
+                logger.warning("Illformed value in property %u"%self.pk) 
+                val=val[1:-1]
+            return json.loads(val)         
+        elif val_type == 'numeric':
+            return int(val)
+        elif val_type == 'bool':
+            # Value may be string or a real boolean value
+            return str(val).lower() == 'true'
+        assert(False)
+
+    def save_value(self, new_value):
+        '''
+            Saves the given value, converts from native representation before.
+        '''
+        val_type = Property.value_type(self.key, self.object())
+        if val_type == 'text':
+            self.value = unicode(new_value)
+        elif val_type == 'compound' or val_type == 'range':
+            if isinstance(new_value, basestring):
+                # Somebody, preferably some importer, forgot to interpret
+                # its JSON data and just passed the raw string
+                # Since this is the only position in the code where property
+                # types are checked anyway, we try to be gentle here.
+                self.value = new_value
+            else:
+                self.value = json.dumps(new_value)            
+        elif val_type == 'numeric':
+            self.value = str(new_value)
+        elif val_type == 'bool':
+            self.value = str(new_value)
+        else:
+            assert(False)
+        self.save()
 
     def same_as(self, prop):
         ''' 
@@ -103,7 +142,7 @@ class Property(models.Model):
         '''
         if self.key != prop.key:
             return False
-        same_val = (str(self.value) == str(prop.value))
+        same_val = (self.get_value() == prop.get_value())
         if not same_val:
             return False
         return True

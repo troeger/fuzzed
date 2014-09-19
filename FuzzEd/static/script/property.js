@@ -20,12 +20,13 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
 
     /**
      * Abstract Class: Property
-     *      Abstract base implementation of a node property. A property models a key-value-attribute. It contains e.g.
-     *      the name, cost, probability... of a node. It is only used as a data object and DOES NOT take care of its
-     *      visual representation.
+     *      Abstract base implementation of a property. A property models a key-value-attribute. It contains e.g. the
+     *      name, cost, probability... of a node, edge or node group. It is only used as a data object and DOES NOT take
+     *      care of its visual representation.
      *
-     *      In line with that, properties may have a <Mirror> that will reflect the properties current value below a
-     *      node. Additionally a property has a reference to his <PropertyMenuEntry> which will allow the modification
+     *      In line with that, properties may have multiple mirrors (<Mirror>) that will reflect the property's
+     *      current value below a mirrorer (<Node>). Labels are special mirrors, that are  currently used for edges
+     *      only. Additionally a property has a reference to its <PropertyMenuEntry> which will allow the modification
      *      of the property value by the user through a visual element (think: text input, checkbox...).
      *
      *      Properties can be declared readonly or hidden, which will accordingly prevent the modification of visual
@@ -97,11 +98,11 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
                 properties[this.name] = value;
 
                 if (this.owner instanceof Edge) {
-                    jQuery(document).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.EDGE_PROPERTY_CHANGED, [this.owner.id, properties]);
                 } else if (this.owner instanceof Node) {
-                    jQuery(document).trigger(Config.Events.NODE_PROPERTY_CHANGED, [this.owner.id, properties]);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, [this.owner.id, properties]);
                 } else if (this.owner instanceof NodeGroup) {
-                    jQuery(document).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [this.owner.id, properties]);
+                    jQuery(document).trigger(Factory.getModule('Config').Events.NODEGROUP_PROPERTY_CHANGED, [this.owner.id, properties]);
                 } else {
                     throw new TypeError ('unknown owner class');
                 }
@@ -118,14 +119,14 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
 
         setHidden: function(newHidden) {
             this.hidden = newHidden;
-            jQuery(this).trigger(Config.Events.PROPERTY_HIDDEN_CHANGED, [newHidden]);
+            jQuery(this).trigger(Factory.getModule('Config').Events.PROPERTY_HIDDEN_CHANGED, [newHidden]);
 
             return this;
         },
 
         setReadonly: function(newReadonly) {
             this.readonly = newReadonly;
-            jQuery(this).trigger(Config.Events.PROPERTY_READONLY_CHANGED, [newReadonly]);
+            jQuery(this).trigger(Factory.getModule('Config').Events.PROPERTY_READONLY_CHANGED, [newReadonly]);
 
             return this;
         },
@@ -178,7 +179,6 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
         },
 
         _setupMenuEntry: function() {
-            //TODO: put this into the factory
             this.menuEntry = new (this.menuEntryClass())(this);
 
             return this;
@@ -193,11 +193,11 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
             var NodeGroup = require('node_group');
 
             if (this.owner instanceof Node) {
-                jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
+                jQuery(this).trigger(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, [value, value, issuer]);
             } else if (this.owner instanceof Edge) {
-                jQuery(this).trigger(Config.Events.EDGE_PROPERTY_CHANGED, [value, value, issuer]);
+                jQuery(this).trigger(Factory.getModule('Config').Events.EDGE_PROPERTY_CHANGED, [value, value, issuer]);
             } else if (this.owner instanceof NodeGroup) {
-                jQuery(this).trigger(Config.Events.NODEGROUP_PROPERTY_CHANGED, [value, value, issuer]);
+                jQuery(this).trigger(Factory.getModule('Config').Events.NODEGROUP_PROPERTY_CHANGED, [value, value, issuer]);
             }
 
             return this;
@@ -268,7 +268,7 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
                 }
             }
 
-            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [value, this.choices[i], issuer]);
+            jQuery(this).trigger(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, [value, this.choices[i], issuer]);
         }
     });
 
@@ -652,7 +652,7 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
     var Transfer = Property.extend({
         UNLINK_VALUE: -1,
         UNLINK_TEXT:  'unlinked',
-        GRAPHS_URL:   Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/',
+        GRAPHS_URL:   Factory.getModule('Config').Backend.BASE_URL + Factory.getModule('Config').Backend.GRAPHS_URL + '/',
 
         transferGraphs: undefined,
 
@@ -692,7 +692,7 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
             var unlinked = value === this.UNLINK_VALUE;
 
             if (!unlinked) this.owner.hideBadge();
-            jQuery(this).trigger(Config.Events.NODE_PROPERTY_CHANGED, [
+            jQuery(this).trigger(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED, [
                 value,
                 unlinked ? this.UNLINK_TEXT : this.transferGraphs[value],
                 issuer]
@@ -723,23 +723,22 @@ function(Factory, Class, Config, Decimal, PropertyMenuEntry, Mirror, Label, Aler
             if (this.value === this.UNLINK_VALUE)
                 this.owner.showBadge('!', 'important');
 
-            jQuery(this).trigger(Config.Events.PROPERTY_SYNCHRONIZED);
+            jQuery(this).trigger(Factory.getModule('Config').Events.PROPERTY_SYNCHRONIZED);
             this._triggerChange(this.value, this);
 
             return this;
         },
 
         _throwError: function(xhr, textStatus, errorThrown) {
-            Alerts.showWarningAlert('Could not fetch graph for transfer:', errorThrown, Config.Alerts.TIMEOUT);
+            Alerts.showWarningAlert('Could not fetch graph for transfer:', errorThrown, Factory.getModule('Config').Alerts.TIMEOUT);
 
             this.value = this.UNLINK_VALUE;
             this.transferGraphs = undefined;
 
-            jQuery(this).trigger(Config.Events.PROPERTY_SYNCHRONIZED);
+            jQuery(this).trigger(Factory.getModule('Config').Events.PROPERTY_SYNCHRONIZED);
         }
     });
 
-    //TODO: put this into the factory
     var from = function(owner, mirrorers, definition) {
         switch (definition.kind) {
             case 'bool':     return new Bool(owner, mirrorers, definition);

@@ -12,10 +12,6 @@ define(['factory', 'faulttree/config', 'node'], function(Factory, Config, Abstra
     return AbstractNode.extend({
         ownProperties: undefined,
 
-        getConfig: function() {
-            return Config;
-        },
-
         select: function() {
             this._super();
 
@@ -43,13 +39,13 @@ define(['factory', 'faulttree/config', 'node'], function(Factory, Config, Abstra
         },
 
         affect: function() {
-            this.container.addClass(this.config.Classes.AFFECTED);
+            this.container.addClass(Factory.getModule('Config').Classes.AFFECTED);
 
             return this;
         },
 
         unaffect: function() {
-            this.container.removeClass(this.config.Classes.AFFECTED);
+            this.container.removeClass(Factory.getModule('Config').Classes.AFFECTED);
 
             return this;
         },

@@ -5,7 +5,7 @@ define(['factory', 'config', 'jquery'], function(Factory, Config) {
 
     /**
      * Structure: FaulttreeConfig
-     *      Faulttree-specific config.
+     *      Faulttree-specific Factory.getModule('Config').
      *
      * Extends: <Base::Config>
      */

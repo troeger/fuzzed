@@ -9,7 +9,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import mail_managers
 from django.http import HttpResponse
-from south.modelsinspector import add_introspection_rules
 
 from graph import Graph
 from node import Node
@@ -29,10 +28,6 @@ logger = logging.getLogger('FuzzEd')
 class NativeXmlField(models.Field):
     def db_type(self, connection):
         return 'xml'
-
-
-add_introspection_rules([], ['^FuzzEd\.models\.job\.NativeXmlField'])
-
 
 def gen_uuid():
     return str(uuid.uuid4())
@@ -320,7 +315,7 @@ class Job(models.Model):
                     else:
                         raise ValueError('Unknown choice %s' % element)
                     db_node = Node.objects.get(client_id=choice.key, graph=self.graph)
-                    db_nodeconf = NodeConfiguration(node=db_node, configuration = db_conf, setting=json_choice)
+                    db_nodeconf = NodeConfiguration(node=db_node, configuration = db_conf, setting=json.dumps(json_choice))
                     db_nodeconfs.append(db_nodeconf)
             logger.debug("Performing bulk insert of node configurations")
             NodeConfiguration.objects.bulk_create(db_nodeconfs)

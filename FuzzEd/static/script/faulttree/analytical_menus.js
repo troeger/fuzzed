@@ -40,14 +40,14 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
          */
         _setupContainer: function() {
             return jQuery(
-                '<div id="' + FaulttreeConfig.IDs.CUTSETS_MENU + '" class="menu" header="Cutsets">\
+                '<div id="' + Factory.getModule('Config').IDs.CUTSETS_MENU + '" class="menu" header="Cutsets">\
                     <div class="menu-controls">\
                        <i class="menu-minimize"></i>\
                        <i class="menu-close">   </i>\
                     </div>\
                     <ul class="nav-list unstyled"></ul>\
                 </div>'
-            ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+            ).appendTo(jQuery('#' + Factory.getModule('Config').IDs.CONTENT));
         },
 
         /**
@@ -186,7 +186,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
            job.queryInterval    = 500;
 
            this._job = job;
-           job.progressMessage = FaulttreeConfig.ProgressIndicator.CALCULATING_MESSAGE;
+           job.progressMessage = Factory.getModule('Config').ProgressIndicator.CALCULATING_MESSAGE;
            job.start();
 
            this._super();
@@ -301,7 +301,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                    <div class="chart"></div>\
                    <div class="table_container content"></div>\
                </div>'
-           ).appendTo(jQuery('#' + FaulttreeConfig.IDs.CONTENT));
+           ).appendTo(jQuery('#' + Factory.getModule('Config').IDs.CONTENT));
        },
 
        /**
@@ -508,7 +508,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                chart: {
                    renderTo: this._chartContainer[0],
                    type:     'line',
-                   height:   FaulttreeConfig.AnalysisMenu.HIGHCHARTS_MIN_HEIGHT,
+                   height:   Factory.getModule('Config').AnalysisMenu.HIGHCHARTS_MIN_HEIGHT,
 
                },
                title: {
@@ -516,7 +516,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                },
                credits: {
                    style: {
-                       fontSize: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_CREDIT_LABEL_SIZE
+                       fontSize: Factory.getModule('Config').AnalysisMenu.HIGHCHARTS_CREDIT_LABEL_SIZE
                    }
                },
                xAxis: axis_definitions.xAxis,
@@ -527,7 +527,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                plotOptions: {
                    series: {
                        marker: {
-                           radius: FaulttreeConfig.AnalysisMenu.HIGHCHARTS_POINT_RADIUS
+                           radius: Factory.getModule('Config').AnalysisMenu.HIGHCHARTS_POINT_RADIUS
                        },
                        events: {
                            mouseOver : function () {
@@ -626,7 +626,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                            "sAjaxSource":   job_result_url,
                            "aoColumns":     columns,
                            "bLengthChange": false,
-                           "iDisplayLength": FaulttreeConfig.AnalysisMenu.RESULTS_TABLE_MAX_ROWS,
+                           "iDisplayLength": Factory.getModule('Config').AnalysisMenu.RESULTS_TABLE_MAX_ROWS,
                            "fnDrawCallback": function(oSettings) {
                                
                                var serverData = oSettings['json'];
@@ -637,7 +637,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                                    this._tableContainer.find('th').removeClass().unbind('click.DT');    
                                }
                                
-                               if(totalRecords <= FaulttreeConfig.AnalysisMenu.RESULTS_TABLE_MAX_ROWS){
+                               if(totalRecords <= Factory.getModule('Config').AnalysisMenu.RESULTS_TABLE_MAX_ROWS){
                                     // remove pagination elements if only one page is displayed
                                     this._tableContainer.find('div.dataTables_paginate').css('display', 'none');
                                     this._tableContainer.find('div.dataTables_info').css('display', 'none');
@@ -765,7 +765,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
         */
        _highlightConfiguration: function(configID) {
            // prevents that node edge anchors are being displayed
-           Canvas.container.addClass(FaulttreeConfig.Classes.CANVAS_NOT_EDITABLE);
+           Canvas.container.addClass(Factory.getModule('Config').Classes.CANVAS_NOT_EDITABLE);
 
            // highlight nodes
            _.invoke(this._configNodeMap[configID], 'highlight');
@@ -789,7 +789,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
         */
        _unhighlightConfiguration: function() {
            // make the anchors visible again
-           Canvas.container.removeClass(FaulttreeConfig.Classes.CANVAS_NOT_EDITABLE);
+           Canvas.container.removeClass(Factory.getModule('Config').Classes.CANVAS_NOT_EDITABLE);
 
            // unhighlight all nodes
            _.invoke(this._editor.graph.getNodes(), 'unhighlight');
@@ -912,7 +912,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
         *      Override of the abstract base class method.
         */
        _containerID: function() {
-           return FaulttreeConfig.IDs.ANALYTICAL_PROBABILITY_MENU;
+           return Factory.getModule('Config').IDs.ANALYTICAL_PROBABILITY_MENU;
        },
        
        /**
@@ -945,7 +945,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
         *      Override of the abstract base class method.
         */
        _containerID: function() {
-           return FaulttreeConfig.IDs.SIMULATED_PROBABILITY_MENU;
+           return Factory.getModule('Config').IDs.SIMULATED_PROBABILITY_MENU;
        },
        
        /**

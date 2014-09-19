@@ -11,17 +11,6 @@ function(Factory, Graph, DfdNode, DfdConfig, DfdNotation) {
      *  Extends <Base::Graph>.
      */
     return Graph.extend({
-        getConfig: function() {
-            return DfdConfig;
-        },
-
-        getNodeClass: function() {
-            return DfdNode;
-        },
-
-        getNotation: function() {
-            return DfdNotation;
-        },
         _getNodeHierarchy: function() {
             return this.getNodeById(0)._hierarchy();
         },
@@ -112,7 +101,7 @@ function(Factory, Graph, DfdNode, DfdConfig, DfdNotation) {
             var minY          = _.min(layoutedNodes, function(node) { return node.y }).y;
             var offsetY       = 1 - minY;
             // center horizontally
-            var centerX       = Math.floor((jQuery('#' + this.config.IDs.CANVAS).width() / this.config.Grid.SIZE) / 2);
+            var centerX       = Math.floor((jQuery('#' + Factory.getModule('Config').IDs.CANVAS).width() / Factory.getModule('Config').Grid.SIZE) / 2);
             var minX          = _.min(layoutedNodes, function(node) { return node.x }).x;
             var maxX          = _.max(layoutedNodes, function(node) { return node.x }).x;
             var offsetX       = centerX - (minX + maxX) / 2;

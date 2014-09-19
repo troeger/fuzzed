@@ -136,9 +136,9 @@ class Node(models.Model):
          {dict} the node as dictionary
         """
         if use_value_dict:
-            prop_values = {prop.key: {'value': prop.value} for prop in self.properties.filter(deleted=False)}
+            prop_values = {prop.key: {'value': prop.get_value()} for prop in self.properties.filter(deleted=False)}
         else:
-            prop_values = {prop.key: prop.value for prop in self.properties.filter(deleted=False)}
+            prop_values = {prop.key: prop.get_value() for prop in self.properties.filter(deleted=False)}
         return {
             'properties': prop_values,
             'id':         self.client_id,
@@ -173,13 +173,10 @@ class Node(models.Model):
         graphml = []
         properties = self.properties.filter(deleted=False)
 
-        for property in properties:
-            key, value = property.key, property.value
-            if key == 'missionTime': continue
-
-            property_notation = properties_notation[property.key]
-            property_kind     = property_notation['kind']
-
+        for prop in properties:
+            if prop.key == 'missionTime': continue
+            # property_notation = properties_notation[prop.key]
+            # property_kind     = property_notation['kind']
             # if property_kind == 'compound':
             #     part_kind = property_notation['parts'][value[0]]['partName']
             #     graphml.append(self.graphml_data_key(key + 'Kind', part_kind))
@@ -189,12 +186,12 @@ class Node(models.Model):
             #     graphml.append(self.graphml_data_key(key + 'Epsilon', value[1]))
             # else:
             #     graphml.append(self.graphml_data_key(key, value))
-            graphml.append(self.graphml_data_key(key, value))
+            graphml.append(self.graphml_data_key(prop.key, prop.get_value()))
 
         return graphml
 
     def graphml_data_key(self, key, value):
-        return '            <data key="%s">%s</data>\n' % (key, value,)
+        return '            <data key="%s">%s</data>\n' % (key, str(value))
 
     def to_json(self, use_value_dict=False):
         """
@@ -561,7 +558,7 @@ class Node(models.Model):
 
     def get_property(self, key, default=None):
         try:
-            return self.properties.get(key=key).value
+            return self.properties.get(key=key).get_value()
         except ObjectDoesNotExist:
             try:
                 prop = notations.by_kind[self.graph.kind]['nodes'][self.kind]['properties'][key]
@@ -594,15 +591,14 @@ class Node(models.Model):
         """
         from FuzzEd.models import Property
         assert(self.pk)         # Catch attribute setting before object saving cases
-        value = Property.sanitized_value(self, key, value)
-        # logger.debug("Setting node attribute %s to %s"%(key, value))
         if hasattr(self, key):
+            # Native node attribute, such as X or Y
             setattr(self, key, value)
             self.save()
         else:
+            # Node property
             prop, created = self.properties.get_or_create(key=key, defaults={'node': self})
-            prop.value = value
-            prop.save()
+            prop.save_value(value)
 
     def set_attrs(self, d):
         '''
@@ -619,8 +615,8 @@ class Node(models.Model):
             Checks if this node is equal to the given one in terms of properties. 
             This is a very expensive operation that is only intended for testing purposes.
         '''
-        #logger.debug(self.to_dict())
-        #logger.debug(node.to_dict())
+        logger.debug(self.to_dict())
+        logger.debug(node.to_dict())
         if self.kind != node.kind or self.x != node.x or self.y != node.y:
             return False
         for my_property in self.properties.all().filter(deleted=False):

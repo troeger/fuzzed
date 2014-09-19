@@ -32,18 +32,18 @@ define(['factory', 'editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 
         _setupMenuActions: function() {
             this._super();
 
-            jQuery('#' + this.config.IDs.ACTION_GROUP).click(function() {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_GROUP).click(function() {
                 this._groupSelection();
             }.bind(this));
 
-            jQuery('#' + this.config.IDs.ACTION_UNGROUP).click(function() {
+            jQuery('#' + Factory.getModule('Config').IDs.ACTION_UNGROUP).click(function() {
                 this._ungroupSelection();
             }.bind(this));
 
             // set the shortcut hints from 'Ctrl+' to '⌘' when on Mac
             if (navigator.platform == 'MacIntel' || navigator.platform == 'MacPPC') {
-                jQuery('#' + this.config.IDs.ACTION_GROUP + ' span').text('⌘G');
-                jQuery('#' + this.config.IDs.ACTION_UNGROUP + ' span').text('⌘U');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_GROUP + ' span').text('⌘G');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_UNGROUP + ' span').text('⌘U');
             }
 
 
@@ -73,16 +73,16 @@ define(['factory', 'editor', 'dfd/graph', 'dfd/config', 'jquery', 'underscore', 
 
             // group is only available when at least two nodes are selected
             if (selectedNodes.length >= 2) {
-                jQuery('#' + this.config.IDs.ACTION_GROUP).parent().removeClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_GROUP).parent().removeClass('disabled');
             } else {
-                jQuery('#' + this.config.IDs.ACTION_GROUP).parent().addClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_GROUP).parent().addClass('disabled');
             }
 
             // ungroup is only available when at least two nodes or at least one node group is selected
             if (selectedNodes.length >= 2 || selectedNodeGroups.length > 0) {
-                jQuery('#' + this.config.IDs.ACTION_UNGROUP).parent().removeClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_UNGROUP).parent().removeClass('disabled');
             } else {
-                jQuery('#' + this.config.IDs.ACTION_UNGROUP).parent().addClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_UNGROUP).parent().addClass('disabled');
             }
         },
 

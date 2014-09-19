@@ -2,9 +2,8 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import FuzzEd.models.job
 from django.conf import settings
-import FuzzEd.lib.jsonfield.fields
+import FuzzEd.models.job
 
 
 class Migration(migrations.Migration):
@@ -14,78 +13,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='AddEdge',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='AddGraph',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='AddNode',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='AddProject',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='ChangeEdge',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='ChangeNode',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
         migrations.CreateModel(
             name='Configuration',
             fields=[
@@ -97,72 +24,11 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='DeleteEdge',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='DeleteGraph',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='DeleteNode',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='DeleteProject',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'abstract': False,
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
             name='Edge',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('client_id', models.BigIntegerField()),
                 ('deleted', models.BooleanField(default=False)),
-            ],
-            options={
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='EdgePropertyChange',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('key', models.CharField(max_length=255)),
-                ('old_value', FuzzEd.lib.jsonfield.fields.JSONField()),
-                ('new_value', FuzzEd.lib.jsonfield.fields.JSONField()),
-                ('command', models.ForeignKey(related_name=b'changes', to='FuzzEd.ChangeEdge')),
             ],
             options={
             },
@@ -218,7 +84,7 @@ class Migration(migrations.Migration):
             name='NodeConfiguration',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('setting', FuzzEd.lib.jsonfield.fields.JSONField()),
+                ('setting', models.TextField()),
                 ('configuration', models.ForeignKey(related_name=b'node_configurations', to='FuzzEd.Configuration')),
                 ('node', models.ForeignKey(to='FuzzEd.Node')),
             ],
@@ -273,41 +139,13 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('key', models.CharField(max_length=255)),
-                ('value', FuzzEd.lib.jsonfield.fields.JSONField()),
+                ('value', models.TextField()),
                 ('deleted', models.BooleanField(default=False)),
                 ('edge', models.ForeignKey(related_name=b'properties', default=None, blank=True, to='FuzzEd.Edge', null=True)),
                 ('node', models.ForeignKey(related_name=b'properties', default=None, blank=True, to='FuzzEd.Node', null=True)),
                 ('node_group', models.ForeignKey(related_name=b'properties', default=None, blank=True, to='FuzzEd.NodeGroup', null=True)),
             ],
             options={
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='PropertyChange',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('key', models.CharField(max_length=255)),
-                ('old_value', FuzzEd.lib.jsonfield.fields.JSONField()),
-                ('new_value', FuzzEd.lib.jsonfield.fields.JSONField()),
-                ('command', models.ForeignKey(related_name=b'changes', to='FuzzEd.ChangeNode')),
-            ],
-            options={
-            },
-            bases=(models.Model,),
-        ),
-        migrations.CreateModel(
-            name='RenameGraph',
-            fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('undoable', models.BooleanField(default=False)),
-                ('insert_date', models.DateTimeField(auto_now_add=True)),
-                ('old_name', models.CharField(max_length=255)),
-                ('new_name', models.CharField(max_length=255)),
-                ('graph', models.ForeignKey(related_name=b'+', to='FuzzEd.Graph')),
-            ],
-            options={
-                'abstract': False,
             },
             bases=(models.Model,),
         ),
@@ -325,8 +163,8 @@ class Migration(migrations.Migration):
                 ('rounds', models.IntegerField(null=True)),
                 ('failures', models.IntegerField(null=True)),
                 ('binary_value', models.BinaryField(null=True)),
-                ('points', FuzzEd.lib.jsonfield.fields.JSONField(null=True, blank=True)),
-                ('issues', FuzzEd.lib.jsonfield.fields.JSONField(null=True, blank=True)),
+                ('points', models.TextField(null=True, blank=True)),
+                ('issues', models.TextField(null=True, blank=True)),
                 ('configuration', models.ForeignKey(related_name=b'results', blank=True, to='FuzzEd.Configuration', null=True)),
                 ('graph', models.ForeignKey(related_name=b'results', to='FuzzEd.Graph')),
                 ('job', models.ForeignKey(related_name=b'results', to='FuzzEd.Job')),
@@ -384,69 +222,9 @@ class Migration(migrations.Migration):
             preserve_default=True,
         ),
         migrations.AddField(
-            model_name='deleteproject',
-            name='project',
-            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Project'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='deletenode',
-            name='node',
-            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Node'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='deletegraph',
-            name='graph',
-            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Graph'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='deleteedge',
-            name='edge',
-            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Edge'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
             model_name='configuration',
             name='graph',
             field=models.ForeignKey(related_name=b'configurations', to='FuzzEd.Graph'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='changenode',
-            name='node',
-            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Node'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='changeedge',
-            name='edge',
-            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Edge'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='addproject',
-            name='project',
-            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Project'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='addnode',
-            name='node',
-            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Node'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='addgraph',
-            name='graph',
-            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Graph'),
-            preserve_default=True,
-        ),
-        migrations.AddField(
-            model_name='addedge',
-            name='edge',
-            field=models.ForeignKey(related_name=b'+', to='FuzzEd.Edge'),
             preserve_default=True,
         ),
     ]

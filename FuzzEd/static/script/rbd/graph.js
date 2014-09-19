@@ -1,5 +1,5 @@
-define(['factory', 'graph', 'rbd/node', 'rbd/config', 'json!notations/rbd.json'],
-function(Factory, Graph, RbdNode, RbdConfig, RbdNotation) {
+define(['factory', 'graph', 'rbd/node', 'json!notations/rbd.json'],
+function(Factory, Graph, RbdNode, RbdNotation) {
     /**
      * Package: RBD
      */
@@ -11,17 +11,6 @@ function(Factory, Graph, RbdNode, RbdConfig, RbdNotation) {
      * Extends <Base::Graph>.
      */
     return Graph.extend({
-        getConfig: function() {
-            return RbdConfig;
-        },
-
-        getNodeClass: function() {
-            return RbdNode;
-        },
-
-        getNotation: function() {
-            return RbdNotation;
-        },
 
         /**
          *  Method: _getClusterLayoutAlgorithm
@@ -72,7 +61,7 @@ function(Factory, Graph, RbdNode, RbdConfig, RbdNotation) {
             var maxY          = _.max(layoutedNodes, function(n) {return n.y}).y;
 
             // try to center the graph on the canvas (if there's enough space)
-            var centerX = Math.floor((jQuery('#' + this.config.IDs.CANVAS).width() / this.config.Grid.SIZE) / 2);
+            var centerX = Math.floor((jQuery('#' + Factory.getModule('Config').IDs.CANVAS).width() / Factory.getModule('Config').Grid.SIZE) / 2);
             var offsetX = Math.max(centerX - (maxY / 2), 0);
 
             // apply positions

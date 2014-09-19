@@ -20,7 +20,6 @@ class Common(Configuration):
     MEDIA_URL=''
     SEND_BROKEN_LINK_EMAILS=False
     SERVER_EMAIL=values.Value('webmaster@fuzzed.org', environ_name='FUZZED_ADMIN_EMAIL')
-    ADMINS=(('FuzzEd Admin', SERVER_EMAIL),)
     SITE_ID=1
     STATICFILES_DIRS=('FuzzEd/static',)
     STATICFILES_STORAGE='require.storage.OptimizedStaticFilesStorage'
@@ -136,10 +135,10 @@ class Dev(Common):
     DATABASES = {
         'default': {
             'ENGINE':   'django.db.backends.sqlite3', 
-            'NAME':     'fuzztrees.sqlite',  
-            'TEST_NAME':'test_fuzztrees.sqlite',                      
-            'USER':     'fuzztrees.sqlite',                              
-            'PASSWORD': 'fuzztrees',                       
+            'NAME':     'fuzzed.sqlite',  
+            'TEST_NAME':'test_fuzzed.sqlite',                      
+            'USER':     'fuzzed.sqlite',                              
+            'PASSWORD': 'fuzzed',                       
             'HOST':     'localhost',                                       
             'PORT':     '',                                       
         }

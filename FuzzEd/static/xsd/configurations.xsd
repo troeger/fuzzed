@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xsd:schema version="1.0"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns="http://www.fuzztrees.net/configurations"
-            targetNamespace="http://www.fuzztrees.net/configurations">
+            xmlns="http://www.fuzzed.org/configurations"
+            targetNamespace="http://www.fuzzed.org/configurations">
   
   <xsd:complexType abstract="true" name="Choice"/>
 

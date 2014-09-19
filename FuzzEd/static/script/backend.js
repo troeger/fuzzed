@@ -59,21 +59,21 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          */
         activate: function() {
             jQuery(document)
-                .on(Config.Events.NODE_PROPERTY_CHANGED,                   this.nodePropertyChanged.bind(this))
-                .on(Config.Events.EDGE_PROPERTY_CHANGED,                   this.edgePropertyChanged.bind(this))
-                .on(Config.Events.NODEGROUP_PROPERTY_CHANGED,              this.nodeGroupPropertyChanged.bind(this))
-                .on(Config.Events.NODEGROUP_NODEIDS_CHANGED,               this.nodeGroupNodeIdsChanged.bind(this))
-                .on(Config.Events.NODE_ADDED,                              this.nodeAdded.bind(this))
-                .on(Config.Events.NODE_DELETED,                            this.nodeDeleted.bind(this))
-                .on(Config.Events.EDGE_ADDED,                              this.edgeAdded.bind(this))
-                .on(Config.Events.EDGE_DELETED,                            this.edgeDeleted.bind(this))
-                .on(Config.Events.NODEGROUP_ADDED,                         this.nodeGroupAdded.bind(this))
-                .on(Config.Events.NODEGROUP_DELETED,                       this.nodeGroupDeleted.bind(this))
-                .on(Config.Events.EDITOR_GRAPH_EXPORT_PDF,                 this.graphExport.bind(this))
-                .on(Config.Events.EDITOR_GRAPH_EXPORT_EPS,                 this.graphExport.bind(this))
-                .on(Config.Events.EDITOR_CALCULATE_CUTSETS,                this.calculateCutsets.bind(this))
-                .on(Config.Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY, this.calculateAnalyticalProbability.bind(this))
-                .on(Config.Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY,  this.calculateSimulatedProbability.bind(this));
+                .on(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED,                   this.nodePropertyChanged.bind(this))
+                .on(Factory.getModule('Config').Events.EDGE_PROPERTY_CHANGED,                   this.edgePropertyChanged.bind(this))
+                .on(Factory.getModule('Config').Events.NODEGROUP_PROPERTY_CHANGED,              this.nodeGroupPropertyChanged.bind(this))
+                .on(Factory.getModule('Config').Events.NODEGROUP_NODEIDS_CHANGED,               this.nodeGroupNodeIdsChanged.bind(this))
+                .on(Factory.getModule('Config').Events.NODE_ADDED,                              this.nodeAdded.bind(this))
+                .on(Factory.getModule('Config').Events.NODE_DELETED,                            this.nodeDeleted.bind(this))
+                .on(Factory.getModule('Config').Events.EDGE_ADDED,                              this.edgeAdded.bind(this))
+                .on(Factory.getModule('Config').Events.EDGE_DELETED,                            this.edgeDeleted.bind(this))
+                .on(Factory.getModule('Config').Events.NODEGROUP_ADDED,                         this.nodeGroupAdded.bind(this))
+                .on(Factory.getModule('Config').Events.NODEGROUP_DELETED,                       this.nodeGroupDeleted.bind(this))
+                .on(Factory.getModule('Config').Events.EDITOR_GRAPH_EXPORT_PDF,                 this.graphExport.bind(this))
+                .on(Factory.getModule('Config').Events.EDITOR_GRAPH_EXPORT_EPS,                 this.graphExport.bind(this))
+                .on(Factory.getModule('Config').Events.EDITOR_CALCULATE_CUTSETS,                this.calculateCutsets.bind(this))
+                .on(Factory.getModule('Config').Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY, this.calculateAnalyticalProbability.bind(this))
+                .on(Factory.getModule('Config').Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY,  this.calculateSimulatedProbability.bind(this));
             return this;
         },
 
@@ -99,16 +99,16 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          */
         deactivate: function() {
             jQuery(document)
-                .off(Config.Events.NODE_PROPERTY_CHANGED)
-                .off(Config.Events.NODE_ADDED)
-                .off(Config.Events.NODE_DELETED)
-                .off(Config.Events.EDGE_ADDED)
-                .off(Config.Events.EDGE_DELETED)
-                .off(Config.Events.EDITOR_GRAPH_EXPORT_PDF)   
-                .off(Config.Events.EDITOR_GRAPH_EXPORT_EPS)                
-                .off(Config.Events.EDITOR_CALCULATE_CUTSETS)
-                .off(Config.Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY)
-                .off(Config.Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY);
+                .off(Factory.getModule('Config').Events.NODE_PROPERTY_CHANGED)
+                .off(Factory.getModule('Config').Events.NODE_ADDED)
+                .off(Factory.getModule('Config').Events.NODE_DELETED)
+                .off(Factory.getModule('Config').Events.EDGE_ADDED)
+                .off(Factory.getModule('Config').Events.EDGE_DELETED)
+                .off(Factory.getModule('Config').Events.EDITOR_GRAPH_EXPORT_PDF)
+                .off(Factory.getModule('Config').Events.EDITOR_GRAPH_EXPORT_EPS)
+                .off(Factory.getModule('Config').Events.EDITOR_CALCULATE_CUTSETS)
+                .off(Factory.getModule('Config').Events.EDITOR_CALCULATE_ANALYTICAL_PROBABILITY)
+                .off(Factory.getModule('Config').Events.EDITOR_CALCULATE_SIMULATED_PROBABILITY);
             return this;
         },
 
@@ -147,7 +147,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
         errorCallback: function(alert, error) {
             return function(jqXHR, errorStatus, errorThrown) {
                 var message = errorThrown || 'Could not connect to backend.';
-                Alerts.showErrorAlert(alert, message, Config.Alerts.TIMEOUT);
+                Alerts.showErrorAlert(alert, message, Factory.getModule('Config').Alerts.TIMEOUT);
                 (error || jQuery.noop).apply(arguments);
             }
         },
@@ -176,7 +176,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
                 properties: properties
             };
 
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:         this._fullUrlForEdges(),
                 type:        'POST',
                 contentType: 'application/json; charset=utf-8',
@@ -216,7 +216,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
                 properties: properties
             };
 
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:         this._fullUrlForNodes(),
                 type:        'POST',
                 contentType: 'application/json; charset=utf-8',
@@ -252,7 +252,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
                 properties: properties
             };
 
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:         this._fullUrlForNodeGroups(),
                 type:        'POST',
                 contentType: 'application/json; charset=utf-8',
@@ -280,7 +280,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *                            erroneous AJAX call.
          */
         edgeDeleted: function(event, edgeId, success, error, complete) {
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:        this._fullUrlForEdge(edgeId),
                 type:       'DELETE',
 
@@ -305,7 +305,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *      {Function} complete - [optional] Callback that is invoked for successful and erroneous AJAX requests.
          */
         nodeDeleted: function(event, nodeId, success, error, complete) {
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:        this._fullUrlForNode(nodeId),
                 type:       'DELETE',
 
@@ -330,7 +330,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *      {Function} complete      - [optional] Callback that is invoked for successful and erroneous requests.
          */
         nodeGroupDeleted: function(event, nodeGroupId, success, error, complete) {
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:        this._fullUrlForNodeGroup(nodeGroupId),
                 type:       'DELETE',
 
@@ -358,7 +358,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *                              successful or erroneous.
          */
         nodePropertyChanged: function(event, nodeId, properties, success, error, complete) {
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:         this._fullUrlForNode(nodeId),
                 type:        'PATCH',
                 contentType: 'application/json; charset=utf-8',
@@ -388,7 +388,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *                              successful or erroneous.
          */
         edgePropertyChanged: function(event, edgeId, properties, success, error, complete) {
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:         this._fullUrlForEdge(edgeId),
                 type:        'PATCH',
                 contentType: 'application/json; charset=utf-8',
@@ -418,7 +418,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *                               successful or erroneous.
          */
         nodeGroupPropertyChanged: function(event, nodeGroupId, properties, success, error, complete) {
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:         this._fullUrlForNodeGroup(nodeGroupId),
                 type:        'PATCH',
                 contentType: 'application/json; charset=utf-8',
@@ -448,7 +448,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *                               successful or erroneous.
          */
         nodeGroupNodeIdsChanged: function(event, nodeGroupId, nodeIds, success, error, complete) {
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:         this._fullUrlForNodeGroup(nodeGroupId),
                 type:        'PATCH',
                 contentType: 'application/json; charset=utf-8',
@@ -475,7 +475,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *      {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
         getGraph: function(success, error, complete) {
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForGraph(),
                 dataType: 'json',
 
@@ -498,7 +498,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *      {Function} complete - [optional] Callback that gets invoked in both; successful or erroneous request.
          */
         calculateCutsets: function(event, success, error, complete) {
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:      this._fullUrlForCutsets(),
                 dataType: 'json',
 
@@ -522,11 +522,11 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *      {Function} complete - [optional] Callback that gets invoked in either a successful or erroneous request.
          */
         calculateAnalyticalProbability: function(event, success, error, complete) {
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:         this._fullUrlForJobTasks(),
                 type:        'POST',
                 contentType: 'application/json',
-                data:        JSON.stringify({kind : Config.Backend.ANALYSIS_JOB}),
+                data:        JSON.stringify({kind : Factory.getModule('Config').Backend.ANALYSIS_JOB}),
 
                 beforeSend:  function(xhr) { xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken')); },
                 statusCode:  {
@@ -552,11 +552,11 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          */
         calculateSimulatedProbability: function(event, success, error, complete) {
 
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:         this._fullUrlForJobTasks(),
                 type:        'POST',
                 contentType: 'application/json',
-                data:        JSON.stringify({kind : Config.Backend.SIMULATION_JOB}),
+                data:        JSON.stringify({kind : Factory.getModule('Config').Backend.SIMULATION_JOB}),
 
                 beforeSend:  function(xhr) { xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken')); },
                 statusCode:  {
@@ -585,15 +585,15 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
             var progressID = _.uniqueId('export_');
             var kind       = undefined;
 
-                 if (event.type === Config.Events.EDITOR_GRAPH_EXPORT_PDF) kind = Config.Backend.PDF_JOB;
-            else if (event.type === Config.Events.EDITOR_GRAPH_EXPORT_EPS) kind = Config.Backend.EPS_JOB;
+                 if (event.type === Factory.getModule('Config').Events.EDITOR_GRAPH_EXPORT_PDF) kind = Factory.getModule('Config').Backend.PDF_JOB;
+            else if (event.type === Factory.getModule('Config').Events.EDITOR_GRAPH_EXPORT_EPS) kind = Factory.getModule('Config').Backend.EPS_JOB;
             else    throw new ValueError('Unknown export type ' + event.type);
 
-            var pendingMessage = Config.ProgressIndicator.EXPORT_PROGRESS_MESSAGE + kind.toUpperCase();
-            var errorMessage   = Config.ProgressIndicator.EXPORT_ERROR_MESSAGE    + kind.toUpperCase();
-            var successMessage = Config.ProgressIndicator.EXPORT_SUCCESS_MESSAGE;
+            var pendingMessage = Factory.getModule('Config').ProgressIndicator.EXPORT_PROGRESS_MESSAGE + kind.toUpperCase();
+            var errorMessage   = Factory.getModule('Config').ProgressIndicator.EXPORT_ERROR_MESSAGE    + kind.toUpperCase();
+            var successMessage = Factory.getModule('Config').ProgressIndicator.EXPORT_SUCCESS_MESSAGE;
 
-            jQuery.ajaxq(Config.Backend.AJAX_QUEUE, {
+            jQuery.ajaxq(Factory.getModule('Config').Backend.AJAX_QUEUE, {
                 url:         this._fullUrlForJobTasks(),
                 type:        'POST',
                 contentType: 'application/json',
@@ -620,7 +620,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
                     var message = jqXHR.responseText || errorThrown || 'Export failed! Could not connect to backend.';
 
                     Progress.flashErrorMessage(errorMessage);
-                    Alerts.showErrorAlert('Error:\n', message, Config.Alerts.TIMEOUT);
+                    Alerts.showErrorAlert('Error:\n', message, Factory.getModule('Config').Alerts.TIMEOUT);
                     (error || jQuery.noop).apply(arguments);
                 }
             });
@@ -638,7 +638,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *      The graph URL as {String}.
          */
         _fullUrlForGraph: function() {
-            return Config.Backend.BASE_URL + Config.Backend.GRAPHS_URL + '/' + this._graphId;
+            return Factory.getModule('Config').Backend.BASE_URL + Factory.getModule('Config').Backend.GRAPHS_URL + '/' + this._graphId;
         },
 
         /**
@@ -650,7 +650,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *      The graph's nodes URL as {String}.
          */
         _fullUrlForNodes: function() {
-            return this._fullUrlForGraph() + Config.Backend.NODES_URL + '/';
+            return this._fullUrlForGraph() + Factory.getModule('Config').Backend.NODES_URL + '/';
         },
 
         /**
@@ -677,7 +677,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *      The graph's edges URL as {String}.
          */
         _fullUrlForEdges: function() {
-            return this._fullUrlForGraph() + Config.Backend.EDGES_URL + '/';
+            return this._fullUrlForGraph() + Factory.getModule('Config').Backend.EDGES_URL + '/';
         },
 
         /**
@@ -704,7 +704,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *      The graph's node groups URL as {String}.
          */
         _fullUrlForNodeGroups: function() {
-            return this._fullUrlForGraph() + Config.Backend.NODEGROUPS_URL + '/';
+            return this._fullUrlForGraph() + Factory.getModule('Config').Backend.NODEGROUPS_URL + '/';
         },
 
         /**
@@ -728,7 +728,7 @@ function (Factory, Class, Config, Job, Alerts, Progress) {
          *   Specific tasks of a Job are PDF and EPS export, as well as Topevent and Simulation analysis.
          */
         _fullUrlForJobTasks: function() {
-            return this._fullUrlForGraph() + Config.Backend.JOBS_URL + '/';
+            return this._fullUrlForGraph() + Factory.getModule('Config').Backend.JOBS_URL + '/';
         }
         
     });

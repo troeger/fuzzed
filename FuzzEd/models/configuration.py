@@ -4,6 +4,7 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
 from graph import Graph
+import json
 
 class Configuration(models.Model):
   """
@@ -28,7 +29,7 @@ class Configuration(models.Model):
     '''
     result = {}
     for node_conf in self.node_configurations.all():
-      result[node_conf.node.client_id] = node_conf.setting
+      result[node_conf.node.client_id] = json.loads(node_conf.setting)
     return result
 
 
