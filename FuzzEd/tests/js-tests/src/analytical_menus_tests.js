@@ -1,5 +1,7 @@
-define(['faulttree/analytical_menus', 'job', 'config', 'jquery'],
-function(AnalyticalMenus, Job, Config) {
+define(['faulttree/analytical_menus', 'job', 'factory', 'config', 'jquery'],
+function(AnalyticalMenus, Job, Factory) {
+    
+    var Config = Factory.getModule('Config');
     
     var apMenu = undefined;
     var server = undefined;

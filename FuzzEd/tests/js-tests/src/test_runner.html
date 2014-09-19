@@ -133,6 +133,12 @@
     <div id="FuzzEdAlertContainer"style="display:none;"></div>
     
     <script>
+        // TODO: leave out factory in tests (or set factory kind in test cases)
+        require(['factory'], function(Factory){
+            Factory.kind ='fuzztree';
+        });
+    
+    
         require(['require', 'chai', 'chai-jquery', 'mocha', 'sinon', 'sinon-server'], function(require, chai, chaiJquery){
             
             // global initialization of mocha and chai
