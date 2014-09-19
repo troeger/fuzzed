@@ -565,11 +565,27 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
                 jQuery('#' + Factory.getModule('Config').IDs.ACTION_DELETE).parent().addClass('disabled');
             }
 
-            // paste is only available when there is something in the clipboard
-            if (this._getClipboard()) {
+            // paste is only available when the graph is not read-only there is something in the clipboard
+            if (!this.graph.readOnly && this._getClipboard()) {
                 jQuery('#' + Factory.getModule('Config').IDs.ACTION_PASTE).parent().removeClass('disabled');
             } else {
                 jQuery('#' + Factory.getModule('Config').IDs.ACTION_PASTE).parent().addClass('disabled');
+            }
+
+            // select all is only available when the graph is not read-only
+            if (!this.graph.readOnly) {
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_SELECTALL).parent().removeClass('disabled');
+            } else {
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_SELECTALL).parent().addClass('disabled');
+            }
+
+            // layouting is only available when the graph is not read-only
+            if (!this.graph.readOnly) {
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_LAYOUT_CLUSTER).parent().removeClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_LAYOUT_TREE).parent().removeClass('disabled');
+            } else {
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_LAYOUT_CLUSTER).parent().addClass('disabled');
+                jQuery('#' + Factory.getModule('Config').IDs.ACTION_LAYOUT_TREE).parent().addClass('disabled');
             }
 
             return this;
