@@ -1,6 +1,6 @@
 ---
 - name: Perform database backup  
-  command: pg_dump -c -f /tmp/dbackup.sql fuzztrees
+  command: pg_dump -c -f /tmp/dbackup.sql fuzzed
   sudo: yes
   sudo_user: postgres
 - name: Ensure latest FuzzEd version is installed
@@ -10,7 +10,7 @@
 - name: Adjusting links for pointing to download package 
   file: dest=/var/www/fuzzed/XXX src=/var/www/fuzzed/current owner=www-data group=www-data state=link
 - name: Perform database migration  
-  command: cd /var/www/fuzztrees.net/www/; ./manage.py syncdb --migrate
+  command: cd /var/www/fuzzed.org/www/; ./manage.py syncdb --migrate
   sudo: yes
 - name: Ensure that Apache config is correct  
   command: apache2ctl configtest

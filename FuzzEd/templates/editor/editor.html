@@ -1,4 +1,5 @@
 {% extends "util/base.html" %}
+{% load settings %}
 
 {% block title %}
     {{ block.super }} - {{ graph.name }}
@@ -175,7 +176,7 @@
                     <ul>
                         <li>Reload the graph</li>
                         <li>Delete your model and build it from scratch</li>
-                        <li>Contact us via our <a href="http://fuzztrees.uservoice.com">feedback page</a></li>
+                        <li>Contact us via our <a href="{% setting 'FEEDBACK_PAGE' %}">feedback page</a></li>
                     </ul>
                     <div id="FuzzEdStacktrace">
                         <p>

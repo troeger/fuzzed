@@ -135,10 +135,10 @@ class Dev(Common):
     DATABASES = {
         'default': {
             'ENGINE':   'django.db.backends.sqlite3', 
-            'NAME':     'fuzztrees.sqlite',  
-            'TEST_NAME':'test_fuzztrees.sqlite',                      
-            'USER':     'fuzztrees.sqlite',                              
-            'PASSWORD': 'fuzztrees',                       
+            'NAME':     'fuzzed.sqlite',  
+            'TEST_NAME':'test_fuzzed.sqlite',                      
+            'USER':     'fuzzed.sqlite',                              
+            'PASSWORD': 'fuzzed',                       
             'HOST':     'localhost',                                       
             'PORT':     '',                                       
         }
