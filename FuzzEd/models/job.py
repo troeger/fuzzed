@@ -315,7 +315,7 @@ class Job(models.Model):
                     else:
                         raise ValueError('Unknown choice %s' % element)
                     db_node = Node.objects.get(client_id=choice.key, graph=self.graph)
-                    db_nodeconf = NodeConfiguration(node=db_node, configuration = db_conf, setting=json_choice)
+                    db_nodeconf = NodeConfiguration(node=db_node, configuration = db_conf, setting=json.dumps(json_choice))
                     db_nodeconfs.append(db_nodeconf)
             logger.debug("Performing bulk insert of node configurations")
             NodeConfiguration.objects.bulk_create(db_nodeconfs)
