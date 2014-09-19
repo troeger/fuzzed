@@ -1,4 +1,3 @@
-syntax: glob
 fuzzed.sqlite
 test_fuzzed.sqlite
 *.pyc
