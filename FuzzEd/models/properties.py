@@ -99,13 +99,17 @@ class Property(models.Model):
         if val_type == 'text':
             return unicode(val)
         elif val_type == 'compound' or val_type == 'range':
-            return json.loads(val)            
+            if val.startswith('"') and val.endswith('"'):
+                # Illformed legacy data stored in older versions
+                # We prefer to trust the notation type specification
+                logger.warning("Illformed value in property %u"%self.pk) 
+                val=val[1:-1]
+            return json.loads(val)         
         elif val_type == 'numeric':
             return int(val)
         elif val_type == 'bool':
             # Value may be string or a real boolean value
             return str(val).lower() == 'true'
-        import pdb; pdb.set_trace()
         assert(False)
 
     def save_value(self, new_value):
@@ -116,11 +120,18 @@ class Property(models.Model):
         if val_type == 'text':
             self.value = unicode(new_value)
         elif val_type == 'compound' or val_type == 'range':
-            self.value = json.dumps(new_value)            
+            if isinstance(new_value, basestring):
+                # Somebody, preferably some importer, forgot to interpret
+                # its JSON data and just passed the raw string
+                # Since this is the only position in the code where property
+                # types are checked anyway, we try to be gentle here.
+                self.value = new_value
+            else:
+                self.value = json.dumps(new_value)            
         elif val_type == 'numeric':
             self.value = str(new_value)
         elif val_type == 'bool':
-            self.value = str(value)
+            self.value = str(new_value)
         else:
             assert(False)
         self.save()
@@ -131,7 +142,7 @@ class Property(models.Model):
         '''
         if self.key != prop.key:
             return False
-        same_val = (str(self.value) == str(prop.value))
+        same_val = (self.get_value() == prop.get_value())
         if not same_val:
             return False
         return True

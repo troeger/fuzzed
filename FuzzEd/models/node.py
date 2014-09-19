@@ -173,13 +173,10 @@ class Node(models.Model):
         graphml = []
         properties = self.properties.filter(deleted=False)
 
-        for property in properties:
-            key, value = property.key, property.value
-            if key == 'missionTime': continue
-
-            property_notation = properties_notation[property.key]
-            property_kind     = property_notation['kind']
-
+        for prop in properties:
+            if prop.key == 'missionTime': continue
+            # property_notation = properties_notation[prop.key]
+            # property_kind     = property_notation['kind']
             # if property_kind == 'compound':
             #     part_kind = property_notation['parts'][value[0]]['partName']
             #     graphml.append(self.graphml_data_key(key + 'Kind', part_kind))
@@ -189,12 +186,12 @@ class Node(models.Model):
             #     graphml.append(self.graphml_data_key(key + 'Epsilon', value[1]))
             # else:
             #     graphml.append(self.graphml_data_key(key, value))
-            graphml.append(self.graphml_data_key(key, value))
+            graphml.append(self.graphml_data_key(prop.key, prop.get_value()))
 
         return graphml
 
     def graphml_data_key(self, key, value):
-        return '            <data key="%s">%s</data>\n' % (key, value,)
+        return '            <data key="%s">%s</data>\n' % (key, str(value))
 
     def to_json(self, use_value_dict=False):
         """
@@ -618,8 +615,8 @@ class Node(models.Model):
             Checks if this node is equal to the given one in terms of properties. 
             This is a very expensive operation that is only intended for testing purposes.
         '''
-        #logger.debug(self.to_dict())
-        #logger.debug(node.to_dict())
+        logger.debug(self.to_dict())
+        logger.debug(node.to_dict())
         if self.kind != node.kind or self.x != node.x or self.y != node.y:
             return False
         for my_property in self.properties.all().filter(deleted=False):

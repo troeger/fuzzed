@@ -4,6 +4,8 @@ import os
 from FuzzEd.models import Graph
 from common import fixt_simple, FuzzEdLiveServerTestCase, FuzzEdTestCase
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
 
 class ExternalAPITestCase(FuzzEdLiveServerTestCase):
     """

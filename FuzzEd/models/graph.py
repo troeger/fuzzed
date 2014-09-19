@@ -61,7 +61,6 @@ class Graph(models.Model):
         if 'defaults' in notation:
             from node import Node
             for index, default_node in enumerate(notation['defaults']['nodes']):
-                print default_node
                 default_node.update({'properties': {}})
                 # use index as node client ID
                 # this is unique since all other client IDs are time stamps
@@ -379,16 +378,26 @@ class Graph(models.Model):
             Comparing the edges is not easily possible, since the source / target ID's in the edge
             instances would need to be mapped between original and copy.
         '''
+
+        def error_reporting():
+            logger.debug("Graphs are differing:")
+            text1 = self.to_graphml()
+            text2 = graph.to_graphml()
+            import difflib
+            difflines = difflib.unified_diff(text1, text2)
+            logger.debug('\n'.join(difflines))
+
         for my_node in self.nodes.all().filter(deleted=False):
             found_match = False
             for their_node in graph.nodes.all().filter(deleted=False):
-                #logger.debug("Checking our %s (%u) against %s (%u)"%(str(my_node), my_node.pk, str(their_node), their_node.pk))
+                logger.debug("Checking our %s (%u) against %s (%u)"%(str(my_node), my_node.pk, str(their_node), their_node.pk))
                 if my_node.same_as(their_node):
-                    #logger.debug("Match")
+                    logger.debug("Match")
                     found_match = True
                     break
             if not found_match:
-                #logger.debug("Couldn't find a match for node %s"%(str(my_node)))
+                logger.debug("Couldn't find a match for node %s"%(str(my_node)))
+                error_reporting()
                 return False
 
         for my_group in self.groups.all().filter(deleted=False):
@@ -398,6 +407,7 @@ class Graph(models.Model):
                     found_match = True
                     break
             if not found_match:
+                error_reporting()
                 return False
 
         return True
