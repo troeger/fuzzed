@@ -22,11 +22,11 @@ You can try the editor at http://www.fuzzed.org.
 
 ## Installation
 
-If you just want to install your own copy of FuzzEd, please read the [[installation guide|InstallationGuide]].
+If you just want to install your own copy of FuzzEd, please read the [installation guide](https://github.com/troeger/fuzzed/wiki/InstallationGuide).
 
 ## Development
 
-If you want to contribute to FuzzEd, there is a lot of information in the [[Wiki|Home]].
+If you want to contribute to FuzzEd, there is a lot of information in the [Wiki](https://github.com/troeger/fuzzed/wiki/Home).
 
 The developers hang around on the [dev mailing list](mailto:fuzzed@lists.nclmail.de).
 
