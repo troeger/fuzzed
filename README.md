@@ -32,7 +32,7 @@ The developers hang around on the [dev mailing list](mailto:fuzzed@lists.nclmail
 
 ## Licence
 
-FuzzEd ist licensed under the (GNU AGPL Version 3)[http://en.wikipedia.org/wiki/Affero_General_Public_License]. This means your are allowed to:
+FuzzEd ist licensed under the [GNU AGPL Version 3](http://en.wikipedia.org/wiki/Affero_General_Public_License). This means your are allowed to:
 
 * Install and run the unmodified FuzzEd code at your site.
 * Re-package and distribute the unmodified version of FuzzEd from this repository. 
