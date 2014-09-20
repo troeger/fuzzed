@@ -18,15 +18,15 @@ The editor supports the following generic features for all diagram types:
 * Analytical and simulation-based analysis of fault tree and FuzzTree diagrams. 
 * REST API for creating new diagrams with external software.
 
-You can try the editor at [http://www.fuzzed.org].
+You can try the editor at http://www.fuzzed.org.
 
 ## Installation
 
-If you just want to install your own copy of FuzzEd, please read the [[installation guide]].
+If you just want to install your own copy of FuzzEd, please read the [[installation guide|InstallationGuide]].
 
 ## Development
 
-If you want to contribute to FuzzEd, there is a lot of information in the [[developer section]] of the Wiki.
+If you want to contribute to FuzzEd, there is a lot of information in the [[Wiki|Home]].
 
 The developers hang around on the [dev mailing list](mailto:fuzzed@lists.nclmail.de).
 
