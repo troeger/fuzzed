@@ -1,6 +1,6 @@
 #pragma once
-#include "Interval.h"
-#include "fuzztree.h"
+#include "NumericInterval.h"
+#include "Node.h"
 #include <future>
 #include <vector>
 
@@ -11,7 +11,7 @@ typedef NumericInterval AlphaCutAnalysisResult;
 class AlphaCutAnalysisTask
 {
 public:
-	AlphaCutAnalysisTask(const fuzztree::TopEvent* topEvent, const double alpha, std::ofstream& logfile);
+	AlphaCutAnalysisTask(const Node* topEvent, const unsigned int missionTime, const double alpha, std::ofstream& logfile);
 	~AlphaCutAnalysisTask();
 
 	std::future<AlphaCutAnalysisResult> run();
@@ -24,10 +24,11 @@ protected:
 
 
 	AlphaCutAnalysisResult analyze();
-	AlphaCutAnalysisResult analyzeRecursive(const fuzztree::ChildNode&);
+	AlphaCutAnalysisResult analyzeRecursive(const Node&);
 
+	const unsigned int m_missionTime;
 	const double m_alpha;
-	const fuzztree::TopEvent* m_tree;
+	const  Node* m_tree;
 
 	std::ofstream& m_logFile;
 

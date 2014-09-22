@@ -5,6 +5,7 @@
 #include <iostream>
 #include <set>
 #include <regex>
+#include "util.h"
 
 namespace fs = boost::filesystem;
 using namespace pugi;
@@ -93,15 +94,6 @@ void Model::loadTree(const std::vector<pugi::xml_node>& nodes, const std::vector
     printTreeRecursive(m_topEvent, 0);
 }
 
-// TODO move to utilities
-std::string insideBrackets(std::string str)
-{
-    const auto i1 = str.find_first_of("[")+1;
-    const auto i2 = str.find_last_of("]")-1;
-    return str.substr(i1, i2);
-}
-
-
 void Model::loadRecursive(
     const std::vector<pugi::xml_node> nodes,
     const std::vector<pugi::xml_node> edges,
@@ -133,26 +125,16 @@ void Model::loadRecursive(
                 if (child.canHaveProbability())
                 { // determine probability
                     std::string probabilityDescriptor = 
-                        insideBrackets(GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, PROB));
-                    
-                    const std::string probTypeId = probabilityDescriptor.substr(0,1);
-                    probabilityDescriptor = insideBrackets(probabilityDescriptor);
-                    if (probTypeId == "0") // static probability
-                    {   
-                        // std::cout << probabilityDescriptor;
-						child.setProbability(atoi(probabilityDescriptor.substr(0, probabilityDescriptor.find_first_of(",")-1).c_str()));
-                    }
-                    else if (probTypeId == "1")
-                    {
+                        util::insideBrackets(GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, PROB));
 
-                    }
+					child.setProbabilityFromString(probabilityDescriptor, m_missionTime);
                 }
 				else if (childType == nodetype::REDUNDANCYVP)
 				{
 					//<data key="nRange">[1, 2]</data>
 					//<data key = "kFormula">N - 1 < / data >
 					std::string nRange =
-						insideBrackets(GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, "nRange"));
+						util::insideBrackets(GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, "nRange"));
 
 					const int commaIndex = nRange.find_first_of(",");
 

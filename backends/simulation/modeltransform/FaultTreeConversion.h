@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "Model.h"
+#include "events/TopLevelEvent.h"
 
 std::shared_ptr<TopLevelEvent> fromGraphModel(const Model& graphMLModel);
 

@@ -1,6 +1,5 @@
 #pragma once
-#include "fuzztree.h"
-#include "DecomposedFuzzyInterval.h"
+#include "Node.h"
 #include <map>
 
 typedef DecomposedFuzzyInterval InstanceAnalysisResult;
@@ -14,20 +13,22 @@ class InstanceAnalysisTask
 {
 public:
 	InstanceAnalysisTask(
-		const fuzztree::TopEvent* tree,
+		const Node* tree,
 		unsigned int decompositionNumber,
+		unsigned int missionTime,
 		std::ofstream& logfile);
 
 	InstanceAnalysisResult compute();
 	
 protected:
-	InstanceAnalysisResult computeDecomposedResult();
-	InstanceAnalysisResult computeSingleResult();
+	DecomposedFuzzyInterval computeDecomposedResult();
+	DecomposedFuzzyInterval computeSingleResult();
 
-	static const bool isFuzzy(const fuzztree::Node* tree);
+	static const bool isFuzzy(const Node* tree);
 
-	const fuzztree::TopEvent* m_tree;
+	const Node* m_tree;
 	unsigned int m_decompositionNumber;
+	unsigned int m_missionTime;
 
 	std::ofstream& m_logFile;
 };

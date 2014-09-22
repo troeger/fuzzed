@@ -3,9 +3,7 @@
 #include <vector>
 #include <cassert>
 #include <iostream>
-
-// TODO
-typedef double Probability;
+#include "Probability.h"
 
 namespace nodetype
 {
@@ -42,7 +40,7 @@ public:
     typedef std::vector<Node> ChildList;
 
     Node(const std::string type, const std::string id, const bool isOptional=false, const std::string name="") :
-        m_type(type), m_id(id), m_name(name), m_isOptional(isOptional) {};
+        m_type(type), m_id(id), m_name(name), m_isOptional(isOptional), m_probability(INVALID) {};
 
     void addChild(const Node c) { m_children.emplace_back(c); }
     const ChildList& getChildren() const { return m_children; }
@@ -60,7 +58,7 @@ public:
 	const std::string& getRedundancyFormula() const { assert(m_type == nodetype::REDUNDANCYVP); return m_redundancyFormula; }
 
 	void setKOutOfN(const unsigned int& k) { assert(m_type == nodetype::VOTINGOR); m_kOutOfN = k; };
-	const unsigned int& getKOutOfN() const { { assert(m_type == nodetype::VOTINGOR); return m_kOutOfN; }
+	const unsigned int& getKOutOfN() const { assert(m_type == nodetype::VOTINGOR); return m_kOutOfN; }
 
     /**
      * Utility functions
@@ -72,8 +70,9 @@ public:
     bool isEventSet() const;
 	bool canHaveProbability() const;
 
-	void setProbability(const Probability p) { assert(canHaveProbability()); m_probability = p; }
-    const Probability& getProbability() const { assert(canHaveProbability()); return m_probability; }
+	void setProbabilityFromString(const std::string& str, const unsigned int missionTime);
+	void setProbability(const Probability& p);
+    const Probability& getProbability() const;
 
     std::string print() const { return std::string("- ") + m_type + " ID: " + m_id + " " + m_name; };
 

@@ -1,7 +1,6 @@
 #include "InstanceAnalysisTask.h"
 #include "AlphaCutAnalysisTask.h"
 #include "Probability.h"
-#include "FuzzTreeTypes.h"
 
 #include <assert.h>
 #include <map>
@@ -11,9 +10,10 @@
 using std::map;
 using std::future;
 
-InstanceAnalysisTask::InstanceAnalysisTask(const fuzztree::TopEvent* tree, unsigned int decompositionNumber, std::ofstream& logfile) :
+InstanceAnalysisTask::InstanceAnalysisTask(const Node* tree, unsigned int decompositionNumber, unsigned int missionTime, std::ofstream& logfile) :
 	m_tree(tree),
 	m_decompositionNumber(decompositionNumber),
+	m_missionTime(missionTime),
 	m_logFile(logfile)
 {}
 
@@ -22,7 +22,7 @@ InstanceAnalysisResult InstanceAnalysisTask::compute()
 	return isFuzzy(m_tree) ? computeDecomposedResult() : computeSingleResult();
 }
 
-InstanceAnalysisResult InstanceAnalysisTask::computeDecomposedResult()
+DecomposedFuzzyInterval InstanceAnalysisTask::computeDecomposedResult()
 {
 	map<AlphaCutAnalysisTask*, future<AlphaCutAnalysisResult>> alphaCutResults;
 	DecomposedFuzzyInterval resultInterval;
@@ -36,7 +36,7 @@ InstanceAnalysisResult InstanceAnalysisTask::computeDecomposedResult()
 	for (unsigned int i = 0; i <= m_decompositionNumber; ++i)
 	{
 		const double alpha = (double)(i / m_decompositionNumber);
-		AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, alpha, m_logFile);
+		AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, m_missionTime, alpha, m_logFile);
 		alphaCutResults[task] = task->run();
 	}
 
@@ -53,32 +53,28 @@ InstanceAnalysisResult InstanceAnalysisTask::computeDecomposedResult()
 	return resultInterval;
 }
 
-const bool InstanceAnalysisTask::isFuzzy(const fuzztree::Node* node)
+const bool InstanceAnalysisTask::isFuzzy(const Node* node)
 {
 	bool fuzzy = false;
 
-	using namespace fuzztreeType;
-	const type_info& typeName = typeid(*node);
-
-	if (typeName == *BASICEVENT) 
+	if (node->getType() == nodetype::BASICEVENT) 
 	{
-		const type_info& probName = typeid((static_cast<const fuzztree::BasicEvent*>(node))->probability());
-		return (probName == *TRIANGULARFUZZYINTERVAL || probName == *DECOMPOSEDFUZZYINTERVAL);
+		return node->getProbability().isFuzzy();
 	}
 
-	for (const auto& child : node->children())
+	for (const auto& child : node->getChildren())
 	{
 		fuzzy |= isFuzzy(&child);
 	}
 	return fuzzy;
 }
 
-InstanceAnalysisResult InstanceAnalysisTask::computeSingleResult()
+DecomposedFuzzyInterval InstanceAnalysisTask::computeSingleResult()
 {
 	future<AlphaCutAnalysisResult> alphaCutResult;
 	DecomposedFuzzyInterval resultInterval;
 
-	AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, 0, m_logFile);
+	AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, 0, m_missionTime, m_logFile);
 	alphaCutResult = task->run();
 
 	resultInterval[task->getAlpha()] = alphaCutResult.get();

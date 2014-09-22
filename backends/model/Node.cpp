@@ -57,3 +57,21 @@ bool Node::canHaveProbability() const
 		m_type == BASICEVENTSET ||
 		m_type == BASICEVENT;
 }
+
+void Node::setProbabilityFromString(const std::string& str, const unsigned int missionTime)
+{
+	assert(canHaveProbability());
+	m_probability = Probability::fromDescriptionString(str, missionTime);
+}
+
+const Probability& Node::getProbability() const
+{
+	assert(canHaveProbability());
+	return m_probability;
+}
+
+void Node::setProbability(const Probability& p)
+{
+	assert(canHaveProbability());
+	m_probability = p;
+}

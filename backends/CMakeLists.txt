@@ -139,6 +139,9 @@ add_executable(common_model_test test_common_model.cpp
 	${MODEL_DIR}/Node.cpp
 	${MODEL_DIR}/Model.h
 	${MODEL_DIR}/Node.h
+	${MODEL_DIR}/Probability.h
+	${MODEL_DIR}/Probability.cpp
+	${MODEL_DIR}/NumericInterval.h
 
 	${COMMON_DIR}/Issue.h
 	${COMMON_DIR}/FatalException.h
