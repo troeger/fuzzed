@@ -5,8 +5,6 @@ set(FT_INCLUDE_DIR
   "${CMAKE_CURRENT_SOURCE_DIR}/fuzztreeconfiguration"
   "${CMAKE_CURRENT_SOURCE_DIR}/util")
 
-option(USE_TIMENET ON)
-
 set(SIM_COMMON_SOURCES
   ${CMAKE_CURRENT_SOURCE_DIR}/util/XMLImport.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/util/Condition.cpp
