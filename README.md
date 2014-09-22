@@ -18,27 +18,27 @@ The editor supports the following generic features for all diagram types:
 * Analytical and simulation-based analysis of fault tree and FuzzTree diagrams. 
 * REST API for creating new diagrams with external software.
 
-You can try the editor at [http://www.fuzzed.org].
+You can try the editor at http://www.fuzzed.org.
 
 ## Installation
 
-If you just want to install your own copy of FuzzEd, please read the [[installation guide]].
+If you just want to install your own copy of FuzzEd, please read the [installation guide](https://github.com/troeger/fuzzed/wiki/InstallationGuide).
 
 ## Development
 
-If you want to contribute to FuzzEd, there is a lot of information in the [[developer section]] of the Wiki.
+If you want to contribute to FuzzEd, there is a lot of information in the [Wiki](https://github.com/troeger/fuzzed/wiki/Home).
 
 The developers hang around on the [dev mailing list](mailto:fuzzed@lists.nclmail.de).
 
 ## Licence
 
-FuzzEd ist licensed under the AGPL Version 3. This means your are allowed to:
+FuzzEd ist licensed under the [GNU AGPL Version 3](http://en.wikipedia.org/wiki/Affero_General_Public_License). This means your are allowed to:
 
 * Install and run the unmodified FuzzEd code at your site.
 * Re-package and distribute the unmodified version of FuzzEd from this repository. 
-* Modify and re-publish (fork) the editor, as long as your modified sources are accessible for everybody.
+* Fork and re-publish the editor, as long as your modified sources are accessible for everybody.
 
-In short, AGPL forbids you to distribute / run your own modified version of FuzzEd without publishing your code.
+In short, AGPL forbids you to distribute or run your own modified version of FuzzEd without publishing your code.
  
 ## Acknowledgements
 
