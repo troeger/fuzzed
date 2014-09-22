@@ -39,10 +39,10 @@ protected:
 template <typename T>
 Dynamic2dArray<T>::Dynamic2dArray(unsigned int w, unsigned int h)
 {
-	for (int i = 0; i < w; ++i)
+	for (unsigned int i = 0; i < w; ++i)
 	{
 		m_data.emplace_back(std::vector<T>());
-		for (int j = 0; j < h; ++j)
+		for (unsigned int j = 0; j < h; ++j)
 			m_data[i].emplace_back(T());
 	}
 	m_w = w;
