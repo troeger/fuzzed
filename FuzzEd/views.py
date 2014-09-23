@@ -279,6 +279,36 @@ def dashboard(request, project_id):
 
     return render(request, 'dashboard/dashboard.html', parameters)
 
+@login_required
+def dashboard_import(request, project_id):
+    """
+    Handles POST request for GraphML file import in the dashboard,
+    """
+    project = get_object_or_404(Project, pk=project_id)
+
+    parameters = {
+        'project': project.to_dict()
+    }
+
+    # user can only create a graph if he is owner or member of the respective
+    # project
+    if not (project.is_authorized(request.user)):
+        raise Http404
+
+    POST = request.POST
+
+    # import the graph
+    if POST.get('save') and POST.get('filename'):
+        graph = Graph(owner=request.user, project=project)
+        try:            
+            graph.from_graphml(POST.get("filename"))
+            graph.save()
+            graph.ensure_default_nodes()
+            return redirect('dashboard', project_id=project_id)
+        except Exception as e:
+            parameters['error_text'] = str(e)
+
+    return render(request, 'dashboard/dashboard_import.html', parameters)            
 
 @login_required
 def dashboard_new(request, project_id, kind):
@@ -311,7 +341,7 @@ def dashboard_new(request, project_id, kind):
             owner=request.user,
             project=project)
         graph.save()
-        graph.add_default_nodes()
+        graph.ensure_default_nodes()
         return redirect('dashboard', project_id=project_id)
 
     # render the create diagram if fuzztree
@@ -322,6 +352,11 @@ def dashboard_new(request, project_id, kind):
             'project': project.to_dict()
         }
         return render(request, 'dashboard/dashboard_new.html', parameters)
+
+    elif kind == "from_graphml":
+        # Redirect to file upload dialogue
+        return render(request, 'dashboard/dashboard_import.html',
+                        {'project': project.to_dict()})
 
     # something is not right with the request
     return HttpResponseBadRequest()
@@ -668,10 +703,10 @@ def login(request):
     # Ordinary password login. Since this is normally disabled in favour of OpenID login, all such users
     # got garbage passwords. This means that this code can remain in here as last ressort fallback for
     # the admin users that have real passwords.
-    if 'loginname' in POST and 'loginpw' in POST:
+    if 'username' in POST and 'password' in POST:
         user = auth.authenticate(
-            username=POST['loginname'],
-            password=POST['loginpw'])
+            username=POST['username'],
+            password=POST['password'])
         # user found? sign-on
         if user is not None and user.is_active:
             auth.login(request, user)

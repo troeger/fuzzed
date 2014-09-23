@@ -17,17 +17,11 @@
 <form method="POST" action="{% url 'dashboard_new' project.pk kind %}" class="form-horizontal">
     {% csrf_token %}
     <fieldset>
-        <div class="form-group">
-            <label class="col-lg-2 control-label">Kind</label>
-            <div class="col-lg-10">
-                <p class="form-control-static">{{ name }}</p>
-            </div>
-        </div>
 
         <div class="form-group">
             <label class="col-lg-2 control-label" for="name">Title</label>
             <div class="col-lg-10">
-                <input type="text" class="form-control" name="name" value="Reliability Diagram" id="name">
+                <input type="text" class="form-control" name="name" value="{{ name }}" id="name">
             </div>
         </div>
 

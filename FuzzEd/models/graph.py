@@ -57,9 +57,10 @@ class Graph(models.Model):
         return unicode(
             '%s%s' % ('[DELETED] ' if self.deleted else '', self.name))
 
-    def add_default_nodes(self):
+    def ensure_default_nodes(self):
         """
-            Add nodes that are contained in this kind of graph by default.
+            Add nodes that are contained in this kind of graph by default,
+            in case they are missing.
         """
         notation = notations.by_kind[self.kind]
         if 'defaults' in notation:
@@ -69,13 +70,15 @@ class Graph(models.Model):
                 default_node.update({'properties': {}})
                 # use index as node client ID
                 # this is unique since all other client IDs are time stamps
-                node = Node(
-                    graph=self,
-                    client_id=int(index),
-                    kind=default_node['kind'],
-                    x=default_node['x'],
-                    y=default_node['y'])
-                node.save()
+                node, created = Node.objects.get_or_create(kind=default_node['kind'],
+                    graph=self, deleted=False,
+                    defaults={'client_id':int(index), 
+                        'x':default_node['x'],
+                        'y':default_node['y']
+                    }
+                )
+                if created:
+                    node.save()
 
     def top_node(self):
         """
