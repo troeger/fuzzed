@@ -1,16 +1,19 @@
-import logging, json
+import logging
+import json
 
 from django.db import models
 
-from node import Node
-from edge import Edge
-from node_group import NodeGroup
+from .node import Node
+from .edge import Edge
+from .node_group import NodeGroup
 
 logger = logging.getLogger('FuzzEd')
 
-import notations
+from . import notations
+
 
 class Property(models.Model):
+
     """
     Class: Property
 
@@ -28,15 +31,31 @@ class Property(models.Model):
     class Meta:
         app_label = 'FuzzEd'
 
-    key        = models.CharField(max_length=255)
-    value      = models.TextField()
-    node       = models.ForeignKey(Node, related_name='properties', blank=True, null=True, default=None)
-    edge       = models.ForeignKey(Edge, related_name='properties', blank=True, null=True, default=None)
-    node_group = models.ForeignKey(NodeGroup, related_name='properties', blank=True, null=True, default=None)
-    deleted    = models.BooleanField(default=False)
+    key = models.CharField(max_length=255)
+    value = models.TextField()
+    node = models.ForeignKey(
+        Node,
+        related_name='properties',
+        blank=True,
+        null=True,
+        default=None)
+    edge = models.ForeignKey(
+        Edge,
+        related_name='properties',
+        blank=True,
+        null=True,
+        default=None)
+    node_group = models.ForeignKey(
+        NodeGroup,
+        related_name='properties',
+        blank=True,
+        null=True,
+        default=None)
+    deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return '%s%s: %s' % ('[DELETED] ' if self.deleted else '', self.key, self.value)
+        return '%s%s: %s' % (
+            '[DELETED] ' if self.deleted else '', self.key, self.value)
 
     @property
     def graph(self):
@@ -66,17 +85,22 @@ class Property(models.Model):
         # Check for property keys that are not part of the notations file
         # TODO: Make this an issue for the JS guys, so that the notations
         #       file really has all possible properties defined
-        if key in ['x','y','key']:
-            return 'numeric'        
+        if key in ['x', 'y', 'key']:
+            return 'numeric'
         try:
-            if type(obj) == Node:
-                return notations.by_kind[obj.graph.kind]['nodes'][obj.kind]['properties'][key]['kind']
-            elif type(obj) == Edge:
-                return notations.by_kind[obj.graph.kind]['edges']['properties'][key]['kind']
-            elif type(obj) == NodeGroup:
-                return notations.by_kind[obj.graph.kind]['nodeGroups']['properties'][key]['kind']
+            if isinstance(obj, Node):
+                return notations.by_kind[obj.graph.kind][
+                    'nodes'][obj.kind]['properties'][key]['kind']
+            elif isinstance(obj, Edge):
+                return notations.by_kind[obj.graph.kind][
+                    'edges']['properties'][key]['kind']
+            elif isinstance(obj, NodeGroup):
+                return notations.by_kind[obj.graph.kind][
+                    'nodeGroups']['properties'][key]['kind']
         except:
-            raise Exception("Invalid property key '%s' being used for %s"%(key, str(obj)))
+            raise Exception(
+                "Invalid property key '%s' being used for %s" %
+                (key, str(obj)))
 
     def object(self):
         if self.node:
@@ -102,9 +126,9 @@ class Property(models.Model):
             if val.startswith('"') and val.endswith('"'):
                 # Illformed legacy data stored in older versions
                 # We prefer to trust the notation type specification
-                logger.warning("Illformed value in property %u"%self.pk) 
-                val=val[1:-1]
-            return json.loads(val)         
+                logger.warning("Illformed value in property %u" % self.pk)
+                val = val[1:-1]
+            return json.loads(val)
         elif val_type == 'numeric':
             return int(val)
         elif val_type == 'bool':
@@ -127,7 +151,7 @@ class Property(models.Model):
                 # types are checked anyway, we try to be gentle here.
                 self.value = new_value
             else:
-                self.value = json.dumps(new_value)            
+                self.value = json.dumps(new_value)
         elif val_type == 'numeric':
             self.value = str(new_value)
         elif val_type == 'bool':
@@ -137,8 +161,8 @@ class Property(models.Model):
         self.save()
 
     def same_as(self, prop):
-        ''' 
-            Checks if this property is equal to the given one. 
+        '''
+            Checks if this property is equal to the given one.
         '''
         if self.key != prop.key:
             return False
@@ -146,5 +170,3 @@ class Property(models.Model):
         if not same_val:
             return False
         return True
-
-

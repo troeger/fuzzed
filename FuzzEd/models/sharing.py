@@ -7,7 +7,9 @@ from FuzzEd.models import Graph, Project
 
 logger = logging.getLogger('FuzzEd')
 
+
 class Sharing(models.Model):
+
     """
     Class: Sharing
 
@@ -24,11 +26,15 @@ class Sharing(models.Model):
     class Meta:
         app_label = 'FuzzEd'
 
-    graph   = models.ForeignKey(Graph, related_name='sharings')
-    user    = models.ForeignKey(User, related_name='sharings')
+    graph = models.ForeignKey(Graph, related_name='sharings')
+    user = models.ForeignKey(User, related_name='sharings')
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    project = models.ForeignKey(Project, null=True, default=None, related_name='sharings')
+    project = models.ForeignKey(
+        Project,
+        null=True,
+        default=None,
+        related_name='sharings')
 
     def __unicode__(self):
-        return unicode('Graph %u shared with %s by %s.' % (self.graph.pk, self.user, self.graph.owner))
-
+        return unicode('Graph %u shared with %s by %s.' %
+                       (self.graph.pk, self.user, self.graph.owner))

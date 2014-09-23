@@ -49,7 +49,6 @@ define(['factory', 'config', 'class', 'jquery'], function(Factory, Config, Class
                                 // overlap each other as soon as there are two edges between two nodes
             }]);
 
-            //TODO: implement usage of properties (e.g. style)
             this._setupEvents();
         },
 

@@ -1,4 +1,3 @@
-syntax: glob
 fuzzed.sqlite
 test_fuzzed.sqlite
 *.pyc
@@ -28,3 +27,4 @@ FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js
 FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js
 backends/build
 backends/thirdParty/pugixml/build
+id_rsa

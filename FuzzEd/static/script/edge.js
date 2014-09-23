@@ -5,11 +5,8 @@ function(Factory, Class, Config, Property) {
      */
 
     /**
-     * Class: {Abstract} Edge
+     * Class: Edge
      *      This class models a generic connection of two nodes, further specified in the respective notations file.
-     *
-     *  This class models a generic connection of two nodes, further specified in the respective notations file.
-     *
      */
     return Class.extend({
         /**

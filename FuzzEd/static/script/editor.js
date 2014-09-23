@@ -12,7 +12,6 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
     return Class.extend({
         /**
          * Group: Members:
-         *      {Object}              config                        - Graph-specific <Config> object.
          *      {<Graph>}             graph                         - <Graph> instance to be edited.
          *      {<PropertiesMenu>}    properties                    - The <PropertiesMenu> instance used by this editor
          *                                                            for changing the properties of nodes of the edited
@@ -28,7 +27,6 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      {Underscore Template} _nodeOffsetStylesheetTemplate - The underscore.js template used to generate the
          *                                                            CSS transformation for the print offset.
          */
-        factory:                       undefined,
         graph:                         undefined,
         properties:                    undefined,
         shapes:                        undefined,
@@ -108,10 +106,9 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          */
         _loadGraphCompleted: function(readOnly) {
             // create manager objects for the bars
-            //TODO: put this into the factory
-            this.properties = new Menus.PropertiesMenu(Factory.getNotation().propertiesDisplayOrder);
-            this.shapes     = new Menus.ShapeMenu();
-            this.layout     = new Menus.LayoutMenu();
+            this.properties = Factory.getModule('Menus').PropertiesMenu(Factory.getNotation().propertiesDisplayOrder);
+            this.shapes     = Factory.getModule('Menus').ShapeMenu();
+            this.layout     = Factory.getModule('Menus').LayoutMenu();
             this.graph.layoutMenu = this.layout;
             this._backend.activate();
 
@@ -248,23 +245,23 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
         _setupJsPlumb: function() {
             jsPlumb.importDefaults({
                 EndpointStyle: {
-                    fillStyle:   Factory.getModule('Config').JSPlumb.ENDPOINT_FILL
+                    fillStyle:    Factory.getModule('Config').JSPlumb.ENDPOINT_FILL
                 },
                 Endpoint:        [Factory.getModule('Config').JSPlumb.ENDPOINT_STYLE, {
-                    radius:      Factory.getModule('Config').JSPlumb.ENDPOINT_RADIUS,
-                    cssClass:    Factory.getModule('Config').Classes.JSPLUMB_ENDPOINT,
-                    hoverClass:  Factory.getModule('Config').Classes.HIGHLIGHTED
+                    radius:       Factory.getModule('Config').JSPlumb.ENDPOINT_RADIUS,
+                    cssClass:     Factory.getModule('Config').Classes.JSPLUMB_ENDPOINT,
+                    hoverClass:   Factory.getModule('Config').Classes.HIGHLIGHTED
                 }],
                 PaintStyle: {
-                    strokeStyle: Factory.getModule('Config').JSPlumb.STROKE_COLOR,
-                    lineWidth:   Factory.getModule('Config').JSPlumb.STROKE_WIDTH,
-                    outlineColor:Factory.getModule('Config').JSPlumb.OUTLINE_COLOR,
-                    outlineWidth:Factory.getModule('Config').JSPlumb.OUTLINE_WIDTH
+                    strokeStyle:  Factory.getModule('Config').JSPlumb.STROKE_COLOR,
+                    lineWidth:    Factory.getModule('Config').JSPlumb.STROKE_WIDTH,
+                    outlineColor: Factory.getModule('Config').JSPlumb.OUTLINE_COLOR,
+                    outlineWidth: Factory.getModule('Config').JSPlumb.OUTLINE_WIDTH
                 },
                 HoverPaintStyle: {
-                    strokeStyle: Factory.getModule('Config').JSPlumb.STROKE_COLOR_HIGHLIGHTED
+                    strokeStyle:  Factory.getModule('Config').JSPlumb.STROKE_COLOR_HIGHLIGHTED
                 },
-                HoverClass:      Factory.getModule('Config').Classes.HIGHLIGHTED,
+                HoverClass:       Factory.getModule('Config').Classes.HIGHLIGHTED,
                 Connector:       [Factory.getModule('Config').JSPlumb.CONNECTOR_STYLE, Factory.getModule('Config').JSPlumb.CONNECTOR_OPTIONS],
                 ConnectionsDetachable: false,
                 ConnectionOverlays: Factory.getModule('Config').JSPlumb.CONNECTION_OVERLAYS
@@ -390,7 +387,8 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
 
             // update the available menu actions corresponding to the current selection
             jQuery(document).on([ Factory.getModule('Config').Events.NODE_SELECTED,
-                                  Factory.getModule('Config').Events.NODE_UNSELECTED ].join(' '), this._updateMenuActions.bind(this));
+                                  Factory.getModule('Config').Events.NODE_UNSELECTED ].join(' '),
+                this._updateMenuActions.bind(this));
 
             // show status of global AJAX events in navbar
             jQuery(document).ajaxSend(Progress.showAjaxProgress);
@@ -425,7 +423,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             // delete selected node groups
             _.each(deletableNodeGroups, this.graph.deleteNodeGroup.bind(this.graph));
 
-            // if at least one element was deletable, hide the properties window
+            // if at least one element was deletable, hide the properties window (if it isn't already)
             if (_.union(deletableNodes, deletableEdges, deletableNodeGroups).length > 0) this.properties.hide();
 
             // update the available menu actions
@@ -607,9 +605,9 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             //XXX: hack to emulate a new selection process
             Canvas.container.data(Factory.getModule('Config').Keys.SELECTABLE)._mouseStart(event);
 
-            jQuery('.'+Factory.getModule('Config').Classes.SELECTEE)
-                .addClass(Factory.getModule('Config').Classes.SELECTING)
-                .addClass(Factory.getModule('Config').Classes.SELECTED);
+            jQuery('.' + Factory.getModule('Config').Classes.SELECTEE)
+               .addClass(Factory.getModule('Config').Classes.SELECTING)
+               .addClass(Factory.getModule('Config').Classes.SELECTED);
 
             //XXX: trigger selection stop event manually here
             //XXX: nasty hack to bypass draggable and selectable incompatibility, see also canvas.js
@@ -631,7 +629,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
                 event = window.event;
             }
 
-            //XXX: Since a deselect-click only works without metaKey or ctrlKey pressed,
+            //XXX: Since a deselect-click (which we simulate here) only works without metaKey or ctrlKey pressed,
             // we need to deactivate them manually.
             var hackEvent = jQuery.extend({}, event, {
                 metaKey: false,
@@ -650,7 +648,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
         /**
          * Method: _copySelection
          *      Will copy all selected nodes by serializing and saving them to HTML5 Local Storage or the _clipboard
-         *      variable if the former capability is not available.
+         *      variable if Local Storage is not available.
          *
          * Returns:
          *      This {<Editor>} instance for chaining.
@@ -686,7 +684,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      This {<Editor>} instance for chaining.
          */
         _paste: function() {
-            // fetch clipboard from local storage or variable
+            // fetch clipboard contents
             var clipboard = this._getClipboard();
 
             // if there is nothing in the clipboard, return
@@ -702,6 +700,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             var nodes       = clipboard.nodes;
             var edges       = clipboard.edges;
             var nodeGroups  = clipboard.nodeGroups;
+
             var ids         = {}; // stores to every old id the newly generated id to connect the nodes again
             var boundingBox = this._boundingBoxForNodes(nodes); // used along with pasteCount to place the copy nicely
 
@@ -865,7 +864,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
             var clipboardString = JSON.stringify(clipboardDict);
             if (typeof window.Storage !== 'undefined') {
                 localStorage['clipboard_' + this.graph.kind] = clipboardString;
-            } else { // fallback
+            } else { // fallback (doesn't work cross-tab)
                 this._clipboard = clipboardString;
             }
 
@@ -881,7 +880,8 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
          *      The clipboard contents as {Object}.
          */
         _getClipboard: function() {
-            if (typeof window.Storage !== 'undefined' && typeof localStorage['clipboard_' + this.graph.kind] !== 'undefined') {
+            if (typeof window.Storage !== 'undefined' &&
+                typeof localStorage['clipboard_' + this.graph.kind] !== 'undefined') {
                 return JSON.parse(localStorage['clipboard_' + this.graph.kind]);
             } else if (typeof this._clipboard !== 'undefined') {
                 return JSON.parse(this._clipboard);
@@ -927,7 +927,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _deletePressed
-         *      Event callback for handling delete key presses. Will remove the selected nodes and edges by calling
+         *      Event callback for handling delete key presses. Will remove the selected elements by calling
          *      _deleteSelection as long as no input field is currently focused (allows e.g. character removal in
          *      properties).
          *
@@ -964,8 +964,7 @@ function(Factory, Class, Menus, Canvas, Backend, Alerts, Progress) {
 
         /**
          * Method: _selectAllPressed
-         *      Event callback for handling a select all (CTRL/CMD + A) key presses. Will select all nodes and edges by
-         *      calling _selectAll().
+         *      Event callback for handling a select all (CTRL/CMD + A) key presses.
          *
          * Parameters:
          *      {jQuery::Event} event - the issued select all keypress event

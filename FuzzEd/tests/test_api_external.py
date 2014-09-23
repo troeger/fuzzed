@@ -2,12 +2,14 @@ import json
 import os
 
 from FuzzEd.models import Graph
-from common import fixt_simple, FuzzEdLiveServerTestCase, FuzzEdTestCase
+from .common import fixt_simple, FuzzEdLiveServerTestCase, FuzzEdTestCase
 
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
+
 class ExternalAPITestCase(FuzzEdLiveServerTestCase):
+
     """
         Tests for the Tastypie API.
     """
@@ -47,7 +49,9 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
         data = json.loads(response.content)
 
     def testSingleProjectResource(self):
-        response = self.getWithAPIKey('/api/v1/project/%u/?format=json' % fixt_simple['pkProject'])
+        response = self.getWithAPIKey(
+            '/api/v1/project/%u/?format=json' %
+            fixt_simple['pkProject'])
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content)
 
@@ -64,7 +68,9 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
             if kind in ['faulttree', 'fuzztree']:
                 response = self.get('/api/v1/graph/%u/?format=tex' % id)
                 self.assertEqual(response.status_code, 401)
-                response = self.getWithAPIKey('/api/v1/graph/%u/?format=tex' % id)
+                response = self.getWithAPIKey(
+                    '/api/v1/graph/%u/?format=tex' %
+                    id)
                 self.assertEqual(response.status_code, 200)
                 assert ("tikz" in response.content)
 
@@ -74,15 +80,19 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
                 # Should only be possible with API key authentication
                 response = self.get('/api/v1/graph/%u/?format=graphml' % id)
                 self.assertEqual(response.status_code, 401)
-                response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % id)
+                response = self.getWithAPIKey(
+                    '/api/v1/graph/%u/?format=graphml' %
+                    id)
                 self.assertEqual(response.status_code, 200)
                 assert ("<graphml" in response.content)
 
     def testGraphmlImport(self):
         for id, kind in fixt_simple['graphs'].iteritems():
             # First export GraphML
-            print "Testing graph %u (%s)"%(id, kind)
-            response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % id)
+            print "Testing graph %u (%s)" % (id, kind)
+            response = self.getWithAPIKey(
+                '/api/v1/graph/%u/?format=graphml' %
+                id)
             self.assertEqual(response.status_code, 200)
             graphml = response.content
             # Now import the same GraphML
@@ -97,20 +107,30 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
 
     def testInvalidGraphImportProject(self):
         # First export valid GraphML
-        response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % fixt_simple['pkFaultTree'])
+        response = self.getWithAPIKey(
+            '/api/v1/graph/%u/?format=graphml' %
+            fixt_simple['pkFaultTree'])
         self.assertEqual(response.status_code, 200)
         graphml = response.content
         # Now send request with wrong project ID
-        response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=99', graphml, 'application/xml')
+        response = self.postWithAPIKey(
+            '/api/v1/graph/?format=graphml&project=99',
+            graphml,
+            'application/xml')
         self.assertEqual(response.status_code, 403)
 
     def testMissingGraphImportProject(self):
         # First export valid GraphML
-        response = self.getWithAPIKey('/api/v1/graph/%u/?format=graphml' % fixt_simple['pkFaultTree'])
+        response = self.getWithAPIKey(
+            '/api/v1/graph/%u/?format=graphml' %
+            fixt_simple['pkFaultTree'])
         self.assertEqual(response.status_code, 200)
         graphml = response.content
         # Now send request with wrong project ID
-        response = self.postWithAPIKey('/api/v1/graph/?format=graphml', graphml, 'application/xml')
+        response = self.postWithAPIKey(
+            '/api/v1/graph/?format=graphml',
+            graphml,
+            'application/xml')
         self.assertEqual(response.status_code, 403)
 
     def testInvalidGraphImportFormat(self):
@@ -120,17 +140,19 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
             self.assertEqual(response.status_code, 413)
 
     def testInvalidContentType(self):
-        for format in ['application/text', 'application/x-www-form-urlencoded']:
+        for format in ['application/text',
+                       'application/x-www-form-urlencoded']:
             response = self.postWithAPIKey('/api/v1/graph/?format=graphml&project=%u' % (fixt_simple['pkProject']),
                                            "<graphml></graphml>", format)
             self.assertEqual(response.status_code, 413)
-
 
     def testFoo(self):
         ''' Leave this out, and the last test will fail. Dont ask me why.'''
         assert (True)
 
+
 class GraphMLFilesTestCase(FuzzEdTestCase):
+
     """
         Testing different GraphML file imports.
         The fixture gives us existing user accounts and a valid project ID.
@@ -141,14 +163,16 @@ class GraphMLFilesTestCase(FuzzEdTestCase):
         self.setUpAnonymous()
 
     def testImportFiles(self):
-        files = [f for f in os.listdir('FuzzEd/fixtures') if f.endswith(".graphml")]
+        files = [
+            f for f in os.listdir('FuzzEd/fixtures') if f.endswith(".graphml")]
         print files
         for f in files:
-            print("Testing "+f)
+            print("Testing " + f)
             text = open('FuzzEd/fixtures/' + f).read()
             # Now import the same GraphML
             response = self.postWithAPIKey(
-                        '/api/v1/graph/?format=graphml&project=%u' % fixt_simple['pkProject'],
-                        text,
-                        'application/xml')
+                '/api/v1/graph/?format=graphml&project=%u' % fixt_simple[
+                    'pkProject'],
+                text,
+                'application/xml')
             self.assertEqual(response.status_code, 201)
