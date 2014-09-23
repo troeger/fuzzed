@@ -4,6 +4,13 @@
 '''
 
 import os, platform, socket
+
+if "DJANGO_CONFIGURATION" not in os.environ:
+  # Not set by user, so we assume developer mode, since
+  # production systems are supposed to not use this script
+  os.environ["DJANGO_CONFIGURATION"]="Dev"
+  print("Assuming Dev mode")
+
 from FuzzEd import VERSION
 
 #./site_scons automatically becomes part of the Python search path
@@ -97,11 +104,11 @@ patch4 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js',
 env.Alias("backend", "ftconfiguration")
 env.Alias("backend", "ftanalysis")
 env.Alias("backend", "ftsimulation")
-env.Alias("backend", shapes)
 
 env.Alias("frontend", css)
 env.Alias("frontend", xml)
 env.Alias("frontend", notations)
+env.Alias("frontend", shapes)
 env.Alias("frontend", patch1)
 env.Alias("frontend", patch2)
 env.Alias("frontend", patch3)
