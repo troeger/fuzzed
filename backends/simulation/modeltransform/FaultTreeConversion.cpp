@@ -29,16 +29,11 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const Node& templateNode
 		// Leaf nodes...
 		if (typeName == nodetype::BASICEVENT) 
 		{
-			const auto& prob = child.getProbability();
-			double failureRate = 0.f;
-			// TODO
-// 			if (probName == *CRISPPROB)
-// 				failureRate = util::rateFromProbability(static_cast<const faulttree::CrispProbability&>(prob).value(), missionTime);
-// 			else
-// 			{
-// 				assert(dynamic_cast<const faulttree::FailureRate*>(&prob));
-// 				failureRate = static_cast<const faulttree::FailureRate&>(prob).value();
-// 			}
+			const Probability& prob = child.getProbability();
+			
+			if (prob.isFuzzy())
+				throw FatalException("Cannot convert fuzzy numbers to failure rates");
+
 			current = make_shared<BasicEvent>(id, prob.getRateValue());
 			node->addChild(current);
 			alreadyAdded = true;

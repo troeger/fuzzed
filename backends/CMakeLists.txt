@@ -99,9 +99,9 @@ set(MODEL_DIR 		${CMAKE_CURRENT_SOURCE_DIR}/model)
 set(COMMON_SOURCES
 	${MODEL_DIR}/Model.cpp
 	${MODEL_DIR}/Node.cpp
+	${MODEL_DIR}/Probability.cpp
 
 	${COMMON_DIR}/util.cpp
-	#${COMMON_DIR}/xmlutil.cpp
 
 	${COMMON_DIR}/CommandLineParser.cpp
 	${COMMON_DIR}/Issue.cpp
@@ -112,10 +112,11 @@ set(COMMON_SOURCES
 set(COMMON_HEADERS
 	${MODEL_DIR}/Model.h
 	${MODEL_DIR}/Node.h
+	${MODEL_DIR}/Probability.h
 
 	${COMMON_DIR}/platform.h
 	${COMMON_DIR}/util.h
-	#${COMMON_DIR}/xmlutil.h
+	${COMMON_DIR}/resultxml.h
 
 	${COMMON_DIR}/CommandLineParser.h
 	${COMMON_DIR}/Issue.h

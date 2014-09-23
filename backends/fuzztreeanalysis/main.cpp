@@ -7,9 +7,9 @@
 
 #include "FatalException.h"
 #include "CommandLineParser.h"
-#include "FaultTreeToFuzzTree.h"
 #include "util.h"
 
+#include "Model.h"
 
 
 int main(int argc, char** argv)
@@ -44,8 +44,16 @@ int main(int argc, char** argv)
 	inputFileStream.close();
 
 	// Analyze all configs
+	Model m(inFile);
+	InstanceAnalysisTask analysis(m.getTopEvent(), m.getDecompositionNumber(), m.getMissionTime(), *logFileStream);
+	DecomposedFuzzyInterval result = analysis.compute();
 
+	std::vector<AnalysisResult> results;
+
+	ResultsXML xml;
+	xml.generate(results);
 	// Report all issues
+
 
 	// Write result xml
 	

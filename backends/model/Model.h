@@ -32,6 +32,8 @@ public:
     const std::string& getId()      const { return m_id; };
     const std::string& getName()    const { return m_name; };
     const std::string& getType()    const { return m_type; };
+	
+	const unsigned int& getDecompositionNumber() const { return m_decompositionNumber; };
 
 	const unsigned int& getMissionTime() const { return m_missionTime; };
 
@@ -50,7 +52,7 @@ private:
     Model(std::string type, std::string id, std::string name)
         : m_type(type), m_id(id), m_name(name), m_topEvent(nullptr), m_decompositionNumber(0)
     {};
-
+	
     std::string m_id;
     std::string m_type;
 
