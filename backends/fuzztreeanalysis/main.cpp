@@ -12,6 +12,7 @@
 #include "Model.h"
 #include "AnalysisResult.h"
 #include "resultxml.h"
+#include "FuzzTreeToFaultTree.h"
 
 int main(int argc, char** argv)
 {
@@ -47,23 +48,37 @@ int main(int argc, char** argv)
 	// Analyze
 	std::vector<AnalysisResult> results;
 	Model m(inFile);
+	ResultsXML xml;
+
+	const unsigned int decompositionNumber = m.getDecompositionNumber();
+	const unsigned int missionTime = m.getMissionTime();
+	const std::string modelId = m.getId();
+
 	if (m.getType() == modeltype::FUZZTREE)
 	{
+		FuzzTreeToFaultTree transform(&m);
+		const auto configs = transform.generateConfigurations();
+		for (const FuzzTreeConfiguration& inst : configs)
+		{
+			Model faultTree = transform.faultTreeFromConfiguration(inst);
+			InstanceAnalysisTask analysis(faultTree.getTopEvent(), decompositionNumber, missionTime, *logFileStream);
+			DecomposedFuzzyInterval result = analysis.compute();
+			results.emplace_back(modelId, inst.getId(), util::timeStamp(), result);
+		}
+
+		xml.generate(configs, results, std::ofstream(outFile));
 	}
 	else
 	{
-		InstanceAnalysisTask analysis(m.getTopEvent(), m.getDecompositionNumber(), m.getMissionTime(), *logFileStream);
+		InstanceAnalysisTask analysis(m.getTopEvent(), decompositionNumber, missionTime, *logFileStream);
 		DecomposedFuzzyInterval result = analysis.compute();
-		results.emplace_back(m.getId(), "", util::timeStamp(), result);
+		results.emplace_back(modelId, "", util::timeStamp(), result);
+
+		xml.generate(results, std::ofstream(outFile));
 	}
-
-	ResultsXML xml;
-	xml.generate(results, std::cout);
-	// Report all issues
-
-
-	// Write result xml
 	
+	// TODO: Report all issues
+
 	logFileStream->close();
 	delete logFileStream;
 

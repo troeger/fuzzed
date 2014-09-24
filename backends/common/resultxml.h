@@ -73,7 +73,7 @@ class ResultsXML
 public:
     /* "FaultTree" template without configurations */
     template <typename ResultType>
-    void generate(std::vector<ResultType>& results, std::ostream& output) const
+    void generate(const std::vector<ResultType>& results, std::ostream& output) const
     {
         pugi::xml_document document;
         pugi::xml_node resultsNode = this->createResultsNode(document);
@@ -87,7 +87,7 @@ public:
 
     /* "FuzzTree" template that accepts configurations */
     template <typename ResultType>
-    void generate(std::vector<FuzzTreeConfiguration>& configurations, std::vector<ResultType>& results, std::ostream& output) const
+    void generate(const std::vector<FuzzTreeConfiguration>& configurations, const std::vector<ResultType>& results, std::ostream& output) const
     {
         pugi::xml_document document;
         pugi::xml_node resultsNode = this->createResultsNode(document);

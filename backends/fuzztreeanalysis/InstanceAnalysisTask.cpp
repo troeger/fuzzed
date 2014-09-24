@@ -74,7 +74,7 @@ DecomposedFuzzyInterval InstanceAnalysisTask::computeSingleResult()
 	future<AlphaCutAnalysisResult> alphaCutResult;
 	DecomposedFuzzyInterval resultInterval;
 
-	AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, 0, m_missionTime, m_logFile);
+	AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, m_missionTime, 0.0, m_logFile);
 	alphaCutResult = task->run();
 
 	resultInterval[task->getAlpha()] = alphaCutResult.get();

@@ -24,9 +24,9 @@ static const char* PROB = "probability";
 static const char* FROM = "from";
 static const char* TO = "to";
 
-#define GET_STRING_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (std::string(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_string()))
-#define GET_INT_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_int())
-#define GET_BOOL_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL) (NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_bool())
+#define GET_STRING_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL)	(std::string(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_string()))
+#define GET_INT_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL)		(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_int())
+#define GET_BOOL_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL)		(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_bool())
 
 Model::Model(const std::string graphMLFileName)
 {
@@ -45,9 +45,11 @@ Model::Model(const std::string graphMLFileName)
     doc.print(std::cout);
 #endif
     const xml_node graph = doc.child("graphml").child("graph");
-    //graph.print(std::cout);
-    //graph.find_child_by_attribute(DATA, KEY, KIND).print(std::cout);
+    graph.print(std::cout);
     
+	if (!graph)
+		throw FatalException("This does not appear to be a GraphML file");
+
     m_type = GET_STRING_VALUE_BY_ATTR(graph, DATA, KEY, KIND);
 
     if (m_type != modeltype::FUZZTREE && m_type != modeltype::FAULTTREE)

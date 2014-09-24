@@ -206,3 +206,9 @@ bool util::isWritable(const string& path)
 	}
 	return true;
 }
+
+std::string util::afterComma(const std::string& str)
+{
+	const std::string result = str.substr(str.find_first_of(",")+1).c_str();
+	return result;
+}

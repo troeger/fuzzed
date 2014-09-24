@@ -7,7 +7,7 @@ Probability Probability::fromDescriptionString(const std::string descriptionStri
 {
 	const std::string probTypeId = descriptionString.substr(0, 1);
 	std::string probabilityDescriptor = util::insideBrackets(descriptionString);
-	double val = atof(probabilityDescriptor.substr(0, probabilityDescriptor.find_first_of(",") - 1).c_str());
+	double val = atof(util::afterComma(probabilityDescriptor).c_str());
 
 	if (probTypeId == "0") // static probability
 	{
@@ -17,6 +17,9 @@ Probability Probability::fromDescriptionString(const std::string descriptionStri
 	else if (probTypeId == "1")
 	{
 		return rateProbability(val, missionTime);
+	}
+	else // fuzzy
+	{
 	}
 
 	throw FatalException("Could not parse probability.");
@@ -54,13 +57,8 @@ Probability Probability::triangularFuzzyProbability(const double a, const double
 }
 
 Probability::Probability(const probabilitytype type)
-{
-	assert(
-		type == probabilitytype::STATIC ||
-		type == probabilitytype::RATE ||
-		type == probabilitytype::TRIANGULARFUZZY ||
-		type == probabilitytype::DECOMPOSEDFUZZY);
-}
+: m_type(type)
+{}
 
 NumericInterval Probability::getAlphaCutBounds(const double alpha) const
 {
@@ -69,7 +67,7 @@ NumericInterval Probability::getAlphaCutBounds(const double alpha) const
 	case STATIC:
 	case RATE:
 		{
-			return NumericInterval(m_rateValue, m_rateValue);
+				 return NumericInterval(m_staticValue, m_staticValue);
 		}
 	case TRIANGULARFUZZY:
 		{

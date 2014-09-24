@@ -64,6 +64,7 @@ namespace util
 	bool bitSet(const int var, const int pos);
 
 	std::string insideBrackets(const std::string& str);
+	std::string afterComma(const std::string& str);
 
 	/************************************************************************/
 	/* Timing                                                               */
