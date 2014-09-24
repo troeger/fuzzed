@@ -4,12 +4,13 @@
 #include <iostream>
 
 #include "pugixml.hpp"
+#include "FuzzTreeConfiguration.h"
 
 static const char* INDENT = "    ";
 
 class ResultsXML
 {
-    pugi::xml_node createResultsNode(pugi::xml_document& document)
+    pugi::xml_node createResultsNode(pugi::xml_document& document) const
     {
         pugi::xml_node results = document.append_child();
         results.set_name("ftr:backendResults");
@@ -24,27 +25,30 @@ class ResultsXML
     {
         pugi::xml_node configurationNode = results.append_child();
         configurationNode.set_name("configuration");
-        configurationNode.append_attribute("id")    = configuration.getId();
-        configurationNode.append_attribute("costs") = configuration.getCosts();
+        configurationNode.append_attribute("id")    = configuration.getId().c_str();
+        configurationNode.append_attribute("costs") = configuration.getCost();
 
-        return configuration;
+		return configurationNode;
     }
 
     template <typename ResultType>
     pugi::xml_node createResultNode(pugi::xml_node& results, const ResultType& result) const
     {
-        pugi::xml_node resultNode = results.append_child;
+        pugi::xml_node resultNode = results.append_child();
         resultNode.set_name("result");
         resultNode.append_attribute("valid")     = result.isValid();
-        resultNode.append_attribute("modelId")   = result.getModelId();
-        resultNode.append_attribute("configId")  = result.getId();
-        resultNode.append_attribute("timestamp") = result.getTimestamp();
+        resultNode.append_attribute("modelId")   = result.getModelId().c_str();
+        resultNode.append_attribute("configId")  = result.getId().c_str();
+        resultNode.append_attribute("timestamp") = result.getTimestamp().c_str();
         resultNode.append_attribute("xsi:type")  = "ftr:AnalysisResult";
 
-        this->createSpecificOutome(resultNode, result);
+        this->createSpecificOutcome(resultNode, result);
+
+		return resultNode;
     }
 
-    pugi::xml_node createSpecificOutcome(pugi::xml_node& result, const FuzzTreeAnalysisResults& outcome) const
+	template <typename ResultType>
+	pugi::xml_node createSpecificOutcome(pugi::xml_node& result, const ResultType& outcome) const
     {
         pugi::xml_node probability = result.append_child();
         probability.set_name("probability");
@@ -52,16 +56,18 @@ class ResultsXML
 
         for (const auto& alphaCut : outcome.getAlphaCuts())
         {
-            pugi::xml_node alphaCut = probability.append_child();
-            alphaCut.set_name("alphaCuts");
-            alphaCut.append_attribute("key") = alphaCut->first;
+            pugi::xml_node alphaCut_node = probability.append_child();
+			alphaCut_node.set_name("alphaCuts");
+			alphaCut_node.append_attribute("key") = alphaCut.first;
 
-            const auto& bounds = alphaCut->second;
-            pugi::xml_node value = alphaCut.append_child();
+            const NumericInterval& bounds = alphaCut.second;
+			pugi::xml_node value = alphaCut_node.append_child();
             value.set_name("value");
-            value.append_attribute("lowerBounds") = bounds.first;
-            value.append_attribute("upperBounds") = bounds.second;
+            value.append_attribute("lowerBounds") = bounds.lowerBound;
+            value.append_attribute("upperBounds") = bounds.upperBound;
         }
+
+		return probability;
     }
 
 public:

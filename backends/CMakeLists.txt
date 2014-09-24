@@ -72,7 +72,6 @@ message(STATUS "** Boost Libraries: ${Boost_LIBRARIES}")
 #########################################
 
 add_subdirectory(thirdParty/pugixml)
-message("Building pugixml")
 set(PUGIXML_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/pugixml/src")
 
 ################# Directories ###########
@@ -128,7 +127,7 @@ set(COMMON_HEADERS
 add_library(common_model STATIC ${COMMON_SOURCES} ${COMMON_HEADERS})
 
 include_directories(${COMMON_DIR})
-target_link_libraries(common_model ${Boost_LIBRARIES} ${PUGIXML_LIB})
+target_link_libraries(common_model ${Boost_LIBRARIES} pugixml)
 
 add_subdirectory(fuzztreeconfiguration)
 add_subdirectory(fuzztreeanalysis)
@@ -156,4 +155,4 @@ add_executable(common_model_test test_common_model.cpp
 	fuzztreeconfiguration/FuzzTreeToFaultTree.cpp
 	fuzztreeconfiguration/FuzzTreeToFaultTree.h
 )
-target_link_libraries(common_model_test ${Boost_LIBRARIES} ${PUGIXML_LIB})
+target_link_libraries(common_model_test ${Boost_LIBRARIES} pugixml)

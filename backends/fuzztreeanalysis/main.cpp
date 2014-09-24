@@ -10,7 +10,8 @@
 #include "util.h"
 
 #include "Model.h"
-
+#include "AnalysisResult.h"
+#include "resultxml.h"
 
 int main(int argc, char** argv)
 {
@@ -43,15 +44,21 @@ int main(int argc, char** argv)
 	*logFileStream << "Analysis input file: " << s << std::endl;
 	inputFileStream.close();
 
-	// Analyze all configs
-	Model m(inFile);
-	InstanceAnalysisTask analysis(m.getTopEvent(), m.getDecompositionNumber(), m.getMissionTime(), *logFileStream);
-	DecomposedFuzzyInterval result = analysis.compute();
-
+	// Analyze
 	std::vector<AnalysisResult> results;
+	Model m(inFile);
+	if (m.getType() == modeltype::FUZZTREE)
+	{
+	}
+	else
+	{
+		InstanceAnalysisTask analysis(m.getTopEvent(), m.getDecompositionNumber(), m.getMissionTime(), *logFileStream);
+		DecomposedFuzzyInterval result = analysis.compute();
+		results.emplace_back(m.getId(), "", util::timeStamp(), result);
+	}
 
 	ResultsXML xml;
-	xml.generate(results);
+	xml.generate(results, std::cout);
 	// Report all issues
 
 
