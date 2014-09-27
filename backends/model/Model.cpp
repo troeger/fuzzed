@@ -138,11 +138,19 @@ void Model::loadRecursive(
 					std::string nRange =
 						util::insideBrackets(GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, "nRange"));
 
-					const int commaIndex = nRange.find_first_of(",");
+					const size_t commaIndex = nRange.find_first_of(",");
 
 					child.m_from = atoi(nRange.substr(0, commaIndex).c_str());
 					child.m_to = atoi(std::string(nRange.begin()+commaIndex+1, nRange.end()).c_str());
 					child.m_redundancyFormula = GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, "kFormula");
+				}
+				else if (childType == nodetype::FEATUREVP)
+				{
+
+				}
+				else if (childType == nodetype::VOTINGOR)
+				{
+					child.m_kOutOfN = GET_INT_VALUE_BY_ATTR(c, DATA, KEY, "k");
 				}
 				else if (child.isEventSet())
 				{

@@ -29,7 +29,7 @@ double StaticGate::computeUnreliability() const
 
 bool StaticGate::hasDynamicChildren() const
 {
-	return !m_bStaticSubTree; // TODO
+	return !m_bStaticSubTree;
 }
 
 const std::string StaticGate::s_NOToperator = " NOT ";

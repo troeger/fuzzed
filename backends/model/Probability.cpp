@@ -12,14 +12,18 @@ Probability Probability::fromDescriptionString(const std::string descriptionStri
 	if (probTypeId == "0") // static probability
 	{
 		// std::cout << probabilityDescriptor;
+		if (probabilityDescriptor.find("[") != -1)
+		{
+		}
 		return staticProbability(val, missionTime);
 	}
 	else if (probTypeId == "1")
 	{
 		return rateProbability(val, missionTime);
 	}
-	else // fuzzy
+	else if (probTypeId == "2")// fuzzy
 	{
+		//return triangularFuzzyProbability(a, b1, b2, c, val, missionTime);
 	}
 
 	throw FatalException("Could not parse probability.");

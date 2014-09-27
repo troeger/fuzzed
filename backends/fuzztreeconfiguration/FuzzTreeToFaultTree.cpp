@@ -204,11 +204,11 @@ bool FuzzTreeToFaultTree::faultTreeFromConfigurationRecursive(
 
 		if (typeName == nodetype::REDUNDANCYVP)
 		{ // TODO: probably this always ends up with a leaf node
-			int numChildren = currentChild.getChildren().size();
+			size_t numChildren = currentChild.getChildren().size();
 			if (numChildren != 1)
 			{
 				throw FatalException(
-					std::string("Redundancy VP with invalid number of children found: ") + util::toString(numChildren),
+					std::string("Redundancy VP with invalid number of children found: ") + util::toString((int)numChildren),
 					0, id);
 			}
 			const auto& firstChild = currentChild.getChildren().front();
@@ -324,7 +324,7 @@ bool FuzzTreeToFaultTree::expandBasicEventSet(const Node* child, Node* parent, c
 {
 	assert(child && parent && child->getType() == nodetype::BASICEVENTSET);
 
-	const int numChildren = std::max(defaultQuantity, (int)child->getQuantity());
+	const unsigned int numChildren = std::max(defaultQuantity, (int)child->getQuantity());
 	if (numChildren <= 0)
 	{
 		m_issues.insert(Issue("Invalid number of Children in BasicEventSet", 0, child->getId()));
@@ -339,6 +339,7 @@ bool FuzzTreeToFaultTree::expandBasicEventSet(const Node* child, Node* parent, c
 	{
 		Node be(nodetype::BASICEVENT, eventSetId + "." + util::toString((int)i), false, child->getName());
 		be.setProbability(prob);
+		be.m_cost = cost;
 		parent->addChild(be);
 		i++;
 	}

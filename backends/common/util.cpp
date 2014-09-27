@@ -122,7 +122,6 @@ void util::tokenizeString(const string& input, vector<string>& results /*out*/)
 		results.push_back(string(*it));
 }
 
-// TODO move to utilities
 std::string util::insideBrackets(const std::string& str)
 {
 	const auto i1 = str.find_first_of("[") + 1;

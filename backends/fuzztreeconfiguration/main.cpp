@@ -9,6 +9,9 @@
 #include "xmlutil.h"
 #include "CommandLineParser.h"
 #include "FatalException.h"
+#include "FuzzTreeToFaultTree.h"
+#include "resultxml.h"
+#include "Result.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -25,9 +28,15 @@ int main(int argc, char **argv)
 	*logFileStream << "Configuration errors for " << inFile << std::endl;
 	if (!logFileStream->good())
 	{// create default log file
-		std::cout << "Could not open logfile" << std::endl;
-		return -1;
+		logFileStream = new std::ofstream(
+			parser.getWorkingDirectory().generic_string() +
+			util::slash +
+			"errors.txt");
 	}
+
+	Model m(inFile);
+	ResultsXML xml;
+	const std::string modelId = m.getId();
 
 	std::ifstream instream(inFile);
 	if (!instream.good())
@@ -37,53 +46,17 @@ int main(int argc, char **argv)
 	}
 
 	std::set<Issue> issues; // issues at fuzztree level
-	/*FuzzTreeTransform tf(instream, issues);
-	instream.close();
-
-	backendResults::BackendResults backendresults;
-
-	try
+	if (m.getType() == modeltype::FUZZTREE)
 	{
-		if (!tf.isValid())
-		{ // only fuzztrees should be configured 
-			issues.insert(Issue::fatalIssue("Could not configure the model. Did you try to configure a fault tree?"));
-		}
-		else
-		{ // handle fuzztree
-			const auto modelId = tf.getFuzzTree()->id();
-			for (const auto& t : tf.transform())
-			{
-				// TODO: where to put the ModelID?
-				backendresults.configuration().push_back(serializedConfiguration(t.first));
-			}
-		}
-
-		// Log errors
-		for (const Issue& issue : issues)
-		{
-			backendresults.issue().push_back(issue.serialized());
-			*logFileStream << issue.getMessage() << std::endl;
-		}
-
-		std::ofstream output(outFile);
-		backendResults::backendResults(output, backendresults);
+		FuzzTreeToFaultTree transform(&m);
+		const auto configs = transform.generateConfigurations();
+		xml.generate<Result>(configs, std::ofstream(outFile));
 	}
-
-	// This should not happen.
-	catch (const std::exception& e)
+	else
 	{
-		*logFileStream << "Exception while trying to configure " << inFile << e.what() << std::endl << "Results so far: ";
-		backendResults::backendResults(*logFileStream, backendresults);
-
-		fuzztree::fuzzTree(*logFileStream, *(tf.getFuzzTree()));
-		return -1;
+		issues.insert(Issue::fatalIssue("Not a FuzzTree model"));
 	}
-	catch (...)
-	{
-		*logFileStream << "Exception while trying to configure " << inFile << std::endl << "Results so far: ";
-		backendResults::backendResults(*logFileStream, backendresults);
-		return -1;
-	}*/
+	
 
 	logFileStream->close();
 	delete logFileStream;

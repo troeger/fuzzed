@@ -22,6 +22,7 @@
 #include <iostream>
 #include <fstream>
 #include "DeadlockMonitor.h"
+#include "FuzzTreeToFaultTree.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -111,11 +112,33 @@ void SimulationProxy::simulateAllConfigurations(
 	
 	try
 	{
-		// TODO: Rewrite the actual simulation call
+		std::vector<SimulationResult> results;
+		Model m(inFile);
+		ResultsXML xml;
 
-		// TODO: Log errors
-		
-		// TODO: Output results
+		const unsigned int decompositionNumber = m.getDecompositionNumber();
+		const unsigned int missionTime = m.getMissionTime();
+		const std::string modelId = m.getId();
+
+		if (m.getType() == modeltype::FUZZTREE)
+		{
+			FuzzTreeToFaultTree transform(&m);
+			const auto configs = transform.generateConfigurations();
+			for (const FuzzTreeConfiguration& inst : configs)
+			{
+				Model faultTree = transform.faultTreeFromConfiguration(inst);
+				const auto res = simulateFaultTree(fromGraphModel(faultTree), workingDir, logFileStream);
+				results.emplace_back(modelId, inst.getId(), util::timeStamp(), res);
+			}
+
+			xml.generate(configs, results, std::ofstream(outputFile.generic_string()));
+		}
+		else
+		{
+			const auto res = simulateFaultTree(fromGraphModel(m), workingDir, logFileStream);
+			results.emplace_back(modelId, "", util::timeStamp(), res);
+			xml.generate(results, std::ofstream(outputFile.generic_string()));
+		}
 	}
 	catch (std::exception& e)
 	{

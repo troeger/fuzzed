@@ -104,4 +104,19 @@ public:
         }
         document.save(output, INDENT);
     }
+
+	/* "FuzzTree" template that only outputs configurations */
+	template <typename ResultType>
+	void generate(const std::vector<FuzzTreeConfiguration>& configurations, std::ostream& output) const
+	{
+		pugi::xml_document document;
+		pugi::xml_node resultsNode = this->createResultsNode(document);
+
+		for (size_t i = 0; i < configurations.size(); ++i)
+		{
+			const auto& configuration = configurations[i];
+			this->createConfigurationNode(resultsNode, configuration);
+		}
+		document.save(output, INDENT);
+	}
 };

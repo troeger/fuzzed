@@ -12,7 +12,7 @@ struct FuzzTreeConfiguration
 public:
 	typedef std::string id_type;
 
-	FuzzTreeConfiguration() { std::cout << "Hello"; };
+	FuzzTreeConfiguration() { };
 	FuzzTreeConfiguration(const unsigned int id);
 	FuzzTreeConfiguration(const FuzzTreeConfiguration& other);
 	void operator=(const FuzzTreeConfiguration &other);
