@@ -346,3 +346,8 @@ bool FuzzTreeToFaultTree::expandBasicEventSet(const Node* child, Node* parent, c
 
 	return true;
 }
+
+const std::set<Issue>& FuzzTreeToFaultTree::getIssues() const
+{
+	return m_issues;
+}

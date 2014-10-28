@@ -24,22 +24,6 @@ Issue::Issue(const std::string& msg, const int issueId /*= 0*/, const std::strin
 
 }
 
-// commonTypes::Issue Issue::serialized() const
-// {
-// 	commonTypes::Issue i;
-// 	i.message(m_message);
-// 	i.isFatal(m_bFatal);
-// 	i.elementId(m_elementId);
-// 	i.issueId(m_issueId);
-// 
-// 	return i;
-// }
-
-const std::string Issue::getMessage() const
-{
-	return m_message;
-}
-
 bool Issue::operator==(const Issue&b) const
 {
 	return

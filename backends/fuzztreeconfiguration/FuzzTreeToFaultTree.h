@@ -12,6 +12,8 @@ public:
 	std::vector<FuzzTreeConfiguration> generateConfigurations();
 	Model faultTreeFromConfiguration(const FuzzTreeConfiguration& config);
 
+	const std::set<Issue>& getIssues() const;
+
 private:
 	bool generateConfigurationsRecursive(
 		const Node* node, 

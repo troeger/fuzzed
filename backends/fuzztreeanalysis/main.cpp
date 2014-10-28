@@ -54,6 +54,7 @@ int main(int argc, char** argv)
 	const unsigned int missionTime = m.getMissionTime();
 	const std::string modelId = m.getId();
 
+	std::set<Issue> issues;
 	if (m.getType() == modeltype::FUZZTREE)
 	{
 		FuzzTreeToFaultTree transform(&m);
@@ -66,7 +67,7 @@ int main(int argc, char** argv)
 			results.emplace_back(modelId, inst.getId(), util::timeStamp(), result);
 		}
 
-		xml.generate(configs, results, std::ofstream(outFile));
+		xml.generate(configs, results, transform.getIssues(), std::ofstream(outFile));
 	}
 	else
 	{
@@ -74,7 +75,7 @@ int main(int argc, char** argv)
 		DecomposedFuzzyInterval result = analysis.compute();
 		results.emplace_back(modelId, "", util::timeStamp(), result);
 
-		xml.generate(results, std::ofstream(outFile));
+		xml.generate(results, issues, std::ofstream(outFile));
 	}
 	
 	// TODO: Report all issues

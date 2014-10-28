@@ -50,7 +50,8 @@ int main(int argc, char **argv)
 	{
 		FuzzTreeToFaultTree transform(&m);
 		const auto configs = transform.generateConfigurations();
-		xml.generate<Result>(configs, std::ofstream(outFile));
+		auto output = std::ofstream(outFile);
+		xml.generate(configs, issues, output);
 	}
 	else
 	{

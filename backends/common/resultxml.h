@@ -5,6 +5,7 @@
 
 #include "pugixml.hpp"
 #include "FuzzTreeConfiguration.h"
+#include "Issue.h"
 
 static const char* INDENT = "    ";
 
@@ -20,6 +21,16 @@ class ResultsXML
 
         return results;
     }
+	pugi::xml_node createIssueNode(pugi::xml_node& results, const Issue& issue) const
+	{
+		pugi::xml_node issueNode = results.append_child("issue");
+
+		issueNode.append_attribute("issueId").set_value(issue.getIssueId());
+		issueNode.append_attribute("elementId").set_value(issue.getElementId().c_str());
+		issueNode.append_attribute("message").set_value(issue.getMessage().c_str());
+		issueNode.append_attribute("isFatal").set_value(issue.isFatal());
+		return issueNode;
+	}
 
     pugi::xml_node createConfigurationNode(pugi::xml_node& results, const FuzzTreeConfiguration& configuration) const
     {
@@ -93,7 +104,10 @@ class ResultsXML
 public:
     /* "FaultTree" template without configurations */
     template <typename ResultType>
-    void generate(const std::vector<ResultType>& results, std::ostream& output) const
+    void generate(
+		const std::vector<ResultType>& results,
+		const std::set<Issue>& issues,
+		std::ostream& output) const
     {
         pugi::xml_document document;
         pugi::xml_node resultsNode = this->createResultsNode(document);
@@ -102,12 +116,21 @@ public:
         {
             this->createResultNode(resultsNode, result);
         }
+
+		for (const Issue& issue : issues)
+		{
+			this->createIssueNode(resultsNode, issue);
+		}
         document.save(output, INDENT);
     }
 
     /* "FuzzTree" template that accepts configurations */
     template <typename ResultType>
-    void generate(const std::vector<FuzzTreeConfiguration>& configurations, const std::vector<ResultType>& results, std::ostream& output) const
+	void generate(
+		const std::vector<FuzzTreeConfiguration>& configurations,
+		const std::vector<ResultType>& results,
+		const std::set<Issue>& issues,
+		std::ostream& output) const
     {
         pugi::xml_document document;
         pugi::xml_node resultsNode = this->createResultsNode(document);
@@ -122,12 +145,19 @@ public:
             this->createConfigurationNode(resultsNode, configuration);
             this->createResultNode(resultsNode, result);
         }
+
+		for (const auto& issue : issues)
+		{
+			this->createIssueNode(resultsNode, issue);
+		}
         document.save(output, INDENT);
     }
 
 	/* "FuzzTree" template that only outputs configurations */
-	template <typename ResultType>
-	void generate(const std::vector<FuzzTreeConfiguration>& configurations, std::ostream& output) const
+	void generate(
+		const std::vector<FuzzTreeConfiguration>& configurations,
+		const std::set<Issue>& issues,
+		std::ostream& output) const
 	{
 		pugi::xml_document document;
 		pugi::xml_node resultsNode = this->createResultsNode(document);
@@ -137,6 +167,12 @@ public:
 			const auto& configuration = configurations[i];
 			this->createConfigurationNode(resultsNode, configuration);
 		}
+
+		for (const Issue& issue : issues)
+		{
+			this->createIssueNode(resultsNode, issue);
+		}
+
 		document.save(output, INDENT);
 	}
 };
