@@ -23,10 +23,30 @@ class ResultsXML
 
     pugi::xml_node createConfigurationNode(pugi::xml_node& results, const FuzzTreeConfiguration& configuration) const
     {
-        pugi::xml_node configurationNode = results.append_child();
-        configurationNode.set_name("configuration");
+        pugi::xml_node configurationNode = results.append_child("configuration");
         configurationNode.append_attribute("id")    = configuration.getId().c_str();
         configurationNode.append_attribute("costs") = configuration.getCost();
+
+		for (const auto& inclusionChoice : configuration.getOptionalNodes())
+		{
+			pugi::xml_node choiceNode = configurationNode.append_child("choice");
+			choiceNode.append_attribute("key").set_value(inclusionChoice.first.c_str());
+			choiceNode.append_child("value").append_attribute("included").set_value(inclusionChoice.second);
+		}
+
+		for (const auto& redundancyChoice : configuration.getRedundancyNodes())
+		{
+			pugi::xml_node choiceNode = configurationNode.append_child("choice");
+			choiceNode.append_attribute("key").set_value(redundancyChoice.first.c_str());
+			choiceNode.append_child("value").append_attribute("n").set_value(std::get<1>(redundancyChoice.second));
+		}
+
+		for (const auto& featureChoice : configuration.getFeaturedNodes())
+		{
+			pugi::xml_node choiceNode = configurationNode.append_child("choice");
+			choiceNode.append_attribute("key").set_value(featureChoice.first.c_str());
+			choiceNode.append_child("value").append_attribute("featureId").set_value(featureChoice.second.c_str());
+		}
 
 		return configurationNode;
     }

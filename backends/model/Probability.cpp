@@ -23,7 +23,9 @@ Probability Probability::fromDescriptionString(const std::string descriptionStri
 	}
 	else if (probTypeId == "2")// fuzzy
 	{
-		//return triangularFuzzyProbability(a, b1, b2, c, val, missionTime);
+		//[0, [b1 = b2, b1 - a = c - b1]]
+		std::string b = probabilityDescriptor.substr(0, probabilityDescriptor.find_first_of(","));
+		return triangularFuzzyProbability(val, atof(b.c_str()), atof(b.c_str()), val, missionTime);
 	}
 
 	throw FatalException("Could not parse probability.");
