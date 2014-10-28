@@ -12,7 +12,7 @@
 
 #include "Config.h"
 #include "platform.h"
-#include "ResultStruct.h"
+#include "SimulationResult.h"
 
 class TopLevelEvent;
 
@@ -44,13 +44,15 @@ protected:
 		const boost::filesystem::path& workingDir,
 		const boost::filesystem::path& logFile);
 
-	SimulationResultStruct simulateFaultTree(
+	SimulationResult simulateFaultTree(
 		const std::shared_ptr<TopLevelEvent> ft,
+		const std::string modelId,
+		const std::string resultId,
 		const boost::filesystem::path& workingDir,
 		std::ofstream* logFile);
 
-	SimulationResultStruct runSimulationInternal(
-		const boost::filesystem::path& inPath);
+	SimulationResult runSimulationInternal(
+		const boost::filesystem::path& inPath, const std::string modelId, const std::string resultId);
 	
 	unsigned int m_missionTime;
 	unsigned int m_simulationTime;

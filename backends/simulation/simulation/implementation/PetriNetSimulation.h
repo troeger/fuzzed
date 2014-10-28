@@ -1,7 +1,6 @@
 #pragma once
 #include "Simulation.h"
-#include "ResultStruct.h"
-
+#include "SimulationResult.h"
 #include <fstream>
 
 class PetriNet;
@@ -10,6 +9,8 @@ class PetriNetSimulation : public Simulation
 {
 public:
 	PetriNetSimulation(
+		const std::string modelId,
+		const std::string resultId,
 		const boost::filesystem::path& p, 
 		unsigned int simulationTime,		// the maximum duration of one simulation in seconds
 		unsigned int simulationSteps,		// the number of logical simulation steps performed in each round
@@ -20,9 +21,9 @@ public:
 
 	virtual bool run() override;
 
-	const SimulationResultStruct& result() const { return m_result; }
+	const SimulationResult& result() const { return m_result; }
 
-	void printResults(const SimulationResultStruct& res);
+	void printResults(const SimulationResult& res);
 
 	virtual ~PetriNetSimulation();
 
@@ -41,5 +42,5 @@ protected:
 	const bool m_simulateUntilFailure;
 	double m_convergenceThresh;
 
-	SimulationResultStruct m_result;
+	SimulationResult m_result;
 };

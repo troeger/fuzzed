@@ -23,6 +23,7 @@
 #include <fstream>
 #include "DeadlockMonitor.h"
 #include "FuzzTreeToFaultTree.h"
+#include "resultxml.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -35,17 +36,19 @@ SimulationProxy::SimulationProxy(int argc, char** arguments) :
 	parseCommandline_default(argc, arguments);
 }
 
-SimulationResultStruct SimulationProxy::runSimulationInternal(
-	const boost::filesystem::path& petriNetFile) 
+SimulationResult SimulationProxy::runSimulationInternal(
+	const boost::filesystem::path& inPath, const std::string modelId, const std::string resultId) 
 {
 	Simulation* sim = new PetriNetSimulation(
-		petriNetFile,
+		modelId,
+		resultId,
+		inPath,
 		m_simulationTime,
 		m_missionTime,
 		m_numRounds,
 		m_convergenceThresh,
 		true);
-	SimulationResultStruct res;
+	SimulationResult res(modelId, resultId, util::timeStamp());
 	
 	try
 	{
@@ -67,8 +70,10 @@ SimulationResultStruct SimulationProxy::runSimulationInternal(
 	return res;
 }
 
-SimulationResultStruct SimulationProxy::simulateFaultTree(
+SimulationResult SimulationProxy::simulateFaultTree(
 	const std::shared_ptr<TopLevelEvent> ft,
+	const std::string modelId,
+	const std::string resultId,
 	const boost::filesystem::path& workingDir,
 	std::ofstream* logfile)
 {
@@ -94,7 +99,7 @@ SimulationResultStruct SimulationProxy::simulateFaultTree(
 		throw FatalException(err);
 	}
 
-	return runSimulationInternal(petriNetFile);
+	return runSimulationInternal(petriNetFile, modelId, resultId);
 }
 
 void SimulationProxy::simulateAllConfigurations(
@@ -113,6 +118,7 @@ void SimulationProxy::simulateAllConfigurations(
 	try
 	{
 		std::vector<SimulationResult> results;
+		std::set<Issue> issues;
 		Model m(inFile);
 		ResultsXML xml;
 
@@ -127,17 +133,17 @@ void SimulationProxy::simulateAllConfigurations(
 			for (const FuzzTreeConfiguration& inst : configs)
 			{
 				Model faultTree = transform.faultTreeFromConfiguration(inst);
-				const auto res = simulateFaultTree(fromGraphModel(faultTree), workingDir, logFileStream);
+				const auto res = simulateFaultTree(fromGraphModel(faultTree), modelId, inst.getId(), workingDir, logFileStream);
 				results.emplace_back(modelId, inst.getId(), util::timeStamp(), res);
 			}
 
-			xml.generate(configs, results, std::ofstream(outputFile.generic_string()));
+			xml.generate(configs, results, issues, std::ofstream(outputFile.generic_string()));
 		}
 		else
 		{
-			const auto res = simulateFaultTree(fromGraphModel(m), workingDir, logFileStream);
+			const auto res = simulateFaultTree(fromGraphModel(m), modelId, "", workingDir, logFileStream);
 			results.emplace_back(modelId, "", util::timeStamp(), res);
-			xml.generate(results, std::ofstream(outputFile.generic_string()));
+			xml.generate(results, issues, std::ofstream(outputFile.generic_string()));
 		}
 	}
 	catch (std::exception& e)

@@ -23,7 +23,7 @@ set(HEADERS
    ${SIM_COMMON_HEADERS}
 
    SimulationProxy.h
-   ResultStruct.h
+   SimulationResult.h
    Config.h
    
    implementation/PetriNetSimulation.h

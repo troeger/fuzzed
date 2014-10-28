@@ -142,7 +142,7 @@ bool PetriNetSimulation::run()
 	double avgFailureTime_fail	= (double)sumFailureTime_fail	/(double)numFailures;
 	double meanAvailability		= avgFailureTime_fail			/(double)m_numSimulationSteps;
 	
-	SimulationResultStruct res;
+	SimulationResult res(m_result);
 	res.reliability			= 1.0 - unreliability;
 	res.meanAvailability	= meanAvailability;
 	res.nFailures			= numFailures;
@@ -158,15 +158,19 @@ bool PetriNetSimulation::run()
 }
 
 PetriNetSimulation::PetriNetSimulation(
+	const std::string modelId,
+	const std::string resultId,
 	const boost::filesystem::path& inPath,
 	unsigned int simulationTime,	// the maximum duration of one simulation in seconds
 	unsigned int simulationSteps,	// the number of logical simulation steps performed in each round
 	unsigned int numRounds,
 	double convergenceThresh,
 	bool simulateUntilFailure)
-	: Simulation(inPath, simulationTime, simulationSteps, numRounds),
+	:
+	Simulation(inPath, simulationTime, simulationSteps, numRounds),
 	m_simulateUntilFailure(simulateUntilFailure),
-	m_convergenceThresh(convergenceThresh)
+	m_convergenceThresh(convergenceThresh),
+	m_result(modelId, resultId, util::timeStamp())
 {
 	assert(!m_netFile.empty());
 }
@@ -295,7 +299,7 @@ void PetriNetSimulation::tryTimedTransitions(PetriNet* pn, int tick)
 	}
 }
 
-void PetriNetSimulation::printResults(const SimulationResultStruct& res)
+void PetriNetSimulation::printResults(const SimulationResult& res)
 {
 	const string results = str(
 		format("----- File %1%, %2% simulations with %3% simulated time steps \n \
