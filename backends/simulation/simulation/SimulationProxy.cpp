@@ -50,21 +50,10 @@ SimulationResult SimulationProxy::runSimulationInternal(
 		true);
 	SimulationResult res(modelId, resultId, util::timeStamp());
 	
-	try
-	{
-		std::function<void()> fun = [&]() { sim->run(); };
-		DeadlockMonitor monitor(&fun);
-		monitor.executeWithin(10000);
-        res = (static_cast<PetriNetSimulation*>(sim))->result();
-	}
-	catch (exception& e)
-	{
-		cout << "Exception during simulation: " << e.what(); 
-	}
-	catch (...)
-	{
-		cout << "Unknown Exception during simulation";
-	}
+	std::function<void()> fun = [&]() { sim->run(); };
+	DeadlockMonitor monitor(&fun);
+	monitor.executeWithin(10000);
+	res = (static_cast<PetriNetSimulation*>(sim))->result();
 	
 	delete sim;
 	return res;
@@ -114,43 +103,49 @@ void SimulationProxy::simulateAllConfigurations(
 		throw runtime_error("Could not open file");
 
 	std::ofstream* logFileStream = new std::ofstream(logFile.generic_string());
+
+	std::vector<SimulationResult> results;
+	std::vector<FuzzTreeConfiguration> configs;
+	std::set<Issue> issues;
+
+	Model m(inFile);
+	ResultsXML xml;
+
+	const std::string modelId = m.getId();
+	const std::string modelType = m.getType();
 	
 	try
 	{
-		std::vector<SimulationResult> results;
-		std::set<Issue> issues;
-		Model m(inFile);
-		ResultsXML xml;
-
-		const unsigned int decompositionNumber = m.getDecompositionNumber();
-		const unsigned int missionTime = m.getMissionTime();
-		const std::string modelId = m.getId();
-
-		if (m.getType() == modeltype::FUZZTREE)
+		if (modelType == modeltype::FUZZTREE)
 		{
 			FuzzTreeToFaultTree transform(&m);
-			const auto configs = transform.generateConfigurations();
+			configs = transform.generateConfigurations();
 			for (const FuzzTreeConfiguration& inst : configs)
 			{
 				Model faultTree = transform.faultTreeFromConfiguration(inst);
-				const auto res = simulateFaultTree(fromGraphModel(faultTree), modelId, inst.getId(), workingDir, logFileStream);
-				results.emplace_back(modelId, inst.getId(), util::timeStamp(), res);
+				results.emplace_back(simulateFaultTree(fromGraphModel(faultTree), modelId, inst.getId(), workingDir, logFileStream));
 			}
-
-			xml.generate(configs, results, issues, std::ofstream(outputFile.generic_string()));
 		}
-		else
+		else if (modelType == modeltype::FAULTTREE)
 		{
-			const auto res = simulateFaultTree(fromGraphModel(m), modelId, "", workingDir, logFileStream);
-			results.emplace_back(modelId, "", util::timeStamp(), res);
-			xml.generate(results, issues, std::ofstream(outputFile.generic_string()));
+			results.emplace_back(simulateFaultTree(fromGraphModel(m), modelId, "", workingDir, logFileStream));
 		}
 	}
 	catch (std::exception& e)
 	{
-		std::cout << e.what();
+		issues.insert(Issue::fatalIssue(e.what()));
 		*logFileStream << e.what() << std::endl;
 	}
+	catch (...)
+	{
+		issues.insert(Issue::fatalIssue("Unknown exception during simulation"));
+		*logFileStream << "Unknown exception during simulation" << std::endl;
+	}
+
+	if (modelType == modeltype::FUZZTREE)
+		xml.generate(configs, results, issues, std::ofstream(outputFile.generic_string()));
+	else if (modelType == modeltype::FAULTTREE)
+		xml.generate(results, issues, std::ofstream(outputFile.generic_string()));
 }
 
 void SimulationProxy::parseCommandline_default(int numArguments, char** arguments)

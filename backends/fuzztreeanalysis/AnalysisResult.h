@@ -9,6 +9,11 @@ public:
 
 	const DecomposedFuzzyInterval& getAlphaCuts() const;
 
+	const std::string getType() const override;
+	void createXML(pugi::xml_node& resultNode) const override;
+
+	const bool isValid() const;
+
 private:
 	const DecomposedFuzzyInterval m_analysisResult;
 };

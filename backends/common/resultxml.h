@@ -71,9 +71,11 @@ class ResultsXML
         resultNode.append_attribute("modelId")   = result.getModelId().c_str();
         resultNode.append_attribute("configId")  = result.getId().c_str();
         resultNode.append_attribute("timestamp") = result.getTimestamp().c_str();
-        resultNode.append_attribute("xsi:type")  = "ftr:AnalysisResult";
+        resultNode.append_attribute("xsi:type")  = result.getType().c_str();
 
-        this->createSpecificOutcome(resultNode, result);
+        //this->createSpecificOutcome(resultNode, result);
+
+		result.createXML(resultNode);
 
 		return resultNode;
     }
