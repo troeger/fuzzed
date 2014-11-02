@@ -47,7 +47,7 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const Node& templateNode
 			const unsigned int quantity = child.getQuantity();
 
 			if (prob.isFuzzy())
-				throw FatalException("Cannot convert fuzzy numbers to failure rates");
+				throw FatalException("Cannot convert fuzzy numbers to failure rates", 0, child.getId());
 
 			for (int i = 0; i < quantity; ++i)
 			{
@@ -63,7 +63,7 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const Node& templateNode
 		}
 		else if (typeName == nodetype::UNDEVELOPEDEVENT)
 		{
-			throw std::runtime_error("Cannot simulate trees with undeveloped events!");
+			throw FatalException("Cannot simulate models including Undeveloped Events", 0, child.getId());
 			continue;
 		}
 		else if (typeName == nodetype::INTERMEDIATEEVENT)
@@ -80,7 +80,7 @@ void convertFaultTreeRecursive(FaultTreeNode::Ptr node, const Node& templateNode
 		// Dynamic gates...
 		else if (typeName == nodetype::FDEP)
 		{
-// 			const string trigger = child.getTrigger();
+ 			const string trigger = child.getTriggerId();
 // 			std::vector<string> dependentEvents;
 // 			for (const string& e : fdep.triggeredEvents())
 // 				dependentEvents.emplace_back(e);

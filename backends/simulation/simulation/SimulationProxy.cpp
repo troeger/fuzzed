@@ -122,8 +122,21 @@ void SimulationProxy::simulateAllConfigurations(
 			configs = transform.generateConfigurations();
 			for (const FuzzTreeConfiguration& inst : configs)
 			{
-				Model faultTree = transform.faultTreeFromConfiguration(inst);
-				results.emplace_back(simulateFaultTree(fromGraphModel(faultTree), modelId, inst.getId(), workingDir, logFileStream));
+				try
+				{
+					Model faultTree = transform.faultTreeFromConfiguration(inst);
+					results.emplace_back(simulateFaultTree(fromGraphModel(faultTree), modelId, inst.getId(), workingDir, logFileStream));
+				}
+				catch (FatalException& e)
+				{
+					issues.insert(e.getIssue());
+					*logFileStream << e.what() << std::endl;
+				}
+				catch (std::exception& e)
+				{
+					issues.insert(Issue::fatalIssue(e.what()));
+					*logFileStream << e.what() << std::endl;
+				}
 			}
 		}
 		else if (modelType == modeltype::FAULTTREE)

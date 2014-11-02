@@ -14,18 +14,20 @@ class Model
 public:
     Model(const std::string graphMLFile);
 
-    static Model createFaulttree(std::string id, std::string name, Node* topEvent) 
+    static Model createFaulttree(std::string id, std::string name, Node* topEvent, const unsigned int missionTime) 
     {
         Model m(modeltype::FAULTTREE, id, name);
         m.m_topEvent = topEvent;
+		m.m_missionTime = missionTime;
         return m;
     };
 
-    static Model createFuzztree(std::string id, std::string name, Node* topEvent, unsigned int decompositionNumber) 
+	static Model createFuzztree(std::string id, std::string name, Node* topEvent, const unsigned int decompositionNumber, const unsigned int missionTime)
     {
         Model m(modeltype::FUZZTREE, id, name);
         m.m_topEvent = topEvent;
         m.m_decompositionNumber = decompositionNumber;
+		m.m_missionTime = missionTime;
         return m;
     };
 

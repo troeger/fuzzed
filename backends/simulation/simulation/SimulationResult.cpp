@@ -13,5 +13,10 @@ const std::string SimulationResult::getType() const
 
 void SimulationResult::createXML(pugi::xml_node& resultNode) const
 {
-
+	resultNode.append_attribute("reliability").set_value(reliability);
+	resultNode.append_attribute("mttf").set_value(mttf);
+	resultNode.append_attribute("nFailures").set_value(nFailures);
+	resultNode.append_attribute("nRounds").set_value(nRounds);
+	resultNode.append_attribute("availability").set_value(meanAvailability);
+	resultNode.append_attribute("duration").set_value(duration);
 }

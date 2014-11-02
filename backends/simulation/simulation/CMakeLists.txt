@@ -6,6 +6,7 @@ set(SOURCES
 
    main.cpp
    SimulationProxy.cpp
+   SimulationResult.cpp
 
    implementation/PetriNetSimulation.cpp
    implementation/Random.cpp

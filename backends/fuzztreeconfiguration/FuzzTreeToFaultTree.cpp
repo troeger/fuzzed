@@ -28,7 +28,7 @@ Model FuzzTreeToFaultTree::faultTreeFromConfiguration(const FuzzTreeConfiguratio
 		faultTreeFromConfigurationRecursive(m_model->getTopEvent(), topEvent, config);
 	}
 
-	return Model::createFaulttree(m_model->getId(), m_model->getName(), topEvent);
+	return Model::createFaulttree(m_model->getId(), m_model->getName(), topEvent, m_model->getMissionTime());
 }
 
 bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
@@ -42,7 +42,7 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 		const std::string childType = child.getType();
 		
 		if (child.isOptional())
-		{ // inclusion variation point. Generate n + n configurations.
+		{ // Inclusion variation point. Generate n + n configurations.
 			std::cout << "optional";
 
 			std::vector<FuzzTreeConfiguration> additional;
@@ -55,7 +55,7 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 				copied.setId(++configCount);
 				// one configuration with this node
 				copied.setOptionalEnabled(id, true);
-				if (childType == "basicEvent" || childType == "intermediateEvent")
+				if (child.canHaveCost())
 					copied.setCost(copied.getCost() + child.getCost());
 
 				// one configuration without this node
@@ -161,13 +161,10 @@ bool FuzzTreeToFaultTree::generateConfigurationsRecursive(
 					configurations.assign(newConfigs.begin(), newConfigs.end());
 				}
 			}
-			else if (
-				childType == nodetype::BASICEVENT || 
-				childType == nodetype::BASICEVENTSET)
-			{ // handle costs, TODO intermediateEvents!
+			else if (child.canHaveCost())
+			{
 				int costs = child.getCost();
 
-				// multiply costs...
 				if (childType == nodetype::BASICEVENTSET)
 					costs *= child.getQuantity();
 
@@ -317,7 +314,7 @@ bool FuzzTreeToFaultTree::handleFeatureVP(
 
 bool FuzzTreeToFaultTree::expandIntermediateEventSet(const Node* child, Node* parent, const FuzzTreeConfiguration& configuration /*this is needed for further recursive descent*/, const int& defaultQuantity /*= 0*/)
 {
-	return false;
+	return false; // TODO
 }
 
 bool FuzzTreeToFaultTree::expandBasicEventSet(const Node* child, Node* parent, const int& defaultQuantity/*=0*/)

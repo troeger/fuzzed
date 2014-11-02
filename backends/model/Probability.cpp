@@ -7,24 +7,22 @@ Probability Probability::fromDescriptionString(const std::string descriptionStri
 {
 	const std::string probTypeId = descriptionString.substr(0, 1);
 	std::string probabilityDescriptor = util::insideBrackets(descriptionString);
-	double val = atof(util::afterComma(probabilityDescriptor).c_str());
 
 	if (probTypeId == "0") // static probability
 	{
-		// std::cout << probabilityDescriptor;
-		if (probabilityDescriptor.find("[") != -1)
-		{
-		}
+		double val = atof(probabilityDescriptor.substr(0, probabilityDescriptor.find_first_of(",")).c_str());
 		return staticProbability(val, missionTime);
 	}
 	else if (probTypeId == "1")
 	{
+		double val = atof(util::afterComma(probabilityDescriptor).c_str());
 		return rateProbability(val, missionTime);
 	}
 	else if (probTypeId == "2")// fuzzy
 	{
 		//[0, [b1 = b2, b1 - a = c - b1]]
-		std::string b = probabilityDescriptor.substr(0, probabilityDescriptor.find_first_of(","));
+		double val = 0.0; // TODO
+		::string b = probabilityDescriptor.substr(0, probabilityDescriptor.find_first_of(","));
 		return triangularFuzzyProbability(val, atof(b.c_str()), atof(b.c_str()), val, missionTime);
 	}
 

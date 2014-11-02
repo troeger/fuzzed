@@ -135,23 +135,19 @@ public:
 		std::ostream& output) const
     {
         pugi::xml_document document;
-        pugi::xml_node resultsNode = this->createResultsNode(document);
+        pugi::xml_node resultsNode = createResultsNode(document);
 
-        assert(configurations.size() == results.size() /* there are not enough configurations for results or vice versa */);
+        assert(configurations.size() >= results.size() /* there are not enough configurations for results */);
 
-        for (size_t i = 0; i < configurations.size(); ++i)
-        {
-            const auto& configuration = configurations[i];
-            const auto& result        = results[i];
+		for (const auto& configuration : configurations)
+			createConfigurationNode(resultsNode, configuration);
 
-            this->createConfigurationNode(resultsNode, configuration);
-            this->createResultNode(resultsNode, result);
-        }
-
+		for (const auto& result : results)
+			createResultNode(resultsNode, result);
+        
 		for (const auto& issue : issues)
-		{
-			this->createIssueNode(resultsNode, issue);
-		}
+			createIssueNode(resultsNode, issue);
+		
         document.save(output, INDENT);
     }
 
@@ -164,16 +160,11 @@ public:
 		pugi::xml_document document;
 		pugi::xml_node resultsNode = this->createResultsNode(document);
 
-		for (size_t i = 0; i < configurations.size(); ++i)
-		{
-			const auto& configuration = configurations[i];
-			this->createConfigurationNode(resultsNode, configuration);
-		}
+		for (const auto& configuration : configurations)
+			createConfigurationNode(resultsNode, configuration);
 
-		for (const Issue& issue : issues)
-		{
-			this->createIssueNode(resultsNode, issue);
-		}
+		for (const auto& issue : issues)
+			createIssueNode(resultsNode, issue);
 
 		document.save(output, INDENT);
 	}

@@ -58,6 +58,16 @@ bool Node::canHaveProbability() const
 		m_type == BASICEVENT;
 }
 
+bool Node::canHaveCost() const
+{
+	using namespace nodetype;
+	return
+		m_type == BASICEVENT ||
+		m_type == BASICEVENTSET ||
+		m_type == INTERMEDIATEEVENT ||
+		m_type == INTERMEDIATEEVENTSET;
+}
+
 void Node::setProbabilityFromString(const std::string& str, const unsigned int missionTime)
 {
 	assert(canHaveProbability());
@@ -75,3 +85,5 @@ void Node::setProbability(const Probability& p)
 	assert(canHaveProbability());
 	m_probability = p;
 }
+
+

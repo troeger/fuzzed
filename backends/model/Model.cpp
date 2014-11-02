@@ -25,7 +25,7 @@ static const char* FROM = "from";
 static const char* TO = "to";
 
 #define GET_STRING_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL)	(std::string(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_string()))
-#define GET_INT_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL)		(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_int())
+#define GET_INT_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL)		(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_int(0))
 #define GET_BOOL_VALUE_BY_ATTR(NODE, CHILD, ATTR, VAL)		(NODE.find_child_by_attribute(CHILD, ATTR, VAL).text().as_bool())
 
 Model::Model(const std::string graphMLFileName)
@@ -144,18 +144,20 @@ void Model::loadRecursive(
 					child.m_to = atoi(std::string(nRange.begin()+commaIndex+1, nRange.end()).c_str());
 					child.m_redundancyFormula = GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, "kFormula");
 				}
-				else if (childType == nodetype::FEATUREVP)
-				{
-
-				}
 				else if (childType == nodetype::VOTINGOR)
 				{
 					child.m_kOutOfN = GET_INT_VALUE_BY_ATTR(c, DATA, KEY, "k");
 				}
-				else if (child.isEventSet())
+				else if (childType == nodetype::FDEP)
 				{
-					child.m_quantity = GET_INT_VALUE_BY_ATTR(c, DATA, KEY, "quantity");
+					child.m_triggerId = GET_STRING_VALUE_BY_ATTR(c, DATA, KEY, "trigger");
 				}
+				
+				if (child.isEventSet())
+					child.m_quantity = GET_INT_VALUE_BY_ATTR(c, DATA, KEY, "quantity");
+				
+				if (child.canHaveCost())
+					child.m_cost = GET_INT_VALUE_BY_ATTR(c, DATA, KEY, "cost");
             }
 			parentModelNode->addChild(child);
             loadRecursive(nodes, edges, cid, &parentModelNode->getChildren().back());

@@ -122,11 +122,9 @@ void FuzzTreeConfiguration::markInvalid()
 const unsigned int FuzzTreeConfiguration::computeCostRecursive(const Node& node)
 {
 	unsigned int result = 0;
-	const auto& nodeType = node.getType();
-	if (nodeType == "intermediateEvent" || nodeType == "basicEvent")
-	{
+	if (node.canHaveCost())
 		result = node.getCost();
-	}
+	
 	for (const auto child : node.getChildren())
 		result += computeCostRecursive(child);
 

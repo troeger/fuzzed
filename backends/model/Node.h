@@ -60,6 +60,8 @@ public:
 	void setKOutOfN(const unsigned int& k) { assert(m_type == nodetype::VOTINGOR); m_kOutOfN = k; };
 	const unsigned int& getKOutOfN() const { assert(m_type == nodetype::VOTINGOR); return m_kOutOfN; }
 
+	const std::string& getTriggerId() const { assert(m_type == nodetype::FDEP); return m_triggerId; }
+
     /**
      * Utility functions
      */
@@ -69,6 +71,7 @@ public:
     bool isVariationPoint() const;
     bool isEventSet() const;
 	bool canHaveProbability() const;
+	bool canHaveCost() const;
 
 	void setProbabilityFromString(const std::string& str, const unsigned int missionTime);
 	void setProbability(const Probability& p);
@@ -112,4 +115,9 @@ private:
     * Voting Or
     */
 	unsigned int m_kOutOfN;
+
+	/**
+	/* FDEP
+	*/
+	std::string m_triggerId;
 };

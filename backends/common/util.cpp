@@ -125,8 +125,8 @@ void util::tokenizeString(const string& input, vector<string>& results /*out*/)
 std::string util::insideBrackets(const std::string& str)
 {
 	const auto i1 = str.find_first_of("[") + 1;
-	const auto i2 = str.find_last_of("]") - 1;
-	return str.substr(i1, i2);
+	const auto i2 = str.find_last_of("]");
+	return str.substr(i1, i2-i1);
 }
 
 void util::replaceStringInPlace(string& subject, const string& search, const std::string& replacement)
