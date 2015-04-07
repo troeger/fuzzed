@@ -1,7 +1,7 @@
 ---
 - name: Ensure Django is installed
   sudo: yes
-  easy_install: name=django>=1.8
+  easy_install: name=django
 - name: Ensure Django SocialAuth is installed
   sudo: yes
   easy_install: name=django-socialauth
