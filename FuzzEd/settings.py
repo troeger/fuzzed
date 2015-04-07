@@ -25,6 +25,7 @@ class Common(Configuration):
         'webmaster@fuzzed.org',
         environ_name='FUZZED_ADMIN_EMAIL')
     SITE_ID = 1
+    SOCIAL_AUTH_URL_NAMESPACE = 'social'
     STATICFILES_DIRS = ('FuzzEd/static',)
     STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
     STATIC_ROOT = 'FuzzEd/static-release/'
@@ -49,7 +50,9 @@ class Common(Configuration):
     TEMPLATE_CONTEXT_PROCESSORS = (
         'django.core.context_processors.static',
         'django.contrib.auth.context_processors.auth',
-        'django.contrib.messages.context_processors.messages'
+        'django.contrib.messages.context_processors.messages',
+        'social.apps.django_app.context_processors.backends',
+        'social.apps.django_app.context_processors.login_redirect'       
     )
 
     MIDDLEWARE_CLASSES = (
@@ -61,8 +64,7 @@ class Common(Configuration):
         # Uncomment the next line for simple clickjacking protection:
         #'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'FuzzEd.middleware.HttpErrorMiddleware',
-        'corsheaders.middleware.CorsMiddleware',
-        'oauth2_provider.middleware.OAuth2TokenMiddleware'
+        'corsheaders.middleware.CorsMiddleware'
     )
 
     INSTALLED_APPS = (
@@ -73,9 +75,8 @@ class Common(Configuration):
         'django.contrib.staticfiles',
         'django.contrib.admin',
         'django.contrib.admindocs',
-        'openid2rp.django',
         'require',
-        'oauth2_provider',
+        'social.apps.django_app.default',        
         'corsheaders',
         'tastypie',
         'djiki',
@@ -84,8 +85,12 @@ class Common(Configuration):
 
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
-        'oauth2_provider.backends.OAuth2Backend',
-        'openid2rp.django.auth.Backend'
+        'social.backends.open_id.OpenIdAuth',
+        'social.backends.google.GoogleOpenId',
+        'social.backends.google.GoogleOAuth2',
+        'social.backends.google.GoogleOAuth',
+        'social.backends.twitter.TwitterOAuth',
+        'social.backends.yahoo.YahooOpenId'
     )
 
     LOGGING = {

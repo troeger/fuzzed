@@ -1,19 +1,13 @@
 ---
 - name: Ensure Django is installed
   sudo: yes
-  easy_install: name=django
-- name: Ensure OpenID2RP is installed
+  easy_install: name=django>=1.8
+- name: Ensure Django SocialAuth is installed
   sudo: yes
-  easy_install: name=openid2rp 
+  easy_install: name=django-socialauth
 - name: Ensure Django Require is installed
   sudo: yes
   easy_install: name=django-require 
-- name: Ensure Django OAuth Toolkit and dependencies are installed
-  sudo: yes
-  easy_install: name={{item}}
-  with_items:
-  - django-oauth-toolkit
-  - django-cors-headers
 - name: Ensure Django Tastypie is installed
   sudo: yes
   easy_install: name=django-tastypie 

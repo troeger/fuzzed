@@ -8,12 +8,6 @@
 {% block script %}
 {{ block.super }}
 <script type="text/javascript">
-    require(['openid-selector/openid-jquery', 'openid-selector/openid-en'], function() {
-        $(document).ready(function() {
-            openid.img_path = "{{ STATIC_URL }}lib/openid-selector/images/";
-            openid.init('openid_identifier');
-        });
-    });
     require(['bootstrap'], function() {});
 </script>
 {% endblock %}
