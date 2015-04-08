@@ -693,6 +693,10 @@ def login(request):
     GET = request.GET
     POST = request.POST
 
+    print "Login"
+    print GET
+    print POST
+
     # Consider the 'next' redirection
     if 'next' in request.GET:
         # TODO: Security issue ?
