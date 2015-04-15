@@ -690,17 +690,12 @@ def login(request):
     Returns:
      {HttpResponse} a django response object
     """
-    GET = request.GET
-    POST = request.POST
-
-    print "Login"
-    print GET
-    print POST
+    POST=request.POST
 
     # Consider the 'next' redirection
-    if 'next' in request.GET:
+    if 'next' in POST:
         # TODO: Security issue ?
-        redirect_params = '?next=' + request.GET['next']
+        redirect_params = '?next=' + POST['next']
     else:
         redirect_params = ''
 

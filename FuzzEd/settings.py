@@ -12,7 +12,7 @@ class Common(Configuration):
     EMAIL_HOST = 'localhost'
     EMAIL_SUBJECT_PREFIX = '[FuzzEd] '
     LANGUAGE_CODE = 'en-en'
-    LOGIN_REDIRECT_URL = '/dashboard/'
+    LOGIN_REDIRECT_URL = '/projects/'
     LOGIN_URL = '/'
     REQUIRE_BASE_URL = 'script'
     REQUIRE_BUILD_PROFILE = '../lib/requirejs/require_build_profile.js'
@@ -26,6 +26,9 @@ class Common(Configuration):
         environ_name='FUZZED_ADMIN_EMAIL')
     SITE_ID = 1
     SOCIAL_AUTH_URL_NAMESPACE = 'social'
+    SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['next',]
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1028538068970-suoo8eie6l7bgu1e77ugulo9fnvgo5dr.apps.googleusercontent.com'
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Ffk2_eby7yXfBVh-_LwQCYUu'
     STATICFILES_DIRS = ('FuzzEd/static',)
     STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
     STATIC_ROOT = 'FuzzEd/static-release/'
@@ -85,12 +88,9 @@ class Common(Configuration):
 
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
-        'social.backends.open_id.OpenIdAuth',
-        'social.backends.google.GoogleOpenId',
         'social.backends.google.GoogleOAuth2',
-        'social.backends.google.GoogleOAuth',
         'social.backends.twitter.TwitterOAuth',
-        'social.backends.yahoo.YahooOpenId'
+        'social.backends.open_id.OpenIdAuth'
     )
 
     LOGGING = {

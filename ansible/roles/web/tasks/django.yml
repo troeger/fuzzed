@@ -2,9 +2,13 @@
 - name: Ensure Django is installed
   sudo: yes
   easy_install: name=django
-- name: Ensure Django SocialAuth is installed
+- name: Ensure Django SocialAuth and dependencies are installed
   sudo: yes
-  easy_install: name=django-socialauth
+  easy_install: name={{item}}
+  with_items:
+  - python-socialauth
+  - python-openid
+  - python-oauth2
 - name: Ensure Django Require is installed
   sudo: yes
   easy_install: name=django-require 

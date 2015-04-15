@@ -58,33 +58,32 @@
 <section>
     <h5>Please use one of these authentication methods</h5>
 
-    <form action="/login/" method="post" id="openid_url">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ next }}" />
         <div class="row">
             <div class="col-8">
-                <button name="submit_google" class="btn-auth btn-google"><b>Google</b></button>
+                <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}" class="btn-auth btn-google"><b>Google</b></a>
             </div>
             <div class="col-8">
-                <button name="submit_twitter" class="btn-auth btn-twitter"><b>Twitter</b></button>
+                <a href="{% url 'social:begin' 'twitter' %}?next={{ next }}" class="btn-auth btn-twitter"><b>Twitter</b></a>
             </div>
             <div class="col-8">
-                <button name="submit_windows" class="btn-auth btn-windows"><b>Windows Live</b></button>
+                <a href="{% url 'social:begin' 'live' %}?next={{ next }}" class="btn-auth btn-windows"><b>Windows Live</b></a>
             </div>
             <div class="col-8">
-                <button name="submit_yahoo" class="btn-auth btn-yahoo"><b>Yahoo!</b></button>
+                <a href="{% url 'social:begin' 'yahoo' %}?next={{ next }}" class="btn-auth btn-yahoo"><b>Yahoo!</b></a>
             </div>
             <div class="col-8">
-                <button name="submit_github" class="btn-auth btn-github"><b>GitHub</b></button>
+                <a href="{% url 'social:begin' 'github' %}?next={{ next }}" class="btn-auth btn-github"><b>GitHub</b></a>
             </div>
         </div>
-        <label for="openid_url_string">
-            <span class="btn-auth btn-openid"><b>OpenID</b> URL</span>
-        </label>
-        <input id="openid_url_string" name="openid_url_string" type="text" value="http://" />
-        <input id="submit_url" name="submit_url" type="submit" value="Sign-In"/>
-
-    </form>    
+        <form action="/login/" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}" />
+            <label for="openid_url_string">
+                <span class="btn-auth btn-openid"><b>OpenID</b> URL</span>
+            </label>
+            <input id="openid_url_string" name="openid_url_string" type="text" value="http://" />
+            <input id="submit_url" name="submit_url" type="submit" value="Sign-In"/>
+        </form>    
 </section>
 {% endblock %}
 
