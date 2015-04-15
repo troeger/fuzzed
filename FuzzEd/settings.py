@@ -29,6 +29,8 @@ class Common(Configuration):
     SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['next',]
     SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '589443374752-dsq0s0u2uivo8f8edviimou2p97k2ii8.apps.googleusercontent.com'
     SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Y2kEQk7JHyHTUeH4sLZQIhRA'
+    SOCIAL_AUTH_TWITTER_KEY = 'k2MzFngdzZTEBLs2E4A7zqhs7'
+    SOCIAL_AUTH_TWITTER_SECRET = 'Y9XauAcebgNpnf0czIH834oCyNTPxvJz872xmz1EPGulXK6nUh' 
     STATICFILES_DIRS = ('FuzzEd/static',)
     STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
     STATIC_ROOT = 'FuzzEd/static-release/'
