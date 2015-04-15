@@ -20,18 +20,7 @@ def backend(target, source, env):
 
 def server(target, source, env):
     '''Runs the server.'''
-    ip = None
-    # Perform new config build on every startup. 
-    # This is basically intended for the case were somebody
-    # permanently flips between native development and
-    # Vagrant development. The backend daemon currently has
-    # no Vagrant-specific settings, so we don't need to do the same stunt there
-    if os.environ['DJANGO_CONFIGURATION'] == 'Vagrant':
-        ip = "192.168.33.10"
-        print 'Using Vagrant IP: ' + ip
-        os.system('./manage.py runserver %s:8000 --configuration=Vagrant' % ip)
-    else:
-        os.system('./manage.py runserver --configuration=Dev')
+    os.system('./manage.py runserver')
 
 def fixture_save(target, source, env):
     '''Creates a test fixture from the current database.'''
