@@ -31,6 +31,12 @@ class Common(Configuration):
     SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Y2kEQk7JHyHTUeH4sLZQIhRA'
     SOCIAL_AUTH_TWITTER_KEY = 'k2MzFngdzZTEBLs2E4A7zqhs7'
     SOCIAL_AUTH_TWITTER_SECRET = 'Y9XauAcebgNpnf0czIH834oCyNTPxvJz872xmz1EPGulXK6nUh' 
+    SOCIAL_AUTH_LIVE_CLIENT_ID = ''
+    SOCIAL_AUTH_LICE_CLIENT_SECRET = '' 
+    SOCIAL_AUTH_YAHOO_OAUTH2_KEY = 'dj0yJmk9TFltelp2Q1hIaUlCJmQ9WVdrOVoyTmhRVFpPTm1jbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD1mMA--'
+    SOCIAL_AUTH_YAHOO_OAUTH2_SECRET = 'cd77daf8e9952eee6cf7d5af0b4a52b6c5b6926f'
+
+
     STATICFILES_DIRS = ('FuzzEd/static',)
     STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
     STATIC_ROOT = 'FuzzEd/static-release/'
@@ -66,8 +72,6 @@ class Common(Configuration):
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
-        # Uncomment the next line for simple clickjacking protection:
-        #'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'FuzzEd.middleware.HttpErrorMiddleware',
     )
 
@@ -90,7 +94,9 @@ class Common(Configuration):
         'django.contrib.auth.backends.ModelBackend',
         'social.backends.google.GoogleOAuth2',
         'social.backends.twitter.TwitterOAuth',
-        'social.backends.open_id.OpenIdAuth'
+        'social.backends.yahoo.YahooOAuth2',
+        'social.backends.open_id.OpenIdAuth',
+        'social.backends.live.LiveOAuth2'
     )
 
     LOGGING = {
