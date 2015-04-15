@@ -27,14 +27,15 @@ class Common(Configuration):
     SITE_ID = 1
     SOCIAL_AUTH_URL_NAMESPACE = 'social'
     SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['next',]
-    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '589443374752-dsq0s0u2uivo8f8edviimou2p97k2ii8.apps.googleusercontent.com'
-    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Y2kEQk7JHyHTUeH4sLZQIhRA'
-    SOCIAL_AUTH_TWITTER_KEY = 'k2MzFngdzZTEBLs2E4A7zqhs7'
-    SOCIAL_AUTH_TWITTER_SECRET = 'Y9XauAcebgNpnf0czIH834oCyNTPxvJz872xmz1EPGulXK6nUh' 
-    SOCIAL_AUTH_LIVE_CLIENT_ID = ''
-    SOCIAL_AUTH_LICE_CLIENT_SECRET = '' 
-    SOCIAL_AUTH_YAHOO_OAUTH2_KEY = 'dj0yJmk9TFltelp2Q1hIaUlCJmQ9WVdrOVoyTmhRVFpPTm1jbWNHbzlNQS0tJnM9Y29uc3VtZXJzZWNyZXQmeD1mMA--'
-    SOCIAL_AUTH_YAHOO_OAUTH2_SECRET = 'cd77daf8e9952eee6cf7d5af0b4a52b6c5b6926f'
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_TWITTER_KEY = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_TWITTER_SECRET = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_LIVE_CLIENT_ID = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_LIVE_CLIENT_SECRET = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_YAHOO_OAUTH2_KEY = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_YAHOO_OAUTH2_SECRET = values.SecretValue(environ_prefix='FUZZED')
+    SECRET_KEY = values.SecretValue(environ_prefix='FUZZED')
 
 
     STATICFILES_DIRS = ('FuzzEd/static',)
@@ -145,7 +146,6 @@ class Common(Configuration):
 class Dev(Common):
     DEBUG = True
     TEMPLATE_DEBUG = True
-    SECRET_KEY = 'kjshdgfiu438o374o38g4o8figwilfuz4iou34gli'
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -179,9 +179,6 @@ class Vagrant(Dev):
 class Production(Common):
     DEBUG = False
     TEMPLATE_DEBUG = False
-    # Using values.SecretValue here breaks the Dev configuration
-    SECRET_KEY = values.Value('837dsfskfjh!',
-                              environ_name='FUZZED_SECRET')
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
