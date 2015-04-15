@@ -6,7 +6,7 @@
   sudo: yes
   easy_install: name={{item}}
   with_items:
-  - python-socialauth
+  - python-social-auth
   - python-openid
   - python-oauth2
 - name: Ensure Django Require is installed
@@ -14,7 +14,7 @@
   easy_install: name=django-require 
 - name: Ensure Django Tastypie is installed
   sudo: yes
-  easy_install: name=django-tastypie 
+  pip: name=git+https://github.com/django-tastypie/django-tastypie.git 
 - name: Ensure Django Wiki and dependencies are installed
   sudo: yes
   easy_install: name={{item}}
@@ -24,7 +24,7 @@
   - defusedxml
 - name: Ensure Django configurations is installed
   sudo: yes
-  easy_install: name=django-configurations
+  pip: name=git+https://github.com/jezdez/django-configurations.git
 - name: Ensure OAuth client libary is installed for testing purposes
   sudo: yes
   easy_install: name=requests_oauthlib 

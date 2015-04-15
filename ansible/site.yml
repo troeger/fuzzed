@@ -50,3 +50,12 @@
     - backend
     - testing
     - env_vagrant
+
+- name: Configure Virtualenv Dev machine
+  hosts: virtualenvmachine
+  user: root
+
+  roles:
+    - common
+    - web
+

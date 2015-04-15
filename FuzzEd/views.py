@@ -13,7 +13,6 @@ from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
-from openid2rp.django.auth import linkOpenID, preAuthenticate, AX, IncorrectClaimError
 
 from FuzzEd.models import Graph, Project, notations, Sharing, Node
 import FuzzEd.settings
@@ -711,87 +710,4 @@ def login(request):
             auth.login(request, user)
         return redirect('/projects/' + redirect_params)
 
-    elif 'openid_identifier' in POST:
-        # first stage of OpenID authentication
-        open_id = POST['openid_identifier']
-        request.session['openid_identifier'] = open_id
-
-        try:
-            openidreturn = FuzzEd.settings.OPENID_RETURN
-            if 'next' in request.POST:
-                # TODO: Potential security problem
-                openidreturn += '&next=' + request.POST['next']
-            logger.debug("OpenID return URL is " + openidreturn)
-            return preAuthenticate(open_id, openidreturn)
-        except IncorrectClaimError:
-            messages.add_message(
-                request,
-                messages.ERROR,
-                'This OpenID claim is not valid.')
-            return redirect('/' + redirect_params)
-
-    elif 'openidreturn' in GET:
-        user = auth.authenticate(openidrequest=request)
-
-        if user.is_anonymous():
-            user_name = None
-            email = None
-
-            user_sreg = user.openid_sreg
-            user_ax = user.openid_ax
-
-            # not known to the backend so far, create it transparently
-            if 'nickname' in user_sreg:
-                user_name = unicode(user_sreg['nickname'], 'utf-8')[:29]
-            else:
-                now = datetime.datetime.now()
-                user_name = 'Anonymous %d%d%d%d' % (
-                    now.hour, now.minute, now.second, now.microsecond)
-
-            if 'email' in user_sreg:
-                email = unicode(user_sreg['email'], 'utf-8')[:29]
-
-            if AX.email in user_ax:
-                email = unicode(user_ax[AX.email], 'utf-8')[:29]
-
-            # Google is using different claim IDs for the same user, if he comes
-            # from different originating domains
-            # This leads to a problem when user come from "www" or without "www"
-            # We solve this by trusting the given email address as unique
-            # identifier
-            if email:
-                new_user, created = User.objects.get_or_create(
-                    email=email, defaults={
-                        'email': email, 'username': user_name})
-            else:
-                new_user = User(username=user_name)
-                created = True
-
-            if created:
-                # Assign additional information to newly created User object
-                if AX.first in user_ax:
-                    new_user.first_name = unicode(
-                        user_ax[AX.first], 'utf-8')[:29]
-
-                if AX.last in user_ax:
-                    new_user.last_name = unicode(
-                        user_ax[AX.last], 'utf-8')[:29]
-
-                mail_managers('New user', str(new_user), fail_silently=True)
-                new_user.is_active = True
-            else:
-                mail_managers(
-                    'New OpenID claim for user',
-                    str(new_user),
-                    fail_silently=True)
-
-            new_user.save()
-
-            # especially relevant when user object was fetched, and not created
-            linkOpenID(new_user, user.openid_claim)
-
-            return redirect('/login/?openid_identifier=%s' %
-                            urllib.quote_plus(request.session['openid_identifier']))
-
-        auth.login(request, user)
     return redirect('/' + redirect_params)

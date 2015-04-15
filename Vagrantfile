@@ -17,6 +17,7 @@ VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "ubuntu/trusty32"
     config.vm.network "private_network", ip: "192.168.33.10"
+    config.vm.hostname = "vagrant.fuzzed.org"    # Crucial for OAuth2 callbacks to work
     config.vm.synced_folder ".", "/home/vagrant/fuzzed", type: "nfs"
 
     config.vm.provider "virtualbox" do |v|

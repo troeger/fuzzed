@@ -27,8 +27,8 @@ class Common(Configuration):
     SITE_ID = 1
     SOCIAL_AUTH_URL_NAMESPACE = 'social'
     SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['next',]
-    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1028538068970-suoo8eie6l7bgu1e77ugulo9fnvgo5dr.apps.googleusercontent.com'
-    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Ffk2_eby7yXfBVh-_LwQCYUu'
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '589443374752-dsq0s0u2uivo8f8edviimou2p97k2ii8.apps.googleusercontent.com'
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Y2kEQk7JHyHTUeH4sLZQIhRA'
     STATICFILES_DIRS = ('FuzzEd/static',)
     STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
     STATIC_ROOT = 'FuzzEd/static-release/'
@@ -67,7 +67,6 @@ class Common(Configuration):
         # Uncomment the next line for simple clickjacking protection:
         #'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'FuzzEd.middleware.HttpErrorMiddleware',
-        'corsheaders.middleware.CorsMiddleware'
     )
 
     INSTALLED_APPS = (
@@ -80,7 +79,6 @@ class Common(Configuration):
         'django.contrib.admindocs',
         'require',
         'social.apps.django_app.default',        
-        'corsheaders',
         'tastypie',
         'djiki',
         'FuzzEd'
@@ -144,13 +142,13 @@ class Dev(Common):
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': 'fuzzed.sqlite',
-            'TEST_NAME': 'test_fuzzed.sqlite',
             'USER': 'fuzzed.sqlite',
             'PASSWORD': 'fuzzed',
             'HOST': 'localhost',
             'PORT': '',
         }
     }
+    TEST = {'NAME': 'test_fuzzed.sqlite'}
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     SERVER = 'http://localhost:8000'
     OPENID_RETURN = SERVER + '/login/?openidreturn'
