@@ -35,8 +35,6 @@ class Common(Configuration):
     SOCIAL_AUTH_LIVE_CLIENT_SECRET = values.SecretValue(environ_prefix='FUZZED')
     SOCIAL_AUTH_YAHOO_OAUTH2_KEY = values.SecretValue(environ_prefix='FUZZED')
     SOCIAL_AUTH_YAHOO_OAUTH2_SECRET = values.SecretValue(environ_prefix='FUZZED')
-    SECRET_KEY = values.SecretValue(environ_prefix='FUZZED')
-
 
     STATICFILES_DIRS = ('FuzzEd/static',)
     STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
@@ -146,6 +144,7 @@ class Common(Configuration):
 class Dev(Common):
     DEBUG = True
     TEMPLATE_DEBUG = True
+    SECRET_KEY = "4711"
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -179,6 +178,7 @@ class Vagrant(Dev):
 class Production(Common):
     DEBUG = False
     TEMPLATE_DEBUG = False
+    SECRET_KEY = values.SecretValue(environ_prefix='FUZZED')
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
