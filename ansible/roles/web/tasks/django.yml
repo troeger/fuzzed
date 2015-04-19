@@ -1,12 +1,8 @@
 ---
-- name: Make sure VirtualEnv is available
-  pip: name=virtualenv
-- name: Ensure GIT is installed
-  apt: pkg=git state=latest
-  when: ansible_os_family == "Debian"
 - name: Ensure Django is installed
   sudo: yes
   pip: name=django virtualenv={{virtualenvpath}}
+
 - name: Ensure Django SocialAuth and dependencies are installed
   sudo: yes
   pip: name={{item}} virtualenv={{virtualenvpath}}
@@ -14,12 +10,15 @@
   - python-social-auth
   - python-openid
   - python-oauth2
+
 - name: Ensure Django Require is installed
   sudo: yes
   pip: name=django-require  virtualenv={{virtualenvpath}}
+
 - name: Ensure Django Tastypie is installed
   sudo: yes
   pip: name=git+https://github.com/django-tastypie/django-tastypie.git#egg=django-tastypie virtualenv={{virtualenvpath}}
+
 - name: Ensure Django Wiki and dependencies are installed
   sudo: yes
   pip: name={{item}} virtualenv={{virtualenvpath}}
@@ -27,18 +26,12 @@
   - djiki
   - py-wikimarkup
   - defusedxml
+
 - name: Ensure Django configurations is installed
   sudo: yes
   pip: name=git+https://github.com/jezdez/django-configurations.git#egg=django-configurations virtualenv={{virtualenvpath}}
+
 - name: Ensure OAuth client libary is installed for testing purposes
   sudo: yes
   pip: name=requests_oauthlib virtualenv={{virtualenvpath}}
 
-- name: Install PostgreSQL database client 
-  apt: name={{ item }} state=latest
-  with_items:
-  - postgresql-client
-  - libpq-dev
-  when: ansible_os_family == "Debian"
-- name: Install PostgreSQL Python client library
-  pip: name=psycopg2 virtualenv={{ virtualenvpath }}

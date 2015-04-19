@@ -4,25 +4,14 @@
   user: root
 
   roles:
-    - common
     - web
     - web_install
-
-
-- name: Configure production database servers 
-  hosts: dbservers
-  user: root
-
-  roles:
-    - common
-    - db
 
 - name: Configure production backend servers
   hosts: backendservers
   user: root
 
   roles:
-    - common
     - backend
     - backend_install
 
@@ -31,10 +20,8 @@
   user: root
 
   roles:
-    - common
     - build
     - web
-    - db
     - backend
     - testing
 
@@ -43,10 +30,8 @@
   user: root
 
   roles:
-    - common
     - build
     - web
-    - db
     - backend
     - testing
     - env_vagrant

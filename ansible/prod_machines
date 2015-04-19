@@ -1,9 +1,6 @@
 [webservers]
 www.fuzzed.org virtualenvpath=/var/www/fuzztrees.net/www/venv/
 
-[dbservers]
-www.fuzzed.org
-
 [backendservers]
 134.119.11.126
 

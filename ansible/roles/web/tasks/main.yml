@@ -1,5 +1,13 @@
 ---
+- name: Make sure VirtualEnv is available
+  pip: name=virtualenv
+
+- name: Ensure GIT is installed
+  apt: pkg=git state=latest
+  when: ansible_os_family == "Debian"
+
 - include: apache2.yml
+- include: db.yml
 - include: django.yml
 - include: xml_support.yml
 
