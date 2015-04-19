@@ -1,6 +1,7 @@
 ---
 - name: Ensure Boost libraries are installed
   apt: name={{ item }} state=latest
+  sudo: yes
   with_items:
     - libboost-dev
     - libboost-graph-dev

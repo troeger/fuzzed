@@ -1,0 +1,30 @@
+---
+- include: apache2.yml
+- include: db.yml
+
+- name: Perform database backup  
+  command: pg_dump -c -f /tmp/dbackup.sql fuzzed
+  sudo: yes
+  sudo_user: postgres
+
+- name: Ensure latest FuzzEd version is installed
+  git:  repo=https://github.com/troeger/fuzzed.git
+        dest={{ install_base_dir }}{{ version }}
+        version={{ version }}
+        depth=1
+
+- name: Adjusting links for pointing to download package 
+  file: src={{ install_base_dir }}{{ version }} dest={{ www_base_dir }} state=link
+
+- name: Perform database migration  
+  django_manage: command=syncdb
+                 app_path={{ install_base_dir }}
+                 virtualenv={{ virtualenvdir }}
+
+- name: Ensure that Apache config is correct  
+  command: apache2ctl configtest
+  sudo: yes
+
+- name: Ensure Apache is restarted
+  service: name=apache2 state=restarted
+  sudo: yes

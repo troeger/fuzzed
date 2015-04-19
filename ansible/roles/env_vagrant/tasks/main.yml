@@ -1,3 +1,4 @@
 ---
 - lineinfile: dest=/home/vagrant/.bashrc line="export DJANGO_CONFIGURATION=Vagrant"
+- lineinfile: dest=/home/vagrant/.bashrc line="source venv/bin/activate"
 - lineinfile: dest=/home/vagrant/.bashrc line="cd fuzzed" insertafter=EOF

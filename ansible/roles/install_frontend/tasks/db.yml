@@ -1,17 +1,23 @@
 ---
+
 - name: Install PostgreSQL 
   apt: pkg=postgresql state=latest
+  sudo: yes
   when: ansible_os_family == "Debian"
 
 - name: Install PostgreSQL native client 
   apt: name={{ item }} state=latest
+  sudo: yes
   with_items:
   - postgresql-client
   - libpq-dev
   when: ansible_os_family == "Debian"
 
+- include: ../../_lib/python.yml
+
 - name: Install PostgreSQL Python client 
-  pip: name=psycopg2 virtualenv={{ virtualenvpath }}
+  sudo: yes
+  pip: name=psycopg2 virtualenv={{virtualenvpath}}
 
 # Commented out, due to missing VirtualEnv support:
 # http://stackoverflow.com/questions/29728530/using-ansible-postgresql-user-with-psycopg2-from-virtualenv

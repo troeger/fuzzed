@@ -1,18 +1,3 @@
-$provisioning_script = <<SCRIPT
-  export LANGUAGE=en_US.UTF-8
-  export LANG=en_US.UTF-8
-  export LC_ALL=en_US.UTF-8
-  locale-gen en_US.UTF-8
-  dpkg-reconfigure locales
-  apt-get update
-  apt-get install -y python-dev python-pip
-  sudo pip install ansible
-  cd fuzzed
-  cp ansible/vagrant_machine /tmp/vagrant_machine
-  sudo chmod -x /tmp/vagrant_machine
-  sudo ansible-playbook -i /tmp/vagrant_machine ansible/site.yml 
-SCRIPT
-
 VAGRANTFILE_API_VERSION = "2"
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.box = "ubuntu/trusty32"
@@ -39,5 +24,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       v.customize ["modifyvm", :id, "--cpus", cpus]
     end
 
-    config.vm.provision "shell", inline: $provisioning_script
+    config.vm.provision "ansible" do |ansible|
+      ansible.playbook = "ansible/site.yml"
+      ansible.groups = { "devmachine" => ["default"] }
+      ansible.extra_vars = { ansible_ssh_user: "vagrant", 
+                             vagrant: true,
+                             virtualenvpath: "~/fuzzed_venv/" }
+    end
 end

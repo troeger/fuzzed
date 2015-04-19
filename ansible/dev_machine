@@ -1,3 +1,0 @@
-[devmachine]
-localhost ansible_connection="local" virtualenvpath=~/fuzzed_venv/
-

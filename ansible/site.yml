@@ -4,34 +4,27 @@
   user: root
 
   roles:
+    - common
     - web
-    - web_install
+    - install_frontend
 
 - name: Configure production backend servers
   hosts: backendservers
   user: root
 
   roles:
+    - common
     - backend
-    - backend_install
+    - install_backend
 
 - name: Configure developer machine
   hosts: devmachine
   user: root
 
   roles:
+    - common
     - build
     - web
     - backend
     - testing
-
-- name: Configure Vagrant developer machine
-  hosts: vagrantmachine
-  user: root
-
-  roles:
-    - build
-    - web
-    - backend
-    - testing
-    - env_vagrant
+    - { role: env_vagrant, when: vagrant == true }   # set by Vagrant config file

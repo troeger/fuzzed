@@ -1,0 +1,12 @@
+[webservers]
+www.fuzzed.org 
+
+[webservers:vars]
+install_base_dir=/var/www/fuzztrees.net/
+www_base_dir=/var/www/fuzztrees.net/www/
+virtualenvpath=/var/www/fuzztrees.net/www/venv/
+version=HEAD
+
+[backendservers]
+134.119.11.126
+

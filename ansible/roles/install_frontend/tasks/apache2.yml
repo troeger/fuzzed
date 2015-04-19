@@ -1,6 +1,7 @@
 ---
 - name: Ensure apache and modules are at the latest version
   apt: pkg={{ item }} state=latest
+  sudo: yes
   with_items:
   - apache2
   - libapache2-mod-wsgi 

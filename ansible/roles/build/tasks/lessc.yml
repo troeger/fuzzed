@@ -11,6 +11,7 @@
 
 - name: Install Less Compiler
   npm: name=less global=yes
+  sudo: yes
 
 - name: Bring lessc executable into path
   sudo: yes
