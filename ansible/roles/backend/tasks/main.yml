@@ -1,6 +1,6 @@
 ---
 - name: Ensure backend daemon dependencies are installed
-  easy_install: name=requests
+  pip: name=requests virtualenv={{virtualenvpath}}
 
 - name: Ensure LaTex is installed
   apt: pkg=texlive state=latest
@@ -12,5 +12,5 @@
   fail: msg="DVIPS is not available. Please install a Tex distribution."
   when: tex.stat.isfile is defined and tex.stat.isfile == true
 
-- include: ../../common/tasks/xml.yml
-- include: ../../common/tasks/boost.yml
+- include: ../../_lib/xml.yml
+- include: ../../_lib/boost.yml

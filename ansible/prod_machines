@@ -1,5 +1,5 @@
 [webservers]
-www.fuzzed.org
+www.fuzzed.org virtualenvpath=/var/www/fuzztrees.net/www/venv/
 
 [dbservers]
 www.fuzzed.org
