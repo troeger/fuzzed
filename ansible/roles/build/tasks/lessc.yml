@@ -6,7 +6,7 @@
   when: ansible_os_family == "Debian"
 
 - name: Ensure NPM is installed
-  homebrew: pkg=npm state=present
+  homebrew: pkg=npm state=latest
   when: ansible_os_family == "Darwin"
 
 - name: Install Less Compiler
