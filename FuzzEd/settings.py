@@ -27,14 +27,14 @@ class Common(Configuration):
     SITE_ID = 1
     SOCIAL_AUTH_URL_NAMESPACE = 'social'
     SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['next',]
-    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = values.SecretValue(environ_prefix='FUZZED')
-    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = values.SecretValue(environ_prefix='FUZZED')
-    SOCIAL_AUTH_TWITTER_KEY = values.SecretValue(environ_prefix='FUZZED')
-    SOCIAL_AUTH_TWITTER_SECRET = values.SecretValue(environ_prefix='FUZZED')
-    SOCIAL_AUTH_LIVE_CLIENT_ID = values.SecretValue(environ_prefix='FUZZED')
-    SOCIAL_AUTH_LIVE_CLIENT_SECRET = values.SecretValue(environ_prefix='FUZZED')
-    SOCIAL_AUTH_YAHOO_OAUTH2_KEY = values.SecretValue(environ_prefix='FUZZED')
-    SOCIAL_AUTH_YAHOO_OAUTH2_SECRET = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY =    values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_TWITTER_KEY =          values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_TWITTER_SECRET =       values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_LIVE_CLIENT_ID =       values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_LIVE_CLIENT_SECRET =   values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_YAHOO_OAUTH2_KEY =     values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_YAHOO_OAUTH2_SECRET =  values.Value('NOT_SET', environ_prefix='FUZZED')
 
     STATICFILES_DIRS = ('FuzzEd/static',)
     STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
@@ -168,7 +168,7 @@ class Dev(Common):
     FEEDBACK_PAGE = 'http://fuzzed.uservoice.com'
     FOOTER = 'FuzzEd Development Team (Dev Server)'
     SOCIAL_AUTH_USERNAME_FORM_URL = '/'
-    SOCIAL_AUTH_USERNAME_FORM_HTML = 'form_login.html'
+    SOCIAL_AUTH_USERNAME_FORM_HTML = 'dev_login.html'
     AUTHENTICATION_BACKENDS = Common.AUTHENTICATION_BACKENDS + ('social.backends.username.UsernameAuth',)
     INTERNAL_IPS = (
         '0.0.0.0',

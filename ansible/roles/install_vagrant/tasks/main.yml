@@ -1,7 +1,4 @@
 ---
 - lineinfile: dest=/home/vagrant/.bashrc line="export DJANGO_CONFIGURATION=Vagrant"
-- name: Set environment variables in .bashrc
-  lineinfile: dest=/home/vagrant/.bashrc line="export {{ item.key }}='{{ item.value }}'"
-  with_dict: envvariables
 - lineinfile: dest=/home/vagrant/.bashrc line="source {{virtualenvpath}}bin/activate"
 - lineinfile: dest=/home/vagrant/.bashrc line="cd fuzzed" insertafter=EOF

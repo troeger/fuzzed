@@ -29,6 +29,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ansible.groups = { "devmachine" => ["default"] }
       ansible.extra_vars = { ansible_ssh_user: "vagrant", 
                              vagrant: true }
-      ansible.ask_vault_pass = true
     end
 end
