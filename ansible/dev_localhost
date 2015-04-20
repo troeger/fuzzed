@@ -1,5 +1,0 @@
-[devmachine]
-localhost 
-
-[devmachine:vars]
-virtualenvpath=~/fuzzed_venv/

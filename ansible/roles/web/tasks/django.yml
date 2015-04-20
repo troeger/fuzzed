@@ -1,10 +1,8 @@
 ---
 - name: Ensure Django is installed
-  sudo: yes
   pip: name=django virtualenv={{virtualenvpath}}
 
 - name: Ensure Django SocialAuth and dependencies are installed
-  sudo: yes
   pip: name={{item}} virtualenv={{virtualenvpath}}
   with_items:
   - python-social-auth
@@ -12,15 +10,12 @@
   - python-oauth2
 
 - name: Ensure Django Require is installed
-  sudo: yes
   pip: name=django-require  virtualenv={{virtualenvpath}}
 
 - name: Ensure Django Tastypie is installed
-  sudo: yes
   pip: name=git+https://github.com/django-tastypie/django-tastypie.git#egg=django-tastypie virtualenv={{virtualenvpath}}
 
 - name: Ensure Django Wiki and dependencies are installed
-  sudo: yes
   pip: name={{item}} virtualenv={{virtualenvpath}}
   with_items:
   - djiki
@@ -28,10 +23,8 @@
   - defusedxml
 
 - name: Ensure Django configurations is installed
-  sudo: yes
   pip: name=git+https://github.com/jezdez/django-configurations.git#egg=django-configurations virtualenv={{virtualenvpath}}
 
 - name: Ensure OAuth client libary is installed for testing purposes
-  sudo: yes
   pip: name=requests_oauthlib virtualenv={{virtualenvpath}}
 

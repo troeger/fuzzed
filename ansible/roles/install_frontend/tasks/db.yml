@@ -16,7 +16,6 @@
 - include: ../../_lib/python.yml
 
 - name: Install PostgreSQL Python client 
-  sudo: yes
   pip: name=psycopg2 virtualenv={{virtualenvpath}}
 
 # Commented out, due to missing VirtualEnv support:
