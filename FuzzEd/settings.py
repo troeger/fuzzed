@@ -58,6 +58,7 @@ class Common(Configuration):
     )
 
     TEMPLATE_CONTEXT_PROCESSORS = (
+        'django.template.context_processors.debug',
         'django.core.context_processors.static',
         'django.contrib.auth.context_processors.auth',
         'django.contrib.messages.context_processors.messages',
@@ -158,7 +159,6 @@ class Dev(Common):
     TEST = {'NAME': 'test_fuzzed.sqlite'}
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     SERVER = 'http://localhost:8000'
-    OPENID_RETURN = SERVER + '/login/?openidreturn'
     TEMPLATE_DIRS = ('FuzzEd/templates',
                      'FuzzEd/static/img',
                      'FuzzEd/templates/djiki',
@@ -167,13 +167,18 @@ class Dev(Common):
     TERMS_PAGE = '/about/'
     FEEDBACK_PAGE = 'http://fuzzed.uservoice.com'
     FOOTER = 'FuzzEd Development Team (Dev Server)'
-
+    SOCIAL_AUTH_USERNAME_FORM_URL = '/'
+    SOCIAL_AUTH_USERNAME_FORM_HTML = 'form_login.html'
+    AUTHENTICATION_BACKENDS = Common.AUTHENTICATION_BACKENDS + ('social.backends.username.UsernameAuth',)
+    INTERNAL_IPS = (
+        '0.0.0.0',
+        '127.0.0.1',
+    )
 
 class Vagrant(Dev):
-    SERVER = 'http://192.168.33.10:8000'
-    OPENID_RETURN = 'http://192.168.33.10:8000/login/?openidreturn'
+    SERVER = 'http://192.168.33.1:8000'
     FOOTER = 'FuzzEd Development Team (Vagrant Server)'
-
+    INTERNAL_IPS = Dev.INTERNAL_IPS + ('192.168.33.1',)
 
 class Production(Common):
     DEBUG = False
@@ -199,7 +204,6 @@ class Production(Common):
                                   environ_name='FUZZED_HOST_NAME')]
     SERVER = 'https://' + str(values.Value('fuzzed.org',
                                            environ_name='FUZZED_HOST_NAME'))
-    OPENID_RETURN = SERVER + '/login/?openidreturn'
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
     TEMPLATE_DIRS = (PROJECT_ROOT + '/templates',
                      PROJECT_ROOT + '/static-release/img',
