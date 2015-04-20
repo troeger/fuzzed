@@ -83,6 +83,11 @@
                 </form>    
             </div>
         </div>
+        {% if debug %}
+        <div>
+                <a href="{% url 'social:begin' 'username' %}?next={{ next }}"><b>Developer Login</b></a>
+        </div>
+        {% endif %}
 
     <small>Note for returning users: FuzzEd got a major update of the authentication system in April 2015. If you are missing your old graphs after login, <a href="mailto:fuzzed.project@gmail.com">please contact us</a>.</small>
 </section>

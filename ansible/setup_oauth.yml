@@ -4,27 +4,18 @@
   user: root
 
   roles:
-    - common
-    - web
-    - install_frontend
+    - oauth
 
 - name: Configure production backend servers
   hosts: backendservers
   user: root
 
   roles:
-    - common
-    - backend
-    - install_backend
+    - oauth
 
 - name: Configure developer machine
   hosts: devmachine
   user: root
 
   roles:
-    - common
-    - build
-    - web
-    - backend
-    - testing
-    - { role: install_vagrant, when: vagrant == true }   # activated by Vagrant config file
+    - oauth
