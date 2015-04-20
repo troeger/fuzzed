@@ -1,7 +1,17 @@
+# Everything needed for package installation, regardless of the host
 ---
+- debug: msg="{{ virtualenvpath }}"
+
+- debug: msg="{{ env_variables }}"
+
 - name: Update APT cache
   apt: update_cache=yes cache_valid_time=3600
+  sudo: yes
   when: ansible_os_family == "Debian"
 - name: Update Homebrew cache
   homebrew: update_homebrew=yes 
   when: ansible_os_family == "Darwin"
+- name: Ensure GIT is installed
+  apt: pkg=git state=latest
+  sudo: yes
+  when: ansible_os_family == "Debian"

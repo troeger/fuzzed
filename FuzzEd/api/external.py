@@ -1,6 +1,3 @@
-# from oauth2_provider.views.generic import ProtectedResourceView
-# see urls.py for further explanation
-
 import logging
 from tastypie.authentication import ApiKeyAuthentication
 from tastypie.models import ApiKey

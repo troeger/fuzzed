@@ -10,4 +10,5 @@
   when: ansible_os_family == "Darwin"
 
 - name: Install mocha-phantomjs
+  sudo: yes
   npm: name=mocha-phantomjs global=yes

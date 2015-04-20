@@ -86,7 +86,7 @@ shapes = env.Tikz( 'FuzzEd/models/node_rendering.py',
           Glob('FuzzEd/static/img/fuzztree/*.svg') +
           Glob('FuzzEd/static/img/rbd/*.svg') )
 
-# Generate patched versions of third patry code
+# Generate patched versions of third party code
 patch1 = env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css',
           ['FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.patch',
            'FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.orig'])

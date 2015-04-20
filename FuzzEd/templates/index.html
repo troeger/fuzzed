@@ -3,17 +3,12 @@
 
 {% block meta %}
 <meta name="description" content="FuzzEd gives you the fastest way for creating system dependability models in the browser.">
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/social-buttons/auth-buttons.css">
 {% endblock %}
 
 {% block script %}
 {{ block.super }}
 <script type="text/javascript">
-    require(['openid-selector/openid-jquery', 'openid-selector/openid-en'], function() {
-        $(document).ready(function() {
-            openid.img_path = "{{ STATIC_URL }}lib/openid-selector/images/";
-            openid.init('openid_identifier');
-        });
-    });
     require(['bootstrap'], function() {});
 </script>
 {% endblock %}
@@ -61,38 +56,35 @@
 </section>
 
 <section>
-    <h5>Please use one of these authentication providers</h5>
+    <h5>Please use one of these authentication methods: </h5>
 
-    <form action="/login/" method="post" id="openid_form">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="verify" />
-        <fieldset>
-            <div id="openid_choice">
-                <div id="openid_btns"></div>
+        <div class="row">
+            <div class="col-2">
+                <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}" class="btn-auth btn-google"><b>Google</b></a>
             </div>
-            <div id="openid_input_area">
-                <input id="openid_identifier" name="openid_identifier" type="text" value="http://" />
-                <input id="openid_submit" type="submit" value="Sign-In"/>
+            <div class="col-2">
+                <a href="{% url 'social:begin' 'twitter' %}?next={{ next }}" class="btn-auth btn-twitter"><b>Twitter</b></a>
             </div>
-            <noscript>
-                <p>
-                    OpenID is service that allows you to log-on to many different websites using a single identity.
-                    Find out <a href="http://openid.net/what/">more about OpenID</a> and
-                    <a href="http://openid.net/get/">how to get an OpenID enabled account</a>.
-                </p>
-            </noscript>
-        </fieldset>
-        <input type="hidden" name="next" value="{{ next }}" />
-    </form>
-
-    {% if pwlogin %}
-        <div>
-            <form action="/login/" method="post" id="login_form">{% csrf_token %}
-                <input type="text" id="loginname" name="loginname"/>
-                <input type="password" id="loginpw" name="loginpw"/>
-                <input type="submit" name="formlogin" value="Login"/>
-            </form>
+            <div class="col-2">
+                <a href="{% url 'social:begin' 'yahoo-oauth2' %}?next={{ next }}" class="btn-auth btn-yahoo"><b>Yahoo!</b></a>
+            </div>
+            <div class="col-2">
+                <a href="{% url 'social:begin' 'live' %}?next={{ next }}" class="btn-auth btn-windows"><b>Live</b></a>
+            </div>
+            <div class="col-4">
+                <form action="{% url 'social:begin' 'openid' %}?next={{ next }}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}" />
+                    <label for="openid_identifier">
+                        <span class="btn-auth btn-openid"><b>OpenID</b></span>
+                    </label>
+                    <input id="openid_identifier" name="openid_identifier" type="text" value="https://" />
+                    <input id="submit_url" name="submit_url" type="submit" value="Sign-In"/>
+                </form>    
+            </div>
         </div>
-    {% endif %}
+
+    <small>Note for returning users: FuzzEd got a major update of the authentication system in April 2015. If you are missing your old graphs after login, <a href="mailto:fuzzed.project@gmail.com">please contact us</a>.</small>
 </section>
 {% endblock %}
+

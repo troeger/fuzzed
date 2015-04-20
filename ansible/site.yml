@@ -6,16 +6,7 @@
   roles:
     - common
     - web
-    - web_install
-
-
-- name: Configure production database servers 
-  hosts: dbservers
-  user: root
-
-  roles:
-    - common
-    - db
+    - install_frontend
 
 - name: Configure production backend servers
   hosts: backendservers
@@ -24,7 +15,7 @@
   roles:
     - common
     - backend
-    - backend_install
+    - install_backend
 
 - name: Configure developer machine
   hosts: devmachine
@@ -34,19 +25,6 @@
     - common
     - build
     - web
-    - db
     - backend
     - testing
-
-- name: Configure Vagrant developer machine
-  hosts: vagrantmachine
-  user: root
-
-  roles:
-    - common
-    - build
-    - web
-    - db
-    - backend
-    - testing
-    - env_vagrant
+    - { role: env_vagrant, when: vagrant == true }   # set by Vagrant config file

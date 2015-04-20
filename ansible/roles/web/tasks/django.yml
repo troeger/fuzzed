@@ -1,32 +1,30 @@
 ---
 - name: Ensure Django is installed
-  sudo: yes
-  easy_install: name=django
-- name: Ensure OpenID2RP is installed
-  sudo: yes
-  easy_install: name=openid2rp 
-- name: Ensure Django Require is installed
-  sudo: yes
-  easy_install: name=django-require 
-- name: Ensure Django OAuth Toolkit and dependencies are installed
-  sudo: yes
-  easy_install: name={{item}}
+  pip: name=django virtualenv={{virtualenvpath}}
+
+- name: Ensure Django SocialAuth and dependencies are installed
+  pip: name={{item}} virtualenv={{virtualenvpath}}
   with_items:
-  - django-oauth-toolkit
-  - django-cors-headers
+  - python-social-auth
+  - python-openid
+  - python-oauth2
+
+- name: Ensure Django Require is installed
+  pip: name=django-require  virtualenv={{virtualenvpath}}
+
 - name: Ensure Django Tastypie is installed
-  sudo: yes
-  easy_install: name=django-tastypie 
+  pip: name=git+https://github.com/django-tastypie/django-tastypie.git#egg=django-tastypie virtualenv={{virtualenvpath}}
+
 - name: Ensure Django Wiki and dependencies are installed
-  sudo: yes
-  easy_install: name={{item}}
+  pip: name={{item}} virtualenv={{virtualenvpath}}
   with_items:
   - djiki
   - py-wikimarkup
   - defusedxml
+
 - name: Ensure Django configurations is installed
-  sudo: yes
-  easy_install: name=django-configurations
+  pip: name=git+https://github.com/jezdez/django-configurations.git#egg=django-configurations virtualenv={{virtualenvpath}}
+
 - name: Ensure OAuth client libary is installed for testing purposes
-  sudo: yes
-  easy_install: name=requests_oauthlib 
+  pip: name=requests_oauthlib virtualenv={{virtualenvpath}}
+

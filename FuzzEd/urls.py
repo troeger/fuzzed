@@ -89,14 +89,8 @@ urlpatterns = patterns('',
                        # Docs Wiki
                        url(r'^docs/', include('djiki.urls')),
 
-                       # For getting OAuth2 authentication support, enable this
-                       # Please note that the application and token registration views are not tailored so far
-                       # Example client code lives in ./manage.py oauth, but only deals with trusted client authentication
-                       # based on the client secret
-                       # For end-user applications, we want to have full redirect support for the client, which smells
-                       # more like a separate web application
-                       # url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-
+                      # Django Social Auth
+                       url(r'', include('social.apps.django_app.urls', namespace='social'))
 
                        )
 urlpatterns += staticfiles_urlpatterns()
@@ -110,4 +104,4 @@ def show_urls(urllist, depth=0):
         print "  " * depth, entry.regex.pattern
         if hasattr(entry, 'url_patterns'):
             show_urls(entry.url_patterns, depth + 1)
-# show_urls(urlpatterns)
+#show_urls(urlpatterns)

@@ -12,7 +12,7 @@ class Common(Configuration):
     EMAIL_HOST = 'localhost'
     EMAIL_SUBJECT_PREFIX = '[FuzzEd] '
     LANGUAGE_CODE = 'en-en'
-    LOGIN_REDIRECT_URL = '/dashboard/'
+    LOGIN_REDIRECT_URL = '/projects/'
     LOGIN_URL = '/'
     REQUIRE_BASE_URL = 'script'
     REQUIRE_BUILD_PROFILE = '../lib/requirejs/require_build_profile.js'
@@ -25,6 +25,17 @@ class Common(Configuration):
         'webmaster@fuzzed.org',
         environ_name='FUZZED_ADMIN_EMAIL')
     SITE_ID = 1
+    SOCIAL_AUTH_URL_NAMESPACE = 'social'
+    SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['next',]
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_TWITTER_KEY = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_TWITTER_SECRET = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_LIVE_CLIENT_ID = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_LIVE_CLIENT_SECRET = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_YAHOO_OAUTH2_KEY = values.SecretValue(environ_prefix='FUZZED')
+    SOCIAL_AUTH_YAHOO_OAUTH2_SECRET = values.SecretValue(environ_prefix='FUZZED')
+
     STATICFILES_DIRS = ('FuzzEd/static',)
     STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
     STATIC_ROOT = 'FuzzEd/static-release/'
@@ -49,7 +60,9 @@ class Common(Configuration):
     TEMPLATE_CONTEXT_PROCESSORS = (
         'django.core.context_processors.static',
         'django.contrib.auth.context_processors.auth',
-        'django.contrib.messages.context_processors.messages'
+        'django.contrib.messages.context_processors.messages',
+        'social.apps.django_app.context_processors.backends',
+        'social.apps.django_app.context_processors.login_redirect'       
     )
 
     MIDDLEWARE_CLASSES = (
@@ -58,11 +71,7 @@ class Common(Configuration):
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
-        # Uncomment the next line for simple clickjacking protection:
-        #'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'FuzzEd.middleware.HttpErrorMiddleware',
-        'corsheaders.middleware.CorsMiddleware',
-        'oauth2_provider.middleware.OAuth2TokenMiddleware'
     )
 
     INSTALLED_APPS = (
@@ -73,10 +82,8 @@ class Common(Configuration):
         'django.contrib.staticfiles',
         'django.contrib.admin',
         'django.contrib.admindocs',
-        'openid2rp.django',
         'require',
-        'oauth2_provider',
-        'corsheaders',
+        'social.apps.django_app.default',        
         'tastypie',
         'djiki',
         'FuzzEd'
@@ -84,8 +91,11 @@ class Common(Configuration):
 
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
-        'oauth2_provider.backends.OAuth2Backend',
-        'openid2rp.django.auth.Backend'
+        'social.backends.google.GoogleOAuth2',
+        'social.backends.twitter.TwitterOAuth',
+        'social.backends.yahoo.YahooOAuth2',
+        'social.backends.open_id.OpenIdAuth',
+        'social.backends.live.LiveOAuth2'
     )
 
     LOGGING = {
@@ -134,18 +144,18 @@ class Common(Configuration):
 class Dev(Common):
     DEBUG = True
     TEMPLATE_DEBUG = True
-    SECRET_KEY = 'kjshdgfiu438o374o38g4o8figwilfuz4iou34gli'
+    SECRET_KEY = "4711"
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': 'fuzzed.sqlite',
-            'TEST_NAME': 'test_fuzzed.sqlite',
             'USER': 'fuzzed.sqlite',
             'PASSWORD': 'fuzzed',
             'HOST': 'localhost',
             'PORT': '',
         }
     }
+    TEST = {'NAME': 'test_fuzzed.sqlite'}
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     SERVER = 'http://localhost:8000'
     OPENID_RETURN = SERVER + '/login/?openidreturn'
@@ -168,9 +178,7 @@ class Vagrant(Dev):
 class Production(Common):
     DEBUG = False
     TEMPLATE_DEBUG = False
-    # Using values.SecretValue here breaks the Dev configuration
-    SECRET_KEY = values.Value('837dsfskfjh!',
-                              environ_name='FUZZED_SECRET')
+    SECRET_KEY = values.SecretValue(environ_prefix='FUZZED')
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',

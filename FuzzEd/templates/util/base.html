@@ -13,7 +13,6 @@
         @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-4.1.0.min.css");
         @import url("{{ STATIC_URL }}css/datatables/dataTables.bootstrap.css");
         @import url("{{ STATIC_URL }}css/selectize/selectize.bootstrap3.css");
-        @import url("{{ STATIC_URL }}lib/openid-selector/css/openid.css");
         {% endblock %}
     </style>
 
@@ -36,7 +35,6 @@
                 'selectize':        '../lib/selectize/js/standalone/selectize.min',
                 'jquery-cookie':     '../lib/jquery-cookie/jquery.cookie',
                 // other libs
-                'openid-selector': '../lib/openid-selector/js',
                 'bignumber':  '../lib/bignumber/bignumber-1.0.1.min',
                 'bootstrap':  '../lib/bootstrap/bootstrap-3.0.0rc1.min',
                 'highcharts': '../lib/highcharts/highcharts-3.0.2.min',
@@ -51,13 +49,6 @@
             },
             // define dependencies for libs that are not AMD compatible
             shim: {
-
-                'openid-selector/openid-jquery': {
-                    deps: ['jquery'],
-                    exports: 'openid'
-               },
-                'openid-selector/openid-en': 
-                    ['openid-selector/openid-jquery'],
                 'bootstrap': {
                     deps: ['jquery']
                 },

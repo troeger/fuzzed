@@ -1,3 +1,0 @@
-[vagrantmachine]
-localhost ansible_connection="local"
-
