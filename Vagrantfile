@@ -28,7 +28,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ansible.playbook = "ansible/site.yml"
       ansible.groups = { "devmachine" => ["default"] }
       ansible.extra_vars = { ansible_ssh_user: "vagrant", 
-                             vagrant: true,
-                             virtualenvpath: "~/fuzzed_venv/" }
+                             vagrant: true }
+      ansible.ask_vault_pass = true
     end
 end

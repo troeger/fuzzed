@@ -27,4 +27,4 @@
     - web
     - backend
     - testing
-    - { role: env_vagrant, when: vagrant == true }   # set by Vagrant config file
+    - { role: install_vagrant, when: vagrant == true }   # activated by Vagrant config file
