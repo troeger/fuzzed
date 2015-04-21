@@ -41,7 +41,6 @@ package_web = env.Package(
                       Glob("FuzzEd/*"),
                      "manage.py"]
                   )
-Alias('package.web', package_web)
 
 # Backend package generation - 'package.backend' target
 package_backend = env.Package(
@@ -52,7 +51,12 @@ package_backend = env.Package(
                      "backends/daemon.ini",
                      Dir("backends/rendering")]
                   )
-Alias('package.backend', package_backend)
+
+gittag = AlwaysBuild(env.Command('git tag v%s'%VERSION, None, 'git tag v%s'%VERSION))
+
+Alias('package', gittag)
+Alias('package', package_web)
+Alias('package', package_backend)
 
 # Lessc compilation - 'white.css' target
 css = env.Lessc( 'FuzzEd/static/css/theme/white.css',
