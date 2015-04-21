@@ -3,7 +3,7 @@
 - include: db.yml
 
 - name: Perform database backup  
-  command: pg_dump -c -f /tmp/dbackup.sql fuzzed
+  command: pg_dump -c -f /tmp/{{ db_name }}_backup.sql {{ db_name }}
   sudo: yes
   sudo_user: postgres
 
@@ -20,7 +20,7 @@
   file: src={{ install_base_dir }}/{{ release_version }} dest={{ www_base_dir }} state=link force=yes
 
 - name: Perform database migration  
-  django_manage: command=syncdb
+  django_manage: command=migrate
                  app_path={{ www_base_dir }}
                  virtualenv={{ virtualenvpath }}
 
