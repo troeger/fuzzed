@@ -5,6 +5,10 @@
   sudo: yes
   when: ansible_os_family == "Debian"
 
+- name: Configure PostgreSQL for local pw-based access
+  lineinfile: dest={{ pg_hba_conf }} line="host    all             all             127.0.0.1/32            md5"
+  sudo: yes
+
 - name: Install PostgreSQL native client 
   apt: name={{ item }} state=latest
   sudo: yes
@@ -34,6 +38,4 @@
   sudo_user: postgres
   postgresql_db: name={{ db_name }} owner={{ db_user }}
   when: ansible_os_family == "Debian"
-
-
 
