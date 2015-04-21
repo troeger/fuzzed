@@ -41,7 +41,7 @@ class Common(Configuration):
     STATIC_ROOT = 'FuzzEd/static-release/'
     STATIC_URL = '/static/'
     TEST_RUNNER = 'django.test.runner.DiscoverRunner'
-    TIME_ZONE = None
+    TIME_ZONE = 'UTC'      # setting this to None doesn't work on fresh Linux systems
     USE_I18N = False
     USE_L10N = True
     USE_TZ = False

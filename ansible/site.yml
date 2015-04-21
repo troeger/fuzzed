@@ -2,10 +2,11 @@
 - name: Configure production web servers
   hosts: webservers
   user: root
-  environment:  # needed for making ./manage.py workable, normally hidden in Apache config
-    DJANGO_CONFIGURATION: Production
-    FUZZED_SECRET_KEY: 4711
-
+  environment: env_vars # needed for making ./manage.py workable, comes from host config
+  vars_prompt:
+    - name: "release_version"
+      prompt: "FuzzEd Github release version"
+      private: no
   roles:
     - common
     - web
