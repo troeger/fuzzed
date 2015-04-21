@@ -2,6 +2,9 @@
 - name: Configure production web servers
   hosts: webservers
   user: root
+  environment:  # needed for making ./manage.py workable, normally hidden in Apache config
+    DJANGO_CONFIGURATION: Production
+    FUZZED_SECRET_KEY: 4711
 
   roles:
     - common

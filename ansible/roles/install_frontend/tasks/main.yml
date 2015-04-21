@@ -9,17 +9,23 @@
 
 - name: Ensure latest FuzzEd version is installed
   git:  repo=https://github.com/troeger/fuzzed.git
-        dest={{ install_base_dir }}{{ version }}
+        dest={{ install_base_dir }}/{{ version }}
         version={{ version }}
         depth=1
 
 - name: Adjusting links for pointing to download package 
-  file: src={{ install_base_dir }}{{ version }} dest={{ www_base_dir }} state=link
+  file: src={{ install_base_dir }}/{{ version }} dest={{ www_base_dir }} state=link force=yes
 
 - name: Perform database migration  
   django_manage: command=syncdb
-                 app_path={{ install_base_dir }}
-                 virtualenv={{ virtualenvdir }}
+                 app_path={{ www_base_dir }}
+                 virtualenv={{ virtualenvpath }}
+
+- name: Copy Apache VHost config file
+  template: src=/install_frontend/tasks/apache2_config.j2 dest=/etc/apache2/sites-available/{{ servername }}
+
+- name: Set link to Apache VHost config file
+  file: src=/etc/apache2/sites-available/{{ servername }} dest=/etc/apache2/sites-enabled/{{ servername }} state=link force=yes
 
 - name: Ensure that Apache config is correct  
   command: apache2ctl configtest
