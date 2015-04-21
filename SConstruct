@@ -52,7 +52,7 @@ package_backend = env.Package(
                      Dir("backends/rendering")]
                   )
 
-gittag = AlwaysBuild(env.Command('git tag v%s'%VERSION, None, 'git tag v%s'%VERSION))
+gittag = AlwaysBuild(env.Command('git tag %s'%VERSION, None, 'git tag v%s'%VERSION))
 
 Alias('package', gittag)
 Alias('package', package_web)
