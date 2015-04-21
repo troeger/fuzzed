@@ -1,0 +1,12 @@
+---
+- name: Configure developer machine
+  hosts: devmachine
+  user: root
+
+  roles:
+    - common
+    - build
+    - web
+    - backend
+    - testing
+    - { role: install_vagrant, when: vagrant == true }   # activated by Vagrant config file
