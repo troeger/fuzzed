@@ -7,6 +7,7 @@
     - common
     - build
     - web
+    - install_frontend
     - backend
     - testing
     - { role: install_vagrant, when: vagrant == true }   # activated by Vagrant config file

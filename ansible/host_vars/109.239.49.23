@@ -1,0 +1,19 @@
+---
+install_base_dir: /var/www/fuzzed 
+www_base_dir: /var/www/fuzzed/www 
+virtualenvpath: /var/www/fuzzed/venv 
+servername: 109.239.49.23
+db_name: fuzzed
+db_user: fuzzed
+db_pw: fuzzed
+db_host: localhost
+db_port: 5432
+pg_hba_conf: /etc/postgresql/9.1/main/pg_hba.conf 
+env_vars:
+  DJANGO_CONFIGURATION: Production
+  FUZZED_SECRET_KEY: 4711
+  FUZZED_DB_NAME: "{{ db_name }}"
+  FUZZED_DB_USER: "{{ db_user }}"
+  FUZZED_DB_PW:   "{{ db_pw }}"
+  FUZZED_DB_HOST: "{{ db_host }}"
+  FUZZED_DB_PORT: "{{ db_port }}"
