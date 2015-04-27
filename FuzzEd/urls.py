@@ -86,9 +86,6 @@ urlpatterns = patterns('',
                        url(r'^api/',
                            include(v1_api.urls + front_api.urls + back_api.urls)),
 
-                       # Docs Wiki
-                       url(r'^docs/', include('djiki.urls')),
-
                       # Django Social Auth
                        url(r'', include('social.apps.django_app.urls', namespace='social'))
 

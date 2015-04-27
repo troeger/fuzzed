@@ -6,9 +6,6 @@ import logging
 class Common(Configuration):
     AUTH_PROFILE_MODULE = 'FuzzEd.UserProfile'
     CORS_ORIGIN_ALLOW_ALL = True
-    DJIKI_AUTHORIZATION_BACKEND = 'FuzzEd.wiki.FuzzEdWikiAccess'
-    DJIKI_IMAGES_PATH = 'wiki_img'
-    DJIKI_PARSER = 'FuzzEd.wiki'
     EMAIL_HOST = 'localhost'
     EMAIL_SUBJECT_PREFIX = '[FuzzEd] '
     LANGUAGE_CODE = 'en-en'
@@ -86,7 +83,6 @@ class Common(Configuration):
         'require',
         'social.apps.django_app.default',        
         'tastypie',
-        'djiki',
         'FuzzEd'
     )
 
@@ -160,9 +156,7 @@ class Dev(Common):
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     SERVER = 'http://localhost:8000'
     TEMPLATE_DIRS = ('FuzzEd/templates',
-                     'FuzzEd/static/img',
-                     'FuzzEd/templates/djiki',
-                     'djiki')
+                     'FuzzEd/static/img')
     BACKEND_DAEMON = "http://localhost:8000"
     TERMS_PAGE = '/about/'
     FEEDBACK_PAGE = 'http://fuzzed.uservoice.com'
@@ -206,8 +200,7 @@ class Production(Common):
                                            environ_name='FUZZED_HOST_NAME'))
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
     TEMPLATE_DIRS = (PROJECT_ROOT + '/templates',
-                     PROJECT_ROOT + '/static-release/img',
-                     PROJECT_ROOT + '/templates/djiki')
+                     PROJECT_ROOT + '/static-release/img')
     LOGGING = Common.LOGGING
     LOGGING['loggers']['django.request']['handlers'] = ['mail_admins']
     LOGGING['loggers']['FuzzEd']['handlers'] = ['file']

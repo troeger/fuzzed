@@ -15,13 +15,6 @@
 - name: Ensure Django Tastypie is installed
   pip: name=git+https://github.com/django-tastypie/django-tastypie.git#egg=django-tastypie virtualenv={{virtualenvpath}}
 
-- name: Ensure Django Wiki and dependencies are installed
-  pip: name={{item}} virtualenv={{virtualenvpath}}
-  with_items:
-  - djiki
-  - py-wikimarkup
-  - defusedxml
-
 - name: Ensure Django configurations is installed
   pip: name=git+https://github.com/jezdez/django-configurations.git#egg=django-configurations virtualenv={{virtualenvpath}}
 
