@@ -1,16 +1,18 @@
 ---
+servername: {{ ansible_fqdn }}
 install_base_dir: /var/www/fuzzed
-www_base_dir: /var/www/fuzzed/www
 be_install_base_dir: /usr/local/fuzzed
-be_base_dir: /usr/local/fuzzed/current
-virtualenvpath: /var/www/fuzzed/venv
-servername: 109.239.49.23
 db_name: fuzzed
 db_user: fuzzed
 db_pw: fuzzed
 db_host: localhost
 db_port: 5432
 pg_hba_conf: /etc/postgresql/9.1/main/pg_hba.conf
+
+www_base_dir: {{ install_base_dir }}/www
+be_base_dir:  {{ be_install_base_dir }}/current
+virtualenvpath: {{ install_base_dir }}/venv
+
 env_vars:
   DJANGO_CONFIGURATION: Production
   FUZZED_SECRET_KEY: "{{ ansible_machine_id }}"
