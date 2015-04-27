@@ -1,5 +1,4 @@
 ---
-- include: apache2.yml
 - include: db.yml
 
 - name: Perform database backup
@@ -11,10 +10,10 @@
 #  get_url: url=https://github.com/troeger/fuzzed/releases/download/{{release_version}}/FuzzEd-{{release_version}}.tar.gz dest={{ install_base_dir }} 
 
 - name: Upload FuzzEd release to server
-  copy: src=../dist/FuzzEd-{{release_version}}.tar.gz dest={{ install_base_dir }}
+  copy: src=../dist/FuzzEd-{{release_version}}.tar.gz dest={{ install_base_dir }}/
 
 - name: Create target directory for unarchiving
-  file: path={{ install_base_dir }}/{{ release_version }} state=directory
+  file: path={{ install_base_dir }}/{{ release_version }}/ state=directory
 
 - name: Unarchive release package on server
   unarchive: copy=no src={{ install_base_dir }}/FuzzEd-{{release_version}}.tar.gz dest={{ install_base_dir }}/{{ release_version }}
@@ -27,8 +26,19 @@
                  app_path={{ www_base_dir }}
                  virtualenv={{ virtualenvpath }}
 
-- name: Copy Apache VHost config file
-  template: src=/install_frontend/tasks/apache2_config.j2 dest=/etc/apache2/sites-available/{{ servername }}
+- name: Ensure apache and modules are at the latest version
+  apt: pkg={{ item }} state=latest
+  sudo: yes
+  with_items:
+  - apache2
+  - libapache2-mod-wsgi
+  when: ansible_os_family == "Debian"
+
+- name: Copy tailored Apache VHost config file
+  template: src=apache2_config.j2 dest=/etc/apache2/sites-available/{{ servername }}
+
+- name: Copy tailored wsgi.py file
+  template: src=wsgi.py.j2 dest={{ www_base_dir }}/FuzzEd/wsgi.py
 
 - name: Set link to Apache VHost config file
   file: src=/etc/apache2/sites-available/{{ servername }} dest=/etc/apache2/sites-enabled/{{ servername }} state=link force=yes

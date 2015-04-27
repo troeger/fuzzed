@@ -10,12 +10,12 @@
                 Allow from all
         </Directory>
 
-        WSGIDaemonProcess {{ servername }} processes=5 threads=1 maximum-requests=1000 display-name=%{GROUP} python-path={{ www_base_dir }}
+        WSGIDaemonProcess {{ servername }} processes=5 threads=1 maximum-requests=1000 display-name=%{GROUP} python-path={{ www_base_dir }}:{{ virtualenvpath }}/lib/python2.7/site-packages/
         WSGIProcessGroup  {{ servername }}
         WSGIScriptAlias / {{ www_base_dir }}/FuzzEd/wsgi.py
         WSGIPassAuthorization On
 
-        ErrorLog ${APACHE_LOG_DIR}/{{ servername }}/error.log
+        ErrorLog ${APACHE_LOG_DIR}/{{ servername }}.error.log
         LogLevel info
-        CustomLog ${APACHE_LOG_DIR}/{{ servername }}/access.log combined
+        CustomLog ${APACHE_LOG_DIR}/{{ servername }}.access.log combined
 </VirtualHost>

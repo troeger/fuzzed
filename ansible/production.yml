@@ -3,19 +3,28 @@
   hosts: webservers
   user: root
   environment: env_vars # needed for making ./manage.py workable, comes from host config
+
   vars_prompt:
     - name: "release_version"
-      prompt: "FuzzEd release version [e.g. 0.7.0.beta.1]"
+      prompt: "FuzzEd release version"
       private: no
+      default: "0.7.0.beta.2"
+
   roles:
-    - install_frontend
     - common
     - web
 #    - oauth
+    - install_frontend
 
 - name: Configure production backend servers
   hosts: backendservers
   user: root
+
+  vars_prompt:
+    - name: "release_version"
+      prompt: "FuzzEd backend release version"
+      private: no
+      default: "0.7.0.beta.2"
 
   roles:
     - common

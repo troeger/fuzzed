@@ -6,8 +6,12 @@
 #- name: Install PyXB from GitHub sources
 #  sudo: yes
 #  shell: chdir=/tmp/pyxb creates=/usr/local/bin/pyxbgen python setup.py install
-- name: Get PyXB 
-  pip: name=PyXB virtualenv={{virtualenvpath}} 
+
+- name: Get PyXB
+  pip: name=PyXB virtualenv={{virtualenvpath}}
+
+- name: Ensure DefusedXML is installed
+  pip: name=defusedxml virtualenv={{virtualenvpath}}
 
 - include: django.yml
 

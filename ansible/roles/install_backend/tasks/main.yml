@@ -1,12 +1,23 @@
 ---
-- name: Ensure latest FuzzEd backend version is installed
-  get_url: url=http://github.com/XXX dest=/tmp mode=0440
-- name: Unarchive FuzzEd backend download package
-  unarchive: src=/tmp/XXX dest=usr/local/fuzzed/XXX
-- name: Adjusting links for pointing to download package 
-  file: dest=usr/local/fuzzed/XXX src=/usr/local/fuzzed/FuzzEdBackend owner=root group=root state=link
-- name: Ensure startup script link 
-  file: dest=/usr/local/fuzzed/FuzzEdBackend/initscript.sh src=/etc/init.d/fuzzed-backend owner=root group=root state=link
-- name: Ensure FuzzEd backend being started 
+
+- name: Upload FuzzEd Backend release to server
+  copy: src=../dist/FuzzEdBackend-{{release_version}}.tar.gz dest={{ be_install_base_dir }}/
+
+- name: Create target directory for unarchiving backend
+  file: path={{ be_install_base_dir }}/{{ release_version }}/ state=directory
+
+- name: Unarchive backend release package on server
+  unarchive: copy=no src={{ be_install_base_dir }}/FuzzEdBackend-{{release_version}}.tar.gz dest={{ be_install_base_dir }}/{{ release_version }}/
+
+- name: Adjusting links for pointing to download package
+  file: src={{ be_install_base_dir }}/{{ release_version }}/ dest={{ be_base_dir }} state=link force=yes
+
+- name: Ensure access rights for startup script
+  file: path={{ be_base_dir }}/backends/initscript.sh state=touch mode="u+x"
+
+- name: Ensure startup script link
+  file: src={{ be_base_dir }}/backends/initscript.sh dest=/etc/init.d/fuzzed-backend owner=root group=root force=yes state=link
+
+- name: Ensure FuzzEd backend being started
   service: name=fuzzed-backend state=started
 

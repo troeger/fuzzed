@@ -33,11 +33,11 @@ css = env.Lessc( 'FuzzEd/static/css/theme/white.css',
           'FuzzEd/static/less/theme/white/theme.less')
 
 # XML Wrapper generation
-xml_targets = [  'Fuzzed/models/xml_common.py',
-               'Fuzzed/models/xml_configurations.py',
-               'Fuzzed/models/xml_backend.py',
-               'Fuzzed/models/xml_fuzztree.py',
-               'Fuzzed/models/xml_faulttree.py'   ]
+xml_targets = ['FuzzEd/models/xml_common.py',
+               'FuzzEd/models/xml_configurations.py',
+               'FuzzEd/models/xml_backend.py',
+               'FuzzEd/models/xml_fuzztree.py',
+               'FuzzEd/models/xml_faulttree.py'   ]
 xml = env.PyXB(   xml_targets,
             [  'FuzzEd/static/xsd/commonTypes.xsd',
                'FuzzEd/static/xsd/configurations.xsd',
