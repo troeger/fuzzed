@@ -7,7 +7,7 @@
   sudo: yes
   when: ansible_os_family == "Debian"
 
-- name: Check if LaTex was manually installed 
+- name: Check if LaTex was manually installed
   stat: path=/usr/texbin/dvips
   register: tex
 

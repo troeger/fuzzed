@@ -28,16 +28,34 @@ statics = env.Command( Dir('FuzzEd/static-release'),
                       )
 Clean(statics, 'FuzzEd/static-release')
 
+# Lessc compilation - 'white.css' target
+css = env.Lessc( 'FuzzEd/static/css/theme/white.css',
+          'FuzzEd/static/less/theme/white/theme.less')
+
+# XML Wrapper generation
+xml_targets = ['FuzzEd/models/xml_common.py',
+               'FuzzEd/models/xml_configurations.py',
+               'FuzzEd/models/xml_backend.py',
+               'FuzzEd/models/xml_fuzztree.py',
+               'FuzzEd/models/xml_faulttree.py'   ]
+xml = env.PyXB(   xml_targets,
+            [  'FuzzEd/static/xsd/commonTypes.xsd',
+               'FuzzEd/static/xsd/configurations.xsd',
+               'FuzzEd/static/xsd/backendResult.xsd',
+               'FuzzEd/static/xsd/fuzztree.xsd',
+               'FuzzEd/static/xsd/faulttree.xsd' 
+            ])
+
 # Web package generation - 'package.web' target
 package_web = env.Package(
                      "dist/FuzzEd-%s"%VERSION, 
                      [Dir("FuzzEd/api"),
-                      Dir("FuzzEd/lib"),
                       Dir("FuzzEd/management"),
                       Dir("FuzzEd/migrations"),
                       Dir("FuzzEd/models"),
                       Dir("FuzzEd/static-release"),
                       Dir("FuzzEd/templates"),
+                      xml_targets,
                       Glob("FuzzEd/*"),
                      "manage.py"]
                   )
@@ -52,29 +70,12 @@ package_backend = env.Package(
                      Dir("backends/rendering")]
                   )
 
-gittag = AlwaysBuild(env.Command('git tag %s'%VERSION, None, 'git tag v%s'%VERSION))
+gittag = AlwaysBuild(env.Command('git tag -f %s'%VERSION, None, 'git tag -f v%s'%VERSION))
 
 Alias('package', gittag)
 Alias('package', package_web)
 Alias('package', package_backend)
 
-# Lessc compilation - 'white.css' target
-css = env.Lessc( 'FuzzEd/static/css/theme/white.css',
-          'FuzzEd/static/less/theme/white/theme.less')
-
-# XML Wrapper generation
-xml_targets = [  'Fuzzed/models/xml_common.py',
-               'Fuzzed/models/xml_configurations.py',
-               'Fuzzed/models/xml_backend.py',
-               'Fuzzed/models/xml_fuzztree.py',
-               'Fuzzed/models/xml_faulttree.py'   ]
-xml = env.PyXB(   xml_targets,
-            [  'FuzzEd/static/xsd/commonTypes.xsd',
-               'FuzzEd/static/xsd/configurations.xsd',
-               'FuzzEd/static/xsd/backendResult.xsd',
-               'FuzzEd/static/xsd/fuzztree.xsd',
-               'FuzzEd/static/xsd/faulttree.xsd' 
-            ])
 
 # Generation of Python version of the notation files 
 notations = env.Notations(  'FuzzEd/models/notations.py',

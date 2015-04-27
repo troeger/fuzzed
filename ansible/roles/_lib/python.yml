@@ -1,10 +1,10 @@
 ---
-- name: Install Python Dev 
+- name: Install Python Dev
   apt: pkg=python-dev state=latest
   sudo: yes
   when: ansible_os_family == "Debian"
 
-- name: Install Python PIP 
+- name: Install Python PIP
   apt: pkg=python-pip state=latest
   sudo: yes
   when: ansible_os_family == "Debian"
