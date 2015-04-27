@@ -28,36 +28,6 @@ statics = env.Command( Dir('FuzzEd/static-release'),
                       )
 Clean(statics, 'FuzzEd/static-release')
 
-# Web package generation - 'package.web' target
-package_web = env.Package(
-                     "dist/FuzzEd-%s"%VERSION, 
-                     [Dir("FuzzEd/api"),
-                      Dir("FuzzEd/lib"),
-                      Dir("FuzzEd/management"),
-                      Dir("FuzzEd/migrations"),
-                      Dir("FuzzEd/models"),
-                      Dir("FuzzEd/static-release"),
-                      Dir("FuzzEd/templates"),
-                      Glob("FuzzEd/*"),
-                     "manage.py"]
-                  )
-
-# Backend package generation - 'package.backend' target
-package_backend = env.Package(
-                     "dist/FuzzEdBackend-%s"%VERSION, 
-                     [Dir("backends/lib"),
-                     "backends/initscript.sh",
-                     "backends/daemon.py",
-                     "backends/daemon.ini",
-                     Dir("backends/rendering")]
-                  )
-
-gittag = AlwaysBuild(env.Command('git tag %s'%VERSION, None, 'git tag v%s'%VERSION))
-
-Alias('package', gittag)
-Alias('package', package_web)
-Alias('package', package_backend)
-
 # Lessc compilation - 'white.css' target
 css = env.Lessc( 'FuzzEd/static/css/theme/white.css',
           'FuzzEd/static/less/theme/white/theme.less')
@@ -75,6 +45,37 @@ xml = env.PyXB(   xml_targets,
                'FuzzEd/static/xsd/fuzztree.xsd',
                'FuzzEd/static/xsd/faulttree.xsd' 
             ])
+
+# Web package generation - 'package.web' target
+package_web = env.Package(
+                     "dist/FuzzEd-%s"%VERSION, 
+                     [Dir("FuzzEd/api"),
+                      Dir("FuzzEd/management"),
+                      Dir("FuzzEd/migrations"),
+                      Dir("FuzzEd/models"),
+                      Dir("FuzzEd/static-release"),
+                      Dir("FuzzEd/templates"),
+                      xml_targets,
+                      Glob("FuzzEd/*"),
+                     "manage.py"]
+                  )
+
+# Backend package generation - 'package.backend' target
+package_backend = env.Package(
+                     "dist/FuzzEdBackend-%s"%VERSION, 
+                     [Dir("backends/lib"),
+                     "backends/initscript.sh",
+                     "backends/daemon.py",
+                     "backends/daemon.ini",
+                     Dir("backends/rendering")]
+                  )
+
+gittag = AlwaysBuild(env.Command('git tag -f %s'%VERSION, None, 'git tag -f v%s'%VERSION))
+
+Alias('package', gittag)
+Alias('package', package_web)
+Alias('package', package_backend)
+
 
 # Generation of Python version of the notation files 
 notations = env.Notations(  'FuzzEd/models/notations.py',

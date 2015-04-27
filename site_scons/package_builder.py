@@ -12,7 +12,7 @@ def package_builder(target, source, env):
     inclusions = [[str(s), str(s)] for s in source]
     exclusion_suffix=[".pyc", ".sqlite", ".orig"]
     exclusion_files = []
-    exclusion_dirs = []
+    exclusion_dirs = [".git"]
 
     def tarfilter(tarinfo):
         fname = tarinfo.name
