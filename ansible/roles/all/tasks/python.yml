@@ -1,14 +1,14 @@
 # FE and BE both have their Python parts, so we make it mandatory everywhere
 ---
-- name: Install Python Dev
+- name: Ensure Python Dev is installed (Debian)
   apt: pkg=python-dev state=latest
   sudo: yes
   when: ansible_os_family == "Debian"
 
-- name: Install Python PIP
+- name: Ensure Python PIP is installed (Debian)
   apt: pkg=python-pip state=latest
   sudo: yes
   when: ansible_os_family == "Debian"
 
-- name: Make sure VirtualEnv is available
+- name: Ensure VirtualEnv is installed
   pip: name=virtualenv state=present

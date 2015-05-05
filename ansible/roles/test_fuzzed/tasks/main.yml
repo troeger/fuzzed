@@ -1,7 +1,8 @@
 ---
-- name: Install mocha-phantomjs
+- name: Ensure mocha-phantomjs is installed
   npm: name=mocha-phantomjs global=yes
+  sudo: yes
 
-- name: Ensure OAuth client libary is installed for testing purposes
+- name: Ensure OAuth client libary is installed
   pip: name=requests_oauthlib virtualenv={{virtualenvpath}}
 

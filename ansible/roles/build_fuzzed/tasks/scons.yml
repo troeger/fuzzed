@@ -1,9 +1,9 @@
 ---
-- name: Ensure SCONS is installed
+- name: Ensure SCONS is installed (Debian)
   sudo: yes
   apt: pkg=scons state=present
   when: ansible_os_family == "Debian"
 
-- name: Ensure SCONS is installed
+- name: Ensure SCONS is installed (Darwin)
   homebrew: pkg=scons state=present
   when: ansible_os_family == "Darwin"

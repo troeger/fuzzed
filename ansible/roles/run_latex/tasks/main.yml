@@ -1,5 +1,5 @@
 ---
-- name: Ensure LaTex is installed
+- name: Ensure LaTex is installed (Debian)
   apt: pkg=texlive state=latest
   sudo: yes
   when: ansible_os_family == "Debian"

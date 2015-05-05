@@ -1,15 +1,15 @@
 ---
 
-- name: Install PostgreSQL 
+- name: Ensure PostgreSQL server is installed (Debian)
   apt: pkg=postgresql state=latest
   sudo: yes
   when: ansible_os_family == "Debian"
 
-- name: Configure PostgreSQL for local pw-based access
+- name: Ensure PostgreSQL is configured for for local pw-based access
   lineinfile: dest={{ pg_hba_conf }} line="host    all             all             127.0.0.1/32            md5"
   sudo: yes
 
-- name: Install PostgreSQL native client 
+- name: Ensure PostgreSQL native client is installed (Debian)
   apt: name={{ item }} state=latest
   sudo: yes
   with_items:
@@ -18,22 +18,20 @@
   when: ansible_os_family == "Debian"
 
 # http://stackoverflow.com/questions/29728530/using-ansible-postgresql-user-with-psycopg2-from-virtualenv
-- name: Install PostgreSQL Python client globally (for DB management Ansible commands)
+- name: Ensure PostgreSQL Python client library is available globally (for DB management Ansible commands)
   pip: name=psycopg2
   sudo: yes
 
-- name: Install PostgreSQL Python client in VirtualEnv (for DB management Django commands)
+- name: Ensure PostgreSQL Python client library is available in VirtualEnv (for DB management Django commands)
   pip: name=psycopg2 virtualenv={{virtualenvpath}}
 
-- name: Install PostgreSQL user
+- name: Ensure PostgreSQL user for FuzzEd database
   sudo: yes
   sudo_user: postgres
   postgresql_user: name={{ db_user }} password={{ db_pw }} role_attr_flags=NOSUPERUSER
-  when: ansible_os_family == "Debian"
 
-- name: Install PostgreSQL database
+- name: Ensure PostgreSQL database for FuzzEd
   sudo: yes
   sudo_user: postgres
   postgresql_db: name={{ db_name }} owner={{ db_user }}
-  when: ansible_os_family == "Debian"
 

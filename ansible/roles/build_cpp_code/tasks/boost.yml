@@ -1,5 +1,5 @@
 ---
-- name: Ensure Boost libraries are installed
+- name: Ensure Boost libraries are installed (Debian)
   apt: name={{ item }} state=latest
   sudo: yes
   with_items:
@@ -11,6 +11,6 @@
     - libboost-program-options-dev
   when: ansible_os_family == "Debian"
 
-- name: Ensure Boost libraries are installed
+- name: Ensure Boost libraries are installed (Darwin)
   homebrew: name=boost state=latest install_options=c++11
   when: ansible_os_family == "Darwin"

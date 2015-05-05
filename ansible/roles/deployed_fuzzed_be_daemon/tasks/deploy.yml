@@ -8,7 +8,7 @@
 - name: Unarchive backend release package on server
   unarchive: copy=no src={{ be_install_base_dir }}/FuzzEdBackend-{{release_version}}.tar.gz dest={{ be_install_base_dir }}/{{ release_version }}/
 
-- name: Adjusting links for pointing to download package
+- name: Ensure links pointing to download package
   file: src={{ be_install_base_dir }}/{{ release_version }}/ dest={{ be_base_dir }} state=link force=yes
 
 - name: Ensure access rights for startup script

@@ -1,5 +1,5 @@
 ---
-- name: Ensure C++ XML support is installed
+- name: Ensure C++ XML support is installed (Debian)
   apt: name={{ item }} state=present
   sudo: yes
   with_items:
@@ -7,7 +7,7 @@
     - xsdcxx
   when: ansible_os_family == "Debian"
 
-- name: Ensure C++ XML support is installed
+- name: Ensure C++ XML support is installed (Darwin)
   homebrew: name=xerces-c state=present
   when: ansible_os_family == "Darwin"
 

@@ -5,7 +5,7 @@
 #  sudo: yes
 #  shell: chdir=/tmp/pyxb creates=/usr/local/bin/pyxbgen python setup.py install
 
-- name: Get PyXB
+- name: Ensure PyXB is installed
   pip: name=PyXB virtualenv={{virtualenvpath}}
 
 - name: Ensure DefusedXML is installed

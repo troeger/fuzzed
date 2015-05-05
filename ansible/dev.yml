@@ -1,5 +1,5 @@
 ---
-- name: Configure local Web developer machine
+- name: Configure minimal local Web developer machine
   hosts: localdev
   user: root
 
@@ -9,7 +9,6 @@
     - build_less_code
     - build_xsd_code
     - run_fuzzed_fe
-    - test_fuzzed
 
   vars_prompt:
     - name: "virtualenvpath"

@@ -1,8 +1,8 @@
 ---
-- name: Install Less Compiler
+- name: Ensure .less file compiler is installed
   npm: name=less global=yes
 
-- name: Bring lessc executable into path
+- name: Bring lessc executable into path (Debian)
   sudo: yes
   file: src=/usr/local/lib/node_modules/less/bin/lessc dest=/usr/local/bin/lessc state=link
   when: ansible_os_family == "Debian"

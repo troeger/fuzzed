@@ -1,3 +1,4 @@
 ---
 - include: django.yml
 - include: vagrant.yml
+  when: '"vagrantdev" in group_names'
