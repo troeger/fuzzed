@@ -1,3 +1,0 @@
----
-# This needs to be a group var, so that it is applied both in Vagrant and non-Vagrant mode
-virtualenvpath: ~/fuzzed_venv/

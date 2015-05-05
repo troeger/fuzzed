@@ -11,10 +11,8 @@
       default: "0.7.0.beta.2"
 
   roles:
-    - common
-    - web
-#    - oauth
-    - install_frontend
+    - run_fuzzed_fe
+    - deployed_fuzzed_fe_wsgi
 
 - name: Configure production backend servers
   hosts: backendservers
@@ -27,6 +25,5 @@
       default: "0.7.0.beta.2"
 
   roles:
-    - common
-    - backend
-    - install_backend
+    - run_fuzzed_be
+    - deployed_fuzzed_be_daemon

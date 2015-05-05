@@ -1,0 +1,3 @@
+---
+- include: apache_wsgi.yml
+- include: deploy.yml

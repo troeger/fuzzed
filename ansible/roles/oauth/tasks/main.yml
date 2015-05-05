@@ -1,6 +1,0 @@
----
-- include_vars: oauth_secrets.yml
-- name: Set environment variables in .bashrc for Vagrant
-  lineinfile: dest=/home/vagrant/.bashrc line="export {{ item.key }}='{{ item.value }}'"
-  with_dict: envvariables
-  when: vagrant == true 

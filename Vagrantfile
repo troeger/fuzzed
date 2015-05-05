@@ -26,8 +26,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     config.vm.provision "ansible" do |ansible|
       ansible.playbook = "ansible/dev.yml"
-      ansible.groups = { "devmachine" => ["default"] }
-      ansible.extra_vars = { ansible_ssh_user: "vagrant", 
-                             vagrant: true }
+      ansible.groups = { "vagrantdev" => ["default"] }
+      ansible.extra_vars = { ansible_ssh_user: "vagrant" }
+#     ansible.verbose = "vvv"
     end
 end

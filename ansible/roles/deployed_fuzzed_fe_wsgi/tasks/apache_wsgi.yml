@@ -1,0 +1,24 @@
+- name: Ensure apache and modules are at the latest version
+  apt: pkg={{ item }} state=latest
+  sudo: yes
+  with_items:
+  - apache2
+  - libapache2-mod-wsgi
+  when: ansible_os_family == "Debian"
+
+- name: Copy tailored Apache VHost config file
+  template: src=apache2_config.j2 dest=/etc/apache2/sites-available/{{ servername }}
+
+- name: Copy tailored wsgi.py file
+  template: src=wsgi.py.j2 dest={{ www_base_dir }}/FuzzEd/wsgi.py
+
+- name: Set link to Apache VHost config file
+  file: src=/etc/apache2/sites-available/{{ servername }} dest=/etc/apache2/sites-enabled/{{ servername }} state=link force=yes
+
+- name: Ensure that Apache config is correct
+  command: apache2ctl configtest
+  sudo: yes
+
+- name: Ensure Apache is restarted
+  service: name=apache2 state=restarted
+  sudo: yes

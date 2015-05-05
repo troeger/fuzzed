@@ -7,15 +7,11 @@ if __name__ == '__main__':
     from configurations.management import execute_from_command_line
 
     if "runserver" in sys.argv:
-        if "DJANGO_CONFIGURATION" not in os.environ:
-            # Not set by Ansible Vagrant provisioning, so we assume developer mode, since
-            # production systems are supposed to not use this script
-            os.environ["DJANGO_CONFIGURATION"]="Dev"
+        if os.environ["DJANGO_CONFIGURATION"]=="Dev":
             print("Assuming Dev mode")
             args = ["./manage.py","runserver","--configuration=Dev"]
             execute_from_command_line(args)
-        else:
-            os.environ["DJANGO_CONFIGURATION"]="Vagrant"
+        elif os.environ["DJANGO_CONFIGURATION"]=="Vagrant":
             print("Assuming Vagrant mode")
             args = ["./manage.py","runserver","192.168.33.10:8000","--configuration=Vagrant"]
             print "-------------------------------------------------------------------"

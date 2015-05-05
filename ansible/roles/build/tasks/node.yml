@@ -1,6 +1,0 @@
----
-- name: Bring Ubuntu node executable into path
-  sudo: yes
-  file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
-  when: ansible_os_family == "Debian"
-

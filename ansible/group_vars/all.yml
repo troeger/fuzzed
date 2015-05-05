@@ -1,0 +1,3 @@
+---
+env_default_vars:
+  FUZZED_SECRET_KEY: "{{ ansible_machine_id }}"

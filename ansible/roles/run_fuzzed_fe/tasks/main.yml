@@ -1,0 +1,3 @@
+---
+- include: django.yml
+- include: vagrant.yml
