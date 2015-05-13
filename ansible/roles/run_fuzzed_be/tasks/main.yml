@@ -1,4 +1,7 @@
+#TODO: The backend setup must be separated anyway, so that the BE virtualenv is configured correctly
+#      Until then, we allow ourselves to pollute the main machine with one BE dependency
 ---
 - name: Ensure backend daemon dependencies are installed
-  pip: name=requests virtualenv={{virtualenvpath}}
+#  pip: name=requests virtualenv={{virtualenvpath}}
+   pip: name=requests
 

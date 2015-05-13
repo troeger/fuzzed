@@ -18,9 +18,7 @@ class Common(Configuration):
     MEDIA_ROOT = ''
     MEDIA_URL = ''
     SEND_BROKEN_LINK_EMAILS = False
-    SERVER_EMAIL = values.Value(
-        'webmaster@fuzzed.org',
-        environ_name='FUZZED_ADMIN_EMAIL')
+    SERVER_EMAIL = values.Value('NOT_SET', environ_prefix='FUZZED')
     SITE_ID = 1
     SOCIAL_AUTH_URL_NAMESPACE = 'social'
     SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['next',]
@@ -60,7 +58,7 @@ class Common(Configuration):
         'django.contrib.auth.context_processors.auth',
         'django.contrib.messages.context_processors.messages',
         'social.apps.django_app.context_processors.backends',
-        'social.apps.django_app.context_processors.login_redirect'       
+        'social.apps.django_app.context_processors.login_redirect'
     )
 
     MIDDLEWARE_CLASSES = (
@@ -181,33 +179,23 @@ class Production(Common):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': values.Value('fuzzed',
-                                 environ_name='FUZZED_DB_NAME'),
-            'USER': values.Value('fuzzed',
-                                 environ_name='FUZZED_DB_USER'),
-            'PASSWORD': values.Value('fuzzed',
-                                     environ_name='FUZZED_DB_PW'),
-            'HOST': values.Value('localhost',
-                                 environ_name='FUZZED_DB_HOST'),
-            'PORT': values.Value('',
-                                 environ_name='FUZZED_DB_PORT'),
+            'NAME': values.Value('fuzzed', environ_prefix='FUZZED'),
+            'USER': values.Value('fuzzed', environ_prefix='FUZZED'),
+            'PASSWORD': values.Value('fuzzed', environ_prefix='FUZZED'),
+            'HOST': values.Value('localhost', environ_prefix='FUZZED'),
+            'PORT': values.Value('', environ_prefix='FUZZED'),
         }
     }
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    ALLOWED_HOSTS = ["*"]
-    SERVER = 'https://' + str(values.Value('fuzzed.org',
-                                           environ_name='FUZZED_HOST_NAME'))
+    ALLOWED_HOSTS = [str(values.Value('fuzzed.org', environ_prefix='FUZZED', environ_name='SERVER'))]
+    SERVER = 'https://' + str(values.Value('fuzzed.org', environ_prefix='FUZZED', environ_name='SERVER'))
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
     TEMPLATE_DIRS = (PROJECT_ROOT + '/templates',
                      PROJECT_ROOT + '/static-release/img')
     LOGGING = Common.LOGGING
     LOGGING['loggers']['django.request']['handlers'] = ['mail_admins']
     LOGGING['loggers']['FuzzEd']['handlers'] = ['file']
-    BACKEND_DAEMON = values.Value('http://example.com:8000',
-                                  environ_name='FUZZED_BACKEND_HOST_NAME')
-    TERMS_PAGE = values.Value('/about/',
-                              environ_name='FUZZED_TERMS_PAGE')
-    FEEDBACK_PAGE = values.URLValue('http://example.com',
-                                    environ_name='FUZZED_FEEDBACK_PAGE')
-    FOOTER = values.Value('FuzzEd Development Team',
-                          environ_name='FUZZED_FOOTER')
+    BACKEND_DAEMON = values.Value('http://localhost:8000', environ_prefix='FUZZED') #TODO: Ansible integration
+    TERMS_PAGE = values.Value('/about/', environ_prefix='FUZZED')
+    FEEDBACK_PAGE = values.URLValue('http://fuzzed.uservoice.com', environ_prefix='FUZZED')
+    FOOTER = values.Value('FuzzEd Development Team', environ_prefix='FUZZED')
