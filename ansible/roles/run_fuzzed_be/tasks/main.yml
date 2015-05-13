@@ -1,6 +1,5 @@
-#TODO: Configure and prepare a separate VirtualEnv for the backend
-#      Must be also considered in the daemon script
+#TODO: Configure and prepare a separate VirtualEnv for the backend, ,ust be also considered in the daemon script
 ---
 - name: Ensure backend daemon dependencies are installed
-   pip: name=requests
+  pip: name=requests
 
