@@ -81,7 +81,7 @@ class Common(Configuration):
         'django.contrib.admin',
         'django.contrib.admindocs',
         'require',
-        'social.apps.django_app.default',        
+        'social.apps.django_app.default',
         'tastypie',
         'FuzzEd'
     )

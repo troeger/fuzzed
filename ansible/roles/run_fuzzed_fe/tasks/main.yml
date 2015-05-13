@@ -2,3 +2,5 @@
 - include: django.yml
 - include: vagrant.yml
   when: '"vagrantdev" in group_names'
+- include: local.yml
+  when: '"localdev" in group_names'

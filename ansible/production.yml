@@ -11,6 +11,7 @@
       default: "0.7.0.beta.2"
 
   roles:
+    - all
     - run_fuzzed_fe
     - deployed_fuzzed_fe_wsgi
 
@@ -25,5 +26,6 @@
       default: "0.7.0.beta.2"
 
   roles:
+    - all
     - run_fuzzed_be
     - deployed_fuzzed_be_daemon

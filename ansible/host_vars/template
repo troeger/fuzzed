@@ -13,9 +13,6 @@ www_base_dir: "{{ install_base_dir }}/www"
 be_base_dir:  "{{ be_install_base_dir }}/current"
 virtualenvpath: "{{ install_base_dir }}/venv"
 
-env_default_vars:
-  FUZZED_SECRET_KEY: "{{ ansible_machine_id }}"
-
 env_db_vars:
   FUZZED_DB_NAME: "{{ db_name }}"
   FUZZED_DB_USER: "{{ db_user }}"
@@ -24,7 +21,7 @@ env_db_vars:
   FUZZED_DB_PORT: "{{ db_port }}"
   FUZZED_HOST_NAME: "{{ servername }}"
 
-env_social_auth_vars:  
+env_social_auth_vars:
   FUZZED_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY    : "xxx"
   FUZZED_SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET : "xxx"
   FUZZED_SOCIAL_AUTH_TWITTER_KEY          : "xxx"

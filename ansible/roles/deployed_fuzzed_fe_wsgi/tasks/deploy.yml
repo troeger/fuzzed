@@ -19,6 +19,12 @@
 - name: Adjusting links for pointing to download package
   file: src={{ install_base_dir }}/{{ release_version }} dest={{ www_base_dir }} state=link force=yes
 
+# This separate step avoids an issue were the first migration fails with an "auth_user" issue
+- name: Perform database migration
+  django_manage: command="migrate auth"
+                 app_path={{ www_base_dir }}
+                 virtualenv={{ virtualenvpath }}
+
 - name: Perform database migration
   django_manage: command=migrate
                  app_path={{ www_base_dir }}
@@ -31,6 +37,9 @@
   - apache2
   - libapache2-mod-wsgi
   when: ansible_os_family == "Debian"
+
+- name: How can we reach that thing ?
+  debug: msg="Using {{ servername }} as address for web presence"
 
 - name: Copy tailored Apache VHost config file
   template: src=apache2_config.j2 dest=/etc/apache2/sites-available/{{ servername }}

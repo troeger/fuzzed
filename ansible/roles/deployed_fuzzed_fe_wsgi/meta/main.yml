@@ -1,0 +1,5 @@
+# Dependencies of this role
+---
+dependencies:
+  - { role: build_xsd_code }
+  - { role: run_postgres }
