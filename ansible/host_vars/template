@@ -1,0 +1,34 @@
+---
+servername: xxx
+install_base_dir: /var/www/fuzzed
+be_install_base_dir: /usr/local/fuzzed
+db_name: fuzzed
+db_user: fuzzed
+db_pw: fuzzed
+db_host: localhost
+db_port: 5432
+pg_hba_conf: /etc/postgresql/9.1/main/pg_hba.conf
+
+www_base_dir: "{{ install_base_dir }}/www"
+be_base_dir:  "{{ be_install_base_dir }}/current"
+virtualenvpath: "{{ install_base_dir }}/venv"
+
+env_vars:
+  DJANGO_CONFIGURATION: Production
+  FUZZED_SECRET_KEY: "{{ ansible_machine_id }}"
+  FUZZED_NAME: "{{ db_name }}"
+  FUZZED_USER: "{{ db_user }}"
+  FUZZED_PASSWORD:   "{{ db_pw }}"
+  FUZZED_HOST: "{{ db_host }}"
+  FUZZED_PORT: "{{ db_port }}"
+  FUZZED_SERVER: "{{ servername }}"
+  FUZZED_SERVER_URL: "http://{{ servername }}"
+  FUZZED_SERVER_EMAIL: xxx
+  FUZZED_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: xxx
+  FUZZED_SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET: xxx
+  FUZZED_SOCIAL_AUTH_TWITTER_KEY: xxx
+  FUZZED_SOCIAL_AUTH_TWITTER_SECRET: xxx
+  FUZZED_SOCIAL_AUTH_LIVE_CLIENT_ID: xxx
+  FUZZED_SOCIAL_AUTH_LIVE_CLIENT_SECRET: xxx
+  FUZZED_SOCIAL_AUTH_YAHOO_OAUTH2_KEY: xxx
+  FUZZED_SOCIAL_AUTH_YAHOO_OAUTH2_SECRET: xxx
