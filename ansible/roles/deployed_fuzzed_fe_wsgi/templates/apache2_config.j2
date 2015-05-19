@@ -1,5 +1,13 @@
 <VirtualHost *:80>
+        ServerName {{ servername }}
+        ServerAlias {{ serveralias }}
+        ServerAdmin webmaster@{{ servername }}
+        Redirect 301 / https://{{ servername }}/
+</VirtualHost>
+
+<VirtualHost *:443>
         ServerName    {{ servername }}
+        ServerAdmin   webmaster@{{ servername }}
         DocumentRoot  {{ www_base_dir }}
         Alias /static {{ www_base_dir }}/FuzzEd/static-release
 
@@ -18,4 +26,10 @@
         ErrorLog ${APACHE_LOG_DIR}/{{ servername }}.error.log
         LogLevel info
         CustomLog ${APACHE_LOG_DIR}/{{ servername }}.access.log combined
+
+        SSLEngine On
+        SSLCertificateKeyFile   {{ ssl_key }}
+        SSLCertificateChainFile {{ ssl_chain }}
+        SSLCACertificateFile    {{ ssl_ca }}
+        SSLCertificateFile      {{ ssl_cert }}
 </VirtualHost>

@@ -30,6 +30,18 @@ class Common(Configuration):
     SOCIAL_AUTH_LIVE_CLIENT_SECRET =   values.Value('NOT_SET', environ_prefix='FUZZED')
     SOCIAL_AUTH_YAHOO_OAUTH2_KEY =     values.Value('NOT_SET', environ_prefix='FUZZED')
     SOCIAL_AUTH_YAHOO_OAUTH2_SECRET =  values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_PIPELINE = (
+        'social.pipeline.social_auth.social_details',
+        'social.pipeline.social_auth.social_uid',
+        'social.pipeline.social_auth.auth_allowed',
+        'social.pipeline.social_auth.social_user',
+        'social.pipeline.user.get_username',
+        'social.pipeline.social_auth.associate_by_email',  # Transition to 0.7.0 installation for existing users
+        'social.pipeline.user.create_user',
+        'social.pipeline.social_auth.associate_user',
+        'social.pipeline.social_auth.load_extra_data',
+        'social.pipeline.user.user_details'
+    )
 
     STATICFILES_DIRS = ('FuzzEd/static',)
     STATICFILES_STORAGE = 'require.storage.OptimizedStaticFilesStorage'
@@ -187,8 +199,8 @@ class Production(Common):
         }
     }
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    ALLOWED_HOSTS = [str(values.Value('fuzzed.org', environ_prefix='FUZZED', environ_name='SERVER'))]
-    SERVER = str(values.Value('fuzzed.org', environ_prefix='FUZZED', environ_name='SERVER_URL'))
+    ALLOWED_HOSTS = [str(values.Value('xxx', environ_prefix='FUZZED', environ_name='SERVER'))]
+    SERVER = str(values.Value('xxx', environ_prefix='FUZZED', environ_name='SERVER_URL'))
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
     TEMPLATE_DIRS = (PROJECT_ROOT + '/templates',
                      PROJECT_ROOT + '/static-release/img')

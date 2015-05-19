@@ -1,5 +1,4 @@
 ---
 - include: cmake.yml
 - include: gcc.yml
-- include: boost.yml
 - include: xml.yml
