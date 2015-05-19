@@ -105,12 +105,12 @@
             <a class="navbar-brand" anchor="#">
                 {% if graph and project %}
                     {% if user == project.owner %}
-                        <a class="navbar-brand" href="{% url 'dashboard' project.pk %}"><small>{{ project.name }}</small> -</a>
+                        <a class="navbar-brand" href="{% url 'dashboard' project.pk %}"><small><i class="fa fa-fw fa-folder-open"></i>{{ project.name }}</small></a>
                     {% else %}
                         <!-- otherwise user is only viewer of the graph (graph is shared with the current user)-->
-                        <a class="navbar-brand" href="{% url 'shared_graphs_dashboard' %}"><small>Shared Graphs</small> -</a>
+                        <a class="navbar-brand" href="{% url 'shared_graphs_dashboard' %}"><small>Shared Graphs</small></a>
                     {% endif %}
-                    <a class="navbar-brand" href="#">{{ graph }}</a>
+                    <a class="navbar-brand" href="#">"{{ graph }}"</a>
                 {% else %}
                     FuzzEd 
                 {% endif %}

@@ -146,7 +146,7 @@
 {% block goto_menu %}   
     <li>
       {% if user == project.owner %}
-          <a href="{% url 'dashboard' project.pk %}"><i class="fa fa-fw fa-folder-open"></i> {{ project.name }} </a>
+          <a href="{% url 'dashboard' project.pk %}"><i class="fa fa-fw fa-folder-open"></i>Project dashboard</a>
       {% else %}
           <!-- otherwise user is only viewer of the graph (graph is shared with the current user)-->
           <a href="{% url 'shared_graphs_dashboard' %}"><i class="fa fa-fw fa-share"></i> Shared Graphs </a>
