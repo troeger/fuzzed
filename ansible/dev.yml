@@ -10,13 +10,6 @@
     - build_xsd_code
     - run_fuzzed_fe
 
-  vars_prompt:
-    - name: "virtualenvpath"
-      prompt: "Path for VirtualEnv environment"
-      private: no
-      default: "~/fuzzed_venv/"
-
-
 - name: Configure Vagrant developer machine
   hosts: vagrantdev
   user: root

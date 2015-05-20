@@ -8,7 +8,7 @@
 
 - name: Set environment variables in .bashrc for (Vagrant)
   lineinfile: dest=/home/vagrant/.bashrc line="export {{ item.key }}='{{ item.value }}'"
-  with_dict: env_default_vars
+  with_dict: env_vars
 
 - name: Set environment variables in .bashrc for (Vagrant)
   lineinfile: dest=/home/vagrant/.bashrc line="cd fuzzed" insertafter=EOF

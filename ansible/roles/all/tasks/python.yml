@@ -12,3 +12,4 @@
 
 - name: Ensure VirtualEnv is installed
   pip: name=virtualenv state=present
+  sudo: yes
