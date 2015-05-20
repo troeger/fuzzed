@@ -65,13 +65,13 @@
             <div class="col-2">
                 <a href="{% url 'social:begin' 'twitter' %}?next={{ next }}" class="btn-auth btn-twitter"><b>Twitter</b></a>
             </div>
-            <div class="col-2">
+<!--        <div class="col-2">
                 <a href="{% url 'social:begin' 'yahoo-oauth2' %}?next={{ next }}" class="btn-auth btn-yahoo"><b>Yahoo!</b></a>
             </div>
             <div class="col-2">
                 <a href="{% url 'social:begin' 'live' %}?next={{ next }}" class="btn-auth btn-windows"><b>Live</b></a>
             </div>
-            <div class="col-4">
+-->         <div class="col-4">
                 <form action="{% url 'social:begin' 'openid' %}?next={{ next }}" method="post">
                     {% csrf_token %}
                     <input type="hidden" name="next" value="{{ next }}" />
