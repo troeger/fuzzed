@@ -30,6 +30,8 @@ class Common(Configuration):
     SOCIAL_AUTH_LIVE_CLIENT_SECRET =   values.Value('NOT_SET', environ_prefix='FUZZED')
     SOCIAL_AUTH_YAHOO_OAUTH2_KEY =     values.Value('NOT_SET', environ_prefix='FUZZED')
     SOCIAL_AUTH_YAHOO_OAUTH2_SECRET =  values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_GITHUB_KEY =           values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_GITHUB_SECRET =        values.Value('NOT_SET', environ_prefix='FUZZED')
     SOCIAL_AUTH_PIPELINE = (
         'social.pipeline.social_auth.social_details',
         'social.pipeline.social_auth.social_uid',
@@ -102,7 +104,8 @@ class Common(Configuration):
         'social.backends.twitter.TwitterOAuth',
         'social.backends.yahoo.YahooOAuth2',
         'social.backends.open_id.OpenIdAuth',
-        'social.backends.live.LiveOAuth2'
+        'social.backends.live.LiveOAuth2',
+        'social.backends.github.GithubOAuth2'
     )
 
     LOGGING = {
