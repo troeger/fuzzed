@@ -199,6 +199,7 @@ class Production(Common):
         }
     }
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    ADMINS = (('FuzzEd Admin', str(values.Value('xxx', environ_prefix='FUZZED', environ_name='ADMIN_EMAIL')) ),)
     ALLOWED_HOSTS = [str(values.Value('xxx', environ_prefix='FUZZED', environ_name='SERVER'))]
     SERVER = str(values.Value('xxx', environ_prefix='FUZZED', environ_name='SERVER_URL'))
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))

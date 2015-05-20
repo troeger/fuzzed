@@ -1,17 +1,24 @@
 ---
-servername: xxx
+servername:  XXX
+serveralias: "www.{{ servername }}"
+ssl_key:     "/etc/apache2/ssl/{{ servername }}.key"
+ssl_chain:   /etc/apache2/ssl/sub.startssl.pem
+ssl_ca:      /etc/apache2/ssl/ca.startssl.pem
+ssl_cert:    "/etc/apache2/ssl/{{ servername }}.crt"
+
 install_base_dir: /var/www/fuzzed
+www_base_dir:     "{{ install_base_dir }}/www"
+virtualenvpath:   "{{ install_base_dir }}/venv"
+
 be_install_base_dir: /usr/local/fuzzed
+be_base_dir:         "{{ be_install_base_dir }}/current"
+
 db_name: fuzzed
 db_user: fuzzed
-db_pw: fuzzed
+db_pw:   fuzzed
 db_host: localhost
 db_port: 5432
 pg_hba_conf: /etc/postgresql/9.1/main/pg_hba.conf
-
-www_base_dir: "{{ install_base_dir }}/www"
-be_base_dir:  "{{ be_install_base_dir }}/current"
-virtualenvpath: "{{ install_base_dir }}/venv"
 
 env_vars:
   DJANGO_CONFIGURATION: Production
@@ -22,13 +29,14 @@ env_vars:
   FUZZED_HOST: "{{ db_host }}"
   FUZZED_PORT: "{{ db_port }}"
   FUZZED_SERVER: "{{ servername }}"
-  FUZZED_SERVER_URL: "http://{{ servername }}"
-  FUZZED_SERVER_EMAIL: xxx
-  FUZZED_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: xxx
-  FUZZED_SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET: xxx
-  FUZZED_SOCIAL_AUTH_TWITTER_KEY: xxx
-  FUZZED_SOCIAL_AUTH_TWITTER_SECRET: xxx
-  FUZZED_SOCIAL_AUTH_LIVE_CLIENT_ID: xxx
-  FUZZED_SOCIAL_AUTH_LIVE_CLIENT_SECRET: xxx
-  FUZZED_SOCIAL_AUTH_YAHOO_OAUTH2_KEY: xxx
-  FUZZED_SOCIAL_AUTH_YAHOO_OAUTH2_SECRET: xxx
+  FUZZED_SERVER_URL: "https://{{ servername }}"
+  FUZZED_SERVER_EMAIL: XXX
+  FUZZED_ADMIN_EMAIL: XXX
+  FUZZED_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY    : "XXX"
+  FUZZED_SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET : "XXX"
+  FUZZED_SOCIAL_AUTH_TWITTER_KEY          : "XXX"
+  FUZZED_SOCIAL_AUTH_TWITTER_SECRET       : "XXX"
+  FUZZED_SOCIAL_AUTH_LIVE_CLIENT_ID       : "XXX"
+  FUZZED_SOCIAL_AUTH_LIVE_CLIENT_SECRET   : "XXX"
+  FUZZED_SOCIAL_AUTH_YAHOO_OAUTH2_KEY     : "XXX"
+  FUZZED_SOCIAL_AUTH_YAHOO_OAUTH2_SECRET  : "XXX"
