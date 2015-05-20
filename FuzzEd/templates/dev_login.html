@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<form action="/complete/username?next={{ next }}" method="post">
+<form action="/complete/username/?next={{ next }}" method="post">
     {% csrf_token %}
     <input type="hidden" name="next" value="{{ next }}" />
     <label for="username">New or existing username:</label>
