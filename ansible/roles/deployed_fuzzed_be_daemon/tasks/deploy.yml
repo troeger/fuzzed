@@ -18,5 +18,5 @@
   file: src={{ be_base_dir }}/backends/initscript.sh dest=/etc/init.d/fuzzed-backend owner=root group=root force=yes state=link
 
 - name: Ensure FuzzEd backend being started
-  service: name=fuzzed-backend state=started
+  service: name=fuzzed-backend state=restarted
 
