@@ -7,13 +7,13 @@
   when: ansible_os_family == "Debian"
 
 - name: Copy tailored Apache VHost config file
-  template: src=apache2_config.j2 dest=/etc/apache2/sites-available/{{ servername }}
+  template: src=apache2_config.j2 dest=/etc/apache2/sites-available/{{ servername }}.conf
 
 - name: Copy tailored wsgi.py file
   template: src=wsgi.py.j2 dest={{ www_base_dir }}/FuzzEd/wsgi.py
 
 - name: Set link to Apache VHost config file
-  file: src=/etc/apache2/sites-available/{{ servername }} dest=/etc/apache2/sites-enabled/{{ servername }} state=link force=yes
+  file: src=/etc/apache2/sites-available/{{ servername }}.conf dest=/etc/apache2/sites-enabled/{{ servername }}.conf state=link force=yes
 
 - name: Ensure that Apache config is correct
   command: apache2ctl configtest

@@ -41,19 +41,3 @@
 - name: How can we reach that thing ?
   debug: msg="Using {{ servername }} as address for web presence"
 
-- name: Copy tailored Apache VHost config file
-  template: src=apache2_config.j2 dest=/etc/apache2/sites-available/{{ servername }}.conf
-
-- name: Copy tailored wsgi.py file
-  template: src=wsgi.py.j2 dest={{ www_base_dir }}/FuzzEd/wsgi.py
-
-- name: Set link to Apache VHost config file
-  file: src=/etc/apache2/sites-available/{{ servername }}.conf dest=/etc/apache2/sites-enabled/{{ servername }}.conf state=link force=yes
-
-- name: Ensure that Apache config is correct
-  command: apache2ctl configtest
-  sudo: yes
-
-- name: Ensure Apache is restarted
-  service: name=apache2 state=restarted
-  sudo: yes
