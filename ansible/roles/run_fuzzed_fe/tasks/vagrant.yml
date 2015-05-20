@@ -1,14 +1,11 @@
 # Put environment variables into .bashrc, if this is a Vagrant box
 ---
-- name: Set environment variables in .bashrc (Vagrant)
-  lineinfile: dest=/home/vagrant/.bashrc line="export DJANGO_CONFIGURATION=Vagrant"
-
-- name: Set environment variables in .bashrc for (Vagrant)
+- name: Activate VirtualEnv in .bashrc (Vagrant)
   lineinfile: dest=/home/vagrant/.bashrc line="source {{virtualenvpath}}bin/activate"
 
-- name: Set environment variables in .bashrc for (Vagrant)
+- name: Set environment variables in .bashrc (Vagrant)
   lineinfile: dest=/home/vagrant/.bashrc line="export {{ item.key }}='{{ item.value }}'"
   with_dict: env_vars
 
-- name: Set environment variables in .bashrc for (Vagrant)
+- name: Jump into dev folder in .bashrc (Vagrant)
   lineinfile: dest=/home/vagrant/.bashrc line="cd fuzzed" insertafter=EOF

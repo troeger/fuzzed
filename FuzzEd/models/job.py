@@ -140,11 +140,13 @@ class Job(models.Model):
             leads to deletion of old versions. We anyway prepare for the case of
             having multiple cached old results, by just using the youngest one.
         '''
-        try:
-            return Job.objects.filter(
-                graph=graph, kind=kind, graph_modified=graph.modified, exit_code=0).order_by('-created')[0]
-        except:
-            return None
+        return None
+#TODO: The cached job fetching seems to fail in the API part, test again heavily and re-enable then
+#        try:
+#            return Job.objects.filter(
+#                graph=graph, kind=kind, graph_modified=graph.modified, exit_code=0).order_by('-created')[0]
+#        except:
+#            return None
 
     def result_download(self):
         """
