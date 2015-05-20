@@ -29,3 +29,12 @@ backends/build
 backends/thirdParty/pugixml/build
 id_rsa
 secrets.sh
+*.o
+*.make
+backends/CMakeFiles
+cmake_install.cmake
+CMakeFiles
+Makefile
+dist
+CMakeCache.txt
+.Python
