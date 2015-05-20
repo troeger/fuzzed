@@ -134,6 +134,8 @@ class Property(models.Model):
         elif val_type == 'bool':
             # Value may be string or a real boolean value
             return str(val).lower() == 'true'
+        elif val_type == 'transfer':
+            return  int(val)
         assert(False)
 
     def save_value(self, new_value):
@@ -155,6 +157,8 @@ class Property(models.Model):
         elif val_type == 'numeric':
             self.value = str(new_value)
         elif val_type == 'bool':
+            self.value = str(new_value)
+        elif val_type == 'transfer':
             self.value = str(new_value)
         else:
             assert(False)
