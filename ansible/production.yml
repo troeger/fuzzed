@@ -8,7 +8,7 @@
     - name: "release_version"
       prompt: "FuzzEd release version"
       private: no
-      default: "0.7.0"
+      default: "0.7.1"
 
   roles:
     - all
@@ -23,7 +23,7 @@
     - name: "release_version"
       prompt: "FuzzEd backend release version"
       private: no
-      default: "0.7.0"
+      default: "0.7.1"
 
   roles:
     - all
