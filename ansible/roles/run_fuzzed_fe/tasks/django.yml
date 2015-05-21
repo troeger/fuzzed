@@ -12,6 +12,9 @@
 - name: Ensure Django Require is installed
   pip: name=django-require  virtualenv={{virtualenvpath}}
 
+- name: Ensure Django Robots is installed
+  pip: name=django-robots  virtualenv={{virtualenvpath}}
+
 - name: Ensure Django Tastypie is installed
   pip: name=git+https://github.com/django-tastypie/django-tastypie.git#egg=django-tastypie virtualenv={{virtualenvpath}}
 

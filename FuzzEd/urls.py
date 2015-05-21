@@ -76,11 +76,8 @@ urlpatterns = patterns('',
                            'FuzzEd.views.graph_settings',
                            name='graph_settings'),
 
-                       url(
-                           r'^robots\.txt$',
-                           lambda r: HttpResponse(
-                               "User-agent: *\nDisallow: /admin/\nDisallow: /dashboard/\nDisallow: /editor/\n",
-                               mimetype="text/plain")),
+                      # robots.txt via django-robots
+                      url(r'^robots\.txt$', include('robots.urls')),
 
                        # API
                        url(r'^api/',

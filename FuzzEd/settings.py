@@ -55,6 +55,7 @@ class Common(Configuration):
     USE_L10N = True
     USE_TZ = False
     WSGI_APPLICATION = 'FuzzEd.wsgi.application'
+    ROBOTS_USE_SITEMAP = False
 
     STATICFILES_FINDERS = (
         'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -92,6 +93,8 @@ class Common(Configuration):
         'django.contrib.staticfiles',
         'django.contrib.admin',
         'django.contrib.admindocs',
+        'django.contrib.sites',
+        'robots',
         'require',
         'social.apps.django_app.default',
         'tastypie',
