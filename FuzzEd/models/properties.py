@@ -120,7 +120,7 @@ class Property(models.Model):
         else:
             val = self.value
         val_type = Property.value_type(self.key, self.object())
-        if val_type == 'text':
+        if val_type == 'text' or val_type == 'textfield':
             return unicode(val)
         elif val_type == 'compound' or val_type == 'range':
             if val.startswith('"') and val.endswith('"'):
@@ -143,7 +143,7 @@ class Property(models.Model):
             Saves the given value, converts from native representation before.
         '''
         val_type = Property.value_type(self.key, self.object())
-        if val_type == 'text':
+        if val_type == 'text' or val_type == 'textfield':
             self.value = unicode(new_value)
         elif val_type == 'compound' or val_type == 'range':
             if isinstance(new_value, basestring):
@@ -161,7 +161,8 @@ class Property(models.Model):
         elif val_type == 'transfer':
             self.value = str(new_value)
         else:
-            assert(False)
+            import pdb; pdb.set_trace()
+            raise Exception("Unknown property value type '%s' being used for %s"%(val_type, str(self)))
         self.save()
 
     def same_as(self, prop):

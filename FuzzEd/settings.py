@@ -140,16 +140,8 @@ class Common(Configuration):
             },
         },
         'loggers': {
-            'django.request': {
-                'handlers': ['console'],
-                'level': 'ERROR',
-                'propagate': True,
-            },
-            'FuzzEd': {
-                'handlers': ['console'],
-                'level': 'DEBUG',
-                'propagate': True,
-            }
+            'django.request': {},
+            'FuzzEd': {}
         }
     }
 
@@ -184,6 +176,9 @@ class Dev(Common):
         '0.0.0.0',
         '127.0.0.1',
     )
+    LOGGING = Common.LOGGING
+    LOGGING['loggers']['django.request']['handlers'] = ['console']
+    LOGGING['loggers']['FuzzEd']['handlers'] = ['console']
 
 class Vagrant(Dev):
     SERVER = 'http://192.168.33.10:8000'
