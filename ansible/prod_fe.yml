@@ -1,0 +1,10 @@
+---
+- name: Configure production web servers
+  hosts: webservers
+  user: root
+  environment: env_vars # needed for making ./manage.py workable, comes from host config
+
+  roles:
+    - all
+    - run_fuzzed_fe
+    - deployed_fuzzed_fe_wsgi

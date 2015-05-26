@@ -1,0 +1,9 @@
+---
+- name: Configure production backend servers
+  hosts: backendservers
+  user: root
+
+  roles:
+    - all
+    - run_fuzzed_be
+    - deployed_fuzzed_be_daemon

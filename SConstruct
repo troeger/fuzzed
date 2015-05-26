@@ -75,6 +75,7 @@ gittag = AlwaysBuild(env.Command('git tag -f %s'%VERSION, None, 'git tag -f v%s'
 Alias('package', gittag)
 Alias('package', package_web)
 Alias('package', package_backend)
+Alias('package.web', package_web)
 
 
 # Generation of Python version of the notation files 
