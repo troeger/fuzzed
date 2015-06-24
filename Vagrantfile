@@ -5,6 +5,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.hostname = "vagrant.fuzzed.org"    # Crucial for OAuth2 callbacks to work, we donate the DNS entry for that
     config.vm.synced_folder ".", "/home/vagrant/fuzzed", type: "nfs"
 
+    # Make network performance less suck, from https://github.com/mitchellh/vagrant/issues/1807#issuecomment-19132198
+    config.vm.provider :virtualbox do |vb|
+       vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+       vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+    end
+
     config.vm.provider "virtualbox" do |v|
       # Taken from http://www.stefanwrobel.com/how-to-make-vagrant-performance-not-suck
       host = RbConfig::CONFIG['host_os']
