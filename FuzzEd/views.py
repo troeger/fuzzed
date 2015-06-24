@@ -294,20 +294,20 @@ def dashboard_import(request, project_id):
     if not (project.is_authorized(request.user)):
         raise Http404
 
-    POST = request.POST
-
     # import the graph
-    if POST.get('save') and POST.get('filename'):
-        graph = Graph(owner=request.user, project=project)
-        try:            
-            graph.from_graphml(POST.get("filename"))
-            graph.save()
-            graph.ensure_default_nodes()
-            return redirect('dashboard', project_id=project_id)
-        except Exception as e:
-            parameters['error_text'] = str(e)
+    if request.POST.get('save'):
+        for name, f in request.FILES.iteritems():
+            graph = Graph(owner=request.user, project=project)
+            try:
+                graph.from_graphml(f.read())
+                graph.name = request.POST.get("title","Imported graph")
+                graph.save()
+                graph.ensure_default_nodes()
+                return redirect('dashboard', project_id=project_id)
+            except Exception as e:
+                parameters['error_text'] = str(e)
 
-    return render(request, 'dashboard/dashboard_import.html', parameters)            
+    return render(request, 'dashboard/dashboard_import.html', parameters)
 
 @login_required
 def dashboard_new(request, project_id, kind):
