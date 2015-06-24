@@ -15,7 +15,7 @@ logger = logging.getLogger('FuzzEd')
 class Result(models.Model):
 
     """
-      Class: Project
+      Class: Result
 
       Each instance represents a particular backend result.
       On analysis / simulation, both graph-related and configuration-related
@@ -123,6 +123,8 @@ class Result(models.Model):
         '''
           Converts the result into a JSONable dictionary, which includes all information
           stored in this result object, plus data from the linked graph configuration.
+
+          TODO: Looks like dead code, check and, in case, remove. The magic happens now in api/frontend.py.
         '''
         result = {}
         for field in ['minimum', 'maximum', 'peak', 'reliability',

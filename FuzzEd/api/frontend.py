@@ -145,6 +145,7 @@ class JobResource(common.JobResource):
                     response['columns'] = [
                         {'mData': key, 'sTitle': title} for key, title in job.result_titles]
                     response['axis_titles'] = job.axis_titles()
+                    response['static_info'] = job.static_info()
                 try:
                     response['issues'] = Result.objects.get(
                         job=job,

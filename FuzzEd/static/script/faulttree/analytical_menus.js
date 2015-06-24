@@ -126,6 +126,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
         *      {jQuery Selector} _tableContainer       - jQuery reference to the table's container.
         *      {Highchart}       _chart                - The Highchart instance displaying the result.
         *      {DataTables}      _table                - The DataTables instance displaying the result.
+        *      {jQuery Selector} _staticInfoContainer  - Static result information from the backend, directly shown.
         *      {Object}          _configNodeMap        - A mapping of the configuration ID to its node set.
         *      {Object}          _configNodeMap        - A mapping of the configuration ID to its edge set.
         *      {Object}          _redundancyNodeMap    - A mapping of the configuration ID to the nodes' N-values
@@ -139,6 +140,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
        _tableContainer:       undefined,
        _chart:                undefined,
        _table:                undefined,
+       _staticInfoContainer:  undefined,
        _configNodeMap:        {},
        _configEdgeMap:        {},
        _redundancyNodeMap:    {},
@@ -159,6 +161,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
            this._graphIssuesContainer = this.container.find('.graph_issues');
            this._chartContainer       = this.container.find('.chart');
            this._tableContainer       = this.container.find('.table_container');
+           this._staticInfoContainer  = this.container.find('.static_info');
        },
 
        /**
@@ -234,6 +237,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
            this._tableContainer.empty();
            this._chart = null;
            this._table = null;
+           this._staticInfoContainer.empty();
            this._configNodeMap        = {};
            this._redundancyNodeMap    = {};
            this._configEdgeMap        = {};
@@ -300,6 +304,7 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                    <div class="graph_issues"></div>\
                    <div class="chart"></div>\
                    <div class="table_container content"></div>\
+                   <div class="static_info"></div>\
                </div>'
            ).appendTo(jQuery('#' + Factory.getModule('Config').IDs.CONTENT));
        },
@@ -321,7 +326,10 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
                    if (this._chart != null) {
                        
                        // fit all available space with chart    
-                       this._chartContainer.height(this.container.height() - this._graphIssuesContainer.height() - this._tableContainer.height());
+                       this._chartContainer.height(this.container.height() - 
+                       this._graphIssuesContainer.height() - 
+                       this._tableContainer.height() -
+                       this._staticInfoContainer.height());
                        
                        this._chart.setSize(
                            this._chartContainer.width(),
@@ -358,11 +366,16 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
            
            data   = jQuery.parseJSON(data);
            var issues = data.issues;
+           var static_info = data.static_info;
            
            if (issues){
                if (_.size(issues.errors) > 0 || _.size(issues.warnings) > 0){
                    this._displayGraphIssues(issues.errors, issues.warnings);
                }
+           }
+
+           if (static_info){
+              this._displayStaticInfo(static_info);
            }
                
            // remove progress bar
@@ -598,7 +611,8 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
        _displayResultWithDataTables: function(columns, job_result_url) {
            
            // clear container
-           this._tableContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');            
+           this._tableContainer.html('<table id="results_table" class="results_table table table-hover content"></table>');
+
            
            var collapse_column = {
                                    "class":          'details-control',
@@ -800,7 +814,18 @@ function(Factory, Canvas, Menus, FaulttreeConfig, Alerts, DataTables) {
 
            return this;
        },
-       
+
+       /**
+        * Method: _displayStaticInfo
+              Display unparsed static information from the backend
+        *
+        * Returns:
+        *      This {<AnalysisResultMenu>} for chaining.
+        */
+        _displayStaticInfo: function(static_info) {
+           this._staticInfoContainer.append(jQuery('<p>'+static_info+'</p>'));
+        },
+
        /**
         * Method: _displayGraphIssues
         *      Display all warnings/errors that are thrown during graph validation.

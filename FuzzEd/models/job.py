@@ -97,6 +97,14 @@ class Job(models.Model):
         elif self.kind == self.MINCUT_JOB:
             return Result.titles(Result.MINCUT_RESULT, self.graph.kind)
 
+    def static_info(self):
+        '''
+        Provides a static info string for the result that is independent from frontend parsing.
+        This is mainly a debugging vehicle.
+        '''
+        #raw_results = [str(result.to_dict()) for result in self.results.all()]
+        #return "Raw result information:<br/>"+"<br/>".join(raw_results)
+
     def axis_titles(self):
         '''
         Computes labeling and axis scales for the analysis results menu.
@@ -312,7 +320,7 @@ class Job(models.Model):
             return
 
         # Ok, it is not binary, it is true XML result data
-
+        print str(data)
         logger.debug(
             "Parsing backend result XML into database: \n" +
             str(data))
