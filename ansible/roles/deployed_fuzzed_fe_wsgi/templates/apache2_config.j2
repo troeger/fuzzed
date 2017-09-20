@@ -2,7 +2,24 @@
         ServerName {{ servername }}
         ServerAlias {{ serveralias }}
         ServerAdmin webmaster@{{ servername }}
-        Redirect 301 / https://{{ servername }}/
+#        Redirect 301 / https://{{ servername }}/
+
+        Alias /static {{ www_base_dir }}/FuzzEd/static-release
+        <Directory  /usr/local/lib/python2.7/>
+                Options FollowSymLinks
+                AllowOverride None
+                Order deny,allow
+                Allow from all
+        </Directory>
+
+        WSGIDaemonProcess {{ servername }} processes=5 threads=1 maximum-requests=1000 display-name=%{GROUP} python-path={{ www_base_dir }} 
+        WSGIProcessGroup  {{ servername }}
+        WSGIScriptAlias / {{ www_base_dir }}/FuzzEd/wsgi.py
+        WSGIPassAuthorization On
+
+        ErrorLog ${APACHE_LOG_DIR}/{{ servername }}.error.log
+        LogLevel info
+        CustomLog ${APACHE_LOG_DIR}/{{ servername }}.access.log combined
 </VirtualHost>
 
 <VirtualHost *:443>
@@ -18,8 +35,8 @@
                 Allow from all
         </Directory>
 
-        WSGIDaemonProcess {{ servername }} processes=5 threads=1 maximum-requests=1000 display-name=%{GROUP} python-path={{ www_base_dir }} 
-        WSGIProcessGroup  {{ servername }}
+        WSGIDaemonProcess {{ servername }}-ssl processes=5 threads=1 maximum-requests=1000 display-name=%{GROUP} python-path={{ www_base_dir }} 
+        WSGIProcessGroup  {{ servername }}-ssl
         WSGIScriptAlias / {{ www_base_dir }}/FuzzEd/wsgi.py
         WSGIPassAuthorization On
 
