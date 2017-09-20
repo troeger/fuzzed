@@ -17,13 +17,9 @@
   - libpq-dev
   when: ansible_os_family == "Debian"
 
-# http://stackoverflow.com/questions/29728530/using-ansible-postgresql-user-with-psycopg2-from-virtualenv
 - name: Ensure PostgreSQL Python client library is available globally (for DB management Ansible commands)
   pip: name=psycopg2
   sudo: yes
-
-- name: Ensure PostgreSQL Python client library is available in VirtualEnv (for DB management Django commands)
-  pip: name=psycopg2 virtualenv={{virtualenvpath}}
 
 - name: Ensure PostgreSQL user for FuzzEd database
   sudo: yes

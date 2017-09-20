@@ -1,23 +1,23 @@
 ---
 - name: Ensure Django is installed
-  pip: name=django virtualenv={{virtualenvpath}}
+  pip: name=django
 
 - name: Ensure Django SocialAuth and dependencies are installed
-  pip: name={{item}} virtualenv={{virtualenvpath}}
+  pip: name={{item}}
   with_items:
   - python-social-auth
   - python-openid
   - python-oauth2
 
 - name: Ensure Django Require is installed
-  pip: name=django-require  virtualenv={{virtualenvpath}}
+  pip: name=django-require
 
 - name: Ensure Django Robots is installed
-  pip: name=django-robots  virtualenv={{virtualenvpath}}
+  pip: name=django-robots
 
 - name: Ensure Django Tastypie is installed
-  pip: name=git+https://github.com/django-tastypie/django-tastypie.git#egg=django-tastypie virtualenv={{virtualenvpath}}
+  pip: name=django-tastypie
 
 - name: Ensure Django configurations is installed
-  pip: name=git+https://github.com/jezdez/django-configurations.git#egg=django-configurations virtualenv={{virtualenvpath}}
+  pip: name=django-configurations
 

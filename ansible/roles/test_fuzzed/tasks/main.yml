@@ -4,5 +4,5 @@
   sudo: yes
 
 - name: Ensure OAuth client libary is installed
-  pip: name=requests_oauthlib virtualenv={{virtualenvpath}}
+  pip: name=requests_oauthlib
 

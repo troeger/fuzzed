@@ -23,12 +23,10 @@
 - name: Perform database migration
   django_manage: command="migrate auth"
                  app_path={{ www_base_dir }}
-                 virtualenv={{ virtualenvpath }}
 
 - name: Perform database migration
   django_manage: command=migrate
                  app_path={{ www_base_dir }}
-                 virtualenv={{ virtualenvpath }}
 
 - name: Ensure apache and modules are at the latest version
   apt: pkg={{ item }} state=latest

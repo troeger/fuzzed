@@ -1,6 +1,0 @@
-# Put environment variables into VirtualEnv startup script, if this is a non-Vagrant developer box
----
-- name: Set environment variables in VirtualEnv startup script
-  lineinfile: dest={{virtualenvpath}}bin/activate line="export {{ item.key }}='{{ item.value }}'"
-  with_dict: env_vars
-  tags: offline

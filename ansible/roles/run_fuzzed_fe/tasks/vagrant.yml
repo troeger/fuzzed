@@ -1,8 +1,5 @@
 # Put environment variables into .bashrc, if this is a Vagrant box
 ---
-- name: Activate VirtualEnv in .bashrc (Vagrant)
-  lineinfile: dest=/home/vagrant/.bashrc line="source {{virtualenvpath}}bin/activate"
-
 - name: Set environment variables in .bashrc (Vagrant)
   lineinfile: dest=/home/vagrant/.bashrc line="export {{ item.key }}='{{ item.value }}'"
   with_dict: env_vars

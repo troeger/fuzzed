@@ -9,7 +9,3 @@
   apt: pkg=python-pip state=latest
   sudo: yes
   when: ansible_os_family == "Debian"
-
-- name: Ensure VirtualEnv is installed
-  pip: name=virtualenv state=present
-  sudo: yes
