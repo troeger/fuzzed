@@ -1,0 +1,5 @@
+[webservers]
+fuzzed.org ansible_connection=local
+
+[backendservers]
+fuzzed.org ansible_connection=local
