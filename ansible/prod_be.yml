@@ -1,6 +1,6 @@
 ---
 - name: Configure production backend servers
-  hosts: backendservers
+  hosts: all
   user: root
 
   roles:

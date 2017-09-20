@@ -12,7 +12,7 @@
   file: src={{ be_install_base_dir }}/{{ release_version }}/ dest={{ be_base_dir }} state=link force=yes
 
 - name: Ensure access rights for startup script
-  file: path={{ be_base_dir }}/backends/initscript.sh state=touch mode="u+x"
+  file: path={{ be_base_dir }}/backends/initscript.sh state=touch mode=500
 
 - name: Ensure startup script link
   file: src={{ be_base_dir }}/backends/initscript.sh dest=/etc/init.d/fuzzed-backend owner=root group=root force=yes state=link
