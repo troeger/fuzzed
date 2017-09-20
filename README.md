@@ -28,9 +28,21 @@ If you just want to install your own copy of FuzzEd, please read the [installati
 
 If you want to contribute to FuzzEd, there is a lot of information in the [Wiki](https://github.com/troeger/fuzzed/wiki/Home).
 
-The developers hang around on the [dev mailing list](mailto:fuzzed@lists.nclmail.de).
+For the impatient:
 
-## Licence
+### Prepare and run a development machine from a checkout
+
+* Take an Ubuntu box with Ansible being installed.
+* ansible-playbook -i ansible/inventories/localhost ansible/dev.yml
+* scons frontend backend
+* ./manage.py migrate --configuration=Dev
+* ./manage.py runserver  --configuration=Dev
+* ... Coding ...
+* Update the version number in FuzzEd/__init__.py
+* scons package
+
+### Prepare and run a production frontend machine from a checkout
+* ansible-playbook -i ansible/inventories/localhost -e release_version=0.X.X ansible/prod_fe.yml
 
 FuzzEd ist licensed under the [GNU AGPL Version 3](http://en.wikipedia.org/wiki/Affero_General_Public_License). This means your are allowed to:
 
