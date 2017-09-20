@@ -5,12 +5,6 @@
 
 import os, platform, socket
 
-if "DJANGO_CONFIGURATION" not in os.environ:
-  # Not set by user, so we assume developer mode, since
-  # production systems are supposed to not use this script
-  os.environ["DJANGO_CONFIGURATION"]="Dev"
-  print("Assuming Dev mode")
-
 from FuzzEd import VERSION
 
 #./site_scons automatically becomes part of the Python search path
@@ -24,7 +18,7 @@ SConscript('backends/SConscript')
 # Static files generation - 'static-release' target
 statics = env.Command( Dir('FuzzEd/static-release'), 
                        Dir('FuzzEd/static'), 
-                       './manage.py collectstatic -v3 --noinput'
+                       './manage.py collectstatic -v3 --noinput --configuration=Dev'
                       )
 Clean(statics, 'FuzzEd/static-release')
 
