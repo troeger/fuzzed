@@ -1,11 +1,13 @@
 ---
 - name: Ensure Django is installed
-  pip: name=django
+  pip: name=django version=1.8.18
 
-- name: Ensure Django SocialAuth and dependencies are installed
-  pip: name={{item}}
+- name: Ensure Django Social Auth is installed
+  pip: name=python-social-auth version=0.2.21
+
+- name: Ensure Django SocialAuth dependencies are installed
+  pip: name={{item}} 
   with_items:
-  - python-social-auth
   - python-openid
   - python-oauth2
 

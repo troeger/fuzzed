@@ -1,4 +1,4 @@
 ---
 env_vars:
-  FUZZED_SECRET_KEY: "{{ ansible_machine_id }}"
+  FUZZED_SECRET_KEY: "{{ ansible_product_uuid }}"
   DJANGO_CONFIGURATION: Dev
