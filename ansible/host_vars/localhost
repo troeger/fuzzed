@@ -1,9 +1,7 @@
 ---
-servername:  XXX
+servername:  "{{ ansible_fqdn }}"
 serveralias: "www.{{ servername }}"
 ssl_key:     "/etc/apache2/ssl/{{ servername }}.key"
-ssl_chain:   /etc/apache2/ssl/sub.startssl.pem
-ssl_ca:      /etc/apache2/ssl/ca.startssl.pem
 ssl_cert:    "/etc/apache2/ssl/{{ servername }}.crt"
 
 install_base_dir: /var/www/fuzzed
@@ -17,11 +15,11 @@ db_user: fuzzed
 db_pw:   fuzzed
 db_host: localhost
 db_port: 5432
-pg_hba_conf: /etc/postgresql/9.1/main/pg_hba.conf
+pg_hba_conf: /etc/postgresql/9.3/main/pg_hba.conf
 
 env_vars:
   DJANGO_CONFIGURATION: Production
-  FUZZED_SECRET_KEY: "{{ ansible_machine_id }}"
+  FUZZED_SECRET_KEY: "{{ ansible_product_uuid }}"
   FUZZED_NAME: "{{ db_name }}"
   FUZZED_USER: "{{ db_user }}"
   FUZZED_PASSWORD:   "{{ db_pw }}"

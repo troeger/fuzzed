@@ -19,14 +19,15 @@
 - name: Adjusting links for pointing to download package
   file: src={{ install_base_dir }}/{{ release_version }} dest={{ www_base_dir }} state=link force=yes
 
-# This separate step avoids an issue were the first migration fails with an "auth_user" issue
-- name: Perform database migration
-  django_manage: command="migrate auth"
-                 app_path={{ www_base_dir }}
+- name: Touch the debugging log file (fix me in settings.py instead)
+  file: path=/tmp/fuzzed.log state=touch owner=www-data
 
 - name: Perform database migration
-  django_manage: command=migrate
+  django_manage: command="migrate"
                  app_path={{ www_base_dir }}
+  environment:
+    DJANGO_CONFIGURATION: Production
+    FUZZED_SECRET_KEY: 4711
 
 - name: Ensure apache and modules are at the latest version
   apt: pkg={{ item }} state=latest

@@ -1,5 +1,0 @@
-[webservers]
-fuzzed.org
-
-[backendservers]
-fuzzed.org

@@ -18,7 +18,7 @@
                 Allow from all
         </Directory>
 
-        WSGIDaemonProcess {{ servername }} processes=5 threads=1 maximum-requests=1000 display-name=%{GROUP} 
+        WSGIDaemonProcess {{ servername }} processes=5 threads=1 maximum-requests=1000 display-name=%{GROUP} python-path={{ www_base_dir }} 
         WSGIProcessGroup  {{ servername }}
         WSGIScriptAlias / {{ www_base_dir }}/FuzzEd/wsgi.py
         WSGIPassAuthorization On
@@ -29,7 +29,5 @@
 
         SSLEngine On
         SSLCertificateKeyFile   {{ ssl_key }}
-        SSLCertificateChainFile {{ ssl_chain }}
-        SSLCACertificateFile    {{ ssl_ca }}
         SSLCertificateFile      {{ ssl_cert }}
 </VirtualHost>
