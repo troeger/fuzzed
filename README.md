@@ -22,7 +22,7 @@ You can try the editor at http://fuzzed.org.
 
 ## Installation
 
-Currently not supported. Use http://fuzzed.org or wait for #107 to be finished.
+Currently not supported. Use http://fuzzed.org or wait for https://github.com/troeger/fuzzed/issues/107 to be finished.
 
 ## Development
 
