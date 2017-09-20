@@ -1,8 +1,7 @@
 ---
 - name: Configure production web servers
-  hosts: webservers
+  hosts: all
   user: root
-  environment: env_vars # needed for making ./manage.py workable, comes from host config
 
   roles:
     - all
