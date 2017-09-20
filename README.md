@@ -44,6 +44,9 @@ For the impatient:
 ### Prepare and run a production frontend machine from a checkout
 * ansible-playbook -i ansible/inventories/localhost -e release_version=0.X.X ansible/prod_fe.yml
 
+We store our private credentials (OAuth keys etc.) for the fuzzed.org installation in an Ansible vault.
+If you do the same, don't forget to add the *--ask-vault-pass* option to the line above.
+
 FuzzEd ist licensed under the [GNU AGPL Version 3](http://en.wikipedia.org/wiki/Affero_General_Public_License). This means your are allowed to:
 
 * Install and run the unmodified FuzzEd code at your site.
