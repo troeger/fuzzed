@@ -35,9 +35,9 @@ namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
 SimulationProxy::SimulationProxy(int argc, char** arguments) :
+	m_simulationTime(DEFAULT_SIMULATION_TIME),
 	m_numRounds(DEFAULT_SIMULATION_ROUNDS),
-	m_convergenceThresh(0.000005),
-	m_simulationTime(DEFAULT_SIMULATION_TIME)
+	m_convergenceThresh(0.000005)
 {
 	parseCommandline_default(argc, arguments);
 }

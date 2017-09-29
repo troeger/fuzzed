@@ -18,8 +18,8 @@ Issue Issue::fatalIssue(const std::string& msg, const int issueId /*= 0*/, const
 Issue::Issue(const std::string& msg, const int issueId /*= 0*/, const std::string elementId /*= ""*/) :
 	m_issueId(issueId), 
 	m_elementId(elementId),
-	m_bFatal(false),
-	m_message(msg)
+	m_message(msg),
+	m_bFatal(false)
 {
 
 }

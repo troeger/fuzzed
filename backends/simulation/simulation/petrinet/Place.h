@@ -82,24 +82,25 @@ public:
 	 */
 	void requestTokens(Transition* const transition);
 
-	const bool isTopLevelPlace() const { return m_semantics == TOP_LEVEL_PLACE; }
-	const bool isConstraintPlace() const { return m_semantics ==  CONSTRAINT_VIOLATED_PLACE; }
+	bool isTopLevelPlace() const { return m_semantics == TOP_LEVEL_PLACE; }
+	bool isConstraintPlace() const { return m_semantics ==  CONSTRAINT_VIOLATED_PLACE; }
 
 	void reset();
 
 protected:
-	// the set of transitions who requested a token and are enabled
-	std::set<Transition*> m_transitionQueue;
-
-	int m_marking;
 	const int m_initialMarking;
-	
-	const std::string m_ID;
+	int m_marking;
+
 	/**
 	 * Variable: m_capacity
 		The maximal possible marking for this place.
 	 */
 	const int m_capacity;
+	
+	const std::string m_ID;
 
 	PlaceSemantics m_semantics;
+
+	// the set of transitions who requested a token and are enabled
+	std::set<Transition*> m_transitionQueue;
 };

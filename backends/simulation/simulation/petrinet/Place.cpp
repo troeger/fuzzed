@@ -25,8 +25,8 @@ void Place::requestTokens(Transition* const t)
 Place::Place(const string& id, int initialMarking, int capacity, PlaceSemantics semantics) :
 	m_initialMarking(initialMarking),
 	m_marking(initialMarking), 
-	m_ID(id), 
 	m_capacity(capacity), 
+	m_ID(id), 
 	m_semantics(semantics), 
 	m_transitionQueue(set<Transition*>())
 {
@@ -46,7 +46,7 @@ Place::Place(const Place& other) :
 		throw runtime_error("Invalid Place configuration: the initial marking must not be larger than capacity.");
 }
 
-Place::Place() : m_initialMarking(0), m_capacity(0), m_marking(0)
+Place::Place() : m_initialMarking(0), m_marking(0), m_capacity(0)
 {
 	assert(false);
 }

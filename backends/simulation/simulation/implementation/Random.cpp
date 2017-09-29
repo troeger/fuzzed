@@ -14,7 +14,7 @@ using std::unordered_map;
 
 RandomNumberGenerator::RandomNumberGenerator()
 {
-	static int count = 0;
+	// static int count = 0;
 	m_generator.seed(time(NULL) * rand());
 	// cout << "Creating Random Number Generator " << count << " in thread " << omp_get_thread_num() << endl;
 }

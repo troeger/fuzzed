@@ -6,7 +6,7 @@
 #include "util.h"
 
 FaultTreeNode::FaultTreeNode(const std::string& ID, const std::string& name)
-	: m_id(ID), m_name(name), m_parent(nullptr), m_cost(0), m_bDynamic(false), m_bStaticSubTree(true)
+	: m_parent(nullptr), m_id(ID), m_cost(0), m_name(name), m_bDynamic(false), m_bStaticSubTree(true)
 {}
 
 void FaultTreeNode::addChild(FaultTreeNode::Ptr child)

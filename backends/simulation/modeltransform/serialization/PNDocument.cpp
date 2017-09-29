@@ -15,11 +15,11 @@ using namespace pugi;
 
 PNDocument::PNDocument(int id /*= 0*/)
 	: xml_document(),
-	m_placeCount(0), 
 	m_transitionCount(0), 
+	m_placeCount(0), 
 	m_arcCount(0),
-	m_id(id),
-	m_bSaved(false)
+	m_bSaved(false),
+	m_id(id)
 {}
 
 PNDocument::~PNDocument()

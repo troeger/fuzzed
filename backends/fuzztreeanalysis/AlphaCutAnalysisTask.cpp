@@ -23,7 +23,10 @@ namespace
 
 
 AlphaCutAnalysisTask::AlphaCutAnalysisTask(const TopEvent* topEvent, const double alpha, std::ofstream& logfile)
-: m_tree(topEvent), m_alpha(alpha), m_logFile(logfile), m_bDetectedUndeveloped(false)
+	: m_alpha(alpha),
+	m_tree(topEvent),
+	m_logFile(logfile),
+	m_bDetectedUndeveloped(false)
 {}
 
 std::future<AlphaCutAnalysisResult> AlphaCutAnalysisTask::run()

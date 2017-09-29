@@ -53,7 +53,7 @@ InstanceAnalysisResult InstanceAnalysisTask::computeDecomposedResult()
 	return resultInterval;
 }
 
-const bool InstanceAnalysisTask::isFuzzy(const fuzztree::Node* node)
+bool InstanceAnalysisTask::isFuzzy(const fuzztree::Node* node)
 {
 	bool fuzzy = false;
 

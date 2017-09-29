@@ -12,7 +12,7 @@ namespace fs = boost::filesystem;
 CommandLineParser::CommandLineParser()
 {
 	m_commands.add_options()
-		("help,h", "output help message"),
+		("help,h", "output help message")
 		("verbose,v", po::value<bool>(&m_bVerbose), "run in verbose mode");
 }
 
@@ -20,7 +20,7 @@ CommandLineParser::CommandLineParser(boost::program_options::options_description
 {
 	m_commands.add(additionalOptions);
 	m_commands.add_options()
-		("help,h", "output help message"),
+		("help,h", "output help message")
 		("verbose,v", po::value<bool>(&m_bVerbose), "run in verbose mode");
 }
 

@@ -12,8 +12,8 @@
 
 RedundancyGate::RedundancyGate(const std::string& id, int from, int to, int configuredN, const string& formula, const string& name)
 	: VotingORGate(id, 0, name), 
-	m_formulaString(formula), 
-	m_from(from), m_to(to)
+	m_from(from), m_to(to),
+	m_formulaString(formula)
 {
 	assert(configuredN >= m_from && configuredN <= m_to);
 	
