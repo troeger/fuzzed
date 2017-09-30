@@ -163,7 +163,7 @@ AlphaCutAnalysisResult AlphaCutAnalysisTask::analyzeRecursive(const fuzztree::Ch
 		}
 		
 		// Get all permutations of lower and upper bounds (idea see VotingOr gate).
-		const unsigned int numberOfCombinations = (int)std::pow(2, n);
+		const auto numberOfCombinations = static_cast<unsigned int>(std::pow(2, n));
 		vector<interval_t> combinations(numberOfCombinations);
 		for (unsigned int i = 0; i < numberOfCombinations; ++i)
 		{

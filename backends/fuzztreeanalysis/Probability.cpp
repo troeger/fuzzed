@@ -7,7 +7,7 @@ namespace probability
 {
 	NumericInterval getAlphaCutBounds(const fuzztree::CrispProbability& prob)
 	{
-		const interval_t val = (interval_t)prob.value();
+		const interval_t val = static_cast<interval_t>(prob.value());
 		return NumericInterval(val, val);
 	}
 

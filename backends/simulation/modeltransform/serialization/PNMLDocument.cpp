@@ -43,7 +43,7 @@ int PNMLDocument::addImmediateTransition(unsigned int priority, const string& la
 	transitionNode.append_attribute(ID_ATTRIBUTE).set_value(name.c_str());
 	setName(transitionNode, name);
 
-	setNodeValue(transitionNode.append_child(PRIORITY_TAG), util::toString((int)priority));
+	setNodeValue(transitionNode.append_child(PRIORITY_TAG), util::toString(priority));
 	setNodeValue(transitionNode.append_child(TIMED_TAG), "false");
 
 	if (!label.empty())

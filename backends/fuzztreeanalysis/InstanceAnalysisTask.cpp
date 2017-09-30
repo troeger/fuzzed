@@ -35,7 +35,7 @@ InstanceAnalysisResult InstanceAnalysisTask::computeDecomposedResult()
 	// FORK
 	for (unsigned int i = 0; i <= m_decompositionNumber; ++i)
 	{
-		const double alpha = (double)(i / m_decompositionNumber);
+		const double alpha = static_cast<double>(i / m_decompositionNumber);
 		AlphaCutAnalysisTask* task = new AlphaCutAnalysisTask(m_tree, alpha, m_logFile);
 		alphaCutResults[task] = task->run();
 	}

@@ -35,9 +35,9 @@ public:
 	/* data access                                                          */
 	/************************************************************************/
 	FaultTreeNode::Ptr getChildById(const std::string& ID);
-	const FaultTreeNode::Ptr getChildById(const std::string& ID) const; // TODO copy-pasted just to enforce const-ness
+	FaultTreeNode::Ptr getChildById(const std::string& ID) const; // TODO copy-pasted just to enforce const-ness
 
-	unsigned int getNumChildren() const { return (unsigned int)m_children.size(); };
+	unsigned int getNumChildren() const { return static_cast<unsigned int>(m_children.size()); };
 
 	virtual bool isValid() const { return m_children.size() > 0; };
 	const std::string& getId() const { return m_id; };

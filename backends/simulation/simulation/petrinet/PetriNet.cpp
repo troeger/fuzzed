@@ -204,7 +204,7 @@ void PetriNet::generateRandomFiringTimes()
 	if (m_activeTimedTransitions.empty())
 		return;
 
-	m_avgFiringTime			= (double)sumFiringTimes/(double)m_activeTimedTransitions.size();
+	m_avgFiringTime			= sumFiringTimes/static_cast<double>(m_activeTimedTransitions.size());
 	m_previousFiringTime	= m_activeTimedTransitions.cbegin();
 	m_finalFiringTime		= (--m_activeTimedTransitions.end())->first;
 

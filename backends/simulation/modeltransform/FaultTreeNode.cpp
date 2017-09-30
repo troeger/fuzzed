@@ -52,7 +52,7 @@ FaultTreeNode::Ptr FaultTreeNode::getChildById(const std::string& id)
 }
 
 
-const FaultTreeNode::Ptr FaultTreeNode::getChildById(const std::string& id) const
+FaultTreeNode::Ptr FaultTreeNode::getChildById(const std::string& id) const
 {
 	// if (m_id == id) return this;
 
