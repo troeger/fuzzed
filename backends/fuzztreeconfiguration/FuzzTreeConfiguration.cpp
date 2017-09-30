@@ -4,18 +4,18 @@
 
 FuzzTreeConfiguration::FuzzTreeConfiguration(const unsigned int id)
 	: m_costs(0),
-	m_bValid(true),
-	m_id(std::to_string(id))
+	m_id(std::to_string(id)),
+	m_bValid(true)
 {}
 
 FuzzTreeConfiguration::FuzzTreeConfiguration(const FuzzTreeConfiguration& other)
 	: m_notIncluded(other.m_notIncluded),
-	m_featureNodes(other.m_featureNodes),
-	m_redundancyNodes(other.m_redundancyNodes),
 	m_optionalNodes(other.m_optionalNodes),
+	m_redundancyNodes(other.m_redundancyNodes),
+	m_featureNodes(other.m_featureNodes),
 	m_costs(other.m_costs),
-	m_bValid(true),
-	m_id(other.getId())
+	m_id(other.getId()),
+	m_bValid(true)
 {}
 
 void FuzzTreeConfiguration::operator=(const FuzzTreeConfiguration &other)
@@ -62,7 +62,7 @@ const bool& FuzzTreeConfiguration::isOptionalEnabled(const id_type& ID) const
 	return m_optionalNodes.at(ID);
 }
 
-const bool FuzzTreeConfiguration::isIncluded(const id_type& ID) const
+bool FuzzTreeConfiguration::isIncluded(const id_type& ID) const
 {
 	return m_notIncluded.find(ID) == m_notIncluded.end();
 }
@@ -84,7 +84,7 @@ void FuzzTreeConfiguration::setCost(int cost)
 	m_costs = cost;
 }
 
-const int FuzzTreeConfiguration::getCost() const
+int FuzzTreeConfiguration::getCost() const
 {
 	return m_costs;
 }
@@ -115,7 +115,7 @@ void FuzzTreeConfiguration::markInvalid()
 	m_bValid = false;
 }
 
-const int FuzzTreeConfiguration::computeCostRecursive(const fuzztree::Node& node)
+int FuzzTreeConfiguration::computeCostRecursive(const fuzztree::Node& node)
 {
 	int result = 0;
 	const type_info& nodeType = typeid(node);
@@ -135,7 +135,7 @@ void FuzzTreeConfiguration::setId(const unsigned int id)
 	m_id = std::to_string(id);
 }
 
-const bool FuzzTreeConfiguration::isValid() const
+bool FuzzTreeConfiguration::isValid() const
 {
 	return m_bValid;
 }

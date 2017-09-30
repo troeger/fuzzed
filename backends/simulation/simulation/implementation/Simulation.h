@@ -50,10 +50,10 @@ protected:
 
 	boost::filesystem::path m_netFile;
 	std::shared_ptr<FaultTreeNode> m_faultTree;
-	
-	bool m_bRunning;
 
 	unsigned int m_simulationTimeSeconds;
 	unsigned int m_numSimulationSteps;
 	unsigned int m_numRounds;
+	
+	bool m_bRunning;
 };

@@ -23,16 +23,16 @@ public:
 
 	void setNotIncludedRecursive(const fuzztree::Node& ID);
 
-	static const int computeCostRecursive(const fuzztree::Node& ID);
+	static int computeCostRecursive(const fuzztree::Node& ID);
 
 	const bool& isOptionalEnabled(const id_type& ID) const;
-	const bool isIncluded(const id_type& ID) const;
+	bool isIncluded(const id_type& ID) const;
 	
 	const std::tuple<int,int>& getRedundancyCount(const id_type& ID) const;
 	const id_type& getFeaturedChild(const id_type& ID) const;
 
 	void setCost(int cost);
-	const int getCost() const;
+	int getCost() const;
 
 	const id_type& getId() const;
 	void setId(const unsigned int id);
@@ -42,7 +42,7 @@ public:
 	const std::map<id_type, id_type>&				getFeaturedNodes() const;
 
 	void markInvalid();
-	const bool isValid() const;
+	bool isValid() const;
 
 protected:
 	std::set<id_type>										m_notIncluded;

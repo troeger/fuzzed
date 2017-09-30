@@ -2,7 +2,7 @@
 #include <boost/lexical_cast.hpp>
 
 Condition::Condition(int placeID, int val, ConditionType type)
-	: m_placeID(placeID), m_value(val), m_type(type), m_initialized(true)
+	: m_initialized(true), m_placeID(placeID), m_value(val), m_type(type)
 {}
 
 Condition::Condition() : m_initialized(false)

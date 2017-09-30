@@ -69,7 +69,7 @@ bool PetriNetSimulation::run()
 			sumFailureTime_fail += res.failureTime;
 		}
 
-		const double current = (count == 0) ? 0 : ((double)numFailures/(double)count);
+		const double current = (count == 0) ? 0 : (numFailures / static_cast<double>(count));
 		const double diff = std::abs(privateLast - current);
 
 		if ((current > 0.0L) && (current < 1.0L) && (diff < m_convergenceThresh))
@@ -137,10 +137,10 @@ bool PetriNetSimulation::run()
 	
 	const auto elapsedTime = std::chrono::system_clock::now() - startTime;
 
-	double unreliability		= (double)numFailures			/(double)count;
-	double avgFailureTime_all	= (double)sumFailureTime_all	/(double)count;
-	double avgFailureTime_fail	= (double)sumFailureTime_fail	/(double)numFailures;
-	double meanAvailability		= avgFailureTime_fail			/(double)m_numSimulationSteps;
+	double unreliability		= numFailures			/ static_cast<double>(count);
+	double avgFailureTime_all	= sumFailureTime_all	/ static_cast<double>(count);
+	double avgFailureTime_fail	= sumFailureTime_fail	/ static_cast<double>(numFailures);
+	double meanAvailability		= avgFailureTime_fail			/ static_cast<double>(m_numSimulationSteps);
 	
 	SimulationResultStruct res;
 	res.reliability			= 1.0 - unreliability;
@@ -148,7 +148,7 @@ bool PetriNetSimulation::run()
 	res.nFailures			= numFailures;
 	res.nRounds				= count;
 	res.mttf				= avgFailureTime_all;
-	res.duration			= (double) elapsedTime.count();
+	res.duration			= static_cast<double>(elapsedTime.count());
 	
 	// printResults(res);
 	// writeResultXML(res);

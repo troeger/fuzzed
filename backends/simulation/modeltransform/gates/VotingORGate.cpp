@@ -46,7 +46,7 @@ FaultTreeNode::Ptr VotingORGate::clone() const
 
 std::string VotingORGate::description() const 
 {
-	return util::toString((int)m_numVotes) + " out of " + util::toString(getNumChildren());
+	return util::toString(m_numVotes) + " out of " + util::toString(getNumChildren());
 }
 
 std::string VotingORGate::serializeAsFormula(std::shared_ptr<PNDocument> doc) const 

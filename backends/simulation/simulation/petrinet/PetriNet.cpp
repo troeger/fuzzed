@@ -10,17 +10,17 @@ PetriNet::PetriNet(
 	m_immediateTransitions(immediateTransitions),
 	m_timedTransitions(timedTransitions),
 	m_placeDict(places),
-	m_arcs(arcDict),
 	m_topLevelPlace(nullptr),
-	m_finalFiringTime(MAX_INT),
-	m_avgFiringTime(MAX_INT)
+	m_arcs(arcDict),
+	m_avgFiringTime(MAX_INT),
+	m_finalFiringTime(MAX_INT)
 {}
 
 PetriNet::PetriNet(const PetriNet& otherNet) :
 	m_immediateTransitions(otherNet.m_immediateTransitions),
-	m_activeTimedTransitions(TransitionTimeMapping()),
-	m_inactiveTimedTransitions(set<TimedTransition*>()),
 	m_timedTransitions(otherNet.m_timedTransitions),
+	m_inactiveTimedTransitions(set<TimedTransition*>()),
+	m_activeTimedTransitions(TransitionTimeMapping()),
 	m_placeDict(otherNet.m_placeDict),
 	m_arcs(otherNet.m_arcs),
 	m_finalFiringTime(MAX_INT)
@@ -204,7 +204,7 @@ void PetriNet::generateRandomFiringTimes()
 	if (m_activeTimedTransitions.empty())
 		return;
 
-	m_avgFiringTime			= (double)sumFiringTimes/(double)m_activeTimedTransitions.size();
+	m_avgFiringTime			= sumFiringTimes/static_cast<double>(m_activeTimedTransitions.size());
 	m_previousFiringTime	= m_activeTimedTransitions.cbegin();
 	m_finalFiringTime		= (--m_activeTimedTransitions.end())->first;
 

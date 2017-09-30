@@ -11,7 +11,7 @@ public:
 		m_bStaticSubTree = false;
 	}
 
-	virtual std::string serializeAsFormula(std::shared_ptr<PNDocument> doc) const override
+	virtual std::string serializeAsFormula(std::shared_ptr<PNDocument> /*doc*/) const override
 	{
 		return "DYNAMIC_BEHAVIOUR";
 	}

@@ -1,0 +1,14 @@
+language: cpp
+
+addons:
+    apt:
+        packages:
+            - libboost-all-dev
+            - libxerces-c-dev
+            - xsdcxx
+
+script:
+    - cd backends
+    - mkdir build && cd build
+    - cmake ..
+    - make -j 2

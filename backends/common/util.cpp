@@ -30,7 +30,7 @@ std::string util::toString(const unsigned int& i)
 	return lexical_cast<string>(i);
 }
 
-std::string util::toString(const double& d, const int& prec /*= 5*/)
+std::string util::toString(const double& d, const int& prec)
 {
 	std::ostringstream oss;
 	oss << std::fixed << std::setprecision(prec);
@@ -68,7 +68,7 @@ int util::fileSize(const char* filename)
 	ifstream in(filename, ifstream::in | ifstream::binary);
 	in.seekg(0, ifstream::end);
 	in.close();
-	return (int)in.tellg(); 
+	return static_cast<int>(in.tellg()); 
 }
 
 
