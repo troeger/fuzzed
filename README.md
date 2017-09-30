@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/troeger/fuzzed.svg?branch=master)](https://travis-ci.org/troeger/fuzzed)
+
 # FuzzEd
 
 FuzzEd is an browser-based editor for drawing and analyzing dependability models. The currently supported types are:
