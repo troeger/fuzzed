@@ -129,12 +129,10 @@ int main(int argc, char** argv)
 			*logFileStream << "Starting FuzzTree Analysis..." << std::endl;
 			const auto tree = tf.getFuzzTree();
 			const auto modelId = tree->id();
-			
-			const auto topEvent = tree->topEvent();
 
 			const unsigned int decompositionNumber = 
-				topEvent.decompositionNumber().present() ? 
-				topEvent.decompositionNumber().get() : 
+				tree->topEvent().decompositionNumber().present() ? 
+				tree->topEvent().decompositionNumber().get() : 
 				DEFAULT_DECOMPOSITION_NUMBER;
 
 			for (const auto& t : tf.transform())
