@@ -143,19 +143,19 @@ private:
 		int precedence;
 		/// 'L' = left or 'R' = right
 		int associativity;
-		Operator(int opr, int precedence, int associativity) :
+		Operator(int opr, int t_precedence, int t_associativity) :
 			op(opr),
-			precedence(precedence),
-			associativity(associativity)
+			precedence(t_precedence),
+			associativity(t_associativity)
 		{ }
 	};
 
 	struct OperatorValue {
 		Operator op;
 		T value;
-		OperatorValue(const Operator& opr, T value) :
+		OperatorValue(const Operator& opr, T t_value) :
 			op(opr),
-			value(value)
+			value(t_value)
 		{ }
 		int getPrecedence() const {
 			return op.precedence;

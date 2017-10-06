@@ -13,5 +13,5 @@ public:
 	virtual std::string serializeAsFormula(std::shared_ptr<PNDocument> doc) const override;
 
 protected:
-	void initActivationFunc();
+	void initActivationFunc() override;
 };

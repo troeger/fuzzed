@@ -21,10 +21,10 @@ commonTypes::DecomposedFuzzyProbability serialize(const DecomposedFuzzyInterval&
 	for (const auto& alphaCut : interval)
 	{
 		const double alpha = alphaCut.first;
-		const NumericInterval& interval = alphaCut.second; 
+		const NumericInterval& numInterval = alphaCut.second; 
 		
 		res.alphaCuts().push_back(commonTypes::DoubleToIntervalMap(
-			commonTypes::Interval(interval.lowerBound, interval.upperBound), alpha));
+			commonTypes::Interval(numInterval.lowerBound, numInterval.upperBound), alpha));
 	}
 	return res;
 }

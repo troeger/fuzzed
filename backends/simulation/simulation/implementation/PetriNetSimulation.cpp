@@ -84,6 +84,11 @@ bool PetriNetSimulation::run()
 		privateLast = current;
 	}
 #else
+	// TODO: Use convergence checks for non-OpenMP implementation.
+	(void)privateLast;
+	(void)privateConvergence;
+	(void)privateBreak;
+	(void)globalConvergence;
 
 	const int threadNum = std::thread::hardware_concurrency();
 	const int blockSize = std::ceil(m_numRounds / threadNum);
@@ -109,6 +114,7 @@ bool PetriNetSimulation::run()
 				
 				SimulationRoundResult res;
 				res.valid = false;
+				unsigned int repeated = 0;
 				while (!res.valid && ++repeated < m_numRounds) 
 					res = runOneRound(&threadLocalPN);
 

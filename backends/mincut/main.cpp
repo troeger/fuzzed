@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 			const auto tree = tf.getFuzzTree();
 			const auto modelId = tree->id();
 			
-			const auto topEvent = tree->topEvent();
+			/* const auto topEvent = tree->topEvent(); */
 			for (const auto& t : tf.transform())
 			{
 				auto topEvent = fuzztree::TopEvent(t.second.topEvent());

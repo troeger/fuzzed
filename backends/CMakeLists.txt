@@ -20,22 +20,14 @@ SET (CMAKE_BUILD_TYPE Debug)
 ############################################################################
 if(WIN32)
 	set(Boost_USE_STATIC_LIBS ON)
-	set(USE_OMP ON)
-elseif(UNIX)
-	set(USE_OMP ON)
 endif()
-
-if (USE_OMP)
-	add_definitions(-DOMP_PARALLELIZATION=1)
-endif() 
 
 ############################################################################
 # Compiler-specific compilation behavior
 ############################################################################
 
-if (CMAKE_COMPILER_IS_GNUCC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++0x -fPIC -fexceptions -Wall -Wextra -Wold-style-cast -Werror -Wno-deprecated-declarations -Wno-sign-compare")
-elseif (MSVC)
+if(MSVC)
+	set(USE_OMP ON)
 	if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
 		string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 	else()
@@ -43,8 +35,20 @@ elseif (MSVC)
 	endif()
 	add_definitions(/D_CRT_SECURE_NO_WARNINGS /DNOMINMAX /DWIN32_LEAN_AND_MEAN)
 	set(TPN_WIN32 "${TPN_WIN32} /EHsc")
-else()
-	message(WARNING "Untested compiler") # TODO see if we can support clang too
+else() # Assume GCC compatible compiler: Clang, Intel, etc.
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -std=c++0x -fPIC -fexceptions -Wall -Wextra -Wold-style-cast -Werror -Wno-deprecated-declarations -Wno-sign-compare")
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		set(USE_OMP OFF)
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wshadow -Wunused-exception-parameter")
+		# TODO: XSD generated code & typeid malusage.
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wno-potentially-evaluated-expression")
+	else()
+		set(USE_OMP ON)
+	endif()
+endif()
+
+if (USE_OMP)
+	add_definitions(-DOMP_PARALLELIZATION=1)
 endif()
 
 ################# BOOST #################
