@@ -61,9 +61,9 @@ With a second SSH login into the machine, you can also have analysis and simulat
 
     scons run.backend 
 
-Please check the [[architecture|FuzzEdArchitecture]] description page for further details.
+Please check the [architecture description](https://github.com/troeger/fuzzed/wiki/FuzzEdArchitecture) description page for further details.
 
-The start page should have a *Developer Login* link right below the OAuth login logos, which works without Internet connectivity.  The OAuth login logos are broken by default, since you need [[OAuth2 credentials|OAuth2Cred]] to be configured for that.
+The start page should have a *Developer Login* link right below the OAuth login logos, which works without Internet connectivity.  The OAuth login logos are broken by default, since you need [OAuth2 credentials](https://github.com/troeger/fuzzed/wiki/OAuth2Cred) to be configured for that.
 
 If your working on a staging machine, a valid option is to get an OpenID from somewhere such as https://openid.stackexchange.com.
 
