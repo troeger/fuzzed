@@ -6,9 +6,11 @@
 #  shell: chdir=/tmp/pyxb creates=/usr/local/bin/pyxbgen python setup.py install
 
 - name: Ensure PyXB is installed
+  sudo: yes
   pip: name=PyXB
 
 - name: Ensure DefusedXML is installed
+  sudo: yes
   pip: name=defusedxml
 
 
