@@ -1,10 +1,18 @@
-FROM ubuntu:xenial
+# Dockerfile for ORE web application
 
-RUN apt-get update --fix-missing && apt-get install --no-install-recommends -y \
-    vim nano \
-    build-essential cmake g++ libboost-all-dev libxerces-c-dev xsdcxx \
-    ansible python-django python-pip python-setuptools
+FROM ubuntu
 
-ENV HOME /root
-USER root
-WORKDIR /root
+# Prepare Ansible environment
+RUN apt-get update \
+    && apt-get install -y ansible \
+    && rm -rf /var/lib/apt/lists/* 
+
+COPY ansible /ansible
+
+# Install dependencies via Ansible
+RUN ansible-playbook -i /ansible/inventories/localhost /ansible/dev.yml 
+
+ENV PYTHONUNBUFFERED 1
+ENV DJANGO_CONFIGURATION Dev
+EXPOSE 8000
+

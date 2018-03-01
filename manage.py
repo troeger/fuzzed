@@ -9,7 +9,7 @@ if __name__ == '__main__':
     if "runserver" in sys.argv:
         if os.environ["DJANGO_CONFIGURATION"]=="Dev":
             print("Assuming Dev mode")
-            args = ["./manage.py","runserver","--configuration=Dev"]
+            args = ["./manage.py","runserver","0.0.0.0:8000","--configuration=Dev"]
             execute_from_command_line(args)
         elif os.environ["DJANGO_CONFIGURATION"]=="Vagrant":
             print("Assuming Vagrant mode")
