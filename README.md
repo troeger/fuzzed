@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/troeger/fuzzed.svg?branch=master)](https://travis-ci.org/troeger/fuzzed)
 
+[![Security Status](https://pyup.io/repos/github/troeger/fuzzed/shield.svg)]( https://pyup.io/repos/github/troeger/fuzzed/)
+
 # ORE - The Open Reliability Editor (former FuzzEd)
 
 Note: FuzzEd becomes ORE. We are in the middle of that process, so don't get confused while both names are still in use.
