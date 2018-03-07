@@ -173,7 +173,7 @@ class Dev(Common):
     SERVER = 'http://localhost:8000'
     TEMPLATE_DIRS = ('FuzzEd/templates',
                      'FuzzEd/static/img')
-    BACKEND_DAEMON = "http://localhost:8000"
+    BACKEND_DAEMON = "http://localhost:8001"
     TERMS_PAGE = '/about/'
     FEEDBACK_PAGE = 'http://fuzzed.uservoice.com'
     FOOTER = 'FuzzEd Development Team (Dev Server)'
@@ -219,7 +219,7 @@ class Production(Common):
     LOGGING['loggers']['FuzzEd']['handlers'] = ['file']
     # TODO: Ansible integration
     BACKEND_DAEMON = values.Value(
-        'http://localhost:8000', environ_prefix='FUZZED')
+        'http://localhost:8001', environ_prefix='FUZZED')
     TERMS_PAGE = values.Value('/about/', environ_prefix='FUZZED')
     FEEDBACK_PAGE = values.URLValue(
         'http://fuzzed.uservoice.com', environ_prefix='FUZZED')
