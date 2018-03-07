@@ -26,7 +26,7 @@ You can try the editor at http://fuzzed.org.
 
 ## Development
 
-Thanks for your interest in this project. We would love to have you on-board. There is some information in the [Wiki](https://github.com/troeger/fuzzed/wiki/Home). The developers discuss in the [ORE forum](https://groups.google.com/forum/#!forum/ore-dev).
+Thanks for your interest in this project. We would love to have you on-board. The developers discuss in the [ORE forum](https://groups.google.com/forum/#!forum/ore-dev).
 
 The only supported environment for development is a Docker image.
 
@@ -48,13 +48,11 @@ Now you can start the development web server:
 
 ``./manage.py runserver``
 
+Alternatively, you can start the backend analysis engine and the frontend web server in parallel:
+
+``scons run.all``
+
 From this point, you should be able to use the frontend on your machine at http://localhost:8000. 
-
-With a second SSH login into the machine, you can also have analysis and simulation services available by running:
-
-``scons run.backend`` 
-
-Please check the [architecture description](https://github.com/troeger/fuzzed/wiki/FuzzEdArchitecture) description page for further details.
 
 The start page should have a *Developer Login* link right below the OAuth login logos, which works without Internet connectivity.  The OAuth login logos are broken by default, since you need [OAuth2 credentials](https://github.com/troeger/fuzzed/wiki/OAuth2Cred) to be configured for that.
 
