@@ -6,6 +6,7 @@ filter:
         - '*/migrations/*'
         - '*/static/*'
         - '*/fixtures/*'
+        - 'FuzzEd/tests/js-tests/*'
 checks:
     python:
         code_rating: true
