@@ -3,7 +3,6 @@ test_fuzzed.sqlite
 *.pyc
 *.log
 .idea
-.vagrant
 .DS_Store
 FuzzEd/models/node_rendering.py
 FuzzEd/models/notations.py

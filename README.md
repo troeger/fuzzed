@@ -24,25 +24,17 @@ The editor supports the following generic features for all diagram types:
 
 You can try the editor at http://fuzzed.org.
 
-## Local installation
-
-Currently not supported. Use http://fuzzed.org or wait for https://github.com/troeger/fuzzed/issues/107 to be finished.
-
 ## Development
 
 Thanks for your interest in this project. We would love to have you on-board. There is some information in the [Wiki](https://github.com/troeger/fuzzed/wiki/Home). The developers discuss in the [ORE forum](https://groups.google.com/forum/#!forum/ore-dev).
 
-The only tested environment for development is a Docker image.
+The only supported environment for development is a Docker image.
 
-Get a checkout of the master, or the latest release tag, and run:
+Get a checkout and run:
 
-``make docker-dev-build``
+``make shell``
 
-This takes a while and installs a development and execution environment for frontend and backend in a Docker image.
-
-When this was successful, the next step is to enter the container:
-
-``make docker-dev``
+This installs a complete development environment in a new Docker image on your machine and enters it.
 
 Inside the container, you can use SCons to build neccessary static code parts:
 

@@ -180,12 +180,6 @@ class Dev(Common):
     LOGGING['loggers']['django.request']['handlers'] = ['console']
     LOGGING['loggers']['FuzzEd']['handlers'] = ['console']
 
-class Vagrant(Dev):
-    SERVER = 'http://192.168.33.10:8000'
-    ALLOWED_HOSTS = ['vagrant.fuzzed.org','192.168.33.10']
-    FOOTER = 'FuzzEd Development Team (Vagrant Server)'
-    INTERNAL_IPS = Dev.INTERNAL_IPS + ('192.168.33.1',)
-
 class Production(Common):
     DEBUG = False
     TEMPLATE_DEBUG = False

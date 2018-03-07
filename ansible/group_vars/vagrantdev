@@ -1,3 +1,0 @@
----
-env_vars:
-  DJANGO_CONFIGURATION: Vagrant

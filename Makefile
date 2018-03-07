@@ -1,24 +1,25 @@
-VERSION = 0.8.0
-XSD_TARGETS := $(addprefix FuzzEd/models/xml/, common.py configurations.py backend.py faulttree.py fuzztree.py)
+VERSION=0.8.0
 
-all: css $(XSD_TARGETS) 
+DOCKER_RUN=docker run -i -t --rm --mount source=$(PWD),target=/FuzzEd,type=bind -w /FuzzEd -p 127.0.0.1:8000:8000 troeger/ore_front:$(VERSION)
 
-css: FuzzEd/static/css/theme/white.css
+.PHONY=docker
 
-FuzzEd/models/xml/%.py: FuzzEd/static/xsd/%.xsd
-	pyxbgen --binding-root=FuzzEd/models/xml/ -u $< -m $*
+all: build
 
-FuzzEd/static/css/theme/white.css: FuzzEd/static/less/theme/white/theme.less
-	lessc $? $@
-
-clean:
-	rm -f FuzzEd/static/css/theme/white.css
-	rm -f FuzzEd/models/xml/*
-
-# Create a Docker image for local development
-docker-dev-build:
+docker-dev-image:
 	docker build -t troeger/ore_front:$(VERSION) .
 
-# Run Docker image for local development
-docker-dev:
-	docker run -i -t --rm -v $(PWD):/FuzzEd -w /FuzzEd -p 127.0.0.1:8000:8000 troeger/ore_front:$(VERSION) bash
+shell: docker-dev-image
+	$(DOCKER_RUN) bash
+
+build: docker-dev-image
+	$(DOCKER_RUN) scons frontend backend
+
+test: docker-dev-image
+	$(DOCKER_RUN) ./manage.py test
+
+migrate: docker-dev-image
+	$(DOCKER_RUN) ./manage.py migrate
+
+runserver: docker-dev-image
+	$(DOCKER_RUN) ./manage.py runserver
