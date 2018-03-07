@@ -1,0 +1,12 @@
+filter:
+    paths:
+        - 'FuzzEd/*'
+        - 'executor/*'
+    excluded_paths:
+        - '*/migrations/*'
+        - '*/static/*'
+        - '*/fixtures/*'
+checks:
+    python:
+        code_rating: true
+        duplicate_code: true
