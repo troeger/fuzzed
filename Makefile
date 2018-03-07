@@ -15,11 +15,6 @@ shell: docker-dev-image
 build: docker-dev-image
 	$(DOCKER_RUN) scons frontend backend
 
-test: docker-dev-image
+test: docker-dev-image build
 	$(DOCKER_RUN) ./manage.py test
 
-migrate: docker-dev-image
-	$(DOCKER_RUN) ./manage.py migrate
-
-runserver: docker-dev-image
-	$(DOCKER_RUN) ./manage.py runserver
