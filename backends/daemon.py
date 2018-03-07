@@ -8,7 +8,7 @@ If not given, the config file is searched in the current directory.
 It is generated through 'fab build.configs' from the central settings file.
 
 If you want this thing on a development machine for backend services, 
-use 'fab run.backend', so that a potential Vagrant run is considered.
+use 'fab run.backend'.
 '''
 
 import ConfigParser

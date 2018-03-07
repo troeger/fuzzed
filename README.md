@@ -24,64 +24,39 @@ The editor supports the following generic features for all diagram types:
 
 You can try the editor at http://fuzzed.org.
 
-## Local installation
-
-Currently not supported. Use http://fuzzed.org or wait for https://github.com/troeger/fuzzed/issues/107 to be finished.
-
 ## Development
 
-Thanks for your interest in this project. We would love to have you on-board. There is some information in the [Wiki](https://github.com/troeger/fuzzed/wiki/Home). The developers discuss in the [ORE forum](https://groups.google.com/forum/#!forum/ore-dev).
+Thanks for your interest in this project. We would love to have you on-board. The developers discuss in the [ORE forum](https://groups.google.com/forum/#!forum/ore-dev).
 
-The only tested environment for development, at the moment, is a virtual machine managed by Vagrant. On your machine, you need:
+The only supported environment for development is a Docker image.
 
-  * VirtualBox 5.1.30
-  * Vagrant 1.9.8
-  * Ansible 2.1.1.0
-  
-Other versions of these three products may work, too.
-  
-Get a checkout of the master, or the latest release tag, and run ``vagrant up``. This takes a while and installs you a development and execution environment for frontend and backend in a virtual machine.
+Get a checkout and run:
 
-When this was successful, the next step is to enter the VM and to run SCons for building all static parts of the project:
+``make shell``
 
-    vagrant ssh
-    scons frontend backend
+This installs a complete development environment in a new Docker image on your machine and enters it.
 
-If this was successful, you need to initialize the database (SQLite by default):
+Inside the container, you can use SCons to build neccessary static code parts:
 
-    ./manage.py migrate
+``scons frontend backend``
+
+If this was successful, you need to initialize the database once:
+
+``./manage.py migrate``
 
 Now you can start the development web server:
 
-    ./manage.py runserver
+``./manage.py runserver``
 
-From this point, you should be able to use the frontend on your machine. Use the URL http://vagrant.fuzzed.org:8000, which points to the local address of the Vagrant machine on your computer. 
+Alternatively, you can start the backend analysis engine and the frontend web server in parallel:
 
-With a second SSH login into the machine, you can also have analysis and simulation services available by running:
+``scons run.all``
 
-    scons run.backend 
-
-Please check the [architecture description](https://github.com/troeger/fuzzed/wiki/FuzzEdArchitecture) description page for further details.
+From this point, you should be able to use the frontend on your machine at http://localhost:8000. 
 
 The start page should have a *Developer Login* link right below the OAuth login logos, which works without Internet connectivity.  The OAuth login logos are broken by default, since you need [OAuth2 credentials](https://github.com/troeger/fuzzed/wiki/OAuth2Cred) to be configured for that.
 
 If your working on a staging machine, a valid option is to get an OpenID from somewhere such as https://openid.stackexchange.com.
-
-### Development without Vagrant
-
-Our setup is only tested on Ubuntu Trusty 32-bit, as installed by Vagrant. The software dependencies are mostly likely to break on other platforms. You have been warned ...
-
-After cloning the repository, run the following command:
-
-    ansible-playbook -i ansible/inventories/localhost ansible/dev.yml 
-
-The next steps are as above. The only new thing is the environment variable DJANGO_CONFIGURATION, which is automatically set in the Vagrant case:
-
-    export DJANGO_CONFIGURATION=Dev
-    scons frontend backend
-    ./manage.py migrate 
-    ./manage.py runserver 
-    ... Coding ...
 
 ## Prepare and run a production machine from a checkout
 
