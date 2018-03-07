@@ -1,6 +1,5 @@
 from configurations import Configuration, values
 import os.path
-import logging
 
 
 class Common(Configuration):
@@ -21,24 +20,33 @@ class Common(Configuration):
     SERVER_EMAIL = values.Value('NOT_SET', environ_prefix='FUZZED')
     SITE_ID = 1
     SOCIAL_AUTH_URL_NAMESPACE = 'social'
-    SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['next',]
-    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY =    values.Value('NOT_SET', environ_prefix='FUZZED')
-    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = values.Value('NOT_SET', environ_prefix='FUZZED')
-    SOCIAL_AUTH_TWITTER_KEY =          values.Value('NOT_SET', environ_prefix='FUZZED')
-    SOCIAL_AUTH_TWITTER_SECRET =       values.Value('NOT_SET', environ_prefix='FUZZED')
-    SOCIAL_AUTH_LIVE_CLIENT_ID =       values.Value('NOT_SET', environ_prefix='FUZZED')
-    SOCIAL_AUTH_LIVE_CLIENT_SECRET =   values.Value('NOT_SET', environ_prefix='FUZZED')
-    SOCIAL_AUTH_YAHOO_OAUTH2_KEY =     values.Value('NOT_SET', environ_prefix='FUZZED')
-    SOCIAL_AUTH_YAHOO_OAUTH2_SECRET =  values.Value('NOT_SET', environ_prefix='FUZZED')
-    SOCIAL_AUTH_GITHUB_KEY =           values.Value('NOT_SET', environ_prefix='FUZZED')
-    SOCIAL_AUTH_GITHUB_SECRET =        values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['next', ]
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = values.Value(
+        'NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = values.Value(
+        'NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_TWITTER_KEY = values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_TWITTER_SECRET = values.Value(
+        'NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_LIVE_CLIENT_ID = values.Value(
+        'NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_LIVE_CLIENT_SECRET = values.Value(
+        'NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_YAHOO_OAUTH2_KEY = values.Value(
+        'NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_YAHOO_OAUTH2_SECRET = values.Value(
+        'NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_GITHUB_KEY = values.Value('NOT_SET', environ_prefix='FUZZED')
+    SOCIAL_AUTH_GITHUB_SECRET = values.Value(
+        'NOT_SET', environ_prefix='FUZZED')
     SOCIAL_AUTH_PIPELINE = (
         'social.pipeline.social_auth.social_details',
         'social.pipeline.social_auth.social_uid',
         'social.pipeline.social_auth.auth_allowed',
         'social.pipeline.social_auth.social_user',
         'social.pipeline.user.get_username',
-        'social.pipeline.social_auth.associate_by_email',  # Transition to 0.7.0 installation for existing users
+        # Transition to 0.7.0 installation for existing users
+        'social.pipeline.social_auth.associate_by_email',
         'social.pipeline.user.create_user',
         'social.pipeline.social_auth.associate_user',
         'social.pipeline.social_auth.load_extra_data',
@@ -171,7 +179,8 @@ class Dev(Common):
     FOOTER = 'FuzzEd Development Team (Dev Server)'
     SOCIAL_AUTH_USERNAME_FORM_URL = '/'
     SOCIAL_AUTH_USERNAME_FORM_HTML = 'dev_login.html'
-    AUTHENTICATION_BACKENDS = Common.AUTHENTICATION_BACKENDS + ('social.backends.username.UsernameAuth',)
+    AUTHENTICATION_BACKENDS = Common.AUTHENTICATION_BACKENDS + \
+        ('social.backends.username.UsernameAuth',)
     INTERNAL_IPS = (
         '0.0.0.0',
         '127.0.0.1',
@@ -179,6 +188,7 @@ class Dev(Common):
     LOGGING = Common.LOGGING
     LOGGING['loggers']['django.request']['handlers'] = ['console']
     LOGGING['loggers']['FuzzEd']['handlers'] = ['console']
+
 
 class Production(Common):
     DEBUG = False
@@ -195,16 +205,22 @@ class Production(Common):
         }
     }
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    ADMINS = (('FuzzEd Admin', str(values.Value('xxx', environ_prefix='FUZZED', environ_name='ADMIN_EMAIL')) ),)
-    ALLOWED_HOSTS = [str(values.Value('xxx', environ_prefix='FUZZED', environ_name='SERVER'))]
-    SERVER = str(values.Value('xxx', environ_prefix='FUZZED', environ_name='SERVER_URL'))
+    ADMINS = (('FuzzEd Admin', str(values.Value(
+        'xxx', environ_prefix='FUZZED', environ_name='ADMIN_EMAIL'))),)
+    ALLOWED_HOSTS = [
+        str(values.Value('xxx', environ_prefix='FUZZED', environ_name='SERVER'))]
+    SERVER = str(values.Value(
+        'xxx', environ_prefix='FUZZED', environ_name='SERVER_URL'))
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
     TEMPLATE_DIRS = (PROJECT_ROOT + '/templates',
                      PROJECT_ROOT + '/static-release/img')
     LOGGING = Common.LOGGING
     LOGGING['loggers']['django.request']['handlers'] = ['mail_admins']
     LOGGING['loggers']['FuzzEd']['handlers'] = ['file']
-    BACKEND_DAEMON = values.Value('http://localhost:8000', environ_prefix='FUZZED') #TODO: Ansible integration
+    # TODO: Ansible integration
+    BACKEND_DAEMON = values.Value(
+        'http://localhost:8000', environ_prefix='FUZZED')
     TERMS_PAGE = values.Value('/about/', environ_prefix='FUZZED')
-    FEEDBACK_PAGE = values.URLValue('http://fuzzed.uservoice.com', environ_prefix='FUZZED')
+    FEEDBACK_PAGE = values.URLValue(
+        'http://fuzzed.uservoice.com', environ_prefix='FUZZED')
     FOOTER = values.Value('FuzzEd Development Team', environ_prefix='FUZZED')
