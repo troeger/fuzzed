@@ -7,7 +7,11 @@ test_fuzzed.sqlite
 .DS_Store
 FuzzEd/models/node_rendering.py
 FuzzEd/models/notations.py
-FuzzEd/models/xml/*
+FuzzEd/models/xml_backend.py
+FuzzEd/models/xml_common.py
+FuzzEd/models/xml_configurations.py
+FuzzEd/models/xml_faulttree.py
+FuzzEd/models/xml_fuzztree.py
 FuzzEd/static/css/theme/white.css
 FuzzEd/static-release
 backends/**CMakeFiles
@@ -30,6 +34,7 @@ secrets.sh
 backends/CMakeFiles
 cmake_install.cmake
 CMakeFiles
+Makefile
 dist
 CMakeCache.txt
 .Python
