@@ -36,7 +36,7 @@ class Edge(models.Model):
 
     def __unicode__(self):
         prefix = '[DELETED] ' if self.deleted else ''
-        return unicode('%s%s -> %s' %
+        return str('%s%s -> %s' %
                        (prefix, str(self.source), str(self.target)))
 
     def to_dict(self, use_value_dict=False):
@@ -117,7 +117,7 @@ class Edge(models.Model):
 
             TODO: Replace by true bulk insert implementation.
         '''
-        for key, value in d.iteritems():
+        for key, value in d.items():
             self.set_attr(key, value)
         post_save.send(sender=self.__class__, instance=self)
 

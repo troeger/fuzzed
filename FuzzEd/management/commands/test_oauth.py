@@ -22,7 +22,7 @@ class Command(BaseCommand):
         auth_base_url = "/o/authorize/"
         token_url = "/o/token/"
         if len(args) < 2:
-            print "Register your application to get client_id and client_secret: " + server + apps_url
+            print("Register your application to get client_id and client_secret: " + server + apps_url)
             exit(-1)
         elif len(args) > 2:
             server = args[2]
@@ -38,7 +38,7 @@ class Command(BaseCommand):
             client_secret=client_secret)
         # Version 1 of using the gathered token, implicitely
         response = session.get(server + '/api/v1/graph/1/?format=tex')
-        print response.content
+        print(response.content)
         # Version 2, save the token somewhere and reuse it
         #session2 = OAuth2Session(client_id, token=token)
         # print session.get(server+'/api/graphs/1/tex')

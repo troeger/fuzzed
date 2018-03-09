@@ -24,7 +24,7 @@ class DirectRunsTestCase(FuzzEdTestCase):
         for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
             for f in files:
                 fname = root + os.sep + f
-                print "Testing " + fname
+                print("Testing " + fname)
                 retcode = subprocess.call(
                     'backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp' %
                     (fname), shell=True)
@@ -45,7 +45,7 @@ class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
     def setUp(self):
         # Start up backend daemon in testing mode so that it uses port 8081 of
         # the live test server
-        print "Starting backend daemon"
+        print("Starting backend daemon")
         os.chdir("backends")
         self.backend = subprocess.Popen(["python", "daemon.py", "--testing"])
         time.sleep(2)
@@ -53,7 +53,7 @@ class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
         self.setUpLogin()
 
     def tearDown(self):
-        print "\nShutting down backend daemon"
+        print("\nShutting down backend daemon")
         self.backend.terminate()
 
 
@@ -68,7 +68,7 @@ class InternalTestCase(BackendDaemonTestCase):
     fixtures = fixt_analysis['files']
 
     def test_result_parsing(self):
-        for graphPk, graphResult in fixt_analysis['results'].iteritems():
+        for graphPk, graphResult in fixt_analysis['results'].items():
             graph = Graph.objects.get(pk=graphPk)
             job = Job(
                 graph_modified=graph.modified,
@@ -77,8 +77,8 @@ class InternalTestCase(BackendDaemonTestCase):
             job.save()
             job.parse_result(open('FuzzEd/fixtures/' + graphResult).read())
             for result in job.results.exclude(kind__exact=Result.GRAPH_ISSUES):
-                print "Result"
-                print result
+                print("Result")
+                print(result)
 
 
 class AnalysisFixtureTestCase(BackendDaemonTestCase):
@@ -131,21 +131,21 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
         job_result_info = json.loads(job_result.content)
         assert('issues' in job_result_info)
         assert('columns' in job_result_info)
-        print "\n" + str(job_result_info)
+        print("\n" + str(job_result_info))
         result_url = job_result['LOCATION']
         result = self.ajaxGet(
             result_url +
             '?sEcho=doo')  # Fetch result in datatables style
         self.assertEqual(result.status_code, 200)
         data = json.loads(result.content)
-        print "\n" + str(data)
+        print("\n" + str(data))
         self.assertEqual(
             len(data['aaData']), fixt_analysis['prdc_configurations'])
         for conf in data['aaData']:
             assert (round(conf['peak'], 5) in fixt_analysis['prdc_peaks'])
 
     def testFrontendAPIPdfExport(self):
-        for graphPk, graphType in fixt_analysis['graphs'].iteritems():
+        for graphPk, graphType in fixt_analysis['graphs'].items():
             job_result = self.requestJob(self.baseUrl, graphPk, 'pdf')
             pdf_url = job_result['LOCATION']
             pdf = self.get(pdf_url)
@@ -154,7 +154,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
     @unittest.skipUnless(
         sys.platform.startswith("linux"), "requires Linux")
     def testFrontendAPIEpsExport(self):
-        for graphPk, graphType in fixt_analysis['graphs'].iteritems():
+        for graphPk, graphType in fixt_analysis['graphs'].items():
             job_result = self.requestJob(self.baseUrl, graphPk, 'eps')
             eps_url = job_result['LOCATION']
             eps = self.get(eps_url)
@@ -171,21 +171,21 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
         result_url = job_result['LOCATION']
         # Ordering in datatables style
         titles = Result.titles(Result.ANALYSIS_RESULT, 'fuzztree')
-        print "\nFields being supported in the result: %s\n" % str(titles)
+        print("\nFields being supported in the result: %s\n" % str(titles))
         for index, col_desc in enumerate(
                 titles, start=0):      # Datatables starts at column 1
             field_name = col_desc[0]
-            print "Fetching result sorted by " + field_name
+            print("Fetching result sorted by " + field_name)
             url = result_url + \
                 '?sEcho=doo&iSortingCols=1&sSortDir_0=asc&iSortCol_0=' + \
                 str(index)
             result = self.ajaxGet(url)
             data = json.loads(result.content)
-            for i in xrange(0, len(data['aaData']), 2):
+            for i in range(0, len(data['aaData']), 2):
                 prec = data['aaData'][i][field_name]
                 succ = data['aaData'][i + 1][field_name]
-                print prec
-                print succ
+                print(prec)
+                print(succ)
                 assert(prec <= succ)
 
 

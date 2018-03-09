@@ -11,8 +11,8 @@ class Command(BaseCommand):
         try:
             user = User.objects.get(username=args[0])
         except:
-            print "Unknown user, try one of these:"
-            print User.objects.all()
+            print("Unknown user, try one of these:")
+            print(User.objects.all())
             exit(1)
         assert(args[1] in ('faulttree', 'fuzztree'))
         project = Project(owner=user, name="Imported graph")
@@ -21,4 +21,4 @@ class Command(BaseCommand):
         graph.save()
         xmldata = open(args[2]).read()
         graph.from_graphml(xmldata)
-        print "Graph created, ID is %u" % graph.pk
+        print("Graph created, ID is %u" % graph.pk)

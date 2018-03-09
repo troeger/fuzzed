@@ -132,7 +132,7 @@ class FuzzEdTestHelpers():
         jobUrl = response['Location']
         code = 202
         assert (not jobUrl.endswith('jobs/'))
-        print "Waiting for result from " + jobUrl,
+        print("Waiting for result from " + jobUrl, end=' ')
         while (code == 202):
             response = self.ajaxGet(jobUrl)
             code = response.status_code

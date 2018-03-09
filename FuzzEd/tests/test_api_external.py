@@ -56,7 +56,7 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
         data = json.loads(response.content)
 
     def testJsonExport(self):
-        for id, kind in fixt_simple['graphs'].iteritems():
+        for id, kind in fixt_simple['graphs'].items():
             response = self.get('/api/v1/graph/%u/?format=json' % id)
             self.assertEqual(response.status_code, 401)
             response = self.getWithAPIKey('/api/v1/graph/%u/?format=json' % id)
@@ -64,7 +64,7 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
             self.assertEqual(response.status_code, 200)
 
     def testLatexExport(self):
-        for id, kind in fixt_simple['graphs'].iteritems():
+        for id, kind in fixt_simple['graphs'].items():
             if kind in ['faulttree', 'fuzztree']:
                 response = self.get('/api/v1/graph/%u/?format=tex' % id)
                 self.assertEqual(response.status_code, 401)
@@ -75,7 +75,7 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
                 assert ("tikz" in response.content)
 
     def testGraphmlExport(self):
-        for id, kind in fixt_simple['graphs'].iteritems():
+        for id, kind in fixt_simple['graphs'].items():
             if kind in ['faulttree', 'fuzztree']:
                 # Should only be possible with API key authentication
                 response = self.get('/api/v1/graph/%u/?format=graphml' % id)
@@ -87,9 +87,9 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
                 assert ("<graphml" in response.content)
 
     def testGraphmlImport(self):
-        for id, kind in fixt_simple['graphs'].iteritems():
+        for id, kind in fixt_simple['graphs'].items():
             # First export GraphML
-            print "Testing graph %u (%s)" % (id, kind)
+            print("Testing graph %u (%s)" % (id, kind))
             response = self.getWithAPIKey(
                 '/api/v1/graph/%u/?format=graphml' %
                 id)
@@ -165,9 +165,9 @@ class GraphMLFilesTestCase(FuzzEdTestCase):
     def testImportFiles(self):
         files = [
             f for f in os.listdir('FuzzEd/fixtures') if f.endswith(".graphml")]
-        print files
+        print(files)
         for f in files:
-            print("Testing " + f)
+            print(("Testing " + f))
             text = open('FuzzEd/fixtures/' + f).read()
             # Now import the same GraphML
             response = self.postWithAPIKey(

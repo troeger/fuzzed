@@ -36,5 +36,5 @@ class Sharing(models.Model):
         related_name='sharings')
 
     def __unicode__(self):
-        return unicode('Graph %u shared with %s by %s.' %
+        return str('Graph %u shared with %s by %s.' %
                        (self.graph.pk, self.user, self.graph.owner))

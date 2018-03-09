@@ -207,7 +207,7 @@ class NodeSerializer(Serializer):
         data_dict = json.loads(content)
         if 'properties' in data_dict:
             props = data_dict['properties']
-            for key, val in props.iteritems():
+            for key, val in props.items():
                 # JS code: {'prop_name': {'value':'prop_value'}}
                 # All others: {'prop_name': 'prop_value'}
                 if isinstance(val, dict) and 'value' in val:
@@ -308,7 +308,7 @@ class NodeGroupSerializer(Serializer):
         data_dict = json.loads(content)
         if 'properties' in data_dict:
             props = data_dict['properties']
-            for key, val in props.iteritems():
+            for key, val in props.items():
                 # JS code: {'prop_name': {'value':'prop_value'}}
                 # All others: {'prop_name': 'prop_value'}
                 if isinstance(val, dict) and 'value' in val:
@@ -438,7 +438,7 @@ class EdgeSerializer(Serializer):
         data_dict = json.loads(content)
         if 'properties' in data_dict:
             props = data_dict['properties']
-            for key, val in props.iteritems():
+            for key, val in props.items():
                 # JS code: {'prop_name': {'value':'prop_value'}}
                 # All others: {'prop_name': 'prop_value'}
                 if isinstance(val, dict) and 'value' in val:

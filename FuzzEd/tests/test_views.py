@@ -25,7 +25,7 @@ class ViewsTestCase(FuzzEdTestCase):
         self.assertEqual(response.status_code, 200)
 
     def testEditorView(self):
-        for graphId, kind in fixt_simple['graphs'].iteritems():
+        for graphId, kind in fixt_simple['graphs'].items():
             response = self.get('/editor/%u' % graphId)
             self.assertEqual(response.status_code, 200)
 
@@ -50,7 +50,7 @@ class ViewsTestCase(FuzzEdTestCase):
         self.assertEqual(response.status_code, 302)
 
     def testSingleGraphCopy(self):
-        for graphid, kind in fixt_simple['graphs'].iteritems():
+        for graphid, kind in fixt_simple['graphs'].items():
             response = self.post('/projects/%u/dashboard/edit/' % fixt_simple['pkProject'],
                                  {'copy': 'copy', 'graph_id[]': graphid})
             self.assertEqual(response.status_code, 302)

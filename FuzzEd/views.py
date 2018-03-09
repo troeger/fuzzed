@@ -1,5 +1,5 @@
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import datetime
 import logging
 
@@ -296,7 +296,7 @@ def dashboard_import(request, project_id):
 
     # import the graph
     if request.POST.get('save'):
-        for name, f in request.FILES.iteritems():
+        for name, f in list(request.FILES.items()):
             graph = Graph(owner=request.user, project=project)
             try:
                 graph.from_graphml(f.read())

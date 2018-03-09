@@ -5,4 +5,4 @@ class Command(BaseCommand):
     help = 'Prints the FuzzEd version and exits.'
 
     def handle(self, *args, **options):
-    	print FuzzEd.VERSION
+    	print(FuzzEd.VERSION)

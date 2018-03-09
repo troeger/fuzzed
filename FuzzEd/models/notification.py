@@ -14,4 +14,4 @@ class Notification(models.Model):
     text = models.CharField(max_length=255)
 
     def __unicode__(self):
-        return unicode(self.title)
+        return str(self.title)

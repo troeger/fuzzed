@@ -14,8 +14,8 @@ class Command(BaseCommand):
             headers={
                 'Authorization': 'ApiKey admin:' +
                 args[0]})
-        print r.request.headers
+        print(r.request.headers)
         if r.status_code != 200:
-            print("Error: <%u>" % r.status_code)
+            print(("Error: <%u>" % r.status_code))
         else:
-            print r.text
+            print(r.text)

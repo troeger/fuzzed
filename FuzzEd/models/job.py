@@ -1,6 +1,6 @@
 import uuid
 import json
-import xmlrpclib
+import xmlrpc.client
 import math
 import logging
 
@@ -320,7 +320,7 @@ class Job(models.Model):
             return
 
         # Ok, it is not binary, it is true XML result data
-        print str(data)
+        print(str(data))
         logger.debug(
             "Parsing backend result XML into database: \n" +
             str(data))
@@ -441,7 +441,7 @@ def job_post_save(sender, instance, created, **kwargs):
         try:
             # The proxy is instantiated here, since the connection should go
             # away when finished
-            s = xmlrpclib.ServerProxy(settings.BACKEND_DAEMON)
+            s = xmlrpc.client.ServerProxy(settings.BACKEND_DAEMON)
             logger.debug(
                 "Triggering %s job on url %s" %
                 (instance.kind, job_url))

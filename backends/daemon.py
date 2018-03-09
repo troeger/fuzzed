@@ -11,17 +11,17 @@ If you want this thing on a development machine for backend services,
 use 'fab run.backend'.
 '''
 
-import ConfigParser
+import configparser
 import base64
 import sys
 import logging
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import tempfile
 import shutil
 import os
 import threading
 import json
-from SimpleXMLRPCServer import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCServer
 
 import requests
 
@@ -68,7 +68,7 @@ class WorkerThread(threading.Thread):
             tmpfile = tempfile.NamedTemporaryFile(dir=tmpdir, delete=False)
 
             # Fetch input data and store it
-            input_data = urllib2.urlopen(self.joburl).read()
+            input_data = urllib.request.urlopen(self.joburl).read()
             tmpfile.write(input_data)
 #            logger.debug(input_data)
             tmpfile.close()
@@ -120,7 +120,7 @@ class JobServer(SimpleXMLRPCServer):
             logger.debug("Patching job URL for test server support")
             parts = joburl.split('/',3)
             joburl = "http://localhost:8081/"+parts[3]      # LifeTestServer URL from Django docs
-        if jobtype not in backends.keys():
+        if jobtype not in list(backends.keys()):
             logger.error("Unknown job type "+jobtype)
             return False
         else:
@@ -132,7 +132,7 @@ class JobServer(SimpleXMLRPCServer):
 if __name__ == '__main__':
     # Read configuration
     assert(len(sys.argv) < 3)
-    conf=ConfigParser.ConfigParser()
+    conf=configparser.ConfigParser()
     if len(sys.argv) == 1:
         # Use default INI file in local directory
         conf.readfp(open('./daemon.ini'))
@@ -153,7 +153,7 @@ if __name__ == '__main__':
             backends[settings['job_kind']] = settings 
         elif section == 'server':
             options = dict(conf.items('server'))
-    logger.info("Configured backends: "+str(backends.keys()))
+    logger.info("Configured backends: "+str(list(backends.keys())))
     logger.info("Options: "+str(options))
     # Start server
     server = JobServer(conf)

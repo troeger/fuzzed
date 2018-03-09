@@ -29,7 +29,7 @@ class Project(models.Model):
     deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return unicode(self.name)
+        return str(self.name)
 
     def to_dict(self):
         """

@@ -4,10 +4,10 @@ import sys
 
 working_dir, input_file, output_files = sys.argv[1:4]
 
-print "Dummy was called with the following arguments: "
-print "     Working dir:  "+working_dir
-print "     Input file:   "+input_file
-print "     Output files: "+output_files
+print("Dummy was called with the following arguments: ")
+print("     Working dir:  "+working_dir)
+print("     Input file:   "+input_file)
+print("     Output files: "+output_files)
 
 
 if output_files.startswith("*"):

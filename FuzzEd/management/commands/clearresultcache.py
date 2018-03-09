@@ -7,12 +7,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         finished_jobs = Job.objects.filter(exit_code=0)
-        print "%u finished jobs are stored ..."%len(finished_jobs)
+        print("%u finished jobs are stored ..."%len(finished_jobs))
 
         for j in finished_jobs:
-                print "Deleting cached results for job %u"+j.pk
+                print("Deleting cached results for job %u"+j.pk)
                 results = Result.objects.filter(job=j)
                 results.delete()
 
-        print "Deleting finished jobs ..."
+        print("Deleting finished jobs ...")
         finished_jobs.delete()

@@ -30,7 +30,7 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
             self.assertIn(key, content)
 
     def testGetGraph(self):
-        for id, kind in fixt_simple['graphs'].iteritems():
+        for id, kind in fixt_simple['graphs'].items():
             url = self.baseUrl + '/graphs/%u' % fixt_simple['pkFaultTree']
             response = self.ajaxGet(url)
             self.assertEqual(response.status_code, 200)
@@ -40,7 +40,7 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
         self.assertEqual(response.status_code, 404)
 
     def testGraphDownload(self):
-        for id, kind in fixt_simple['graphs'].iteritems():
+        for id, kind in fixt_simple['graphs'].items():
             for format, test_str in [
                     ('graphml', '<graphml'), ('json', '{'), ('tex', '\\begin')]:
                 url = self.baseUrl + \
@@ -93,7 +93,7 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
             newgroup,
             'application/json')
         self.assertEqual(response.status_code, 201)
-        print response['Location']
+        print(response['Location'])
         newid = int(response['Location'].split('/')[-1])
         # TODO: Doesn't work due to non-saving of LiveServerTestCase
         #       newgroup = NodeGroup.objects.get(client_id=newid, deleted=False)

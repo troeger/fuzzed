@@ -121,7 +121,7 @@ class Property(models.Model):
             val = self.value
         val_type = Property.value_type(self.key, self.object())
         if val_type == 'text' or val_type == 'textfield':
-            return unicode(val)
+            return str(val)
         elif val_type == 'compound' or val_type == 'range':
             if val.startswith('"') and val.endswith('"'):
                 # Illformed legacy data stored in older versions
@@ -144,9 +144,9 @@ class Property(models.Model):
         '''
         val_type = Property.value_type(self.key, self.object())
         if val_type == 'text' or val_type == 'textfield':
-            self.value = unicode(new_value)
+            self.value = str(new_value)
         elif val_type == 'compound' or val_type == 'range':
-            if isinstance(new_value, basestring):
+            if isinstance(new_value, str):
                 # Somebody, preferably some importer, forgot to interpret
                 # its JSON data and just passed the raw string
                 # Since this is the only position in the code where property

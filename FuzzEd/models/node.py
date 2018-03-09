@@ -12,7 +12,7 @@ from . import xml_faulttree
 from .graph import Graph
 
 import json
-import notations
+from . import notations
 import sys
 import datetime
 import time
@@ -122,15 +122,15 @@ class Node(models.Model):
         prefix = '[DELETED] ' if self.deleted else ''
 
         try:
-            name = unicode(self.properties.get(key='name').value)
-            return unicode('%s%s' % (prefix, name))
+            name = str(self.properties.get(key='name').value)
+            return str('%s%s' % (prefix, name))
 
         except ObjectDoesNotExist:
             try:
                 name = notations.by_kind[
                     self.graph.kind]['nodes'][
                     self.kind]['properties']['name']['default']
-                return unicode('%s%s_%s' % (prefix, self.pk, name))
+                return str('%s%s_%s' % (prefix, self.pk, name))
             except KeyError:
                 return self.kind
 
@@ -281,7 +281,7 @@ class Node(models.Model):
                     if kind == "range":
                         format = propdetails[prop]['mirror']['format']
                         format = format.replace(
-                            u"\xb1",
+                            "\xb1",
                             "$\\pm$")    # Special unicodes used in format strings, such as \xb1
                         val = format.replace(
                             "{{$0}}", str(
@@ -301,8 +301,8 @@ class Node(models.Model):
                             (prop, kind, partkind, format, str(val)))
                         # Special unicodes used in format strings must be
                         # replaced by their Latex counterpart
-                        format = format.replace(u"\xb1", "$\\pm$")
-                        format = format.replace(u"\u03bb", "$\\lambda$")
+                        format = format.replace("\xb1", "$\\pm$")
+                        format = format.replace("\u03bb", "$\\lambda$")
                         if partkind == 'epsilon':
                             val = format.replace(
                                 "{{$0}}", str(
@@ -373,7 +373,7 @@ class Node(models.Model):
             if 'childProperties' in nodeConfig:
                 for childPropName in nodeConfig['childProperties']:
                     for childPropSettingName, childPropSettingVal in nodeConfig[
-                            'childProperties'][childPropName].iteritems():
+                            'childProperties'][childPropName].items():
                         if childPropSettingName == "hidden" and childPropSettingVal == True:
                             hiddenProps.append(childPropName)
         # Create Tikz snippet for tree node, we start with the TiKZ node for the graph icon
@@ -382,7 +382,7 @@ class Node(models.Model):
             self.kind, nodeStyle, self.x + x_offset, (self.y + y_offset) * 1.2, self.pk)
         # Determine the mirror text based on all properties
         # Text width is exactly the double width of the icons
-        mirrorText = unicode()
+        mirrorText = str()
         for index, propvalue in enumerate(
                 self.get_all_mirror_properties(hiddenProps)):
             propvalue = propvalue.replace(
@@ -653,7 +653,7 @@ class Node(models.Model):
         propdetails = notations.by_kind[
             self.graph.kind]['nodes'][
             self.kind]['properties']
-        if name not in propdetails.keys():
+        if name not in list(propdetails.keys()):
             logger.debug(
                 '%s is not allowed in %s' %
                 (str(name), str(
@@ -725,7 +725,7 @@ class Node(models.Model):
 
             TODO: Replace by true bulk insert implementation.
         '''
-        for key, value in d.iteritems():
+        for key, value in d.items():
             self.set_attr(key, value)
         post_save.send(sender=self.__class__, instance=self)
 

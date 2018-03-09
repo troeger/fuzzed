@@ -23,14 +23,14 @@ class Command(BaseCommand):
         if '/' in title:
             return title[title.find(')') + 1:]
         else:
-            return filter(lambda x: x.isdigit(), title)
+            return [x for x in title if x.isdigit()]
 
     def addNode(self, title, lineno):
         lineno += 10
         node_id = self.get_id(title)
         kind = None
 
-        if node_id not in self.nodes.keys():
+        if node_id not in list(self.nodes.keys()):
             # TODO: Use some reasonable X / Y coordinates
             self.gate_x += 1
 

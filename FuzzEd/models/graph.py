@@ -8,7 +8,7 @@ try:
     from .xml_faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace, CreateFromDocument as faultTreeFromXml
     from .node_rendering import tikz_shapes
 except:
-    print "ERROR: Perform a build process first."
+    print("ERROR: Perform a build process first.")
     exit(-1)
 from defusedxml.ElementTree import fromstring as parseXml
 
@@ -19,7 +19,7 @@ import logging
 logger = logging.getLogger('FuzzEd')
 
 import json
-import notations
+from . import notations
 
 
 class Graph(models.Model):
@@ -54,7 +54,7 @@ class Graph(models.Model):
     read_only = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return unicode(
+        return str(
             '%s%s' % ('[DELETED] ' if self.deleted else '', self.name))
 
     def ensure_default_nodes(self):

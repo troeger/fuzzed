@@ -99,7 +99,7 @@ class NodeGroup(models.Model):
 
             TODO: Replace by true bulk insert implementation.
         '''
-        for key, value in d.iteritems():
+        for key, value in d.items():
             self.set_attr(key, value)
         post_save.send(sender=self.__class__, instance=self)
 
