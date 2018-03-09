@@ -2,32 +2,32 @@
 
 - name: Ensure PostgreSQL server is installed (Debian)
   apt: pkg=postgresql state=latest
-  sudo: yes
+  become: yes
   when: ansible_os_family == "Debian"
 
 - name: Ensure PostgreSQL is configured for for local pw-based access
   lineinfile: dest={{ pg_hba_conf }} line="host    all             all             127.0.0.1/32            md5"
-  sudo: yes
+  become: yes
 
 - name: Ensure PostgreSQL native client is installed (Debian)
   apt: name={{ item }} state=latest
-  sudo: yes
+  become: yes
   with_items:
   - postgresql-client
   - libpq-dev
   when: ansible_os_family == "Debian"
 
 - name: Ensure PostgreSQL Python client library is available globally (for DB management Ansible commands)
-  pip: name=psycopg2
-  sudo: yes
+  pip: name=psycopg2 executable=pip3
+  become: yes
 
 - name: Ensure PostgreSQL user for FuzzEd database
-  sudo: yes
+  become: yes
   sudo_user: postgres
   postgresql_user: name={{ db_user }} password={{ db_pw }} role_attr_flags=NOSUPERUSER
 
 - name: Ensure PostgreSQL database for FuzzEd
-  sudo: yes
+  become: yes
   sudo_user: postgres
   postgresql_db: name={{ db_name }} owner={{ db_user }}
 

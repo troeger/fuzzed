@@ -2,15 +2,15 @@
 #- name: Get PyXB from GitHub (PyPI version is broken)
 #  git: repo=https://github.com/pabigot/pyxb.git dest=/tmp/pyxb version=PyXB-1.2.3 update=no
 #- name: Install PyXB from GitHub sources
-#  sudo: yes
+#  become: yes
 #  shell: chdir=/tmp/pyxb creates=/usr/local/bin/pyxbgen python setup.py install
 
 - name: Ensure PyXB is installed
-  sudo: yes
-  pip: name=PyXB
+  become: yes
+  pip: name=PyXB executable=pip3
 
 - name: Ensure DefusedXML is installed
-  sudo: yes
-  pip: name=defusedxml
+  become: yes
+  pip: name=defusedxml executable=pip3
 
 

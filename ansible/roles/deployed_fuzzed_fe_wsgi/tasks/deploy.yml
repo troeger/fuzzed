@@ -1,8 +1,8 @@
 ---
 - name: Perform database backup
   command: pg_dump -c -f /tmp/{{ db_name }}_backup.sql {{ db_name }}
-  sudo: yes
-  sudo_user: postgres
+  become: yes
+  become_user: postgres
 
 #- name: Download FuzzEd release to server
 #  get_url: url=https://github.com/troeger/fuzzed/releases/download/{{release_version}}/FuzzEd-{{release_version}}.tar.gz dest={{ install_base_dir }} 
@@ -31,7 +31,7 @@
 
 - name: Ensure apache and modules are at the latest version
   apt: pkg={{ item }} state=latest
-  sudo: yes
+  become: yes
   with_items:
   - apache2
   - libapache2-mod-wsgi

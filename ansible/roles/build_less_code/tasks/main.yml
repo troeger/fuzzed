@@ -1,7 +1,7 @@
 ---
 - name: Ensure .less file compiler is installed (Debian)
   npm:  name=less global=yes
-  sudo: yes
+  become: yes
   when: ansible_os_family == "Debian"
 
 - name: Ensure .less file compiler is installed (Darwin)
@@ -9,6 +9,6 @@
   when: ansible_os_family == "Darwin"
 
 - name: Bring lessc executable into path (Debian)
-  sudo: yes
+  become: yes
   file: src=/usr/local/lib/node_modules/less/bin/lessc dest=/usr/local/bin/lessc state=link
   when: ansible_os_family == "Debian"

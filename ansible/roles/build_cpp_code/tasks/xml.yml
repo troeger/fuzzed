@@ -1,7 +1,7 @@
 ---
 - name: Ensure C++ XML support is installed (Debian)
   apt: name={{ item }} state=present
-  sudo: yes
+  become: yes
   with_items:
     - libxerces-c-dev
     - xsdcxx

@@ -1,6 +1,6 @@
 ---
 - name: Ensure SCONS is installed (Debian)
-  sudo: yes
+  become: yes
   apt: pkg=scons state=present
   when: ansible_os_family == "Debian"
 

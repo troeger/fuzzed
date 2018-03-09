@@ -1,7 +1,7 @@
 ---
 # Installing less via npm: no brew on Darwin, too old in Linux apt
 - name: Ensure NPM is installed (Debian)
-  sudo: yes
+  become: yes
   apt: pkg=npm state=present
   when: ansible_os_family == "Debian"
 
@@ -10,6 +10,6 @@
   when: ansible_os_family == "Darwin"
 
 - name: Bring Ubuntu node executable into path (Debian)
-  sudo: yes
+  become: yes
   file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
   when: ansible_os_family == "Debian"

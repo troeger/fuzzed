@@ -2,7 +2,7 @@
 ---
 - name: Update APT cache (Debian)
   apt: update_cache=yes cache_valid_time=3600
-  sudo: yes
+  become: yes
   when: ansible_os_family == "Debian"
 
 - name: Update Homebrew cache (Darwin)
@@ -11,7 +11,7 @@
 
 - name: Ensure GIT is installed (Debian)
   apt: pkg=git state=latest
-  sudo: yes
+  become: yes
   when: ansible_os_family == "Debian"
 
 - name: Ensure GIT is installed (Darwin)

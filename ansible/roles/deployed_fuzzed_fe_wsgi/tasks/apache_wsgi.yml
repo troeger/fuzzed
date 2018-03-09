@@ -1,6 +1,6 @@
 - name: Ensure apache and modules are at the latest version
   apt: pkg={{ item }} state=latest
-  sudo: yes
+  become: yes
   with_items:
   - apache2
   - libapache2-mod-wsgi
@@ -31,8 +31,8 @@
 
 - name: Ensure that Apache config is correct
   command: apache2ctl configtest
-  sudo: yes
+  become: yes
 
 - name: Ensure Apache is restarted
   service: name=apache2 state=restarted
-  sudo: yes
+  become: yes

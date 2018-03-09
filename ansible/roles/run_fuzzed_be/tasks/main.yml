@@ -1,4 +1,4 @@
 ---
 - name: Ensure backend daemon dependencies are installed
-  pip: name=requests
+  pip: name=requests executable=pip3
 
