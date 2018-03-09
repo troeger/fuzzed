@@ -1,0 +1,10 @@
+django==2.0.3
+python-social-auth==0.2.21
+python-openid
+python-oauth2
+django-require
+django-robots
+django-tastypie 
+django-configurations 
+pyxb
+defusedxml

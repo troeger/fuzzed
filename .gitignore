@@ -1,3 +1,4 @@
+venv
 fuzzed.sqlite
 test_fuzzed.sqlite
 *.pyc
