@@ -5,14 +5,7 @@
 
 - name: Ensure Django Social Auth is installed
   become: yes
-  pip: name=python-social-auth version=0.2.21 executable=pip3
-
-- name: Ensure Django SocialAuth dependencies are installed
-  become: yes
-  pip: name={{item}} executable=pip3
-  with_items:
-  - python-openid
-  - python-oauth2
+  pip: name=social-auth-app-django executable=pip3
 
 - name: Ensure Django Require is installed
   become: yes

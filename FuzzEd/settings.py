@@ -104,7 +104,7 @@ class Common(Configuration):
         'django.contrib.sites',
         'robots',
         'require',
-        'social.apps.django_app.default',
+        'social_django',
         'tastypie',
         'FuzzEd'
     )
