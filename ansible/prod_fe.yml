@@ -1,9 +1,0 @@
----
-- name: Configure production web servers
-  hosts: all
-  user: root
-
-  roles:
-    - all
-    - run_fuzzed_fe
-    - deployed_fuzzed_fe_wsgi

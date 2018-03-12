@@ -1,4 +1,0 @@
----
-- include: cmake.yml
-- include: gcc.yml
-- include: xml.yml

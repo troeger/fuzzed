@@ -1,8 +1,0 @@
----
-- name: Ensure mocha-phantomjs is installed
-  npm: name=mocha-phantomjs global=yes
-  become: yes
-
-- name: Ensure OAuth client libary is installed
-  pip: name=requests_oauthlib executable=pip3
-

@@ -1,5 +1,0 @@
----
-- name: Ensure GCC is installed (Debian)
-  apt: name=gcc state=latest
-  become: yes
-  when: ansible_os_family == "Debian"

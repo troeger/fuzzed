@@ -1,4 +1,0 @@
-# Dependencies of this role
----
-dependencies:
-  - { role: run_fuzzed_be }
