@@ -1,7 +1,0 @@
-<?xml version="1.0" ?><svg height="36" id="basicEventSet" label="Basic Event Set" version="1.1" width="36" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-    <g>
-        <circle cx="20" cy="20" r="14.3" style="fill:#ffffff; stroke:#000000; stroke-width:1.4;"/>
-        <circle cx="17.5" cy="17.5" r="14.3" style="fill:#ffffff; stroke:#000000; stroke-width:1.4;"/>
-        <circle cx="15" cy="15" r="14.3" style="fill:#ffffff; stroke:#000000; stroke-width:1.4;"/>
-    </g>
-</svg>

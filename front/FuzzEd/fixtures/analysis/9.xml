@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<fuzzTree:FuzzTree id="460" name="minimal fuzz tree" xmlns:fuzzTree="net.fuzztree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<topEvent decompositionNumber="5" id="0" missionTime="17532" name="Top Event" x="18" y="2">
+		<children id="10" name="-" x="18" xsi:type="fuzzTree:And" y="5">
+			<children costs="1" id="17" name="Basic Event" optional="true" x="22" xsi:type="fuzzTree:BasicEvent" y="8">
+				<probability a="0.4999999996" b1="0.5" b2="0.5" c="0.5000000004" xsi:type="fuzzTree:TriangularFuzzyInterval"/>
+			</children>
+			<children end="3" formula="N" id="13" name="Redundancy Variation" start="1" x="18" xsi:type="fuzzTree:RedundancyVariationPoint" y="7">
+				<children costs="1" id="15" name="Basic Event Set" optional="false" quantity="1" x="18" xsi:type="fuzzTree:BasicEventSet" y="10">
+					<probability a="0.3" b1="0.5" b2="0.5" c="0.7" xsi:type="fuzzTree:TriangularFuzzyInterval"/>
+				</children>
+			</children>
+		</children>
+	</topEvent>
+</fuzzTree:FuzzTree>

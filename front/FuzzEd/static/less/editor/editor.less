@@ -1,0 +1,43 @@
+/**
+ *  File: editor.less
+ *      This file contains all styles related to the Editor view.
+ */
+
+@import "menus";
+@import "node";
+
+#FuzzEdContent {
+    position: absolute;
+    top:      50px;
+    bottom:   0;
+    left:     0;
+    width:    100%;
+}
+
+#FuzzEdCanvas {
+    background-image:      url(/static/img/background.svg);
+    background-attachment: local;
+    position:              absolute;
+    width:                 100%;
+    height:                100%;
+    z-index:               0;
+
+    &.fuzzed-grid-hidden {
+        background-image: none;
+    }
+
+    &.ui-state-disabled {
+        opacity: 1;
+    }
+}
+
+#FuzzEdExceptions {
+    .modal-header>h3 {
+        color: @brand-danger;
+    }
+}
+
+#FuzzEdStacktrace {
+    display: none;
+}
+

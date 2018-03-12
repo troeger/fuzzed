@@ -1,0 +1,76 @@
+/**
+ *  File: util.less
+ *      This file contains all styles that are not directly related to any specific component of the webapp.
+ */
+
+@import "print";
+
+#FuzzEdAlertContainer {
+    position: fixed;
+    top:      60px;
+    width:    30%;
+    left:     35%;
+    z-index:  9999; /*above all*/
+
+    .alert {
+        margin-bottom: 10px;
+    }
+}
+
+#FuzzEdProgressIndicator {
+    display: none;
+    float: left;
+    padding-top: 2px;
+    margin-right: 5px;
+}
+#FuzzEdFuzzEdProgressMessage {
+    display: none;
+}
+
+.center-vertical {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.footer {
+    margin-top: 35px;
+    padding: 35px 0px 35px 0px;
+    border-top: 1px solid @theme-border;
+
+    p {
+        margin-bottom: 0;
+    }
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-color: white;
+}
+
+.space-top {
+    padding-top: 80px;
+}
+
+.space-bottom {
+    padding-bottom: 80px;
+}
+
+.table {
+    td {
+        vertical-align: middle;
+    }
+
+    tbody {
+        tr:hover {
+            cursor: pointer;
+        }
+        form {
+            margin: 0;
+        }
+    }
+}

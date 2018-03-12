@@ -1,6 +1,0 @@
-\path[draw=black,fill=cffffff,dash pattern=on 3.36pt off 1.12pt,line
-    join=miter,line cap=butt,miter limit=2.80,line width=1.040pt] (0.7000,24.0000)
-    .. controls (0.7000,24.0000) and (3.5000,34.0000) .. (17.5000,34.3000) ..
-    controls (31.5000,34.3000) and (34.3000,24.0000) .. (34.3000,24.0000) --
-    (21.0000,0.7000) -- (14.0000,0.7000) -- cycle;
-

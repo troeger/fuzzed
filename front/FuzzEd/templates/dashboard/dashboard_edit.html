@@ -1,0 +1,66 @@
+{% extends "util/base.html" %}
+
+{% block title %}
+    {{ block.super }} - Edit {{ graph }}
+{% endblock %}
+
+{%block navigation_home %}hidden{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript" language="javascript">
+  require(['selectize'], function() {
+      jQuery('#users').selectize({
+          plugins: ['remove_button'],
+		      maxItems: null,
+		      create: false
+      });
+  });
+</script>
+{% endblock %}
+
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        Edit <small>{{ graph }}</small>
+    </h1>
+</div>
+
+<form method="POST" action="{% url 'graph_settings' graph.pk %}" class="form-horizontal">
+    {% csrf_token %}
+    <fieldset>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">Kind</label>
+            <div class="col-lg-10">
+                <p class="form-control-static">{{ kind }}</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="name">Title</label>
+            <div class="col-lg-10">
+                <input type="text" class="form-control" name="name" value="{{ graph }}" id="name">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="name">Viewers</label>
+            <div class="col-lg-10">
+                <select name="users" id="users" multiple placeholder="Pick some users...">
+                {% for user in users %}
+                    <option value="{{ user.pk }}" {% if user in shared_users %} selected="selected" {% endif %} >
+                        {{ user.visible_name }} 
+                    </option>
+                {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-push-2 col-lg-10">
+                <button type="submit" name="save" value="save" class="btn btn-primary">Save</button>
+                <button class="btn btn-default" onclick="history.go(-1); return false;">Cancel</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+{% endblock %}

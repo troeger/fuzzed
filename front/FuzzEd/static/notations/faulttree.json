@@ -1,0 +1,551 @@
+{
+    "kind": "faulttree",
+    "name": "Fault Tree",
+    "edges": {
+        "copyable": true,
+        "deletable": true,
+
+        "properties": {}
+    },
+    "nodes": {
+        "node": {
+            "nodeDisplayName": "Node",
+
+            "numberOfIncomingConnections":  1,
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": [],
+
+            "deletable": true,
+            "resizable": false,
+            "editable": false,
+            "copyable": true,
+            "mirrorable": false,
+
+            "connector": {
+                "offset": {
+                    "top":    0,
+                    "bottom": 0
+                }
+            },
+
+            "properties": {}
+        },
+        
+        "stickyNote": {
+            "nodeDisplayName": "Sticky Note",
+            "inherits": "node",
+            "numberOfOutgoingConnections": 0,
+            "image": "sticky_note.html",
+            "resizable": true,
+            "editable": true,
+            
+            "properties": {
+              "description": {
+                  "kind": "textfield",
+                  "default": "Sample Text",
+                  "hidden": true
+              },
+              
+              "height": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              },
+              
+              "width": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              }
+            }
+        },
+
+        "event": {
+            "nodeDisplayName": "Event",
+            "inherits": "node",
+
+            "properties": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name",
+                    "default": "Event",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "{{$0}}"
+                    }
+                }
+            }
+        },
+
+        "basicEvent": {
+            "nodeDisplayName": "Basic Event",
+            "inherits": "event",
+
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["fdepGate"],
+
+            "mirrorable": true,
+
+            "image": "basic_event.svg",
+            "help": "An initial fault event.",
+
+            "properties": {
+                "name": {
+                    "default": "Basic Event"
+                },
+                "probability": {
+                    "kind": "compound",
+                    "displayName": "Probability",
+                    "default": [0, 0],
+
+                    "parts": [{
+                        "kind": "numeric",
+                        "partName": "Point",
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "default": 0,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate",
+                        "min": 0,
+                        "max": 1000000000,
+                        "step": 0.01,
+                        "default": 17532,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }]
+                }
+            }
+        },
+
+        "houseEvent": {
+            "nodeDisplayName": "House Event",
+            "inherits": "basicEvent",
+
+            "numberOfOutgoingConnections": 0,
+            "allowConnectionTo": [],
+
+            "image": "house_event.svg",
+            "help": "A basic event that is expected to occur in specific situations, such as maintenance-related shutdown activities.",
+
+            "properties": {
+                "name": {
+                    "default": "House Event"
+                }
+            }
+        },
+
+        "intermediateEvent": {
+            "nodeDisplayName": "Intermediate Event",
+            "inherits": "event",
+
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["staticGate", "spareGate", "priorityAndGate", "seqGate"],
+
+            "image": "intermediate_event.svg",
+            "help": "An event resulting from a combination of previous events.",
+
+            "properties": {
+                "name": {
+                    "default": "Intermediate Event"
+                }
+            }
+        },
+
+        "topEvent": {
+            "nodeDisplayName": "Top Event",
+            "inherits": "intermediateEvent",
+
+            "numberOfIncomingConnections": 0,
+            "allowConnectionTo": [
+                "basicEvent", "undevelopedEvent", "houseEvent", "staticGate", "spareGate", "priorityAndGate", "seqGate"
+            ],
+
+            "image": "top_event.svg",
+            "help": "The system failure event.",
+
+            "excludeFromShapesMenu": true,
+            "deletable": false,
+            "copyable": false,
+
+            "properties": {
+                "name": {
+                    "default": "Top Event"
+                },
+                "missionTime": {
+                    "kind": "numeric",
+                    "displayName": "Mission in h",
+                    "min": 0,
+                    "step": 1,
+                    "default": 17532
+                }
+            }
+        },
+
+        "undevelopedEvent": {
+            "nodeDisplayName": "Undeveloped Event",
+            "inherits": "event",
+
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["fdepGate"],
+
+            "image": "undeveloped_event.svg",
+            "help": "An event with unknown details or insignificant impact.",
+
+            "properties": {
+                "name": {
+                    "default": "Undeveloped Event"
+                }
+            }
+        },
+
+        "eventSet": {
+            "nodeDisplayName": "Event Set",
+            "inherits": "event",
+
+            "properties": {
+                "name": {
+                    "default": "Event Set"
+                },
+                "cardinality": {
+                    "kind": "numeric",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1,
+                    "default": 1,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "#{{$0}}"
+                    }
+                }
+            }
+        },
+
+        "basicEventSet": {
+            "nodeDisplayName": "Basic Event Set",
+            "inherits": "eventSet",
+
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["fdepGate"],
+
+            "image": "basic_event_set.svg",
+            "help": "A set of basic events with identical properties.",
+
+            "properties": {
+                "name": {
+                    "default": "Basic Event Set"
+                },
+                "probability": {
+                    "kind": "compound",
+                    "displayName": "Probability",
+                    "default": [0, 0],
+
+                    "parts": [{
+                        "kind": "numeric",
+                        "partName": "Point",
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "default": 0,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate",
+                        "min": 0,
+                        "max": 1000000000,
+                        "step": 0.01,
+                        "default": 17532,
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }]
+                }
+            }
+        },
+
+        "intermediateEventSet": {
+            "nodeDisplayName": "Intermediate Event Set",
+            "inherits": "eventSet",
+
+            "numberOfOutgoingConnections": 0,
+
+            "image": "intermediate_event_set.svg",
+            "help": "A set of intermediate events with identical child trees.",
+            "excludeFromShapesMenu": true,
+
+            "properties": {
+                "name": {
+                    "default": "Intermediate Event Set"
+                }
+            }
+        },
+
+        "gate": {
+            "nodeDisplayName": "Gate",
+            "inherits": "node",
+
+            "allowConnectionTo": ["event", "staticGate", "spareGate", "priorityAndGate", "seqGate", "transferIn"]
+        },
+
+        "staticGate": {
+            "nodeDisplayName": "Static Gate",
+            "inherits": "gate"
+        },
+
+        "andGate": {
+            "nodeDisplayName": "AND Gate",
+            "inherits": "staticGate",
+
+            "image": "and_gate.svg",
+            "help": "The above event occurs if all events below occur."
+        },
+
+        "orGate": {
+            "nodeDisplayName": "OR Gate",
+            "inherits": "staticGate",
+
+            "image": "or_gate.svg",
+            "help": "The above event occurs if one or more of the below events occur.",
+
+            "connector": {
+                "offset": {
+                    "bottom": -7
+                }
+            }
+        },
+
+        "xorGate": {
+            "nodeDisplayName": "XOR Gate",
+            "inherits": "orGate",
+
+            "image": "xor_gate.svg",
+            "help": "The above event occurs if exactly one of the events below occurs."
+        },
+
+        "votingOrGate": {
+            "nodeDisplayName": "Voting OR Gate",
+            "inherits": "orGate",
+
+            "image": "voting_or_gate.svg",
+            "help": "The above event occurs if k of the below events occur.",
+
+            "properties": {
+                "k": {
+                    "kind": "numeric",
+                    "displayName": "k",
+                    "min": 1,
+                    "step": 1,
+                    "default": 1,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "k={{$0}}"
+                    }
+                }
+            }
+        },
+
+        "dynamicGate": {
+            "nodeDisplayName": "Dynamic Gate",
+            "inherits": "gate"
+        },
+
+        "spareGate": {
+            "nodeDisplayName": "Spare Gate",
+            "inherits": "dynamicGate",
+
+            "image": "spare_gate.svg",
+            "help": "The above event occurs if the primary and all secondary events below occur. The primary event changes the probability of the secondary events.",
+
+            "allowConnectionTo": [
+                "basicEvent", "basicEventSet", "undevelopedEvent", "houseEvent", "staticGate",
+                "spareGate", "priorityAndGate", "seqGate", "transferIn"
+            ],
+
+            "properties": {
+                "dormancyFactor": {
+                    "kind": "numeric",
+                    "displayName": "Dormancy",
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.001,
+                    "default": 0,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "d={{$0}}"
+                    }
+                }
+            }
+        },
+
+        "fdepGate": {
+            "nodeDisplayName": "FDEP Gate",
+            "inherits": "dynamicGate",
+
+            "numberOfIncomingConnections": -1,
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": [
+                "basicEvent", "houseEvent", "undevelopedEvent", "staticGate",
+                "spareGate", "priorityAndGate", "seqGate", "transferIn"
+            ],
+
+            "image": "fdep_gate.svg",
+            "help": "All above events occur immediately if the below event occurs."
+        },
+
+        "priorityAndGate": {
+            "nodeDisplayName": "Priority AND Gate",
+            "inherits": "dynamicGate",
+
+            "image": "priority_and_gate.svg",
+            "help": "The above event occurs if all below events occur from left to right. The below events may happen out of order."
+        },
+
+        "seqGate": {
+            "nodeDisplayName": "Sequential Gate",
+            "inherits": "dynamicGate",
+
+            "image": "seq_gate.svg",
+            "help": "The above event occurs if all below events occur from left to right. An out-of-order occurence is not possible."
+        },
+
+        "transferIn": {
+            "nodeDisplayName": "Transfer In",
+            "inherits": "dynamicGate",
+
+            "numberOfOutgoingConnections": 0,
+
+            "image": "transfer_in.svg",
+            "help": "Includes the top event of another tree at this point in the tree.",
+
+            "properties": {
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer",
+                    "default": -1,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "◄ {{$0}}"
+                    }
+                }
+            }
+        }
+    },
+
+    "nodeGroups": {
+        "copyable": true,
+        "deletable": true,
+
+        "properties": {
+            "name": {
+                "kind": "text",
+                "displayName": "Name",
+                "default": "Repeated BasicEvent",
+
+                "mirror": {
+                    "position": "bottom",
+                    "style": ["bold", "large"],
+                    "format": "{{$0}}"
+                }
+            },
+            "probability": {
+                "kind": "compound",
+                "displayName": "Probability",
+                "default": [0, 0],
+
+                "parts": [{
+                    "kind": "numeric",
+                    "partName": "Point",
+                    "min": 0,
+                    "max": 1,
+                    "step": 0.0000000001,
+                    "default": 0,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "p={{$0}}"
+                    }
+                }, {
+                    "kind": "numeric",
+                    "partName": "Rate",
+                    "min": 0,
+                    "max": 1000000000,
+                    "step": 0.01,
+                    "default": 17532,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "λ={{$0}}"
+                    }
+                }]
+            }
+        }
+    },
+
+    "propertiesDisplayOrder": [
+        "name",
+        "missionTime",
+        "probability",
+        "cardinality",
+        "k",
+        "dormancyFactor",
+        "transfer",
+        "description",
+        "width",
+        "height"
+    ],
+
+    "shapeMenuNodeDisplayOrder": [
+        "basicEvent",
+        "basicEventSet",
+        "intermediateEvent",
+        "intermediateEventSet",
+        "topEvent",
+        "houseEvent",
+        "undevelopedEvent",
+
+        "andGate",
+        "orGate",
+        "xorGate",
+        "votingOrGate",
+
+        "spareGate",
+        "fdepGate",
+        "priorityAndGate",
+        "seqGate",
+        "transferIn",
+        "stickyNote"
+    ],
+
+    "defaults": {
+        "nodes": [
+            {
+                "kind": "topEvent",
+                "x": 10,
+                "y": 1
+            }
+        ]
+    }
+}

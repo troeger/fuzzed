@@ -1,0 +1,7 @@
+django==1.11
+social-auth-app-django
+django-require
+django-robots
+django-tastypie 
+django-configurations 
+pyxb

@@ -1,0 +1,87 @@
+{% extends "util/base.html" %}
+
+{% block title %}
+    {{ block.super }} - Settings
+{% endblock %}
+
+{%block navigation_home %}hidden{% endblock %}
+{%block navigation_settings %}active{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript">
+    require(['bootstrap'], function() {});
+</script>
+{% endblock %}
+
+{% block goto_menu %}
+<li><a href="/"><i class="fa fa-fw fa-home"></i> Start page</a></li>
+<li><a href="http://fuzzed.uservoice.com/"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        Settings
+        <small>of your account</small>
+    </h1>
+</div>
+
+<form method="POST" action="/settings/" class="form-horizontal">
+    {% csrf_token %}
+    <fieldset>
+        <div class="form-group">
+            <label class="col-lg-2 control-label">User Name</label>
+            <p class="col-lg-10 form-control-static">{{ user.username }}</p>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="first_name">First Name</label>
+            <div class="col-lg-10">
+                <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}" id="first_name">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="last_name">Last Name</label>
+            <div class="col-lg-10">
+                <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}" id="last_name">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="email">E-Mail</label>
+            <div class="col-lg-10">
+                <input class="form-control" type="email" name="email" value="{{ user.email }}" id="email">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="email">API Key</label>
+            <div class="col-lg-10">
+                <p>{{user.api_key.key}}&nbsp;&nbsp;&nbsp;<button type="submit" name="generate" value="generate" class="btn btn-default">Generate</button></p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-push-2 col-lg-10">
+                <div class="checkbox">
+                    <label for="newsletter">
+                        <input type="checkbox" name="newsletter"
+                            {% if user.get_profile.newsletter %} checked{% endif %}>
+                            Subscribe to Newsletter
+                        </input>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-push-2 col-lg-10">
+                <button type="submit" name="save" value="save" class="btn btn-primary">Save</button>
+                <button type="submit" name="cancel" value="cancel" class="btn btn-default">Cancel</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+{% endblock %}

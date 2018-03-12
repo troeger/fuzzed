@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FuzzTree id="1" name="Optional Tree Test" xmlns:ft="net.fuzztree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <topEvent id="2" name="topEvent" missionTime="1">
+  <children xsi:type="ft:And" id="3" name="AND">
+    <children costs="1" id="10" name="Primary Fail" xsi:type="ft:BasicEvent" optional="true">
+      <probability value="0.5" xsi:type="ft:CrispProbability"/>
+    </children>
+    <children costs="1" id="11" name="Secondary Fail" xsi:type="ft:BasicEvent" optional="false">
+      <probability value="0.5" xsi:type="ft:CrispProbability"/>
+    </children>
+  </children>
+  </topEvent>
+</ft:FuzzTree>

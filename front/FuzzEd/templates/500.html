@@ -1,0 +1,17 @@
+{% extends "util/base_error.html" %}
+{% load settings %}
+
+{% block title %}500 - Internal Server Error{% endblock %}
+
+{% block content %}
+<h1>
+    500
+</h1>
+<h3>
+    “There are two ways to write error-free programs; only the third one works.” - Alan J. Perlis
+</h3>
+<h6>
+    Apparently, we belong to the first two categories. Eventually, we can be join the third group, if you would leave
+    us a short note on how you got <a href="{% setting 'FEEDBACK_PAGE' %}">here</a>.
+</h6>
+{% endblock %}

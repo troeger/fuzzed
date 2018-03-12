@@ -1,0 +1,775 @@
+{
+    "kind": "fuzztree",
+    "name": "Fuzz Tree",
+    "inherits": "faulttree",
+    "edges": {
+        "copyable": true,
+        "deletable": true,
+
+        "properties": {}
+    },
+    "nodes": {
+        "node": {
+            "nodeDisplayName": "Node",
+
+            "numberOfIncomingConnections":  1,
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": [],
+
+            "deletable": true,
+            "copyable": true,
+            "mirrorable": false,
+
+            "connector": {
+                "offset": {
+                    "top":    0,
+                    "bottom": 0
+                }
+            },
+
+            "properties": {}
+        },
+        
+        "stickyNote": {
+            "nodeDisplayName": "Sticky Note",
+            "inherits": "node",
+            "numberOfOutgoingConnections": 0,
+            "image": "sticky_note.html",
+            "resizable": true,
+            "editable": true,
+            
+            "properties": {
+              "description": {
+                  "kind": "textfield",
+                  "default": "Sample Text",
+                  "hidden": true
+              },
+              
+              "height": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              },
+              
+              "width": {
+                  "kind": "numeric",
+                  "step": 1,
+                  "default": 150,
+                  "hidden": true
+              }
+            }
+        },
+
+        "event": {
+            "nodeDisplayName": "Event",
+            "inherits": "node",
+
+            "numberOfOutgoingConnections": 0,
+
+            "properties": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name",
+                    "default": "Event",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "{{$0}}"
+                    }
+
+                },
+                "optional": {
+                    "kind": "bool",
+                    "displayName": "Optional",
+                    "default": false
+                },
+                "cost": {
+                    "kind": "numeric",
+                    "displayName": "Cost",
+                    "min": 0,
+                    "step": 1,
+                    "default": 1,
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "c={{$0}}"
+                    }
+                }
+            }
+        },
+
+        "basicEvent": {
+            "nodeDisplayName": "Basic Event",
+            "inherits": "event",
+
+            "image": "basic_event.svg",
+            "help": "An initial fault event.",
+
+            "mirrorable": true,
+
+            "properties": {
+                "name": {
+                    "default": "Basic Event"
+                },
+                "probability": {
+                    "kind": "compound",
+                    "displayName": "Probability",
+                    "default": [0, [0.5, 0]],
+
+                    "parts": [{
+                        "kind": "epsilon",
+                        "partName": "Point",
+                        "default": [0.5, 0],
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "epsilonStep": 0.0000000001,
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}±{{$1}}"
+                        }
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate",
+                        "min": 0,
+                        "max": 1000000000,
+                        "step": 0.01,
+                        "default": 17532,
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }, {
+                        "kind": "choice",
+                        "partName": "Approx",
+                        "default": [0.75, 0.25],
+                        "choices": [
+                            "extremely unlikely",
+                            "very low probability",
+                            "highly improbable",
+                            "little chance",
+                            "very unlikely",
+                            "unlikely",
+                            "likely",
+                            "quite probable",
+                            "very good chance",
+                            "very probable",
+                            "highly probable",
+                            "very high probability",
+                            "extremely probable"
+                        ],
+                        "values": [
+                            [0.01,  0.01],
+                            [0.05,  0.05],
+                            [0.075, 0.075],
+                            [0.1,   0.1],
+                            [0.125, 0.125],
+                            [0.25,  0.25],
+                            [0.75,  0.25],
+                            [0.8,   0.2],
+                            [0.825, 0.175],
+                            [0.875, 0.175],
+                            [0.925, 0.075],
+                            [0.95,  0.05],
+                            [0.99,  0.01]
+                        ],
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }]
+                }
+            }
+        },
+
+        "houseEvent": {
+            "nodeDisplayName": "House Event",
+            "inherits": "basicEvent",
+
+            "image": "house_event.svg",
+            "help": "A basic event that is expected to occur in specific situations, such as maintenance-related shutdown activities.",
+
+            "properties": {
+                "name": {
+                    "default": "House Event"
+                }
+            }
+        },
+
+        "intermediateEvent": {
+            "nodeDisplayName": "Intermediate Event",
+            "inherits": "event",
+
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["staticGate", "variationPoint"],
+
+            "image": "intermediate_event.svg",
+            "help": "An event resulting from a combination of previous events.",
+
+            "properties": {
+                "name": {
+                    "default": "Intermediate Event"
+                }
+            }
+        },
+
+        "topEvent": {
+            "nodeDisplayName": "Top Event",
+            "inherits": "intermediateEvent",
+
+            "numberOfIncomingConnections": 0,
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["basicEvent", "undevelopedEvent", "houseEvent", "staticGate", "variationPoint"],
+
+            "image": "top_event.svg",
+            "help": "The system failure event.",
+
+            "deletable": false,
+            "copyable": false,
+            "excludeFromShapesMenu": true,
+
+            "properties": {
+                "name": {
+                    "default": "Top Event"
+                },
+                "missionTime": {
+                    "kind": "numeric",
+                    "displayName": "Mission in h",
+                    "min": 0,
+                    "step": 1,
+                    "default": 17532
+                },
+                "decompositions": {
+                    "kind": "numeric",
+                    "displayName": "Decompose",
+                    "min": 1,
+                    "step": 1,
+                    "default": 1
+                },
+
+                "optional": null,
+                "cost": null
+            }
+        },
+
+        "undevelopedEvent": {
+            "nodeDisplayName": "Undeveloped Event",
+            "inherits": "event",
+
+            "image": "undeveloped_event.svg",
+            "help": "An event with unknown details or insignificant impact.",
+
+            "properties": {
+                "name": {
+                    "default": "Undeveloped Event"
+                }
+            }
+        },
+
+        "eventSet": {
+            "nodeDisplayName": "eventSet",
+            "inherits": "event",
+
+            "properties": {
+                "name": {
+                    "default": "Event Set"
+                },
+                "cardinality": {
+                    "kind": "numeric",
+                    "displayName": "Cardinality",
+                    "min": 1,
+                    "step": 1,
+                    "default": 1,
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "#{{$0}}"
+                    }
+                },
+                "cost": {
+                    "displayName": "Cost/Event"
+                }
+            }
+        },
+
+        "basicEventSet": {
+            "nodeDisplayName": "Basic Event Set",
+            "inherits": "eventSet",
+
+            "image": "basic_event_set.svg",
+            "help": "A set of basic events with identical properties.",
+
+            "properties": {
+                "name": {
+                    "default": "Basic Event Set"
+                },
+                "probability": {
+                    "kind": "compound",
+                    "displayName": "Probability",
+                    "default": [0, [0.5, 0]],
+
+                    "parts": [{
+                        "kind": "epsilon",
+                        "partName": "Point",
+                        "default": [0.5, 0],
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "epsilonStep": 0.0000000001,
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}±{{$1}}"
+                        }
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate",
+                        "min": 0,
+                        "max": 1000000000,
+                        "step": 0.01,
+                        "default": 17532,
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }, {
+                        "kind": "choice",
+                        "partName": "Approx",
+                        "default": [0.75, 0.25],
+                        "choices": [
+                            "extremely unlikely",
+                            "very low probability",
+                            "highly improbable",
+                            "little chance",
+                            "very unlikely",
+                            "unlikely",
+                            "likely",
+                            "quite probable",
+                            "very good chance",
+                            "very probable",
+                            "highly probable",
+                            "very high probability",
+                            "extremely probable"
+                        ],
+                        "values": [
+                            [0.01,  0.01],
+                            [0.05,  0.05],
+                            [0.075, 0.075],
+                            [0.1,   0.1],
+                            [0.125, 0.125],
+                            [0.25,  0.25],
+                            [0.75,  0.25],
+                            [0.8,   0.2],
+                            [0.825, 0.175],
+                            [0.875, 0.175],
+                            [0.925, 0.075],
+                            [0.95,  0.05],
+                            [0.99,  0.01]
+                        ],
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }]
+                }
+            }
+        },
+
+        "intermediateEventSet": {
+            "nodeDisplayName": "Intermediate Event Set",
+            "inherits": "eventSet",
+
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["staticGate", "variationPoint"],
+
+            "image": "intermediate_event_set.svg",
+            "help": "A set of intermediate events with identical child trees.",
+
+            "properties": {
+                "name": {
+                    "default": "Intermediate Event Set"
+                }
+            }
+        },
+
+        "gate": {
+            "nodeDisplayName": "Gate",
+            "inherits": "node"
+        },
+
+        "staticGate": {
+            "nodeDisplayName": "Static Gate",
+            "inherits": "gate",
+
+            "numberOfOutgoingConnections": -1,
+            "allowConnectionTo": ["event", "gate", "variationPoint"]
+        },
+
+        "andGate": {
+            "nodeDisplayName": "AND Gate",
+            "inherits": "staticGate",
+
+            "image": "and_gate.svg",
+            "help": "The above event occurs if all events below occur."
+        },
+
+        "orGate": {
+            "nodeDisplayName": "OR Gate",
+            "inherits": "staticGate",
+
+            "image": "or_gate.svg",
+            "help": "The above event occurs if one or of the below events occur.",
+
+            "connector": {
+                "offset": {
+                    "bottom": -7
+                }
+            }
+        },
+
+        "xorGate": {
+            "nodeDisplayName": "XOR Gate",
+            "inherits": "orGate",
+
+            "image": "xor_gate.svg",
+            "help": "The above event occurs if exactly one of the events below occurs."
+        },
+
+        "votingOrGate": {
+            "nodeDisplayName": "Voting OR Gate",
+            "inherits": "orGate",
+
+            "image": "voting_or_gate.svg",
+            "help": "The above event occurs if k of the below events occur.",
+
+            "properties": {
+                "k": {
+                    "kind": "numeric",
+                    "displayName": "k",
+                    "min": 1,
+                    "step": 1,
+                    "default": 1,
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "k={{$0}}"
+                    }
+                }
+            }
+        },
+
+        "dynamicGate": {
+            "nodeDisplayName": "Dynamic Gate",
+            "inherits": "gate"
+        },
+
+        "transferIn": {
+            "nodeDisplayName": "Transfer In",
+            "inherits": "dynamicGate",
+
+            "numberOfOutgoingConnections": 0,
+
+            "image": "transfer_in.svg",
+            "help": "Includes the top event of another tree at this point in the tree.",
+
+            "properties": {
+                "transfer": {
+                    "kind": "transfer",
+                    "displayName": "Transfer",
+                    "default": -1,
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "◄ {{$0}}"
+                    }
+                },
+                "transferMaxCost": {
+                    "kind": "numeric",
+                    "displayName": "Max Cost",
+                    "min": 0,
+                    "step": 1,
+                    "default": 1,
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "max(c)={{$0}}"
+                    }
+                }
+            }
+        },
+
+        "variationPoint": {
+            "nodeDisplayName": "Variation Point",
+            "inherits": "node",
+
+            "properties": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name",
+                    "default": "Variation Point",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "{{$0}}"
+                    }
+                }
+            },
+
+            "connector": {
+                "dashstyle": "4 2"
+            }
+        },
+
+        "featureVariation": {
+            "nodeDisplayName": "Feature Variation",
+            "inherits": "variationPoint",
+
+            "allowConnectionTo": ["event", "variationPoint", "dynamicGate"],
+
+            "image": "feature_variation.svg",
+            "help": "Each child tree expresses a system configuration.",
+
+            "properties": {
+                "name": {
+                    "default": "Feature Variation"
+                }
+            },
+
+            "childProperties": {
+                "optional": {
+                    "hidden": true,
+                    "value":  false
+                }
+            }
+        },
+
+        "redundancyVariation": {
+            "nodeDisplayName": "Redundancy Variation",
+            "inherits": "variationPoint",
+
+            "numberOfOutgoingConnections": 1,
+            "allowConnectionTo": ["eventSet"],
+
+            "image": "redundancy_variation.svg",
+            "help": "Expresses different Voting OR gate configurations.",
+
+            "properties": {
+                "name": {
+                    "default": "Redundancy Variation"
+                },
+                "kFormula": {
+                    "kind": "text",
+                    "displayName": "K-Formula",
+                    "default": "N-1",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "k: {{$0}}"
+                    }
+                },
+                "nRange": {
+                    "kind": "range",
+                    "displayName": "N-Range",
+                    "min": 1,
+                    "step": 1,
+                    "default": [1, 2],
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "N: {{$0}}-{{$1}}"
+                    }
+                }
+            },
+
+            "childProperties": {
+                "optional": {
+                    "hidden": true,
+                    "value":  false
+                },
+                "cardinality": {
+                    "hidden": true,
+                    "value": 1
+                }
+            }
+        }
+    },
+
+    "nodeGroups": {
+        "copyable": true,
+        "deletable": true,
+
+        "properties": {
+                "name": {
+                    "kind": "text",
+                    "displayName": "Name",
+                    "default": "Repeated BasicEvent",
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["bold", "large"],
+                        "format": "{{$0}}"
+                    }
+                },
+                "probability": {
+                    "kind": "compound",
+                    "displayName": "Probability",
+                    "default": [0, [0.5, 0]],
+
+                    "parts": [{
+                        "kind": "epsilon",
+                        "partName": "Point",
+                        "default": [0.5, 0],
+                        "min": 0,
+                        "max": 1,
+                        "step": 0.0000000001,
+                        "epsilonStep": 0.0000000001,
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}±{{$1}}"
+                        }
+                    }, {
+                        "kind": "numeric",
+                        "partName": "Rate",
+                        "min": 0,
+                        "max": 1000000000,
+                        "step": 0.01,
+                        "default": 17532,
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "λ={{$0}}"
+                        }
+                    }, {
+                        "kind": "choice",
+                        "partName": "Approx",
+                        "default": [0.75, 0.25],
+                        "choices": [
+                            "extremely unlikely",
+                            "very low probability",
+                            "highly improbable",
+                            "little chance",
+                            "very unlikely",
+                            "unlikely",
+                            "likely",
+                            "quite probable",
+                            "very good chance",
+                            "very probable",
+                            "highly probable",
+                            "very high probability",
+                            "extremely probable"
+                        ],
+                        "values": [
+                            [0.01,  0.01],
+                            [0.05,  0.05],
+                            [0.075, 0.075],
+                            [0.1,   0.1],
+                            [0.125, 0.125],
+                            [0.25,  0.25],
+                            [0.75,  0.25],
+                            [0.8,   0.2],
+                            [0.825, 0.175],
+                            [0.875, 0.175],
+                            [0.925, 0.075],
+                            [0.95,  0.05],
+                            [0.99,  0.01]
+                        ],
+
+                        "mirror": {
+                            "position": "bottom",
+                            "style": ["italic"],
+                            "format": "p={{$0}}"
+                        }
+                    }]
+                },
+                "optional": {
+                    "kind": "bool",
+                    "displayName": "Optional",
+                    "default": false
+                },
+                "cost": {
+                    "kind": "numeric",
+                    "displayName": "Cost",
+                    "min": 0,
+                    "step": 1,
+                    "default": 1,
+
+                    "mirror": {
+                        "position": "bottom",
+                        "style": ["italic"],
+                        "format": "c={{$0}}"
+                    }
+                }
+            }
+    },
+
+    "propertiesDisplayOrder": [
+        "name",
+        "missionTime",
+        "decompositions",
+        "probability",
+        "optional",
+        "cost",
+        "cardinality",
+        "nRange",
+        "k",
+        "kFormula",
+        "transfer",
+        "transferMaxCost",
+        "description",
+        "width",
+        "height"
+    ],
+
+    "shapeMenuNodeDisplayOrder": [
+        "basicEvent",
+        "basicEventSet",
+        "intermediateEvent",
+        "intermediateEventSet",
+        "topEvent",
+        "houseEvent",
+        "undevelopedEvent",
+
+        "andGate",
+        "orGate",
+        "xorGate",
+        "votingOrGate",
+        "transferIn",
+
+        "featureVariation",
+        "redundancyVariation",
+        "stickyNote"
+    ],
+
+    "defaults": {
+        "nodes": [
+            {
+                "kind": "topEvent",
+                "x": 10,
+                "y": 1
+            }
+        ]
+    }
+}

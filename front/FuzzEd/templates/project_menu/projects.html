@@ -1,0 +1,160 @@
+{% extends "util/base.html" %}
+
+{% block title %}
+    {{ block.super }} - Projects
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript" language="javascript">
+    require(['bootstrap', 'jquery-cookie'], function() {
+        var project_to_delete = null;
+
+        var delete_clicked = function(event) {
+            event.stopPropagation();
+
+            project_to_delete = jQuery(this).closest('form');
+            var dialog      = jQuery('#delete_dialog');
+            var name        = dialog.find('#delete_name');
+
+            name.html(project_to_delete.closest('tr').find('strong.project_name').html());
+            dialog.modal().show();
+        };
+
+        var delete_confirmed = function(event) {
+            project_to_delete.find('input.delete_flag')
+                           .attr('name',  'delete')
+                           .attr('value', 'delete');
+            project_to_delete.submit();
+            project_to_delete = null;
+        };
+
+        var dismiss_notification = function(event) {
+            {% if notification %}
+              jQuery.ajax({ url: '/api/front/notification/{{notification.pk}}/',
+                            type: 'DELETE' ,
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRFToken', jQuery.cookie('csrftoken'));
+                            }});
+            {% endif %}
+        };
+
+        jQuery(document).ready(function() {
+            jQuery('button.require-dialog').click(delete_clicked);
+            jQuery('#confirm_delete').click(delete_confirmed);
+            jQuery('#notification{{ notification.pk }}').bind('closed.bs.alert', dismiss_notification);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block goto_menu %}
+<li><a href="/settings"><i class="fa fa-fw fa-user"></i> Account settings</a></li>
+<li><a href="http://fuzzed.uservoice.com/"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
+<li><a href="/?logout"><i class="fa fa-fw fa-power-off"></i> Logout </a></li>
+{% endblock %}
+
+
+
+{% block content %}
+
+
+{% if notification %}
+<div id="notification{{ notification.pk }}" class="panel panel-default">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <h3 class="panel-title">{{ notification.title }}</h3><br/>
+      <p>{{ notification.text }}</p>
+</div>
+{% endif %}
+
+  <div class="page-header">
+      <h2>
+      <a style="text-decoration: none; color:black" href="{% url 'projects' %}" class="fa fa-home"></a>
+        Projects
+      </h2>
+  </div>
+  
+  <form action="{% url 'project_new' %}" method="get">
+      {% csrf_token %}
+      <div class="btn-group pull-right">
+          <button type="submit" name="kind" value="faulttree" class="btn btn-default">
+              <i class="fa fa-folder-close"></i>
+              New Project
+          </button>
+      </div>
+  </form>
+  
+  
+  <section>
+      <table class="table">
+          <thead>
+              <tr>
+                  <th></th>
+                  <th>Name</th>
+                  <th>Created</th>
+                  <th></th>
+              </tr>
+          </thead>
+
+          <tbody>
+              {% for project in projects %} 
+                  <tr onclick="document.location = '{% url 'dashboard' project.pk %}';">
+                      <td><i class="fa fa-folder fa-lg"></i></td>
+                      <td>
+                          <strong class="project_name">{{ project.name }}</strong>
+                      </td>
+                      <td>{{ project.created }}</td>
+                      <td style="text-align: right;">
+                          <form action="{% url 'project_edit' project.pk %}" method="POST">
+                              {% csrf_token %}
+                              <input type="hidden" class="delete_flag">
+                              <button type="submit" name="edit" value="edit" class="btn btn-default btn-small">
+                                  <i class="fa fa-wrench"></i>
+                                  Settings
+                              </button>
+                              <button type="button" class="btn btn-danger btn-small require-dialog">
+                                  <i class="fa fa-trash"></i>
+                                  Delete
+                              </button>
+                          </form>
+                      </td>
+                  </tr>
+              {% endfor %}
+              {% if user.sharings.count > 0 %}
+                  <tr onclick="document.location = '{% url 'shared_graphs_dashboard' %}';">
+                      <td><i class="fa fa-share fa-lg"></i></td>
+                      <td>
+                          <strong class="project_name"> Shared Graphs</strong>
+                      </td>
+                      <td></td>
+                      <td></td>
+                  </tr>
+              {% endif %}
+          </tbody>
+      </table>
+  </section>
+  
+  <!-- hidden modal dialog for graph deletion confirmation -->
+  <div class="modal fade" id="delete_dialog" role="dialog" aria-labelledby="header" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                  <h3 id="header">Confirmation</h3>
+              </div>
+              <div class="modal-body">
+                  <p>Are you sure you want to delete <strong id="delete_name"></strong>?</p>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" id="confirm_delete">
+                      <i class="fa fa-trash"></i>
+                      Delete
+                  </button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">
+                      Cancel
+                  </button>
+              </div>
+          </div>
+      </div>
+  </div>
+{% endblock %}

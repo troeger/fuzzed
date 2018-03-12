@@ -1,0 +1,213 @@
+{% extends "util/base.html" %}
+
+{% block title %}
+    {{ block.super }} - Dashboard
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript" language="javascript">
+    require(['bootstrap'], function() {
+
+        var delete_clicked = function(event) {
+            event.stopPropagation();
+
+            var dialog      = jQuery('#delete_dialog');
+            dialog.modal().show();
+        };
+
+        var delete_confirmed = function(event) {
+            
+            var form = jQuery('#graph_selection');
+            var delete_flag =jQuery('#delete_flag')
+            
+            delete_flag.attr('name',  'delete')
+                       .attr('value', 'delete');
+                                  
+            form.submit();
+            // delete flag gets cleard on http submit
+        };
+        
+        var row_clicked = function(event){
+          // highlight or unhiglight row if checkbox was clicked
+          jQuery(this).closest('tr').toggleClass('active');
+          
+          // hide/unhide graph toolbar
+          if(jQuery('.graph_select:checked').length > 0){
+            jQuery('#dashboard_toolbar').fadeIn();
+          }
+          else{
+            jQuery('#dashboard_toolbar').fadeOut();
+          }
+        };
+        
+        var initalize_graph_selection = function(){
+          // if page gets loaded with history.go(-1) restore the previous state
+          checked_rows = jQuery('.graph_select:checked');
+          
+          if(checked_rows.length > 0){
+            jQuery('#dashboard_toolbar').css("display", "block");
+            checked_rows.closest('tr').addClass('active');
+          }          
+        };
+          
+        jQuery(document).ready(function() {
+            initalize_graph_selection();
+            jQuery('.graph_select').click(row_clicked);
+            jQuery('button.require-dialog').click(delete_clicked);
+            jQuery('#confirm_delete').click(delete_confirmed);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block goto_menu %}
+    <li><a href="{% url 'projects' %}"><i class="fa fa-fw fa-home"></i> Projects</a></li>
+    {% for project in proposals %} 
+          <li><a href="{% url 'dashboard' project.pk %}"><i class="fa fa-fw fa-folder"></i> {{ project.name }}</a></li>
+    {% endfor %}
+    {% if user.sharings.count > 0 %}
+        <li><a href="{% url 'shared_graphs_dashboard' %}"><i class="fa fa-fw fa-share"></i> Shared Graphs</a><li>
+    {% endif %}
+    <li class="divider"></li>
+    <li><a href="/settings"><i class="fa fa-fw fa-user"></i> Account settings</a></li>
+    <li><a href="http://fuzzed.uservoice.com/"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
+    <li><a href="/?logout"><i class="fa fa-fw fa-power-off"></i> Logout </a></li>
+{% endblock %}
+
+
+{% block content %}
+<div class="page-header">
+    <h2>
+      <i class="fa fa-folder-open"></i>
+      {{ project.name }}
+    </h2>
+</div>
+
+<div class="btn-group pull-right">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+        <i class="fa fa-file"></i>
+        New Graph
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" role="menu">
+       <li><a href="{% url 'dashboard_new' project.pk 'faulttree' %}"> New <i>Fault Tree</i> model </a></li>
+       <li><a href="{% url 'dashboard_new' project.pk 'fuzztree'  %}"> New <i>FuzzTree</i> model </a></li>
+       <li><a href="{% url 'dashboard_new' project.pk 'rbd'       %}"> New <i>Reliability Block Diagram</i> model </a></li>
+       <li><a href="{% url 'dashboard_new' project.pk 'dfd'       %}"> New <i>Data Flow Diagram</i> model </a></li>
+       <li><a href="{% url 'dashboard_new' project.pk 'from_graphml' %}"> New model from <i>GraphML</i> import</a></li>
+    </ul>
+</div>
+
+<section>
+    <form id="graph_selection" action="{% url 'dashboard_edit' project.pk %}" method="POST">
+        {% csrf_token %}
+        <div class ="toolbar_wrap_div">
+            <div id="dashboard_toolbar" class="btn-toolbar pull-left">              
+               <div class="btn-group">   
+                  <button type="submit" name="copy" value="copy" class="btn btn-default btn-small">
+                      <i class="fa fa-plus-circle"></i>
+                      Copy
+                  </button>
+                  <button type="submit" name="snapshot" value="snapshot" class="btn btn-default btn-small">
+                      <i class="fa fa-camera"></i>
+                      Snapshot
+                  </button>
+                  <button type="button" name class="btn btn-danger btn-small require-dialog">
+                      <i class="fa fa-trash"></i>
+                      Delete
+                      <input type="hidden" id="delete_flag">
+                  </button>
+               </div>
+               <div class="btn-group">
+                  <button type="submit" name="share" value="share" class="btn btn-small">
+                      <i class="fa fa-share"></i>
+                      Share
+                  </button>
+               </div>
+            </div>
+        </div>
+       
+        <table id="DashboardTable" class="table img-rounded">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Graph</th>
+                    <th>Kind</th>
+                    <th>Viewers</th>
+                    <th></th>
+                </tr>
+            </thead>
+        
+            <tbody>
+                {% for name, graph in graphs %} 
+
+                       <tr id="{{ graph.pk }}" class="info">               
+                                             
+                        <td>
+                          <div class="checkbox">
+                            <input type="checkbox" name="graph_id[]" value="{{ graph.pk }}"  class="graph_select">
+                          </div>
+                        </td>
+                        
+                        <td>
+                            {% if graph.read_only %}
+                                <i class="fa fa-lock"></i>
+                            {% endif %}
+                        </td>
+                        
+                        <td>
+                            {% if graph.read_only %}
+                              <a href="{% url 'snapshot' graph.pk %}">
+                            {% else %}
+                              <a href="{% url 'editor'   graph.pk %}">
+                            {% endif %}  
+                            <strong class="graph_name">{{ graph }}</strong>
+                            </a>
+                        </td>
+                        
+                        <td><span class="label label-info">{{ name }}</span></td>
+                        
+                        <td>
+                            {% for sharing in graph.sharings.all %}{% if not forloop.first %}, {% endif %}{{sharing.user.visible_name}}{% endfor %}
+                        </td>
+                        
+                        <td style="text-align: right;">
+                                <button type="submit" name="edit" value="edit" formaction="{% url 'graph_settings' graph.pk %}" class="btn btn-default btn-small">
+                                    <i class="fa fa-wrench"></i>
+                                    Settings
+                                </button>
+                        </td>
+                        
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
+</section>
+
+<!-- hidden modal dialog for graph deletion confirmation -->
+<div class="modal fade" id="delete_dialog" role="dialog" aria-labelledby="header" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h3 id="header">Confirmation</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="delete_name"></strong>?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirm_delete">
+                    <i class="fa fa-trash"></i>
+                    Delete
+                </button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

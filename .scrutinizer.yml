@@ -1,12 +1,11 @@
 filter:
     paths:
-        - 'FuzzEd/*'
-        - 'executor/*'
+        - 'front/FuzzEd/*'
     excluded_paths:
         - '*/migrations/*'
         - '*/static/*'
         - '*/fixtures/*'
-        - 'FuzzEd/tests/js-tests/*'
+        - '*/js-tests/*'
 checks:
     python:
         code_rating: true

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FuzzTree id="0" xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ft="net.fuzztree">
+  <topEvent id="1" name="Other" missionTime="1">
+    <children xsi:type="ft:FeatureVariationPoint" id="2">
+      <children xsi:type="ft:BasicEvent" id="110" name="BE 1" costs="20" optional="true">
+        <probability xsi:type="ft:CrispProbability" value="0.1"/>
+      </children>
+      <children xsi:type="ft:RedundancyVariationPoint" id="12" name="Power Failure" start="2" end="5" formula="N-1" costFormula="N/2">
+        <children xsi:type="ft:BasicEventSet" id="120" name="Power Unit Failure">
+          <probability xsi:type="ft:CrispProbability" value="0.5"/>
+        </children>
+      </children>
+    </children>
+  </topEvent>
+</ft:FuzzTree>

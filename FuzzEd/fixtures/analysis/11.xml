@@ -1,4 +1,0 @@
-<?xml version="1.0" ?>
-<faultTree:FaultTree id="606" name="Scenár2" xmlns:faultTree="net.faulttree">
-	<topEvent id="0" missionTime="17532" name="Zlyhanie SBS pri eliminácii narušiteľov" x="10" y="1"/>
-</faultTree:FaultTree>

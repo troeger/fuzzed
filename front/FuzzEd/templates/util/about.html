@@ -1,0 +1,72 @@
+{% extends "util/base.html" %}
+
+{% block title %}
+    {{ block.super }} - About
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript">
+    require(['bootstrap'], function() {});
+</script>
+{% endblock %}
+
+{% block goto_menu %}
+<li><a href="/"><i class="fa fa-fw fa-home"></i> Start page</a></li>
+<li><a href="http://fuzzed.uservoice.com/"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
+{% endblock %}
+
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        About this service
+    </h1>
+</div>
+
+<section>
+    <p>
+        Information and services available on this web site are subject to the following terms and conditions. By
+        accessing this site, you agree to these terms and conditions.
+    </p>
+
+    <p>
+        We reserve the right to change these terms and conditions, and the services on this site at any time, at its
+        sole discretion, without notice. We reserve the right to seek all remedies available by law and in equity for
+        any violation of these terms and conditions. Any rights not expressly granted herein are reserved.
+    </p>
+
+    <p>
+        In no event shall this site be liable for any special, incidental, indirect or consequential damages of any
+        kind, or any damages whatsoever (including without limitation, those resulting from:
+        <ol>
+            <li>Reliance on the information or services presented, </li>
+            <li>loss of use, data or profits, </li>
+            <li>delays or business interruptions, </li>
+            <li>and any theory of liability, arising out of or in connection with the 
+                use or performance of information) whether or not this site has 
+                been advised of the possibility of such damages.</li>
+        </ol>
+    </p>
+
+    <p>
+        We make no warranty that the site or content will meet 
+        your requirements and that the site will be available on an uninterrupted, 
+        timely, secure, or error-free basis.
+    </p>
+
+    <p>
+        Some countries do not allow the limitation or exclusion of liability for 
+        incidental or consequential damages so the above limitations or exclusions 
+        may not apply to you.
+    </p>
+
+    <p>
+        This web site could include technical or other inaccuracies. Changes are 
+        periodically made to the information herein. However, this site makes no 
+        commitment to update materials or services.
+    </p>
+</section>
+
+</section>
+{% endblock %}

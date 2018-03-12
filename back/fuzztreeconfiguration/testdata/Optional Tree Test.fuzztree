@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ft:FuzzTree id="1" name="Optional Tree Test" xmlns:ft="net.fuzztree" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <topEvent id="2" name="">
+    <children costs="1" id="10" name="" xsi:type="ft:BasicEvent" optional="true">
+      <probability value="0.5" xsi:type="ft:CrispProbability"/>
+    </children>
+  </topEvent>
+</ft:FuzzTree>

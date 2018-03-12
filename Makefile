@@ -1,20 +1,18 @@
-VERSION=0.8.0
-
-DOCKER_RUN=docker run -i -t --rm --mount source=$(PWD),target=/FuzzEd,type=bind -w /FuzzEd -p 127.0.0.1:8000:8000 troeger/ore_front:$(VERSION)
+ORE_FRONT_RUN=docker run -i -t --rm --mount source=$(PWD),target=/ore,type=bind -w /ore -p 127.0.0.1:8000:8000 troeger/ore_front
 
 .PHONY=docker
 
 all: build
 
-docker-dev-image:
-	docker build -t troeger/ore_front:$(VERSION) .
+docker-images:
+	docker-compose build
 
-shell: docker-dev-image
-	$(DOCKER_RUN) bash
+shell: docker-images
+	$(ORE_FRONT_RUN) bash
 
-build: docker-dev-image
-	$(DOCKER_RUN) scons frontend backend
+build: docker-images
+	$(ORE_FRONT_RUN) scons frontend backend
 
-test: docker-dev-image build
-	$(DOCKER_RUN) ./manage.py test
+test: docker-images build
+	$(ORE_FRONT_RUN) ./manage.py test
 

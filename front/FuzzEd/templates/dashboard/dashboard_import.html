@@ -1,0 +1,52 @@
+{% extends "util/base.html" %}
+
+{% block title %}
+    {{ block.super }} - Import a Graph
+{% endblock %}
+
+{%block navigation_home %}hidden{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>
+        Import
+        <small>a diagram</small>
+    </h1>
+</div>
+
+<form method="POST" action="{% url 'dashboard_import' project.pk %}" class="form-horizontal" enctype="multipart/form-data">
+    {% csrf_token %}
+    <fieldset>
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="name">New Title</label>
+            <div class="col-lg-10">
+                <input type="text" class="form-control" name="title" value="Reliability Diagram" id="title">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="name">GraphML file</label>
+            <div class="col-lg-10">
+                <input type="file" name="graphml_file" id="graphml_file" class="form-control">
+            </div>
+        </div>
+
+
+        {% if error_text %}
+        <div class="form-group">
+            <label class="col-lg-2 control-label" for="name">Last import error</label>
+            <div class="col-lg-10">{{ error_text }}</div>
+        </div>
+        {% endif %}
+
+
+        <div class="form-group">
+            <div class="col-push-2 col-lg-10">
+                <button type="submit" name="save" value="save" class="btn btn-primary">Import</button>
+                <a class="btn btn-default" href="{% url 'dashboard' project.pk %}">Cancel</a>
+            </div>
+        </div>
+
+    </fieldset>
+</form>
+{% endblock %}

@@ -1,0 +1,1861 @@
+[
+    {
+        "pk": 1, 
+        "model": "FuzzEd.project", 
+        "fields": {
+            "name": "Test Project", 
+            "created": "2014-03-17T07:50:45.835", 
+            "deleted": false, 
+            "modified": "2014-03-21T13:44:09.405", 
+            "owner": 1, 
+            "users": []
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "faulttree", 
+            "name": "Fault Tree", 
+            "created": "2014-03-17T07:50:53.299", 
+            "deleted": true, 
+            "modified": "2014-03-21T13:37:51.595", 
+            "project": 1, 
+            "owner": 1
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "fuzztree", 
+            "name": "FuzzTree", 
+            "created": "2014-03-17T07:50:59.914", 
+            "deleted": true, 
+            "modified": "2014-03-21T13:37:49.419", 
+            "project": 1, 
+            "owner": 1
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "rbd", 
+            "name": "RBD", 
+            "created": "2014-03-17T07:51:08.587", 
+            "deleted": true, 
+            "modified": "2014-03-21T13:37:46.936", 
+            "project": 1, 
+            "owner": 1
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "faulttree", 
+            "name": "Reliability Diagram", 
+            "created": "2013-11-03T22:53:11.563", 
+            "deleted": true, 
+            "modified": "2014-03-17T18:18:53.637", 
+            "project": 1, 
+            "owner": 1
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "faulttree", 
+            "name": "Reliability Diagram", 
+            "created": "2013-11-03T23:02:41.621", 
+            "deleted": true, 
+            "modified": "2014-03-17T18:18:53.642", 
+            "project": 1, 
+            "owner": 1
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "faulttree", 
+            "name": "Reliability Diagram", 
+            "created": "2013-11-03T23:03:02.242", 
+            "deleted": true, 
+            "modified": "2014-03-19T22:27:42.886", 
+            "project": 1, 
+            "owner": 1
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "faulttree", 
+            "name": "Simple fault tree with rate", 
+            "created": "2014-03-21T13:38:13.079", 
+            "deleted": false, 
+            "modified": "2014-03-21T13:38:58.989", 
+            "project": 1, 
+            "owner": 1
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "FuzzEd.graph", 
+        "fields": {
+            "read_only": false, 
+            "kind": "fuzztree", 
+            "name": "PRDC paper tree", 
+            "created": "2014-03-21T13:40:00.307", 
+            "deleted": false, 
+            "modified": "2014-03-21T13:46:38.586", 
+            "project": 1, 
+            "owner": 1
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "topEvent", 
+            "deleted": false, 
+            "graph": 1, 
+            "client_id": 0, 
+            "y": 1, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "topEvent", 
+            "deleted": false, 
+            "graph": 2, 
+            "client_id": 0, 
+            "y": 1, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "start", 
+            "deleted": false, 
+            "graph": 3, 
+            "client_id": 0, 
+            "y": 7, 
+            "x": 5
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "end", 
+            "deleted": false, 
+            "graph": 3, 
+            "client_id": 1, 
+            "y": 7, 
+            "x": 15
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "andGate", 
+            "deleted": false, 
+            "graph": 1, 
+            "client_id": 1, 
+            "y": 3, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 1, 
+            "client_id": 2, 
+            "y": 5, 
+            "x": 9
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": true, 
+            "graph": 1, 
+            "client_id": 3, 
+            "y": 5, 
+            "x": 11
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "orGate", 
+            "deleted": false, 
+            "graph": 1, 
+            "client_id": 7, 
+            "y": 5, 
+            "x": 11
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 1, 
+            "client_id": 9, 
+            "y": 8, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 1, 
+            "client_id": 10, 
+            "y": 8, 
+            "x": 12
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "andGate", 
+            "deleted": false, 
+            "graph": 2, 
+            "client_id": 1, 
+            "y": 3, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 2, 
+            "client_id": 2, 
+            "y": 5, 
+            "x": 9
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "orGate", 
+            "deleted": false, 
+            "graph": 2, 
+            "client_id": 5, 
+            "y": 5, 
+            "x": 11
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 2, 
+            "client_id": 7, 
+            "y": 7, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 2, 
+            "client_id": 9, 
+            "y": 7, 
+            "x": 12
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "block", 
+            "deleted": false, 
+            "graph": 3, 
+            "client_id": 2, 
+            "y": 5, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "block", 
+            "deleted": false, 
+            "graph": 3, 
+            "client_id": 3, 
+            "y": 9, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 4, 
+            "client_id": 7, 
+            "y": 5, 
+            "x": 13
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "andGate", 
+            "deleted": false, 
+            "graph": 3, 
+            "client_id": 1, 
+            "y": 4, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 20, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEventSet", 
+            "deleted": false, 
+            "graph": 3, 
+            "client_id": 3, 
+            "y": 7, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "orGate", 
+            "deleted": false, 
+            "graph": 4, 
+            "client_id": 9, 
+            "y": 5, 
+            "x": 16
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEventSet", 
+            "deleted": false, 
+            "graph": 4, 
+            "client_id": 11, 
+            "y": 7, 
+            "x": 16
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "redundancyVariation", 
+            "deleted": false, 
+            "graph": 2, 
+            "client_id": 14, 
+            "y": 5, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "topEvent", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 0, 
+            "y": 1, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 25, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 7, 
+            "client_id": 1, 
+            "y": 4, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "topEvent", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 0, 
+            "y": 1, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "orGate", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 1, 
+            "y": 4, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 28, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "andGate", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 3, 
+            "y": 6, 
+            "x": 7
+        }
+    }, 
+    {
+        "pk": 29, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 5, 
+            "y": 9, 
+            "x": 6
+        }
+    }, 
+    {
+        "pk": 30, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEvent", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 6, 
+            "y": 9, 
+            "x": 8
+        }
+    }, 
+    {
+        "pk": 31, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "redundancyVariation", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 9, 
+            "y": 6, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEventSet", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 11, 
+            "y": 9, 
+            "x": 10
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "featureVariation", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 13, 
+            "y": 6, 
+            "x": 13
+        }
+    }, 
+    {
+        "pk": 34, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "intermediateEvent", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 15, 
+            "y": 9, 
+            "x": 12
+        }
+    }, 
+    {
+        "pk": 35, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "intermediateEvent", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 16, 
+            "y": 9, 
+            "x": 14
+        }
+    }, 
+    {
+        "pk": 36, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "orGate", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 19, 
+            "y": 11, 
+            "x": 12
+        }
+    }, 
+    {
+        "pk": 37, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "orGate", 
+            "deleted": true, 
+            "graph": 8, 
+            "client_id": 21, 
+            "y": 11, 
+            "x": 14
+        }
+    }, 
+    {
+        "pk": 38, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEventSet", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 23, 
+            "y": 13, 
+            "x": 12
+        }
+    }, 
+    {
+        "pk": 39, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "basicEventSet", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 24, 
+            "y": 13, 
+            "x": 14
+        }
+    }, 
+    {
+        "pk": 40, 
+        "model": "FuzzEd.node", 
+        "fields": {
+            "kind": "andGate", 
+            "deleted": false, 
+            "graph": 8, 
+            "client_id": 27, 
+            "y": 11, 
+            "x": 14
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 1, 
+            "target": 5, 
+            "client_id": 4, 
+            "source": 1
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 1, 
+            "target": 6, 
+            "client_id": 5, 
+            "source": 5
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": true, 
+            "graph": 1, 
+            "target": 7, 
+            "client_id": 6, 
+            "source": 5
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 1, 
+            "target": 8, 
+            "client_id": 8, 
+            "source": 5
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 1, 
+            "target": 9, 
+            "client_id": 11, 
+            "source": 8
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 1, 
+            "target": 10, 
+            "client_id": 12, 
+            "source": 8
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 2, 
+            "target": 11, 
+            "client_id": 3, 
+            "source": 2
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 2, 
+            "target": 12, 
+            "client_id": 4, 
+            "source": 11
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 2, 
+            "target": 13, 
+            "client_id": 6, 
+            "source": 11
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 2, 
+            "target": 14, 
+            "client_id": 8, 
+            "source": 13
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 2, 
+            "target": 15, 
+            "client_id": 10, 
+            "source": 13
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 3, 
+            "target": 16, 
+            "client_id": 4, 
+            "source": 3
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 3, 
+            "target": 17, 
+            "client_id": 5, 
+            "source": 3
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 3, 
+            "target": 4, 
+            "client_id": 6, 
+            "source": 16
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 3, 
+            "target": 4, 
+            "client_id": 7, 
+            "source": 17
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 4, 
+            "target": 21, 
+            "client_id": 10, 
+            "source": 15
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 4, 
+            "target": 22, 
+            "client_id": 12, 
+            "source": 21
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 2, 
+            "target": 23, 
+            "client_id": 15, 
+            "source": 10
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 2, 
+            "target": 11, 
+            "client_id": 16, 
+            "source": 23
+        }
+    }, 
+    {
+        "pk": 20, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 7, 
+            "target": 25, 
+            "client_id": 2, 
+            "source": 24
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 27, 
+            "client_id": 2, 
+            "source": 26
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 28, 
+            "client_id": 4, 
+            "source": 27
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 29, 
+            "client_id": 7, 
+            "source": 28
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 30, 
+            "client_id": 8, 
+            "source": 28
+        }
+    }, 
+    {
+        "pk": 25, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 31, 
+            "client_id": 10, 
+            "source": 27
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 32, 
+            "client_id": 12, 
+            "source": 31
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 33, 
+            "client_id": 14, 
+            "source": 27
+        }
+    }, 
+    {
+        "pk": 28, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 34, 
+            "client_id": 17, 
+            "source": 33
+        }
+    }, 
+    {
+        "pk": 29, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 35, 
+            "client_id": 18, 
+            "source": 33
+        }
+    }, 
+    {
+        "pk": 30, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 36, 
+            "client_id": 20, 
+            "source": 34
+        }
+    }, 
+    {
+        "pk": 31, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": true, 
+            "graph": 8, 
+            "target": 37, 
+            "client_id": 22, 
+            "source": 35
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 38, 
+            "client_id": 25, 
+            "source": 36
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": true, 
+            "graph": 8, 
+            "target": 39, 
+            "client_id": 26, 
+            "source": 37
+        }
+    }, 
+    {
+        "pk": 34, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 40, 
+            "client_id": 28, 
+            "source": 35
+        }
+    }, 
+    {
+        "pk": 35, 
+        "model": "FuzzEd.edge", 
+        "fields": {
+            "deleted": false, 
+            "graph": 8, 
+            "target": 39, 
+            "client_id": 29, 
+            "source": 40
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 6, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 6, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, 0.5]"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 7, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event"
+        }
+    }, 
+    {
+        "pk": 4, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 7, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, 0]"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 9, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event"
+        }
+    }, 
+    {
+        "pk": 6, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 9, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, 0.3]"
+        }
+    }, 
+    {
+        "pk": 7, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 10, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event"
+        }
+    }, 
+    {
+        "pk": 8, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 10, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[1, 10000]"
+        }
+    }, 
+    {
+        "pk": 9, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 12, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 10, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 12, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 11, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 12, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event"
+        }
+    }, 
+    {
+        "pk": 12, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 12, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.5, 0.03]]"
+        }
+    }, 
+    {
+        "pk": 13, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 14, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 14, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 14, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 15, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 14, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event"
+        }
+    }, 
+    {
+        "pk": 16, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 14, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[1, 20000]"
+        }
+    }, 
+    {
+        "pk": 17, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 15, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 18, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 15, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 19, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 15, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event"
+        }
+    }, 
+    {
+        "pk": 20, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 15, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[2, [0.925, 0.075]]"
+        }
+    }, 
+    {
+        "pk": 21, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 16, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Node"
+        }
+    }, 
+    {
+        "pk": 22, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 16, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, 0.7]"
+        }
+    }, 
+    {
+        "pk": 23, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 17, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Node"
+        }
+    }, 
+    {
+        "pk": 24, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 17, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[1, 15000]"
+        }
+    }, 
+    {
+        "pk": 25, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 2, 
+            "deleted": false, 
+            "key": "missionTime", 
+            "value": 17700
+        }
+    }, 
+    {
+        "pk": 26, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 2, 
+            "deleted": false, 
+            "key": "decompositions", 
+            "value": 10
+        }
+    }, 
+    {
+        "pk": 27, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 1, 
+            "deleted": false, 
+            "key": "missionTime", 
+            "value": 16600
+        }
+    }, 
+    {
+        "pk": 28, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 16, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 29, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 16, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event Set"
+        }
+    }, 
+    {
+        "pk": 30, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 16, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.5, 0]]"
+        }
+    }, 
+    {
+        "pk": 31, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 17, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 32, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 17, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 33, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 17, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event"
+        }
+    }, 
+    {
+        "pk": 34, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 17, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.5, 0]]"
+        }
+    }, 
+    {
+        "pk": 35, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 18, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 36, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 18, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 37, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 18, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event"
+        }
+    }, 
+    {
+        "pk": 38, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 18, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.5, 0]]"
+        }
+    }, 
+    {
+        "pk": 39, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 20, 
+            "deleted": false, 
+            "key": "cardinality", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 40, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 20, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event Set"
+        }
+    }, 
+    {
+        "pk": 41, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 20, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, 0]"
+        }
+    }, 
+    {
+        "pk": 42, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 22, 
+            "deleted": false, 
+            "key": "cardinality", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 43, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 22, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 44, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 22, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 45, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 22, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event Set"
+        }
+    }, 
+    {
+        "pk": 46, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 22, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.5, 0]]"
+        }
+    }, 
+    {
+        "pk": 47, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 23, 
+            "deleted": false, 
+            "key": "kFormula", 
+            "value": "N-1"
+        }
+    }, 
+    {
+        "pk": 48, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 23, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Redundancy Variation"
+        }
+    }, 
+    {
+        "pk": 49, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 23, 
+            "deleted": false, 
+            "key": "nRange", 
+            "value": "[1, 5]"
+        }
+    }, 
+    {
+        "pk": 50, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 25, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Basic Event"
+        }
+    }, 
+    {
+        "pk": 51, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 25, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[1, 0.01]"
+        }
+    }, 
+    {
+        "pk": 52, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 24, 
+            "deleted": false, 
+            "key": "missionTime", 
+            "value": 10000
+        }
+    }, 
+    {
+        "pk": 53, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 26, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Server Failure"
+        }
+    }, 
+    {
+        "pk": 54, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 26, 
+            "deleted": false, 
+            "key": "decompositions", 
+            "value": 10
+        }
+    }, 
+    {
+        "pk": 55, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 29, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 56, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 29, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 57, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 29, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Primary CPU Failure"
+        }
+    }, 
+    {
+        "pk": 58, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 29, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.08, 0.008]]"
+        }
+    }, 
+    {
+        "pk": 59, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 30, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 60, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 30, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": true
+        }
+    }, 
+    {
+        "pk": 61, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 30, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Secondary CPU Failure"
+        }
+    }, 
+    {
+        "pk": 62, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 30, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.08, 0.008]]"
+        }
+    }, 
+    {
+        "pk": 63, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 31, 
+            "deleted": false, 
+            "key": "kFormula", 
+            "value": "N-2"
+        }
+    }, 
+    {
+        "pk": 64, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 31, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Redundancy Variation"
+        }
+    }, 
+    {
+        "pk": 65, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 31, 
+            "deleted": false, 
+            "key": "nRange", 
+            "value": "[4, 5]"
+        }
+    }, 
+    {
+        "pk": 66, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 32, 
+            "deleted": false, 
+            "key": "cardinality", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 67, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 32, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 68, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 32, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 69, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 32, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Power Unit Failure"
+        }
+    }, 
+    {
+        "pk": 70, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 32, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.15, 0.05]]"
+        }
+    }, 
+    {
+        "pk": 71, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 33, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Feature Variation"
+        }
+    }, 
+    {
+        "pk": 72, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 34, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 73, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 34, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 74, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 34, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "RAID 0 Failure"
+        }
+    }, 
+    {
+        "pk": 75, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 35, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 76, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 35, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 77, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 35, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "RAID 1 Failure"
+        }
+    }, 
+    {
+        "pk": 78, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 38, 
+            "deleted": false, 
+            "key": "cardinality", 
+            "value": 2
+        }
+    }, 
+    {
+        "pk": 79, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 38, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 80, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 38, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 81, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 38, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Disc Failure"
+        }
+    }, 
+    {
+        "pk": 82, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 38, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.12, 0.01]]"
+        }
+    }, 
+    {
+        "pk": 83, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 39, 
+            "deleted": false, 
+            "key": "cardinality", 
+            "value": 2
+        }
+    }, 
+    {
+        "pk": 84, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 39, 
+            "deleted": false, 
+            "key": "cost", 
+            "value": 1
+        }
+    }, 
+    {
+        "pk": 85, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 39, 
+            "deleted": false, 
+            "key": "optional", 
+            "value": false
+        }
+    }, 
+    {
+        "pk": 86, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 39, 
+            "deleted": false, 
+            "key": "name", 
+            "value": "Disc Failure"
+        }
+    }, 
+    {
+        "pk": 87, 
+        "model": "FuzzEd.property", 
+        "fields": {
+            "node": 39, 
+            "deleted": false, 
+            "key": "probability", 
+            "value": "[0, [0.12, 0.01]]"
+        }
+    }
+]
