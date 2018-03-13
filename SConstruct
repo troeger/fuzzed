@@ -3,7 +3,7 @@
   builders stored in the site_scons folder.
 '''
 
-from FuzzEd import VERSION
+VERSION="0.7.6"
 
 #./site_scons automatically becomes part of the Python search path
 # Add our own builders to the SCons environment
@@ -11,7 +11,7 @@ env=Environment(
   tools=['default', fuzzed_builders])  
 
 # Include SCons file for backend daemons
-SConscript('backends/SConscript')
+SConscript('back/SConscript')
 
 # Static files generation - 'static-release' target
 statics = env.Command( Dir('FuzzEd/static-release'), 
@@ -55,11 +55,11 @@ package_web = env.Package(
 # Backend package generation - 'package.backend' target
 package_backend = env.Package(
                      "dist/FuzzEdBackend-%s"%VERSION, 
-                     [Dir("backends/lib"),
-                     "backends/initscript.sh",
-                     "backends/daemon.py",
-                     "backends/daemon.ini",
-                     Dir("backends/rendering")]
+                     [Dir("back/lib"),
+                     "back/initscript.sh",
+                     "back/daemon.py",
+                     "back/daemon.ini",
+                     Dir("back/rendering")]
                   )
 
 gittag = AlwaysBuild(env.Command('git tag -f %s'%VERSION, None, 'git tag -f v%s'%VERSION))
