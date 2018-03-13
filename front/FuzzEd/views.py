@@ -1,21 +1,16 @@
 import json
-import urllib.request, urllib.parse, urllib.error
-import datetime
 import logging
 
-from django.core.mail import mail_managers
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.template import context, RequestContext
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 
-from FuzzEd.models import Graph, Project, notations, Sharing, Node
-import FuzzEd.settings
+from FuzzEd.models import Graph, Project, notations, Sharing
 
 
 logger = logging.getLogger('FuzzEd')
@@ -56,11 +51,9 @@ def index(request):
     if 'next' in request.GET:
         # Makes this a hidden form parameter for the OpenID auth form
         # submission
-        return render(request, 'index.html', {'next': request.GET['next'], 'pwlogin': ('pwlogin' in request.GET)},
-                      context_instance=RequestContext(request))
+        return render(request, 'index.html', {'next': request.GET['next'], 'pwlogin': ('pwlogin' in request.GET)})
     else:
-        return render(request, 'index.html', {'pwlogin': ('pwlogin' in request.GET)},
-                      context_instance=RequestContext(request))
+        return render(request, 'index.html', {'pwlogin': ('pwlogin' in request.GET)})
 
 
 def about(request):
