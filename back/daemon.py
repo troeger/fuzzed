@@ -132,7 +132,7 @@ class JobServer(SimpleXMLRPCServer):
 if __name__ == '__main__':
     # Read configuration
     assert(len(sys.argv) < 3)
-    conf=configparser.ConfigParser()
+    conf=configparser.ConfigParser(strict=False)
     if len(sys.argv) == 1:
         # Use default INI file in local directory
         conf.readfp(open('./daemon.ini'))
