@@ -19,7 +19,6 @@ class Common(Configuration):
     SEND_BROKEN_LINK_EMAILS = False
     SERVER_EMAIL = values.Value('NOT_SET', environ_prefix='FUZZED')
     SITE_ID = 1
-    SOCIAL_AUTH_URL_NAMESPACE = 'social'
     SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['next', ]
     SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = values.Value(
         'NOT_SET', environ_prefix='FUZZED')
@@ -40,17 +39,17 @@ class Common(Configuration):
     SOCIAL_AUTH_GITHUB_SECRET = values.Value(
         'NOT_SET', environ_prefix='FUZZED')
     SOCIAL_AUTH_PIPELINE = (
-        'social.pipeline.social_auth.social_details',
-        'social.pipeline.social_auth.social_uid',
-        'social.pipeline.social_auth.auth_allowed',
-        'social.pipeline.social_auth.social_user',
-        'social.pipeline.user.get_username',
+        'social_core.pipeline.social_auth.social_details',
+        'social_core.pipeline.social_auth.social_uid',
+        'social_core.pipeline.social_auth.auth_allowed',
+        'social_core.pipeline.social_auth.social_user',
+        'social_core.pipeline.user.get_username',
         # Transition to 0.7.0 installation for existing users
-        'social.pipeline.social_auth.associate_by_email',
-        'social.pipeline.user.create_user',
-        'social.pipeline.social_auth.associate_user',
-        'social.pipeline.social_auth.load_extra_data',
-        'social.pipeline.user.user_details'
+        'social_core.pipeline.social_auth.associate_by_email',
+        'social_core.pipeline.user.create_user',
+        'social_core.pipeline.social_auth.associate_user',
+        'social_core.pipeline.social_auth.load_extra_data',
+        'social_core.pipeline.user.user_details'
     )
 
     STATICFILES_DIRS = ('FuzzEd/static',)
@@ -70,19 +69,25 @@ class Common(Configuration):
         'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     )
 
-    TEMPLATE_LOADERS = (
-        'django.template.loaders.filesystem.Loader',
-        'django.template.loaders.app_directories.Loader',
-    )
-
-    TEMPLATE_CONTEXT_PROCESSORS = (
-        'django.template.context_processors.debug',
-        'django.core.context_processors.static',
-        'django.contrib.auth.context_processors.auth',
-        'django.contrib.messages.context_processors.messages',
-        'social.apps.django_app.context_processors.backends',
-        'social.apps.django_app.context_processors.login_redirect'
-    )
+    TEMPLATES = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {
+                'loaders': (
+                    'django.template.loaders.filesystem.Loader',
+                    'django.template.loaders.app_directories.Loader',
+                ),
+                'context_processors': (
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.static',
+                    'django.contrib.auth.context_processors.auth',
+                    'django.contrib.messages.context_processors.messages',
+                    'social_django.context_processors.backends',
+                    'social_django.context_processors.login_redirect'
+                )
+            }
+        },
+    ]
 
     MIDDLEWARE_CLASSES = (
         'django.middleware.common.CommonMiddleware',
@@ -111,12 +116,12 @@ class Common(Configuration):
 
     AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
-        'social.backends.google.GoogleOAuth2',
-        'social.backends.twitter.TwitterOAuth',
-        'social.backends.yahoo.YahooOAuth2',
-        'social.backends.open_id.OpenIdAuth',
-        'social.backends.live.LiveOAuth2',
-        'social.backends.github.GithubOAuth2'
+        'social_core.backends.google.GoogleOAuth2',
+        'social_core.backends.twitter.TwitterOAuth',
+        'social_core.backends.yahoo.YahooOAuth2',
+        'social_core.backends.open_id.OpenIdAuth',
+        'social_core.backends.live.LiveOAuth2',
+        'social_core.backends.github.GithubOAuth2'
     )
 
     LOGGING = {
@@ -156,7 +161,6 @@ class Common(Configuration):
 
 class Dev(Common):
     DEBUG = True
-    TEMPLATE_DEBUG = True
     SECRET_KEY = "4711"
     DATABASES = {
         'default': {
@@ -171,8 +175,8 @@ class Dev(Common):
     TEST = {'NAME': 'test_fuzzed.sqlite'}
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     SERVER = 'http://localhost:8000'
-    TEMPLATE_DIRS = ('FuzzEd/templates',
-                     'FuzzEd/static/img')
+    TEMPLATES = Common.TEMPLATES
+    TEMPLATES[0]['DIRS'] = ('FuzzEd/templates', 'FuzzEd/static/img')
     BACKEND_DAEMON = "http://localhost:8001"
     TERMS_PAGE = '/about/'
     FEEDBACK_PAGE = 'http://fuzzed.uservoice.com'
@@ -180,7 +184,7 @@ class Dev(Common):
     SOCIAL_AUTH_USERNAME_FORM_URL = '/'
     SOCIAL_AUTH_USERNAME_FORM_HTML = 'dev_login.html'
     AUTHENTICATION_BACKENDS = Common.AUTHENTICATION_BACKENDS + \
-        ('social.backends.username.UsernameAuth',)
+        ('social_core.backends.username.UsernameAuth',)
     INTERNAL_IPS = (
         '0.0.0.0',
         '127.0.0.1',
@@ -192,7 +196,6 @@ class Dev(Common):
 
 class Production(Common):
     DEBUG = False
-    TEMPLATE_DEBUG = False
     SECRET_KEY = values.SecretValue(environ_prefix='FUZZED')
     DATABASES = {
         'default': {
@@ -212,8 +215,9 @@ class Production(Common):
     SERVER = str(values.Value(
         'xxx', environ_prefix='FUZZED', environ_name='SERVER_URL'))
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-    TEMPLATE_DIRS = (PROJECT_ROOT + '/templates',
-                     PROJECT_ROOT + '/static-release/img')
+    TEMPLATES = Common.TEMPLATES
+    TEMPLATES[0]['DIRS'] = (PROJECT_ROOT + '/templates',
+                            PROJECT_ROOT + '/static-release/img')
     LOGGING = Common.LOGGING
     LOGGING['loggers']['django.request']['handlers'] = ['mail_admins']
     LOGGING['loggers']['FuzzEd']['handlers'] = ['file']
