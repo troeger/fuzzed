@@ -14,39 +14,40 @@ env=Environment(
 SConscript('back/SConscript')
 
 # Static files generation - 'static-release' target
-statics = env.Command( Dir('FuzzEd/static-release'), 
-                       Dir('FuzzEd/static'), 
+statics = env.Command( Dir('front/FuzzEd/static-release'), 
+                       Dir('front/FuzzEd/static'), 
                        './manage.py collectstatic -v3 --noinput --configuration=Dev'
                       )
-Clean(statics, 'FuzzEd/static-release')
+Clean(statics, 'front/FuzzEd/static-release')
 
 # Lessc compilation - 'white.css' target
-css = env.Lessc( 'FuzzEd/static/css/theme/white.css',
-          'FuzzEd/static/less/theme/white/theme.less')
+css = env.Command( Dir('front/FuzzEd/static/css/theme'),
+                   Dir('front/FuzzEd/static/less/theme/white'),
+                   'lesscpy theme.less -o front/FuzzEd/static/css/theme')
 
 # XML Wrapper generation
-xml_targets = ['FuzzEd/models/xml_common.py',
-               'FuzzEd/models/xml_configurations.py',
-               'FuzzEd/models/xml_backend.py',
-               'FuzzEd/models/xml_fuzztree.py',
-               'FuzzEd/models/xml_faulttree.py'   ]
+xml_targets = ['front/FuzzEd/models/xml_common.py',
+               'front/FuzzEd/models/xml_configurations.py',
+               'front/FuzzEd/models/xml_backend.py',
+               'front/FuzzEd/models/xml_fuzztree.py',
+               'front/FuzzEd/models/xml_faulttree.py'   ]
 xml = env.PyXB(   xml_targets,
-            [  'FuzzEd/static/xsd/commonTypes.xsd',
-               'FuzzEd/static/xsd/configurations.xsd',
-               'FuzzEd/static/xsd/backendResult.xsd',
-               'FuzzEd/static/xsd/fuzztree.xsd',
-               'FuzzEd/static/xsd/faulttree.xsd' 
+            [  'front/FuzzEd/static/xsd/commonTypes.xsd',
+               'front/FuzzEd/static/xsd/configurations.xsd',
+               'front/FuzzEd/static/xsd/backendResult.xsd',
+               'front/FuzzEd/static/xsd/fuzztree.xsd',
+               'front/FuzzEd/static/xsd/faulttree.xsd' 
             ])
 
 # Web package generation - 'package.web' target
 package_web = env.Package(
                      "dist/FuzzEd-%s"%VERSION, 
-                     [Dir("FuzzEd/api"),
-                      Dir("FuzzEd/management"),
-                      Dir("FuzzEd/migrations"),
-                      Dir("FuzzEd/models"),
-                      Dir("FuzzEd/static-release"),
-                      Dir("FuzzEd/templates"),
+                     [Dir("front/FuzzEd/api"),
+                      Dir("front/FuzzEd/management"),
+                      Dir("front/FuzzEd/migrations"),
+                      Dir("front/FuzzEd/models"),
+                      Dir("front/FuzzEd/static-release"),
+                      Dir("front/FuzzEd/templates"),
                       xml_targets,
                       Glob("FuzzEd/*"),
                      "manage.py"]
@@ -71,32 +72,32 @@ Alias('package.web', package_web)
 
 
 # Generation of Python version of the notation files 
-notations = env.Notations(  'FuzzEd/models/notations.py',
-              [ 'FuzzEd/static/notations/dfd.json',
-                'FuzzEd/static/notations/faulttree.json',
-                'FuzzEd/static/notations/fuzztree.json',
-                'FuzzEd/static/notations/rbd.json'] )
+notations = env.Notations(  'front/FuzzEd/models/notations.py',
+              [ 'front/FuzzEd/static/notations/dfd.json',
+                'front/FuzzEd/static/notations/faulttree.json',
+                'front/FuzzEd/static/notations/fuzztree.json',
+                'front/FuzzEd/static/notations/rbd.json'] )
 
 # Generation of the TikZ library code, based on SVG images
-shapes = env.Tikz( 'FuzzEd/models/node_rendering.py', 
-          Glob('FuzzEd/static/img/dfd/*.svg') +
-          Glob('FuzzEd/static/img/faulttree/*.svg') +
-          Glob('FuzzEd/static/img/fuzztree/*.svg') +
-          Glob('FuzzEd/static/img/rbd/*.svg') )
+shapes = env.Tikz( 'front/FuzzEd/models/node_rendering.py', 
+          Glob('front/FuzzEd/static/img/dfd/*.svg') +
+          Glob('front/FuzzEd/static/img/faulttree/*.svg') +
+          Glob('front/FuzzEd/static/img/fuzztree/*.svg') +
+          Glob('front/FuzzEd/static/img/rbd/*.svg') )
 
 # Generate patched versions of third party code
-patch1 = env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css',
-          ['FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.patch',
-           'FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.orig'])
-patch2 = env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css',
-          ['FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css.patch',
-           'FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css.orig'])
-patch3 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js',
-          ['FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.patch',
-           'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.orig'])
-patch4 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js',
-          ['FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.patch',
-           'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.orig'])
+patch1 = env.Patch('front/FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css',
+          ['front/FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.patch',
+           'front/FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.orig'])
+patch2 = env.Patch('front/FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css',
+          ['front/FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css.patch',
+           'front/FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css.orig'])
+patch3 = env.Patch('front/FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js',
+          ['front/FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.patch',
+           'front/FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.orig'])
+patch4 = env.Patch('front/FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js',
+          ['front/FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.patch',
+           'front/FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.orig'])
 
 # Define meta-targets for ease of use
 env.Alias("backend", "ftconfiguration")
