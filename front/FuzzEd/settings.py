@@ -71,16 +71,16 @@ class Common(Configuration):
 
     TEMPLATES = [
         {
+            'APP_DIRS': True,
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'OPTIONS': {
-                'loaders': (
-                    'django.template.loaders.filesystem.Loader',
-                    'django.template.loaders.app_directories.Loader',
-                ),
                 'context_processors': (
-                    'django.template.context_processors.debug',
-                    'django.template.context_processors.static',
                     'django.contrib.auth.context_processors.auth',
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.i18n',
+                    'django.template.context_processors.media',
+                    'django.template.context_processors.static',
+                    'django.template.context_processors.tz',
                     'django.contrib.messages.context_processors.messages',
                     'social_django.context_processors.backends',
                     'social_django.context_processors.login_redirect'
@@ -216,8 +216,8 @@ class Production(Common):
         'xxx', environ_prefix='FUZZED', environ_name='SERVER_URL'))
     PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
     TEMPLATES = Common.TEMPLATES
-    TEMPLATES[0]['DIRS'] = (PROJECT_ROOT + '/templates',
-                            PROJECT_ROOT + '/static-release/img')
+    #TEMPLATES[0]['DIRS'] = (PROJECT_ROOT + '/templates', PROJECT_ROOT + '/static-release/img')
+
     LOGGING = Common.LOGGING
     LOGGING['loggers']['django.request']['handlers'] = ['mail_admins']
     LOGGING['loggers']['FuzzEd']['handlers'] = ['file']
