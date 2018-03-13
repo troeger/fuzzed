@@ -3,23 +3,22 @@ from django.db import models
 from django.db.models.aggregates import Max
 
 import pyxb.utils.domutils
+import json
+
 try:
     from .xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlFuzzTreeNamespace, CreateFromDocument as fuzzTreeFromXml
     from .xml_faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace, CreateFromDocument as faultTreeFromXml
     from .node_rendering import tikz_shapes
-except:
+except Exception:
     print("ERROR: Perform a build process first.")
     exit(-1)
 from defusedxml.ElementTree import fromstring as parseXml
 
 from .project import Project
-from .node_rendering import tikz_shapes
+from . import notations
 
 import logging
 logger = logging.getLogger('FuzzEd')
-
-import json
-from . import notations
 
 
 class Graph(models.Model):
@@ -124,10 +123,13 @@ class Graph(models.Model):
         node_seed = self.nodes.aggregate(Max('client_id'))['client_id__max']
         edge_seed = self.edges.aggregate(Max('client_id'))['client_id__max']
         group_seed = self.groups.aggregate(Max('client_id'))['client_id__max']
+        graph_seed = max(0 if node_seed is None else node_seed,
+                         0 if edge_seed is None else edge_seed,
+                         0 if group_seed is None else group_seed)
 
         return {
             'id': self.pk,
-            'seed': max(node_seed, edge_seed, group_seed),
+            'seed': graph_seed,
             'name': self.name,
             'type': self.kind,
             'readOnly': self.read_only,
