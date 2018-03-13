@@ -4,15 +4,20 @@ ORE_FRONT_RUN=docker run -i -t --rm --mount source=$(PWD),target=/ore,type=bind 
 
 all: build
 
-docker-images:
-	docker-compose build
+docker-front-image:
+	cd front; docker build -t troeger/ore_front:latest .;cd ..
 
-shell: docker-images
+docker-back-image:
+	cd back; docker build -t troeger/ore_back:latest .;cd ..
+
+docker-images: docker-front-image docker-back-image
+
+front-shell: docker-front-image
 	$(ORE_FRONT_RUN) bash
 
-build: docker-images
-	$(ORE_FRONT_RUN) scons frontend backend
+front-build: docker-front-image
+	$(ORE_FRONT_RUN) scons frontend
 
-test: docker-images build
-	$(ORE_FRONT_RUN) ./manage.py test
+front-test: docker-front-image
+	$(ORE_FRONT_RUN) web/manage.py test
 
