@@ -394,12 +394,11 @@ class NodeGroupResource(ModelResource):
             If the resource is updated, return ``HttpAccepted`` (202 Accepted).
             If the resource did not exist, return ``HttpNotFound`` (404 Not Found).
         """
+        node_client_id = int(kwargs['client_id'])
+        graph_id = int(kwargs['graph_id'])
+
         try:
-            # Fetch relevant node object as Tastypie does it
-            basic_bundle = self.build_bundle(request=request)
-            obj = self.cached_obj_get(
-                bundle=basic_bundle,
-                **self.remove_api_resource_names(kwargs))
+            obj = NodeGroup.objects.get(client_id=node_client_id, graph__pk=graph_id)
         except ObjectDoesNotExist:
             return HttpNotFound()
         except MultipleObjectsReturned:
@@ -512,12 +511,11 @@ class EdgeResource(ModelResource):
             If the resource is updated, return ``HttpAccepted`` (202 Accepted).
             If the resource did not exist, return ``HttpNotFound`` (404 Not Found).
         """
+        node_client_id = int(kwargs['client_id'])
+        graph_id = int(kwargs['graph_id'])
+
         try:
-            # Fetch relevant node object as Tastypie does it
-            basic_bundle = self.build_bundle(request=request)
-            obj = self.cached_obj_get(
-                bundle=basic_bundle,
-                **self.remove_api_resource_names(kwargs))
+            obj = Edge.objects.get(client_id=node_client_id, graph__pk=graph_id)
         except ObjectDoesNotExist:
             return HttpNotFound()
         except MultipleObjectsReturned:
