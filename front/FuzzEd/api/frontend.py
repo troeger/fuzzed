@@ -10,6 +10,7 @@ from tastypie.bundle import Bundle
 from tastypie.exceptions import ImmediateHttpResponse
 from tastypie.http import HttpApplicationError, HttpAccepted, HttpForbidden, HttpNotFound, HttpMultipleChoices
 from tastypie import fields
+from tastypie.constants import ALL
 from django.core.mail import mail_managers
 from tastypie.resources import ModelResource
 from tastypie.serializers import Serializer
@@ -232,6 +233,10 @@ class NodeResource(ModelResource):
         list_allowed_methods = ['get', 'post']
         detail_allowed_methods = ['get', 'post', 'patch', 'delete']
         excludes = ['deleted', 'id']
+        filtering = {
+            "client_id": ALL,
+            "graph": ALL
+        }
 
     graph = fields.ToOneField('FuzzEd.api.common.GraphResource', 'graph')
 
@@ -272,12 +277,11 @@ class NodeResource(ModelResource):
             If the resource is updated, return ``HttpAccepted`` (202 Accepted).
             If the resource did not exist, return ``HttpNotFound`` (404 Not Found).
         """
+        node_client_id = int(kwargs['client_id'])
+        graph_id = int(kwargs['graph_id'])
+
         try:
-            # Fetch relevant node object as Tastypie does it
-            basic_bundle = self.build_bundle(request=request)
-            obj = self.cached_obj_get(
-                bundle=basic_bundle,
-                **self.remove_api_resource_names(kwargs))
+            obj = Node.objects.get(client_id=node_client_id, graph__pk=graph_id)
         except ObjectDoesNotExist:
             return HttpNotFound()
         except MultipleObjectsReturned:
