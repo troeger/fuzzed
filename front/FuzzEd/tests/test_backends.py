@@ -46,10 +46,10 @@ class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
         # Start up backend daemon in testing mode so that it uses port 8081 of
         # the live test server
         print("Starting backend daemon")
-        os.chdir("backends")
-        self.backend = subprocess.Popen(["python", "daemon.py", "--testing"])
+        os.chdir("../back")
+        self.backend = subprocess.Popen(["python3", "daemon.py", "--testing"])
         time.sleep(2)
-        os.chdir("..")
+        os.chdir("../front")
         self.setUpLogin()
 
     def tearDown(self):

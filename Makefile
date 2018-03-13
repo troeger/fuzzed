@@ -1,4 +1,4 @@
-ORE_FRONT_RUN=docker run -i -t --rm --mount source=$(PWD),target=/ore,type=bind -w /ore -p 127.0.0.1:8000:8000 troeger/ore_front
+ORE_FRONT_RUN=docker run -i -t --rm --mount source=$(PWD),target=/ore,type=bind -p 127.0.0.1:8000:8000 
 
 .PHONY=docker
 
@@ -13,11 +13,11 @@ docker-back-image:
 docker-images: docker-front-image docker-back-image
 
 front-shell: docker-front-image
-	$(ORE_FRONT_RUN) bash
+	$(ORE_FRONT_RUN) -w /ore troeger/ore_front bash
 
 front-build: docker-front-image
-	$(ORE_FRONT_RUN) scons frontend
+	$(ORE_FRONT_RUN) -w /ore troeger/ore_front scons frontend
 
 front-test: docker-front-image
-	$(ORE_FRONT_RUN) web/manage.py test
+	$(ORE_FRONT_RUN) -w /ore/front troeger/ore_front ./manage.py test
 
