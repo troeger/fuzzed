@@ -9,9 +9,7 @@ if __name__ == '__main__':
 
     if "runserver" in sys.argv:
         if os.environ["DJANGO_CONFIGURATION"] == "Dev":
-            print("Assuming Dev mode")
-            args = ["./manage.py", "runserver",
-                    "0.0.0.0:8000", "--configuration=Dev"]
+            args = ["./manage.py", "runserver", "0.0.0.0:8000"]
             execute_from_command_line(args)
     else:
         # Perform ordinary manage.py functionality
