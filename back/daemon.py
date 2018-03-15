@@ -34,7 +34,7 @@ logger = logging.getLogger('FuzzEd')
 backends = {}
 options = {}
 
-useTestServer = False
+server = None
 
 class WorkerThread(threading.Thread):
     jobtype = ""
@@ -116,10 +116,10 @@ class JobServer(SimpleXMLRPCServer):
 
     def handle_request(self, jobtype, joburl):
         logger.debug("Received %s job at %s"%(jobtype, joburl))
-        if useTestServer:
-            logger.debug("Patching job URL for test server support")
+        if server:
+            logger.debug("Changing job URL due to command-line override")
             parts = joburl.split('/',3)
-            joburl = "http://localhost:8081/"+parts[3]      # LifeTestServer URL from Django docs
+            joburl = server+parts[3]      # LifeTestServer URL from Django docs
         if jobtype not in list(backends.keys()):
             logger.error("Unknown job type "+jobtype)
             return False
@@ -137,11 +137,10 @@ if __name__ == '__main__':
         # Use default INI file in local directory
         conf.readfp(open('./daemon.ini'))
     elif len(sys.argv) == 2:
-        if sys.argv[1] == "--testing":
-            useTestServer = True
+        if sys.argv[1] == "--server":
+            server = sys.argv[2]
             conf.readfp(open('./daemon.ini'))
         else:
-            useTestServer = False
             # Use provided INI file
             conf.readfp(open(sys.argv[1]))
     # Initialize logging, based on settings

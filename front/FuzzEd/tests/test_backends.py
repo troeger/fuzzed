@@ -47,7 +47,7 @@ class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
         # the live test server
         print("Starting backend daemon")
         os.chdir("../back")
-        self.backend = subprocess.Popen(["python3", "daemon.py", "--testing"])
+        self.backend = subprocess.Popen(["python3", "daemon.py", "--server", self.live_server_url])
         time.sleep(2)
         os.chdir("../front")
         self.setUpLogin()
