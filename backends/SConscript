@@ -7,7 +7,6 @@ env=Environment(
 # TODO: This is obviousely a hack, build directly with SCons instead
 
 # Let CMake run to generate Makefile
-# This always needs to run, in order to consider Vagrant / native flipping
 if platform.system() == "Darwin":
     cmake_call = "cmake -D CMAKE_C_COMPILER=/usr/local/bin/gcc-4.9 -D CMAKE_CXX_COMPILER=/usr/local/bin/g++-4.9 ."
 else:

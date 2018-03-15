@@ -19,7 +19,7 @@ class DirectRunsTestCase(FuzzEdTestCase):
     """
 
     @unittest.skipUnless(
-        sys.platform.startswith("linux"), "requires Vagrant Linux")
+        sys.platform.startswith("linux"), "requires Linux")
     def testFileAnalysis(self):
         for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
             for f in files:
@@ -89,7 +89,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
     fixtures = fixt_analysis['files']
 
     @unittest.skipUnless(
-        sys.platform.startswith("linux"), "requires Vagrant Linux")
+        sys.platform.startswith("linux"), "requires Linux")
     def testRateFaulttree(self):
         job_result = self.requestJob(
             self.baseUrl,
@@ -107,7 +107,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
         self.assertEqual(data['aaData'][0]['peak'], 1.0)
 
     @unittest.skipUnless(
-        sys.platform.startswith("linux"), "requires Vagrant Linux")
+        sys.platform.startswith("linux"), "requires Linux")
     def testRateFaulttreeSimulation(self):
         job_result = self.requestJob(
             self.baseUrl,
@@ -122,7 +122,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
         assert(len(data['aaData']) > 0)
 
     @unittest.skipUnless(
-        sys.platform.startswith("linux"), "requires Vagrant Linux")
+        sys.platform.startswith("linux"), "requires Linux")
     def testPRDCFuzztree(self):
         job_result = self.requestJob(
             self.baseUrl,
@@ -152,7 +152,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
             self.assertEqual('application/pdf', pdf['CONTENT-TYPE'])
 
     @unittest.skipUnless(
-        sys.platform.startswith("linux"), "requires Vagrant Linux")
+        sys.platform.startswith("linux"), "requires Linux")
     def testFrontendAPIEpsExport(self):
         for graphPk, graphType in fixt_analysis['graphs'].iteritems():
             job_result = self.requestJob(self.baseUrl, graphPk, 'eps')
@@ -161,7 +161,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
             self.assertEqual('application/postscript', eps['CONTENT-TYPE'])
 
     @unittest.skipUnless(
-        sys.platform.startswith("linux"), "requires Vagrant Linux")
+        sys.platform.startswith("linux"), "requires Linux")
     def testResultOrdering(self):
         job_result = self.requestJob(
             self.baseUrl,
@@ -197,7 +197,7 @@ class MinCutFixtureTestCase(BackendDaemonTestCase):
     fixtures = fixt_mincut['files']
 
     @unittest.skip("")
-#    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Vagrant Linux")
+#    @unittest.skipUnless(sys.platform.startswith("linux"), "requires Linux")
     def testMincutFaulttree(self):
         job_result = self.requestJob(
             self.baseUrl,
