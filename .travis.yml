@@ -4,4 +4,4 @@ services:
   - docker
 
 script:
-  - make docker-test
+  - make docker-front-test
