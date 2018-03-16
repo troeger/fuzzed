@@ -9,7 +9,7 @@
 #include "FuzzTreeTransform.h"
 #include "util.h"
 #include "xmlutil.h"
-#include "backendResult.h"
+#include "backend.h"
 #include "FaultTreeToFuzzTree.h"
 
 int main(int argc, char** argv)

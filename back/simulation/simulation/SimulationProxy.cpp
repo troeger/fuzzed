@@ -16,7 +16,7 @@
 // Generated files...
 #include "faulttree.h"
 #include "fuzztree.h"
-#include "backendResult.h"
+#include "backend.h"
 
 #include <xsd/cxx/xml/dom/serialization-header.hxx>
 
