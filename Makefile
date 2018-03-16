@@ -7,9 +7,9 @@ build:
 	$(DOCKER_FRONT_RUN) -w /ore/front troeger/ore_front make
 	$(DOCKER_BACK_RUN) -w /ore/back troeger/ore_back make
 
-# Run the test suite in a recent Docker image of the web frontend
-docker-test: docker-front-image
-	$(DOCKER_FRONT_RUN) -w /ore/front troeger/ore_front ./manage.py test
+# Run the front test suite in a recent Docker image of the web frontend
+docker-front-test: docker-front-image
+	$(DOCKER_FRONT_RUN) -w /ore/front troeger/ore_front ./manage.py test --exclude-tag=back
 
 # Generate a Docker image for the web frontend
 docker-front-image:
