@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_CONFIGURATIONS_H
-#define CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_CONFIGURATIONS_H
+#ifndef CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_COMMON_H
+#define CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_COMMON_H
 
 #ifndef XSD_USE_CHAR
 #define XSD_USE_CHAR
@@ -250,15 +250,17 @@ namespace xml_schema
 
 // Forward declarations.
 //
-namespace configurations
+namespace commonTypes
 {
-  class Choice;
-  class IntegerToChoiceMap;
-  class Configuration;
-  class InclusionChoice;
-  class RedundancyChoice;
-  class FeatureChoice;
-  class TransferInChoice;
+  class Model;
+  class GraphNode;
+  class IdList;
+  class DoubleToIntervalMap;
+  class Interval;
+  class Issue;
+  class Probability;
+  class CrispProbability;
+  class DecomposedFuzzyProbability;
 }
 
 
@@ -275,46 +277,205 @@ namespace configurations
 
 #include <xsd/cxx/xml/dom/parsing-header.hxx>
 
-namespace configurations
+namespace commonTypes
 {
-  class Choice: public ::xml_schema::Type
+  class Model: public ::xml_schema::Type
   {
     public:
+    // id
+    //
+    typedef ::xml_schema::String IdType;
+    typedef ::xsd::cxx::tree::optional< IdType > IdOptional;
+    typedef ::xsd::cxx::tree::traits< IdType, char > IdTraits;
+
+    const IdOptional&
+    id () const;
+
+    IdOptional&
+    id ();
+
+    void
+    id (const IdType& x);
+
+    void
+    id (const IdOptional& x);
+
+    void
+    id (::std::auto_ptr< IdType > p);
+
     // Constructors.
     //
-    Choice ();
+    Model ();
 
-    Choice (const ::xercesc::DOMElement& e,
+    Model (const ::xercesc::DOMElement& e,
+           ::xml_schema::Flags f = 0,
+           ::xml_schema::Container* c = 0);
+
+    Model (const Model& x,
+           ::xml_schema::Flags f = 0,
+           ::xml_schema::Container* c = 0);
+
+    virtual Model*
+    _clone (::xml_schema::Flags f = 0,
+            ::xml_schema::Container* c = 0) const;
+
+    Model&
+    operator= (const Model& x);
+
+    virtual 
+    ~Model ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::Flags);
+
+    protected:
+    IdOptional id_;
+  };
+
+  class GraphNode: public ::xml_schema::Type
+  {
+    public:
+    // x
+    //
+    typedef ::xml_schema::Int XType;
+    typedef ::xsd::cxx::tree::optional< XType > XOptional;
+    typedef ::xsd::cxx::tree::traits< XType, char > XTraits;
+
+    const XOptional&
+    x () const;
+
+    XOptional&
+    x ();
+
+    void
+    x (const XType& x);
+
+    void
+    x (const XOptional& x);
+
+    // y
+    //
+    typedef ::xml_schema::Int YType;
+    typedef ::xsd::cxx::tree::optional< YType > YOptional;
+    typedef ::xsd::cxx::tree::traits< YType, char > YTraits;
+
+    const YOptional&
+    y () const;
+
+    YOptional&
+    y ();
+
+    void
+    y (const YType& x);
+
+    void
+    y (const YOptional& x);
+
+    // id
+    //
+    typedef ::xml_schema::String IdType;
+    typedef ::xsd::cxx::tree::optional< IdType > IdOptional;
+    typedef ::xsd::cxx::tree::traits< IdType, char > IdTraits;
+
+    const IdOptional&
+    id () const;
+
+    IdOptional&
+    id ();
+
+    void
+    id (const IdType& x);
+
+    void
+    id (const IdOptional& x);
+
+    void
+    id (::std::auto_ptr< IdType > p);
+
+    // Constructors.
+    //
+    GraphNode ();
+
+    GraphNode (const ::xercesc::DOMElement& e,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
+
+    GraphNode (const GraphNode& x,
+               ::xml_schema::Flags f = 0,
+               ::xml_schema::Container* c = 0);
+
+    virtual GraphNode*
+    _clone (::xml_schema::Flags f = 0,
+            ::xml_schema::Container* c = 0) const;
+
+    GraphNode&
+    operator= (const GraphNode& x);
+
+    virtual 
+    ~GraphNode ();
+
+    // Implementation.
+    //
+    protected:
+    void
+    parse (::xsd::cxx::xml::dom::parser< char >&,
+           ::xml_schema::Flags);
+
+    protected:
+    XOptional x_;
+    YOptional y_;
+    IdOptional id_;
+  };
+
+  class IdList: public ::xml_schema::SimpleType,
+    public ::xsd::cxx::tree::list< ::xml_schema::String, char >
+  {
+    public:
+    IdList ();
+
+    IdList (size_type n, const ::xml_schema::String& x);
+
+    template < typename I >
+    IdList (const I& begin, const I& end)
+    : ::xsd::cxx::tree::list< ::xml_schema::String, char > (begin, end, this)
+    {
+    }
+
+    IdList (const ::xercesc::DOMElement& e,
             ::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0);
 
-    Choice (const ::xercesc::DOMAttr& a,
+    IdList (const ::xercesc::DOMAttr& a,
             ::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0);
 
-    Choice (const ::std::string& s,
+    IdList (const ::std::string& s,
             const ::xercesc::DOMElement* e,
             ::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0);
 
-    Choice (const Choice& x,
+    IdList (const IdList& x,
             ::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0);
 
-    virtual Choice*
+    virtual IdList*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
     virtual 
-    ~Choice ();
+    ~IdList ();
   };
 
-  class IntegerToChoiceMap: public ::xml_schema::Type
+  class DoubleToIntervalMap: public ::xml_schema::Type
   {
     public:
     // value
     //
-    typedef ::configurations::Choice ValueType;
+    typedef ::commonTypes::Interval ValueType;
     typedef ::xsd::cxx::tree::traits< ValueType, char > ValueTraits;
 
     const ValueType&
@@ -331,8 +492,8 @@ namespace configurations
 
     // key
     //
-    typedef ::xml_schema::String KeyType;
-    typedef ::xsd::cxx::tree::traits< KeyType, char > KeyTraits;
+    typedef ::xml_schema::Double KeyType;
+    typedef ::xsd::cxx::tree::traits< KeyType, char, ::xsd::cxx::tree::schema_type::double_ > KeyTraits;
 
     const KeyType&
     key () const;
@@ -343,34 +504,31 @@ namespace configurations
     void
     key (const KeyType& x);
 
-    void
-    key (::std::auto_ptr< KeyType > p);
-
     // Constructors.
     //
-    IntegerToChoiceMap (const ValueType&,
-                        const KeyType&);
+    DoubleToIntervalMap (const ValueType&,
+                         const KeyType&);
 
-    IntegerToChoiceMap (::std::auto_ptr< ValueType >,
-                        const KeyType&);
+    DoubleToIntervalMap (::std::auto_ptr< ValueType >,
+                         const KeyType&);
 
-    IntegerToChoiceMap (const ::xercesc::DOMElement& e,
-                        ::xml_schema::Flags f = 0,
-                        ::xml_schema::Container* c = 0);
+    DoubleToIntervalMap (const ::xercesc::DOMElement& e,
+                         ::xml_schema::Flags f = 0,
+                         ::xml_schema::Container* c = 0);
 
-    IntegerToChoiceMap (const IntegerToChoiceMap& x,
-                        ::xml_schema::Flags f = 0,
-                        ::xml_schema::Container* c = 0);
+    DoubleToIntervalMap (const DoubleToIntervalMap& x,
+                         ::xml_schema::Flags f = 0,
+                         ::xml_schema::Container* c = 0);
 
-    virtual IntegerToChoiceMap*
+    virtual DoubleToIntervalMap*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
-    IntegerToChoiceMap&
-    operator= (const IntegerToChoiceMap& x);
+    DoubleToIntervalMap&
+    operator= (const DoubleToIntervalMap& x);
 
     virtual 
-    ~IntegerToChoiceMap ();
+    ~DoubleToIntervalMap ();
 
     // Implementation.
     //
@@ -384,79 +542,59 @@ namespace configurations
     ::xsd::cxx::tree::one< KeyType > key_;
   };
 
-  class Configuration: public ::xml_schema::Type
+  class Interval: public ::xml_schema::Type
   {
     public:
-    // choice
+    // lowerBound
     //
-    typedef ::configurations::IntegerToChoiceMap ChoiceType;
-    typedef ::xsd::cxx::tree::sequence< ChoiceType > ChoiceSequence;
-    typedef ChoiceSequence::iterator ChoiceIterator;
-    typedef ChoiceSequence::const_iterator ChoiceConstIterator;
-    typedef ::xsd::cxx::tree::traits< ChoiceType, char > ChoiceTraits;
+    typedef ::xml_schema::Double LowerBoundType;
+    typedef ::xsd::cxx::tree::traits< LowerBoundType, char, ::xsd::cxx::tree::schema_type::double_ > LowerBoundTraits;
 
-    const ChoiceSequence&
-    choice () const;
+    const LowerBoundType&
+    lowerBound () const;
 
-    ChoiceSequence&
-    choice ();
+    LowerBoundType&
+    lowerBound ();
 
     void
-    choice (const ChoiceSequence& s);
+    lowerBound (const LowerBoundType& x);
 
-    // id
+    // upperBound
     //
-    typedef ::xml_schema::String IdType;
-    typedef ::xsd::cxx::tree::traits< IdType, char > IdTraits;
+    typedef ::xml_schema::Double UpperBoundType;
+    typedef ::xsd::cxx::tree::traits< UpperBoundType, char, ::xsd::cxx::tree::schema_type::double_ > UpperBoundTraits;
 
-    const IdType&
-    id () const;
+    const UpperBoundType&
+    upperBound () const;
 
-    IdType&
-    id ();
-
-    void
-    id (const IdType& x);
+    UpperBoundType&
+    upperBound ();
 
     void
-    id (::std::auto_ptr< IdType > p);
-
-    // costs
-    //
-    typedef ::xml_schema::Int CostsType;
-    typedef ::xsd::cxx::tree::traits< CostsType, char > CostsTraits;
-
-    const CostsType&
-    costs () const;
-
-    CostsType&
-    costs ();
-
-    void
-    costs (const CostsType& x);
+    upperBound (const UpperBoundType& x);
 
     // Constructors.
     //
-    Configuration (const IdType&,
-                   const CostsType&);
+    Interval (const LowerBoundType&,
+              const UpperBoundType&);
 
-    Configuration (const ::xercesc::DOMElement& e,
-                   ::xml_schema::Flags f = 0,
-                   ::xml_schema::Container* c = 0);
+    Interval (const ::xercesc::DOMElement& e,
+              ::xml_schema::Flags f = 0,
+              ::xml_schema::Container* c = 0);
 
-    Configuration (const Configuration& x,
-                   ::xml_schema::Flags f = 0,
-                   ::xml_schema::Container* c = 0);
+    Interval (const Interval& x,
+              ::xml_schema::Flags f = 0,
+              ::xml_schema::Container* c = 0);
 
-    virtual Configuration*
+    virtual Interval*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
-    Configuration&
-    operator= (const Configuration& x);
+    Interval&
+    operator= (const Interval& x);
 
     virtual 
-    ~Configuration ();
+    ~Interval ();
 
     // Implementation.
     //
@@ -466,49 +604,112 @@ namespace configurations
            ::xml_schema::Flags);
 
     protected:
-    ChoiceSequence choice_;
-    ::xsd::cxx::tree::one< IdType > id_;
-    ::xsd::cxx::tree::one< CostsType > costs_;
+    ::xsd::cxx::tree::one< LowerBoundType > lowerBound_;
+    ::xsd::cxx::tree::one< UpperBoundType > upperBound_;
   };
 
-  class InclusionChoice: public ::configurations::Choice
+  class Issue: public ::xml_schema::Type
   {
     public:
-    // included
+    // issueId
     //
-    typedef ::xml_schema::Boolean IncludedType;
-    typedef ::xsd::cxx::tree::traits< IncludedType, char > IncludedTraits;
+    typedef ::xml_schema::Int IssueIdType;
+    typedef ::xsd::cxx::tree::optional< IssueIdType > IssueIdOptional;
+    typedef ::xsd::cxx::tree::traits< IssueIdType, char > IssueIdTraits;
 
-    const IncludedType&
-    included () const;
+    const IssueIdOptional&
+    issueId () const;
 
-    IncludedType&
-    included ();
+    IssueIdOptional&
+    issueId ();
 
     void
-    included (const IncludedType& x);
+    issueId (const IssueIdType& x);
+
+    void
+    issueId (const IssueIdOptional& x);
+
+    // elementId
+    //
+    typedef ::xml_schema::String ElementIdType;
+    typedef ::xsd::cxx::tree::optional< ElementIdType > ElementIdOptional;
+    typedef ::xsd::cxx::tree::traits< ElementIdType, char > ElementIdTraits;
+
+    const ElementIdOptional&
+    elementId () const;
+
+    ElementIdOptional&
+    elementId ();
+
+    void
+    elementId (const ElementIdType& x);
+
+    void
+    elementId (const ElementIdOptional& x);
+
+    void
+    elementId (::std::auto_ptr< ElementIdType > p);
+
+    // message
+    //
+    typedef ::xml_schema::String MessageType;
+    typedef ::xsd::cxx::tree::optional< MessageType > MessageOptional;
+    typedef ::xsd::cxx::tree::traits< MessageType, char > MessageTraits;
+
+    const MessageOptional&
+    message () const;
+
+    MessageOptional&
+    message ();
+
+    void
+    message (const MessageType& x);
+
+    void
+    message (const MessageOptional& x);
+
+    void
+    message (::std::auto_ptr< MessageType > p);
+
+    // isFatal
+    //
+    typedef ::xml_schema::Boolean IsFatalType;
+    typedef ::xsd::cxx::tree::optional< IsFatalType > IsFatalOptional;
+    typedef ::xsd::cxx::tree::traits< IsFatalType, char > IsFatalTraits;
+
+    const IsFatalOptional&
+    isFatal () const;
+
+    IsFatalOptional&
+    isFatal ();
+
+    void
+    isFatal (const IsFatalType& x);
+
+    void
+    isFatal (const IsFatalOptional& x);
 
     // Constructors.
     //
-    InclusionChoice (const IncludedType&);
+    Issue ();
 
-    InclusionChoice (const ::xercesc::DOMElement& e,
-                     ::xml_schema::Flags f = 0,
-                     ::xml_schema::Container* c = 0);
+    Issue (const ::xercesc::DOMElement& e,
+           ::xml_schema::Flags f = 0,
+           ::xml_schema::Container* c = 0);
 
-    InclusionChoice (const InclusionChoice& x,
-                     ::xml_schema::Flags f = 0,
-                     ::xml_schema::Container* c = 0);
+    Issue (const Issue& x,
+           ::xml_schema::Flags f = 0,
+           ::xml_schema::Container* c = 0);
 
-    virtual InclusionChoice*
+    virtual Issue*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
-    InclusionChoice&
-    operator= (const InclusionChoice& x);
+    Issue&
+    operator= (const Issue& x);
 
     virtual 
-    ~InclusionChoice ();
+    ~Issue ();
 
     // Implementation.
     //
@@ -518,47 +719,82 @@ namespace configurations
            ::xml_schema::Flags);
 
     protected:
-    ::xsd::cxx::tree::one< IncludedType > included_;
+    IssueIdOptional issueId_;
+    ElementIdOptional elementId_;
+    MessageOptional message_;
+    IsFatalOptional isFatal_;
   };
 
-  class RedundancyChoice: public ::configurations::Choice
+  class Probability: public ::xml_schema::Type
   {
     public:
-    // n
+    // Constructors.
     //
-    typedef ::xml_schema::Int NType;
-    typedef ::xsd::cxx::tree::traits< NType, char > NTraits;
+    Probability ();
 
-    const NType&
-    n () const;
+    Probability (const ::xercesc::DOMElement& e,
+                 ::xml_schema::Flags f = 0,
+                 ::xml_schema::Container* c = 0);
 
-    NType&
-    n ();
+    Probability (const ::xercesc::DOMAttr& a,
+                 ::xml_schema::Flags f = 0,
+                 ::xml_schema::Container* c = 0);
+
+    Probability (const ::std::string& s,
+                 const ::xercesc::DOMElement* e,
+                 ::xml_schema::Flags f = 0,
+                 ::xml_schema::Container* c = 0);
+
+    Probability (const Probability& x,
+                 ::xml_schema::Flags f = 0,
+                 ::xml_schema::Container* c = 0);
+
+    virtual Probability*
+    _clone (::xml_schema::Flags f = 0,
+            ::xml_schema::Container* c = 0) const;
+
+    virtual 
+    ~Probability ();
+  };
+
+  class CrispProbability: public ::commonTypes::Probability
+  {
+    public:
+    // val
+    //
+    typedef ::xml_schema::Double ValType;
+    typedef ::xsd::cxx::tree::traits< ValType, char, ::xsd::cxx::tree::schema_type::double_ > ValTraits;
+
+    const ValType&
+    val () const;
+
+    ValType&
+    val ();
 
     void
-    n (const NType& x);
+    val (const ValType& x);
 
     // Constructors.
     //
-    RedundancyChoice (const NType&);
+    CrispProbability (const ValType&);
 
-    RedundancyChoice (const ::xercesc::DOMElement& e,
+    CrispProbability (const ::xercesc::DOMElement& e,
                       ::xml_schema::Flags f = 0,
                       ::xml_schema::Container* c = 0);
 
-    RedundancyChoice (const RedundancyChoice& x,
+    CrispProbability (const CrispProbability& x,
                       ::xml_schema::Flags f = 0,
                       ::xml_schema::Container* c = 0);
 
-    virtual RedundancyChoice*
+    virtual CrispProbability*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
-    RedundancyChoice&
-    operator= (const RedundancyChoice& x);
+    CrispProbability&
+    operator= (const CrispProbability& x);
 
     virtual 
-    ~RedundancyChoice ();
+    ~CrispProbability ();
 
     // Implementation.
     //
@@ -568,50 +804,50 @@ namespace configurations
            ::xml_schema::Flags);
 
     protected:
-    ::xsd::cxx::tree::one< NType > n_;
+    ::xsd::cxx::tree::one< ValType > val_;
   };
 
-  class FeatureChoice: public ::configurations::Choice
+  class DecomposedFuzzyProbability: public ::commonTypes::Probability
   {
     public:
-    // featureId
+    // alphaCuts
     //
-    typedef ::xml_schema::String FeatureIdType;
-    typedef ::xsd::cxx::tree::traits< FeatureIdType, char > FeatureIdTraits;
+    typedef ::commonTypes::DoubleToIntervalMap AlphaCutsType;
+    typedef ::xsd::cxx::tree::sequence< AlphaCutsType > AlphaCutsSequence;
+    typedef AlphaCutsSequence::iterator AlphaCutsIterator;
+    typedef AlphaCutsSequence::const_iterator AlphaCutsConstIterator;
+    typedef ::xsd::cxx::tree::traits< AlphaCutsType, char > AlphaCutsTraits;
 
-    const FeatureIdType&
-    featureId () const;
+    const AlphaCutsSequence&
+    alphaCuts () const;
 
-    FeatureIdType&
-    featureId ();
+    AlphaCutsSequence&
+    alphaCuts ();
 
     void
-    featureId (const FeatureIdType& x);
-
-    void
-    featureId (::std::auto_ptr< FeatureIdType > p);
+    alphaCuts (const AlphaCutsSequence& s);
 
     // Constructors.
     //
-    FeatureChoice (const FeatureIdType&);
+    DecomposedFuzzyProbability ();
 
-    FeatureChoice (const ::xercesc::DOMElement& e,
-                   ::xml_schema::Flags f = 0,
-                   ::xml_schema::Container* c = 0);
+    DecomposedFuzzyProbability (const ::xercesc::DOMElement& e,
+                                ::xml_schema::Flags f = 0,
+                                ::xml_schema::Container* c = 0);
 
-    FeatureChoice (const FeatureChoice& x,
-                   ::xml_schema::Flags f = 0,
-                   ::xml_schema::Container* c = 0);
+    DecomposedFuzzyProbability (const DecomposedFuzzyProbability& x,
+                                ::xml_schema::Flags f = 0,
+                                ::xml_schema::Container* c = 0);
 
-    virtual FeatureChoice*
+    virtual DecomposedFuzzyProbability*
     _clone (::xml_schema::Flags f = 0,
             ::xml_schema::Container* c = 0) const;
 
-    FeatureChoice&
-    operator= (const FeatureChoice& x);
+    DecomposedFuzzyProbability&
+    operator= (const DecomposedFuzzyProbability& x);
 
     virtual 
-    ~FeatureChoice ();
+    ~DecomposedFuzzyProbability ();
 
     // Implementation.
     //
@@ -621,62 +857,7 @@ namespace configurations
            ::xml_schema::Flags);
 
     protected:
-    ::xsd::cxx::tree::one< FeatureIdType > featureId_;
-  };
-
-  class TransferInChoice: public ::configurations::Choice
-  {
-    public:
-    // chosenConfiguration
-    //
-    typedef ::configurations::Configuration ChosenConfigurationType;
-    typedef ::xsd::cxx::tree::traits< ChosenConfigurationType, char > ChosenConfigurationTraits;
-
-    const ChosenConfigurationType&
-    chosenConfiguration () const;
-
-    ChosenConfigurationType&
-    chosenConfiguration ();
-
-    void
-    chosenConfiguration (const ChosenConfigurationType& x);
-
-    void
-    chosenConfiguration (::std::auto_ptr< ChosenConfigurationType > p);
-
-    // Constructors.
-    //
-    TransferInChoice (const ChosenConfigurationType&);
-
-    TransferInChoice (::std::auto_ptr< ChosenConfigurationType >);
-
-    TransferInChoice (const ::xercesc::DOMElement& e,
-                      ::xml_schema::Flags f = 0,
-                      ::xml_schema::Container* c = 0);
-
-    TransferInChoice (const TransferInChoice& x,
-                      ::xml_schema::Flags f = 0,
-                      ::xml_schema::Container* c = 0);
-
-    virtual TransferInChoice*
-    _clone (::xml_schema::Flags f = 0,
-            ::xml_schema::Container* c = 0) const;
-
-    TransferInChoice&
-    operator= (const TransferInChoice& x);
-
-    virtual 
-    ~TransferInChoice ();
-
-    // Implementation.
-    //
-    protected:
-    void
-    parse (::xsd::cxx::xml::dom::parser< char >&,
-           ::xml_schema::Flags);
-
-    protected:
-    ::xsd::cxx::tree::one< ChosenConfigurationType > chosenConfiguration_;
+    AlphaCutsSequence alphaCuts_;
   };
 }
 
@@ -686,7 +867,7 @@ namespace configurations
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMErrorHandler.hpp>
 
-namespace configurations
+namespace commonTypes
 {
 }
 
@@ -698,35 +879,48 @@ namespace configurations
 
 #include <xsd/cxx/xml/dom/auto-ptr.hxx>
 
-namespace configurations
+namespace commonTypes
 {
   void
-  operator<< (::xercesc::DOMElement&, const Choice&);
+  operator<< (::xercesc::DOMElement&, const Model&);
 
   void
-  operator<< (::xercesc::DOMAttr&, const Choice&);
+  operator<< (::xercesc::DOMElement&, const GraphNode&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const IdList&);
+
+  void
+  operator<< (::xercesc::DOMAttr&, const IdList&);
 
   void
   operator<< (::xml_schema::ListStream&,
-              const Choice&);
+              const IdList&);
 
   void
-  operator<< (::xercesc::DOMElement&, const IntegerToChoiceMap&);
+  operator<< (::xercesc::DOMElement&, const DoubleToIntervalMap&);
 
   void
-  operator<< (::xercesc::DOMElement&, const Configuration&);
+  operator<< (::xercesc::DOMElement&, const Interval&);
 
   void
-  operator<< (::xercesc::DOMElement&, const InclusionChoice&);
+  operator<< (::xercesc::DOMElement&, const Issue&);
 
   void
-  operator<< (::xercesc::DOMElement&, const RedundancyChoice&);
+  operator<< (::xercesc::DOMElement&, const Probability&);
 
   void
-  operator<< (::xercesc::DOMElement&, const FeatureChoice&);
+  operator<< (::xercesc::DOMAttr&, const Probability&);
 
   void
-  operator<< (::xercesc::DOMElement&, const TransferInChoice&);
+  operator<< (::xml_schema::ListStream&,
+              const Probability&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const CrispProbability&);
+
+  void
+  operator<< (::xercesc::DOMElement&, const DecomposedFuzzyProbability&);
 }
 
 #include <xsd/cxx/post.hxx>
@@ -736,4 +930,4 @@ namespace configurations
 //
 // End epilogue.
 
-#endif // CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_CONFIGURATIONS_H
+#endif // CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_COMMON_H
