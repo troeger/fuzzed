@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "commonTypes.h"
+#include "common.h"
 
 /**
  * Class: Issue
