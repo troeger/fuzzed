@@ -1872,65 +1872,65 @@ choices = [('fuzztree', 'Fuzz Tree'),
  ('rbd', 'Reliability Block Diagram')]
 
 node_choices = [('Fuzz Tree',
-  (('node', 'Node'),
-   ('xorGate', 'XOR Gate'),
+  (('featureVariation', 'Feature Variation'),
    ('orGate', 'OR Gate'),
+   ('node', 'Node'),
+   ('intermediateEventSet', 'Intermediate Event Set'),
+   ('votingOrGate', 'Voting OR Gate'),
+   ('transferIn', 'Transfer In'),
    ('eventSet', 'eventSet'),
    ('dynamicGate', 'Dynamic Gate'),
-   ('redundancyVariation', 'Redundancy Variation'),
-   ('gate', 'Gate'),
-   ('basicEventSet', 'Basic Event Set'),
    ('houseEvent', 'House Event'),
-   ('intermediateEvent', 'Intermediate Event'),
-   ('votingOrGate', 'Voting OR Gate'),
+   ('staticGate', 'Static Gate'),
    ('variationPoint', 'Variation Point'),
    ('topEvent', 'Top Event'),
-   ('basicEvent', 'Basic Event'),
-   ('stickyNote', 'Sticky Note'),
-   ('andGate', 'AND Gate'),
-   ('event', 'Event'),
-   ('intermediateEventSet', 'Intermediate Event Set'),
+   ('redundancyVariation', 'Redundancy Variation'),
    ('undevelopedEvent', 'Undeveloped Event'),
-   ('featureVariation', 'Feature Variation'),
-   ('staticGate', 'Static Gate'),
-   ('transferIn', 'Transfer In'))),
- ('Fault Tree',
-  (('node', 'Node'),
+   ('basicEventSet', 'Basic Event Set'),
+   ('basicEvent', 'Basic Event'),
    ('xorGate', 'XOR Gate'),
+   ('stickyNote', 'Sticky Note'),
+   ('gate', 'Gate'),
+   ('event', 'Event'),
+   ('andGate', 'AND Gate'),
+   ('intermediateEvent', 'Intermediate Event'))),
+ ('Fault Tree',
+  (('fdepGate', 'FDEP Gate'),
    ('orGate', 'OR Gate'),
+   ('node', 'Node'),
+   ('intermediateEventSet', 'Intermediate Event Set'),
+   ('votingOrGate', 'Voting OR Gate'),
+   ('seqGate', 'Sequential Gate'),
+   ('transferIn', 'Transfer In'),
    ('eventSet', 'Event Set'),
    ('dynamicGate', 'Dynamic Gate'),
-   ('gate', 'Gate'),
-   ('basicEventSet', 'Basic Event Set'),
    ('houseEvent', 'House Event'),
-   ('intermediateEvent', 'Intermediate Event'),
-   ('priorityAndGate', 'Priority AND Gate'),
-   ('votingOrGate', 'Voting OR Gate'),
-   ('topEvent', 'Top Event'),
-   ('basicEvent', 'Basic Event'),
-   ('stickyNote', 'Sticky Note'),
-   ('andGate', 'AND Gate'),
-   ('seqGate', 'Sequential Gate'),
-   ('event', 'Event'),
-   ('intermediateEventSet', 'Intermediate Event Set'),
-   ('fdepGate', 'FDEP Gate'),
-   ('undevelopedEvent', 'Undeveloped Event'),
-   ('spareGate', 'Spare Gate'),
    ('staticGate', 'Static Gate'),
-   ('transferIn', 'Transfer In'))),
+   ('topEvent', 'Top Event'),
+   ('undevelopedEvent', 'Undeveloped Event'),
+   ('basicEventSet', 'Basic Event Set'),
+   ('basicEvent', 'Basic Event'),
+   ('xorGate', 'XOR Gate'),
+   ('stickyNote', 'Sticky Note'),
+   ('priorityAndGate', 'Priority AND Gate'),
+   ('gate', 'Gate'),
+   ('spareGate', 'Spare Gate'),
+   ('event', 'Event'),
+   ('andGate', 'AND Gate'),
+   ('intermediateEvent', 'Intermediate Event'))),
  ('Data Flow Diagram',
-  (('node', 'Node'),
-   ('process', 'Process'),
+  (('process', 'Process'),
+   ('stickyNote', 'Sticky Note'),
    ('storage', 'Storage'),
-   ('stickyNote', 'Sticky Note'),
-   ('external', 'External Entity'))),
+   ('external', 'External Entity'),
+   ('node', 'Node'))),
  ('Reliability Block Diagram',
-  (('node', 'Node'),
+  (('start', 'Start'),
    ('out_of', 'Out of'),
-   ('start', 'Start'),
+   ('node', 'Node'),
    ('block', 'Block'),
-   ('stickyNote', 'Sticky Note'),
-   ('end', 'End')))]
+   ('end', 'End'),
+   ('stickyNote', 'Sticky Note')))]
 
 graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type="string">\n'
         '            <default>0</default>\n'
@@ -1951,15 +1951,15 @@ graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type
         '        </key>\n'
         '        <key id="name" for="node" attr.name="name" '
         'attr.type="string">\n'
-        '            <default>Node</default>\n'
-        '        </key>\n'
-        '        <key id="description" for="node" attr.name="description" '
-        'attr.type="string">\n'
-        '            <default>Sample Text</default>\n'
+        '            <default>Process</default>\n'
         '        </key>\n'
         '        <key id="width" for="node" attr.name="width" '
         'attr.type="long">\n'
         '            <default>150</default>\n'
+        '        </key>\n'
+        '        <key id="description" for="node" attr.name="description" '
+        'attr.type="string">\n'
+        '            <default>Sample Text</default>\n'
         '        </key>\n'
         '        <key id="height" for="node" attr.name="height" '
         'attr.type="long">\n'
@@ -1985,11 +1985,18 @@ graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type
               '        </key>\n'
               '        <key id="name" for="node" attr.name="name" '
               'attr.type="string">\n'
-              '            <default>Event Set</default>\n'
+              '            <default>Intermediate Event Set</default>\n'
               '        </key>\n'
               '        <key id="cardinality" for="node" '
               'attr.name="cardinality" attr.type="long">\n'
               '            <default>1</default>\n'
+              '        </key>\n'
+              '        <key id="k" for="node" attr.name="k" attr.type="long">\n'
+              '            <default>1</default>\n'
+              '        </key>\n'
+              '        <key id="transfer" for="node" attr.name="transfer" '
+              'attr.type="string">\n'
+              '            <default></default>\n'
               '        </key>\n'
               '        <key id="probability" for="node" '
               'attr.name="probability" attr.type="string">\n'
@@ -1999,12 +2006,13 @@ graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type
               'attr.name="probabilityKind" attr.type="string">\n'
               '            <default>Point</default>\n'
               '        </key>\n'
-              '        <key id="k" for="node" attr.name="k" attr.type="long">\n'
-              '            <default>1</default>\n'
-              '        </key>\n'
               '        <key id="missionTime" for="graph" '
               'attr.name="missionTime" attr.type="long">\n'
               '            <default>17532</default>\n'
+              '        </key>\n'
+              '        <key id="width" for="node" attr.name="width" '
+              'attr.type="long">\n'
+              '            <default>150</default>\n'
               '        </key>\n'
               '        <key id="description" for="node" '
               'attr.name="description" attr.type="string">\n'
@@ -2014,17 +2022,9 @@ graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type
               'attr.type="long">\n'
               '            <default>150</default>\n'
               '        </key>\n'
-              '        <key id="width" for="node" attr.name="width" '
-              'attr.type="long">\n'
-              '            <default>150</default>\n'
-              '        </key>\n'
               '        <key id="dormancyFactor" for="node" '
               'attr.name="dormancyFactor" attr.type="double">\n'
               '            <default>0</default>\n'
-              '        </key>\n'
-              '        <key id="transfer" for="node" attr.name="transfer" '
-              'attr.type="string">\n'
-              '            <default></default>\n'
               '        </key>',
  'fuzztree': '        <key id="id" for="node" attr.name="id" '
              'attr.type="string">\n'
@@ -2044,6 +2044,14 @@ graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type
              'attr.type="string">\n'
              '            <default>faulttree</default>\n'
              '        </key>\n'
+             '        <key id="name" for="node" attr.name="name" '
+             'attr.type="string">\n'
+             '            <default>Feature Variation</default>\n'
+             '        </key>\n'
+             '        <key id="cardinality" for="node" attr.name="cardinality" '
+             'attr.type="long">\n'
+             '            <default>1</default>\n'
+             '        </key>\n'
              '        <key id="optional" for="node" attr.name="optional" '
              'attr.type="boolean">\n'
              '            <default>false</default>\n'
@@ -2052,12 +2060,31 @@ graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type
              'attr.type="long">\n'
              '            <default>1</default>\n'
              '        </key>\n'
-             '        <key id="name" for="node" attr.name="name" '
-             'attr.type="string">\n'
-             '            <default>Event Set</default>\n'
+             '        <key id="k" for="node" attr.name="k" attr.type="long">\n'
+             '            <default>1</default>\n'
              '        </key>\n'
-             '        <key id="cardinality" for="node" attr.name="cardinality" '
-             'attr.type="long">\n'
+             '        <key id="transfer" for="node" attr.name="transfer" '
+             'attr.type="string">\n'
+             '            <default></default>\n'
+             '        </key>\n'
+             '        <key id="transferMaxCost" for="node" '
+             'attr.name="transferMaxCost" attr.type="long">\n'
+             '            <default>1</default>\n'
+             '        </key>\n'
+             '        <key id="probability" for="node" attr.name="probability" '
+             'attr.type="string">\n'
+             '            <default>[0.5, 0]</default>\n'
+             '        </key>\n'
+             '        <key id="probabilityKind" for="node" '
+             'attr.name="probabilityKind" attr.type="string">\n'
+             '            <default>Point</default>\n'
+             '        </key>\n'
+             '        <key id="missionTime" for="graph" '
+             'attr.name="missionTime" attr.type="long">\n'
+             '            <default>17532</default>\n'
+             '        </key>\n'
+             '        <key id="decompositions" for="node" '
+             'attr.name="decompositions" attr.type="long">\n'
              '            <default>1</default>\n'
              '        </key>\n'
              '        <key id="nRange" for="node" attr.name="nRange" '
@@ -2068,24 +2095,9 @@ graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type
              'attr.type="string">\n'
              '            <default>N-1</default>\n'
              '        </key>\n'
-             '        <key id="probability" for="node" attr.name="probability" '
-             'attr.type="string">\n'
-             '            <default>[0.5, 0]</default>\n'
-             '        </key>\n'
-             '        <key id="probabilityKind" for="node" '
-             'attr.name="probabilityKind" attr.type="string">\n'
-             '            <default>Point</default>\n'
-             '        </key>\n'
-             '        <key id="k" for="node" attr.name="k" attr.type="long">\n'
-             '            <default>1</default>\n'
-             '        </key>\n'
-             '        <key id="missionTime" for="graph" '
-             'attr.name="missionTime" attr.type="long">\n'
-             '            <default>17532</default>\n'
-             '        </key>\n'
-             '        <key id="decompositions" for="node" '
-             'attr.name="decompositions" attr.type="long">\n'
-             '            <default>1</default>\n'
+             '        <key id="width" for="node" attr.name="width" '
+             'attr.type="long">\n'
+             '            <default>150</default>\n'
              '        </key>\n'
              '        <key id="description" for="node" attr.name="description" '
              'attr.type="string">\n'
@@ -2094,18 +2106,6 @@ graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type
              '        <key id="height" for="node" attr.name="height" '
              'attr.type="long">\n'
              '            <default>150</default>\n'
-             '        </key>\n'
-             '        <key id="width" for="node" attr.name="width" '
-             'attr.type="long">\n'
-             '            <default>150</default>\n'
-             '        </key>\n'
-             '        <key id="transferMaxCost" for="node" '
-             'attr.name="transferMaxCost" attr.type="long">\n'
-             '            <default>1</default>\n'
-             '        </key>\n'
-             '        <key id="transfer" for="node" attr.name="transfer" '
-             'attr.type="string">\n'
-             '            <default></default>\n'
              '        </key>',
  'rbd': '        <key id="id" for="node" attr.name="id" attr.type="string">\n'
         '            <default>0</default>\n'
@@ -2126,7 +2126,7 @@ graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type
         '        </key>\n'
         '        <key id="name" for="node" attr.name="name" '
         'attr.type="string">\n'
-        '            <default>Node</default>\n'
+        '            <default>Start</default>\n'
         '        </key>\n'
         '        <key id="out_of" for="node" attr.name="out_of" '
         'attr.type="long">\n'
@@ -2140,13 +2140,13 @@ graphml_keys = {'dfd': '        <key id="id" for="node" attr.name="id" attr.type
         'attr.name="probabilityKind" attr.type="string">\n'
         '            <default>Point</default>\n'
         '        </key>\n'
-        '        <key id="description" for="node" attr.name="description" '
-        'attr.type="string">\n'
-        '            <default>Sample Text</default>\n'
-        '        </key>\n'
         '        <key id="width" for="node" attr.name="width" '
         'attr.type="long">\n'
         '            <default>150</default>\n'
+        '        </key>\n'
+        '        <key id="description" for="node" attr.name="description" '
+        'attr.type="string">\n'
+        '            <default>Sample Text</default>\n'
         '        </key>\n'
         '        <key id="height" for="node" attr.name="height" '
         'attr.type="long">\n'
@@ -2158,7 +2158,7 @@ graphml_graph_data = {'dfd': {'kind'},
  'fuzztree': {'missionTime', 'kind'},
  'rbd': {'kind'}}
 
-graphml_node_data = {'dfd': {'y', 'width', 'x', 'id', 'description', 'height', 'name', 'kind'},
+graphml_node_data = {'dfd': {'name', 'kind', 'description', 'id', 'height', 'y', 'width', 'x'},
  'faulttree': {'cardinality',
                'description',
                'dormancyFactor',
