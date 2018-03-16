@@ -6,10 +6,15 @@ import os
 import json
 import time
 
-from FuzzEd.models import Graph, Job, Result
+from django.test import tag
+
+from FuzzEd.models.graph import Graph
+from FuzzEd.models.job import Job
+from FuzzEd.models.result import Result
 from .common import fixt_analysis, fixt_mincut, FuzzEdLiveServerTestCase, FuzzEdTestCase
 
 
+@tag('back')
 class DirectRunsTestCase(FuzzEdTestCase):
 
     """
@@ -32,6 +37,7 @@ class DirectRunsTestCase(FuzzEdTestCase):
                 dom = parse('/tmp/output.xml')
 
 
+@tag('back')
 class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
 
     """
@@ -57,6 +63,7 @@ class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
         self.backend.terminate()
 
 
+@tag('back')
 class InternalTestCase(BackendDaemonTestCase):
 
     """
@@ -81,6 +88,7 @@ class InternalTestCase(BackendDaemonTestCase):
                 print(result)
 
 
+@tag('back')
 class AnalysisFixtureTestCase(BackendDaemonTestCase):
 
     """
@@ -189,6 +197,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
                 assert(prec <= succ)
 
 
+@tag('back')
 class MinCutFixtureTestCase(BackendDaemonTestCase):
 
     """

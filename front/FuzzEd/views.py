@@ -10,7 +10,10 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 
-from FuzzEd.models import Graph, Project, notations, Sharing
+from FuzzEd.models.graph import Graph
+from FuzzEd.models.project import Project
+from FuzzEd.models.sharing import Sharing
+from FuzzEd.models import notations
 
 
 logger = logging.getLogger('FuzzEd')

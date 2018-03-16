@@ -8,14 +8,22 @@ from tastypie.authentication import SessionAuthentication
 from tastypie.authorization import Authorization
 from tastypie.bundle import Bundle
 from tastypie.exceptions import ImmediateHttpResponse
-from tastypie.http import HttpApplicationError, HttpAccepted, HttpForbidden, HttpNotFound, HttpMultipleChoices
+from tastypie.http import HttpApplicationError, HttpAccepted
+from tastypie.http import HttpForbidden, HttpNotFound, HttpMultipleChoices
 from tastypie import fields
 from tastypie.constants import ALL
 from django.core.mail import mail_managers
 from tastypie.resources import ModelResource
 from tastypie.serializers import Serializer
 
-from FuzzEd.models import Job, Graph, Notification, Node, NodeGroup, Edge, Result
+from FuzzEd.models.job import Job
+from FuzzEd.models.graph import Graph
+from FuzzEd.models.notification import Notification
+from FuzzEd.models.node import Node
+from FuzzEd.models.node_group import NodeGroup
+from FuzzEd.models.edge import Edge
+from FuzzEd.models.result import Result
+
 from . import common
 
 logger = logging.getLogger('FuzzEd')

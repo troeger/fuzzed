@@ -4,7 +4,9 @@ import json
 
 from django.contrib.auth.models import User
 
-from FuzzEd.models import Node, Notification, Edge
+from FuzzEd.models.node import Node
+from FuzzEd.models.notification import Notification
+from FuzzEd.models.edge import Edge
 from .common import fixt_simple, FuzzEdLiveServerTestCase
 
 

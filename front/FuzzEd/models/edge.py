@@ -101,7 +101,7 @@ class Edge(models.Model):
         TODO: Deprecate this method, set_attrs() should only be used to have an efficient modification signal handling.
         """
         assert(self.pk)
-        from FuzzEd.models import Property
+        from FuzzEd.models.properties import Property
         if hasattr(self, key):
             # Native Edge attribute, such as client_id
             setattr(self, key, value)

@@ -4,7 +4,9 @@ from abc import abstractmethod
 from django.conf.urls import url
 from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
-from tastypie.exceptions import UnsupportedFormat, BadRequest, ImmediateHttpResponse
+from tastypie.exceptions import UnsupportedFormat
+from tastypie.exceptions import BadRequest
+from tastypie.exceptions import ImmediateHttpResponse
 from django.core.exceptions import ValidationError
 from tastypie.serializers import Serializer
 from tastypie import fields
@@ -14,12 +16,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.utils.cache import patch_cache_control, patch_vary_headers
 
-from FuzzEd.models import Project, Graph
+from FuzzEd.models.project import Project
+from FuzzEd.models.graph import Graph
 
 
 logger = logging.getLogger('FuzzEd')
 
-### Resources ###
+# Resources #
 
 
 class JobResource(ModelResource):

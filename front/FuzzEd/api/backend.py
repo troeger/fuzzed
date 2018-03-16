@@ -11,7 +11,7 @@ from django.conf.urls import url
 from django.utils import http
 
 from . import common
-from FuzzEd.models import Job
+from FuzzEd.models.job import Job
 from FuzzEd import settings
 
 

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from FuzzEd.models import Graph
+from FuzzEd.models.graph import Graph
 from .common import fixt_unicode
 
 

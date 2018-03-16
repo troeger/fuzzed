@@ -15,11 +15,8 @@ from .node import Node
 from .configuration import Configuration
 from .node_configuration import NodeConfiguration
 from .result import Result
-from FuzzEd.models import xml_backend
 from FuzzEd import settings
 from FuzzEd.middleware import HttpResponseServerErrorAnswer
-from .xml_configurations import FeatureChoice, InclusionChoice, RedundancyChoice
-from .xml_backend import AnalysisResult, MincutResult, SimulationResult
 
 
 logger = logging.getLogger('FuzzEd')
@@ -368,13 +365,13 @@ class Job(models.Model):
                 for choice in configuration.choice:
                     element = choice.value_
                     json_choice = {}
-                    if isinstance(element, FeatureChoice):
+                    if isinstance(element, FuzzEd.models.xml_configurations.FeatureChoice):
                         json_choice['type'] = 'FeatureChoice'
                         json_choice['featureId'] = element.featureId
-                    elif isinstance(element, InclusionChoice):
+                    elif isinstance(element, FuzzEd.models.xml_configurations.InclusionChoice):
                         json_choice['type'] = 'InclusionChoice'
                         json_choice['included'] = element.included
-                    elif isinstance(element, RedundancyChoice):
+                    elif isinstance(element, FuzzEd.models.xml_configurations.RedundancyChoice):
                         json_choice['type'] = 'RedundancyChoice'
                         json_choice['n'] = int(element.n)
                     else:
@@ -404,11 +401,11 @@ class Job(models.Model):
                 db_result = Result(graph=self.graph, job=self)
                 if result.configId in conf_id_mappings:
                     db_result.configuration = conf_id_mappings[result.configId]
-                if isinstance(result, AnalysisResult):
+                if isinstance(result, FuzzEd.models.xml_backend.AnalysisResult):
                     db_result.kind = Result.ANALYSIS_RESULT
-                elif isinstance(result, MincutResult):
+                elif isinstance(result, FuzzEd.models.xml_backend.MincutResult):
                     db_result.kind = Result.MINCUT_RESULT
-                elif isinstance(result, SimulationResult):
+                elif isinstance(result, FuzzEd.models.xml_backend.SimulationResult):
                     db_result.kind = Result.SIMULATION_RESULT
                 self.interpret_value(result, db_result)
                 if result.issue:

@@ -37,7 +37,7 @@ $(CSS_DIR)/theme/$(THEME).css: $(LESS_DIR)/theme/$(THEME)/theme.less
 
 # Generate XML binding classes for the project XSDs
 $(MODELS_DIR)/xml_%.py: $(XSD_DIR)/%.xsd
-	pyxbgen --binding-root=$(MODELS_DIR) $(foreach xsd_file,$(XSD_FILES),-u $(XSD_DIR)/$(xsd_file).xsd -m xml_$(xsd_file))
+	pyxbgen --module-prefix=FuzzEd.models $(foreach xsd_file,$(XSD_FILES),-u $(XSD_DIR)/$(xsd_file).xsd -m xml_$(xsd_file))
 
 # Generate a large Python string with TiKZ code for the SVG images in models
 $(MODELS_DIR)/node_rendering.py: $(shell find $(IMG_DIR)/*/ -type f -name '*.svg')

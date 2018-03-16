@@ -6,7 +6,8 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 from django.db import models
 
-from FuzzEd.models import Node, Graph
+from FuzzEd.models.node import Node
+from FuzzEd.models.graph import Graph
 
 
 class NodeGroup(models.Model):
@@ -83,7 +84,7 @@ class NodeGroup(models.Model):
         TODO: Deprecate this method, set_attrs() should only be used to have an efficient modification signal handling.
         """
         assert(self.pk)
-        from FuzzEd.models import Property
+        from FuzzEd.models.properties import Property
         if hasattr(self, key):
             # Native NodeGroup attribute, such as client_id
             setattr(self, key, value)

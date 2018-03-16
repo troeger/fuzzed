@@ -3,7 +3,8 @@ import logging
 from django.contrib.auth.models import User
 from django.db import models
 
-from FuzzEd.models import Graph, Project
+from FuzzEd.models.graph import Graph
+from FuzzEd.models.project import Project
 
 logger = logging.getLogger('FuzzEd')
 

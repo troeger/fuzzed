@@ -704,7 +704,7 @@ class Node(models.Model):
 
         TODO: Deprecate this method, set_attrs() should only be used to have an efficient modification signal handling.
         """
-        from FuzzEd.models import Property
+        from FuzzEd.models.properties import Property
         # Catch attribute setting before object saving cases
         assert(self.pk)
         if hasattr(self, key):
