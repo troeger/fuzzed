@@ -325,12 +325,12 @@ class Node(models.Model):
                     elif 'mirror' in propdetails[prop]:
                         if 'format' in propdetails[prop]['mirror']:
                             format = propdetails[prop]['mirror'][
-                                'format'].encode('utf-8')
+                                'format']
                             if isinstance(val, int):
                                 val = str(val)
                             val = format.replace(
-                                "{{$0}}".encode('utf-8'),
-                                val.encode('utf-8'))
+                                "{{$0}}",
+                                val)
                         else:
                             logger.debug(
                                 "Property '%s' has no specified mirror format" %
@@ -394,7 +394,6 @@ class Node(models.Model):
                 propvalue = "\\baselineskip=0.8\\baselineskip\\textbf{{\\footnotesize %s}}" % propvalue
             else:
                 propvalue = "{\\it\\scriptsize %s}" % propvalue
-            propvalue = propvalue.decode('utf-8')
             mirrorText += propvalue + "\\\\"
         # Create child nodes and their edges
         for edge in self.outgoing.filter(deleted=False):

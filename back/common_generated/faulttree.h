@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef CXX_FUZZ_ED_BACKENDS____FUZZ_ED_STATIC_XSD_FAULTTREE_H
-#define CXX_FUZZ_ED_BACKENDS____FUZZ_ED_STATIC_XSD_FAULTTREE_H
+#ifndef CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_FAULTTREE_H
+#define CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_FAULTTREE_H
 
 #include <faulttree-fwd.hxx>
 
@@ -1649,4 +1649,4 @@ namespace faulttree
 //
 // End epilogue.
 
-#endif // CXX_FUZZ_ED_BACKENDS____FUZZ_ED_STATIC_XSD_FAULTTREE_H
+#endif // CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_FAULTTREE_H

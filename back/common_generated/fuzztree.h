@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef CXX_FUZZ_ED_BACKENDS____FUZZ_ED_STATIC_XSD_FUZZTREE_H
-#define CXX_FUZZ_ED_BACKENDS____FUZZ_ED_STATIC_XSD_FUZZTREE_H
+#ifndef CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_FUZZTREE_H
+#define CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_FUZZTREE_H
 
 #include <fuzztree-fwd.hxx>
 
@@ -1828,4 +1828,4 @@ namespace fuzztree
 //
 // End epilogue.
 
-#endif // CXX_FUZZ_ED_BACKENDS____FUZZ_ED_STATIC_XSD_FUZZTREE_H
+#endif // CXX_ORE_BACK____FRONT_FUZZ_ED_STATIC_XSD_FUZZTREE_H
