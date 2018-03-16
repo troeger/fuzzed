@@ -32,35 +32,35 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
         ''' Root view of external API should provide graph and project resource base URLs, even without API key.'''
         response = self.get('/api/v1/?format=json')
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response.json()
         assert ('graph' in data)
         assert ('project' in data)
 
     def testProjectListResource(self):
         response = self.getWithAPIKey('/api/v1/project/?format=json')
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response.json()
         assert ('objects' in data)
         assert ('graphs' in data['objects'][0])
 
     def testGraphListResource(self):
         response = self.getWithAPIKey('/api/v1/graph/?format=json')
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response.json()
 
     def testSingleProjectResource(self):
         response = self.getWithAPIKey(
             '/api/v1/project/%u/?format=json' %
             fixt_simple['pkProject'])
         self.assertEqual(response.status_code, 200)
-        data = json.loads(response.content)
+        data = response.json()
 
     def testJsonExport(self):
         for id, kind in fixt_simple['graphs'].items():
             response = self.get('/api/v1/graph/%u/?format=json' % id)
             self.assertEqual(response.status_code, 401)
             response = self.getWithAPIKey('/api/v1/graph/%u/?format=json' % id)
-            data = json.loads(response.content)
+            data = response.json()
             self.assertEqual(response.status_code, 200)
 
     def testLatexExport(self):
@@ -72,7 +72,7 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
                     '/api/v1/graph/%u/?format=tex' %
                     id)
                 self.assertEqual(response.status_code, 200)
-                assert ("tikz" in response.content)
+                assert ("tikz" in str(response.content))
 
     def testGraphmlExport(self):
         for id, kind in fixt_simple['graphs'].items():
@@ -84,7 +84,7 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
                     '/api/v1/graph/%u/?format=graphml' %
                     id)
                 self.assertEqual(response.status_code, 200)
-                assert ("<graphml" in response.content)
+                assert ("<graphml" in str(response.content))
 
     def testGraphmlImport(self):
         for id, kind in fixt_simple['graphs'].items():
