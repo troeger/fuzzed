@@ -34,7 +34,7 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
             url = self.baseUrl + '/graphs/%u' % fixt_simple['pkFaultTree']
             response = self.ajaxGet(url)
             self.assertEqual(response.status_code, 200)
-            content = json.loads(response.content)
+            content = response.json()
             self._testValidGraphJson(content)
         response = self.ajaxGet(self.baseUrl + '/graphs/9999')
         self.assertEqual(response.status_code, 404)
@@ -49,20 +49,20 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
                         format)
                 response = self.ajaxGet(url)
                 self.assertEqual(response.status_code, 200)
-                self.assertIn(test_str, response.content)
+                self.assertIn(test_str, response.content.decode('utf-8'))
 
     def testGetGraphs(self):
         url = self.baseUrl + '/graphs/'
         response = self.ajaxGet(url)
         self.assertEqual(response.status_code, 200)
-        content = json.loads(response.content)
+        content = response.json()
         assert ('graphs' in content)
 
     def testGraphFiltering(self):
         url = self.baseUrl + '/graphs/?kind=faulttree'
         response = self.ajaxGet(url)
         self.assertEqual(response.status_code, 200)
-        content = json.loads(response.content)
+        content = response.json()
         assert ('graphs' in content)
 
     def testCreateNode(self):
@@ -104,11 +104,11 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
         url = self.baseUrl + '/graphs/%u' % fixt_simple['pkDFD']
         response = self.ajaxGet(url)
         self.assertEqual(response.status_code, 200)
-        content = json.loads(response.content)
+        content = response.json()
         for group in content['nodeGroups']:
             self.assertEqual(group['id'], 999)
-            self.assertItemsEqual(group['nodeIds'], nodes)
-            self.assertItemsEqual(group['properties'], initial_properties)
+            self.assertCountEqual(group['nodeIds'], nodes)
+            self.assertCountEqual(group['properties'], initial_properties)
 
     def testDeleteNode(self):
         response = self.ajaxDelete(
@@ -194,9 +194,9 @@ class FrontendApiTestCase(FuzzEdLiveServerTestCase):
         url = self.baseUrl + '/graphs/%u' % fixt_simple['pkDFD']
         response = self.ajaxGet(url)
         self.assertEqual(response.status_code, 200)
-        content = json.loads(response.content)
+        content = response.json()
         for group in content['nodeGroups']:
-            self.assertItemsEqual(group['nodeIds'], nodes2)
+            self.assertCountEqual(group['nodeIds'], nodes2)
 
     def testEdgePropertyChange(self):
         newprop = json.dumps({"properties": {"name": "bar"}})
