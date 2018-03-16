@@ -1,4 +1,4 @@
-django==1.11
+django<1.12
 social-auth-app-django
 django-require
 django-robots
