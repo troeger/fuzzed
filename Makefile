@@ -1,4 +1,5 @@
 DOCKER_FRONT_RUN=docker run -i -t --rm --mount source=$(PWD),target=/ore,type=bind -p 127.0.0.1:8000:8000 
+DOCKER_BACK_RUN=docker run -i -t --rm --mount source=$(PWD),target=/ore,type=bind -p 127.0.0.1:8000:8000 
 
 # Generate a Docker image for the web frontend
 docker-front-image:
@@ -10,7 +11,11 @@ docker-back-image:
 
 # Start a shell in a recent Docker image of the web frontend
 docker-front-shell: docker-front-image
-	$(DOCKER_FRONT_RUN) -w /ore troeger/ore_front bash
+	$(DOCKER_FRONT_RUN) -w /ore/front troeger/ore_front bash
+
+# Start a shell in a recent Docker image of the backend
+docker-back-shell: docker-back-image
+	$(DOCKER_BACK_RUN) -w /ore/back troeger/ore_back bash
 
 # Run the test suite in a recent Docker image of the web frontend
 docker-test: docker-front-image
