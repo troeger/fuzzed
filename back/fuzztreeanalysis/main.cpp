@@ -11,7 +11,7 @@
 #include "FaultTreeToFuzzTree.h"
 #include "util.h"
 #include "xmlutil.h"
-#include "backendResult.h"
+#include "backend.h"
 
 
 void analyze(

@@ -1,6 +1,6 @@
 #pragma once
 #include "fuzztree.h"
-#include "commonTypes.h"
+#include "common.h"
 #include "Interval.h"
 
 // TODO: this should become obsolete once the commonTypes are really shared

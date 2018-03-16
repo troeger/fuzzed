@@ -12,7 +12,7 @@
 #include "CommandLineParser.h"
 #include "FatalException.h"
 
-#include "backendResult.h"
+#include "backend.h"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
