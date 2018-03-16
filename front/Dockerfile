@@ -3,7 +3,7 @@
 FROM ubuntu
 
 RUN apt-get update \
-    && apt-get install -y scons python3-pip python3-dev phantomjs python3-lesscpy \
+    && apt-get install -y scons python3-pip python3-dev phantomjs node-less \
     && rm -rf /var/lib/apt/lists/* \
     && pip3 install --upgrade pip
 

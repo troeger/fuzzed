@@ -1,7 +1,7 @@
 # front/FuzzEd/models/xml_fuzztree.py
 # -*- coding: utf-8 -*-
 # PyXB bindings for NM:4e577dc0c998265d17f355c47a293bafde28b966
-# Generated 2018-03-13 20:23:23.652363 by PyXB version 1.2.6 using Python 3.5.2.final.0
+# Generated 2018-03-16 08:24:57.477008 by PyXB version 1.2.6 using Python 3.5.2.final.0
 # Namespace net.fuzztree
 
 from __future__ import unicode_literals
@@ -14,7 +14,7 @@ import pyxb.utils.domutils
 import sys
 import pyxb.utils.six as _six
 # Unique identifier for bindings created at the same time
-_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:60e52fd2-26fc-11e8-8df3-0242ac110002')
+_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:82da2a40-28f3-11e8-adbc-0242ac110002')
 
 # Version of PyXB used to generate the bindings
 _PyXBVersion = '1.2.6'
