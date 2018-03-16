@@ -1,18 +1,111 @@
 '''
-    A builder that creates several python config files from central JSON
-    config files, the so-called 'notations' files. Each notation file
-    describes all the relevant semantical rules for the particular graph type.
-    The Python derivates are generated in a way that they can be smoothly used
-    for correctness and consistency checks.
-'''
+A set of functions that is only needed at build-time,
+not at run-time, of the web application.
 
-from SCons.Script import * 
+They are called from the project Makefile.
+'''
+from xml.dom.minidom import parse as parseXml
 import json, pprint
+import sys
+
+
+def svg2pgf_shape(filename):
+    '''
+        Convert given SVG file to TiKZ code.
+    '''
+    xml = parseXml(filename)
+    # determine size of the picture from SVG source
+    svg = xml.getElementsByTagName('svg')[0]
+    name = svg.attributes['id'].value
+    height = int(svg.attributes['height'].value)
+    width = int(svg.attributes['width'].value)
+    # Define shape anchors, based on image size
+    # We need double backslashes since the output is Python again
+    # The SVG coordinate system is mirrored on the horizon axis,
+    # so we add a rotation command and a positional compensation
+    result = '''
+\\\\pgfdeclareshape{%(name)s}{
+    \\\\anchor{center}{\pgfpoint{%(halfwidth)u}{%(halfheight)u}}
+    \\\\anchor{north}{\pgfpoint{%(halfwidth)u}{%(height)u}}
+    \\\\anchor{south}{\pgfpoint{%(halfwidth)u}{0}}
+    \\\\anchor{west}{\pgfpoint{0}{%(halfheight)u}}
+    \\\\anchor{east}{\pgfpoint{%(width)u}{%(halfheight)u}}
+    \\\\foregroundpath{
+        \\\\pgfsetlinewidth{1.4}
+        \\\\pgftransformshift{\pgfpoint{%(width)u}{%(height)u}}
+        \\\\pgftransformrotate{180}
+        \\\\pgfsetfillcolor{white}
+'''%{'name':name, 'height':height, 'halfheight':height/2, 'width':width, 'halfwidth':width/2}
+    # add all SVG path
+    pathCommands = xml.getElementsByTagName('path')
+    for p in pathCommands:
+        # The path may have styling. We ignore everything but dashing.
+        if 'style' in p.attributes:
+            if 'stroke-dasharray' in p.attributes['style'].value:
+                # http://stuff.mit.edu/afs/athena/contrib/tex-contrib/beamer/pgf-1.01/doc/generic/pgf/version-for-tex4ht/en/pgfmanualse23.html
+                result += "        \\\\pgfsetdash{{4.2}{1.4}}{0}\n"
+        # Add the SVG path
+        result +="        \\\\pgfpathsvg{%s}\n"%p.attributes['d'].value
+    # add all SVG rectangle definitions
+    # Add usepath after each rectangle, in order to get overlayed filled rects correctly generated
+    rectCommands = xml.getElementsByTagName('rect')
+    for r in rectCommands:
+        rheight = float(r.attributes['height'].value)
+        rwidth = float(r.attributes['width'].value)
+        x = float(r.attributes['x'].value)
+        y = float(r.attributes['y'].value)
+        result += "        \\\\pgfrect{\pgfpoint{%f}{%f}}{\pgfpoint{%f}{%f}}\n\\\\pgfusepath{stroke, fill}\n"%(x, y, rwidth, rheight)
+    # add all SVG circle definitions
+    circleCommands = xml.getElementsByTagName('circle')
+    for c in circleCommands:
+        x = float(c.attributes['cx'].value)
+        y = float(c.attributes['cy'].value)
+        radius = float(c.attributes['r'].value)
+        result += "        \\\\pgfcircle{\pgfpoint{%f}{%f}}{%f}\n\\\\pgfusepath{stroke, fill}\n"%(x,y,radius)
+    # finalize TiKZ shape definition
+    result += '        \\\\pgfusepath{stroke}\n}}'
+    return result
+
+
+def build_shape_lib_recursive(sources, covered=[]):
+    '''
+        Build static LaTex representation for our graphical symbols
+        as TiKZ shapes.
+        Some SVGs occur multiple times in subdirectories,
+        so we track the already converted ones.
+    '''
+    result = ''
+    for f in sources:
+        try:
+            result += svg2pgf_shape(f)
+            print("Converting %s to TiKZ shape ..." % f)
+        except Exception as e:
+            print("Error on parsing, ignoring %s ..." % f)
+            print(e)
+    return result
+
+
+def create_tikz_lib(target_file, source_files):
+    '''
+        Builds TiKZ shape library needed for Latex export
+        and the rendedering server.
+    '''
+    print("Generating TiKZ shape library ...")
+    f = open(target_file, "w")
+    f.write("# Auto-generated, do not change !\n")
+    f.write("tikz_shapes='''")
+    f.write("\n%% Start of shape library. This part remains the same for all graph exports.")
+    f.write(build_shape_lib_recursive(source_files))
+    f.write("\n%% End of shape library. This part below is unique for all graph exports.\n")    
+    f.write("'''")
+    f.close()
+
 
 def generate_graphml_keys(notations):
     '''
         Derive the GraphML preamble from our notations file. This is cool,
-        because our GraphML import / export magically matches to the notations file.
+        because our GraphML import / export magically matches to the
+        notations file.
 
         GraphML allows to define extensions as part of the document, by having
         <key> elements that describe the extensions. Later <data> elements
@@ -175,20 +268,23 @@ def resolve_inheritance(notations):
         for node_name, node in nodes.items():
             nodes[node_name] = inherit(node_name, node, nodes, node_cache)
 
-def notations(target, source, env):
+def notations(target_file, source_files):
     '''
-        The central build task for the Python notations file equivalents.
+        Creates a Python representation of the central JSON
+        config files, the so-called 'notations' files. Each notation file
+        describes all the relevant semantical rules for the particular graph type.
+        The Python derivates are generated in a way that they can be smoothly used
+        for correctness and consistency checks.
     '''
     notations = []
 
-    for input_file in source:
-        with open(str(input_file)) as handle:
-            notations.append(json.loads(handle.read()))
+    for input_file in source_files:
+        with open(input_file, encoding='utf-8') as handle:
+            notations.append(json.load(handle))
     resolve_inheritance(notations)
 
-
-    with open(str(target[0]), 'w') as out:
-        out.write('# DO NOT EDIT! This file is auto-generated by "setup.py build"\n')
+    with open(target_file, mode='w', encoding='utf-8') as out:
+        out.write('# DO NOT EDIT! This file is auto-generated\n')
         out.write('notations = ')
         pprint.pprint(notations, out)
         out.write('\nby_kind = {notation[\'kind\']: notation for notation in notations}\n')
@@ -205,4 +301,13 @@ def notations(target, source, env):
         pprint.pprint(node_data, out)
         out.write('\n# END OF GENERATED CONTENT')
 
-notationsbuilder = Builder(action = notations)
+
+if __name__ == '__main__':
+    target=sys.argv[2]
+    sources=sys.argv[3:]
+
+    if sys.argv[1] == 'tikz':
+        create_tikz_lib(target, sources)
+
+    if sys.argv[1] == 'notations':
+        notations(target, sources)

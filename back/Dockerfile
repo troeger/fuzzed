@@ -4,7 +4,7 @@ FROM ubuntu
 
 # Prepare Ansible environment
 RUN apt-get update \
-    && apt-get install -y scons python3-pip python3-dev libxerces-c-dev xsdcxx cmake gcc \
+    && apt-get install -y python3-pip python3-dev libxerces-c-dev xsdcxx cmake gcc \
                           texlive libboost-dev libboost-graph-dev libboost-date-time-dev \
                           libboost-system-dev libboost-filesystem-dev \
                           libboost-program-options-dev \
