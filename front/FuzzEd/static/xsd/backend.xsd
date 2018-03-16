@@ -6,7 +6,7 @@
             targetNamespace = "http://www.fuzzed.org/backendResults"
             xmlns="http://www.fuzzed.org/backendResults">
 
-  <xsd:import schemaLocation="commonTypes.xsd"
+  <xsd:import schemaLocation="common.xsd"
               namespace="http://www.fuzzed.org/commonTypes"/>
   
   <xsd:import schemaLocation="configurations.xsd"
