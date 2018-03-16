@@ -121,7 +121,7 @@ set(COMMON_GEN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common_generated)
 ############### XSD COMPILER ############
 #########################################
 
-set(XSD_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../FuzzEd/static/xsd")
+set(XSD_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../front/FuzzEd/static/xsd")
 
 set(XSD_GENERATED_TREE_FILES
 	${COMMON_GEN_DIR}/fuzztree.h
@@ -165,15 +165,15 @@ set(XSD_TO_FUZZTREE_ARGS
 ########### RESULT XML ##################
 
 set(XSD_GENERATED_RESULT_FILES
-	${COMMON_GEN_DIR}/backendResult.h
-	${COMMON_GEN_DIR}/commonTypes.h
+	${COMMON_GEN_DIR}/backend.h
+	${COMMON_GEN_DIR}/common.h
 	${COMMON_GEN_DIR}/configurations.h
-	${COMMON_GEN_DIR}/backendResult.cpp
-	${COMMON_GEN_DIR}/commonTypes.cpp
+	${COMMON_GEN_DIR}/backend.cpp
+	${COMMON_GEN_DIR}/common.cpp
 	${COMMON_GEN_DIR}/configurations.cpp)
 
-set(RESULT_XSD					"${XSD_FILE_PATH}/backendResult.xsd")
-set(COMMON_TYPES_XSD			"${XSD_FILE_PATH}/commonTypes.xsd")
+set(RESULT_XSD					"${XSD_FILE_PATH}/backend.xsd")
+set(COMMON_TYPES_XSD			"${XSD_FILE_PATH}/common.xsd")
 set(CONFIGURATION_XSD			"${XSD_FILE_PATH}/configurations.xsd")
 
 set(XSD_RESULT_ARGS
@@ -248,8 +248,8 @@ set(COMMON_SOURCES
 
 	${COMMON_GEN_DIR}/faulttree.cpp
 	${COMMON_GEN_DIR}/fuzztree.cpp
-	${COMMON_GEN_DIR}/backendResult.cpp
-	${COMMON_GEN_DIR}/commonTypes.cpp
+	${COMMON_GEN_DIR}/backend.cpp
+	${COMMON_GEN_DIR}/common.cpp
 	${COMMON_GEN_DIR}/configurations.cpp
 )
 
@@ -269,8 +269,8 @@ set(COMMON_HEADERS
 
 	${COMMON_GEN_DIR}/faulttree.h
 	${COMMON_GEN_DIR}/fuzztree.h
-	${COMMON_GEN_DIR}/backendResult.h
-	${COMMON_GEN_DIR}/commonTypes.h
+	${COMMON_GEN_DIR}/backend.h
+	${COMMON_GEN_DIR}/common.h
 	${COMMON_GEN_DIR}/configurations.h
 )
 
