@@ -1,14 +1,6 @@
 ''' 
-This is the connector daemon for all backend services. It talks to the FuzzEd web application
-and retrieves new jobs. Based on the retrieved job type, the according backend executable 
-is called.
-
-This script takes the path of the config file 'daemon.ini' as command-line argument. 
-If not given, the config file is searched in the current directory. 
-It is generated through 'fab build.configs' from the central settings file.
-
-If you want this thing on a development machine for backend services, 
-use 'fab run.backend'.
+This daemon waits for XML-RPC request from an ORE web server to execute jobs.
+Basically Celery done by ourselves.
 '''
 
 import configparser
@@ -21,20 +13,14 @@ import shutil
 import os
 import threading
 import json
+import argparse
+import requests
 from xmlrpc.server import SimpleXMLRPCServer
 
-import requests
-
-
-
-# Initial configuration of logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('FuzzEd')
 
 backends = {}
-options = {}
-
-server = None
 
 class WorkerThread(threading.Thread):
     jobtype = ""
@@ -52,7 +38,7 @@ class WorkerThread(threading.Thread):
         results = {'exit_code': exit_code}
         if file_data and file_name:
             results['file_name'] = file_name
-            results['file_data'] = base64.b64encode(file_data)
+            results['file_data'] = str(base64.b64encode(file_data))
         logger.debug("Sending result data to %s"%(self.joburl))
         headers = {'content-type': 'application/json'}
         r = requests.patch(self.joburl, data=json.dumps(results), verify=False, headers=headers)
@@ -68,7 +54,9 @@ class WorkerThread(threading.Thread):
             tmpfile = tempfile.NamedTemporaryFile(dir=tmpdir, delete=False)
 
             # Fetch input data and store it
+            logger.debug("Fetching input data ...")
             input_data = urllib.request.urlopen(self.joburl).read()
+            logger.debug("Fetched {0} bytes of input data.".format(len(input_data)))
             tmpfile.write(input_data)
 #            logger.debug(input_data)
             tmpfile.close()
@@ -107,19 +95,24 @@ class WorkerThread(threading.Thread):
 
         finally:
             shutil.rmtree(tmpdir, ignore_errors=True)
+            logger.debug('Terminating worker thread for job '+self.joburl)
 
 class JobServer(SimpleXMLRPCServer):
 
-    def __init__(self, conf):
+    server_override = None
+
+    def __init__(self, options):
         SimpleXMLRPCServer.__init__(self, (options['backend_daemon_host'], int(options['backend_daemon_port'])))
+        if 'server' in options:
+            self.server_override = options['server']
         self.register_function(self.handle_request, 'start_job')
 
     def handle_request(self, jobtype, joburl):
         logger.debug("Received %s job at %s"%(jobtype, joburl))
-        if server:
+        if self.server_override:
             logger.debug("Changing job URL due to command-line override")
             parts = joburl.split('/',3)
-            joburl = server+parts[3]      # LifeTestServer URL from Django docs
+            joburl = self.server_override + '/' + parts[3]      # LifeTestServer URL from Django docs
         if jobtype not in list(backends.keys()):
             logger.error("Unknown job type "+jobtype)
             return False
@@ -130,21 +123,18 @@ class JobServer(SimpleXMLRPCServer):
             return True
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter, description='ORE backend daemon.')
+    parser.add_argument('-c', '--config', default='./daemon.ini', help='Daemon configuration file.')
+    parser.add_argument('-s', '--server', default=None, help='Override for ORE web server machine and port. Example: "testserver:8000"')
+    args = parser.parse_args()
+
     # Read configuration
-    assert(len(sys.argv) < 3)
     conf=configparser.ConfigParser(strict=False)
-    if len(sys.argv) == 1:
-        # Use default INI file in local directory
-        conf.readfp(open('./daemon.ini'))
-    elif len(sys.argv) == 2:
-        if sys.argv[1] == "--server":
-            server = sys.argv[2]
-            conf.readfp(open('./daemon.ini'))
-        else:
-            # Use provided INI file
-            conf.readfp(open(sys.argv[1]))
+    conf.readfp(open(args.config))
+
     # Initialize logging, based on settings
     logger.addHandler(logging.FileHandler(conf.get('server','backend_log_file')))
+
     # Read backends from configuration
     for section in conf.sections():
         if section.startswith('backend_'):
@@ -152,8 +142,13 @@ if __name__ == '__main__':
             backends[settings['job_kind']] = settings 
         elif section == 'server':
             options = dict(conf.items('server'))
+
+    if args.server:
+        options['server'] = args.server
+
     logger.info("Configured backends: "+str(list(backends.keys())))
     logger.info("Options: "+str(options))
+
     # Start server
-    server = JobServer(conf)
+    server = JobServer(options)
     server.serve_forever()
