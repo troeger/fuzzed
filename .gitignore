@@ -9,4 +9,5 @@ back/**/Makefile
 *.a
 CMakeCache.txt
 *.log
-xml_*.py
+**/models/xml/*.py
+venv

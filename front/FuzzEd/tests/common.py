@@ -130,15 +130,15 @@ class FuzzEdTestHelpers():
             201)  # test if we got a created job
         assert ('Location' in response)
         jobUrl = response['Location']
-        code = 202
+        print("New job created for test suite, URL is "+jobUrl)
         assert (not jobUrl.endswith('jobs/'))
-        print("Waiting for result from " + jobUrl, end=' ')
-        while (code == 202):
+        # Cycle in asking the web server for a change in job status
+        while True:
             response = self.ajaxGet(jobUrl)
-            code = response.status_code
+            if 202 != response.status_code:
+                break
         self.assertEqual(response.status_code, 200)
         assert ('Location' in response)
-        resultUrl = response['Location']
         return response
 
 

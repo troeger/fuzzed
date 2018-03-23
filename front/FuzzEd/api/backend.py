@@ -15,7 +15,7 @@ from FuzzEd.models.job import Job
 from FuzzEd import settings
 
 
-logger = logging.getLogger('FuzzEd')
+logger = logging.getLogger('ore_back')
 
 
 class JobResource(common.JobResource):
@@ -88,9 +88,9 @@ class JobResource(common.JobResource):
                 bundle=basic_bundle,
                 **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
-            return http.HttpNotFound()
+            return HttpNotFound()
         except MultipleObjectsReturned:
-            return http.HttpMultipleChoices(
+            return HttpMultipleChoices(
                 "More than one resource is found at this URI.")
 
         if job.done():

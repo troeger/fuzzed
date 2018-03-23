@@ -6,8 +6,8 @@ import pyxb.utils.domutils
 import json
 
 try:
-    from .xml_fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlFuzzTreeNamespace, CreateFromDocument as fuzzTreeFromXml
-    from .xml_faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace, CreateFromDocument as faultTreeFromXml
+    from .xml.fuzztree import FuzzTree as XmlFuzzTree, Namespace as XmlFuzzTreeNamespace, CreateFromDocument as fuzzTreeFromXml
+    from .xml.faulttree import FaultTree as XmlFaultTree, Namespace as XmlFaultTreeNamespace, CreateFromDocument as faultTreeFromXml
     from .node_rendering import tikz_shapes
 except Exception:
     print("ERROR: Perform a build process first.")

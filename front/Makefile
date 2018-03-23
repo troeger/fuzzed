@@ -13,7 +13,7 @@ FAWS_DIR=$(CSS_DIR)/font-awesome
 
 XSD_FILES=common configurations backend fuzztree faulttree
 
-PYXBGEN_TARGETS=$(foreach xsd_file,$(XSD_FILES),$(MODELS_DIR)/xml_$(xsd_file).py)
+PYXBGEN_TARGETS=$(foreach xsd_file,$(XSD_FILES),$(MODELS_DIR)/xml/$(xsd_file).py)
 
 PATCH_TARGETS=$(FAWS_DIR)/font-awesome-4.1.0.css \
               $(FAWS_DIR)/font-awesome-4.1.0.min.css \
@@ -36,8 +36,10 @@ $(CSS_DIR)/theme/$(THEME).css: $(LESS_DIR)/theme/$(THEME)/theme.less
 	lessc $< $@
 
 # Generate XML binding classes for the project XSDs
-$(MODELS_DIR)/xml_%.py: $(XSD_DIR)/%.xsd
-	pyxbgen --module-prefix=FuzzEd.models $(foreach xsd_file,$(XSD_FILES),-u $(XSD_DIR)/$(xsd_file).xsd -m xml_$(xsd_file))
+$(MODELS_DIR)/xml/%.py: $(XSD_DIR)/%.xsd
+	mkdir -p $(MODELS_DIR)/xml
+	touch $(MODELS_DIR)/xml/__init__.py
+	pyxbgen --module-prefix=FuzzEd.models.xml $(foreach xsd_file,$(XSD_FILES),-u $(XSD_DIR)/$(xsd_file).xsd -m $(xsd_file))
 
 # Generate a large Python string with TiKZ code for the SVG images in models
 $(MODELS_DIR)/node_rendering.py: $(shell find $(IMG_DIR)/*/ -type f -name '*.svg')

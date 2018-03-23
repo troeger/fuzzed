@@ -128,11 +128,8 @@ class JobResource(common.JobResource):
             Called by the request dispatcher in case somebody tries to GET a job resource.
             For the frontend, deliver the current job status if pending, or the result.
         """
-        basic_bundle = self.build_bundle(request=request)
         try:
-            job = self.cached_obj_get(
-                bundle=basic_bundle,
-                **self.remove_api_resource_names(kwargs))
+            job = Job.objects.get(secret=kwargs["secret"], graph__pk=kwargs["graph_id"])
         except ObjectDoesNotExist:
             return HttpNotFound()
         except MultipleObjectsReturned:
@@ -273,6 +270,19 @@ class NodeResource(ModelResource):
         if 'properties' in bundle.data:
             bundle.obj.set_attrs(bundle.data['properties'])
         return self.save(bundle)
+
+    def obj_delete(self, bundle, **kwargs):
+        '''
+            Override deletion method to restrict the delete operation to the right graph.
+        '''   
+        try:
+            obj = Node.objects.get(client_id=kwargs['client_id'], graph__pk=kwargs['graph_id'])
+            obj.delete()
+        except ObjectDoesNotExist:
+            pass  # that was the goal
+        except MultipleObjectsReturned:
+            return HttpMultipleChoices(
+                "More than one resource is found at this URI.")
 
     def patch_detail(self, request, **kwargs):
         """
@@ -507,6 +517,20 @@ class EdgeResource(ModelResource):
         if 'properties' in bundle.data:
             bundle.obj.set_attrs(bundle.data['properties'])
         return self.save(bundle)
+
+    def obj_delete(self, bundle, **kwargs):
+        '''
+            Override deletion method to restrict the delete operation to the right graph.
+        '''   
+        try:
+            obj = Edge.objects.get(client_id=kwargs['client_id'], graph__pk=kwargs['graph_id'])
+            obj.delete()
+        except ObjectDoesNotExist:
+            pass  # that was the goal
+        except MultipleObjectsReturned:
+            return HttpMultipleChoices(
+                "More than one resource is found at this URI.")
+
 
     def patch_detail(self, request, **kwargs):
         """
