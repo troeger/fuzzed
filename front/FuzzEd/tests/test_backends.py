@@ -49,8 +49,7 @@ class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
     baseUrl = '/api/front'
 
     def setUp(self):
-        # Start up backend daemon in testing mode so that it uses port 8081 of
-        # the live test server
+        # Start up backend daemon in testing mode so that it uses the live test server
         print("Starting backend daemon")
         os.chdir("../back")
         self.backend = subprocess.Popen(["python3", "daemon.py", "--server", self.live_server_url])
@@ -154,6 +153,7 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
 
     def testFrontendAPIPdfExport(self):
         for graphPk, graphType in fixt_analysis['graphs'].items():
+            print("Running analysis for {0} graph type".format(graphType))
             job_result = self.requestJob(self.baseUrl, graphPk, 'pdf')
             pdf_url = job_result['LOCATION']
             pdf = self.get(pdf_url)
