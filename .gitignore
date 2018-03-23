@@ -10,3 +10,4 @@ back/**/Makefile
 CMakeCache.txt
 *.log
 xml_*.py
+venv
