@@ -7,12 +7,10 @@ from django.dispatch import receiver
 
 logger = logging.getLogger('FuzzEd')
 
-from . import xml_fuzztree
-from . import xml_faulttree
 from .graph import Graph
 
 import json
-from . import notations
+from . import notations, xml
 import sys
 import datetime
 import time
@@ -22,69 +20,69 @@ def new_client_id():
     return str(int(time.mktime(time.gmtime())))
 
 fuzztree_classes = {
-    'topEvent': xml_fuzztree.TopEvent,
-    'basicEvent': xml_fuzztree.BasicEvent,
-    'basicEventSet': xml_fuzztree.BasicEventSet,
-    'intermediateEvent': xml_fuzztree.IntermediateEvent,
-    'intermediateEventSet': xml_fuzztree.IntermediateEventSet,
-    'houseEvent': xml_fuzztree.HouseEvent,
-    'undevelopedEvent': xml_fuzztree.UndevelopedEvent,
-    'andGate': xml_fuzztree.And,
-    'orGate': xml_fuzztree.Or,
-    'xorGate': xml_fuzztree.Xor,
-    'votingOrGate': xml_fuzztree.VotingOr,
-    'featureVariation': xml_fuzztree.FeatureVariationPoint,
-    'redundancyVariation': xml_fuzztree.RedundancyVariationPoint,
-    'transferIn': xml_fuzztree.TransferIn,
-    xml_fuzztree.TopEvent_: 'topEvent',
-    xml_fuzztree.BasicEvent_: 'basicEvent',
-    xml_fuzztree.BasicEventSet_: 'basicEventSet',
-    xml_fuzztree.IntermediateEvent_: 'intermediateEvent',
-    xml_fuzztree.IntermediateEventSet_: 'intermediateEventSet',
-    xml_fuzztree.HouseEvent_: 'houseEvent',
-    xml_fuzztree.UndevelopedEvent_: 'undevelopedEvent',
-    xml_fuzztree.And_: 'andGate',
-    xml_fuzztree.Or_: 'orGate',
-    xml_fuzztree.Xor_: 'xorGate',
-    xml_fuzztree.VotingOr_: 'votingOrGate',
-    xml_fuzztree.FeatureVariationPoint_: 'featureVariation',
-    xml_fuzztree.RedundancyVariationPoint_: 'redundancyVariation',
-    xml_fuzztree.TransferIn_: 'transferIn'
+    'topEvent': xml.fuzztree.TopEvent,
+    'basicEvent': xml.fuzztree.BasicEvent,
+    'basicEventSet': xml.fuzztree.BasicEventSet,
+    'intermediateEvent': xml.fuzztree.IntermediateEvent,
+    'intermediateEventSet': xml.fuzztree.IntermediateEventSet,
+    'houseEvent': xml.fuzztree.HouseEvent,
+    'undevelopedEvent': xml.fuzztree.UndevelopedEvent,
+    'andGate': xml.fuzztree.And,
+    'orGate': xml.fuzztree.Or,
+    'xorGate': xml.fuzztree.Xor,
+    'votingOrGate': xml.fuzztree.VotingOr,
+    'featureVariation': xml.fuzztree.FeatureVariationPoint,
+    'redundancyVariation': xml.fuzztree.RedundancyVariationPoint,
+    'transferIn': xml.fuzztree.TransferIn,
+    xml.fuzztree.TopEvent_: 'topEvent',
+    xml.fuzztree.BasicEvent_: 'basicEvent',
+    xml.fuzztree.BasicEventSet_: 'basicEventSet',
+    xml.fuzztree.IntermediateEvent_: 'intermediateEvent',
+    xml.fuzztree.IntermediateEventSet_: 'intermediateEventSet',
+    xml.fuzztree.HouseEvent_: 'houseEvent',
+    xml.fuzztree.UndevelopedEvent_: 'undevelopedEvent',
+    xml.fuzztree.And_: 'andGate',
+    xml.fuzztree.Or_: 'orGate',
+    xml.fuzztree.Xor_: 'xorGate',
+    xml.fuzztree.VotingOr_: 'votingOrGate',
+    xml.fuzztree.FeatureVariationPoint_: 'featureVariation',
+    xml.fuzztree.RedundancyVariationPoint_: 'redundancyVariation',
+    xml.fuzztree.TransferIn_: 'transferIn'
 }
 
 faulttree_classes = {
-    'topEvent': xml_faulttree.TopEvent,
-    'basicEvent': xml_faulttree.BasicEvent,
-    'basicEventSet': xml_faulttree.BasicEventSet,
-    'intermediateEvent': xml_faulttree.IntermediateEvent,
-    'intermediateEventSet': xml_faulttree.IntermediateEventSet,
-    'houseEvent': xml_faulttree.HouseEvent,
-    'undevelopedEvent': xml_faulttree.UndevelopedEvent,
-    'andGate': xml_faulttree.And,
-    'orGate': xml_faulttree.Or,
-    'xorGate': xml_faulttree.Xor,
-    'votingOrGate': xml_faulttree.VotingOr,
-    'transferIn': xml_faulttree.TransferIn,
-    'fdepGate': xml_faulttree.FDEP,
-    'priorityAndGate': xml_faulttree.PriorityAnd,
-    'seqGate': xml_faulttree.Sequence,
-    'spareGate': xml_faulttree.Spare,
-    xml_faulttree.TopEvent_: 'topEvent',
-    xml_faulttree.BasicEvent_: 'basicEvent',
-    xml_faulttree.BasicEventSet_: 'basicEventSet',
-    xml_faulttree.IntermediateEvent_: 'intermediateEvent',
-    xml_faulttree.IntermediateEventSet_: 'intermediateEventSet',
-    xml_faulttree.HouseEvent_: 'houseEvent',
-    xml_faulttree.UndevelopedEvent_: 'undevelopedEvent',
-    xml_faulttree.And_: 'andGate',
-    xml_faulttree.Or_: 'orGate',
-    xml_faulttree.Xor_: 'xorGate',
-    xml_faulttree.VotingOr_: 'votingOrGate',
-    xml_faulttree.TransferIn_: 'transferIn',
-    xml_faulttree.FDEP_: 'fdepGate',
-    xml_faulttree.PriorityAnd_: 'priorityAndGate',
-    xml_faulttree.Sequence_: 'seqGate',
-    xml_faulttree.Spare_: 'spareGate'
+    'topEvent': xml.faulttree.TopEvent,
+    'basicEvent': xml.faulttree.BasicEvent,
+    'basicEventSet': xml.faulttree.BasicEventSet,
+    'intermediateEvent': xml.faulttree.IntermediateEvent,
+    'intermediateEventSet': xml.faulttree.IntermediateEventSet,
+    'houseEvent': xml.faulttree.HouseEvent,
+    'undevelopedEvent': xml.faulttree.UndevelopedEvent,
+    'andGate': xml.faulttree.And,
+    'orGate': xml.faulttree.Or,
+    'xorGate': xml.faulttree.Xor,
+    'votingOrGate': xml.faulttree.VotingOr,
+    'transferIn': xml.faulttree.TransferIn,
+    'fdepGate': xml.faulttree.FDEP,
+    'priorityAndGate': xml.faulttree.PriorityAnd,
+    'seqGate': xml.faulttree.Sequence,
+    'spareGate': xml.faulttree.Spare,
+    xml.faulttree.TopEvent_: 'topEvent',
+    xml.faulttree.BasicEvent_: 'basicEvent',
+    xml.faulttree.BasicEventSet_: 'basicEventSet',
+    xml.faulttree.IntermediateEvent_: 'intermediateEvent',
+    xml.faulttree.IntermediateEventSet_: 'intermediateEventSet',
+    xml.faulttree.HouseEvent_: 'houseEvent',
+    xml.faulttree.UndevelopedEvent_: 'undevelopedEvent',
+    xml.faulttree.And_: 'andGate',
+    xml.faulttree.Or_: 'orGate',
+    xml.faulttree.Xor_: 'xorGate',
+    xml.faulttree.VotingOr_: 'votingOrGate',
+    xml.faulttree.TransferIn_: 'transferIn',
+    xml.faulttree.FDEP_: 'fdepGate',
+    xml.faulttree.PriorityAnd_: 'priorityAndGate',
+    xml.faulttree.Sequence_: 'seqGate',
+    xml.faulttree.Spare_: 'spareGate'
 }
 
 
@@ -486,11 +484,11 @@ class Node(models.Model):
             # Crisp probability
             if self.graph.kind == "faulttree":
                 point = probability[1]
-                return xml_faulttree.CrispProbability(value_=point)
+                return xml.faulttree.CrispProbability(value_=point)
             elif self.graph.kind == "fuzztree":
                 point = probability[1][0]
                 alpha = probability[1][1]
-                return xml_fuzztree.TriangularFuzzyInterval(
+                return xml.fuzztree.TriangularFuzzyInterval(
                     a=point - alpha, b1=point, b2=point, c=point + alpha)
             else:
                 raise ValueError(
@@ -498,9 +496,9 @@ class Node(models.Model):
         elif probability[0] == 1:
             # Failure rate
             if self.graph.kind == "faulttree":
-                return xml_faulttree.FailureRate(value_=probability[1])
+                return xml.faulttree.FailureRate(value_=probability[1])
             elif self.graph.kind == "fuzztree":
-                return xml_fuzztree.FailureRate(value_=probability[1])
+                return xml.fuzztree.FailureRate(value_=probability[1])
             else:
                 raise ValueError(
                     'Cannot handle failure rate value for this graph type')
@@ -509,7 +507,7 @@ class Node(models.Model):
             point = probability[1][0]
             alpha = probability[1][1]
             if self.graph.kind == "fuzztree":
-                return xml_fuzztree.TriangularFuzzyInterval(
+                return xml.fuzztree.TriangularFuzzyInterval(
                     a=point - alpha, b1=point, b2=point, c=point + alpha)
             else:
                 raise ValueError(

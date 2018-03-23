@@ -293,6 +293,9 @@ class Job(models.Model):
             Parses the result data and saves the content to the database,
             in relation to this job.
         """
+        # Avoid module init problems by placing it here
+        from FuzzEd.models.xml import backend, configurations
+
         if self.requires_download:
             if self.kind == self.PDF_RENDERING_JOB:
                 old_results = self.results.filter(
@@ -317,11 +320,10 @@ class Job(models.Model):
             return
 
         # Ok, it is not binary, it is true XML result data
-        print(str(data))
         logger.debug(
             "Parsing backend result XML into database: \n" +
             str(data))
-        doc = xml_backend.CreateFromDocument(str(data))
+        doc = backend.CreateFromDocument(str(data))
 
         # Delete old graph issues from a former analysis run
         self.graph.delete_results(kind=Result.GRAPH_ISSUES)
@@ -365,13 +367,13 @@ class Job(models.Model):
                 for choice in configuration.choice:
                     element = choice.value_
                     json_choice = {}
-                    if isinstance(element, FuzzEd.models.xml_configurations.FeatureChoice):
+                    if isinstance(element, configurations.FeatureChoice):
                         json_choice['type'] = 'FeatureChoice'
                         json_choice['featureId'] = element.featureId
-                    elif isinstance(element, FuzzEd.models.xml_configurations.InclusionChoice):
+                    elif isinstance(element, configurations.InclusionChoice):
                         json_choice['type'] = 'InclusionChoice'
                         json_choice['included'] = element.included
-                    elif isinstance(element, FuzzEd.models.xml_configurations.RedundancyChoice):
+                    elif isinstance(element, configurations.RedundancyChoice):
                         json_choice['type'] = 'RedundancyChoice'
                         json_choice['n'] = int(element.n)
                     else:
@@ -401,11 +403,11 @@ class Job(models.Model):
                 db_result = Result(graph=self.graph, job=self)
                 if result.configId in conf_id_mappings:
                     db_result.configuration = conf_id_mappings[result.configId]
-                if isinstance(result, FuzzEd.models.xml_backend.AnalysisResult):
+                if isinstance(result, backend.AnalysisResult):
                     db_result.kind = Result.ANALYSIS_RESULT
-                elif isinstance(result, FuzzEd.models.xml_backend.MincutResult):
+                elif isinstance(result, backend.MincutResult):
                     db_result.kind = Result.MINCUT_RESULT
-                elif isinstance(result, FuzzEd.models.xml_backend.SimulationResult):
+                elif isinstance(result, backend.SimulationResult):
                     db_result.kind = Result.SIMULATION_RESULT
                 self.interpret_value(result, db_result)
                 if result.issue:
