@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:9
+    environment:
+      POSTGRES_PASSWORD: ore
+      POSTGRES_USER: ore
+      POSTGRES_DB: ore
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data  
+  front:
+    image: troeger/ore_front
+    environment:
+      DJANGO_CONFIGURATION: Dev
+      FUZZED_DATABASE_HOST: db
+      FUZZED_DATABASE_PORT: 5432
+    build: 
+      context: ./front/
+    tty: true
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+      - .:/ore
+    command: /ore/front/docker/docker-entry-dev.sh
+  back:
+    image: troeger/ore_back
+    build: 
+      context: ./back/
+    tty: true
+    depends_on:
+      - front
+
+volumes:
+  postgres-volume:

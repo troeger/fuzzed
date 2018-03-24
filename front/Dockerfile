@@ -3,7 +3,7 @@
 FROM ubuntu
 
 RUN apt-get update \
-    && apt-get install -y python3-pip python3-dev phantomjs node-less \
+    && apt-get install -y python3-pip python3-dev phantomjs node-less netcat \
     && rm -rf /var/lib/apt/lists/* \
     && pip3 install --upgrade pip
 
