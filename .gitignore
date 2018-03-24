@@ -11,3 +11,9 @@ CMakeCache.txt
 *.log
 **/models/xml/*.py
 venv
+**/models/node_rendering.py
+**/static/css/font-awesome/font-awesome-4.1.0.css
+**/static/css/font-awesome/font-awesome-4.1.0.min.css
+**/static/css/theme/white.css
+**/static/lib/jquery-ui/jquery-ui-1.10.3.js
+**/static/lib/jquery-ui/jquery-ui-1.10.3.min.js
