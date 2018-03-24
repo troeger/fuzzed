@@ -1,7 +1,7 @@
 from FuzzEd.models.graph import Graph
 from .common import fixt_simple, FuzzEdTestCase
 
-
+@tag('front')
 class ViewsTestCase(FuzzEdTestCase):
 
     """

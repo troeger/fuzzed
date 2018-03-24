@@ -11,7 +11,7 @@ def mocha_exists():
     except OSError as e:
         return False
 
-
+@tag('front')
 class JavaScriptTestCase(TestCase):
 
     """

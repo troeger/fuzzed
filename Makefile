@@ -3,15 +3,19 @@ DOCKER_BACK_RUN=docker run -i -t --rm --mount source=$(PWD),target=/ore,type=bin
 
 all: docker-front-build docker-back-build
 
-docker-front-build:
+docker-front-build: docker-front-image 
 	$(DOCKER_FRONT_RUN) -w /ore/front troeger/ore_front make
 
-docker-back-build:
+docker-back-build: docker-back-image
 	$(DOCKER_BACK_RUN) -w /ore/back troeger/ore_back make
 
-# Run the front test suite in a recent Docker image of the web frontend
+# Run the front test suite in a recent Docker image
 docker-front-test: docker-front-image docker-front-build
 	$(DOCKER_FRONT_RUN) -w /ore/front troeger/ore_front ./manage.py test --exclude-tag=back
+
+# Run the backend test suite in a recent Docker image
+docker-back-test: docker-back-image docker-back-build
+	$(DOCKER_BACK_RUN) -w /ore/front troeger/ore_back ./manage.py test --exclude-tag=front
 
 # Generate a Docker image for the web frontend
 docker-front-image:

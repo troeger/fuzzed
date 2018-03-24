@@ -8,6 +8,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 
 
+@tag('front')
 class ExternalAPITestCase(FuzzEdLiveServerTestCase):
 
     """
@@ -150,7 +151,7 @@ class ExternalAPITestCase(FuzzEdLiveServerTestCase):
         ''' Leave this out, and the last test will fail. Dont ask me why.'''
         assert (True)
 
-
+@tag('front')
 class GraphMLFilesTestCase(FuzzEdTestCase):
 
     """

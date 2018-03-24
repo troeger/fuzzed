@@ -9,7 +9,7 @@ from FuzzEd.models.notification import Notification
 from FuzzEd.models.edge import Edge
 from .common import fixt_simple, FuzzEdLiveServerTestCase
 
-
+@tag('front')
 class FrontendApiTestCase(FuzzEdLiveServerTestCase):
 
     """
