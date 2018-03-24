@@ -15,6 +15,7 @@ services:
       DJANGO_CONFIGURATION: Dev
       FUZZED_DATABASE_HOST: db
       FUZZED_DATABASE_PORT: 5432
+      FUZZED_BACKEND_DAEMON: http://back:8001
     build: 
       context: ./front/
     tty: true
@@ -32,6 +33,9 @@ services:
     tty: true
     depends_on:
       - front
+    volumes:
+      - .:/ore
+    command: python3 /ore/back/daemon.py -c /ore/back/daemon.ini
 
 volumes:
   postgres-volume:

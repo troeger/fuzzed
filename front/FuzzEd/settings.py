@@ -177,7 +177,8 @@ class Dev(Common):
     SERVER = 'http://localhost:8000'
     TEMPLATES = Common.TEMPLATES
     TEMPLATES[0]['DIRS'] = ('FuzzEd/templates', 'FuzzEd/static/img')
-    BACKEND_DAEMON = "http://localhost:8001"
+    BACKEND_DAEMON = values.Value(
+        'http://localhost:8001', environ_prefix='FUZZED')
     TERMS_PAGE = '/about/'
     FEEDBACK_PAGE = 'http://fuzzed.uservoice.com'
     FOOTER = 'FuzzEd Development Team (Dev Server)'
