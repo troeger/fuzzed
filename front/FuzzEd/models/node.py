@@ -277,11 +277,11 @@ class Node(models.Model):
                     kind = "text"
                 if val is not None:
                     if kind == "range":
-                        format = propdetails[prop]['mirror']['format']
-                        format = format.replace(
+                        fmt = propdetails[prop]['mirror']['format']
+                        fmt = fmt.replace(
                             "\xb1",
                             "$\\pm$")    # Special unicodes used in format strings, such as \xb1
-                        val = format.replace(
+                        val = fmt.replace(
                             "{{$0}}", str(
                                 val[0])).replace(
                             "{{$1}}", str(
@@ -292,17 +292,14 @@ class Node(models.Model):
                         active_part = val[0]
                         partkind = propdetails[prop][
                             'parts'][active_part]['kind']
-                        format = propdetails[prop]['parts'][
+                        fmt = propdetails[prop]['parts'][
                             active_part]['mirror']['format']
-                        logger.debug(
-                            "Property '%s' with kind '%s' has part_kind '%s' with format '%s' for value '%s'" %
-                            (prop, kind, partkind, format, str(val)))
                         # Special unicodes used in format strings must be
                         # replaced by their Latex counterpart
-                        format = format.replace("\xb1", "$\\pm$")
-                        format = format.replace("\u03bb", "$\\lambda$")
+                        fmt = fmt.replace("\xb1", "$\\pm$")
+                        fmt = fmt.replace("\u03bb", "$\\lambda$")
                         if partkind == 'epsilon':
-                            val = format.replace(
+                            val = fmt.replace(
                                 "{{$0}}", str(
                                     val[1][0])).replace(
                                 "{{$1}}", str(
@@ -316,23 +313,21 @@ class Node(models.Model):
                                     choices, choice_values):
                                 if val[1][0] == choice_vals[
                                         0] and val[1][1] == choice_vals[1]:
-                                    val = format.replace("{{$0}}", choice_name)
+                                    val = fmt.replace("{{$0}}", choice_name)
                                     break
                         elif partkind == 'numeric':
-                            val = format.replace("{{$0}}", str(val[1]))
+                            val = fmt.replace("{{$0}}", str(val[1]))
                     elif 'mirror' in propdetails[prop]:
                         if 'format' in propdetails[prop]['mirror']:
-                            format = propdetails[prop]['mirror'][
+                            fmt = propdetails[prop]['mirror'][
                                 'format']
                             if isinstance(val, int):
                                 val = str(val)
-                            val = format.replace(
+                            val = fmt.replace(
                                 "{{$0}}",
                                 val)
                         else:
-                            logger.debug(
-                                "Property '%s' has no specified mirror format" %
-                                prop)
+                            logger.debug("Property {0} has no specified mirror format".format(prop))
                             val = str(val)
                     else:
                         # Property has no special type and no mirror definition, so it shouldn't be shown
