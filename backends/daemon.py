@@ -119,7 +119,7 @@ class JobServer(SimpleXMLRPCServer):
         if useTestServer:
             logger.debug("Patching job URL for test server support")
             parts = joburl.split('/',3)
-            joburl = "http://localhost:8081/"+parts[3]      # LifeTestServer URL from Django docs
+            joburl = testServer + "/" + parts[3]   
         if jobtype not in backends.keys():
             logger.error("Unknown job type "+jobtype)
             return False
@@ -131,14 +131,15 @@ class JobServer(SimpleXMLRPCServer):
 
 if __name__ == '__main__':
     # Read configuration
-    assert(len(sys.argv) < 3)
+    assert(len(sys.argv) < 4)
     conf=ConfigParser.ConfigParser()
     if len(sys.argv) == 1:
         # Use default INI file in local directory
         conf.readfp(open('./daemon.ini'))
-    elif len(sys.argv) == 2:
-        if sys.argv[1] == "--testing":
+    else:
+        if sys.argv[1] == "--force_server":
             useTestServer = True
+            testServer = sys.argv[2]
             conf.readfp(open('./daemon.ini'))
         else:
             useTestServer = False

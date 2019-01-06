@@ -23,6 +23,7 @@ services:
       - db
     volumes:
       - ./frontend:/ore-front
+      - ./backends:/ore-back
   back:
     image: troeger/ore-back
     container_name: ore-back

@@ -21,7 +21,7 @@ class DirectRunsTestCase(FuzzEdTestCase):
     @unittest.skipUnless(
         sys.platform.startswith("linux"), "requires Linux")
     def testFileAnalysis(self):
-        for root, dirs, files in os.walk('FuzzEd/fixtures/analysis'):
+        for root, dirs, files in os.walk('/ore-front/FuzzEd/fixtures/analysis'):
             for f in files:
                 fname = root + os.sep + f
                 print "Testing " + fname
@@ -46,8 +46,8 @@ class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
         # Start up backend daemon in testing mode so that it uses port 8081 of
         # the live test server
         print "Starting backend daemon"
-        os.chdir("backends")
-        self.backend = subprocess.Popen(["python", "daemon.py", "--testing"])
+        os.chdir("/ore-back")
+        self.backend = subprocess.Popen(["python", "daemon.py", "--force_server", self.live_server_url])
         time.sleep(2)
         os.chdir("..")
         self.setUpLogin()
