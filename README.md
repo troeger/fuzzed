@@ -30,33 +30,13 @@ You can try the editor at http://fuzzed.org.
 
 Thanks for your interest in this project. We would love to have you on-board. The developers discuss in the [ORE forum](https://groups.google.com/forum/#!forum/ore-dev).
 
-The only supported environment for development is a Docker image.
+The only supported environment for development is Docker Compose.
 
 Get a checkout and run:
 
-``make shell``
+``make up``
 
-This installs a complete development environment in a new Docker image on your machine and enters it.
-
-Inside the container, you can use SCons to build neccessary static code parts:
-
-``scons frontend backend``
-
-If this was successful, you need to initialize the database once:
-
-``./manage.py migrate``
-
-Now you can start the development web server:
-
-``./manage.py runserver``
-
-Alternatively, you can start the backend analysis engine and the frontend web server in parallel:
-
-``scons run.all``
-
-From this point, you should be able to use the frontend on your machine at http://localhost:8000. 
-
-The start page should have a *Developer Login* link right below the OAuth login logos, which works without Internet connectivity.  The OAuth login logos are broken by default, since you need [OAuth2 credentials](https://github.com/troeger/fuzzed/wiki/OAuth2Cred) to be configured for that.
+This prepares docker images for the frontend and the backend part, and starts them. After finishing, you should be able to use the frontend on your machine at http://localhost:8000. The start page has a *Developer Login* link right below the OAuth login logos, which works without Internet connectivity.  The OAuth login logos are broken by default, since you need [OAuth2 credentials](https://github.com/troeger/fuzzed/wiki/OAuth2Cred) to be configured for that.
 
 If your working on a staging machine, a valid option is to get an OpenID from somewhere such as https://openid.stackexchange.com.
 
@@ -67,18 +47,15 @@ If your working on a staging machine, a valid option is to get an OpenID from so
     ansible-playbook -i ansible/inventories/localhost -e release_version=0.X.X ansible/prod_fe.yml
     ansible-playbook -i ansible/inventories/localhost -e release_version=0.X.X ansible/prod_be.yml
 
-We store our private credentials (OAuth keys etc.) for the fuzzed.org installation in an Ansible vault.
-If you do the same, don't forget to add the *--ask-vault-pass* option to the line above.
-
 ## Licence
 
-FuzzEd ist licensed under the [GNU AGPL Version 3](http://en.wikipedia.org/wiki/Affero_General_Public_License). This means your are allowed to:
+ORE ist licensed under the [GNU AGPL Version 3](http://en.wikipedia.org/wiki/Affero_General_Public_License). This means your are allowed to:
 
-* Install and run the unmodified FuzzEd code at your site.
-* Re-package and distribute the unmodified version of FuzzEd from this repository. 
+* Install and run the unmodified ORE code at your site.
+* Re-package and distribute the unmodified version of ORE from this repository. 
 * Fork and re-publish the editor, as long as your modified sources are accessible for everybody.
 
-In short, AGPL forbids you to distribute or run your own modified version of FuzzEd without publishing your code.
+In short, AGPL forbids you to distribute or run your own modified version of ORE without publishing your code.
  
 ## Acknowledgements
 
