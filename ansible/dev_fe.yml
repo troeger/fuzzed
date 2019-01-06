@@ -1,5 +1,5 @@
 ---
-- name: Configure developer machine
+- name: Configure developer machine for frontend
   hosts: localhost
   user: root
 
@@ -8,7 +8,5 @@
     - build_fuzzed
     - build_less_code
     - build_xsd_code
-    - build_cpp_code
-    - run_fuzzed_be
     - run_fuzzed_fe
     - test_fuzzed

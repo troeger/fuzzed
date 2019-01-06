@@ -1,20 +1,17 @@
-VERSION=0.8.0
+build:
+	docker-compose build
 
-DOCKER_RUN=docker run -i -t --rm --mount source=$(PWD),target=/FuzzEd,type=bind -w /FuzzEd -p 127.0.0.1:8000:8000 troeger/ore_front:$(VERSION)
+up:
+	docker-compose up -d
 
-.PHONY=docker
+down:
+	docker-compose down
 
-all: build
+front-shell: up
+	docker-compose exec front bash
 
-docker-dev-image:
-	docker build -t troeger/ore_front:$(VERSION) .
+back-shell: up
+	docker-compose exec back bash
 
-shell: docker-dev-image
-	$(DOCKER_RUN) bash
-
-build: docker-dev-image
-	$(DOCKER_RUN) scons frontend backend
-
-test: docker-dev-image build
-	$(DOCKER_RUN) ./manage.py test
-
+clean: up
+	docker-compose exec front /usr/bin/scons -C /ore-front -c

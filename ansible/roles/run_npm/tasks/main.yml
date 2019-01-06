@@ -9,7 +9,3 @@
   homebrew: pkg=npm state=present
   when: ansible_os_family == "Darwin"
 
-- name: Bring Ubuntu node executable into path (Debian)
-  sudo: yes
-  file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
-  when: ansible_os_family == "Debian"

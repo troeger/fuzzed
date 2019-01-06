@@ -1,0 +1,9 @@
+---
+- name: Configure developer machine for backend
+  hosts: localhost
+  user: root
+
+  roles:
+    - all
+    - build_cpp_code
+    - run_fuzzed_fe

@@ -1,4 +1,4 @@
-# Dockerfile for ORE web application
+# Dockerfile for ORE backend
 
 FROM ubuntu
 
@@ -10,9 +10,4 @@ RUN apt-get update \
 COPY ansible /ansible
 
 # Install dependencies via Ansible
-RUN ansible-playbook -i /ansible/inventories/localhost /ansible/dev.yml 
-
-ENV PYTHONUNBUFFERED 1
-ENV DJANGO_CONFIGURATION Dev
-EXPOSE 8000
-
+RUN ansible-playbook -i /ansible/inventories/localhost /ansible/dev_be.yml 
