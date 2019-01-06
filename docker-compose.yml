@@ -3,6 +3,7 @@ version: '3'
 services:
   db:
     image: postgres:9
+    container_name: ore-db
     environment:
       POSTGRES_PASSWORD: ore
       POSTGRES_USER: ore
@@ -11,6 +12,7 @@ services:
       - postgres-volume:/var/lib/postgresql/data  
   front:
     image: troeger/ore-front
+    container_name: ore-front
     build: 
       context: .
       dockerfile: ./frontend/docker/Dockerfile
@@ -23,6 +25,7 @@ services:
       - ./frontend:/ore-front
   back:
     image: troeger/ore-back
+    container_name: ore-back
     build: 
       context: .
       dockerfile: ./backends/Dockerfile

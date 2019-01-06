@@ -8,10 +8,13 @@ down:
 	docker-compose down
 
 front-shell: up
-	docker-compose exec front bash
+	docker exec -it ore-front bash
 
 back-shell: up
-	docker-compose exec back bash
+	docker exec -it ore-back bash
 
 clean: up
-	docker-compose exec front /usr/bin/scons -C /ore-front -c
+	docker exec ore-front /usr/bin/scons -C /ore-front -c
+
+test: up
+	docker exec -w /ore-front ore-front python /ore-front/manage.py test
