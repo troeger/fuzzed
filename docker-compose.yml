@@ -29,7 +29,7 @@ services:
     container_name: ore-back
     build: 
       context: .
-      dockerfile: ./backends/Dockerfile
+      dockerfile: ./backends/docker/Dockerfile
     tty: true
     volumes:
       - ./backends:/ore-back 
