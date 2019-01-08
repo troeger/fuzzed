@@ -1,4 +1,5 @@
-# Assumes host directory to be mounted at /ore-front
+# Assumes "frontend" directory to be mounted at /ore-front
+
 cd /ore-front
 scons 
 ./manage.py migrate
