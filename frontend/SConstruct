@@ -10,9 +10,6 @@ from FuzzEd import VERSION
 env=Environment(
   tools=['default', fuzzed_builders])  
 
-# Include SCons file for backend daemons
-SConscript('backends/SConscript')
-
 # Static files generation - 'static-release' target
 statics = env.Command( Dir('FuzzEd/static-release'), 
                        Dir('FuzzEd/static'), 
@@ -31,11 +28,11 @@ xml_targets = ['FuzzEd/models/xml_common.py',
                'FuzzEd/models/xml_fuzztree.py',
                'FuzzEd/models/xml_faulttree.py'   ]
 xml = env.PyXB(   xml_targets,
-            [  'FuzzEd/static/xsd/commonTypes.xsd',
-               'FuzzEd/static/xsd/configurations.xsd',
-               'FuzzEd/static/xsd/backendResult.xsd',
-               'FuzzEd/static/xsd/fuzztree.xsd',
-               'FuzzEd/static/xsd/faulttree.xsd' 
+            [  '/ore-common/xsd/commonTypes.xsd',
+               '/ore-common/xsd/configurations.xsd',
+               '/ore-common/xsd/backendResult.xsd',
+               '/ore-common/xsd/fuzztree.xsd',
+               '/ore-common/xsd/faulttree.xsd' 
             ])
 
 # Web package generation - 'package.web' target

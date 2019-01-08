@@ -23,7 +23,7 @@ services:
       - db
     volumes:
       - ./frontend:/ore-front
-      - ./backends:/ore-back
+      - ./common:/ore-common 
   back:
     image: troeger/ore-back
     container_name: ore-back
@@ -31,6 +31,9 @@ services:
       context: .
       dockerfile: ./backends/Dockerfile
     tty: true
+    volumes:
+      - ./backends:/ore-back 
+      - ./common:/ore-common 
 
 volumes:
   data-volume:

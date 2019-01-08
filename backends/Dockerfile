@@ -1,6 +1,6 @@
 # Dockerfile for ORE backend
 
-FROM ubuntu
+FROM ubuntu:xenial
 
 # Prepare Ansible environment
 RUN apt-get update \

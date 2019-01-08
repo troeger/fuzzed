@@ -121,7 +121,7 @@ set(COMMON_GEN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/common_generated)
 ############### XSD COMPILER ############
 #########################################
 
-set(XSD_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../FuzzEd/static/xsd")
+set(XSD_FILE_PATH "/ore-common/xsd")
 
 set(XSD_GENERATED_TREE_FILES
 	${COMMON_GEN_DIR}/fuzztree.h

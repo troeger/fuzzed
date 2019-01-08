@@ -6,4 +6,6 @@
   roles:
     - all
     - build_cpp_code
-    - run_fuzzed_fe
+    - build_boost_code
+    - run_latex
+    - run_fuzzed_be

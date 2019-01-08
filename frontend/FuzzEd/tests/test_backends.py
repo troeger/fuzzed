@@ -1,4 +1,3 @@
-from xml.dom.minidom import parse
 import subprocess
 import unittest
 import sys
@@ -7,29 +6,7 @@ import json
 import time
 
 from FuzzEd.models import Graph, Job, Result
-from .common import fixt_analysis, fixt_mincut, FuzzEdLiveServerTestCase, FuzzEdTestCase
-
-
-class DirectRunsTestCase(FuzzEdTestCase):
-
-    """
-        These are tests based on the analysis engine input files in fixture/analysis.
-        They only test if the analysis engine crashes on them.
-        The may later be translated to real tests with some expected output.
-    """
-
-    @unittest.skipUnless(
-        sys.platform.startswith("linux"), "requires Linux")
-    def testFileAnalysis(self):
-        for root, dirs, files in os.walk('/ore-front/FuzzEd/fixtures/analysis'):
-            for f in files:
-                fname = root + os.sep + f
-                print "Testing " + fname
-                retcode = subprocess.call(
-                    'backends/lib/ftanalysis_exe %s /tmp/output.xml /tmp' %
-                    (fname), shell=True)
-                self.assertEqual(retcode, 0, fname + " failed")
-                dom = parse('/tmp/output.xml')
+from .common import fixt_analysis, fixt_mincut, FuzzEdLiveServerTestCase
 
 
 class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
@@ -45,16 +22,16 @@ class BackendDaemonTestCase(FuzzEdLiveServerTestCase):
     def setUp(self):
         # Start up backend daemon in testing mode so that it uses port 8081 of
         # the live test server
-        print "Starting backend daemon"
-        os.chdir("/ore-back")
-        self.backend = subprocess.Popen(["python", "daemon.py", "--force_server", self.live_server_url])
-        time.sleep(2)
-        os.chdir("..")
+        # print "Starting backend daemon"
+        # os.chdir("/ore-back")
+        # self.backend = subprocess.Popen(["python", "daemon.py", "--force_server", self.live_server_url])
+        # time.sleep(2)
+        # os.chdir("..")
         self.setUpLogin()
 
-    def tearDown(self):
-        print "\nShutting down backend daemon"
-        self.backend.terminate()
+#    def tearDown(self):
+#        print "\nShutting down backend daemon"
+        # self.backend.terminate()
 
 
 class InternalTestCase(BackendDaemonTestCase):
@@ -167,7 +144,6 @@ class AnalysisFixtureTestCase(BackendDaemonTestCase):
             self.baseUrl,
             fixt_analysis['prdc_fuzztree'],
             'topevent')
-        job_result_info = json.loads(job_result.content)
         result_url = job_result['LOCATION']
         # Ordering in datatables style
         titles = Result.titles(Result.ANALYSIS_RESULT, 'fuzztree')
