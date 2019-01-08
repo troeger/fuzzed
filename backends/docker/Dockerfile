@@ -11,3 +11,8 @@ COPY ansible /ansible
 
 # Install dependencies via Ansible
 RUN ansible-playbook -i /ansible/inventories/localhost /ansible/dev_be.yml 
+
+COPY backends/docker/startup.sh /startup.sh
+
+EXPOSE 8000
+CMD ["bash", "/startup.sh"]
