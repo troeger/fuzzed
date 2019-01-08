@@ -170,10 +170,10 @@ class Dev(Common):
     }
     TEST = {'NAME': 'test_fuzzed.sqlite'}
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    SERVER = 'http://localhost:8000'
+    SERVER = 'http://front:8000'
     TEMPLATE_DIRS = ('FuzzEd/templates',
                      'FuzzEd/static/img')
-    BACKEND_DAEMON = "http://localhost:8001"
+    BACKEND_DAEMON = "http://back:8000"
     TERMS_PAGE = '/about/'
     FEEDBACK_PAGE = 'http://fuzzed.uservoice.com'
     FOOTER = 'FuzzEd Development Team (Dev Server)'
@@ -185,6 +185,7 @@ class Dev(Common):
         '0.0.0.0',
         '127.0.0.1',
     )
+    ALLOWED_HOSTS = ["front", "localhost"]
     LOGGING = Common.LOGGING
     LOGGING['loggers']['django.request']['handlers'] = ['console']
     LOGGING['loggers']['FuzzEd']['handlers'] = ['console']
