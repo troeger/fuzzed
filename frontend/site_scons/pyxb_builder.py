@@ -1,4 +1,5 @@
-from SCons.Script import * 
+from SCons.Script import *
+
 
 def build_xmlschema_wrappers(target, source, env):
     '''
@@ -21,7 +22,7 @@ def build_xmlschema_wrappers(target, source, env):
     prefix = ""
     all_same_prefix = True
     for t in target:
-        new_prefix = str(t).rsplit('/',1)[0]
+        new_prefix = str(t).rsplit('/', 1)[0]
         if new_prefix != prefix:
             if prefix == "":
                 prefix = new_prefix
@@ -30,19 +31,21 @@ def build_xmlschema_wrappers(target, source, env):
         prefix = new_prefix
 
     if all_same_prefix:
-        targets = [str(trg).rsplit('/',1)[1].rsplit('.')[0] for trg in target]
-        modulespec = ['-u %s -m %s'%(src, trg) for src, trg in zip(sources,targets)]
-        cmdline = 'pyxbgen --binding-root='+prefix+' '+' '.join(modulespec)
+        targets = [str(trg).rsplit('/', 1)[1].rsplit('.')[0] for trg in target]
+        modulespec = ['-u %s -m %s' % (src, trg)
+                      for src, trg in zip(sources, targets)]
+        cmdline = 'pyxbgen --binding-root=' + \
+            prefix + ' ' + ' '.join(modulespec)
     else:
         targets = [str(trg).rsplit('.')[0] for trg in target]
-        modulespec = ['-u %s -m %s'%(src, trg) for src, trg in zip(sources,targets)]
-        cmdline = 'pyxbgen '+' '.join(modulespec)
+        modulespec = ['-u %s -m %s' % (src, trg)
+                      for src, trg in zip(sources, targets)]
+        cmdline = 'pyxbgen ' + ' '.join(modulespec)
 
     print cmdline
     if os.system(cmdline) != 0:
         raise Exception('Execution of pyxbgen failed.')
 
+
 # Define Builder for Django config file from settings INI file
-pyxbbuilder = Builder(action = build_xmlschema_wrappers)
-
-
+pyxbbuilder = Builder(action=build_xmlschema_wrappers)

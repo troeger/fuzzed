@@ -1,0 +1,18 @@
+{% extends "util/base.html" %}
+{% load settings %}
+
+{% block meta %}
+<meta name="description" content="ORE gives you the fastest way for creating system dependability models in the browser.">
+{% endblock %}
+
+{% block content %}
+<form action="/complete/username/?next={{ next }}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}" />
+    <label for="username">New or existing username:</label>
+    <input id="username" name="username" type="text"/>
+    <input id="submit_url" name="submit_url" type="submit" value="Sign-In"/>
+</form>    
+
+{% endblock %}
+

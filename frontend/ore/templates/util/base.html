@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block meta %}{% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}ORE{% endblock %}
+    </title>
+    <style type="text/css">
+        {% block style %}
+        @import url("{{ STATIC_URL }}css/jquery-ui/jquery-ui-1.10.3.min.css");
+        @import url("{{ STATIC_URL }}css/theme/white.css");
+        @import url("{{ STATIC_URL }}css/font-awesome/font-awesome-4.1.0.min.css");
+        @import url("{{ STATIC_URL }}css/datatables/dataTables.bootstrap.css");
+        @import url("{{ STATIC_URL }}css/selectize/selectize.bootstrap3.css");
+        {% endblock %}
+    </style>
+
+    {% block script %}
+    {{ block.super }}
+    <script src="{{ STATIC_URL }}lib/requirejs/require-2.1.6.min.js" type="text/javascript" language="javascript"></script>
+    <script type="text/javascript" language="javascript">
+        require.config({
+            baseUrl: '{{ STATIC_URL }}script/',
+            waitSeconds: 5,
+            paths: {
+                // require plugins
+                'text' :      '../lib/requirejs/plugins/text-2.0.7', // required by json plugin
+                'json' :      '../lib/requirejs/plugins/json-0.3.1',
+                // jquery and plugins
+                'jquery':           '../lib/jquery/jquery-2.0.2.min',
+                'jquery-ui':        '../lib/jquery-ui/jquery-ui-1.10.3.min',
+                'jquery-classlist': '../lib/jquery-classlist/jquery-classlist-1.0.0',
+                'jquery-ajaxq':     '../lib/jquery-ajaxq/ajaxq-1.0.0',
+                'selectize':        '../lib/selectize/js/standalone/selectize.min',
+                'jquery-cookie':     '../lib/jquery-cookie/jquery.cookie',
+                // other libs
+                'bignumber':  '../lib/bignumber/bignumber-1.0.1.min',
+                'bootstrap':  '../lib/bootstrap/bootstrap-3.0.0rc1.min',
+                'highcharts': '../lib/highcharts/highcharts-3.0.2.min',
+                'jsplumb':    '../lib/jsplumb/jsplumb-1.5.5.min',
+                'datatables-base': '../lib/datatables/jquery.dataTables.min',
+                'datatables': '../lib/datatables/plugins/dataTables.bootstrap',
+                'datatables-api' : '../lib/datatables/plugins/datatables.api',
+                'underscore': '../lib/underscore/underscore-1.4.4.min',
+                'd3':         '../lib/d3/d3-3.3.11.min',
+                // ORE specifics
+                'notations':  '../notations'
+            },
+            // define dependencies for libs that are not AMD compatible
+            shim: {
+                'bootstrap': {
+                    deps: ['jquery']
+                },
+                'jquery-ui': {
+                    deps: ['jquery']
+                },
+                'jquery-classlist': {
+                    deps: ['jquery']
+                },
+                'jquery-ajaxq': {
+                    deps: ['jquery']
+                },
+                'jsplumb': {
+                    deps: ['jquery', 'jquery-ui'],
+                    exports: 'jsPlumb'
+                },
+                'highcharts': {
+                    deps: ['jquery'],
+                    exports: 'Highcharts'
+                },
+                'datatables-base': {
+                  deps: ['jquery']
+                },
+                'datatables':{
+                  deps:['datatables-base']
+                },
+                'datatables-api':{
+                  deps: ['datatables-base']
+                },
+                'underscore': {
+                    exports: '_'
+                }
+            }
+        });
+    </script>
+
+    {% if messages %}
+        <script type="text/javascript">
+            require(['alerts'], function(Alerts) {
+                jQuery(document).ready( function(){
+                    {% for message in messages %}
+                        Alerts.showAlert('{{ message.tags }}', '{{ message.tags.capitalize }}', '{{ message }}', 5000);
+                    {% endfor %}
+                });
+            });
+        </script>
+    {% endif %}
+    {% endblock %}
+</head>
+
+<body>
+    <div class="navbar navbar-fixed-top no-print">
+        <div class="container">
+            <a class="navbar-brand" anchor="#">
+                {% if graph and project %}
+                    {% if user == project.owner %}
+                        <a class="navbar-brand" href="{% url 'dashboard' project.pk %}"><small><i class="fa fa-fw fa-folder-open"></i>{{ project.name }}</small></a>
+                    {% else %}
+                        <!-- otherwise user is only viewer of the graph (graph is shared with the current user)-->
+                        <a class="navbar-brand" href="{% url 'shared_graphs_dashboard' %}"><small>Shared Graphs</small></a>
+                    {% endif %}
+                    <a class="navbar-brand" href="#">"{{ graph }}"</a>
+                {% else %}
+                    ORE 
+                {% endif %}
+            </a>
+
+            {% block nav_center %}{% endblock %}
+
+            <!-- .navbar-toggle is used as the toggle for collapsed navbar content -->
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                <span class="fa fa-bar"></span>
+                <span class="fa fa-bar"></span>
+                <span class="fa fa-bar"></span>
+            </button>
+
+            <!-- Used to clear the float on small devices to get the collaps menu right -->
+            <div class="navbar-collapse-clear"></div>
+
+            <!-- Place everything within .nav-collapse to hide it until above 768px -->
+            <div class="nav-collapse collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav pull-right">
+                    {% block menu_right %}{% endblock %}
+                    <li class="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-fw fa-arrow-circle-o-right"></i> Go to ...<i class="caret"></i></a>
+                      <ul class="dropdown-menu">
+                        {% block goto_menu %}{% endblock %}
+                      </ul>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {% block body %}
+    <div class="container space-top">
+        <div id="FuzzEdAlertContainer" class="no-print"></div>
+
+        {% block content %}{% endblock %}
+
+        {% block footer %}
+            {% include "util/footer.html" %}
+        {% endblock %}
+    </div>
+    {% endblock %}
+</body>
+</html>

@@ -1,5 +1,5 @@
-from SCons.Script import * 
+from SCons.Script import *
 
 lessbuilder = Builder(action='lessc $SOURCE $TARGET',
-                      suffix = '.css',
-                      src_suffix = '.less')
+                      suffix='.css',
+                      src_suffix='.less')

@@ -1,65 +1,66 @@
 '''
-  The central SCons file for this project, which is based on a set of FuzzEd-specific
+  The central SCons file for this project, which is based on a set of ORE-specific
   builders stored in the site_scons folder.
 '''
 
-from FuzzEd import VERSION
+from ore import VERSION
 
-#./site_scons automatically becomes part of the Python search path
+# ./site_scons automatically becomes part of the Python search path
 # Add our own builders to the SCons environment
-env=Environment(
-  tools=['default', fuzzed_builders])  
+env = Environment(
+    tools=['default', fuzzed_builders])
 
 # Static files generation - 'static-release' target
-statics = env.Command( Dir('FuzzEd/static-release'), 
-                       Dir('FuzzEd/static'), 
-                       './manage.py collectstatic -v3 --noinput --configuration=Dev'
+statics = env.Command(Dir('ore/static-release'),
+                      Dir('ore/static'),
+                      './manage.py collectstatic -v3 --noinput --configuration=Dev'
                       )
-Clean(statics, 'FuzzEd/static-release')
+Clean(statics, 'ore/static-release')
 
 # Lessc compilation - 'white.css' target
-css = env.Lessc( 'FuzzEd/static/css/theme/white.css',
-          'FuzzEd/static/less/theme/white/theme.less')
+css = env.Lessc('ore/static/css/theme/white.css',
+                'ore/static/less/theme/white/theme.less')
 
 # XML Wrapper generation
-xml_targets = ['FuzzEd/models/xml_common.py',
-               'FuzzEd/models/xml_configurations.py',
-               'FuzzEd/models/xml_backend.py',
-               'FuzzEd/models/xml_fuzztree.py',
-               'FuzzEd/models/xml_faulttree.py'   ]
-xml = env.PyXB(   xml_targets,
-            [  '/ore-common/xsd/commonTypes.xsd',
-               '/ore-common/xsd/configurations.xsd',
-               '/ore-common/xsd/backendResult.xsd',
-               '/ore-common/xsd/fuzztree.xsd',
-               '/ore-common/xsd/faulttree.xsd' 
-            ])
+xml_targets = ['ore/models/xml_common.py',
+               'ore/models/xml_configurations.py',
+               'ore/models/xml_backend.py',
+               'ore/models/xml_fuzztree.py',
+               'ore/models/xml_faulttree.py']
+xml = env.PyXB(xml_targets,
+               ['/ore-common/xsd/commonTypes.xsd',
+                '/ore-common/xsd/configurations.xsd',
+                '/ore-common/xsd/backendResult.xsd',
+                '/ore-common/xsd/fuzztree.xsd',
+                '/ore-common/xsd/faulttree.xsd'
+                ])
 
 # Web package generation - 'package.web' target
 package_web = env.Package(
-                     "dist/FuzzEd-%s"%VERSION, 
-                     [Dir("FuzzEd/api"),
-                      Dir("FuzzEd/management"),
-                      Dir("FuzzEd/migrations"),
-                      Dir("FuzzEd/models"),
-                      Dir("FuzzEd/static-release"),
-                      Dir("FuzzEd/templates"),
-                      xml_targets,
-                      Glob("FuzzEd/*"),
-                     "manage.py"]
-                  )
+    "dist/ore-%s" % VERSION,
+    [Dir("ore/api"),
+     Dir("ore/management"),
+     Dir("ore/migrations"),
+     Dir("ore/models"),
+     Dir("ore/static-release"),
+     Dir("ore/templates"),
+     xml_targets,
+     Glob("ore/*"),
+     "manage.py"]
+)
 
 # Backend package generation - 'package.backend' target
 package_backend = env.Package(
-                     "dist/FuzzEdBackend-%s"%VERSION, 
-                     [Dir("backends/lib"),
-                     "backends/initscript.sh",
-                     "backends/daemon.py",
-                     "backends/daemon.ini",
-                     Dir("backends/rendering")]
-                  )
+    "dist/OreBackend-%s" % VERSION,
+    [Dir("backends/lib"),
+     "backends/initscript.sh",
+     "backends/daemon.py",
+     "backends/daemon.ini",
+     Dir("backends/rendering")]
+)
 
-gittag = AlwaysBuild(env.Command('git tag -f %s'%VERSION, None, 'git tag -f v%s'%VERSION))
+gittag = AlwaysBuild(env.Command('git tag -f %s' %
+                                 VERSION, None, 'git tag -f v%s' % VERSION))
 
 Alias('package', gittag)
 Alias('package', package_web)
@@ -67,33 +68,33 @@ Alias('package', package_backend)
 Alias('package.web', package_web)
 
 
-# Generation of Python version of the notation files 
-notations = env.Notations(  'FuzzEd/models/notations.py',
-              [ 'FuzzEd/static/notations/dfd.json',
-                'FuzzEd/static/notations/faulttree.json',
-                'FuzzEd/static/notations/fuzztree.json',
-                'FuzzEd/static/notations/rbd.json'] )
+# Generation of Python version of the notation files
+notations = env.Notations( 'ore/models/notations.py',
+                          ['ore/static/notations/dfd.json',
+                           'ore/static/notations/faulttree.json',
+                           'ore/static/notations/fuzztree.json',
+                           'ore/static/notations/rbd.json'])
 
 # Generation of the TikZ library code, based on SVG images
-shapes = env.Tikz( 'FuzzEd/models/node_rendering.py', 
-          Glob('FuzzEd/static/img/dfd/*.svg') +
-          Glob('FuzzEd/static/img/faulttree/*.svg') +
-          Glob('FuzzEd/static/img/fuzztree/*.svg') +
-          Glob('FuzzEd/static/img/rbd/*.svg') )
+shapes = env.Tikz(     'ore/models/node_rendering.py',
+                  Glob('ore/static/img/dfd/*.svg') +
+                  Glob('ore/static/img/faulttree/*.svg') +
+                  Glob('ore/static/img/fuzztree/*.svg') +
+                  Glob('ore/static/img/rbd/*.svg'))
 
 # Generate patched versions of third party code
-patch1 = env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css',
-          ['FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.patch',
-           'FuzzEd/static/css/font-awesome/font-awesome-4.1.0.css.orig'])
-patch2 = env.Patch('FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css',
-          ['FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css.patch',
-           'FuzzEd/static/css/font-awesome/font-awesome-4.1.0.min.css.orig'])
-patch3 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js',
-          ['FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.patch',
-           'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.js.orig'])
-patch4 = env.Patch('FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js',
-          ['FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.patch',
-           'FuzzEd/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.orig'])
+patch1 = env.Patch( 'ore/static/css/font-awesome/font-awesome-4.1.0.css',
+                   ['ore/static/css/font-awesome/font-awesome-4.1.0.css.patch',
+                    'ore/static/css/font-awesome/font-awesome-4.1.0.css.orig'])
+patch2 = env.Patch( 'ore/static/css/font-awesome/font-awesome-4.1.0.min.css',
+                   ['ore/static/css/font-awesome/font-awesome-4.1.0.min.css.patch',
+                    'ore/static/css/font-awesome/font-awesome-4.1.0.min.css.orig'])
+patch3 = env.Patch( 'ore/static/lib/jquery-ui/jquery-ui-1.10.3.js',
+                   ['ore/static/lib/jquery-ui/jquery-ui-1.10.3.js.patch',
+                    'ore/static/lib/jquery-ui/jquery-ui-1.10.3.js.orig'])
+patch4 = env.Patch( 'ore/static/lib/jquery-ui/jquery-ui-1.10.3.min.js',
+                   ['ore/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.patch',
+                    'ore/static/lib/jquery-ui/jquery-ui-1.10.3.min.js.orig'])
 
 # Define meta-targets for ease of use
 env.Alias("backend", "ftconfiguration")
@@ -119,5 +120,3 @@ AlwaysBuild(env.Command('fixture.save', None, fixture_save))
 AlwaysBuild(env.Command('run.frontend', None, run_frontend))
 AlwaysBuild(env.Command('run.backend', None, run_backend))
 AlwaysBuild(env.Command('run.all', None, run_all))
-
-

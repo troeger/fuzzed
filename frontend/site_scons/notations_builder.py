@@ -6,8 +6,10 @@
     for correctness and consistency checks.
 '''
 
-from SCons.Script import * 
-import json, pprint
+from SCons.Script import *
+import json
+import pprint
+
 
 def generate_graphml_keys(notations):
     '''
@@ -21,11 +23,11 @@ def generate_graphml_keys(notations):
         Our GraphML export behaves nicely and always adds this preamble, so that
         other GraphML tools can render the values nicely. For this reason,
         the 'graphml_keys' list is generated. It is just an ugly collection of XML
-        definitions, which means that Marcus violates his own understand of 
-        beautiful code ... 
+        definitions, which means that Marcus violates his own understand of
+        beautiful code ...
 
         Our GraphML import does not rely on the existence of this preamble, but
-        simply wants to know if a given GraphML <data> element refers to a valid key. 
+        simply wants to know if a given GraphML <data> element refers to a valid key.
         For this reason, the 'graphml_graph_data' and 'graphml_node_data' list is generated.
         It tells the import code if a graph / node element in the input XML is allowed
         to have a particulary named data element.
@@ -40,13 +42,12 @@ def generate_graphml_keys(notations):
             '            <default>%s</default>\n' \
             '        </key>' % (name, for_what, name, kind, default,)
 
-
     for notation in notations:
         notation_kind = notation['kind']
         graphml_graph_data[notation_kind] = set(['kind'])
-        graphml_node_data[notation_kind] = set(['id','kind','x','y'])
-        properties    = set()
-        all_keys      = [
+        graphml_node_data[notation_kind] = set(['id', 'kind', 'x', 'y'])
+        properties = set()
+        all_keys = [
             generate_key_xml('id', 'string', '0'),
             generate_key_xml('kind', 'string', 'node'),
             generate_key_xml('x', 'long', '0'),
@@ -62,44 +63,54 @@ def generate_graphml_keys(notations):
                     properties.add(property_name)
 
                 property_default = propertie.get('default', '')
-                property_kind    = propertie['kind']
-                key              = None
-                keys             = None
+                property_kind = propertie['kind']
+                key = None
+                keys = None
 
                 if property_kind in {'text', 'textfield'}:
-                    key = generate_key_xml(property_name, 'string', property_default if propertie != 'name' else 'Node')
+                    key = generate_key_xml(
+                        property_name, 'string', property_default if propertie != 'name' else 'Node')
                     graphml_node_data[notation_kind].add(property_name)
                 elif property_kind == 'compound':
-                    parts_index    = property_default[0]
+                    parts_index = property_default[0]
                     compound_parts = propertie['parts']
 
                     keys = [
-                        generate_key_xml(property_name,          'string', property_default[1]),
-                        generate_key_xml(property_name + 'Kind', 'string', compound_parts[parts_index]['partName']),
+                        generate_key_xml(
+                            property_name, 'string', property_default[1]),
+                        generate_key_xml(
+                            property_name + 'Kind', 'string', compound_parts[parts_index]['partName']),
                     ]
                     graphml_node_data[notation_kind].add(property_name)
                 elif property_kind == 'bool':
-                    key = generate_key_xml(property_name, 'boolean', 'true' if property_default else 'false')
+                    key = generate_key_xml(
+                        property_name, 'boolean', 'true' if property_default else 'false')
                     graphml_node_data[notation_kind].add(property_name)
                 elif property_kind == 'choice':
                     index = propertie['values'].index(property_default)
                     property_default = property_default[index]
-                    key = generate_key_xml(property_name, 'string', property_default)
+                    key = generate_key_xml(
+                        property_name, 'string', property_default)
                     graphml_node_data[notation_kind].add(property_name)
                 elif property_kind == 'epsilon':
                     keys = [
-                        generate_key_xml(property_name,             'double', property_default[0]),
-                        generate_key_xml(property_name + 'Epsilon', 'double', property_default[1])
+                        generate_key_xml(
+                            property_name, 'double', property_default[0]),
+                        generate_key_xml(
+                            property_name + 'Epsilon', 'double', property_default[1])
                     ]
                     graphml_node_data[notation_kind].add(property_name)
                 elif property_kind in {'numeric', 'range'}:
-                    kind = 'long' if propertie.get('step', 1) == 1 else 'double'
+                    kind = 'long' if propertie.get(
+                        'step', 1) == 1 else 'double'
 
                     if property_name != 'missionTime':
-                        key = generate_key_xml(property_name, kind, property_default)
+                        key = generate_key_xml(
+                            property_name, kind, property_default)
                         graphml_node_data[notation_kind].add(property_name)
                     else:
-                        key = generate_key_xml(property_name, kind, property_default, 'graph')
+                        key = generate_key_xml(
+                            property_name, kind, property_default, 'graph')
                         graphml_graph_data[notation_kind].add(property_name)
                 elif property_kind == 'transfer':
                     key = generate_key_xml(property_name, 'string', '')
@@ -113,6 +124,7 @@ def generate_graphml_keys(notations):
         graphml_keys[notation_kind] = '\n'.join(all_keys)
 
     return graphml_keys, graphml_graph_data, graphml_node_data
+
 
 def extend(target, source, *others, **options):
     all_sources = (source,) + others
@@ -132,8 +144,10 @@ def extend(target, source, *others, **options):
 
     return target
 
+
 def generate_choices(notations):
     return [(notation['kind'], notation['name']) for notation in notations]
+
 
 def generate_node_choices(notations):
     node_choices = []
@@ -151,6 +165,7 @@ def generate_node_choices(notations):
 
     return node_choices
 
+
 def inherit(node_name, node, nodes, node_cache):
     inherits_from = node.get('inherits')
 
@@ -166,6 +181,7 @@ def inherit(node_name, node, nodes, node_cache):
 
     return resolved
 
+
 def resolve_inheritance(notations):
     for notation in notations:
         notation[u'edges'] = notation.get(u'edges', {})
@@ -174,6 +190,7 @@ def resolve_inheritance(notations):
 
         for node_name, node in nodes.items():
             nodes[node_name] = inherit(node_name, node, nodes, node_cache)
+
 
 def notations(target, source, env):
     '''
@@ -186,12 +203,13 @@ def notations(target, source, env):
             notations.append(json.loads(handle.read()))
     resolve_inheritance(notations)
 
-
     with open(str(target[0]), 'w') as out:
-        out.write('# DO NOT EDIT! This file is auto-generated by "setup.py build"\n')
+        out.write(
+            '# DO NOT EDIT! This file is auto-generated by "setup.py build"\n')
         out.write('notations = ')
         pprint.pprint(notations, out)
-        out.write('\nby_kind = {notation[\'kind\']: notation for notation in notations}\n')
+        out.write(
+            '\nby_kind = {notation[\'kind\']: notation for notation in notations}\n')
         out.write('choices = ')
         pprint.pprint(generate_choices(notations), out)
         out.write('\nnode_choices = ')
@@ -205,4 +223,5 @@ def notations(target, source, env):
         pprint.pprint(node_data, out)
         out.write('\n# END OF GENERATED CONTENT')
 
-notationsbuilder = Builder(action = notations)
+
+notationsbuilder = Builder(action=notations)

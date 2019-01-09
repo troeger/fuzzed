@@ -1,0 +1,98 @@
+{% extends "util/base.html" %}
+{% load settings %}
+
+{% block meta %}
+<meta name="description" content="ORE gives you the fastest way for creating system dependability models in the browser.">
+<link rel="stylesheet" href="{{ STATIC_URL }}lib/social-buttons/auth-buttons.css">
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript">
+    require(['bootstrap'], function() {});
+</script>
+{% endblock %}
+
+{% block goto_menu %}
+<li><a href="{% setting 'FEEDBACK_PAGE' %}"><i class="fa fa-fw fa-bolt"></i> Feedback </a></li>
+{% endblock %}
+
+
+{% block content %}
+<section>
+    <div class="row">
+        <div class="col-4">
+            <h4>Dependability Analysis<br/>in the Cloud.
+                <br><small>Fault Trees and RBDs.</small>
+            </h4>
+            <p>
+                ORE gives you the fastest way for creating system 
+                dependability models. Share your models and ideas with other experts, but only if you want to.
+                <br/> 
+            </p>
+        </div>
+
+        <div class="col-4">
+            <h4>Make The Uncertainties<br/>Explicit.
+                <br><small>Introducing FuzzTrees.</small>
+            </h4>
+            <p>
+                Our novel concept for fault tree modeling with uncertainties allows you to express
+                configurable and currently underspecified parts of the system.<br/> 
+                Our analysis engine tells you which configuration options 
+                will give the best cost-dependability ratio.
+            </p>
+        </div>
+
+        <div class="col-4">
+            <h4>Freedom of Research,<br/>Privacy of Data.
+                <br><small>Options available.</small>
+            </h4>
+            <p>
+                ORE is licensed under AGPL, which allows you to install und use it freely in your own environment. If you want to contribute modifications, please join our <a href="https://github.com/troeger/fuzzed">GitHub project</a>. 
+            </p>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h5>Please use one of these authentication methods: </h5>
+
+        <div class="row">
+            <div class="col-2">
+                <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}" class="btn-auth btn-google"><b>Google</b></a>
+            </div>
+            <div class="col-2">
+                <a href="{% url 'social:begin' 'twitter' %}?next={{ next }}" class="btn-auth btn-twitter"><b>Twitter</b></a>
+            </div>
+            <div class="col-2">
+                <a href="{% url 'social:begin' 'github' %}?next={{ next }}" class="btn-auth btn-github"><b>GitHub</b></a>
+            </div>
+<!--        <div class="col-2">
+                <a href="{% url 'social:begin' 'yahoo-oauth2' %}?next={{ next }}" class="btn-auth btn-yahoo"><b>Yahoo!</b></a>
+            </div>
+            <div class="col-2">
+                <a href="{% url 'social:begin' 'live' %}?next={{ next }}" class="btn-auth btn-windows"><b>Live</b></a>
+            </div>
+-->         <div class="col-4">
+                <form action="{% url 'social:begin' 'openid' %}?next={{ next }}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}" />
+                    <label for="openid_identifier">
+                        <span class="btn-auth btn-openid"><b>OpenID</b></span>
+                    </label>
+                    <input id="openid_identifier" name="openid_identifier" type="text" value="https://" />
+                    <input id="submit_url" name="submit_url" type="submit" value="Sign-In"/>
+                </form>    
+            </div>
+        </div>
+        {% get_debug_status as debug %}
+        {% if debug %}
+        <div>
+                <a href="{% url 'social:begin' 'username' %}?next={{ next }}"><b>Developer Login</b></a>
+        </div>
+        {% endif %}
+
+</section>
+{% endblock %}
+

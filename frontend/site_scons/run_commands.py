@@ -1,5 +1,4 @@
 from SCons.Script import *
-
 from subprocess import Popen
 import sys
 import os
@@ -46,12 +45,12 @@ def fixture_save(target, source, env):
                    }
                    }
     jsontext = subprocess.check_output(['./manage.py', 'dumpdata',
-                                        'FuzzEd.project',
-                                        'FuzzEd.graph',
-                                        'FuzzEd.node',
-                                        'FuzzEd.nodegroup',
-                                        'FuzzEd.edge',
-                                        'FuzzEd.property'])
+                                        'ore.project',
+                                        'ore.graph',
+                                        'ore.node',
+                                        'ore.nodegroup',
+                                        'ore.edge',
+                                        'ore.property'])
     data = json.loads(jsontext)
     # Remove existing user account data, replace with test suite user
     for entry in data:
@@ -62,14 +61,8 @@ def fixture_save(target, source, env):
             entry['fields']['owner'] = 2   # see above
             print "Replacing database user reference for " + entry["model"]
     data.append(testaccount)
-    output = open("FuzzEd/fixtures/new.json", "w")
+    output = open("ore/fixtures/new.json", "w")
     output.write(json.dumps(data, indent=4))
     print "New fixture file is now available at fixtures/new.json"
     output.close()
 
-# def fixture_load(fname=None):
-#    '''Loads the database with a test fixture from ./FuzzEd/fixtures/'''
-#    if fname==None:
-#        print "Usage: fab fixture_load:<filename>"
-#        return
-#    os.system('./manage.py loaddata ./FuzzEd/fixtures/'+fname)

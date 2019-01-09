@@ -39,4 +39,4 @@ back-shell: up
 
 # Run test suite
 test: up
-	docker exec -w /ore-front ore-front python /ore-front/manage.py test
+	docker exec ore-front bash -c "cd /ore-front; python manage.py test"
