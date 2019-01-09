@@ -34,18 +34,13 @@ The only supported environment for development is Docker Compose.
 
 Get a checkout and run:
 
-``make up``
+``make build``
 
-This prepares docker images for the frontend and the backend part, and starts them. After finishing, you should be able to use the frontend on your machine at http://localhost:8000. The start page has a *Developer Login* link right below the OAuth login logos, which works without Internet connectivity.  The OAuth login logos are broken by default, since you need [OAuth2 credentials](https://github.com/troeger/fuzzed/wiki/OAuth2Cred) to be configured for that.
+This prepares docker images for the frontend and the backend part, compiles neccessary code parts, starts the images and runs the frontend Django development server, the backend daemon and the database in separate containers.
+
+After finishing, you should be able to use the frontend on your machine at http://localhost:8000. The start page has a *Developer Login* link right below the OAuth login logos, which works without Internet connectivity.  The OAuth login logos are broken by default, since you need [OAuth2 credentials](https://github.com/troeger/fuzzed/wiki/OAuth2Cred) to be configured for that.
 
 If your working on a staging machine, a valid option is to get an OpenID from somewhere such as https://openid.stackexchange.com.
-
-## Prepare and run a production machine from a checkout
-
-    scons frontend backend
-    scons package
-    ansible-playbook -i ansible/inventories/localhost -e release_version=0.X.X ansible/prod_fe.yml
-    ansible-playbook -i ansible/inventories/localhost -e release_version=0.X.X ansible/prod_be.yml
 
 ## Licence
 
