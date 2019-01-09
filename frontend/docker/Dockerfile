@@ -7,6 +7,8 @@ RUN apt-get update \
     && apt-get install -y ansible \
     && rm -rf /var/lib/apt/lists/* 
 
+# Copy ansible script instead of mounting, so that
+# changes in the roles trigger an docker image rebuilt
 COPY ansible /ansible
 
 # Install dependencies via Ansible

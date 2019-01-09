@@ -16,9 +16,18 @@ services:
     build: 
       context: .
       dockerfile: ./frontend/docker/Dockerfile
+    environment:
+      DJANGO_CONFIGURATION: Dev
+      ORE_BACKEND_DAEMON: http://back:8000
+      ORE_SERVER_URL: http://front:8000
+      ORE_SERVER: front
+      ORE_DB_NAME: ore 
+      ORE_DB_USER: ore 
+      ORE_DB_PASSWORD: ore 
+      ORE_DB_HOST: db 
     tty: true
     ports:
-      - "8000:8000"
+      - 8000:8000
     depends_on:
       - db
     volumes:

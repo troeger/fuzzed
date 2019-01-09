@@ -2,5 +2,6 @@
 
 cd /ore-front
 scons 
+./manage.py migrate auth
 ./manage.py migrate
-./manage.py runserver
+./manage.py runserver 0.0.0.0:8000
