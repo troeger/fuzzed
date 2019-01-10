@@ -7,7 +7,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* 
 
 RUN apt-get update \
-    && apt-get install -y python python-pip libboost libboost-graph libboost-date-time libboost-system libboost-filesystem libboost-program-options libxerces-c xsdcxx \
+    && apt-get install -y python python-pip  libboost-dev libboost-graph-dev libboost-date-time-dev libboost-system-dev libboost-filesystem-dev libboost-program-options-dev libxerces-c-dev xsdcxx \
     && rm -rf /var/lib/apt/lists/* 
 
 RUN pip install requests
