@@ -1,9 +1,9 @@
 version: '3'
 
 services:
-  ore-db:
+  ore-db-dev:
     image: postgres:9
-    container_name: ore-db
+    container_name: ore-db-dev
     environment:
       POSTGRES_PASSWORD: ore
       POSTGRES_USER: ore
@@ -23,12 +23,12 @@ services:
       ORE_DB_NAME: ore 
       ORE_DB_USER: ore 
       ORE_DB_PASSWORD: ore 
-      ORE_DB_HOST: ore-db 
+      ORE_DB_HOST: ore-db-dev
     tty: true
     ports:
       - 8000:8000
     depends_on:
-      - ore-db
+      - ore-db-dev
       - ore-back-dev
     volumes:
       - ./frontend:/ore-front
