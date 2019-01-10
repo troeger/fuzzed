@@ -65,4 +65,3 @@ def fixture_save(target, source, env):
     output.write(json.dumps(data, indent=4))
     print "New fixture file is now available at fixtures/new.json"
     output.close()
-
