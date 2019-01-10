@@ -31,6 +31,11 @@ dev-back-shell:
 prod-build:
 	docker-compose -f docker-compose.production.yml build
 
+prod-up:
+	docker-compose -f docker-compose.production.yml up
+
+prod-down:
+	docker-compose -f docker-compose.production.yml down 
 
 
 
