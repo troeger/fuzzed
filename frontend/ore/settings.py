@@ -143,11 +143,23 @@ class Common(Configuration):
         'filters': {
             'require_debug_false': {
                 '()': 'django.utils.log.RequireDebugFalse'
-            }
+            },
+            'require_debug_true': {
+                '()': 'django.utils.log.RequireDebugTrue'
+            },
+        },
+        'formatters': {
+            'verbose': {
+                'format': "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s"
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+            },
         },
         'handlers': {
             'console': {
                 'level': 'DEBUG',
+                'filters': ['require_debug_true'],
                 'class': 'logging.StreamHandler'
             },
             'mail_admins': {
@@ -166,8 +178,22 @@ class Common(Configuration):
             },
         },
         'loggers': {
-            'django.request': {},
-            'ore': {}
+            'django.request': {
+                'handlers': ['mail_admins', 'file', 'console'],
+                'level': 'ERROR',
+                'propagate': True,
+            },
+            'ore': {
+                'handlers': ['console', 'file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+            'social': {
+                'handlers': ['console', 'file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+
         }
     }
 
