@@ -8,7 +8,7 @@ from ore import VERSION
 # ./site_scons automatically becomes part of the Python search path
 # Add our own builders to the SCons environment
 env = Environment(
-    tools=['default', fuzzed_builders])
+    tools=['default', ore_builders])
 
 # Static files generation - 'static-release' target
 statics = env.Command(Dir('ore/static-release'),
@@ -114,9 +114,3 @@ env.Alias("frontend", patch4)
 # We skip the backend and doc builds here, which mainly is speeding
 # up frontend development
 env.Default("frontend")
-
-# Special pseudo-targets to run stuff via Scons
-AlwaysBuild(env.Command('fixture.save', None, fixture_save))
-AlwaysBuild(env.Command('run.frontend', None, run_frontend))
-AlwaysBuild(env.Command('run.backend', None, run_backend))
-AlwaysBuild(env.Command('run.all', None, run_all))

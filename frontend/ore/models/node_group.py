@@ -6,7 +6,7 @@ import logging
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 from django.db import models
-from django.core.exeptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 from ore.models import Node, Graph
 from .notations import notations

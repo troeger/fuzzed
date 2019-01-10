@@ -4,7 +4,7 @@
  */
 /**
  *  File: bootstrap-custom.less
- *      This file contains all ORE-specific overrides for Bootstrap.
+ *      This file contains all FuzzEd-specific overrides for Bootstrap.
  */
 /*!
  * Bootstrap v3.0.0
@@ -4104,7 +4104,7 @@ i.icon-layout-tree:hover {
 }
 /**
  *  File: jquery-ui-custom.less
- *      This file contains all ORE-specific overrides for jQuery UI.
+ *      This file contains all FuzzEd-specific overrides for jQuery UI.
  */
 .ui-selectable-helper {
   border: 1px gray dashed;

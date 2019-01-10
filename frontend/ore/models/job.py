@@ -443,7 +443,7 @@ def job_post_save(sender, instance, created, **kwargs):
             # away when finished
             s = xmlrpclib.ServerProxy(settings.BACKEND_DAEMON)
             logger.debug(
-                "Triggering %s job on url %s" %
+                "Triggering %s job available through url %s" %
                 (instance.kind, job_url))
             s.start_job(instance.kind, job_url)
         except Exception as e:

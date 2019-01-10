@@ -1,7 +1,7 @@
-# FuzzEd/models/xml_backend.py
+# ore/models/xml_backend.py
 # -*- coding: utf-8 -*-
 # PyXB bindings for NM:05ee920a1d4f1202361106450bf13e4b20aed253
-# Generated 2019-01-08 22:31:08.675728 by PyXB version 1.2.6 using Python 2.7.15.candidate.1
+# Generated 2019-01-09 14:06:28.496310 by PyXB version 1.2.6 using Python 2.7.15.candidate.1
 # Namespace http://www.fuzzed.org/backendResults
 
 from __future__ import unicode_literals
@@ -14,7 +14,7 @@ import pyxb.utils.domutils
 import sys
 import pyxb.utils.six as _six
 # Unique identifier for bindings created at the same time
-_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:17f5226a-1395-11e9-89d0-0242c0a80004')
+_GenerationUID = pyxb.utils.utility.UniqueIdentifier('urn:uuid:c1f84e9a-1417-11e9-9981-0242c0a83004')
 
 # Version of PyXB used to generate the bindings
 _PyXBVersion = '1.2.6'

@@ -4,11 +4,9 @@ import json
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.mail import mail_managers
-from django.http import HttpResponse
-from tastypie.http import HttpBadRequest, HttpNotFound, HttpMultipleChoices
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseNotFound
 from tastypie import fields
 from django.conf.urls import url
-from django.utils import http
 
 from . import common
 from ore.models import Job
@@ -55,10 +53,9 @@ class JobResource(common.JobResource):
                 bundle=basic_bundle,
                 **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
-            return HttpNotFound()
+            return HttpResponseNotFound()
         except MultipleObjectsReturned:
-            return HttpMultipleChoices(
-                "More than one resource is found at this URI.")
+            return HttpResponse(status=300)  # multiple choices
 
         logger.debug("Delivering data for job %d" % job.pk)
         response = HttpResponse()
@@ -88,10 +85,9 @@ class JobResource(common.JobResource):
                 bundle=basic_bundle,
                 **self.remove_api_resource_names(kwargs))
         except ObjectDoesNotExist:
-            return http.HttpNotFound()
+            return HttpResponseNotFound()
         except MultipleObjectsReturned:
-            return http.HttpMultipleChoices(
-                "More than one resource is found at this URI.")
+            return HttpResponse(status=300)  # multiple choices
 
         if job.done():
             logger.error("Job already done, discarding uploaded results")
@@ -104,7 +100,7 @@ class JobResource(common.JobResource):
                 result = json.loads(request.body)
                 assert('exit_code' in result)
             except Exception:
-                return HttpBadRequest()
+                return HttpResponseBadRequest()
             job.exit_code = result['exit_code']
             if "file_name" in result:
                 try:

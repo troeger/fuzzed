@@ -10,7 +10,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
 \\pgfusepath{stroke, fill}
@@ -25,7 +25,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{16.800000}
 \\pgfusepath{stroke, fill}
@@ -40,7 +40,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,7.7 L 34.3,7.7 M 0.7,27.3 L 34.3,27.3}
         \\pgfrect{\pgfpoint{0.700000}{7.700000}}{\pgfpoint{33.600000}{20.000000}}
@@ -56,7 +56,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,34.3 L 34.3,34.3 34.3,21 C 34.3,21 34.3,0.7 17.5,0.7 C 0.7,0.7 0.7,21 0.7,21 z}
         \\pgfusepath{stroke}
@@ -70,7 +70,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{16.800000}
 \\pgfusepath{stroke, fill}
@@ -85,7 +85,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{20.000000}{20.000000}}{14.300000}
 \\pgfusepath{stroke, fill}
@@ -104,7 +104,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
 \\pgfusepath{stroke, fill}
@@ -119,7 +119,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,17.5 34.3,17.5}
         \\pgfpathsvg{M 1,34.3 17.5,19 34,34.3}
@@ -136,7 +136,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 17.5,0.7 L 34.3,15 34.3,34.3 0.7,34.3 0.7,15 z}
         \\pgfusepath{stroke}
@@ -150,7 +150,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 17.5,0.7 L 34.3,11 34.3,24 17.5,34.3 0.7,24 0.7,11 z}
         \\pgfusepath{stroke}
@@ -164,7 +164,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
 \\pgfusepath{stroke, fill}
@@ -179,7 +179,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfrect{\pgfpoint{7.700000}{7.700000}}{\pgfpoint{26.600000}{26.600000}}
 \\pgfusepath{stroke, fill}
@@ -198,7 +198,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{16.800000}
 \\pgfusepath{stroke, fill}
@@ -213,7 +213,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
         \\pgfusepath{stroke}
@@ -227,7 +227,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{16.800000}
 \\pgfusepath{stroke, fill}
@@ -242,7 +242,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,34.3 L 34.3,34.3 34.3,21 C 34.3,21 34.3,0.7 17.5,0.7 C 0.7,0.7 0.7,21 0.7,21 z}
         \\pgfpathsvg{M 1,34.3 17.5,2.8 34,34.3}
@@ -257,7 +257,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,17.5 34.3,17.5}
         \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
@@ -273,7 +273,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,17.5 34.3,17.5}
         \\pgfpathsvg{M 17.5,34.3 17.5,25.55 34.3,25.55}
@@ -290,7 +290,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
 \\pgfusepath{stroke, fill}
@@ -305,7 +305,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 17.5,1 35,34.3 1,34.3 z}
         \\pgfusepath{stroke}
@@ -319,7 +319,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 17.5,0.7 34.3,17.5 17.5,34.3 0.7,17.5 z}
         \\pgfusepath{stroke}
@@ -333,7 +333,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{35}{35}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
         \\pgfpathsvg{M 8.4,9.1 17.5,28.0 26.6,9.1}
@@ -348,7 +348,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{35}{35}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
         \\pgfpathsvg{M 0.7,34.3 L 17.5,1.4 34.3,34.3}
@@ -363,7 +363,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,34.3 L 34.3,34.3 34.3,21 C 34.3,21 34.3,0.7 17.5,0.7 C 0.7,0.7 0.7,21 0.7,21 z}
         \\pgfusepath{stroke}
@@ -377,7 +377,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{16.800000}
 \\pgfusepath{stroke, fill}
@@ -392,7 +392,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{20.000000}{20.000000}}{14.300000}
 \\pgfusepath{stroke, fill}
@@ -411,7 +411,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
 \\pgfusepath{stroke, fill}
@@ -426,7 +426,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfsetdash{{4.2}{1.4}}{0}
         \\pgfpathsvg{M 0.7,24 C 0.7,24 3.5,34 17.5,34.3 31.5,34.3 34.3,24 34.3,24 L 21,0.7 14,0.7 z}
@@ -441,7 +441,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 17.5,0.7 L 34.3,15 34.3,34.3 0.7,34.3 0.7,15 z}
         \\pgfusepath{stroke}
@@ -455,7 +455,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 17.5,0.7 L 34.3,11 34.3,24 17.5,34.3 0.7,24 0.7,11 z}
         \\pgfusepath{stroke}
@@ -469,7 +469,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
 \\pgfusepath{stroke, fill}
@@ -484,7 +484,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfrect{\pgfpoint{7.700000}{7.700000}}{\pgfpoint{26.600000}{26.600000}}
 \\pgfusepath{stroke, fill}
@@ -503,7 +503,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{16.800000}
 \\pgfusepath{stroke, fill}
@@ -518,7 +518,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
         \\pgfusepath{stroke}
@@ -532,7 +532,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{16.800000}
 \\pgfusepath{stroke, fill}
@@ -547,7 +547,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfsetdash{{4.2}{1.4}}{0}
         \\pgfpathsvg{M 0.7,24.5 C 0.7,38 34.3,38 34.3,24.5 L 28,21 C 26.6,10.5 22.4,3.5 17.5,0.7 C 12.6,3.5 8.4,10.5 7,21 z}
@@ -562,7 +562,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
 \\pgfusepath{stroke, fill}
@@ -577,7 +577,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 17.5,1 35,34.3 1,34.3 z}
         \\pgfusepath{stroke}
@@ -591,7 +591,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 17.5,0.7 34.3,17.5 17.5,34.3 0.7,17.5 z}
         \\pgfusepath{stroke}
@@ -605,7 +605,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{35}{35}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
         \\pgfpathsvg{M 8.4,9.1 17.5,28.0 26.6,9.1}
@@ -620,7 +620,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{35}{35}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfpathsvg{M 0.7,34.3 C 12.6,28 22.4,28 34.3,34.3 C 34.3,21 28,7 17.5,0.7 C 7,7 0.7,21 0.7,34.3 z}
         \\pgfpathsvg{M 0.7,34.3 L 17.5,1.4 34.3,34.3}
@@ -635,7 +635,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfrect{\pgfpoint{0.700000}{0.700000}}{\pgfpoint{33.600000}{33.600000}}
 \\pgfusepath{stroke, fill}
@@ -650,7 +650,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{9.000000}
 \\pgfusepath{stroke, fill}
@@ -665,7 +665,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{16.800000}
 \\pgfusepath{stroke, fill}
@@ -680,7 +680,7 @@ tikz_shapes='''
     \\foregroundpath{
         \\pgfsetlinewidth{1.4}
         \\pgftransformshift{\pgfpoint{36}{36}}
-        \\pgftransformrotate{180} 
+        \\pgftransformrotate{180}
         \\pgfsetfillcolor{white}
         \\pgfcircle{\pgfpoint{17.500000}{17.500000}}{9.000000}
 \\pgfusepath{stroke, fill}

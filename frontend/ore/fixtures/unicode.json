@@ -1,7 +1,7 @@
 [
     {
         "pk": 1, 
-        "model": "FuzzEd.project", 
+        "model": "ore.project", 
         "fields": {
             "name": "My Graphs", 
             "created": "2014-04-15T07:07:05.260", 
@@ -13,7 +13,7 @@
     }, 
     {
         "pk": 2, 
-        "model": "FuzzEd.project", 
+        "model": "ore.project", 
         "fields": {
             "name": "My Graphs", 
             "created": "2014-04-15T07:07:05.262", 
@@ -25,7 +25,7 @@
     }, 
     {
         "pk": 1, 
-        "model": "FuzzEd.graph", 
+        "model": "ore.graph", 
         "fields": {
             "read_only": false, 
             "kind": "faulttree", 
@@ -39,7 +39,7 @@
     }, 
     {
         "pk": 1, 
-        "model": "FuzzEd.node", 
+        "model": "ore.node", 
         "fields": {
             "kind": "topEvent", 
             "deleted": false, 
@@ -51,7 +51,7 @@
     }, 
     {
         "pk": 2, 
-        "model": "FuzzEd.node", 
+        "model": "ore.node", 
         "fields": {
             "kind": "andGate", 
             "deleted": false, 
@@ -63,7 +63,7 @@
     }, 
     {
         "pk": 3, 
-        "model": "FuzzEd.node", 
+        "model": "ore.node", 
         "fields": {
             "kind": "basicEventSet", 
             "deleted": false, 
@@ -75,7 +75,7 @@
     }, 
     {
         "pk": 1, 
-        "model": "FuzzEd.edge", 
+        "model": "ore.edge", 
         "fields": {
             "deleted": false, 
             "graph": 1, 
@@ -86,7 +86,7 @@
     }, 
     {
         "pk": 2, 
-        "model": "FuzzEd.edge", 
+        "model": "ore.edge", 
         "fields": {
             "deleted": false, 
             "graph": 1, 
@@ -97,7 +97,7 @@
     }, 
     {
         "pk": 1, 
-        "model": "FuzzEd.property", 
+        "model": "ore.property", 
         "fields": {
             "node": 1, 
             "deleted": false, 
@@ -109,7 +109,7 @@
     }, 
     {
         "pk": 2, 
-        "model": "FuzzEd.property", 
+        "model": "ore.property", 
         "fields": {
             "node": 3, 
             "deleted": false, 
@@ -121,7 +121,7 @@
     }, 
     {
         "pk": 3, 
-        "model": "FuzzEd.property", 
+        "model": "ore.property", 
         "fields": {
             "node": 3, 
             "deleted": false, 
@@ -133,7 +133,7 @@
     }, 
     {
         "pk": 4, 
-        "model": "FuzzEd.property", 
+        "model": "ore.property", 
         "fields": {
             "node": 3, 
             "deleted": false, 

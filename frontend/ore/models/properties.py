@@ -6,7 +6,7 @@ from django.db import models
 from .node import Node
 from .edge import Edge
 from .node_group import NodeGroup
-from .notations import notations
+from .notations import by_kind
 
 logger = logging.getLogger('ore')
 
@@ -88,18 +88,18 @@ class Property(models.Model):
             return 'numeric'
         try:
             if isinstance(obj, Node):
-                return notations.by_kind[obj.graph.kind][
+                return by_kind[obj.graph.kind][
                     'nodes'][obj.kind]['properties'][key]['kind']
             elif isinstance(obj, Edge):
-                return notations.by_kind[obj.graph.kind][
+                return by_kind[obj.graph.kind][
                     'edges']['properties'][key]['kind']
             elif isinstance(obj, NodeGroup):
-                return notations.by_kind[obj.graph.kind][
+                return by_kind[obj.graph.kind][
                     'nodeGroups']['properties'][key]['kind']
-        except Exception:
-            raise Exception(
-                "Invalid property key '%s' being used for %s" %
-                (key, str(obj)))
+        except Exception as e:
+            text = "Invalid property key '{0}' being used for {1}, exception thrown: {2}".format(key, obj, e)
+            logger.error(text)
+            raise Exception(text)
 
     def object(self):
         if self.node:
